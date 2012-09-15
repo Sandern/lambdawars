@@ -1,0 +1,23 @@
+#ifndef GCCXML_STRSTREAM
+#define GCCXML_STRSTREAM
+
+#include_next <strstream>
+
+// GCC 2.95 does not conform.
+namespace std
+{
+  using ::ios;
+  using ::streamoff;
+  using ::streampos;
+  using ::streamsize;
+  using ::streambuf;
+  using ::istream;
+  using ::ostream;
+  using ::iostream;
+  using ::istrstream;
+  using ::ostrstream;
+  using ::strstream;
+  using ::ends;
+}
+
+#endif

@@ -1,0 +1,9 @@
+#ifndef __EXCEPTION_GCCXML
+#define __EXCEPTION_GCCXML
+
+#include <gccxml_mpro_internals.h>
+
+#include_next <exception>
+
+#endif
+

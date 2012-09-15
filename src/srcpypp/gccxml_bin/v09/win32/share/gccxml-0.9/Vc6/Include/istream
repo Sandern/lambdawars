@@ -1,0 +1,621 @@
+// istream standard header
+
+#if     _MSC_VER > 1000
+#pragma once
+#endif
+
+#ifndef _ISTREAM_
+#define _ISTREAM_
+#include <ostream>
+
+#ifdef  _MSC_VER
+#pragma pack(push,8)
+#endif  /* _MSC_VER */
+_STD_BEGIN
+		// TEMPLATE CLASS basic_istream
+template<class _E, class _Tr >
+	class basic_istream : virtual public basic_ios<_E, _Tr> {
+public:
+	typedef basic_istream<_E, _Tr> _Myt;
+	typedef basic_ios<_E, _Tr> _Myios;
+	typedef basic_streambuf<_E, _Tr> _Mysb;
+	typedef istreambuf_iterator<_E, _Tr> _Iter;
+	typedef ctype<_E> _Ctype;
+	typedef num_get<_E, _Iter> _Nget;
+        typedef typename _Myios::pos_type pos_type;
+        typedef typename _Myios::off_type off_type;
+        typedef typename _Myios::iostate iostate;
+        typedef typename _Myios::int_type int_type;
+	explicit basic_istream(_Mysb *_S, bool _Isstd = false)
+		: _Chcount(0) {init(_S, _Isstd); }
+	basic_istream(_Uninitialized)
+		{this->_Addstd(); }
+	virtual ~basic_istream()
+		{}
+	class sentry {
+	public:
+		explicit sentry(_Myt& _Is, bool _Noskip = false)
+			: _Ok(_Is.ipfx(_Noskip)) {}
+		operator bool() const
+			{return (_Ok); }
+	private:
+		bool _Ok;
+		};
+	bool ipfx(bool _Noskip = false)
+		{if (this->good())
+			{if (this->tie() != 0)
+				this->tie()->flush();
+			if (!_Noskip && this->flags() & ios_base::skipws)
+				{const _Ctype& _Fac = _USE(this->getloc(), _Ctype);
+				_TRY_IO_BEGIN
+				int_type _C = this->rdbuf()->sgetc();
+				while (!_Tr::eq_int_type(_Tr::eof(), _C)
+					&& _Fac.is(_Ctype::space,
+						_Tr::to_char_type(_C)))
+					_C = this->rdbuf()->snextc();
+				_CATCH_IO_END }
+			if (this->good())
+				return (true); }
+		this->setstate(ios_base::failbit);
+		return (false); }
+	void isfx()
+		{}
+	_Myt& operator>>(_Myt& (__cdecl *_F)(_Myt&))
+		{return ((*_F)(*this)); }
+	_Myt& operator>>(_Myios& (__cdecl *_F)(_Myios&))
+		{(*_F)(*(_Myios *)this);
+		return (*this); }
+	_Myt& operator>>(ios_base& (__cdecl *_F)(ios_base&))
+		{(*_F)(*(ios_base *)this);
+		return (*this); }
+	_Myt& operator>>(_Bool& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(short& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{long _Y;
+			const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _Y);
+			_CATCH_IO_END
+			if (_St & ios_base::failbit || _Y < SHRT_MIN || SHRT_MAX < _Y)
+				_St |= ios_base::failbit;
+			else
+				_X = (short)_Y; }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(unsigned short& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(int& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{long _Y;
+			const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _Y);
+			_CATCH_IO_END
+			if (_St & ios_base::failbit || _Y < INT_MIN || INT_MAX < _Y)
+				_St |= ios_base::failbit;
+			else
+				_X = _Y; }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(unsigned int& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(long& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(unsigned long& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(float& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(double& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(long double& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(void *& _X)
+		{iostate _St = ios_base::goodbit;
+		const sentry _Ok(*this);
+		if (_Ok)
+			{const _Nget& _Fac = _USE(this->getloc(), _Nget);
+			_TRY_IO_BEGIN
+			_Fac.get(_Iter(this->rdbuf()), _Iter(0), *this, _St, _X);
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& operator>>(_Mysb *_Pb)
+		{iostate _St = ios_base::goodbit;
+		bool _Copied = false;
+		const sentry _Ok(*this);
+		if (_Ok && _Pb != 0)
+			{_TRY_IO_BEGIN
+			int_type _C = this->rdbuf()->sgetc();
+			for (; ; _C = this->rdbuf()->snextc())
+				if (_Tr::eq_int_type(_Tr::eof(), _C))
+					{_St |= ios_base::eofbit;
+					break; }
+				else
+					{_TRY_BEGIN
+						if (_Tr::eq_int_type(_Tr::eof(),
+							_Pb->sputc(_Tr::to_char_type(_C))))
+							break;
+					_CATCH_ALL
+						break;
+					_CATCH_END
+					_Copied = true; }
+			_CATCH_IO_END }
+		setstate(!_Copied ? _St | ios_base::failbit : _St);
+		return (*this); }
+	int_type get()
+		{int_type _C;
+		iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (!_Ok)
+			_C = _Tr::eof();
+		else
+			{_TRY_IO_BEGIN
+			_C = this->rdbuf()->sbumpc();
+			if (_Tr::eq_int_type(_Tr::eof(), _C))
+				_St |= ios_base::eofbit | ios_base::failbit;
+			else
+				++_Chcount;
+			_CATCH_IO_END }
+		setstate(_St);
+		return (_C); }
+	_Myt& get(_E *_S, streamsize _N)
+		{return (get(_S, _N, this->widen('\n'))); }
+	_Myt& get(_E *_S, streamsize _N, _E _D)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok && 0 < _N)
+			{_TRY_IO_BEGIN
+			int_type _C = this->rdbuf()->sgetc();
+			for (; 0 < --_N; _C = this->rdbuf()->snextc())
+				if (_Tr::eq_int_type(_Tr::eof(), _C))
+					{_St |= ios_base::eofbit;
+					break; }
+				else if (_Tr::to_char_type(_C) == _D)
+					break;
+				else
+					*_S++ = _Tr::to_char_type(_C), ++_Chcount;
+			_CATCH_IO_END }
+		setstate(_Chcount == 0 ? _St | ios_base::failbit : _St);
+		*_S = _E(0);
+		return (*this); }
+	_Myt& get(_E& _X)
+		{int_type _C = get();
+		if (!_Tr::eq_int_type(_Tr::eof(), _C))
+			_X = _Tr::to_char_type(_C);
+		return (*this); }
+	_Myt& get(_Mysb& _Sb)
+		{return (get(_Sb, this->widen('\n'))); }
+	_Myt& get(_Mysb& _Sb, _E _D)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok)
+			{_TRY_IO_BEGIN
+			int_type _C = this->rdbuf()->sgetc();
+			for (; ; _C = this->rdbuf()->snextc())
+				if (_Tr::eq_int_type(_Tr::eof(), _C))
+					{_St |= ios_base::eofbit;
+					break; }
+				else
+					{_TRY_BEGIN
+						_E _Ch = _Tr::to_char_type(_C);
+						if (_Ch == _D
+							|| _Tr::eq_int_type(_Tr::eof(),
+								_Sb.sputc(_Ch)))
+							break;
+					_CATCH_ALL
+						break;
+					_CATCH_END
+					++_Chcount; }
+			_CATCH_IO_END }
+		if (_Chcount == 0)
+			_St |= ios_base::failbit;
+		setstate(_St);
+		return (*this); }
+	_Myt& getline(_E *_S, streamsize _N)
+		{return (getline(_S, _N, this->widen('\n'))); }
+	_Myt& getline(_E *_S, streamsize _N, _E _D)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok && 0 < _N)
+			{int_type _Di = _Tr::to_int_type(_D);
+			_TRY_IO_BEGIN
+			int_type _C = this->rdbuf()->sgetc();
+			for (; ; _C = this->rdbuf()->snextc())
+				if (_Tr::eq_int_type(_Tr::eof(), _C))
+					{_St |= ios_base::eofbit;
+					break; }
+				else if (_C == _Di)
+					{++_Chcount;
+					this->rdbuf()->stossc();
+					break; }
+				else if (--_N <= 0)
+					{_St |= ios_base::failbit;
+					break; }
+				else
+					{++_Chcount;
+					*_S++ = _Tr::to_char_type(_C); }
+			_CATCH_IO_END }
+		*_S = _E(0);
+		setstate(_Chcount == 0 ? _St | ios_base::failbit : _St);
+		return (*this); }
+	_Myt& ignore(streamsize _N = 1, int_type _Di = _Tr::eof())
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok && 0 < _N)
+			{_TRY_IO_BEGIN
+			for (; ; )
+				{int_type _C;
+				if (_N != INT_MAX && --_N < 0)
+					break;
+				else if (_Tr::eq_int_type(_Tr::eof(),
+					_C = this->rdbuf()->sbumpc()))
+					{_St |= ios_base::eofbit;
+					break; }
+				else
+					{++_Chcount;
+					if (_C == _Di)
+						break; }}
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& read(_E *_S, streamsize _N)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok)
+			{_TRY_IO_BEGIN
+			const streamsize _M = this->rdbuf()->sgetn(_S, _N);
+			_Chcount += _M;
+			if (_M != _N)
+				_St |= ios_base::eofbit | ios_base::failbit;
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	streamsize readsome(_E *_S, streamsize _N)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		int _M;
+		if (this->rdbuf() == 0)
+			_St |= this->ios_base::failbit;
+		else if ((_M = this->rdbuf()->in_avail()) < 0)
+			_St |= ios_base::eofbit;
+		else if (0 < _M)
+			read(_S, _M < _N ? _M : _N);
+		setstate(_St);
+		return (gcount()); }
+	int_type peek()
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		int_type _C;
+		const sentry _Ok(*this, true);
+		if (!_Ok)
+			_C = _Tr::eof();
+		else
+			{_TRY_IO_BEGIN
+			if (_Tr::eq_int_type(_Tr::eof(),
+				_C = this->rdbuf()->sgetc()))
+				_St |= ios_base::eofbit;
+			_CATCH_IO_END }
+		setstate(_St);
+		return (_C); }
+	_Myt& putback(_E _X)
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok)
+			{_TRY_IO_BEGIN
+			if (_Tr::eq_int_type(_Tr::eof(),
+				this->rdbuf()->sputbackc(_X)))
+				_St |= ios_base::badbit;
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	_Myt& unget()
+		{iostate _St = ios_base::goodbit;
+		_Chcount = 0;
+		const sentry _Ok(*this, true);
+		if (_Ok)
+			{_TRY_IO_BEGIN
+			if (_Tr::eq_int_type(_Tr::eof(),
+				this->rdbuf()->sungetc()))
+				_St |= ios_base::badbit;
+			_CATCH_IO_END }
+		setstate(_St);
+		return (*this); }
+	streamsize gcount() const
+		{return (_Chcount); }
+	int sync()
+		{iostate _St = ios_base::goodbit;
+		int _Ans;
+		if (this->rdbuf() == 0)
+			_Ans = -1;
+		else if (this->rdbuf()->pubsync() == -1)
+			_St |= ios_base::badbit, _Ans = -1;
+		else
+			_Ans = 0;
+		setstate(_St);
+		return (_Ans); }
+	_Myt& seekg(pos_type _P)
+		{if (!this->fail())
+			this->rdbuf()->pubseekpos(_P, ios_base::in);
+		return (*this); }
+	_Myt& seekg(off_type _O, ios_base::seekdir _W)
+		{if (!this->fail())
+			this->rdbuf()->pubseekoff(_O, _W, ios_base::in);
+		return (*this); }
+	pos_type tellg()
+		{if (!this->fail())
+			return (this->rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in));
+		else
+			return (streampos(_BADOFF)); }
+private:
+	streamsize _Chcount;
+	};
+
+#ifdef _DLL
+#pragma warning(disable:4231) /* the extern before template is a non-standard extension */
+extern template class _CRTIMP basic_istream<char, char_traits<char> >;
+extern template class _CRTIMP basic_istream<wchar_t, char_traits<wchar_t> >;
+#pragma warning(default:4231) /* restore previous warning */
+#endif		// _DLL
+
+		// TEMPLATE CLASS basic_iostream
+template<class _E, class _Tr >
+	class basic_iostream : public basic_istream<_E, _Tr>,
+		public basic_ostream<_E, _Tr> {
+public:
+	explicit basic_iostream(basic_streambuf<_E, _Tr> *_S)
+		: basic_istream<_E, _Tr>(_S), basic_ostream<_E, _Tr>(_S, false, false)
+		{}
+	virtual ~basic_iostream()
+		{}
+	};
+
+#ifdef _DLL
+#pragma warning(disable:4231) /* the extern before template is a non-standard extension */
+extern template class _CRTIMP basic_iostream<char, char_traits<char> >;
+extern template class _CRTIMP basic_iostream<wchar_t, char_traits<wchar_t> >;
+#pragma warning(default:4231) /* restore previous warning */
+#endif		// _DLL
+
+
+
+		// EXTRACTORS
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, _E *_X)
+	{typedef basic_istream<_E, _Tr> _Myis;
+	typedef ctype<_E> _Ctype;
+	ios_base::iostate _St = ios_base::goodbit;
+	_E *_S = _X;
+	const typename _Myis::sentry _Ok(_I);
+	if (_Ok)
+		{const _Ctype& _Fac = _USE(_I.getloc(), _Ctype);
+		_TRY_IO_BEGIN
+		int _N = 0 < _I.width() ? _I.width() : INT_MAX;
+		typename _Myis::int_type _C = _I.rdbuf()->sgetc();
+		for (; 0 < --_N; _C = _I.rdbuf()->snextc())
+			if (_Tr::eq_int_type(_Tr::eof(), _C))
+				{_St |= ios_base::eofbit;
+				break; }
+			else if (_Fac.is(_Ctype::space,
+				_Tr::to_char_type(_C)))
+				break;
+			else
+				*_S++ = _Tr::to_char_type(_C);
+		_CATCH_IO_(_I) }
+	*_S = _E(0);
+	_I.width(0);
+	_I.setstate(_S == _X ? _St | ios_base::failbit : _St);
+	return (_I); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, _E& _X)
+	{typedef basic_istream<_E, _Tr> _Myis;
+	typename _Myis::int_type _C;
+	typename ios_base::iostate _St = ios_base::goodbit;
+	const typename _Myis::sentry _Ok(_I);
+	if (_Ok)
+		{_TRY_IO_BEGIN
+		_C = _I.rdbuf()->sbumpc();
+		if (_Tr::eq_int_type(_Tr::eof(), _C))
+			_St |= ios_base::eofbit | ios_base::failbit;
+		else
+			_X = _Tr::to_char_type(_C);
+		_CATCH_IO_(_I) }
+	_I.setstate(_St);
+	return (_I); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, signed char *_X)
+	{return (_I >> (char *)_X); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, signed char& _C)
+	{return (_I >> (char&)_C); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, unsigned char *_X)
+	{return (_I >> (char *)_X); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, unsigned char& _C)
+	{return (_I >> (char&)_C); }
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl operator>>(
+		basic_istream<_E, _Tr>& _I, signed short * _X)
+	{return (_I >> (wchar_t *)_X); }
+		// MANIPULATORS
+template<class _E, class _Tr> inline
+	basic_istream<_E, _Tr>& __cdecl ws(basic_istream<_E, _Tr>& _I)
+	{typedef basic_istream<_E, _Tr> _Myis;
+	typedef ctype<_E> _Ctype;
+	ios_base::iostate _St = ios_base::goodbit;
+	const typename _Myis::sentry _Ok(_I, true);
+	if (_Ok)
+		{const _Ctype& _Fac = _USE(_I.getloc(), _Ctype);
+		_TRY_IO_BEGIN
+		for (typename _Tr::int_type _C = _I.rdbuf()->sgetc(); ;
+			_C = _I.rdbuf()->snextc())
+			if (_Tr::eq_int_type(_Tr::eof(), _C))
+				{_St |= ios_base::eofbit;
+				break; }
+			else if (!_Fac.is(_Ctype::space,
+				_Tr::to_char_type(_C)))
+				break;
+		_CATCH_IO_(_I) }
+	_I.setstate(_St);
+	return (_I); }
+_CRTIMP inline basic_istream<char, char_traits<char> >&
+	__cdecl ws(basic_istream<char, char_traits<char> >& _I)
+	{typedef char _E;
+	typedef char_traits<_E> _Tr;
+	ios_base::iostate _St = ios_base::goodbit;
+	const basic_istream<_E, _Tr>::sentry _Ok(_I, true);
+	if (_Ok)
+		{const ctype<_E>& _Fac = _USE(_I.getloc(), ctype<_E>);
+		_TRY_IO_BEGIN
+		for (_Tr::int_type _C = _I.rdbuf()->sgetc(); ;
+			_C = _I.rdbuf()->snextc())
+			if (_Tr::eq_int_type(_Tr::eof(), _C))
+				{_St |= ios_base::eofbit;
+				break; }
+			else if (!_Fac.is(ctype<_E>::space,
+				_Tr::to_char_type(_C)))
+				break;
+		_CATCH_IO_(_I) }
+	_I.setstate(_St);
+	return (_I); }
+_CRTIMP inline basic_istream<wchar_t, char_traits<wchar_t> >&
+	__cdecl ws(basic_istream<wchar_t, char_traits<wchar_t> >& _I)
+	{typedef wchar_t _E;
+	typedef char_traits<_E> _Tr;
+	ios_base::iostate _St = ios_base::goodbit;
+	const basic_istream<_E, _Tr>::sentry _Ok(_I, true);
+	if (_Ok)
+		{const ctype<_E>& _Fac = _USE(_I.getloc(), ctype<_E>);
+		_TRY_IO_BEGIN
+		for (_Tr::int_type _C = _I.rdbuf()->sgetc(); ;
+			_C = _I.rdbuf()->snextc())
+			if (_Tr::eq_int_type(_Tr::eof(), _C))
+				{_St |= ios_base::eofbit;
+				break; }
+			else if (_Fac.is(ctype<_E>::space,
+				_Tr::to_char_type(_C)))
+				break;
+		_CATCH_IO_(_I) }
+	_I.setstate(_St);
+	return (_I); }
+
+
+#ifdef _DLL
+#pragma warning(disable:4231) /* the extern before template is a non-standard extension */
+
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, char *);
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, char&);
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, signed char *);
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, signed char&);
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, unsigned char *);
+extern template _CRTIMP basic_istream<char, char_traits<char> >& __cdecl operator>>(
+       basic_istream<char, char_traits<char> >&, unsigned char&);
+extern template _CRTIMP basic_istream<wchar_t, char_traits<wchar_t> >& __cdecl operator>>(
+       basic_istream<wchar_t, char_traits<wchar_t> >&, wchar_t *);
+extern template _CRTIMP basic_istream<wchar_t, char_traits<wchar_t> >& __cdecl operator>>(
+       basic_istream<wchar_t, char_traits<wchar_t> >&, wchar_t&);
+extern template _CRTIMP basic_istream<wchar_t, char_traits<wchar_t> >& __cdecl operator>>(
+       basic_istream<wchar_t, char_traits<wchar_t> >&, signed short *);
+
+#pragma warning(default:4231) /* restore previous warning */
+#endif		// _DLL
+
+
+_STD_END
+#ifdef  _MSC_VER
+#pragma pack(pop)
+#endif  /* _MSC_VER */
+
+#endif /* _ISTREAM_ */
+
+/*
+ * Copyright (c) 1994 by P.J. Plauger.  ALL RIGHTS RESERVED. 
+ * Consult your license regarding permissions and restrictions.
+ */

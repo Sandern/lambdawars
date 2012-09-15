@@ -1,0 +1,2 @@
+GCCXML_COMPILER="/usr/bin/c++"
+GCCXML_CXXFLAGS=" "
