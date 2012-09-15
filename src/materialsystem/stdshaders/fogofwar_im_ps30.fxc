@@ -1,0 +1,56 @@
+//========= Copyright © 1996-2006, Valve Corporation, All rights reserved. ============//
+// Includes =======================================================================================
+// STATIC: "CONVERT_TO_SRGB" "0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
+// STATIC: "CONVERT_TO_SRGB" "0..0"	[= 0] [XBOX]
+// STATIC: "FOW"				 "0..1"
+
+#include "common_ps_fxc.h"
+
+// Texture Samplers ===============================================================================
+sampler FogOfWarSampler		: register( s0 );
+sampler FogOfWarSampler_im	: register( s1 );
+
+// Contants =======================================================================================
+const float4 g_FowParams	    : register( c0 );
+
+// Input ==========================================================================================
+struct PS_INPUT
+{
+	float2 vTexCoord0 : TEXCOORD0;
+};
+
+// Main ===========================================================================================
+float4 main( PS_INPUT i ) : COLOR
+{
+	float4 result = float4(0, 0, 0, 1.0);
+	float current = tex2D( FogOfWarSampler, i.vTexCoord0 ).r;
+	float target = tex2D( FogOfWarSampler_im, i.vTexCoord0 ).r;
+	float diff = clamp( target - current, -g_FowParams.r, g_FowParams.g );
+
+	if( current != target )
+	{
+		/*
+		bool neighborvis = tex2D( FogOfWarSampler, i.vTexCoord0 + float2(g_FowParams.b, 0) ).r > 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(-g_FowParams.b, 0) ).r > 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(0, g_FowParams.b) ).r > 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(0, -g_FowParams.b) ).r > 0.5f;
+
+		bool neighbornotvis = tex2D( FogOfWarSampler, i.vTexCoord0 + float2(g_FowParams.b, 0) ).r < 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(-g_FowParams.b, 0) ).r < 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(0, g_FowParams.b) ).r < 0.5f || 
+						   tex2D( FogOfWarSampler, i.vTexCoord0 + float2(0, -g_FowParams.b) ).r < 0.5f;
+
+		if( target < current && neighborvis ) // Become shrouded
+			result.r = current + diff;
+		else if( target > current && neighbornotvis ) // Become visible
+			result.r = current + diff;
+		*/
+		result.r = current + diff;
+	}
+	else
+	{
+		result.r = current;
+	}
+
+	return result;
+}

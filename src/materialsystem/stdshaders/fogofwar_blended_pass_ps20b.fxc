@@ -1,0 +1,57 @@
+// STATIC: "CONVERT_TO_SRGB" "0..1"	[ps20b][= g_pHardwareConfig->NeedsShaderSRGBConversion()] [PC]
+// STATIC: "BASEALPHAENVMAPMASK"		"0..1"
+// STATIC: "SELFILLUM"					"0..1"
+// STATIC: "FOW"						"0..1"
+
+// DYNAMIC: "PIXELFOGTYPE"				"0..1"						[ps20]
+
+#include "common_vertexlitgeneric_dx9.h"
+#include "fow_ps_fxc.h"
+
+// Texture Samplers ===============================================================================
+sampler BaseTextureSampler					: register( s0 );	// Base Texture sampler
+sampler FogOfWarSampler						: register( s1 );	// FOW sampler
+
+// Interpolated values ============================================================================
+struct PS_INPUT
+{
+	float2 vTexCoord0 : TEXCOORD0;
+	
+#if ( FOW == 1 )
+	float2 vFowCoord				: TEXCOORD1;
+#endif
+};
+
+// Main ===========================================================================================
+float4 main( PS_INPUT i ) : COLOR
+{
+#if FOW
+    bool bBaseAlphaEnvmapMask = BASEALPHAENVMAPMASK ? true : false;
+    bool bSelfIllum = SELFILLUM ? true : false;
+    
+    float fogFactor;
+    float4 result;
+    
+    float fowvalue = 1.0f - tex2D( FogOfWarSampler, i.vFowCoord ).r;
+    fowvalue = max(min(1.0, fowvalue), 0.0);
+    
+    // Base color
+    result = float4(g_FoWToGray.rgb, fowvalue);
+    result = ( result * FOW_GRAY_FACTOR	 * FOW_DARKNESS_VALUE ) + ( result * FOW_COLOR_FACTOR * FOW_DARKNESS_VALUE );
+
+    if( !bBaseAlphaEnvmapMask && !bSelfIllum )
+    {
+        // Take alpha of base texture into account
+        float fBaseAlpha = tex2D( BaseTextureSampler, i.vTexCoord0 )[3];
+        if( fBaseAlpha > 0.0 )
+            result.a = result.a * fBaseAlpha;
+        else
+            result.a = 0.0f;
+    }
+    
+    //return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+    return result;
+#else
+	return float4(0,0,0,0);
+#endif
+}

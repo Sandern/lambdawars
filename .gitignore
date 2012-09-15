@@ -170,3 +170,9 @@ src/game/server/Release_swarm/*
 src/game/client/Debug_swarm/*
 src/game/server/Debug_swarm/*
 src/game/missionchooser/*
+
+# Shaders
+.vcs
+src/materialsystem/stdshaders/fxctmp9_tmp/*
+src/materialsystem/stdshaders/vshtmp9_tmp/*
+src/materialsystem/stdshaders/Release_dx9/*
