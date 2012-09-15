@@ -1,0 +1,413 @@
+﻿Build started 9/9/2012 3:59:56 PM.
+     1>Project "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\pythoncore.vcxproj" on node 3 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pythoncore.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\Python /I..\Modules\zlib /I..\..\public\tier0 /I..\..\public /I..\Include /I..\PC /Zi /nologo /W3 /WX- /O2 /Ob1 /Oi /Oy- /D _USRDLL /D Py_ENABLE_SHARED /D Py_BUILD_CORE /D WIN32 /D PLATFORM_WINDOWS /D COMPILER_MSVC32 /D COMPILER_MSVC /D NDEBUG /D _WIN32 /GF /Gm- /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\\" /Fd"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt ..\Modules\_bisectmodule.c ..\Modules\_codecsmodule.c ..\Modules\_collectionsmodule.c ..\Modules\_csv.c ..\Modules\_functoolsmodule.c ..\Modules\_heapqmodule.c ..\Modules\_hotshot.c ..\Modules\_json.c ..\Modules\_localemodule.c ..\Modules\_lsprof.c ..\Modules\_math.c ..\Modules\_randommodule.c ..\Modules\_sre.c ..\Modules\_struct.c ..\Modules\_weakref.c ..\Modules\arraymodule.c ..\Modules\audioop.c ..\Modules\binascii.c ..\Modules\cmathmodule.c ..\Modules\cPickle.c ..\Modules\cStringIO.c ..\Modules\datetimemodule.c ..\Modules\errnomodule.c ..\Modules\future_builtins.c ..\Modules\gcmodule.c ..\Modules\imageop.c ..\Modules\itertoolsmodule.c ..\Modules\main.c ..\Modules\mathmodule.c ..\Modules\md5.c ..\Modules\md5module.c ..\Modules\mmapmodule.c ..\Modules\operator.c ..\Modules\parsermodule.c ..\Modules\rotatingtree.c ..\Modules\sha256module.c ..\Modules\sha512module.c ..\Modules\shamodule.c ..\Modules\signalmodule.c ..\Modules\stropmodule.c ..\Modules\symtablemodule.c ..\Modules\threadmodule.c ..\Modules\timemodule.c ..\Modules\xxsubtype.c ..\Modules\zipimport.c ..\Modules\zlibmodule.c ..\Modules\zlib\adler32.c ..\Modules\zlib\compress.c ..\Modules\zlib\crc32.c ..\Modules\zlib\deflate.c ..\Modules\zlib\gzio.c ..\Modules\zlib\infback.c ..\Modules\zlib\inffast.c ..\Modules\zlib\inflate.c ..\Modules\zlib\inftrees.c ..\Modules\zlib\trees.c ..\Modules\zlib\uncompr.c ..\Modules\zlib\zutil.c ..\Modules\cjkcodecs\_codecs_cn.c ..\Modules\cjkcodecs\_codecs_hk.c ..\Modules\cjkcodecs\_codecs_iso2022.c ..\Modules\cjkcodecs\_codecs_jp.c ..\Modules\cjkcodecs\_codecs_kr.c ..\Modules\cjkcodecs\_codecs_tw.c ..\Modules\cjkcodecs\multibytecodec.c ..\Modules\_io\_iomodule.c ..\Modules\_io\bufferedio.c ..\Modules\_io\bytesio.c ..\Modules\_io\fileio.c ..\Modules\_io\iobase.c ..\Modules\_io\stringio.c ..\Modules\_io\textio.c ..\Objects\abstract.c ..\Objects\boolobject.c ..\Objects\bufferobject.c ..\Objects\bytearrayobject.c ..\Objects\bytes_methods.c ..\Objects\capsule.c ..\Objects\cellobject.c ..\Objects\classobject.c ..\Objects\cobject.c ..\Objects\codeobject.c ..\Objects\complexobject.c ..\Objects\descrobject.c ..\Objects\dictobject.c ..\Objects\enumobject.c ..\Objects\exceptions.c ..\Objects\floatobject.c ..\Objects\frameobject.c ..\Objects\funcobject.c ..\Objects\genobject.c ..\Objects\intobject.c ..\Objects\iterobject.c ..\Objects\listobject.c ..\Objects\longobject.c ..\Objects\memoryobject.c ..\Objects\methodobject.c ..\Objects\moduleobject.c ..\Objects\object.c ..\Objects\obmalloc.c ..\Objects\rangeobject.c ..\Objects\setobject.c ..\Objects\sliceobject.c ..\Objects\stringobject.c ..\Objects\structseq.c ..\Objects\tupleobject.c ..\Objects\typeobject.c ..\Objects\unicodectype.c ..\Objects\unicodeobject.c ..\Objects\weakrefobject.c ..\Parser\acceler.c ..\Parser\bitset.c ..\Parser\firstsets.c ..\Parser\grammar.c ..\Parser\grammar1.c ..\Parser\listnode.c ..\Parser\metagrammar.c ..\Parser\myreadline.c ..\Parser\node.c ..\Parser\parser.c ..\Parser\parsetok.c ..\Parser\tokenizer.c ..\PC\_subprocess.c ..\PC\_winreg.c ..\PC\config.c ..\PC\dl_nt.c ..\PC\import_nt.c ..\PC\msvcrtmodule.c ..\Python\random.c ..\Python\_warnings.c ..\Python\asdl.c ..\Python\ast.c ..\Python\ceval.c ..\Python\codecs.c ..\Python\compile.c ..\Python\dtoa.c ..\Python\dynload_win.c ..\Python\errors.c ..\Python\formatter_string.c ..\Python\formatter_unicode.c ..\Python\frozen.c ..\Python\future.c ..\Python\getargs.c ..\Python\getcompiler.c ..\Python\getcopyright.c ..\Python\getopt.c ..\Python\getplatform.c ..\Python\getversion.c ..\Python\graminit.c ..\Python\import.c ..\Python\importdl.c ..\Python\marshal.c ..\Python\modsupport.c ..\Python\mysnprintf.c ..\Python\mystrtoul.c ..\Python\peephole.c ..\Python\pyarena.c ..\Python\pyctype.c ..\Python\pyfpe.c ..\Python\pymath.c ..\Python\pystate.c ..\Python\pystrcmp.c ..\Python\pystrtod.c "..\Python\Python-ast.c" ..\Python\pythonrun.c ..\Python\structmember.c ..\Python\symtable.c src\sysmodule.c ..\Python\thread.c ..\Python\traceback.c src\bltinmodule.c src\getpathp.c src\srcfileobject.c src\srcosmodule.c /Zm200  
+         _bisectmodule.c
+         _codecsmodule.c
+         _collectionsmodule.c
+         _csv.c
+         _functoolsmodule.c
+         _heapqmodule.c
+         _hotshot.c
+         _json.c
+         _localemodule.c
+         _lsprof.c
+         _math.c
+         _randommodule.c
+         _sre.c
+         _struct.c
+         _weakref.c
+         arraymodule.c
+         audioop.c
+         binascii.c
+         cmathmodule.c
+         cPickle.c
+         Generating Code...
+     1>c:\program files (x86)\microsoft visual studio 10.0\vc\include\math.h(164): warning C4717: '_hypot' : recursive on all control paths, function will cause runtime stack overflow
+         Compiling...
+         cStringIO.c
+         datetimemodule.c
+         errnomodule.c
+         future_builtins.c
+         gcmodule.c
+         imageop.c
+         itertoolsmodule.c
+         main.c
+         mathmodule.c
+         md5.c
+         md5module.c
+         mmapmodule.c
+         operator.c
+         parsermodule.c
+         rotatingtree.c
+         sha256module.c
+         sha512module.c
+         shamodule.c
+         signalmodule.c
+         stropmodule.c
+         Generating Code...
+     1>c:\program files (x86)\microsoft visual studio 10.0\vc\include\math.h(164): warning C4717: '_hypot' : recursive on all control paths, function will cause runtime stack overflow
+         Compiling...
+         symtablemodule.c
+         threadmodule.c
+         timemodule.c
+         xxsubtype.c
+         zipimport.c
+         zlibmodule.c
+         adler32.c
+         compress.c
+         crc32.c
+         deflate.c
+         gzio.c
+     1>..\Modules\zlib\gzio.c(131): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\Modules\zlib\gzio.c(181): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(234) : see declaration of 'fopen'
+     1>..\Modules\zlib\gzio.c(226): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>..\Modules\zlib\gzio.c(627): warning C4996: '_vsnprintf': This function or variable may be unsafe. Consider using _vsnprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(363) : see declaration of '_vsnprintf'
+     1>..\Modules\zlib\gzio.c(1001): warning C4996: 'strerror': This function or variable may be unsafe. Consider using strerror_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\string.h(157) : see declaration of 'strerror'
+     1>..\Modules\zlib\gzio.c(1008): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\Modules\zlib\gzio.c(1009): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>..\Modules\zlib\gzio.c(1010): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+         infback.c
+         inffast.c
+         inflate.c
+         inftrees.c
+         trees.c
+         uncompr.c
+         zutil.c
+         _codecs_cn.c
+         _codecs_hk.c
+         Generating Code...
+         Compiling...
+         _codecs_iso2022.c
+         _codecs_jp.c
+         _codecs_kr.c
+         _codecs_tw.c
+         multibytecodec.c
+         _iomodule.c
+         bufferedio.c
+         bytesio.c
+         fileio.c
+         iobase.c
+         stringio.c
+         textio.c
+         abstract.c
+         boolobject.c
+         bufferobject.c
+         bytearrayobject.c
+         bytes_methods.c
+         capsule.c
+         cellobject.c
+         classobject.c
+         Generating Code...
+         Compiling...
+         cobject.c
+         codeobject.c
+         complexobject.c
+         descrobject.c
+         dictobject.c
+         enumobject.c
+         exceptions.c
+         floatobject.c
+         frameobject.c
+         funcobject.c
+         genobject.c
+         intobject.c
+         iterobject.c
+         listobject.c
+         longobject.c
+         memoryobject.c
+         methodobject.c
+         moduleobject.c
+         object.c
+         obmalloc.c
+         Generating Code...
+     1>c:\program files (x86)\microsoft visual studio 10.0\vc\include\math.h(164): warning C4717: '_hypot' : recursive on all control paths, function will cause runtime stack overflow
+         Compiling...
+         rangeobject.c
+         setobject.c
+         sliceobject.c
+         stringobject.c
+         structseq.c
+         tupleobject.c
+         typeobject.c
+         unicodectype.c
+         unicodeobject.c
+         weakrefobject.c
+         acceler.c
+         bitset.c
+         firstsets.c
+         grammar.c
+         grammar1.c
+         listnode.c
+         metagrammar.c
+         myreadline.c
+         node.c
+         parser.c
+         Generating Code...
+         Compiling...
+         parsetok.c
+         tokenizer.c
+         _subprocess.c
+         _winreg.c
+         config.c
+         dl_nt.c
+         import_nt.c
+         msvcrtmodule.c
+     1>..\PC\msvcrtmodule.c(400): warning C4101: 'st' : unreferenced local variable
+         random.c
+         _warnings.c
+         asdl.c
+         ast.c
+         ceval.c
+         codecs.c
+         compile.c
+         dtoa.c
+         dynload_win.c
+         errors.c
+         formatter_string.c
+         formatter_unicode.c
+         Generating Code...
+         Compiling...
+         frozen.c
+         future.c
+         getargs.c
+         getcompiler.c
+         getcopyright.c
+         getopt.c
+         getplatform.c
+         getversion.c
+         graminit.c
+         import.c
+         importdl.c
+         marshal.c
+         modsupport.c
+         mysnprintf.c
+         mystrtoul.c
+         peephole.c
+         pyarena.c
+         pyctype.c
+         pyfpe.c
+         pymath.c
+         Generating Code...
+         Compiling...
+         pystate.c
+         pystrcmp.c
+         pystrtod.c
+         Python-ast.c
+         pythonrun.c
+         structmember.c
+         symtable.c
+         sysmodule.c
+         thread.c
+         traceback.c
+         bltinmodule.c
+         getpathp.c
+         srcfileobject.c
+         srcosmodule.c
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\Python /I..\Modules\zlib /I..\..\public\tier0 /I..\..\public /I..\Include /I..\PC /Zi /nologo /W3 /WX- /O2 /Ob1 /Oi /Oy- /D _USRDLL /D Py_ENABLE_SHARED /D Py_BUILD_CORE /D WIN32 /D PLATFORM_WINDOWS /D COMPILER_MSVC32 /D COMPILER_MSVC /D NDEBUG /D _WIN32 /GF /Gm- /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\\" /Fd"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\srcwrap.cpp /Zm200  
+         srcwrap.cpp
+       ResourceCompile:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /D NDEBUG /l"0x0409" /I..\Include /I..\PC /I..\Include /nologo /fo"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\python_nt.res" ..\PC\python_nt.rc 
+       PreLinkEvent:
+         Description: Generate build information...
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\make_buildinfo.exe" Release
+         :VCEnd
+         cl.exe -c -D_WIN32 -DUSE_DL_EXPORT -D_WINDOWS -DWIN32 -D_WINDLL -MD ..\Modules\getbuildinfo.c -Fogetbuildinfo.o -I..\Include -I..\PC
+         Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+         Copyright (C) Microsoft Corporation.  All rights reserved.
+         
+         getbuildinfo.c
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\..\..\lib\public\python27.lib" /NOLOGO /NODEFAULTLIB:libc /NODEFAULTLIB:libcd /NODEFAULTLIB:libcmtd "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\python_nt.res"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_bisectmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecsmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_collectionsmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_csv.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_functoolsmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_heapqmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_hotshot.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_json.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_localemodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_lsprof.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_math.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_randommodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_sre.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_struct.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_weakref.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\arraymodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\audioop.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\binascii.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\cmathmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\cPickle.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\cStringIO.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\datetimemodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\errnomodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\future_builtins.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\gcmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\imageop.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\itertoolsmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\main.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\mathmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\md5.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\md5module.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\mmapmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\operator.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\parsermodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\rotatingtree.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\sha256module.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\sha512module.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\shamodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\signalmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\stropmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\symtablemodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\threadmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\timemodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\xxsubtype.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\zipimport.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\zlibmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\adler32.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\compress.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\crc32.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\deflate.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\gzio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\infback.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\inffast.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\inflate.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\inftrees.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\trees.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\uncompr.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\zutil.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_cn.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_hk.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_iso2022.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_jp.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_kr.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_codecs_tw.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\multibytecodec.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_iomodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bufferedio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bytesio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\fileio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\iobase.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\stringio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\textio.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\abstract.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\boolobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bufferobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bytearrayobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bytes_methods.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\capsule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\cellobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\classobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\cobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\codeobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\complexobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\descrobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\dictobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\enumobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\exceptions.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\floatobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\frameobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\funcobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\genobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\intobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\iterobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\listobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\longobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\memoryobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\methodobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\moduleobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\object.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\obmalloc.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\rangeobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\setobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\sliceobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\stringobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\structseq.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\tupleobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\typeobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\unicodectype.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\unicodeobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\weakrefobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\acceler.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bitset.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\firstsets.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\grammar.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\grammar1.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\listnode.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\metagrammar.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\myreadline.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\node.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\parser.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\parsetok.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\tokenizer.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_subprocess.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_winreg.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\config.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\dl_nt.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\import_nt.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\msvcrtmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\random.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\_warnings.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\asdl.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\ast.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\ceval.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\codecs.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\compile.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\dtoa.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\dynload_win.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\errors.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\formatter_string.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\formatter_unicode.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\frozen.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\future.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getargs.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getcompiler.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getcopyright.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getopt.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getplatform.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getversion.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\graminit.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\import.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\importdl.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\marshal.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\modsupport.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\mysnprintf.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\mystrtoul.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\peephole.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pyarena.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pyctype.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pyfpe.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pymath.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pystate.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pystrcmp.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pystrtod.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\Python-ast.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pythonrun.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\structmember.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\symtable.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\sysmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\thread.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\traceback.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\bltinmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\getpathp.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\srcfileobject.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\srcosmodule.obj"
+         "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\srcwrap.obj"
+     1>LINK : warning LNK4068: /MACHINE not specified; defaulting to X86
+         pythoncore.vcxproj -> D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\..\..\lib\public\python27.lib
+       FinalizeBuildStatus:
+         Deleting file "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pythoncore.unsuccessfulbuild".
+         Touching "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\pythoncore\pythoncore.lastbuildstate".
+     1>Done Building Project "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\pythoncore.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:31.31

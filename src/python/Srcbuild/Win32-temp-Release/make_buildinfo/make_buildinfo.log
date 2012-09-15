@@ -1,0 +1,20 @@
+﻿Build started 9/9/2012 3:59:55 PM.
+     1>Project "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\make_buildinfo.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\Include /I..\PC /Zi /nologo /W3 /WX- /Od /Ob1 /Oi /Oy- /D _CONSOLE /D NDEBUG /D _WIN32 /GF /Gm- /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\\" /Fd"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt make_buildinfo.c
+         make_buildinfo.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\make_buildinfo.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\ kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\make_buildinfo.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE:NO /IMPLIB:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\make_buildinfo.lib" /MACHINE:X86 "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.obj"
+         make_buildinfo.vcxproj -> D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\make_buildinfo.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\\make_buildinfo.exe;#1" /manifest "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.exe.intermediate.manifest"
+       FinalizeBuildStatus:
+         Deleting file "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.unsuccessfulbuild".
+         Touching "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\Win32-temp-Release\make_buildinfo\make_buildinfo.lastbuildstate".
+     1>Done Building Project "D:\Sander\hl2wars_dev\hl2wars_asw_dev\src\python\Srcbuild\make_buildinfo.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.76
