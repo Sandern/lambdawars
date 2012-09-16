@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4086CE3F-2EFA-4029-8F04-D20576718A12}</ProjectGuid>
+    <RootNamespace>boost_python</RootNamespace>
+    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\../bin-stage\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\debug-obj\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\../bin-stage\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\release-obj\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\../bin-stage/boost_python.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm800 /Zm800 /Zm800 /Zm800 /Zm800 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\python;..\..\..\..\..\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_SERIALIZATION_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BasicRuntimeChecks>
+      </BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>.\debug-obj/boost_python.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\debug-obj/</AssemblerListingLocation>
+      <ObjectFileName>.\debug-obj/</ObjectFileName>
+      <ProgramDataBaseFileName>.\debug-obj/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <MinimalRebuild>true</MinimalRebuild>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>..\..\..\..\..\lib\public\boost_python.lib</OutputFile>
+      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\../bin-stage/boost_python.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\../bin-stage/boost_python.tlb</TypeLibraryName>
+      <HeaderFileName>
+      </HeaderFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Zm800 /Zm800 /Zm800 /Zm800  %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\python\PC;..\..\..\..\..\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_PYTHON_NO_PY_SIGNATURES;BOOST_SERIALIZATION_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>.\release-obj/boost_python.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\release-obj/</AssemblerListingLocation>
+      <ObjectFileName>.\release-obj/</ObjectFileName>
+      <ProgramDataBaseFileName>.\release-obj/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x1409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>..\..\..\..\..\lib\public\boost_python.lib</OutputFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\../bin-stage/boost_python.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\converter\arg_to_python_base.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\converter\builtin_converters.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\class.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dict.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\enum.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\errors.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\exec.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\converter\from_python.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\function.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\function_doc_signature.cpp" />
+    <ClCompile Include="..\..\src\import.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\inheritance.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\iterator.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\life_support.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\list.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\long.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\module.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\numeric.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object_operators.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object_protocol.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\pickle_support.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\converter\registry.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slice.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\object\stl_iterator.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\str.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tuple.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\converter\type_id.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wrapper.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\boost\python\arg_from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\args.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\args_fwd.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\back_reference.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\base_type_traits.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\bases.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\borrowed.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\call.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\call_method.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\cast.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\class.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\class_fwd.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\copy_const_reference.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\copy_non_const_reference.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\data_members.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\def.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\default_call_policies.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\dict.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\enum.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\errors.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\exception_translator.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\extract.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\handle.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\handle_fwd.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\has_back_reference.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\implicit.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\init.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\instance_holder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\iterator.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\list.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\long.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\lvalue_from_pytype.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\make_function.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\manage_new_object.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\module.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\module_init.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\numeric.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_attributes.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_call.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_core.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_fwd.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_items.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_operators.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_protocol.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_protocol_core.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object_slices.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\operators.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\operators2.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\other.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\overloads.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\pointee.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\proxy.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\ptr.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\refcount.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\reference_existing_object.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\return_internal_reference.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\return_value_policy.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\scope.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\self.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\signature.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\slice_nil.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\stl_iterator.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\str.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\tag.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\to_python_converter.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\to_python_indirect.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\to_python_value.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\tuple.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\type_id.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\with_custodian_and_ward.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\api_placeholder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\arg_tuple_size.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\borrowed_ptr.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\call_object.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\caller.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\char_array.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\config.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\construct.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\convertible.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\cv_category.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\decorated_type_id.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\def_helper.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\defaults_def.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\defaults_gen.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\dependent.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\destroy.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\exception_handler.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\force_instantiate.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\if_else.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\indirect_traits.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\make_keyword_range_fn.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\make_tuple.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\map_entry.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\member_function_cast.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\module_base.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\module_init.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\msvc_typeinfo.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\none.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\not_specified.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\operator_id.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\overloads_fwd.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\pointee.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\preprocessor.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\python22_fixed.h" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\raw_pyobject.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\referent_storage.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\result.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\returning.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\scope.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\string_literal.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\target.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\translate_exception.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\type_list.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl_no_pts.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_utils.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\unwind_type.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\void_ptr.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\void_return.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\detail\wrap_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\arg_from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\arg_to_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\arg_to_python_base.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\builtin_converters.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\constructor_function.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\convertible_function.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\implicit.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\obj_mgr_arg_from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\object_manager.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\pointer_type_id.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\pyobject_traits.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\pyobject_type.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\pytype_arg_from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\pytype_object_mgr_traits.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\registered.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\registered_pointee.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\registrations.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\registry.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\return_from_python.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\rvalue_from_python_data.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\converter\to_python_function_type.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\add_to_namespace.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\class.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\class_converters.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\class_detail.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\class_wrapper.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\construct.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\enum_base.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\find_instance.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\forward.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\function.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\function_handle.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\function_object.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\inheritance.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\instance.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\iterator.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\iterator_core.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\life_support.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\make_holder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\make_instance.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\pickle_support.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\pointer_holder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\py_function.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\select_holder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\stl_iterator_core.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\value_holder.hpp" />
+    <ClInclude Include="..\..\..\..\boost\python\object\value_holder_fwd.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

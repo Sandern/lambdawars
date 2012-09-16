@@ -137,7 +137,7 @@ Desktop.ini
 *.egg
 *.egg-info
 dist
-build
+#build
 eggs
 parts
 bin
@@ -170,6 +170,7 @@ src/game/server/Release_swarm/*
 src/game/client/Debug_swarm/*
 src/game/server/Debug_swarm/*
 src/game/missionchooser/*
+src/boost/libs/python/build/VisualStudio/release-obj/*
 
 # Shaders
 .vcs
