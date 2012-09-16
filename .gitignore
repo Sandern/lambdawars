@@ -42,7 +42,7 @@ local.properties
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
+#[Dd]ebug/ # Boost library contains folders with debug..
 [Rr]elease/
 *_i.c
 *_p.c
@@ -177,3 +177,6 @@ src/boost/libs/python/build/VisualStudio/release-obj/*
 src/materialsystem/stdshaders/fxctmp9_tmp/*
 src/materialsystem/stdshaders/vshtmp9_tmp/*
 src/materialsystem/stdshaders/Release_dx9/*
+
+# Ignore certain libraries
+src/lib/public/shaderlib.lib
