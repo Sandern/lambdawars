@@ -234,8 +234,6 @@ bool FoundPublicGames::ShouldShowPublicGame( KeyValues *pGameDetails )
 	// if no mission and no website, skip it
 	//if ( !pInstalledMission && !*szWebsite )
 		//return false;
-#else
-	return false;
 #endif // 0
 
 	return true;
@@ -275,6 +273,7 @@ void FoundPublicGames::AddServersToList( void )
 			continue;
 		if ( !ShouldShowPublicGame( pGameDetails ) )
 			continue;
+
 
 		FoundGameListItem::Info fi;
 

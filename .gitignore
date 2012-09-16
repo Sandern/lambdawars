@@ -168,6 +168,8 @@ pip-log.txt
 #############
 ## Project Specific
 #############
+.cd # Class diagram
+
 src/game/client/Release_swarm/*
 src/game/server/Release_swarm/*
 src/game/client/Debug_swarm/*

@@ -1906,7 +1906,7 @@ void FoundGames::OnItemSelected( const char* panelName )
 	
 	const char* chapterName = "#L4D360UI_LevelName_Unknown";
 	
-	//char chDifficultyBuffer[64] = {0};
+	char chDifficultyBuffer[64] = {0};
 	const char* currentDifficulty = "#L4D360UI_Unknown";
 	
 	const char* currentSurvivorAccess = "#L4D360UI_Unknown";
@@ -2068,7 +2068,9 @@ void FoundGames::OnItemSelected( const char* panelName )
 				campaignName = fi.mpGameDetails->GetString( "game/missioninfo/displaytitle", "#L4D360UI_CampaignName_Unknown" );
 				bDownloadableCampaign = true;
 			}
-
+#else
+			chapterName = "";
+#endif // 0
 			campaignName = fi.mpGameDetails->GetString( "game/missioninfo/displaytitle", campaignName );
 			szDownloadAuthor = fi.mpGameDetails->GetString( "game/missioninfo/author", szDownloadAuthor );
 			szDownloadWebsite = fi.mpGameDetails->GetString( "game/missioninfo/website", szDownloadWebsite );
@@ -2188,7 +2190,6 @@ void FoundGames::OnItemSelected( const char* panelName )
 					szGameState );
 				lblGameStatus->SetText( chStatusTextBuffer );
 			}
-#endif // 0
 		}
 		if ( !fi.mbInGame || ( eDetails == DETAILS_PRESENCE ) )
 		{
