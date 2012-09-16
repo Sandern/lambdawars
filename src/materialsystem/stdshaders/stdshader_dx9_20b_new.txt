@@ -8,6 +8,3 @@
 //	    _vs20.vcs
 //
 Water_ps2x.fxc
-
-multiblend_ps2x.fxc
-multiblend_vs20.fxc

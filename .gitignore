@@ -180,3 +180,4 @@ src/materialsystem/stdshaders/Release_dx9/*
 
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
+src/lib/public/boost_python.lib
