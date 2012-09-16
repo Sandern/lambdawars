@@ -99,11 +99,18 @@ void FoundPublicGames::ApplySchemeSettings( IScheme *pScheme )
 	m_drpCampaign = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpFilterCampaign" ) );
 	m_btnFilters = dynamic_cast< BaseModUI::BaseModHybridButton* >( FindChildByName( "BtnFilters" ) );
 
+#if 0
 	bool bHasDifficulty = GameModeHasDifficulty( m_pDataSettings->GetString( "game/mode", "" ) );
 	if ( m_drpDifficulty )
 	{
 		SetDropDownMenuVisible( m_drpDifficulty, bHasDifficulty );
 	}
+#else
+	if ( m_drpDifficulty ) SetDropDownMenuVisible( m_drpDifficulty, false );
+	if ( m_drpOnslaught ) SetDropDownMenuVisible( m_drpOnslaught, false );
+	if ( m_drpCampaign ) SetDropDownMenuVisible( m_drpCampaign, false );
+#endif // 0
+
 
 	m_pSupportRequiredDetails = dynamic_cast< vgui::Label * >( FindChildByName( "LblSupportRequiredDetails" ) );
 	m_pInstallSupportBtn = dynamic_cast< BaseModUI::BaseModHybridButton * >( FindChildByName( "BtnInstallSupport" ) );
@@ -420,6 +427,7 @@ void FoundPublicGames::OnCommand( const char *command )
 			return;
 		}
 
+#if 0
 		KeyValues *pSettings = KeyValues::FromString(
 			"settings",
 			" system { "
@@ -463,6 +471,24 @@ void FoundPublicGames::OnCommand( const char *command )
 		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
 		CBaseModPanel::GetSingleton().CloseAllWindows();
 		CBaseModPanel::GetSingleton().OpenWindow( WT_GAMESETTINGS, NULL, true, pSettings );
+#else
+		KeyValues *pSettings = KeyValues::FromString(
+		"settings",
+		" system { "
+		" network LIVE "
+		" access public "
+		" } "
+		" game { "
+		" mode sdk "
+		" mission gamelobby "
+		" } "
+		);
+		KeyValues::AutoDelete autodelete( pSettings );
+
+		pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
+
+		g_pMatchFramework->CreateSession( pSettings );
+#endif // 0
 	}
 	else if ( !Q_stricmp( command, "StartCustomMatchSearch" ) )
 	{

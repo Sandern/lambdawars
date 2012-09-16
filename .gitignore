@@ -62,6 +62,8 @@ local.properties
 *.vspscc
 .builds
 *.dotCover
+*.exe
+*.o
 
 ## TODO: If you have NuGet Package Restore enabled, uncomment this
 #packages/
@@ -107,6 +109,7 @@ stylecop.*
 ~$*
 *.dbmdl
 Generated_Code #added for RIA/Silverlight projects
+*.log
 
 # Backup & report files from converting an old project file to a newer
 # Visual Studio version. Backup files are not needed, because we have git ;-)
@@ -171,6 +174,8 @@ src/game/client/Debug_swarm/*
 src/game/server/Debug_swarm/*
 src/game/missionchooser/*
 src/boost/libs/python/build/VisualStudio/release-obj/*
+src/python/Srcbuild/Win32-temp-Release/*
+src/python/Srcbuild/Win32-temp-Debug/*
 
 # Shaders
 .vcs
@@ -181,3 +186,4 @@ src/materialsystem/stdshaders/Release_dx9/*
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
 src/lib/public/boost_python.lib
+src/lib/public/python27.lib

@@ -93,7 +93,7 @@ modules_2007 = [
     ('_srctests', '_SrcTests'),
 ]
 
-# Base files (in case you want to use the auto updating of the vcxproj)
+# Base files (in case you want to make use automatically updating the vcxproj)
 pythonfiles_shared = [
     '../shared/python/src_python.cpp',
     '../shared/python/src_python.h',

@@ -1043,6 +1043,7 @@ void FoundGames::OnCommand( const char *command )
 			return;
 		}
 
+#if 0
 		KeyValues *pSettings = KeyValues::FromString(
 			"settings",
 			" system { "
@@ -1086,6 +1087,24 @@ void FoundGames::OnCommand( const char *command )
 		CBaseModPanel::GetSingleton().PlayUISound( UISOUND_ACCEPT );
 		CBaseModPanel::GetSingleton().CloseAllWindows();
 		CBaseModPanel::GetSingleton().OpenWindow( WT_GAMESETTINGS, NULL, true, pSettings );
+#else
+		KeyValues *pSettings = KeyValues::FromString(
+		"settings",
+		" system { "
+		" network LIVE "
+		" access friends "
+		" } "
+		" game { "
+		" mode sdk "
+		" mission gamelobby "
+		" } "
+		);
+		KeyValues::AutoDelete autodelete( pSettings );
+
+		pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
+
+		g_pMatchFramework->CreateSession( pSettings );
+#endif // 0
 	}
 	else if ( V_strcmp( command, "JoinSelected" ) == 0 )
 	{
