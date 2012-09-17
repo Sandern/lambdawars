@@ -1,3 +1,10 @@
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
 #include "cbase.h"
 #include "videocfgext.h"
 #include "filesystem.h"

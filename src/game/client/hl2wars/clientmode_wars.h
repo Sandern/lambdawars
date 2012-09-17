@@ -1,5 +1,12 @@
-#ifndef _INCLUDED_CLIENTMODE_SDK_H
-#define _INCLUDED_CLIENTMODE_SDK_H
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
+#ifndef _INCLUDED_CLIENTMODE_WARS_H
+#define _INCLUDED_CLIENTMODE_WARS_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -36,4 +43,4 @@ extern vgui::HScheme g_hVGuiCombineScheme;
 
 extern ClientModeSDK* GetClientModeSDK();
 
-#endif // _INCLUDED_CLIENTMODE_SDK_H
+#endif // _INCLUDED_CLIENTMODE_WARS_H

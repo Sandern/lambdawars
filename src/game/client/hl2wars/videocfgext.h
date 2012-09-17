@@ -1,3 +1,10 @@
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
 #ifndef VIDEOCFGEXT_H
 #define VIDEOCFGEXT_H
 

@@ -1,3 +1,10 @@
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
 #include "cbase.h"
 #include "hl2wars_in_main.h"
 #include "c_hl2wars_player.h"

@@ -1,3 +1,10 @@
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//
+// Purpose: 
+//
+// $NoKeywords: $
+//=============================================================================//
+
 #ifndef _INCLUDED_C_WARS_FX_H
 #define _INCLUDED_C_WARS_FX_H
 
