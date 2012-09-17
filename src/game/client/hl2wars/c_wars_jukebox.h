@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2006, Valve Corporation, All rights reserved. =======//
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
 //
 // Purpose: Handles construction of a user defined music playlist.
 //

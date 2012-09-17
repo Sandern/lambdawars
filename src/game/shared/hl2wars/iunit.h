@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
 //
 // Purpose: Any entity that implements this interface is controlable by the player
 //

@@ -1,4 +1,4 @@
-//========= Copyright © 200X-2012, Sander Corporation, All rights reserved. ============//
+//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //
