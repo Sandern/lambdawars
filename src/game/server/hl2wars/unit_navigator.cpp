@@ -1460,6 +1460,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 
 	const Vector &origin = GetOuter()->EyePosition();
 
+#if 0
 	// First test by doing a trace if we can reach the goal directly
 	UTIL_TraceHull( GetAbsOrigin(), GetPath()->m_vGoalPos, 
 		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
@@ -1470,6 +1471,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 			AdvancePath();
 		return bBlocked;
 	}
+#endif // 0
 
 	float fMaxLookAhead = unit_reactivepath_maxlookahead.GetFloat();
 	int nMaxLookAhead = unit_reactivepath_maxwaypointsahead.GetInt();
