@@ -194,6 +194,7 @@ src/materialsystem/stdshaders/makefile*
 src/materialsystem/stdshaders/uniquefilestocopy.txt
 src/materialsystem/stdshaders/vcslist.txt
 src/materialsystem/stdshaders/filestocopy.txt
+src/materialsystem/stdshaders/shaders/*
 
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
