@@ -185,7 +185,18 @@ src/materialsystem/stdshaders/fxctmp9_tmp/*
 src/materialsystem/stdshaders/vshtmp9_tmp/*
 src/materialsystem/stdshaders/Release_dx9/*
 
+materialsystem/stdshaders/buildsdkshaders_wars_dev.bat
+materialsystem/stdshaders/stdshader_dx9_20b_wars_dev.txt
+materialsystem/stdshaders/stdshader_dx9_30_wars_dev.txt
+materialsystem/stdshaders/filelist*
+materialsystem/stdshaders/inclist.txt
+materialsystem/stdshaders/makefile*
+materialsystem/stdshaders/uniquefilestocopy.txt
+materialsystem/stdshaders/vcslist.txt
+
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
 src/lib/public/boost_python.lib
 src/lib/public/python27.lib
+
+
