@@ -934,7 +934,7 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 //-----------------------------------------------------------------------------
 // Purpose: Start rendering the fow state to a render target
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::BeginRenderFow()
+void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 {
 	if( !m_RenderBufferIM || !m_RenderBufferIM.IsValid() ) 
 	{
@@ -974,7 +974,11 @@ void CFogOfWarMgr::BeginRenderFow()
 	pRenderContext->Viewport(0,0,m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight());
 
 	// Render fog of war
-	pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); // Default to shrouded
+	if( bStartShrouded )
+		pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); // Default to shrouded
+	else
+		pRenderContext->ClearColor4ub( 255, 255, 255, 255 ); // Cleared
+
 	pRenderContext->ClearBuffers( true, false );
 
 	pRenderContext.SafeRelease();
@@ -1094,6 +1098,15 @@ void CFogOfWarMgr::EndRenderFow()
 
 	m_bRenderingFOW = false;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Clears all
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::RenderFowClear()
+{
+	BeginRenderFow( false );
+	EndRenderFow();
+}
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -1143,6 +1156,10 @@ void CFogOfWarMgr::UpdateShared()
 #endif // FOW_USE_PROCTEX
 			m_bWasFogofwarOn = false;
 		}
+
+#ifdef CLIENT_DLL
+		RenderFowClear();
+#endif // CLIENT_DLL
 		return;
 	}
 

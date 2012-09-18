@@ -106,10 +106,11 @@ private:
 #ifdef CLIENT_DLL
 	void				UpdateTexture( bool bConverge, float fTime = 0.0f );
 	
-	void				BeginRenderFow();
+	void				BeginRenderFow( bool bStartShrouded = true );
 	void				RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y );
 	void				EndRenderFow();
-	void				RenderFogOfWar( float frametime);
+	void				RenderFowClear();
+	void				RenderFogOfWar( float frametime );
 #endif // CLIENT_DLL
 
 protected:
