@@ -1,4 +1,4 @@
-Half-Life 2: Wars code (Alien Swarm engine).
+Half-Life 2: Wars code (Alien Swarm engine). WIP README.
 
 ==============================================================
 Description
@@ -18,3 +18,5 @@ Generating Python bindings
 ==============================================================
 Compiling shaders
 ==============================================================
+- Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
+- Update paths buildsdkshaders_wars.bat
