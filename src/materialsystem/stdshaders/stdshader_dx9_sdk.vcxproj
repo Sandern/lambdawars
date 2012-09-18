@@ -1373,7 +1373,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="floattoscreen.cpp" />
     <ClCompile Include="floattoscreen_vanilla.cpp" />
     <ClCompile Include="fogofwar.cpp" />
-    <ClCompile Include="fogofwar_blended_pass_helper.cpp" />
     <ClCompile Include="fogofwar_im.cpp" />
     <ClCompile Include="gamecontrols.cpp" />
     <ClCompile Include="HDRCombineTo16Bit.cpp" />
@@ -1471,7 +1470,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="common_vertexlitgeneric_dx9.h" />
     <ClInclude Include="common_vs_fxc.h" />
     <ClInclude Include="flesh_helper.h" />
-    <ClInclude Include="fogofwar_blended_pass_helper.H" />
     <ClInclude Include="fow_ps_fxc.h" />
     <ClInclude Include="fow_vs_fxc.h" />
     <ClInclude Include="lightmappedgeneric_dx9_helper.h" />

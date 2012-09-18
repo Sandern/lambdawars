@@ -12,11 +12,11 @@ vertexlit_and_unlit_generic_bump_ps2x.fxc
 vertexlit_and_unlit_generic_bump_vs20.fxc
 phong_ps20b.fxc
 
-fogofwar_ps30.fxc
-fogofwar_vs30.fxc
+fogofwar_ps2x.fxc
+fogofwar_vs20.fxc
 
-fogofwar_im_ps30.fxc
-fogofwar_im_vs30.fxc
+fogofwar_im_ps2x.fxc
+fogofwar_im_vs20.fxc
 
 multiblend_vs20.fxc
 multiblend_ps2x.fxc

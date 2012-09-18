@@ -361,9 +361,6 @@
     <ClCompile Include="fogofwar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fogofwar_blended_pass_helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fogofwar_im.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -499,9 +496,6 @@
     </ClInclude>
     <ClInclude Include="worldvertextransition_dx8_helper.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="fogofwar_blended_pass_helper.H">
-      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

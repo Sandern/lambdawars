@@ -17,9 +17,6 @@ vertexlit_and_unlit_generic_bump_vs20.fxc
 vertexlit_and_unlit_generic_ps2x.fxc
 phong_ps20b.fxc
 
-fogofwar_blended_pass_vs20.fxc
-fogofwar_blended_pass_ps20b.fxc
-
 lightmappedgeneric_ps20.fxc
 lightmappedgeneric_ps20b.fxc
 lightmappedgeneric_ps2x.fxc
@@ -27,3 +24,9 @@ lightmappedgeneric_vs20.fxc
 
 multiblend_ps2x.fxc
 multiblend_vs20.fxc
+
+fogofwar_ps2x.fxc
+fogofwar_vs20.fxc
+
+fogofwar_im_ps2x.fxc
+fogofwar_im_vs20.fxc
