@@ -382,6 +382,8 @@ void CHL2WarsGameRules::Precache( void )
 	PrecacheEffect( "Impact" );
 	PrecacheEffect( "AirboatGunImpact" );
 	PrecacheEffect( "HelicopterImpact" );
+	PrecacheEffect( "cball_bounce" );
+	PrecacheEffect( "cball_explode" );
 
 	// Sparks
 	PrecacheEffect( "ManhackSparks" );
