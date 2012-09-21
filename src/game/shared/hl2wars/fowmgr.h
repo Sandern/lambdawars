@@ -89,8 +89,11 @@ public: // CBaseGameSystem overrides
 
 	// Gets called each frame
 #ifdef CLIENT_DLL
+	int					CalculateRenderTargetSize( void );
 	void				InitRenderTargets( void );
-	void				ShutdownRenderTargets();
+	void				ShutdownRenderTargets( void );
+	void				OnResolutionChanged();
+
 	virtual void		Update( float frametime );
 #else
 	virtual void		PreClientUpdate();
@@ -189,12 +192,14 @@ private:
 
 	// Visualization on the client
 #ifdef CLIENT_DLL
-	CMaterialReference m_FOWMaterial; // Must ensure we have at least one reference to the material (otherwise texture regeneration does not work)
+	CMaterialReference m_FOWMaterial;
 	CMaterialReference m_FOWImMaterial;
 	CMaterialReference m_FOWBlurMaterial;
 	CTextureReference m_RenderBuffer;
-	CTextureReference m_RenderBuffer1;
+	CTextureReference m_RenderBufferBlur;
 	CTextureReference m_RenderBufferIM;
+
+
 	CFOWTextureRegen *m_pTextureRegen;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWarTextureData;
 

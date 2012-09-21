@@ -2949,6 +2949,8 @@ void CHLClient::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 {
 	// Tell split screen system
 	VGui_OnScreenSizeChanged();
+
+	FogOfWarMgr()->OnResolutionChanged();
 }
 
 IMaterialProxy *CHLClient::InstantiateMaterialProxy( const char *proxyName )

@@ -30,7 +30,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// Increment this to force rebuilding of all networks
+// Increment this to force rebuilding all heightmaps
 #define	 HEIGHTMAP_VERSION_NUMBER	2
 
 // #define FOW_USE_PROCTEX
@@ -691,18 +691,49 @@ void CFogOfWarMgr::DeallocateFogOfWar()
 }
 
 #ifdef CLIENT_DLL
-#define RT_FOW_SIZE 1024
-#define RT_FOW_IM_SIZE 1024
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#define FOW_RT_SIZE 1024
+#define FOW_RT_SIZE_LOW 512
+#define FOW_RT_SIZE_VERY_LOW 256
+
+int CFogOfWarMgr::CalculateRenderTargetSize( void )
+{
+	int iSize = (ScreenHeight() < 1024 || ScreenWidth() < 1024) ? FOW_RT_SIZE_LOW : FOW_RT_SIZE;
+	return (ScreenHeight() < 512 || ScreenWidth() < 512) ? FOW_RT_SIZE_VERY_LOW : iSize;
+}
+
 void CFogOfWarMgr::InitRenderTargets( void )
 {
 #ifndef FOW_USE_PROCTEX
+	int iSize = CalculateRenderTargetSize();
+
+	unsigned int fowFlags =	TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
 	ImageFormat fmt = IMAGE_FORMAT_RGBA8888;
-	m_RenderBuffer.InitRenderTarget( RT_FOW_SIZE, RT_FOW_SIZE, RT_SIZE_OFFSCREEN, fmt, MATERIAL_RT_DEPTH_NONE, false, "_rt_fog_of_war" );
-	m_RenderBuffer1.InitRenderTarget( RT_FOW_IM_SIZE, RT_FOW_IM_SIZE, RT_SIZE_OFFSCREEN, fmt, MATERIAL_RT_DEPTH_NONE, false, "__rt_fow1" );
-	m_RenderBufferIM.InitRenderTarget( RT_FOW_IM_SIZE, RT_FOW_IM_SIZE, RT_SIZE_OFFSCREEN, fmt, MATERIAL_RT_DEPTH_NONE, false, "__rt_fow_im" );
+
+	m_RenderBuffer.Init( materials->CreateNamedRenderTargetTextureEx2(
+		"_rt_fog_of_war",
+		iSize, iSize,
+		RT_SIZE_NO_CHANGE,
+		fmt,
+		MATERIAL_RT_DEPTH_NONE,
+		fowFlags, 0 ) );
+	m_RenderBufferBlur.Init( materials->CreateNamedRenderTargetTextureEx2(
+		"__rt_fow_blur",
+		iSize, iSize,
+		RT_SIZE_NO_CHANGE,
+		fmt,
+		MATERIAL_RT_DEPTH_NONE,
+		fowFlags, 0 ) );
+	m_RenderBufferIM.Init( materials->CreateNamedRenderTargetTextureEx2(
+		"__rt_fow_im",
+		iSize, iSize,
+		RT_SIZE_NO_CHANGE,
+		fmt,
+		MATERIAL_RT_DEPTH_NONE,
+		fowFlags, 0 ) );
+
 #endif // FOW_USE_PROCTEX
 }
 
@@ -710,8 +741,29 @@ void CFogOfWarMgr::ShutdownRenderTargets( void )
 {
 #ifndef FOW_USE_PROCTEX
 	m_RenderBuffer.Shutdown();
-	m_RenderBuffer1.Shutdown();
+	m_RenderBufferBlur.Shutdown();
 	m_RenderBufferIM.Shutdown();
+#endif // FOW_USE_PROCTEX
+}
+
+void CFogOfWarMgr::OnResolutionChanged()
+{
+#ifndef FOW_USE_PROCTEX
+	// FIXME: End result seems incorrect if the resolution is lower than the render target
+	//		  For now, we will reallocate the render target
+	int iSize = CalculateRenderTargetSize();
+
+	if( m_RenderBuffer.IsValid() )
+	{
+		if( m_RenderBuffer->GetActualWidth() == iSize )
+			return; // Nothing to do
+	}
+
+	materials->ReEnableRenderTargetAllocation_IRealizeIfICallThisAllTexturesWillBeUnloadedAndLoadTimeWillSufferHorribly();
+	materials->BeginRenderTargetAllocation();
+	ShutdownRenderTargets();
+	InitRenderTargets();
+	materials->EndRenderTargetAllocation();
 #endif // FOW_USE_PROCTEX
 }
 
@@ -853,11 +905,13 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 	pRenderContext->SetFloatRenderingParameter( FLOAT_RENDERPARM_GLOBAL_FOW_RATEOUT, frametime * mat_fow_converge_rateout.GetFloat() );
 	pRenderContext->SetFloatRenderingParameter( FLOAT_RENDERPARM_GLOBAL_FOW_TILESIZE, m_nTileSize / (float)FOW_WORLDSIZE );
 	
+	int iFOWRenderSize = m_RenderBuffer->GetActualWidth();
+
 	// Setup view
 	CViewSetup setup;
 	setup.x = setup.y = 0;
-	setup.width = RT_FOW_SIZE;
-	setup.height = RT_FOW_SIZE;
+	setup.width = iFOWRenderSize;
+	setup.height = iFOWRenderSize;
 	setup.m_bOrtho = false;
 	setup.m_flAspectRatio = 1;
 	setup.fov = 90;
@@ -876,22 +930,22 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 		//////////////////////////////////////
 
 		// Setup view and render target
-		render->Push2DView( setup, 0, m_RenderBuffer1, m_Frustum );
+		render->Push2DView( setup, 0, m_RenderBufferBlur, m_Frustum );
 
 		pRenderContext->PushRenderTargetAndViewport();
 
-		pRenderContext->SetRenderTarget( m_RenderBuffer1 );
+		pRenderContext->SetRenderTarget( m_RenderBufferBlur );
 
 		float fBlurFactor = mat_fow_blur_factor.GetFloat();
-		SetMaterialVarFloat( m_FOWBlurMaterial, "$c0_x", fBlurFactor / (float)m_RenderBuffer1->GetActualWidth() );
-		SetMaterialVarFloat( m_FOWBlurMaterial, "$c0_y", fBlurFactor / (float)m_RenderBuffer1->GetActualHeight() );
-		SetMaterialVarFloat( m_FOWBlurMaterial, "$c1_x", -fBlurFactor / (float)m_RenderBuffer1->GetActualWidth() );
-		SetMaterialVarFloat( m_FOWBlurMaterial, "$c1_y", fBlurFactor / (float)m_RenderBuffer1->GetActualHeight() );
+		SetMaterialVarFloat( m_FOWBlurMaterial, "$c0_x", fBlurFactor / (float)m_RenderBufferBlur->GetActualWidth() );
+		SetMaterialVarFloat( m_FOWBlurMaterial, "$c0_y", fBlurFactor / (float)m_RenderBufferBlur->GetActualHeight() );
+		SetMaterialVarFloat( m_FOWBlurMaterial, "$c1_x", -fBlurFactor / (float)m_RenderBufferBlur->GetActualWidth() );
+		SetMaterialVarFloat( m_FOWBlurMaterial, "$c1_y", fBlurFactor / (float)m_RenderBufferBlur->GetActualHeight() );
 
 		pRenderContext->DrawScreenSpaceRectangle(
 			m_FOWBlurMaterial, 0, 0, nSrcWidth, nSrcHeight,
-			0, 0, m_RenderBuffer1->GetActualWidth()-1, m_RenderBuffer1->GetActualHeight()-1,
-			m_RenderBuffer1->GetActualWidth(), m_RenderBuffer1->GetActualHeight() );
+			0, 0, m_RenderBufferBlur->GetActualWidth()-1, m_RenderBufferBlur->GetActualHeight()-1,
+			m_RenderBufferBlur->GetActualWidth(), m_RenderBufferBlur->GetActualHeight() );
 
 		pRenderContext->PopRenderTargetAndViewport();
 
@@ -907,7 +961,7 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 
 	if( !bFOWBlur )
 	{
-		pRenderContext->CopyRenderTargetToTextureEx( m_RenderBuffer1, 0, NULL, NULL );
+		pRenderContext->CopyRenderTargetToTextureEx( m_RenderBufferBlur, 0, NULL, NULL );
 	}
 
 	// Render
@@ -950,11 +1004,13 @@ void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 		return;
 	}
 
+	int iFOWRenderSize = m_RenderBuffer->GetActualWidth();
+
 	// Setup view, settings and render target
 	CViewSetup setup;
 	setup.x = setup.y = 0;
-	setup.width = RT_FOW_SIZE;
-	setup.height = RT_FOW_SIZE;
+	setup.width = iFOWRenderSize;
+	setup.height = iFOWRenderSize;
 	setup.m_bOrtho = false;
 	setup.m_flAspectRatio = 1;
 	setup.fov = 90;
@@ -994,6 +1050,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 	if( !m_bRenderingFOW )
 		return;
 
+	int iFOWRenderSize = m_RenderBuffer->GetActualWidth();
+
 	CMatRenderContextPtr pRenderContext( materials );
 
 	//IMaterial *black_mat = materials->FindMaterial( "Tools/toolsblack", TEXTURE_GROUP_OTHER, true );
@@ -1012,8 +1070,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 
 		for( int i = 0; i < EndPos.Count(); i++ )
 		{
-			x = EndPos[i].x * (RT_FOW_IM_SIZE / (float)m_nGridSize);
-			y = EndPos[i].y * (RT_FOW_IM_SIZE / (float)m_nGridSize);
+			x = EndPos[i].x * (iFOWRenderSize / (float)m_nGridSize);
+			y = EndPos[i].y * (iFOWRenderSize / (float)m_nGridSize);
 
 			meshBuilder.Position3f( x, y, 0.0f );
 			meshBuilder.TexCoord2f( 0, 0.0f, 1.0f );
