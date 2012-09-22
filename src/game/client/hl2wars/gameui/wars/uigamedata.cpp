@@ -1331,7 +1331,7 @@ void CUIGameData::OnEvent( KeyValues *pEvent )
 
 bool GameModeHasDifficulty( char const *szGameMode )
 {
-	return true;	// all alien swarm game modes have difficulty
+	return false; // Currently no hl2wars gamemodes display the difficulty
 	//return !Q_stricmp( szGameMode, "campaign" ) || !Q_stricmp( szGameMode, "single_mission" );
 }
 

@@ -353,8 +353,9 @@ void FoundGameListItem::SetGameIndex( const Info& fi )
 
 		SetGamePlayerCount( numPlayers , numSlots );
 
+#if 0
 		char const *szMode = fi.mpGameDetails->GetString( "game/mode", "campaign" );
-		
+
 		if ( !Q_stricmp( "finale", fi.mpGameDetails->GetString( "game/state", "" ) ) )
 		{
 			// Display it as in finale, hide the playercount, but it's still joinable if they really want to.
@@ -372,7 +373,10 @@ void FoundGameListItem::SetGameIndex( const Info& fi )
 			Q_snprintf( chDiffBuffer, sizeof( chDiffBuffer ), "#L4D360UI_Difficulty_%s_%s", szDiff, szMode );
 			SetGameDifficulty( chDiffBuffer );
 		}
-
+#else
+		SetGameDifficulty( "" ); // Don't display difficulty
+#endif // 0
+		
 		char const *szDiff = fi.mpGameDetails->GetString( "game/swarmstate", "ingame" );
 		Msg( "Adding a server to the list:\n" );
 		KeyValuesDumpAsDevMsg( fi.mpGameDetails );
