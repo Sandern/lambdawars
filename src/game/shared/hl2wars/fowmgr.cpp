@@ -1197,7 +1197,7 @@ void CFogOfWarMgr::UpdateShared()
 	// look if fog of war is disabled, and if we need to clear the fog then
 	if( !sv_fogofwar.GetBool() 
 #ifdef CLIENT_DLL
-		|| (pPlayer->IsObserver() && pPlayer->GetOwnerNumber() == 0) 
+		|| (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0) 
 #endif // CLIENT_DLL
 		)
 	{
@@ -1616,7 +1616,7 @@ void CFogOfWarMgr::UpdateVisibility()
 		// Just dispatch update transmit/update visiblity, which should make the entities visible
 		if( !sv_fogofwar.GetBool() 
 #ifdef CLIENT_DLL
-			|| (pPlayer->IsObserver() && pPlayer->GetOwnerNumber() == 0) 
+			|| (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0) 
 #endif // CLIENT_DLL
 			)
 		{

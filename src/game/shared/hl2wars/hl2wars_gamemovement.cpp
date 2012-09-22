@@ -207,8 +207,8 @@ void CHL2WarsGameMovement::CheckParameters( void )
 	QAngle	v_angle;
 
 	if ( player->GetFlags() & FL_FROZEN ||
-		 player->GetFlags() & FL_ONTRAIN || 
-		 IsDead() )
+		 player->GetFlags() & FL_ONTRAIN /*|| 
+		 IsDead()*/ )
 	{
 		mv->m_flForwardMove = 0;
 		mv->m_flSideMove    = 0;
@@ -218,7 +218,7 @@ void CHL2WarsGameMovement::CheckParameters( void )
 	DecayPunchAngle();
 
 	// Take angles from command.
-	if ( !IsDead() )
+	//if ( !IsDead() )
 	{
 		v_angle = mv->m_vecAngles;
 		v_angle = v_angle + player->m_Local.m_vecPunchAngle;
@@ -236,16 +236,16 @@ void CHL2WarsGameMovement::CheckParameters( void )
 		mv->m_vecAngles[PITCH] = v_angle[PITCH];
 		mv->m_vecAngles[YAW]   = v_angle[YAW];
 	}
-	else
+	/*else
 	{
 		mv->m_vecAngles = mv->m_vecOldAngles;
-	}
+	}*/
 
 	// Set dead player view_offset
-	if ( IsDead() )
+	/*if ( IsDead() )
 	{
 		player->SetViewOffset( VEC_DEAD_VIEWHEIGHT );
-	}
+	}*/
 
 	// Adjust client view angles to match values used on server.
 	if ( mv->m_vecAngles[YAW] > 180.0f )

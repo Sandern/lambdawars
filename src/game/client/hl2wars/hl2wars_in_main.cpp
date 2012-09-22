@@ -800,13 +800,13 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 		vgui::Panel *pViewPort = GetClientMode()->GetViewport();
 		if( !pPlayer->ForceShowMouse()/*!(pPlayer->m_nButtons & IN_SPEED)*/ )
 		{
-		if( pViewPort->IsMouseInputEnabled() )
-			pViewPort->SetMouseInputEnabled(false);
+			if( pViewPort->IsMouseInputEnabled() )
+				pViewPort->SetMouseInputEnabled(false);
 		}
 		else
 		{
-		if( pViewPort->IsMouseInputEnabled() == false )
-			pViewPort->SetMouseInputEnabled(true);
+			if( pViewPort->IsMouseInputEnabled() == false )
+				pViewPort->SetMouseInputEnabled(true);
 		}
 		CInput::MouseMove(nSlot,cmd);
 		return;

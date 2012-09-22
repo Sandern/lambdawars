@@ -141,11 +141,7 @@ CSrcPython::CSrcPython()
 
 bool CSrcPython::Init( )
 {
-#ifdef HL2WARS_ASW_DLL
 	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablepython") == 0;
-#else
-	const bool bEnabled = true;
-#endif // HL2WARS_ASW_DLL
 
 	if( !bEnabled )
 	{
@@ -164,15 +160,10 @@ bool CSrcPython::Init( )
 #ifndef _LINUX
 	// Change working directory	
 	// FIXME: On linux this causes very weird crashes	
-#ifdef HL2WARS_ASW_DLL
-	if( CommandLine()->FindParm("-shaderedit") == false )
-#endif // HL2WARS_ASW_DLL
-	{
-		char moddir[_MAX_PATH];
-		filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
-		V_FixupPathName(moddir, _MAX_PATH, moddir);	
-		V_SetCurrentDirectory(moddir);
-	}
+	char moddir[_MAX_PATH];
+	filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
+	V_FixupPathName(moddir, _MAX_PATH, moddir);	
+	V_SetCurrentDirectory(moddir);
 #endif // _LINUX
 
 	m_bPythonRunning = true;

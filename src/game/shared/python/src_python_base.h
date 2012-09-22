@@ -34,13 +34,6 @@ KeyValues *PyDictToKeyValues( boost::python::dict d );
 //	boost::python::object firstKey = boost::python::object(), boost::python::object firstValue = boost::python::object(),
 //	boost::python::object secondKey = boost::python::object(), boost::python::object secondValue = boost::python::object() );
 
-#ifndef HL2WARS_ASW_DLL
-inline bool KeyValuesDumpAsDevMsg( KeyValues *pKeyValues, int nIndentLevel = 0, int nDeveloperLevel = 1 )
-{
-	return false;
-}
-#endif // HL2WARS_ASW_DLL
-
 #if 1
 class PyKeyValues
 {

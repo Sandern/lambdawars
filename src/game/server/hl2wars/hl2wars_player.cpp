@@ -414,6 +414,20 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		SetControlledUnit( NULL );
 		return true;
 	}
+	else if( !Q_stricmp( args[0], "spectate" ) )
+	{
+		if ( GetTeamNumber() == TEAM_SPECTATOR )
+			return true;
+
+		ChangeTeam( TEAM_SPECTATOR );
+		SetOwnerNumber( 0 );
+		//SetObserverMode( OBS_MODE_ROAMING );
+		//m_afPhysicsFlags |= PFLAG_OBSERVER;
+		//SetMoveType( MOVETYPE_STRATEGIC );
+
+		return true;
+	}
+
 	return BaseClass::ClientCommand(args);
 }
 
