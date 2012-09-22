@@ -20,3 +20,12 @@ Compiling shaders
 ==============================================================
 - Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
 - Update paths buildsdkshaders_wars.bat
+
+
+==============================================================
+License
+==============================================================
+Creative Commons Attribution-NonCommercial 3.0 Unported
+Only applies to the new code in the sdk (in particular the code in the hl2wars and python folders).
+
+See license.txt
