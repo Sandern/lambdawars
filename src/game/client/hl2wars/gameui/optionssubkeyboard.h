@@ -106,6 +106,8 @@ private:
 	CUtlVector<ButtonCode_t> m_KeysToUnbind;
 
 	int				m_nSplitScreenUser;
+
+	char			m_strActiveConfig[MAX_PATH];
 };
 
 #endif // OPTIONS_SUB_KEYBOARD_H

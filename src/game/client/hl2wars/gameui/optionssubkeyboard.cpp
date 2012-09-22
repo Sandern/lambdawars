@@ -71,6 +71,9 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(pa
 		}
 	}
 
+	// Copy active config
+	Q_strncpy( m_strActiveConfig, cl_active_config.GetString(), MAX_PATH );
+
 	m_drpConfig = NULL;
 
 	// create the key bindings list
@@ -96,6 +99,11 @@ COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : EditablePanel(pa
 COptionsSubKeyboard::~COptionsSubKeyboard()
 {
 	DeleteSavedBindings();
+
+	if ( stricmp(m_strActiveConfig, cl_active_config.GetString()) )
+	{
+		cl_active_config.SetValue( m_strActiveConfig );
+	}
 }
 
 //-----------------------------------------------------------------------------
