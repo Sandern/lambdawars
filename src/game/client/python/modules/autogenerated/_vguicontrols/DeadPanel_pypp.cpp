@@ -32,6 +32,9 @@ namespace bp = boost::python;
 
 void register_DeadPanel_class(){
 
-    bp::class_< DeadPanel >( "DeadPanel" );
+    bp::class_< DeadPanel >( "DeadPanel" )    
+        .def( 
+            "__nonzero__"
+            , (bool ( ::DeadPanel::* )(  ) )( &::DeadPanel::NonZero ) );
 
 }

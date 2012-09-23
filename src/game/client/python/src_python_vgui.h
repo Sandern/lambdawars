@@ -172,7 +172,11 @@ void PyVGUIHandle<T>::Set(T *pent)
 //-----------------------------------------------------------------------------
 // Purpose: Destroyed python panel.
 //-----------------------------------------------------------------------------
-class DeadPanel {};
+class DeadPanel 
+{
+public:
+	bool NonZero() { return false; }
+};
 
 #ifdef HL2WARS_ASW_DLL
 PyObject *GetPyPanel( Panel *pPanel );

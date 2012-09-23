@@ -174,6 +174,7 @@ void PyPanel::DrawFromSBuffer( CallBuffer_t &CallBuffer )
 //-----------------------------------------------------------------------------
 void DestroyPyPanels()
 {
+#if 0 // Just crash. Screw this.
 	DevMsg("Clearing %d python panels\n", g_PyPanels.Count());
 
 	for( int i = g_PyPanels.Count()-1; i >= 0; i-- )
@@ -182,6 +183,7 @@ void DestroyPyPanels()
 	}
 
 	vgui::ivgui()->RunFrame();
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------

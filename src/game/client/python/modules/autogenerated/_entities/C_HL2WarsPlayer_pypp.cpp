@@ -331,6 +331,36 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         C_HL2WarsPlayer::OnRightMouseButtonReleased( boost::ref(data) );
     }
 
+    virtual void Spawn(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling Spawn(  ) of Class: C_HL2WarsPlayer\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_Spawn = this->get_override( "Spawn" );
+        if( func_Spawn.ptr() != Py_None )
+            try {
+                func_Spawn(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_HL2WarsPlayer::Spawn(  );
+            }
+        else
+            this->C_HL2WarsPlayer::Spawn(  );
+    }
+    
+    void default_Spawn(  ) {
+        C_HL2WarsPlayer::Spawn( );
+    }
+
     virtual void UpdateOnRemove(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -937,36 +967,6 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     
     bool default_Simulate(  ) {
         return C_BaseAnimating::Simulate( );
-    }
-
-    virtual void Spawn(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: C_BaseFlex\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Spawn = this->get_override( "Spawn" );
-        if( func_Spawn.ptr() != Py_None )
-            try {
-                func_Spawn(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_BaseFlex::Spawn(  );
-            }
-        else
-            this->C_BaseFlex::Spawn(  );
-    }
-    
-    void default_Spawn(  ) {
-        C_BaseFlex::Spawn( );
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
@@ -1923,6 +1923,17 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("vPos") ) );
         
         }
+        { //::C_HL2WarsPlayer::Spawn
+        
+            typedef void ( ::C_HL2WarsPlayer::*Spawn_function_type )(  ) ;
+            typedef void ( C_HL2WarsPlayer_wrapper::*default_Spawn_function_type )(  ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "Spawn"
+                , Spawn_function_type(&::C_HL2WarsPlayer::Spawn)
+                , default_Spawn_function_type(&C_HL2WarsPlayer_wrapper::default_Spawn) );
+        
+        }
         { //::C_HL2WarsPlayer::StopDirectMove
         
             typedef void ( ::C_HL2WarsPlayer::*StopDirectMove_function_type )(  ) ;
@@ -2247,17 +2258,6 @@ void register_C_HL2WarsPlayer_class(){
                 "Simulate"
                 , Simulate_function_type(&::C_BaseAnimating::Simulate)
                 , default_Simulate_function_type(&C_HL2WarsPlayer_wrapper::default_Simulate) );
-        
-        }
-        { //::C_BaseFlex::Spawn
-        
-            typedef void ( ::C_BaseFlex::*Spawn_function_type )(  ) ;
-            typedef void ( C_HL2WarsPlayer_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            C_HL2WarsPlayer_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::C_BaseFlex::Spawn)
-                , default_Spawn_function_type(&C_HL2WarsPlayer_wrapper::default_Spawn) );
         
         }
         { //::C_BaseEntity::StartTouch

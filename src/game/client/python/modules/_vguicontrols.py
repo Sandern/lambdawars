@@ -209,7 +209,9 @@ class VGUIControls(GenerateModuleClient):
 
     def ParsePanels(self, mb):
         # Panels
-        mb.class_('DeadPanel').include()
+        cls = mb.class_('DeadPanel')
+        cls.include()
+        cls.mem_fun('NonZero').rename('__nonzero__')
 
         # For each panel sub class we take some default actions
         for cls_name in self.panel_cls_list:
