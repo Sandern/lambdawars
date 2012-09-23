@@ -92,6 +92,24 @@ C_HL2WarsPlayer* C_HL2WarsPlayer::GetLocalHL2WarsPlayer(int nSlot)
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::Spawn()
+{
+	BaseClass::Spawn( );
+
+	// Hook spawn to a signal
+#ifndef DISABLE_PYTHON
+	// Setup dict for sending a signal
+	bp::dict kwargs;
+	kwargs["sender"] = bp::object();
+	kwargs["client"] = GetPyHandle();
+	bp::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
+	SrcPySystem()->CallSignal( signal, kwargs );
+#endif // DISABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::ClientThink( void )
 {
 	BaseClass::PreThink();

@@ -35,6 +35,8 @@ public:
 	
 	static C_HL2WarsPlayer*			GetLocalHL2WarsPlayer(int nSlot = -1);
 
+	virtual void					Spawn();
+
 	virtual void					ClientThink();
 	virtual bool					CreateMove( float flInputSampleTime, CUserCmd *pCmd );
 	virtual void					PostDataUpdate( DataUpdateType_t updateType );

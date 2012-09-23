@@ -13,6 +13,9 @@
 #include <Awesomium/WebCore.h>
 #include "src_python.h"
 
+#include "steam/steam_api.h"
+#include "steam/isteamfriends.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -38,9 +41,11 @@ WebNews::WebNews( vgui::Panel *pParent ) : WebView( false, pParent )
 	m_LaunchUpdaterMethodName = CREATE_WEBSTRING("launchupdater");
 	m_HasDesuraMethodName = CREATE_WEBSTRING("hasdesura");
 	m_GetVersionMethodName = CREATE_WEBSTRING("getversion");
+	m_OpenURLMethodName = CREATE_WEBSTRING("openurl");
 	m_JSInterface.SetCustomMethod( m_LaunchUpdaterMethodName, false );
 	m_JSInterface.SetCustomMethod( m_HasDesuraMethodName, true );
 	m_JSInterface.SetCustomMethod( m_GetVersionMethodName, true );
+	m_JSInterface.SetCustomMethod( m_OpenURLMethodName, false );
 }
 
 void WebNews::OnMethodCall(Awesomium::WebView* caller,
@@ -66,6 +71,17 @@ void WebNews::OnMethodCall(Awesomium::WebView* caller,
 		}
 
 		engine->ClientCmd( "exit" );
+	}
+	else if( method_name.Compare( m_OpenURLMethodName ) == 0 )
+	{
+		if( args.size() > 0 )
+		{
+			Awesomium::WebString url = args[0].ToString();
+			char buf[MAX_PATH];
+			url.ToUTF8(buf, MAX_PATH);
+
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( buf );
+		}
 	}
 }
 

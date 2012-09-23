@@ -39,6 +39,7 @@ private:
 	Awesomium::WebString m_LaunchUpdaterMethodName;
 	Awesomium::WebString m_HasDesuraMethodName;
 	Awesomium::WebString m_GetVersionMethodName;
+	Awesomium::WebString m_OpenURLMethodName;
 };
 
 #endif // VGUI_NEWS_H
