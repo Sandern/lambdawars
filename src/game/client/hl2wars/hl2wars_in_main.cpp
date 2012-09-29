@@ -238,7 +238,7 @@ void CHL2WarsInput::CreateMove ( int sequence_number, float input_sample_frameti
 	m_fCurrentSampleTime = input_sample_frametime;
 
 #if 0
-	// We won't do this is Init_all, since it will do a "exec config.cfg"
+	// We won't do this in Init_all, since it will do a "exec config.cfg"
 	static bool bConfigInitialized = false;
 	if( !bConfigInitialized )
 	{

@@ -726,7 +726,7 @@ bp::object PyCreatePhysicsObject( IPhysicsObject *pPhysObj )
 
 bp::object PyCreatePhysicsObject( CBaseEntity *pEnt )
 {
-	bp::object physobj = _physics.attr("PhysicsObject")(*pEnt);
+	bp::object physobj = _physics.attr("PhysicsObject")( *pEnt );
 	//pPyPhysObj = bp::extract<PyPhysicsObject *)(physobj);
 	//if( !pPyPhysObj )
 	//	return;

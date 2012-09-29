@@ -646,7 +646,7 @@ void SrcWebViewSurface::Resize( int width, int height )
 		DevMsg("WebView: initializing material %s...", m_MatWebViewName);
 
 	// Make sure the directory exists
-	if( filesystem->FileExists("materials/vgui/webview") == false )
+	if( filesystem->FileExists("materials/vgui/webview", "MOD") == false )
 	{
 		filesystem->CreateDirHierarchy("materials/vgui/webview", "MOD");
 	}
