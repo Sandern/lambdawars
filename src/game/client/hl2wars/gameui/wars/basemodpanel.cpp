@@ -1239,6 +1239,7 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 		}
 	}
 
+#if 0
 	//
 	// If we are just loading into some unknown map, then fake chapter information
 	// (static lifetime of fake keyvalues so that we didn't worry about ownership)
@@ -1256,6 +1257,12 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 		pChapterInfo->SetString( "displayname", levelName ? levelName : "#L4D360UI_Lobby_Unknown_Campaign" );
 		pChapterInfo->SetString( "map", levelName ? levelName : "" );
 	}
+#else
+	if( pMissionInfo )
+	{
+		pMissionInfo->SetString( "displaytitle", levelName ? levelName : "Unknown Map" );
+	}
+#endif // 0
 	
 	//
 	// If we are transitioning maps from a real level then we don't want poster.

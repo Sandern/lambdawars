@@ -68,6 +68,8 @@ public:
 	// Traces the player bbox as it is swept from start to end
 	virtual CBaseHandle		TestPlayerPosition( const Vector& pos, int collisionGroup, trace_t& pm );
 
+	virtual bool CanAccelerate();
+
 private:
 	float m_fCamDistance, m_fCamDesiredDistance;
 };
@@ -158,6 +160,20 @@ const Vector& CHL2WarsGameMovement::GetPlayerMaxs( void ) const
 	}
 }
 #endif // 0
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CHL2WarsGameMovement::CanAccelerate()
+{
+	if( player->GetMoveType() != MOVETYPE_STRATEGIC )
+	{
+		return CGameMovement::CanAccelerate();
+	}
+
+	// Can always accelerate in rts mode.
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
