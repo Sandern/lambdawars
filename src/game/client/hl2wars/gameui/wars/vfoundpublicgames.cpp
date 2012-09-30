@@ -33,6 +33,8 @@ static ConVar ui_public_lobby_filter_onslaught( "ui_public_lobby_filter_onslaugh
 ConVar ui_public_lobby_filter_campaign( "ui_public_lobby_filter_campaign", "", FCVAR_ARCHIVE, "Filter type for campaigns on the public lobby display" );
 ConVar ui_public_lobby_filter_status( "ui_public_lobby_filter_status", "", FCVAR_ARCHIVE, "Filter type for game status on the public lobby display" );
 
+ConVar ui_public_lobby_debug( "ui_public_lobby_debug", "0", 0, "Debug public lobby" );
+
 //=============================================================================
 FoundPublicGames::FoundPublicGames( Panel *parent, const char *panelName ) :
 	BaseClass( parent, panelName ),
@@ -166,6 +168,7 @@ void FoundPublicGames::StartSearching( void )
 {
 	KeyValues *pKeyValuesSearch = new KeyValues( "Search" );
 
+#if 0
 	char const *szGameMode = m_pDataSettings->GetString( "game/mode", "" );
 	if ( szGameMode && *szGameMode )
 		pKeyValuesSearch->SetString( "game/mode", szGameMode );
@@ -185,6 +188,7 @@ void FoundPublicGames::StartSearching( void )
 	char const *szStatus = ui_public_lobby_filter_status.GetString();
 	if ( szStatus && *szStatus )
 		pKeyValuesSearch->SetString( "game/state", szStatus );
+#endif // 0
 
 	if ( !m_pSearchManager )
 	{
@@ -265,6 +269,8 @@ void FoundPublicGames::AddServersToList( void )
 		return;
 
 	int numItems = m_pSearchManager->GetNumResults();
+	if( ui_public_lobby_debug.GetBool() )
+		DevMsg( "Public lobby unfiltered search results: %d\n", numItems );
 	for ( int i = 0; i < numItems; ++ i )
 	{
 		IMatchSearchResult *item = m_pSearchManager->GetResultByIndex( i );
@@ -280,10 +286,10 @@ void FoundPublicGames::AddServersToList( void )
 		fi.mInfoType = FoundGameListItem::FGT_PUBLICGAME;
 		char const *szGameMode = pGameDetails->GetString( "game/mode", "campaign" );
 		bool bGameModeChapters = GameModeIsSingleChapter( szGameMode );
-		const char *szDisplayName = pGameDetails->GetString( "game/missioninfo/displaytitle" );
+		const char *szDisplayName = pGameDetails->GetString( "game/mission" );
 		if ( !szDisplayName || !szDisplayName[0] )
 		{
-			szDisplayName = "Unknown Mission";
+			szDisplayName = "Unknown Map";
 		}
 		Q_strncpy( fi.Name, szDisplayName, sizeof( fi.Name ) );
 

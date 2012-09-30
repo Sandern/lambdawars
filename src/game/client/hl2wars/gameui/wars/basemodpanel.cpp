@@ -1218,6 +1218,7 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 			}
 		}
 		
+#if 0
 		KeyValues::AutoDelete autodelete_pGameSettings( pGameSettings );
 		if ( pGameSettings )
 		{
@@ -1227,6 +1228,7 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 			pChapterInfo = g_pMatchExtSwarm->GetMapInfoByBspName( pGameSettings, levelName, &pMissionInfo );
 			Q_strncpy( chGameMode, pGameSettings->GetString( "game/mode", "" ), ARRAYSIZE( chGameMode ) );
 		}
+#endif // 0
 	}
 	
 	IMatchSession *pSession = g_pMatchFramework->GetMatchSession();
@@ -1258,9 +1260,18 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 		pChapterInfo->SetString( "map", levelName ? levelName : "" );
 	}
 #else
-	if( pMissionInfo )
+	if( !pMissionInfo )
 	{
+		static KeyValues *s_pFakeMissionInfo = new KeyValues( "" );
+		pMissionInfo = s_pFakeMissionInfo;
 		pMissionInfo->SetString( "displaytitle", levelName ? levelName : "Unknown Map" );
+	}
+	if ( !pChapterInfo )
+	{
+		static KeyValues *s_pFakeChapterInfo = new KeyValues( "1" );
+		pChapterInfo = s_pFakeChapterInfo;
+		pChapterInfo->SetString( "displayname", levelName ? levelName : "Unknown name" );
+		pChapterInfo->SetString( "map", levelName ? levelName : "" );
 	}
 #endif // 0
 	

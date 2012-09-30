@@ -2075,7 +2075,7 @@ void FoundGames::OnItemSelected( const char* panelName )
 #else
 			chapterName = "";
 #endif // 0
-			campaignName = fi.mpGameDetails->GetString( "game/missioninfo/displaytitle", campaignName );
+			campaignName = fi.mpGameDetails->GetString( "game/mission", campaignName );
 			szDownloadAuthor = fi.mpGameDetails->GetString( "game/missioninfo/author", szDownloadAuthor );
 			szDownloadWebsite = fi.mpGameDetails->GetString( "game/missioninfo/website", szDownloadWebsite );
 			bBuiltIn = fi.mpGameDetails->GetInt( "game/missioninfo/builtin", 0 );
