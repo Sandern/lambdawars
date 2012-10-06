@@ -34,7 +34,7 @@
 ConVar sk_plr_dmg_grenade( "sk_plr_dmg_grenade","0");		
 #endif
 
-ConVar mm_max_players( "mm_max_players", "4", FCVAR_REPLICATED | FCVAR_CHEAT, "Max players for matchmaking system" );
+ConVar mm_max_players( "mm_max_players", "16", FCVAR_REPLICATED | FCVAR_CHEAT, "Max players for matchmaking system" );
 
 REGISTER_GAMERULES_CLASS( CHL2WarsGameRules );
 
