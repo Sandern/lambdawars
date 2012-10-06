@@ -70,7 +70,7 @@ ConVar demo_connect_string( "demo_connect_string", "", FCVAR_DEVELOPMENTONLY, "C
 
 ///Asyncronous Operations
 
-#if 0 // Original
+#if 1 // Original
 ConVar mm_ping_max_green( "ping_max_green", "70" );
 ConVar mm_ping_max_yellow( "ping_max_yellow", "140" );
 ConVar mm_ping_max_red( "ping_max_red", "250" );

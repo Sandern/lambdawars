@@ -21,6 +21,8 @@
 #include "missionchooser/iasw_mission_chooser.h"
 #include "missionchooser/iasw_mission_chooser_source.h"
 
+#include "steam/ISteamMatchmaking.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -34,6 +36,8 @@ ConVar ui_public_lobby_filter_campaign( "ui_public_lobby_filter_campaign", "", F
 ConVar ui_public_lobby_filter_status( "ui_public_lobby_filter_status", "", FCVAR_ARCHIVE, "Filter type for game status on the public lobby display" );
 
 ConVar ui_public_lobby_debug( "ui_public_lobby_debug", "0", 0, "Debug public lobby" );
+
+ConVar ui_public_lobby_filter_worldwide( "ui_public_lobby_filter_worldwide", "1", 0, "World wide filter shows all games, while when it's off, it will only show games based on region." );
 
 //=============================================================================
 FoundPublicGames::FoundPublicGames( Panel *parent, const char *panelName ) :
@@ -164,15 +168,28 @@ void FoundPublicGames::PaintBackground()
 }
 
 //=============================================================================
+void FoundPublicGames::SetupSearchFilters( void )
+{
+	if( ui_public_lobby_filter_worldwide.GetBool() )
+	{
+		ISteamMatchmaking *pSteamMatchMaking = steamapicontext->SteamMatchmaking();
+		if( pSteamMatchMaking )
+		{
+			pSteamMatchMaking->AddRequestLobbyListDistanceFilter( k_ELobbyDistanceFilterWorldwide );
+		}
+	}
+}
+
+//=============================================================================
 void FoundPublicGames::StartSearching( void )
 {
 	KeyValues *pKeyValuesSearch = new KeyValues( "Search" );
 
-#if 0
 	char const *szGameMode = m_pDataSettings->GetString( "game/mode", "" );
 	if ( szGameMode && *szGameMode )
 		pKeyValuesSearch->SetString( "game/mode", szGameMode );
 
+#if 0
 	char const *szCampaign = ui_public_lobby_filter_campaign.GetString();
 	if ( szCampaign && *szCampaign )
 		pKeyValuesSearch->SetString( "game/missioninfo/builtin", szCampaign );
@@ -189,6 +206,8 @@ void FoundPublicGames::StartSearching( void )
 	if ( szStatus && *szStatus )
 		pKeyValuesSearch->SetString( "game/state", szStatus );
 #endif // 0
+
+	SetupSearchFilters();
 
 	if ( !m_pSearchManager )
 	{
@@ -258,6 +277,8 @@ static void HandleJoinPublicGame( FoundGameListItem::Info const &fi )
 	IMatchSearchResult *pResult = pWnd->m_pSearchManager->GetResultByOnlineId( fi.mFriendXUID );
 	if ( !pResult )
 		return;
+
+	pWnd->SetupSearchFilters();
 
 	pResult->Join();
 }
@@ -432,6 +453,7 @@ void FoundPublicGames::OnCommand( const char *command )
 			return;
 		}
 
+		DevMsg("Public games: creating a new game\n");
 #if 0
 		KeyValues *pSettings = KeyValues::FromString(
 			"settings",
@@ -489,6 +511,12 @@ void FoundPublicGames::OnCommand( const char *command )
 		" } "
 		);
 		KeyValues::AutoDelete autodelete( pSettings );
+
+		if ( !CUIGameData::Get()->SignedInToLive() )
+		{
+			pSettings->SetString( "system/network", "lan" );
+			pSettings->SetString( "system/access", "public" );
+		}
 
 		pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
 

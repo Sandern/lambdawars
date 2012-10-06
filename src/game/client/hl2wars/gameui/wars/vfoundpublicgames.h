@@ -33,6 +33,8 @@ namespace BaseModUI {
 		virtual void Activate();
 		virtual void OnEvent( KeyValues *pEvent );
 		virtual void OnKeyCodePressed( vgui::KeyCode code );
+
+		void		SetupSearchFilters( void );
 		
 	protected:
 
