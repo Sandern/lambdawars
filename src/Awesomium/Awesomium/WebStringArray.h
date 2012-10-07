@@ -28,26 +28,26 @@ class WebVector;
 class OSM_EXPORT WebStringArray {
  public:
   WebStringArray();
-  explicit WebStringArray(size_t n);
+  explicit WebStringArray(unsigned int n);
   WebStringArray(const WebStringArray& rhs);
   ~WebStringArray();
 
   WebStringArray& operator=(const WebStringArray& rhs);
 
   /// The size of the array
-  size_t size() const;
+  unsigned int size() const;
 
   /// Get the item at a specific index
-  WebString& At(size_t idx);
+  WebString& At(unsigned int idx);
 
   /// Get the item at a specific index
-  const WebString& At(size_t idx) const;
+  const WebString& At(unsigned int idx) const;
 
   /// Get the item at a specific index
-  WebString& operator[](size_t idx);
+  WebString& operator[](unsigned int idx);
 
   /// Get the item at a specific index
-  const WebString& operator[](size_t idx) const;
+  const WebString& operator[](unsigned int idx) const;
 
   /// Add an item to the end of the array
   void Push(const WebString& item);

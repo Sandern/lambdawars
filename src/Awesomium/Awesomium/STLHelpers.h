@@ -1,5 +1,5 @@
 ///
-/// @file STLHelper.h
+/// @file STLHelpers.h
 ///
 /// @brief The header for all of the STL helper functions.
 ///
@@ -29,7 +29,7 @@ inline std::string ToString(const WebString& str) {
   if (str.IsEmpty())
     return std::string();
 
-  size_t len = str.ToUTF8(NULL, 0);
+  unsigned int len = str.ToUTF8(NULL, 0);
 
   char* buffer = new char[len];
   str.ToUTF8(buffer, len);

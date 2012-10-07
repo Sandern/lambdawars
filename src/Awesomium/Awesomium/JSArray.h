@@ -37,7 +37,7 @@ class OSM_EXPORT JSArray {
   /// Create a JSArray with a certain number of elements. All elements will
   /// have Undefined type by default.
   ///
-  explicit JSArray(size_t n);
+  explicit JSArray(unsigned int n);
 
   JSArray(const JSArray& rhs);
   ~JSArray();
@@ -45,25 +45,25 @@ class OSM_EXPORT JSArray {
   JSArray& operator=(const JSArray& rhs);
 
   /// Get the number of items in the array
-  size_t size() const;
+  unsigned int size() const;
 
   /// Get the internal capacity of the array
-  size_t capacity() const;
+  unsigned int capacity() const;
 
   ///
   /// Get the value at a certain index. Will assert if the index is out
   /// of bounds.
   ///
-  JSValue& At(size_t idx);
+  JSValue& At(unsigned int idx);
 
   ///
   /// Get the value at a certain index. Will assert if the index is out
   /// of bounds.
   ///
-  const JSValue& At(size_t idx) const;
+  const JSValue& At(unsigned int idx) const;
 
-  JSValue& operator[](size_t idx);
-  const JSValue& operator[](size_t idx) const;
+  JSValue& operator[](unsigned int idx);
+  const JSValue& operator[](unsigned int idx) const;
 
   ///
   /// Push an item onto the back of the array
@@ -79,12 +79,12 @@ class OSM_EXPORT JSArray {
   /// Insert an item into the array at a specific index.
   /// The index must be greater than or equal to size().
   ///
-  void Insert(const JSValue& item, size_t idx);
+  void Insert(const JSValue& item, unsigned int idx);
 
   ///
   /// Erase an item at a specific index.
   ///
-  void Erase(size_t idx);
+  void Erase(unsigned int idx);
 
   ///
   /// Clear the entire array.

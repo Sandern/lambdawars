@@ -30,7 +30,7 @@ namespace Awesomium {
 ///
 /// Sessions can either be purely in-memory or saved to disk to be restored
 /// later (you will need to provide a writeable path to store the data at
-/// runtime). 
+/// runtime).
 ///
 /// @see WebCore::CreateWebSession
 /// @see WebCore::CreateWebView
@@ -64,6 +64,9 @@ class OSM_EXPORT WebSession {
   /// certain hostname. This is useful for providing your own resource loader
   /// for local assets.
   ///
+  /// @note  You should not add a single DataSource instance to multiple
+  ///        WebSessions. The DataSource should outlive this WebSession.
+  ///
   /// @param  asset_host  The asset hostname that this DataSource will be used
   ///                     for, (eg, asset://asset_host_goes_here/foobar.html).
   ///
@@ -73,6 +76,29 @@ class OSM_EXPORT WebSession {
   ///
   virtual void AddDataSource(const WebString& asset_host,
                              DataSource* source) = 0;
+
+  ///
+  /// Sets a cookie for a certain URL asynchronously.
+  ///
+  /// @param  url  The URL to set the cookie on.
+  ///
+  /// @param  cookie_string  The cookie string, for example:
+  ///                        <pre> "key1=value1; key2=value2" </pre>
+  ///
+  /// @param  is_http_only   Whether or not this cookie is HTTP-only.
+  ///
+  /// @param  force_session_cookie  Whether or not to force this as a session
+  ///                               cookie. (Will not be saved to disk)
+  ///
+  virtual void SetCookie(const WebURL& url,
+                         const WebString& cookie_string,
+                         bool is_http_only,
+                         bool force_session_cookie) = 0;
+
+  ///
+  /// Clears all cookies asynchronously.
+  ///
+  virtual void ClearCookies() = 0;
 
  protected:
   virtual ~WebSession() {}

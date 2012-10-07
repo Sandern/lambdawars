@@ -11,6 +11,7 @@
 #endif
 
 #include "vgui_webview.h"
+#undef PostMessage
 
 class WebNews : public WebView
 {

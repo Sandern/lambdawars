@@ -32,13 +32,13 @@ class OSM_EXPORT WebString {
   explicit WebString();
 
   /// Create a string by copying it from another substring
-  explicit WebString(const WebString& src, size_t pos, size_t n);
+  explicit WebString(const WebString& src, unsigned int pos, unsigned int n);
 
   /// Create a string by copying it from a UTF-16 buffer
   explicit WebString(const wchar16* data);
 
   /// Create a string by copying it from a UTF-16 buffer
-  explicit WebString(const wchar16* data, size_t len);
+  explicit WebString(const wchar16* data, unsigned int len);
 
   WebString(const WebString& src);
 
@@ -47,24 +47,24 @@ class OSM_EXPORT WebString {
   WebString& operator=(const WebString& rhs);
 
   /// Create a WebString from a UTF8 buffer
-  static WebString CreateFromUTF8(const char* data, size_t len);
+  static WebString CreateFromUTF8(const char* data, unsigned int len);
 
   /// Get the internal UTF-16 buffer
-  inline const wchar16* data() const;
+  const wchar16* data() const;
 
   /// Get the length of this string
-  inline size_t length() const;
+  unsigned int length() const;
   
   /// Whether or not this string is empty.
-  inline bool IsEmpty() const;
+  bool IsEmpty() const;
 
   /// Compare this string with another string.
-  inline int Compare(const WebString& src) const;
+  int Compare(const WebString& src) const;
 
   WebString& Assign(const WebString& src);
-  WebString& Assign(const WebString& src, size_t pos, size_t n);
+  WebString& Assign(const WebString& src, unsigned int pos, unsigned int n);
   WebString& Assign(const wchar16* data);
-  WebString& Assign(const wchar16* data, size_t len);
+  WebString& Assign(const wchar16* data, unsigned int len);
 
   /// Append a string to the end of this string.
   WebString& Append(const WebString& src);
@@ -80,7 +80,7 @@ class OSM_EXPORT WebString {
   /// the destination buffer, you should call this with NULL dest and 0 len 
   /// first. Returns the length of the final conversion.
   ///
-  size_t ToUTF8(char* dest, size_t len) const;
+  unsigned int ToUTF8(char* dest, unsigned int len) const;
 
   bool operator==(const WebString& other) const;
   bool operator!=(const WebString& other) const;

@@ -26,8 +26,9 @@ namespace Awesomium {
 ///
 /// @see WebCore::CreateWebSession
 ///
-class OSM_EXPORT WebPreferences {
- public:
+#pragma pack(push)
+#pragma pack(1)
+struct OSM_EXPORT WebPreferences {
   ///
   /// Create a default set of Preferences.
   ///
@@ -92,6 +93,13 @@ class OSM_EXPORT WebPreferences {
   bool enable_smooth_scrolling;
 
   ///
+  /// Whether or not GPU accelerated compositing (experimental) should be
+  /// enabled. This is only compatible with windowed WebViews at this time.
+  /// (Default: false)
+  ///
+  bool enable_gpu_acceleration;
+
+  ///
   /// User-defined CSS to be applied to all web-pages. This is useful for
   /// overriding default styles. (Default: empty)
   ///
@@ -100,8 +108,8 @@ class OSM_EXPORT WebPreferences {
   ///
   /// Proxy configuration string.
   ///
-  /// @note  Can either be: "auto" (use the OS proxy config), "none" (ignore 
-  ///        proxy settings), or you can specify a hardcoded proxy config 
+  /// @note  Can either be: "auto" (use the OS proxy config), "none" (ignore
+  ///        proxy settings), or you can specify a hardcoded proxy config
   ///        string, for example: "myproxyserver.com:80". (Default: "auto")
   ///
   WebString proxy_config;
@@ -164,6 +172,7 @@ class OSM_EXPORT WebPreferences {
   ///
   bool allow_running_insecure_content;
 };
+#pragma pack(pop)
 
 }  // namespace Awesomium
 

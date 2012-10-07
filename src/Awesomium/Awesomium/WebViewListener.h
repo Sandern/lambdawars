@@ -82,18 +82,18 @@ enum Cursor {
 /// Used with WebViewListener::View::OnChangeFocus
 ///
 /// @note  You should generally forward keyboard events to the active WebView
-/// whenever one of the following element types are focused: input, text-input, 
+/// whenever one of the following element types are focused: input, text-input,
 /// editable-content, or plugin
 ///
 enum FocusedElementType {
-  kFocusedElementType_None = 0,        ///< Nothing is focused
-  kFocusedElementType_Text,            ///< A text-node is focused
-  kFocusedElementType_Link,            ///< A link is focused
-  kFocusedElementType_Input,           ///< An input element is focused
-  kFocusedElementType_TextInput,       ///< A text-input element is focused
-  kFocusedElementType_EditableContent, ///< Some editable content is focused
-  kFocusedElementType_Plugin,          ///< A plugin (eg, Flash) is focused
-  kFocusedElementType_Other,           ///< Some other element is focused
+  kFocusedElementType_None = 0,         ///< Nothing is focused
+  kFocusedElementType_Text,             ///< A text-node is focused
+  kFocusedElementType_Link,             ///< A link is focused
+  kFocusedElementType_Input,            ///< An input element is focused
+  kFocusedElementType_TextInput,        ///< A text-input element is focused
+  kFocusedElementType_EditableContent,  ///< Some editable content is focused
+  kFocusedElementType_Plugin,           ///< A plugin (eg, Flash) is focused
+  kFocusedElementType_Other,            ///< Some other element is focused
 };
 
 /// Used with WebViewListener::Process::OnCrashed
@@ -105,6 +105,18 @@ enum TerminationStatus {
   kTerminationStatus_StillRunning  ///< Process hasn't exited yet
 };
 
+/// Used with WebViewListener::InputMethodEditor::OnUpdate
+enum TextInputType {
+  kTextInputType_None,      ///< Input is not editable, no IME should be displayed.
+  kTextInputType_Text,      ///< Input is editable, IME should be displayed.
+  kTextInputType_Password,  ///< Input is a password box, IME should only be displayed if suitable.
+  kTextInputType_Search,    ///< Input is a search box, IME should only be displayed if suitable.
+  kTextInputType_Email,     ///< Input is an email input, IME should only be displayed if suitable.
+  kTextInputType_Number,    ///< Input is a number input, IME should only be displayed if suitable.
+  kTextInputType_Telephone, ///< Input is a telephone input, IME should only be displayed if suitable.
+  kTextInputType_URL,       ///< Input is a URL input, IME should only be displayed if suitable.
+};
+
 /// Used with WebFileChooserInfo
 enum WebFileChooserMode {
   kWebFileChooserMode_Open,         ///< Select a file (file should exist)
@@ -114,14 +126,19 @@ enum WebFileChooserMode {
 };
 
 /// Used with WebViewListener::Dialog::OnShowFileChooser
+#pragma pack(push)
+#pragma pack(1)
 struct OSM_EXPORT WebFileChooserInfo {
   WebFileChooserMode mode;       ///< The type of dialog to display
   WebString title;               ///< Title of the dialog
   WebString default_file_name;   ///< Suggested file name for the dialog
   WebStringArray accept_types;   ///< Valid mime types
 };
+#pragma pack(pop)
 
 /// Used with WebViewListener::Menu::OnShowPopupMenu
+#pragma pack(push)
+#pragma pack(1)
 struct OSM_EXPORT WebPopupMenuInfo {
   Awesomium::Rect bounds;  ///< The location to display the menu
   int item_height;         ///< The height of each menu item
@@ -130,21 +147,20 @@ struct OSM_EXPORT WebPopupMenuInfo {
   WebMenuItemArray items;  ///< The actual menu items
   bool right_aligned;      ///< Whether or not the menu is right-aligned
 };
+#pragma pack(pop)
 
 /// Used with WebContextMenuInfo
-enum MediaType
-{
-	kMediaType_None,
-	kMediaType_Image,
-	kMediaType_Video,
-	kMediaType_Audio,
+enum MediaType {
+  kMediaType_None,
+  kMediaType_Image,
+  kMediaType_Video,
+  kMediaType_Audio,
   kMediaType_File,
   kMediaType_Plugin
 };
 
 /// Used with WebContextMenuInfo
-enum MediaState
-{
+enum MediaState {
   kMediaState_None = 0x0,
   kMediaState_Error = 0x1,
   kMediaState_Paused = 0x2,
@@ -156,8 +172,7 @@ enum MediaState
 };
 
 /// Used with WebContextMenuInfo
-enum CanEditFlags
-{
+enum CanEditFlags {
   kCan_EditNothing = 0x0,
   kCan_Undo = 0x1,
   kCan_Redo = 0x2,
@@ -169,31 +184,37 @@ enum CanEditFlags
 };
 
 /// Used with WebViewListener::Menu::OnShowContextMenu
+#pragma pack(push)
+#pragma pack(1)
 struct OSM_EXPORT WebContextMenuInfo {
-  int pos_x;                ///< The x-coordinate of the menu's position.
-  int pos_y;                ///< The y-coordinate of the menu's position.
-  MediaType media_type;     ///< The type of media (if any) that was clicked.
-  int media_state;          ///< The state of the media (if any).
-  WebURL link_url;          ///< The URL of the link (if any).
-  WebURL src_url;           ///< The URL of the media (if any).
-  WebURL page_url;          ///< The URL of the web-page.
-  WebURL frame_url;         ///< The URL of the frame.
-  int64 frame_id;           ///< The ID of the frame.
-  WebString selection_text; ///< The selected text (if any).
-  bool is_editable;         ///< Whether or not this node is editable.
-  int edit_flags;           ///< Which edit actions can be performed.
+  int pos_x;                 ///< The x-coordinate of the menu's position.
+  int pos_y;                 ///< The y-coordinate of the menu's position.
+  MediaType media_type;      ///< The type of media (if any) that was clicked.
+  int media_state;           ///< The state of the media (if any).
+  WebURL link_url;           ///< The URL of the link (if any).
+  WebURL src_url;            ///< The URL of the media (if any).
+  WebURL page_url;           ///< The URL of the web-page.
+  WebURL frame_url;          ///< The URL of the frame.
+  int64 frame_id;            ///< The ID of the frame.
+  WebString selection_text;  ///< The selected text (if any).
+  bool is_editable;          ///< Whether or not this node is editable.
+  int edit_flags;            ///< Which edit actions can be performed.
 };
+#pragma pack(pop)
 
 /// Used with WebViewListener::Dialog::OnShowLoginDialog
+#pragma pack(push)
+#pragma pack(1)
 struct OSM_EXPORT WebLoginDialogInfo {
-  int request_id;        ///< The unique ID of the request.
-  WebString request_url; ///< The URL of the web-page requesting login.
-  bool is_proxy;         ///< Whether or not this is a proxy auth.
-  WebString host;        ///< The hostname of the server.
-  unsigned short port;   ///< The port of the server.
-  WebString scheme;      ///< The scheme of the server.
-  WebString realm;       ///< The realm of the server.
+  int request_id;         ///< The unique ID of the request.
+  WebString request_url;  ///< The URL of the web-page requesting login.
+  bool is_proxy;          ///< Whether or not this is a proxy auth.
+  WebString host;         ///< The hostname of the server.
+  unsigned short port;    ///< The port of the server.
+  WebString scheme;       ///< The scheme of the server.
+  WebString realm;        ///< The realm of the server.
 };
+#pragma pack(pop)
 
 /// Namespace containing all the WebView event-listener interfaces.
 namespace WebViewListener {
@@ -241,6 +262,11 @@ class OSM_EXPORT View {
   /// application. You should call Resize on the child WebView
   /// immediately after this event to make it match your container
   /// size.
+  ///
+  /// If this is a child of a Windowed WebView, you should call
+  /// WebView::set_parent_window on the new view immediately within
+  /// this event.
+  ///
   virtual void OnShowCreatedWebView(Awesomium::WebView* caller,
                                     Awesomium::WebView* new_view,
                                     const Awesomium::WebURL& opener_url,
@@ -379,6 +405,7 @@ class OSM_EXPORT Dialog {
   ///
   virtual void OnShowLoginDialog(Awesomium::WebView* caller,
                                  const WebLoginDialogInfo& dialog_info) = 0;
+
  protected:
   virtual ~Dialog() {}
 };
@@ -424,8 +451,116 @@ class OSM_EXPORT Print {
   virtual void OnFinishPrint(Awesomium::WebView* caller,
                              int request_id,
                              const WebStringArray& file_list) = 0;
+
  protected:
   virtual ~Print() {}
+};
+
+///
+/// @brief  An interface that you can use to handle all download-related events
+///         for a certain WebView.
+///
+/// @see  WebView::set_download_listener
+///
+class OSM_EXPORT Download {
+ public:
+  ///
+  /// This event occurs when the page requests to begin downloading a certain
+  /// file. It is your responsiblity to call WebView::DidChooseDownloadPath or
+  /// WebView::DidCancelDownload as a result of this event.
+  ///
+  /// @param  download_id  The unique ID of the download.
+  ///
+  /// @param  url  The URL that initiated the download.
+  ///
+  /// @param  suggested_filename  The suggested name for the file.
+  ///
+  /// @param  mime_type  The mime type of the file.
+  ///
+  virtual void OnRequestDownload(Awesomium::WebView* caller,
+                                 int download_id,
+                                 const Awesomium::WebURL& url,
+                                 const Awesomium::WebString& suggested_filename,
+                                 const Awesomium::WebString& mime_type) = 0;
+
+  ///
+  /// This event occurs when the progress of the download is updated.
+  ///
+  /// @param  download_id  The unique ID of the download.
+  ///
+  /// @param  total_bytes  The total number of bytes (may be 0 if unknown).
+  ///
+  /// @param  received_bytes  The number of bytes received so far.
+  ///
+  /// @param  current_speed  The current speed in bytes per second.
+  ///
+  virtual void OnUpdateDownload(Awesomium::WebView* caller,
+                                int download_id,
+                                int64 total_bytes,
+                                int64 received_bytes,
+                                int64 current_speed) = 0;
+
+  ///
+  /// This event occurs when the download is finished.
+  ///
+  /// @param  download_id  The unique ID of the download.
+  ///
+  /// @param  url  The URL that initiated the download.
+  ///
+  /// @param  saved_path  The path that the download was saved to.
+  ///
+  virtual void OnFinishDownload(Awesomium::WebView* caller,
+                                int download_id,
+                                const Awesomium::WebURL& url,
+                                const Awesomium::WebString& saved_path) = 0;
+
+ protected:
+  virtual ~Download() {}
+};
+
+///
+/// @brief  An interface that you can use to handle all IME-related events
+///         for a certain WebView.
+///
+/// @see  WebView::set_input_method_editor_listener
+///
+class OSM_EXPORT InputMethodEditor {
+ public:
+  ///
+  /// You should handle this message if you are displaying your
+  /// own IME (input method editor) widget.
+  ///
+  /// This event is fired whenever the user does something that may change
+  /// the position, visiblity, or type of the IME Widget. This event is only
+  /// active when IME is active (please see WebView::ActivateIME).
+  ///
+  /// @param  caller  The WebView that fired this event.
+  ///
+  /// @param  type  The type of IME widget that should be displayed (if any).
+  ///
+  /// @param  caret_x  The x-position of the caret (relative to the View).
+  /// @param  caret_y  The y-position of the caret (relative to the View).
+  ///
+  virtual void OnUpdateIME(Awesomium::WebView* caller,
+                           Awesomium::TextInputType type,
+                           int caret_x,
+                           int caret_y) = 0;
+
+  ///
+  /// This event is fired when the page cancels the IME composition.
+  ///
+  virtual void OnCancelIME(Awesomium::WebView* caller) = 0;
+
+  ///
+  /// This event is fired when the page changes the displayed range
+  /// of the IME composition.
+  ///
+  virtual void OnChangeIMERange(Awesomium::WebView* caller,
+                                unsigned int start,
+                                unsigned int end) = 0;
+
+ protected:
+  virtual ~InputMethodEditor() {}
 };
 
 }  // namespace WebViewListener

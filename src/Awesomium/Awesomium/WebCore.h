@@ -22,6 +22,7 @@
 #include <Awesomium/WebSession.h>
 #include <Awesomium/WebView.h>
 #include <Awesomium/Surface.h>
+#include <Awesomium/ResourceInterceptor.h>
 
 namespace Awesomium {
 
@@ -53,7 +54,7 @@ class OSM_EXPORT WebCore {
   ///
   /// Get a pointer to the WebCore singleton.
   ///
-  /// @note  Will return NULL if the WebCore has not been initialized.
+  /// @note  Will return 0 if the WebCore has not been initialized.
   ///
   static WebCore* instance();
 
@@ -77,20 +78,24 @@ class OSM_EXPORT WebCore {
   /// @param  width    The initial width, in pixels.
   /// @param  height   The initial height, in pixels.
   ///
-  /// @param  session  The session to use for this WebView. Pass NULL to use
+  /// @param  session  The session to use for this WebView. Pass 0 to use
   ///                  a default, global, in-memory session.
+  ///
+  /// @param  type     The type of WebView to create. See WebViewType for more
+  ///                  information.
   ///
   /// @return  Returns a pointer to a new WebView instance. You should call
   ///          WebView::Destroy when you are done with the instance.
   ///
   virtual WebView* CreateWebView(int width,
                                  int height,
-                                 WebSession* session = NULL) = 0;
+                                 WebSession* session = 0,
+                                 WebViewType type = kWebViewType_Offscreen) = 0;
 
   ///
-  /// Set the SurfaceFactory to be used to create Surfaces for all WebViews
-  /// from this point forward. If you call this, you are responsible for
-  /// destroying the passed instance after you Shutdown the WebCore.
+  /// Set the SurfaceFactory to be used to create Surfaces for all offscreen
+  /// WebViews from this point forward. If you call this, you are responsible
+  /// for destroying the passed instance after you Shutdown the WebCore.
   ///
   /// @param  factory  The factory to be used to create all Surfaces. You are
   ///                  responsible for destroying this instance after you
@@ -105,6 +110,20 @@ class OSM_EXPORT WebCore {
   /// Get the current SurfaceFactory instance.
   ///
   virtual SurfaceFactory* surface_factory() const = 0;
+
+  ///
+  /// Set the ResourceInterceptor instance.
+  ///
+  /// @param  interceptor  The instance that will be used to intercept all
+  ///                      resources. You are responsible for destroying this
+  ///                      instance after you call Shutdown.
+  ///
+  virtual void set_resource_interceptor(ResourceInterceptor* interceptor) = 0;
+
+  ///
+  /// Get the current ResourceInterceptor instance.
+  ///
+  virtual ResourceInterceptor* resource_interceptor() const = 0;
 
   ///
   /// Updates the WebCore, you must call this periodically within your

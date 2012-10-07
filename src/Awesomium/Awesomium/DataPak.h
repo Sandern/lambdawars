@@ -25,7 +25,10 @@ namespace Awesomium {
 class DataPakImpl;
 
 ///
-/// Packs all files in a certain directory into a PAK file.
+/// Packs all files in a certain directory into a PAK file. You should probably
+/// not call this during run-time; the general idea is to create a standalone
+/// app that calls this function to pack your files before-hand and then use
+/// DataPakSource to load those during the runtime of your application.
 ///
 /// @param  out_file  The full file-path to the output PAK file (filename
 ///                   should end with `.pak`).
@@ -46,6 +49,8 @@ bool OSM_EXPORT WriteDataPak(const WebString& out_file,
 
 ///
 /// @brief  A special DataSource that loads all resources from a PAK file.
+///
+/// @see WriteDataPak
 ///
 class OSM_EXPORT DataPakSource : public DataSource {
  public:

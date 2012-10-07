@@ -36,8 +36,9 @@ enum WebMenuItemType {
 ///
 /// @brief  Represents an item in a menu. This is used for Popup Menus.
 ///
-class OSM_EXPORT WebMenuItem {
- public:
+#pragma pack(push)
+#pragma pack(1)
+struct OSM_EXPORT WebMenuItem {
   WebMenuItem();
 
   /// The type of this item
@@ -65,6 +66,7 @@ class OSM_EXPORT WebMenuItem {
   /// kTypeCheckableOption).
   bool checked;
 };
+#pragma pack(pop)
 
 template<class T>
 class WebVector;
@@ -75,26 +77,26 @@ class WebVector;
 class OSM_EXPORT WebMenuItemArray {
  public:
   WebMenuItemArray();
-  explicit WebMenuItemArray(size_t n);
+  explicit WebMenuItemArray(unsigned int n);
   WebMenuItemArray(const WebMenuItemArray& rhs);
   ~WebMenuItemArray();
 
   WebMenuItemArray& operator=(const WebMenuItemArray& rhs);
 
   /// The size of the array
-  size_t size() const;
+  unsigned int size() const;
 
   /// Get the item at a specific index
-  WebMenuItem& At(size_t idx);
+  WebMenuItem& At(unsigned int idx);
 
   /// Get the item at a specific index
-  const WebMenuItem& At(size_t idx) const;
+  const WebMenuItem& At(unsigned int idx) const;
 
   /// Get the item at a specific index
-  WebMenuItem& operator[](size_t idx);
+  WebMenuItem& operator[](unsigned int idx);
 
   /// Get the item at a specific index
-  const WebMenuItem& operator[](size_t idx) const;
+  const WebMenuItem& operator[](unsigned int idx) const;
 
   /// Add an item to the end of the array
   void Push(const WebMenuItem& item);

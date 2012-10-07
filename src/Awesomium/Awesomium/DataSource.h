@@ -69,7 +69,7 @@ class OSM_EXPORT DataSource {
   ///        that the request failed.
   ///
   void SendResponse(int request_id,
-                    size_t buffer_size,
+                    unsigned int buffer_size,
                     unsigned char* buffer,
                     const WebString& mime_type);
 

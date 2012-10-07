@@ -35,7 +35,12 @@ enum LogLevel {
 ///
 /// @see WebCore::Initialize
 ///
-class OSM_EXPORT WebConfig {
+/// @note  You can specify additional settings for each WebSession via
+///        the WebPreferences class.
+///
+#pragma pack(push)
+#pragma pack(1)
+struct OSM_EXPORT WebConfig {
  public:
   ///
   /// Creates the default WebConfig.
@@ -104,6 +109,7 @@ class OSM_EXPORT WebConfig {
   ///
   WebStringArray additional_options;
 };
+#pragma pack(pop)
 
 }  // namespace Awesomium
 

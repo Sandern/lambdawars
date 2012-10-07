@@ -25,15 +25,13 @@ namespace Awesomium {
 ///
 /// @see WebView::PrintToFile
 ///
-class OSM_EXPORT PrintConfig {
- public:
+#pragma pack(push)
+#pragma pack(1)
+struct OSM_EXPORT PrintConfig {
   ///
   /// Create the default Printing Configuration
   ///
   PrintConfig();
-
-  /// A writable directory where all files will be written to.
-  WebString output_directory;
 
   /// The dimensions (width/height) of the page, in points.
   Awesomium::Rect page_size;
@@ -47,6 +45,7 @@ class OSM_EXPORT PrintConfig {
   /// Whether or not we should only print the selection.
   bool print_selection_only;
 };
+#pragma pack(pop)
 
 }  // namespace Awesomium
 

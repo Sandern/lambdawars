@@ -32,6 +32,20 @@ namespace Awesomium {
 class WebSession;
 
 ///
+/// The different WebView types.
+///
+/// @see WebCore::CreateWebView
+///
+enum WebViewType {
+  kWebViewType_Offscreen,  // This type will render continuously to a buffer
+                           // (Surface). You must display the Surface and pass
+                           // all input (mouse/keyboard events) yourself.
+
+  kWebViewType_Window,     // This type will create a native Window to display
+                           // the WebView and will capture all input itself.
+};
+
+///
 /// The three different mouse-button types.
 ///
 /// @see WebView::InjectMouseDown
@@ -45,11 +59,11 @@ enum MouseButton {
 ///
 /// @brief A WebView is similar to a tab in a browser. You load pages into a
 /// WebView, interact with it, and display it however you want.
-/// 
+///
 /// Unless otherwise specified, all methods are asynchronous and must
 /// be called from the main thread. Each WebView is rendered in its own
 /// child-process and most API calls must be proxied through IPC messages.
-/// 
+///
 /// @see WebCore::CreateWebView
 ///
 class OSM_EXPORT WebView {
@@ -59,6 +73,53 @@ class OSM_EXPORT WebView {
   /// will be destroyed upon calling WebCore::Shutdown.
   ///
   virtual void Destroy() = 0;
+
+  ///
+  /// The type of this WebView (declared at WebCore::CreateWebView). If this
+  /// is an Offscreen WebView, you will need to display the Surface and pass
+  /// all input yourself.
+  ///
+  virtual WebViewType type() = 0;
+
+  ///
+  /// Get the unique ID for the corresponding child-process hosting this
+  /// WebView. May return 0 if the WebView has crashed or there is no
+  /// process active.
+  ///
+  virtual int process_id() = 0;
+
+  ///
+  /// Get the handle for the corresponding child-process hosting this
+  /// WebView. This may not be initialized until some time after the
+  /// WebView is actually created (when we receive the first IPC message
+  /// from the child-process).
+  ///
+  virtual ProcessHandle process_handle() = 0;
+
+  ///
+  /// Set the parent window for this WebView. You should only call this
+  /// for windowed WebViews (eg, those created with kWebViewType_Window)
+  /// on the Windows platform.
+  ///
+  /// You should call this method immediately after calling CreateWebView,
+  /// the window for this WebView will not be created until the first
+  /// call to set_parent_window on the Windows platform.
+  ///
+  virtual void set_parent_window(NativeWindow parent) = 0;
+
+  ///
+  /// Get the parent window for this WebView.
+  ///
+  virtual NativeWindow parent_window() = 0;
+
+  ///
+  /// Get the actual window handle that was created by this WebView. This is
+  /// only valid for windowed WebViews.
+  ///
+  /// On the Mac OSX platform, you will need to retrieve this window (NSView)
+  /// and add it to your application's view container to display it.
+  ///
+  virtual NativeWindow window() = 0;
 
   ///
   /// Register a listener to handle view-related events.
@@ -102,6 +163,21 @@ class OSM_EXPORT WebView {
   ///
   virtual void set_print_listener(WebViewListener::Print* listener) = 0;
 
+  ///
+  /// Register a listener to handle download-related events.
+  ///
+  /// @param  listener  The instance to register (you retain ownership).
+  ///
+  virtual void set_download_listener(WebViewListener::Download* listener) = 0;
+
+  ///
+  /// Register a listener to handle IME-related events.
+  ///
+  /// @param  listener  The instance to register (you retain ownership).
+  ///
+  virtual void set_input_method_editor_listener(
+                             WebViewListener::InputMethodEditor* listener) = 0;
+
   /// Get the current view-event listener (may be NULL).
   virtual WebViewListener::View* view_listener() = 0;
 
@@ -119,6 +195,12 @@ class OSM_EXPORT WebView {
 
   /// Get the current print-event listener (may be NULL).
   virtual WebViewListener::Print* print_listener() = 0;
+
+  /// Get the current download-event listener (may be NULL).
+  virtual WebViewListener::Download* download_listener() = 0;
+
+  /// Get the current download-event listener (may be NULL).
+  virtual WebViewListener::InputMethodEditor* input_method_editor_listener() = 0;
 
   ///
   /// Begin loading a certain URL asynchronously.
@@ -172,14 +254,15 @@ class OSM_EXPORT WebView {
   ///
   virtual bool CanGoForward() = 0;
 
-  /// 
-  /// Get the current rendering Surface. May be NULL.
-  /// 
+  ///
+  /// Get the current rendering Surface. May be NULL. This is only valid for
+  /// offscreen WebViews (this will be NULL for windowed WebViews).
+  ///
   /// @note: If you never call WebCore::SetSurfaceFactory, the returned
   ///        Surface will always be of type BitmapSurface.
   ///
   /// @see WebCore::set_surface_factory
-  /// 
+  ///
   virtual Surface* surface() = 0;
 
   /// Get the current page URL.
@@ -199,7 +282,8 @@ class OSM_EXPORT WebView {
 
   ///
   /// Resize to certain pixel dimensions (will trigger a new Surface to
-  /// be created).
+  /// be created). This operation is asynchronous and may not complete
+  /// by the time this method returns.
   ///
   /// @param  width  The width in pixels.
   ///
@@ -213,6 +297,8 @@ class OSM_EXPORT WebView {
   /// body element has "background-color: transparent;" or some other
   /// semi-translucent background). Please note that the alpha channel is
   /// premultiplied.
+  ///
+  /// This is only compatible with Offscreen WebViews.
   ///
   /// If you never call this, the view will have an opaque, white background
   /// by default.
@@ -257,9 +343,9 @@ class OSM_EXPORT WebView {
   virtual void Unfocus() = 0;
 
   ///
-  /// Get the type of the currently-focused element. This is useful for determining if
-  /// the WebView should capture keyboard events. If no element is focused, this will
-  /// return kFocusedElementType_None.
+  /// Get the type of the currently-focused element. This is useful for
+  /// determining if the WebView should capture keyboard events. If no element
+  /// is focused, this will return kFocusedElementType_None.
   ///
   /// @see FocusedElementType
   ///
@@ -316,6 +402,43 @@ class OSM_EXPORT WebView {
   virtual void InjectTouchEvent(const WebTouchEvent& touch_event) = 0;
 
   ///
+  /// Call this method to let the WebView know you will be passing
+  /// text input via IME and will need to be notified of any
+  /// IME-related events (caret position, user unfocusing textbox, etc.)
+  /// Please see WebViewListener::InputMethodEditor.
+  ///
+  /// Please note this is only compatible with Offscreen WebViews.
+  ///
+  /// @param  activate  Whether or not IME should be activated.
+  ///
+  virtual void ActivateIME(bool activate) = 0;
+
+  ///
+  /// Update the current IME text composition.
+  ///
+  /// @param  input_string  The string generated by your IME.
+  /// @param  cursor_pos    The current cursor position in your IME composition.
+  /// @param  target_start  The position of the beginning of the selection.
+  /// @param  target_end    The position of the end of the selection.
+  ///
+  virtual void SetIMEComposition(const WebString& input_string,
+                                 int cursor_pos,
+                                 int target_start,
+                                 int target_end) = 0;
+
+  ///
+  /// Confirm a current IME text composition.
+  ///
+  /// @param  input_string  The string generated by your IME.
+  ///
+  virtual void ConfirmIMEComposition(const WebString& input_string) = 0;
+
+  ///
+  /// Cancel a current IME text composition.
+  ///
+  virtual void CancelIMEComposition() = 0;
+
+  ///
   /// Undo the last 'edit' operation. (Similar to CTRL+Z).
   ///
   virtual void Undo() = 0;
@@ -368,6 +491,8 @@ class OSM_EXPORT WebView {
   ///
   /// Prints this WebView to a PDF file asynchronously.
   ///
+  /// @param  output_directory  A writeable directory to write the file(s) to.
+  ///
   /// @param  config  The configuration settings to use (you must specify
   ///                 a writable output_path or this operation will fail).
   ///
@@ -377,7 +502,8 @@ class OSM_EXPORT WebView {
   ///          this specific request (see WebViewListener::Print). May return 0
   ///          if this method fails prematurely (eg, if the view has crashed).
   ///
-  virtual int PrintToFile(const PrintConfig& config) = 0;
+  virtual int PrintToFile(const WebString& output_directory,
+                          const PrintConfig& config) = 0;
 
   ///
   /// Check if an error occurred during the last synchronous API call.
@@ -392,12 +518,13 @@ class OSM_EXPORT WebView {
   ///
   /// @note
   ///
-  /// Global Objects can only contain the following JavaScript types as 
+  /// Global Objects can only contain the following JavaScript types as
   /// properties:
   ///
   /// - Number
   /// - String
   /// - Array
+  /// - Other Global Objects
   /// - Null
   /// - Undefined
   ///
@@ -407,6 +534,12 @@ class OSM_EXPORT WebView {
   /// wait until the first DOMReady event before creating your objects).
   ///
   /// @param  name  The name of the object as it will appear in JavaScript.
+  ///               To create a child global-object, you should specify the
+  ///               the full name with dot-notation for example:
+  ///                  parentobject.childobject
+  ///
+  ///               The parent object should exist before attempting to make
+  ///               any children.
   ///
   /// @return The returned JSValue will be of 'Object' type if this call
   /// succeeds. You can check the reason why the call failed by calling
@@ -463,7 +596,7 @@ class OSM_EXPORT WebView {
 
   ///
   /// This method should be called as the result of a user selecting an item
-  /// in a popup (dropdown) menu. 
+  /// in a popup (dropdown) menu.
   ///
   /// @param  item_index  The index of the item selected. Item index starts
   ///                     at 0. You can pass -1 as a shortcut for
@@ -499,7 +632,7 @@ class OSM_EXPORT WebView {
   /// This method should be called as the result of a user supplying
   /// their credentials in a login dialog.
   ///
-  /// @param  request_id  The id of the request that was handled (see 
+  /// @param  request_id  The id of the request that was handled (see
   ///                     WebLoginDialogInfo::request_id).
   ///
   /// @param  username  The username supplied.
@@ -516,12 +649,36 @@ class OSM_EXPORT WebView {
   /// This method should be called as the result of a user cancelling
   /// a login dialog.
   ///
-  /// @param  request_id  The id of the request that was handled (see 
+  /// @param  request_id  The id of the request that was handled (see
   ///                     WebLoginDialogInfo::request_id).
   ///
   /// @see  WebViewListener::Dialog::OnShowLoginDialog
   ///
   virtual void DidCancelLogin(int request_id) = 0;
+
+  ///
+  /// This method should be called as the result of a user selecting
+  /// a path to download a file. The file will only begin downloading
+  /// after this call is made.
+  ///
+  /// @param  download_id  The id of the download.
+  ///
+  /// @param  path  The full path (including filename) to write the download to.
+  ///
+  /// @see  WebViewListener::Download::OnRequestDownload
+  ///
+  virtual void DidChooseDownloadPath(int download_id,
+                                     const WebString& path) = 0;
+
+  ///
+  /// This method should be called as the result of a user cancelling a
+  /// download.
+  ///
+  /// @param  download_id  The id of the download.
+  ///
+  /// @see  WebViewListener::Download::OnRequestDownload
+  ///
+  virtual void DidCancelDownload(int download_id) = 0;
 
  protected:
     virtual ~WebView() {}

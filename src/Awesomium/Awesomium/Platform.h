@@ -25,8 +25,19 @@
 #  define OSM_EXPORT __attribute__((visibility("default")))
 #endif
 
+#if defined(_WIN32)
+#include <Windows.h>
+#elif defined(__APPLE__)
+#include <unistd.h>
+#ifdef __OBJC__
+@class NSView;
+#else
+class NSView;
+#endif
+#endif
+
 #if __LP64__
-typedef long		int64;
+typedef long int64;
 #else
 typedef long long	int64;
 #endif
@@ -38,14 +49,26 @@ namespace Awesomium {
 
 /// Represents a generic error.
 enum Error {
-  kError_None = 0,       ///< No error (everything is cool!)
-  kError_BadParameters,  ///< Bad parameters were supplied.
-  kError_ObjectGone,     ///< The object no longer exists.
-  kError_ConnectionGone, ///< The IPC connection no longest exists.
-  kError_TimedOut,       ///< The operation timed out.
-  kError_WebViewGone,    ///< The WebView no longer exists.
-  kError_Generic,        ///< A generic error was encountered.
+  kError_None = 0,        ///< No error (everything is cool!)
+  kError_BadParameters,   ///< Bad parameters were supplied.
+  kError_ObjectGone,      ///< The object no longer exists.
+  kError_ConnectionGone,  ///< The IPC connection no longest exists.
+  kError_TimedOut,        ///< The operation timed out.
+  kError_WebViewGone,     ///< The WebView no longer exists.
+  kError_Generic,         ///< A generic error was encountered.
 };
+
+#if defined(_WIN32)
+typedef HWND NativeWindow;
+#elif defined(__APPLE__)
+typedef NSView* NativeWindow;
+#endif
+
+#if defined(_WIN32)
+typedef HANDLE ProcessHandle;
+#elif defined(__APPLE__)
+typedef pid_t ProcessHandle;
+#endif
 
 #pragma pack(push)
 #pragma pack(1)
@@ -91,10 +114,11 @@ struct OSM_EXPORT Rect {
 ///
 /// @section usefullinks_sec Useful Links
 /// - Awesomium Main: <http://www.awesomium.com>
-/// - Support Home: <http://support.awesomium.com>
-/// 
+/// - Community Forums: <http://forums.awesomium.com>
+/// - Wiki: <http://wiki.awesomium.com>
+///
 /// @section copyright_sec Copyright
-/// This documentation is copyright (C) 2012 Khrona. All rights reserved. 
+/// This documentation is copyright (C) 2012 Khrona. All rights reserved.
 /// Awesomium is a trademark of Khrona.
 ///
 

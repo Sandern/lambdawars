@@ -75,6 +75,11 @@ class OSM_EXPORT JSObject {
   ///
   unsigned int remote_id() const;
 
+  ///
+  /// Get the remote reference count for this JSObject (will be 0 for Local).
+  ///
+  int ref_count() const;
+
   /// Get this object's type.
   JSObjectType type() const;
 

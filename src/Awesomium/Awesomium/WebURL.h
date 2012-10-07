@@ -35,6 +35,9 @@ class OSM_EXPORT WebURL {
   ///
   /// Create a WebURL from a string.
   ///
+  /// @param  url_string  A properly-formatted URL string. For example,
+  ///                     http://www.google.com is valid, www.google.com is not
+  ///
   explicit WebURL(const WebString& url_string);
   WebURL(const WebURL& rhs);
 
@@ -43,10 +46,10 @@ class OSM_EXPORT WebURL {
   WebURL& operator=(const WebURL& rhs);
 
   /// Whether or not this URL is valid (was parsed successfully).
-  inline bool IsValid() const;
+  bool IsValid() const;
 
   /// Whether or not this URL is empty.
-  inline bool IsEmpty() const;
+  bool IsEmpty() const;
 
   /// The actual URL string.
   WebString spec() const;

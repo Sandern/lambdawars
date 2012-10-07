@@ -25,7 +25,7 @@ class WebView;
 ///
 /// @brief  This interface can be used to provide your own Surface
 ///         implementation to directly handle paint and pixel-scroll events
-///         for all WebViews.
+///         for all offscreen WebViews.
 ///
 /// You should use this by defining your own SurfaceFactory that creates
 /// your specific Surface implementation.
@@ -42,7 +42,10 @@ class OSM_EXPORT Surface {
   /// src_buffer to the location in this Surface specified by dest_rect.
   ///
   /// @param src_buffer  A pointer to a block of pixels in 32-bit BGRA format.
-  ///                    Size of the buffer is `src_row_span * src_rect.height`
+  ///                    Size of the buffer is `src_row_span * src_rect.height`.
+  ///                    Beware that src_buffer points to the beginning of the
+  ///                    transport buffer, you should use src_rect to determine
+  ///                    the offset to begin copying pixels from.
   ///
   /// @param src_row_span  The number of bytes of each row.
   ///                      (Usually `src_rect.width * 4`)
