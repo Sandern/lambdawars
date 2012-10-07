@@ -1628,7 +1628,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="functionproxy.h" />
     <ClInclude Include="fx.h" />
     <ClInclude Include="fx_blood.h" />
-    <ClInclude Include="cstrike\fx_cs_blood.h" />
     <ClInclude Include="fx_discreetline.h" />
     <ClInclude Include="fx_envelope.h" />
     <ClInclude Include="fx_explosion.h" />
@@ -1660,7 +1659,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="hud_macros.h" />
     <ClInclude Include="hud_numericdisplay.h" />
     <ClInclude Include="hud_pdump.h" />
-    <ClInclude Include="cstrike\hud_radar.h" />
     <ClInclude Include="hud_vehicle.h" />
     <ClInclude Include="hudelement.h" />
     <ClInclude Include="hudtexturehandle.h" />
@@ -1982,7 +1980,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\animation.h" />
     <ClInclude Include="..\shared\apparent_velocity_helper.h" />
     <ClInclude Include="..\shared\base_playeranimstate.h" />
-    <ClInclude Include="..\shared\cstrike\basecsgrenade_projectile.h" />
     <ClInclude Include="..\shared\baseentity_shared.h" />
     <ClInclude Include="..\shared\basegrenade_shared.h" />
     <ClInclude Include="..\shared\hl2\basehlcombatweapon_shared.h" />
@@ -2010,7 +2007,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\eventlist.h" />
     <ClInclude Include="..\shared\func_dust_shared.h" />
     <ClInclude Include="..\shared\func_ladder.h" />
-    <ClInclude Include="..\shared\cstrike\fx_cs_shared.h" />
     <ClInclude Include="..\shared\gameeventdefs.h" />
     <ClInclude Include="..\shared\gamemovement.h" />
     <ClInclude Include="..\shared\gamerules.h" />
@@ -2089,9 +2085,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\voice_gamemgr.h" />
     <ClInclude Include="..\shared\voice_status.h" />
     <ClInclude Include="..\shared\vphysics_sound.h" />
-    <ClInclude Include="..\shared\cstrike\weapon_flashbang.h" />
-    <ClInclude Include="..\shared\cstrike\weapon_hegrenade.h" />
-    <ClInclude Include="..\shared\weapon_ifmsteadycam.h" />
     <ClInclude Include="..\shared\weapon_parse.h" />
     <ClInclude Include="..\shared\weapon_proficiency.h" />
     <ClInclude Include="game_controls\baseviewport.h" />

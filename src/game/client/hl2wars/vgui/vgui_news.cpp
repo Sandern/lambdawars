@@ -33,19 +33,26 @@ WebNews::WebNews( vgui::Panel *pParent ) : WebView( false, pParent )
 	SetMouseInputEnabled( true );
 	//SetUseMouseCapture( false );
 
-	m_CurVersion = CREATE_WEBSTRING( SrcPySystem()->RunT< const char * >( SrcPySystem()->Get("_GetVersion", "srcmgr"), "" ) );
+	if( IsValid() )
+	{
+		m_CurVersion = CREATE_WEBSTRING( SrcPySystem()->RunT< const char * >( SrcPySystem()->Get("_GetVersion", "srcmgr"), "" ) );
 
-	Awesomium::WebString interfacename = CREATE_WEBSTRING( "interface" );
-	m_JSInterface = GetWebView()->CreateGlobalJavascriptObject( interfacename ).ToObject();
+		Awesomium::WebString interfacename = CREATE_WEBSTRING( "interface" );
+		Awesomium::JSValue v = GetWebView()->CreateGlobalJavascriptObject( interfacename );
+		if( GetWebView()->last_error() == Awesomium::kError_None )
+		{
+			m_JSInterface = v.ToObject();
 
-	m_LaunchUpdaterMethodName = CREATE_WEBSTRING("launchupdater");
-	m_HasDesuraMethodName = CREATE_WEBSTRING("hasdesura");
-	m_GetVersionMethodName = CREATE_WEBSTRING("getversion");
-	m_OpenURLMethodName = CREATE_WEBSTRING("openurl");
-	m_JSInterface.SetCustomMethod( m_LaunchUpdaterMethodName, false );
-	m_JSInterface.SetCustomMethod( m_HasDesuraMethodName, true );
-	m_JSInterface.SetCustomMethod( m_GetVersionMethodName, true );
-	m_JSInterface.SetCustomMethod( m_OpenURLMethodName, false );
+			m_LaunchUpdaterMethodName = CREATE_WEBSTRING("launchupdater");
+			m_HasDesuraMethodName = CREATE_WEBSTRING("hasdesura");
+			m_GetVersionMethodName = CREATE_WEBSTRING("getversion");
+			m_OpenURLMethodName = CREATE_WEBSTRING("openurl");
+			m_JSInterface.SetCustomMethod( m_LaunchUpdaterMethodName, false );
+			m_JSInterface.SetCustomMethod( m_HasDesuraMethodName, true );
+			m_JSInterface.SetCustomMethod( m_GetVersionMethodName, true );
+			m_JSInterface.SetCustomMethod( m_OpenURLMethodName, false );
+		}
+	}
 }
 
 void WebNews::OnMethodCall(Awesomium::WebView* caller,

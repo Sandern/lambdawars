@@ -475,6 +475,11 @@ void WebView::Clear()
 	}
 }
 
+bool WebView::IsValid()
+{
+	return g_pWebCore && m_pWebView && m_pWebView->process_id() != 0;
+}
+
 void WebView::SetSize( int wide, int tall )
 {
 	m_pPanel->SetSize( wide, tall );
@@ -620,6 +625,11 @@ bp::object WebView::ExecuteJavascriptWithResult(bp::str script, bp::str frame_xp
 	Awesomium::WebString wframe_xpath = PyObjectToWebString( frame_xpath );
 
 	Awesomium::JSValue result = m_pWebView->ExecuteJavascriptWithResult( wscript, wframe_xpath );
+	if( GetWebView()->last_error() != Awesomium::kError_None )
+	{
+		PyErr_SetString(PyExc_ValueError, "An error occurred during ExecuteJavascriptWithResult");	\
+		throw boost::python::error_already_set();													\
+	}
 
 	return ConvertJSValue( result );
 }
@@ -634,6 +644,11 @@ bp::object WebView::CreateGlobalJavascriptObject( bp::object name )
 	Awesomium::WebString wname = PyObjectToWebString( name );
 
 	Awesomium::JSValue result = m_pWebView->CreateGlobalJavascriptObject( wname );
+	if( GetWebView()->last_error() != Awesomium::kError_None )
+	{
+		PyErr_SetString(PyExc_ValueError, "An error occurred during CreateGlobalJavascriptObject");	\
+		throw boost::python::error_already_set();													\
+	}
 	return ConvertJSValue( result );
 }
 
@@ -1096,6 +1111,10 @@ void WebView::OnCrashed(Awesomium::WebView* caller, Awesomium::TerminationStatus
 			PyErr_Print();
 			return;
 		}
+	}
+	else
+	{
+		Warning("WebView crashed\n");
 	}
 #endif // DISABLE_PYTHON
 }

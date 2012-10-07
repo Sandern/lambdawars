@@ -44,6 +44,7 @@ public:
 	~WebView( void );
 
 	void Clear();
+	bool IsValid(); // True if both webcore and webview are valid
 
 	void SetSize( int wide, int tall );
 	void SetPos( int x, int y );

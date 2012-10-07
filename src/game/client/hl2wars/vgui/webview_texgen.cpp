@@ -114,6 +114,12 @@ bool CSrcWebCore::Init()
 	// Create the WebCore singleton with our custom config
 	g_pWebCore = Awesomium::WebCore::Initialize( config );
 
+	if( !g_pWebCore )
+	{
+		Warning("Failed to initialize WebCore (Awesomium)\n");
+		return true;
+	}
+
 	// Custom surface factory
 	g_pWebCore->set_surface_factory( GetWebViewSurfaceFactory() );
 
@@ -244,7 +250,6 @@ bool CSrcWebCore::Init()
 	m_AwesomiumSrcKeyMap.Insert( KEY_F11, Awesomium::KeyCodes::AK_F11 ); 
 	m_AwesomiumSrcKeyMap.Insert( KEY_F12, Awesomium::KeyCodes::AK_F12 ); 
 #endif // DISABLE_AWESOMIUM
-
 	return true; 
 }
 

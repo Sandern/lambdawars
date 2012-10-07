@@ -1349,13 +1349,11 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="hl2\npc_attackchopper.h" />
     <ClInclude Include="hl2\npc_bullseye.h" />
     <ClInclude Include="hl2\rotorwash.h" />
-    <ClInclude Include="..\..\public\mathlib\amd3dx.h" />
     <ClInclude Include="..\shared\ammodef.h" />
     <ClInclude Include="..\shared\base_playeranimstate.h" />
     <ClInclude Include="base_transmit_proxy.h" />
     <ClInclude Include="..\..\public\basehandle.h" />
     <ClInclude Include="basetempentity.h" />
-    <ClInclude Include="..\..\public\basetypes.h" />
     <ClInclude Include="..\shared\beam_flags.h" />
     <ClInclude Include="..\..\public\tier1\bitbuf.h" />
     <ClInclude Include="..\..\public\bittools.h" />
@@ -1365,7 +1363,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\..\public\bspfile.h" />
     <ClInclude Include="..\..\public\bspflags.h" />
     <ClInclude Include="..\..\public\mathlib\bumpvects.h" />
-    <ClInclude Include="..\..\public\cache_user.h" />
     <ClInclude Include="..\shared\cellcoord.h" />
     <ClInclude Include="..\..\public\tier1\characterset.h" />
     <ClInclude Include="..\..\public\tier1\checksum_md5.h" />
@@ -1376,7 +1373,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="coerciblevariant_t.h" />
     <ClInclude Include="..\..\public\vphysics\collision_set.h" />
     <ClInclude Include="..\..\public\Color.h" />
-    <ClInclude Include="..\..\public\commonmacros.h" />
     <ClInclude Include="..\..\public\mathlib\compressed_light_cube.h" />
     <ClInclude Include="..\..\public\mathlib\compressed_vector.h" />
     <ClInclude Include="..\..\public\const.h" />
@@ -1384,7 +1380,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\..\public\coordsize.h" />
     <ClInclude Include="cplane.h" />
     <ClInclude Include="damagemodifier.h" />
-    <ClInclude Include="..\..\public\tier1\datalru.h" />
     <ClInclude Include="..\..\public\datamap.h" />
     <ClInclude Include="..\..\public\tier0\dbg.h" />
     <ClInclude Include="..\shared\death_pose.h" />
@@ -1437,7 +1432,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\..\public\vstdlib\IKeyValuesSystem.h" />
     <ClInclude Include="ilagcompensationmanager.h" />
     <ClInclude Include="..\..\public\vgui\ILocalize.h" />
-    <ClInclude Include="..\..\public\ImageLoader.h" />
     <ClInclude Include="..\..\public\materialsystem\imaterial.h" />
     <ClInclude Include="..\..\public\materialsystem\imaterialsystem.h" />
     <ClInclude Include="..\..\public\materialsystem\imaterialvar.h" />
@@ -1458,7 +1452,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\itempents.h" />
     <ClInclude Include="..\..\public\engine\ivdebugoverlay.h" />
     <ClInclude Include="..\shared\IVehicle.h" />
-    <ClInclude Include="..\..\public\engine\IVEngineCache.h" />
     <ClInclude Include="..\..\public\engine\ivmodelinfo.h" />
     <ClInclude Include="..\..\public\tier1\KeyValues.h" />
     <ClInclude Include="..\..\public\tier0\l2cache.h" />
@@ -1478,7 +1471,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="npc_vehicledriver.h" />
     <ClInclude Include="..\shared\npcevent.h" />
     <ClInclude Include="..\..\public\vphysics\object_hash.h" />
-    <ClInclude Include="..\shared\particle_dispatch_shared.h" />
     <ClInclude Include="particle_system.h" />
     <ClInclude Include="physics_cannister.h" />
     <ClInclude Include="physics_fx.h" />
@@ -1538,7 +1530,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\util_shared.h" />
     <ClInclude Include="..\..\public\UtlCachedFileData.h" />
     <ClInclude Include="..\..\public\tier1\utldict.h" />
-    <ClInclude Include="..\..\public\tier1\utlfixedlinkedlist.h" />
     <ClInclude Include="..\..\public\tier1\utlfixedmemory.h" />
     <ClInclude Include="..\..\public\tier1\utlhash.h" />
     <ClInclude Include="..\..\public\tier1\utllinkedlist.h" />
@@ -1553,8 +1544,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="variant_t.h" />
     <ClInclude Include="..\..\public\vcollide.h" />
     <ClInclude Include="..\..\public\vcollide_parse.h" />
-    <ClInclude Include="..\..\public\tier0\vcr_shared.h" />
-    <ClInclude Include="..\..\public\tier0\vcrmode.h" />
     <ClInclude Include="..\..\public\mathlib\vector.h" />
     <ClInclude Include="..\..\public\mathlib\vector2d.h" />
     <ClInclude Include="..\..\public\mathlib\vector4d.h" />
