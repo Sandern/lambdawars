@@ -56,13 +56,6 @@ struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject >
     
     }
 
-    PyPhysicsObject_wrapper(::IPhysicsObject * pPhysObj )
-    : PyPhysicsObject( boost::python::ptr(pPhysObj) )
-      , bp::wrapper< PyPhysicsObject >(){
-        // constructor
-    
-    }
-
     PyPhysicsObject_wrapper(::C_BaseEntity * pEnt )
     : PyPhysicsObject( boost::python::ptr(pEnt) )
       , bp::wrapper< PyPhysicsObject >(){
@@ -600,8 +593,6 @@ BOOST_PYTHON_MODULE(_physics){
         typedef bp::class_< PyPhysicsObject_wrapper, bp::bases< PyPhysicsObjectBase > > PhysicsObject_exposer_t;
         PhysicsObject_exposer_t PhysicsObject_exposer = PhysicsObject_exposer_t( "PhysicsObject", bp::init< >() );
         bp::scope PhysicsObject_scope( PhysicsObject_exposer );
-        PhysicsObject_exposer.def( bp::init< IPhysicsObject * >(( bp::arg("pPhysObj") )) );
-        bp::implicitly_convertible< IPhysicsObject *, PyPhysicsObject >();
         PhysicsObject_exposer.def( bp::init< C_BaseEntity * >(( bp::arg("pEnt") )) );
         bp::implicitly_convertible< C_BaseEntity *, PyPhysicsObject >();
         { //::PyPhysicsObject::CheckValid
@@ -983,13 +974,6 @@ struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject >
     : PyPhysicsObject( )
       , bp::wrapper< PyPhysicsObject >(){
         // null constructor
-    
-    }
-
-    PyPhysicsObject_wrapper(::IPhysicsObject * pPhysObj )
-    : PyPhysicsObject( boost::python::ptr(pPhysObj) )
-      , bp::wrapper< PyPhysicsObject >(){
-        // constructor
     
     }
 
@@ -1530,8 +1514,6 @@ BOOST_PYTHON_MODULE(_physics){
         typedef bp::class_< PyPhysicsObject_wrapper, bp::bases< PyPhysicsObjectBase > > PhysicsObject_exposer_t;
         PhysicsObject_exposer_t PhysicsObject_exposer = PhysicsObject_exposer_t( "PhysicsObject", bp::init< >() );
         bp::scope PhysicsObject_scope( PhysicsObject_exposer );
-        PhysicsObject_exposer.def( bp::init< IPhysicsObject * >(( bp::arg("pPhysObj") )) );
-        bp::implicitly_convertible< IPhysicsObject *, PyPhysicsObject >();
         PhysicsObject_exposer.def( bp::init< CBaseEntity * >(( bp::arg("pEnt") )) );
         bp::implicitly_convertible< CBaseEntity *, PyPhysicsObject >();
         { //::PyPhysicsObject::CheckValid

@@ -660,11 +660,12 @@ void PyPhysicsObjectBase::OutputDebugInfo()
 // Purpose: 
 //-----------------------------------------------------------------------------
 PyPhysicsObject::PyPhysicsObject() :
-	 m_hEnt(NULL), m_bValid(false)
+	 m_hEnt(NULL), m_bValid(false), m_bOwnsPhysObject(false)
 {
 }
 
-PyPhysicsObject::PyPhysicsObject( IPhysicsObject *pPhysObj ) : m_hEnt(NULL)
+#if 0
+PyPhysicsObject::PyPhysicsObject( IPhysicsObject *pPhysObj ) : m_hEnt(NULL), m_bOwnsPhysObject(true)
 {
 	if( !pPhysObj )
 	{
@@ -674,8 +675,9 @@ PyPhysicsObject::PyPhysicsObject( IPhysicsObject *pPhysObj ) : m_hEnt(NULL)
 
 	m_bValid = true;
 }
+#endif // 0
 
-PyPhysicsObject::PyPhysicsObject( CBaseEntity *pEnt )
+PyPhysicsObject::PyPhysicsObject( CBaseEntity *pEnt ) : m_hEnt(NULL), m_bOwnsPhysObject(false)
 {
 	if( !pEnt || !pEnt->VPhysicsGetObject() )
 	{
@@ -704,7 +706,7 @@ void PyPhysicsObject::InitFromPhysicsObject( IPhysicsObject *pPhysObj )
 
 void PyPhysicsObject::Destroy()
 {
-	if( !m_bValid || !m_pPhysObj )
+	if( !m_bOwnsPhysObject || !m_bValid || !m_pPhysObj )
 		return;
 
 	if( !g_EntityCollisionHash )

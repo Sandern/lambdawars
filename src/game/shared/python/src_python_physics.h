@@ -293,6 +293,7 @@ public:
 
 protected:
 	IPhysicsObject *m_pPhysObj;
+	bool			m_bOwnsObject;
 };
 
 inline bool PyPhysicsObjectBase::operator==( const PyPhysicsObjectBase& src ) const
@@ -313,7 +314,7 @@ class PyPhysicsObject : public PyPhysicsObjectBase
 {
 public:
 	PyPhysicsObject();
-	PyPhysicsObject( IPhysicsObject *pPhysObj );
+	//PyPhysicsObject( IPhysicsObject *pPhysObj );
 	PyPhysicsObject( CBaseEntity *pEnt );
 
 	~PyPhysicsObject();
@@ -330,7 +331,7 @@ public:
 
 	// Functions for modifying. Not for python.
 	void SetEntity( CBaseEntity *pEnt ) { m_hEnt = pEnt; }
-	void SetInvalid() { m_bValid = false; m_hEnt = NULL; }
+	void SetInvalid() { m_bValid = false; m_hEnt = NULL; m_pPhysObj = NULL; }
 	bool IsValid() { return m_bValid; }
 	IPhysicsObject *GetVPhysicsObject() { return m_pPhysObj; }
 	void InitFromPhysicsObject( IPhysicsObject *pPhysObj );
@@ -340,6 +341,7 @@ public:
 private:
 	EHANDLE m_hEnt;
 	bool m_bValid;
+	bool m_bOwnsPhysObject;
 };
 
 boost::python::object PyCreateEmptyPhysicsObject();
