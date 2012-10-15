@@ -11,10 +11,9 @@
 float4 ApplyTeamColor( sampler TeamColorSampler, float4 TeamColor, float2 tc, float4 incolor )
 {
 	float4 result;
-	float alpha = tex2D( TeamColorSampler, tc )[0];
-	TeamColor.a = alpha;
-	result = TextureCombine( incolor, TeamColor, TCOMBINE_DETAIL_OVER_BASE, alpha );
-
+	float a = tex2D( TeamColorSampler, tc ).r;
+	result = TextureCombine( incolor, TeamColor, TCOMBINE_MULTIPLY, a );
+	result.a = incolor.a;
 	return result;
 }
 
