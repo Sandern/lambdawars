@@ -118,8 +118,10 @@ class GameInterface(GenerateModuleSemiShared):
         cls.rename('ConVar')
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('Shutdown').exclude()
-        mb.free_function('PyShutdownConVar').include()
         
+        mb.free_function('PyShutdownConVar').include()
+        mb.free_function('PyShutdownConCommand').include()
+
         # Don't want to include ConVar, so add methods manually...
         # Can't this be done automatically in py++?
         cls.add_registration_code(

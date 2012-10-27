@@ -56,6 +56,36 @@ void PyRemoveDirectory( char const* pPath, const char *pathID )
 #endif // WIN32
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Shutdown a Python ConVar
+//-----------------------------------------------------------------------------
+bool PyShutdownConVar( const char *pName )
+{
+	PyConVar *pConVar = dynamic_cast<PyConVar *>( cvar->FindVar( pName ) );
+	if( pConVar != NULL )
+	{
+		pConVar->Shutdown();
+		return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Shutdown a Python ConCommand
+//-----------------------------------------------------------------------------
+bool PyShutdownConCommand( const char *pName )
+{
+	PyConCommand *pConCommand = dynamic_cast<PyConCommand *>( cvar->FindCommand( pName ) );
+	if( pConCommand != NULL )
+	{
+		pConCommand->Shutdown();
+		return true;
+	}
+
+	return false;
+}
+
 // -------------------------------------------------------------------------------
 void PyDummyCallback( const CCommand &args ) {}
 
@@ -137,6 +167,10 @@ bool PyConCommand::CanAutoComplete( void )
 	return m_pyCommandCallback.ptr() != Py_None;
 }
 
+void PyConCommand::Shutdown()
+{
+	BaseClass::Shutdown();
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructors. Saves python callback method and ensures 
@@ -228,20 +262,6 @@ void PyConVar::Create( const char *pName, const char *pDefaultValue, int flags,
 	BaseClass::Create( pName, pDefaultValue, flags, pHelpString, bMin, fMin, bMax, fMax, callback );
 }
 #endif // 0
-
-void PyShutdownConVar( const char *pName )
-{
-	PyConVar *pConVar = dynamic_cast<PyConVar *>( cvar->FindVar( pName ) );
-	if( pConVar != NULL )
-	{
-		pConVar->Shutdown();
-		DevMsg("PyShutdownConVar: Shutted down ConVar %s\n", pName);
-	}
-	else
-	{
-		DevMsg("PyShutdownConVar: Could not find ConVar %s\n", pName);
-	}
-}
 
 #ifdef HL2WARS_ASW_DLL
 //-----------------------------------------------------------------------------

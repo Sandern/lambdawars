@@ -46,12 +46,20 @@ void PyRemoveFile( char const* pRelativePath, const char *pathID = 0 );
 void PyRemoveDirectory( char const* pPath, const char *pathID = 0 );
 
 //-----------------------------------------------------------------------------
+// Purpose: Shutting down vars
+//-----------------------------------------------------------------------------
+bool PyShutdownConVar( const char *pName );
+bool PyShutdownConCommand( const char *pName );
+
+//-----------------------------------------------------------------------------
 // Purpose: Python version of concommand
 //-----------------------------------------------------------------------------
 void PyDummyCallback( const CCommand &args );
 class PyConCommand : public ConCommand
 {
 public:
+	typedef ConCommand BaseClass;
+
 	PyConCommand( const char *pName, bp::object method, const char *helpstring = 0, int flags = 0, 
 		bp::object completionfunc = bp::object(), bool useweakref = false );
 	// We must cleanup if we are destroyed
@@ -64,6 +72,8 @@ public:
 	virtual int AutoCompleteSuggest( const char *partial, CUtlVector< CUtlString > &commands );
 
 	virtual bool CanAutoComplete( void );
+
+	void		 Shutdown();
 
 private:
 	bool m_bUsesWeakRef;
@@ -110,8 +120,6 @@ private:
 	// Call this function when ConVar changes
 	bp::object m_pyChangeCallback;
 };
-
-void PyShutdownConVar( const char *pName );
 
 //-----------------------------------------------------------------------------
 // Engine function wrappers

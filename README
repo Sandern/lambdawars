@@ -13,7 +13,18 @@ Requires Visual Studio 2010 SP1
 ==============================================================
 Generating Python bindings
 ==============================================================
+Bindings are automatically generated from python files.
+You can find the list of modules and other settings in "src/srcpypp/settings.py".
+The actually modules can be found in "game/(client|server|shared)/python/modules".
 
+Py++ is used to generate the actually bindings. You can find more information at:
+http://sourceforge.net/projects/pygccxml/
+
+Generating the modules (requires Python 2.7):
+Open a commmand prompt and go to the srcpypp folder.
+From here you can run a few commands:
+- Generate bindings for all modules: python generate_mods
+- Generate bindings for a single module: python generate_mods -m module_name
 
 ==============================================================
 Compiling shaders

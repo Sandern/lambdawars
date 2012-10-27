@@ -2591,7 +2591,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
     bp::class_< PyConCommand >( "ConCommand", bp::init< char const *, bp::object, bp::optional< char const *, int, bp::object, bool > >(( bp::arg("pName"), bp::arg("method"), bp::arg("helpstring")=bp::object(), bp::arg("flags")=(int)(0), bp::arg("completionfunc")=boost::python::object(), bp::arg("useweakref")=(bool)(false) )) )    
         .def( 
             "CanAutoComplete"
-            , (bool ( ::PyConCommand::* )(  ) )( &::PyConCommand::CanAutoComplete ) );
+            , (bool ( ::PyConCommand::* )(  ) )( &::PyConCommand::CanAutoComplete ) )    
+        .def( 
+            "Shutdown"
+            , (void ( ::PyConCommand::* )(  ) )( &::PyConCommand::Shutdown ) );
 
     bp::class_< PyConVar, boost::noncopyable >( "ConVar", bp::init< char const *, char const *, bp::optional< int > >(( bp::arg("name"), bp::arg("defaultvalue"), bp::arg("flags")=(int)(0) )) )    
         .def( bp::init< char const *, char const *, int, char const * >(( bp::arg("name"), bp::arg("defaultvalue"), bp::arg("flags"), bp::arg("helpstring") )) )    
@@ -3269,6 +3272,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PyShutdownConCommand
+    
+        typedef bool ( *PyShutdownConCommand_function_type )( char const * );
+        
+        bp::def( 
+            "PyShutdownConCommand"
+            , PyShutdownConCommand_function_type( &::PyShutdownConCommand )
+            , ( bp::arg("pName") ) );
+    
+    }
+
     bp::def( "SysAppendPath", SysAppendPath, bp::arg("path"), bp::arg("inclsubdirs") );
 
     bp::scope().attr( "engine" ) = boost::ref(pyengine);
@@ -3331,7 +3345,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
     { //::PyShutdownConVar
     
-        typedef void ( *PyShutdownConVar_function_type )( char const * );
+        typedef bool ( *PyShutdownConVar_function_type )( char const * );
         
         bp::def( 
             "PyShutdownConVar"
@@ -6376,7 +6390,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
     bp::class_< PyConCommand >( "ConCommand", bp::init< char const *, bp::object, bp::optional< char const *, int, bp::object, bool > >(( bp::arg("pName"), bp::arg("method"), bp::arg("helpstring")=bp::object(), bp::arg("flags")=(int)(0), bp::arg("completionfunc")=boost::python::object(), bp::arg("useweakref")=(bool)(false) )) )    
         .def( 
             "CanAutoComplete"
-            , (bool ( ::PyConCommand::* )(  ) )( &::PyConCommand::CanAutoComplete ) );
+            , (bool ( ::PyConCommand::* )(  ) )( &::PyConCommand::CanAutoComplete ) )    
+        .def( 
+            "Shutdown"
+            , (void ( ::PyConCommand::* )(  ) )( &::PyConCommand::Shutdown ) );
 
     bp::class_< PyConVar, boost::noncopyable >( "ConVar", bp::init< char const *, char const *, bp::optional< int > >(( bp::arg("name"), bp::arg("defaultvalue"), bp::arg("flags")=(int)(0) )) )    
         .def( bp::init< char const *, char const *, int, char const * >(( bp::arg("name"), bp::arg("defaultvalue"), bp::arg("flags"), bp::arg("helpstring") )) )    
@@ -7035,6 +7052,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PyShutdownConCommand
+    
+        typedef bool ( *PyShutdownConCommand_function_type )( char const * );
+        
+        bp::def( 
+            "PyShutdownConCommand"
+            , PyShutdownConCommand_function_type( &::PyShutdownConCommand )
+            , ( bp::arg("pName") ) );
+    
+    }
+
     bp::def( "SysAppendPath", SysAppendPath, bp::arg("path"), bp::arg("inclsubdirs") );
 
     bp::scope().attr( "engine" ) = boost::ref(pyengine);
@@ -7097,7 +7125,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
     { //::PyShutdownConVar
     
-        typedef void ( *PyShutdownConVar_function_type )( char const * );
+        typedef bool ( *PyShutdownConVar_function_type )( char const * );
         
         bp::def( 
             "PyShutdownConVar"
