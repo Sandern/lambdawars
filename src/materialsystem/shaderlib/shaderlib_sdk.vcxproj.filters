@@ -15,26 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaderlib.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_lib_base.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_lib_win32_base.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_lib_win32_debug.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_lib_win32_release.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\version.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="BaseShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,9 +27,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\public\tier0\basetypes.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\commonmacros.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\tier0\dbg.h">
@@ -65,9 +42,6 @@
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\icvar.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\ImageLoader.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\materialsystem\imaterial.h">
@@ -100,9 +74,6 @@
     <ClInclude Include="..\..\public\materialsystem\materialsystem_config.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\public\MATHLIB.H">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\public\tier0\memdbgoff.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
@@ -110,9 +81,6 @@
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\tier0\platform.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\protected_things.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\string_t.h">
@@ -125,21 +93,6 @@
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\tier1\utlvector.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\vector.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\vector2d.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\vector4d.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\vmatrix.h">
-      <Filter>External Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\vplane.h">
       <Filter>External Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\public\vstdlib\vstdlib.h">

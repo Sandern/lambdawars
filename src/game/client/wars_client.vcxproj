@@ -228,15 +228,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
-    <None Include="client_base.vpc" />
-    <None Include="client_swarm.vpc" />
-    <None Include="..\..\vpc_scripts\loadaddress.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
-    <None Include="..\..\vpc_scripts\version.vpc" />
     <None Include="vscript_client.nut" />
   </ItemGroup>
   <ItemGroup>

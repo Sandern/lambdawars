@@ -235,6 +235,11 @@ void PyShutdownConVar( const char *pName )
 	if( pConVar != NULL )
 	{
 		pConVar->Shutdown();
+		DevMsg("PyShutdownConVar: Shutted down ConVar %s\n", pName);
+	}
+	else
+	{
+		DevMsg("PyShutdownConVar: Could not find ConVar %s\n", pName);
 	}
 }
 

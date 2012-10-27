@@ -30,22 +30,7 @@
     <None Include="..\..\vpc_scripts\loadaddress.vpc">
       <Filter>VPC Scripts</Filter>
     </None>
-    <None Include="..\..\vpc_scripts\source_dll_base.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
     <None Include="stdshader_dx9.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\version.vpc">
       <Filter>VPC Scripts</Filter>
     </None>
     <None Include="buildallshaders.bat" />
@@ -53,8 +38,6 @@
     <None Include="..\..\devtools\bin\checkshaderchecksums.pl" />
     <None Include="..\..\devtools\bin\copyshaders.pl" />
     <None Include="..\..\devtools\bin\fxc_prep.pl" />
-    <None Include="..\..\devtools\bin\p4autocheckout.pl" />
-    <None Include="..\..\devtools\bin\p4revertshadertargets.pl" />
     <None Include="..\..\devtools\bin\psh_prep.pl" />
     <None Include="..\..\devtools\bin\updateshaders.pl" />
     <None Include="..\..\devtools\bin\valve_perl_helpers.pl" />
@@ -491,9 +474,6 @@
     <ClInclude Include="vortwarp_vs20_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="water_ps2x_helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="worldvertextransition_dx8_helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -508,37 +488,10 @@
     <CustomBuildStep Include="stdshader_dx9_30.txt">
       <Filter>Shader Source</Filter>
     </CustomBuildStep>
-    <CustomBuildStep Include="AccumBuff4Sample_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="accumbuff5sample_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
     <CustomBuildStep Include="aftershock_ps2x.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="aftershock_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="appchooser360movie_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="bik_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="bik_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="blob_arm_ps20b.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="blob_arm_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="blob_ps30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="blob_vs30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="Bloom_ps2x.fxc">
@@ -790,15 +743,6 @@
     <CustomBuildStep Include="hsv_ps2x.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
-    <CustomBuildStep Include="IceSurface_ps30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="IceSurface_vs30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="IntroScreenSpaceEffect_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
     <CustomBuildStep Include="lightmappedgeneric_decal_ps2x.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
@@ -877,12 +821,6 @@
     <CustomBuildStep Include="object_motion_blur_vs20.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
-    <CustomBuildStep Include="paintblob_ps20b.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="paintblob_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
     <CustomBuildStep Include="parallaxtest_ps30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
@@ -901,34 +839,10 @@
     <CustomBuildStep Include="phong_vs20.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
-    <CustomBuildStep Include="portal_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="portal_refract_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="portal_refract_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="portal_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="portalstaticoverlay_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="portalstaticoverlay_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
     <CustomBuildStep Include="projected_ps2x.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="projected_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="proto_ice_ps20b.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="proto_ice_vs20.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="prototype_ps20b.fxc">
@@ -965,33 +879,6 @@
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="screenspaceeffect_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_ambientocclusion_ps30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_ambientocclusion_vs30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_ao_blur_ps30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_ao_blur_vs30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_blur_ps30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_combine_vs20.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_integercombine_ps2x.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_screenspace_vs30.fxc">
-      <Filter>Shader Source\fxc</Filter>
-    </CustomBuildStep>
-    <CustomBuildStep Include="sfm_shape_ps30.fxc">
       <Filter>Shader Source\fxc</Filter>
     </CustomBuildStep>
     <CustomBuildStep Include="shadow_ps2x.fxc">

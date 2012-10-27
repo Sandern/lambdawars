@@ -214,12 +214,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\..\vpc_scripts\loadaddress.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
     <None Include="stdshader_dx9.vpc" />
-    <None Include="..\..\vpc_scripts\version.vpc" />
     <CustomBuildStep Include="stdshader_dx9_20b.txt">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -1322,8 +1317,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <None Include="..\..\devtools\bin\checkshaderchecksums.pl" />
     <None Include="..\..\devtools\bin\copyshaders.pl" />
     <None Include="..\..\devtools\bin\fxc_prep.pl" />
-    <None Include="..\..\devtools\bin\p4autocheckout.pl" />
-    <None Include="..\..\devtools\bin\p4revertshadertargets.pl" />
     <None Include="..\..\devtools\bin\psh_prep.pl" />
     <None Include="..\..\devtools\bin\updateshaders.pl" />
     <None Include="..\..\devtools\bin\valve_perl_helpers.pl" />
@@ -1486,7 +1479,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="vertexlitgeneric_dx9_helper.h" />
     <ClInclude Include="volume_clouds_helper.h" />
     <ClInclude Include="vortwarp_vs20_helper.h" />
-    <ClInclude Include="water_ps2x_helper.h" />
     <ClInclude Include="worldvertextransition_dx8_helper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

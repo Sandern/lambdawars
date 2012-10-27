@@ -221,15 +221,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\vpc_scripts\loadaddress.vpc" />
-    <None Include="ClassDiagram1.cd" />
-    <None Include="server_base.vpc" />
-    <None Include="server_swarm.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
-    <None Include="..\..\vpc_scripts\version.vpc" />
     <None Include="spawn_helper.nut" />
     <None Include="vscript_server.nut" />
   </ItemGroup>
@@ -1198,7 +1189,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="hierarchy.h" />
     <ClInclude Include="..\shared\hintmessage.h" />
     <ClInclude Include="..\shared\hintsystem.h" />
-    <ClInclude Include="..\..\common\hl2orange.spa.h" />
     <ClInclude Include="hl2wars\hl2wars_bot_temp.h" />
     <ClInclude Include="hl2wars\hl2wars_gameinterface.h" />
     <ClInclude Include="hl2wars\hl2wars_nav_pathfind.h" />

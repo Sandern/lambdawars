@@ -254,9 +254,6 @@
     <ClInclude Include="..\..\..\..\boost\python\operators.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\operators2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\other.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -326,19 +323,10 @@
     <ClInclude Include="..\..\..\..\boost\python\detail\api_placeholder.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\arg_tuple_size.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\borrowed_ptr.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\call_object.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\caller.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\char_array.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\config.hpp">
@@ -392,15 +380,6 @@
     <ClInclude Include="..\..\..\..\boost\python\detail\map_entry.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\member_function_cast.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\module_base.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\module_init.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\msvc_typeinfo.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
@@ -434,9 +413,6 @@
     <ClInclude Include="..\..\..\..\boost\python\detail\result.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\returning.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\scope.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
@@ -456,9 +432,6 @@
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl_no_pts.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_utils.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\unwind_type.hpp">
@@ -512,9 +485,6 @@
     <ClInclude Include="..\..\..\..\boost\python\converter\pyobject_type.hpp">
       <Filter>Header Files\converter</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\converter\pytype_arg_from_python.hpp">
-      <Filter>Header Files\converter</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\converter\pytype_object_mgr_traits.hpp">
       <Filter>Header Files\converter</Filter>
     </ClInclude>
@@ -545,16 +515,10 @@
     <ClInclude Include="..\..\..\..\boost\python\object\class.hpp">
       <Filter>Header Files\object</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\object\class_converters.hpp">
-      <Filter>Header Files\object</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\object\class_detail.hpp">
       <Filter>Header Files\object</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\object\class_wrapper.hpp">
-      <Filter>Header Files\object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\object\construct.hpp">
       <Filter>Header Files\object</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\object\enum_base.hpp">
@@ -603,9 +567,6 @@
       <Filter>Header Files\object</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\object\py_function.hpp">
-      <Filter>Header Files\object</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\object\select_holder.hpp">
       <Filter>Header Files\object</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\object\stl_iterator_core.hpp">

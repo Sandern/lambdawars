@@ -170,6 +170,10 @@ pip-log.txt
 #############
 .cd # Class diagram
 
+*.hpp~
+*.cpp~
+*.py~
+
 src/game/client/Release_swarm/*
 src/game/server/Release_swarm/*
 src/game/client/Debug_swarm/*
