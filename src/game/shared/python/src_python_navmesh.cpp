@@ -11,6 +11,7 @@
 #include "nav_pathfind.h"
 #include "nav_area.h"
 #include "wars_mapboundary.h"
+#include "hl2wars_nav_pathfind.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -25,7 +26,7 @@ bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 	return TheNavMesh->GetNavArea( pos, beneathLimt ) != NULL;
 }
 
-float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance )
+float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CUnitBase *pUnit )
 {
 	CNavArea *startArea, *goalArea;
 	if( bNoTolerance )
@@ -40,8 +41,17 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 	}
 	if( !startArea || !goalArea )
 		return -1;
-	ShortestPathCost costFunc;
-	return NavAreaTravelDistance<ShortestPathCost>(startArea, goalArea, costFunc);
+
+	if( !pUnit )
+	{
+		ShortestPathCost costFunc;
+		return NavAreaTravelDistance<ShortestPathCost>(startArea, goalArea, costFunc);
+	}
+	else
+	{
+		UnitShortestPathCost costFunc( pUnit, false );
+		return NavAreaTravelDistance<UnitShortestPathCost>(startArea, goalArea, costFunc);
+	}
 }
 
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit )

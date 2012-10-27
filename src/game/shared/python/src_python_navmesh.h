@@ -11,9 +11,16 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+	class C_UnitBase;
+	#define CUnitBase C_UnitBase
+#else
+	class CUnitBase;
+#endif // CLIENT_DLL
+
 bool NavMeshAvailable();
 bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
-float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false );
+float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CUnitBase *unit = NULL );
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f );
 void DestroyAllNavAreas();
 

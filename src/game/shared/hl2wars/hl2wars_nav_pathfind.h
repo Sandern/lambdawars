@@ -60,28 +60,32 @@ public:
 				cost += crouchPenalty * dist;
 			}*/
 
-			if( !m_bNoSpecialTravel )
-			{
-				// Compute height difference
-				float heightdiff = fromArea->ComputeAdjacentConnectionHeightChange( area );
+			// Compute height difference
+			float heightdiff = fromArea->ComputeAdjacentConnectionHeightChange( area );
 				
-				// Don't consider insignificant height differences
-				if( fabs(heightdiff) > 16.0f )
+			// Don't consider insignificant height differences
+			if( fabs(heightdiff) > 16.0f )
+			{
+				if( m_bNoSpecialTravel )
+					return -1;
+
+				if( heightdiff > 0 )
 				{
-					if( heightdiff > 0 )
-					{
-						// Means we need to climb up or jump up
-						if( heightdiff > m_pUnit->m_fMaxClimbHeight )
-							return -1;
-						cost += heightdiff * 2;
-					}
-					else
-					{
-						// Only allow save drops (so don't get any damage)
-						if( fabs(heightdiff) > m_pUnit->m_fSaveDrop )
-							return -1;
-						cost += fabs(heightdiff) * 1.1f;
-					}
+#ifndef CLIENT_DLL
+					// Means we need to climb up or jump up
+					if( heightdiff > m_pUnit->m_fMaxClimbHeight )
+						return -1;
+#endif // CLIENT_DLL
+					cost += heightdiff * 2;
+				}
+				else
+				{
+#ifndef CLIENT_DLL
+					// Only allow save drops (so don't get any damage)
+					if( fabs(heightdiff) > m_pUnit->m_fSaveDrop )
+						return -1;
+#endif // CLIENT_DLL
+					cost += fabs(heightdiff) * 1.1f;
 				}
 			}
 

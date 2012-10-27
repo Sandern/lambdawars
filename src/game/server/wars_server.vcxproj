@@ -964,6 +964,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="toolframework_server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared\hl2wars\hl2wars_nav_pathfind.h" />
     <ClInclude Include="..\shared\hl2wars\wars_plat_misc.h" />
     <ClInclude Include="..\shared\python\src_python_util.h" />
     <ClInclude Include="..\shared\python\src_python_sound.h" />
@@ -1191,7 +1192,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\hintsystem.h" />
     <ClInclude Include="hl2wars\hl2wars_bot_temp.h" />
     <ClInclude Include="hl2wars\hl2wars_gameinterface.h" />
-    <ClInclude Include="hl2wars\hl2wars_nav_pathfind.h" />
     <ClInclude Include="hl2wars\hl2wars_player.h" />
     <ClInclude Include="hl2wars\hl2wars_team.h" />
     <ClInclude Include="hl2wars\unit_airnavigator.h" />

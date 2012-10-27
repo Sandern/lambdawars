@@ -3471,9 +3471,6 @@
     <ClInclude Include="hl2wars\hl2wars_gameinterface.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\hl2wars_nav_pathfind.h">
-      <Filter>Source Files\wars</Filter>
-    </ClInclude>
     <ClInclude Include="hl2wars\hl2wars_player.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
@@ -3583,6 +3580,9 @@
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\hl2wars\wars_plat_misc.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\hl2wars\hl2wars_nav_pathfind.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>
