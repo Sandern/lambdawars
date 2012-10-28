@@ -16,6 +16,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+
 bool NavMeshAvailable()
 {
 	return TheNavMesh->IsLoaded();
@@ -36,11 +38,15 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 	}
 	else
 	{
-		startArea = TheNavMesh->GetNearestNavArea(vStart, anyz, maxdist);
-		goalArea = TheNavMesh->GetNearestNavArea(vGoal, anyz, maxdist);
+		startArea = TheNavMesh->GetNearestNavArea(vStart, anyz, maxdist, false, false);
+		goalArea = TheNavMesh->GetNearestNavArea(vGoal, anyz, maxdist, false, false);
 	}
 	if( !startArea || !goalArea )
+	{
+		if( g_pynavmesh_debug.GetBool() )
+			DevMsg("NavMeshGetPathDistance: No start=%d or goal=%d area\n", startArea, goalArea);
 		return -1;
+	}
 
 	if( !pUnit )
 	{
@@ -130,9 +136,19 @@ Vector RandomNavAreaPosition( )
 		mins.y + ((float)rand() / RAND_MAX) * (maxs.y - mins.y),
 		maxs.z
 	);
-	CNavArea *pArea = TheNavMesh->GetNearestNavArea( random );
+	CNavArea *pArea = TheNavMesh->GetNearestNavArea( random, false, 10000.0f, false, false );
 	if( !pArea )
+	{
+		if( g_pynavmesh_debug.GetBool() )
+			DevMsg("RandomNavAreaPosition: No area found within Mins: %f %f %f, Maxs: %f %f %f, Random: %f %f %f\n", 
+					mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, random.x, random.y, random.z);
 		return vec3_origin;
+	}
+	Vector vRandomPoint = pArea->GetRandomPoint();
+	vRandomPoint.z += 32.0f;
+
+	if( g_pynavmesh_debug.GetBool() )
+		DevMsg("\nRandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
 
 	return pArea->GetCenter();
 }
