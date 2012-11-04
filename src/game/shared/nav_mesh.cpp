@@ -608,7 +608,7 @@ inline void CNavMesh::GridToWorld( int gridX, int gridY, Vector *pos ) const
 /**
  * Given a position, return the nav area that IsOverlapping and is *immediately* beneath it
  */
-CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
+CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit, bool checkBlocked ) const
 {
 	VPROF_BUDGET( "CNavMesh::GetNavArea", "NextBot"  );
 
@@ -628,6 +628,10 @@ CNavArea *CNavMesh::GetNavArea( const Vector &pos, float beneathLimit ) const
 	FOR_EACH_VEC( (*areaVector), it )
 	{
 		CNavArea *area = (*areaVector)[ it ];
+
+		// Don't consider blocked areas if specified
+		if( checkBlocked && area->IsBlocked( TEAM_ANY ) )
+			continue;
 
 		// check if position is within 2D boundaries of this area
 		if (area->IsOverlapping( testPos ))
@@ -757,7 +761,7 @@ CNavArea *CNavMesh::GetNearestNavArea( const Vector &pos, bool anyZ, float maxDi
 	// quick check
 	if ( !checkLOS && !checkGround )
 	{
-		close = GetNavArea( pos );
+		close = GetNavArea( pos, 120.0f, true );
 		if ( close )
 		{
 			return close;

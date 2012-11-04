@@ -18,18 +18,30 @@
 
 ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool NavMeshAvailable()
 {
 	return TheNavMesh->IsLoaded();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 {
 	return TheNavMesh->GetNavArea( pos, beneathLimt ) != NULL;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CUnitBase *pUnit )
 {
+	if( g_pynavmesh_debug.GetInt() > 1 )
+		DevMsg("NavMeshGetPathDistance: anyz: %d, maxdist: %f, bNoTolerance: %d, unit: %d\n", anyz, maxdist, bNoTolerance, pUnit);
+
 	CNavArea *startArea, *goalArea;
 	if( bNoTolerance )
 	{
@@ -48,6 +60,9 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 		return -1;
 	}
 
+	if( g_pynavmesh_debug.GetInt() > 1 )
+		DevMsg("NavMeshGetPathDistance: startArea: %d, goalArea: %d\n", startArea->GetID(), goalArea->GetID());
+
 	if( !pUnit )
 	{
 		ShortestPathCost costFunc;
@@ -60,6 +75,9 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit )
 {
 	CNavArea *pArea;
@@ -73,6 +91,9 @@ Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit )
 	return vec3_origin;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CreateNavArea( const Vector &corner, const Vector &otherCorner )
 {
 #ifndef CLIENT_DLL
@@ -82,6 +103,9 @@ int CreateNavArea( const Vector &corner, const Vector &otherCorner )
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, const Vector &seCorner, const Vector &swCorner )
 {
 #ifndef CLIENT_DLL
@@ -91,6 +115,9 @@ int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, cons
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void DestroyNavArea( int id )
 {
 	CNavArea *area;
@@ -102,11 +129,17 @@ void DestroyNavArea( int id )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void DestroyAllNavAreas()
 {
 	TheNavMesh->Reset();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 Vector RandomNavAreaPosition( )
 {
 	if( !GetMapBoundaryList() )
@@ -148,11 +181,14 @@ Vector RandomNavAreaPosition( )
 	vRandomPoint.z += 32.0f;
 
 	if( g_pynavmesh_debug.GetBool() )
-		DevMsg("\nRandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
+		DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
 
 	return pArea->GetCenter();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int GetNavAreaAt( const Vector &pos, float beneathlimit )
 {
 	CNavArea *pArea = TheNavMesh->GetNavArea( pos, beneathlimit );
@@ -162,6 +198,9 @@ int GetNavAreaAt( const Vector &pos, float beneathlimit )
 	return pArea->GetID();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs )
 {
 	bp::list l;
@@ -201,6 +240,9 @@ bp::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs )
 	return l;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 {
 #ifndef CLIENT_DLL
@@ -290,6 +332,9 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SetAreasBlocked( bp::list areas, bool blocked )
 {
 #ifndef CLIENT_DLL
@@ -329,6 +374,9 @@ void SetAreasBlocked( bp::list areas, bool blocked )
 static ConVar g_debug_coveredbynavareas("g_debug_coveredbynavareas", "0", FCVAR_CHEAT);
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolerance, bool bRequireIsFlat, float fFlatTol )
 {
 	float fArea, fGoalArea;
@@ -392,6 +440,9 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool TryMergeSurrounding( int id, float tolerance )
 {
 #ifdef CLIENT_DLL
@@ -452,6 +503,9 @@ CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 }
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 class HidingSpotCollector
 {
 public:
@@ -481,6 +535,9 @@ private:
 	CUtlVector< HidingSpot * > &m_HidingSpots;
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::list GetHidingSpotsInRadius( const Vector &pos, float radius )
 {
 	bp::list l;

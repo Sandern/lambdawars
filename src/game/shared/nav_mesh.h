@@ -276,7 +276,7 @@ public:
 	unsigned int GetNavAreaCount( void ) const	{ return m_areaCount; }	// return total number of nav areas
 
 	// See GetNavAreaFlags_t for flags
-	CNavArea *GetNavArea( const Vector &pos, float beneathLimt = 120.0f ) const;	// given a position, return the nav area that IsOverlapping and is *immediately* beneath it
+	CNavArea *GetNavArea( const Vector &pos, float beneathLimt = 120.0f, bool checkBlocked = false ) const;	// given a position, return the nav area that IsOverlapping and is *immediately* beneath it
 	CNavArea *GetNavArea( CBaseEntity *pEntity, int nGetNavAreaFlags, float flBeneathLimit = 120.0f ) const;
 	CNavArea *GetNavAreaByID( unsigned int id ) const;
 	CNavArea *GetNearestNavArea( const Vector &pos, bool anyZ = false, float maxDist = 10000.0f, bool checkLOS = false, bool checkGround = true ) const;
