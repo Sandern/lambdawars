@@ -139,13 +139,13 @@ void InGameMainMenu::OnCommand( const char *command )
 	{
 		engine->ClientCmd("gameui_hide");
 		//engine->ClientCmd("callvote RestartGame;");
-		engine->ServerCmd("gl_callvote;\n");
+		engine->ServerCmd("gl_callvote");
 	}
 	else if (!Q_strcmp(command, "ReturnToLobby"))
 	{
 		engine->ClientCmd("gameui_hide");
 		//engine->ClientCmd("callvote ReturnToLobby;");
-		engine->ServerCmd("gl_callvote;\n");
+		engine->ServerCmd("gl_callvote");
 	}
 	else if ( char const *szInviteType = StringAfterPrefix( command, "InviteUI_" ) )
 	{
@@ -325,6 +325,7 @@ void InGameMainMenu::OnCommand( const char *command )
 
 		if ( !Q_strcmp( command, "FlmVoteFlyout" ) )
 		{
+#if 0
 			if ( gpGlobals->maxClients <= 1 )
 			{
 				engine->ClientCmd("asw_restart_mission");
@@ -333,6 +334,9 @@ void InGameMainMenu::OnCommand( const char *command )
 			{
 				// TODO: c_asw_concommands... -> ShowPlayerList();
 			}
+#else
+			engine->ServerCmd("gl_callvote");
+#endif // 0
 			engine->ClientCmd("gameui_hide");
 			return;
 			/*
@@ -607,10 +611,12 @@ void InGameMainMenu::PerformLayout( void )
 		if ( bCanVote )
 		{
 			pVoteButton->SetText( "#L4D360UI_InGameMainMenu_CallAVote" );
+			pVoteButton->SetVisible( true );
 		}
 		else
 		{
-			pVoteButton->SetText( "#asw_button_restart_mis" );
+			//pVoteButton->SetText( "#asw_button_restart_mis" );
+			pVoteButton->SetVisible( false );
 		}
 		SetControlEnabled( "BtnCallAvote", true );
 	}
