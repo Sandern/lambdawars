@@ -1577,7 +1577,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 //-----------------------------------------------------------------------------
 // Purpose: Updates the state of entities affected by the fog of war.
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::UpdateVisibility()
+void CFogOfWarMgr::UpdateVisibility( void )
 {
 	int i;
 	CBaseEntity *pEnt;
@@ -1699,7 +1699,7 @@ void CFogOfWarMgr::UpdateVisibility()
 //-----------------------------------------------------------------------------
 // Purpose: Adds an entity which can clear the fog of war for a player/owner.
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::AddFogUpdater(int owner, CBaseEntity *pEnt )
+void CFogOfWarMgr::AddFogUpdater( int owner, CBaseEntity *pEnt )
 { 
 	if( !pEnt )
 		return;
@@ -1718,7 +1718,7 @@ void CFogOfWarMgr::AddFogUpdater(int owner, CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 // Purpose: Removes an entity which can clear the fog of war for a player/owner.
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::RemoveFogUpdater(int owner, CBaseEntity *pEnt ) 
+void CFogOfWarMgr::RemoveFogUpdater( int owner, CBaseEntity *pEnt ) 
 { 
 	if( !pEnt ) 
 		return;
@@ -1734,7 +1734,7 @@ void CFogOfWarMgr::RemoveFogUpdater(int owner, CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 // Purpose: Adds an entity which is affected by the fog of war (not visible/transmitted)
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::AddFogEntity(CBaseEntity *pEnt)
+void CFogOfWarMgr::AddFogEntity( CBaseEntity *pEnt)
 {
 	if( m_FogEntities.Find(pEnt) == -1 )
 	{
@@ -1746,9 +1746,36 @@ void CFogOfWarMgr::AddFogEntity(CBaseEntity *pEnt)
 //-----------------------------------------------------------------------------
 // Purpose: Removes an entity which is affected by the fog of war (not visible/transmitted)
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::RemoveFogEntity(CBaseEntity *pEnt )
+void CFogOfWarMgr::RemoveFogEntity( CBaseEntity *pEnt )
 {
 	m_FogEntities.FindAndRemove(pEnt);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Test if entity should be shown in fow
+//-----------------------------------------------------------------------------
+bool CFogOfWarMgr::ShouldShowInFOW( CBasePlayer *pPlayer, CBaseEntity *pEnt )
+{
+	if( !pEnt )
+		return false;
+
+	if( sv_fogofwar.GetBool() == false )
+		return true;
+
+	if( pPlayer )
+	{
+		if( pPlayer->IsObserver() || ( pPlayer->GetOwnerNumber() == 0 && pPlayer->GetTeamNumber() == TEAM_SPECTATOR ) )
+			return true;
+	}
+
+	if( (pEnt->GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
+		return true;
+
+#ifdef CLIENT_DLL
+	return !pEnt->IsInFOW( );
+#else
+	return !pEnt->IsInFOW( pEnt->GetOwnerNumber() );
+#endif // CLIENT_DLL
 }
 
 #if 0

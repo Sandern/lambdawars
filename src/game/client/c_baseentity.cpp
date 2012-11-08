@@ -6547,19 +6547,9 @@ void C_BaseEntity::SetOwnerNumber( int owner_number )
 }
 
 //------------------------------------------------------------------------------
-extern ConVar sv_fogofwar;
 bool C_BaseEntity::ShouldShowInFOW()
 {
-	if( sv_fogofwar.GetBool() == false )
-		return true;
-
-	if( C_BasePlayer::GetLocalPlayer() && C_BasePlayer::GetLocalPlayer()->IsObserver() && C_BasePlayer::GetLocalPlayer()->GetOwnerNumber() == 0 )
-		return true;
-
-	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
-		return true;
-
-	return !m_bInFOW;
+	return FogOfWarMgr()->ShouldShowInFOW( C_BasePlayer::GetLocalPlayer(), this );
 }
 
 #ifndef DISABLE_PYTHON

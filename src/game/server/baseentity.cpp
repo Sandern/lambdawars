@@ -8772,10 +8772,9 @@ void CBaseEntity::InputChangeOwnerNumber( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-extern ConVar sv_fogofwar;
 bool CBaseEntity::IsInFOW( int owner )
 {
-	if( owner < 0 || owner >= MAX_PLAYERS )
+	if( owner < 0 || owner >= FOWMAXPLAYERS )
 		return false;
 
 	return m_bInFOW[owner];
@@ -8786,19 +8785,7 @@ bool CBaseEntity::IsInFOW( int owner )
 //------------------------------------------------------------------------------
 bool CBaseEntity::ShouldShowInFOW( CBasePlayer *pPlayer )
 {
-	if( sv_fogofwar.GetBool() == false )
-		return true;
-
-	if( pPlayer->IsObserver() && pPlayer->GetOwnerNumber() == 0 )
-		return true;
-
-	if( pPlayer->GetOwnerNumber() < 0 || pPlayer->GetOwnerNumber() >= MAX_PLAYERS )
-		return true;
-
-	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
-		return true;
-
-	return !m_bInFOW[pPlayer->GetOwnerNumber()];
+	return FogOfWarMgr()->ShouldShowInFOW( pPlayer, this );
 }
 
 //------------------------------------------------------------------------------
@@ -8809,10 +8796,10 @@ bool CBaseEntity::ShouldTransmitInFOW( CBasePlayer *pPlayer )
 	if( sv_fogofwar.GetBool() == false )
 		return true;
 
-	if( pPlayer->IsObserver() && pPlayer->GetOwnerNumber() == 0  )
+	if( pPlayer->IsObserver() || ( pPlayer->GetOwnerNumber() == 0 && pPlayer->GetTeamNumber() == TEAM_SPECTATOR ) )
 		return true;
 
-	if( pPlayer->GetOwnerNumber() < 0|| pPlayer->GetOwnerNumber() >= FOWMAXPLAYERS )
+	if( pPlayer->GetOwnerNumber() < 0 || pPlayer->GetOwnerNumber() >= FOWMAXPLAYERS )
 		return true;
 
 	if( (GetFOWFlags() & FOWFLAG_NOTRANSMIT) == 0 )

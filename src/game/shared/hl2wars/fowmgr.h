@@ -50,6 +50,9 @@ extern ConVar sv_fogofwar;
 	#define FOWINDEX(x, y) x + y*m_nGridSize
 #endif // CLIENT_DLL
 
+class CBaseEntity;
+class CBasePlayer;
+
 //-----------------------------------------------------------------------------
 // The class responsible for updating the fog of war. Runs on both client and server.
 //
@@ -134,6 +137,8 @@ public:
 
 	Vector				ComputeWorldPosition( int x, int y );
 	void				ComputeFOWPosition( const Vector &vPos, int &x, int &y );
+
+	bool				ShouldShowInFOW( CBasePlayer *pPlayer, CBaseEntity *pEnt );
 
 public:
 	// Lists
