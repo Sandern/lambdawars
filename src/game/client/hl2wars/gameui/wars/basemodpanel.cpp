@@ -1879,11 +1879,11 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 	if ( aspectRatio >= 1.6f )
 	{
 		// use the widescreen version
-		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "SwarmSelectionScreen" );
+		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "hl2wars_bg1" );
 	}
 	else
 	{
-		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "SwarmSelectionScreen" );
+		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "hl2wars_bg1" );
 	}
 
 	// TODO: GetBackgroundMusic

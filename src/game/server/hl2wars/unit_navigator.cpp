@@ -1483,7 +1483,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 		endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
 		endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
-		if( !TestRoute(testPos, endPos) ) {
+		if( !TestRoute( testPos, endPos ) ) {
 			bBlocked = true;
 		}
 	}
