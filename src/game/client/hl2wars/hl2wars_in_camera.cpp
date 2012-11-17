@@ -64,32 +64,33 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 		if( fabs(fDiff) > 2.0f )
 		{
 			m_flCurrentCameraDist -= fDiff;
-			//Msg("Camera distance changed %f -> %f : %f\n", m_fLastOriginZ, pPlayer->GetAbsOrigin().z, fDiff);
 		}
 	}
 	m_fLastOriginZ = pPlayer->GetAbsOrigin().z;
 
+	// Single player doesn't run client side movement, so update height here
+	if( gpGlobals->maxClients == 1 )
+	{
+		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() );
+	}
+
+	// Reset if desired height or max height is not yet set
 	if( m_flDesiredCameraDist == -1 )
 	{
-		Vector vPoint = pPlayer->GetAbsOrigin();
-		CBaseFuncMapBoundary::SnapToNearestBoundary( vPoint );
-		vPoint.z += -pPlayer->GetPlayerMins().z + 32.0f;
-		pPlayer->CalculateHeight( vPoint );
-		//Msg("original origin: %f %f %f\n", pPlayer->GetAbsOrigin().x, pPlayer->GetAbsOrigin().y, pPlayer->GetAbsOrigin().z);
-		//Msg("Init height. Max height: %f. vPoint: %f %f %f, playermins z: %f, cam ground: %f %f %f\n",  pPlayer->GetCamMaxHeight(), vPoint.x, vPoint.y, vPoint.z, pPlayer->GetPlayerMins().z,
-		//		pPlayer->GetCamGroundPos().x, pPlayer->GetCamGroundPos().y, pPlayer->GetCamGroundPos().z);
-		m_flDesiredCameraDist = m_flCurrentCameraDist = 800.0f; //pPlayer->GetCamHeight();
+		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() ); // Ensure we have a valid height
+		m_flDesiredCameraDist = m_flCurrentCameraDist = clamp( 800.0f, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 		m_flCurrentCameraDist = clamp( m_flCurrentCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 	}
 
+	// Clamp camera height within the valid range
 	if( pPlayer->GetCamHeight() != -1 )
 	{
-		// Clamp within the current range
 		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 	}
 
 	// Converge cam height
 	float flCameraDelta = fabs( m_flCurrentCameraDist - m_flDesiredCameraDist );
+
 	// Check against a tolerance so we don't oscillate forever.
 	if ( flCameraDelta > cl_strategic_height_tol.GetFloat() )
 	{
@@ -116,8 +117,6 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 		m_vecCameraVelocity.z = 0.0f;
 		m_flCurrentCameraDist = m_flDesiredCameraDist;
 	}
-
-	
 
 	return m_flCurrentCameraDist;
 }
@@ -198,4 +197,20 @@ void CHL2WarsInput::Wars_CamReset()
 CON_COMMAND_F( cam_reset, "Reset camera", 0 )
 {
 	((CHL2WarsInput *)input)->Wars_CamReset();
+}
+
+CON_COMMAND_F( cam_debug_info, "Debug camera info", 0 )
+{
+	CHL2WarsInput *wars_input = (CHL2WarsInput *)input;
+	if( !wars_input )
+		return;
+
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if( !pPlayer )
+		return;
+
+	Msg("Player Movement Cam Height: %f\n", pPlayer->GetCamHeight() );
+	Msg("Player Max Cam Height: %f\n", pPlayer->GetCamMaxHeight() );
+	Msg("Current Cam Height: %f\n", wars_input->GetCurrentCamHeight() );
+	Msg("Desired Cam Height: %f\n", wars_input->GetDesiredCamHeight() );
 }

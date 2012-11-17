@@ -122,6 +122,7 @@ void CHL2WarsInput::LevelInit( void )
 {
 	CInput::LevelInit();
 
+	m_flCurrentCameraDist = -1;
 	m_flDesiredCameraDist = -1;
 	m_fLastOriginZ = -1;
 	m_fScrollTimeOut = 0.0f;

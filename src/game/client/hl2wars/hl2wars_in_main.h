@@ -71,6 +71,9 @@ public:
 
 	virtual void			Wars_CamReset();
 
+	float					GetCurrentCamHeight() { return m_flCurrentCameraDist; }
+	float					GetDesiredCamHeight() { return m_flDesiredCameraDist; }
+
 	// Mouse clipping
 	virtual		void		ActivateMouseClipping( void );
 	virtual		void		DeactivateMouseClipping( void );
