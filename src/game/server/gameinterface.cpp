@@ -1182,7 +1182,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	// Import map script (find better place?)
 	char buf[_MAX_PATH];
 	Q_snprintf(buf, _MAX_PATH, "maps/%s.py", pMapName);
-	if( filesystem->FileExists( buf ) )
+	if( SrcPySystem()->IsPythonRunning() && filesystem->FileExists( buf ) )
 	{
 		SrcPySystem()->Import(pMapName);
 	}

@@ -14,8 +14,6 @@ ConVar g_debug_webview("g_debug_webview", "0", FCVAR_CHEAT);
 
 bool g_AllowTextureGeneration = true;
 
-//#define DISABLE_AWESOMIUM
-
 Awesomium::WebCore *g_pWebCore = NULL;
 
 //-----------------------------------------------------------------------------
@@ -104,7 +102,7 @@ bool CSrcWebCore::Init()
 {
 	SetAllowTextureGeneration( false );
 
-#ifndef DISABLE_AWESOMIUM
+#ifdef ENABLE_AWESOMIUM
 	Awesomium::WebConfig config;
 	config.log_level = Awesomium::kLogLevel_Verbose;
 

@@ -19,8 +19,6 @@
 
 #include "webview_texgen.h"
 
-//#define DISABLE_AWESOMIUM
-
 #ifndef DISABLE_PYTHON
 	#include "vgui_webview_python.h"
 #endif // DISABLE_PYTHON

@@ -9,6 +9,8 @@
 #include "videocfgext.h"
 #include "filesystem.h"
 
+#include "videocfg/videocfg.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -41,3 +43,24 @@ void SaveVideoCfgExt()
 
 	pConfig->deleteThis();
 }
+
+#if 0
+CON_COMMAND( force_dxlevel_92, "" )
+{
+	KeyValues *pConfigKeys = new KeyValues( "Data" );
+
+	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+	materials->GetRecommendedConfigurationInfo( 0, pConfigKeys );
+
+	KeyValuesDumpAsDevMsg( pConfigKeys );
+
+	Msg("Cur mat_dxlevel: %d\n", pConfigKeys->GetInt( "settings.mat_dxlevel", -1 ) );
+
+	pConfigKeys->SetInt( "settings.mat_dxlevel", 92 );
+
+	Msg("New mat_dxlevel: %d\n", pConfigKeys->GetInt( "settings.mat_dxlevel", -1 ) );
+
+	materials->
+	//UpdateVideoConfigConVars( pConfigKeys );
+}
+#endif // 0

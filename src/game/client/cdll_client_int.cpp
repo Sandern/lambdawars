@@ -37,6 +37,7 @@
 #include "materialsystem/imaterialsystemstub.h"
 #include "vguimatsurface/IMatSystemSurface.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "materialsystem/materialsystem_config.h"
 #include "c_soundscape.h"
 #include "engine/IVDebugOverlay.h"
 #include "vguicenterprint.h"
@@ -150,6 +151,10 @@
 #include "hl2wars/fowmgr.h"
 #include "wars_mount_system.h"
 #include "nav_mesh.h"
+
+#ifdef ENABLE_CEF
+	#include "cef/src_cef.h"
+#endif // ENABLE_CEF
 
 // @Deferred - Biohazard
 // For cookie string table
@@ -1230,6 +1235,15 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 
 	if( !g_pMaterialSystemHardwareConfig )
 		return false;
+
+	if( !g_pMaterialSystemHardwareConfig->HasFastVertexTextures() )
+	{
+		//const MaterialSystemHardwareIdentifier_t &VideoID = materials->GetVideoCardIdentifier();
+		int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
+		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported dx level: %d.", 
+				nDXLevel);
+		return false;
+	}
 
 	// Hook up the gaussian random number generator
 	s_GaussianRandomStream.AttachToStream( random );
@@ -2951,6 +2965,10 @@ void CHLClient::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 	VGui_OnScreenSizeChanged();
 
 	FogOfWarMgr()->OnResolutionChanged();
+
+#ifdef ENABLE_CEF
+	CEFSystem().OnScreenSizeChanged( nOldWidth, nOldHeight );
+#endif // ENALBE_CEF
 }
 
 IMaterialProxy *CHLClient::InstantiateMaterialProxy( const char *proxyName )

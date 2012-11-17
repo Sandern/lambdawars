@@ -555,9 +555,11 @@ void WebView::OnSizeChanged(int newWide, int newTall)
 //-----------------------------------------------------------------------------
 void WebView::LoadHTML( const char *html )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	//m_pWebView->LoadHTML( std::string(html) ); // TODO
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -565,10 +567,12 @@ void WebView::LoadHTML( const char *html )
 //-----------------------------------------------------------------------------
 void WebView::LoadURL( const char *url )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	Awesomium::WebString aurl = Awesomium::WebString::CreateFromUTF8(url, Q_strlen(url));
 	m_pWebView->LoadURL( Awesomium::WebURL( aurl ) );
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -576,6 +580,7 @@ void WebView::LoadURL( const char *url )
 //-----------------------------------------------------------------------------
 void WebView::LoadFile( const char *filename )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	char fullpath[MAX_PATH];
@@ -587,6 +592,7 @@ void WebView::LoadFile( const char *filename )
 	awebfilename.Append( afilename );
 
 	m_pWebView->LoadURL( Awesomium::WebURL( awebfilename ) );
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -594,9 +600,11 @@ void WebView::LoadFile( const char *filename )
 //-----------------------------------------------------------------------------
 void WebView::Reload( bool ignore_cache )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	m_pWebView->Reload( ignore_cache );
+#endif // DISABLE_AWESOMIUM
 }
 
 #ifndef DISABLE_PYTHON
@@ -606,12 +614,14 @@ void WebView::Reload( bool ignore_cache )
 //-----------------------------------------------------------------------------
 void WebView::ExecuteJavascript( bp::str script, bp::str frame_xpath )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	Awesomium::WebString wscript = PyObjectToWebString( script );
 	Awesomium::WebString wframe_xpath = PyObjectToWebString( frame_xpath );
 
 	m_pWebView->ExecuteJavascript( wscript, wframe_xpath );
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -619,6 +629,7 @@ void WebView::ExecuteJavascript( bp::str script, bp::str frame_xpath )
 //-----------------------------------------------------------------------------
 bp::object WebView::ExecuteJavascriptWithResult(bp::str script, bp::str frame_xpath)
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	Awesomium::WebString wscript = PyObjectToWebString( script );
@@ -632,6 +643,9 @@ bp::object WebView::ExecuteJavascriptWithResult(bp::str script, bp::str frame_xp
 	}
 
 	return ConvertJSValue( result );
+#else
+	return bp::object();
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -639,6 +653,7 @@ bp::object WebView::ExecuteJavascriptWithResult(bp::str script, bp::str frame_xp
 //-----------------------------------------------------------------------------
 bp::object WebView::CreateGlobalJavascriptObject( bp::object name )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 
 	Awesomium::WebString wname = PyObjectToWebString( name );
@@ -650,6 +665,9 @@ bp::object WebView::CreateGlobalJavascriptObject( bp::object name )
 		throw boost::python::error_already_set();													\
 	}
 	return ConvertJSValue( result );
+#else
+	return bp::object();
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -716,8 +734,10 @@ Awesomium::JSValue WebView::OnMethodCallWithReturnValue(Awesomium::WebView* call
 //-----------------------------------------------------------------------------
 void WebView::Focus()
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 	m_pWebView->Focus();
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -725,8 +745,10 @@ void WebView::Focus()
 //-----------------------------------------------------------------------------
 void WebView::Unfocus()
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 	m_pWebView->Unfocus();
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------
@@ -734,8 +756,10 @@ void WebView::Unfocus()
 //-----------------------------------------------------------------------------
 void WebView::SetTransparent( bool istransparent )
 {
+#ifdef ENABLE_AWESOMIUM
 	WEBVIEW_VALID;
 	m_pWebView->SetTransparent( istransparent );
+#endif // DISABLE_AWESOMIUM
 }
 
 //-----------------------------------------------------------------------------

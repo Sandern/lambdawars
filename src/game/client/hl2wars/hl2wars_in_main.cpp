@@ -1055,29 +1055,3 @@ bool CHL2WarsInput::HasWindowFocus()
 	}
 	return false;
 }
-
-#if _DEBUG
-// debug
-//-----------------------------------------------------------------------------
-// Purpose: Hacky way to detect input focus.
-//-----------------------------------------------------------------------------
-static int g_debugWinCount;
-BOOL CALLBACK DebugEnumerateWindows(HWND hwnd, LPARAM lParam)
-{
-	// Filter zero size windows. Don't care about those!
-	RECT windowRect;
-	GetWindowRect(hwnd, &windowRect);
-	Msg("\t%d Window size: %d %d %d %d\n", hwnd, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
-	g_debugWinCount++;
-	return true;
-}
-
-void CC_Debug_Windows_Count( void )
-{
-	g_debugWinCount = 0;
-	EnumThreadWindows( GetCurrentThreadId(), DebugEnumerateWindows, NULL );
-	Msg("Window count: %d\n", g_debugWinCount);
-	
-}
-static ConCommand debug_wincount("debug_wincount", CC_Debug_Windows_Count, "", FCVAR_CHEAT);
-#endif // _DEBUG

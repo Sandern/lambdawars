@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#ifdef ENABLE_AWESOMIUM
 #include "vgui_webview.h"
 #undef PostMessage
 
@@ -42,5 +43,21 @@ private:
 	Awesomium::WebString m_GetVersionMethodName;
 	Awesomium::WebString m_OpenURLMethodName;
 };
+#elif ENABLE_CEF
+#include "src_cef_browser.h"
+
+class WebNews : public SrcCefBrowser
+{
+public:
+	WebNews( vgui::Panel *pParent );
+
+	virtual void OnAfterCreated( void );
+	virtual void PerformLayout( void );
+	virtual void OnThink( void );
+
+private:
+	vgui::Panel *m_pParent;
+};
+#endif // 0
 
 #endif // VGUI_NEWS_H

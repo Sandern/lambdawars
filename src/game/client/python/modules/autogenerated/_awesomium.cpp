@@ -10,9 +10,9 @@
 
 #include "cbase.h"
 
-#include "Awesomium/WebCore.h"
-
 #include "hl2wars/vgui/vgui_webview.h"
+
+#include "Awesomium/WebCore.h"
 
 #include "src_python.h"
 
@@ -471,6 +471,15 @@ BOOST_PYTHON_MODULE(_awesomium){
             WebView_exposer.def( 
                 "IsMouseInputEnabled"
                 , IsMouseInputEnabled_function_type( &::WebView::IsMouseInputEnabled ) );
+        
+        }
+        { //::WebView::IsValid
+        
+            typedef bool ( ::WebView::*IsValid_function_type )(  ) ;
+            
+            WebView_exposer.def( 
+                "IsValid"
+                , IsValid_function_type( &::WebView::IsValid ) );
         
         }
         { //::WebView::IsVisible

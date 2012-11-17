@@ -25,6 +25,8 @@ void RemoveWebview( Awesomium::WebView *pView );
 
 void SetAllowTextureGeneration( bool bAllowTextureGeneration );
 
+#define DISABLE_AWESOMIUM
+
 //-----------------------------------------------------------------------------
 // Purpose: WebCore system
 //-----------------------------------------------------------------------------

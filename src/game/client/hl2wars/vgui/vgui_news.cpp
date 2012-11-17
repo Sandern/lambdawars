@@ -7,18 +7,25 @@
 #include "vgui_news.h"
 #include "wars_plat_misc.h"
 
+#include <vgui_controls/Panel.h>
 #include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 #include <vgui/IVGui.h>
+#include "vgui_controls/Controls.h"
 
-#include <Awesomium/WebCore.h>
 #include "src_python.h"
 
 #include "steam/steam_api.h"
 #include "steam/isteamfriends.h"
 
+#include "GameUI/GameConsole.h"
+
+#include <Awesomium/WebCore.h>
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+#ifdef ENABLE_AWESOMIUM
 WebNews::WebNews( vgui::Panel *pParent ) : WebView( false, pParent )
 {
 	GetWebView()->set_load_listener( this );
@@ -128,3 +135,53 @@ void WebNews::OnDocumentReady(Awesomium::WebView* caller,
 	SetVisible( true );
 	SetTransparent( true );
 }
+
+#elif ENABLE_CEF
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "file:///ui/mainmenu.html" ), m_pParent(pParent)
+{
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WebNews::OnAfterCreated( void )
+{
+	SetVisible( true );
+	//SetZPos( -1 );
+	//SetMouseInputEnabled( true );
+	//SetUseMouseCapture( false );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WebNews::PerformLayout()
+{
+	int screenWide, screenTall;
+	vgui::surface()->GetScreenSize( screenWide, screenTall );
+
+	int insetx = vgui::scheme()->GetProportionalScaledValue( 200 );
+	int insety = vgui::scheme()->GetProportionalScaledValue( 20 );
+	SetPos( insetx, insety );
+	SetSize( screenWide - insetx - insety, screenTall - insety * 2 );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WebNews::OnThink( void )
+{
+	if( GameConsole().IsConsoleVisible() || !m_pParent->HasFocus() )
+	{
+		SetVisible( false );
+	}
+	else
+	{
+		SetVisible( true );
+	}
+}
+
+#endif // 0

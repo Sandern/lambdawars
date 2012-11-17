@@ -5,6 +5,7 @@ import settings
 from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers
 from pyplusplus.module_builder import call_policies
+from pyplusplus import code_creators
 
 class Awesomium(GenerateModuleClient):
     module_name = '_awesomium'
@@ -17,7 +18,7 @@ class Awesomium(GenerateModuleClient):
     files.extend( [
         'cbase.h',
         
-        'Awesomium/WebCore.h',
+        #'Awesomium/WebCore.h',
         'hl2wars/vgui/vgui_webview.h',
     ] )
 
@@ -59,3 +60,9 @@ class Awesomium(GenerateModuleClient):
         mb.enum('Cursor').include()
         mb.enum('FocusedElementType').include()
         mb.enum('TerminationStatus').include()
+        
+    def AddAdditionalCode(self, mb):
+        header = code_creators.include_t( 'Awesomium/WebCore.h' )
+        mb.code_creator.adopt_include(header)
+        super(Awesomium, self).AddAdditionalCode(mb)
+        

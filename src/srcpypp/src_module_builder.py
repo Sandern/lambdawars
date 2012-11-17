@@ -87,6 +87,7 @@ dsymbols = [
     'BOOST_AUTO_LINK_NOMANGLE',
     
     'HL2WARS_DLL',
+    'ENABLE_AWESOMIUM',
 
     # Just pretend SSE and MMX are enabled
     '__SSE__',
