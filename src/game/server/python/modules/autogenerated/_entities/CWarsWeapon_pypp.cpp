@@ -1404,6 +1404,8 @@ void register_CWarsWeapon_class(){
         CWarsWeapon_exposer.def_readwrite( "m_PrimaryAttackActivity", &CWarsWeapon::m_PrimaryAttackActivity );
         CWarsWeapon_exposer.def_readwrite( "m_SecondaryAttackActivity", &CWarsWeapon::m_SecondaryAttackActivity );
         CWarsWeapon_exposer.def_readwrite( "firerate", &CWarsWeapon::m_fFireRate );
+        CWarsWeapon_exposer.def_readwrite( "maxbulletrange", &CWarsWeapon::m_fMaxBulletRange );
+        CWarsWeapon_exposer.def_readwrite( "overrideammodamage", &CWarsWeapon::m_fOverrideAmmoDamage );
         CWarsWeapon_exposer.def_readwrite( "bulletspread", &CWarsWeapon::m_vBulletSpread );
         { //::CBaseCombatWeapon::Activate
         

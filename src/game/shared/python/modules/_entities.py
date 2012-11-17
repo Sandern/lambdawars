@@ -1460,6 +1460,8 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
         cls.vars('m_fFireRate').rename('firerate')
         cls.vars('m_vBulletSpread').rename('bulletspread')
+        cls.vars('m_fOverrideAmmoDamage').rename('overrideammodamage')
+        cls.vars('m_fMaxBulletRange').rename('maxbulletrange')
         
         cls.mem_funs('GetPrimaryAttackActivity').exclude()
         cls.mem_funs('SetPrimaryAttackActivity').exclude()

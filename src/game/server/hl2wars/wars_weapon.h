@@ -74,6 +74,8 @@ public:
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flTimeWeaponIdle );
 
 	float m_fFireRate;
+	float m_fOverrideAmmoDamage;
+	float m_fMaxBulletRange;
 	Vector m_vBulletSpread;
 	Activity m_PrimaryAttackActivity;
 	Activity m_SecondaryAttackActivity;

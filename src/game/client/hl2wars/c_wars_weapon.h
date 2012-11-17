@@ -74,6 +74,8 @@ public:
 public:
 	float m_fFireRate;
 	Vector m_vBulletSpread;
+	float m_fOverrideAmmoDamage;
+	float m_fMaxBulletRange;
 
 private:
 	float m_fFireTimeOut;

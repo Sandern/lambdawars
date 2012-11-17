@@ -548,21 +548,27 @@ void CHL2WarsInput::SetScrollTimeOut(bool forward)
 	m_bScrolling = true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 float CHL2WarsInput::ComputeScrollSpeed( float frametime )
 {
 	float fScrollSpeed = 0.0f;
 
-
-
 	return fScrollSpeed;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::ComputeMoveSpeed( float frametime )
 {
 
 }
 
-
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::CapAndSetSpeed( CUserCmd *cmd )
 {
 	int nSlot = GET_ACTIVE_SPLITSCREEN_SLOT();

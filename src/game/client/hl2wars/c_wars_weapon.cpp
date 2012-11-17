@@ -65,6 +65,7 @@ C_WarsWeapon::C_WarsWeapon()
 {
 	SetPredictionEligible( true );
 
+	m_fMaxBulletRange = MAX_TRACE_LENGTH;
 	m_PrimaryAttackActivity = ACT_VM_PRIMARYATTACK;
 	m_SecondaryAttackActivity = ACT_VM_SECONDARYATTACK;
 }

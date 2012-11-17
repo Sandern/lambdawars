@@ -113,6 +113,7 @@ CWarsWeapon::CWarsWeapon()
 {
 	SetPredictionEligible(true);
 	m_fFireTimeOut = 0.25f;
+	m_fMaxBulletRange = MAX_TRACE_LENGTH;
 	AddFOWFlags(FOWFLAG_HIDDEN|FOWFLAG_NOTRANSMIT);
 
 	m_PrimaryAttackActivity = ACT_VM_PRIMARYATTACK;

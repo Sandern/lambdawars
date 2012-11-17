@@ -347,6 +347,7 @@ public:
 
 	virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
 	//virtual bool		TestPosition( const Vector &vPosition );
+	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
 	// Goals

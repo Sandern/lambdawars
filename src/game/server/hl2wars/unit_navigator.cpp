@@ -1460,36 +1460,23 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 
 	const Vector &origin = GetOuter()->EyePosition();
 
-#if 0
-	// First test by doing a trace if we can reach the goal directly
-	UTIL_TraceHull( GetAbsOrigin(), GetPath()->m_vGoalPos, 
-		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
-		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
-	if( tr.fraction == 1.0f || tr.m_pEnt == GetPath()->m_hTarget )
-	{
-		while( GetPath()->m_pWaypointHead->GetNext() )
-			AdvancePath();
-		return bBlocked;
-	}
-#endif // 0
-
 	float fMaxLookAhead = unit_reactivepath_maxlookahead.GetFloat();
 	int nMaxLookAhead = unit_reactivepath_maxwaypointsahead.GetInt();
 	pBestWaypoint = NULL;
 
 	if( GetPath()->CurWaypointIsGoal() )
 	{
-		//endPos = GetPath()->m_pWaypointHead->GetPos();
+		// Just test the head waypoint
 		endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
 		endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
-		if( !TestRoute( testPos, endPos ) ) {
+		if( !TestRouteEnd( GetPath()->m_pWaypointHead ) && !TestRoute( testPos, endPos ) ) {
 			bBlocked = true;
 		}
 	}
 	else
 	{
-		// Find max lookahead waypoint
+		// Build list of max waypoints we will look ahead
 		pCur = GetPath()->m_pWaypointHead;
 
 		for( int i = 0; i < nMaxLookAhead; i++ )
@@ -1518,12 +1505,13 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 			endPos = ComputeWaypointTarget( testPos, pCur );
 			endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
-			if( !TestRoute(testPos, endPos) ) 
+			if( !TestRouteEnd( pCur ) && !TestRoute(testPos, endPos) ) 
 			{
 				pCur = pCur->GetPrev();
 				continue;
 			}
 
+			// Furthest waypoint we can move, so we are done. No need to test more.
 			pBestWaypoint = pCur;
 			break;
 		}	
@@ -1566,6 +1554,34 @@ bool UnitBaseNavigator::TestPosition( const Vector &vPosition )
 	return true;
 }
 #endif // 0
+
+//-----------------------------------------------------------------------------
+// Purpose: Test end waypoint
+//-----------------------------------------------------------------------------
+bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
+{
+	// Test if testing end waypoint
+	if( pWaypoint->GetNext() != NULL )
+		return false;
+
+	// Try direct trace if we have a target as end point
+	// Buildings block the nav mesh, so test route will fail
+	if( GetPath()->m_hTarget )
+	{
+		trace_t tr;
+		UTIL_TraceHull( GetAbsOrigin() + Vector(0, 0, 16), GetPath()->m_vGoalPos + Vector(0, 0, 16), 
+			WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
+			GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
+		if( tr.fraction == 1.0f || tr.m_pEnt == GetPath()->m_hTarget )
+		{
+			while( GetPath()->m_pWaypointHead->GetNext() )
+				AdvancePath();
+			return true;
+		}
+	}
+
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Test route from start to end by using the nav mesh

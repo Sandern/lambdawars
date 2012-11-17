@@ -90,10 +90,11 @@ void CWarsWeapon::PrimaryAttack( void )
 	info.m_vecSrc = vecShootOrigin;
 	info.m_vecDirShooting = vecShootDir;
 	info.m_iShots = shots;
-	info.m_flDistance = MAX_TRACE_LENGTH;
+	info.m_flDistance = m_fMaxBulletRange;
 	info.m_iAmmoType = GetPrimaryAmmoType();
 	info.m_iTracerFreq = 2;
 	info.m_vecSpread = m_vBulletSpread;
+	info.m_flDamage = m_fOverrideAmmoDamage;
 
 	pOwner->FireBullets( info );
 
