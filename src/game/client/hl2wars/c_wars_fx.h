@@ -10,6 +10,6 @@
 
 class CUnitBase;
 
-void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, int iAttributeEffects = 0 );
+void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects = 0 );
 
 #endif // _INCLUDED_C_WARS_FX_H

@@ -77,6 +77,8 @@ public:
 	float m_fOverrideAmmoDamage;
 	float m_fMaxBulletRange;
 
+	Vector m_vTracerColor;
+
 private:
 	float m_fFireTimeOut;
 	Activity m_PrimaryAttackActivity;

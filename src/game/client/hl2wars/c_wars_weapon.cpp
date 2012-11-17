@@ -68,6 +68,9 @@ C_WarsWeapon::C_WarsWeapon()
 	m_fMaxBulletRange = MAX_TRACE_LENGTH;
 	m_PrimaryAttackActivity = ACT_VM_PRIMARYATTACK;
 	m_SecondaryAttackActivity = ACT_VM_SECONDARYATTACK;
+
+	// Default is white (exact output depends on the used particle effect and material)
+	m_vTracerColor = Vector( 1, 1, 1 ); 
 }
 
 //-----------------------------------------------------------------------------

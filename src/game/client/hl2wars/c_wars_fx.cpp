@@ -62,7 +62,7 @@ enum ASW_Bullet_Attribute_Bits
 	BULLET_ATT_MAX				=	0x00000020,
 };
 
-void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart, const Vector &vecEnd, bool bRedTracer, int iAttributeEffects = 0 )
+void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects = 0 )
 {
 	VPROF_BUDGET( "ASWDoParticleTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -74,9 +74,9 @@ void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart,
 		pTracer->SetControlPoint( 0, vecStart );
 		pTracer->SetControlPoint( 1, vecEnd );
 		// the color
-		Vector vecColor = Vector( 1, 1, 1 );
-		if ( bRedTracer )
-			vecColor = Vector( 1, 0.65, 0.65 );
+		//Vector vecColor = Vector( 1, 1, 1 );
+		//if ( bRedTracer )
+		//	vecColor = Vector( 1, 0.65, 0.65 );
 
 		pTracer->SetControlPoint( 10, vecColor );
 	}
@@ -104,7 +104,7 @@ void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart,
 }
 
 static int asw_num_u_tracers = 0;
-void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, int iAttributeEffects )
+void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects )
 {
 	MDLCACHE_CRITICAL_SECTION();
 	Vector vecStart;
@@ -135,7 +135,7 @@ void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, int iAttribut
 
 	asw_num_u_tracers++;
 	//ASWDoParticleTracer( pWpn, vecStart, vecEnd, pWpn->GetMuzzleFlashRed(), iAttributeEffects );
-	ASWDoParticleTracer( "tracer_rifle", vecStart, vecEnd, false );
+	ASWDoParticleTracer( "tracer_rifle", vecStart, vecEnd, vecColor, false );
 
 	// do a trace to the hit surface for impacts
 	trace_t tr;

@@ -1463,6 +1463,9 @@ class Entities(GenerateModuleSemiShared):
         cls.vars('m_fOverrideAmmoDamage').rename('overrideammodamage')
         cls.vars('m_fMaxBulletRange').rename('maxbulletrange')
         
+        if self.isClient:
+            cls.vars('m_vTracerColor').rename('tracercolor')
+        
         cls.mem_funs('GetPrimaryAttackActivity').exclude()
         cls.mem_funs('SetPrimaryAttackActivity').exclude()
         cls.mem_funs('GetSecondaryAttackActivity').exclude()

@@ -139,7 +139,7 @@ void CWarsWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 #endif
 #else
 #ifdef CLIENT_DLL
-	ASWUTracer( GetOwner(), tr.endpos );
+	ASWUTracer( GetOwner(), tr.endpos, m_vTracerColor );
 #endif
 #endif // 0
 #endif // HL2WARS_ASW_DLL
