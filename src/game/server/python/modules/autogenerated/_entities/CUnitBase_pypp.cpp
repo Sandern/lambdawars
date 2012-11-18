@@ -2414,6 +2414,7 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.def_readwrite( "eyepitch", &CUnitBase::m_fEyePitch );
         CUnitBase_exposer.def_readwrite( "eyeyaw", &CUnitBase::m_fEyeYaw );
         CUnitBase_exposer.def_readwrite( "maxclimbheight", &CUnitBase::m_fMaxClimbHeight );
+        CUnitBase_exposer.def_readwrite( "minslope", &CUnitBase::m_fMinSlope );
         CUnitBase_exposer.def_readwrite( "savedrop", &CUnitBase::m_fSaveDrop );
         CUnitBase_exposer.def_readwrite( "testroutestartheight", &CUnitBase::m_fTestRouteStartHeight );
         { //::CBaseAnimating::Activate

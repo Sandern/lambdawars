@@ -26,6 +26,8 @@ public:
 	virtual void		Update( UnitBaseMoveCommand &mv );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint();
 
+	virtual bool		ShouldConsiderNavMesh( void );
+
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
 	int GetTestRouteMask();
@@ -35,6 +37,12 @@ private:
 	float m_fCurrentHeight;
 	int m_iTestRouteMask;
 };
+
+// Inlines
+inline bool UnitBaseAirNavigator::ShouldConsiderNavMesh( void )
+{
+	return false; // Never add density from nav areas
+}
 
 inline int UnitBaseAirNavigator::GetTestRouteMask()
 {

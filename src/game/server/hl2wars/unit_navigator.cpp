@@ -92,7 +92,6 @@ ConVar unit_testroute_bloatscale("unit_testroute_bloatscale", "1.2");
 ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "1.5");
 ConVar unit_seed_density("unit_seed_density", "0.1");
 ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
-ConVar unit_position_check("unit_position_check", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 
@@ -183,6 +182,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_vFacingTargetPos = vec3_origin;
 	m_bFacingFaceTarget = false;
 	m_bNoAvoid = false;
+	m_bNoNavAreasNearby = false;
 }
 #endif // DISABLE_PYTHON
 
@@ -200,8 +200,9 @@ void UnitBaseNavigator::Reset()
 	m_vLastWishVelocity.Init(0, 0, 0);
 
 	m_fLastPathRecomputation = 0.0f;
-	m_fNextLastPositionCheck = gpGlobals->curtime + unit_position_check.GetFloat();
 	m_fNextReactivePathUpdate = 0.0f;
+	m_fNextAllowPathRecomputeTime = 0.0f;
+	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
 	m_fLastAvgDist = -1;
@@ -333,9 +334,11 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	VectorAngles( vDir, vAngles );
 	CalcMove( MoveCommand, vAngles, fSpeed );
 
-	m_vLastPosition = GetAbsOrigin();
-
 	UpdateGoalStatus( MoveCommand, GoalStatus );
+
+	UpdateBlockedStatus();
+
+	m_vLastPosition = GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -561,6 +564,12 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 	const Vector &origin = GetAbsOrigin();
 	fRadius = GetEntityBoundingRadius(m_pOuter);
 
+	// Try testing a bit further in case we are stuck
+	if( GetBlockedStatus() >= BS_MUCH )
+		fRadius *= 3.0f;
+	else if( GetBlockedStatus() >= BS_LITTLE )
+		fRadius *= 2.0f;
+
 	// Reset list information
 	//m_bUnitArrivedAtSameGoalNearby = false;
 	m_iUsedTestDirections = 0;
@@ -655,12 +664,16 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 			fTotalDensity += m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity;
 		}	
 
-		// Half circle scan with mid at waypoint direction
+		// Half circle scan with mid at waypoint direction (except if stuck, then do a full scan)
 		// Scan starts in the middle, alternating between the two different directions
-		// Scan breaks early if fTotalDensity is very low for the scanned direction.
+		// Scan breaks early if:
+		//		- fTotalDensity is very low for the scanned direction.
+		//		- No seeds
+		//		- Not blocked
 		float fRotate = 45.0f;
 		j = 0;
-		while( j < 4 && (m_Seeds.Count() || fTotalDensity > 0.01f) )
+		int jmax = GetBlockedStatus() == BS_STUCK ? 7 : 4; // Do full scan in case we are stuck
+		while( j < jmax && ( GetBlockedStatus() != BS_NONE || m_Seeds.Count() || fTotalDensity > 0.01f ) )
 		{
 			m_iUsedTestDirections += 1;
 			j++;
@@ -704,6 +717,17 @@ bool UnitBaseNavigator::ShouldConsiderEntity( CBaseEntity *pEnt )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Whether we should add density from nav areas
+//-----------------------------------------------------------------------------
+bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
+{
+	if( m_bNoNavAreasNearby ) // Set when in BS_STUCK and we can't find anything nearby 
+		return false;
+	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
+	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Computes the density and average velocity for a given direction.
 //-----------------------------------------------------------------------------
 float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity )
@@ -742,45 +766,15 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 		}
 	}	
 
-	// Disabled because it's not really needed and also causes potential problems
-#if 0
-	if( TheNavMesh->IsLoaded() )
+	// Add density from nav mesh (don't drop off cliffs when we don't want too)
+	// Note that we don't do this for special waypoints (climbing/dropping/etc)
+	if( ShouldConsiderNavMesh() )
 	{
-		// Add in density from the nav mesh
-		// We do this if:
-		// 1. If the test pos has no nav area
-		// 2. The nav area changed and we can't traverse to that area from the current area.
 		UnitShortestPathCost costFunc(m_pOuter);
 
-		if( GetPath()->m_iGoalType != GOALTYPE_NONE )
-		{
-
-
-		}
-		else
-		{
-			CNavArea *pArea = TheNavMesh->GetNavArea(GetAbsOrigin()+Vector(0,0,4.0f), 32.0f); 
-			CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,4.0f), 32.0f); 
-
-			if( pArea )
-			{
-				if( !pAreaTo || costFunc(pAreaTo, pArea, NULL, NULL, -1.0f ) < 0 )
-				{
-					float fDensity = 100.0f;
-					fSumDensity += fDensity;
-					Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
-					VectorNormalize(vDir);
-					*pAvgVelocity += fDensity * vDir * 500.0f;
-				}
-			}
-		}
-
-		/*
-		UnitShortestPathCost costFunc(m_pOuter);
-		CNavArea *pArea = TheNavMesh->GetNavArea(GetAbsOrigin()+Vector(0,0,32.0f), 2000.0f); // Might be half over an edge, so need to look down a lot for nav area's.
-		CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,64.0f), 2000.0f);  // NOTE: Might be a jump down area, so need to look down for a large distance.
-
-		if( (!pArea && !pAreaTo) || (pArea && pArea != pAreaTo && (!pAreaTo || costFunc(pAreaTo, pArea, NULL, NULL, -1.0f ) < 0) ) )
+		// Add density from nav area
+		CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
+		if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
 		{
 			float fDensity = 100.0f;
 			fSumDensity += fDensity;
@@ -788,20 +782,27 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 			VectorNormalize(vDir);
 			*pAvgVelocity += fDensity * vDir * 500.0f;
 		}
-		*/
 	}
-#endif // 0
 
 	if( m_Seeds.Count() )
 	{
-		// Add seeds if in range
-		float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
 		float fDist;
+		float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
+		float fBaseDensitySeed = unit_seed_density.GetFloat();
+
+		// Increase seed density + radius a bit when blocked for a longer time
+		if( GetBlockedStatus() >= BS_MUCH )
+		{
+			fBaseDensitySeed *= 1.5f;
+			fRadius *= 1.2f;
+		}
+
+		// Add seeds if in range
 		for( i = 0; i < m_Seeds.Count(); i++ )
 		{
 			fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
 			if( fDist < fRadius )
-				fSumDensity += unit_seed_density.GetFloat() - ((fDist / fRadius) * unit_seed_density.GetFloat());
+				fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
 		}
 	}
 
@@ -909,6 +910,17 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeVelocity", VPROF_BUDGETGROUP_UNITS );
 
+	// Don't go out of "ignore nav areas" mode until we found a valid nav area.
+	if( m_bNoNavAreasNearby )
+	{
+		UnitShortestPathCost costFunc(m_pOuter);
+		CNavArea *pMyArea = TheNavMesh->GetNavArea(m_pOuter->EyePosition(), 150.0f);
+		if( pMyArea && costFunc.IsAreaValid( pMyArea ) )
+		{
+			m_bNoNavAreasNearby = false;
+		}
+	}
+
 	// By default we are moving into the direction of the next waypoint
 	// We now calculate the velocity based on current velocity, flow, density, etc
 	Vector vBestVel, vVelocity;
@@ -986,9 +998,15 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		}
 		if( m_fLastBestDensity > fDensNoMove )
 		{
-			//Vector vPathDir;
-			//UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
-			vBestVel = vPathDir * MoveCommand.maxspeed; // NOTE: Just try to move in this case, better than doing nothing.
+			if( GetBlockedStatus() >= BS_STUCK && m_fLastBestDensity > 90.0f )
+			{
+				vBestVel = vPathDir * MoveCommand.maxspeed; // NOTE: Stuck because there are no nav areas around. Just try moving!
+				m_bNoNavAreasNearby = true;
+			}
+			else
+			{
+				vBestVel.Zero();
+			}
 		}
 	}
 	m_vDebugVelocity = vBestVel;
@@ -1117,47 +1135,53 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			fGoalDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
 		}
 
-		if( bPathBlocked || (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
+		// Path might be blocked. Recompute or add density seeds
+		if( bPathBlocked || GetBlockedStatus() > BS_NONE )
 		{
-			if( m_fNextLastPositionCheck < gpGlobals->curtime )
+			if( unit_navigator_debug.GetBool() )
 			{
-				if( unit_navigator_debug.GetBool() )
-				{
-					DevMsg("#%d UnitNavigator: path blocked, recomputing path...(reasons: ", GetOuter()->entindex());
-					if( bPathBlocked )
-						DevMsg("blocked");
-					if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
-						DevMsg(", no movement");
-					DevMsg(")\n");
-				}
+				DevMsg("#%d UnitNavigator: path blocked, recomputing path...(reasons: ", GetOuter()->entindex());
+				if( bPathBlocked )
+					DevMsg("blocked");
+				if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
+					DevMsg(", no movement");
+				if( MoveCommand.m_hBlocker )
+					DevMsg(", blocked entity: #%d - %s", MoveCommand.m_hBlocker->entindex(), MoveCommand.m_hBlocker->GetClassname());
+				DevMsg(")\n");
+			}
 
+			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime )
+			{
 				// Recompute path
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE || GetPath()->m_iGoalType == GOALTYPE_POSITION_INRANGE )
 					DoFindPathToPosInRange();
 				else
 					DoFindPathToPos();
 
-				// Apparently we are stuck, so try to add a seed that serves as density point
-				// TODO/FIXME: what if you get blocked due the place of the waypoint? In this case it might insert a seed that is undesirable.
-				if( MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsWorld() )
-				{
-					Vector vHitPos = MoveCommand.blocker_hitpos + MoveCommand.blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
-					if( unit_navigator_debug.GetBool() )
-					{
-						if( unit_navigator_debug.GetInt() > 1 )
-							NDebugOverlay::Box( vHitPos, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, 255, 1.0f );
-						DevMsg("#%d: UpdateGoalAndPath: Added density seed due path blocked\n", GetOuter()->entindex() );
-					}
-					m_Seeds.AddToTail( seed_entry_t( vHitPos.AsVector2D(), gpGlobals->curtime ) );
-				}
-
-				m_fNextLastPositionCheck = gpGlobals->curtime + unit_position_check.GetFloat();
+				// Don't allow too many recomputations
+				if( GetBlockedStatus() >= BS_STUCK )
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 15.0f;
+				else if( GetBlockedStatus() >= BS_MUCH )
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 7.0f;
+				else if( GetBlockedStatus() >= BS_LITTLE )
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 3.0f;
+				else
+					m_fNextAllowPathRecomputeTime = 1.0f;
 			}
-		}
-		else
-		{
-			// Reset to avoid too many path recomputations
-			m_fNextLastPositionCheck = gpGlobals->curtime + unit_position_check.GetFloat();
+
+			// Apparently we are stuck, so try to add a seed that serves as density point
+			// TODO/FIXME: what if you get blocked due the place of the waypoint? In this case it might insert a seed that is undesirable.
+			if( MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsWorld() )
+			{
+				Vector vHitPos = MoveCommand.blocker_hitpos + MoveCommand.blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
+				if( unit_navigator_debug.GetBool() )
+				{
+					if( unit_navigator_debug.GetInt() > 1 )
+						NDebugOverlay::Box( vHitPos, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, 255, 1.0f );
+					DevMsg("#%d: UpdateGoalAndPath: Added density seed due path blocked\n", GetOuter()->entindex() );
+				}
+				m_Seeds.AddToTail( seed_entry_t( vHitPos.AsVector2D(), gpGlobals->curtime ) );
+			}
 		}
 	}
 
@@ -1694,6 +1718,49 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 		vPos.z += 16.0f;
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::ResetBlockedStatus()
+{
+	m_BlockedStatus = BS_NONE;
+	m_fBlockedStartTime = 0.0f;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update blocked status based on the last position.
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::UpdateBlockedStatus()
+{
+	// Determine if we are stuck:
+	//		  * Should have a goal and we are not at our goal yet
+	//		  * Not moving from our position. Either real stuck or we think we can't move
+	// UNDONE * Detect moving back and forth between two positions
+	//		    Something like that should also be classified as stuck
+	if( m_LastGoalStatus == CHS_HASGOAL && 
+		(m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0 )
+	{
+		if( m_BlockedStatus == BS_NONE )
+		{
+			m_fBlockedStartTime = gpGlobals->curtime;
+		}
+
+		float fBlockedTime = gpGlobals->curtime - m_fBlockedStartTime;
+		if( fBlockedTime < 3.0f )
+			m_BlockedStatus = BS_LITTLE;
+		else if( fBlockedTime < 10.0f )
+			m_BlockedStatus = BS_MUCH;
+		else if( fBlockedTime < 20.f )
+			m_BlockedStatus = BS_STUCK;
+		else
+			m_BlockedStatus = BS_GIVEUP;
+	}
+	else
+	{
+		ResetBlockedStatus();
+	}
 }
 
 // Goals
@@ -2501,4 +2568,5 @@ void UnitBaseNavigator::DrawDebugInfo()
 	m_pOuter->EntityText( 3, UTIL_VarArgs("BoundingRadius: %f\n", GetEntityBoundingRadius(m_pOuter)), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 4, UTIL_VarArgs("Threshold: %f\n", THRESHOLD), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 5, UTIL_VarArgs("DiscomfortWeight: %f\n", m_fDiscomfortWeight), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 6, UTIL_VarArgs("m_BlockedStatus: %d\n", m_BlockedStatus), 0, 255, 0, 0, 255 );
 }

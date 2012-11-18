@@ -150,6 +150,8 @@ CUnitBase::CUnitBase() : m_bUseCheapShotSimulation(true), m_fAccuracy(1.0f), m_b
 	m_fSaveDrop = 300.0f;
 	m_fMaxClimbHeight = 0.0f; // Indicates not capable of climbing
 	m_fTestRouteStartHeight = 100.0f;
+	m_fMinSlope = 0.83f; // Require slope is less than ~35 degrees by default
+
 	m_fLastRangeAttackLOSTime = -1;
 	m_iAttackLOSMask = MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE;
 

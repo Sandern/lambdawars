@@ -61,6 +61,7 @@ enum BlockedStatus_t
 {
 	BS_NONE = 0,
 	BS_LITTLE,
+	BS_MUCH,
 	BS_STUCK,
 	BS_GIVEUP, 
 };
@@ -324,9 +325,10 @@ public:
 	float				GetDensityMultiplier();
 	Vector				GetWishVelocity() { return m_vLastWishVelocity; }
 
-	float				GetEntityBoundingRadius( CBaseEntity *pEnt );
-	void				RegenerateConsiderList( Vector &vPathDir, CheckGoalStatus_t GoalStatus );
-	bool				ShouldConsiderEntity( CBaseEntity *pEnt );
+	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
+	virtual void		RegenerateConsiderList( Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
+	virtual bool		ShouldConsiderNavMesh( void );
 
 	float				ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity );
 	float				ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
@@ -349,6 +351,10 @@ public:
 	//virtual bool		TestPosition( const Vector &vPosition );
 	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
+
+	BlockedStatus_t		GetBlockedStatus( void );
+	virtual void		ResetBlockedStatus( void );
+	virtual void		UpdateBlockedStatus( void );
 
 	// Goals
 	virtual bool		SetGoal( Vector &destination, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
@@ -422,9 +428,13 @@ private:
 #endif // DISABLE_PYTHON
 
 	// Position checking
+	BlockedStatus_t m_BlockedStatus;
+	float m_fBlockedStartTime;
 	float m_fNextLastPositionCheck;
 	float m_fLastPathRecomputation;
 	float m_fNextReactivePathUpdate;
+	float m_fNextAllowPathRecomputeTime;
+	bool m_bNoNavAreasNearby;
 	Vector m_vLastPosition;
 
 	// Misc
@@ -446,9 +456,6 @@ private:
 	Vector m_vTestDirections[MAX_TESTDIRECTIONS];
 	Vector m_vTestPositions[MAX_TESTDIRECTIONS];
 	int m_iUsedTestDirections;
-	
-
-	//bool m_bUnitArrivedAtSameGoalNearby;
 
 	float m_fLastComputedDensity;
 	float m_fLastBestDensity;
@@ -482,6 +489,11 @@ private:
 inline float UnitBaseNavigator::GetEntityBoundingRadius( CBaseEntity *pEnt )
 {
 	return pEnt->CollisionProp()->BoundingRadius2D();
+}
+
+inline BlockedStatus_t UnitBaseNavigator::GetBlockedStatus( void )
+{
+	return m_BlockedStatus;
 }
 
 inline float UnitBaseNavigator::GetIdealYaw()

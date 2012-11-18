@@ -399,6 +399,7 @@ public:
 	float m_fDeathDrop;
 	float m_fMaxClimbHeight;
 	float m_fTestRouteStartHeight;
+	float m_fMinSlope;
 #else
 	// CLIENT VARIABLES
 	int m_iMaxHealth;

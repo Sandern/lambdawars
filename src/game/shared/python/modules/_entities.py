@@ -1065,7 +1065,7 @@ class Entities(GenerateModuleSemiShared):
 
             mb.mem_funs('CalcView').add_transformation( FT.output('zNear'), FT.output('zFar'), FT.output('fov') )
         else:
-            # NO DECLARATION lol
+            # NO DECLARATION
             mb.mem_funs('SetWeaponAnimType').exclude()
             mb.mem_funs('SetTargetInfo').exclude()
             mb.mem_funs('SendAmmoUpdate').exclude()
@@ -1275,6 +1275,7 @@ class Entities(GenerateModuleSemiShared):
             cls.vars('m_fSaveDrop').rename('savedrop')
             cls.vars('m_fMaxClimbHeight').rename('maxclimbheight')
             cls.vars('m_fTestRouteStartHeight').rename('testroutestartheight')
+            cls.vars('m_fMinSlope').rename('minslope')
             
             cls.mem_funs('SetEnemy').exclude() 
             cls.add_property( 'enemy'

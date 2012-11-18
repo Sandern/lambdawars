@@ -24,6 +24,43 @@ public:
 		m_fBoundingRadius = m_pUnit->CollisionProp()->BoundingRadius2D();
 	}
 
+	bool IsAreaValid( CNavArea *area )
+	{
+		if( (area->GetAttributes() & NAV_MESH_JUMP) )
+		{
+			//Msg("#%d jump not supported\n", m_pUnit->entindex());
+			return false;
+		}
+
+		if( (area->GetAttributes() & NAV_MESH_CROUCH) )
+		{
+			//Msg("#%d crouch not supported\n", m_pUnit->entindex());
+			return false;
+		}
+
+		// Must fit in the nav area. Take surrounding area's in consideration
+		float fTolX = MIN(area->GetTolerance(WEST), area->GetTolerance(EAST)) + area->GetSizeX();
+		float fTolY =  MIN(area->GetTolerance(NORTH), area->GetTolerance(SOUTH)) + area->GetSizeY();
+
+		if(m_fBoundingRadius > fTolX || m_fBoundingRadius > fTolY )
+		{
+			return false;
+		}
+
+#ifndef CLIENT_DLL
+		// Figure out normal, calculate and check min slope
+		Vector normal;
+		area->ComputeNormal( &normal );
+		float fSlope = DotProduct( normal, Vector(0, 0, 1) );
+		if( fSlope < m_pUnit->m_fMinSlope )
+		{
+			return false;
+		}
+#endif // CLIENT_DLL
+
+		return true;
+	}
+
 	float operator() ( CNavArea *area, CNavArea *fromArea, const CNavLadder *ladder, const CFuncElevator *elevator, float length )
 	{
 		if ( fromArea == NULL )
@@ -33,6 +70,12 @@ public:
 		}
 		else
 		{
+			// First check if the target area is valid
+			if( !IsAreaValid( area ) )
+			{
+				return -1;
+			}
+
 			// compute distance traveled along path so far
 			float dist;
 
@@ -87,27 +130,6 @@ public:
 #endif // CLIENT_DLL
 					cost += fabs(heightdiff) * 1.1f;
 				}
-			}
-
-			// Must fit in the nav area. Take surrounding area's in consideration
-			float fTolX = MIN(area->GetTolerance(WEST), area->GetTolerance(EAST)) + area->GetSizeX();
-			float fTolY =  MIN(area->GetTolerance(NORTH), area->GetTolerance(SOUTH)) + area->GetSizeY();
-
-			if(m_fBoundingRadius > fTolX || m_fBoundingRadius > fTolY )
-			{
-				return -1;
-			}
-
-			if( (area->GetAttributes() & NAV_MESH_JUMP) )
-			{
-				//Msg("#%d jump not supported\n", m_pUnit->entindex());
-				return -1;
-			}
-
-			if( (area->GetAttributes() & NAV_MESH_CROUCH) )
-			{
-				//Msg("#%d crouch not supported\n", m_pUnit->entindex());
-				return -1;
 			}
 
 			// if this is a "jump" area, add penalty
