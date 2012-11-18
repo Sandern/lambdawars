@@ -201,6 +201,17 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	::input->GetFullscreenMousePos( &(m_MouseData.m_iX), &(m_MouseData.m_iY) );
 #endif 
 
+	// Clear ent in case we are not supposed to see it with the mouse
+	if( m_MouseData.m_hEnt )
+	{
+#ifdef CLIENT_DLL
+		if( !m_MouseData.m_hEnt->ShouldShowInFOW() && m_MouseData.m_hEnt->IsInFOW() )
+#else
+		if( !m_MouseData.m_hEnt->ShouldShowInFOW( this ) && m_MouseData.m_hEnt->IsInFOW( GetOwnerNumber() ) )
+#endif // CLIENT_DLL
+			m_MouseData.SetEnt( NULL );
+	}
+
 	// If we hit the world or nothing, do a larger scan for entities
 #define MOUSE_ENT_TOLERANCE 64.0f 
 	if( (!m_MouseData.GetEnt() || m_MouseData.GetEnt()->GetRefEHandle().GetEntryIndex() == 0) && !g_debug_mouse_noradiuscheck.GetBool() )
@@ -220,15 +231,25 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 			for(i=0; i <n; i++)
 			{
 				pEnt = pList[i];
-				if( !pEnt || pEnt->GetRefEHandle().GetEntryIndex() == 0 || pEnt->IsPointSized() || !pEnt->IsSolid() )
+				if( !pEnt || pEnt->GetRefEHandle().GetEntryIndex() == 0 || pEnt->IsPointSized() || !pEnt->IsSolid() || pEnt->IsDormant() )
 					continue;
-	#ifdef CLIENT_DLL
+
+				// Dont grab entities that should not be shown
+#ifdef CLIENT_DLL
+				if( !pEnt->ShouldShowInFOW() && pEnt->IsInFOW() )
+					continue;
+#else
+				if( !pEnt->ShouldShowInFOW( this ) && pEnt->IsInFOW( GetOwnerNumber() ) )
+					continue;
+#endif // CLIENT_DLL
+
+#ifdef CLIENT_DLL
 				Vector vVel;
 				pEnt->EstimateAbsVelocity(vVel);
 				fSpeed = vVel.Length2D();
-	#else
+#else
 				fSpeed = pEnt->GetSmoothedVelocity().Length();
-	#endif // CLIENT_DLL
+#endif // CLIENT_DLL
 				fDist = (tr.endpos - pEnt->GetAbsOrigin()).Length();
 				if( fDist < MOUSE_ENT_TOLERANCE * MAX(1.0, (fSpeed/125.0)) )
 				{
@@ -845,7 +866,14 @@ void CHL2WarsPlayer::UpdateSelection( void )
 	bChanged = false;
 	for ( i = nCount-1; i >= 0; i-- )
 	{
-		if( !GetUnit(i) || !GetUnit(i)->IsAlive() ) {
+		CBaseEntity *pUnit = GetUnit(i);
+		if( !pUnit || !pUnit->IsAlive() ||
+#ifdef CLIENT_DLL
+				pUnit->IsInFOW() )
+#else
+				pUnit->IsInFOW( GetOwnerNumber() ) )
+#endif // CLIENT_DLL
+		{
 			RemoveUnit( i, false );		
 			bChanged = true;
 		}
@@ -1145,7 +1173,8 @@ void CHL2WarsPlayer::CleanupGroups( void )
 		bChanged = false;
 		for( i= m_Groups[iGroup].m_Group.Count()-1; i >= 0; i-- )
 		{
-			if( m_Groups[iGroup].m_Group[i] != NULL && m_Groups[iGroup].m_Group[i]->IsAlive() )
+			EHANDLE m_pEntity = m_Groups[iGroup].m_Group[i];
+			if( m_pEntity != NULL && m_pEntity->IsAlive() )
 				continue;
 
 			m_Groups[iGroup].m_Group.Remove(i);
