@@ -49,8 +49,13 @@ CON_COMMAND( force_dxlevel_92, "" )
 {
 	KeyValues *pConfigKeys = new KeyValues( "Data" );
 
-	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-	materials->GetRecommendedConfigurationInfo( 0, pConfigKeys );
+	//struct VidMatConfigData_t data;
+	//RecommendedConfig( data );
+
+	ReadCurrentVideoConfig( pConfigKeys );
+
+	//const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+	//materials->GetRecommendedConfigurationInfo( 0, pConfigKeys );
 
 	KeyValuesDumpAsDevMsg( pConfigKeys );
 
@@ -60,7 +65,15 @@ CON_COMMAND( force_dxlevel_92, "" )
 
 	Msg("New mat_dxlevel: %d\n", pConfigKeys->GetInt( "settings.mat_dxlevel", -1 ) );
 
-	materials->
-	//UpdateVideoConfigConVars( pConfigKeys );
+	//materials->
+	UpdateVideoConfigConVars( pConfigKeys );
 }
 #endif // 0
+
+CON_COMMAND( debug_print_dxlevel, "" )
+{
+	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
+	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
+
+	Msg( "nDXLevel: %d, nMaxDXLevel: %d\n", nDXLevel, nMaxDXLevel );
+}

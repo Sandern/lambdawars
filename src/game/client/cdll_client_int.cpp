@@ -1236,12 +1236,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	if( !g_pMaterialSystemHardwareConfig )
 		return false;
 
-	if( !g_pMaterialSystemHardwareConfig->HasFastVertexTextures() )
+	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
+	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
+	if( nMaxDXLevel <= 92 )
 	{
-		//const MaterialSystemHardwareIdentifier_t &VideoID = materials->GetVideoCardIdentifier();
-		int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
-		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported dx level: %d.", 
-				nDXLevel);
+		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported max dx level: %d (cur setting: %d).", 
+				nMaxDXLevel, nDXLevel);
 		return false;
 	}
 

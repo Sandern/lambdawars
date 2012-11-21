@@ -173,6 +173,9 @@ pip-log.txt
 *.hpp~
 *.cpp~
 *.py~
+*.txt~
+*.txt # Usually don't want txt files
+*.h~
 
 src/game/client/Release_swarm/*
 src/game/server/Release_swarm/*

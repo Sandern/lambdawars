@@ -386,7 +386,7 @@ void CWebViewTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 
 	if( m_bScrollScheduled )
 	{
-		if( g_debug_webview.GetBool() )
+		if( g_debug_webview.GetInt() > 1 )
 			DevMsg("WebView: Updating texture (scroll action)\n");
 
 		int y, ystart, yend;
@@ -461,7 +461,7 @@ void CWebViewTextureRegen::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	}
 	else
 	{
-		if( g_debug_webview.GetBool() )
+		if( g_debug_webview.GetInt() > 1 )
 			DevMsg("WebView: Updating texture (dirty rect)\n");
 
 		// NOTE: code assumes that if pSubRect is not the texture size that it falls in bounds

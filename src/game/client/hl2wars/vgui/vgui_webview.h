@@ -30,8 +30,9 @@ Awesomium::WebString CreateWebString();
 #define CREATE_WEBSTRING( str ) Awesomium::WebString::CreateFromUTF8( str, Q_strlen(str) );
 
 class WebView : public Awesomium::WebViewListener::View, 
-	public Awesomium::WebViewListener::Load, public Awesomium::WebViewListener::Process,
-	public Awesomium::JSMethodHandler 
+				public Awesomium::WebViewListener::Load, 
+				public Awesomium::WebViewListener::Process,
+				public Awesomium::JSMethodHandler 
 {
 public:
 	friend class SrcWebViewSurfaceFactory;
