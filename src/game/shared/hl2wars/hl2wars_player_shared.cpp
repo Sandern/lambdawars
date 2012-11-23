@@ -205,9 +205,9 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	if( m_MouseData.m_hEnt )
 	{
 #ifdef CLIENT_DLL
-		if( !m_MouseData.m_hEnt->ShouldShowInFOW() && m_MouseData.m_hEnt->IsInFOW() )
+		if( !m_MouseData.m_hEnt->ShouldShowInFOW() )
 #else
-		if( !m_MouseData.m_hEnt->ShouldShowInFOW( this ) && m_MouseData.m_hEnt->IsInFOW( GetOwnerNumber() ) )
+		if( !m_MouseData.m_hEnt->ShouldShowInFOW( this ) )
 #endif // CLIENT_DLL
 			m_MouseData.SetEnt( NULL );
 	}
@@ -236,10 +236,10 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 
 				// Dont grab entities that should not be shown
 #ifdef CLIENT_DLL
-				if( !pEnt->ShouldShowInFOW() && pEnt->IsInFOW() )
+				if( !pEnt->ShouldShowInFOW() )
 					continue;
 #else
-				if( !pEnt->ShouldShowInFOW( this ) && pEnt->IsInFOW( GetOwnerNumber() ) )
+				if( !pEnt->ShouldShowInFOW( this ) )
 					continue;
 #endif // CLIENT_DLL
 
@@ -869,9 +869,9 @@ void CHL2WarsPlayer::UpdateSelection( void )
 		CBaseEntity *pUnit = GetUnit(i);
 		if( !pUnit || !pUnit->IsAlive() ||
 #ifdef CLIENT_DLL
-				pUnit->IsInFOW() )
+				!pUnit->ShouldShowInFOW() )
 #else
-				pUnit->IsInFOW( GetOwnerNumber() ) )
+				!pUnit->ShouldShowInFOW( this ) )
 #endif // CLIENT_DLL
 		{
 			RemoveUnit( i, false );		
