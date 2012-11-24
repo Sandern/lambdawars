@@ -880,6 +880,16 @@ void register_C_BaseAnimating_class(){
                 , AddToClientSideAnimationList_function_type( &::C_BaseAnimating::AddToClientSideAnimationList ) );
         
         }
+        { //::C_BaseAnimating::ApplyBoneMatrixTransform
+        
+            typedef void ( ::C_BaseAnimating::*ApplyBoneMatrixTransform_function_type )( ::matrix3x4_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "ApplyBoneMatrixTransform"
+                , ApplyBoneMatrixTransform_function_type( &::C_BaseAnimating::ApplyBoneMatrixTransform )
+                , ( bp::arg("transform") ) );
+        
+        }
         { //::C_BaseAnimating::BecomeRagdollOnClient
         
             typedef ::C_BaseAnimating * ( ::C_BaseAnimating::*BecomeRagdollOnClient_function_type )(  ) ;
@@ -1062,6 +1072,16 @@ void register_C_BaseAnimating_class(){
                 "DoAnimationEvents"
                 , DoAnimationEvents_function_type( &::C_BaseAnimating::DoAnimationEvents )
                 , ( bp::arg("pStudio") ) );
+        
+        }
+        { //::C_BaseAnimating::DoInternalDrawModel
+        
+            typedef void ( ::C_BaseAnimating::*DoInternalDrawModel_function_type )( ::ClientModelRenderInfo_t *,::DrawModelState_t *,::matrix3x4_t * ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "DoInternalDrawModel"
+                , DoInternalDrawModel_function_type( &::C_BaseAnimating::DoInternalDrawModel )
+                , ( bp::arg("pInfo"), bp::arg("pState"), bp::arg("pBoneToWorldArray")=bp::object() ) );
         
         }
         { //::C_BaseAnimating::DoMuzzleFlash
@@ -1270,6 +1290,26 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("number"), bp::arg("origin"), bp::arg("angles") ) );
         
         }
+        { //::C_BaseAnimating::GetAttachment
+        
+            typedef bool ( ::C_BaseAnimating::*GetAttachment_function_type )( int,::matrix3x4_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetAttachment"
+                , GetAttachment_function_type( &::C_BaseAnimating::GetAttachment )
+                , ( bp::arg("number"), bp::arg("matrix") ) );
+        
+        }
+        { //::C_BaseAnimating::GetAttachmentLocal
+        
+            typedef bool ( ::C_BaseAnimating::*GetAttachmentLocal_function_type )( int,::matrix3x4_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetAttachmentLocal"
+                , GetAttachmentLocal_function_type( &::C_BaseAnimating::GetAttachmentLocal )
+                , ( bp::arg("iAttachment"), bp::arg("attachmentToLocal") ) );
+        
+        }
         { //::C_BaseAnimating::GetAttachmentLocal
         
             typedef bool ( ::C_BaseAnimating::*GetAttachmentLocal_function_type )( int,::Vector &,::QAngle & ) ;
@@ -1368,6 +1408,26 @@ void register_C_BaseAnimating_class(){
                 "GetBonePosition"
                 , GetBonePosition_function_type( &::C_BaseAnimating::GetBonePosition )
                 , ( bp::arg("iBone"), bp::arg("origin"), bp::arg("angles") ) );
+        
+        }
+        { //::C_BaseAnimating::GetBoneTransform
+        
+            typedef void ( ::C_BaseAnimating::*GetBoneTransform_function_type )( int,::matrix3x4_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetBoneTransform"
+                , GetBoneTransform_function_type( &::C_BaseAnimating::GetBoneTransform )
+                , ( bp::arg("iBone"), bp::arg("pBoneToWorld") ) );
+        
+        }
+        { //::C_BaseAnimating::GetCachedBoneMatrix
+        
+            typedef void ( ::C_BaseAnimating::*GetCachedBoneMatrix_function_type )( int,::matrix3x4_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetCachedBoneMatrix"
+                , GetCachedBoneMatrix_function_type( &::C_BaseAnimating::GetCachedBoneMatrix )
+                , ( bp::arg("boneIndex"), bp::arg("out") ) );
         
         }
         { //::C_BaseAnimating::GetCollideType
@@ -1747,6 +1807,16 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("msg") ) );
         
         }
+        { //::C_BaseAnimating::HitboxToWorldTransforms
+        
+            typedef bool ( ::C_BaseAnimating::*HitboxToWorldTransforms_function_type )( ::matrix3x4_t * * ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "HitboxToWorldTransforms"
+                , HitboxToWorldTransforms_function_type( &::C_BaseAnimating::HitboxToWorldTransforms )
+                , ( bp::arg("pHitboxToWorld") ) );
+        
+        }
         { //::C_BaseAnimating::IgniteRagdoll
         
             typedef void ( ::C_BaseAnimating::*IgniteRagdoll_function_type )( ::C_BaseAnimating * ) ;
@@ -1764,6 +1834,16 @@ void register_C_BaseAnimating_class(){
             C_BaseAnimating_exposer.def( 
                 "InThreadedBoneSetup"
                 , InThreadedBoneSetup_function_type( &::C_BaseAnimating::InThreadedBoneSetup ) );
+        
+        }
+        { //::C_BaseAnimating::InitAsClientRagdoll
+        
+            typedef bool ( ::C_BaseAnimating::*InitAsClientRagdoll_function_type )( ::matrix3x4_t const *,::matrix3x4_t const *,::matrix3x4_t const *,float ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "InitAsClientRagdoll"
+                , InitAsClientRagdoll_function_type( &::C_BaseAnimating::InitAsClientRagdoll )
+                , ( bp::arg("pDeltaBones0"), bp::arg("pDeltaBones1"), bp::arg("pCurrentBonePosition"), bp::arg("boneDt") ) );
         
         }
         { //::C_BaseAnimating::InitBoneSetupThreadPool
@@ -2202,6 +2282,16 @@ void register_C_BaseAnimating_class(){
             C_BaseAnimating_exposer.def( 
                 "ResetSequenceInfo"
                 , ResetSequenceInfo_function_type( &::C_BaseAnimating::ResetSequenceInfo ) );
+        
+        }
+        { //::C_BaseAnimating::SaveRagdollInfo
+        
+            typedef void ( ::C_BaseAnimating::*SaveRagdollInfo_function_type )( int,::matrix3x4_t const &,::CBoneAccessor & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "SaveRagdollInfo"
+                , SaveRagdollInfo_function_type( &::C_BaseAnimating::SaveRagdollInfo )
+                , ( bp::arg("numbones"), bp::arg("cameraTransform"), bp::arg("pBoneToWorld") ) );
         
         }
         { //::C_BaseAnimating::ScriptSetPoseParameter

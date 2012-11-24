@@ -1020,6 +1020,16 @@ void register_C_BaseFlex_class(){
                 , ( bp::arg("pchFileRoot") ) );
         
         }
+        { //::C_BaseFlex::SetupWeights
+        
+            typedef void ( ::C_BaseFlex::*SetupWeights_function_type )( ::matrix3x4_t const *,int,float *,float * ) ;
+            
+            C_BaseFlex_exposer.def( 
+                "SetupWeights"
+                , SetupWeights_function_type( &::C_BaseFlex::SetupWeights )
+                , ( bp::arg("pBoneToWorld"), bp::arg("nFlexWeightCount"), bp::arg("pFlexWeights"), bp::arg("pFlexDelayedWeights") ) );
+        
+        }
         { //::C_BaseFlex::Spawn
         
             typedef void ( ::C_BaseFlex::*Spawn_function_type )(  ) ;

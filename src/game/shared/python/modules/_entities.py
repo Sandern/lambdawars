@@ -430,6 +430,9 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('GetTextureFrameIndex').exclude() # Don't care
         mb.mem_funs('SetTextureFrameIndex').exclude() # Don't care
         
+        mb.mem_funs('GetParentToWorldTransform').exclude() # Problem with argument/return type
+        if self.isClient: mb.mem_funs('BuildJiggleTransformations').exclude() # No declaration
+        
         # Use isclient/isserver globals/builtins
         mb.mem_funs('IsServer').exclude() 
         mb.mem_funs('IsClient').exclude() 
@@ -498,7 +501,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs( lambda decl: HasArgType(decl, 'groundlink_t') ).exclude()
         mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('groundlink_t') != -1 ).exclude()
         mb.mem_funs( lambda decl: HasArgType(decl, 'touchlink_t') ).exclude()    
-        mb.mem_funs( lambda decl: HasArgType(decl, 'matrix3x4_t') ).exclude()
+        #mb.mem_funs( lambda decl: HasArgType(decl, 'matrix3x4_t') ).exclude()
         mb.mem_funs( lambda decl: HasArgType(decl, 'bf_read') ).exclude()
         
         # Exclude trace stuff for now

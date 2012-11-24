@@ -1694,6 +1694,16 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::GetAttachment
         
+            typedef bool ( ::C_BaseEntity::*GetAttachment_function_type )( int,::matrix3x4_t & ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetAttachment"
+                , GetAttachment_function_type( &::C_BaseEntity::GetAttachment )
+                , ( bp::arg("number"), bp::arg("matrix") ) );
+        
+        }
+        { //::C_BaseEntity::GetAttachment
+        
             typedef bool ( ::C_BaseEntity::*GetAttachment_function_type )( int,::Vector & ) ;
             
             C_BaseEntity_exposer.def( 
@@ -5258,6 +5268,16 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("iDim"), bp::arg("flValue") ) );
         
         }
+        { //::C_BaseEntity::SetLocalTransform
+        
+            typedef void ( ::C_BaseEntity::*SetLocalTransform_function_type )( ::matrix3x4_t const & ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetLocalTransform"
+                , SetLocalTransform_function_type( &::C_BaseEntity::SetLocalTransform )
+                , ( bp::arg("localTransform") ) );
+        
+        }
         { //::C_BaseEntity::SetLocalVelocity
         
             typedef void ( ::C_BaseEntity::*SetLocalVelocity_function_type )( ::Vector const & ) ;
@@ -5716,6 +5736,16 @@ void register_C_BaseEntity_class(){
                 "SetupBones"
                 , SetupBones_function_type( &::C_BaseEntity::SetupBones )
                 , ( bp::arg("pBoneToWorldOut"), bp::arg("nMaxBones"), bp::arg("boneMask"), bp::arg("currentTime") ) );
+        
+        }
+        { //::C_BaseEntity::SetupWeights
+        
+            typedef void ( ::C_BaseEntity::*SetupWeights_function_type )( ::matrix3x4_t const *,int,float *,float * ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetupWeights"
+                , SetupWeights_function_type( &::C_BaseEntity::SetupWeights )
+                , ( bp::arg("pBoneToWorld"), bp::arg("nFlexWeightCount"), bp::arg("pFlexWeights"), bp::arg("pFlexDelayedWeights") ) );
         
         }
         { //::C_BaseEntity::ShadowCastType

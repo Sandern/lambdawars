@@ -1217,6 +1217,16 @@ void register_CRagdollProp_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::CRagdollProp::InitRagdoll
+        
+            typedef void ( ::CRagdollProp::*InitRagdoll_function_type )( ::Vector const &,int,::Vector const &,::matrix3x4_t *,::matrix3x4_t *,float,int,bool,bool ) ;
+            
+            CRagdollProp_exposer.def( 
+                "InitRagdoll"
+                , InitRagdoll_function_type( &::CRagdollProp::InitRagdoll )
+                , ( bp::arg("forceVector"), bp::arg("forceBone"), bp::arg("forcePos"), bp::arg("pPrevBones"), bp::arg("pBoneToWorld"), bp::arg("dt"), bp::arg("collisionGroup"), bp::arg("activateRagdoll"), bp::arg("bWakeRagdoll")=(bool)(true) ) );
+        
+        }
         { //::CRagdollProp::InitRagdollAnimation
         
             typedef void ( ::CRagdollProp::*InitRagdollAnimation_function_type )(  ) ;

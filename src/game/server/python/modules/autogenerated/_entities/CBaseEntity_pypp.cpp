@@ -5605,6 +5605,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("origin") ) );
         
         }
+        { //::CBaseEntity::SetLocalTransform
+        
+            typedef void ( ::CBaseEntity::*SetLocalTransform_function_type )( ::matrix3x4_t const & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetLocalTransform"
+                , SetLocalTransform_function_type( &::CBaseEntity::SetLocalTransform )
+                , ( bp::arg("localTransform") ) );
+        
+        }
         { //::CBaseEntity::SetLocalVelocity
         
             typedef void ( ::CBaseEntity::*SetLocalVelocity_function_type )( ::Vector const & ) ;

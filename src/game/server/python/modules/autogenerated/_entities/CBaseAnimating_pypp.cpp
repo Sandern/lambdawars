@@ -1155,6 +1155,16 @@ void register_CBaseAnimating_class(){
                 , ( bp::arg("force") ) );
         
         }
+        { //::CBaseAnimating::BuildMatricesWithBoneMerge
+        
+            typedef void ( ::CBaseAnimating::*BuildMatricesWithBoneMerge_function_type )( ::CStudioHdr const *,::QAngle const &,::Vector const &,::Vector const *,::Quaternion const *,::matrix3x4_t *,::CBaseAnimating *,::CBoneCache * ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "BuildMatricesWithBoneMerge"
+                , BuildMatricesWithBoneMerge_function_type( &::CBaseAnimating::BuildMatricesWithBoneMerge )
+                , ( bp::arg("pStudioHdr"), bp::arg("angles"), bp::arg("origin"), bp::arg("pos"), bp::arg("q"), bp::arg("bonetoworld"), bp::arg("pParent"), bp::arg("pParentCache") ) );
+        
+        }
         { //::CBaseAnimating::CalculateIKLocks
         
             typedef void ( ::CBaseAnimating::*CalculateIKLocks_function_type )( float ) ;
@@ -1304,6 +1314,16 @@ void register_CBaseAnimating_class(){
                 , default_DrawDebugTextOverlays_function_type(&CBaseAnimating_wrapper::default_DrawDebugTextOverlays) );
         
         }
+        { //::CBaseAnimating::DrawRawSkeleton
+        
+            typedef void ( ::CBaseAnimating::*DrawRawSkeleton_function_type )( ::matrix3x4_t *,int,bool,float,bool ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "DrawRawSkeleton"
+                , DrawRawSkeleton_function_type( &::CBaseAnimating::DrawRawSkeleton )
+                , ( bp::arg("boneToWorld"), bp::arg("boneMask"), bp::arg("noDepthTest")=(bool)(true), bp::arg("duration")=0.0f, bp::arg("monocolor")=(bool)(false) ) );
+        
+        }
         { //::CBaseAnimating::DrawServerHitboxes
         
             typedef void ( ::CBaseAnimating::*DrawServerHitboxes_function_type )( float,bool ) ;
@@ -1423,6 +1443,16 @@ void register_CBaseAnimating_class(){
         }
         { //::CBaseAnimating::GetAttachment
         
+            typedef bool ( ::CBaseAnimating::*GetAttachment_function_type )( int,::matrix3x4_t & ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "GetAttachment"
+                , GetAttachment_function_type( &::CBaseAnimating::GetAttachment )
+                , ( bp::arg("iAttachment"), bp::arg("attachmentToWorld") ) );
+        
+        }
+        { //::CBaseAnimating::GetAttachment
+        
             typedef bool ( ::CBaseAnimating::*GetAttachment_function_type )( char const *,::Vector &,::Vector *,::Vector *,::Vector * ) ;
             
             CBaseAnimating_exposer.def( 
@@ -1469,6 +1499,16 @@ void register_CBaseAnimating_class(){
                 "GetAttachmentLocal"
                 , GetAttachmentLocal_function_type( &::CBaseAnimating::GetAttachmentLocal )
                 , ( bp::arg("iAttachment"), bp::arg("origin"), bp::arg("angles") ) );
+        
+        }
+        { //::CBaseAnimating::GetAttachmentLocal
+        
+            typedef bool ( ::CBaseAnimating::*GetAttachmentLocal_function_type )( int,::matrix3x4_t & ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "GetAttachmentLocal"
+                , GetAttachmentLocal_function_type( &::CBaseAnimating::GetAttachmentLocal )
+                , ( bp::arg("iAttachment"), bp::arg("attachmentToLocal") ) );
         
         }
         { //::CBaseAnimating::GetBodygroup
@@ -1538,6 +1578,16 @@ void register_CBaseAnimating_class(){
                 "GetBonePosition"
                 , GetBonePosition_function_type( &::CBaseAnimating::GetBonePosition )
                 , ( bp::arg("iBone"), bp::arg("origin"), bp::arg("angles") ) );
+        
+        }
+        { //::CBaseAnimating::GetBoneTransform
+        
+            typedef void ( ::CBaseAnimating::*GetBoneTransform_function_type )( int,::matrix3x4_t & ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "GetBoneTransform"
+                , GetBoneTransform_function_type( &::CBaseAnimating::GetBoneTransform )
+                , ( bp::arg("iBone"), bp::arg("pBoneToWorld") ) );
         
         }
         { //::CBaseAnimating::GetCycle
