@@ -12,6 +12,8 @@
 #include "shaderlib/commandbuilder.h"
 #include "tier0/vprof.h"
 
+#include "phong_vs20.inc"
+#include "phong_ps20b.inc"
 #include "phong_vs30.inc"
 #include "phong_ps30.inc"
 
@@ -457,32 +459,60 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		// default behavior of forcing half lambert on.
 		bool bPhongHalfLambert = IS_PARAM_DEFINED( info.m_nPhongDisableHalfLambert ) ? ( params[ info.m_nPhongDisableHalfLambert ]->GetIntValue() == 0 ) : true;
 
-		// The vertex shader uses the vertex id stream
-		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-		SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+		if ( !g_pHardwareConfig->HasFastVertexTextures() )
+		{
+			DECLARE_STATIC_VERTEX_SHADER( phong_vs20 );
+			SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, 0 );
+			SET_STATIC_VERTEX_SHADER( phong_vs20 );
 
-		DECLARE_STATIC_VERTEX_SHADER( phong_vs30 );
-		SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
-		SET_STATIC_VERTEX_SHADER_COMBO( DECAL, bIsDecal );
-		SET_STATIC_VERTEX_SHADER( phong_vs30 );
+			// Assume we're only going to get in here if we support 2b
+			DECLARE_STATIC_PIXEL_SHADER( phong_ps20b );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
+			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM,  phongInfo.m_bHasSelfIllum && !bHasFlashlightOnly );
+			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUMFRESNEL,  phongInfo.m_bHasSelfIllumFresnel && !bHasFlashlightOnly );
+			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
+			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
+			SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, phongInfo.m_bHasBaseTextureWrinkle );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
+			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
+			SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+			SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
+			SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, 0 );
+			SET_STATIC_PIXEL_SHADER_COMBO( PHONG_HALFLAMBERT, bPhongHalfLambert );
+			SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER( phong_ps20b );
+		}
+		else
+		{
+			// The vertex shader uses the vertex id stream
+			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+			SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
 
-		DECLARE_STATIC_PIXEL_SHADER( phong_ps30 );
-		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-		SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM,  phongInfo.m_bHasSelfIllum && !bHasFlashlightOnly );
-		SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUMFRESNEL,  phongInfo.m_bHasSelfIllumFresnel && !bHasFlashlightOnly );
-		SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
-		SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
-		SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, phongInfo.m_bHasBaseTextureWrinkle );
-		SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
-		SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
-		SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
-		SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
-		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-		SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
-		SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
-		SET_STATIC_PIXEL_SHADER_COMBO( PHONG_HALFLAMBERT, bPhongHalfLambert );
-		SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
-		SET_STATIC_PIXEL_SHADER( phong_ps30 );
+			DECLARE_STATIC_VERTEX_SHADER( phong_vs30 );
+			SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
+			SET_STATIC_VERTEX_SHADER_COMBO( DECAL, bIsDecal );
+			SET_STATIC_VERTEX_SHADER( phong_vs30 );
+
+			DECLARE_STATIC_PIXEL_SHADER( phong_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
+			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM,  phongInfo.m_bHasSelfIllum && !bHasFlashlightOnly );
+			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUMFRESNEL,  phongInfo.m_bHasSelfIllumFresnel && !bHasFlashlightOnly );
+			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
+			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
+			SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, phongInfo.m_bHasBaseTextureWrinkle );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
+			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
+			SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+			SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
+			SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
+			SET_STATIC_PIXEL_SHADER_COMBO( PHONG_HALFLAMBERT, bPhongHalfLambert );
+			SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER( phong_ps30 );
+		}
 
 		if( bHasFlashlightOnly )
 		{
@@ -942,66 +972,82 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			pShaderAPI->GetDX9LightState( &lightState );
 		}
 
-		pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
-
-		int nLightingPreviewMode = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_ENABLE_FIXED_LIGHTING );
-		if ( ( nLightingPreviewMode == ENABLE_FIXED_LIGHTING_OUTPUTNORMAL_AND_DEPTH ) && IsPC() )
+		if ( !g_pHardwareConfig->HasFastVertexTextures() )
 		{
-			float vEyeDir[4];
-			pShaderAPI->GetWorldSpaceCameraDirection( vEyeDir );
+			DECLARE_DYNAMIC_VERTEX_SHADER( phong_vs20 );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, numBones > 0 );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, 0 );
+			SET_DYNAMIC_VERTEX_SHADER( phong_vs20 );
 
-			float flFarZ = pShaderAPI->GetFarZ();
-			vEyeDir[0] /= flFarZ;	// Divide by farZ for SSAO algorithm
-			vEyeDir[1] /= flFarZ;
-			vEyeDir[2] /= flFarZ;
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, vEyeDir );
+			DECLARE_DYNAMIC_PIXEL_SHADER( phong_ps20b );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS,  lightState.m_nNumLights );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA, bWriteWaterFogToAlpha );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, bWriteDepthToAlpha );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
+			SET_DYNAMIC_PIXEL_SHADER( phong_ps20b );
 		}
-
-		TessellationMode_t nTessellationMode = pShaderAPI->GetTessellationMode();
-		if ( nTessellationMode != TESSELLATION_MODE_DISABLED )
+		else
 		{
-			pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER1, TEXTURE_SUBDIVISION_PATCHES );
+			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
 
-
-
-			float vSubDDimensions[4] = { 1.0f/pShaderAPI->GetSubDHeight(),
-											bHasDisplacement && mat_displacementmap.GetBool() ? 1.0f : 0.0f,
-											bHasDisplacementWrinkles && mat_displacementmap.GetBool() ? 1.0f : 0.0f, 0.0f };
-
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_9, vSubDDimensions );
-			if( bHasDisplacement )
+			int nLightingPreviewMode = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_ENABLE_FIXED_LIGHTING );
+			if ( ( nLightingPreviewMode == ENABLE_FIXED_LIGHTING_OUTPUTNORMAL_AND_DEPTH ) && IsPC() )
 			{
-				pShader->BindVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, info.m_nDisplacementMap );
-			}
-			else
-			{
-				pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, TEXTURE_BLACK );
+				float vEyeDir[4];
+				pShaderAPI->GetWorldSpaceCameraDirection( vEyeDir );
+
+				float flFarZ = pShaderAPI->GetFarZ();
+				vEyeDir[0] /= flFarZ;	// Divide by farZ for SSAO algorithm
+				vEyeDir[1] /= flFarZ;
+				vEyeDir[2] /= flFarZ;
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, vEyeDir );
 			}
 
-			// Currently, tessellation is mutually exclusive with any kind of GPU-side skinning, morphing or vertex compression
-			Assert( !pShaderAPI->IsHWMorphingEnabled() );
-			Assert( numBones == 0 );
-			Assert( vertexCompression == 0);
+			TessellationMode_t nTessellationMode = pShaderAPI->GetTessellationMode();
+			if ( nTessellationMode != TESSELLATION_MODE_DISABLED )
+			{
+				pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER1, TEXTURE_SUBDIVISION_PATCHES );
+
+				float vSubDDimensions[4] = { 1.0f/pShaderAPI->GetSubDHeight(),
+												bHasDisplacement && mat_displacementmap.GetBool() ? 1.0f : 0.0f,
+												bHasDisplacementWrinkles && mat_displacementmap.GetBool() ? 1.0f : 0.0f, 0.0f };
+
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_9, vSubDDimensions );
+				if( bHasDisplacement )
+				{
+					pShader->BindVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, info.m_nDisplacementMap );
+				}
+				else
+				{
+					pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, TEXTURE_BLACK );
+				}
+
+				// Currently, tessellation is mutually exclusive with any kind of GPU-side skinning, morphing or vertex compression
+				Assert( !pShaderAPI->IsHWMorphingEnabled() );
+				Assert( numBones == 0 );
+				Assert( vertexCompression == 0);
+			}
+			DECLARE_DYNAMIC_VERTEX_SHADER( phong_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, ( numBones > 0) && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, nTessellationMode );
+			SET_DYNAMIC_VERTEX_SHADER( phong_vs30 );
+
+			DECLARE_DYNAMIC_PIXEL_SHADER( phong_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, nLightingPreviewMode ? 0 : lightState.m_nNumLights );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA, nLightingPreviewMode ? false : bWriteWaterFogToAlpha );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, bWriteDepthToAlpha );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, nLightingPreviewMode ? false : bFlashlightShadows );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( UBERLIGHT, bUberlight );
+			SET_DYNAMIC_PIXEL_SHADER( phong_ps30 );
+
+			bool bUnusedTexCoords[3] = { false, false, !pShaderAPI->IsHWMorphingEnabled() || !bIsDecal };
+			pShaderAPI->MarkUnusedVertexFields( 0, 3, bUnusedTexCoords );
+
+			// Set constant to enable translation of VPOS to render target coordinates in ps_3_0
+			pShaderAPI->SetScreenSizeForVPOS();
 		}
-		DECLARE_DYNAMIC_VERTEX_SHADER( phong_vs30 );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, ( numBones > 0) && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
-		SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, nTessellationMode );
-		SET_DYNAMIC_VERTEX_SHADER( phong_vs30 );
-
-		DECLARE_DYNAMIC_PIXEL_SHADER( phong_ps30 );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, nLightingPreviewMode ? 0 : lightState.m_nNumLights );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA, nLightingPreviewMode ? false : bWriteWaterFogToAlpha );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, bWriteDepthToAlpha );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, nLightingPreviewMode ? false : bFlashlightShadows );
-		SET_DYNAMIC_PIXEL_SHADER_COMBO( UBERLIGHT, bUberlight );
-		SET_DYNAMIC_PIXEL_SHADER( phong_ps30 );
-
-		bool bUnusedTexCoords[3] = { false, false, !pShaderAPI->IsHWMorphingEnabled() || !bIsDecal };
-		pShaderAPI->MarkUnusedVertexFields( 0, 3, bUnusedTexCoords );
-
-		// Set constant to enable translation of VPOS to render target coordinates in ps_3_0
-		pShaderAPI->SetScreenSizeForVPOS();
 
 		DynamicCmdsOut.End();
 		pShaderAPI->ExecuteCommandBuffer( DynamicCmdsOut.Base() );

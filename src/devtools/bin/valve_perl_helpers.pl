@@ -390,9 +390,9 @@ sub LoadShaderListFile
 			{
    				if( $shaderbase =~ m/_ps2x/i )
 				{
-					my $targetbase = $shaderbase;
-					$targetbase =~ s/_ps2x/_ps20/i;
-					push @srcfiles, ( $line . "-----" . $targetbase );
+					#my $targetbase = $shaderbase;
+					#$targetbase =~ s/_ps2x/_ps20/i;
+					#push @srcfiles, ( $line . "-----" . $targetbase );
 					
 					$targetbase = $shaderbase;
 					$targetbase =~ s/_ps2x/_ps20b/i;

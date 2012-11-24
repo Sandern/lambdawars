@@ -310,7 +310,7 @@ float4 main( PS_INPUT i ) : COLOR
 	}
 	#endif
 
-	#if ( DISTANCEALPHA )
+	#if ( DISTANCEALPHA && !defined( SHADER_MODEL_PS_2_0 ) )
 	{
 		// now, do all distance alpha effects
 		if ( OUTLINE && ( distAlphaMask >= OUTLINE_MIN_VALUE0 ) && ( distAlphaMask <= OUTLINE_MAX_VALUE1 ) )
@@ -478,7 +478,7 @@ float4 main( PS_INPUT i ) : COLOR
 	}
 	#endif
 
-	#if !( FLASHLIGHT && defined( SHADER_MODEL_PS_2_0 ) )
+	#if !( /*FLASHLIGHT &&*/ defined( SHADER_MODEL_PS_2_0 ) )
 	{
 		#if SELFILLUM_ENVMAPMASK_ALPHA
 		{
