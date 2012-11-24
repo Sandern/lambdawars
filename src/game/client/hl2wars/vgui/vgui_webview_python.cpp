@@ -34,6 +34,9 @@ bp::object PyJSObject::Invoke(const char *name, bp::list args)
 
 void PyJSObject::SetCustomMethod( const char *name, bool has_return_value )
 {
+	// FIXME: Awesomium sometimes throws an exception and then custom calls without return value fail...
+	has_return_value = true;
+
 	Awesomium::WebString wname = Awesomium::WebString::CreateFromUTF8( name, Q_strlen(name) );
 	m_JSObject.SetCustomMethod( wname, has_return_value );
 }

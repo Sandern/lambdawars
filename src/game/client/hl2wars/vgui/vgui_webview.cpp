@@ -25,6 +25,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+ConVar g_debug_webview_methodcalls("g_debug_webview_methodcalls", "0", FCVAR_CHEAT);
+
 extern ConVar g_debug_webview;
 
 #define WEBVIEW_VALID if( !m_pWebView )										\
@@ -683,6 +685,9 @@ void WebView::OnMethodCall(Awesomium::WebView* caller,
 	method_name.ToUTF8(pMethodName, size);
 	pMethodName[size] = '\0';
 
+	if( g_debug_webview_methodcalls.GetBool() )
+		Msg("OnMethodCall: %s\n", pMethodName );
+
 	try {
 		bp::str pymethodname( (const char *)pMethodName );
 
@@ -712,6 +717,9 @@ Awesomium::JSValue WebView::OnMethodCallWithReturnValue(Awesomium::WebView* call
 	char *pMethodName = new char[size+1];
 	method_name.ToUTF8(pMethodName, size);
 	pMethodName[size] = '\0';
+
+	if( g_debug_webview_methodcalls.GetBool() )
+		Msg("OnMethodCallWithReturnValue: %s\n", pMethodName );
 
 	try {
 		bp::str pymethodname( (const char *)pMethodName );
