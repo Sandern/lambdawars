@@ -30,10 +30,10 @@ extern unsigned int g_hPythonThreadID;
 #ifndef _DEBUG
 
 /* Undef this to remove the thread id checks */
-#define PY_CHECKTHREADID
+//#define PY_CHECKTHREADID
 
 /* Define this to check if we should log overrides calls */
-#define PY_CHECK_LOG_OVERRIDES
+//#define PY_CHECK_LOG_OVERRIDES
 
 #endif // _DEBUG
 
