@@ -673,6 +673,38 @@ void CHL2WarsPlayer::CreateViewModel( int index /*=0*/ )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+extern ConVar VisForce;
+void CHL2WarsPlayer::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, int pvssize )
+{
+	if( !IsStrategicModeOn() )
+	{
+		BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
+		return;
+	}
+
+	Vector org;
+
+	// If we have a view entity, we don't add the player's origin.
+	if ( !pViewEntity || VisForce.GetBool() )
+	{
+		org = Weapon_ShootPosition() + GetCameraOffset();
+		engine->AddOriginToPVS( org );
+	}
+
+	// Merge in PVS from split screen players
+	for ( int i = 1; i < MAX_SPLITSCREEN_PLAYERS; ++i )
+	{
+		CHL2WarsPlayer *pl = (CHL2WarsPlayer *)ToHL2WarsPlayer( GetContainingEntity( engine->GetSplitScreenPlayerForEdict( entindex(), i ) ) );
+		if ( !pl )
+			continue;
+		org = pl->Weapon_ShootPosition() + pl->GetCameraOffset();
+		engine->AddOriginToPVS( org );
+	}
+}
+
 //================================================================================
 // TEAM HANDLING
 //================================================================================

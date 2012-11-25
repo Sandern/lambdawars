@@ -90,6 +90,8 @@ public:
 	virtual void					ChangeFaction( const char *faction );
 
 	// Camera settings
+	virtual void					SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, int pvssize );
+
 	virtual void					SnapCameraTo( const Vector &vPos ); // Positions camera correctly, uses SetAbsOrigin
 	void							SetCameraOffset( Vector &offs );
 	const Vector &					GetCameraOffset() const;
