@@ -202,7 +202,7 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastPathRecomputation = 0.0f;
 	m_fNextReactivePathUpdate = 0.0f;
-	m_fNextAllowPathRecomputeTime = 0.0f;
+	//m_fNextAllowPathRecomputeTime = 0.0f;
 	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
@@ -1162,13 +1162,13 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 				// Don't allow too many recomputations
 				if( GetBlockedStatus() >= BS_STUCK )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 15.0f;
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(15.0f, 20.0f);
 				else if( GetBlockedStatus() >= BS_MUCH )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 7.0f;
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(10.0f, 15.0f);
 				else if( GetBlockedStatus() >= BS_LITTLE )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + 3.0f;
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(5.0f, 7.0f);
 				else
-					m_fNextAllowPathRecomputeTime = 1.0f;
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(3.0f, 5.0f);
 			}
 
 			// Apparently we are stuck, so try to add a seed that serves as density point
@@ -1280,7 +1280,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 
 		if( GetPath()->m_iGoalFlags & GF_REQUIREVISION )
 		{
-			if( FogOfWarMgr()->PointInFOW( GetPath()->m_hTarget->GetAbsOrigin(), m_pOuter->GetOwnerNumber() ) )
+			if( !FogOfWarMgr()->PointInFOW( GetPath()->m_hTarget->EyePosition(), m_pOuter->GetOwnerNumber() ) )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No vision\n", GetOuter()->entindex() );
@@ -1325,7 +1325,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 
 		if( GetPath()->m_iGoalFlags & GF_REQUIREVISION )
 		{
-			if( FogOfWarMgr()->PointInFOW( GetPath()->m_vGoalPos, m_pOuter->GetOwnerNumber() ) )
+			if( !FogOfWarMgr()->PointInFOW( GetPath()->m_vGoalPos, m_pOuter->GetOwnerNumber() ) )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No vision\n", GetOuter()->entindex() );

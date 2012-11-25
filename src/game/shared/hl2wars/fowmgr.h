@@ -241,7 +241,7 @@ inline bool CFogOfWarMgr::PointInFOW( const Vector &vPoint, int iOwner )
 {
 	int x, y;
 	ComputeFOWPosition( vPoint, x, y );
-	return ( m_FogOfWar[FOWINDEX(x, y)] & ~CalculatePlayerVisibilityMask( iOwner ) ) != 0;
+	return ( m_FogOfWar[FOWINDEX(x, y)] & (1 << iOwner) ) == 0;
 }
 
 inline bool CFogOfWarMgr::IsEntityKnown( int iPlayerIndex, int iEntIndex )
