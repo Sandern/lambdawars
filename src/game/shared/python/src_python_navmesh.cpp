@@ -164,6 +164,14 @@ Vector RandomNavAreaPosition( )
 		maxs.z = MAX(maxs.z, othermaxs.z);
 	}
 
+	return RandomNavAreaPositionWithin( mins, maxs );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs )
+{
 	Vector random( 
 		mins.x + ((float)rand() / RAND_MAX) * (maxs.x - mins.x),
 		mins.y + ((float)rand() / RAND_MAX) * (maxs.y - mins.y),

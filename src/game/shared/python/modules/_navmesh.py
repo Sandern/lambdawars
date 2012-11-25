@@ -39,6 +39,7 @@ class NavMesh(GenerateModuleSemiShared):
         mb.free_function('CreateNavAreaByCorners').include()
         mb.free_function('DestroyNavArea').include()
         mb.free_function('RandomNavAreaPosition').include()
+        mb.free_function('RandomNavAreaPositionWithin').include()
         mb.free_function('DestroyAllNavAreas').include()
         
         mb.free_function('GetNavAreaAt').include()

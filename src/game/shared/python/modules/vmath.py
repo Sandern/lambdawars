@@ -11,6 +11,7 @@ class VMath(GenerateModulePureShared):
     module_name = 'vmath'
     
     files = [
+        'fmtstr.h',
         'mathlib/mathlib.h',
         'mathlib/vector.h',
         'mathlib/vector2d.h',
@@ -53,6 +54,10 @@ class VMath(GenerateModulePureShared):
                                 '   char buf[256];\r\n' + \
                                 '   Q_snprintf(buf, 256, "(%f, %f)", inst.x, inst.y);\r\n' + \
                                 '   return boost::python::object(buf);\r\n' + \
+                                '}\r\n'
+                                
+        str_vmatrix_wrapper = 'static boost::python::object Str( VMatrix const & inst ) {\r\n' + \
+                                '   return boost::python::object(VMatToString(inst));\r\n' + \
                                 '}\r\n'
                                 
         str_reg =   '%(cls_name)s_exposer.def( "__str__", &::%(cls_name)s_wrapper::Str );\r\n'
@@ -405,6 +410,9 @@ class VMath(GenerateModulePureShared):
         cls.mem_funs('As3x4').exclude()
         cls.mem_funs('GetTranslation').exclude()
         cls.vars('m').exclude()
+        
+        cls.add_wrapper_code( str_vmatrix_wrapper % {'cls_name':'VMatrix'} )
+        cls.add_registration_code( str_reg % {'cls_name':'VMatrix'}, False)
         
         mb.free_functions('MatrixSetIdentity').include()
         mb.free_functions('MatrixTranspose').include()

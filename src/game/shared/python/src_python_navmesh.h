@@ -27,7 +27,8 @@ void DestroyAllNavAreas();
 int CreateNavArea( const Vector &corner, const Vector &otherCorner );
 int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, const Vector &seCorner, const Vector &swCorner );
 void DestroyNavArea( int id );
-Vector RandomNavAreaPosition( );
+Vector RandomNavAreaPosition();
+Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs );
 
 int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );
 bp::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs );

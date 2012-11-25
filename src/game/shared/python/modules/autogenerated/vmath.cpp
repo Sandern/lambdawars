@@ -10,6 +10,8 @@
 
 #include "__call_policies.pypp.hpp"
 
+#include "fmtstr.h"
+
 #include "mathlib/mathlib.h"
 
 #include "mathlib/vector.h"
@@ -67,6 +69,49 @@ struct QAngle_wrapper : QAngle, bp::wrapper< QAngle > {
            throw boost::python::error_already_set();
        }
        inst[i] = v;
+    }
+
+};
+
+struct VMatrix_wrapper : VMatrix, bp::wrapper< VMatrix > {
+
+    VMatrix_wrapper(VMatrix const & arg )
+    : VMatrix( arg )
+      , bp::wrapper< VMatrix >(){
+        // copy constructor
+        
+    }
+
+    VMatrix_wrapper( )
+    : VMatrix( )
+      , bp::wrapper< VMatrix >(){
+        // null constructor
+    
+    }
+
+    VMatrix_wrapper(::vec_t m00, ::vec_t m01, ::vec_t m02, ::vec_t m03, ::vec_t m10, ::vec_t m11, ::vec_t m12, ::vec_t m13, ::vec_t m20, ::vec_t m21, ::vec_t m22, ::vec_t m23, ::vec_t m30, ::vec_t m31, ::vec_t m32, ::vec_t m33 )
+    : VMatrix( m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33 )
+      , bp::wrapper< VMatrix >(){
+        // constructor
+    
+    }
+
+    VMatrix_wrapper(::matrix3x4_t const & matrix3x4 )
+    : VMatrix( boost::ref(matrix3x4) )
+      , bp::wrapper< VMatrix >(){
+        // constructor
+    
+    }
+
+    VMatrix_wrapper(::Vector const & xAxis, ::Vector const & yAxis, ::Vector const & zAxis )
+    : VMatrix( boost::ref(xAxis), boost::ref(yAxis), boost::ref(zAxis) )
+      , bp::wrapper< VMatrix >(){
+        // constructor
+    
+    }
+
+    static boost::python::object Str( VMatrix const & inst ) {
+       return boost::python::object(VMatToString(inst));
     }
 
 };
@@ -364,7 +409,7 @@ BOOST_PYTHON_MODULE(vmath){
     }
 
     { //::VMatrix
-        typedef bp::class_< VMatrix > VMatrix_exposer_t;
+        typedef bp::class_< VMatrix_wrapper > VMatrix_exposer_t;
         VMatrix_exposer_t VMatrix_exposer = VMatrix_exposer_t( "VMatrix", bp::init< >() );
         bp::scope VMatrix_scope( VMatrix_exposer );
         VMatrix_exposer.def( bp::init< vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t, vec_t >(( bp::arg("m00"), bp::arg("m01"), bp::arg("m02"), bp::arg("m03"), bp::arg("m10"), bp::arg("m11"), bp::arg("m12"), bp::arg("m13"), bp::arg("m20"), bp::arg("m21"), bp::arg("m22"), bp::arg("m23"), bp::arg("m30"), bp::arg("m31"), bp::arg("m32"), bp::arg("m33") )) );
@@ -730,6 +775,7 @@ BOOST_PYTHON_MODULE(vmath){
         VMatrix_exposer.def( -bp::self );
         VMatrix_exposer.def( bp::self == bp::self );
         VMatrix_exposer.def( ~bp::self );
+        VMatrix_exposer.def( "__str__", &::VMatrix_wrapper::Str );
     }
 
     { //::Vector

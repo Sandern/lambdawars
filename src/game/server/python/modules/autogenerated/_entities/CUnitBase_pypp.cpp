@@ -422,6 +422,36 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::PassesDamageFilter( boost::ref(info) );
     }
 
+    virtual void Spawn(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling Spawn(  ) of Class: CUnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_Spawn = this->get_override( "Spawn" );
+        if( func_Spawn.ptr() != Py_None )
+            try {
+                func_Spawn(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::Spawn(  );
+            }
+        else
+            this->CUnitBase::Spawn(  );
+    }
+    
+    void default_Spawn(  ) {
+        CUnitBase::Spawn( );
+    }
+
     virtual void UpdateOnRemove(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1217,36 +1247,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     bool default_ShouldGib( ::CTakeDamageInfo const & info ) {
         return CBaseCombatCharacter::ShouldGib( boost::ref(info) );
-    }
-
-    virtual void Spawn(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: CBaseCombatCharacter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Spawn = this->get_override( "Spawn" );
-        if( func_Spawn.ptr() != Py_None )
-            try {
-                func_Spawn(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseCombatCharacter::Spawn(  );
-            }
-        else
-            this->CBaseCombatCharacter::Spawn(  );
-    }
-    
-    void default_Spawn(  ) {
-        CBaseCombatCharacter::Spawn( );
     }
 
     virtual void StartTouch( ::CBaseEntity * pOther ) {
@@ -2323,6 +2323,17 @@ void register_CUnitBase_class(){
                 , ( bp::arg("bUseCustomCanBeSeen") ) );
         
         }
+        { //::CUnitBase::Spawn
+        
+            typedef void ( ::CUnitBase::*Spawn_function_type )(  ) ;
+            typedef void ( CUnitBase_wrapper::*default_Spawn_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "Spawn"
+                , Spawn_function_type(&::CUnitBase::Spawn)
+                , default_Spawn_function_type(&CUnitBase_wrapper::default_Spawn) );
+        
+        }
         { //::CUnitBase::TakeHealth
         
             typedef int ( ::CUnitBase::*TakeHealth_function_type )( float,int ) ;
@@ -2693,17 +2704,6 @@ void register_CUnitBase_class(){
                 , ShouldGib_function_type(&::CBaseCombatCharacter::ShouldGib)
                 , default_ShouldGib_function_type(&CUnitBase_wrapper::default_ShouldGib)
                 , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseCombatCharacter::Spawn
-        
-            typedef void ( ::CBaseCombatCharacter::*Spawn_function_type )(  ) ;
-            typedef void ( CUnitBase_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CUnitBase_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseCombatCharacter::Spawn)
-                , default_Spawn_function_type(&CUnitBase_wrapper::default_Spawn) );
         
         }
         { //::CBaseEntity::StartTouch

@@ -815,18 +815,6 @@ inline CNavArea *CNavArea::GetAdjacentArea( NavDirType dir, int i ) const
 }
 
 //--------------------------------------------------------------------------------------------------------------
-inline float CNavArea::GetTolerance( NavDirType dir ) const
-{
-	return m_tolerance[ dir ];
-}
-
-//--------------------------------------------------------------------------------------------------------------
-inline float CNavArea::GetToleranceContiguous( NavDirType dir ) const
-{
-	return m_toleranceContiguous[ dir ];
-}
-
-//--------------------------------------------------------------------------------------------------------------
 inline bool CNavArea::IsOpen( void ) const
 {
 	return (m_openMarker == m_masterMarker) ? true : false;

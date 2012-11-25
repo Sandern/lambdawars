@@ -1140,20 +1140,20 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		// Path might be blocked. Recompute or add density seeds
 		if( bPathBlocked || GetBlockedStatus() > BS_NONE )
 		{
-			if( unit_navigator_debug.GetBool() )
-			{
-				DevMsg("#%d UnitNavigator: path blocked, recomputing path...(reasons: ", GetOuter()->entindex());
-				if( bPathBlocked )
-					DevMsg("blocked");
-				if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
-					DevMsg(", no movement");
-				if( MoveCommand.m_hBlocker )
-					DevMsg(", blocked entity: #%d - %s", MoveCommand.m_hBlocker->entindex(), MoveCommand.m_hBlocker->GetClassname());
-				DevMsg(")\n");
-			}
-
 			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime )
 			{
+				if( unit_navigator_debug.GetBool() )
+				{
+					DevMsg("#%d UnitNavigator: path blocked, recomputing path...(reasons: ", GetOuter()->entindex());
+					if( bPathBlocked )
+						DevMsg("blocked");
+					if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
+						DevMsg(", no movement");
+					if( MoveCommand.m_hBlocker )
+						DevMsg(", blocked entity: #%d - %s", MoveCommand.m_hBlocker->entindex(), MoveCommand.m_hBlocker->GetClassname());
+					DevMsg(")\n");
+				}
+
 				// Recompute path
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE || GetPath()->m_iGoalType == GOALTYPE_POSITION_INRANGE )
 					DoFindPathToPosInRange();

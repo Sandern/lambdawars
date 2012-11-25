@@ -4308,6 +4308,22 @@ float CNavArea::GetLightIntensity( void ) const
 	return light / 4.0f;
 }
 
+ConVar nav_disable_tolerance("nav_disable_tolerance", "1", FCVAR_CHEAT|FCVAR_REPLICATED);
+
+//--------------------------------------------------------------------------------------------------------------
+float CNavArea::GetTolerance( NavDirType dir ) const
+{
+	if( nav_disable_tolerance.GetBool() ) return 0;
+	return m_tolerance[ dir ];
+}
+
+//--------------------------------------------------------------------------------------------------------------
+float CNavArea::GetToleranceContiguous( NavDirType dir ) const
+{
+	if( nav_disable_tolerance.GetBool() ) return 0;
+	return m_toleranceContiguous[ dir ];
+}
+
 #ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -4420,7 +4436,7 @@ void CNavArea::ComputeTolerance()
 		for( j = 0; j < iCount; ++j )
 		{
 			adj = GetAdjacentArea( dir, j );
-			if( !adj || !IsConnected(adj, dir) || adj->IsBlocked() )
+			if( !adj || !IsConnected(adj, dir) || adj->IsBlocked() || !adj->IsCoplanar(this) )
 				continue;
 
 			ComputePortal( adj, dir, &center, &fAdjPortalWidth );
@@ -4472,7 +4488,7 @@ void CNavArea::ComputeTolerance()
 		for( j = 0; j < iCount; ++j )
 		{
 			adj = GetAdjacentArea( dir, j );
-			if( !adj || !IsConnected(adj, dir) || !IsContiguous(adj) || adj->IsBlocked() )
+			if( !adj || !IsConnected(adj, dir) || !IsContiguous(adj) || adj->IsBlocked() || !adj->IsCoplanar(this) )
 				continue;
 
 			ComputePortal( adj, dir, &center, &fAdjPortalWidth );

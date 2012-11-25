@@ -161,6 +161,17 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::RandomNavAreaPositionWithin
+    
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "RandomNavAreaPositionWithin"
+            , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
+            , ( bp::arg("mins"), bp::arg("maxs") ) );
+    
+    }
+
     { //::SetAreasBlocked
     
         typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool );
@@ -349,6 +360,17 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "RandomNavAreaPosition"
             , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition ) );
+    
+    }
+
+    { //::RandomNavAreaPositionWithin
+    
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "RandomNavAreaPositionWithin"
+            , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
+            , ( bp::arg("mins"), bp::arg("maxs") ) );
     
     }
 

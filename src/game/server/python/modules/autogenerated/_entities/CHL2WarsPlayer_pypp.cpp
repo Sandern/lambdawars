@@ -2245,6 +2245,16 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("state") ) );
         
         }
+        { //::CHL2WarsPlayer::SetupVisibility
+        
+            typedef void ( ::CHL2WarsPlayer::*SetupVisibility_function_type )( ::CBaseEntity *,unsigned char *,int ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "SetupVisibility"
+                , SetupVisibility_function_type( &::CHL2WarsPlayer::SetupVisibility )
+                , ( bp::arg("pViewEntity"), bp::arg("pvs"), bp::arg("pvssize") ) );
+        
+        }
         { //::CHL2WarsPlayer::SnapCameraTo
         
             typedef void ( ::CHL2WarsPlayer::*SnapCameraTo_function_type )( ::Vector const & ) ;
