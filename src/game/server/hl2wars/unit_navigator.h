@@ -365,6 +365,10 @@ public:
 	bool				SetVectorGoal( const Vector &dir, float targetDist, float minDist = 0, bool fShouldDeflect = false );
 	virtual bool		SetVectorGoalFromTarget( Vector &destination, float minDist, float goaltolerance=64.0f) { return SetGoal(destination, goaltolerance); }
 
+	virtual void		UpdateGoalInRange( float maxrange, float minrange=0.0f );
+	virtual void		UpdateGoalInfo( void );
+	virtual float		GetGoalDistance( void );
+
 	// Path finding
 	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f );
 	virtual bool		DoFindPathToPos();
@@ -426,6 +430,8 @@ private:
 #ifndef DISABLE_PYTHON
 	boost::python::object m_refPath;
 #endif // DISABLE_PYTHON
+	float m_fGoalDistance;
+	Vector m_vGoalDir;
 
 	// Position checking
 	BlockedStatus_t m_BlockedStatus;
@@ -528,6 +534,5 @@ inline void UnitBaseNavigator::SetFacingTargetPos( Vector &vFacingTargetPos )
 	m_vFacingTargetPos = vFacingTargetPos;
 	m_bFacingFaceTarget = false;
 }
-
 
 #endif // UNIT_NAVIGATOR_H

@@ -436,6 +436,17 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	SendPropDataTable( "normaldata", 0, &REFERENCE_SEND_TABLE(DT_NormalExclusive), SendProxy_SendNormalDataTable ),
 END_SEND_TABLE()
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::Spawn( void )
+{
+	BaseClass::Spawn();
+
+	// If owernumber wasn't changed yet, trigger on change once
+	if( GetOwnerNumber() == 0 )
+		OnChangeOwnerNumber(0);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -651,7 +662,7 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 	}
 
 	if( bConsiderSizeUnit )
-		return enemyDelta.Length() - pEnemy->CollisionProp()->BoundingRadius2D();
+		return MAX(enemyDelta.Length() - pEnemy->CollisionProp()->BoundingRadius2D(), 0.0f);
 	return enemyDelta.Length();
 }
 

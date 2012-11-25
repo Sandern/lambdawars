@@ -183,6 +183,8 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.mem_fun('SetGoalInRange').include()
         cls.mem_fun('SetGoalTargetInRange').include()
         cls.mem_fun('SetVectorGoal').include()
+        cls.mem_fun('UpdateGoalInRange').include()
+        cls.mem_fun('GetGoalDistance').include()
         cls.mem_fun('DrawDebugRouteOverlay').include()
         cls.mem_fun('DrawDebugInfo').include()
         

@@ -179,6 +179,14 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
 
+	// Created?
+	if( updateType == DATA_UPDATE_CREATED )
+	{
+		// If owernumber wasn't changed yet, trigger on change once
+		if( GetOwnerNumber() == 0 )
+			OnChangeOwnerNumber(0);
+	}
+
 	// Check if the player's faction changed ( Might want to add a string table )
 	if( m_UnitType == NULL_STRING || Q_strncmp( STRING(m_UnitType), m_NetworkedUnitType, MAX_PATH ) != 0 ) 
 	{

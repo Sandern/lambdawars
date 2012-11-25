@@ -162,6 +162,7 @@ public:
 	virtual void OnChangeOwnerNumberInternal( int old_owner_number );
 
 #ifndef CLIENT_DLL
+	virtual void Spawn( void );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 
 	Class_T Classify ( void );

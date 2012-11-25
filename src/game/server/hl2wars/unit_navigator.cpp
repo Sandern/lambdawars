@@ -196,6 +196,7 @@ void UnitBaseNavigator::Reset()
 
 	m_LastGoalStatus = CHS_NOGOAL;
 	m_vForceGoalVelocity = vec3_origin;
+	m_fGoalDistance = -1;
 
 	m_vLastWishVelocity.Init(0, 0, 0);
 
@@ -1066,7 +1067,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		// Check if the target ent moved into another area. In that case recalculate.
 		// In the other case just update the goal pos (quick).
 		CNavArea *pTargetArea, *pGoalArea;
-		const Vector &vTargetOrigin = GetPath()->m_hTarget->GetAbsOrigin();
+		const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition();
 
 		pTargetArea = TheNavMesh->GetNavArea( vTargetOrigin );
 		if( !pTargetArea ) pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin );
@@ -1079,7 +1080,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
 					GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
 
-			// Recompute
+			// Update goal target position and recompute
 			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
 			if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 				DoFindPathToPosInRange();
@@ -1088,6 +1089,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		}
 		else
 		{
+			// Just update goal target position and update the last waypoint
 			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
 			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
@@ -1243,38 +1245,25 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 {
-	Vector dir;
-	float dist;
+	// Store distance and range
+	UpdateGoalInfo();
 
 	if( GetPath()->m_hTarget )
 	{
-		// Get distance
-		if( GetPath()->m_iGoalFlags & GF_USETARGETDIST )
-		{
-			dist = m_pOuter->EnemyDistance( GetPath()->m_hTarget );
-			dist = MAX(0.0f, dist); // Negative distance makes no sense
-		}
-		else
-		{
-			dir = GetPath()->m_hTarget->GetAbsOrigin() - GetAbsOrigin();
-			dir.z = 0.0f;
-			dist = VectorNormalize(dir);
-		}
-
 		// Check range
 		// skip dist check if we have no minimum range and are bumping into the target, then we are in range
 		if( GetPath()->m_fMaxRange == 0 && MoveCommand.m_hBlocker != GetPath()->m_hTarget )
 		{
 			if( unit_navigator_debug_inrange.GetBool() )
 				DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f)\n", 
-					GetOuter()->entindex(), dist, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
+					GetOuter()->entindex(), m_fGoalDistance, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
 			return false;
 		}
-		else if( dist < GetPath()->m_fMinRange || dist > GetPath()->m_fMaxRange )
+		else if( m_fGoalDistance < GetPath()->m_fMinRange || m_fGoalDistance > GetPath()->m_fMaxRange )
 		{
 			if( unit_navigator_debug_inrange.GetBool() )
 				DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f)\n", 
-					GetOuter()->entindex(), dist, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
+					GetOuter()->entindex(), m_fGoalDistance, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
 			return false;
 		}
 
@@ -1302,14 +1291,11 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 	else
 	{
 		// Check range
-		dir = GetPath()->m_vGoalPos - GetAbsOrigin();
-		dir.z = 0.0f;
-		dist = VectorNormalize(dir);
-		if( dist < GetPath()->m_fMinRange || dist > GetPath()->m_fMaxRange )
+		if( m_fGoalDistance < GetPath()->m_fMinRange || m_fGoalDistance > GetPath()->m_fMaxRange )
 		{
 			if( unit_navigator_debug_inrange.GetBool() )
 				DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f)\n", 
-					GetOuter()->entindex(), dist, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
+					GetOuter()->entindex(), m_fGoalDistance, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
 			return false;
 		}
 
@@ -1830,10 +1816,8 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 #endif // DISABLE_PYTHON
 		return false;
 	}
-	//Vector destination;
 
-	//CalculateDestinationInRange(&destination, pTarget->GetAbsOrigin(), minrange, maxrange);
-
+	// Find a path
 	bool bResult = FindPath(GOALTYPE_TARGETENT_INRANGE, pTarget->EyePosition(), goaltolerance, goalflags, minrange, maxrange);
 	GetPath()->m_hTarget = pTarget;
 	if( !bResult )
@@ -1855,6 +1839,64 @@ bool UnitBaseNavigator::SetVectorGoal( const Vector &dir, float targetDist, floa
 		return SetGoal( result );
 	
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update In range path information
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::UpdateGoalInRange( float maxrange, float minrange )
+{
+	if( GetPath()->m_iGoalType != GOALTYPE_POSITION_INRANGE && GetPath()->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
+	{
+		Warning("UnitBaseNavigator::UpdateGoalInRange: Invalid goal type\n");
+		return;
+	}
+
+	GetPath()->m_fMaxRange = maxrange;
+	GetPath()->m_fMinRange = minrange;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::UpdateGoalInfo( void )
+{
+	// Get distance and direction
+	if( GetPath()->m_hTarget )
+	{
+		if( GetPath()->m_iGoalFlags & GF_USETARGETDIST )
+		{
+			m_fGoalDistance = m_pOuter->EnemyDistance( GetPath()->m_hTarget );
+			m_fGoalDistance = MAX(0.0f, m_fGoalDistance); // Negative distance makes no sense
+		}
+		else
+		{
+			m_vGoalDir = GetPath()->m_hTarget->GetAbsOrigin() - GetAbsOrigin();
+			m_vGoalDir.z = 0.0f;
+			m_fGoalDistance = VectorNormalize( m_vGoalDir );
+		}
+	}
+	else
+	{
+		m_vGoalDir = GetPath()->m_vGoalPos - GetAbsOrigin();
+		m_vGoalDir.z = 0.0f;
+		m_fGoalDistance = VectorNormalize( m_vGoalDir );
+	}
+	
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Last computed target distance
+//-----------------------------------------------------------------------------
+float UnitBaseNavigator::GetGoalDistance( void )
+{
+	// Might be called before we did an update (e.g. when a path is restored).
+	// In this case, update the goal distance + direction here
+	if( m_fGoalDistance == -1 )
+	{
+		UpdateGoalInfo();
+	}
+	return m_fGoalDistance;
 }
 
 // Path finding

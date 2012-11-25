@@ -2187,6 +2187,66 @@ struct UnitBaseNavigator_wrapper : UnitBaseNavigator, bp::wrapper< UnitBaseNavig
         UnitBaseNavigator::DrawDebugRouteOverlay( );
     }
 
+    virtual float GetGoalDistance(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetGoalDistance: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetGoalDistance(  ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_GetGoalDistance = this->get_override( "GetGoalDistance" );
+        if( func_GetGoalDistance.ptr() != Py_None )
+            try {
+                return func_GetGoalDistance(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseNavigator::GetGoalDistance(  );
+            }
+        else
+            return this->UnitBaseNavigator::GetGoalDistance(  );
+    }
+    
+    float default_GetGoalDistance(  ) {
+        return UnitBaseNavigator::GetGoalDistance( );
+    }
+
+    virtual void RegenerateConsiderList( ::Vector & vPathDir, ::CheckGoalStatus_t GoalStatus ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "RegenerateConsiderList: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling RegenerateConsiderList( boost::ref(vPathDir), GoalStatus ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_RegenerateConsiderList = this->get_override( "RegenerateConsiderList" );
+        if( func_RegenerateConsiderList.ptr() != Py_None )
+            try {
+                func_RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+            }
+        else
+            this->UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+    }
+    
+    void default_RegenerateConsiderList( ::Vector & vPathDir, ::CheckGoalStatus_t GoalStatus ) {
+        UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+    }
+
     virtual void Reset(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2397,6 +2457,36 @@ struct UnitBaseNavigator_wrapper : UnitBaseNavigator, bp::wrapper< UnitBaseNavig
         UnitBaseNavigator::Update( boost::ref(mv) );
     }
 
+    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateGoalInRange: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateGoalInRange( maxrange, minrange ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateGoalInRange = this->get_override( "UpdateGoalInRange" );
+        if( func_UpdateGoalInRange.ptr() != Py_None )
+            try {
+                func_UpdateGoalInRange( maxrange, minrange );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+            }
+        else
+            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+    }
+    
+    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+    }
+
     virtual void UpdateIdealAngles( ::UnitBaseMoveCommand & MoveCommand, ::Vector * pathdir=0 ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2466,6 +2556,36 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
     
     ::CheckGoalStatus_t default_MoveUpdateWaypoint(  ) {
         return UnitBaseAirNavigator::MoveUpdateWaypoint( );
+    }
+
+    virtual bool ShouldConsiderNavMesh(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "ShouldConsiderNavMesh: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling ShouldConsiderNavMesh(  ) of Class: UnitBaseAirNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_ShouldConsiderNavMesh = this->get_override( "ShouldConsiderNavMesh" );
+        if( func_ShouldConsiderNavMesh.ptr() != Py_None )
+            try {
+                return func_ShouldConsiderNavMesh(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAirNavigator::ShouldConsiderNavMesh(  );
+            }
+        else
+            return this->UnitBaseAirNavigator::ShouldConsiderNavMesh(  );
+    }
+    
+    bool default_ShouldConsiderNavMesh(  ) {
+        return UnitBaseAirNavigator::ShouldConsiderNavMesh( );
     }
 
     virtual bool TestRoute( ::Vector const & vStartPos, ::Vector const & vEndPos ) {
@@ -2616,6 +2736,66 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
     
     void default_DrawDebugRouteOverlay(  ) {
         UnitBaseNavigator::DrawDebugRouteOverlay( );
+    }
+
+    virtual float GetGoalDistance(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetGoalDistance: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetGoalDistance(  ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_GetGoalDistance = this->get_override( "GetGoalDistance" );
+        if( func_GetGoalDistance.ptr() != Py_None )
+            try {
+                return func_GetGoalDistance(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseNavigator::GetGoalDistance(  );
+            }
+        else
+            return this->UnitBaseNavigator::GetGoalDistance(  );
+    }
+    
+    float default_GetGoalDistance(  ) {
+        return UnitBaseNavigator::GetGoalDistance( );
+    }
+
+    virtual void RegenerateConsiderList( ::Vector & vPathDir, ::CheckGoalStatus_t GoalStatus ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "RegenerateConsiderList: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling RegenerateConsiderList( boost::ref(vPathDir), GoalStatus ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_RegenerateConsiderList = this->get_override( "RegenerateConsiderList" );
+        if( func_RegenerateConsiderList.ptr() != Py_None )
+            try {
+                func_RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+            }
+        else
+            this->UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
+    }
+    
+    void default_RegenerateConsiderList( ::Vector & vPathDir, ::CheckGoalStatus_t GoalStatus ) {
+        UnitBaseNavigator::RegenerateConsiderList( boost::ref(vPathDir), GoalStatus );
     }
 
     virtual void Reset(  ) {
@@ -2796,6 +2976,36 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
     
     void default_StopMoving(  ) {
         UnitBaseNavigator::StopMoving( );
+    }
+
+    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateGoalInRange: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateGoalInRange( maxrange, minrange ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateGoalInRange = this->get_override( "UpdateGoalInRange" );
+        if( func_UpdateGoalInRange.ptr() != Py_None )
+            try {
+                func_UpdateGoalInRange( maxrange, minrange );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+            }
+        else
+            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+    }
+    
+    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
     }
 
     virtual void UpdateIdealAngles( ::UnitBaseMoveCommand & MoveCommand, ::Vector * pathdir=0 ) {
@@ -4740,13 +4950,26 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , default_DrawDebugRouteOverlay_function_type(&UnitBaseNavigator_wrapper::default_DrawDebugRouteOverlay) );
         
         }
+        { //::UnitBaseNavigator::GetGoalDistance
+        
+            typedef float ( ::UnitBaseNavigator::*GetGoalDistance_function_type )(  ) ;
+            typedef float ( UnitBaseNavigator_wrapper::*default_GetGoalDistance_function_type )(  ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "GetGoalDistance"
+                , GetGoalDistance_function_type(&::UnitBaseNavigator::GetGoalDistance)
+                , default_GetGoalDistance_function_type(&UnitBaseNavigator_wrapper::default_GetGoalDistance) );
+        
+        }
         { //::UnitBaseNavigator::RegenerateConsiderList
         
             typedef void ( ::UnitBaseNavigator::*RegenerateConsiderList_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            typedef void ( UnitBaseNavigator_wrapper::*default_RegenerateConsiderList_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
             
             UnitBaseNavigator_exposer.def( 
                 "RegenerateConsiderList"
-                , RegenerateConsiderList_function_type( &::UnitBaseNavigator::RegenerateConsiderList )
+                , RegenerateConsiderList_function_type(&::UnitBaseNavigator::RegenerateConsiderList)
+                , default_RegenerateConsiderList_function_type(&UnitBaseNavigator_wrapper::default_RegenerateConsiderList)
                 , ( bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
         
         }
@@ -4842,6 +5065,18 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("mv") ) );
         
         }
+        { //::UnitBaseNavigator::UpdateGoalInRange
+        
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float ) ;
+            typedef void ( UnitBaseNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "UpdateGoalInRange"
+                , UpdateGoalInRange_function_type(&::UnitBaseNavigator::UpdateGoalInRange)
+                , default_UpdateGoalInRange_function_type(&UnitBaseNavigator_wrapper::default_UpdateGoalInRange)
+                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f ) );
+        
+        }
         { //::UnitBaseNavigator::UpdateIdealAngles
         
             typedef void ( ::UnitBaseNavigator::*UpdateIdealAngles_function_type )( ::UnitBaseMoveCommand &,::Vector * ) ;
@@ -4924,6 +5159,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , default_MoveUpdateWaypoint_function_type(&UnitBaseAirNavigator_wrapper::default_MoveUpdateWaypoint) );
         
         }
+        { //::UnitBaseAirNavigator::ShouldConsiderNavMesh
+        
+            typedef bool ( ::UnitBaseAirNavigator::*ShouldConsiderNavMesh_function_type )(  ) ;
+            typedef bool ( UnitBaseAirNavigator_wrapper::*default_ShouldConsiderNavMesh_function_type )(  ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "ShouldConsiderNavMesh"
+                , ShouldConsiderNavMesh_function_type(&::UnitBaseAirNavigator::ShouldConsiderNavMesh)
+                , default_ShouldConsiderNavMesh_function_type(&UnitBaseAirNavigator_wrapper::default_ShouldConsiderNavMesh) );
+        
+        }
         { //::UnitBaseAirNavigator::TestRoute
         
             typedef bool ( ::UnitBaseAirNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
@@ -4980,6 +5226,29 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "DrawDebugRouteOverlay"
                 , DrawDebugRouteOverlay_function_type(&::UnitBaseNavigator::DrawDebugRouteOverlay)
                 , default_DrawDebugRouteOverlay_function_type(&UnitBaseAirNavigator_wrapper::default_DrawDebugRouteOverlay) );
+        
+        }
+        { //::UnitBaseNavigator::GetGoalDistance
+        
+            typedef float ( ::UnitBaseNavigator::*GetGoalDistance_function_type )(  ) ;
+            typedef float ( UnitBaseAirNavigator_wrapper::*default_GetGoalDistance_function_type )(  ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "GetGoalDistance"
+                , GetGoalDistance_function_type(&::UnitBaseNavigator::GetGoalDistance)
+                , default_GetGoalDistance_function_type(&UnitBaseAirNavigator_wrapper::default_GetGoalDistance) );
+        
+        }
+        { //::UnitBaseNavigator::RegenerateConsiderList
+        
+            typedef void ( ::UnitBaseNavigator::*RegenerateConsiderList_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            typedef void ( UnitBaseAirNavigator_wrapper::*default_RegenerateConsiderList_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "RegenerateConsiderList"
+                , RegenerateConsiderList_function_type(&::UnitBaseNavigator::RegenerateConsiderList)
+                , default_RegenerateConsiderList_function_type(&UnitBaseAirNavigator_wrapper::default_RegenerateConsiderList)
+                , ( bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
         
         }
         { //::UnitBaseNavigator::Reset
@@ -5050,6 +5319,18 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "StopMoving"
                 , StopMoving_function_type(&::UnitBaseNavigator::StopMoving)
                 , default_StopMoving_function_type(&UnitBaseAirNavigator_wrapper::default_StopMoving) );
+        
+        }
+        { //::UnitBaseNavigator::UpdateGoalInRange
+        
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float ) ;
+            typedef void ( UnitBaseAirNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "UpdateGoalInRange"
+                , UpdateGoalInRange_function_type(&::UnitBaseNavigator::UpdateGoalInRange)
+                , default_UpdateGoalInRange_function_type(&UnitBaseAirNavigator_wrapper::default_UpdateGoalInRange)
+                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f ) );
         
         }
         { //::UnitBaseNavigator::UpdateIdealAngles
