@@ -1754,7 +1754,28 @@ void CFogOfWarMgr::RemoveFogEntity( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 // Purpose: Test if entity should be shown in fow
 //-----------------------------------------------------------------------------
-bool CFogOfWarMgr::ShouldShowInFOW( CBasePlayer *pPlayer, CBaseEntity *pEnt )
+bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, CBasePlayer *pPlayer )
+{
+	if( !pPlayer )
+		return false;
+
+	if( pPlayer->IsObserver() || ( pPlayer->GetOwnerNumber() == 0 && pPlayer->GetTeamNumber() == TEAM_SPECTATOR ) )
+		return true;
+
+#ifdef CLIENT_DLL
+	return ShouldShowInFOW( pEnt );
+#else
+	return ShouldShowInFOW( pEnt, pPlayer->GetOwnerNumber() );
+#endif // CLIENT_DLL
+
+	
+}
+
+#ifdef CLIENT_DLL
+bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt )
+#else
+bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, int owner )
+#endif // CLIENT_DLL
 {
 	if( !pEnt )
 		return false;
@@ -1762,19 +1783,13 @@ bool CFogOfWarMgr::ShouldShowInFOW( CBasePlayer *pPlayer, CBaseEntity *pEnt )
 	if( sv_fogofwar.GetBool() == false )
 		return true;
 
-	if( pPlayer )
-	{
-		if( pPlayer->IsObserver() || ( pPlayer->GetOwnerNumber() == 0 && pPlayer->GetTeamNumber() == TEAM_SPECTATOR ) )
-			return true;
-	}
-
 	if( (pEnt->GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
 		return true;
 
 #ifdef CLIENT_DLL
 	return !pEnt->IsInFOW( );
 #else
-	return !pEnt->IsInFOW( pEnt->GetOwnerNumber() );
+	return !pEnt->IsInFOW( owner );
 #endif // CLIENT_DLL
 }
 

@@ -12,6 +12,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifndef DISABLE_PYTHON
 UnitBaseSense::UnitBaseSense( boost::python::object outer ) : 
 	UnitComponent(outer), m_fSenseDistance(-1), m_bUseLimitedViewCone(false), 
@@ -22,6 +25,9 @@ UnitBaseSense::UnitBaseSense( boost::python::object outer ) :
 }
 #endif // DISABLE_PYTHON
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseSense::PerformSensing()
 {
 	if( m_fNextSenseTime > gpGlobals->curtime )
@@ -35,17 +41,26 @@ void UnitBaseSense::PerformSensing()
 	m_fNextSenseTime = gpGlobals->curtime + m_fSenseRate;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseSense::ForcePerformSensing()
 {
 	m_fNextSenseTime = 0.0f;
 	PerformSensing();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseSense::Look( int iDistance )
 {
 	LookForUnits(iDistance);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 {
 	// Skip myself and skip not alive if an unit
@@ -72,14 +87,20 @@ bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool UnitBaseSense::TestUnit( CUnitBase *pUnit )
 {
-	if( !pUnit->CanBeSeen( m_pOuter ) || pUnit->IsInFOW( m_pOuter->GetOwnerNumber() ) )
+	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->ShouldShowInFOW( m_pOuter->GetOwnerNumber() ) )
 		return false;
 
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int UnitBaseSense::LookForUnits( int iDistance )
 {
 	int i;
@@ -213,6 +234,9 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	return CountSeen();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int UnitBaseSense::CountEnemiesInRange( float range )
 {
 	int count = 0;
@@ -225,6 +249,9 @@ int UnitBaseSense::CountEnemiesInRange( float range )
 	return count;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int UnitBaseSense::CountOthersInRange( float range )
 {
 	int count = 0;
@@ -237,6 +264,9 @@ int UnitBaseSense::CountOthersInRange( float range )
 	return count;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseEntity *UnitBaseSense::GetNearestOther()
 {
 	CBaseEntity *pBest = NULL;
@@ -255,6 +285,9 @@ CBaseEntity *UnitBaseSense::GetNearestOther()
 	return pBest;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifndef DISABLE_PYTHON
 bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 {
@@ -272,6 +305,9 @@ bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 	return units;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::list UnitBaseSense::PyGetOthers( const char *unittype )
 {
 	bp::list units;

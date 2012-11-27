@@ -152,6 +152,36 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseAnimating::Activate( );
     }
 
+    virtual bool BecomeRagdoll( ::CTakeDamageInfo const & info, ::Vector const & forceVector ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "BecomeRagdoll: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling BecomeRagdoll( boost::ref(info), boost::ref(forceVector) ) of Class: CBaseCombatCharacter\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_BecomeRagdoll = this->get_override( "BecomeRagdoll" );
+        if( func_BecomeRagdoll.ptr() != Py_None )
+            try {
+                return func_BecomeRagdoll( boost::ref(info), boost::ref(forceVector) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseCombatCharacter::BecomeRagdoll( boost::ref(info), boost::ref(forceVector) );
+            }
+        else
+            return this->CBaseCombatCharacter::BecomeRagdoll( boost::ref(info), boost::ref(forceVector) );
+    }
+    
+    bool default_BecomeRagdoll( ::CTakeDamageInfo const & info, ::Vector const & forceVector ) {
+        return CBaseCombatCharacter::BecomeRagdoll( boost::ref(info), boost::ref(forceVector) );
+    }
+
     virtual bool CanBecomeRagdoll(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1554,6 +1584,18 @@ void register_CBaseGrenade_class(){
                 "Activate"
                 , Activate_function_type(&::CBaseAnimating::Activate)
                 , default_Activate_function_type(&CBaseGrenade_wrapper::default_Activate) );
+        
+        }
+        { //::CBaseCombatCharacter::BecomeRagdoll
+        
+            typedef bool ( ::CBaseCombatCharacter::*BecomeRagdoll_function_type )( ::CTakeDamageInfo const &,::Vector const & ) ;
+            typedef bool ( CBaseGrenade_wrapper::*default_BecomeRagdoll_function_type )( ::CTakeDamageInfo const &,::Vector const & ) ;
+            
+            CBaseGrenade_exposer.def( 
+                "BecomeRagdoll"
+                , BecomeRagdoll_function_type(&::CBaseCombatCharacter::BecomeRagdoll)
+                , default_BecomeRagdoll_function_type(&CBaseGrenade_wrapper::default_BecomeRagdoll)
+                , ( bp::arg("info"), bp::arg("forceVector") ) );
         
         }
         { //::CBaseAnimating::CanBecomeRagdoll

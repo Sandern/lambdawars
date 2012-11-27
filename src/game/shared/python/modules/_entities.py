@@ -720,6 +720,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('StopLoopingSounds').virtuality = 'virtual'
             mb.mem_funs('VPhysicsCollision').virtuality = 'virtual'
             mb.mem_funs('CanBecomeRagdoll').virtuality = 'virtual'
+            mb.mem_funs('BecomeRagdoll').virtuality = 'virtual'
             mb.mem_funs('ShouldGib').virtuality = 'virtual'
             mb.mem_funs('CorpseGib').virtuality = 'virtual'
             mb.mem_funs('DrawDebugGeometryOverlays').virtuality = 'virtual'

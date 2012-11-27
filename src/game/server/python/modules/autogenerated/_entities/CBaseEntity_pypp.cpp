@@ -6053,6 +6053,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("pPlayer") ) );
         
         }
+        { //::CBaseEntity::ShouldShowInFOW
+        
+            typedef bool ( ::CBaseEntity::*ShouldShowInFOW_function_type )( int ) ;
+            
+            CBaseEntity_exposer.def( 
+                "ShouldShowInFOW"
+                , ShouldShowInFOW_function_type( &::CBaseEntity::ShouldShowInFOW )
+                , ( bp::arg("owner") ) );
+        
+        }
         { //::CBaseEntity::ShouldToggle
         
             typedef int ( ::CBaseEntity::*ShouldToggle_function_type )( ::USE_TYPE,int ) ;

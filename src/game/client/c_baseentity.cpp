@@ -6549,7 +6549,7 @@ void C_BaseEntity::SetOwnerNumber( int owner_number )
 //------------------------------------------------------------------------------
 bool C_BaseEntity::ShouldShowInFOW()
 {
-	return FogOfWarMgr()->ShouldShowInFOW( C_BasePlayer::GetLocalPlayer(), this );
+	return FogOfWarMgr()->ShouldShowInFOW( this, C_BasePlayer::GetLocalPlayer() );
 }
 
 #ifndef DISABLE_PYTHON

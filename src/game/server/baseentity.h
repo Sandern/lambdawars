@@ -1933,6 +1933,7 @@ public:
 	void						RemoveFOWFlags( int flag );
 	bool						IsInFOW( int owner );
 	bool						ShouldShowInFOW( CBasePlayer *pPlayer );
+	bool						ShouldShowInFOW( int owner );
 	bool						ShouldTransmitInFOW( CBasePlayer *pPlayer );
 	float						GetViewDistance();
 	void						SetViewDistance( float dist );

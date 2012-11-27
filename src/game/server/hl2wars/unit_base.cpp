@@ -580,7 +580,7 @@ void CUnitBase::CheckEnemyAlive()
 {
 	if( m_bHasEnemy )
 	{
-		if( !m_hEnemy || (m_hEnemy->GetFOWFlags() && m_hEnemy->IsInFOW( GetOwnerNumber() )) )
+		if( !m_hEnemy || !m_hEnemy->ShouldShowInFOW( GetOwnerNumber() ) )
 		{
 			SetEnemy(NULL);
 		}
@@ -600,6 +600,9 @@ void CUnitBase::CheckEnemyAlive()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::PassesDamageFilter( const CTakeDamageInfo &info )
 {
 	if( info.GetAttacker() )

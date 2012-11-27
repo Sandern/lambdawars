@@ -8785,7 +8785,15 @@ bool CBaseEntity::IsInFOW( int owner )
 //------------------------------------------------------------------------------
 bool CBaseEntity::ShouldShowInFOW( CBasePlayer *pPlayer )
 {
-	return FogOfWarMgr()->ShouldShowInFOW( pPlayer, this );
+	return FogOfWarMgr()->ShouldShowInFOW( this, pPlayer );
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+//------------------------------------------------------------------------------
+bool CBaseEntity::ShouldShowInFOW( int owner )
+{
+	return FogOfWarMgr()->ShouldShowInFOW( this, owner );
 }
 
 //------------------------------------------------------------------------------
