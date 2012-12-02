@@ -1700,6 +1700,16 @@ BOOST_PYTHON_MODULE(srcbase){
 
     bp::scope().attr( "BLOOD_COLOR_MECH" ) = (int)BLOOD_COLOR_MECH;
 
+    bp::scope().attr( "BLOOD_COLOR_ANTLION" ) = (int)BLOOD_COLOR_ANTLION;
+
+    bp::scope().attr( "BLOOD_COLOR_ZOMBIE" ) = (int)BLOOD_COLOR_ZOMBIE;
+
+    bp::scope().attr( "BLOOD_COLOR_ANTLION_WORKER" ) = (int)BLOOD_COLOR_ANTLION_WORKER;
+
+    bp::scope().attr( "BLOOD_COLOR_BLOB" ) = (int)BLOOD_COLOR_BLOB;
+
+    bp::scope().attr( "BLOOD_COLOR_BLOB_FROZEN" ) = (int)BLOOD_COLOR_BLOB_FROZEN;
+
     bp::scope().attr( "HIDEHUD_WEAPONSELECTION" ) = (int)HIDEHUD_WEAPONSELECTION;
 
     bp::scope().attr( "HIDEHUD_FLASHLIGHT" ) = (int)HIDEHUD_FLASHLIGHT;

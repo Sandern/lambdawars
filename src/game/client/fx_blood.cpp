@@ -478,7 +478,7 @@ ParticleForBlood_t	bloodCallbacks[] =
 	{ BLOOD_COLOR_GREEN,	"blood_impact_green_01" },
 	{ BLOOD_COLOR_YELLOW,	"blood_impact_yellow_01" },
 
-#if defined( HL2_EPISODIC )
+#if defined( HL2_EPISODIC ) || defined( HL2WARS_DLL )
 	{ BLOOD_COLOR_ANTLION,			"blood_impact_antlion_01" },		// FIXME: Move to Base HL2
 	{ BLOOD_COLOR_ZOMBIE,			"blood_impact_zombie_01" },			// FIXME: Move to Base HL2
 	{ BLOOD_COLOR_ANTLION_WORKER,	"blood_impact_antlion_worker_01" },
@@ -537,7 +537,7 @@ DECLARE_CLIENT_EFFECT_BEGIN( BloodImpact, BloodImpactCallback )
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_red_01" )
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_green_01" )
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_yellow_01" )
-#if defined( HL2_EPISODIC )
+#if defined( HL2_EPISODIC ) || defined( HL2WARS_DLL )
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_antlion_01" )			// FIXME: Move to Base HL2
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_zombie_01" )			// FIXME: Move to Base HL2
 	PRECACHE( PARTICLE_SYSTEM, "blood_impact_antlion_worker_01" )

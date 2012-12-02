@@ -404,6 +404,12 @@ class SrcBase(GenerateModulePureShared):
         mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_GREEN\" ) = (int)BLOOD_COLOR_GREEN;" )
         mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_MECH\" ) = (int)BLOOD_COLOR_MECH;" )
         
+        mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_ANTLION\" ) = (int)BLOOD_COLOR_ANTLION;" )
+        mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_ZOMBIE\" ) = (int)BLOOD_COLOR_ZOMBIE;" )
+        mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_ANTLION_WORKER\" ) = (int)BLOOD_COLOR_ANTLION_WORKER;" )
+        mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_BLOB\" ) = (int)BLOOD_COLOR_BLOB;" )
+        mb.add_registration_code( "bp::scope().attr( \"BLOOD_COLOR_BLOB_FROZEN\" ) = (int)BLOOD_COLOR_BLOB_FROZEN;" )
+    
         # Hud defines
         mb.add_registration_code( "bp::scope().attr( \"HIDEHUD_WEAPONSELECTION\" ) = (int)HIDEHUD_WEAPONSELECTION;" )
         mb.add_registration_code( "bp::scope().attr( \"HIDEHUD_FLASHLIGHT\" ) = (int)HIDEHUD_FLASHLIGHT;" )
