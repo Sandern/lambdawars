@@ -201,10 +201,6 @@ void UnitAnimState::Update( float eyeYaw, float eyePitch )
 	if( unit_disableanimstate.GetBool() )
 		return;
 
-#ifndef CLIENT_DLL
-	GetOuter()->DispatchAnimEvents(GetOuter());
-#endif // CLIENT_DLL
-
 	// Clear animation overlays because we're about to completely reconstruct them.
 	ClearAnimationLayers();
 
@@ -238,25 +234,6 @@ void UnitAnimState::Update( float eyeYaw, float eyePitch )
 	{
 		DebugShowAnimStateFull( 5 );
 	}
-	else if ( cl_showanimstate.GetInt() == -2 )
-	{
-		/*C_BasePlayer *targetPlayer = C_BasePlayer::GetLocalPlayer();
-
-		if( targetPlayer && ( targetPlayer->GetObserverMode() == OBS_MODE_IN_EYE || targetPlayer->GetObserverMode() == OBS_MODE_CHASE ) )
-		{
-			C_BaseEntity *target = targetPlayer->GetObserverTarget();
-
-			if( target && target->IsPlayer() )
-			{
-				targetPlayer = ToBasePlayer( target );
-			}
-		}
-
-		if ( GetOuter() == targetPlayer )
-		{
-			DebugShowAnimStateFull( 6 );
-		}*/
-	}
 #else
 	if ( sv_showanimstate.GetInt() == GetOuter()->entindex() )
 	{
@@ -270,6 +247,7 @@ void UnitAnimState::Update( float eyeYaw, float eyePitch )
 	// NOTE2: StudioFrameAdvance also updates the layers, StudioFrameAdvanceManual does not.
 	//StudioFrameAdvance();
 	GetOuter()->StudioFrameAdvanceManual( GetAnimTimeInterval() );
+	GetOuter()->DispatchAnimEvents(GetOuter());
 #endif // CLIENT_DLL
 }
 
