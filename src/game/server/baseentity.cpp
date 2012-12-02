@@ -4204,7 +4204,7 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 
 	// HL2Wars: Don't send when in the fow for the recv player.
 	//Msg("%s Send? FOWFLAGS: %d, ShouldTransmitInFOW(): %d, recipient owner: %d, my owner: %d\n", GetClassname(), (GetFOWFlags() & FOWFLAG_NOTRANSMIT), ShouldTransmitInFOW( pRecipientPlayer->GetOwnerNumber() ), pRecipientPlayer->GetOwnerNumber(), GetOwnerNumber());
-	if( !ShouldTransmitInFOW( pRecipientPlayer ) ) 
+	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
 		return FL_EDICT_DONTSEND;
 	}
@@ -8783,23 +8783,23 @@ bool CBaseEntity::IsInFOW( int owner )
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-bool CBaseEntity::ShouldShowInFOW( CBasePlayer *pPlayer )
+bool CBaseEntity::FOWShouldShow( CBasePlayer *pPlayer )
 {
-	return FogOfWarMgr()->ShouldShowInFOW( this, pPlayer );
+	return FogOfWarMgr()->FOWShouldShow( this, pPlayer );
 }
 
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-bool CBaseEntity::ShouldShowInFOW( int owner )
+bool CBaseEntity::FOWShouldShow( int owner )
 {
-	return FogOfWarMgr()->ShouldShowInFOW( this, owner );
+	return FogOfWarMgr()->FOWShouldShow( this, owner );
 }
 
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-bool CBaseEntity::ShouldTransmitInFOW( CBasePlayer *pPlayer )
+bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 {
 	if( sv_fogofwar.GetBool() == false )
 		return true;

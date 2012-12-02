@@ -1892,7 +1892,7 @@ public:
 	int								GetFOWFlags();
 	float							GetViewDistance();
 	bool							IsInFOW();
-	bool							ShouldShowInFOW();
+	bool							FOWShouldShow();
 	void							SetInFOW( bool infow );
 	ShouldTransmitState_t			GetLastShouldTransmitState();
 

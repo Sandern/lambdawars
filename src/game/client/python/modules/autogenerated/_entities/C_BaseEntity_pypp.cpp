@@ -1604,6 +1604,15 @@ void register_C_BaseEntity_class(){
                 , EyePosition_function_type( &::C_BaseEntity::EyePosition ) );
         
         }
+        { //::C_BaseEntity::FOWShouldShow
+        
+            typedef bool ( ::C_BaseEntity::*FOWShouldShow_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "FOWShouldShow"
+                , FOWShouldShow_function_type( &::C_BaseEntity::FOWShouldShow ) );
+        
+        }
         { //::C_BaseEntity::FireBullets
         
             typedef void ( ::C_BaseEntity::*FireBullets_function_type )( ::FireBulletsInfo_t const & ) ;
@@ -5850,15 +5859,6 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "ShouldSavePhysics"
                 , ShouldSavePhysics_function_type( &::C_BaseEntity::ShouldSavePhysics ) );
-        
-        }
-        { //::C_BaseEntity::ShouldShowInFOW
-        
-            typedef bool ( ::C_BaseEntity::*ShouldShowInFOW_function_type )(  ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "ShouldShowInFOW"
-                , ShouldShowInFOW_function_type( &::C_BaseEntity::ShouldShowInFOW ) );
         
         }
         { //::C_BaseEntity::ShutdownPredictable

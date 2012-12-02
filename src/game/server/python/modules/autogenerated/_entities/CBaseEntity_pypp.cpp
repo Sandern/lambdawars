@@ -1983,6 +1983,26 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("iPlayerIndex") ) );
         
         }
+        { //::CBaseEntity::FOWShouldShow
+        
+            typedef bool ( ::CBaseEntity::*FOWShouldShow_function_type )( ::CBasePlayer * ) ;
+            
+            CBaseEntity_exposer.def( 
+                "FOWShouldShow"
+                , FOWShouldShow_function_type( &::CBaseEntity::FOWShouldShow )
+                , ( bp::arg("pPlayer") ) );
+        
+        }
+        { //::CBaseEntity::FOWShouldShow
+        
+            typedef bool ( ::CBaseEntity::*FOWShouldShow_function_type )( int ) ;
+            
+            CBaseEntity_exposer.def( 
+                "FOWShouldShow"
+                , FOWShouldShow_function_type( &::CBaseEntity::FOWShouldShow )
+                , ( bp::arg("owner") ) );
+        
+        }
         { //::CBaseEntity::FindContextByName
         
             typedef int ( ::CBaseEntity::*FindContextByName_function_type )( char const * ) const;
@@ -6041,26 +6061,6 @@ void register_CBaseEntity_class(){
             CBaseEntity_exposer.def( 
                 "ShouldSavePhysics"
                 , ShouldSavePhysics_function_type( &::CBaseEntity::ShouldSavePhysics ) );
-        
-        }
-        { //::CBaseEntity::ShouldShowInFOW
-        
-            typedef bool ( ::CBaseEntity::*ShouldShowInFOW_function_type )( ::CBasePlayer * ) ;
-            
-            CBaseEntity_exposer.def( 
-                "ShouldShowInFOW"
-                , ShouldShowInFOW_function_type( &::CBaseEntity::ShouldShowInFOW )
-                , ( bp::arg("pPlayer") ) );
-        
-        }
-        { //::CBaseEntity::ShouldShowInFOW
-        
-            typedef bool ( ::CBaseEntity::*ShouldShowInFOW_function_type )( int ) ;
-            
-            CBaseEntity_exposer.def( 
-                "ShouldShowInFOW"
-                , ShouldShowInFOW_function_type( &::CBaseEntity::ShouldShowInFOW )
-                , ( bp::arg("owner") ) );
         
         }
         { //::CBaseEntity::ShouldToggle

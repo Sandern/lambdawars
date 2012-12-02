@@ -771,7 +771,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('ForceVPhysicsCollide').exclude() # Don't care
             mb.mem_funs('GetGroundVelocityToApply').exclude() # Don't care
             mb.mem_funs('GetMaxHealth').exclude() # Use property maxhealth
-            mb.mem_funs('ShouldTransmitInFOW').exclude()
+            mb.mem_funs('FOWShouldTransmit').exclude()
             mb.mem_funs('SetModelIndex').exclude()
             
             mb.mem_funs('SendProxy_AnglesX').exclude()

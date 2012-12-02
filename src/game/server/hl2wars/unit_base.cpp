@@ -580,7 +580,7 @@ void CUnitBase::CheckEnemyAlive()
 {
 	if( m_bHasEnemy )
 	{
-		if( !m_hEnemy || !m_hEnemy->ShouldShowInFOW( GetOwnerNumber() ) )
+		if( !m_hEnemy || !m_hEnemy->FOWShouldShow( GetOwnerNumber() ) )
 		{
 			SetEnemy(NULL);
 		}

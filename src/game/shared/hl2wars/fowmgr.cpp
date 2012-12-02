@@ -1754,7 +1754,7 @@ void CFogOfWarMgr::RemoveFogEntity( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 // Purpose: Test if entity should be shown in fow
 //-----------------------------------------------------------------------------
-bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, CBasePlayer *pPlayer )
+bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, CBasePlayer *pPlayer )
 {
 	if( !pPlayer )
 		return false;
@@ -1763,18 +1763,18 @@ bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, CBasePlayer *pPlayer )
 		return true;
 
 #ifdef CLIENT_DLL
-	return ShouldShowInFOW( pEnt );
+	return FOWShouldShow( pEnt );
 #else
-	return ShouldShowInFOW( pEnt, pPlayer->GetOwnerNumber() );
+	return FOWShouldShow( pEnt, pPlayer->GetOwnerNumber() );
 #endif // CLIENT_DLL
 
 	
 }
 
 #ifdef CLIENT_DLL
-bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt )
+bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt )
 #else
-bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, int owner )
+bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, int owner )
 #endif // CLIENT_DLL
 {
 	if( !pEnt )
@@ -1786,6 +1786,13 @@ bool CFogOfWarMgr::ShouldShowInFOW( CBaseEntity *pEnt, int owner )
 	if( (pEnt->GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
 		return true;
 
+	// Client can't see dormant entities if they have the FOWFLAG_HIDDEN flag
+#ifdef CLIENT_DLL
+	if( pEnt->IsDormant() )
+		return false;
+#endif // CLIENT_DLL
+
+	// Got the hidden flag, so now check if in fow
 #ifdef CLIENT_DLL
 	return !pEnt->IsInFOW( );
 #else

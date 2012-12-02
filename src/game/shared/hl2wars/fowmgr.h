@@ -138,11 +138,11 @@ public:
 	Vector				ComputeWorldPosition( int x, int y );
 	void				ComputeFOWPosition( const Vector &vPos, int &x, int &y );
 
-	bool				ShouldShowInFOW( CBaseEntity *pEnt, CBasePlayer *pPlayer );
+	bool				FOWShouldShow( CBaseEntity *pEnt, CBasePlayer *pPlayer );
 #ifdef CLIENT_DLL
-	bool				ShouldShowInFOW( CBaseEntity *pEnt );
+	bool				FOWShouldShow( CBaseEntity *pEnt );
 #else
-	bool				ShouldShowInFOW( CBaseEntity *pEnt, int owner );
+	bool				FOWShouldShow( CBaseEntity *pEnt, int owner );
 #endif // CLIENT_DLL
 public:
 	// Lists

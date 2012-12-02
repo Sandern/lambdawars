@@ -1932,9 +1932,9 @@ public:
 	void						RecalculateFOWFlags();
 	void						RemoveFOWFlags( int flag );
 	bool						IsInFOW( int owner );
-	bool						ShouldShowInFOW( CBasePlayer *pPlayer );
-	bool						ShouldShowInFOW( int owner );
-	bool						ShouldTransmitInFOW( CBasePlayer *pPlayer );
+	bool						FOWShouldShow( CBasePlayer *pPlayer );
+	bool						FOWShouldShow( int owner );
+	bool						FOWShouldTransmit( CBasePlayer *pPlayer );
 	float						GetViewDistance();
 	void						SetViewDistance( float dist );
 	void						FOWForceUpdate( int iPlayerIndex );
