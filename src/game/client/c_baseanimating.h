@@ -460,6 +460,9 @@ public:
 
 	void							ScriptSetPoseParameter( const char *szName, float fValue );
 
+	// Override
+	void							ForceUseFastPath( bool bUseFastPath ) { m_bCanUseFastPath = bUseFastPath; }
+
 protected:
 	// View models scale their attachment positions to account for FOV. To get the unmodified
 	// attachment position (like if you're rendering something else during the view model's DrawModel call),

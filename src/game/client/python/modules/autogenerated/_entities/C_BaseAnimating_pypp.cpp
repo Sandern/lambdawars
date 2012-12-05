@@ -1221,6 +1221,16 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("pBonesOut"), bp::arg("flTime") ) );
         
         }
+        { //::C_BaseAnimating::ForceUseFastPath
+        
+            typedef void ( ::C_BaseAnimating::*ForceUseFastPath_function_type )( bool ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "ForceUseFastPath"
+                , ForceUseFastPath_function_type( &::C_BaseAnimating::ForceUseFastPath )
+                , ( bp::arg("bUseFastPath") ) );
+        
+        }
         { //::C_BaseAnimating::ForcedMaterialOverride
         
             typedef void ( ::C_BaseAnimating::*ForcedMaterialOverride_function_type )( char const *,::OverrideType_t ) ;

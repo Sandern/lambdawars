@@ -215,7 +215,7 @@ int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )
 	if( m_bIsBlinking )
 	{
 		flags |= STUDIO_ITEM_BLINK;
-		if( m_fBlinkTimeOut < gpGlobals->curtime )
+		if( m_fBlinkTimeOut != -1 && m_fBlinkTimeOut < gpGlobals->curtime )
 			m_bIsBlinking = false;
 	}
 
@@ -242,7 +242,7 @@ bool CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int bo
 void CUnitBase::Blink( float blink_time )
 {
 	m_bIsBlinking = true;
-	m_fBlinkTimeOut = gpGlobals->curtime + blink_time;
+	m_fBlinkTimeOut = blink_time != -1 ? gpGlobals->curtime + blink_time : -1;
 }
 
 bool CUnitBase::ShouldDraw( void )

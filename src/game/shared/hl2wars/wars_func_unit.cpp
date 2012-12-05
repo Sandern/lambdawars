@@ -195,7 +195,7 @@ int CFuncUnit::DrawModel( int flags )
 	if( m_bIsBlinking )
 	{
 		flags |= STUDIO_ITEM_BLINK;
-		if( m_fBlinkTimeOut < gpGlobals->curtime )
+		if( m_fBlinkTimeOut != -1 && m_fBlinkTimeOut < gpGlobals->curtime )
 			m_bIsBlinking = false;
 	}
 
@@ -207,7 +207,7 @@ int CFuncUnit::DrawModel( int flags )
 void CFuncUnit::Blink( float blink_time )
 {
 	m_bIsBlinking = true;
-	m_fBlinkTimeOut = gpGlobals->curtime + blink_time;
+	m_fBlinkTimeOut = blink_time != -1 ? gpGlobals->curtime + blink_time : -1;
 }
 #else
 //-----------------------------------------------------------------------------
