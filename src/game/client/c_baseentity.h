@@ -1991,7 +1991,13 @@ private:
 	int m_iFOWOldPosX, m_iFOWOldPosY;
 	int m_iFOWPosX, m_iFOWPosY;
 	CUtlVector< FowPos_t > m_FOWMesh;
-	Vector m_vTeamColor;
+
+	Vector m_vTeamColor; // Real team color
+	Vector m_vCurTeamColor; // Current used team color
+	Vector m_vTargetTeamColor; // Current target team color
+	bool m_bTeamColorChanging;
+	bool m_bUseRelationBasedTeamColor;
+	float m_fTeamColorLastUpdateFrame;
 
 	bool m_bAllowNavIgnore;
 	float m_flNavIgnoreUntilTime;
@@ -2599,19 +2605,6 @@ inline void	CBaseEntity::SetInFOW( bool infow )
 inline ShouldTransmitState_t CBaseEntity::GetLastShouldTransmitState() 
 { 
 	return m_LastShouldTransmitState; 
-}
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-inline void	CBaseEntity::SetTeamColor( Vector &vTeamColor ) 
-{ 
-	m_vTeamColor = vTeamColor; 
-}
-
-inline Vector &CBaseEntity::GetTeamColor( void ) 
-{ 
-	return m_vTeamColor; 
 }
 
 #ifndef DISABLE_PYTHON

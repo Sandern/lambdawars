@@ -6552,6 +6552,76 @@ bool C_BaseEntity::FOWShouldShow()
 	return FogOfWarMgr()->FOWShouldShow( this, C_BasePlayer::GetLocalPlayer() );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetTeamColor( Vector &vTeamColor ) 
+{ 
+	m_vTeamColor = vTeamColor;
+	m_vCurTeamColor = m_vTeamColor;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+extern Disposition_t GetPlayerRelationShip(int p1, int p2);
+ConVar cl_teamcolor_relationbased( "cl_teamcolor_relationbased", "0" );
+ConVar cl_teamcolor_converge_speed( "cl_teamcolor_converge_speed", "1.75" );
+
+Vector &CBaseEntity::GetTeamColor( void ) 
+{ 
+	// Detect if we changed color
+	bool bUseRelationBasedTeamColor = cl_teamcolor_relationbased.GetBool();
+	if( bUseRelationBasedTeamColor != m_bUseRelationBasedTeamColor )
+	{
+		if( bUseRelationBasedTeamColor )
+		{
+			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+			if( !pPlayer )
+				return m_vTeamColor;
+
+			Disposition_t d = GetPlayerRelationShip( pPlayer->GetOwnerNumber(), GetOwnerNumber() );
+
+			switch( d )
+			{
+			case D_HT:
+				m_vTargetTeamColor = Vector(1, 0, 0);
+				break;
+			case D_LI:
+				m_vTargetTeamColor = Vector(0, 1, 0);
+				break;
+			case D_NU:
+			default:
+				m_vTargetTeamColor = Vector(0.2, 0.2, 0.2);
+				break;
+			}
+		}
+		else
+		{
+			m_vTargetTeamColor = m_vTeamColor;
+		}
+
+		m_bUseRelationBasedTeamColor = bUseRelationBasedTeamColor;
+		m_bTeamColorChanging = true;
+	}
+
+	// Update current color
+	if( m_bTeamColorChanging && m_fTeamColorLastUpdateFrame != gpGlobals->frametime )
+	{
+		if( m_vTargetTeamColor != m_vCurTeamColor )
+		{
+			m_vCurTeamColor = VectorLerp( m_vCurTeamColor, m_vTargetTeamColor, gpGlobals->frametime * cl_teamcolor_converge_speed.GetFloat() );
+			m_fTeamColorLastUpdateFrame = gpGlobals->frametime;
+		}
+		else
+		{
+			m_bTeamColorChanging = false;
+		}
+	}
+
+	return m_vCurTeamColor; 
+}
+
 #ifndef DISABLE_PYTHON
 //------------------------------------------------------------------------------
 void C_BaseEntity::ClearPyInstance()
