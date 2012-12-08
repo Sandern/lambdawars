@@ -66,12 +66,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase * );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius") ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("pUnit")=bp::object() ) );
     
     }
 
@@ -268,12 +268,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase * );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius") ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("pUnit")=bp::object() ) );
     
     }
 

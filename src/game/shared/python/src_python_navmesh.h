@@ -39,6 +39,6 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 
 bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
 
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius );
+bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit=NULL );
 
 #endif // SRC_PYTHON_NAVMESH_H

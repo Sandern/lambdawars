@@ -718,7 +718,7 @@ bool UnitBaseNavigator::ShouldConsiderEntity( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 {
-	if( m_bNoNavAreasNearby ) // Set when in BS_STUCK and we can't find anything nearby 
+	if( m_bNoNavAreasNearby || m_fGoalDistance < 64.0f ) // Set when in BS_STUCK and we can't find anything nearby 
 		return false;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );

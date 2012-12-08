@@ -43,7 +43,7 @@ enum UnitGoalFlags
 	GF_NOCLEAR = (1 << 0),
 	GF_REQTARGETALIVE = (1 << 1),
 	GF_USETARGETDIST = (1 << 2 ),
-	GF_NOLOSREQUIRED = (1 << 3 ), // No line check
+	GF_NOLOSREQUIRED = (1 << 3 ), // No line check (just get in sense range)
 	GF_REQUIREVISION = (1 << 4 ), // Fog of war
 	GF_OWNERISTARGET = (1 << 5 ), // Bumped into entity that is being owned by the target
 	GF_DIRECTPATH = (1 << 6), // Build direct path, don't do path finding. For special cases.

@@ -66,12 +66,12 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 	if( !pUnit )
 	{
 		ShortestPathCost costFunc;
-		return NavAreaTravelDistance<ShortestPathCost>(startArea, goalArea, costFunc);
+		return NavAreaTravelDistance<ShortestPathCost>(startArea, goalArea, costFunc, maxdist);
 	}
 	else
 	{
 		UnitShortestPathCost costFunc( pUnit, false );
-		return NavAreaTravelDistance<UnitShortestPathCost>(startArea, goalArea, costFunc);
+		return NavAreaTravelDistance<UnitShortestPathCost>(startArea, goalArea, costFunc, maxdist);
 	}
 }
 
@@ -514,12 +514,26 @@ CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+typedef struct HidingSpotResult_t
+{
+	HidingSpotResult_t( HidingSpot *spot, float dist ) : pSpot(spot), fDist(dist) {}
+
+	HidingSpot *pSpot;
+	float fDist;
+} HidingSpotResult_t;
+
+#define USE_NAVAREA_BASED_DIST
 class HidingSpotCollector
 {
 public:
-	HidingSpotCollector( CUtlVector< HidingSpot * > &HidingSpots, const Vector &vPos, float fRadius ) : m_HidingSpots( HidingSpots ), m_vPos( vPos )
+	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit)
 	{
+#ifndef USE_NAVAREA_BASED_DIST
 		m_fRadiusSqr = fRadius * fRadius;
+#else
+		m_fRadius = fRadius;
+		m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, false);
+#endif // USE_NAVAREA_BASED_DIST
 	}
 
 	bool operator() ( CNavArea *area )
@@ -528,36 +542,78 @@ public:
 
 		for( int i = 0; i < spots->Count(); i++ )
 		{
-			const Vector &vPos = spots->Element( i )->GetPosition();
+			HidingSpot *pSpot = spots->Element( i );
+			const Vector &vPos = pSpot->GetPosition();
 
-			if( (vPos - m_vPos).LengthSqr() < m_fRadiusSqr )
-				m_HidingSpots.AddToTail( spots->Element( i ) );
+#ifndef USE_NAVAREA_BASED_DIST
+			float fDist = (vPos - m_vPos).LengthSqr();
+			if( fDist < m_fRadiusSqr )
+				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
+#else
+			CNavArea *pTestArea = TheNavMesh->GetNearestNavArea( vPos, false, m_fRadius, false, false );
+
+			float fDist;
+			if( !m_pUnit )
+			{
+				ShortestPathCost costFunc;
+				fDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius );
+			}
+			else
+			{
+				UnitShortestPathCost costFunc( m_pUnit, false );
+				fDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius );
+			}
+
+			if( fDist > 0 && fDist < m_fRadius )
+			{
+				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
+			}
+
+#endif // USE_NAVAREA_BASED_DIST
 		}
 
 		return true;
 	}
 
 private:
+#ifndef USE_NAVAREA_BASED_DIST
 	float m_fRadiusSqr;
+#else
+	CUnitBase *m_pUnit;
+	CNavArea *m_pOrderArea;
+	float m_fRadius;
+#endif // USE_NAVAREA_BASED_DIST
 	const Vector &m_vPos;
-	CUtlVector< HidingSpot * > &m_HidingSpots;
+	CUtlVector< HidingSpotResult_t > &m_HidingSpots;
 };
+
+static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotResult_t *pRight )
+{
+	if( pLeft->fDist < pRight->fDist )
+		return -1;
+	else if( pLeft->fDist > pRight->fDist )
+		return 1;
+	return 0;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius )
+bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit )
 {
 	bp::list l;
-	CUtlVector< HidingSpot * > HidingSpots;
-	HidingSpotCollector collector( HidingSpots, pos, radius );
 
+	// Get hiding spots in radius
+	CUtlVector< HidingSpotResult_t > HidingSpots;
+	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
 	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, radius );
 
+	// Sort based on distance
+	HidingSpots.Sort( HidingSpotCompare );
+
+	// Python return result
 	for( int i = 0; i < HidingSpots.Count(); i++ )
-	{
-		l.append( bp::make_tuple( HidingSpots[i]->GetID(), HidingSpots[i]->GetPosition() ) );
-	}
+		l.append( bp::make_tuple( HidingSpots[i].pSpot->GetID(), HidingSpots[i].pSpot->GetPosition() ) );
 
 	return l;
 }
