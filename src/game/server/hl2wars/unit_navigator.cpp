@@ -95,16 +95,12 @@ ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 
-static ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
-static ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
+ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
+ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
 
 #define THRESHOLD unit_potential_threshold.GetFloat()
 #define THRESHOLD_MIN (THRESHOLD+(GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmin_offset.GetFloat() : unit_potential_nogoal_tmin_offset.GetFloat()) )
 #define THRESHOLD_MAX (GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmax.GetFloat() : unit_potential_nogoal_tmax.GetFloat())
-
-#define NavDbgMsg( fmt, ... )	\
-	if( unit_navigator_debug.GetBool() )	\
-		DevMsg( fmt, ##__VA_ARGS__ );	\
 
 float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &pDirection );
 

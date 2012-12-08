@@ -26,6 +26,8 @@ public:
 	virtual void		Update( UnitBaseMoveCommand &mv );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint();
 
+	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
+
 	virtual bool		ShouldConsiderNavMesh( void );
 
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
@@ -33,9 +35,13 @@ public:
 	int GetTestRouteMask();
 	void SetTestRouteMask( int mask );
 
+	int GetUseSimplifiedRouteBuilding();
+	void SetUseSimplifiedRouteBuilding( bool enable );
+
 private:
 	float m_fCurrentHeight;
 	int m_iTestRouteMask;
+	bool m_bUseSimplifiedRouteBuilding;
 };
 
 // Inlines
@@ -52,6 +58,16 @@ inline int UnitBaseAirNavigator::GetTestRouteMask()
 inline void UnitBaseAirNavigator::SetTestRouteMask( int mask )
 {
 	m_iTestRouteMask = mask;
+}
+
+inline int UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding()
+{
+	return m_bUseSimplifiedRouteBuilding;
+}
+
+inline void UnitBaseAirNavigator::SetUseSimplifiedRouteBuilding( bool enable )
+{
+	m_bUseSimplifiedRouteBuilding = enable;
 }
 
 #endif // UNIT_AIRNAVIGATOR_H

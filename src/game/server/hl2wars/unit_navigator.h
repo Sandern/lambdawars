@@ -14,6 +14,14 @@
 #include "unit_component.h"
 #include "nav.h"
 
+// Debug
+#define NavDbgMsg( fmt, ... )				\
+	if( unit_navigator_debug.GetBool() )	\
+		DevMsg( fmt, ##__VA_ARGS__ );		\
+
+extern ConVar unit_navigator_debug;
+extern ConVar unit_navigator_debug_inrange;
+
 // Forward declarations
 class UnitBaseMoveCommand;
 class CNavArea;

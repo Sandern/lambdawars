@@ -2427,6 +2427,36 @@ struct UnitBaseNavigator_wrapper : UnitBaseNavigator, bp::wrapper< UnitBaseNavig
         UnitBaseNavigator::StopMoving( );
     }
 
+    virtual bool TestRoute( ::Vector const & vStartPos, ::Vector const & vEndPos ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "TestRoute: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_TestRoute = this->get_override( "TestRoute" );
+        if( func_TestRoute.ptr() != Py_None )
+            try {
+                return func_TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseNavigator::TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) );
+            }
+        else
+            return this->UnitBaseNavigator::TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) );
+    }
+    
+    bool default_TestRoute( ::Vector const & vStartPos, ::Vector const & vEndPos ) {
+        return UnitBaseNavigator::TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) );
+    }
+
     virtual void Update( ::UnitBaseMoveCommand & mv ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2528,66 +2558,6 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
     
     }
 
-    virtual ::CheckGoalStatus_t MoveUpdateWaypoint(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "MoveUpdateWaypoint: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling MoveUpdateWaypoint(  ) of Class: UnitBaseAirNavigator\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_MoveUpdateWaypoint = this->get_override( "MoveUpdateWaypoint" );
-        if( func_MoveUpdateWaypoint.ptr() != Py_None )
-            try {
-                return func_MoveUpdateWaypoint(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->UnitBaseAirNavigator::MoveUpdateWaypoint(  );
-            }
-        else
-            return this->UnitBaseAirNavigator::MoveUpdateWaypoint(  );
-    }
-    
-    ::CheckGoalStatus_t default_MoveUpdateWaypoint(  ) {
-        return UnitBaseAirNavigator::MoveUpdateWaypoint( );
-    }
-
-    virtual bool ShouldConsiderNavMesh(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldConsiderNavMesh: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldConsiderNavMesh(  ) of Class: UnitBaseAirNavigator\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldConsiderNavMesh = this->get_override( "ShouldConsiderNavMesh" );
-        if( func_ShouldConsiderNavMesh.ptr() != Py_None )
-            try {
-                return func_ShouldConsiderNavMesh(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->UnitBaseAirNavigator::ShouldConsiderNavMesh(  );
-            }
-        else
-            return this->UnitBaseAirNavigator::ShouldConsiderNavMesh(  );
-    }
-    
-    bool default_ShouldConsiderNavMesh(  ) {
-        return UnitBaseAirNavigator::ShouldConsiderNavMesh( );
-    }
-
     virtual bool TestRoute( ::Vector const & vStartPos, ::Vector const & vEndPos ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2616,36 +2586,6 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
     
     bool default_TestRoute( ::Vector const & vStartPos, ::Vector const & vEndPos ) {
         return UnitBaseAirNavigator::TestRoute( boost::ref(vStartPos), boost::ref(vEndPos) );
-    }
-
-    virtual void Update( ::UnitBaseMoveCommand & mv ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Update: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Update( boost::ref(mv) ) of Class: UnitBaseAirNavigator\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Update = this->get_override( "Update" );
-        if( func_Update.ptr() != Py_None )
-            try {
-                func_Update( boost::ref(mv) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->UnitBaseAirNavigator::Update( boost::ref(mv) );
-            }
-        else
-            this->UnitBaseAirNavigator::Update( boost::ref(mv) );
-    }
-    
-    void default_Update( ::UnitBaseMoveCommand & mv ) {
-        UnitBaseAirNavigator::Update( boost::ref(mv) );
     }
 
     virtual void CalcMove( ::UnitBaseMoveCommand & MoveCommand, ::QAngle angles, float speed ) {
@@ -5053,6 +4993,18 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , default_StopMoving_function_type(&UnitBaseNavigator_wrapper::default_StopMoving) );
         
         }
+        { //::UnitBaseNavigator::TestRoute
+        
+            typedef bool ( ::UnitBaseNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
+            typedef bool ( UnitBaseNavigator_wrapper::*default_TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "TestRoute"
+                , TestRoute_function_type(&::UnitBaseNavigator::TestRoute)
+                , default_TestRoute_function_type(&UnitBaseNavigator_wrapper::default_TestRoute)
+                , ( bp::arg("vStartPos"), bp::arg("vEndPos") ) );
+        
+        }
         { //::UnitBaseNavigator::Update
         
             typedef void ( ::UnitBaseNavigator::*Update_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -5148,28 +5100,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseAirNavigator_exposer_t UnitBaseAirNavigator_exposer = UnitBaseAirNavigator_exposer_t( "UnitBaseAirNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAirNavigator_scope( UnitBaseAirNavigator_exposer );
         bp::implicitly_convertible< bp::object, UnitBaseAirNavigator >();
-        { //::UnitBaseAirNavigator::MoveUpdateWaypoint
-        
-            typedef ::CheckGoalStatus_t ( ::UnitBaseAirNavigator::*MoveUpdateWaypoint_function_type )(  ) ;
-            typedef ::CheckGoalStatus_t ( UnitBaseAirNavigator_wrapper::*default_MoveUpdateWaypoint_function_type )(  ) ;
-            
-            UnitBaseAirNavigator_exposer.def( 
-                "MoveUpdateWaypoint"
-                , MoveUpdateWaypoint_function_type(&::UnitBaseAirNavigator::MoveUpdateWaypoint)
-                , default_MoveUpdateWaypoint_function_type(&UnitBaseAirNavigator_wrapper::default_MoveUpdateWaypoint) );
-        
-        }
-        { //::UnitBaseAirNavigator::ShouldConsiderNavMesh
-        
-            typedef bool ( ::UnitBaseAirNavigator::*ShouldConsiderNavMesh_function_type )(  ) ;
-            typedef bool ( UnitBaseAirNavigator_wrapper::*default_ShouldConsiderNavMesh_function_type )(  ) ;
-            
-            UnitBaseAirNavigator_exposer.def( 
-                "ShouldConsiderNavMesh"
-                , ShouldConsiderNavMesh_function_type(&::UnitBaseAirNavigator::ShouldConsiderNavMesh)
-                , default_ShouldConsiderNavMesh_function_type(&UnitBaseAirNavigator_wrapper::default_ShouldConsiderNavMesh) );
-        
-        }
         { //::UnitBaseAirNavigator::TestRoute
         
             typedef bool ( ::UnitBaseAirNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
@@ -5180,18 +5110,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , TestRoute_function_type(&::UnitBaseAirNavigator::TestRoute)
                 , default_TestRoute_function_type(&UnitBaseAirNavigator_wrapper::default_TestRoute)
                 , ( bp::arg("vStartPos"), bp::arg("vEndPos") ) );
-        
-        }
-        { //::UnitBaseAirNavigator::Update
-        
-            typedef void ( ::UnitBaseAirNavigator::*Update_function_type )( ::UnitBaseMoveCommand & ) ;
-            typedef void ( UnitBaseAirNavigator_wrapper::*default_Update_function_type )( ::UnitBaseMoveCommand & ) ;
-            
-            UnitBaseAirNavigator_exposer.def( 
-                "Update"
-                , Update_function_type(&::UnitBaseAirNavigator::Update)
-                , default_Update_function_type(&UnitBaseAirNavigator_wrapper::default_Update)
-                , ( bp::arg("mv") ) );
         
         }
         { //::UnitBaseNavigator::CalcMove
@@ -5354,6 +5272,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "testroutemask"
                 , fget( &::UnitBaseAirNavigator::GetTestRouteMask )
                 , fset( &::UnitBaseAirNavigator::SetTestRouteMask ) );
+        
+        }
+        { //property "usesimplifiedroutebuilding"[fget=::UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding, fset=::UnitBaseAirNavigator::SetUseSimplifiedRouteBuilding]
+        
+            typedef int ( ::UnitBaseAirNavigator::*fget )(  ) ;
+            typedef void ( ::UnitBaseAirNavigator::*fset )( bool ) ;
+            
+            UnitBaseAirNavigator_exposer.add_property( 
+                "usesimplifiedroutebuilding"
+                , fget( &::UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding )
+                , fset( &::UnitBaseAirNavigator::SetUseSimplifiedRouteBuilding ) );
         
         }
     }

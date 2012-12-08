@@ -172,6 +172,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls = mb.class_('UnitBaseNavigator')
         cls.include()
         cls.mem_funs().exclude()
+        cls.mem_funs('TestRoute').include()
         cls.mem_fun('Reset').include()
         cls.mem_fun('StopMoving').include()
         cls.mem_fun('Update').include()
@@ -233,11 +234,14 @@ class UnitHelper(GenerateModuleSemiShared):
         # Special air version
         cls = mb.class_('UnitBaseAirNavigator')
         cls.include()
-        cls.mem_funs('GetTestRouteMask').exclude()
-        cls.mem_funs('SetTestRouteMask').exclude()
+        cls.mem_funs().exclude()
+        cls.mem_funs('TestRoute').include()
         cls.add_property( 'testroutemask'
                          , cls.mem_fun('GetTestRouteMask')
                          , cls.mem_fun('SetTestRouteMask') )
+        cls.add_property( 'usesimplifiedroutebuilding'
+                         , cls.mem_fun('GetUseSimplifiedRouteBuilding')
+                         , cls.mem_fun('SetUseSimplifiedRouteBuilding') )
                          
     def AddIntention(self, mb):
         pass

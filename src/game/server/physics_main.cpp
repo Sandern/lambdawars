@@ -1052,9 +1052,9 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 			else
 			{
 #ifdef _WIN32
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).raw_name(), time );
+				Msg( "#%d: %s(%s) thinking for %.02f ms!!!\n", entindex(), GetClassname(), typeid(this).raw_name(), time );
 #elif POSIX
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );
+				Msg( "#%d: %s(%s) thinking for %.02f ms!!!\n", entindex(), GetClassname(), typeid(this).name(), time );
 #else
 #error "typeinfo"
 #endif
@@ -1143,9 +1143,9 @@ void CBaseEntity::PhysicsPyDispatchThink( bp::object thinkFunc )
 			else
 			{
 #ifdef _WIN32
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).raw_name(), time );
+				Msg( "#%d: %s(%s) thinking for %.02f ms!!!\n", entindex(), GetClassname(), typeid(this).raw_name(), time );
 #elif POSIX
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );
+				Msg( "#%d: %s(%s) thinking for %.02f ms!!!\n", entindex(), GetClassname(), typeid(this).name(), time );
 #else
 #error "typeinfo"
 #endif

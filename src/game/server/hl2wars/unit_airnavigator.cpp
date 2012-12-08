@@ -20,6 +20,7 @@ UnitBaseAirNavigator::UnitBaseAirNavigator( boost::python::object outer )
 	: UnitBaseNavigator(outer)
 {
 	m_iTestRouteMask = MASK_NPCSOLID_BRUSHONLY;
+	m_bUseSimplifiedRouteBuilding = true;
 }
 #endif // DISABLE_PYTHON
 
@@ -80,7 +81,8 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 	vEnd.z += m_fCurrentHeight;
 
 	//CTraceFilterSkipFriendly filter( GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), GetOuter() );
-	CTraceFilterSimple filter( GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup() );
+	//CTraceFilterSimple filter( GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup() );
+	CTraceFilterWorldOnly filter;
 	trace_t tr;
 	UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
 		&filter, &tr);
@@ -88,4 +90,31 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 	if( tr.DidHit() )
 		return false;
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+UnitBaseWaypoint *UnitBaseAirNavigator::BuildLocalPath( const Vector &vGoalPos )
+{
+	if( !m_bUseSimplifiedRouteBuilding || GetBlockedStatus() >= BS_LITTLE )
+	{
+		// Do a simple trace, always do this for air units
+		trace_t tr;
+		CTraceFilterWorldOnly filter;
+		UTIL_TraceHull( GetAbsOrigin(), vGoalPos, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
+			&filter, &tr);
+		//UTIL_TraceHull(GetAbsOrigin()+Vector(0,0,16.0), vGoalPos+Vector(0,0,16.0), 
+		//	WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
+		if( tr.DidHit() && (!GetPath()->m_hTarget || !tr.m_pEnt || tr.m_pEnt != GetPath()->m_hTarget) )
+			return NULL;
+
+		NavDbgMsg("#%d BuildLocalPath: builded local route\n", GetOuter()->entindex());
+		return new UnitBaseWaypoint(vGoalPos);
+	}
+	else
+	{
+		NavDbgMsg("#%d BuildLocalPath: builded direct route\n", GetOuter()->entindex());
+		return new UnitBaseWaypoint(vGoalPos);
+	}
 }
