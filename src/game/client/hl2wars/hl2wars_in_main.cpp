@@ -186,6 +186,7 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 {
 	if( pSaveCurConfigTo )
 	{
+		filesystem->AsyncFinishAllWrites(); // Ensure we have the right config, because host_writeconfig uses async write
 		CUtlBuffer buf;
 		GetBindings("config.cfg", buf);
 		filesystem->WriteFile(VarArgs("cfg/%s", pSaveCurConfigTo), "MOD", buf);
@@ -207,6 +208,7 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 		}
 		engine->ExecuteClientCmd( VarArgs("exec %s\n", pSwitchToConfig) );
 		engine->ExecuteClientCmd( "host_writeconfig\n" ); // Writes it into config.cfg
+		
 	}
 }
 
