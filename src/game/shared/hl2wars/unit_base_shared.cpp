@@ -33,6 +33,12 @@ extern void	SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, flo
 ConVar unit_cheaphitboxtest("unit_cheaphitboxtest", "1", FCVAR_CHEAT|FCVAR_REPLICATED, "Enables/disables testing against hitboxes of an unit, regardless of whether they have hitboxes");
 ConVar unit_cheapshotsimulation("unit_cheapshotsimulation", "1", FCVAR_CHEAT|FCVAR_REPLICATED, "Enables/disables cheap shooting.");
 
+#ifdef CLIENT_DLL
+ConVar unit_debugfirebullets("cl_unit_debugfirebullets", "0", FCVAR_CHEAT, "");
+#else
+ConVar unit_debugfirebullets("unit_debugfirebullets", "0", FCVAR_CHEAT, "");
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -614,10 +620,16 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 
 		AI_TraceLine(info.m_vecSrc, vecEnd, MASK_SHOT, &traceFilter, &tr);
 
-		//Msg("Firing bullets. Ent: %d, IsSelf? %d, My own? %d, World? %d, Fraction: %f\n", tr.m_pEnt, tr.m_pEnt == this, 
-		//	tr.m_pEnt->GetOwnerNumber() == GetOwnerNumber(), tr.m_pEnt->IsWorld(), tr.fraction);
-		//NDebugOverlay::Line(info.m_vecSrc, vecEnd, 255, 0, 0, 255, 0.1f);
-		//NDebugOverlay::Line(info.m_vecSrc, tr.endpos, 0, 255, 0, 255, 0.1f);
+		if( unit_debugfirebullets.GetBool() )
+		{
+#ifdef CLIENT_DLL
+			NDebugOverlay::Line(info.m_vecSrc, vecEnd, 255, 0, 0, 255, 0.1f);
+			NDebugOverlay::Line(info.m_vecSrc, tr.endpos, 0, 255, 0, 255, 0.1f);
+#else
+			NDebugOverlay::Line(info.m_vecSrc, vecEnd, 255, 255, 0, 255, 0.1f);
+			NDebugOverlay::Line(info.m_vecSrc, tr.endpos, 0, 255, 255, 255, 0.1f);
+#endif // CLIENT_DLL
+		}
 
 		// Make sure given a valid bullet type
 		if (info.m_iAmmoType == -1)
