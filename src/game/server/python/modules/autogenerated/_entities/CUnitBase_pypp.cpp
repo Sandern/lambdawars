@@ -1927,6 +1927,16 @@ void register_CUnitBase_class(){
                 , ( bp::arg("vecSpot"), bp::arg("fMinDot")=9.94000017642974853515625e-1f ) );
         
         }
+        { //::CUnitBase::FastLOSCheck
+        
+            typedef bool ( ::CUnitBase::*FastLOSCheck_function_type )( ::Vector const & ) ;
+            
+            CUnitBase_exposer.def( 
+                "FastLOSCheck"
+                , FastLOSCheck_function_type( &::CUnitBase::FastLOSCheck )
+                , ( bp::arg("vTargetPos") ) );
+        
+        }
         { //::CUnitBase::FireBullets
         
             typedef void ( ::CUnitBase::*FireBullets_function_type )( ::FireBulletsInfo_t const & ) ;

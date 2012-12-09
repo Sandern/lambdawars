@@ -530,7 +530,7 @@ void UnitBaseLocomotion::AirMove( void )
 		// Apply hack
 		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
 		mv->origin = trace.endpos;
-		DevMsg("#%d Applying unstuck hack\n", m_pOuter->entindex());
+		DevMsg("#%d Applying unstuck hack at position %f %f %f\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z);
 	}
 
 	trace_t pm;

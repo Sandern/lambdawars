@@ -427,6 +427,9 @@ public:
 	// Override avoidance behavior
 	bool m_bNoAvoid;
 
+	// Override move in path direction behavior
+	bool m_bNoPathVelocity;
+
 protected:
 	CheckGoalStatus_t m_LastGoalStatus;
 

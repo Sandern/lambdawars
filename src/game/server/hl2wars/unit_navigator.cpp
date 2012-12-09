@@ -191,8 +191,9 @@ void UnitBaseNavigator::Reset()
 		DevMsg( "#%d UnitNavigator: reset status\n", m_pOuter->entindex());
 
 	m_LastGoalStatus = CHS_NOGOAL;
-	m_vForceGoalVelocity = vec3_origin;
+	m_vForceGoalVelocity.Invalidate();
 	m_fGoalDistance = -1;
+	m_bNoPathVelocity = false;
 
 	m_vLastWishVelocity.Init(0, 0, 0);
 
@@ -270,7 +271,7 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	CheckGoalStatus_t GoalStatus;
 
 	// Allow the AI to override the desired goal velocity
-	if( m_vForceGoalVelocity != vec3_origin )
+	if( m_vForceGoalVelocity.IsValid() )
 	{
 		vPathDir = m_vForceGoalVelocity;
 		fGoalDist = VectorNormalize( vPathDir ) + 1000.0f;
@@ -846,7 +847,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	m_fLastComputedDensity = fDensity;
 
 	// Compute path speed
-	if( GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
+	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
 		float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
 		// TODO: If we are very close to the waypoint, should we always go to the waypoint?
 		if( (fGoalDist-MoveCommand.stopdistance) <= fMaxTravelDist /*&& GetPath()->CurWaypointIsGoal()*/ )
@@ -1732,7 +1733,7 @@ void UnitBaseNavigator::UpdateBlockedStatus()
 	//		  * Not moving from our position. Either real stuck or we think we can't move
 	// UNDONE * Detect moving back and forth between two positions
 	//		    Something like that should also be classified as stuck
-	if( m_LastGoalStatus == CHS_HASGOAL && 
+	if( !m_bNoPathVelocity && m_LastGoalStatus == CHS_HASGOAL && 
 		(m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0 )
 	{
 		if( m_BlockedStatus == BS_NONE )

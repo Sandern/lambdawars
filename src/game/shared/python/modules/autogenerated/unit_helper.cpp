@@ -5140,6 +5140,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
         UnitBaseNavigator_exposer.def_readwrite( "noavoid", &UnitBaseNavigator::m_bNoAvoid );
+        UnitBaseNavigator_exposer.def_readwrite( "nopathvelocity", &UnitBaseNavigator::m_bNoPathVelocity );
         UnitBaseNavigator_exposer.def_readwrite( "facingcone", &UnitBaseNavigator::m_fFacingCone );
         UnitBaseNavigator_exposer.def_readwrite( "idealyawtolerance", &UnitBaseNavigator::m_fIdealYawTolerance );
         UnitBaseNavigator_exposer.def_readwrite( "forcegoalvelocity", &UnitBaseNavigator::m_vForceGoalVelocity );
@@ -5521,15 +5522,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::UnitBaseSense::GetTestLOS
-        
-            typedef bool ( ::UnitBaseSense::*GetTestLOS_function_type )(  ) ;
-            
-            UnitBaseSense_exposer.def( 
-                "GetTestLOS"
-                , GetTestLOS_function_type( &::UnitBaseSense::GetTestLOS ) );
-        
-        }
         { //::UnitBaseSense::Look
         
             typedef void ( ::UnitBaseSense::*Look_function_type )( int ) ;
@@ -5587,16 +5579,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "GetOthers"
                 , GetOthers_function_type( &::UnitBaseSense::PyGetOthers )
                 , ( bp::arg("unittype")=bp::object() ) );
-        
-        }
-        { //::UnitBaseSense::SetTestLOS
-        
-            typedef void ( ::UnitBaseSense::*SetTestLOS_function_type )( bool ) ;
-            
-            UnitBaseSense_exposer.def( 
-                "SetTestLOS"
-                , SetTestLOS_function_type( &::UnitBaseSense::SetTestLOS )
-                , ( bp::arg("bTestLOS") ) );
         
         }
         { //::UnitBaseSense::SetUseLimitedViewCone

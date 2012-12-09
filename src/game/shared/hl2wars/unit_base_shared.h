@@ -278,6 +278,8 @@ public:
 	void				SetAttackLOSMask( int iMask ) { m_iAttackLOSMask = iMask; }
 	int					GetAttackLOSMask() { return m_iAttackLOSMask; }
 
+	bool				FastLOSCheck( const Vector &vTargetPos );
+
 	// Navigator
 #ifndef DISABLE_PYTHON
 	boost::python::object PyGetNavigator();
@@ -556,6 +558,14 @@ inline boost::python::object CUnitBase::PyGetExpresser()
 }
 */
 
+inline bool CUnitBase::FastLOSCheck( const Vector &vTargetPos )
+{
+	CTraceFilterWorldOnly filter;
+	trace_t tr;
+	UTIL_TraceHull( GetAbsOrigin(), vTargetPos, WorldAlignMins(), WorldAlignMaxs(), m_iAttackLOSMask, 
+		&filter, &tr);
+	return !tr.DidHit();
+}
 
 #endif // CLIENT_DLL
 

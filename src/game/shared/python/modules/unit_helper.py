@@ -212,6 +212,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_vForceGoalVelocity').rename('forcegoalvelocity')
         
         cls.var('m_bNoAvoid').rename('noavoid')
+        cls.var('m_bNoPathVelocity').rename('nopathvelocity')
         
         # Path class
         cls = mb.class_('UnitBasePath')
@@ -278,6 +279,8 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.vars('m_fSenseDistance').rename('sensedistance')
         cls.vars('m_fSenseRate').rename('senserate')
         
+        cls.mem_funs('GetTestLOS').exclude()
+        cls.mem_funs('SetTestLOS').exclude()
         cls.add_property( 'testlos'
                          , cls.mem_fun('GetTestLOS')
                          , cls.mem_fun('SetTestLOS') )
