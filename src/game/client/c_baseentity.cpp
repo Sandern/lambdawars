@@ -6580,20 +6580,28 @@ Vector &CBaseEntity::GetTeamColor( void )
 			if( !pPlayer )
 				return m_vTeamColor;
 
-			Disposition_t d = GetPlayerRelationShip( pPlayer->GetOwnerNumber(), GetOwnerNumber() );
-
-			switch( d )
+			if( pPlayer->GetOwnerNumber() == GetOwnerNumber() )
 			{
-			case D_HT:
-				m_vTargetTeamColor = Vector(1, 0, 0);
-				break;
-			case D_LI:
+				// Our own units are green
 				m_vTargetTeamColor = Vector(0, 1, 0);
-				break;
-			case D_NU:
-			default:
-				m_vTargetTeamColor = Vector(0.2, 0.2, 0.2);
-				break;
+			}
+			else
+			{
+				// Enemies are red, allies yellow and neutral grey
+				Disposition_t d = GetPlayerRelationShip( pPlayer->GetOwnerNumber(), GetOwnerNumber() );
+				switch( d )
+				{
+				case D_HT:
+					m_vTargetTeamColor = Vector(1, 0, 0);
+					break;
+				case D_LI:
+					m_vTargetTeamColor = Vector(1, 1, 0);
+					break;
+				case D_NU:
+				default:
+					m_vTargetTeamColor = Vector(0.2, 0.2, 0.2);
+					break;
+				}
 			}
 		}
 		else
