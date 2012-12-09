@@ -41,6 +41,7 @@ public:
 
 	virtual void CycleToNextWeapon( void );
 	virtual void CycleToPrevWeapon( void );
+	virtual void SwitchToLastWeapon( void );
 
 	virtual void SelectSlot( int iSlot );
 
@@ -115,6 +116,7 @@ private:
 
 	bool m_bFadingOut;
 
+	int m_iLastSelectedSlot;
 	int m_iSlotDoublePressedTime;
 	float m_flLastKeyPressedTime;
 	int m_iSlotDoublePressed;
@@ -132,6 +134,7 @@ CHudWeaponSelection::CHudWeaponSelection( const char *pElementName ) : CBaseHudW
 	vgui::Panel *pParent = GetClientMode()->GetViewport();
 	SetParent( pParent );
 	m_bFadingOut = false;
+	m_iLastSelectedSlot = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -164,6 +167,9 @@ void CHudWeaponSelection::SelectSlot( int iSlot )
 	}
 
 	iSlot--;
+
+	iSlot = MAX( 0, MIN( iSlot, 10 ) ); // Make sure the slot is within valid range
+
 	if( pPlayer->m_nButtons & IN_SPEED )
 	{
 		pPlayer->MakeCurrentSelectionGroup( iSlot, false );
@@ -176,6 +182,7 @@ void CHudWeaponSelection::SelectSlot( int iSlot )
 	}
 	else 
 	{
+		m_iLastSelectedSlot = iSlot;
 		pPlayer->SelectGroup( iSlot );
 		engine->ServerCmd( VarArgs( "select_group %d", iSlot ) );
 	}
@@ -590,7 +597,7 @@ C_BaseCombatWeapon *CHudWeaponSelection::FindNextWeaponInWeaponSelection(int iCu
 //-----------------------------------------------------------------------------
 C_BaseCombatWeapon *CHudWeaponSelection::FindPrevWeaponInWeaponSelection(int iCurrentSlot, int iCurrentPosition)
 {
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if ( !pPlayer )
 		return NULL;
 
@@ -632,9 +639,15 @@ C_BaseCombatWeapon *CHudWeaponSelection::FindPrevWeaponInWeaponSelection(int iCu
 void CHudWeaponSelection::CycleToNextWeapon( void )
 {
 	// Get the local player.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if ( !pPlayer )
 		return;
+
+	if( pPlayer->IsStrategicModeOn() )
+	{
+		SelectSlot( m_iLastSelectedSlot + 1 );
+		return;
+	}
 
 	C_BaseCombatWeapon *pNextWeapon = NULL;
 	if ( IsInSelectionMode() )
@@ -682,9 +695,15 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 void CHudWeaponSelection::CycleToPrevWeapon( void )
 {
 	// Get the local player.
-	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if ( !pPlayer )
 		return;
+
+	if( pPlayer->IsStrategicModeOn() )
+	{
+		SelectSlot( m_iLastSelectedSlot - 1 );
+		return;
+	}
 
 	C_BaseCombatWeapon *pNextWeapon = NULL;
 	if ( IsInSelectionMode() )
@@ -724,6 +743,25 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		// Play the "cycle to next weapon" sound
 		pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Moves the selection to the previous item in the menu
+//-----------------------------------------------------------------------------
+void CHudWeaponSelection::SwitchToLastWeapon( void )
+{
+	// Get the local player.
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if ( !pPlayer )
+		return;
+
+	if( pPlayer->IsStrategicModeOn() )
+	{
+		SelectSlot( m_iLastSelectedSlot );
+		return;
+	}
+
+	CBaseHudWeaponSelection::SwitchToLastWeapon();
 }
 
 //-----------------------------------------------------------------------------

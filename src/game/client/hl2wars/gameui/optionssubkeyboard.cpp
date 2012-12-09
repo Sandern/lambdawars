@@ -191,11 +191,15 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 	else if( !stricmp(command, "#GameUI_RTS") )
 	{
 		engine->ExecuteClientCmd("cl_active_config config_rts;");
+		ParseActionDescriptions();
+		InvalidateLayout(true);
 		OnResetData();
 	}
 	else if( !stricmp(command, "#GameUI_FPS") )
 	{
 		engine->ExecuteClientCmd("cl_active_config config_fps;");
+		ParseActionDescriptions();
+		InvalidateLayout(true);
 		OnResetData();
 	}
 	else
@@ -244,8 +248,17 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 
 	// Load the default keys list
 	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
-	if ( !g_pFullFileSystem->ReadFile( "scripts/kb_act.lst", NULL, buf ) )
+
+	char kb_act_config[MAX_PATH];
+	Q_snprintf( kb_act_config, MAX_PATH, "scripts/kb_act_%s.lst", cl_active_config.GetString());
+
+	// Try read the config specific kb_act file first, otherwise fall back to default
+	if ( !g_pFullFileSystem->ReadFile( kb_act_config, NULL, buf ) && !g_pFullFileSystem->ReadFile( "scripts/kb_act.lst", NULL, buf ) )
 		return;
+
+	// Clear previous bind list
+	m_pKeyBindList->RemoveAllSections();
+	m_pKeyBindList->RemoveAll();
 
 	const char *data = (const char*)buf.Base();
 
