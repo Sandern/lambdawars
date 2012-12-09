@@ -185,6 +185,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.mem_fun('SetGoalTargetInRange').include()
         cls.mem_fun('SetVectorGoal').include()
         cls.mem_fun('UpdateGoalInRange').include()
+        cls.mem_fun('UpdateGoalTarget').include()
         cls.mem_fun('GetGoalDistance').include()
         cls.mem_fun('DrawDebugRouteOverlay').include()
         cls.mem_fun('DrawDebugInfo').include()
@@ -228,6 +229,8 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_fMaxRange').rename('maxrange')
         cls.var('m_hTarget').exclude()
         cls.var('m_bAvoidEnemies').rename('avoidenemies')
+        cls.var('m_fMaxMoveDist').rename('maxmovedist')
+        cls.var('m_vStartPosition').rename('startposition')
         
         mb.enum('UnitGoalFlags').include()
         

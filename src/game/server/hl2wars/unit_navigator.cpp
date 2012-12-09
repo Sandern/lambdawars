@@ -1091,6 +1091,17 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		}
 	}
 
+	// Check distance we moved. Might have a max distance we may move to a target
+	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->m_fMaxMoveDist != 0 )
+	{
+		if( GetPath()->m_fMaxMoveDist < (GetPath()->m_vStartPosition - GetAbsOrigin()).Length2D() )
+		{
+			if( unit_navigator_debug.GetBool() )
+				DevMsg("#%d UnitNavigator: max move distance exceeded\n", GetOuter()->entindex());
+			return CHS_FAILED;
+		}
+	}
+
 	// Check if we bumped into our target goal. In that case we are done.
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
 	{
@@ -1840,16 +1851,46 @@ bool UnitBaseNavigator::SetVectorGoal( const Vector &dir, float targetDist, floa
 //-----------------------------------------------------------------------------
 // Purpose: Update In range path information
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::UpdateGoalInRange( float maxrange, float minrange )
+void UnitBaseNavigator::UpdateGoalInRange( float maxrange, float minrange, UnitBasePath *pPath )
 {
-	if( GetPath()->m_iGoalType != GOALTYPE_POSITION_INRANGE && GetPath()->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
+	if( !pPath ) 
+		pPath = GetPath();
+
+	if( pPath->m_iGoalType != GOALTYPE_POSITION_INRANGE && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
 	{
+#ifndef DISABLE_PYTHON
+		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalInRange: Invalid goal type" );
+		throw boost::python::error_already_set(); 
+#else
 		Warning("UnitBaseNavigator::UpdateGoalInRange: Invalid goal type\n");
+#endif // DISABLE_PYTHON
 		return;
 	}
 
-	GetPath()->m_fMaxRange = maxrange;
-	GetPath()->m_fMinRange = minrange;
+	pPath->m_fMaxRange = maxrange;
+	pPath->m_fMinRange = minrange;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Update path target information
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pPath )
+{
+	if( !pPath ) 
+		pPath = GetPath();
+
+	if( pPath->m_iGoalType != GOALTYPE_TARGETENT && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
+	{
+#ifndef DISABLE_PYTHON
+		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalTarget: Invalid goal type" );
+		throw boost::python::error_already_set(); 
+#else
+		Warning("UnitBaseNavigator::UpdateGoalTarget: Invalid goal type\n");
+#endif // DISABLE_PYTHON
+		return;
+	}
+
+	pPath->m_hTarget = pTarget;
 }
 
 //-----------------------------------------------------------------------------
@@ -1960,6 +2001,7 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 
 	m_LastGoalStatus = CHS_HASGOAL;
 
+	GetPath()->m_vStartPosition = GetAbsOrigin();
 	GetPath()->m_iGoalType = goaltype;
 	GetPath()->m_vGoalPos = vDestination;
 	GetPath()->m_fGoalTolerance = fGoalTolerance;

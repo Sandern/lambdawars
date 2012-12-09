@@ -2487,7 +2487,7 @@ struct UnitBaseNavigator_wrapper : UnitBaseNavigator, bp::wrapper< UnitBaseNavig
         UnitBaseNavigator::Update( boost::ref(mv) );
     }
 
-    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f, ::UnitBasePath * path=0 ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
@@ -2499,22 +2499,52 @@ struct UnitBaseNavigator_wrapper : UnitBaseNavigator, bp::wrapper< UnitBaseNavig
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateGoalInRange( maxrange, minrange ) of Class: UnitBaseNavigator\n");
+            Msg("Calling UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) ) of Class: UnitBaseNavigator\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_UpdateGoalInRange = this->get_override( "UpdateGoalInRange" );
         if( func_UpdateGoalInRange.ptr() != Py_None )
             try {
-                func_UpdateGoalInRange( maxrange, minrange );
+                func_UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
             }
         else
-            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
     }
     
-    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
-        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f, ::UnitBasePath * path=0 ) {
+        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
+    }
+
+    virtual void UpdateGoalTarget( ::CBaseEntity * target, ::UnitBasePath * path=0 ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateGoalTarget: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateGoalTarget = this->get_override( "UpdateGoalTarget" );
+        if( func_UpdateGoalTarget.ptr() != Py_None )
+            try {
+                func_UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+            }
+        else
+            this->UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+    }
+    
+    void default_UpdateGoalTarget( ::CBaseEntity * target, ::UnitBasePath * path=0 ) {
+        UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
     }
 
     virtual void UpdateIdealAngles( ::UnitBaseMoveCommand & MoveCommand, ::Vector * pathdir=0 ) {
@@ -2918,7 +2948,7 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
         UnitBaseNavigator::StopMoving( );
     }
 
-    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
+    virtual void UpdateGoalInRange( float maxrange, float minrange=0.0f, ::UnitBasePath * path=0 ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
@@ -2930,22 +2960,52 @@ struct UnitBaseAirNavigator_wrapper : UnitBaseAirNavigator, bp::wrapper< UnitBas
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateGoalInRange( maxrange, minrange ) of Class: UnitBaseNavigator\n");
+            Msg("Calling UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) ) of Class: UnitBaseNavigator\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_UpdateGoalInRange = this->get_override( "UpdateGoalInRange" );
         if( func_UpdateGoalInRange.ptr() != Py_None )
             try {
-                func_UpdateGoalInRange( maxrange, minrange );
+                func_UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+                this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
             }
         else
-            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+            this->UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
     }
     
-    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f ) {
-        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange );
+    void default_UpdateGoalInRange( float maxrange, float minrange=0.0f, ::UnitBasePath * path=0 ) {
+        UnitBaseNavigator::UpdateGoalInRange( maxrange, minrange, boost::python::ptr(path) );
+    }
+
+    virtual void UpdateGoalTarget( ::CBaseEntity * target, ::UnitBasePath * path=0 ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateGoalTarget: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) ) of Class: UnitBaseNavigator\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateGoalTarget = this->get_override( "UpdateGoalTarget" );
+        if( func_UpdateGoalTarget.ptr() != Py_None )
+            try {
+                func_UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+            }
+        else
+            this->UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
+    }
+    
+    void default_UpdateGoalTarget( ::CBaseEntity * target, ::UnitBasePath * path=0 ) {
+        UnitBaseNavigator::UpdateGoalTarget( boost::python::ptr(target), boost::python::ptr(path) );
     }
 
     virtual void UpdateIdealAngles( ::UnitBaseMoveCommand & MoveCommand, ::Vector * pathdir=0 ) {
@@ -4851,6 +4911,32 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
+    bp::class_< UnitBasePath >( "UnitBasePath", bp::init< >() )    
+        .def( bp::init< UnitBasePath const & >(( bp::arg("src") )) )    
+        .def( 
+            "Advance"
+            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Advance ) )    
+        .def( 
+            "Clear"
+            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Clear ) )    
+        .def( 
+            "CurWaypointIsGoal"
+            , (bool ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::CurWaypointIsGoal ) )    
+        .def( 
+            "GetToleranceCurWaypoint"
+            , (float ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::GetToleranceCurWaypoint ) )    
+        .def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies )    
+        .def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance )    
+        .def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist )    
+        .def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange )    
+        .def_readwrite( "minrange", &UnitBasePath::m_fMinRange )    
+        .def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags )    
+        .def_readwrite( "goaltype", &UnitBasePath::m_iGoalType )    
+        .def_readwrite( "goalinrangepos", &UnitBasePath::m_vGoalInRangePos )    
+        .def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos )    
+        .def_readwrite( "startposition", &UnitBasePath::m_vStartPosition )    
+        .def_readwrite( "waypointtolerance", &UnitBasePath::m_waypointTolerance );
+
     { //::UnitBaseNavigator
         typedef bp::class_< UnitBaseNavigator_wrapper, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseNavigator_exposer_t;
         UnitBaseNavigator_exposer_t UnitBaseNavigator_exposer = UnitBaseNavigator_exposer_t( "UnitBaseNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
@@ -5019,14 +5105,26 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseNavigator::UpdateGoalInRange
         
-            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float ) ;
-            typedef void ( UnitBaseNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float ) ;
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float,::UnitBasePath * ) ;
+            typedef void ( UnitBaseNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float,::UnitBasePath * ) ;
             
             UnitBaseNavigator_exposer.def( 
                 "UpdateGoalInRange"
                 , UpdateGoalInRange_function_type(&::UnitBaseNavigator::UpdateGoalInRange)
                 , default_UpdateGoalInRange_function_type(&UnitBaseNavigator_wrapper::default_UpdateGoalInRange)
-                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f ) );
+                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f, bp::arg("path")=bp::object() ) );
+        
+        }
+        { //::UnitBaseNavigator::UpdateGoalTarget
+        
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalTarget_function_type )( ::CBaseEntity *,::UnitBasePath * ) ;
+            typedef void ( UnitBaseNavigator_wrapper::*default_UpdateGoalTarget_function_type )( ::CBaseEntity *,::UnitBasePath * ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "UpdateGoalTarget"
+                , UpdateGoalTarget_function_type(&::UnitBaseNavigator::UpdateGoalTarget)
+                , default_UpdateGoalTarget_function_type(&UnitBaseNavigator_wrapper::default_UpdateGoalTarget)
+                , ( bp::arg("target"), bp::arg("path")=bp::object() ) );
         
         }
         { //::UnitBaseNavigator::UpdateIdealAngles
@@ -5241,14 +5339,26 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseNavigator::UpdateGoalInRange
         
-            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float ) ;
-            typedef void ( UnitBaseAirNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float ) ;
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalInRange_function_type )( float,float,::UnitBasePath * ) ;
+            typedef void ( UnitBaseAirNavigator_wrapper::*default_UpdateGoalInRange_function_type )( float,float,::UnitBasePath * ) ;
             
             UnitBaseAirNavigator_exposer.def( 
                 "UpdateGoalInRange"
                 , UpdateGoalInRange_function_type(&::UnitBaseNavigator::UpdateGoalInRange)
                 , default_UpdateGoalInRange_function_type(&UnitBaseAirNavigator_wrapper::default_UpdateGoalInRange)
-                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f ) );
+                , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f, bp::arg("path")=bp::object() ) );
+        
+        }
+        { //::UnitBaseNavigator::UpdateGoalTarget
+        
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalTarget_function_type )( ::CBaseEntity *,::UnitBasePath * ) ;
+            typedef void ( UnitBaseAirNavigator_wrapper::*default_UpdateGoalTarget_function_type )( ::CBaseEntity *,::UnitBasePath * ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "UpdateGoalTarget"
+                , UpdateGoalTarget_function_type(&::UnitBaseNavigator::UpdateGoalTarget)
+                , default_UpdateGoalTarget_function_type(&UnitBaseAirNavigator_wrapper::default_UpdateGoalTarget)
+                , ( bp::arg("target"), bp::arg("path")=bp::object() ) );
         
         }
         { //::UnitBaseNavigator::UpdateIdealAngles
@@ -5329,30 +5439,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
     }
-
-    bp::class_< UnitBasePath >( "UnitBasePath", bp::init< >() )    
-        .def( bp::init< UnitBasePath const & >(( bp::arg("src") )) )    
-        .def( 
-            "Advance"
-            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Advance ) )    
-        .def( 
-            "Clear"
-            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Clear ) )    
-        .def( 
-            "CurWaypointIsGoal"
-            , (bool ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::CurWaypointIsGoal ) )    
-        .def( 
-            "GetToleranceCurWaypoint"
-            , (float ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::GetToleranceCurWaypoint ) )    
-        .def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies )    
-        .def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance )    
-        .def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange )    
-        .def_readwrite( "minrange", &UnitBasePath::m_fMinRange )    
-        .def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags )    
-        .def_readwrite( "goaltype", &UnitBasePath::m_iGoalType )    
-        .def_readwrite( "goalinrangepos", &UnitBasePath::m_vGoalInRangePos )    
-        .def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos )    
-        .def_readwrite( "waypointtolerance", &UnitBasePath::m_waypointTolerance );
 
     { //::UnitBaseSense
         typedef bp::class_< UnitBaseSense, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseSense_exposer_t;

@@ -254,6 +254,7 @@ public:
 		m_iGoalFlags = 0;
 		m_hTarget = NULL;
 		m_bAvoidEnemies = true;
+		m_fMaxMoveDist = 0;
 		SetWaypoint(NULL);
 	}
 
@@ -300,6 +301,8 @@ public:
 	float m_fMinRange, m_fMaxRange;
 	EHANDLE m_hTarget;
 	bool m_bAvoidEnemies;
+	Vector m_vStartPosition;
+	float m_fMaxMoveDist;
 };
 
 #define CONSIDER_SIZE 48
@@ -373,7 +376,8 @@ public:
 	bool				SetVectorGoal( const Vector &dir, float targetDist, float minDist = 0, bool fShouldDeflect = false );
 	virtual bool		SetVectorGoalFromTarget( Vector &destination, float minDist, float goaltolerance=64.0f) { return SetGoal(destination, goaltolerance); }
 
-	virtual void		UpdateGoalInRange( float maxrange, float minrange=0.0f );
+	virtual void		UpdateGoalInRange( float maxrange, float minrange=0.0f, UnitBasePath *path = NULL );
+	virtual void		UpdateGoalTarget( CBaseEntity *target, UnitBasePath *path = NULL );
 	virtual void		UpdateGoalInfo( void );
 	virtual float		GetGoalDistance( void );
 
