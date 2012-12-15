@@ -35,6 +35,12 @@
 #include "inputsystem/iinputsystem.h"
 #include "gameui_util.h"
 
+#ifndef DISABLE_PYTHON
+	#include "cbase.h"
+	#include "igamesystem.h"
+	#include "src_python.h"
+#endif // DISABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -104,6 +110,14 @@ COptionsSubKeyboard::~COptionsSubKeyboard()
 	{
 		cl_active_config.SetValue( m_strActiveConfig );
 	}
+
+#ifndef DISABLE_PYTHON
+	// Setup dict for sending a signal
+	boost::python::dict kwargs;
+	kwargs["sender"] = boost::python::object();
+	boost::python::object signal = SrcPySystem()->Get( "clientconfigchanged", "core.signals", true );
+	SrcPySystem()->CallSignal( signal, kwargs );
+#endif // DISABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
