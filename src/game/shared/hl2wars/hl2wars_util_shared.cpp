@@ -14,6 +14,7 @@
 #ifndef DISABLE_PYTHON
 	#include "src_python_navmesh.h"
 #endif // DISABLE_PYTHON
+	#include "hl2wars_player.h"
 #else
 	#include "c_hl2wars_player.h"
 #endif // GAME_DLL
@@ -27,6 +28,25 @@
 LINK_ENTITY_TO_CLASS( env_sprite_clientside, CSprite );
 #endif
 #endif // HL2WARS_ASW_DLL
+
+void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players )
+{
+	for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+	{
+		CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( i ) );
+#ifdef CLIENT_DLL
+		if( !pPlayer )
+#else
+		if( !pPlayer || !pPlayer->IsConnected() )
+#endif // CLIENT_DLL
+			continue;
+
+		if( pPlayer->GetOwnerNumber() != ownernumber )
+			continue;
+
+		players.AddToTail( pPlayer );
+	}
+}
 
 void UTIL_FindPositionInRadius( positioninradius_t &info )
 {

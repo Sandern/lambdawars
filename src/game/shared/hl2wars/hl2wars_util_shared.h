@@ -12,6 +12,8 @@
 
 #include "unit_base_shared.h"
 
+void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players );
+
 struct positioninradius_t
 {
 	positioninradius_t( const Vector &startposition, const Vector &mins, const Vector &maxs, float radius, 

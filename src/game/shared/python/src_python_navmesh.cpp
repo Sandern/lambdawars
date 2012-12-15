@@ -396,6 +396,9 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 	fGoalArea = (maxs.x - mins.x) * (maxs.y - mins.y);
 	fArea = 0.0f;
 
+	if( !TheNavMesh->IsLoaded() )
+		return true;
+
 	// TODO: Use ForAllAreasOverlappingExtent?
 	FOR_EACH_VEC( TheNavAreas, it )
 	{

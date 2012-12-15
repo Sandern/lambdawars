@@ -88,6 +88,7 @@ class Entities(GenerateModuleSemiShared):
         'wars_weapon.h',
         'spark.h',
         'physics_prop_ragdoll.h',
+        'filters.h',
     ]
     
     def GetFiles(self):
@@ -152,6 +153,7 @@ class Entities(GenerateModuleSemiShared):
         'CBreakableProp',
         'CPhysicsProp',
         'CRagdollProp',
+        'CBaseFilter',
     ]
     
     def SetupProperty(self, mb, cls, pyname, gettername, settername):
@@ -282,7 +284,7 @@ class Entities(GenerateModuleSemiShared):
 
             # Check if the python class is networkable. Return the right serverclass.
             cls = mb.class_(cls_name)
-            if cls_name not in ['CPointEntity','CServerOnlyEntity', 'CServerOnlyPointEntity', 'CLogicalEntity', 'CFuncBrush']:
+            if cls_name not in ['CPointEntity','CServerOnlyEntity', 'CServerOnlyPointEntity', 'CLogicalEntity', 'CFuncBrush', 'CBaseFilter']:
                 cls.add_wrapper_code(   'virtual ServerClass* GetServerClass() {\r\n' + \
                                         '    #if defined(_WIN32)\r\n' + \
                                         '    #if defined(_DEBUG)\r\n' + \
@@ -1676,6 +1678,12 @@ class Entities(GenerateModuleSemiShared):
             mb.free_functions('CreateRagGib').call_policies = call_policies.return_value_policy( call_policies.return_by_value )    
             mb.mem_funs('GetSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value )    
             mb.mem_funs('GetFlame').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+        
+            # Base filter
+            cls = mb.class_('CBaseFilter')
+            cls.no_init = False
+            cls.mem_funs('PassesFilterImpl').virtuality = 'virtual' 
+            cls.mem_funs('PassesDamageFilterImpl').virtuality = 'virtual' 
         else:
             # C_PlayerResource
             mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
@@ -1696,7 +1704,7 @@ class Entities(GenerateModuleSemiShared):
         else:
             self.ParseServerEntities(mb)
         mb.mem_funs('GetPyNetworkType').include()
-        
+
         # Dead entity
         cls = mb.class_('DeadEntity')
         cls.include()
@@ -1756,7 +1764,9 @@ class Entities(GenerateModuleSemiShared):
         # Protected functions we do want:
         if self.isServer:
             mb.mem_funs('TraceAttack').include()
-    
+            mb.mem_funs('PassesFilterImpl').include()
+            mb.mem_funs('PassesDamageFilterImpl').include()
+            
         # //--------------------------------------------------------------------------------------------------------------------------------
         # Disable warning about classes that are redefined in a wrapper. Just a notification? 
         mb.classes().disable_warnings( messages.W1023 )

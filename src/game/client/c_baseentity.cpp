@@ -6599,7 +6599,7 @@ Vector &CBaseEntity::GetTeamColor( void )
 					break;
 				case D_NU:
 				default:
-					m_vTargetTeamColor = Vector(0.2, 0.2, 0.2);
+					m_vTargetTeamColor = Vector(0.6, 0.6, 0.6);
 					break;
 				}
 			}

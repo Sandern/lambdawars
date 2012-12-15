@@ -155,6 +155,11 @@ public:
 	virtual void					OnRightMouseButtonDoublePressed( const MouseTraceData_t &data );
 	virtual void					OnRightMouseButtonReleased( const MouseTraceData_t &data );	
 
+	//---------------------------------
+	// Inputs
+	//---------------------------------
+	void	InputSetCameraFollowEntity( inputdata_t &inputdata );
+
 	// Team Handling
 	//virtual void			ChangeTeam( int iTeamNum ) { ChangeTeam(iTeamNum,false, false); }
 	//virtual void			ChangeTeam( int iTeamNum, bool bAutoTeam, bool bSilent );

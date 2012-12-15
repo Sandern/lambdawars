@@ -50,47 +50,74 @@
 #include "src_python_converters_ents.h"
 #include "src_python.h"
 #include "tier0/memdbgon.h"
-#include "CServerOnlyPointEntity_pypp.hpp"
+#include "CBaseFilter_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CServerOnlyPointEntity > {
+struct CBaseFilter_wrapper : CBaseFilter, bp::wrapper< CBaseFilter > {
 
-    CServerOnlyPointEntity_wrapper()
-    : CServerOnlyPointEntity()
-      , bp::wrapper< CServerOnlyPointEntity >(){
-        // null constructor
-        
-    }
-
-    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
+    virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
         Assert( GetCurrentThreadId() == g_hPythonThreadID );
         #elif defined(PY_CHECKTHREADID)
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+            Error( "PassesDamageFilter: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
         #endif // _DEBUG/PY_CHECKTHREADID
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling KeyValue( szKeyName, szValue ) of Class: CServerOnlyPointEntity\n");
+            Msg("Calling PassesDamageFilter( boost::ref(info) ) of Class: CBaseFilter\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_KeyValue = this->get_override( "KeyValue" );
-        if( func_KeyValue.ptr() != Py_None )
+        bp::override func_PassesDamageFilter = this->get_override( "PassesDamageFilter" );
+        if( func_PassesDamageFilter.ptr() != Py_None )
             try {
-                return func_KeyValue( szKeyName, szValue );
+                return func_PassesDamageFilter( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CServerOnlyPointEntity::KeyValue( szKeyName, szValue );
+                return this->CBaseFilter::PassesDamageFilter( boost::ref(info) );
             }
         else
-            return this->CServerOnlyPointEntity::KeyValue( szKeyName, szValue );
+            return this->CBaseFilter::PassesDamageFilter( boost::ref(info) );
     }
     
-    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
-        return CServerOnlyPointEntity::KeyValue( szKeyName, szValue );
+    bool default_PassesDamageFilter( ::CTakeDamageInfo const & info ) {
+        return CBaseFilter::PassesDamageFilter( boost::ref(info) );
+    }
+
+    virtual bool PassesDamageFilterImpl( ::CTakeDamageInfo const & info ){
+        bp::override func_PassesDamageFilterImpl = this->get_override( "PassesDamageFilterImpl" );
+        if( func_PassesDamageFilterImpl.ptr() != Py_None )
+            try {
+                return func_PassesDamageFilterImpl( boost::ref(info) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseFilter::PassesDamageFilterImpl( boost::ref(info) );
+            }
+        else
+            return this->CBaseFilter::PassesDamageFilterImpl( boost::ref(info) );
+    }
+    
+    virtual bool default_PassesDamageFilterImpl( ::CTakeDamageInfo const & info ){
+        return CBaseFilter::PassesDamageFilterImpl( boost::ref(info) );
+    }
+
+    virtual bool PassesFilterImpl( ::CBaseEntity * pCaller, ::CBaseEntity * pEntity ){
+        bp::override func_PassesFilterImpl = this->get_override( "PassesFilterImpl" );
+        if( func_PassesFilterImpl.ptr() != Py_None )
+            try {
+                return func_PassesFilterImpl( boost::python::ptr(pCaller), boost::python::ptr(pEntity) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseFilter::PassesFilterImpl( boost::python::ptr(pCaller), boost::python::ptr(pEntity) );
+            }
+        else
+            return this->CBaseFilter::PassesFilterImpl( boost::python::ptr(pCaller), boost::python::ptr(pEntity) );
+    }
+    
+    virtual bool default_PassesFilterImpl( ::CBaseEntity * pCaller, ::CBaseEntity * pEntity ){
+        return CBaseFilter::PassesFilterImpl( boost::python::ptr(pCaller), boost::python::ptr(pEntity) );
     }
 
     virtual void Activate(  ) {
@@ -543,6 +570,36 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
         return CBaseEntity::KeyValue( szKeyName, boost::ref(vecValue) );
     }
 
+    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling KeyValue( szKeyName, szValue ) of Class: CLogicalEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_KeyValue = this->get_override( "KeyValue" );
+        if( func_KeyValue.ptr() != Py_None )
+            try {
+                return func_KeyValue( szKeyName, szValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CLogicalEntity::KeyValue( szKeyName, szValue );
+            }
+        else
+            return this->CLogicalEntity::KeyValue( szKeyName, szValue );
+    }
+    
+    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
+        return CLogicalEntity::KeyValue( szKeyName, szValue );
+    }
+
     virtual void MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -661,36 +718,6 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
     
     int default_OnTakeDamage( ::CTakeDamageInfo const & info ) {
         return CBaseEntity::OnTakeDamage( boost::ref(info) );
-    }
-
-    virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PassesDamageFilter: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PassesDamageFilter( boost::ref(info) ) of Class: CBaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_PassesDamageFilter = this->get_override( "PassesDamageFilter" );
-        if( func_PassesDamageFilter.ptr() != Py_None )
-            try {
-                return func_PassesDamageFilter( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseEntity::PassesDamageFilter( boost::ref(info) );
-            }
-        else
-            return this->CBaseEntity::PassesDamageFilter( boost::ref(info) );
-    }
-    
-    bool default_PassesDamageFilter( ::CTakeDamageInfo const & info ) {
-        return CBaseEntity::PassesDamageFilter( boost::ref(info) );
     }
 
     virtual void PostClientActive(  ) {
@@ -978,7 +1005,7 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
                 #endif // _WIN32
                 #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
                 if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CServerOnlyPointEntity\n");
+                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBaseFilter\n");
                 #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
                 bp::override func_TestCollision = this->get_override( "TestCollision" );
                 if( func_TestCollision.ptr() != Py_None )
@@ -986,392 +1013,435 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
                         return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
                     } catch(bp::error_already_set &) {
                         PyErr_Print();
-                        return this->CServerOnlyPointEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                        return this->CBaseFilter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
                     }
                 else
-                    return this->CServerOnlyPointEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                    return this->CBaseFilter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
             }
             
             bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CServerOnlyPointEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                return CBaseFilter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
             }
 
 };
 
-void register_CServerOnlyPointEntity_class(){
+void register_CBaseFilter_class(){
 
-    { //::CServerOnlyPointEntity
-        typedef bp::class_< CServerOnlyPointEntity_wrapper, bp::bases< CServerOnlyEntity >, boost::noncopyable > CServerOnlyPointEntity_exposer_t;
-        CServerOnlyPointEntity_exposer_t CServerOnlyPointEntity_exposer = CServerOnlyPointEntity_exposer_t( "CServerOnlyPointEntity" );
-        bp::scope CServerOnlyPointEntity_scope( CServerOnlyPointEntity_exposer );
-        { //::CServerOnlyPointEntity::KeyValue
+    { //::CBaseFilter
+        typedef bp::class_< CBaseFilter_wrapper, bp::bases< CLogicalEntity >, boost::noncopyable > CBaseFilter_exposer_t;
+        CBaseFilter_exposer_t CBaseFilter_exposer = CBaseFilter_exposer_t( "CBaseFilter" );
+        bp::scope CBaseFilter_scope( CBaseFilter_exposer );
+        { //::CBaseFilter::InputTestActivator
         
-            typedef bool ( ::CServerOnlyPointEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
+            typedef void ( ::CBaseFilter::*InputTestActivator_function_type )( ::inputdata_t & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CServerOnlyPointEntity::KeyValue)
-                , default_KeyValue_function_type(&CServerOnlyPointEntity_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
+            CBaseFilter_exposer.def( 
+                "InputTestActivator"
+                , InputTestActivator_function_type( &::CBaseFilter::InputTestActivator )
+                , ( bp::arg("inputdata") ) );
         
         }
+        { //::CBaseFilter::PassesDamageFilter
+        
+            typedef bool ( ::CBaseFilter::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
+            
+            CBaseFilter_exposer.def( 
+                "PassesDamageFilter"
+                , PassesDamageFilter_function_type(&::CBaseFilter::PassesDamageFilter)
+                , default_PassesDamageFilter_function_type(&CBaseFilter_wrapper::default_PassesDamageFilter)
+                , ( bp::arg("info") ) );
+        
+        }
+        { //::CBaseFilter::PassesDamageFilterImpl
+        
+            typedef bool ( CBaseFilter_wrapper::*PassesDamageFilterImpl_function_type )( ::CTakeDamageInfo const & ) ;
+            
+            CBaseFilter_exposer.def( 
+                "PassesDamageFilterImpl"
+                , PassesDamageFilterImpl_function_type( &CBaseFilter_wrapper::default_PassesDamageFilterImpl )
+                , ( bp::arg("info") ) );
+        
+        }
+        { //::CBaseFilter::PassesFilter
+        
+            typedef bool ( ::CBaseFilter::*PassesFilter_function_type )( ::CBaseEntity *,::CBaseEntity * ) ;
+            
+            CBaseFilter_exposer.def( 
+                "PassesFilter"
+                , PassesFilter_function_type( &::CBaseFilter::PassesFilter )
+                , ( bp::arg("pCaller"), bp::arg("pEntity") ) );
+        
+        }
+        { //::CBaseFilter::PassesFilterImpl
+        
+            typedef bool ( CBaseFilter_wrapper::*PassesFilterImpl_function_type )( ::CBaseEntity *,::CBaseEntity * ) ;
+            
+            CBaseFilter_exposer.def( 
+                "PassesFilterImpl"
+                , PassesFilterImpl_function_type( &CBaseFilter_wrapper::default_PassesFilterImpl )
+                , ( bp::arg("pCaller"), bp::arg("pEntity") ) );
+        
+        }
+        CBaseFilter_exposer.def_readwrite( "m_OnFail", &CBaseFilter::m_OnFail );
+        CBaseFilter_exposer.def_readwrite( "m_OnPass", &CBaseFilter::m_OnPass );
+        CBaseFilter_exposer.def_readwrite( "m_bNegated", &CBaseFilter::m_bNegated );
         { //::CBaseEntity::Activate
         
             typedef void ( ::CBaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_Activate_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_Activate_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "Activate"
                 , Activate_function_type(&::CBaseEntity::Activate)
-                , default_Activate_function_type(&CServerOnlyPointEntity_wrapper::default_Activate) );
+                , default_Activate_function_type(&CBaseFilter_wrapper::default_Activate) );
         
         }
         { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
         
             typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "ComputeWorldSpaceSurroundingBox"
                 , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CServerOnlyPointEntity_wrapper::default_ComputeWorldSpaceSurroundingBox)
+                , default_ComputeWorldSpaceSurroundingBox_function_type(&CBaseFilter_wrapper::default_ComputeWorldSpaceSurroundingBox)
                 , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
         
         }
         { //::CBaseEntity::CreateVPhysics
         
             typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_CreateVPhysics_function_type )(  ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_CreateVPhysics_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "CreateVPhysics"
                 , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CServerOnlyPointEntity_wrapper::default_CreateVPhysics) );
+                , default_CreateVPhysics_function_type(&CBaseFilter_wrapper::default_CreateVPhysics) );
         
         }
         { //::CBaseEntity::DeathNotice
         
             typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "DeathNotice"
                 , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CServerOnlyPointEntity_wrapper::default_DeathNotice)
+                , default_DeathNotice_function_type(&CBaseFilter_wrapper::default_DeathNotice)
                 , ( bp::arg("pVictim") ) );
         
         }
         { //::CBaseEntity::DoImpactEffect
         
             typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
+            typedef void ( CBaseFilter_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "DoImpactEffect"
                 , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CServerOnlyPointEntity_wrapper::default_DoImpactEffect)
+                , default_DoImpactEffect_function_type(&CBaseFilter_wrapper::default_DoImpactEffect)
                 , ( bp::arg("tr"), bp::arg("nDamageType") ) );
         
         }
         { //::CBaseEntity::DrawDebugGeometryOverlays
         
             typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "DrawDebugGeometryOverlays"
                 , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CServerOnlyPointEntity_wrapper::default_DrawDebugGeometryOverlays) );
+                , default_DrawDebugGeometryOverlays_function_type(&CBaseFilter_wrapper::default_DrawDebugGeometryOverlays) );
         
         }
         { //::CBaseEntity::DrawDebugTextOverlays
         
             typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CServerOnlyPointEntity_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
+            typedef int ( CBaseFilter_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "DrawDebugTextOverlays"
                 , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CServerOnlyPointEntity_wrapper::default_DrawDebugTextOverlays) );
+                , default_DrawDebugTextOverlays_function_type(&CBaseFilter_wrapper::default_DrawDebugTextOverlays) );
         
         }
         { //::CBaseEntity::EndTouch
         
             typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "EndTouch"
                 , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CServerOnlyPointEntity_wrapper::default_EndTouch)
+                , default_EndTouch_function_type(&CBaseFilter_wrapper::default_EndTouch)
                 , ( bp::arg("pOther") ) );
         
         }
         { //::CBaseEntity::Event_Killed
         
             typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef void ( CBaseFilter_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "Event_Killed"
                 , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CServerOnlyPointEntity_wrapper::default_Event_Killed)
+                , default_Event_Killed_function_type(&CBaseFilter_wrapper::default_Event_Killed)
                 , ( bp::arg("info") ) );
         
         }
         { //::CBaseEntity::Event_KilledOther
         
             typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
+            typedef void ( CBaseFilter_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "Event_KilledOther"
                 , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CServerOnlyPointEntity_wrapper::default_Event_KilledOther)
+                , default_Event_KilledOther_function_type(&CBaseFilter_wrapper::default_Event_KilledOther)
                 , ( bp::arg("pVictim"), bp::arg("info") ) );
         
         }
         { //::CBaseEntity::GetIMouse
         
             typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CServerOnlyPointEntity_wrapper::*default_GetIMouse_function_type )(  ) ;
+            typedef ::IMouse * ( CBaseFilter_wrapper::*default_GetIMouse_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "GetIMouse"
                 , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CServerOnlyPointEntity_wrapper::default_GetIMouse)
+                , default_GetIMouse_function_type(&CBaseFilter_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::CBaseEntity::GetTracerType
         
             typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CServerOnlyPointEntity_wrapper::*default_GetTracerType_function_type )(  ) ;
+            typedef char const * ( CBaseFilter_wrapper::*default_GetTracerType_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "GetTracerType"
                 , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CServerOnlyPointEntity_wrapper::default_GetTracerType) );
+                , default_GetTracerType_function_type(&CBaseFilter_wrapper::default_GetTracerType) );
         
         }
         { //::CBaseEntity::KeyValue
         
             typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CServerOnlyPointEntity_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&CBaseFilter_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
         
         }
         { //::CBaseEntity::KeyValue
         
             typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CServerOnlyPointEntity_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&CBaseFilter_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
         
         }
         { //::CBaseEntity::KeyValue
         
             typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CServerOnlyPointEntity_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&CBaseFilter_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
+        
+        }
+        { //::CLogicalEntity::KeyValue
+        
+            typedef bool ( ::CLogicalEntity::*KeyValue_function_type )( char const *,char const * ) ;
+            typedef bool ( CBaseFilter_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
+            
+            CBaseFilter_exposer.def( 
+                "KeyValue"
+                , KeyValue_function_type(&::CLogicalEntity::KeyValue)
+                , default_KeyValue_function_type(&CBaseFilter_wrapper::default_KeyValue)
+                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
         
         }
         { //::CBaseEntity::MakeTracer
         
             typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
+            typedef void ( CBaseFilter_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "MakeTracer"
                 , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CServerOnlyPointEntity_wrapper::default_MakeTracer)
+                , default_MakeTracer_function_type(&CBaseFilter_wrapper::default_MakeTracer)
                 , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
         
         }
         { //::CBaseEntity::ModifyOrAppendCriteria
         
             typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
+            typedef void ( CBaseFilter_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "ModifyOrAppendCriteria"
                 , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CServerOnlyPointEntity_wrapper::default_ModifyOrAppendCriteria)
+                , default_ModifyOrAppendCriteria_function_type(&CBaseFilter_wrapper::default_ModifyOrAppendCriteria)
                 , ( bp::arg("set") ) );
         
         }
         { //::CBaseEntity::OnChangeOwnerNumber
         
             typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
+            typedef void ( CBaseFilter_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "OnChangeOwnerNumber"
                 , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CServerOnlyPointEntity_wrapper::default_OnChangeOwnerNumber)
+                , default_OnChangeOwnerNumber_function_type(&CBaseFilter_wrapper::default_OnChangeOwnerNumber)
                 , ( bp::arg("old_owner_number") ) );
         
         }
         { //::CBaseEntity::OnTakeDamage
         
             typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CServerOnlyPointEntity_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef int ( CBaseFilter_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "OnTakeDamage"
                 , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CServerOnlyPointEntity_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CServerOnlyPointEntity_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CServerOnlyPointEntity_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CServerOnlyPointEntity_wrapper::default_PassesDamageFilter)
+                , default_OnTakeDamage_function_type(&CBaseFilter_wrapper::default_OnTakeDamage)
                 , ( bp::arg("info") ) );
         
         }
         { //::CBaseEntity::PostClientActive
         
             typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_PostClientActive_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_PostClientActive_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "PostClientActive"
                 , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CServerOnlyPointEntity_wrapper::default_PostClientActive) );
+                , default_PostClientActive_function_type(&CBaseFilter_wrapper::default_PostClientActive) );
         
         }
         { //::CBaseEntity::PostConstructor
         
             typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_PostConstructor_function_type )( char const * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_PostConstructor_function_type )( char const * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "PostConstructor"
                 , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CServerOnlyPointEntity_wrapper::default_PostConstructor)
+                , default_PostConstructor_function_type(&CBaseFilter_wrapper::default_PostConstructor)
                 , ( bp::arg("szClassname") ) );
         
         }
         { //::CBaseEntity::Precache
         
             typedef void ( ::CBaseEntity::*Precache_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_Precache_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_Precache_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "Precache"
                 , Precache_function_type(&::CBaseEntity::Precache)
-                , default_Precache_function_type(&CServerOnlyPointEntity_wrapper::default_Precache) );
+                , default_Precache_function_type(&CBaseFilter_wrapper::default_Precache) );
         
         }
         { //::CBaseEntity::Spawn
         
             typedef void ( ::CBaseEntity::*Spawn_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_Spawn_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_Spawn_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "Spawn"
                 , Spawn_function_type(&::CBaseEntity::Spawn)
-                , default_Spawn_function_type(&CServerOnlyPointEntity_wrapper::default_Spawn) );
+                , default_Spawn_function_type(&CBaseFilter_wrapper::default_Spawn) );
         
         }
         { //::CBaseEntity::StartTouch
         
             typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "StartTouch"
                 , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CServerOnlyPointEntity_wrapper::default_StartTouch)
+                , default_StartTouch_function_type(&CBaseFilter_wrapper::default_StartTouch)
                 , ( bp::arg("pOther") ) );
         
         }
         { //::CBaseEntity::StopLoopingSounds
         
             typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "StopLoopingSounds"
                 , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CServerOnlyPointEntity_wrapper::default_StopLoopingSounds) );
+                , default_StopLoopingSounds_function_type(&CBaseFilter_wrapper::default_StopLoopingSounds) );
         
         }
         { //::CBaseEntity::TraceAttack
         
-            typedef void ( CServerOnlyPointEntity_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
+            typedef void ( CBaseFilter_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "TraceAttack"
-                , TraceAttack_function_type( &CServerOnlyPointEntity_wrapper::TraceAttack )
+                , TraceAttack_function_type( &CBaseFilter_wrapper::TraceAttack )
                 , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
         
         }
         { //::CBaseEntity::UpdateOnRemove
         
             typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
+            typedef void ( CBaseFilter_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "UpdateOnRemove"
                 , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CServerOnlyPointEntity_wrapper::default_UpdateOnRemove) );
+                , default_UpdateOnRemove_function_type(&CBaseFilter_wrapper::default_UpdateOnRemove) );
         
         }
         { //::CBaseEntity::UpdateTransmitState
         
             typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CServerOnlyPointEntity_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
+            typedef int ( CBaseFilter_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "UpdateTransmitState"
                 , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CServerOnlyPointEntity_wrapper::default_UpdateTransmitState) );
+                , default_UpdateTransmitState_function_type(&CBaseFilter_wrapper::default_UpdateTransmitState) );
         
         }
         { //::CBaseEntity::VPhysicsCollision
         
             typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CServerOnlyPointEntity_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
+            typedef void ( CBaseFilter_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
             
-            CServerOnlyPointEntity_exposer.def( 
+            CBaseFilter_exposer.def( 
                 "VPhysicsCollision"
                 , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CServerOnlyPointEntity_wrapper::default_VPhysicsCollision)
+                , default_VPhysicsCollision_function_type(&CBaseFilter_wrapper::default_VPhysicsCollision)
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        { //::CServerOnlyPointEntity::TestCollision
+        { //::CBaseFilter::TestCollision
             
-                typedef bool ( ::CServerOnlyPointEntity::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CServerOnlyPointEntity_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
+                typedef bool ( ::CBaseFilter::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
+                typedef bool ( CBaseFilter_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
 
-                CServerOnlyPointEntity_exposer.def( 
+                CBaseFilter_exposer.def( 
                     "TestCollision"
-                    , TestCollision_function_type(&::CServerOnlyPointEntity::TestCollision)
-                    , default_TestCollision_function_type(&CServerOnlyPointEntity_wrapper::default_TestCollision)
+                    , TestCollision_function_type(&::CBaseFilter::TestCollision)
+                    , default_TestCollision_function_type(&CBaseFilter_wrapper::default_TestCollision)
                     , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
 
             }

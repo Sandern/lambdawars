@@ -641,6 +641,13 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 	DispatchUpdateTransmitState();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CHL2WarsPlayer::InputSetCameraFollowEntity( inputdata_t &inputdata )
+{
+
+}
 
 //-----------------------------------------------------------------------------
 // Purpose:

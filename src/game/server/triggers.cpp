@@ -370,18 +370,21 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 		{
 			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
 
-			if ( HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
+			if( pNPC )
 			{
-				if ( !pNPC || !pNPC->IsPlayerAlly() )
+				if ( HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
 				{
-					return false;
+					if ( !pNPC->IsPlayerAlly() )
+					{
+						return false;
+					}
 				}
-			}
 
-			if ( HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
-			{
-				if ( !pNPC || !pNPC->IsInAVehicle() )
-					return false;
+				if ( HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
+				{
+					if ( !pNPC->IsInAVehicle() )
+						return false;
+				}
 			}
 		}
 

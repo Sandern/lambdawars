@@ -12,6 +12,7 @@
 #endif
 
 #include <boost/python.hpp>
+#include <set>
 
 namespace bp = boost::python;
 
@@ -85,6 +86,10 @@ public:
 
 private:
 	bp::dict m_dataInternal;
+
+#if 0
+	std::set<bp::object> m_changedKeys;
+#endif // 0
 };
 
 void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict );

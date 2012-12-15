@@ -33,6 +33,7 @@
 #include "wars_weapon.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
+#include "filters.h"
 #include "shared_classnames.h"
 #include "npcevent.h"
 #include "studio.h"

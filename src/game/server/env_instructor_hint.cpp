@@ -14,6 +14,11 @@
 	#include "asw_player.h"
 #endif
 
+#ifdef HL2WARS_DLL
+	#include "hl2wars_player.h"
+	#include "hl2wars_util_shared.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -121,6 +126,22 @@ void CEnvInstructorHint::InputShowHint( inputdata_t &inputdata )
 		{
 			pActivator = pMarine->GetCommander();
 		}
+#elif HL2WARS_DLL
+		CUtlVector< CHL2WarsPlayer * > players;
+		if( inputdata.pActivator )
+		{
+			UTIL_ListPlayersForOwnerNumber( inputdata.pActivator->GetOwnerNumber(), players );
+		}
+
+		if( !pActivator && inputdata.value.StringID() != NULL_STRING )
+		{
+			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, inputdata.value.String() );
+			pActivator = dynamic_cast<CBasePlayer*>( pTarget );
+			if ( pActivator )
+			{
+				bFilterByActivator = true;
+			}
+		}
 #else
 		if ( inputdata.value.StringID() != NULL_STRING )
 		{
@@ -170,7 +191,22 @@ void CEnvInstructorHint::InputShowHint( inputdata_t &inputdata )
 		event->SetBool( "hint_forcecaption", m_bForceCaption );
 		event->SetBool( "hint_local_player_only", bFilterByActivator );
 
-		gameeventmanager->FireEvent( event );
+#ifdef HL2WARS_DLL
+		if( !pActivator && players.Count() > 0 )
+		{
+			for( int i = 0; i < players.Count(); i++ )
+			{
+				if( !players[i] )
+					continue;
+				event->SetInt( "hint_activator_userid", players[i]->GetUserID() );
+				gameeventmanager->FireEvent( event );
+			}
+		}
+		else
+		{
+			gameeventmanager->FireEvent( event );
+		}
+#endif // HL2WARS_DLL
 	}
 }
 

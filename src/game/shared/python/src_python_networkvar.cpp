@@ -217,6 +217,9 @@ void CPythonNetworkDict::SetItem( bp::object key, bp::object data )
 		PyErr_Clear();
 	}
 
+#if 0
+	m_changedKeys.insert(key);
+#endif // 0
 	m_dataInternal[key] = data;
 	NetworkStateChanged();
 }
@@ -236,27 +239,40 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 {
 	bp::object type = __builtin__.attr("type");
 
-	// Parse list
+	// Create write list
+	// TODO: Only write changed keys if possible
 	unsigned long length = 0;
 	CUtlVector<pywrite> writelist;
 	try {
 
-		bp::object objectKey, objectValue;
-		const bp::object objectKeys = m_dataInternal.iterkeys();
-		const bp::object objectValues = m_dataInternal.itervalues();
-		length = bp::len(m_dataInternal); 
-		for( unsigned long u = 0; u < length; u++ )
+#if 0
+		if( m_changedKeys.size() > 0 )
 		{
-			objectKey = objectKeys.attr( "next" )();
-			objectValue = objectValues.attr( "next" )();
+			// Send changed keys
 
-			pywrite write;
-			PyFillWriteElement(write, objectKey, type );
-			writelist.AddToTail(write);
 
-			pywrite write2;
-			PyFillWriteElement(write2, objectValue, type );
-			writelist.AddToTail(write2);
+			m_changedKeys.clear();
+		}
+		else
+#endif // 0
+		{
+			bp::object objectKey, objectValue;
+			const bp::object objectKeys = m_dataInternal.iterkeys();
+			const bp::object objectValues = m_dataInternal.itervalues();
+			length = bp::len(m_dataInternal); 
+			for( unsigned long u = 0; u < length; u++ )
+			{
+				objectKey = objectKeys.attr( "next" )();
+				objectValue = objectValues.attr( "next" )();
+
+				pywrite write;
+				PyFillWriteElement(write, objectKey, type );
+				writelist.AddToTail(write);
+
+				pywrite write2;
+				PyFillWriteElement(write2, objectValue, type );
+				writelist.AddToTail(write2);
+			}
 		}
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
@@ -264,6 +280,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 		return;
 	}
 
+	// Send message
 	CRecipientFilter filter;
 	filter.MakeReliable();
 	filter.AddRecipient(iClient);

@@ -4647,14 +4647,13 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 					DrawInputOverlay(szInputName,pCaller,Value);
 				}
 
-				/*
-				// TODO?
 				// convert the value if necessary
-				if ( Value.FieldType() != dmap->dataDesc[i].fieldType )
+				fieldtype_t fieldtype = bp::extract< fieldtype_t >( inputmethod.attr("fieldtype") );
+				if ( Value.FieldType() != fieldtype )
 				{
-					if ( !(Value.FieldType() == FIELD_VOID && dmap->dataDesc[i].fieldType == FIELD_STRING) ) // allow empty strings
+					if ( !(Value.FieldType() == FIELD_VOID && fieldtype == FIELD_STRING) ) // allow empty strings
 					{
-						if ( !Value.Convert( (fieldtype_t)dmap->dataDesc[i].fieldType ) )
+						if ( !Value.Convert( fieldtype ) )
 						{
 							// bad conversion
 							Warning( "!! ERROR: bad input/output link:\n!! %s(%s,%s) doesn't match type from %s(%s)\n", 
@@ -4665,7 +4664,6 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 						}
 					}
 				}
-				*/
 
 				// Package the data into a struct for passing to the input handler.
 				inputdata_t data;

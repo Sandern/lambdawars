@@ -32,6 +32,7 @@
 #include "wars_weapon.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
+#include "filters.h"
 #include "shared_classnames.h"
 #include "npcevent.h"
 #include "studio.h"
@@ -1957,6 +1958,16 @@ void register_CHL2WarsPlayer_class(){
                 , GetUnit_function_type( &::CHL2WarsPlayer::GetUnit )
                 , ( bp::arg("idx") )
                 , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CHL2WarsPlayer::InputSetCameraFollowEntity
+        
+            typedef void ( ::CHL2WarsPlayer::*InputSetCameraFollowEntity_function_type )( ::inputdata_t & ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "InputSetCameraFollowEntity"
+                , InputSetCameraFollowEntity_function_type( &::CHL2WarsPlayer::InputSetCameraFollowEntity )
+                , ( bp::arg("inputdata") ) );
         
         }
         { //::CHL2WarsPlayer::IsActiveAbility

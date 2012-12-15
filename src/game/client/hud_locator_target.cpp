@@ -64,7 +64,11 @@ ConVar locator_lerp_time( "locator_lerp_time", "1.75f", FCVAR_NONE, "Number of s
 ConVar locator_pulse_time( "locator_pulse_time", "1.0f", FCVAR_NONE, "Number of seconds to pulse after changing icon or position" );
 ConVar locator_start_at_crosshair( "locator_start_at_crosshair", "0", FCVAR_NONE, "Start position at the crosshair instead of the top middle of the screen." );
 
-ConVar locator_topdown_style( "locator_topdown_style", "0", FCVAR_NONE, "Topdown games set this to handle distance and offscreen location differently." );
+#ifdef HL2WARS_DLL
+	ConVar locator_topdown_style( "locator_topdown_style", "1", FCVAR_NONE, "Topdown games set this to handle distance and offscreen location differently." );
+#else
+	ConVar locator_topdown_style( "locator_topdown_style", "0", FCVAR_NONE, "Topdown games set this to handle distance and offscreen location differently." );
+#endif // HL2WARS_DLL
 
 ConVar locator_background_style( "locator_background_style", "0", FCVAR_NONE, "Setting this to 1 will show rectangle backgrounds behind the items word-bubble pointers." );
 ConVar locator_background_color( "locator_background_color", "255 255 255 5", FCVAR_NONE, "The default color for the background." );
