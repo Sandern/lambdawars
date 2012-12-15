@@ -118,6 +118,16 @@ void CHL2WarsInput::Init_All( void )
 	BuildWindowList();
 }
 
+void CHL2WarsInput::Shutdown_All( void )
+{
+	CInput::Shutdown_All();
+
+	char config[MAX_PATH];
+	Q_snprintf( config, MAX_PATH, "%s.cfg", cl_active_config.GetString());
+
+	SwitchConfig( config, NULL, NULL );
+}
+
 void CHL2WarsInput::LevelInit( void )
 {
 	CInput::LevelInit();
@@ -190,6 +200,7 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 		CUtlBuffer buf;
 		GetBindings("config.cfg", buf);
 		filesystem->WriteFile(VarArgs("cfg/%s", pSaveCurConfigTo), "MOD", buf);
+		filesystem->AsyncFinishAllWrites(); // Make sure the current config is written away
 	}
 
 	if( pSwitchToConfig )

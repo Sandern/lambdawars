@@ -27,8 +27,9 @@ public:
 							CHL2WarsInput( void );
 
 	virtual		void		Init_All( void );
+	virtual		void		Shutdown_All( void );
 
-	virtual void		LevelInit( void );
+	virtual		void		LevelInit( void );
 
 	virtual		void		CreateMove ( int sequence_number, float input_sample_frametime, bool active );
 	virtual		void		ExtraMouseSample( float frametime, bool active );
