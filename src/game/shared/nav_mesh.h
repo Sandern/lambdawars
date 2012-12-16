@@ -888,7 +888,6 @@ private:
 		FIND_EARLIEST_OCCUPY_TIMES,
 		FIND_LIGHT_INTENSITY,
 		COMPUTE_MESH_VISIBILITY,
-		COMPUTE_AREA_TOLERANCE,
 		CUSTOM,													// mod-specific generation step
 		SAVE_NAV_MESH,
 

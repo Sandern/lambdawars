@@ -32,9 +32,7 @@
 /// IMPORTANT: If this version changes, the swap function in makegamedata 
 /// must be updated to match. If not, this will break the Xbox 360.
 // TODO: Was changed from 15, update when latest 360 code is integrated (MSB 5/5/09)
-// HL2WARS: Updated to 17 for tolerance stuff.
-// HL2WARS: Updated to 18 for tolerance stuff
-const int NavCurrentVersion = 18;
+const int NavCurrentVersion = 19;
 
 //--------------------------------------------------------------------------------------------------------------
 //
@@ -399,13 +397,6 @@ void CNavArea::Save( CUtlBuffer &fileBuffer, unsigned int version ) const
 	// store area we inherit visibility from
 	unsigned int id = ( m_inheritVisibilityFrom.area ) ? m_inheritVisibilityFrom.area->GetID() : 0;
 	fileBuffer.PutUnsignedInt( id );
-
-	// store tolerance in directions
-	for( int d=0; d<NUM_DIRECTIONS; d++ )
-	{
-		fileBuffer.PutFloat( m_tolerance[d] );
-		fileBuffer.PutFloat( m_toleranceContiguous[d] );
-	}
 }
 
 
@@ -694,25 +685,18 @@ NavErrorType CNavArea::Load( CUtlBuffer &fileBuffer, unsigned int version, unsig
 	// read area from which we inherit visibility
 	m_inheritVisibilityFrom.id = fileBuffer.GetUnsignedInt();
 
-	if ( version < 17 )
-		return NAV_OK;
-
+	// Skip deprecated tolerance for version 17 and 18
 	if ( version == 17 )
 	{
-		// Load tolerance
-		for ( int i=0; i<NUM_DIRECTIONS; ++i )
-		{
-			m_tolerance[i] = fileBuffer.GetFloat();
-			m_toleranceContiguous[i] = m_tolerance[i];
-		}
+		for ( int i=0; i<NUM_DIRECTIONS; ++i ) 
+			fileBuffer.GetFloat();
 	}
-	else
+	else if( version == 18 )
 	{
-		// Load tolerance
-		for ( int i=0; i<NUM_DIRECTIONS; ++i )
+		for ( int i=0; i<NUM_DIRECTIONS; ++i ) 
 		{
-			m_tolerance[i] = fileBuffer.GetFloat();
-			m_toleranceContiguous[i] = fileBuffer.GetFloat();
+			fileBuffer.GetFloat();
+			fileBuffer.GetFloat();
 		}
 	}
 

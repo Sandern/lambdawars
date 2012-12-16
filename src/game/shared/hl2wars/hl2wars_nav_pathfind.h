@@ -39,8 +39,8 @@ public:
 		}
 
 		// Must fit in the nav area. Take surrounding area's in consideration
-		float fTolX = MIN(area->GetTolerance(WEST), area->GetTolerance(EAST)) + area->GetSizeX();
-		float fTolY =  MIN(area->GetTolerance(NORTH), area->GetTolerance(SOUTH)) + area->GetSizeY();
+		float fTolX = area->GetSizeX();
+		float fTolY =  area->GetSizeY();
 
 		if(m_fBoundingRadius > fTolX || m_fBoundingRadius > fTolY )
 		{

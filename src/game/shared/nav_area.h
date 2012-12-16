@@ -410,10 +410,6 @@ public:
 	float GetLightIntensity( float x, float y ) const;			// returns a 0..1 light intensity for the given point
 	float GetLightIntensity( void ) const;						// returns a 0..1 light intensity averaged over the whole area
 
-	//- Tolerance ----------------------------------------------------------------------------------------
-	float GetTolerance( NavDirType dir ) const;
-	float GetToleranceContiguous( NavDirType dir ) const;
-
 	//- A* pathfinding algorithm ------------------------------------------------------------------------
 	static void MakeNewMarker( void )	{ ++m_masterMarker; if (m_masterMarker == 0) m_masterMarker = 1; }
 	void Mark( void )					{ m_marker = m_masterMarker; }
@@ -454,7 +450,6 @@ public:
 	void DrawDragSelectionSet( Color &dragSelectionSetColor ) const;
 	void DrawConnectedAreas( void ) const;
 	void DrawHidingSpots( void ) const;
-	void DrawTolerance( void ) const;
 	bool SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha = NULL, CNavArea **outBeta = NULL );	// split this area into two areas at the given edge
 	bool MergeEdit( CNavArea *adj );							// merge this area and given adjacent area 
 	bool SpliceEdit( CNavArea *other );							// create a new area between this area and given area 
@@ -477,7 +472,6 @@ public:
 	virtual void ComputeEarliestOccupyTimes( void );
 	virtual void CustomAnalysis( bool isIncremental = false ) { }	// for game-specific analysis
 	virtual bool ComputeLighting( void );						// compute 0..1 light intensity at corners and center (requires client via listenserver)
-	virtual void ComputeTolerance( void );						// Compute tolerance
 	bool TestStairs( void );									// Test an area for being on stairs
 	virtual bool IsAbleToMergeWith( CNavArea *other ) const;
 #endif // CLIENT_DLL
@@ -716,10 +710,6 @@ private:
 
 	//- lighting ----------------------------------------------------------------------------------------
 	float m_lightIntensity[ NUM_CORNERS ];						// 0..1 light intensity at corners
-
-	//- tolerance ----------------------------------------------------------------------------------------
-	float m_tolerance[ NUM_DIRECTIONS ];						// Tolerance in all directions. For big units. Only uses connections to decide on tolerance.
-	float m_toleranceContiguous[ NUM_DIRECTIONS ];				// Tolerance in all directions. For big units. Same as above but also requires adjacent areas to be contiguous.
 
 	//- A* pathfinding algorithm ------------------------------------------------------------------------
 	static unsigned int m_masterMarker;

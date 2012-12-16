@@ -3882,7 +3882,7 @@ bool CNavMesh::UpdateGeneration( float maxTime )
 
 			if ( shouldSkipLightComputation )
 			{
-				m_generationState = COMPUTE_AREA_TOLERANCE;	// no light intensity calcs for incremental generation or dedicated servers
+				m_generationState = CUSTOM;	// no light intensity calcs for incremental generation or dedicated servers
 			}
 			else
 			{
@@ -3912,7 +3912,7 @@ bool CNavMesh::UpdateGeneration( float maxTime )
 			{
 				Msg( "Finding light intensity...DONE\n" );
 
-				m_generationState = COMPUTE_AREA_TOLERANCE;
+				m_generationState = CUSTOM;
 				m_generationIndex = 0;
 				return true;
 			}
@@ -3986,28 +3986,6 @@ bool CNavMesh::UpdateGeneration( float maxTime )
 			m_generationState = CUSTOM;
 			m_generationIndex = 0;
 			return true;
-		}
-
-		//---------------------------------------------------------------------------
-		case COMPUTE_AREA_TOLERANCE:
-		{
-			int i;
-			for( i = 0; i < 4; ++i )
-			{
-				while( m_generationIndex < TheNavAreas.Count() )
-				{
-					CNavArea *area = TheNavAreas[ m_generationIndex ];
-					++m_generationIndex;
-
-					area->ComputeTolerance();
-				}
-				m_generationIndex = 0;
-			}
-
-			Msg( "Computing area tolerance...DONE\n" );
-
-			m_generationState = CUSTOM;
-			m_generationIndex = 0;
 		}
 
 		//---------------------------------------------------------------------------

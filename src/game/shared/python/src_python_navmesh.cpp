@@ -301,24 +301,18 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 			ids.AddToTail(other->GetID());
 		}
 		//TheNavMesh->StripNavigationAreas();
-		//area->ComputeTolerance();
-		//other->ComputeTolerance();
 
 		if( area->SplitEdit( false, TheNavMesh->SnapToGrid(maxs.x, true), &area, &other ) )
 		{
 			ids.AddToTail(other->GetID());
 		}
 		//TheNavMesh->StripNavigationAreas();
-		//area->ComputeTolerance();
-		//other->ComputeTolerance();
 
 		if( area->SplitEdit( true, TheNavMesh->SnapToGrid(mins.y, true), &other, &area ) )
 		{
 			ids.AddToTail(other->GetID());
 		}
 		//TheNavMesh->StripNavigationAreas();
-		//area->ComputeTolerance();
-		//other->ComputeTolerance();
 
 		if( area->SplitEdit( true, TheNavMesh->SnapToGrid(maxs.y, true), &area, &other ) )
 		{
@@ -326,17 +320,7 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 		}
 		ids.AddToTail(area->GetID());
 		//TheNavMesh->StripNavigationAreas();
-		//area->ComputeTolerance();
-		//other->ComputeTolerance();
 	}
-
-#if 0
-	Msg("Split result.\n");
-	for( int i = 0; i < ids.Count(); i++ )
-	{
-		Msg("Split result id: %d\n", ids[i]);
-	}
-#endif // 0
 #endif // CLIENT_DLL
 }
 
@@ -346,8 +330,8 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 void SetAreasBlocked( bp::list areas, bool blocked )
 {
 #ifndef CLIENT_DLL
-	CNavArea *area, *adj;
-	int id, iCount, k, j;
+	CNavArea *area;
+	int id;
 	int length = boost::python::len(areas);
 	for(int i=0; i<length; i++)
 	{
@@ -359,20 +343,6 @@ void SetAreasBlocked( bp::list areas, bool blocked )
 				area->SetAttributes( area->GetAttributes()|NAV_MESH_NAV_BLOCKER );
 			else
 				area->SetAttributes( area->GetAttributes()&(~NAV_MESH_NAV_BLOCKER) );
-			
-			// Tell adjs to recompute tolerance
-			for( k = 0; k<NUM_DIRECTIONS; ++k )
-			{
-				NavDirType dir = (NavDirType)k;
-				iCount = area->GetAdjacentCount( dir );
-				for( j = 0; j < iCount; ++j )
-				{
-					adj = area->GetAdjacentArea( dir, j );
-					if( !adj )
-						continue;
-					adj->ComputeTolerance();
-				}
-			}
 		}
 	}
 #endif // CLIENT_DLL

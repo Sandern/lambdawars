@@ -62,7 +62,6 @@ ConVar nav_split_place_on_ground( "nav_split_place_on_ground", "0", FCVAR_CHEAT|
 ConVar nav_area_bgcolor( "nav_area_bgcolor", "0 0 0 30", FCVAR_CHEAT|FCVAR_REPLICATED, "RGBA color to draw as the background color for nav areas while editing." );
 ConVar nav_corner_adjust_adjacent( "nav_corner_adjust_adjacent", "18", FCVAR_CHEAT|FCVAR_REPLICATED, "radius used to raise/lower corners in nearby areas when raising/lowering corners." );
 ConVar nav_show_light_intensity( "nav_show_light_intensity", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
-ConVar nav_show_tolerance( "nav_show_tolerance", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
 ConVar nav_debug_blocked( "nav_debug_blocked", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
 ConVar nav_show_contiguous( "nav_show_continguous", "0", FCVAR_CHEAT|FCVAR_REPLICATED, "Highlight non-contiguous connections" );
 
@@ -241,12 +240,6 @@ CNavArea::CNavArea( void )
 	for ( i=0; i<NUM_CORNERS; ++i )
 	{
 		m_lightIntensity[i] = 1.0f;
-	}
-
-	for( i = 0; i<NUM_DIRECTIONS; ++i )
-	{
-		m_tolerance[i] = 0.0f;
-		m_toleranceContiguous[i] = 0.0f;
 	}
 
 	m_elevator = NULL;
@@ -2343,28 +2336,26 @@ void CNavArea::ComputeSemiPortal( const CNavArea *to, NavDirType dir, Vector *ce
 			center->y = m_seCorner.y;
 		}
 
-		float left = MAX( m_nwCorner.x - GetToleranceContiguous( WEST ), 
-			to->m_nwCorner.x - to->GetToleranceContiguous( WEST ) );
-		float right = MIN( m_seCorner.x + GetToleranceContiguous( EAST ), 
-			to->m_seCorner.x + to->GetToleranceContiguous( EAST ) );
+		float left = MAX( m_nwCorner.x, to->m_nwCorner.x );
+		float right = MIN( m_seCorner.x, to->m_seCorner.x );
 
 		// clamp to our extent in case areas are disjoint
-		if ( left < m_nwCorner.x - GetToleranceContiguous( WEST ) )
+		if ( left < m_nwCorner.x )
 		{
-			left = m_nwCorner.x - GetToleranceContiguous( WEST );
+			left = m_nwCorner.x;
 		}
-		else if ( left > m_seCorner.x + GetToleranceContiguous( EAST ) )
+		else if ( left > m_seCorner.x )
 		{
-			left = m_seCorner.x + GetToleranceContiguous( EAST );
+			left = m_seCorner.x;
 		}
 
-		if ( right < m_nwCorner.x - GetToleranceContiguous( WEST ) )
+		if ( right < m_nwCorner.x )
 		{
-			right = m_nwCorner.x - GetToleranceContiguous( WEST );
+			right = m_nwCorner.x;
 		}
-		else if ( right > m_seCorner.x + GetToleranceContiguous( EAST ) )
+		else if ( right > m_seCorner.x )
 		{
-			right = m_seCorner.x + GetToleranceContiguous( EAST );
+			right = m_seCorner.x;
 		}
 
 		center->x = ( left + right )/2.0f;
@@ -2381,28 +2372,26 @@ void CNavArea::ComputeSemiPortal( const CNavArea *to, NavDirType dir, Vector *ce
 			center->x = m_seCorner.x;
 		}
 
-		float top = MAX( m_nwCorner.y - GetToleranceContiguous( NORTH ), 
-			to->m_nwCorner.y - to->GetToleranceContiguous( NORTH ) );
-		float bottom = MIN( m_seCorner.y + GetToleranceContiguous( SOUTH ), 
-			to->m_seCorner.y + to->GetToleranceContiguous( SOUTH ) );
+		float top = MAX( m_nwCorner.y, to->m_nwCorner.y );
+		float bottom = MIN( m_seCorner.y, to->m_seCorner.y );
 
 		// clamp to our extent in case areas are disjoint
-		if ( top < m_nwCorner.y - GetToleranceContiguous( NORTH ) )
+		if ( top < m_nwCorner.y )
 		{
-			top = m_nwCorner.y - GetToleranceContiguous( NORTH );
+			top = m_nwCorner.y;
 		}
-		else if ( top > m_seCorner.y + GetToleranceContiguous( SOUTH ) )
+		else if ( top > m_seCorner.y )
 		{
-			top = m_seCorner.y + GetToleranceContiguous( SOUTH );
+			top = m_seCorner.y;
 		}
 
-		if ( bottom < m_nwCorner.y - GetToleranceContiguous( NORTH ) )
+		if ( bottom < m_nwCorner.y )
 		{
-			bottom = m_nwCorner.y - GetToleranceContiguous( NORTH );
+			bottom = m_nwCorner.y;
 		}
-		else if ( bottom > m_seCorner.y + GetToleranceContiguous( SOUTH ) )
+		else if ( bottom > m_seCorner.y )
 		{
-			bottom = m_seCorner.y + GetToleranceContiguous( SOUTH );
+			bottom = m_seCorner.y;
 		}
 
 		center->y = (top + bottom)/2.0f;
@@ -2891,11 +2880,6 @@ void CNavArea::Draw( void ) const
 		}
 	}
 
-	if ( nav_show_tolerance.GetBool() )
-	{
-		DrawTolerance();
-	}
-
 	int bgcolor[4];
 	if ( 4 == sscanf( nav_area_bgcolor.GetString(), "%d %d %d %d", &(bgcolor[0]), &(bgcolor[1]), &(bgcolor[2]), &(bgcolor[3]) ) )
 	{
@@ -3378,49 +3362,6 @@ void CNavArea::DrawConnectedAreas( void ) const
 	}
 }
 
-//--------------------------------------------------------------------------------------------------------------
-/**
- * Draw tolerance for each direction
- */
-void CNavArea::DrawTolerance( void ) const
-{
-	int i;
-
-	const float DebugDuration = NDEBUG_PERSIST_TILL_NEXT_SERVER;
-
-	for( i=0; i<NUM_DIRECTIONS; ++i )
-	{
-		NavDirType dir = (NavDirType)i;
-
-		float size;
-		Vector vPos = GetCenter();
-
-		switch( dir )
-		{
-			case NORTH:
-				size = GetSizeY()/2.0f - 5.0f;
-				vPos.y -= size;
-				break;
-			case SOUTH:
-				size = GetSizeY()/2.0f - 5.0f;
-				vPos.y += size;
-				break;
-			case EAST:
-				size = GetSizeX()/2.0f - 5.0f;
-				vPos.x += size;
-				break;
-			case WEST:
-				size = GetSizeX()/2.0f - 5.0f;
-				vPos.x -= size;
-				break;
-		}
-
-		if( nav_show_tolerance.GetInt() == 1 )
-			NDebugOverlay::Text( vPos, UTIL_VarArgs( "Tol: %f", m_tolerance[i] ), true, DebugDuration );
-		else
-			NDebugOverlay::Text( vPos, UTIL_VarArgs( "ContTol: %f", m_toleranceContiguous[i] ), true, DebugDuration );
-	}
-}
 #endif // CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
@@ -4308,22 +4249,6 @@ float CNavArea::GetLightIntensity( void ) const
 	return light / 4.0f;
 }
 
-ConVar nav_disable_tolerance("nav_disable_tolerance", "1", FCVAR_CHEAT|FCVAR_REPLICATED);
-
-//--------------------------------------------------------------------------------------------------------------
-float CNavArea::GetTolerance( NavDirType dir ) const
-{
-	if( nav_disable_tolerance.GetBool() ) return 0;
-	return m_tolerance[ dir ];
-}
-
-//--------------------------------------------------------------------------------------------------------------
-float CNavArea::GetToleranceContiguous( NavDirType dir ) const
-{
-	if( nav_disable_tolerance.GetBool() ) return 0;
-	return m_toleranceContiguous[ dir ];
-}
-
 #ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -4411,122 +4336,6 @@ CON_COMMAND_F( nav_update_lighting, "Recomputes lighting values", FCVAR_CHEAT )
 		}
 	}
 	DevMsg( "Computed lighting for %d/%d areas\n", numComputed, TheNavAreas.Count() );
-}
-
-//--------------------------------------------------------------------------------------------------------------
-/**
- * Compute max tolerance in all directions of this nav area
- * TODO: Dump repeating code into a separate function
- */
-void CNavArea::ComputeTolerance()
-{
-	int i, j, iCount;
-	CNavArea *adj;
-	float fAdjPortalWidth;
-	Vector center;
-
-	for( i = 0; i<NUM_DIRECTIONS; ++i )
-	{
-		NavDirType dir = (NavDirType)i;
-
-		float fAdjCovered = 0.0f; // Determine if this side is completely covered
-		float fTolerance = MAX_COORD_FLOAT;
-
-		iCount = GetAdjacentCount( dir );
-		for( j = 0; j < iCount; ++j )
-		{
-			adj = GetAdjacentArea( dir, j );
-			if( !adj || !IsConnected(adj, dir) || adj->IsBlocked() || !adj->IsCoplanar(this) )
-				continue;
-
-			ComputePortal( adj, dir, &center, &fAdjPortalWidth );
-			fAdjPortalWidth *= 2;
-
-			switch( i ) 
-			{
-			case NORTH:
-			case SOUTH:
-				fAdjCovered += fAdjPortalWidth;
-				fTolerance = MIN(fTolerance, adj->GetSizeY()+adj->GetTolerance( dir ) );
-				break;
-			case EAST:
-			case WEST:
-				fAdjCovered += fAdjPortalWidth;
-				fTolerance = MIN(fTolerance, adj->GetSizeX()+adj->GetTolerance( dir ) );
-				break;
-			}
-		}
-
-		float fDiff;
-		switch( dir ) 
-		{
-		case NORTH:
-		case SOUTH:
-			fDiff = fAdjCovered - GetSizeX();
-			break;
-		case EAST:
-		case WEST:
-			fDiff = fAdjCovered - GetSizeY();
-			break;
-		}	
-
-		if( fDiff < -4 )
-			fTolerance = 0.0f;
-
-		m_tolerance[ i ] = fTolerance;
-	}
-
-	// Contiguous version
-	for( i = 0; i<NUM_DIRECTIONS; ++i )
-	{
-		NavDirType dir = (NavDirType)i;
-
-		float fAdjCovered = 0.0f; // Determine if this side is completely covered
-		float fTolerance = MAX_COORD_FLOAT;
-
-		iCount = GetAdjacentCount( dir );
-		for( j = 0; j < iCount; ++j )
-		{
-			adj = GetAdjacentArea( dir, j );
-			if( !adj || !IsConnected(adj, dir) || !IsContiguous(adj) || adj->IsBlocked() || !adj->IsCoplanar(this) )
-				continue;
-
-			ComputePortal( adj, dir, &center, &fAdjPortalWidth );
-			fAdjPortalWidth *= 2;
-
-			switch( i ) 
-			{
-			case NORTH:
-			case SOUTH:
-				fAdjCovered += fAdjPortalWidth;
-				fTolerance = MIN(fTolerance, adj->GetSizeY()+adj->GetToleranceContiguous( dir ) );
-				break;
-			case EAST:
-			case WEST:
-				fAdjCovered += fAdjPortalWidth;
-				fTolerance = MIN(fTolerance, adj->GetSizeX()+adj->GetToleranceContiguous( dir ) );
-				break;
-			}
-		}
-
-		float fDiff;
-		switch( dir ) 
-		{
-		case NORTH:
-		case SOUTH:
-			fDiff = fAdjCovered - GetSizeX();
-			break;
-		case EAST:
-		case WEST:
-			fDiff = fAdjCovered - GetSizeY();
-			break;
-		}	
-
-		if( fDiff < -4 )
-			fTolerance = 0.0f;
-
-		m_toleranceContiguous[ i ] = fTolerance;
-	}
 }
 
 //--------------------------------------------------------------------------------------------------------------
