@@ -29,6 +29,9 @@ LINK_ENTITY_TO_CLASS( env_sprite_clientside, CSprite );
 #endif
 #endif // HL2WARS_ASW_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players )
 {
 	for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
@@ -48,6 +51,29 @@ void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+QAngle UTIL_CalculateDirection( Vector &point1, Vector &point2 )
+{
+	float diff_x = point1.x - point2.x;
+	float diff_y = point1.y - point2.y;
+	if( diff_x == 0 )
+		return vec3_angle;
+	float yaw = atan( diff_y / diff_x ) * ( 180 / M_PI );
+
+	// fix up yaw if needed
+	if( diff_x > 0 && diff_y > 0 )
+		yaw += 180.0;
+	else if( diff_x > 0 )
+		yaw += 180.0;
+    
+	return QAngle(0.0, yaw, 0.0);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UTIL_FindPositionInRadius( positioninradius_t &info )
 {
 	Vector vecDir, vecTest;

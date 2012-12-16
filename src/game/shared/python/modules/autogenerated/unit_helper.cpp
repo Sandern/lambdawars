@@ -46,6 +46,36 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     }
 
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
     virtual void Update( float eyeYaw, float eyePitch ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -197,6 +227,36 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
         UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
     }
 
 };
@@ -680,6 +740,28 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetAnimTimeInterval_function_type( &::UnitBaseAnimState::GetAnimTimeInterval ) );
         
         }
+        { //::UnitBaseAnimState::HasActivity
+        
+            typedef bool ( ::UnitBaseAnimState::*HasActivity_function_type )( ::Activity ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "HasActivity"
+                , HasActivity_function_type( &::UnitBaseAnimState::HasActivity )
+                , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitBaseAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitBaseAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
         { //::UnitBaseAnimState::Update
         
             typedef void ( ::UnitBaseAnimState::*Update_function_type )( float,float ) ;
@@ -1017,16 +1099,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , RestartMainSequence_function_type( &::UnitAnimState::RestartMainSequence ) );
         
         }
-        { //::UnitAnimState::SelectWeightedSequence
-        
-            typedef int ( ::UnitAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
-            
-            UnitAnimState_exposer.def( 
-                "SelectWeightedSequence"
-                , SelectWeightedSequence_function_type( &::UnitAnimState::SelectWeightedSequence )
-                , ( bp::arg("activity") ) );
-        
-        }
         { //::UnitAnimState::SetActivityMap
         
             typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::object ) ;
@@ -1159,6 +1231,18 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "movey", &UnitAnimState::m_iMoveY );
         UnitAnimState_exposer.def_readwrite( "moveyaw", &UnitAnimState::m_iMoveYaw );
         UnitAnimState_exposer.def_readwrite( "specificmainactivity", &UnitAnimState::m_nSpecificMainActivity );
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
         { //property "aimlayersequence"[fget=::UnitAnimState::GetAimLayerSequence, fset=::UnitAnimState::SetAimLayerSequence]
         
             typedef char const * ( ::UnitAnimState::*fget )(  ) ;
@@ -1837,6 +1921,36 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     }
 
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
     virtual void Update( float eyeYaw, float eyePitch ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1988,6 +2102,36 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
         UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
     }
 
 };
@@ -4085,6 +4229,28 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetAnimTimeInterval_function_type( &::UnitBaseAnimState::GetAnimTimeInterval ) );
         
         }
+        { //::UnitBaseAnimState::HasActivity
+        
+            typedef bool ( ::UnitBaseAnimState::*HasActivity_function_type )( ::Activity ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "HasActivity"
+                , HasActivity_function_type( &::UnitBaseAnimState::HasActivity )
+                , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitBaseAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitBaseAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
         { //::UnitBaseAnimState::Update
         
             typedef void ( ::UnitBaseAnimState::*Update_function_type )( float,float ) ;
@@ -4422,16 +4588,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , RestartMainSequence_function_type( &::UnitAnimState::RestartMainSequence ) );
         
         }
-        { //::UnitAnimState::SelectWeightedSequence
-        
-            typedef int ( ::UnitAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
-            
-            UnitAnimState_exposer.def( 
-                "SelectWeightedSequence"
-                , SelectWeightedSequence_function_type( &::UnitAnimState::SelectWeightedSequence )
-                , ( bp::arg("activity") ) );
-        
-        }
         { //::UnitAnimState::SetActivityMap
         
             typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::object ) ;
@@ -4564,6 +4720,18 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "movey", &UnitAnimState::m_iMoveY );
         UnitAnimState_exposer.def_readwrite( "moveyaw", &UnitAnimState::m_iMoveYaw );
         UnitAnimState_exposer.def_readwrite( "specificmainactivity", &UnitAnimState::m_nSpecificMainActivity );
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
         { //property "aimlayersequence"[fget=::UnitAnimState::GetAimLayerSequence, fset=::UnitAnimState::SetAimLayerSequence]
         
             typedef char const * ( ::UnitAnimState::*fget )(  ) ;

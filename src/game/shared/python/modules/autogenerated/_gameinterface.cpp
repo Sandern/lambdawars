@@ -3195,6 +3195,16 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PyAsyncFinishAllWrites
+    
+        typedef void ( *AsyncFinishAllWrites_function_type )(  );
+        
+        bp::def( 
+            "AsyncFinishAllWrites"
+            , AsyncFinishAllWrites_function_type( &::PyAsyncFinishAllWrites ) );
+    
+    }
+
     { //::PyFireGameEventClientSide
     
         typedef void ( *FireGameEventClientSide_function_type )( ::PyGameEvent * );
@@ -6918,6 +6928,16 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "AddSearchPath"
             , AddSearchPath_function_type( &::PyAddSearchPath )
             , ( bp::arg("pPath"), bp::arg("pathID"), bp::arg("addType")=::PATH_ADD_TO_TAIL ) );
+    
+    }
+
+    { //::PyAsyncFinishAllWrites
+    
+        typedef void ( *AsyncFinishAllWrites_function_type )(  );
+        
+        bp::def( 
+            "AsyncFinishAllWrites"
+            , AsyncFinishAllWrites_function_type( &::PyAsyncFinishAllWrites ) );
     
     }
 

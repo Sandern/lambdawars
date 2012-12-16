@@ -6558,7 +6558,15 @@ bool C_BaseEntity::FOWShouldShow()
 void CBaseEntity::SetTeamColor( Vector &vTeamColor ) 
 { 
 	m_vTeamColor = vTeamColor;
-	m_vCurTeamColor = m_vTeamColor;
+	if( !m_bUseRelationBasedTeamColor )
+	{
+		m_vCurTeamColor = m_vTeamColor; // Directly change
+		m_vTargetTeamColor = m_vTeamColor;
+	}
+	else
+	{
+		m_bCheckTeamColor = true; // Something might have changed
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -6568,11 +6576,18 @@ extern Disposition_t GetPlayerRelationShip(int p1, int p2);
 ConVar cl_teamcolor_relationbased( "cl_teamcolor_relationbased", "0" );
 ConVar cl_teamcolor_converge_speed( "cl_teamcolor_converge_speed", "1.75" );
 
-Vector &CBaseEntity::GetTeamColor( void ) 
+Vector &CBaseEntity::GetTeamColor( bool bDirect ) 
 { 
-	// Detect if we changed color
+	// Check if relationbase setting changed
 	bool bUseRelationBasedTeamColor = cl_teamcolor_relationbased.GetBool();
 	if( bUseRelationBasedTeamColor != m_bUseRelationBasedTeamColor )
+	{
+		m_bCheckTeamColor = true;
+		m_bUseRelationBasedTeamColor = bUseRelationBasedTeamColor;
+	}
+
+	// Detect if we changed color
+	if( m_bCheckTeamColor )
 	{
 		if( bUseRelationBasedTeamColor )
 		{
@@ -6609,22 +6624,23 @@ Vector &CBaseEntity::GetTeamColor( void )
 			m_vTargetTeamColor = m_vTeamColor;
 		}
 
-		m_bUseRelationBasedTeamColor = bUseRelationBasedTeamColor;
-		m_bTeamColorChanging = true;
+		m_bCheckTeamColor = false;
+	}
+
+	// For parts of code that don't update the team color actively:
+	if( bDirect )
+	{
+		if( m_bUseRelationBasedTeamColor )
+			return m_vTargetTeamColor;
+		else
+			return m_vTeamColor;
 	}
 
 	// Update current color
-	if( m_bTeamColorChanging && m_fTeamColorLastUpdateFrame != gpGlobals->frametime )
+	if( m_fTeamColorLastUpdateFrame != gpGlobals->frametime && m_vTargetTeamColor != m_vCurTeamColor )
 	{
-		if( m_vTargetTeamColor != m_vCurTeamColor )
-		{
-			m_vCurTeamColor = VectorLerp( m_vCurTeamColor, m_vTargetTeamColor, gpGlobals->frametime * cl_teamcolor_converge_speed.GetFloat() );
-			m_fTeamColorLastUpdateFrame = gpGlobals->frametime;
-		}
-		else
-		{
-			m_bTeamColorChanging = false;
-		}
+		m_vCurTeamColor = VectorLerp( m_vCurTeamColor, m_vTargetTeamColor, gpGlobals->frametime * cl_teamcolor_converge_speed.GetFloat() );
+		m_fTeamColorLastUpdateFrame = gpGlobals->frametime;
 	}
 
 	return m_vCurTeamColor; 

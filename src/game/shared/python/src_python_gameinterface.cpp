@@ -56,6 +56,11 @@ void PyRemoveDirectory( char const* pPath, const char *pathID )
 #endif // WIN32
 }
 
+void PyAsyncFinishAllWrites( void )
+{
+	filesystem->AsyncFinishAllWrites();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Shutdown a Python ConVar
 //-----------------------------------------------------------------------------

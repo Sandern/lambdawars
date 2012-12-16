@@ -2702,6 +2702,7 @@ void CBaseEntity::OnChangeOwnerNumberInternal( int old_owner_number )
 	}
 
 #ifdef CLIENT_DLL
+	m_bCheckTeamColor = true; // Team color might be changing, so recheck
 	UpdateVisibility();
 #else
 	DispatchUpdateTransmitState();

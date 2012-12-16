@@ -1672,8 +1672,4 @@ void UnitAnimState::DebugShowAnimStateFull( int iStartLine )
 }
 
 // -----------------------------------------------------------------------------
-int UnitAnimState::SelectWeightedSequence( Activity activity ) 
-{
-	return GetOuter()->SelectWeightedSequence( activity ); 
-}
 

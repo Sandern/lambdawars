@@ -2728,11 +2728,12 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::GetTeamColor
         
-            typedef ::Vector & ( ::C_BaseEntity::*GetTeamColor_function_type )(  ) ;
+            typedef ::Vector & ( ::C_BaseEntity::*GetTeamColor_function_type )( bool ) ;
             
             C_BaseEntity_exposer.def( 
                 "GetTeamColor"
                 , GetTeamColor_function_type( &::C_BaseEntity::GetTeamColor )
+                , ( bp::arg("bDirect")=(bool)(true) )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }

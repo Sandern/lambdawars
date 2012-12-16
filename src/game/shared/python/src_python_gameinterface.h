@@ -45,6 +45,9 @@ void PyRemoveFile( char const* pRelativePath, const char *pathID = 0 );
 
 void PyRemoveDirectory( char const* pPath, const char *pathID = 0 );
 
+// Special use case
+void PyAsyncFinishAllWrites( void );
+
 //-----------------------------------------------------------------------------
 // Purpose: Shutting down vars
 //-----------------------------------------------------------------------------

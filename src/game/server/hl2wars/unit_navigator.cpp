@@ -94,6 +94,8 @@ ConVar unit_seed_density("unit_seed_density", "0.1");
 ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
+ConVar unit_route_local_paths("unit_route_local_paths", "1");
+ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
 ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
 ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
@@ -2148,6 +2150,9 @@ bool UnitBaseNavigator::DoFindPathToPosInRange()
 //-----------------------------------------------------------------------------
 UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( const Vector &vGoalPos )
 {
+	if( !unit_route_local_paths.GetBool() )
+		return NULL;
+
 	if( GetAbsOrigin().DistTo(vGoalPos) < 300 )
 	{
 		//Do a simple trace
@@ -2402,6 +2407,9 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 //-----------------------------------------------------------------------------
 UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( const Vector &vGoalPos )
 {
+	if( !unit_route_navmesh_paths.GetBool() )
+		return NULL;
+
 	CNavArea *startArea, *goalArea, *closestArea;
 
 	// Use GetAbsOrigin here. Nav area selection falls back to nearest nav.
@@ -2487,12 +2495,17 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute()
 	}
 
 	// Cheap: try to do trace from start to goal
-	waypoints = BuildLocalPath(GetPath()->m_vGoalPos);
+	waypoints = BuildLocalPath( GetPath()->m_vGoalPos );
 	if( waypoints )
 		return waypoints;
 
 	// Expensive: use nav mesh
-	return BuildNavAreaPath(GetPath()->m_vGoalPos);
+	waypoints = BuildNavAreaPath( GetPath()->m_vGoalPos );
+	if( waypoints )
+		return waypoints;
+
+	// Fallback to a direct path
+	return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
 }
 
 #ifndef DISABLE_PYTHON

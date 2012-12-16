@@ -49,7 +49,7 @@ void CTeamColorProxy::OnBind( void *pRenderable )
 	if ( !pEnt )
 		return;
 
-	Vector &teamcolor = pEnt->GetTeamColor();
+	Vector &teamcolor = pEnt->GetTeamColor(false);
 
 	m_pColorTextureVar->SetVecValue(teamcolor[0], teamcolor[1], teamcolor[2], 1);
 }

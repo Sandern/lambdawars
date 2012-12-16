@@ -4204,6 +4204,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_CalculateDirection
+    
+        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector &,::Vector & );
+        
+        bp::def( 
+            "UTIL_CalculateDirection"
+            , UTIL_CalculateDirection_function_type( &::UTIL_CalculateDirection )
+            , ( bp::arg("point1"), bp::arg("point2") ) );
+    
+    }
+
     { //::UTIL_ClearTrace
     
         typedef void ( *UTIL_ClearTrace_function_type )( ::trace_t & );
@@ -4563,6 +4574,17 @@ BOOST_PYTHON_MODULE(_utils){
             "UTIL_ListDir"
             , UTIL_ListDir_function_type( &::UTIL_ListDir )
             , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
+    
+    }
+
+    { //::UTIL_ListPlayersForOwnerNumber
+    
+        typedef void ( *UTIL_ListPlayersForOwnerNumber_function_type )( int,::CUtlVector< C_HL2WarsPlayer*, CUtlMemory< C_HL2WarsPlayer*, int > > & );
+        
+        bp::def( 
+            "UTIL_ListPlayersForOwnerNumber"
+            , UTIL_ListPlayersForOwnerNumber_function_type( &::UTIL_ListPlayersForOwnerNumber )
+            , ( bp::arg("ownernumber"), bp::arg("players") ) );
     
     }
 
@@ -9262,6 +9284,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_CalculateDirection
+    
+        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector &,::Vector & );
+        
+        bp::def( 
+            "UTIL_CalculateDirection"
+            , UTIL_CalculateDirection_function_type( &::UTIL_CalculateDirection )
+            , ( bp::arg("point1"), bp::arg("point2") ) );
+    
+    }
+
     { //::UTIL_CenterPrintAll
     
         typedef void ( *UTIL_CenterPrintAll_function_type )( char const *,char const *,char const *,char const *,char const * );
@@ -9960,6 +9993,17 @@ BOOST_PYTHON_MODULE(_utils){
             "UTIL_ListDir"
             , UTIL_ListDir_function_type( &::UTIL_ListDir )
             , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
+    
+    }
+
+    { //::UTIL_ListPlayersForOwnerNumber
+    
+        typedef void ( *UTIL_ListPlayersForOwnerNumber_function_type )( int,::CUtlVector< CHL2WarsPlayer*, CUtlMemory< CHL2WarsPlayer*, int > > & );
+        
+        bp::def( 
+            "UTIL_ListPlayersForOwnerNumber"
+            , UTIL_ListPlayersForOwnerNumber_function_type( &::UTIL_ListPlayersForOwnerNumber )
+            , ( bp::arg("ownernumber"), bp::arg("players") ) );
     
     }
 

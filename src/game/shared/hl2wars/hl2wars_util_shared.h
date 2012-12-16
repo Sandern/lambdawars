@@ -14,6 +14,8 @@
 
 void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players );
 
+QAngle UTIL_CalculateDirection( Vector &point1, Vector &point2 );
+
 struct positioninradius_t
 {
 	positioninradius_t( const Vector &startposition, const Vector &mins, const Vector &maxs, float radius, 

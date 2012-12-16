@@ -1517,12 +1517,11 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::GetSelection
         
-            typedef ::boost::python::list ( ::C_HL2WarsPlayer::*GetSelection_function_type )( int,int ) ;
+            typedef ::boost::python::list ( ::C_HL2WarsPlayer::*GetSelection_function_type )(  ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "GetSelection"
-                , GetSelection_function_type( &::C_HL2WarsPlayer::GetSelection )
-                , ( bp::arg("rangemin")=(int)(0), bp::arg("rangemax")=(int)(-0x000000001) ) );
+                , GetSelection_function_type( &::C_HL2WarsPlayer::GetSelection ) );
         
         }
         { //::C_HL2WarsPlayer::GetSingleActiveAbility

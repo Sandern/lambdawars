@@ -1897,7 +1897,7 @@ public:
 	ShouldTransmitState_t			GetLastShouldTransmitState();
 
 	void							SetTeamColor( Vector &vTeamColor );
-	Vector &						GetTeamColor( void );
+	Vector &						GetTeamColor( bool bDirect=true );
 
 #ifndef DISABLE_PYTHON
 	// Python generic
@@ -1995,8 +1995,8 @@ private:
 	Vector m_vTeamColor; // Real team color
 	Vector m_vCurTeamColor; // Current used team color
 	Vector m_vTargetTeamColor; // Current target team color
-	bool m_bTeamColorChanging;
 	bool m_bUseRelationBasedTeamColor;
+	bool m_bCheckTeamColor;
 	float m_fTeamColorLastUpdateFrame;
 
 	bool m_bAllowNavIgnore;

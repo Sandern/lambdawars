@@ -86,7 +86,7 @@ public:
 	// selection management
 	void							UpdateSelection( void );
 #ifndef DISABLE_PYTHON
-	boost::python::list				GetSelection( int rangemin = 0, int rangemax = -1 );
+	boost::python::list				GetSelection( void );
 #endif // DISABLE_PYTHON
 	CBaseEntity*					GetUnit( int idx );
 	void							AddUnit( CBaseEntity *pUnit, bool bTriggerOnSel=true );
@@ -227,6 +227,8 @@ private:
 	CUtlVector< EHANDLE >		m_hSelectedUnits;
 	bool				m_bSelectionChangedSignalScheduled;
 	CNetworkHandle( C_BaseEntity, m_hControlledUnit );	
+	bool				m_bRebuildPySelection;
+	bp::list			m_pySelection;
 
 	// Selected unittype data
 	string_t			m_pSelectedUnitType;

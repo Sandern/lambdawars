@@ -888,23 +888,25 @@ void CHL2WarsPlayer::UpdateSelection( void )
 }
 
 #ifndef DISABLE_PYTHON
-boost::python::list	CHL2WarsPlayer::GetSelection( int iRangeMin, int iRangeMax )
+boost::python::list	CHL2WarsPlayer::GetSelection( void )
 {
-	bp::list selection;
-	CBaseEntity *pUnit;
-	int nCount = CountUnits();
-	if( iRangeMax == -1 ) iRangeMax = nCount;
-	else iRangeMax = MIN( MAX( 0, iRangeMax ), nCount );
-	iRangeMin = MIN( MAX( 0, iRangeMin ), nCount );
-	for ( int i = iRangeMax-1; i >= iRangeMin; i-- )
+	if( m_bRebuildPySelection )
 	{
-		pUnit = GetUnit(i);
-		if( pUnit )
+		m_pySelection = bp::list();
+
+		CBaseEntity *pUnit;
+		int nCount = CountUnits();
+		for ( int i = 0; i < nCount; i++ )
 		{
-			selection.append( pUnit->GetPyHandle() );	
+			pUnit = m_hSelectedUnits[i];
+			if( pUnit )
+				m_pySelection.append( pUnit->GetPyHandle() );	
 		}
+
+		m_bRebuildPySelection = false;
 	}
-	return selection;
+
+	return m_pySelection;
 }
 #endif // DISABLE_PYTHON
 
@@ -966,6 +968,8 @@ void CHL2WarsPlayer::AddUnit( CBaseEntity *pUnit, bool bTriggerOnSel )
 		m_hSelectedUnits.AddToTail(pUnit);
 	}
 
+	m_bRebuildPySelection = true;
+
 	pIUnit->OnSelected(this);
 	if( bTriggerOnSel )
 		ScheduleSelectionChangedSignal();
@@ -987,6 +991,9 @@ void CHL2WarsPlayer::RemoveUnit( int idx, bool bTriggerOnSel )
 		m_hSelectedUnits.Element(idx)->GetIUnit()->OnDeSelected(this);
 	}
 	m_hSelectedUnits.Remove(idx);
+
+	m_bRebuildPySelection = true;
+
 	if( bTriggerOnSel )
 		ScheduleSelectionChangedSignal();
 }
@@ -1010,6 +1017,7 @@ void CHL2WarsPlayer::ClearSelection( bool bTriggerOnSel )
 			m_hSelectedUnits.Element(i)->GetIUnit()->OnDeSelected(this);
 	}
 	m_hSelectedUnits.RemoveAll();
+	m_bRebuildPySelection = true;
 	if( bTriggerOnSel )
 		ScheduleSelectionChangedSignal();
 }

@@ -205,9 +205,6 @@ public:
 	// internal ACT comparisons using the base activity
 	virtual Activity TranslateActivity( Activity actDesired );
 
-	// Allow inheriting classes to override SelectWeightedSequence
-	virtual int SelectWeightedSequence( Activity activity );
-
 #ifndef DISABLE_PYTHON
 	// Translate activity map
 	void SetActivityMap( boost::python::object activitymap );

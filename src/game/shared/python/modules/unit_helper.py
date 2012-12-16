@@ -121,12 +121,7 @@ class UnitHelper(GenerateModuleSemiShared):
                          , cls.mem_fun('SetAimLayerSequence') )
         
         cls.mem_fun('OnNewModel').virtuality = 'virtual'
-        #cls.mem_fun('TranslateActivity').virtuality = 'virtual'
         cls.mem_fun('OnEndSpecificActivity').virtuality = 'virtual'
-        #cls.mem_fun('CalcMainActivity').virtuality = 'virtual'
-        # cls.mem_fun('TranslateActivity').virtuality = 'virtual'
-        # cls.mem_fun('CalcMainActivity').virtuality = 'virtual'
-        # cls.mem_fun('SetupPoseParameters').virtuality = 'virtual'
         
         cls.mem_fun('GetCustomSpecificActPlaybackRate').exclude()
         cls.mem_fun('SetCustomSpecificActPlaybackRate').exclude()

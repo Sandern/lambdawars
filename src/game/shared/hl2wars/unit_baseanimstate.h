@@ -27,6 +27,23 @@ public:
 
 	// Get the correct interval
 	float	GetAnimTimeInterval( void ) const;
+
+	// Check if the unit has this activity
+	bool HasActivity( Activity actDesired );
+
+	// Allow inheriting classes to override SelectWeightedSequence
+	virtual int SelectWeightedSequence( Activity activity );
 };
+
+// Inlines
+inline int UnitBaseAnimState::SelectWeightedSequence( Activity activity ) 
+{
+	return GetOuter()->SelectWeightedSequence( activity ); 
+}
+
+inline bool UnitBaseAnimState::HasActivity( Activity actDesired ) 
+{ 
+	return SelectWeightedSequence( actDesired ) > 0; 
+}
 
 #endif // UNIT_BASEANIMSTATE_H
