@@ -8,12 +8,13 @@
 #include "hl2wars_util_shared.h"
 #include "wars_mapboundary.h"
 
-#ifdef GAME_DLL
-	#include "nav_mesh.h"
-	#include "Sprite.h"
+#include "nav_mesh.h"
 #ifndef DISABLE_PYTHON
 	#include "src_python_navmesh.h"
 #endif // DISABLE_PYTHON
+
+#ifdef GAME_DLL
+	#include "Sprite.h"
 	#include "hl2wars_player.h"
 #else
 	#include "c_hl2wars_player.h"
@@ -54,7 +55,7 @@ void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-QAngle UTIL_CalculateDirection( Vector &point1, Vector &point2 )
+QAngle UTIL_CalculateDirection( const Vector &point1, const Vector &point2 )
 {
 	float diff_x = point1.x - point2.x;
 	float diff_y = point1.y - point2.y;
@@ -78,14 +79,14 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 {
 	Vector vecDir, vecTest;
 	trace_t tr;
-	for(; info.m_vFan.y < 360; info.m_vFan.y += info.m_fStepSize )
+	for(; info.m_vFan.y < 360 - info.m_fStepSize; info.m_vFan.y += info.m_fStepSize )
 	{
 		AngleVectors( info.m_vFan, &vecDir );
 
 		vecTest = info.m_vStartPosition + vecDir * info.m_fRadius;
 
 		Vector vEndPos;
-#ifdef GAME_DLL
+
 		if( TheNavMesh->IsLoaded() )
 		{
 #ifndef DISABLE_PYTHON
@@ -95,31 +96,45 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 #endif // DISABLE_PYTHON
             if( vEndPos == vec3_origin )
                 continue;
-            vEndPos.z += 32.0;
+            vEndPos.z += 8.0f;
 		}
 		else
-#endif // GAME_DLL
 		{
-			UTIL_TraceLine( vecTest, vecTest - Vector( 0, 0, 8192 ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine( vecTest, vecTest - Vector( 0, 0, MAX_TRACE_LENGTH ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
 			if( tr.fraction == 1.0 )
 				continue;
 			vEndPos = tr.endpos;
 		}
             
-        UTIL_TraceHull( vEndPos,
-                        vEndPos + Vector( 0, 0, 10 ),
-                        info.m_vMins,
-                        info.m_vMaxs,
-                        MASK_NPCSOLID,
-                        info.m_hIgnore.Get(),
-                        COLLISION_GROUP_NONE,
-                        &tr );
+		if( info.m_bTestPosition )
+		{
+			// Test position
+			vEndPos.z += -info.m_vMins.z + info.m_fZOffset;
+			UTIL_TraceHull( vEndPos,
+							vEndPos + Vector( 0, 0, 10 ),
+							info.m_vMins,
+							info.m_vMaxs,
+							info.m_iMask,
+							info.m_hIgnore.Get(),
+							COLLISION_GROUP_NONE,
+							&tr );
 
-        if( tr.fraction == 1.0 )
-            info.m_vPosition = tr.endpos;
-            info.m_bSuccess = true;
-            info.m_vFan.y += info.m_fStepSize;
-            return;     
+			if( tr.fraction == 1.0 )
+			{
+				info.m_vPosition = tr.endpos;
+				info.m_bSuccess = true;
+				info.m_vFan.y += info.m_fStepSize;
+				return;   
+			}
+		}
+		else
+		{
+			info.m_vPosition = vEndPos;
+			info.m_vPosition.z += info.m_fZOffset;
+			info.m_bSuccess = true;
+			info.m_vFan.y += info.m_fStepSize;
+			return;
+		}
 	}
 
 	info.m_bSuccess = false;
@@ -132,7 +147,7 @@ void UTIL_FindPosition( positioninfo_t &info )
 	{
 		// Find a start pos
 		Vector vEndPos;
-#ifdef GAME_DLL
+
 		if( TheNavMesh->IsLoaded() )
 		{
 #ifndef DISABLE_PYTHON
@@ -141,30 +156,41 @@ void UTIL_FindPosition( positioninfo_t &info )
 			vEndPos= vec3_origin;
 #endif // DISABLE_PYTHON
             if( vEndPos != vec3_origin )
-				vEndPos.z += 32.0;
+				vEndPos.z += 8.0f;
 		}
 		else
-#endif // GAME_DLL
 		{
-			UTIL_TraceLine( info.m_vPosition, info.m_vPosition - Vector( 0, 0, 8192 ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine( info.m_vPosition, info.m_vPosition - Vector( 0, 0, MAX_TRACE_LENGTH ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
 			vEndPos = ( tr.fraction == 1.0 ) ? tr.endpos : vec3_origin;
 		}
 
+		info.m_fRadius += info.m_fRadiusGrow;
+
 		// Test pos
-        UTIL_TraceHull( info.m_vPosition,
-                        info.m_vPosition + Vector( 0, 0, 10 ),
-                        info.m_vMins,
-                        info.m_vMaxs,
-                        MASK_NPCSOLID,
-                        info.m_hIgnore,
-                        COLLISION_GROUP_NONE,
-                        &tr );
-        info.m_fRadius += info.m_fRadiusStep;
-        if( tr.fraction == 1.0 )
+		if( info.m_bTestPosition )
 		{
-            info.m_vPosition = tr.endpos;
-            info.m_bSuccess = true;
-            return;
+			vEndPos.z += -info.m_vMins.z + info.m_fZOffset;
+			UTIL_TraceHull( vEndPos,
+							vEndPos + Vector( 0, 0, 10 ),
+							info.m_vMins,
+							info.m_vMaxs,
+							info.m_iMask,
+							info.m_hIgnore,
+							COLLISION_GROUP_NONE,
+							&tr );
+			if( tr.fraction == 1.0 )
+			{
+				info.m_vPosition = tr.endpos;
+				info.m_bSuccess = true;
+				return;
+			}
+		}
+		else
+		{
+			info.m_vPosition = vEndPos;
+			info.m_vPosition.z += info.m_fZOffset;
+			info.m_bSuccess = true;
+			return;
 		}
 	}
 
@@ -181,7 +207,7 @@ void UTIL_FindPosition( positioninfo_t &info )
             return;
 		}
         info.m_InRadiusInfo.m_vFan.Init(0,0,0);
-        info.m_fRadius += info.m_fRadiusStep;
+        info.m_fRadius += info.m_fRadiusGrow;
 	}
     info.m_bSuccess = false;
 }

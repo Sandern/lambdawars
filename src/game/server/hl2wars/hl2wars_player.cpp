@@ -244,19 +244,22 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_addunit" ) )
 	{
+		for( int i = 1; i < args.ArgC(); i++ )
+		{
 #ifdef CLIENTSENDEHANDLE
-		long iEncodedEHandle = atol(args[1]);
-		int iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
-		int iEntryIndex = iEncodedEHandle & ~(iSerialNum << MAX_EDICT_BITS);
-		EHANDLE pEnt( iEntryIndex, iSerialNum );
+			long iEncodedEHandle = atol(args[i]);
+			int iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
+			int iEntryIndex = iEncodedEHandle & ~(iSerialNum << MAX_EDICT_BITS);
+			EHANDLE pEnt( iEntryIndex, iSerialNum );
 #else
-		CBaseEntity *pEnt = UTIL_EntityByIndex( atoi(args[1]) );
+			CBaseEntity *pEnt = UTIL_EntityByIndex( atoi(args[i]) );
 #endif // CLIENTSENDEHANDLE
-		if( pEnt && pEnt->IsAlive() && pEnt->GetIUnit() )
-			pEnt->GetIUnit()->Select(this);
-			//AddUnit(hEnt);
-		else
-			DevMsg( "player_addunit: tried to select an invalid unit (#%d)\n",  atoi(args[1]) );
+			//DevMsg( "player_addunit: selecting ent #%d\n",  atoi(args[i]) );
+			if( pEnt && pEnt->IsAlive() && pEnt->GetIUnit() )
+				pEnt->GetIUnit()->Select(this);
+			else
+				DevMsg( "player_addunit: tried to select an invalid unit (#%d)\n",  atoi(args[i]) );
+		}
 		return true;
 	}
 	else if( !Q_stricmp( args[0], "player_removeunit" ) )

@@ -1132,7 +1132,6 @@ void CHL2WarsPlayer::SelectGroup( int iGroup )
 	{
 		if( m_Groups[iGroup].m_Group[i] )
 			m_Groups[iGroup].m_Group[i]->GetIUnit()->Select(this, false);
-			//AddUnit(m_Groups[iGroup].m_Group[i].Get(), false);
 	}
 	ScheduleSelectionChangedSignal();
 

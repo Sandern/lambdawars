@@ -1068,29 +1068,30 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		CNavArea *pTargetArea, *pGoalArea;
 		const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition();
 
-		pTargetArea = TheNavMesh->GetNavArea( vTargetOrigin );
-		if( !pTargetArea ) pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin );
-		pGoalArea = TheNavMesh->GetNavArea( GetPath()->m_vGoalPos );
-		if( !pGoalArea ) pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos );
-
-		if( pTargetArea != pGoalArea && (gpGlobals->curtime - m_fLastPathRecomputation) > 0.8f )
+		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 0.8f )
 		{
-			if( unit_navigator_debug.GetBool() )
-				DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
-					GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
+			pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
+			pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos, true, 256.0f, false, false );
 
-			// Update goal target position and recompute
-			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
-			if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
-				DoFindPathToPosInRange();
+			if( pTargetArea != pGoalArea )
+			{
+				if( unit_navigator_debug.GetBool() )
+					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
+						GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
+
+				// Update goal target position and recompute
+				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
+					DoFindPathToPosInRange();
+				else
+					DoFindPathToPos();
+			}
 			else
-				DoFindPathToPos();
-		}
-		else
-		{
-			// Just update goal target position and update the last waypoint
-			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
-			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
+			{
+				// Just update goal target position and update the last waypoint
+				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
+			}
 		}
 	}
 
@@ -1186,13 +1187,13 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			if( MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsWorld() )
 			{
 				Vector vHitPos = MoveCommand.blocker_hitpos + MoveCommand.blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
+				m_Seeds.AddToTail( seed_entry_t( vHitPos.AsVector2D(), gpGlobals->curtime ) );
 				if( unit_navigator_debug.GetBool() )
 				{
 					if( unit_navigator_debug.GetInt() > 1 )
 						NDebugOverlay::Box( vHitPos, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, 255, 1.0f );
-					DevMsg("#%d: UpdateGoalAndPath: Added density seed due path blocked\n", GetOuter()->entindex() );
+					DevMsg("#%d: UpdateGoalAndPath: Added density seed due path blocked (total seeds: %d)\n", GetOuter()->entindex(), m_Seeds.Count() );
 				}
-				m_Seeds.AddToTail( seed_entry_t( vHitPos.AsVector2D(), gpGlobals->curtime ) );
 			}
 		}
 	}

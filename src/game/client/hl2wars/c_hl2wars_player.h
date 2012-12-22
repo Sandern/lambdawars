@@ -180,6 +180,8 @@ private:
 	void					OnRightMouseButtonDoublePressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data );	
 
+	void					MakeSelection( CUtlVector< EHANDLE > &selection );
+
 private:
 	bool m_bOldIsStrategicModeOn;
 	EHANDLE				m_hOldControlledUnit;

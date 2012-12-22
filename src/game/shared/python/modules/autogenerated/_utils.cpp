@@ -4206,7 +4206,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_CalculateDirection
     
-        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector &,::Vector & );
+        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector const &,::Vector const & );
         
         bp::def( 
             "UTIL_CalculateDirection"
@@ -9286,7 +9286,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_CalculateDirection
     
-        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector &,::Vector & );
+        typedef ::QAngle ( *UTIL_CalculateDirection_function_type )( ::Vector const &,::Vector const & );
         
         bp::def( 
             "UTIL_CalculateDirection"

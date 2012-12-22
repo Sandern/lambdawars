@@ -30,6 +30,8 @@ UnitBaseSense::UnitBaseSense( boost::python::object outer ) :
 //-----------------------------------------------------------------------------
 void UnitBaseSense::PerformSensing()
 {
+	VPROF_BUDGET( "UnitBaseSense::PerformSensing", VPROF_BUDGETGROUP_UNITS );
+
 	if( m_fNextSenseTime > gpGlobals->curtime )
 		return;
 

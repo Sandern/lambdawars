@@ -12,7 +12,10 @@
 #endif
 
 #include <boost/python.hpp>
+
+#if 0
 #include <set>
+#endif // 0
 
 namespace bp = boost::python;
 

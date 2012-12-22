@@ -487,10 +487,54 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::SelectBox( int iXMin, int iYMin, int iXMax, int iYMax )
+void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 {
 	int i;
 
+	if( selection.Count() == 0 )
+		return;
+
+#define MAX_COMMAND_SIZE 260
+
+	// Make selection
+	int n = 0;
+	int maxn = 47; // Max N per command to stay within the command limit
+	char buf[MAX_COMMAND_SIZE];
+	buf[0] = '\0';
+	Q_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
+	for( i = 0; i < selection.Count(); i++)
+	{
+		selection[i]->GetIUnit()->Select(this, false);
+		Q_strncat( buf, VarArgs(" %ld", EncodeEntity(selection[i].Get())), MAX_COMMAND_SIZE );
+		n++;
+
+		// Send max N per command, because commands are limited to about 256 chars
+		if( n >= maxn )
+		{
+			// Send and reset
+			//DevMsg("Sending command of length %d: %s\n", Q_strlen( buf ), buf );
+			engine->ServerCmd( buf );
+			n = 0;
+			buf[0] = '\0';
+			Q_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
+		}
+	}
+
+	// Send remaining
+	if( n > 0 )
+	{
+		//DevMsg("Sending command of length %d: %s\n", Q_strlen( buf ), buf );
+		engine->ServerCmd( buf );
+	}
+
+	ScheduleSelectionChangedSignal();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::SelectBox( int iXMin, int iYMin, int iXMax, int iYMax )
+{
 	//Msg("Select box xmin: %d, ymin: %d, xmax: %d, ymax: %d\n", iXMin, iYMin, iXMax, iYMax);
 	if( !g_pUnitListHead )
 	{
@@ -499,29 +543,18 @@ void C_HL2WarsPlayer::SelectBox( int iXMin, int iYMin, int iXMax, int iYMax )
 		return;
 	}
 
-	CUtlVector< EHANDLE > finalselection;
-	GetBoxSelection( iXMin, iYMin, iXMax, iYMax, finalselection ); 
+	CUtlVector< EHANDLE > selection;
+	GetBoxSelection( iXMin, iYMin, iXMax, iYMax, selection ); 
 
-	if( cl_selection_noclear.GetBool() && finalselection.Count() == 0 )
-	{
+	if( cl_selection_noclear.GetBool() && selection.Count() == 0 )
 		return;
-	}
 
 	if( (m_nButtons & IN_SPEED) == 0 ) {
 		ClearSelection( false ); // Do not trigger on selection changed, since we do that below too already.
 		engine->ServerCmd("player_clearselection");
 	}
 
-
-
-	// Make selection
-	for(i=0; i<finalselection.Count(); i++)
-	{
-		finalselection[i]->GetIUnit()->Select(this, false);
-		engine->ServerCmd( VarArgs("player_addunit %ld", EncodeEntity(finalselection[i].Get())) );
-	}
-	
-	ScheduleSelectionChangedSignal();
+	MakeSelection( selection );
 }
 
 //-----------------------------------------------------------------------------
@@ -533,6 +566,7 @@ void C_HL2WarsPlayer::SelectAllUnitsOfTypeInScreen(const char *pUnitType)
 	CUnitBase *pUnit;
 	int iX, iY;
 	bool bInScreen;
+	CUtlVector< EHANDLE > selection;
 
 	if( !g_pUnitListHead )
 		return;
@@ -558,11 +592,10 @@ void C_HL2WarsPlayer::SelectAllUnitsOfTypeInScreen(const char *pUnitType)
 			continue;
 		}
 
-		AddUnit(pUnit, false);
-		engine->ServerCmd( VarArgs("player_addunit %ld", EncodeEntity(pUnit)) );
+		selection.AddToTail( pUnit );
 	}
 
-	ScheduleSelectionChangedSignal();
+	MakeSelection( selection );
 }
 
 //-----------------------------------------------------------------------------

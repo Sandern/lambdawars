@@ -196,7 +196,7 @@ float UnitAnimState::TimeSinceLastAnimationStateClear() const
 
 void UnitAnimState::Update( float eyeYaw, float eyePitch )
 {
-	VPROF( "UnitAnimState::Update" );
+	VPROF_BUDGET( "UnitAnimState::Update", VPROF_BUDGETGROUP_UNITS );
 
 	if( unit_disableanimstate.GetBool() )
 		return;

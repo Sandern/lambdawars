@@ -14,14 +14,15 @@
 
 void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players );
 
-QAngle UTIL_CalculateDirection( Vector &point1, Vector &point2 );
+QAngle UTIL_CalculateDirection( const Vector &point1, const Vector &point2 );
 
 struct positioninradius_t
 {
 	positioninradius_t( const Vector &startposition, const Vector &mins, const Vector &maxs, float radius, 
-						QAngle fan=QAngle(0, 0, 0), float stepsize=0, CBaseEntity *ignore = NULL, float beneathlimit = 256.0f )
+						QAngle fan=QAngle(0, 0, 0), float stepsize=0, CBaseEntity *ignore = NULL, float zoffset = 0.0f,
+						float beneathlimit = 256.0f, int mask = MASK_NPCSOLID, bool testposition = false )
 		: m_vStartPosition(startposition), m_vPosition(startposition), m_vMins(mins), m_vMaxs(maxs), m_fRadius(radius), m_vFan(fan), 
-		  m_fStepSize(stepsize), m_hIgnore(ignore), m_bSuccess(false), m_fBeneathLimit(beneathlimit)
+		  m_fStepSize(stepsize), m_hIgnore(ignore), m_bSuccess(false), m_fZOffset(0.0f), m_fBeneathLimit(beneathlimit), m_iMask(mask), m_bTestPosition(testposition)
 	{
 		if( m_fStepSize == 0 )
 			ComputeRadiusStepSize();
@@ -35,15 +36,18 @@ struct positioninradius_t
 	QAngle m_vFan;
 	float m_fStepSize;
 	EHANDLE m_hIgnore;
+	float m_fZOffset;
 	float m_fBeneathLimit;
 	bool m_bSuccess;
+	int m_iMask;
+	bool m_bTestPosition;
 
     void ComputeRadiusStepSize( void )
 	{
         Assert( m_fRadius > 0 );
         float perimeter = 2 * M_PI * m_fRadius;
-        float sizeunit = int(sqrt(pow(m_vMins.x - m_vMaxs.x, 2)+pow(m_vMins.y - m_vMaxs.y, 2))*1.25);
-        m_fStepSize = int(360 / (perimeter / sizeunit));
+        float sizeunit = int(sqrt(pow(m_vMins.x - m_vMaxs.x, 2)+pow(m_vMins.y - m_vMaxs.y, 2))*1.25f);
+        m_fStepSize = int(360.0f / (perimeter / sizeunit));
 	}
 };
 
@@ -52,16 +56,16 @@ void UTIL_FindPositionInRadius( positioninradius_t &info );
 struct positioninfo_t
 {
 	positioninfo_t( const Vector &startposition, const Vector &mins, const Vector &maxs, float startradius=0, 
-		            float maxradius=0.0, float radiusstep=0.0, CBaseEntity *ignore = NULL , float zoffset=0.0, float beneathlimit = 256.0f ) 
-		: m_vPosition(startposition), m_vMins(mins), m_vMaxs(maxs), m_fRadius(startradius), m_fMaxRadius(maxradius), m_fRadiusStep(radiusstep), 
-		  m_hIgnore(ignore), m_bSuccess(false), m_InRadiusInfo(startposition, mins, maxs, 0, QAngle(0, 0, 0), 0, ignore), m_fBeneathLimit(beneathlimit)
+		            float maxradius=0.0f, float radiusgrow=0.0f, float radiusstep=0.0f, CBaseEntity *ignore = NULL , 
+					float zoffset=0.0f, float beneathlimit = 256.0f, int mask = MASK_NPCSOLID, bool testposition = false )
+		: m_vPosition(startposition), m_vMins(mins), m_vMaxs(maxs), 
+		  m_fRadius(startradius), m_fMaxRadius(maxradius), m_fRadiusGrow(radiusgrow), m_fRadiusStep(radiusstep), 
+		  m_hIgnore(ignore), m_bSuccess(false), m_fZOffset(zoffset), m_fBeneathLimit(beneathlimit), m_iMask(mask),
+		  m_bTestPosition(testposition),
+		  m_InRadiusInfo(startposition, mins, maxs, 0, QAngle(0, 0, 0), 0, ignore, zoffset, beneathlimit, mask, testposition)
 	{
-		m_vPosition.z += zoffset;
-		m_InRadiusInfo.m_vStartPosition.z += zoffset;
-		m_InRadiusInfo.m_vPosition.z += zoffset;
-
-        if( m_fRadiusStep == 0 )
-            m_fRadiusStep = int(abs(mins.x - maxs.x));
+        if( m_fRadiusGrow == 0 )
+			m_fRadiusGrow = (mins - maxs).Length2D();
 
         if( m_fMaxRadius == 0 )
             m_fMaxRadius = m_fRadiusStep*100;
@@ -72,10 +76,14 @@ struct positioninfo_t
 	Vector m_vMaxs;
 	float m_fRadius;
 	float m_fMaxRadius;
+	float m_fRadiusGrow;
 	float m_fRadiusStep;
 	EHANDLE m_hIgnore;
+	float m_fZOffset;
 	float m_fBeneathLimit;
 	bool m_bSuccess;
+	int m_iMask;
+	bool m_bTestPosition;
 
 	positioninradius_t m_InRadiusInfo;
 };

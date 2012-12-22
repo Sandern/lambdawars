@@ -40,6 +40,7 @@ class UnitHelper(GenerateModuleSemiShared):
         'unit_locomotion.h',
         'unit_airlocomotion.h',
         'unit_animstate.h',
+        #'wars_orders.h'
     ]
     
     def GetFiles(self):
@@ -319,9 +320,19 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.include()
         
     def AddMisc(self, mb):
-        mb.free_function('VecCheckThrowTolerance').include()
-        #if self.isClient:
-        #    mb.free_function('DrawHealthBar').include()
+        if self.isServer:
+            mb.free_function('VecCheckThrowTolerance').include()
+            #if self.isClient:
+            #    mb.free_function('DrawHealthBar').include()
+        
+        '''cls = mb.class_('GroupMoveOrder')
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'
+        cls.mem_funs().exclude()
+        cls.class_('UnitRatio_t').exclude()
+        cls.class_('PositionRatio_t').exclude()
+        cls.mem_funs('Apply').include()
+        cls.mem_funs('AddUnit').include()'''
         
     def Parse(self, mb):
         # Exclude everything by default
@@ -337,5 +348,5 @@ class UnitHelper(GenerateModuleSemiShared):
             self.AddSense(mb)
             self.AddAnimEventMap(mb)
             self.AddExpresser(mb)
-            self.AddMisc(mb)
+        self.AddMisc(mb)
             
