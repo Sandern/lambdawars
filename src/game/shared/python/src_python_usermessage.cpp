@@ -331,12 +331,24 @@ bp::object PyReadElement( bf_read &msg )
 		z = msg.ReadFloat();
 		return boost::python::object(QAngle(x, y, z));
 	case PYTYPE_HANDLE:
+		// Decode handle
 		iEncodedEHandle = msg.ReadLong();
 		iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
 		iEntryIndex = iEncodedEHandle & ~(iSerialNum << MAX_EDICT_BITS);
+
+		// If the entity already exists on te client, return the handle from the entity
 		handle = EHANDLE( iEntryIndex, iSerialNum );
 		if( handle )
 			return handle->GetPyHandle();
+
+		// If it does not exist, create a new handle
+		try {																
+			return _entities.attr("PyHandle")( iEntryIndex, iSerialNum );							
+		} catch(boost::python::error_already_set &) {					
+			Warning("Failed to create a PyHandle\n");				
+			PyErr_Print();																		
+			PyErr_Clear();												
+		}	
 		return bp::object();
 	case PYTYPE_LIST:
 		length = msg.ReadShort();

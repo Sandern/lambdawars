@@ -172,7 +172,10 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	CRecipientFilter filter;
 	filter.MakeReliable();
 	filter.AddRecipient(iClient);
-	UserMessageBegin( filter, "PyNetworkArrayFull");
+	if( m_bChangedCallback )
+		UserMessageBegin( filter, "PyNetworkArrayFullCC" );
+	else
+		UserMessageBegin( filter, "PyNetworkArrayFull");
 	WRITE_EHANDLE(pEnt);
 	WRITE_STRING(m_Name);
 	WRITE_BYTE(length);
@@ -460,6 +463,49 @@ void __MsgFunc_PyNetworkArrayFull( bf_read &msg )
 	}
 }
 
+void __MsgFunc_PyNetworkArrayFullChangedCallback( bf_read &msg )
+{
+	char buf[_MAX_PATH];
+	bp::list data;
+	int length, i;
+
+	// Read entity
+	EHANDLE h = ReadEHANLE( msg );
+
+	// Read variable name + number of elements
+	msg.ReadString(buf, _MAX_PATH);
+	length = msg.ReadByte();
+
+	try {
+		for( i = 0; i < length; i++)
+		{
+			data.append( PyReadElement(msg) );
+		}
+	} catch(boost::python::error_already_set &) {
+		PyErr_Print();
+		PyErr_Clear();
+		return;
+	}
+
+	if( h == NULL )
+	{
+		if( g_debug_pynetworkvar.GetBool() )
+		{
+			Msg("#%d Received PyNetworkArrayFull %s, but entity NULL\n", h.GetEntryIndex(), buf);
+		}
+		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
+		return;
+	}
+
+	h->PyUpdateNetworkVar( buf, data );
+	h->PyNetworkVarCallChangedCallback( buf );
+
+	if( g_debug_pynetworkvar.GetBool() )
+	{
+		Msg("#%d Received PyNetworkArrayFull %s\n", h->entindex(), buf);
+	}
+}
+
 // ================== Dictionaries ==================
 void __MsgFunc_PyNetworkDictElement( bf_read &msg )
 {
@@ -544,26 +590,64 @@ void __MsgFunc_PyNetworkDictFull( bf_read &msg )
 	}
 }
 
+void __MsgFunc_PyNetworkDictFullChangedCallback( bf_read &msg )
+{
+	char buf[_MAX_PATH];
+	bp::dict data;
+	int length, i;
+
+	// Read entity
+	EHANDLE h = ReadEHANLE( msg );
+
+	// Read variable name + number of elements
+	msg.ReadString(buf, _MAX_PATH);
+	length = msg.ReadByte();
+
+	// Parse data
+	try {
+		for( i = 0; i < length; i++)
+		{
+			data[PyReadElement(msg)] = PyReadElement(msg);
+		}
+	} catch(boost::python::error_already_set &) {
+		PyErr_Print();
+		PyErr_Clear();
+		return;
+	}
+
+	if( h == NULL )
+	{
+		if( g_debug_pynetworkvar.GetBool() )
+		{
+			Msg("#%d Received PyNetworkDictFull %s, but entity NULL\n", h.GetEntryIndex(), buf);
+		}
+		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
+		return;
+	}
+
+	h->PyUpdateNetworkVar( buf, data );
+	h->PyNetworkVarCallChangedCallback( buf );
+
+	if( g_debug_pynetworkvar.GetBool() )
+	{
+		Msg("#%d Received PyNetworkDictFull %s (length: %d)\n", h->entindex(), buf, length);
+	}
+}
+
 // register message handler once
 void HookPyNetworkVar() 
 {
-#ifdef HL2WARS_ASW_DLL
 	for ( int hh = 0; hh < MAX_SPLITSCREEN_PLAYERS; ++hh )
 	{
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( hh );
 		usermessages->HookMessage( "PyNetworkVar", __MsgFunc_PyNetworkVar );
 		usermessages->HookMessage( "PyNetworkVarCC", __MsgFunc_PyNetworkVarChangedCallback );
 		usermessages->HookMessage( "PyNetworkArrayFull", __MsgFunc_PyNetworkArrayFull );
+		usermessages->HookMessage( "PyNetworkArrayFullCC", __MsgFunc_PyNetworkArrayFullChangedCallback );
 		usermessages->HookMessage( "PyNetworkDictElement", __MsgFunc_PyNetworkDictElement );
 		usermessages->HookMessage( "PyNetworkDictFull", __MsgFunc_PyNetworkDictFull );
+		usermessages->HookMessage( "PyNetworkDictFullCC", __MsgFunc_PyNetworkDictFullChangedCallback );
 	}
-#else
-	usermessages->HookMessage( "PyNetworkVar", __MsgFunc_PyNetworkVar );
-	usermessages->HookMessage( "PyNetworkVarCC", __MsgFunc_PyNetworkVarChangedCallback );
-	usermessages->HookMessage( "PyNetworkArrayFull", __MsgFunc_PyNetworkArrayFull );
-	usermessages->HookMessage( "PyNetworkDictElement", __MsgFunc_PyNetworkDictElement );
-	usermessages->HookMessage( "PyNetworkDictFull", __MsgFunc_PyNetworkDictFull );
-#endif // HL2WARS_ASW_DEV
 }
 
 #endif // CLIENT_DLL
