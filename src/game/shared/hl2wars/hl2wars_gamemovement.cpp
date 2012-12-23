@@ -318,7 +318,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		wishvel[i] = up[i]*fmove + right[i]*smove;
 	wishvel[2] = 0.0f;
 
-	if( warsplayer->GetCamHeight() != -1 && warsplayer->GetCamHeight() > 2.0f )
+	if( warsplayer->GetCamMaxHeight() != -1 && warsplayer->GetCamMaxHeight() > 2.0f )
 		;//wishvel[2] = -warsplayer->GetCamHeight() * 4.0f; // Force player origin down
 	else
 		wishvel = wishvel + forward*umove*4.0;		// Zooming is forward
@@ -398,7 +398,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	// Store current height
 	heightchange = mv->GetAbsOrigin().z;
 
-	if( warsplayer->GetCamHeight() != -1 )
+	if( warsplayer->GetCamMaxHeight() != -1 )
 	{
 		//Vector vCamOffsetZ = Vector(0.0f, 0.0f, warsplayer->GetCameraOffset().z);
 		//TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos()+vCamOffsetZ, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
@@ -426,7 +426,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	// Determine new height and return player to the ground
 	warsplayer->CalculateHeight( mv->GetAbsOrigin() );
 
-	if( warsplayer->GetCamHeight() != -1 )
+	if( warsplayer->GetCamMaxHeight() != -1 )
 	{
 		TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos(), PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 		mv->SetAbsOrigin( pm.endpos );
@@ -435,15 +435,6 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		// Determine new height again :)
 		warsplayer->CalculateHeight( mv->GetAbsOrigin() );
 	}
-
-	// Determine height change and notify input
-	heightchange = mv->GetAbsOrigin().z - heightchange;
-#ifdef CLIENT_DLL
-	if( heightchange > 0.1f )
-	{
-
-	}
-#endif // CLIENT_DLL
 
 	//CheckVelocity();
 

@@ -102,7 +102,6 @@ public:
 	float							GetCamFriction() { return m_fCamFriction; }
 
 	virtual void					CalculateHeight( const Vector &vPosition );
-	float							GetCamHeight() { return m_fCurHeight; }
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
 	const Vector &					GetCamGroundPos() { return m_vCamGroundPos; }
 
@@ -212,7 +211,7 @@ private:
 	float m_fCamAcceleration;
 	float m_fCamStopSpeed;
 	float m_fCamFriction;
-	float m_fCurHeight, m_fMaxHeight;
+	float m_fMaxHeight;
 	Vector m_vCamGroundPos;
 
 	// Selection data

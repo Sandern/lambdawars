@@ -151,7 +151,6 @@ public:
 	float							GetCamFriction() { return cl_strategic_cam_friction.GetFloat(); }
 
 	virtual void					CalculateHeight( const Vector &vPosition );
-	float							GetCamHeight() { return m_fCurHeight; }
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
 	const Vector &					GetCamGroundPos() { return m_vCamGroundPos; }
 
@@ -215,7 +214,7 @@ private:
 	Vector				m_vDirectMove;
 	float				m_fDirectMoveTimeOut;
 
-	float				m_fCurHeight, m_fMaxHeight;
+	float				m_fMaxHeight;
 	Vector				m_vCamGroundPos;
 
 	EHANDLE				m_hCamFollowEntity;

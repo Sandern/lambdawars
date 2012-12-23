@@ -1289,15 +1289,6 @@ void register_C_HL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        { //::C_HL2WarsPlayer::GetCamHeight
-        
-            typedef float ( ::C_HL2WarsPlayer::*GetCamHeight_function_type )(  ) ;
-            
-            C_HL2WarsPlayer_exposer.def( 
-                "GetCamHeight"
-                , GetCamHeight_function_type( &::C_HL2WarsPlayer::GetCamHeight ) );
-        
-        }
         { //::C_HL2WarsPlayer::GetCamMaxHeight
         
             typedef float ( ::C_HL2WarsPlayer::*GetCamMaxHeight_function_type )(  ) ;

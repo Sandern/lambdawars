@@ -83,7 +83,7 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 	}
 
 	// Clamp camera height within the valid range
-	if( pPlayer->GetCamHeight() != -1 )
+	if( pPlayer->GetCamMaxHeight() != -1 )
 	{
 		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 	}
@@ -209,7 +209,7 @@ CON_COMMAND_F( cam_debug_info, "Debug camera info", 0 )
 	if( !pPlayer )
 		return;
 
-	Msg("Player Movement Cam Height: %f\n", pPlayer->GetCamHeight() );
+	Msg("Player Position: %f %f %f\n", pPlayer->GetAbsOrigin().x, pPlayer->GetAbsOrigin().y, pPlayer->GetAbsOrigin().z );
 	Msg("Player Max Cam Height: %f\n", pPlayer->GetCamMaxHeight() );
 	Msg("Current Cam Height: %f\n", wars_input->GetCurrentCamHeight() );
 	Msg("Desired Cam Height: %f\n", wars_input->GetDesiredCamHeight() );

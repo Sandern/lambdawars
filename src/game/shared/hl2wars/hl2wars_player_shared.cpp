@@ -1320,39 +1320,39 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 //-----------------------------------------------------------------------------
 void CHL2WarsPlayer::CalculateHeight( const Vector &vPosition )
 {
-	// Determine height
 	trace_t tr;
 	CTraceFilterWars traceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
-	UTIL_TraceHull( vPosition, vPosition + Vector(0, 0, -MAX_TRACE_LENGTH), 
+
+	Vector vTestStartPos( vPosition );
+	vTestStartPos.z += 64.0f; // Should be placed at the ground, so raise a bit.
+
+	// Trace up
+	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, MAX_TRACE_LENGTH), 
 		GetPlayerMins(), GetPlayerMaxs(),
 		CONTENTS_PLAYERCLIP, &traceFilter, &tr );
-
-	if( tr.DidHit() )
+	if( !tr.DidHit() )
 	{
-		// Store ground position
-		m_vCamGroundPos = tr.endpos;
-
-		m_fCurHeight = (tr.endpos - vPosition).Length();
-
-		Vector vStart = tr.endpos;
-		UTIL_TraceHull( vStart, vStart + Vector(0, 0, MAX_TRACE_LENGTH), GetPlayerMins(), GetPlayerMaxs(), CONTENTS_PLAYERCLIP, &traceFilter, &tr );
-		if( tr.DidHit() )
-		{
-			m_fMaxHeight = (tr.endpos - vStart).Length() - 64.0f;
-		}
-		else
-		{
-			m_fCurHeight = -1;
-			m_fMaxHeight = -1;
-			m_vCamGroundPos = vPosition;
-		}
-	}
-	else
-	{
-		m_fCurHeight = -1;
 		m_fMaxHeight = -1;
-		m_vCamGroundPos = vPosition;
+		m_vCamGroundPos = vTestStartPos;
+		return;
 	}
+
+	Vector vMaxPos = tr.endpos;
+
+	// Trace down
+	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, -MAX_TRACE_LENGTH), 
+		GetPlayerMins(), GetPlayerMaxs(),
+		CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	if( !tr.DidHit() )
+	{
+		m_fMaxHeight = -1;
+		m_vCamGroundPos = vTestStartPos;
+		return;
+	}
+
+	// Update height settings
+	m_vCamGroundPos = tr.endpos;
+	m_fMaxHeight = (vMaxPos - tr.endpos).Length() - 64.0f;
 }
 
 //-----------------------------------------------------------------------------
