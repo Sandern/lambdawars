@@ -333,7 +333,7 @@ void PyEntityFactory::InitPyClass()
 	bp::object meth = SrcPySystem()->Get("InitEntityClass", m_PyClass, false);
 	if( meth.ptr() == Py_None )
 		return;		// Not implemented, ignore
-	SrcPySystem()->Run<bp::object>( meth, m_PyClass );
+	SrcPySystem()->Run( meth );
 }
 
 // Check existing entities with this classname
@@ -469,8 +469,15 @@ END_SEND_TABLE()
 
 static CTEPyEvent g_TEPyEvent( "PyEvent" );
 
+ConVar g_debug_pyevent("g_debug_pyevent", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+
 void PySendEvent( IRecipientFilter &filter, EHANDLE ent, int event, int data)
 {
+	if( g_debug_pyevent.GetBool() )
+	{
+		DevMsg("Sending Python event to entity #%d with event %d and data %d\n", ent ? ent->entindex() : -1, event, data);
+	}
+
 	g_TEPyEvent.m_hEnt = ent;
 	g_TEPyEvent.m_iEvent = event;
 	g_TEPyEvent.m_nData = data;
