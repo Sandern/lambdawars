@@ -1713,6 +1713,54 @@ struct PyGameEventListener_wrapper : PyGameEventListener, bp::wrapper< PyGameEve
 
 };
 
+struct PyVEngineClient_wrapper : PyVEngineClient, bp::wrapper< PyVEngineClient > {
+
+    PyVEngineClient_wrapper(PyVEngineClient const & arg )
+    : PyVEngineClient( arg )
+      , bp::wrapper< PyVEngineClient >(){
+        // copy constructor
+        
+    }
+
+    PyVEngineClient_wrapper()
+    : PyVEngineClient()
+      , bp::wrapper< PyVEngineClient >(){
+        // null constructor
+        
+    }
+
+    virtual ::Vector GetLightForPoint( ::Vector const & pos, bool clamp ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetLightForPoint: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetLightForPoint( boost::ref(pos), clamp ) of Class: PyVEngineClient\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_GetLightForPoint = this->get_override( "GetLightForPoint" );
+        if( func_GetLightForPoint.ptr() != Py_None )
+            try {
+                return func_GetLightForPoint( boost::ref(pos), clamp );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->PyVEngineClient::GetLightForPoint( boost::ref(pos), clamp );
+            }
+        else
+            return this->PyVEngineClient::GetLightForPoint( boost::ref(pos), clamp );
+    }
+    
+    ::Vector default_GetLightForPoint( ::Vector const & pos, bool clamp ) {
+        return PyVEngineClient::GetLightForPoint( boost::ref(pos), clamp );
+    }
+
+};
+
 struct lump_t_wrapper : lump_t, bp::wrapper< lump_t > {
 
     lump_t_wrapper(lump_t const & arg )
@@ -2794,7 +2842,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( "ListenForGameEvent", (void ( ::PyGameEventListener::* )( char const * ) )( &::PyGameEventListener::ListenForGameEvent ), bp::arg("name") )    
         .def( "StopListeningForAllEvents", (void ( ::PyGameEventListener::* )() )( &::PyGameEventListener::StopListeningForAllEvents ) );
 
-    bp::class_< PyVEngineClient >( "VEngineClient" )    
+    bp::class_< PyVEngineClient_wrapper >( "VEngineClient" )    
         .def( 
             "ActivateOccluder"
             , (void ( ::PyVEngineClient::* )( int,bool ) )( &::PyVEngineClient::ActivateOccluder )
@@ -2882,6 +2930,11 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "GetLevelName"
             , (char const * ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::GetLevelName ) )    
+        .def( 
+            "GetLightForPoint"
+            , (::Vector ( ::PyVEngineClient::* )( ::Vector const &,bool ) )(&::PyVEngineClient::GetLightForPoint)
+            , (::Vector ( PyVEngineClient_wrapper::* )( ::Vector const &,bool ) )(&PyVEngineClient_wrapper::default_GetLightForPoint)
+            , ( bp::arg("pos"), bp::arg("clamp") ) )    
         .def( 
             "GetLightForPointFast"
             , (::Vector ( ::PyVEngineClient::* )( ::Vector const &,bool ) )( &::PyVEngineClient::GetLightForPointFast )

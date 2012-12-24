@@ -1003,7 +1003,7 @@ CON_COMMAND_F( cl_py_runfile, "Run a python script", FCVAR_CHEAT)
 	if( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 #endif // CLIENT_DLL
-	g_SrcPythonSystem.ExecuteFile(args.ArgS());
+	g_SrcPythonSystem.ExecuteFile( args.ArgS() );
 }
 
 #ifndef CLIENT_DLL
@@ -1018,13 +1018,127 @@ CON_COMMAND_F( cl_py_run, "Run a string on the python interpreter", FCVAR_CHEAT)
 	if( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 #endif // CLIENT_DLL
-	g_SrcPythonSystem.Run(args.ArgS());
+	g_SrcPythonSystem.Run( args.ArgS(), "consolespace" );
+}
+
+static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+{
+	int numMatches = 0;
+
+	char newmodulepath[MAX_PATH];
+
+	// Get command
+	CUtlVector<char*, CUtlMemory<char*, int> > commandandrest;
+	Q_SplitString( partial, " ", commandandrest );
+	if( commandandrest.Count() == 0 )
+		return numMatches;
+	char *pCommand = commandandrest[0];
+
+	char *pRest = "";
+	if( commandandrest.Count() > 1 )
+		pRest = commandandrest[1];
+	bool bEndsWithDot = pRest[Q_strlen(pRest)-1] == '.';
+
+	// Get modules typed so far
+	CUtlVector<char*, CUtlMemory<char*, int> > modulesnames;
+	Q_SplitString( pRest, ".", modulesnames );
+
+	// Construct path
+	char path[MAX_PATH];
+	path[0] = '\0';
+	Q_strcat( path, "python", MAX_PATH );
+	char basemodulepath[MAX_PATH];
+	basemodulepath[0] = '\0';
+
+	//Msg("Command: %s, rest: %s, modulesnames: %d\n", pCommand, pRest, modulesnames.Count() );
+
+	// Add modules to path + remember base module path, stripping the last module
+	for( int i = 0; i < modulesnames.Count(); i++ )
+	{
+		if( modulesnames.Count() - 1 == i && !bEndsWithDot )
+			continue;
+
+		Q_strcat( path, "\\", MAX_PATH );
+		Q_strcat( path, modulesnames[i], MAX_PATH );
+
+		Q_strcat( basemodulepath, modulesnames[i], MAX_PATH );
+		Q_strcat( basemodulepath, ".", MAX_PATH );
+	}
+
+	char finalpath[MAX_PATH];
+	Q_FixupPathName( finalpath, MAX_PATH, path );
+	
+	// Create whildcar
+	char wildcard[MAX_PATH];
+	Q_snprintf( wildcard, MAX_PATH, "%s\\*", finalpath );
+
+	//Msg("Final path: %s, wildcard: %s\n", finalpath, wildcard );
+
+	// List directories/filenames
+	FileFindHandle_t findHandle;
+	const char *filename = filesystem->FindFirstEx( wildcard, "MOD", &findHandle );
+	while ( filename )
+	{
+		char fullpath[MAX_PATH];
+		Q_snprintf( fullpath, MAX_PATH, "%s/%s", finalpath, filename );
+
+		//Msg("filename: %s, fullpath: %s\n", filename, fullpath );
+
+		if( Q_strncmp( filename, ".", 1 ) == 0 || Q_strncmp( filename, "..", 2 ) == 0 )
+		{
+			filename = filesystem->FindNext( findHandle );
+			continue;
+		}
+
+		if( filesystem->IsDirectory( fullpath, "MOD" ) )
+		{
+			
+			// Add directory if __init__.py inside
+			char initpath[MAX_PATH];
+			Q_snprintf( initpath, MAX_PATH, "%s\\__init__.py", fullpath );
+			//Msg("Is dir, testing for %s\n", initpath);
+			if( filesystem->FileExists( initpath, "MOD" ) )
+			{
+				
+				
+				Q_snprintf( newmodulepath, MAX_PATH, "%s%s", basemodulepath, filename );
+				//Msg("is package. Testing: %s starts with %s\n", newmodulepath, pRest );
+				if( Q_strncmp( pRest, newmodulepath, Q_strlen(pRest) ) == 0 )
+					Q_snprintf( commands[ numMatches++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", pCommand, newmodulepath );
+			}
+		}
+		else
+		{
+			// Check extension. If .py, strip and add
+			char ext[5];
+			Q_ExtractFileExtension( filename, ext, 5 );
+
+			if( Q_strncmp( ext, "py", 5 ) == 0 )
+			{
+				char noextfilename[MAX_PATH]; 
+				Q_StripExtension( filename, noextfilename, MAX_PATH );
+
+				Q_snprintf( newmodulepath, MAX_PATH, "%s%s", basemodulepath, noextfilename );
+				//Msg("is file. Testing: %s starts with %s\n", newmodulepath, pRest );
+				if( Q_strncmp( pRest, newmodulepath, Q_strlen(pRest) ) == 0 )
+					Q_snprintf( commands[ numMatches++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", pCommand, newmodulepath );
+			}
+		}
+
+		if ( numMatches == COMMAND_COMPLETION_MAXITEMS )
+			break;
+
+		filename = filesystem->FindNext( findHandle );
+	}
+	filesystem->FindClose( findHandle );
+
+	return numMatches;
 }
 
 #ifndef CLIENT_DLL
-CON_COMMAND( py_import, "Import a python module")
+CON_COMMAND_F_COMPLETION( py_import, "Import a python module", 0, PyModuleAutocomplete )
 #else
-CON_COMMAND_F( cl_py_import, "Import a python module", FCVAR_CHEAT)
+CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #endif // CLIENT_DLL
 {
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -1039,9 +1153,9 @@ CON_COMMAND_F( cl_py_import, "Import a python module", FCVAR_CHEAT)
 }
 
 #ifndef CLIENT_DLL
-CON_COMMAND( py_reload, "Reload a python module")
+CON_COMMAND_F_COMPLETION( py_reload, "Reload a python module", 0, PyModuleAutocomplete )
 #else
-CON_COMMAND_F( cl_py_reload, "Reload a python module", FCVAR_CHEAT)
+CON_COMMAND_F_COMPLETION( cl_py_reload, "Reload a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #endif // CLIENT_DLL
 {
 	if( !SrcPySystem()->IsPythonRunning() )

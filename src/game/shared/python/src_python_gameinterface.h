@@ -226,6 +226,10 @@ class PyVEngineClient
 {
 public:
 
+	// Get the lighting intensivty for a specified point
+	// If bClamp is specified, the resulting Vector is restricted to the 0.0 to 1.0 for each element
+	virtual Vector			GetLightForPoint(const Vector &pos, bool clamp) { return engine->GetLightForPoint(pos, clamp); }
+
 	// Gets the dimensions of the game window
 	inline void				GetScreenSize( int& width, int& height ) { return engine->GetScreenSize(width, height); }
 
@@ -436,11 +440,7 @@ public:
 	inline bool			CopyFrameBufferToMaterial( const char *pMaterialName ) { return engine->CopyFrameBufferToMaterial(pMaterialName); }
 
 	// Causes the engine to read in the user's configuration on disk
-#ifdef HL2WARS_ASW_DLL
 	inline void			ReadConfiguration( const int iController, const bool readDefault ) { engine->ReadConfiguration(iController, readDefault); }
-#else
-	inline void			ReadConfiguration( const bool readDefault = false ) { engine->ReadConfiguration(readDefault); }
-#endif // HL2WARS_ASW_DLL
 
 	inline bool			IsLowViolence() { return engine->IsLowViolence(); }
 	inline const char		*GetMostRecentSaveGame( void ) { return engine->GetMostRecentSaveGame(); }
