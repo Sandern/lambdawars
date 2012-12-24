@@ -517,6 +517,7 @@ public:
 		{
 			HidingSpot *pSpot = spots->Element( i );
 			const Vector &vPos = pSpot->GetPosition();
+			float fDist = (vPos - m_vPos).Length2D();
 
 #ifndef USE_NAVAREA_BASED_DIST
 			float fDist = (vPos - m_vPos).LengthSqr();
@@ -525,19 +526,19 @@ public:
 #else
 			CNavArea *pTestArea = TheNavMesh->GetNearestNavArea( vPos, false, m_fRadius, false, false );
 
-			float fDist;
+			float fPathDist;
 			if( !m_pUnit )
 			{
 				ShortestPathCost costFunc;
-				fDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius );
+				fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius * 2.0f );
 			}
 			else
 			{
 				UnitShortestPathCost costFunc( m_pUnit, false );
-				fDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius );
+				fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius * 2.0f );
 			}
 
-			if( fDist > 0 && fDist < m_fRadius )
+			if( fPathDist >= 0 && fDist < m_fRadius )
 			{
 				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
 			}
@@ -579,7 +580,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 	// Get hiding spots in radius
 	CUtlVector< HidingSpotResult_t > HidingSpots;
 	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
-	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, radius );
+	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, radius * 2.0f ); // Use a larger radius for testing the areas
 
 	// Sort based on distance
 	HidingSpots.Sort( HidingSpotCompare );
