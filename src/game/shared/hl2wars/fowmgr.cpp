@@ -490,7 +490,8 @@ void CFogOfWarMgr::LoadHeightMap()
 	}
 	else
 	{
-		Q_memset( m_TileHeights.Base(), 0, gridsize*gridsize*sizeof(float) );
+		for ( i = 0; i < gridsize*gridsize; i++)
+			m_TileHeights[i] = -MAX_COORD_FLOAT;
 	}
 
 	DevMsg("CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime);
