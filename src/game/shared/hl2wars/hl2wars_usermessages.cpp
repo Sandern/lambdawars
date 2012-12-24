@@ -64,7 +64,9 @@ void RegisterUserMessages()
 	usermessages->Register( "PyNetworkVar", -1 );
 	usermessages->Register( "PyNetworkVarCC", -1 );
 	usermessages->Register( "PyNetworkArrayFull", -1 );
+	usermessages->Register( "PyNetworkArrayFullCC", -1 );
 	usermessages->Register( "PyNetworkDictElement", -1 );
 	usermessages->Register( "PyNetworkDictFull", -1 );
+	usermessages->Register( "PyNetworkDictFullCC", -1 );
 }
 
