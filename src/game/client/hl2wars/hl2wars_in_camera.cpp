@@ -22,6 +22,7 @@ ConVar cl_strategic_cam_spring_dampening( "cl_strategic_cam_spring_dampening", "
 extern ConVar cl_strategic_height_tol;
 
 ConVar cl_strategic_cam_min_dist( "cl_strategic_cam_min_dist", "240.0", FCVAR_CHEAT, "Camera minimum distance" );
+ConVar cl_strategic_cam_max_dist( "cl_strategic_cam_max_dist", "840.0", FCVAR_CHEAT, "Camera maximum distance" );
 
 #define	DIST	 2
 
@@ -78,14 +79,14 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 	if( m_flDesiredCameraDist == -1 )
 	{
 		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() ); // Ensure we have a valid height
-		m_flDesiredCameraDist = m_flCurrentCameraDist = clamp( 800.0f, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
+		m_flDesiredCameraDist = m_flCurrentCameraDist = clamp( 800.0f, cl_strategic_cam_min_dist.GetFloat(), MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() ) );
 		m_flCurrentCameraDist = clamp( m_flCurrentCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 	}
 
 	// Clamp camera height within the valid range
 	if( pPlayer->GetCamMaxHeight() != -1 )
 	{
-		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
+		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() ) );
 	}
 
 	// Converge cam height
