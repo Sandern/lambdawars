@@ -78,11 +78,11 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit )
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, bool bCheckBlocked )
 {
 	CNavArea *pArea;
 	//pArea = TheNavMesh->GetNearestNavArea(pos, false, 64.0f);
-	pArea = TheNavMesh->GetNavArea(pos, beneathlimit);
+	pArea = TheNavMesh->GetNavArea(pos, beneathlimit, bCheckBlocked);
 	if( pArea ) {
 		Vector vAreaPos(pos);
 		vAreaPos.z = pArea->GetZ(pos);

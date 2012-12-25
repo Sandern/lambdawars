@@ -21,7 +21,7 @@
 bool NavMeshAvailable();
 bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
 float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CUnitBase *unit = NULL );
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f );
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, bool checkblocked=true );
 void DestroyAllNavAreas();
 
 int CreateNavArea( const Vector &corner, const Vector &otherCorner );

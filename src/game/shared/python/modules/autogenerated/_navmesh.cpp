@@ -131,12 +131,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,bool );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("checkblocked")=(bool)(true) ) );
     
     }
 
@@ -333,12 +333,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,bool );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("checkblocked")=(bool)(true) ) );
     
     }
 
