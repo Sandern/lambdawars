@@ -418,15 +418,17 @@ void NetworkedClass::AttachClientClass( PyClientClassBase *pClientClass )
 // Message handler for PyNetworkCls
 void __MsgFunc_PyNetworkCls( bf_read &msg )
 {
-	char buf[512];
+#define BUFSIZE 512
+
+	char buf[BUFSIZE];
 	int iType = msg.ReadByte();
 
 	// Make sure the client class is imported
-	msg.ReadString(buf, 512);
+	msg.ReadString(buf, BUFSIZE);
 	SrcPySystem()->Import(buf);
 
 	// Read which client class we are modifying
-	msg.ReadString(buf, 512);
+	msg.ReadString(buf, BUFSIZE);
 //	Msg("Incoming python network class message %s\n", buf);
 	PyClientClassBase *p = FindPyClientClass(buf);
 	if( !p )
@@ -440,8 +442,8 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	SetupClientClassRecv(p, iType);
 
 	// Read network class name
-	msg.ReadString(buf, 512);
-	Q_strncpy(p->m_strPyNetworkedClassName, buf, 512);
+	msg.ReadString(buf, BUFSIZE);
+	Q_strncpy(p->m_strPyNetworkedClassName, buf, BUFSIZE);
 
 	// Attach if a network class exists
 	unsigned short lookup = m_NetworkClassDatabase.Find( buf );
@@ -454,15 +456,11 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 // register message handler once
 void HookPyNetworkCls() 
 {
-#ifdef HL2WARS_ASW_DLL
 	for ( int hh = 0; hh < MAX_SPLITSCREEN_PLAYERS; ++hh )
 	{
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( hh );
 		usermessages->HookMessage( "PyNetworkCls", __MsgFunc_PyNetworkCls );
 	}
-#else
-	usermessages->HookMessage( "PyNetworkCls", __MsgFunc_PyNetworkCls );
-#endif // HL2WARS_ASW_DEV
 }
 
 CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )

@@ -1944,9 +1944,26 @@ void CDetailObjectSystem::UnserializeModels( CUtlBuffer& buf )
 							pos. z = lump.m_Origin.z;
 						}
 						int newObj = m_DetailObjects.AddToTail();
+
+						ColorRGBExp32 oldColor = lump.m_Lighting;
+						Vector oldLight;
+						ColorRGBExp32ToVector( oldColor, oldLight );
+						//test.exponent = engine->GetLightForPoint( pos, false ).Length();
+						//Vector light = engine->GetLightForPoint( pos, false );
+
+						ColorRGBExp32 newColor;
+						Vector light;
+						Vector normal(0, 0, 1);
+						engine->ComputeLighting( pos, &normal, false, light );
+						light *= 255.0f;
+
+						light = (oldLight * 0.65 + light * 0.35);
+
+						VectorToColorRGBExp32( light, newColor );
+
 						m_DetailObjects[newObj].InitSprite( 
 							newObj, bFlipped, pos, lump.m_Angles, 
-							lump.m_DetailModel, lump.m_Lighting,
+							lump.m_DetailModel, newColor/*lump.m_Lighting*/,
 							lump.m_LightStyles, lump.m_LightStyleCount, lump.m_Orientation, lump.m_flScale,
 							lump.m_Type, lump.m_ShapeAngle, lump.m_ShapeSize, lump.m_SwayAmount );
 						++detailObjectCount;
