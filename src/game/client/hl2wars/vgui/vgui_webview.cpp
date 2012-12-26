@@ -230,12 +230,15 @@ void WebViewPanel::OnMouseReleased(vgui::MouseCode code)
 	if( !m_pWebView )
 		return;
 
-	if( vgui::input()->GetMouseCapture() == GetVPanel() )
+	// Check mouse capture and make sure it is cleared
+	bool bHasMouseCapture = vgui::input()->GetMouseCapture() == GetVPanel();
+	if( bHasMouseCapture )
 	{
 		vgui::input()->SetMouseCaptureEx(0, code);
 	}
 
-	if( m_pController->GetPassMouseTruIfAlphaZero() && m_pController->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	// Check if we should pass input to parent (only if we don't have mouse capture active)
+	if( !bHasMouseCapture && m_pController->GetPassMouseTruIfAlphaZero() && m_pController->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
 		if( g_debug_webview.GetInt() > 0 )
 			DevMsg("WebView: passed mouse released %d %d to parent\n", m_iMouseX, m_iMouseY);
@@ -244,6 +247,7 @@ void WebViewPanel::OnMouseReleased(vgui::MouseCode code)
 		return;
 	}
 
+	// Inject mouse
 	switch( code )
 	{
 	case MOUSE_LEFT:
@@ -274,6 +278,9 @@ void WebViewPanel::OnMouseWheeled( int delta )
 		CallParentFunction(new KeyValues("MouseWheeled", "delta", delta));
 		return;
 	}
+
+	if( g_debug_webview.GetInt() > 2 )
+		DevMsg("WebView: injected mouse wheeled %d\n", delta);
 
 	// VGUI just gives -1 or +1. injectMouseWheel expects
 	// the number of pixels to shift.
