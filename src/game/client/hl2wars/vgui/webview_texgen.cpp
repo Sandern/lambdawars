@@ -107,7 +107,7 @@ bool CSrcWebCore::Init()
 	config.log_level = Awesomium::kLogLevel_Verbose;
 
 	AddOption( config, "--disable-fullscreen=1" );
-	
+	AddOption( config, "--enable-strict-site-isolation" );
 
 	// Create the WebCore singleton with our custom config
 	g_pWebCore = Awesomium::WebCore::Initialize( config );

@@ -22,6 +22,8 @@
 
 //LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+ConVar g_debug_cef("g_debug_cef", "1");
+
 //-----------------------------------------------------------------------------
 // Purpose: Helper for finding the main window
 //-----------------------------------------------------------------------------
@@ -180,63 +182,6 @@ static CCefSystem s_CEFSystem;
 CCefSystem &CEFSystem()
 {
 	return s_CEFSystem;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Debug commands
-//-----------------------------------------------------------------------------
-CON_COMMAND_F( cef_move_window_to_back, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		::SetWindowPos( CEFSystem().GetBrowser( i )->GetWindow(), 
-			HWND_BOTTOM, -1, -1, -1, -1, SWP_NOSIZE | SWP_NOMOVE );
-	}
-}
-
-CON_COMMAND_F( cef_move_window_to_top, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		::SetWindowPos( CEFSystem().GetBrowser( i )->GetWindow(), 
-			HWND_TOP, -1, -1, -1, -1, SWP_NOSIZE | SWP_NOMOVE );
-	}
-}
-
-CON_COMMAND_F( cef_set_window_topmost, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		::SetWindowPos( CEFSystem().GetBrowser( i )->GetWindow(), 
-			HWND_TOPMOST, -1, -1, -1, -1, SWP_NOSIZE | SWP_NOMOVE );
-	}
-}
-
-CON_COMMAND_F( cef_set_window_notopmost, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		::SetWindowPos( CEFSystem().GetBrowser( i )->GetWindow(), 
-			HWND_NOTOPMOST, -1, -1, -1, -1, SWP_NOSIZE | SWP_NOMOVE );
-	}
-}
-
-CON_COMMAND_F( cef_set_window_after_main, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		::SetWindowPos( CEFSystem().GetBrowser( i )->GetWindow(), 
-			CEFSystem().GetMainWindow(), -1, -1, -1, -1, SWP_NOSIZE | SWP_NOMOVE );
-	}
-}
-
-CON_COMMAND_F( cef_invalidate_layout, "", 0 )
-{
-	for( int i = 0; i < CEFSystem().CountBrowsers(); i++ )
-	{
-		CEFSystem().GetBrowser( i )->InvalidateLayout();
-	}
 }
 
 #if 1 // _DEBUG

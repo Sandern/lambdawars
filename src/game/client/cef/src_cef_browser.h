@@ -13,10 +13,13 @@
 class CefClientHandler;
 
 #include "include/internal/cef_ptr.h"
+#include "src_cef_osrenderer.h"
 
 #ifdef WIN32
 	#include <winlite.h>
 #endif // WIN32
+
+class SrcCefVGUIPanel;
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -60,7 +63,8 @@ public:
 	virtual void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
 
 	// Internal
-	HWND		GetWindow( void );
+	SrcCefVGUIPanel *GetPanel() { return m_pPanel; }
+	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
 
 protected:
 	CefRefPtr< CefClientHandler > GetClientHandler( void );
@@ -70,6 +74,8 @@ private:
 
 private:
 	CefRefPtr< CefClientHandler > m_CefClientHandler;
+
+	SrcCefVGUIPanel *m_pPanel;
 
 	std::string m_URL;
 

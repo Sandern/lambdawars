@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "src_cef_browser.h"
 #include "src_cef.h"
+#include "src_cef_vgui_panel.h"
 
 // CEF
 #include "include/cef_app.h"
@@ -29,6 +30,7 @@ class CefClientHandler : public CefClient,
                       public CefKeyboardHandler,
                       public CefLifeSpanHandler,
                       public CefLoadHandler,
+					  //public CefRenderHandler,
                       public CefRequestHandler
 {
 public:
@@ -59,6 +61,9 @@ public:
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() {
 		return this;
 	}
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() {
+		return m_OSRHandler.get();
+	}
 	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() {
 		return this;
 	}
@@ -85,9 +90,18 @@ public:
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 							const CefString& errorText, const CefString& failedUrl);
 
+	// CefRenderHandler
+	void SetOSRHandler(CefRefPtr<SrcCefOSRRenderer> handler) {
+		m_OSRHandler = handler;
+	}
+	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler() { return m_OSRHandler; }
+
+
+
 private:
 	// The child browser window
 	CefRefPtr<CefBrowser> m_Browser;
+	CefRefPtr<SrcCefOSRRenderer> m_OSRHandler;
 
 	// The child browser id
 	int m_BrowserId;
@@ -104,7 +118,6 @@ private:
 //-----------------------------------------------------------------------------
 CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser )
 {
-	
 }
 
 //-----------------------------------------------------------------------------
@@ -133,10 +146,10 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
 	//HWND hWnd = browser->GetHost()->GetWindowHandle();
 
-    RECT rect;
-    GetClientRect( browser->GetHost()->GetWindowHandle(), &rect );
+   // RECT rect;
+    //GetClientRect( browser->GetHost()->GetWindowHandle(), &rect );
 
-	m_hostWindow = CEFSystem().GetMainWindow();
+	//m_hostWindow = CEFSystem().GetMainWindow();
 
 	m_pSrcBrowser->OnAfterCreated();
 
@@ -173,6 +186,10 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVisible(false)
 {
+	// Create panel and texture generator
+	m_pPanel = new SrcCefVGUIPanel( this, NULL );
+
+	// Initialize browser
 	CEFSystem().AddBrowser( this );
 
 	m_URL = pURL;
@@ -184,26 +201,24 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 	//Msg( "Creating SrcCefBrowser, window: %d. rect: %d %d %d %d\n", CEFSystem().GetMainWindow(), rect.left, rect.right, rect.top, rect.bottom );
 
     CefWindowInfo info;
-	//info.SetAsChild( CEFSystem().GetMainWindow(), mainrect );
-	info.SetAsPopup( CEFSystem().GetMainWindow(), "Popup" );
-	info.style = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	info.ex_style = WS_EX_TOOLWINDOW | WS_EX_TOPMOST; //WS_EX_TRANSPARENT;
-	//info.parent_window = 0;
+	info.SetAsOffScreen( 0 );
+
+	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
 
 	// Make sure the initial pos is within the main window
 	info.x = mainrect.left;
 	info.y = mainrect.top;
 	info.width = 1;
 	info.height = 1;
-	info.SetTransparentPainting( TRUE ); // AeroGlass
+	info.SetTransparentPainting( TRUE );
 	
 	// Browser settings
     CefBrowserSettings settings;
 	settings.web_security_disabled = 1;
 
     // Creat the new child browser window
-    bool success = CefBrowserHost::CreateBrowser(info, m_CefClientHandler.get(),
-        m_URL, settings);
+	CefBrowserHost::CreateBrowser(info, m_CefClientHandler.get(),
+		m_URL, settings);
 
 	//Msg("Created SrcCefBrowser success: %d, window: %d\n", success, info.window);
 }
@@ -213,6 +228,9 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 //-----------------------------------------------------------------------------
 SrcCefBrowser::~SrcCefBrowser()
 {
+	delete m_pPanel;
+	m_pPanel = NULL;
+
 	// Remove ourself from the list
 	CEFSystem().RemoveBrowser( this );
 
@@ -251,11 +269,20 @@ bool SrcCefBrowser::IsValid( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+CefRefPtr<SrcCefOSRRenderer> SrcCefBrowser::GetOSRHandler()
+{
+	return m_CefClientHandler->GetOSRHandler();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::Think( void )
 {
 	if( m_bPerformLayout )
 	{
 		PerformLayout();
+		m_CefClientHandler->GetBrowser()->GetHost()->WasResized();
 
 		m_bPerformLayout = false;
 	}
@@ -294,17 +321,6 @@ CefRefPtr< CefClientHandler > SrcCefBrowser::GetClientHandler( void )
 	return m_CefClientHandler;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-HWND SrcCefBrowser::GetWindow( void )
-{
-	if( !IsValid() )
-		return NULL;
-
-	return m_CefClientHandler->GetBrowser()->GetHost()->GetWindowHandle();
-}
-
 // Usage functions
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -314,7 +330,7 @@ void SrcCefBrowser::SetSize( int wide, int tall )
 	if( !IsValid() )
 		return;
 
-	::SetWindowPos( GetWindow(), NULL, -1, -1, wide, tall, SWP_NOMOVE|SWP_NOZORDER );
+	m_pPanel->SetSize( wide, tall );
 }
 
 //-----------------------------------------------------------------------------
@@ -322,10 +338,7 @@ void SrcCefBrowser::SetSize( int wide, int tall )
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::SetPos( int x, int y )
 {
-	RECT rect;
-	GetWindowRect( CEFSystem().GetMainWindow(), &rect );
-
-	::SetWindowPos( GetWindow(), NULL, rect.left + x, rect.top + y, -1, -1, SWP_NOSIZE|SWP_NOZORDER );
+	m_pPanel->SetPos( x, y );
 }
 
 //-----------------------------------------------------------------------------
@@ -342,7 +355,7 @@ void SrcCefBrowser::SetZPos( int z )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void SrcCefBrowser::SetVisible(bool state)
+void SrcCefBrowser::SetVisible( bool state )
 {
 	if( !IsValid() )
 		return;
@@ -351,7 +364,7 @@ void SrcCefBrowser::SetVisible(bool state)
 		return;
 
 	m_bVisible = state;
-	::ShowWindow( GetWindow(), state );
+	m_pPanel->SetVisible( state );
 }
 
 //-----------------------------------------------------------------------------
@@ -362,7 +375,7 @@ bool SrcCefBrowser::IsVisible()
 	if( !IsValid() )
 		return false;
 
-	return m_bVisible; //::IsWindowVisible( GetWindow() );
+	return m_pPanel->IsVisible(); 
 }
 
 //-----------------------------------------------------------------------------

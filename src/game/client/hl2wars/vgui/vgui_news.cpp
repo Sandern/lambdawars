@@ -20,7 +20,9 @@
 
 #include "GameUI/GameConsole.h"
 
-#include <Awesomium/WebCore.h>
+#include "src_cef_vgui_panel.h"
+
+//#include <Awesomium/WebCore.h>
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -54,10 +56,10 @@ WebNews::WebNews( vgui::Panel *pParent ) : WebView( false, pParent )
 			m_HasDesuraMethodName = CREATE_WEBSTRING("hasdesura");
 			m_GetVersionMethodName = CREATE_WEBSTRING("getversion");
 			m_OpenURLMethodName = CREATE_WEBSTRING("openurl");
-			m_JSInterface.SetCustomMethod( m_LaunchUpdaterMethodName, false );
+			m_JSInterface.SetCustomMethod( m_LaunchUpdaterMethodName, true/*false*/ );
 			m_JSInterface.SetCustomMethod( m_HasDesuraMethodName, true );
 			m_JSInterface.SetCustomMethod( m_GetVersionMethodName, true );
-			m_JSInterface.SetCustomMethod( m_OpenURLMethodName, false );
+			m_JSInterface.SetCustomMethod( m_OpenURLMethodName, true /*false*/ );
 		}
 	}
 }
@@ -67,6 +69,7 @@ void WebNews::OnMethodCall(Awesomium::WebView* caller,
 						const Awesomium::WebString& method_name,
 						const Awesomium::JSArray& args)
 {
+#if 0
 	if( method_name.Compare( m_LaunchUpdaterMethodName ) == 0 )
 	{
 		Msg("Launching updater\n");
@@ -97,6 +100,7 @@ void WebNews::OnMethodCall(Awesomium::WebView* caller,
 			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( buf );
 		}
 	}
+#endif // 0
 }
 
 Awesomium::JSValue WebNews::OnMethodCallWithReturnValue(Awesomium::WebView* caller,
@@ -111,6 +115,36 @@ Awesomium::JSValue WebNews::OnMethodCallWithReturnValue(Awesomium::WebView* call
 	else if( method_name.Compare( m_GetVersionMethodName ) == 0 )
 	{
 		return Awesomium::JSValue( m_CurVersion );
+	}
+	else if( method_name.Compare( m_LaunchUpdaterMethodName ) == 0 )
+	{
+		Msg("Launching updater\n");
+
+
+		if( SrcHasProtocolHandler( "desura" ) )
+		{
+			SrcShellExecute( "desura://launch/mods/half-life-2-wars" );
+			//SrcShellExecute( "desura://install/mods/half-life-2-wars" );
+			//SrcShellExecute( "desura://refresh" );
+			//SrcShellExecute( "desura://update//mods/half-life-2-wars" );
+		}
+		else
+		{
+			SrcShellExecute( "http://www.desura.com/" );
+		}
+
+		engine->ClientCmd( "exit" );
+	}
+	else if( method_name.Compare( m_OpenURLMethodName ) == 0 )
+	{
+		if( args.size() > 0 )
+		{
+			Awesomium::WebString url = args[0].ToString();
+			char buf[MAX_PATH];
+			url.ToUTF8(buf, MAX_PATH);
+
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( buf );
+		}
 	}
 
 	return Awesomium::JSValue();
@@ -140,8 +174,9 @@ void WebNews::OnDocumentReady(Awesomium::WebView* caller,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "file:///ui/mainmenu.html" ), m_pParent(pParent)
+WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "file:///ui/mainmenu.html" /*"http://google.com"*/ ), m_pParent(pParent)
 {
+	GetPanel()->SetParent( pParent );
 }
 
 //-----------------------------------------------------------------------------
@@ -174,14 +209,6 @@ void WebNews::PerformLayout()
 //-----------------------------------------------------------------------------
 void WebNews::OnThink( void )
 {
-	if( GameConsole().IsConsoleVisible() || !m_pParent->HasFocus() )
-	{
-		SetVisible( false );
-	}
-	else
-	{
-		SetVisible( true );
-	}
 }
 
 #endif // 0

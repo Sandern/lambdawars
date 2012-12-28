@@ -391,6 +391,7 @@ void CHL2WarsGameRules::Precache( void )
 
 	PrecacheEffect( "StriderMuzzleFlash" ); // TODO: Move to python
 	PrecacheEffect( "VortDispel" ); // TODO: Move to python
+	PrecacheEffect( "HelicopterMegaBomb" ); // TODO: Move to python
 
 	BaseClass::Precache(); 
 }
