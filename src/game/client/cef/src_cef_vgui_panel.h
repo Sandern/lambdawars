@@ -27,10 +27,13 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual void ResizeTexture( int width, int height );
+	virtual void MarkTextureDirty();
 
 	virtual void Paint();
 	virtual void OnSizeChanged(int newWide, int newTall);
 	virtual void PerformLayout();
+
+	int	GetKeyModifiers();
 
 	virtual void OnCursorMoved(int x,int y);
 	virtual void OnMousePressed(vgui::MouseCode code);
@@ -42,7 +45,6 @@ public:
 	virtual void OnKeyCodeTyped(vgui::KeyCode code);
 	virtual void OnKeyTyped(wchar_t unichar);
 	virtual void OnKeyCodeReleased(vgui::KeyCode code);
-	//int	GetKeyModifiers();
 
 	virtual vgui::HCursor GetCursor();
 

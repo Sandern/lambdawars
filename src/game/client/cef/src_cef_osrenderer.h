@@ -21,6 +21,8 @@ public:
 	SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent );
 	virtual ~SrcCefOSRRenderer();
 
+	void Destroy( void ) { m_bValid = false; }
+
 	// ClientHandler::RenderHandler methods
 	//virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
 
@@ -52,9 +54,17 @@ public:
 	int GetWidth() { return m_iWidth; }
 	int GetHeight() { return m_iHeight; }
 
+	void LockTextureBuffer() { s_BufferMutex.Lock(); }
+	void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
+
+	int GetAlphaAt( int x, int y );
+
 private:
+	bool m_bValid;
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;
+
+	CThreadFastMutex s_BufferMutex;
 
 	SrcCefBrowser *m_pBrowser;
 

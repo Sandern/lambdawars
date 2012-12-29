@@ -8,6 +8,7 @@
 #include "src_cef_browser.h"
 #include "src_cef.h"
 #include "src_cef_vgui_panel.h"
+#include "vgui_int.h"
 
 // CEF
 #include "include/cef_app.h"
@@ -195,10 +196,8 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 	m_URL = pURL;
 	m_CefClientHandler = new CefClientHandler( this );
 
-    RECT mainrect;
-	GetWindowRect( CEFSystem().GetMainWindow(), &mainrect );
-
-	//Msg( "Creating SrcCefBrowser, window: %d. rect: %d %d %d %d\n", CEFSystem().GetMainWindow(), rect.left, rect.right, rect.top, rect.bottom );
+    //RECT mainrect;
+	//GetWindowRect( CEFSystem().GetMainWindow(), &mainrect );
 
     CefWindowInfo info;
 	info.SetAsOffScreen( 0 );
@@ -206,10 +205,10 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
 
 	// Make sure the initial pos is within the main window
-	info.x = mainrect.left;
+	/*info.x = mainrect.left;
 	info.y = mainrect.top;
 	info.width = 1;
-	info.height = 1;
+	info.height = 1;*/
 	info.SetTransparentPainting( TRUE );
 	
 	// Browser settings
@@ -228,9 +227,6 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 //-----------------------------------------------------------------------------
 SrcCefBrowser::~SrcCefBrowser()
 {
-	delete m_pPanel;
-	m_pPanel = NULL;
-
 	// Remove ourself from the list
 	CEFSystem().RemoveBrowser( this );
 
@@ -245,9 +241,14 @@ void SrcCefBrowser::Destroy( void )
 	if( !IsValid() )
 		return;
 
+	delete m_pPanel;
+	m_pPanel = NULL;
+
 	// Close browser
 	if( m_CefClientHandler )
 	{
+		m_CefClientHandler->SetOSRHandler( NULL );
+
 		if( m_CefClientHandler->GetBrowser() )
 		{
 			m_CefClientHandler->GetBrowser()->GetHost()->CloseBrowser();
@@ -272,6 +273,14 @@ bool SrcCefBrowser::IsValid( void )
 CefRefPtr<SrcCefOSRRenderer> SrcCefBrowser::GetOSRHandler()
 {
 	return m_CefClientHandler->GetOSRHandler();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CefRefPtr<CefBrowser> SrcCefBrowser::GetBrowser()
+{
+	return m_CefClientHandler->GetBrowser();
 }
 
 //-----------------------------------------------------------------------------
@@ -338,6 +347,9 @@ void SrcCefBrowser::SetSize( int wide, int tall )
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::SetPos( int x, int y )
 {
+	if( !IsValid() )
+		return;
+
 	m_pPanel->SetPos( x, y );
 }
 
@@ -349,7 +361,7 @@ void SrcCefBrowser::SetZPos( int z )
 	if( !IsValid() )
 		return;
 
-
+	m_pPanel->SetZPos( z );
 }
 
 //-----------------------------------------------------------------------------
@@ -376,6 +388,80 @@ bool SrcCefBrowser::IsVisible()
 		return false;
 
 	return m_pPanel->IsVisible(); 
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::SetMouseInputEnabled( bool state )
+{
+	if( !IsValid() )
+		return;
+
+	m_pPanel->SetMouseInputEnabled( state );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::SetKeyBoardInputEnabled( bool state )
+{
+	if( !IsValid() )
+		return;
+
+	m_pPanel->SetKeyBoardInputEnabled( state );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool SrcCefBrowser::IsMouseInputEnabled()
+{
+	if( !IsValid() )
+		return false;
+
+	return m_pPanel->IsMouseInputEnabled( );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool SrcCefBrowser::IsKeyBoardInputEnabled()
+{
+	if( !IsValid() )
+		return false;
+
+	return m_pPanel->IsKeyBoardInputEnabled( );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::SetCursor(vgui::HCursor cursor)
+{
+	if( !IsValid() )
+		return;
+
+	return m_pPanel->SetCursor( cursor );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+vgui::HCursor SrcCefBrowser::GetCursor()
+{
+	if( !IsValid() )
+		return 0;
+
+	return m_pPanel->GetCursor( );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int SrcCefBrowser::GetAlphaAt( int x, int y )
+{
+	return GetOSRHandler()->GetAlphaAt( x, y );
 }
 
 //-----------------------------------------------------------------------------
@@ -409,6 +495,22 @@ void SrcCefBrowser::StopLoad( void )
 		return;
 
 	m_CefClientHandler->GetBrowser()->StopLoad();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::Focus()
+{
+	m_CefClientHandler->GetBrowser()->GetHost()->SendFocusEvent( true );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::Unfocus()
+{
+	m_CefClientHandler->GetBrowser()->GetHost()->SendFocusEvent( false );
 }
 
 //-----------------------------------------------------------------------------

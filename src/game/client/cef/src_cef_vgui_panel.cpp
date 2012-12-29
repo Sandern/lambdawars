@@ -6,14 +6,22 @@
 
 #include "cbase.h"
 #include "src_cef_vgui_panel.h"
+#include "src_cef_browser.h"
 #include "src_cef.h"
 #include "src_cef_texgen.h"
 #include "clientmode_shared.h"
+
+#include <vgui_controls/Controls.h>
+#include <vgui/IInput.h>
+
+// CEF
+#include "include/cef_browser.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
 ConVar g_cef_draw("g_cef_draw", "1");
+ConVar g_cef_debug_texture("g_cef_debug_texture", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose: Find appropiate texture width/height helper
@@ -49,6 +57,26 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 SrcCefVGUIPanel::~SrcCefVGUIPanel()
 {
 	m_pBrowser = NULL;
+
+	if( m_iTextureID != -1 )
+	{
+		vgui::surface()->DestroyTextureID( m_iTextureID );
+	}
+
+	if( m_RenderBuffer.IsValid() )
+	{
+		m_RenderBuffer->SetTextureRegenerator( NULL );
+		m_RenderBuffer.Shutdown();
+	}
+	if( m_MatRef.IsValid() )
+	{
+		m_MatRef.Shutdown();
+	}
+	if( m_pTextureRegen )
+	{
+		delete m_pTextureRegen; 
+		m_pTextureRegen = NULL;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -172,30 +200,34 @@ void SrcCefVGUIPanel::Paint()
 		ResizeTexture( iWide, iTall );
 
 		// Update texture ID
-		if( g_debug_cef.GetBool() )
+		if( g_cef_debug_texture.GetBool() )
 			DevMsg("CEF: initializing texture id...");
 
 		m_iTextureID = vgui::surface()->CreateNewTextureID( true );
 		vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
 
-		if( g_debug_cef.GetBool() )
+		if( g_cef_debug_texture.GetBool() )
 			DevMsg("done.\n");
 	}
 
 	if( !m_pTextureRegen )
 		return;
 
+	m_pBrowser->GetOSRHandler()->LockTextureBuffer();
+
 	// Draw
 	if( m_pTextureRegen->IsDirty() )
 	{
-		if( g_debug_cef.GetBool() )
-			DevMsg("CEF: texture requires full regeneration\n");
+		//if( g_cef_debug_texture.GetBool() )
+		//	DevMsg("CEF: texture requires full regeneration\n");
 		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
 		m_RenderBuffer->Download( NULL );	
 
-		if( m_pTextureRegen->IsDirty() == false )
-			materials->ReloadMaterials(m_MatWebViewName); // FIXME
+		//if( m_pTextureRegen->IsDirty() == false )
+		//	materials->ReloadMaterials(m_MatWebViewName); // FIXME
 	}
+
+	//DevMsg("Paint. Thread ID: %d\n", GetCurrentThreadId());
 
 	// Must have a valid texture and the texture regenerator should be valid
 	if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
@@ -204,7 +236,31 @@ void SrcCefVGUIPanel::Paint()
 		vgui::surface()->DrawSetTexture( m_iTextureID );
 		vgui::surface()->DrawTexturedSubRect( 0, 0, iWide, iTall, 0, 0, m_fTexS1, m_fTexT1 );
 	}
+	else
+	{
+		if( g_cef_debug_texture.GetBool() )
+		{
+			DevMsg("CEF: not drawing");
+			if( m_iTextureID == -1 )
+				DevMsg(", texture does not exists");
+			if( m_pTextureRegen->IsDirty() )
+				DevMsg(", texture is dirty");
+			if( !g_cef_draw.GetBool() )
+				DevMsg(", g_cef_draw is 0");
+			DevMsg("\n");
+		}
+	}
 
+	m_pBrowser->GetOSRHandler()->UnlockTextureBuffer();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::MarkTextureDirty()
+{
+	if( !m_pTextureRegen )
+		return;
 	m_pTextureRegen->MakeDirty();
 }
 
@@ -230,10 +286,37 @@ void SrcCefVGUIPanel::PerformLayout()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+int	SrcCefVGUIPanel::GetKeyModifiers()
+{
+	int modifiers = 0;
+
+	return modifiers;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 {
 	m_iMouseX = x;
 	m_iMouseY = y;
+
+	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( x, y ) )
+	{
+		if( g_debug_cef.GetInt() > 2 )
+			DevMsg("CEF: passed cursor move %d %d to parent (alpha zero)\n", x, y);
+
+		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
+		//return;
+	}
+
+	CefMouseEvent me;
+	me.x = x;
+	me.y = y;
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, false );
+
+	if( g_debug_cef.GetInt() > 2 )
+		DevMsg("CEF: injected cursor move %d %d\n", x, y);
 }
 
 //-----------------------------------------------------------------------------
@@ -241,7 +324,40 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 {
+	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	{
+		if( g_debug_cef.GetInt() > 0 )
+			DevMsg("CEF: passed mouse pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
+		CallParentFunction(new KeyValues("MousePressed", "code", code));
+		return;
+	}
+
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+
+	switch( code )
+	{
+	case MOUSE_LEFT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, false, 1 );
+		break;
+	case MOUSE_RIGHT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, false, 1 );
+		break;
+	case MOUSE_MIDDLE:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, false, 1 );
+		break;
+	}
+
+	if( m_pBrowser->GetUseMouseCapture() )
+	{
+		// Make sure released is called on this panel
+		vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
+	}
+
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg("CEF: injected mouse pressed %d %d (mouse capture: %d)\n", m_iMouseX, m_iMouseY, (int)(m_pBrowser->GetUseMouseCapture()));
 }
 
 //-----------------------------------------------------------------------------
@@ -249,7 +365,34 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 {
+	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	{
+		if( g_debug_cef.GetInt() > 0 )
+			DevMsg("CEF: passed mouse double pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
+		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
+		return;
+	}
+
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+
+	switch( code )
+	{
+	case MOUSE_LEFT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, false, 1 );
+		break;
+	case MOUSE_RIGHT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, false, 1 );
+		break;
+	case MOUSE_MIDDLE:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, false, 1 );
+		break;
+	}
+
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg("CEF: injected mouse released %d %d\n", m_iMouseX, m_iMouseY);
 }
 
 //-----------------------------------------------------------------------------
@@ -257,7 +400,39 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 {
+	// Check mouse capture and make sure it is cleared
+	bool bHasMouseCapture = vgui::input()->GetMouseCapture() == GetVPanel();
+	if( bHasMouseCapture )
+	{
+		vgui::input()->SetMouseCaptureEx( 0, code );
+	}
 
+	// Check if we should pass input to parent (only if we don't have mouse capture active)
+	if( !bHasMouseCapture && m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	{
+		if( g_debug_cef.GetInt() > 0 )
+			DevMsg("CEF: passed mouse released %d %d to parent\n", m_iMouseX, m_iMouseY);
+
+		CallParentFunction(new KeyValues("MouseReleased", "code", code));
+		return;
+	}
+
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+
+	switch( code )
+	{
+	case MOUSE_LEFT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, true, 1 );
+		break;
+	case MOUSE_RIGHT:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, true, 1 );
+		break;
+	case MOUSE_MIDDLE:
+		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, true, 1 );
+		break;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -265,7 +440,23 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 {
+	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	{
+		CallParentFunction(new KeyValues("MouseWheeled", "delta", delta));
+		return;
+	}
 
+	if( g_debug_cef.GetInt() > 2 )
+		DevMsg("CEF: injected mouse wheeled %d\n", delta);
+
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+
+	// VGUI just gives -1 or +1. SendMouseWheelEvent expects
+	// the number of pixels to shift.
+	// TODO: Scale/accelerate?
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, delta * 20 );
 }
 
 //-----------------------------------------------------------------------------

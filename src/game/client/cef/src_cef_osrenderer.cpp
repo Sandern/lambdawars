@@ -12,12 +12,18 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent ) 
-	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0)
+	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0), m_bValid(true)
 {
 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 SrcCefOSRRenderer::~SrcCefOSRRenderer()
 {
 	if( m_pTextureBuffer != NULL )
@@ -26,6 +32,9 @@ SrcCefOSRRenderer::~SrcCefOSRRenderer()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 bool SrcCefOSRRenderer::GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 								CefRect& rect)
 {
@@ -36,14 +45,22 @@ bool SrcCefOSRRenderer::GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 bool SrcCefOSRRenderer::GetViewRect(CefRefPtr<CefBrowser> browser,
 						CefRect& rect)
 {
+	if( !m_bValid )
+		return false;
 	m_pBrowser->GetPanel()->GetPos( rect.x, rect.y );
 	m_pBrowser->GetPanel()->GetSize( rect.width, rect.height );
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 							int viewX,
 							int viewY,
@@ -53,18 +70,27 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 						bool show)
 {
 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnPopupSize(CefRefPtr<CefBrowser> browser,
 						const CefRect& rect)
 {
 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 					PaintElementType type,
 					const RectList& dirtyRects,
@@ -74,11 +100,16 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 {
 	int channels = 4;
 
+	if( !m_bValid )
+		return;
+
 	if( type != PET_VIEW )
 	{
 		Msg("Unsupported paint type\n");
 		return;
 	}
+
+	s_BufferMutex.Lock();
 
 	// Update image buffer size if needed
 	if( m_iWidth != width || m_iHeight != height )
@@ -94,16 +125,13 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 	}
 
 	const unsigned char *imagebuffer = (const unsigned char *)buffer;
-#if 0
+
 	// Update dirty rects
 	CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
 	for (; i != dirtyRects.end(); ++i) 
 	{
 		const CefRect& rect = *i;
 
-		
-
-		//Msg("Copying dirty rect: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height );
 		for( int y = rect.y; y < rect.y + rect.height; y++ )
 		{
 			memcpy( m_pTextureBuffer + (y * m_iWidth * channels) + (rect.x * channels), // Our current row + x offset
@@ -112,14 +140,35 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 			); 
 		}
 	}
-#endif // 0
-	memcpy( m_pTextureBuffer, imagebuffer, width * height * channels );
 
-	//Msg("SrcCefOSRRenderer::OnPaint\n");
+	m_pBrowser->GetPanel()->MarkTextureDirty();
+
+	s_BufferMutex.Unlock();
+
+	//DevMsg("SrcCefOSRRenderer::OnPaint. Thread ID: %d\n", GetCurrentThreadId());
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 							CefCursorHandle cursor)
 {
 
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
+{
+	if( !m_bValid || x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )
+		return 0;
+	unsigned char *pImageData = m_pTextureBuffer;
+	if( pImageData )
+	{
+		int channels = 4;
+		return pImageData[(y * m_iWidth * channels) + (x * channels) + 3];
+	}
+	return 0;
 }

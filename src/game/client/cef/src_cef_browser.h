@@ -47,6 +47,19 @@ public:
 	virtual void SetVisible(bool state);
 	virtual bool IsVisible();
 	virtual void OnThink( void ) {}
+	void SetMouseInputEnabled( bool state );
+	void SetKeyBoardInputEnabled( bool state );
+	bool IsMouseInputEnabled();
+	bool IsKeyBoardInputEnabled();
+	virtual void SetCursor(vgui::HCursor cursor);
+	virtual vgui::HCursor GetCursor();
+	void SetUseMouseCapture( bool usemousecapture ) { m_bUseMouseCapture = usemousecapture; }
+	bool GetUseMouseCapture( ) { return m_bUseMouseCapture; }
+
+	bool IsAlphaZeroAt( int x, int y );
+	int GetAlphaAt( int x, int y );
+	void SetPassMouseTruIfAlphaZero( bool passtruifzero ) { m_bPassMouseTruIfAlphaZero = passtruifzero; }
+	bool GetPassMouseTruIfAlphaZero( void ) { return m_bPassMouseTruIfAlphaZero; }
 
 	// Notifications
 	virtual void OnLoadStart( void ) {}
@@ -57,6 +70,8 @@ public:
 	virtual bool IsLoading( void );
 	virtual void Reload( void );
 	virtual void StopLoad( void );
+	virtual void Focus();
+	virtual void Unfocus();
 
 	virtual void LoadURL( const char *url );
 
@@ -65,6 +80,7 @@ public:
 	// Internal
 	SrcCefVGUIPanel *GetPanel() { return m_pPanel; }
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
+	CefRefPtr<CefBrowser> GetBrowser();
 
 protected:
 	CefRefPtr< CefClientHandler > GetClientHandler( void );
@@ -81,6 +97,13 @@ private:
 
 	bool m_bVisible;
 	bool m_bPerformLayout;
+	bool m_bPassMouseTruIfAlphaZero;
+	bool m_bUseMouseCapture;
 };
+
+inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
+{
+	return GetAlphaAt( x, y ) == 0;
+}
 
 #endif // SRC_CEF_BROWSER_H
