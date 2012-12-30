@@ -44,19 +44,30 @@ private:
 	Awesomium::WebString m_OpenURLMethodName;
 };
 #elif ENABLE_CEF
-#include "src_cef_browser.h"
+#include "src_cef.h"
 
 class WebNews : public SrcCefBrowser
 {
 public:
 	WebNews( vgui::Panel *pParent );
 
-	virtual void OnAfterCreated( void );
+	virtual void OnContextCreated( void );
 	virtual void PerformLayout( void );
 	virtual void OnThink( void );
 
+	virtual void OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
+
 private:
 	vgui::Panel *m_pParent;
+
+	CefString m_CurVersion;
+
+	// Objects and functions
+	CefRefPtr<JSObject> m_InterfaceObj;
+	CefRefPtr<JSObject> m_LaunchUpdaterFunc;
+	CefRefPtr<JSObject> m_OpenURLFunc;
+	CefRefPtr<JSObject> m_RetrieveVersionFunc;
+	CefRefPtr<JSObject> m_RetrieveDesuraFunc;
 };
 #endif // 0
 

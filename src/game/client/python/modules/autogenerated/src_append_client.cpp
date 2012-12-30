@@ -16,11 +16,13 @@ extern "C" __declspec(dllexport) void initisteam();
 extern "C" __declspec(dllexport) void init_input();
 extern "C" __declspec(dllexport) void init_vgui();
 extern "C" __declspec(dllexport) void init_vguicontrols();
+extern "C" __declspec(dllexport) void init_cef();
 #else
 extern "C"  void initisteam();
 extern "C"  void init_input();
 extern "C"  void init_vgui();
 extern "C"  void init_vguicontrols();
+extern "C"  void init_cef();
 #endif
 
 // The append function
@@ -30,5 +32,6 @@ void AppendClientModules()
 	APPEND_MODULE(_input)
 	APPEND_MODULE(_vgui)
 	APPEND_MODULE(_vguicontrols)
+	APPEND_MODULE(_cef)
 }
 

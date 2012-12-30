@@ -43,7 +43,9 @@ incl_paths_client = [
     '../game/client/hl2wars', 
     '../game/client', 
     '../game/client/python',
-    '../Awesomium',
+    '../game/client/cef',
+    #'../Awesomium',
+    '../cef',
 ]
 incl_paths_server = [
     '../game/server/hl2wars', 
@@ -87,7 +89,8 @@ dsymbols = [
     'BOOST_AUTO_LINK_NOMANGLE',
     
     'HL2WARS_DLL',
-    'ENABLE_AWESOMIUM',
+    'ENABLE_CEF',
+    'ENABLE_PYTHON',
 
     # Just pretend SSE and MMX are enabled
     '__SSE__',

@@ -10,16 +10,24 @@
 #pragma once
 #endif
 
-class CefClientHandler;
-
+#include <string>
 #include "include/internal/cef_ptr.h"
-#include "src_cef_osrenderer.h"
+
 
 #ifdef WIN32
 	#include <winlite.h>
 #endif // WIN32
 
+// Forward declarations
+class CefClientHandler;
 class SrcCefVGUIPanel;
+class SrcCefOSRRenderer;
+class CefBrowser;
+class CefFrame;
+class CefProcessMessage;
+class CefListValue;
+
+class JSObject;
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -29,7 +37,7 @@ class SrcCefBrowser
 	friend class CCefSystem;
 
 public:
-	SrcCefBrowser( const char *pURL = NULL );
+	SrcCefBrowser( const char *url = "" );
 	~SrcCefBrowser();
 
 	void Destroy( void );
@@ -51,8 +59,8 @@ public:
 	void SetKeyBoardInputEnabled( bool state );
 	bool IsMouseInputEnabled();
 	bool IsKeyBoardInputEnabled();
-	virtual void SetCursor(vgui::HCursor cursor);
-	virtual vgui::HCursor GetCursor();
+	void SetCursor(vgui::HCursor cursor);
+	vgui::HCursor GetCursor();
 	void SetUseMouseCapture( bool usemousecapture ) { m_bUseMouseCapture = usemousecapture; }
 	bool GetUseMouseCapture( ) { return m_bUseMouseCapture; }
 
@@ -61,10 +69,12 @@ public:
 	void SetPassMouseTruIfAlphaZero( bool passtruifzero ) { m_bPassMouseTruIfAlphaZero = passtruifzero; }
 	bool GetPassMouseTruIfAlphaZero( void ) { return m_bPassMouseTruIfAlphaZero; }
 
-	// Notifications
-	virtual void OnLoadStart( void ) {}
-	virtual void OnLoadEnd( int httpStatusCode ) {}
-	virtual void OnLoadError( int errorCode, const wchar_t *errorText, const wchar_t *failedUrl ) {}
+	// Load handler methods
+	virtual void OnLoadStart( CefRefPtr<CefFrame> frame );
+	virtual void OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode );
+	virtual void OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl );
+
+	virtual void OnContextCreated() {}
 
 	// Browser Methods
 	virtual bool IsLoading( void );
@@ -75,21 +85,42 @@ public:
 
 	virtual void LoadURL( const char *url );
 
-	virtual void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
+	// Javascript methods
+	void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
+
+	CefRefPtr<JSObject> CreateGlobalObject( const char *name );
+	CefRefPtr<JSObject> CreateFunction( const char *name, CefRefPtr<JSObject> object = NULL, bool bHasCallback = false );
+
+	void SendCallback( int *pCallbackID, CefRefPtr<CefListValue> methodargs );
+
+	// Method Handlers
+	virtual void OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
+
+	// Python methods
+#ifdef ENABLE_PYTHON
+	virtual void PyOnLoadStart( boost::python::object frame ) {}
+	virtual void PyOnLoadEnd( boost::python::object frame, int httpStatusCode ) {}
+	virtual void PyOnLoadError( boost::python::object frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl ) {}
+
+	boost::python::object PyGetMainFrame();
+
+	boost::python::object PyCreateGlobalObject( const char *name );
+
+	virtual void PyOnMethodCall( boost::python::object name, boost::python::object arguments ) {}
+#endif // ENABLE_PYTHON
+
+	void Ping();
 
 	// Internal
 	SrcCefVGUIPanel *GetPanel() { return m_pPanel; }
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
 	CefRefPtr<CefBrowser> GetBrowser();
 
-protected:
-	CefRefPtr< CefClientHandler > GetClientHandler( void );
-
 private:
 	virtual void Think( void );
 
 private:
-	CefRefPtr< CefClientHandler > m_CefClientHandler;
+	CefClientHandler *m_CefClientHandler;
 
 	SrcCefVGUIPanel *m_pPanel;
 

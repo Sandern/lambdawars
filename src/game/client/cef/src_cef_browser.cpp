@@ -8,7 +8,12 @@
 #include "src_cef_browser.h"
 #include "src_cef.h"
 #include "src_cef_vgui_panel.h"
-#include "vgui_int.h"
+#include "src_cef_osrenderer.h"
+#include "src_cef_js.h"
+
+#ifdef ENABLE_PYTHON
+	#include "src_cef_python.h"
+#endif // ENABLE_PYTHON
 
 // CEF
 #include "include/cef_app.h"
@@ -69,6 +74,11 @@ public:
 		return this;
 	}
 
+	// Client
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+										CefProcessId source_process,
+										CefRefPtr<CefProcessMessage> message);
+
 	// CefDisplayHandler methods
 	virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 								const CefString& message,
@@ -97,8 +107,6 @@ public:
 	}
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler() { return m_OSRHandler; }
 
-
-
 private:
 	// The child browser window
 	CefRefPtr<CefBrowser> m_Browser;
@@ -119,6 +127,55 @@ private:
 //-----------------------------------------------------------------------------
 CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser )
 {
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
+								CefProcessId source_process,
+								CefRefPtr<CefProcessMessage> message )
+{
+	if( message->GetName() == "pong" ) 
+	{
+		Msg("Received PONG from render process!\n");
+		return true;
+	}
+	else if( message->GetName() == "methodcall" )
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		int iIdentifier = args->GetInt( 0 );
+		CefRefPtr<CefListValue> methodargs = args->GetList( 1 );
+	
+		if( args->GetType( 2 ) == VTYPE_NULL )
+		{
+			m_pSrcBrowser->OnMethodCall( iIdentifier, methodargs );
+		}
+		else
+		{
+			int iCallbackID = args->GetInt( 2 );
+			m_pSrcBrowser->OnMethodCall( iIdentifier, methodargs, &iCallbackID );
+		}
+		return true;
+	}
+	else if( message->GetName() == "oncontextcreated" )
+	{
+		m_pSrcBrowser->OnContextCreated();
+	}
+	else if( message->GetName() == "msg" )
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		Msg("Browser %d Render Process: %ls\n", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		return true;
+	}
+	else if( message->GetName() == "warning" )
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		Warning("Browser %d Render Process: %ls\n", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		return true;
+	}
+
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,16 +202,7 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		m_BrowserId = browser->GetIdentifier();
 	}
 
-	//HWND hWnd = browser->GetHost()->GetWindowHandle();
-
-   // RECT rect;
-    //GetClientRect( browser->GetHost()->GetWindowHandle(), &rect );
-
-	//m_hostWindow = CEFSystem().GetMainWindow();
-
 	m_pSrcBrowser->OnAfterCreated();
-
-	//::BringWindowToTop( hWnd );
 }
 
 //-----------------------------------------------------------------------------
@@ -162,7 +210,7 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
 {
-	m_pSrcBrowser->OnLoadStart();
+	m_pSrcBrowser->OnLoadStart( frame );
 }
 
 //-----------------------------------------------------------------------------
@@ -170,7 +218,7 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
 {
-	m_pSrcBrowser->OnLoadEnd( httpStatusCode );
+	m_pSrcBrowser->OnLoadEnd( frame, httpStatusCode );
 }
 
 //-----------------------------------------------------------------------------
@@ -179,7 +227,7 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 						const CefString& errorText, const CefString& failedUrl)
 {
-	m_pSrcBrowser->OnLoadError( errorCode, errorText.c_str(), failedUrl.c_str() );
+	m_pSrcBrowser->OnLoadError( frame, errorCode, errorText.c_str(), failedUrl.c_str() );
 }
 
 //-----------------------------------------------------------------------------
@@ -193,33 +241,22 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 	// Initialize browser
 	CEFSystem().AddBrowser( this );
 
-	m_URL = pURL;
+	m_URL = pURL ? pURL : "";
 	m_CefClientHandler = new CefClientHandler( this );
-
-    //RECT mainrect;
-	//GetWindowRect( CEFSystem().GetMainWindow(), &mainrect );
 
     CefWindowInfo info;
 	info.SetAsOffScreen( 0 );
+	info.SetTransparentPainting( TRUE );
 
 	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
-
-	// Make sure the initial pos is within the main window
-	/*info.x = mainrect.left;
-	info.y = mainrect.top;
-	info.width = 1;
-	info.height = 1;*/
-	info.SetTransparentPainting( TRUE );
 	
 	// Browser settings
     CefBrowserSettings settings;
-	settings.web_security_disabled = 1;
+	settings.web_security_disabled = true;
 
     // Creat the new child browser window
-	CefBrowserHost::CreateBrowser(info, m_CefClientHandler.get(),
+	CefBrowserHost::CreateBrowser(info, m_CefClientHandler,
 		m_URL, settings);
-
-	//Msg("Created SrcCefBrowser success: %d, window: %d\n", success, info.window);
 }
 
 //-----------------------------------------------------------------------------
@@ -264,7 +301,7 @@ void SrcCefBrowser::Destroy( void )
 //-----------------------------------------------------------------------------
 bool SrcCefBrowser::IsValid( void )
 {
-	return m_CefClientHandler.get() && m_CefClientHandler->GetBrowser();
+	return m_CefClientHandler && m_CefClientHandler->GetBrowser();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,6 +346,36 @@ void SrcCefBrowser::OnAfterCreated( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
+{
+#ifdef ENABLE_PYTHON
+	PyOnLoadStart( bp::object( PyCefFrame( frame ) ) );
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
+{
+#ifdef ENABLE_PYTHON
+	PyOnLoadEnd( bp::object( PyCefFrame( frame ) ), httpStatusCode );
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl )
+{
+#ifdef ENABLE_PYTHON
+	PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, errorText, failedUrl );
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::PerformLayout( void )
 {
 	
@@ -320,14 +387,6 @@ void SrcCefBrowser::PerformLayout( void )
 void SrcCefBrowser::InvalidateLayout( void )
 {
 	m_bPerformLayout = true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-CefRefPtr< CefClientHandler > SrcCefBrowser::GetClientHandler( void )
-{
-	return m_CefClientHandler;
 }
 
 // Usage functions
@@ -541,4 +600,109 @@ void SrcCefBrowser::ExecuteJavaScript( const char *code, const char *script_url,
 		return;
 
 	mainFrame->ExecuteJavaScript( code, script_url, start_line );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CefRefPtr<JSObject> SrcCefBrowser::CreateGlobalObject( const char *name )
+{
+	CefRefPtr<JSObject> jsObject = new JSObject( name );
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("createglobalobject");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 1, name );
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+	return jsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CefRefPtr<JSObject> SrcCefBrowser::CreateFunction( const char *name, CefRefPtr<JSObject> object, bool bHasCallback )
+{
+	CefRefPtr<JSObject> jsObject = new JSObject( name );
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create( !bHasCallback ? "createfunction" : "createfunctionwithcallback" );
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 1, name );
+	if( object )
+		args->SetInt( 2, object->GetIdentifier() );
+	else
+		args->SetNull( 2 );
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+	return jsObject;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::SendCallback( int *pCallbackID, CefRefPtr<CefListValue> methodargs )
+{
+	if( !pCallbackID )
+	{
+		Warning("SendCallback: no callback specified\n");
+		return;
+	}
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("callbackmethod");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, *pCallbackID );
+	args->SetList( 1, methodargs );
+
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
+{
+#ifdef ENABLE_PYTHON
+
+#endif // ENABLE_PYTHON
+}
+
+#ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object SrcCefBrowser::PyGetMainFrame()
+{
+	if( !IsValid() )
+		return bp::object();
+
+	CefRefPtr<CefFrame> mainFrame = m_CefClientHandler->GetBrowser()->GetMainFrame();
+	if( !mainFrame )
+		return bp::object();
+
+	return bp::object( PyCefFrame( mainFrame ) );
+}
+
+boost::python::object SrcCefBrowser::PyCreateGlobalObject( const char *name )
+{
+	if( !IsValid() )
+		return bp::object();
+
+	CefRefPtr<JSObject> jsObject = CreateGlobalObject( name );
+	if( !jsObject )
+		return bp::object();
+
+	return bp::object( PyJSObject( jsObject ) );
+}
+#endif // ENABLE_PYTHON
+
+void SrcCefBrowser::Ping()
+{
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("ping");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	CefRefPtr<CefListValue> val = CefListValue::Create();
+	args->SetList(0, val);
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
 }

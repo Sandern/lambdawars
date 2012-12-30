@@ -17,8 +17,15 @@
 	#undef CreateEvent
 #endif // WIN32
 
-// Forward declarations
-class SrcCefBrowser;
+// Src CEF
+#include "src_cef_browser.h"
+#include "src_cef_js.h"
+#include "src_cef_vgui_panel.h"
+
+// CEF
+#include "include/cef_app.h"
+#include "include/cef_browser.h"
+#include "include/cef_frame.h"
 
 extern ConVar g_debug_cef;
 
@@ -42,6 +49,7 @@ public:
 	void RemoveBrowser( SrcCefBrowser *pBrowser );
 	int CountBrowsers( void );
 	SrcCefBrowser *GetBrowser( int idx );
+	SrcCefBrowser *FindBrowser( CefBrowser *pBrowser );
 
 	void OnScreenSizeChanged( int nOldWidth, int nOldHeight );
 

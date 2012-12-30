@@ -60,6 +60,19 @@ public:
 	int GetAlphaAt( int x, int y );
 
 private:
+	// Cursors
+	HCURSOR m_hArrow;
+	HCURSOR m_hCross;
+	HCURSOR m_hHand;
+	HCURSOR m_hHelp;
+	HCURSOR m_hBeam;
+	HCURSOR m_hSizeAll;
+	HCURSOR m_hSizeNWSE;
+	HCURSOR m_hSizeNESW;
+	HCURSOR m_hSizeWE;
+	HCURSOR m_hSizeNS;
+
+private:
 	bool m_bValid;
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;

@@ -11,6 +11,7 @@
 #endif
 
 #include <vgui_controls/Panel.h>
+#include "materialsystem/MaterialSystemUtil.h"
 
 class SrcCefBrowser;
 class CCefTextureGenerator;

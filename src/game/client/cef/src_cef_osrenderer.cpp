@@ -8,6 +8,7 @@
 #include "src_cef_osrenderer.h"
 #include "src_cef_browser.h"
 #include "src_cef_vgui_panel.h"
+#include "vgui/Cursor.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -18,7 +19,16 @@
 SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent ) 
 	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0), m_bValid(true)
 {
-
+	m_hArrow = LoadCursor (NULL, IDC_ARROW );
+	m_hCross = LoadCursor (NULL, IDC_CROSS );
+	m_hHand = LoadCursor (NULL, IDC_HAND );
+	m_hHelp = LoadCursor (NULL, IDC_HELP );
+	m_hBeam = LoadCursor (NULL, IDC_IBEAM );
+	m_hSizeAll = LoadCursor (NULL, IDC_SIZEALL );
+	m_hSizeNWSE = LoadCursor (NULL, IDC_SIZENWSE ); // dc_sizenwse
+	m_hSizeNESW = LoadCursor (NULL, IDC_SIZENESW ); // dc_sizenesw
+	m_hSizeWE = LoadCursor (NULL, IDC_SIZEWE ); // dc_sizewe
+	m_hSizeNS = LoadCursor (NULL, IDC_SIZENS ); // dc_sizens
 }
 
 //-----------------------------------------------------------------------------
@@ -67,7 +77,10 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 							int& screenX,
 							int& screenY)
 {
-	return false;
+	screenX = viewX;
+	screenY = viewY;
+	m_pBrowser->GetPanel()->LocalToScreen( screenX, screenY );
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +167,46 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 							CefCursorHandle cursor)
 {
-
+	if( cursor == m_hArrow )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_arrow );
+	}
+	else if( cursor == m_hCross )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_crosshair );
+	}
+	else if( cursor == m_hHand )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_hand );
+	}
+	else if( cursor == m_hHelp )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_blank );
+	}
+	else if( cursor == m_hBeam )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_ibeam );
+	}
+	else if( cursor == m_hSizeAll )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizeall );
+	}
+	else if( cursor == m_hSizeNWSE )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizenwse );
+	}
+	else if( cursor == m_hSizeNESW )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizenesw );
+	}
+	else if( cursor == m_hSizeWE )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizewe );
+	}
+	else if( cursor == m_hSizeNS )
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizens );
+	}
 }
 
 //-----------------------------------------------------------------------------

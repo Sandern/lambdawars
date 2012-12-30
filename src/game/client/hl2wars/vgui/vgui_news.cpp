@@ -20,9 +20,7 @@
 
 #include "GameUI/GameConsole.h"
 
-#include "src_cef_vgui_panel.h"
-
-//#include <Awesomium/WebCore.h>
+#include "src_cef.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -182,12 +180,25 @@ WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "file:///ui/mainmenu.h
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void WebNews::OnAfterCreated( void )
+void WebNews::OnContextCreated( void )
 {
 	SetVisible( true );
 	//SetZPos( -1 );
 	//SetMouseInputEnabled( true );
 	//SetUseMouseCapture( false );
+
+	m_CurVersion = SrcPySystem()->RunT< const char * >( SrcPySystem()->Get("_GetVersion", "srcmgr"), "" );
+
+	// Create global interface object
+	m_InterfaceObj = CreateGlobalObject("interface");
+
+	// Create and bind functions
+	m_LaunchUpdaterFunc = CreateFunction( "launchupdater", m_InterfaceObj );
+	m_OpenURLFunc = CreateFunction( "openurl", m_InterfaceObj );
+
+	m_RetrieveVersionFunc = CreateFunction( "retrieveversion", m_InterfaceObj, true );
+	m_RetrieveDesuraFunc = CreateFunction( "retrievedesura", m_InterfaceObj, true );
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -209,6 +220,54 @@ void WebNews::PerformLayout()
 //-----------------------------------------------------------------------------
 void WebNews::OnThink( void )
 {
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WebNews::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
+{
+	if( iIdentifier == m_LaunchUpdaterFunc->GetIdentifier() )
+	{
+		Msg("Launching updater\n");
+
+		if( SrcHasProtocolHandler( "desura" ) )
+		{
+			SrcShellExecute( "desura://launch/mods/half-life-2-wars" );
+			//SrcShellExecute( "desura://install/mods/half-life-2-wars" );
+			//SrcShellExecute( "desura://refresh" );
+			//SrcShellExecute( "desura://update//mods/half-life-2-wars" );
+		}
+		else
+		{
+			SrcShellExecute( "http://www.desura.com/" );
+		}
+
+		engine->ClientCmd( "exit" );
+	}
+	else if( iIdentifier == m_OpenURLFunc->GetIdentifier() )
+	{
+		if( methodargs->GetSize() > 0 )
+		{
+			CefString url = methodargs->GetString( 0 );
+
+			char buf[MAX_PATH];
+			Q_snprintf( buf, MAX_PATH, "%ls", url.c_str() );
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( buf );
+		}
+	}
+	else if( iIdentifier == m_RetrieveVersionFunc->GetIdentifier() )
+	{
+		CefRefPtr<CefListValue> args = CefListValue::Create();
+		args->SetString( 0, m_CurVersion );
+		SendCallback( pCallbackID, args );
+	}
+	else if( iIdentifier == m_RetrieveDesuraFunc->GetIdentifier() )
+	{
+		CefRefPtr<CefListValue> args = CefListValue::Create();
+		args->SetBool( 0, SrcHasProtocolHandler( "desura" ) );
+		SendCallback( pCallbackID, args );
+	}
 }
 
 #endif // 0

@@ -9,6 +9,7 @@
 #include "src_cef_browser.h"
 #include "src_cef.h"
 #include "src_cef_texgen.h"
+#include "src_cef_osrenderer.h"
 #include "clientmode_shared.h"
 
 #include <vgui_controls/Controls.h>
@@ -91,7 +92,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	int po2tall = nexthigher(m_iWVTall);
 
 	if( g_debug_cef.GetBool() )
-		DevMsg("WebView: Resizing texture to %d %d (wish size: %d %d)\n", po2wide, po2tall, m_iWVWide, m_iWVTall );
+		DevMsg("Cef: Resizing texture to %d %d (wish size: %d %d)\n", po2wide, po2tall, m_iWVWide, m_iWVTall );
 
 	// Only rebuild when the actual size change and don't bother if the size
 	// is larger than needed.
@@ -111,13 +112,13 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	if( !m_pTextureRegen )
 	{
 		if( g_debug_cef.GetBool() )
-			DevMsg("WebView: initializing texture regenerator\n");
+			DevMsg("Cef: initializing texture regenerator\n");
 		m_pTextureRegen = new CCefTextureGenerator( m_pBrowser );
 	}
 	else
 	{
 		if( g_debug_cef.GetBool() )
-			DevMsg("WebView: Invalidating old render texture\n");
+			DevMsg("Cef: Invalidating old render texture\n");
 		m_RenderBuffer->SetTextureRegenerator( NULL );
 		m_RenderBuffer.Shutdown();
 		m_MatRef.Shutdown();
@@ -127,7 +128,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	Q_snprintf( m_TextureWebViewName, _MAX_PATH, "_rt_test%d", staticTextureID++ );
 
 	if( g_debug_cef.GetBool() )
-		DevMsg("WebView: initializing texture %s\n", m_TextureWebViewName);
+		DevMsg("Cef: initializing texture %s\n", m_TextureWebViewName);
 
 	// IMPORTANT: Use TEXTUREFLAGS_POINTSAMPLE. Otherwise mat_filtertextures will make it really blurred and ugly.
 	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specifiy
@@ -136,7 +137,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY );
 	if( !m_RenderBuffer.IsValid() )
 	{
-		Warning("Failed to initialize render buffer texture\n");
+		Warning("Cef: Failed to initialize render buffer texture\n");
 		return;
 	}
 
@@ -148,7 +149,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	//	m_MatRef.Shutdown();
 
 	if( g_debug_cef.GetBool() )
-		DevMsg("WebView: initializing material %s...", m_MatWebViewName);
+		DevMsg("Cef: initializing material %s...", m_MatWebViewName);
 
 	// Make sure the directory exists
 	if( filesystem->FileExists("materials/vgui/webview", "MOD") == false )
@@ -357,7 +358,7 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 	}
 
 	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected mouse pressed %d %d (mouse capture: %d)\n", m_iMouseX, m_iMouseY, (int)(m_pBrowser->GetUseMouseCapture()));
+		DevMsg("CEF: injected mouse pressed %d %d (mouse capture: %d)\n", m_iMouseX, m_iMouseY, m_pBrowser->GetUseMouseCapture());
 }
 
 //-----------------------------------------------------------------------------

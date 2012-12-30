@@ -8,6 +8,8 @@
 #include "src_cef.h"
 #include "src_cef_browser.h"
 
+#include <set>
+
 // CEF
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
@@ -22,7 +24,7 @@
 
 //LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-ConVar g_debug_cef("g_debug_cef", "1");
+ConVar g_debug_cef("g_debug_cef", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose: Helper for finding the main window
@@ -44,15 +46,79 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 //-----------------------------------------------------------------------------
 class ClientApp : public CefApp,
                   public CefBrowserProcessHandler,
-                  public CefProxyHandler,
-                  public CefRenderProcessHandler
+                  public CefProxyHandler
 {
+public:
+	ClientApp();
+
+protected:
+	// CefBrowserProcessHandler
+	virtual void OnContextInitialized();
+
+	// CefRenderProcessHandler
+	virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								CefRefPtr<CefV8Context> context);
+
+	virtual void OnContextReleased(CefRefPtr<CefBrowser> browser,
+									CefRefPtr<CefFrame> frame,
+									CefRefPtr<CefV8Context> context);
+
+private:
+	// CefApp methods.
+	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() { return this; }
+
 private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
 
 };
 
 CefRefPtr<ClientApp> g_pClientApp;
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+ClientApp::ClientApp()
+{
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnContextInitialized()
+{
+	Msg("ClientApp::OnContextInitialized\n" );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
+                            CefRefPtr<CefFrame> frame,
+                            CefRefPtr<CefV8Context> context)
+{
+	SrcCefBrowser *pSrcBrowser = CEFSystem().FindBrowser( browser );
+	//Msg("ClientApp::OnContextCreated %d\n", pSrcBrowser );
+	if( !pSrcBrowser )
+		return;
+
+	//pSrcBrowser->OnContextCreated( browser, frame, context );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
+                                CefRefPtr<CefFrame> frame,
+                                CefRefPtr<CefV8Context> context)
+{
+	SrcCefBrowser *pSrcBrowser = CEFSystem().FindBrowser( browser );
+	//Msg("ClientApp::OnContextReleased %d\n", pSrcBrowser );
+	if( !pSrcBrowser )
+		return;
+
+	//pSrcBrowser->OnContextReleased( browser, frame, context );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: SrcCEF system
@@ -75,7 +141,9 @@ bool CCefSystem::Init()
 
 	// Settings
 	CefSettings settings;
-	settings.multi_threaded_message_loop = 1;
+	settings.single_process = 0;
+	settings.multi_threaded_message_loop = 0;
+	settings.log_severity = LOGSEVERITY_ERROR_REPORT;
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
@@ -106,7 +174,7 @@ void CCefSystem::Shutdown()
 void CCefSystem::Update( float frametime ) 
 { 
 	// Perform a single iteration of the CEF message loop
-	//CefDoMessageLoopWork();
+	CefDoMessageLoopWork();
 
 	// Let browser think
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
@@ -161,6 +229,19 @@ SrcCefBrowser *CCefSystem::GetBrowser( int idx )
 {
 	if( m_CefBrowsers.IsValidIndex( idx ) )
 		return m_CefBrowsers[idx];
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
+{
+	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	{
+		if( m_CefBrowsers[i]->GetBrowser() == pBrowser )
+			return m_CefBrowsers[i];
+	}
 	return NULL;
 }
 

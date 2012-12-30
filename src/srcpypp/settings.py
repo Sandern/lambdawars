@@ -47,6 +47,7 @@ modules_asw = [
     ('_vgui', 'VGUI'),
     ('_vguicontrols', 'VGUIControls'),
     #('_awesomium', 'Awesomium'),
+    ('_cef', 'CEF'),
     
     # # Game
     ('_gamerules', 'GameRules'),
