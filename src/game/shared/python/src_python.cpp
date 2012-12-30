@@ -1149,7 +1149,7 @@ CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, P
 #endif // CLIENT_DLL
 	char command[MAX_PATH];
 	Q_snprintf( command, sizeof( command ), "import %s", args.ArgS() );
-	g_SrcPythonSystem.Run(command);
+	g_SrcPythonSystem.Run( command, "consolespace" );
 }
 
 #ifndef CLIENT_DLL
@@ -1164,7 +1164,7 @@ CON_COMMAND_F_COMPLETION( cl_py_reload, "Reload a python module", FCVAR_CHEAT, P
 	if( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 #endif // CLIENT_DLL
-	g_SrcPythonSystem.Reload(args.ArgS());
+	g_SrcPythonSystem.Reload( args.ArgS() );
 }
 
 #ifdef CLIENT_DLL
