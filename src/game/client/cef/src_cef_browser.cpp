@@ -15,6 +15,8 @@
 	#include "src_cef_python.h"
 #endif // ENABLE_PYTHON
 
+#include "inputsystem/iinputsystem.h"
+
 // CEF
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
@@ -44,6 +46,8 @@ public:
 
 	CefRefPtr<CefBrowser> GetBrowser() { return m_Browser; }
 	int GetBrowserId() { return m_BrowserId; }
+
+	virtual void Destroy();
 
 	// CefClient methods
 	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() {
@@ -95,6 +99,9 @@ public:
 	// CefLifeSpanHandler methods
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
 
+	virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+										TerminationStatus status);
+
 	// CefLoadHandler methods
 	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame);
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode);
@@ -132,10 +139,28 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CefClientHandler::Destroy()
+{
+	m_pSrcBrowser = NULL;
+
+	SetOSRHandler( NULL );
+
+	if( GetBrowser() )
+	{
+		GetBrowser()->GetHost()->CloseBrowser();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 								CefProcessId source_process,
 								CefRefPtr<CefProcessMessage> message )
 {
+	if( !m_pSrcBrowser )
+		return false;
+
 	if( message->GetName() == "pong" ) 
 	{
 		Msg("Received PONG from render process!\n");
@@ -193,8 +218,20 @@ bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CefClientHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+									TerminationStatus status)
+{
+	Warning("Browser %d render process crashed with status code %d!\n", browser->GetIdentifier(), status);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) 
 {
+	if( !m_pSrcBrowser )
+		return;
+
 	if( !m_Browser.get() ) 
 	{
 		// We need to keep the main child window, but not popup windows
@@ -210,6 +247,8 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame)
 {
+	if( !m_pSrcBrowser )
+		return;
 	m_pSrcBrowser->OnLoadStart( frame );
 }
 
@@ -218,6 +257,8 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode)
 {
+	if( !m_pSrcBrowser )
+		return;
 	m_pSrcBrowser->OnLoadEnd( frame, httpStatusCode );
 }
 
@@ -227,13 +268,15 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 						const CefString& errorText, const CefString& failedUrl)
 {
+	if( !m_pSrcBrowser )
+		return;
 	m_pSrcBrowser->OnLoadError( frame, errorCode, errorText.c_str(), failedUrl.c_str() );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVisible(false)
+SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_bGameInputEnabled(false)
 {
 	// Create panel and texture generator
 	m_pPanel = new SrcCefVGUIPanel( this, NULL );
@@ -284,12 +327,8 @@ void SrcCefBrowser::Destroy( void )
 	// Close browser
 	if( m_CefClientHandler )
 	{
-		m_CefClientHandler->SetOSRHandler( NULL );
+		m_CefClientHandler->Destroy();
 
-		if( m_CefClientHandler->GetBrowser() )
-		{
-			m_CefClientHandler->GetBrowser()->GetHost()->CloseBrowser();
-		}
 	}
 
 	// Delete the handler
@@ -491,6 +530,21 @@ bool SrcCefBrowser::IsKeyBoardInputEnabled()
 		return false;
 
 	return m_pPanel->IsKeyBoardInputEnabled( );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int SrcCefBrowser::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
+{
+	if( !IsGameInputEnabled() )
+		return 1;
+
+	const char *pKeyStr = g_pInputSystem->ButtonCodeToString( keynum );
+	g_pInputSystem->ButtonCodeToVirtualKey( keynum );
+	wchar_t unichar = (wchar_t)keynum;
+	Msg("Keyname: %s, key: %lc\n", pKeyStr, unichar);
+	return 1;
 }
 
 //-----------------------------------------------------------------------------

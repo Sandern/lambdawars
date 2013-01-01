@@ -20,9 +20,9 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-//WNDPROC RealWndProc;
+WNDPROC RealWndProc;
 
-//LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 ConVar g_debug_cef("g_debug_cef", "0");
 
@@ -41,6 +41,24 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 	return true;
 }
 
+LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_SYSCHAR:
+	case WM_SYSKEYDOWN:
+	case WM_KEYDOWN:
+	case WM_SYSKEYUP:
+	case WM_KEYUP:
+	case WM_CHAR:
+		CEFSystem().ProcessKeyInput( message, wParam, lParam );
+	default:
+		break;
+	}
+ 
+	return CallWindowProc(RealWndProc, hWnd, message, wParam, lParam);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Client App
 //-----------------------------------------------------------------------------
@@ -54,15 +72,6 @@ public:
 protected:
 	// CefBrowserProcessHandler
 	virtual void OnContextInitialized();
-
-	// CefRenderProcessHandler
-	virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
-								CefRefPtr<CefFrame> frame,
-								CefRefPtr<CefV8Context> context);
-
-	virtual void OnContextReleased(CefRefPtr<CefBrowser> browser,
-									CefRefPtr<CefFrame> frame,
-									CefRefPtr<CefV8Context> context);
 
 private:
 	// CefApp methods.
@@ -87,37 +96,7 @@ ClientApp::ClientApp()
 //-----------------------------------------------------------------------------
 void ClientApp::OnContextInitialized()
 {
-	Msg("ClientApp::OnContextInitialized\n" );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void ClientApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
-                            CefRefPtr<CefFrame> frame,
-                            CefRefPtr<CefV8Context> context)
-{
-	SrcCefBrowser *pSrcBrowser = CEFSystem().FindBrowser( browser );
-	//Msg("ClientApp::OnContextCreated %d\n", pSrcBrowser );
-	if( !pSrcBrowser )
-		return;
-
-	//pSrcBrowser->OnContextCreated( browser, frame, context );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void ClientApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefFrame> frame,
-                                CefRefPtr<CefV8Context> context)
-{
-	SrcCefBrowser *pSrcBrowser = CEFSystem().FindBrowser( browser );
-	//Msg("ClientApp::OnContextReleased %d\n", pSrcBrowser );
-	if( !pSrcBrowser )
-		return;
-
-	//pSrcBrowser->OnContextReleased( browser, frame, context );
+	//Msg("ClientApp::OnContextInitialized\n" );
 }
 
 //-----------------------------------------------------------------------------
@@ -133,6 +112,8 @@ bool CCefSystem::Init()
 
 	// Find and set the main window
 	EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
+
+	RealWndProc = (WNDPROC)SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)CefWndProcHook);
 
 	// Arguments
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
@@ -227,7 +208,7 @@ int CCefSystem::CountBrowsers( void )
 //-----------------------------------------------------------------------------
 SrcCefBrowser *CCefSystem::GetBrowser( int idx )
 {
-	if( m_CefBrowsers.IsValidIndex( idx ) )
+	if( m_CefBrowsers[idx]->IsValid() && m_CefBrowsers.IsValidIndex( idx ) )
 		return m_CefBrowsers[idx];
 	return NULL;
 }
@@ -239,10 +220,62 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 {
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( m_CefBrowsers[i]->GetBrowser() == pBrowser )
+		if( m_CefBrowsers[i]->IsValid() && m_CefBrowsers[i]->GetBrowser() == pBrowser )
 			return m_CefBrowsers[i];
 	}
 	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
+{
+	/*for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	{
+		if( !m_CefBrowsers[i]->IsValid() )
+			continue;
+
+		int ret = m_CefBrowsers[i]->KeyInput( down, keynum, pszCurrentBinding );
+		if( ret == 0 )
+			return 0;
+	}*/
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
+{
+	CefKeyEvent keyevent;
+
+	keyevent.character = wParam;
+
+    if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+      keyevent.type = KEYEVENT_RAWKEYDOWN;
+    else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+      keyevent.type = KEYEVENT_KEYUP;
+    else
+      keyevent.type = KEYEVENT_CHAR;
+
+    keyevent.windows_key_code = wParam;
+    keyevent.native_key_code = lParam;
+    keyevent.is_system_key = message == WM_SYSCHAR ||
+                          message == WM_SYSKEYDOWN ||
+                          message == WM_SYSKEYUP;
+
+	//keyevent.modifiers = GetCefKeyboardModifiers(wParam, lParam); // TODO
+
+	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	{
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+			continue;
+
+		CefRefPtr<CefBrowser> browser = m_CefBrowsers[i]->GetBrowser();
+
+		browser->GetHost()->SendKeyEvent( keyevent );
+	}
 }
 
 //-----------------------------------------------------------------------------

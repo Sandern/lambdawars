@@ -58,8 +58,10 @@ public:
 	virtual void OnThink( void ) {}
 	void SetMouseInputEnabled( bool state );
 	void SetKeyBoardInputEnabled( bool state );
+	void SetGameInputEnabled( bool state );
 	bool IsMouseInputEnabled();
 	bool IsKeyBoardInputEnabled();
+	bool IsGameInputEnabled();
 	void SetCursor(vgui::HCursor cursor);
 	vgui::HCursor GetCursor();
 	void SetUseMouseCapture( bool usemousecapture ) { m_bUseMouseCapture = usemousecapture; }
@@ -69,6 +71,8 @@ public:
 	int GetAlphaAt( int x, int y );
 	void SetPassMouseTruIfAlphaZero( bool passtruifzero ) { m_bPassMouseTruIfAlphaZero = passtruifzero; }
 	bool GetPassMouseTruIfAlphaZero( void ) { return m_bPassMouseTruIfAlphaZero; }
+
+	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
 	// Load handler methods
 	virtual void OnLoadStart( CefRefPtr<CefFrame> frame );
@@ -138,11 +142,22 @@ private:
 	bool m_bPerformLayout;
 	bool m_bPassMouseTruIfAlphaZero;
 	bool m_bUseMouseCapture;
+	bool m_bGameInputEnabled;
 };
 
 inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
 {
 	return GetAlphaAt( x, y ) == 0;
+}
+
+inline void SrcCefBrowser::SetGameInputEnabled( bool state )
+{
+	m_bGameInputEnabled = state;
+}
+
+inline bool SrcCefBrowser::IsGameInputEnabled()
+{
+	return m_bGameInputEnabled;
 }
 
 #endif // SRC_CEF_BROWSER_H

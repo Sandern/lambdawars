@@ -212,6 +212,54 @@ static void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<C
 	}
 }
 
+static CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, int idx )
+{
+	CefRefPtr<CefV8Value> ret = NULL;
+
+	switch( args->GetType( idx ) )
+	{
+		case VTYPE_INT:
+		{
+			ret = CefV8Value::CreateInt( args->GetInt( idx ) );
+			break;
+		}
+		case VTYPE_DOUBLE:
+		{
+			ret = CefV8Value::CreateDouble( args->GetDouble( idx ) );
+			break;
+		}
+		case VTYPE_BOOL:
+		{
+			ret = CefV8Value::CreateBool( args->GetBool( idx ) );
+			break;
+		}
+		case VTYPE_STRING:
+		{
+			ret = CefV8Value::CreateString( args->GetString( idx ) );
+			break;
+		}
+		case VTYPE_LIST:
+		{
+			CefRefPtr<CefListValue> src = args->GetList( idx );
+			CefRefPtr<CefV8Value> v = CefV8Value::CreateArray( src->GetSize() );
+			if( v )
+			{
+				for( int i = 0; i < v->GetArrayLength(); i++ )
+					v->SetValue( i, ListValueToV8Value( src, i ) );
+				ret = v;
+			}
+			break;
+		}
+		default:
+		{
+			ret = CefV8Value::CreateString( args->GetString( idx ) );
+			break;
+		}
+	}
+
+	return ret;
+}
+
 static void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8ValueList& arguments )
 {
 	int idx = 0;
@@ -221,36 +269,7 @@ static void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8Val
 	size_t n = args->GetSize();
 
 	for( size_t i = 0; i < n; i++ )
-	{
-		switch( args->GetType( i ) )
-		{
-			case VTYPE_INT:
-			{
-				arguments.push_back( CefV8Value::CreateInt( args->GetInt( i ) ) );
-				break;
-			}
-			case VTYPE_DOUBLE:
-			{
-				arguments.push_back( CefV8Value::CreateDouble( args->GetDouble( i ) ) );
-				break;
-			}
-			case VTYPE_BOOL:
-			{
-				arguments.push_back( CefV8Value::CreateBool( args->GetBool( i ) ) );
-				break;
-			}
-			case VTYPE_STRING:
-			{
-				arguments.push_back( CefV8Value::CreateString( args->GetString( i ) ) );
-				break;
-			}
-			default:
-			{
-				arguments.push_back( CefV8Value::CreateString( args->GetString( i ) ) );
-				break;
-			}
-		}
-	}
+		arguments.push_back( ListValueToV8Value( args, i ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -321,14 +340,16 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 			}*/
 
 			// Do callback
-			if( m_Context )
+			if( m_Context && m_Context->Enter() )
 			{
 				CefV8ValueList args;
 				ListValueToV8ValueList( methodargs, args );
 
-				CefRefPtr<CefV8Value> result = (*i).callback->ExecuteFunctionWithContext(m_Context, (*i).thisobject, args);
+				CefRefPtr<CefV8Value> result = (*i).callback->ExecuteFunction((*i).thisobject, args);
 				if( !result )
 					m_ClientApp->SendWarning( m_Browser, "Error occurred during calling callback\n");
+
+				m_Context->Exit();
 			}
 			else
 			{
@@ -366,16 +387,19 @@ bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<Cef
 		return false;
 	}
 
-	// Make call
-	if( !m_Context )
+	// Enter context and Make call
+	if( !m_Context || !m_Context->Enter() )
 		return false;
 
 	CefV8ValueList args;
 	ListValueToV8ValueList( methodargs, args );
 
-	CefRefPtr<CefV8Value> result = method->ExecuteFunctionWithContext(m_Context, object, args);
+	CefRefPtr<CefV8Value> result = method->ExecuteFunction( object, args );
+
+	// Leave context
+	m_Context->Exit();
+
 	if( !result )
 		return false;
-
 	return true;
 }

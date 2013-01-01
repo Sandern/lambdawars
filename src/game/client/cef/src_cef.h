@@ -42,6 +42,10 @@ public:
 	virtual void LevelInitPreEntity();
 	virtual void LevelInitPostEntity();
 
+	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
+
+	void ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam );
+
 	HWND GetMainWindow( void );
 	void SetMainWIndow( HWND hWnd );
 

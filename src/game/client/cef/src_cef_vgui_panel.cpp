@@ -502,7 +502,6 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnKeyCodePressed(vgui::KeyCode code)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -510,7 +509,6 @@ void SrcCefVGUIPanel::OnKeyCodePressed(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnKeyCodeTyped(vgui::KeyCode code)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -518,7 +516,6 @@ void SrcCefVGUIPanel::OnKeyCodeTyped(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnKeyTyped(wchar_t unichar)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -526,7 +523,6 @@ void SrcCefVGUIPanel::OnKeyTyped(wchar_t unichar)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnKeyCodeReleased(vgui::KeyCode code)
 {
-
 }
 
 //-----------------------------------------------------------------------------

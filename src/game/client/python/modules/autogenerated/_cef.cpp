@@ -162,6 +162,36 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         return SrcCefBrowser::IsVisible( );
     }
 
+    virtual int KeyInput( int down, ::ButtonCode_t keynum, char const * pszCurrentBinding ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "KeyInput: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling KeyInput( down, keynum, pszCurrentBinding ) of Class: SrcCefBrowser\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_KeyInput = this->get_override( "KeyInput" );
+        if( func_KeyInput.ptr() != Py_None )
+            try {
+                return func_KeyInput( down, keynum, pszCurrentBinding );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->SrcCefBrowser::KeyInput( down, keynum, pszCurrentBinding );
+            }
+        else
+            return this->SrcCefBrowser::KeyInput( down, keynum, pszCurrentBinding );
+    }
+    
+    int default_KeyInput( int down, ::ButtonCode_t keynum, char const * pszCurrentBinding ) {
+        return SrcCefBrowser::KeyInput( down, keynum, pszCurrentBinding );
+    }
+
     virtual void LoadURL( char const * url ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -774,6 +804,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , ( bp::arg("x"), bp::arg("y") ) );
         
         }
+        { //::SrcCefBrowser::IsGameInputEnabled
+        
+            typedef bool ( ::SrcCefBrowser::*IsGameInputEnabled_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "IsGameInputEnabled"
+                , IsGameInputEnabled_function_type( &::SrcCefBrowser::IsGameInputEnabled ) );
+        
+        }
         { //::SrcCefBrowser::IsKeyBoardInputEnabled
         
             typedef bool ( ::SrcCefBrowser::*IsKeyBoardInputEnabled_function_type )(  ) ;
@@ -821,6 +860,18 @@ BOOST_PYTHON_MODULE(_cef){
                 "IsVisible"
                 , IsVisible_function_type(&::SrcCefBrowser::IsVisible)
                 , default_IsVisible_function_type(&SrcCefBrowser_wrapper::default_IsVisible) );
+        
+        }
+        { //::SrcCefBrowser::KeyInput
+        
+            typedef int ( ::SrcCefBrowser::*KeyInput_function_type )( int,::ButtonCode_t,char const * ) ;
+            typedef int ( SrcCefBrowser_wrapper::*default_KeyInput_function_type )( int,::ButtonCode_t,char const * ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "KeyInput"
+                , KeyInput_function_type(&::SrcCefBrowser::KeyInput)
+                , default_KeyInput_function_type(&SrcCefBrowser_wrapper::default_KeyInput)
+                , ( bp::arg("down"), bp::arg("keynum"), bp::arg("pszCurrentBinding") ) );
         
         }
         { //::SrcCefBrowser::LoadURL
@@ -1014,6 +1065,16 @@ BOOST_PYTHON_MODULE(_cef){
                 "SetCursor"
                 , SetCursor_function_type( &::SrcCefBrowser::SetCursor )
                 , ( bp::arg("cursor") ) );
+        
+        }
+        { //::SrcCefBrowser::SetGameInputEnabled
+        
+            typedef void ( ::SrcCefBrowser::*SetGameInputEnabled_function_type )( bool ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "SetGameInputEnabled"
+                , SetGameInputEnabled_function_type( &::SrcCefBrowser::SetGameInputEnabled )
+                , ( bp::arg("state") ) );
         
         }
         { //::SrcCefBrowser::SetKeyBoardInputEnabled

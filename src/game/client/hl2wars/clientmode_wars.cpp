@@ -20,6 +20,7 @@
 #include "nb_header_footer.h"
 #include "glow_outline_effect.h"
 #include "c_hl2wars_player.h"
+#include "src_cef.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -347,16 +348,21 @@ int	ClientModeSDK::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 	if ( engine->Con_IsVisible() )
 		return 1;
 
-	// annoyingly we can't intercept ESC here, it'll still bring up the gameui stuff
-	//  but we'll use it for a couple of things anyway
+	// Use escape to leave control
 	if (keynum == KEY_ESCAPE)
 	{
 		C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 		if( pPlayer && pPlayer->GetControlledUnit() )
 		{
 			engine->ClientCmd( "player_release_control_unit" );
+			return 0;
 		}
 	}
+
+	// Pass input to cef browser if they want it
+	int ret = CEFSystem().KeyInput( down, keynum, pszCurrentBinding );
+	if( ret == 0 )
+		return 0;
 
 	return BaseClass::KeyInput(down, keynum, pszCurrentBinding);
 }
