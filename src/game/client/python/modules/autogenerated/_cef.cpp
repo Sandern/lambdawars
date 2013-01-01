@@ -222,6 +222,36 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::OnAfterCreated( );
     }
 
+    virtual void OnContextCreated(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnContextCreated: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnContextCreated(  ) of Class: SrcCefBrowser\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnContextCreated = this->get_override( "OnContextCreated" );
+        if( func_OnContextCreated.ptr() != Py_None )
+            try {
+                func_OnContextCreated(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::OnContextCreated(  );
+            }
+        else
+            this->SrcCefBrowser::OnContextCreated(  );
+    }
+    
+    void default_OnContextCreated(  ) {
+        SrcCefBrowser::OnContextCreated( );
+    }
+
     virtual void OnThink(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -372,7 +402,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::PyOnLoadStart( frame );
     }
 
-    virtual void PyOnMethodCall( ::boost::python::object name, ::boost::python::object arguments ) {
+    virtual void PyOnMethodCall( int identifier, ::boost::python::object methodargs, ::boost::python::object callbackid ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
@@ -384,22 +414,22 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnMethodCall( name, arguments ) of Class: SrcCefBrowser\n");
+            Msg("Calling PyOnMethodCall( identifier, methodargs, callbackid ) of Class: SrcCefBrowser\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMethodCall = this->get_override( "OnMethodCall" );
         if( func_OnMethodCall.ptr() != Py_None )
             try {
-                func_OnMethodCall( name, arguments );
+                func_OnMethodCall( identifier, methodargs, callbackid );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->SrcCefBrowser::PyOnMethodCall( name, arguments );
+                this->SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
             }
         else
-            this->SrcCefBrowser::PyOnMethodCall( name, arguments );
+            this->SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
     
-    void default_OnMethodCall( ::boost::python::object name, ::boost::python::object arguments ) {
-        SrcCefBrowser::PyOnMethodCall( name, arguments );
+    void default_OnMethodCall( int identifier, ::boost::python::object methodargs, ::boost::python::object callbackid ) {
+        SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
 
     virtual void Reload(  ) {
@@ -627,9 +657,28 @@ BOOST_PYTHON_MODULE(_cef){
 
     { //::PyJSObject
         typedef bp::class_< PyJSObject > JSObject_exposer_t;
-        JSObject_exposer_t JSObject_exposer = JSObject_exposer_t( "JSObject", bp::init< CefRefPtr< JSObject > >(( bp::arg("object") )) );
+        JSObject_exposer_t JSObject_exposer = JSObject_exposer_t( "JSObject", bp::no_init );
         bp::scope JSObject_scope( JSObject_exposer );
+        JSObject_exposer.def( bp::init< CefRefPtr< JSObject > >(( bp::arg("object") )) );
         bp::implicitly_convertible< CefRefPtr< JSObject >, PyJSObject >();
+        { //property "identifier"[fget=::PyJSObject::GetIdentifier]
+        
+            typedef int ( ::PyJSObject::*fget )(  ) ;
+            
+            JSObject_exposer.add_property( 
+                "identifier"
+                , fget( &::PyJSObject::GetIdentifier ) );
+        
+        }
+        { //property "name"[fget=::PyJSObject::GetName]
+        
+            typedef ::boost::python::object ( ::PyJSObject::*fget )(  ) ;
+            
+            JSObject_exposer.add_property( 
+                "name"
+                , fget( &::PyJSObject::GetName ) );
+        
+        }
     }
 
     { //::SrcCefBrowser
@@ -637,16 +686,6 @@ BOOST_PYTHON_MODULE(_cef){
         SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< bp::optional< char const * > >(( bp::arg("url")="" )) );
         bp::scope SrcCefBrowser_scope( SrcCefBrowser_exposer );
         bp::implicitly_convertible< char const *, SrcCefBrowser >();
-        { //::SrcCefBrowser::CreateFunction
-        
-            typedef ::CefRefPtr< JSObject > ( ::SrcCefBrowser::*CreateFunction_function_type )( char const *,::CefRefPtr< JSObject > ) ;
-            
-            SrcCefBrowser_exposer.def( 
-                "CreateFunction"
-                , CreateFunction_function_type( &::SrcCefBrowser::CreateFunction )
-                , ( bp::arg("name"), bp::arg("object")=0 ) );
-        
-        }
         { //::SrcCefBrowser::Destroy
         
             typedef void ( ::SrcCefBrowser::*Destroy_function_type )(  ) ;
@@ -807,6 +846,17 @@ BOOST_PYTHON_MODULE(_cef){
                 , default_OnAfterCreated_function_type(&SrcCefBrowser_wrapper::default_OnAfterCreated) );
         
         }
+        { //::SrcCefBrowser::OnContextCreated
+        
+            typedef void ( ::SrcCefBrowser::*OnContextCreated_function_type )(  ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnContextCreated_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "OnContextCreated"
+                , OnContextCreated_function_type(&::SrcCefBrowser::OnContextCreated)
+                , default_OnContextCreated_function_type(&SrcCefBrowser_wrapper::default_OnContextCreated) );
+        
+        }
         { //::SrcCefBrowser::OnThink
         
             typedef void ( ::SrcCefBrowser::*OnThink_function_type )(  ) ;
@@ -838,6 +888,16 @@ BOOST_PYTHON_MODULE(_cef){
                 , Ping_function_type( &::SrcCefBrowser::Ping ) );
         
         }
+        { //::SrcCefBrowser::PyCreateFunction
+        
+            typedef ::boost::python::object ( ::SrcCefBrowser::*CreateFunction_function_type )( char const *,::PyJSObject *,bool ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "CreateFunction"
+                , CreateFunction_function_type( &::SrcCefBrowser::PyCreateFunction )
+                , ( bp::arg("name"), bp::arg("pPyObject")=bp::object(), bp::arg("hascallback")=(bool)(false) ) );
+        
+        }
         { //::SrcCefBrowser::PyCreateGlobalObject
         
             typedef ::boost::python::object ( ::SrcCefBrowser::*CreateGlobalObject_function_type )( char const * ) ;
@@ -848,6 +908,16 @@ BOOST_PYTHON_MODULE(_cef){
                 , ( bp::arg("name") ) );
         
         }
+        { //::SrcCefBrowser::PyExecuteJavaScriptWithResult
+        
+            typedef ::boost::python::object ( ::SrcCefBrowser::*ExecuteJavaScriptWithResult_function_type )( char const *,char const *,int ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "ExecuteJavaScriptWithResult"
+                , ExecuteJavaScriptWithResult_function_type( &::SrcCefBrowser::PyExecuteJavaScriptWithResult )
+                , ( bp::arg("code"), bp::arg("script_url"), bp::arg("start_line")=(int)(0) ) );
+        
+        }
         { //::SrcCefBrowser::PyGetMainFrame
         
             typedef ::boost::python::object ( ::SrcCefBrowser::*GetMainFrame_function_type )(  ) ;
@@ -855,6 +925,16 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "GetMainFrame"
                 , GetMainFrame_function_type( &::SrcCefBrowser::PyGetMainFrame ) );
+        
+        }
+        { //::SrcCefBrowser::PyInvoke
+        
+            typedef void ( ::SrcCefBrowser::*Invoke_function_type )( ::PyJSObject *,char const *,::boost::python::list ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "Invoke"
+                , Invoke_function_type( &::SrcCefBrowser::PyInvoke )
+                , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs") ) );
         
         }
         { //::SrcCefBrowser::PyOnLoadEnd
@@ -895,14 +975,24 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnMethodCall
         
-            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( ::boost::python::object,::boost::python::object ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( ::boost::python::object,::boost::python::object ) ;
+            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( int,::boost::python::object,::boost::python::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( int,::boost::python::object,::boost::python::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnMethodCall"
                 , OnMethodCall_function_type(&::SrcCefBrowser::PyOnMethodCall)
                 , default_OnMethodCall_function_type(&SrcCefBrowser_wrapper::default_OnMethodCall)
-                , ( bp::arg("name"), bp::arg("arguments") ) );
+                , ( bp::arg("identifier"), bp::arg("methodargs"), bp::arg("callbackid") ) );
+        
+        }
+        { //::SrcCefBrowser::PySendCallback
+        
+            typedef void ( ::SrcCefBrowser::*SendCallback_function_type )( ::boost::python::object,::boost::python::list ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "SendCallback"
+                , SendCallback_function_type( &::SrcCefBrowser::PySendCallback )
+                , ( bp::arg("callbackid"), bp::arg("methodargs") ) );
         
         }
         { //::SrcCefBrowser::Reload

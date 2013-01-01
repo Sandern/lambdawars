@@ -48,6 +48,10 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 	m_Color = Color(255, 255, 255, 255);
 	m_iTexWide = m_iTexTall = 0;
 
+	m_iEventFlags = EVENTFLAG_NONE;
+	m_iMouseX = 0;
+	m_iMouseY = 0;
+
 	static int staticMatWebViewID = 0;
 	Q_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
 }
@@ -134,7 +138,8 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specifiy
 	//				a sub rect when calling ->Download()).
 	m_RenderBuffer.InitProceduralTexture( m_TextureWebViewName, TEXTURE_GROUP_VGUI, m_iTexWide, m_iTexTall, IMAGE_FORMAT_BGRA8888, 
-		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY );
+		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY|
+		TEXTUREFLAGS_PRE_SRGB|TEXTUREFLAGS_NODEPTHBUFFER);
 	if( !m_RenderBuffer.IsValid() )
 	{
 		Warning("Cef: Failed to initialize render buffer texture\n");
@@ -287,9 +292,9 @@ void SrcCefVGUIPanel::PerformLayout()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	SrcCefVGUIPanel::GetKeyModifiers()
+int	SrcCefVGUIPanel::GetEventFlags()
 {
-	int modifiers = 0;
+	int modifiers = m_iEventFlags;
 
 	return modifiers;
 }
@@ -314,6 +319,7 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 	CefMouseEvent me;
 	me.x = x;
 	me.y = y;
+	me.modifiers = GetEventFlags();
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, false );
 
 	if( g_debug_cef.GetInt() > 2 )
@@ -334,6 +340,8 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 		return;
 	}
 
+	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
+
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -341,15 +349,22 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 	switch( code )
 	{
 	case MOUSE_LEFT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, false, 1 );
+		iMouseType = MBT_LEFT;
+		m_iEventFlags |= EVENTFLAG_LEFT_MOUSE_BUTTON;
 		break;
 	case MOUSE_RIGHT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, false, 1 );
+		iMouseType = MBT_RIGHT;
+		m_iEventFlags |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
 		break;
 	case MOUSE_MIDDLE:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, false, 1 );
+		iMouseType = MBT_MIDDLE;
+		m_iEventFlags |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
 		break;
 	}
+
+	me.modifiers = GetEventFlags();
+
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
 
 	if( m_pBrowser->GetUseMouseCapture() )
 	{
@@ -375,6 +390,8 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 		return;
 	}
 
+	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
+
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -382,18 +399,25 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 	switch( code )
 	{
 	case MOUSE_LEFT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, false, 1 );
+		iMouseType = MBT_LEFT;
+		m_iEventFlags |= EVENTFLAG_LEFT_MOUSE_BUTTON;
 		break;
 	case MOUSE_RIGHT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, false, 1 );
+		iMouseType = MBT_RIGHT;
+		m_iEventFlags |= EVENTFLAG_RIGHT_MOUSE_BUTTON;
 		break;
 	case MOUSE_MIDDLE:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, false, 1 );
+		iMouseType = MBT_MIDDLE;
+		m_iEventFlags |= EVENTFLAG_MIDDLE_MOUSE_BUTTON;
 		break;
 	}
 
+	me.modifiers = GetEventFlags();
+
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
+
 	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected mouse released %d %d\n", m_iMouseX, m_iMouseY);
+		DevMsg("CEF: injected mouse double pressed %d %d\n", m_iMouseX, m_iMouseY);
 }
 
 //-----------------------------------------------------------------------------
@@ -418,6 +442,8 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 		return;
 	}
 
+	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
+
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -425,15 +451,25 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 	switch( code )
 	{
 	case MOUSE_LEFT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_LEFT, true, 1 );
+		iMouseType = MBT_LEFT;
+		m_iEventFlags &= ~EVENTFLAG_LEFT_MOUSE_BUTTON;
 		break;
 	case MOUSE_RIGHT:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_RIGHT, true, 1 );
+		iMouseType = MBT_RIGHT;
+		m_iEventFlags &= ~EVENTFLAG_RIGHT_MOUSE_BUTTON;
 		break;
 	case MOUSE_MIDDLE:
-		m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, MBT_MIDDLE, true, 1 );
+		iMouseType = MBT_MIDDLE;
+		m_iEventFlags &= ~EVENTFLAG_MIDDLE_MOUSE_BUTTON;
 		break;
 	}
+
+	me.modifiers = GetEventFlags();
+
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, true, 1 );
+
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg("CEF: injected mouse released %d %d\n", m_iMouseX, m_iMouseY);
 }
 
 //-----------------------------------------------------------------------------
@@ -453,6 +489,7 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
+	me.modifiers = GetEventFlags();
 
 	// VGUI just gives -1 or +1. SendMouseWheelEvent expects
 	// the number of pixels to shift.

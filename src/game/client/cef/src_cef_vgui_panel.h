@@ -34,7 +34,7 @@ public:
 	virtual void OnSizeChanged(int newWide, int newTall);
 	virtual void PerformLayout();
 
-	int	GetKeyModifiers();
+	int	GetEventFlags();
 
 	virtual void OnCursorMoved(int x,int y);
 	virtual void OnMousePressed(vgui::MouseCode code);
@@ -51,6 +51,7 @@ public:
 
 private:
 	int m_iMouseX, m_iMouseY;
+	int m_iEventFlags;
 	SrcCefBrowser *m_pBrowser;
 
 	// Texture variables

@@ -18,8 +18,6 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	{
 		CefRefPtr<CefProcessMessage> retmessage =
 			CefProcessMessage::Create("pong");
-		//CefRefPtr<CefListValue> retargs = retmessage->GetArgumentList();
-		//CefRefPtr<CefListValue> val = CefListValue::Create();
 		browser->SendProcessMessage(PID_BROWSER, retmessage);
 
 		SendMsg( browser, "Just send a pong message from browser %d", browser->GetIdentifier() );
@@ -80,6 +78,29 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
+	else if( message->GetName() == "calljswithresult" ) 
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		int iIdentifier = args->GetInt( 0 );
+		CefString code = args->GetString( 1 );
+
+		if( !renderBrowser->ExecuteJavascriptWithResult( iIdentifier, code ) )
+			SendWarning(browser, "Failed to call javascript with result: %ls", code.c_str());
+
+		return true;
+	}
+	else if( message->GetName() == "invoke" ) 
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		int iIdentifier = args->GetInt( 0 );
+		CefString methodname = args->GetString( 1 );
+		CefRefPtr<CefListValue> methodargs = args->GetList( 2 );
+
+		if( !renderBrowser->Invoke( iIdentifier, methodname, methodargs ) )
+			SendWarning(browser, "Failed to invoke id %d with methodname %ls\n", iIdentifier, methodname.c_str());
+
+		return true;
+	}
 	else
 	{
 		SendWarning( browser, "Unknown proccess message %ls", message->GetName().c_str() );
@@ -135,6 +156,12 @@ void ClientApp::OnContextCreated(CefRefPtr<CefBrowser> browser,
 							CefRefPtr<CefFrame> frame,
 							CefRefPtr<CefV8Context> context)
 {
+	if( browser->GetMainFrame()->GetIdentifier() != frame->GetIdentifier() )
+	{
+		SendWarning( browser, "Context created for different frame than the main frame (currently unsupported)\n");
+		return;
+	}
+
 	// Tell Main process context is created
 	CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("oncontextcreated");
 	browser->SendProcessMessage(PID_BROWSER, message);
@@ -156,11 +183,16 @@ void ClientApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 								CefRefPtr<CefFrame> frame,
 								CefRefPtr<CefV8Context> context)
 {
+	if( browser->GetMainFrame()->GetIdentifier() != frame->GetIdentifier() )
+	{
+		return;
+	}
+
 	CefRefPtr<RenderBrowser> renderBrowser = FindBrowser( browser );
 	if( !renderBrowser )
 		return;
 
-	renderBrowser->SetV8Context( context );
+	renderBrowser->SetV8Context( NULL );
 }
 
 //-----------------------------------------------------------------------------

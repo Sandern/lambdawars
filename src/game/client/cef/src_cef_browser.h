@@ -28,6 +28,7 @@ class CefProcessMessage;
 class CefListValue;
 
 class JSObject;
+class PyJSObject;
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -87,11 +88,13 @@ public:
 
 	// Javascript methods
 	void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
+	CefRefPtr<JSObject>  ExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
 
 	CefRefPtr<JSObject> CreateGlobalObject( const char *name );
 	CefRefPtr<JSObject> CreateFunction( const char *name, CefRefPtr<JSObject> object = NULL, bool bHasCallback = false );
 
 	void SendCallback( int *pCallbackID, CefRefPtr<CefListValue> methodargs );
+	void Invoke( CefRefPtr<JSObject> object, const char *methodname,  CefRefPtr<CefListValue> methodargs );
 
 	// Method Handlers
 	virtual void OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
@@ -105,8 +108,13 @@ public:
 	boost::python::object PyGetMainFrame();
 
 	boost::python::object PyCreateGlobalObject( const char *name );
+	boost::python::object PyCreateFunction( const char *name, PyJSObject *pPyObject = NULL, bool hascallback = false );
 
-	virtual void PyOnMethodCall( boost::python::object name, boost::python::object arguments ) {}
+	boost::python::object PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
+	void PySendCallback( boost::python::object callbackid, boost::python::list methodargs );
+	void PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs );
+
+	virtual void PyOnMethodCall( int identifier, boost::python::object methodargs, boost::python::object callbackid ) {}
 #endif // ENABLE_PYTHON
 
 	void Ping();

@@ -18,7 +18,7 @@ class CefFrame;
 class JSObject
 {
 public:
-	JSObject( const char *pName );
+	JSObject( const char *pName = "" );
 
 	int GetIdentifier();
 	CefString GetName();

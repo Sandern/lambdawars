@@ -18,4 +18,5 @@ static int s_NextJSObjectID = 0;
 JSObject::JSObject( const char *pName )
 {
 	m_iIdentifier = s_NextJSObjectID++;
+	m_Name = pName;
 }

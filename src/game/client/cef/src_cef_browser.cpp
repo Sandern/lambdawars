@@ -165,13 +165,13 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "msg" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		Msg("Browser %d Render Process: %ls\n", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		Msg("Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
 		return true;
 	}
 	else if( message->GetName() == "warning" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		Warning("Browser %d Render Process: %ls\n", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		Warning("Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
 		return true;
 	}
 
@@ -603,10 +603,32 @@ void SrcCefBrowser::ExecuteJavaScript( const char *code, const char *script_url,
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Execute javascript code with reference to result
+//-----------------------------------------------------------------------------
+CefRefPtr<JSObject> SrcCefBrowser::ExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line )
+{
+	if( !IsValid() )
+		return NULL;
+
+	CefRefPtr<JSObject> jsObject = new JSObject();
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("calljswithresult");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 1, code );
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+	return jsObject;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 CefRefPtr<JSObject> SrcCefBrowser::CreateGlobalObject( const char *name )
 {
+	if( !IsValid() )
+		return NULL;
+
 	CefRefPtr<JSObject> jsObject = new JSObject( name );
 
 	CefRefPtr<CefProcessMessage> message =
@@ -623,6 +645,9 @@ CefRefPtr<JSObject> SrcCefBrowser::CreateGlobalObject( const char *name )
 //-----------------------------------------------------------------------------
 CefRefPtr<JSObject> SrcCefBrowser::CreateFunction( const char *name, CefRefPtr<JSObject> object, bool bHasCallback )
 {
+	if( !IsValid() )
+		return NULL;
+
 	CefRefPtr<JSObject> jsObject = new JSObject( name );
 
 	CefRefPtr<CefProcessMessage> message =
@@ -643,6 +668,9 @@ CefRefPtr<JSObject> SrcCefBrowser::CreateFunction( const char *name, CefRefPtr<J
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::SendCallback( int *pCallbackID, CefRefPtr<CefListValue> methodargs )
 {
+	if( !IsValid() )
+		return;
+
 	if( !pCallbackID )
 	{
 		Warning("SendCallback: no callback specified\n");
@@ -661,10 +689,63 @@ void SrcCefBrowser::SendCallback( int *pCallbackID, CefRefPtr<CefListValue> meth
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefBrowser::Invoke( CefRefPtr<JSObject> object, const char *methodname,  CefRefPtr<CefListValue> methodargs )
+{
+	if( !IsValid() )
+		return;
+
+	if( !object )
+		return;
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("invoke");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, object->GetIdentifier() );
+	args->SetString( 1, methodname );
+	args->SetList( 2, methodargs );
+
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
 {
 #ifdef ENABLE_PYTHON
-
+	bp::list pyargs;
+	for( size_t i = 0; i < methodargs->GetSize(); i++ )
+	{
+		switch( methodargs->GetType( i ) )
+		{
+			case VTYPE_INT:
+			{
+				pyargs.append( methodargs->GetInt( i ) );
+				break;
+			}
+			case VTYPE_DOUBLE:
+			{
+				pyargs.append( methodargs->GetDouble( i ) );
+				break;
+			}
+			case VTYPE_BOOL:
+			{
+				pyargs.append( methodargs->GetBool( i ) );
+				break;
+			}
+			case VTYPE_STRING:
+			{
+				pyargs.append( methodargs->GetString( i ) );
+				break;
+			}
+			default:
+			{
+				pyargs.append( methodargs->GetString( i ) );
+				break;
+			}
+		}
+	}
+	PyOnMethodCall( iIdentifier, pyargs, pCallbackID ? bp::object( *pCallbackID ) : bp::object() );
 #endif // ENABLE_PYTHON
 }
 
@@ -684,6 +765,9 @@ boost::python::object SrcCefBrowser::PyGetMainFrame()
 	return bp::object( PyCefFrame( mainFrame ) );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 boost::python::object SrcCefBrowser::PyCreateGlobalObject( const char *name )
 {
 	if( !IsValid() )
@@ -695,10 +779,78 @@ boost::python::object SrcCefBrowser::PyCreateGlobalObject( const char *name )
 
 	return bp::object( PyJSObject( jsObject ) );
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object SrcCefBrowser::PyCreateFunction( const char *name, PyJSObject *pPyObject, bool hascallback )
+{
+	if( !IsValid() || !pPyObject )
+		return bp::object();
+
+	CefRefPtr<JSObject> object = pPyObject->GetJSObject();
+	if( !object )
+		return bp::object();
+
+	CefRefPtr<JSObject> jsObject = CreateFunction( name, object, hascallback );
+	if( !jsObject )
+		return bp::object();
+
+	return bp::object( PyJSObject( jsObject ) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object SrcCefBrowser::PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line )
+{
+	if( !IsValid() )
+		return bp::object();
+
+	CefRefPtr<JSObject> jsObject = ExecuteJavaScriptWithResult( code, script_url, start_line );
+	if( !jsObject )
+		return bp::object();
+
+	return bp::object( PyJSObject( jsObject ) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs )
+{
+	if( !IsValid() )
+		return;
+
+	if( !object || !methodname )
+		return;
+
+	Invoke( object->GetJSObject(), methodname, PyToCefValueList( methodargs ) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::PySendCallback( bp::object callbackid, bp::list pymethodargs )
+{
+	if( callbackid.ptr() == Py_None )
+		return;
+
+	int iCallbackID = bp::extract<int>( callbackid );
+
+	// Convert list to CefListValue
+	CefRefPtr<CefListValue> methodargs = PyToCefValueList( pymethodargs );
+
+	// Do callback
+	SendCallback( &iCallbackID, methodargs );
+}
 #endif // ENABLE_PYTHON
 
 void SrcCefBrowser::Ping()
 {
+	if( !IsValid() )
+		return;
+
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create("ping");
 	CefRefPtr<CefListValue> args = message->GetArgumentList();

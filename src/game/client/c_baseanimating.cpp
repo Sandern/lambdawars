@@ -1931,7 +1931,7 @@ void C_BaseAnimating::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quat
 	IBoneSetup boneSetup( hdr, boneMask, poseparam );
 	boneSetup.InitPose( pos, q );
 	boneSetup.AccumulatePose( pos, q, GetSequence(), fCycle, 1.0, currentTime, m_pIk );
-	
+
 	// debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, "%30s %6.2f : %6.2f", hdr->pSeqdesc( GetSequence() )->pszLabel( ), fCycle, 1.0 );
 
 	MaintainSequenceTransitions( boneSetup, fCycle, pos, q );

@@ -58,12 +58,17 @@ public:
 	void SetV8Context( CefRefPtr<CefV8Context> context );
 	CefRefPtr<CefV8Context> GetV8Context();
 
+	void Clear();
+
 	// Creating new objects
 	bool RegisterObject( int iIdentifier, CefRefPtr<CefV8Value> object );
 
 	bool CreateGlobalObject( int iIdentifier, CefString name );
 
 	bool CreateFunction( int iIdentifier, CefString name, int iParentIdentifier = -1, bool bCallback = false );
+
+	// Function calling with "result"
+	bool ExecuteJavascriptWithResult( int iIdentifier, CefString code );
 
 	// Function handlers
 	bool CallFunction(	CefRefPtr<CefV8Value> object, 
@@ -72,6 +77,7 @@ public:
 						CefRefPtr<CefV8Value> callback = NULL );
 
 	bool DoCallback( int iCallbackID, CefRefPtr<CefListValue> methodargs );
+	bool Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 
 private:
 	CefRefPtr<CefBrowser> m_Browser;

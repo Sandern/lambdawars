@@ -23,6 +23,76 @@ PyJSObject::PyJSObject( CefRefPtr<JSObject> object ) : m_Object(object)
 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+CefRefPtr<JSObject> PyJSObject::GetJSObject()
+{
+	return m_Object;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int PyJSObject::GetIdentifier()
+{
+	return m_Object->GetIdentifier();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bp::object PyJSObject::GetName()
+{
+	std::string name = m_Object->GetName().ToString();
+	return bp::object(name.c_str());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
+{
+	int n = bp::len( l );
+
+	CefRefPtr<CefListValue> result = CefListValue::Create();
+	result->SetSize( n );
+
+	for( int i = 0; i < n; i++ )
+	{
+		bp::object value = l[i];
+		bp::object type = __builtin__.attr("type")( value );
+
+		if( value.ptr() == Py_None )
+		{
+			result->SetNull( i );
+		}
+		else if( type.ptr() == bp::object( types.attr("IntType")).ptr() )
+		{
+			result->SetInt( i, boost::python::extract<int>(value) );
+		}
+		else if( type.ptr() == bp::object(types.attr("FloatType")).ptr() )
+		{
+			result->SetDouble( i, boost::python::extract<float>(value) );
+		}
+		else if( type.ptr() == bp::object( types.attr("StringType")).ptr() )
+		{
+			const char *pStr = boost::python::extract<const char *>(value);
+			result->SetString( i, pStr );
+		}
+		else if( type.ptr() == bp::object( types.attr("BooleanType")).ptr() )
+		{
+			result->SetBool( i, boost::python::extract<bool>(value) );
+		}
+		else if( type.ptr() == bp::object( types.attr("ListType")).ptr() )
+		{
+			result->SetList( i, PyToCefValueList( bp::list( value ) ) );
+		}
+	}
+
+	return result;
+}
+
 #if 0
 //-----------------------------------------------------------------------------
 // Purpose:

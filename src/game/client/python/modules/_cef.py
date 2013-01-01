@@ -38,18 +38,34 @@ class CEF(GenerateModuleClient):
         cls.mem_fun('OnLoadEnd').exclude()
         cls.mem_fun('OnLoadError').exclude()
         cls.mem_fun('CreateGlobalObject').exclude()
+        cls.mem_fun('CreateFunction').exclude()
+        cls.mem_fun('ExecuteJavaScriptWithResult').exclude()
         cls.mem_fun('OnMethodCall').exclude()
+        cls.mem_fun('SendCallback').exclude()
+        cls.mem_fun('Invoke').exclude()
         
         cls.mem_fun('PyOnLoadStart').rename('OnLoadStart')
         cls.mem_fun('PyOnLoadEnd').rename('OnLoadEnd')
         cls.mem_fun('PyOnLoadError').rename('OnLoadError')
         cls.mem_fun('PyCreateGlobalObject').rename('CreateGlobalObject')
+        cls.mem_fun('PyCreateFunction').rename('CreateFunction')
         cls.mem_fun('PyOnMethodCall').rename('OnMethodCall')
+        cls.mem_fun('PyExecuteJavaScriptWithResult').rename('ExecuteJavaScriptWithResult')
+        cls.mem_fun('PySendCallback').rename('SendCallback')
+        cls.mem_fun('PyInvoke').rename('Invoke')
         
         cls = mb.class_('PyJSObject')
         cls.include()
+        cls.no_init = True
         cls.rename('JSObject')
+        cls.mem_fun('GetJSObject').exclude()
+        cls.mem_fun('GetIdentifier').exclude()
+        cls.mem_fun('GetName').exclude()
         
+        cls.add_property( 'identifier'
+                         , cls.mem_fun('GetIdentifier') )
+        cls.add_property( 'name'
+                         , cls.mem_fun('GetName') )
         
         '''
         cls = mb.class_('PyCefV8Value')

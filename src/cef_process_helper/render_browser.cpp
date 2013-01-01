@@ -63,6 +63,18 @@ void RenderBrowser::SetV8Context( CefRefPtr<CefV8Context> context )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void RenderBrowser::Clear()
+{
+	m_Context = NULL;
+
+	m_Objects.clear();
+	m_GlobalObjects.clear();
+	m_Callbacks.clear();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool RenderBrowser::RegisterObject( int iIdentifier, CefRefPtr<CefV8Value> object )
 {
 	std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
@@ -132,6 +144,35 @@ bool RenderBrowser::CreateFunction( int iIdentifier, CefString name, int iParent
 	// Register
 	if( !RegisterObject( iIdentifier, func ) )
 		return false;
+
+	m_Context->Exit();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool RenderBrowser::ExecuteJavascriptWithResult( int iIdentifier, CefString code )
+{
+	if( !m_Context || !m_Context->Enter() )
+		return false;
+
+	// Execute code
+	CefRefPtr<CefV8Value> retval;
+	CefRefPtr<CefV8Exception> exception;
+	if( !m_Context->Eval( code, retval, exception ) )
+	{
+		m_Context->Exit();
+		return false;
+	}
+
+	// Register object
+	if( !RegisterObject( iIdentifier, retval ) )
+	{
+		m_Context->Exit();
+		return false;
+	}
 
 	m_Context->Exit();
 
@@ -220,14 +261,11 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 					CefRefPtr<CefV8Value>& retval, 
 					CefRefPtr<CefV8Value> callback )
 {
-	//m_ClientApp->SendMsg( m_Browser, "CallFunction" );
 	std::map< int, CefRefPtr<CefV8Value> >::iterator i = m_Objects.begin();
 	for( ; i != m_Objects.end(); ++i )
 	{
 		if( i->second->IsSame( object ) )
 		{
-			//m_ClientApp->SendMsg( m_Browser, "... Found function" );
-
 			// Create message
 			CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("methodcall");
 			CefRefPtr<CefListValue> args = message->GetArgumentList();
@@ -276,17 +314,25 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 	{
 		if( (*i).callbackid == iCallbackID )
 		{
-			//m_ClientApp->SendMsg( m_Browser, "... Found callback" );
+			/*m_ClientApp->SendMsg( m_Browser, "Doing callback %d\n", iCallbackID );
+			for( size_t j = 0; j < methodargs->GetSize(); j++ )
+			{
+				m_ClientApp->SendMsg( m_Browser, "\tArg %d: %ls\n", j, methodargs->GetString( j ).c_str() );
+			}*/
 
 			// Do callback
-			if( m_Context && m_Context->Enter() )
+			if( m_Context )
 			{
 				CefV8ValueList args;
 				ListValueToV8ValueList( methodargs, args );
 
-				(*i).callback->ExecuteFunctionWithContext(m_Context, (*i).thisobject, args);
-
-				m_Context->Exit();
+				CefRefPtr<CefV8Value> result = (*i).callback->ExecuteFunctionWithContext(m_Context, (*i).thisobject, args);
+				if( !result )
+					m_ClientApp->SendWarning( m_Browser, "Error occurred during calling callback\n");
+			}
+			else
+			{
+				m_ClientApp->SendWarning( m_Browser, "No context, erasing callback...\n" );
 			}
 
 			// Remove callback
@@ -295,4 +341,41 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 		}
 	}
 	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
+{
+	//m_ClientApp->SendMsg( m_Browser, "Invoke %d %ls\n", iIdentifier, methodname.c_str());
+
+	// Get object
+	std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
+	if( it == m_Objects.end() )
+	{
+		//m_ClientApp->SendMsg( m_Browser, "\tNo object of id %d\n", iIdentifier );
+		return false;
+	}
+
+	CefRefPtr<CefV8Value> object = it->second;
+	CefRefPtr<CefV8Value> method = object->GetValue( methodname );
+	if( !method )
+	{
+		//m_ClientApp->SendMsg( m_Browser, "\tNo method of name %ls on object\n", methodname.c_str() );
+		return false;
+	}
+
+	// Make call
+	if( !m_Context )
+		return false;
+
+	CefV8ValueList args;
+	ListValueToV8ValueList( methodargs, args );
+
+	CefRefPtr<CefV8Value> result = method->ExecuteFunctionWithContext(m_Context, object, args);
+	if( !result )
+		return false;
+
+	return true;
 }

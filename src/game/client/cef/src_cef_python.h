@@ -15,12 +15,21 @@
 // Forward declarations
 class CefFrame;
 class JSObject;
+class CefListValue;
+
+// Helper functions
+CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l );
 
 // JS object
 class PyJSObject 
 {
 public:
 	PyJSObject( CefRefPtr<JSObject> object );
+
+	CefRefPtr<JSObject> GetJSObject();
+
+	int GetIdentifier();
+	bp::object GetName();
 
 private:
 	CefRefPtr<JSObject> m_Object;
