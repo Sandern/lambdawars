@@ -331,13 +331,15 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 {
+	bool bAllowMouseCapture = true;
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
 		if( g_debug_cef.GetInt() > 0 )
 			DevMsg("CEF: passed mouse pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MousePressed", "code", code));
-		return;
+		bAllowMouseCapture = false;
+		//return;
 	}
 
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
@@ -366,7 +368,7 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
 
-	if( m_pBrowser->GetUseMouseCapture() )
+	if( bAllowMouseCapture && m_pBrowser->GetUseMouseCapture() )
 	{
 		// Make sure released is called on this panel
 		vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
@@ -387,7 +389,7 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 			DevMsg("CEF: passed mouse double pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
-		return;
+		//return;
 	}
 
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
@@ -439,7 +441,7 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 			DevMsg("CEF: passed mouse released %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MouseReleased", "code", code));
-		return;
+		//return;
 	}
 
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
@@ -530,20 +532,10 @@ void SrcCefVGUIPanel::OnKeyCodeReleased(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 vgui::HCursor SrcCefVGUIPanel::GetCursor()
 {
-#if 0
-	if( !m_pWebView )
+	if( GetParent() && m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
-		if( GetParent() )
-			return GetParent()->GetCursor();
-		return BaseClass::GetCursor();
+		return GetParent()->GetCursor();
 	}
-
-	if( m_pController->GetPassMouseTruIfAlphaZero() && m_pController->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
-	{
-		if( GetParent() )
-			return GetParent()->GetCursor();
-	}
-#endif // 0
 
 	return BaseClass::GetCursor();
 }

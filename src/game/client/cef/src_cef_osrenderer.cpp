@@ -207,6 +207,10 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 	{
 		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizens );
 	}
+	else
+	{
+		m_pBrowser->GetPanel()->SetCursor( vgui::dc_arrow );
+	}
 }
 
 //-----------------------------------------------------------------------------
