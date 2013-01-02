@@ -612,14 +612,7 @@ void C_HL2WarsPlayer::SimulateOrderUnits( Vector &vStart, Vector &vEnd, CBaseEnt
 	m_MouseDataRightPressed = mousedata;
 	m_MouseDataRightReleased = mousedata;
 			
-	CBaseEntity *pUnit;
-	for( int i = 0; i < CountUnits(); i++ )
-	{
-		pUnit = GetUnit(i);
-		if( !pUnit )
-			continue;
-		pUnit->GetIUnit()->Order(this);
-	}
+	OrderUnits();
 
 	engine->ServerCmd( VarArgs("player_orderunits %f %f %f %f %f %f %lu", vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z, pHitEnt ? pHitEnt->index : -1) );
 }

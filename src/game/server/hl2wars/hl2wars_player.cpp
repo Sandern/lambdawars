@@ -306,14 +306,8 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		m_MouseData = mousedata;
 		m_MouseDataRightPressed = mousedata;
 		m_MouseDataRightReleased = mousedata;
-		CBaseEntity *pUnit;
-		for( int i = 0; i < CountUnits(); i++)
-		{
-			pUnit = GetUnit(i);
-			if( !pUnit )
-				continue;
-			pUnit->GetIUnit()->Order(this);
-		}
+		
+		OrderUnits();
 
 		return true;
 	}
