@@ -302,6 +302,36 @@ int	SrcCefVGUIPanel::GetEventFlags()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::OnCursorEntered()
+{
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+	me.modifiers = GetEventFlags();
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, false );
+
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg("CEF: injected cursor entered %d %d\n", m_iMouseX, m_iMouseY);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::OnCursorExited()
+{
+	CefMouseEvent me;
+	me.x = m_iMouseX;
+	me.y = m_iMouseY;
+	me.modifiers = GetEventFlags();
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, true );
+
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg("CEF: injected cursor exited %d %d\n", m_iMouseX, m_iMouseY);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 {
 	m_iMouseX = x;

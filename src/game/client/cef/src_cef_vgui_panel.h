@@ -36,6 +36,8 @@ public:
 
 	int	GetEventFlags();
 
+	virtual void OnCursorEntered();
+	virtual void OnCursorExited();
 	virtual void OnCursorMoved(int x,int y);
 	virtual void OnMousePressed(vgui::MouseCode code);
 	virtual void OnMouseDoublePressed(vgui::MouseCode code);
