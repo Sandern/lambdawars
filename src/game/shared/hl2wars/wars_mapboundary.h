@@ -36,7 +36,7 @@ public:
 
 	bool IsWithinMapBoundary( const Vector &vPoint, bool bIgnoreZ = false );
 	static CBaseFuncMapBoundary *IsWithinAnyMapBoundary( const Vector &vPoint, bool bIgnoreZ = false );
-	static void SnapToNearestBoundary( Vector &vPoint );
+	static void SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ=false );
 
 	float GetBloat() { return m_fBloat; }
 

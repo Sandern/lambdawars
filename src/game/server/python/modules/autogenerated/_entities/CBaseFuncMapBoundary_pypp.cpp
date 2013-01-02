@@ -1067,12 +1067,12 @@ void register_CBaseFuncMapBoundary_class(){
         }
         { //::CBaseFuncMapBoundary::SnapToNearestBoundary
         
-            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector & );
+            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector &,bool );
             
             CBaseFuncMapBoundary_exposer.def( 
                 "SnapToNearestBoundary"
                 , SnapToNearestBoundary_function_type( &::CBaseFuncMapBoundary::SnapToNearestBoundary )
-                , ( bp::arg("vPoint") ) );
+                , ( bp::arg("vPoint"), bp::arg("bUseMaxZ")=(bool)(false) ) );
         
         }
         { //::CBaseFuncMapBoundary::UpdateTransmitState

@@ -870,12 +870,12 @@ void register_C_BaseFuncMapBoundary_class(){
         }
         { //::C_BaseFuncMapBoundary::SnapToNearestBoundary
         
-            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector & );
+            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector &,bool );
             
             C_BaseFuncMapBoundary_exposer.def( 
                 "SnapToNearestBoundary"
                 , SnapToNearestBoundary_function_type( &::C_BaseFuncMapBoundary::SnapToNearestBoundary )
-                , ( bp::arg("vPoint") ) );
+                , ( bp::arg("vPoint"), bp::arg("bUseMaxZ")=(bool)(false) ) );
         
         }
         { //::C_BaseEntity::Activate

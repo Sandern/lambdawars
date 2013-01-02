@@ -91,7 +91,7 @@ CBaseFuncMapBoundary *CBaseFuncMapBoundary::IsWithinAnyMapBoundary( const Vector
 	return NULL;
 }
 
-void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint )
+void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ )
 {
 	Vector mins, maxs;
 	float fNearestZ = MAX_COORD_FLOAT;
@@ -104,7 +104,7 @@ void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint )
 		if( pEnt->IsWithinMapBoundary( vPoint ) )
 		{
 			pEnt->GetMapBoundary(mins, maxs);
-			vPoint.z = mins.z;
+			vPoint.z = bUseMaxZ ? maxs.z : mins.z;
 			//DevMsg("SnapToNearestBoundary: Modifying point z to %f\n", vPoint.z);
 			break;
 		}
@@ -115,7 +115,7 @@ void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint )
 			if( zdist < fNearestZ )
 			{
 				fNearestZ = zdist;
-				vPoint.z = mins.z;
+				vPoint.z = bUseMaxZ ? maxs.z : mins.z;
 				//DevMsg("SnapToNearestBoundary: Modifying point z to %f\n", vPoint.z);
 			}
 		}
