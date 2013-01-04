@@ -992,8 +992,10 @@ bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 #endif // DISABLE_PYTHON
 
 	ActivityList_Init();
+	ActivityList_Free();
 	ActivityList_RegisterSharedActivities();
 	EventList_Init();
+	EventList_Free();
 	EventList_RegisterSharedEvents();
 
 	modemanager->Init( );
