@@ -13,6 +13,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+extern ConVar g_debug_cef;
+
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
@@ -169,48 +171,58 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 {
 	if( cursor == m_hArrow )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_arrow );
+		SetCursor( vgui::dc_arrow );
 	}
 	else if( cursor == m_hCross )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_crosshair );
+		SetCursor( vgui::dc_crosshair );
 	}
 	else if( cursor == m_hHand )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_hand );
+		SetCursor( vgui::dc_hand );
 	}
 	else if( cursor == m_hHelp )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_blank );
+		SetCursor( vgui::dc_blank );
 	}
 	else if( cursor == m_hBeam )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_ibeam );
+		SetCursor( vgui::dc_ibeam );
 	}
 	else if( cursor == m_hSizeAll )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizeall );
+		SetCursor( vgui::dc_sizeall );
 	}
 	else if( cursor == m_hSizeNWSE )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizenwse );
+		SetCursor( vgui::dc_sizenwse );
 	}
 	else if( cursor == m_hSizeNESW )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizenesw );
+		SetCursor( vgui::dc_sizenesw );
 	}
 	else if( cursor == m_hSizeWE )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizewe );
+		SetCursor( vgui::dc_sizewe );
 	}
 	else if( cursor == m_hSizeNS )
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_sizens );
+		SetCursor( vgui::dc_sizens );
 	}
 	else
 	{
-		m_pBrowser->GetPanel()->SetCursor( vgui::dc_arrow );
+		SetCursor( vgui::dc_arrow );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
+{
+	if( g_debug_cef.GetInt() > 0 )
+		DevMsg( "CEF: OnCursorChange -> %d\n", cursor );
+	m_pBrowser->GetPanel()->SetCursor( cursor );
 }
 
 //-----------------------------------------------------------------------------

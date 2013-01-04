@@ -11,6 +11,7 @@
 #endif
 
 #include "include/cef_render_handler.h"
+#include "vgui/Cursor.h"
 
 // Forward declarations
 class SrcCefBrowser;
@@ -48,6 +49,8 @@ public:
 						int height);
 	virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
 								CefCursorHandle cursor);
+
+	virtual void SetCursor( vgui::CursorCode cursor );
 
 	// For texture generation
 	unsigned char *GetTextureBuffer() { return m_pTextureBuffer; }

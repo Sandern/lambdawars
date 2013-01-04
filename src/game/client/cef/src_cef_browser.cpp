@@ -789,12 +789,12 @@ void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> metho
 			}
 			case VTYPE_STRING:
 			{
-				pyargs.append( methodargs->GetString( i ) );
+				pyargs.append( methodargs->GetString( i ).ToString().c_str() );
 				break;
 			}
 			default:
 			{
-				pyargs.append( methodargs->GetString( i ) );
+				pyargs.append( methodargs->GetString( i ).ToString().c_str() );
 				break;
 			}
 		}
