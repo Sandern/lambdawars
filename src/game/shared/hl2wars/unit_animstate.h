@@ -307,6 +307,7 @@ public:
 	// Combat state.
 	bool m_bUseCombatState;
 	float m_fCombatStateTime;
+	bool m_bCombatStateIfEnemy;
 
 protected:
 	// The player's eye yaw and pitch angles.

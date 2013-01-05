@@ -161,7 +161,7 @@ class UnitHelper(GenerateModuleSemiShared):
         
         cls.var('m_bUseCombatState').rename('usecombatstate')
         cls.var('m_fCombatStateTime').rename('combatstatetime')
-
+        cls.var('m_bCombatStateIfEnemy').rename('combatstateifenemy')
         
     def AddNavigator(self, mb):
         # Main class

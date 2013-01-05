@@ -1205,6 +1205,7 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("iLayer"), bp::arg("bEnabled"), bp::arg("flCurCycle"), bp::arg("iSequence"), bp::arg("bWaitAtEnd"), bp::arg("fBlendIn")=1.500000059604644775390625e-1f, bp::arg("fBlendOut")=1.500000059604644775390625e-1f, bp::arg("bMoveBlend")=(bool)(false), bp::arg("fPlaybackRate")=1.0e+0f, bp::arg("bUpdateCycle")=(bool)(true) ) );
         
         }
+        UnitAnimState_exposer.def_readwrite( "combatstateifenemy", &UnitAnimState::m_bCombatStateIfEnemy );
         UnitAnimState_exposer.def_readwrite( "firstjumpframe", &UnitAnimState::m_bFirstJumpFrame );
         UnitAnimState_exposer.def_readwrite( "flipmovey", &UnitAnimState::m_bFlipMoveY );
         UnitAnimState_exposer.def_readwrite( "jumping", &UnitAnimState::m_bJumping );
@@ -4694,6 +4695,7 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("iLayer"), bp::arg("bEnabled"), bp::arg("flCurCycle"), bp::arg("iSequence"), bp::arg("bWaitAtEnd"), bp::arg("fBlendIn")=1.500000059604644775390625e-1f, bp::arg("fBlendOut")=1.500000059604644775390625e-1f, bp::arg("bMoveBlend")=(bool)(false), bp::arg("fPlaybackRate")=1.0e+0f, bp::arg("bUpdateCycle")=(bool)(true) ) );
         
         }
+        UnitAnimState_exposer.def_readwrite( "combatstateifenemy", &UnitAnimState::m_bCombatStateIfEnemy );
         UnitAnimState_exposer.def_readwrite( "firstjumpframe", &UnitAnimState::m_bFirstJumpFrame );
         UnitAnimState_exposer.def_readwrite( "flipmovey", &UnitAnimState::m_bFlipMoveY );
         UnitAnimState_exposer.def_readwrite( "jumping", &UnitAnimState::m_bJumping );

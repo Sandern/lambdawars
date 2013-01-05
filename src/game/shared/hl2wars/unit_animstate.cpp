@@ -168,6 +168,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 
 	m_bUseCombatState = false;
 	m_fCombatStateTime = 0.0f;
+	m_bCombatStateIfEnemy = false;
 
 	m_AnimConfig = animconfig;
 	m_pActivityMap = NULL;
@@ -849,20 +850,23 @@ void UnitAnimState::SetActivityMap( boost::python::object activitymap )
 
 Activity UnitAnimState::TranslateActivity( Activity actDesired )
 { 
-	if( m_bUseCombatState && m_fCombatStateTime > gpGlobals->curtime )
+	if( m_bUseCombatState )
 	{
-		if( actDesired == ACT_IDLE )
-			actDesired = ACT_IDLE_AIM_AGITATED; // Meh, no ACT_IDLE_AIM :(
-		else if( actDesired == ACT_WALK )
-			actDesired = ACT_WALK_AIM;
-		else if( actDesired == ACT_RUN )
-			actDesired = ACT_RUN_AIM;
-		else if( actDesired == ACT_CROUCH )
-			actDesired = ACT_CROUCHIDLE_AIM_STIMULATED; // Meh, no ACT_IDLE_AIM :(
-		else if( actDesired == ACT_WALK_CROUCH )
-			actDesired = ACT_WALK_CROUCH_AIM;
-		else if( actDesired == ACT_RUN_CROUCH )
-			actDesired = ACT_RUN_CROUCH_AIM;
+		if( (m_bCombatStateIfEnemy && GetOuter()->GetEnemy()) || m_fCombatStateTime > gpGlobals->curtime )
+		{
+			if( actDesired == ACT_IDLE )
+				actDesired = ACT_IDLE_AIM_AGITATED; // Meh, no ACT_IDLE_AIM :(
+			else if( actDesired == ACT_WALK )
+				actDesired = ACT_WALK_AIM;
+			else if( actDesired == ACT_RUN )
+				actDesired = ACT_RUN_AIM;
+			else if( actDesired == ACT_CROUCH )
+				actDesired = ACT_CROUCHIDLE_AIM_STIMULATED; // Meh, no ACT_IDLE_AIM :(
+			else if( actDesired == ACT_WALK_CROUCH )
+				actDesired = ACT_WALK_CROUCH_AIM;
+			else if( actDesired == ACT_RUN_CROUCH )
+				actDesired = ACT_RUN_CROUCH_AIM;
+		}
 	}
 
 	if( m_pActivityMap )
