@@ -14,6 +14,7 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar g_debug_cef;
+ConVar cef_alpha_force_zero("cef_alpha_force_zero", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -126,6 +127,14 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		return;
 	}
 
+	Assert( dirtyRects.size() > 0 );
+
+	int dirtyx, dirtyy, dirtyw, dirtyh;
+	dirtyx = width;
+	dirtyy = height;
+	dirtyw = 0;
+	dirtyh = 0;
+
 	s_BufferMutex.Lock();
 
 	// Update image buffer size if needed
@@ -139,6 +148,12 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		m_iWidth = width;
 		m_iHeight = height;
 		m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
+
+		// Full dirty
+		dirtyx = 0;
+		dirtyy = 0;
+		dirtyw = m_iWidth;
+		dirtyh = m_iHeight;
 	}
 
 	const unsigned char *imagebuffer = (const unsigned char *)buffer;
@@ -156,9 +171,15 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 				rect.width * channels // size of row we want to copy
 			); 
 		}
+
+		// Update max dirty area
+		dirtyx = MIN( rect.x, dirtyx );
+		dirtyy = MIN( rect.y, dirtyy );
+		dirtyw = MAX( rect.width, dirtyw );
+		dirtyh = MAX( rect.height, dirtyh );
 	}
 
-	m_pBrowser->GetPanel()->MarkTextureDirty();
+	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
 
 	s_BufferMutex.Unlock();
 
@@ -232,13 +253,17 @@ void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
 //-----------------------------------------------------------------------------
 int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 {
+	if( cef_alpha_force_zero.GetBool() )
+		return 0;
+
 	if( x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )
 		return 0;
+
+	int channels = 4;
+
+	s_BufferMutex.Lock();
 	unsigned char *pImageData = m_pTextureBuffer;
-	if( pImageData )
-	{
-		int channels = 4;
-		return pImageData[(y * m_iWidth * channels) + (x * channels) + 3];
-	}
-	return 0;
+	unsigned char alpha = pImageData ? pImageData[(y * m_iWidth * channels) + (x * channels) + 3] : 0;
+	s_BufferMutex.Unlock();
+	return alpha;
 }

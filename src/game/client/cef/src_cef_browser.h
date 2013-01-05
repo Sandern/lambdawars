@@ -147,11 +147,6 @@ private:
 	bool m_bGameInputEnabled;
 };
 
-inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
-{
-	return GetAlphaAt( x, y ) == 0;
-}
-
 inline void SrcCefBrowser::SetGameInputEnabled( bool state )
 {
 	m_bGameInputEnabled = state;

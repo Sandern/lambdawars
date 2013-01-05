@@ -27,6 +27,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+//ConVar cef_alpha_epsilon("cef_alpha_epsilon", "10");
+
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser internal implementation
 //-----------------------------------------------------------------------------
@@ -295,7 +297,8 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_bGameInputEnabled(false)
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), 
+	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false)
 {
 	m_Name = name ? name : "";
 
@@ -589,6 +592,18 @@ vgui::HCursor SrcCefBrowser::GetCursor()
 		return 0;
 
 	return m_pPanel->GetCursor( );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
+{
+	return GetAlphaAt( x, y ) == 0;
+	//int alpha = GetAlphaAt( x, y );
+	//if( alpha < cef_alpha_epsilon.GetInt() )
+	//	return true;
+	//return false;
 }
 
 //-----------------------------------------------------------------------------

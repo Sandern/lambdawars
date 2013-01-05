@@ -22,19 +22,26 @@ CCefTextureGenerator::CCefTextureGenerator( SrcCefBrowser *pBrowser ) : m_pBrows
 //-----------------------------------------------------------------------------
 void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
 {
+	VPROF_BUDGET( "CCefTextureGenerator::RegenerateTextureBits", "CefRegenerateTexture" );
+
+	if( !pSubRect )
+	{
+		Warning("CCefTextureGenerator: Regenerating image, but no area specified\n");
+		return;
+	}
+
+	if( !m_pBrowser->GetOSRHandler() || !m_pBrowser->GetOSRHandler()->GetTextureBuffer() )
+		return;
+
 	int width, height, channels;
 	int srcwidth, srcheight;
 	
-
 	width = pVTFTexture->Width();
 	height = pVTFTexture->Height();
 	Assert( pVTFTexture->Format() == IMAGE_FORMAT_BGRA8888 );
 	channels = 4; 
 	
 	unsigned char *imageData = pVTFTexture->ImageData( 0, 0, 0 );
-
-	if( !m_pBrowser->GetOSRHandler() || !m_pBrowser->GetOSRHandler()->GetTextureBuffer() )
-		return;
 
 	m_bIsDirty = false;
 
@@ -44,11 +51,13 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	const unsigned char *srcbuffer = m_pBrowser->GetOSRHandler()->GetTextureBuffer();
 
 	// Copy per row
-	for( int y = 0; y < srcheight; y++ )
+	int yend = pSubRect->y + pSubRect->height;
+	int xoffset = (pSubRect->x * channels);
+	for( int y = pSubRect->y; y < yend; y++ )
 	{
-		memcpy( imageData + (y * width * channels), // Destination
-			srcbuffer + (y * srcwidth * channels), // Source
-			srcwidth * channels // Row width
+		memcpy( imageData + (y * width * channels) + xoffset, // Destination
+			srcbuffer + (y * srcwidth * channels) + xoffset, // Source
+			pSubRect->width * channels // Row width to copy
 		);
 	}
 }

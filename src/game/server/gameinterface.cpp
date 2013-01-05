@@ -767,10 +767,13 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// Mount any game that is available to us
 	MountExtraContent();
 
-	if( !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp(420) == false )
+	if ( !CommandLine()->CheckParm( "-noep2check") )
 	{
-		SrcShellExecute("steam://store/420");
-		Error("This mod requires Half-Life 2: Episode Two.");
+		if( !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp(420) == false )
+		{
+			SrcShellExecute("steam://store/420");
+			Error("This mod requires Half-Life 2: Episode Two.");
+		}
 	}
 
 	if ( CommandLine()->FindParm( "-headtracking" ) )

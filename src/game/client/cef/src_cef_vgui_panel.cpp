@@ -52,6 +52,11 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 	m_iMouseX = 0;
 	m_iMouseY = 0;
 
+	m_DirtyArea.x = 0;
+	m_DirtyArea.y = 0;
+	m_DirtyArea.width = 0;
+	m_DirtyArea.height = 0;
+
 	static int staticMatWebViewID = 0;
 	Q_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
 }
@@ -146,9 +151,10 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 		return;
 	}
 
-	//m_pTextureRegen->ScheduleInit();
 	m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-	m_RenderBuffer->Download( NULL );	
+
+	// Mark full dirty
+	MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
 
 	//if( m_MatRef.IsValid() )
 	//	m_MatRef.Shutdown();
@@ -227,7 +233,20 @@ void SrcCefVGUIPanel::Paint()
 		//if( g_cef_debug_texture.GetBool() )
 		//	DevMsg("CEF: texture requires full regeneration\n");
 		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-		m_RenderBuffer->Download( NULL );	
+
+		{
+			VPROF_BUDGET( "Download", "CefDownloadTexture" );
+			m_RenderBuffer->Download( &m_DirtyArea );
+		}
+
+		if( !m_pTextureRegen->IsDirty() )
+		{
+			// Clear if no longer dirty
+			m_DirtyArea.x = m_iWVWide;
+			m_DirtyArea.y = m_iWVTall;
+			m_DirtyArea.width = 0;
+			m_DirtyArea.height = 0;
+		}
 
 		//if( m_pTextureRegen->IsDirty() == false )
 		//	materials->ReloadMaterials(m_MatWebViewName); // FIXME
@@ -263,8 +282,13 @@ void SrcCefVGUIPanel::Paint()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::MarkTextureDirty()
+void SrcCefVGUIPanel::MarkTextureDirty( int dirtyx, int dirtyy, int dirtyw, int dirtyh )
 {
+	m_DirtyArea.x = MIN( m_DirtyArea.x, dirtyx );
+	m_DirtyArea.y = MIN( m_DirtyArea.y, dirtyy );
+	m_DirtyArea.width = MAX( m_DirtyArea.width, dirtyw );
+	m_DirtyArea.height = MAX( m_DirtyArea.height, dirtyh );
+
 	if( !m_pTextureRegen )
 		return;
 	m_pTextureRegen->MakeDirty();

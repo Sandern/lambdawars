@@ -22,9 +22,6 @@ public:
 	SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent );
 	virtual ~SrcCefOSRRenderer();
 
-	// ClientHandler::RenderHandler methods
-	//virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
-
 	// CefRenderHandler methods
 	virtual bool GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 									CefRect& rect);

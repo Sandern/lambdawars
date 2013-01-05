@@ -732,14 +732,9 @@ void CUnitBase::AimGun()
 
 void CUnitBase::RelaxAim()
 {
-	float curPitch = m_fEyePitch;
-
 	// dampen existing aim
-	float newPitch = AngleNormalize( ApproachAngle(0, curPitch, 3 ));
-	//float newYaw = AngleNormalize( ApproachAngle(GetAbsAngles().y, curYaw, 2) )
-
-	m_fEyePitch = newPitch;
-	m_fEyeYaw = GetAbsAngles().y; // newYaw
+	m_fEyePitch = AngleNormalize( ApproachAngle(0, m_fEyePitch, 3 ));
+	m_fEyeYaw = GetAbsAngles().y;
 }
 
 void CUnitBase::SetAim( Vector &vAimDir )
