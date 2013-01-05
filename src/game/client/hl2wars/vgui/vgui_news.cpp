@@ -28,7 +28,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "file:///ui/mainmenu.html" ), m_pParent(pParent)
+WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "MainMenu", "file:///ui/mainmenu.html" ), m_pParent(pParent)
 {
 	GetPanel()->SetParent( pParent );
 }

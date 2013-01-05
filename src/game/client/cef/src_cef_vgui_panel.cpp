@@ -526,7 +526,7 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 	// VGUI just gives -1 or +1. SendMouseWheelEvent expects
 	// the number of pixels to shift.
 	// TODO: Scale/accelerate?
-	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, delta * 120 );
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, delta * 50 );
 }
 
 //-----------------------------------------------------------------------------

@@ -38,7 +38,7 @@ class SrcCefBrowser
 	friend class CCefSystem;
 
 public:
-	SrcCefBrowser( const char *url = "" );
+	SrcCefBrowser( const char *name, const char *url = "" );
 	~SrcCefBrowser();
 
 	void Destroy( void );
@@ -127,6 +127,7 @@ public:
 	SrcCefVGUIPanel *GetPanel() { return m_pPanel; }
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
 	CefRefPtr<CefBrowser> GetBrowser();
+	const char *GetName();
 
 private:
 	virtual void Think( void );
@@ -136,6 +137,7 @@ private:
 
 	SrcCefVGUIPanel *m_pPanel;
 
+	std::string m_Name;
 	std::string m_URL;
 
 	bool m_bVisible;
@@ -158,6 +160,11 @@ inline void SrcCefBrowser::SetGameInputEnabled( bool state )
 inline bool SrcCefBrowser::IsGameInputEnabled()
 {
 	return m_bGameInputEnabled;
+}
+
+inline const char *SrcCefBrowser::GetName()
+{
+	return m_Name.c_str();
 }
 
 #endif // SRC_CEF_BROWSER_H

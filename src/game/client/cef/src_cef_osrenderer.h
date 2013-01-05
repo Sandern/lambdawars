@@ -22,8 +22,6 @@ public:
 	SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent );
 	virtual ~SrcCefOSRRenderer();
 
-	void Destroy( void ) { m_bValid = false; }
-
 	// ClientHandler::RenderHandler methods
 	//virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
 
@@ -76,7 +74,6 @@ private:
 	HCURSOR m_hSizeNS;
 
 private:
-	bool m_bValid;
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;
 

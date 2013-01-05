@@ -83,6 +83,12 @@ public:
 										CefProcessId source_process,
 										CefRefPtr<CefProcessMessage> message);
 
+	// CefContextMenuHandler methods
+	virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+									CefRefPtr<CefFrame> frame,
+									CefRefPtr<CefContextMenuParams> params,
+									CefRefPtr<CefMenuModel> model);
+
 	// CefDisplayHandler methods
 	virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 								const CefString& message,
@@ -141,14 +147,13 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0
 //-----------------------------------------------------------------------------
 void CefClientHandler::Destroy()
 {
-	m_pSrcBrowser = NULL;
-
-	SetOSRHandler( NULL );
-
 	if( GetBrowser() )
 	{
 		GetBrowser()->GetHost()->CloseBrowser();
 	}
+
+	m_pSrcBrowser = NULL;
+	SetOSRHandler( NULL );
 }
 
 //-----------------------------------------------------------------------------
@@ -206,6 +211,18 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CefClientHandler::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								CefRefPtr<CefContextMenuParams> params,
+								CefRefPtr<CefMenuModel> model)
+{
+	// Always clear context menus
+	model->Clear();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CefClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
 							const CefString& message,
 							const CefString& source,
@@ -231,6 +248,8 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
 	if( !m_pSrcBrowser )
 		return;
+
+	DevMsg( "#%d %s: SrcCefBrowser::OnAfterCreated\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
 
 	if( !m_Browser.get() ) 
 	{
@@ -276,8 +295,10 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_bGameInputEnabled(false)
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_bGameInputEnabled(false)
 {
+	m_Name = name ? name : "";
+
 	// Create panel and texture generator
 	m_pPanel = new SrcCefVGUIPanel( this, NULL );
 
@@ -298,6 +319,7 @@ SrcCefBrowser::SrcCefBrowser( const char *pURL ) : m_bPerformLayout(true), m_bVi
 	settings.web_security_disabled = true;
 
     // Creat the new child browser window
+	DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
 	CefBrowserHost::CreateBrowser(info, m_CefClientHandler,
 		m_URL, settings);
 }
@@ -318,21 +340,21 @@ SrcCefBrowser::~SrcCefBrowser()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Destroy( void )
 {
-	if( !IsValid() )
-		return;
-
-	delete m_pPanel;
-	m_pPanel = NULL;
+	// Delete panel
+	if( m_pPanel )
+	{
+		delete m_pPanel;
+		m_pPanel = NULL;
+	}
 
 	// Close browser
 	if( m_CefClientHandler )
 	{
+		DevMsg( "#%d %s: SrcCefBrowser::Destroy\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
+
 		m_CefClientHandler->Destroy();
-
+		m_CefClientHandler = NULL;
 	}
-
-	// Delete the handler
-	m_CefClientHandler = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -540,10 +562,10 @@ int SrcCefBrowser::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 	if( !IsGameInputEnabled() )
 		return 1;
 
-	const char *pKeyStr = g_pInputSystem->ButtonCodeToString( keynum );
-	g_pInputSystem->ButtonCodeToVirtualKey( keynum );
-	wchar_t unichar = (wchar_t)keynum;
-	Msg("Keyname: %s, key: %lc\n", pKeyStr, unichar);
+	//const char *pKeyStr = g_pInputSystem->ButtonCodeToString( keynum );
+	//g_pInputSystem->ButtonCodeToVirtualKey( keynum );
+	//wchar_t unichar = (wchar_t)keynum;
+	//Msg("Keyname: %s, key: %lc\n", pKeyStr, unichar);
 	return 1;
 }
 
@@ -574,7 +596,9 @@ vgui::HCursor SrcCefBrowser::GetCursor()
 //-----------------------------------------------------------------------------
 int SrcCefBrowser::GetAlphaAt( int x, int y )
 {
-	return GetOSRHandler()->GetAlphaAt( x, y );
+	if( GetOSRHandler() )
+		return GetOSRHandler()->GetAlphaAt( x, y );
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -615,6 +639,8 @@ void SrcCefBrowser::StopLoad( void )
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Focus()
 {
+	if( !IsValid() )
+		return;
 	m_CefClientHandler->GetBrowser()->GetHost()->SendFocusEvent( true );
 }
 
@@ -623,6 +649,8 @@ void SrcCefBrowser::Focus()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Unfocus()
 {
+	if( !IsValid() )
+		return;
 	m_CefClientHandler->GetBrowser()->GetHost()->SendFocusEvent( false );
 }
 

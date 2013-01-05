@@ -19,7 +19,7 @@ extern ConVar g_debug_cef;
 // Purpose:
 //-----------------------------------------------------------------------------
 SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent ) 
-	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0), m_bValid(true)
+	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0)
 {
 	m_hArrow = LoadCursor (NULL, IDC_ARROW );
 	m_hCross = LoadCursor (NULL, IDC_CROSS );
@@ -63,7 +63,7 @@ bool SrcCefOSRRenderer::GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 bool SrcCefOSRRenderer::GetViewRect(CefRefPtr<CefBrowser> browser,
 						CefRect& rect)
 {
-	if( !m_bValid )
+	if( !m_pBrowser || !m_pBrowser->GetPanel() )
 		return false;
 	m_pBrowser->GetPanel()->GetPos( rect.x, rect.y );
 	m_pBrowser->GetPanel()->GetSize( rect.width, rect.height );
@@ -79,6 +79,8 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 							int& screenX,
 							int& screenY)
 {
+	if( !m_pBrowser || !m_pBrowser->GetPanel() )
+		return false;
 	screenX = viewX;
 	screenY = viewY;
 	m_pBrowser->GetPanel()->LocalToScreen( screenX, screenY );
@@ -113,10 +115,10 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 					int width,
 					int height)
 {
-	int channels = 4;
-
-	if( !m_bValid )
+	if( !m_pBrowser || !m_pBrowser->GetPanel() )
 		return;
+
+	int channels = 4;
 
 	if( type != PET_VIEW )
 	{
@@ -230,7 +232,7 @@ void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
 //-----------------------------------------------------------------------------
 int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 {
-	if( !m_bValid || x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )
+	if( x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )
 		return 0;
 	unsigned char *pImageData = m_pTextureBuffer;
 	if( pImageData )
