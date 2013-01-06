@@ -101,6 +101,19 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
+	else if( message->GetName() == "invokewithresult" ) 
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		int iResultIdentifier = args->GetInt( 0 );
+		int iIdentifier = args->GetInt( 1 );
+		CefString methodname = args->GetString( 2 );
+		CefRefPtr<CefListValue> methodargs = args->GetList( 3 );
+
+		if( !renderBrowser->InvokeWithResult( iResultIdentifier, iIdentifier, methodname, methodargs ) )
+			SendWarning(browser, "Failed to invoke with result id %d / %d with methodname %ls\n", iResultIdentifier, iIdentifier, methodname.c_str());
+
+		return true;
+	}
 	else
 	{
 		SendWarning( browser, "Unknown proccess message %ls", message->GetName().c_str() );

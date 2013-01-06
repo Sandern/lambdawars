@@ -57,6 +57,8 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 	m_DirtyArea.width = 0;
 	m_DirtyArea.height = 0;
 
+	m_bCalledLeftPressedParent = m_bCalledRightPressedParent = m_bCalledMiddlePressedParent = false;
+
 	static int staticMatWebViewID = 0;
 	Q_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
 }
@@ -383,17 +385,66 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::UpdatePressedParent( vgui::MouseCode code, bool state )
+{
+	switch( code )
+	{
+	case MOUSE_LEFT:
+		m_bCalledLeftPressedParent = state;
+		break;
+	case MOUSE_RIGHT:
+		m_bCalledRightPressedParent = state;
+		break;
+	case MOUSE_MIDDLE:
+		m_bCalledMiddlePressedParent = state;
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool SrcCefVGUIPanel::IsPressedParent( vgui::MouseCode code )
+{
+	switch( code )
+	{
+	case MOUSE_LEFT:
+		return m_bCalledLeftPressedParent;
+	case MOUSE_RIGHT:
+		return m_bCalledRightPressedParent;
+	case MOUSE_MIDDLE:
+		return m_bCalledMiddlePressedParent;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 {
-	bool bAllowMouseCapture = true;
+	// Do click on parent if needed
+	// Store if we pressed on the parent
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
 		if( g_debug_cef.GetInt() > 0 )
 			DevMsg("CEF: passed mouse pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MousePressed", "code", code));
-		bAllowMouseCapture = false;
-		//return;
+
+		UpdatePressedParent( code, true );
+	}
+	else
+	{
+		UpdatePressedParent( code, false );
+	}
+
+	if( m_pBrowser->GetUseMouseCapture() )
+	{
+		// Make sure released is called on this panel
+		// Make sure to do this after calling the parent, so we override
+		// the mouse capture to this panel
+		vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
 	}
 
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
@@ -422,12 +473,6 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
 
-	if( bAllowMouseCapture && m_pBrowser->GetUseMouseCapture() )
-	{
-		// Make sure released is called on this panel
-		vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
-	}
-
 	if( g_debug_cef.GetInt() > 0 )
 		DevMsg("CEF: injected mouse pressed %d %d (mouse capture: %d)\n", m_iMouseX, m_iMouseY, m_pBrowser->GetUseMouseCapture());
 }
@@ -437,17 +482,18 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 {
+	// Do click on parent if needed
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
 		if( g_debug_cef.GetInt() > 0 )
 			DevMsg("CEF: passed mouse double pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
-		//return;
 	}
 
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
 
+	// Do click
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -489,15 +535,18 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 	}
 
 	// Check if we should pass input to parent (only if we don't have mouse capture active)
-	if( !bHasMouseCapture && m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
+	if( (m_pBrowser->GetUseMouseCapture() && IsPressedParent( code )) || ( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) ) )
 	{
 		if( g_debug_cef.GetInt() > 0 )
 			DevMsg("CEF: passed mouse released %d %d to parent\n", m_iMouseX, m_iMouseY);
 
 		CallParentFunction(new KeyValues("MouseReleased", "code", code));
-		//return;
 	}
 
+	// Clear parent pressed
+	UpdatePressedParent( code, false );
+
+	// Do click
 	CefBrowserHost::MouseButtonType iMouseType = MBT_LEFT;
 
 	CefMouseEvent me;
@@ -592,4 +641,17 @@ vgui::HCursor SrcCefVGUIPanel::GetCursor()
 	}
 
 	return BaseClass::GetCursor();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::InternalFocusChanged(bool lost)
+{
+	if( g_debug_cef.GetBool() )
+		DevMsg("CEF: InternalFocusChanged lost:%d\n", lost);
+	if( lost )
+		m_pBrowser->Unfocus();
+	else
+		m_pBrowser->Focus();
 }

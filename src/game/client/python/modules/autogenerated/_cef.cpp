@@ -765,6 +765,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , GetCursor_function_type( &::SrcCefBrowser::GetCursor ) );
         
         }
+        { //::SrcCefBrowser::GetName
+        
+            typedef char const * ( ::SrcCefBrowser::*GetName_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "GetName"
+                , GetName_function_type( &::SrcCefBrowser::GetName ) );
+        
+        }
         { //::SrcCefBrowser::GetPassMouseTruIfAlphaZero
         
             typedef bool ( ::SrcCefBrowser::*GetPassMouseTruIfAlphaZero_function_type )(  ) ;
@@ -985,6 +994,16 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "Invoke"
                 , Invoke_function_type( &::SrcCefBrowser::PyInvoke )
+                , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs") ) );
+        
+        }
+        { //::SrcCefBrowser::PyInvokeWithResult
+        
+            typedef ::boost::python::object ( ::SrcCefBrowser::*InvokeWithResult_function_type )( ::PyJSObject *,char const *,::boost::python::list ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "InvokeWithResult"
+                , InvokeWithResult_function_type( &::SrcCefBrowser::PyInvokeWithResult )
                 , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs") ) );
         
         }

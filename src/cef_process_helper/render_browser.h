@@ -1,7 +1,3 @@
-// Copyright (c) 2012 The Chromium Embedded Framework Authors. All rights
-// reserved. Use of this source code is governed by a BSD-style license that can
-// be found in the LICENSE file.
-
 #ifndef RENDER_BROWSER_H
 #define RENDER_BROWSER_H
 #ifdef _WIN32
@@ -13,6 +9,8 @@
 
 class RenderBrowser;
 class ClientApp;
+
+#define INVALID_IDENTIFIER -1
 
 class FunctionV8Handler : public CefV8Handler
 {
@@ -78,7 +76,8 @@ public:
 
 	bool DoCallback( int iCallbackID, CefRefPtr<CefListValue> methodargs );
 	bool Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
-
+	bool InvokeWithResult( int iResultIdentifier, int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
+	
 private:
 	CefRefPtr<CefBrowser> m_Browser;
 	CefRefPtr<ClientApp> m_ClientApp;

@@ -259,7 +259,7 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	boost::python::object type = __builtin__.attr("type"); //SrcPySystem()->Get("type", "__builtin__");
+	boost::python::object type = __builtin__.attr("type");
 	try {
 		length = boost::python::len(msg);
 		for(int i=0; i<length; i++)

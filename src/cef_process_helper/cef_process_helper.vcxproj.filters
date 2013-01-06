@@ -30,6 +30,9 @@
     <ClInclude Include="render_browser.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="render_browser_helpers.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,6 +45,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="render_browser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="render_browser_helpers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

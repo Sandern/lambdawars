@@ -1,6 +1,8 @@
 #include "render_browser.h"
 #include "client_app.h"
 
+#include "render_browser_helpers.h"
+
 static int s_NextCallbackID = 0;
 
 
@@ -121,7 +123,7 @@ bool RenderBrowser::CreateFunction( int iIdentifier, CefString name, int iParent
 
 	// Get object to bind to
 	CefRefPtr<CefV8Value> object;
-	if( iParentIdentifier != -1 )
+	if( iParentIdentifier != INVALID_IDENTIFIER )
 	{
 		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iParentIdentifier );
 		if( it != m_Objects.end() )
@@ -177,99 +179,6 @@ bool RenderBrowser::ExecuteJavascriptWithResult( int iIdentifier, CefString code
 	m_Context->Exit();
 
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Helper for converting a V8ValueList to CefList
-//-----------------------------------------------------------------------------
-static void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListValue> args )
-{
-	int idx = 0;
-
-	// Add arguments
-	CefV8ValueList::const_iterator i2 = arguments.begin();
-	for( ; i2 != arguments.end(); ++i2 )
-	{
-		CefRefPtr<CefV8Value> value = (*i2);
-		if( value->IsBool() )
-		{
-			args->SetBool( idx, value->GetBoolValue() );
-		}
-		else if( value->IsInt() )
-		{
-			args->SetInt( idx, value->GetIntValue() );
-		}
-		else if( value->IsDouble() )
-		{
-			args->SetDouble( idx, value->GetDoubleValue() );
-		}
-		else if( value->IsString() )
-		{
-			args->SetString( idx, value->GetStringValue() );
-		}
-
-		idx++;
-	}
-}
-
-static CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, int idx )
-{
-	CefRefPtr<CefV8Value> ret = NULL;
-
-	switch( args->GetType( idx ) )
-	{
-		case VTYPE_INT:
-		{
-			ret = CefV8Value::CreateInt( args->GetInt( idx ) );
-			break;
-		}
-		case VTYPE_DOUBLE:
-		{
-			ret = CefV8Value::CreateDouble( args->GetDouble( idx ) );
-			break;
-		}
-		case VTYPE_BOOL:
-		{
-			ret = CefV8Value::CreateBool( args->GetBool( idx ) );
-			break;
-		}
-		case VTYPE_STRING:
-		{
-			ret = CefV8Value::CreateString( args->GetString( idx ) );
-			break;
-		}
-		case VTYPE_LIST:
-		{
-			CefRefPtr<CefListValue> src = args->GetList( idx );
-			CefRefPtr<CefV8Value> v = CefV8Value::CreateArray( src->GetSize() );
-			if( v )
-			{
-				for( int i = 0; i < v->GetArrayLength(); i++ )
-					v->SetValue( i, ListValueToV8Value( src, i ) );
-				ret = v;
-			}
-			break;
-		}
-		default:
-		{
-			ret = CefV8Value::CreateString( args->GetString( idx ) );
-			break;
-		}
-	}
-
-	return ret;
-}
-
-static void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8ValueList& arguments )
-{
-	int idx = 0;
-
-	arguments.clear();
-
-	size_t n = args->GetSize();
-
-	for( size_t i = 0; i < n; i++ )
-		arguments.push_back( ListValueToV8Value( args, i ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -333,12 +242,6 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 	{
 		if( (*i).callbackid == iCallbackID )
 		{
-			/*m_ClientApp->SendMsg( m_Browser, "Doing callback %d\n", iCallbackID );
-			for( size_t j = 0; j < methodargs->GetSize(); j++ )
-			{
-				m_ClientApp->SendMsg( m_Browser, "\tArg %d: %ls\n", j, methodargs->GetString( j ).c_str() );
-			}*/
-
 			// Do callback
 			if( m_Context && m_Context->Enter() )
 			{
@@ -369,32 +272,94 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 //-----------------------------------------------------------------------------
 bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
 {
-	//m_ClientApp->SendMsg( m_Browser, "Invoke %d %ls\n", iIdentifier, methodname.c_str());
+	if( !m_Context )
+		return false;
 
 	// Get object
-	std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
-	if( it == m_Objects.end() )
-	{
-		//m_ClientApp->SendMsg( m_Browser, "\tNo object of id %d\n", iIdentifier );
-		return false;
-	}
+	CefRefPtr<CefV8Value> object = NULL;
 
-	CefRefPtr<CefV8Value> object = it->second;
-	CefRefPtr<CefV8Value> method = object->GetValue( methodname );
-	if( !method )
+	if( iIdentifier != INVALID_IDENTIFIER )
 	{
-		//m_ClientApp->SendMsg( m_Browser, "\tNo method of name %ls on object\n", methodname.c_str() );
-		return false;
+		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
+		if( it == m_Objects.end() )
+		{
+			return false;
+		}
+
+		object = it->second;
 	}
 
 	// Enter context and Make call
-	if( !m_Context || !m_Context->Enter() )
+	if( !m_Context->Enter() )
 		return false;
 
-	CefV8ValueList args;
-	ListValueToV8ValueList( methodargs, args );
+	// Use global if no object was specified
+	if( !object )
+		object = m_Context->GetGlobal();
 
-	CefRefPtr<CefV8Value> result = method->ExecuteFunction( object, args );
+	CefRefPtr<CefV8Value> result = NULL;
+
+	// Get method
+	CefRefPtr<CefV8Value> method = object->GetValue( methodname );
+	if( method )
+	{
+		// Execute method
+		CefV8ValueList args;
+		ListValueToV8ValueList( methodargs, args );
+
+		result = method->ExecuteFunction( object, args );
+	}
+
+	// Leave context
+	m_Context->Exit();
+
+	if( !result )
+		return false;
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool RenderBrowser::InvokeWithResult( int iResultIdentifier, int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
+{
+	if( !m_Context )
+		return false;
+
+	// Get object
+	CefRefPtr<CefV8Value> object = NULL;
+
+	if( iIdentifier != INVALID_IDENTIFIER )
+	{
+		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
+		if( it == m_Objects.end() )
+			return false;
+
+		object = it->second;
+	}
+
+	// Enter context and Make call
+	if( !m_Context->Enter() )
+		return false;
+
+	// Use global if no object was specified
+	if( !object )
+		object = m_Context->GetGlobal();
+
+	CefRefPtr<CefV8Value> result = NULL;
+
+	CefRefPtr<CefV8Value> method = object->GetValue( methodname );
+	if( method )
+	{
+		// Execute method
+		CefV8ValueList args;
+		ListValueToV8ValueList( methodargs, args );
+
+		result = method->ExecuteFunction( object, args );
+
+		// Register result object
+		RegisterObject( iResultIdentifier, result );
+	}
 
 	// Leave context
 	m_Context->Exit();

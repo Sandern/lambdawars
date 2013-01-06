@@ -16,9 +16,14 @@
 class CefFrame;
 class JSObject;
 class CefListValue;
+class CefDictionaryValue;
 
 // Helper functions
 CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l );
+boost::python::list CefValueListToPy( CefRefPtr<CefListValue> l );
+
+boost::python::dict CefDictionaryValueToPy( CefRefPtr<CefDictionaryValue> d );
+CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d );
 
 // JS object
 class PyJSObject 

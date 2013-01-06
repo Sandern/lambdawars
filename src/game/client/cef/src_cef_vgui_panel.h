@@ -49,12 +49,22 @@ public:
 	virtual void OnKeyTyped(wchar_t unichar);
 	virtual void OnKeyCodeReleased(vgui::KeyCode code);
 
+	virtual void InternalFocusChanged(bool lost);
+
 	virtual vgui::HCursor GetCursor();
+
+private:
+	virtual void UpdatePressedParent( vgui::MouseCode code, bool state );
+	virtual bool IsPressedParent( vgui::MouseCode code );
 
 private:
 	int m_iMouseX, m_iMouseY;
 	int m_iEventFlags;
 	SrcCefBrowser *m_pBrowser;
+
+	bool m_bCalledLeftPressedParent;
+	bool m_bCalledRightPressedParent;
+	bool m_bCalledMiddlePressedParent;
 
 	// Texture variables
 	bool m_bSizeChanged;

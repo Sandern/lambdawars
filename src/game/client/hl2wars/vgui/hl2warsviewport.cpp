@@ -505,8 +505,9 @@ void HL2WarsViewport::OnMousePressed( MouseCode code )
 			break;
 	}	
 
-	// Make sure the released is called to this panel
-	vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
+	// Make sure the released is called to this panel if mouse capture is not set yet
+	if( vgui::input()->GetMouseCapture() == 0 )
+		vgui::input()->SetMouseCaptureEx(GetVPanel(), code);
 }
 
 //-----------------------------------------------------------------------------
@@ -562,7 +563,7 @@ void HL2WarsViewport::OnMouseReleased(MouseCode code)
 	}
 
 	// Stop mouse capture
-	vgui::input()->SetMouseCapture(NULL);
+	vgui::input()->SetMouseCaptureEx(NULL, code);
 }
 
 //-----------------------------------------------------------------------------

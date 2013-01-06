@@ -22,7 +22,11 @@ CCefTextureGenerator::CCefTextureGenerator( SrcCefBrowser *pBrowser ) : m_pBrows
 //-----------------------------------------------------------------------------
 void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
 {
-	VPROF_BUDGET( "CCefTextureGenerator::RegenerateTextureBits", "CefRegenerateTexture" );
+	// Don't regenerate while loading
+	if( engine->IsDrawingLoadingImage() )
+	{
+		return;
+	}
 
 	if( !pSubRect )
 	{
@@ -51,13 +55,14 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	const unsigned char *srcbuffer = m_pBrowser->GetOSRHandler()->GetTextureBuffer();
 
 	// Copy per row
-	int yend = pSubRect->y + pSubRect->height;
+	int clampedwidth = MIN(srcwidth, pSubRect->width);
+	int yend = MIN(srcheight, pSubRect->y + pSubRect->height);
 	int xoffset = (pSubRect->x * channels);
 	for( int y = pSubRect->y; y < yend; y++ )
 	{
 		memcpy( imageData + (y * width * channels) + xoffset, // Destination
 			srcbuffer + (y * srcwidth * channels) + xoffset, // Source
-			pSubRect->width * channels // Row width to copy
+			clampedwidth * channels // Row width to copy
 		);
 	}
 }

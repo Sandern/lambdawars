@@ -99,6 +99,7 @@ public:
 
 	void SendCallback( int *pCallbackID, CefRefPtr<CefListValue> methodargs );
 	void Invoke( CefRefPtr<JSObject> object, const char *methodname,  CefRefPtr<CefListValue> methodargs );
+	CefRefPtr<JSObject> InvokeWithResult( CefRefPtr<JSObject> object, const char *methodname,  CefRefPtr<CefListValue> methodargs );
 
 	// Method Handlers
 	virtual void OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
@@ -117,6 +118,7 @@ public:
 	boost::python::object PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
 	void PySendCallback( boost::python::object callbackid, boost::python::list methodargs );
 	void PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs );
+	boost::python::object PyInvokeWithResult( PyJSObject *object, const char *methodname, boost::python::list methodargs );
 
 	virtual void PyOnMethodCall( int identifier, boost::python::object methodargs, boost::python::object callbackid ) {}
 #endif // ENABLE_PYTHON
