@@ -228,6 +228,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_bAvoidEnemies').rename('avoidenemies')
         cls.var('m_fMaxMoveDist').rename('maxmovedist')
         cls.var('m_vStartPosition').rename('startposition')
+        cls.var('m_bSuccess').rename('success')
         
         mb.enum('UnitGoalFlags').include()
         

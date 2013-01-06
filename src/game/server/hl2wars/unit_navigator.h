@@ -212,6 +212,7 @@ public:
 		m_fMinRange = src.m_fMinRange;
 		m_hTarget = src.m_hTarget;
 		m_bAvoidEnemies = src.m_bAvoidEnemies;
+		m_bSuccess = src.m_bSuccess;
 
 		// Copy waypoints
 		if( src.m_pWaypointHead )
@@ -303,6 +304,7 @@ public:
 	bool m_bAvoidEnemies;
 	Vector m_vStartPosition;
 	float m_fMaxMoveDist;
+	bool m_bSuccess;
 };
 
 #define CONSIDER_SIZE 48

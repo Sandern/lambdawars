@@ -5096,6 +5096,7 @@ BOOST_PYTHON_MODULE(unit_helper){
             "GetToleranceCurWaypoint"
             , (float ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::GetToleranceCurWaypoint ) )    
         .def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies )    
+        .def_readwrite( "success", &UnitBasePath::m_bSuccess )    
         .def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance )    
         .def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist )    
         .def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange )    

@@ -232,7 +232,8 @@ void UnitBaseNavigator::StopMoving()
 void UnitBaseNavigator::DispatchOnNavComplete()
 {
 	// Keep path around for querying the information about the last path
-	GetPath()->m_iGoalType = GOALTYPE_NONE; 
+	GetPath()->m_iGoalType = GOALTYPE_NONE;
+	GetPath()->m_bSuccess = true;
 	Reset();
 
 #ifndef DISABLE_PYTHON
@@ -366,6 +367,8 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we are at our goal
 			if( m_LastGoalStatus != CHS_ATGOAL )
 			{
+				GetPath()->m_bSuccess = true;
+
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: At goal, but marked as no clear. Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
 #ifndef DISABLE_PYTHON
@@ -384,6 +387,8 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we lost our goal
 			if( m_LastGoalStatus == CHS_ATGOAL )
 			{
+				GetPath()->m_bSuccess = false;
+
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: Was at goal, but lost it. Dispatching lost (OnNavLostGoal).\n", GetOuter()->entindex());
 #ifndef DISABLE_PYTHON
@@ -1109,7 +1114,8 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	// Check if we bumped into our target goal. In that case we are done.
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
 	{
-		if( MoveCommand.m_hBlocker == GetPath()->m_hTarget )
+		// Goal is satisfied if our blocker is the target or if we are REALLY close
+		if( MoveCommand.m_hBlocker == GetPath()->m_hTarget || m_fGoalDistance < GetEntityBoundingRadius(m_pOuter)*2.0f )
 		{
 			return CHS_ATGOAL;
 		}
@@ -1262,13 +1268,17 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 	if( GetPath()->m_hTarget )
 	{
 		// Check range
-		// skip dist check if we have no minimum range and are bumping into the target, then we are in range
-		if( GetPath()->m_fMaxRange == 0 && MoveCommand.m_hBlocker != GetPath()->m_hTarget )
+		if( GetPath()->m_fMaxRange == 0 )
 		{
-			if( unit_navigator_debug_inrange.GetBool() )
-				DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f)\n", 
-					GetOuter()->entindex(), m_fGoalDistance, GetPath()->m_fMinRange, GetPath()->m_fMaxRange  );
-			return false;
+			// skip dist check if we have no minimum range and are bumping into the target or the dist is really close (might have the wrong blocker set), then we are in range
+			float fTargetTolerance = GetEntityBoundingRadius(m_pOuter)*2.0f;
+			if( MoveCommand.m_hBlocker != GetPath()->m_hTarget || m_fGoalDistance > fTargetTolerance )
+			{
+				if( unit_navigator_debug_inrange.GetBool() )
+					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f, tolerance: %f)\n", 
+						GetOuter()->entindex(), m_fGoalDistance, GetPath()->m_fMinRange, GetPath()->m_fMaxRange, fTargetTolerance  );
+				return false;
+			}
 		}
 		else if( m_fGoalDistance < GetPath()->m_fMinRange || m_fGoalDistance > GetPath()->m_fMaxRange )
 		{
@@ -2014,6 +2024,7 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 	GetPath()->m_iGoalFlags = iGoalFlags;
 	GetPath()->m_fMinRange = 0.0f; //fMinRange; // TODO: Add support for minimum range.
 	GetPath()->m_fMaxRange = fMaxRange;
+	GetPath()->m_bSuccess = false;
 
 	if( GetPath()->m_iGoalType == GOALTYPE_POSITION ||
 			GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
