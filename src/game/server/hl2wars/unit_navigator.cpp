@@ -367,7 +367,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we are at our goal
 			if( m_LastGoalStatus != CHS_ATGOAL )
 			{
-				GetPath()->m_bSuccess = true;
+ 				GetPath()->m_bSuccess = true;
 
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: At goal, but marked as no clear. Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
@@ -1050,6 +1050,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	m_iConsiderSize = 0;
 	m_iUsedTestDirections = 0;
 
+	// Store distance and range
+	UpdateGoalInfo();
+
 	// In case we have an target ent
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT || GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 	{
@@ -1262,9 +1265,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 {
-	// Store distance and range
-	UpdateGoalInfo();
-
 	if( GetPath()->m_hTarget )
 	{
 		// Check range
@@ -1912,6 +1912,9 @@ void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pP
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateGoalInfo( void )
 {
+	if( GetPath()->m_iGoalType == GOALTYPE_NONE )
+		return;
+
 	// Get distance and direction
 	if( GetPath()->m_hTarget )
 	{
