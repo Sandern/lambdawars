@@ -101,7 +101,6 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 			bHasFoW = false;
 		}
 	}
-
 	int nLightingPreviewMode = IS_FLAG2_SET( MATERIAL_VAR2_USE_GBUFFER0 ) + 2 * IS_FLAG2_SET( MATERIAL_VAR2_USE_GBUFFER1 );
 	bool bHasSpec1 = ( info.m_nSpecTexture != -1 && params[ info.m_nSpecTexture ]->IsDefined() );
 	bool bHasSpec2 = ( info.m_nSpecTexture2 != -1 && params[ info.m_nSpecTexture2 ]->IsDefined() );

@@ -157,6 +157,7 @@ const float4 cModulationColor			: register( c47 );
 #define SHADER_SPECIFIC_CONST_10 c14
 #define SHADER_SPECIFIC_CONST_11 c15
 #define SHADER_SPECIFIC_CONST_12 c12
+#define SHADER_SPECIFIC_CONST_13 c218
 
 static const int cModel0Index = 58;
 const float4x3 cModel[53]					: register( c58 );

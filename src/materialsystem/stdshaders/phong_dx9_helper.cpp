@@ -105,7 +105,7 @@ void InitParamsPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, const c
 
 	InitIntParam( info.m_nPhongDisableHalfLambert, params, 0 );
 
-	SET_PARAM_STRING_IF_NOT_DEFINED( info.m_nFoW, "__rt_fow" );
+	SET_PARAM_STRING_IF_NOT_DEFINED( info.m_nFoW, "_rt_fog_of_war" );
 }
 
 //-----------------------------------------------------------------------------
@@ -208,7 +208,11 @@ void InitPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, VertexLitGene
 		pShader->LoadTexture( info.m_nDisplacementMap );
 	}
 
-	//Msg("phong %s m_nTeamColorTexture: %d. Defined: %d\n", params[BASETEXTURE]->GetStringValue(), info.m_nTeamColorTexture, info.m_nTeamColorTexture != -1 ? params[info.m_nTeamColorTexture]->IsDefined() : 0 );
+	if ( info.m_nFoW != -1 && params[ info.m_nFoW ]->IsDefined() )
+	{
+		pShader->LoadTexture( info.m_nFoW );
+	}
+
 	if( (info.m_nTeamColorTexture != -1) && params[info.m_nTeamColorTexture]->IsDefined() )
 	{
 		pShader->LoadTexture( info.m_nTeamColorTexture );
@@ -281,6 +285,16 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 	bool bHasTeamColorTexture = ( info.m_nTeamColorTexture != -1 ) && params[info.m_nTeamColorTexture]->IsTexture() && g_pHardwareConfig->HasFastVertexTextures();
 
+	bool bHasFoW = ( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
+	if ( bHasFoW == true )
+	{
+		ITexture *pTexture = params[ info.m_nFoW ]->GetTextureValue();
+		if ( ( pTexture->GetFlags() & TEXTUREFLAGS_RENDERTARGET ) == 0 )
+		{
+			bHasFoW = false;
+		}
+	}
+
 	if( pShader->IsSnapshotting() )
 	{
 		PhongShaderInfo_t phongInfo;
@@ -350,7 +364,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );		// Base (albedo) map
 		pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, !bShaderSrgbRead );
 
-		if ( phongInfo.m_bHasBaseTextureWrinkle )
+		if ( !bHasFoW && (phongInfo.m_bHasBaseTextureWrinkle) )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );	// Base (albedo) compression map
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER9, !bShaderSrgbRead );
@@ -386,13 +400,18 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		userDataSize = 4; // tangent S
 		pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );		// Normalizing cube map
 
-		if ( phongInfo.m_bHasBumpWrinkle || phongInfo.m_bHasBaseTextureWrinkle )
+		if ( !bHasFoW && (phongInfo.m_bHasBumpWrinkle || phongInfo.m_bHasBaseTextureWrinkle) )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER11, true );	// Normal compression map
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER11, false );
 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER12, true );	// Normal stretch map
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER12, false );
+		}
+
+		if( bHasFoW )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
 		}
 
 		if ( phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture )
@@ -463,6 +482,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		{
 			DECLARE_STATIC_VERTEX_SHADER( phong_vs20 );
 			SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, 0 );
+			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
 			SET_STATIC_VERTEX_SHADER( phong_vs20 );
 
 			// Assume we're only going to get in here if we support 2b
@@ -472,7 +492,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUMFRESNEL,  phongInfo.m_bHasSelfIllumFresnel && !bHasFlashlightOnly );
 			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
-			SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, phongInfo.m_bHasBaseTextureWrinkle );
+			//SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, !bHasFoW && phongInfo.m_bHasBaseTextureWrinkle );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
@@ -482,6 +502,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, 0 );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONG_HALFLAMBERT, bPhongHalfLambert );
 			SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
+			//SET_STATIC_PIXEL_SHADER_COMBO( FOW, /*bHasFoW*/ 1 );
 			SET_STATIC_PIXEL_SHADER( phong_ps20b );
 		}
 		else
@@ -493,6 +514,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			DECLARE_STATIC_VERTEX_SHADER( phong_vs30 );
 			SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
 			SET_STATIC_VERTEX_SHADER_COMBO( DECAL, bIsDecal );
+			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
 			SET_STATIC_VERTEX_SHADER( phong_vs30 );
 
 			DECLARE_STATIC_PIXEL_SHADER( phong_ps30 );
@@ -501,7 +523,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUMFRESNEL,  phongInfo.m_bHasSelfIllumFresnel && !bHasFlashlightOnly );
 			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
-			SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, phongInfo.m_bHasBaseTextureWrinkle );
+			//SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, !bHasFoW && phongInfo.m_bHasBaseTextureWrinkle );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
@@ -511,6 +533,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONG_HALFLAMBERT, bPhongHalfLambert );
 			SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
+			//SET_STATIC_PIXEL_SHADER_COMBO( FOW, /*bHasFoW*/ 1 );
 			SET_STATIC_PIXEL_SHADER( phong_ps30 );
 		}
 
@@ -970,6 +993,20 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		if( !bHasFlashlightOnly )
 		{
 			pShaderAPI->GetDX9LightState( &lightState );
+		}
+
+		if ( bHasFoW )
+		{
+			pShader->BindTexture( SHADER_SAMPLER9, info.m_nFoW, -1 );
+
+			float	vFoWSize[ 4 ];
+			Vector	vMins = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MINS );
+			Vector	vMaxs = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MAXS );
+			vFoWSize[ 0 ] = vMins.x;
+			vFoWSize[ 1 ] = vMins.y;
+			vFoWSize[ 2 ] = vMaxs.x - vMins.x;
+			vFoWSize[ 3 ] = vMaxs.y - vMins.y;
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_10, vFoWSize );
 		}
 
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )

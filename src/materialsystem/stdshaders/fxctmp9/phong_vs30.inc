@@ -48,6 +48,27 @@ public:
 #endif
 	}
 private:
+	int m_nFOW;
+#ifdef _DEBUG
+	bool m_bFOW;
+#endif
+public:
+	void SetFOW( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nFOW = i;
+#ifdef _DEBUG
+		m_bFOW = true;
+#endif
+	}
+	void SetFOW( bool i )
+	{
+		m_nFOW = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFOW = true;
+#endif
+	}
+private:
 	int m_nDOPIXELFOG;
 #ifdef _DEBUG
 	bool m_bDOPIXELFOG;
@@ -102,6 +123,10 @@ public:
 #endif // _DEBUG
 		m_nWORLD_NORMAL = 0;
 #ifdef _DEBUG
+		m_bFOW = false;
+#endif // _DEBUG
+		m_nFOW = 0;
+#ifdef _DEBUG
 		m_bDOPIXELFOG = true;
 #endif // _DEBUG
 		m_nDOPIXELFOG = ( g_pHardwareConfig->SupportsPixelShaders_2_b() && !IS_FLAG_SET( MATERIAL_VAR_VERTEXFOG ) ) ? 1 : 0 ;
@@ -115,13 +140,13 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bDECAL && m_bWORLD_NORMAL && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
+		bool bAllStaticVarsDefined = m_bDECAL && m_bWORLD_NORMAL && m_bFOW && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 48 * m_nDECAL ) + ( 96 * m_nWORLD_NORMAL ) + ( 192 * m_nDOPIXELFOG ) + ( 384 * m_nHARDWAREFOGBLEND ) + 0;
+		return ( 48 * m_nDECAL ) + ( 96 * m_nWORLD_NORMAL ) + ( 192 * m_nFOW ) + ( 384 * m_nDOPIXELFOG ) + ( 768 * m_nHARDWAREFOGBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_phong_vs30 vsh_forgot_to_set_static_DECAL + vsh_forgot_to_set_static_WORLD_NORMAL + 0
+#define shaderStaticTest_phong_vs30 vsh_forgot_to_set_static_DECAL + vsh_forgot_to_set_static_WORLD_NORMAL + vsh_forgot_to_set_static_FOW + 0
 class phong_vs30_Dynamic_Index
 {
 private:

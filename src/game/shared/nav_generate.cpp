@@ -41,6 +41,8 @@ ConVar nav_generate_incremental_range( "nav_generate_incremental_range", "2000",
 ConVar nav_generate_incremental_tolerance( "nav_generate_incremental_tolerance", "0", FCVAR_CHEAT, "Z tolerance for adding new nav areas." );
 ConVar nav_area_max_size( "nav_area_max_size", "50", FCVAR_CHEAT, "Max area size created in nav generation" );
 
+ConVar nav_generate_skip_viscomp("nav_generate_skip_viscomp", "1", FCVAR_CHEAT);
+
 // Common bounding box for traces
 Vector NavTraceMins( -0.45, -0.45, 0 );
 Vector NavTraceMaxs( 0.45, 0.45, HumanCrouchHeight );
@@ -3817,10 +3819,19 @@ bool CNavMesh::UpdateGeneration( float maxTime )
 
 			Msg( "Finding sniper spots...DONE\n" );
 
-			m_generationState = COMPUTE_MESH_VISIBILITY;
-			m_generationIndex = 0;
-			BeginVisibilityComputations();
-			Msg( "Computing mesh visibility...\n" );
+			if( nav_generate_skip_viscomp.GetBool() )
+			{
+				Msg( "Computing mesh visibility...DONE\n" );
+				m_generationState = FIND_EARLIEST_OCCUPY_TIMES;
+				m_generationIndex = 0;
+			}
+			else
+			{
+				m_generationState = COMPUTE_MESH_VISIBILITY;
+				m_generationIndex = 0;
+				BeginVisibilityComputations();
+				Msg( "Computing mesh visibility...\n" );
+			}
 		
 			return true;
 		}

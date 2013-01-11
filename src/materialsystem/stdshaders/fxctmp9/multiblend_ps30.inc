@@ -21,7 +21,7 @@ private:
 public:
 	void SetLIGHTING_PREVIEW( int i )
 	{
-		Assert( i >= 0 && i <= 1 );
+		Assert( i >= 0 && i <= 2 );
 		m_nLIGHTING_PREVIEW = i;
 #ifdef _DEBUG
 		m_bLIGHTING_PREVIEW = true;
@@ -126,7 +126,7 @@ public:
 		bool bAllStaticVarsDefined = m_bLIGHTING_PREVIEW && m_bFOW && m_bFLASHLIGHT && m_bFLASHLIGHTDEPTHFILTERMODE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 2 * m_nLIGHTING_PREVIEW ) + ( 4 * m_nFOW ) + ( 8 * m_nFLASHLIGHT ) + ( 16 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
+		return ( 2 * m_nLIGHTING_PREVIEW ) + ( 6 * m_nFOW ) + ( 12 * m_nFLASHLIGHT ) + ( 24 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
 #define shaderStaticTest_multiblend_ps30 psh_forgot_to_set_static_LIGHTING_PREVIEW + psh_forgot_to_set_static_FOW + psh_forgot_to_set_static_FLASHLIGHT + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + 0

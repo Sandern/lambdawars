@@ -500,7 +500,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 		}
 	}
 
-	bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 ) && !bHasFoW;
+	bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 ); //&& !bHasFoW;
 	int nTreeSwayMode = GetIntParam( info.m_nTreeSway, params, 0 );
 	nTreeSwayMode = clamp( nTreeSwayMode, 0, 2 );
 
@@ -1086,22 +1086,11 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			}
 
 			// Team color constant + sampler
-#if 0
-			if( bHasTeamColorTexture )
-			{
-				static const float kDefaultTeamColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-				const float *vecTeamColor = IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor;
-				//pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 0, IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor, 1 );
-				pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 19, vecTeamColor, 1 );
-				pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER12, info.m_nTeamColorTexture, -1 );
-			}
-#else
 			static const float kDefaultTeamColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			const float *vecTeamColor = (bHasTeamColorTexture && IS_PARAM_DEFINED( info.m_nTeamColor )) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor;
 			//pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 0, IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor, 1 );
 			pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 19, vecTeamColor, 1 );
 			if( bHasTeamColorTexture ) pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER12, info.m_nTeamColorTexture, -1 );
-#endif // 0
 			
 			int nLightingPreviewMode = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_ENABLE_FIXED_LIGHTING );
 			if ( ( nLightingPreviewMode == ENABLE_FIXED_LIGHTING_OUTPUTNORMAL_AND_DEPTH ) && IsPC() )
@@ -1529,7 +1518,11 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			vFoWSize[ 1 ] = vMins.y;
 			vFoWSize[ 2 ] = vMaxs.x - vMins.x;
 			vFoWSize[ 3 ] = vMaxs.y - vMins.y;
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, vFoWSize );
+
+			if( !bHasBump )
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_13, vFoWSize );
+			else
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, vFoWSize );
 		}
 
 		if ( bHasBump || bHasDiffuseWarp )

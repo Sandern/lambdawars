@@ -374,6 +374,62 @@ void ClientModeSDK::DoPostScreenSpaceEffects( const CViewSetup *pSetup )
 	g_GlowObjectManager.RenderGlowEffects( pSetup, 0 /*GetSplitScreenPlayerSlot()*/ );
 }
 
+void ClientModeSDK::OnColorCorrectionWeightsReset( void )
+{
+	C_ColorCorrection *pNewColorCorrection = NULL;
+	C_ColorCorrection *pOldColorCorrection = m_pCurrentColorCorrection;
+
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if ( pPlayer )
+	{
+		pNewColorCorrection = pPlayer->GetActiveColorCorrection();
+	}
+
+#if 0
+
+	if ( m_CCFailedHandle != INVALID_CLIENT_CCHANDLE && ASWGameRules() )
+	{
+		m_fFailedCCWeight = Approach( TechMarineFailPanel::s_pTechPanel ? 1.0f : 0.0f, m_fFailedCCWeight, gpGlobals->frametime * ( 1.0f / FAILED_CC_FADE_TIME ) );
+		g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCFailedHandle, m_fFailedCCWeight );
+
+		// If the mission was failed due to a dead tech, disable the environmental color correction in favor of the mission failed color correction
+		if ( m_fFailedCCWeight != 0.0f && m_pCurrentColorCorrection )
+		{
+			m_pCurrentColorCorrection->EnableOnClient( false );
+			m_pCurrentColorCorrection = NULL;
+		}
+	}
+
+	if ( m_CCInfestedHandle != INVALID_CLIENT_CCHANDLE && ASWGameRules() )
+	{
+		C_ASW_Marine *pMarine = C_ASW_Marine::GetLocalMarine();
+		m_fInfestedCCWeight = Approach( pMarine && pMarine->IsInfested() ? 1.0f : 0.0f, m_fInfestedCCWeight, gpGlobals->frametime * ( 1.0f / INFESTED_CC_FADE_TIME ) );
+		g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCInfestedHandle, m_fInfestedCCWeight );
+
+		// If the mission was failed due to a dead tech, disable the environmental color correction in favor of the mission failed color correction
+		if ( m_fInfestedCCWeight != 0.0f && m_pCurrentColorCorrection )
+		{
+			m_pCurrentColorCorrection->EnableOnClient( false );
+			m_pCurrentColorCorrection = NULL;
+		}
+	}
+#endif // 0
+
+	// Only blend between environmental color corrections if there is no failure/infested-induced color correction
+	if ( pNewColorCorrection != pOldColorCorrection /*&& m_fFailedCCWeight == 0.0f && m_fInfestedCCWeight == 0.0f*/ )
+	{
+		if ( pOldColorCorrection )
+		{
+			pOldColorCorrection->EnableOnClient( false );
+		}
+		if ( pNewColorCorrection )
+		{
+			pNewColorCorrection->EnableOnClient( true, pOldColorCorrection == NULL );
+		}
+		m_pCurrentColorCorrection = pNewColorCorrection;
+	}
+}
+
 /*
 CON_COMMAND(wars_test, "")
 {

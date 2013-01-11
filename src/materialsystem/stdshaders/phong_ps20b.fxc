@@ -6,7 +6,7 @@
 // STATIC: "FLASHLIGHT"					"0..1"
 // STATIC: "LIGHTWARPTEXTURE"			"0..1"
 // STATIC: "PHONGWARPTEXTURE"			"0..1"
-// STATIC: "WRINKLEMAP"					"0..1"
+// DISABLED STATIC: "WRINKLEMAP"					"0..1"
 // STATIC: "DETAIL_BLEND_MODE"          "0..6"
 // STATIC: "DETAILTEXTURE"				"0..1"
 // STATIC: "RIMLIGHT"					"0..1"
@@ -20,6 +20,7 @@
 // STATIC: "WORLD_NORMAL"				"0..0"	[XBOX]
 // STATIC: "PHONG_HALFLAMBERT"          "0..1"
 // STATIC: "TEAMCOLORTEXTURE"			"0..1"
+// DISABLED STATIC: "FOW"						"1..1"
 
 // DYNAMIC: "WRITEWATERFOGTODESTALPHA"  "0..1"
 #include "common_fog_ps_fxc.h"
@@ -53,9 +54,15 @@
 // Use detail sampler for team color sampler
 // SKIP: ( $TEAMCOLORTEXTURE == 1 ) && ( $DETAILTEXTURE == 1 )
 
+// FOW skip combinations
+// SKIP: ( $FOW == 1 ) && ( $WRINKLEMAP == 1 )
+
+#define FOW 1
+
 #include "common_flashlight_fxc.h"
 #include "shader_constant_register_map.h"
 #include "common_teamcolor.h"
+#include "fow_ps_fxc.h"
 
 #ifdef _X360
 	#define SINGLE_PASS_FLASHLIGHT 1
@@ -154,6 +161,10 @@ sampler NormalWrinkleSampler	: register( s11 );	// Compression normal
 sampler NormalStretchSampler	: register( s12 );	// Expansion normal
 #endif
 
+#if FOW
+	sampler FoWSampler			: register( s9 );	// Fog of war
+#endif // FOW
+
 #if DETAILTEXTURE
 sampler DetailSampler			: register( s13 );	// detail texture
 #endif
@@ -187,6 +198,7 @@ struct PS_INPUT
 #else
 	float4 worldPos_vertexFogFactor								: TEXCOORD6; //it's important that this declaration stay down here. Moving it seems to trigger a BS compile error on 360 saying we've run out of temp registers.
 #endif
+	float4 fowCoords											: TEXCOORD7;
 };
 
 #if defined( _X360 )
@@ -448,6 +460,10 @@ float4 main( PS_INPUT i ) : COLOR
 	#endif
 
 	float3 result = (specularLighting + envMapColor + diffuseComponent) * fAmbientOcclusion;
+
+#if ( FOW == 1 )
+	result.rgb = CalcFoW( FoWSampler, i.fowCoords.xy, result.rgb );
+#endif
 
 	float flVertexFogFactor = 0.0f;
 	#if ( !HARDWAREFOGBLEND && !DOPIXELFOG )

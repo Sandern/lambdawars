@@ -35,7 +35,14 @@ public:
 	virtual void SDK_CloseAllWindows();
 	virtual void SDK_CloseAllWindowsFrom(vgui::Panel* pPanel);	
 
+	virtual void	OnColorCorrectionWeightsReset( void );
+	virtual float	GetColorCorrectionScale( void ) const { return 1.0f; }
+	virtual void	ClearCurrentColorCorrection() { m_pCurrentColorCorrection = NULL; }
+
 	virtual int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
+
+private:
+	CHandle<C_ColorCorrection> m_pCurrentColorCorrection;
 };
 
 extern IClientMode *GetClientModeNormal();

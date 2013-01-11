@@ -1,6 +1,6 @@
 //========== Copyright (c) Valve Corporation, All rights reserved. ==========//
 
-// STATIC: "LIGHTING_PREVIEW"			"0..1"	[PC]
+// STATIC: "LIGHTING_PREVIEW"			"0..2"	[PC]
 // STATIC: "LIGHTING_PREVIEW"			"0..0"	[XBOX]
 // STATIC: "FOW"						"0..1"
 // STATIC: "FLASHLIGHT"					"0..1" [ps20b]

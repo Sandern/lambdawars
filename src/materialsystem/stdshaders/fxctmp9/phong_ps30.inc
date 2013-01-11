@@ -7,6 +7,7 @@
 // ( $FLASHLIGHT == 1 ) && ( $SELFILLUM == 1 ) 
 // ( $WORLD_NORMAL == 1 ) && ( $FLASHLIGHTSHADOWS == 1 ) && ( $NUM_LIGHTS != 0 ) && ( $WRITEWATERFOGTODESTALPHA == 1 )
 // ( $TEAMCOLORTEXTURE == 1 ) && ( $DETAILTEXTURE == 1 )
+// ( $FOW == 1 ) && ( $WRINKLEMAP == 1 )
 // defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
 // defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
 // defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
@@ -144,27 +145,6 @@ public:
 		m_nPHONGWARPTEXTURE = i ? 1 : 0;
 #ifdef _DEBUG
 		m_bPHONGWARPTEXTURE = true;
-#endif
-	}
-private:
-	int m_nWRINKLEMAP;
-#ifdef _DEBUG
-	bool m_bWRINKLEMAP;
-#endif
-public:
-	void SetWRINKLEMAP( int i )
-	{
-		Assert( i >= 0 && i <= 1 );
-		m_nWRINKLEMAP = i;
-#ifdef _DEBUG
-		m_bWRINKLEMAP = true;
-#endif
-	}
-	void SetWRINKLEMAP( bool i )
-	{
-		m_nWRINKLEMAP = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bWRINKLEMAP = true;
 #endif
 	}
 private:
@@ -364,10 +344,6 @@ public:
 #endif // _DEBUG
 		m_nPHONGWARPTEXTURE = 0;
 #ifdef _DEBUG
-		m_bWRINKLEMAP = false;
-#endif // _DEBUG
-		m_nWRINKLEMAP = 0;
-#ifdef _DEBUG
 		m_bDETAIL_BLEND_MODE = false;
 #endif // _DEBUG
 		m_nDETAIL_BLEND_MODE = 0;
@@ -405,13 +381,13 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE && m_bPHONGWARPTEXTURE && m_bWRINKLEMAP && m_bDETAIL_BLEND_MODE && m_bDETAILTEXTURE && m_bRIMLIGHT && m_bFLASHLIGHTDEPTHFILTERMODE && m_bSHADER_SRGB_READ && m_bWORLD_NORMAL && m_bPHONG_HALFLAMBERT && m_bTEAMCOLORTEXTURE;
+		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE && m_bPHONGWARPTEXTURE && m_bDETAIL_BLEND_MODE && m_bDETAILTEXTURE && m_bRIMLIGHT && m_bFLASHLIGHTDEPTHFILTERMODE && m_bSHADER_SRGB_READ && m_bWORLD_NORMAL && m_bPHONG_HALFLAMBERT && m_bTEAMCOLORTEXTURE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 160 * m_nCUBEMAP ) + ( 320 * m_nSELFILLUM ) + ( 640 * m_nSELFILLUMFRESNEL ) + ( 1280 * m_nFLASHLIGHT ) + ( 2560 * m_nLIGHTWARPTEXTURE ) + ( 5120 * m_nPHONGWARPTEXTURE ) + ( 10240 * m_nWRINKLEMAP ) + ( 20480 * m_nDETAIL_BLEND_MODE ) + ( 143360 * m_nDETAILTEXTURE ) + ( 286720 * m_nRIMLIGHT ) + ( 573440 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 1720320 * m_nSHADER_SRGB_READ ) + ( 1720320 * m_nWORLD_NORMAL ) + ( 3440640 * m_nPHONG_HALFLAMBERT ) + ( 6881280 * m_nTEAMCOLORTEXTURE ) + 0;
+		return ( 160 * m_nCUBEMAP ) + ( 320 * m_nSELFILLUM ) + ( 640 * m_nSELFILLUMFRESNEL ) + ( 1280 * m_nFLASHLIGHT ) + ( 2560 * m_nLIGHTWARPTEXTURE ) + ( 5120 * m_nPHONGWARPTEXTURE ) + ( 10240 * m_nDETAIL_BLEND_MODE ) + ( 71680 * m_nDETAILTEXTURE ) + ( 143360 * m_nRIMLIGHT ) + ( 286720 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 860160 * m_nSHADER_SRGB_READ ) + ( 860160 * m_nWORLD_NORMAL ) + ( 1720320 * m_nPHONG_HALFLAMBERT ) + ( 3440640 * m_nTEAMCOLORTEXTURE ) + 0;
 	}
 };
-#define shaderStaticTest_phong_ps30 psh_forgot_to_set_static_CUBEMAP + psh_forgot_to_set_static_SELFILLUM + psh_forgot_to_set_static_SELFILLUMFRESNEL + psh_forgot_to_set_static_FLASHLIGHT + psh_forgot_to_set_static_LIGHTWARPTEXTURE + psh_forgot_to_set_static_PHONGWARPTEXTURE + psh_forgot_to_set_static_WRINKLEMAP + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_RIMLIGHT + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + psh_forgot_to_set_static_SHADER_SRGB_READ + psh_forgot_to_set_static_WORLD_NORMAL + psh_forgot_to_set_static_PHONG_HALFLAMBERT + psh_forgot_to_set_static_TEAMCOLORTEXTURE + 0
+#define shaderStaticTest_phong_ps30 psh_forgot_to_set_static_CUBEMAP + psh_forgot_to_set_static_SELFILLUM + psh_forgot_to_set_static_SELFILLUMFRESNEL + psh_forgot_to_set_static_FLASHLIGHT + psh_forgot_to_set_static_LIGHTWARPTEXTURE + psh_forgot_to_set_static_PHONGWARPTEXTURE + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_RIMLIGHT + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + psh_forgot_to_set_static_SHADER_SRGB_READ + psh_forgot_to_set_static_WORLD_NORMAL + psh_forgot_to_set_static_PHONG_HALFLAMBERT + psh_forgot_to_set_static_TEAMCOLORTEXTURE + 0
 class phong_ps30_Dynamic_Index
 {
 private:

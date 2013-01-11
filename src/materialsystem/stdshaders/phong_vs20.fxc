@@ -4,6 +4,7 @@
 // STATIC: "WORLD_NORMAL"			"0..0" [vs20] [PC]
 // STATIC: "WORLD_NORMAL"			"0..1" [vs30] [PC]
 // STATIC: "WORLD_NORMAL"			"0..0" [XBOX]
+// STATIC: "FOW"					"0..1"
 
 // DYNAMIC: "COMPRESSED_VERTS"		"0..1"
 // DYNAMIC: "SKINNING"				"0..1"
@@ -17,6 +18,7 @@
 
 #include "common_fog_vs_supportsvertexfog_fxc.h"
 #include "common_vs_fxc.h"
+#include "fow_vs_fxc.h"
 
 static const bool g_bSkinning		= SKINNING ? true : false;
 static const int g_FogType			= DOWATERFOG;
@@ -35,6 +37,7 @@ sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
 
 const float4 g_vEyeVector					: register( SHADER_SPECIFIC_CONST_8 );
 
+const float4 g_vFoWWorldSize				  	: register( SHADER_SPECIFIC_CONST_10 );
 
 #if TESSELLATION
 
@@ -92,6 +95,7 @@ struct VS_OUTPUT
 	#else
 		float4 worldPos_vertexFogFactor	: TEXCOORD6; //it's important that this declaration stay down here. Moving it seems to trigger a BS compile error on 360 saying we've run out of temp registers.
 	#endif
+	float4 fowCoords				: TEXCOORD7;
 };
 
 //-----------------------------------------------------------------------------
@@ -191,6 +195,11 @@ VS_OUTPUT main( const VS_INPUT v )
 		o.worldPos_vertexFogFactor.w = CalcNonFixedFunctionFog( worldPos, g_FogType );
 	}
 	#endif
+
+
+#if ( FOW == 1 )
+	o.fowCoords.xy = CalcFoWCoord( g_vFoWWorldSize, worldPos.xy );
+#endif
 
 	return o;
 }

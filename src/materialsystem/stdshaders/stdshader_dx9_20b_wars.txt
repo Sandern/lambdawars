@@ -12,8 +12,6 @@
 //  These shaders use the old DirectX compiler.
 //
 
-lightmappedgeneric_ps20.fxc
-lightmappedgeneric_ps20b.fxc
 lightmappedgeneric_ps2x.fxc
 lightmappedgeneric_vs20.fxc
 

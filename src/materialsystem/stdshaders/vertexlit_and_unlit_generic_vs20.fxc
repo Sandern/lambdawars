@@ -29,7 +29,6 @@
 //	SKIP: ( $FOW ) && ( $TESSELLATION )
 //	SKIP: ($TREESWAY) && ($MORPHING)
 //	SKIP: ($TREESWAY) && ($TESSELLATION)
-//	SKIP: ($TREESWAY) && ($FOW)
 //	SKIP: ( $TREESWAY ) && ( $SEAMLESS_DETAIL || $SEAMLESS_BASE )
 
 #include "common_fog_vs_supportsvertexfog_fxc.h"
@@ -67,7 +66,8 @@ const float4 g_vMiscParams1				: register( SHADER_SPECIFIC_CONST_3 );
 #elif TESSELLATION
 	#define g_SubDControls g_vMiscParams1
 #elif FOW
-	#define g_vFoWWorldSize g_vMiscParams1
+	//#define g_vFoWWorldSize g_vMiscParams1
+	const float4 g_vFoWWorldSize				: register( SHADER_SPECIFIC_CONST_13 );
 #endif
 
 const float4 cDetailTexCoordTransform[2]	: register( SHADER_SPECIFIC_CONST_4 );	// 4 & 5
