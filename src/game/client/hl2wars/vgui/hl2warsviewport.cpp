@@ -147,8 +147,8 @@ void HL2WarsViewport::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 	SetPaintBackgroundEnabled( false );
 
-	// dc_arrow is translated in Panel::InternalSetCursor, so it works everywhere properly.
-	m_iDefaultMouseCursor = dc_arrow; //vgui::surface()->CreateCursorFromFile( "resource/arrows/default_cursor.cur" );
+	// TODO: Find out a way to override dc_arrow
+	m_iDefaultMouseCursor = vgui::surface()->CreateCursorFromFile( "resource/arrows/default_cursor.cur" );
 
 	SetCursor( m_iDefaultMouseCursor );
 }
