@@ -63,8 +63,8 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 // Purpose: Client App
 //-----------------------------------------------------------------------------
 class ClientApp : public CefApp,
-                  public CefBrowserProcessHandler,
-                  public CefProxyHandler
+					public CefBrowserProcessHandler,
+					public CefProxyHandler
 {
 public:
 	ClientApp();
@@ -252,18 +252,18 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 
 	keyevent.character = wParam;
 
-    if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
-      keyevent.type = KEYEVENT_RAWKEYDOWN;
-    else if (message == WM_KEYUP || message == WM_SYSKEYUP)
-      keyevent.type = KEYEVENT_KEYUP;
-    else
-      keyevent.type = KEYEVENT_CHAR;
+	if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+		keyevent.type = KEYEVENT_RAWKEYDOWN;
+	else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+		keyevent.type = KEYEVENT_KEYUP;
+	else
+		keyevent.type = KEYEVENT_CHAR;
 
-    keyevent.windows_key_code = wParam;
-    keyevent.native_key_code = lParam;
-    keyevent.is_system_key = message == WM_SYSCHAR ||
-                          message == WM_SYSKEYDOWN ||
-                          message == WM_SYSKEYUP;
+	keyevent.windows_key_code = wParam;
+	keyevent.native_key_code = lParam;
+	keyevent.is_system_key = message == WM_SYSCHAR ||
+							message == WM_SYSKEYDOWN ||
+							message == WM_SYSKEYUP;
 
 	//keyevent.modifiers = GetCefKeyboardModifiers(wParam, lParam); // TODO
 
@@ -297,39 +297,3 @@ CCefSystem &CEFSystem()
 {
 	return s_CEFSystem;
 }
-
-#if 1 // _DEBUG
-// debug
-//-----------------------------------------------------------------------------
-// Purpose: Hacky way to detect input focus.
-//-----------------------------------------------------------------------------
-static int g_debugWinCount;
-BOOL CALLBACK DebugEnumerateWindows(HWND hwnd, LPARAM lParam)
-{
-	RECT windowRect;
-	GetWindowRect(hwnd, &windowRect);
-	Msg("\t%d Window size: %d %d %d %d\n", hwnd, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom);
-	g_debugWinCount++;
-	return true;
-}
-
-void CC_Debug_Windows_Count( void )
-{
-	//g_debugWinCount = 0;
-	EnumThreadWindows( GetCurrentThreadId(), DebugEnumerateWindows, NULL );
-	//EnumWindows( DebugEnumerateWindows, NULL );
-	Msg("Window count: %d\n", g_debugWinCount);
-	
-}
-static ConCommand debug_wincount("debug_wincount", CC_Debug_Windows_Count, "", FCVAR_CHEAT);
-
-void CC_Debug_WindowChilds_Count( void )
-{
-	g_debugWinCount = 0;
-	EnumChildWindows( CEFSystem().GetMainWindow(), DebugEnumerateWindows, NULL );
-	Msg("Window count childs: %d\n", g_debugWinCount);
-	
-}
-static ConCommand debug_wincount_childs("debug_wincount_childs", CC_Debug_WindowChilds_Count, "", FCVAR_CHEAT);
-
-#endif // _DEBUG

@@ -182,8 +182,6 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
 
 	s_BufferMutex.Unlock();
-
-	//DevMsg("SrcCefOSRRenderer::OnPaint. Thread ID: %d\n", GetCurrentThreadId());
 }
 
 //-----------------------------------------------------------------------------

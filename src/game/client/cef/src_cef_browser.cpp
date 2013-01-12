@@ -27,8 +27,6 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-//ConVar cef_alpha_epsilon("cef_alpha_epsilon", "10");
-
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser internal implementation
 //-----------------------------------------------------------------------------
@@ -40,7 +38,6 @@ class CefClientHandler : public CefClient,
                       public CefKeyboardHandler,
                       public CefLifeSpanHandler,
                       public CefLoadHandler,
-					  //public CefRenderHandler,
                       public CefRequestHandler
 {
 public:
@@ -251,7 +248,8 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 	if( !m_pSrcBrowser )
 		return;
 
-	DevMsg( "#%d %s: SrcCefBrowser::OnAfterCreated\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+	if( g_debug_cef.GetBool() )
+		DevMsg( "#%d %s: SrcCefBrowser::OnAfterCreated\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
 
 	if( !m_Browser.get() ) 
 	{
@@ -322,7 +320,8 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	settings.web_security_disabled = true;
 
     // Creat the new child browser window
-	DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
+	if( g_debug_cef.GetBool() )
+		DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
 	CefBrowserHost::CreateBrowser(info, m_CefClientHandler,
 		m_URL, settings);
 }
@@ -353,7 +352,8 @@ void SrcCefBrowser::Destroy( void )
 	// Close browser
 	if( m_CefClientHandler )
 	{
-		DevMsg( "#%d %s: SrcCefBrowser::Destroy\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
+		if( g_debug_cef.GetBool() )
+			DevMsg( "#%d %s: SrcCefBrowser::Destroy\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
 
 		m_CefClientHandler->Destroy();
 		m_CefClientHandler = NULL;
@@ -592,18 +592,6 @@ vgui::HCursor SrcCefBrowser::GetCursor()
 		return 0;
 
 	return m_pPanel->GetCursor( );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
-{
-	return GetAlphaAt( x, y ) == 0;
-	//int alpha = GetAlphaAt( x, y );
-	//if( alpha < cef_alpha_epsilon.GetInt() )
-	//	return true;
-	//return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -164,4 +164,9 @@ inline const char *SrcCefBrowser::GetName()
 	return m_Name.c_str();
 }
 
+inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
+{
+	return GetAlphaAt( x, y ) == 0;
+}
+
 #endif // SRC_CEF_BROWSER_H
