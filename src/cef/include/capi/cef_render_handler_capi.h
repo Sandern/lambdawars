@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2013 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -57,8 +57,7 @@ typedef struct _cef_render_handler_t {
 
   ///
   // Called to retrieve the root window rectangle in screen coordinates. Return
-  // true (1) if the rectangle was provided. Return false (0) if the screen
-  // rectangle is the same as the view rectangle.
+  // true (1) if the rectangle was provided.
   ///
   int (CEF_CALLBACK *get_root_screen_rect)(struct _cef_render_handler_t* self,
       struct _cef_browser_t* browser, cef_rect_t* rect);

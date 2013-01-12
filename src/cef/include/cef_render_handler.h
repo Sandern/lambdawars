@@ -54,8 +54,7 @@ class CefRenderHandler : public virtual CefBase {
 
   ///
   // Called to retrieve the root window rectangle in screen coordinates. Return
-  // true if the rectangle was provided. Return false if the screen rectangle is
-  // the same as the view rectangle.
+  // true if the rectangle was provided.
   ///
   /*--cef()--*/
   virtual bool GetRootScreenRect(CefRefPtr<CefBrowser> browser,

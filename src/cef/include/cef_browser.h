@@ -118,6 +118,13 @@ class CefBrowser : public virtual CefBase {
   virtual int GetIdentifier() =0;
 
   ///
+  // Returns true if this object is pointing to the same handle as |that|
+  // object.
+  ///
+  /*--cef()--*/
+  virtual bool IsSame(CefRefPtr<CefBrowser> that) =0;
+
+  ///
   // Returns true if the window is a popup window.
   ///
   /*--cef()--*/
@@ -220,7 +227,7 @@ class CefBrowserHost : public virtual CefBase {
   // will be created on the UI thread. This method can be called on any browser
   // process thread and will not block.
   ///
-  /*--cef(optional_param=url)--*/
+  /*--cef(optional_param=client,optional_param=url)--*/
   static bool CreateBrowser(const CefWindowInfo& windowInfo,
                             CefRefPtr<CefClient> client,
                             const CefString& url,
@@ -231,7 +238,7 @@ class CefBrowserHost : public virtual CefBase {
   // |windowInfo|. This method can only be called on the browser process UI
   // thread.
   ///
-  /*--cef(optional_param=url)--*/
+  /*--cef(optional_param=client,optional_param=url)--*/
   static CefRefPtr<CefBrowser> CreateBrowserSync(
       const CefWindowInfo& windowInfo,
       CefRefPtr<CefClient> client,
@@ -357,7 +364,6 @@ class CefBrowserHost : public virtual CefBase {
 
   ///
   // Send a key event to the browser.
-  // This method is only used when window rendering is disabled.
   ///
   /*--cef()--*/
   virtual void SendKeyEvent(const CefKeyEvent& event) =0;
@@ -365,7 +371,6 @@ class CefBrowserHost : public virtual CefBase {
   ///
   // Send a mouse click event to the browser. The |x| and |y| coordinates are
   // relative to the upper-left corner of the view.
-  // This method is only used when window rendering is disabled.
   ///
   /*--cef()--*/
   virtual void SendMouseClickEvent(const CefMouseEvent& event,
@@ -375,7 +380,6 @@ class CefBrowserHost : public virtual CefBase {
   ///
   // Send a mouse move event to the browser. The |x| and |y| coordinates are
   // relative to the upper-left corner of the view.
-  // This method is only used when window rendering is disabled.
   ///
   /*--cef()--*/
   virtual void SendMouseMoveEvent(const CefMouseEvent& event,
@@ -385,9 +389,8 @@ class CefBrowserHost : public virtual CefBase {
   // Send a mouse wheel event to the browser. The |x| and |y| coordinates are
   // relative to the upper-left corner of the view. The |deltaX| and |deltaY|
   // values represent the movement delta in the X and Y directions respectively.
-  // To scroll inside select popups, CefRenderHandler::GetScreenPoint
-  // should be implemented properly
-  // This method is only used when window rendering is disabled.
+  // In order to scroll inside select popups with window rendering disabled
+  // CefRenderHandler::GetScreenPoint should be implemented properly.
   ///
   /*--cef()--*/
   virtual void SendMouseWheelEvent(const CefMouseEvent& event,

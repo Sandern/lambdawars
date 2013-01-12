@@ -1,4 +1,4 @@
-// Copyright (c) 2012 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2013 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -108,6 +108,13 @@ typedef struct _cef_browser_t {
   // Returns the globally unique identifier for this browser.
   ///
   int (CEF_CALLBACK *get_identifier)(struct _cef_browser_t* self);
+
+  ///
+  // Returns true (1) if this object is pointing to the same handle as |that|
+  // object.
+  ///
+  int (CEF_CALLBACK *is_same)(struct _cef_browser_t* self,
+      struct _cef_browser_t* that);
 
   ///
   // Returns true (1) if the window is a popup window.
@@ -314,16 +321,14 @@ typedef struct _cef_browser_host_t {
       const cef_rect_t* dirtyRect, enum cef_paint_element_type_t type);
 
   ///
-  // Send a key event to the browser. This function is only used when window
-  // rendering is disabled.
+  // Send a key event to the browser.
   ///
   void (CEF_CALLBACK *send_key_event)(struct _cef_browser_host_t* self,
       const struct _cef_key_event_t* event);
 
   ///
   // Send a mouse click event to the browser. The |x| and |y| coordinates are
-  // relative to the upper-left corner of the view. This function is only used
-  // when window rendering is disabled.
+  // relative to the upper-left corner of the view.
   ///
   void (CEF_CALLBACK *send_mouse_click_event)(struct _cef_browser_host_t* self,
       const struct _cef_mouse_event_t* event,
@@ -331,8 +336,7 @@ typedef struct _cef_browser_host_t {
 
   ///
   // Send a mouse move event to the browser. The |x| and |y| coordinates are
-  // relative to the upper-left corner of the view. This function is only used
-  // when window rendering is disabled.
+  // relative to the upper-left corner of the view.
   ///
   void (CEF_CALLBACK *send_mouse_move_event)(struct _cef_browser_host_t* self,
       const struct _cef_mouse_event_t* event, int mouseLeave);
@@ -341,9 +345,8 @@ typedef struct _cef_browser_host_t {
   // Send a mouse wheel event to the browser. The |x| and |y| coordinates are
   // relative to the upper-left corner of the view. The |deltaX| and |deltaY|
   // values represent the movement delta in the X and Y directions respectively.
-  // To scroll inside select popups, cef_render_handler_t::GetScreenPoint should
-  // be implemented properly This function is only used when window rendering is
-  // disabled.
+  // In order to scroll inside select popups with window rendering disabled
+  // cef_render_handler_t::GetScreenPoint should be implemented properly.
   ///
   void (CEF_CALLBACK *send_mouse_wheel_event)(struct _cef_browser_host_t* self,
       const struct _cef_mouse_event_t* event, int deltaX, int deltaY);

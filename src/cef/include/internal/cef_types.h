@@ -980,12 +980,12 @@ enum cef_mouse_button_type_t {
 ///
 typedef struct _cef_mouse_event_t {
   ///
-  // x coordinate relative to the left side of the view
+  // X coordinate relative to the left side of the view.
   ///
   int x;
 
   ///
-  // y coordinate relative to the top side of the view
+  // Y coordinate relative to the top side of the view.
   ///
   int y;
 
