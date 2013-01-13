@@ -50,9 +50,9 @@
 #include "nav_pathfind.h"
 #include "hl2wars_nav_pathfind.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -163,7 +163,7 @@ UnitBaseWaypoint *	UnitBaseWaypoint::GetLast()
 	return pCurr;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_bNoAvoid = false;
 	m_bNoNavAreasNearby = false;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: Clear variables
@@ -216,13 +216,13 @@ void UnitBaseNavigator::Reset()
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::StopMoving()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object path = m_refPath;
 	UnitBasePath *pPath = m_pPath;
 	SetPath(boost::python::object());
 
 	GetPath()->m_vGoalPos = pPath-> m_vGoalPos;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	Reset();
 }
 
@@ -236,12 +236,12 @@ void UnitBaseNavigator::DispatchOnNavComplete()
 	GetPath()->m_bSuccess = true;
 	Reset();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavComplete"
 	);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -253,12 +253,12 @@ void UnitBaseNavigator::DispatchOnNavFailed()
 	GetPath()->m_iGoalType = GOALTYPE_NONE; 
 	Reset();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavFailed"
 	);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -351,9 +351,9 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 	// This way the event can clear the move command if it wants
 	// It's also more clear to keep all event dispatching here, since they might result in a new
 	// goal being set. In this case we should not update m_LastGoalStatus.
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object curPath = m_refPath;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	if( GoalStatus == CHS_ATGOAL )
 	{
 		if( !(GetPath()->m_iGoalFlags & GF_NOCLEAR) )
@@ -371,12 +371,12 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: At goal, but marked as no clear. Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 				SrcPySystem()->Run<const char *>( 
 					SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 					"OnNavAtGoal"
 				);		
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			}
 		}
 	}
@@ -391,12 +391,12 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: Was at goal, but lost it. Dispatching lost (OnNavLostGoal).\n", GetOuter()->entindex());
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 				SrcPySystem()->Run<const char *>( 
 					SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 					"OnNavLostGoal"
 				);		
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			}
 		}
 	}
@@ -411,17 +411,17 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 	{
 		if( unit_navigator_debug.GetBool() )
 			DevMsg("#%d UnitNavigator: Encounter climb obstacle. Dispatching OnStartClimb.\n", GetOuter()->entindex());
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		SrcPySystem()->Run<const char *, float, Vector>( 
 			SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 			"OnStartClimb", m_fClimbHeight, m_vecClimbDirection
 		);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 
 	// Do not update last goal status in case the path changed.
 	// A new path will already set m_LastGoalStatus to something appropriate.
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( curPath == m_refPath )
 	{
 		if( unit_navigator_debug.GetBool() )
@@ -452,7 +452,7 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 {
 	if( bIsFacing != m_bFacingFaceTarget )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( bIsFacing )
 		{
 			SrcPySystem()->Run<const char *>( 
@@ -467,7 +467,7 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 				"OnLostFacingTarget"
 			);
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		m_bFacingFaceTarget = bIsFacing;
 	}
 }
@@ -771,43 +771,53 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 		}
 	}	
 
-	// Add density from nav mesh (don't drop off cliffs when we don't want too)
-	// Note that we don't do this for special waypoints (climbing/dropping/etc)
-	if( ShouldConsiderNavMesh() )
-	{
-		UnitShortestPathCost costFunc(m_pOuter);
+	CBaseEntity *pGroundEntity = m_pOuter->GetGroundEntity();
 
-		// Add density from nav area
-		CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
-		if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
-		{
-			float fDensity = 100.0f;
-			fSumDensity += fDensity;
-			Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
-			VectorNormalize(vDir);
-			*pAvgVelocity += fDensity * vDir * 500.0f;
-		}
+	if( pGroundEntity && pGroundEntity->IsBaseTrain() )
+	{
+		// TODO: Generate density at edges while moving
+		//		 For now, assume mapper blocks the edges
 	}
-
-	if( m_Seeds.Count() )
+	else
 	{
-		float fDist;
-		float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
-		float fBaseDensitySeed = unit_seed_density.GetFloat();
-
-		// Increase seed density + radius a bit when blocked for a longer time
-		if( GetBlockedStatus() >= BS_MUCH )
+		// Add density from nav mesh (don't drop off cliffs when we don't want too)
+		// Note that we don't do this for special waypoints (climbing/dropping/etc)
+		if( ShouldConsiderNavMesh() )
 		{
-			fBaseDensitySeed *= 1.5f;
-			fRadius *= 1.2f;
+			UnitShortestPathCost costFunc(m_pOuter);
+
+			// Add density from nav area
+			CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
+			if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
+			{
+				float fDensity = 100.0f;
+				fSumDensity += fDensity;
+				Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
+				VectorNormalize(vDir);
+				*pAvgVelocity += fDensity * vDir * 500.0f;
+			}
 		}
 
-		// Add seeds if in range
-		for( i = 0; i < m_Seeds.Count(); i++ )
+		if( m_Seeds.Count() )
 		{
-			fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
-			if( fDist < fRadius )
-				fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
+			float fDist;
+			float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
+			float fBaseDensitySeed = unit_seed_density.GetFloat();
+
+			// Increase seed density + radius a bit when blocked for a longer time
+			if( GetBlockedStatus() >= BS_MUCH )
+			{
+				fBaseDensitySeed *= 1.5f;
+				fRadius *= 1.2f;
+			}
+
+			// Add seeds if in range
+			for( i = 0; i < m_Seeds.Count(); i++ )
+			{
+				fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
+				if( fDist < fRadius )
+					fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
+			}
 		}
 	}
 
@@ -1792,10 +1802,10 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 {
 	if( !pTarget )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		PyErr_SetString(PyExc_Exception, "SetGoalTarget: target is None" );
 		throw boost::python::error_already_set(); 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		return false;
 	}
 	bool bResult = FindPath(GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags);
@@ -1831,10 +1841,10 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 {
 	if( !pTarget )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		PyErr_SetString(PyExc_Exception, "SetGoalTargetInRange: target is None" );
 		throw boost::python::error_already_set(); 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		return false;
 	}
 
@@ -1872,12 +1882,12 @@ void UnitBaseNavigator::UpdateGoalInRange( float maxrange, float minrange, UnitB
 
 	if( pPath->m_iGoalType != GOALTYPE_POSITION_INRANGE && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalInRange: Invalid goal type" );
 		throw boost::python::error_already_set(); 
 #else
 		Warning("UnitBaseNavigator::UpdateGoalInRange: Invalid goal type\n");
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		return;
 	}
 
@@ -1895,12 +1905,12 @@ void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pP
 
 	if( pPath->m_iGoalType != GOALTYPE_TARGETENT && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalTarget: Invalid goal type" );
 		throw boost::python::error_already_set(); 
 #else
 		Warning("UnitBaseNavigator::UpdateGoalTarget: Invalid goal type\n");
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		return;
 	}
 
@@ -2012,9 +2022,9 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 
 	Reset();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SetPath( boost::python::object() ); // Clear current path
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	m_LastGoalStatus = CHS_HASGOAL;
 
@@ -2075,89 +2085,6 @@ bool UnitBaseNavigator::DoFindPathToPosInRange()
 	GetPath()->SetWaypoint(waypoints);
 	if( unit_reactivepath.GetBool() ) UpdateReactivePath( true );
 	return true;
-#if 0
-	// Start with the normal DoFindPathToPos
-	if( !DoFindPathToPos() )
-		return false;
-
-	//Msg("Find path succeeded, tweaking to range now\n");
-	// Now modify the the last waypoints to fall into the min and max range.
-	// Remove waypoints we don't need.
-	UnitBaseWaypoint *pCur, *pNext;
-	pCur = GetPath()->m_pWaypointHead;
-	while( pCur->GetNext() )
-		pCur = pCur->GetNext();
-
-	Vector vNewGoalPos;
-	if( dist < GetPath()->m_fMinRange )
-	{
-		//Msg("Below minimum range\n");
-		// Need to move back from the target
-		while( pCur->GetPrev() && (pCur->GetPos()-vGoalPos).Length2D() < GetPath()->m_fMinRange )
-			pCur = pCur->GetPrev();
-
-		pNext = pCur->GetNext();
-		pCur->SetNext(NULL);
-
-		// Calculate the goal position
-		Vector dir = GetAbsOrigin()-vGoalPos;
-		dir.z = 0.0f;
-		dist = VectorNormalize(dir);
-		vNewGoalPos = GetAbsOrigin() + dir*(GetPath()->m_fMinRange-dist);
-		if( pCur->pFrom )
-			vNewGoalPos.z = pCur->pFrom->GetZ(vNewGoalPos);
-		pCur->SetNext( new UnitBaseWaypoint(vNewGoalPos) );
-	}
-	else
-	{
-		//Msg("Outside maximum range\n");
-
-		// Need to move towards the target
-		while( pCur->GetPrev() && (pCur->GetPos()-vGoalPos).Length2D() < GetPath()->m_fMaxRange )
-			pCur = pCur->GetPrev();
-
-		if( pCur->GetNext() )
-		{
-			pNext = pCur->GetNext();
-			pCur->SetNext(NULL);
-
-			// Calculate the goal position
-			Vector dir = vGoalPos - pCur->GetPos();
-			dir.z = 0.0f;
-			dist = VectorNormalize(dir);
-			vNewGoalPos = pCur->GetPos() + dir*(dist-GetPath()->m_fMaxRange);
-			if( pCur->pTo )
-				vNewGoalPos.z = pCur->pTo->GetZ(vNewGoalPos);
-			pCur->SetNext( new UnitBaseWaypoint(vNewGoalPos) );
-		}
-		else
-		{
-			pNext = pCur->GetNext();
-			pCur->SetNext(NULL);
-
-			// Calculate the goal position
-			Vector dir = vGoalPos - GetAbsOrigin();
-			dir.z = 0.0f;
-			dist = VectorNormalize(dir);
-			vNewGoalPos = GetAbsOrigin() + dir*(dist-GetPath()->m_fMaxRange);
-			if( pCur->pTo )
-				vNewGoalPos.z = pCur->pTo->GetZ(vNewGoalPos);
-			pCur->SetNext( new UnitBaseWaypoint(vNewGoalPos) );
-		}
-	}
-
-	// Delete old
-	while( pNext )
-	{
-		pCur = pNext;
-		pNext = pCur->GetNext();
-		delete pCur;
-	}
-
-	GetPath()->m_vGoalInRangePos = vNewGoalPos;
-
-	return true;
-#endif // 0
 }
 // Route buiding
 //-----------------------------------------------------------------------------
@@ -2364,38 +2291,10 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 					if( dir == WEST || dir == EAST )
 					{
 						pFromAreaWayPoint->flToleranceY = 2.0f;
-
-#if 0
-						point1 = hookPos2 + pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceX;
-						point2 = hookPos2 + -1 * pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceX;
-
-						float fGroundZ = hookPos2.z;
-						if( point1.z - fGroundZ > m_pOuter->m_fMaxClimbHeight )
-						{
-							float z = point1.z - fGroundZ;
-							float fAngle = tan( z / pGoalAreaWayPoint->flToleranceX );
-							pGoalAreaWayPoint->flToleranceX = m_pOuter->m_fMaxClimbHeight / tan(fAngle);
-							hookPos2 = point2 + point2 * pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceX / 2.0f;
-							pFromAreaWayPoint->SetPos( hookPos2 );
-						}
-						else if( point2.z - fGroundZ > m_pOuter->m_fMaxClimbHeight )
-						{
-							float z = point2.z - fGroundZ;
-							float fAngle = tan( z / pGoalAreaWayPoint->flToleranceX );
-							pGoalAreaWayPoint->flToleranceX = m_pOuter->m_fMaxClimbHeight / tan(fAngle);
-							hookPos2 = point1 + point1 * pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceX / 2.0f;
-							pFromAreaWayPoint->SetPos( hookPos2 );
-						}
-#endif // 0
 					}
 					else
 					{
 						pFromAreaWayPoint->flToleranceX = 2.0f;
-
-#if 0
-						point1 = hookPos2 + pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceY;
-						point2 = hookPos2 + -1 * pGoalAreaWayPoint->areaSlope * pGoalAreaWayPoint->flToleranceY;
-#endif // 0
 					}
 
 
@@ -2523,7 +2422,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute()
 	return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -2541,7 +2440,7 @@ void UnitBaseNavigator::SetPath( boost::python::object path )
 	m_pPath = boost::python::extract<UnitBasePath *>(path);
 	m_refPath = path;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #if 0
 //-----------------------------------------------------------------------------
