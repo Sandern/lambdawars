@@ -31,7 +31,7 @@
 #include "tier0/memdbgon.h"
 
 // Increment this to force rebuilding all heightmaps
-#define	 HEIGHTMAP_VERSION_NUMBER	2
+#define	 HEIGHTMAP_VERSION_NUMBER	3
 
 // #define FOW_USE_PROCTEX
 
@@ -295,6 +295,7 @@ void CFogOfWarMgr::CalculateHeightMap()
 		float tilez;
 		Vector start, end;
 		trace_t tr;
+		CTraceFilterNoNPCsOrPlayer traceFilter( NULL, COLLISION_GROUP_NONE );
 		for( int x = 0; x < m_nGridSize; x++ )
 		{
 			for( int y = 0; y < m_nGridSize; y++ )
@@ -308,22 +309,22 @@ void CFogOfWarMgr::CalculateHeightMap()
 				//	MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
 
 				// Use four trace lines and average the result
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
+				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
 				start.x += m_nTileSize;
 				end.x += m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
+				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
 				start.y += m_nTileSize;
 				end.y += m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
+				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
 				start.x -= m_nTileSize;
 				end.x -= m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
+				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
 				//Msg("start: %f %f %f, end: %f %f %f, x: %d, y: %d, end: %f\n", x, y, tr.endpos.z);
