@@ -1387,6 +1387,16 @@ void register_CFuncUnit_class(){
         typedef bp::class_< CFuncUnit_wrapper, bp::bases< CFuncBrush >, boost::noncopyable > CFuncUnit_exposer_t;
         CFuncUnit_exposer_t CFuncUnit_exposer = CFuncUnit_exposer_t( "CFuncUnit", bp::init< >() );
         bp::scope CFuncUnit_scope( CFuncUnit_exposer );
+        { //::CFuncUnit::CanBeSeen
+        
+            typedef bool ( ::CFuncUnit::*CanBeSeen_function_type )( ::CUnitBase * ) ;
+            
+            CFuncUnit_exposer.def( 
+                "CanBeSeen"
+                , CanBeSeen_function_type( &::CFuncUnit::CanBeSeen )
+                , ( bp::arg("pUnit")=bp::object() ) );
+        
+        }
         { //::CFuncUnit::ClientCommand
         
             typedef bool ( ::CFuncUnit::*ClientCommand_function_type )( ::CCommand const & ) ;
@@ -1508,6 +1518,16 @@ void register_CFuncUnit_class(){
                 , OnUnitTypeChanged_function_type(&::CFuncUnit::OnUnitTypeChanged)
                 , default_OnUnitTypeChanged_function_type(&CFuncUnit_wrapper::default_OnUnitTypeChanged)
                 , ( bp::arg("old_unit_type") ) );
+        
+        }
+        { //::CFuncUnit::SetCanBeSeen
+        
+            typedef void ( ::CFuncUnit::*SetCanBeSeen_function_type )( bool ) ;
+            
+            CFuncUnit_exposer.def( 
+                "SetCanBeSeen"
+                , SetCanBeSeen_function_type( &::CFuncUnit::SetCanBeSeen )
+                , ( bp::arg("canbeseen") ) );
         
         }
         { //::CFuncUnit::SetCommander

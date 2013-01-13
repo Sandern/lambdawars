@@ -15,6 +15,7 @@
 #include "networkvar.h"
 #ifdef CLIENT_DLL
 	#define CFuncUnit C_FuncUnit
+	#define CUnitBase C_UnitBase
 	#define FUNCUNIT_DERIVED C_FuncBrush
 	#include "c_func_brush.h"
 	class WarsVGUIScreen;
@@ -23,8 +24,11 @@
 	#include "modelentities.h"
 #endif // CLIENT_DLL
 
-// Func unit list
+// Forward declarations
 class CFuncUnit;
+class CUnitBase;
+
+// Func unit list
 typedef CUtlVector<CFuncUnit *> CFuncUnitArray;
 
 extern CFuncUnitArray g_FuncUnitList;
@@ -86,6 +90,9 @@ public:
 #endif // HL2WARS_ASW_DLL
 	void					Blink( float blink_time = 3.0f );
 #endif // CLIENT_DLL
+
+	void				SetCanBeSeen( bool canbeseen ) { m_bCanBeSeen = canbeseen; }
+	bool				CanBeSeen( CUnitBase *pUnit = NULL ) { return m_bCanBeSeen; }
 
 	// IUnit
 	const char *		GetUnitType();
@@ -154,6 +161,8 @@ private:
 
 	int m_iSelectionPriority;
 	int m_iAttackPriority;
+
+	bool m_bCanBeSeen;
 
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;

@@ -1416,6 +1416,8 @@ BOOST_PYTHON_MODULE(_entities){
 
     register_CFuncBrush_class();
 
+    register_CUnitBase_class();
+
     register_CFuncUnit_class();
 
     register_CGib_class();
@@ -1437,8 +1439,6 @@ BOOST_PYTHON_MODULE(_entities){
     register_CSpriteTrail_class();
 
     register_CTriggerMultiple_class();
-
-    register_CUnitBase_class();
 
     register_CWarsWeapon_class();
 

@@ -66,7 +66,7 @@ END_NETWORK_TABLE()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CFuncUnit::CFuncUnit()
+CFuncUnit::CFuncUnit() : m_bCanBeSeen(true)
 {
 	g_FuncUnitList.AddToTail(this);
 #ifndef CLIENT_DLL

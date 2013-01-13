@@ -1320,6 +1320,16 @@ void register_C_FuncUnit_class(){
                 , ( bp::arg("blink_time")=3.0e+0f ) );
         
         }
+        { //::C_FuncUnit::CanBeSeen
+        
+            typedef bool ( ::C_FuncUnit::*CanBeSeen_function_type )( ::C_UnitBase * ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "CanBeSeen"
+                , CanBeSeen_function_type( &::C_FuncUnit::CanBeSeen )
+                , ( bp::arg("pUnit")=bp::object() ) );
+        
+        }
         { //::C_FuncUnit::DrawModel
         
             typedef int ( ::C_FuncUnit::*DrawModel_function_type )( int,::RenderableInstance_t const & ) ;
@@ -1495,6 +1505,16 @@ void register_C_FuncUnit_class(){
                 "SelectSlot"
                 , SelectSlot_function_type( &::C_FuncUnit::SelectSlot )
                 , ( bp::arg("slot") ) );
+        
+        }
+        { //::C_FuncUnit::SetCanBeSeen
+        
+            typedef void ( ::C_FuncUnit::*SetCanBeSeen_function_type )( bool ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "SetCanBeSeen"
+                , SetCanBeSeen_function_type( &::C_FuncUnit::SetCanBeSeen )
+                , ( bp::arg("canbeseen") ) );
         
         }
         { //::C_FuncUnit::Spawn

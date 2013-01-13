@@ -340,13 +340,11 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	// Send high res version for the commander
 	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 
-#ifdef HL2WARS_ASW_DLL
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
 
 	// This data is only send to the commander for prediction
-	SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 	//SendPropVector		( SENDINFO( m_vecBaseVelocity ), 20, 0, -1000, 1000 ),
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 0), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 1), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
@@ -356,40 +354,17 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 0), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 1), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 2), 12, SPROP_CHANGES_OFTEN,	-1.0f, 1024.0f),
-#else
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 0, x), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 1, y), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 2, z), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
 
-	// This data is only send to the commander for prediction
-	SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
-	SendPropVector		( SENDINFO( m_vecBaseVelocity ), 20, 0, -1000, 1000 ),
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecVelocity, 0, x), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecVelocity, 1, y), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecVelocity, 2, z), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
-
-	// Update SetDefaultEyeOffset when changing the range!
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecViewOffset, 0, x), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecViewOffset, 1, y), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
-	SendPropFloat		( SENDINFO_VECTORELEM2(m_vecViewOffset, 2, z), 12, SPROP_CHANGES_OFTEN,	-1.0f, 1024.0f),
-#endif // HL2WARS_ASW_DLL
 END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
-#ifdef HL2WARS_ASW_DLL
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
 	SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-#else
-	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_COORD_MP_LOWPRECISION|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 0, x), 9, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 1, y), 9, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
-	SendPropAngle( SENDINFO_VECTORELEM2(m_angRotation, 2, z), 9, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-#endif // HL2WARS_ASW_DLL
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
@@ -403,6 +378,7 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
 	SendPropInt		(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
 
+	SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 	SendPropEHandle		( SENDINFO( m_hSquadUnit ) ),
 	SendPropEHandle		( SENDINFO( m_hCommander ) ),
 	SendPropEHandle		( SENDINFO( m_hEnemy ) ),

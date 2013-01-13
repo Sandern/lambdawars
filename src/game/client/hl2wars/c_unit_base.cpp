@@ -107,7 +107,6 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
 
 	// Only received by the commander
-	RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 	RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
 	RecvPropFloat		( RECVINFO(m_vecVelocity[0]), 0, RecvProxy_Unit_LocalVelocityX ),
 	RecvPropFloat		( RECVINFO(m_vecVelocity[1]), 0, RecvProxy_Unit_LocalVelocityY ),
@@ -140,6 +139,7 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropEHandle		( RECVINFO( m_hSquadUnit ) ),
 	RecvPropEHandle		( RECVINFO( m_hCommander ) ),
 	RecvPropEHandle		( RECVINFO( m_hEnemy ) ),
+	RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
 	RecvPropBool( RECVINFO( m_bCrouching ) ),
 	RecvPropBool( RECVINFO( m_bClimbing ) ),

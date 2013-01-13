@@ -929,6 +929,8 @@ BOOST_PYTHON_MODULE(_entities){
 
     register_C_FuncBrush_class();
 
+    register_C_UnitBase_class();
+
     register_C_FuncUnit_class();
 
     register_C_HL2WarsPlayer_class();
@@ -944,8 +946,6 @@ BOOST_PYTHON_MODULE(_entities){
     register_C_Sprite_class();
 
     register_C_SpriteTrail_class();
-
-    register_C_UnitBase_class();
 
     register_C_WarsWeapon_class();
 
