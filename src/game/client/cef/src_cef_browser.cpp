@@ -629,6 +629,17 @@ void SrcCefBrowser::Reload( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void SrcCefBrowser::ReloadIgnoreCache( void )
+{
+	if( !IsValid() )
+		return;
+
+	m_CefClientHandler->GetBrowser()->ReloadIgnoreCache();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::StopLoad( void )
 {
 	if( !IsValid() )

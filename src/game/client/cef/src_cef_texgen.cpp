@@ -8,6 +8,7 @@
 #include "src_cef_texgen.h"
 #include "src_cef_browser.h"
 #include "src_cef_osrenderer.h"
+#include "src_cef_vgui_panel.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -25,6 +26,11 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	// Don't regenerate while loading
 	if( engine->IsDrawingLoadingImage() )
 	{
+		int width, height;
+		width = m_pBrowser->GetOSRHandler()->GetWidth();
+		height = m_pBrowser->GetOSRHandler()->GetHeight();
+
+		m_pBrowser->GetPanel()->MarkTextureDirty( 0, 0, width, height );
 		return;
 	}
 

@@ -492,6 +492,36 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::Reload( );
     }
 
+    virtual void ReloadIgnoreCache(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "ReloadIgnoreCache: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling ReloadIgnoreCache(  ) of Class: SrcCefBrowser\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_ReloadIgnoreCache = this->get_override( "ReloadIgnoreCache" );
+        if( func_ReloadIgnoreCache.ptr() != Py_None )
+            try {
+                func_ReloadIgnoreCache(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::ReloadIgnoreCache(  );
+            }
+        else
+            this->SrcCefBrowser::ReloadIgnoreCache(  );
+    }
+    
+    void default_ReloadIgnoreCache(  ) {
+        SrcCefBrowser::ReloadIgnoreCache( );
+    }
+
     virtual void SetPos( int x, int y ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1074,6 +1104,17 @@ BOOST_PYTHON_MODULE(_cef){
                 "Reload"
                 , Reload_function_type(&::SrcCefBrowser::Reload)
                 , default_Reload_function_type(&SrcCefBrowser_wrapper::default_Reload) );
+        
+        }
+        { //::SrcCefBrowser::ReloadIgnoreCache
+        
+            typedef void ( ::SrcCefBrowser::*ReloadIgnoreCache_function_type )(  ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_ReloadIgnoreCache_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "ReloadIgnoreCache"
+                , ReloadIgnoreCache_function_type(&::SrcCefBrowser::ReloadIgnoreCache)
+                , default_ReloadIgnoreCache_function_type(&SrcCefBrowser_wrapper::default_ReloadIgnoreCache) );
         
         }
         { //::SrcCefBrowser::SetCursor

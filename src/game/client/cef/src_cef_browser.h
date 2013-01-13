@@ -84,6 +84,7 @@ public:
 	// Browser Methods
 	virtual bool IsLoading( void );
 	virtual void Reload( void );
+	virtual void ReloadIgnoreCache( void );
 	virtual void StopLoad( void );
 	virtual void Focus();
 	virtual void Unfocus();
