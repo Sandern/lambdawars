@@ -1416,11 +1416,23 @@ const QAngle& UnitAnimState::GetRenderAngles()
 void UnitAnimState::GetOuterAbsVelocity( Vector& vel ) const
 {
 #if defined( CLIENT_DLL )
-	C_UnitBase *pUnit = (C_UnitBase *)GetOuter();
-	pUnit->EstimateAbsVelocity( vel );
+	m_pOuter->EstimateAbsVelocity( vel );
 #else
-	vel = GetOuter()->GetAbsVelocity();
+	vel = m_pOuter->GetAbsVelocity();
 #endif
+
+	// Special case: track train. Substract base velocity.
+	CBaseEntity *pEnt = m_pOuter->GetGroundEntity();
+	if( pEnt && pEnt->IsBaseTrain() )
+	{
+		Vector baseVel;
+#if defined( CLIENT_DLL )
+		pEnt->EstimateAbsVelocity( baseVel );
+#else
+		baseVel = pEnt->GetAbsVelocity();
+#endif
+		vel -= baseVel;
+	}
 }
 
 
