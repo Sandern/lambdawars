@@ -3381,6 +3381,16 @@ BOOST_PYTHON_MODULE(_utils){
                 , ( bp::arg("ref"), bp::arg("vMin")=::Vector( ), bp::arg("vMax")=::Vector( ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) ) );
         
         }
+        { //::ProjectedTexture::SetColor
+        
+            typedef void ( ::ProjectedTexture::*SetColor_function_type )( int,int,int,int ) ;
+            
+            ProjectedTexture_exposer.def( 
+                "SetColor"
+                , SetColor_function_type( &::ProjectedTexture::SetColor )
+                , ( bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) ) );
+        
+        }
         { //::ProjectedTexture::SetMaterial
         
             typedef void ( ::ProjectedTexture::*SetMaterial_function_type )( char const *,char const * ) ;

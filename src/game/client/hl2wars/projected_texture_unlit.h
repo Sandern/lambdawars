@@ -42,6 +42,7 @@ public:
 	void SetMaterial( const char *pMaterial, const char *pTextureGroupName = 0 );
 	void SetMaterial( CMaterialReference &ref );
 	void SetProjectionDistance( float dist );
+	void SetColor( int r = 255, int g = 255, int b = 255, int a = 255 );
 
 private:
 #if 0 //def  HL2WARS_ASW_DLL

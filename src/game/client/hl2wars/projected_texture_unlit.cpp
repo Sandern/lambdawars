@@ -396,4 +396,14 @@ void ProjectedTexture::SetProjectionDistance( float dist )
 
 	UpdateShadow();
 }
+
+void ProjectedTexture::SetColor( int r, int g, int b, int a )
+{
+	m_Info.m_fR = r;
+	m_Info.m_fG = g;
+	m_Info.m_fB = b;
+	m_Info.m_fA = a;
+
+	UpdateShadow();
+}
 #endif // HL2WARS_ASW_DLL
