@@ -511,6 +511,15 @@ public:
 
 	bool operator() ( CNavArea *area )
 	{
+		// Figure out normal and skip if the slope is crap
+		Vector normal;
+		area->ComputeNormal( &normal );
+		float fSlope = DotProduct( normal, Vector(0, 0, 1) );
+		if( fSlope < 0.83f )
+		{
+			return false;
+		}
+
 		const HidingSpotVector *spots = area->GetHidingSpots();
 
 		for( int i = 0; i < spots->Count(); i++ )
