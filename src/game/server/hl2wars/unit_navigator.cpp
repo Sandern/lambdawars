@@ -82,6 +82,7 @@ ConVar unit_cost_discomfortweight_growrate("unit_cost_discomfortweight_growrate"
 ConVar unit_cost_discomfortweight_max("unit_cost_discomfortweight_max", "25000.0");
 ConVar unit_cost_history("unit_cost_history", "0.2");
 ConVar unit_cost_minavg_improvement("unit_cost_minavg_improvement", "0.0");
+ConVar unit_cost_nonavareacheck("unit_cost_nonavareacheck", "0", FCVAR_CHEAT, "");
 
 ConVar unit_nogoal_mindiff("unit_nogoal_mindiff", "0.25");
 ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
@@ -196,6 +197,8 @@ void UnitBaseNavigator::Reset()
 	m_vForceGoalVelocity.Invalidate();
 	m_fGoalDistance = -1;
 	m_bNoPathVelocity = false;
+	m_fIgnoreNavMeshTime = 0.0f;
+	m_bNoNavAreasNearby = true; // Reset, so we ignore nav meshes until we found a valid area again
 
 	m_vLastWishVelocity.Init(0, 0, 0);
 
@@ -726,7 +729,11 @@ bool UnitBaseNavigator::ShouldConsiderEntity( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 {
-	if( m_bNoNavAreasNearby || m_fGoalDistance < 64.0f ) // Set when in BS_STUCK and we can't find anything nearby 
+	if( unit_cost_nonavareacheck.GetBool() )
+		return false;
+	// Set when in BS_STUCK and we can't find anything nearby 
+	// Also don't consider nav meshes when really nearby our goal
+	if( m_bNoNavAreasNearby || m_fGoalDistance < 32.0f ) 
 		return false;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );
@@ -771,52 +778,55 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 		}
 	}	
 
-	CBaseEntity *pGroundEntity = m_pOuter->GetGroundEntity();
+	if( m_fIgnoreNavMeshTime < gpGlobals->curtime )
+	{
+		CBaseEntity *pGroundEntity = m_pOuter->GetGroundEntity();
 
-	if( pGroundEntity && pGroundEntity->IsBaseTrain() )
-	{
-		// TODO: Generate density at edges while moving
-		//		 For now, assume mapper blocks the edges
-	}
-	else
-	{
-		// Add density from nav mesh (don't drop off cliffs when we don't want too)
-		// Note that we don't do this for special waypoints (climbing/dropping/etc)
-		if( ShouldConsiderNavMesh() )
+		if( pGroundEntity && pGroundEntity->IsBaseTrain() )
 		{
-			UnitShortestPathCost costFunc(m_pOuter);
-
-			// Add density from nav area
-			CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
-			if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
-			{
-				float fDensity = 100.0f;
-				fSumDensity += fDensity;
-				Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
-				VectorNormalize(vDir);
-				*pAvgVelocity += fDensity * vDir * 500.0f;
-			}
+			// TODO: Generate density at edges while moving
+			//		 For now, assume mapper blocks the edges
 		}
-
-		if( m_Seeds.Count() )
+		else
 		{
-			float fDist;
-			float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
-			float fBaseDensitySeed = unit_seed_density.GetFloat();
-
-			// Increase seed density + radius a bit when blocked for a longer time
-			if( GetBlockedStatus() >= BS_MUCH )
+			// Add density from nav mesh (don't drop off cliffs when we don't want too)
+			// Note that we don't do this for special waypoints (climbing/dropping/etc)
+			if( ShouldConsiderNavMesh() )
 			{
-				fBaseDensitySeed *= 1.5f;
-				fRadius *= 1.2f;
+				UnitShortestPathCost costFunc(m_pOuter);
+
+				// Add density from nav area
+				CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
+				if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
+				{
+					float fDensity = 100.0f;
+					fSumDensity += fDensity;
+					Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
+					VectorNormalize(vDir);
+					*pAvgVelocity += fDensity * vDir * 500.0f;
+				}
 			}
 
-			// Add seeds if in range
-			for( i = 0; i < m_Seeds.Count(); i++ )
+			if( m_Seeds.Count() )
 			{
-				fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
-				if( fDist < fRadius )
-					fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
+				float fDist;
+				float fRadius = GetEntityBoundingRadius(m_pOuter) * unit_seed_radius_bloat.GetFloat();
+				float fBaseDensitySeed = unit_seed_density.GetFloat();
+
+				// Increase seed density + radius a bit when blocked for a longer time
+				if( GetBlockedStatus() >= BS_MUCH )
+				{
+					fBaseDensitySeed *= 1.5f;
+					fRadius *= 1.2f;
+				}
+
+				// Add seeds if in range
+				for( i = 0; i < m_Seeds.Count(); i++ )
+				{
+					fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
+					if( fDist < fRadius )
+						fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
+				}
 			}
 		}
 	}
@@ -1282,7 +1292,9 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		{
 			// skip dist check if we have no minimum range and are bumping into the target or the dist is really close (might have the wrong blocker set), then we are in range
 			float fTargetTolerance = GetEntityBoundingRadius(m_pOuter)*2.0f;
-			if( MoveCommand.m_hBlocker != GetPath()->m_hTarget || m_fGoalDistance > fTargetTolerance )
+			bool bTouchingTarget = MoveCommand.m_hBlocker && ( MoveCommand.m_hBlocker == GetPath()->m_hTarget || 
+				( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && MoveCommand.m_hBlocker->GetOwnerEntity() == GetPath()->m_hTarget ) );
+			if( !bTouchingTarget && m_fGoalDistance > fTargetTolerance )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f, tolerance: %f)\n", 
@@ -1405,15 +1417,23 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint()
 			// Check special goal status
 			SpecialGoalStatus = pCurWaypoint->SpecialGoalStatus;
 			UnitBaseWaypoint *pNextWaypoint = pCurWaypoint->GetNext();
-			if( pNextWaypoint && SpecialGoalStatus == CHS_CLIMB )
-			{
-				Vector end = ComputeWaypointTarget(GetAbsOrigin(), pNextWaypoint);
 
-				// Calculate climb direction.
-				m_fClimbHeight = end.z - pCurWaypoint->GetPos().z;
-				//Msg("%f = %f - %f (end: %f %f %f, tol: %f %f)\n", m_fClimbHeight, end.z, pCurWaypoint->GetPos().z, end.x, end.y, end.z, pNextWaypoint->flToleranceX, pNextWaypoint->flToleranceY);
-				//UnitComputePathDirection2(pCurWaypoint->GetPos(), pNextWaypoint, m_vecClimbDirection);
-				UnitComputePathDirection(pCurWaypoint->GetPos(), pNextWaypoint->GetPos(), m_vecClimbDirection);
+			if( pNextWaypoint )
+			{
+				if( SpecialGoalStatus == CHS_CLIMB )
+				{
+					Vector end = ComputeWaypointTarget(GetAbsOrigin(), pNextWaypoint);
+
+					// Calculate climb direction.
+					m_fClimbHeight = end.z - pCurWaypoint->GetPos().z;
+					//Msg("%f = %f - %f (end: %f %f %f, tol: %f %f)\n", m_fClimbHeight, end.z, pCurWaypoint->GetPos().z, end.x, end.y, end.z, pNextWaypoint->flToleranceX, pNextWaypoint->flToleranceY);
+					//UnitComputePathDirection2(pCurWaypoint->GetPos(), pNextWaypoint, m_vecClimbDirection);
+					UnitComputePathDirection(pCurWaypoint->GetPos(), pNextWaypoint->GetPos(), m_vecClimbDirection);
+				}
+				else if( SpecialGoalStatus == CHS_EDGEDOWN )
+				{
+					m_fIgnoreNavMeshTime = gpGlobals->curtime + 5.0f;
+				}
 			}
 
 			AdvancePath();

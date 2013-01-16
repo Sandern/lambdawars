@@ -459,6 +459,7 @@ private:
 	float m_fNextAllowPathRecomputeTime;
 	bool m_bNoNavAreasNearby;
 	Vector m_vLastPosition;
+	float m_fIgnoreNavMeshTime;
 
 	// Misc
 	float m_fClimbHeight;
