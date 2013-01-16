@@ -72,6 +72,10 @@ public:
 	virtual void SetCommander(CHL2WarsPlayer *player)										= 0;
 #endif // CLIENT_DLL
 	virtual CHL2WarsPlayer* GetCommander() const											= 0;
+
+	// Relationships
+	virtual Disposition_t		IRelationType( CBaseEntity *pTarget )						= 0;
+	virtual int					IRelationPriority( CBaseEntity *pTarget )					= 0;
 };
 
 #endif // IUNIT_H

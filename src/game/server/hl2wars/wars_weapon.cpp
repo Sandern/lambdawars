@@ -14,6 +14,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar g_debug_wars_weapon("g_debug_wars_weapon", "0", FCVAR_CHEAT);
 
 void* SendProxy_SendWarsLocalWeaponDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
@@ -142,7 +143,9 @@ public:
 	}
 	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
 	{
-		CBaseEntity *pEntity = (CBaseEntity *)pServerEntity;
+		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
+		if ( !pEntity )
+			return false;
 
 		if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
 			return false;
@@ -151,16 +154,16 @@ public:
 		if ( pServerEntity == m_pVehicle )
 			return false;
 
-		if ( pEntity->GetHealth() > 0 )
+		/*if ( pEntity->GetHealth() > 0 )
 		{
-			/*CBreakable *pBreakable = dynamic_cast<CBreakable *>(pEntity);
+			CBreakable *pBreakable = dynamic_cast<CBreakable *>(pEntity);
 			if ( pBreakable  && pBreakable->IsBreakable() && pBreakable->GetMaterialType() == matGlass)
 			{
 				return false;
-			}*/
-		}
+			}
+		}*/
 
-		CUnitBase *pUnit = pEntity->MyUnitPointer();
+		IUnit *pUnit = pEntity->GetIUnit();
 		if( pUnit && pUnit->IRelationType((CBaseEntity *)GetPassEntity()) != D_HT )
 		{
 			return false;
@@ -193,6 +196,9 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	CWarsWeaponLOSFilter traceFilter( npcOwner, npcOwner->GetEnemy(), COLLISION_GROUP_BREAKABLE_GLASS );
 	trace_t tr;
 	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT, &traceFilter, &tr );
+
+	if( g_debug_wars_weapon.GetBool() )
+		NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
 
 	// See if we completed the trace without interruption
 	if ( tr.fraction == 1.0 )

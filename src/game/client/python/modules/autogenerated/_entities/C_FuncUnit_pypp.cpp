@@ -1419,6 +1419,26 @@ void register_C_FuncUnit_class(){
                 , GetUnitType_function_type( &::C_FuncUnit::GetUnitType ) );
         
         }
+        { //::C_FuncUnit::IRelationPriority
+        
+            typedef int ( ::C_FuncUnit::*IRelationPriority_function_type )( ::C_BaseEntity * ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "IRelationPriority"
+                , IRelationPriority_function_type( &::C_FuncUnit::IRelationPriority )
+                , ( bp::arg("pTarget") ) );
+        
+        }
+        { //::C_FuncUnit::IRelationType
+        
+            typedef ::Disposition_t ( ::C_FuncUnit::*IRelationType_function_type )( ::C_BaseEntity * ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "IRelationType"
+                , IRelationType_function_type( &::C_FuncUnit::IRelationType )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::C_FuncUnit::IsUnit
         
             typedef bool ( ::C_FuncUnit::*IsUnit_function_type )(  ) ;

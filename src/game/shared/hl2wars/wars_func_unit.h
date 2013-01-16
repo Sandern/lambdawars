@@ -74,6 +74,10 @@ public:
 	virtual void OnCursorEntered( CHL2WarsPlayer *player )					{}
 	virtual void OnCursorExited( CHL2WarsPlayer *player )					{}
 
+	// Relationships
+	Disposition_t		IRelationType( CBaseEntity *pTarget );
+	int					IRelationPriority( CBaseEntity *pTarget );
+
 #ifdef CLIENT_DLL
 	virtual void		OnDataChanged( DataUpdateType_t updateType );
 
@@ -83,11 +87,7 @@ public:
 	virtual int			GetHealth() const { return m_iHealth; }
 	virtual int			GetMaxHealth()  const	{ return m_iMaxHealth; }
 
-#ifdef HL2WARS_ASW_DLL
 	virtual int				DrawModel( int flags, const RenderableInstance_t &instance );
-#else
-	virtual int				DrawModel( int flags );
-#endif // HL2WARS_ASW_DLL
 	void					Blink( float blink_time = 3.0f );
 #endif // CLIENT_DLL
 
@@ -103,9 +103,9 @@ public:
 
 	virtual void		OnUnitTypeChanged( const char *old_unit_type ) {}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual bool IsSelectableByPlayer( CHL2WarsPlayer *pPlayer, boost::python::object target_selection = boost::python::object() ) { return true; }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual void Select( CHL2WarsPlayer *pPlayer, bool bTriggerOnSel = true );
 	virtual void OnSelected( CHL2WarsPlayer *pPlayer );
 	virtual void OnDeSelected( CHL2WarsPlayer *pPlayer );

@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "wars_func_unit.h"
+#include "unit_base_shared.h"
 #include "iunit.h"
 
 #include "gamestringpool.h"
@@ -177,7 +178,6 @@ void CFuncUnit::OnDataChanged( DataUpdateType_t updateType )
 	}
 }
 
-#ifdef HL2WARS_ASW_DLL
 int CFuncUnit::DrawModel( int flags, const RenderableInstance_t &instance )
 {
 	if( m_bIsBlinking )
@@ -189,20 +189,6 @@ int CFuncUnit::DrawModel( int flags, const RenderableInstance_t &instance )
 
 	return BaseClass::DrawModel( flags, instance );
 }
-#else
-int CFuncUnit::DrawModel( int flags )
-{
-	if( m_bIsBlinking )
-	{
-		flags |= STUDIO_ITEM_BLINK;
-		if( m_fBlinkTimeOut != -1 && m_fBlinkTimeOut < gpGlobals->curtime )
-			m_bIsBlinking = false;
-	}
-
-	return BaseClass::DrawModel( flags );
-}
-#endif // HL2WARS_ASW_DLL
-
 
 void CFuncUnit::Blink( float blink_time )
 {
@@ -234,7 +220,9 @@ void CFuncUnit::SetUnitType( const char *unit_type )
 	OnUnitTypeChanged(pOldUnitType);
 }
 
-// sets which player commands this unit
+//-----------------------------------------------------------------------------
+// Purpose: sets which player commands this unit
+//-----------------------------------------------------------------------------
 void CFuncUnit::SetCommander( CHL2WarsPlayer *player )
 {
 	if ( m_hCommander.Get() == player )
@@ -244,4 +232,38 @@ void CFuncUnit::SetCommander( CHL2WarsPlayer *player )
 
 	m_hCommander = player;
 }
+
 #endif // CLIENT_DLL
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Disposition_t CFuncUnit::IRelationType( CBaseEntity *pTarget )
+{
+	if ( pTarget )
+	{
+#if 0
+		// First check for specific relationship with this edict
+		for (int i=0;i<m_Relationship.Count();i++) 
+		{
+			if (pTarget == m_Relationship[i].entity) 
+			{
+				return m_Relationship[i].disposition;
+			}
+		}
+#endif // 0
+
+		// Global relationships between teams
+		return GetPlayerRelationShip( GetOwnerNumber(), pTarget->GetOwnerNumber() );
+	}
+	return D_ER;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CFuncUnit::IRelationPriority( CBaseEntity *pTarget )
+{
+	return 0;
+}

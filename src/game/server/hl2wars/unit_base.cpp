@@ -479,7 +479,7 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 {
 	if( GetActiveWeapon() )
 	{
-		m_bHasRangeAttackLOS = GetActiveWeapon()->WeaponLOSCondition(Weapon_ShootPosition(), vTargetPos, false);
+		m_bHasRangeAttackLOS = GetActiveWeapon()->WeaponLOSCondition(GetLocalOrigin(), vTargetPos, false);
 	}
 	else
 	{

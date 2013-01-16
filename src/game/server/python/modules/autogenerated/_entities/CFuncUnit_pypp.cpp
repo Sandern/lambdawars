@@ -1475,6 +1475,26 @@ void register_CFuncUnit_class(){
                 , GetUnitType_function_type( &::CFuncUnit::GetUnitType ) );
         
         }
+        { //::CFuncUnit::IRelationPriority
+        
+            typedef int ( ::CFuncUnit::*IRelationPriority_function_type )( ::CBaseEntity * ) ;
+            
+            CFuncUnit_exposer.def( 
+                "IRelationPriority"
+                , IRelationPriority_function_type( &::CFuncUnit::IRelationPriority )
+                , ( bp::arg("pTarget") ) );
+        
+        }
+        { //::CFuncUnit::IRelationType
+        
+            typedef ::Disposition_t ( ::CFuncUnit::*IRelationType_function_type )( ::CBaseEntity * ) ;
+            
+            CFuncUnit_exposer.def( 
+                "IRelationType"
+                , IRelationType_function_type( &::CFuncUnit::IRelationType )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::CFuncUnit::IsUnit
         
             typedef bool ( ::CFuncUnit::*IsUnit_function_type )(  ) ;
