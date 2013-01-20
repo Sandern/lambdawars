@@ -49,7 +49,7 @@ public:
 	virtual void OnKeyTyped(wchar_t unichar);
 	virtual void OnKeyCodeReleased(vgui::KeyCode code);
 
-	virtual void InternalFocusChanged(bool lost);
+	//virtual void InternalFocusChanged(bool lost);
 
 	virtual vgui::HCursor GetCursor();
 

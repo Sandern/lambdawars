@@ -45,6 +45,9 @@ public:
 	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
 	void ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam );
+	const CefKeyEvent &GetLastKeyUpEvent();
+	const CefKeyEvent &GetLastKeyDownEvent();
+	const CefKeyEvent &GetLastKeyCharEvent();
 
 	HWND GetMainWindow( void );
 	void SetMainWIndow( HWND hWnd );
@@ -58,6 +61,10 @@ public:
 	void OnScreenSizeChanged( int nOldWidth, int nOldHeight );
 
 private:
+	CefKeyEvent m_LastKeyUpEvent;
+	CefKeyEvent m_LastKeyDownEvent;
+	CefKeyEvent m_LastKeyCharEvent;
+
 	// Main Window..
 	HWND m_MainWindow;
 
@@ -65,14 +72,44 @@ private:
 	CUtlVector< SrcCefBrowser * > m_CefBrowsers;
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 inline HWND CCefSystem::GetMainWindow( void )
 {
 	return m_MainWindow;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 inline void CCefSystem::SetMainWIndow( HWND hWnd )
 {
 	m_MainWindow = hWnd;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline const CefKeyEvent &CCefSystem::GetLastKeyUpEvent()
+{
+	return m_LastKeyUpEvent;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline const CefKeyEvent &CCefSystem::GetLastKeyDownEvent()
+{
+	return m_LastKeyDownEvent;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline const CefKeyEvent &CCefSystem::GetLastKeyCharEvent()
+{
+	return m_LastKeyCharEvent;
 }
 
 CCefSystem &CEFSystem();

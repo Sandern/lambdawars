@@ -8,6 +8,8 @@
 #include "src_cef.h"
 #include "src_cef_browser.h"
 
+#include <vgui/IInput.h>
+
 #include <set>
 
 // CEF
@@ -231,7 +233,7 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 //-----------------------------------------------------------------------------
 int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
-	/*for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() )
 			continue;
@@ -239,8 +241,97 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 		int ret = m_CefBrowsers[i]->KeyInput( down, keynum, pszCurrentBinding );
 		if( ret == 0 )
 			return 0;
-	}*/
+	}
 	return 1;
+}
+
+
+static bool isKeyDown(WPARAM wparam) {
+  return (GetKeyState(wparam) & 0x8000) != 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+static int getKeyModifiers( WPARAM wparam, LPARAM lparam )
+{
+	int modifiers = 0;
+	if (isKeyDown(VK_SHIFT))
+		modifiers |= EVENTFLAG_SHIFT_DOWN;
+	if (isKeyDown(VK_CONTROL))
+		modifiers |= EVENTFLAG_CONTROL_DOWN;
+	if (isKeyDown(VK_MENU))
+		modifiers |= EVENTFLAG_ALT_DOWN;
+
+	// Low bit set from GetKeyState indicates "toggled".
+	if (::GetKeyState(VK_NUMLOCK) & 1)
+		modifiers |= EVENTFLAG_NUM_LOCK_ON;
+	if (::GetKeyState(VK_CAPITAL) & 1)
+		modifiers |= EVENTFLAG_CAPS_LOCK_ON;
+
+	switch (wparam) {
+		case VK_RETURN:
+			if ((lparam >> 16) & KF_EXTENDED)
+				modifiers |= EVENTFLAG_IS_KEY_PAD;
+			break;
+		case VK_INSERT:
+		case VK_DELETE:
+		case VK_HOME:
+		case VK_END:
+		case VK_PRIOR:
+		case VK_NEXT:
+		case VK_UP:
+		case VK_DOWN:
+		case VK_LEFT:
+		case VK_RIGHT:
+			if (!((lparam >> 16) & KF_EXTENDED))
+				modifiers |= EVENTFLAG_IS_KEY_PAD;
+			break;
+		case VK_NUMLOCK:
+		case VK_NUMPAD0:
+		case VK_NUMPAD1:
+		case VK_NUMPAD2:
+		case VK_NUMPAD3:
+		case VK_NUMPAD4:
+		case VK_NUMPAD5:
+		case VK_NUMPAD6:
+		case VK_NUMPAD7:
+		case VK_NUMPAD8:
+		case VK_NUMPAD9:
+		case VK_DIVIDE:
+		case VK_MULTIPLY:
+		case VK_SUBTRACT:
+		case VK_ADD:
+		case VK_DECIMAL:
+		case VK_CLEAR:
+			modifiers |= EVENTFLAG_IS_KEY_PAD;
+			break;
+		case VK_SHIFT:
+			if (isKeyDown(VK_LSHIFT))
+				modifiers |= EVENTFLAG_IS_LEFT;
+			else if (isKeyDown(VK_RSHIFT))
+				modifiers |= EVENTFLAG_IS_RIGHT;
+			break;
+		case VK_CONTROL:
+			if (isKeyDown(VK_LCONTROL))
+				modifiers |= EVENTFLAG_IS_LEFT;
+			else if (isKeyDown(VK_RCONTROL))
+				modifiers |= EVENTFLAG_IS_RIGHT;
+			break;
+		case VK_MENU:
+			if (isKeyDown(VK_LMENU))
+				modifiers |= EVENTFLAG_IS_LEFT;
+			else if (isKeyDown(VK_RMENU))
+				modifiers |= EVENTFLAG_IS_RIGHT;
+			break;
+		case VK_LWIN:
+			modifiers |= EVENTFLAG_IS_LEFT;
+			break;
+		case VK_RWIN:
+			modifiers |= EVENTFLAG_IS_RIGHT;
+		break;
+	}
+	return modifiers;
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +339,9 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 //-----------------------------------------------------------------------------
 void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 {
+	if( wParam ==  VK_ESCAPE )
+		return;
+
 	CefKeyEvent keyevent;
 
 	keyevent.character = wParam;
@@ -265,17 +359,30 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 							message == WM_SYSKEYDOWN ||
 							message == WM_SYSKEYUP;
 
-	//keyevent.modifiers = GetCefKeyboardModifiers(wParam, lParam); // TODO
+	keyevent.modifiers = getKeyModifiers( wParam, lParam );
 
+#if 0
+	if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+		m_LastKeyDownEvent = keyevent;
+	else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+		m_LastKeyUpEvent = keyevent;
+	else	
+		m_LastKeyCharEvent = keyevent;
+#else
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+		// Only send key input if no vgui panel has key focus
+		// TODO: Deal with game bindings
+		vgui::VPANEL focus = vgui::input()->GetFocus();
+		vgui::Panel *pPanel = m_CefBrowsers[i]->GetPanel();
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() || !pPanel->IsVisible() || focus != 0 )
 			continue;
 
 		CefRefPtr<CefBrowser> browser = m_CefBrowsers[i]->GetBrowser();
 
 		browser->GetHost()->SendKeyEvent( keyevent );
 	}
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------

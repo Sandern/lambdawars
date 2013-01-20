@@ -148,6 +148,8 @@ private:
 	bool m_bPassMouseTruIfAlphaZero;
 	bool m_bUseMouseCapture;
 	bool m_bGameInputEnabled;
+
+	bool m_bHasFocus;
 };
 
 inline void SrcCefBrowser::SetGameInputEnabled( bool state )

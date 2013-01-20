@@ -16,6 +16,7 @@
 #endif // ENABLE_PYTHON
 
 #include "inputsystem/iinputsystem.h"
+#include <vgui/IInput.h>
 
 // CEF
 #include "include/cef_app.h"
@@ -296,7 +297,7 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), 
-	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false)
+	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false)
 {
 	m_Name = name ? name : "";
 
@@ -395,6 +396,25 @@ void SrcCefBrowser::Think( void )
 		m_CefClientHandler->GetBrowser()->GetHost()->WasResized();
 
 		m_bPerformLayout = false;
+	}
+
+	vgui::VPANEL focus = vgui::input()->GetFocus();
+	vgui::Panel *pPanel = GetPanel();
+	if( pPanel->IsVisible() && focus == 0 )
+	{
+		if( !m_bHasFocus )
+		{
+			m_bHasFocus = true;
+			GetBrowser()->GetHost()->SendFocusEvent(m_bHasFocus);
+		}
+	}
+	else
+	{
+		if( m_bHasFocus )
+		{
+			m_bHasFocus = false;
+			GetBrowser()->GetHost()->SendFocusEvent(m_bHasFocus);
+		}
 	}
 
 	OnThink();
@@ -565,10 +585,29 @@ int SrcCefBrowser::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 	if( !IsGameInputEnabled() )
 		return 1;
 
+#if 0
+	// Prevent certain keys from being sent to CEF
+	if( keynum == KEY_ESCAPE )
+		return 1;
+
+	CefRefPtr<CefBrowser> browser = GetBrowser();
+	if( down )
+	{
+		Msg("down keynum: %d, char: %c\n", keynum, CEFSystem().GetLastKeyDownEvent().character);
+		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyDownEvent() );
+		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyCharEvent() );
+	}
+	else
+	{
+		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyUpEvent() );
+		Msg("up keynum: %d, char: %c\n", keynum, CEFSystem().GetLastKeyUpEvent().character);
+	}
+
 	//const char *pKeyStr = g_pInputSystem->ButtonCodeToString( keynum );
 	//g_pInputSystem->ButtonCodeToVirtualKey( keynum );
 	//wchar_t unichar = (wchar_t)keynum;
 	//Msg("Keyname: %s, key: %lc\n", pKeyStr, unichar);
+#endif // 0
 	return 1;
 }
 

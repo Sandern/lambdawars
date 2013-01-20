@@ -643,6 +643,7 @@ vgui::HCursor SrcCefVGUIPanel::GetCursor()
 	return BaseClass::GetCursor();
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -655,3 +656,4 @@ void SrcCefVGUIPanel::InternalFocusChanged(bool lost)
 	else
 		m_pBrowser->Focus();
 }
+#endif // 0
