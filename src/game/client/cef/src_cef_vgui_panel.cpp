@@ -52,10 +52,7 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 	m_iMouseX = 0;
 	m_iMouseY = 0;
 
-	m_DirtyArea.x = 0;
-	m_DirtyArea.y = 0;
-	m_DirtyArea.width = 0;
-	m_DirtyArea.height = 0;
+	m_iDirtyX = m_iDirtyY = m_iDirtyXEnd = m_iDirtyYEnd = 0;
 
 	m_bCalledLeftPressedParent = m_bCalledRightPressedParent = m_bCalledMiddlePressedParent = false;
 
@@ -238,16 +235,20 @@ void SrcCefVGUIPanel::Paint()
 
 		{
 			VPROF_BUDGET( "Download", "CefDownloadTexture" );
-			m_RenderBuffer->Download( &m_DirtyArea );
+			Rect_t dirtyArea;
+			dirtyArea.x = m_iDirtyX;
+			dirtyArea.y = m_iDirtyY;
+			dirtyArea.width = m_iDirtyXEnd - m_iDirtyX;
+			dirtyArea.height = m_iDirtyYEnd - m_iDirtyY;
+			m_RenderBuffer->Download( &dirtyArea );
 		}
 
+		// Clear if no longer dirty
 		if( !m_pTextureRegen->IsDirty() )
 		{
-			// Clear if no longer dirty
-			m_DirtyArea.x = m_iWVWide;
-			m_DirtyArea.y = m_iWVTall;
-			m_DirtyArea.width = 0;
-			m_DirtyArea.height = 0;
+			m_iDirtyX = m_iWVWide;
+			m_iDirtyY = m_iWVTall;
+			m_iDirtyXEnd = m_iDirtyYEnd = 0;
 		}
 
 		//if( m_pTextureRegen->IsDirty() == false )
@@ -284,12 +285,12 @@ void SrcCefVGUIPanel::Paint()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::MarkTextureDirty( int dirtyx, int dirtyy, int dirtyw, int dirtyh )
+void SrcCefVGUIPanel::MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend )
 {
-	m_DirtyArea.x = MIN( m_DirtyArea.x, dirtyx );
-	m_DirtyArea.y = MIN( m_DirtyArea.y, dirtyy );
-	m_DirtyArea.width = MAX( m_DirtyArea.width, dirtyw );
-	m_DirtyArea.height = MAX( m_DirtyArea.height, dirtyh );
+	m_iDirtyX = MIN( m_iDirtyX, dirtyx );
+	m_iDirtyY = MIN( m_iDirtyY, dirtyy );
+	m_iDirtyXEnd = MAX( m_iDirtyXEnd, dirtyxend );
+	m_iDirtyYEnd = MAX( m_iDirtyYEnd, dirtyyend );
 
 	if( !m_pTextureRegen )
 		return;

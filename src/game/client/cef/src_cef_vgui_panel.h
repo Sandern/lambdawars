@@ -28,7 +28,7 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual void ResizeTexture( int width, int height );
-	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyw, int dirtyh );
+	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend );
 
 	virtual void Paint();
 	virtual void OnSizeChanged(int newWide, int newTall);
@@ -80,7 +80,7 @@ private:
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 
-	Rect_t m_DirtyArea;
+	int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
 };
 
 #endif // SRC_CEF_VGUI_PANEL_H

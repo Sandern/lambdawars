@@ -60,6 +60,8 @@ public:
 
 	void OnScreenSizeChanged( int nOldWidth, int nOldHeight );
 
+	CUtlVector< SrcCefBrowser * > &GetBrowsers();
+
 private:
 	CefKeyEvent m_LastKeyUpEvent;
 	CefKeyEvent m_LastKeyDownEvent;
@@ -110,6 +112,14 @@ inline const CefKeyEvent &CCefSystem::GetLastKeyDownEvent()
 inline const CefKeyEvent &CCefSystem::GetLastKeyCharEvent()
 {
 	return m_LastKeyCharEvent;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline CUtlVector< SrcCefBrowser * > &CCefSystem::GetBrowsers()
+{
+	return m_CefBrowsers;
 }
 
 CCefSystem &CEFSystem();

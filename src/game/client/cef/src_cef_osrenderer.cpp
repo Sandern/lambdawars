@@ -129,11 +129,11 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	Assert( dirtyRects.size() > 0 );
 
-	int dirtyx, dirtyy, dirtyw, dirtyh;
+	int dirtyx, dirtyy, dirtyxend, dirtyyend;
 	dirtyx = width;
 	dirtyy = height;
-	dirtyw = 0;
-	dirtyh = 0;
+	dirtyxend = 0;
+	dirtyyend = 0;
 
 	s_BufferMutex.Lock();
 
@@ -152,8 +152,8 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		// Full dirty
 		dirtyx = 0;
 		dirtyy = 0;
-		dirtyw = m_iWidth;
-		dirtyh = m_iHeight;
+		dirtyxend = m_iWidth;
+		dirtyyend = m_iHeight;
 	}
 
 	const unsigned char *imagebuffer = (const unsigned char *)buffer;
@@ -175,11 +175,11 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		// Update max dirty area
 		dirtyx = MIN( rect.x, dirtyx );
 		dirtyy = MIN( rect.y, dirtyy );
-		dirtyw = MAX( rect.width, dirtyw );
-		dirtyh = MAX( rect.height, dirtyh );
+		dirtyxend = MAX( rect.x + rect.width, dirtyxend );
+		dirtyyend = MAX( rect.y + rect.height, dirtyyend );
 	}
 
-	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
+	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
 
 	s_BufferMutex.Unlock();
 }

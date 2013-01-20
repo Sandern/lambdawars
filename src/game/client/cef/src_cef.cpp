@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "src_cef.h"
 #include "src_cef_browser.h"
+#include "src_cef_osrenderer.h"
 
 #include <vgui/IInput.h>
 
@@ -403,4 +404,26 @@ static CCefSystem s_CEFSystem;
 CCefSystem &CEFSystem()
 {
 	return s_CEFSystem;
+}
+
+
+CON_COMMAND_F( cef_debug_markfulldirty, "", FCVAR_CHEAT )
+{
+	CUtlVector< SrcCefBrowser * > &browsers = CEFSystem().GetBrowsers();
+
+	for( int i = browsers.Count() - 1; i >= 0; i-- )
+	{
+		if( browsers[i]->IsValid() )
+		{
+			int dirtyx, dirtyy, dirtyw, dirtyh;
+
+			// Full dirty
+			dirtyx = 0;
+			dirtyy = 0;
+			dirtyw = browsers[i]->GetOSRHandler()->GetWidth();
+			dirtyh = browsers[i]->GetOSRHandler()->GetHeight();
+
+			browsers[i]->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
+		}
+	}
 }
