@@ -433,7 +433,14 @@ void SrcCefBrowser::OnAfterCreated( void )
 void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 {
 #ifdef ENABLE_PYTHON
-	PyOnLoadStart( bp::object( PyCefFrame( frame ) ) );
+	try
+	{
+		PyOnLoadStart( bp::object( PyCefFrame( frame ) ) );
+	}
+	catch(bp::error_already_set &)
+	{
+		PyErr_Print();
+	}
 #endif // ENABLE_PYTHON
 }
 
@@ -443,7 +450,14 @@ void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
 {
 #ifdef ENABLE_PYTHON
-	PyOnLoadEnd( bp::object( PyCefFrame( frame ) ), httpStatusCode );
+	try
+	{
+		PyOnLoadEnd( bp::object( PyCefFrame( frame ) ), httpStatusCode );
+	}
+	catch(bp::error_already_set &)
+	{
+		PyErr_Print();
+	}
 #endif // ENABLE_PYTHON
 }
 
@@ -453,7 +467,14 @@ void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
 void SrcCefBrowser::OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl )
 {
 #ifdef ENABLE_PYTHON
-	PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, errorText, failedUrl );
+	try
+	{
+		PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, errorText, failedUrl );
+	}
+	catch(bp::error_already_set &)
+	{
+		PyErr_Print();
+	}
 #endif // ENABLE_PYTHON
 }
 
@@ -868,7 +889,14 @@ CefRefPtr<JSObject> SrcCefBrowser::InvokeWithResult( CefRefPtr<JSObject> object,
 void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
 {
 #ifdef ENABLE_PYTHON
-	PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? bp::object( *pCallbackID ) : bp::object() );
+	try
+	{
+		PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? bp::object( *pCallbackID ) : bp::object() );
+	}
+	catch(bp::error_already_set &)
+	{
+		PyErr_Print();
+	}
 #endif // ENABLE_PYTHON
 }
 

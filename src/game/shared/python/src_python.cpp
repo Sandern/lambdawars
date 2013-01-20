@@ -243,6 +243,7 @@ bool CSrcPython::Init( )
 #ifdef CLIENT_DLL
 	Run( "import input" );		// Registers buttons
 	_vguicontrols = Import("_vguicontrols");
+	Run( "import _cef" );
 #endif	// CLIENT_DLL
 
 	//  initialize the module that manages the python side
@@ -770,6 +771,7 @@ void CSrcPython::ExecuteAllScriptsInPath( const char *pPath )
 	while ( pFilename != NULL )
 	{
 		Q_snprintf( tempfile, sizeof( tempfile ), "%s/%s", pPath, pFilename );
+		Msg("Executing %s\n", tempfile);
 		ExecuteFile(tempfile);
 		pFilename = filesystem->FindNext( findHandle );
 	}
