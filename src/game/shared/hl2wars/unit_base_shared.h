@@ -475,6 +475,9 @@ private:
 	CHandle< CHL2WarsPlayer > m_hOldCommander;
 	CHandle< C_BaseCombatWeapon > m_hOldActiveWeapon;
 
+	CHandle< CBaseEntity > m_hOldEnemy;
+	bool					m_bForcedEnemyHate;
+
 	// Target unit/produced new unit: blink
 	bool					m_bIsBlinking;
 	float					m_fBlinkTimeOut;

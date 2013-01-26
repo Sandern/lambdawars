@@ -208,6 +208,25 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 		OnActiveWeaponChanged();
 		m_hOldActiveWeapon = GetActiveWeapon();
 	}
+
+	// Check for enemy, make sure we are hating on the client (for correct effects)
+	if( m_hOldEnemy != m_hEnemy )
+	{
+		if( m_bForcedEnemyHate )
+		{
+			if( m_hOldEnemy )
+				RemoveEntityRelationship( m_hOldEnemy );
+			m_bForcedEnemyHate = false;
+		}
+
+		m_hOldEnemy = m_hEnemy;
+
+		if( m_hEnemy && IRelationType( m_hEnemy ) != D_HT )
+		{
+			AddEntityRelationship( m_hEnemy, D_HT, 0 );
+			m_bForcedEnemyHate = true;
+		}
+	}
 }
 
 int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )
