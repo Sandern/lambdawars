@@ -50,9 +50,9 @@ struct UnitListInfo
 extern UnitListInfo *g_pUnitListHead;
 
 UnitListInfo *GetUnitListForOwnernumber(int iOwnerNumber);
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	void MapUnits( boost::python::object method );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //=============================================================================
 //
@@ -257,6 +257,9 @@ public:
 	virtual void		OnFullHealth( void ) {}
 	virtual void		OnLostFullHealth( void ) {}
 
+	void				DispatchOutOfAmmo( void );
+	void				DispatchBurstFinished( void );
+
 	virtual float		GetDensityMultiplier();
 
 	// Weapons
@@ -281,10 +284,10 @@ public:
 	bool				FastLOSCheck( const Vector &vTargetPos );
 
 	// Navigator
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object PyGetNavigator();
 	void				SetNavigator( boost::python::object navigator );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	UnitBaseNavigator*	GetNavigator();
 
 	// Expresser
@@ -296,9 +299,9 @@ public:
 	IResponseSystem *	GetResponseSystem();
 
 	// Anim Event map
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	void SetAnimEventMap( boost::python::object animeventmap );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual void		HandleAnimEvent( animevent_t *pEvent );
 
 #endif
@@ -321,9 +324,9 @@ public:
 	void				SetDefaultEyeOffset ( Vector *pCustomOfset = NULL );
 	const Vector &		GetDefaultEyeOffset( void )			{ return m_vDefaultEyeOffset;	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual bool IsSelectableByPlayer( CHL2WarsPlayer *pPlayer, boost::python::object target_selection = boost::python::object() ) { return true; }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual void Select( CHL2WarsPlayer *pPlayer, bool bTriggerOnSel = true );
 	virtual void OnSelected( CHL2WarsPlayer *pPlayer );
 	virtual void OnDeSelected( CHL2WarsPlayer *pPlayer );
@@ -440,21 +443,21 @@ private:
 
 	// Navigator
 	UnitBaseNavigator *m_pNavigator;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_pyNavigator;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Expresser
 	UnitExpresser *m_pExpresser;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_pyExpresser;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Anim Event handler map
 	AnimEventMap *m_pAnimEventMap;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_pyAnimEventMap; // Keeps m_pAnimEventMap valid
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Animation state
 	CNetworkVar(bool, m_bCrouching );
@@ -539,12 +542,12 @@ inline Class_T CUnitBase::Classify ( void )
 	return CLASS_PLAYER;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 inline boost::python::object CUnitBase::PyGetNavigator() 
 {
 	return m_pyNavigator;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 inline UnitBaseNavigator *CUnitBase::GetNavigator() 
 { 

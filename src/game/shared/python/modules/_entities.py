@@ -1369,10 +1369,6 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('PrimaryAttack').virtuality = 'virtual'
         mb.mem_funs('SecondaryAttack').virtuality = 'virtual'
         
-        # Maybe replace these?
-        #mb.mem_funs('GetPrimaryAttackActivity').virtuality = 'virtual'
-        #mb.mem_funs('GetSecondaryAttackActivity').virtuality = 'virtual'
-        
         # Basecombatweapon
         mb.mem_funs('ActivityList').exclude()
         mb.mem_funs('GetConstraint').exclude()
@@ -1465,10 +1461,22 @@ class Entities(GenerateModuleSemiShared):
             cls.mem_funs('GetMuzzleAttachEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             
         cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
-        cls.vars('m_fFireRate').rename('firerate')
-        cls.vars('m_vBulletSpread').rename('bulletspread')
-        cls.vars('m_fOverrideAmmoDamage').rename('overrideammodamage')
-        cls.vars('m_fMaxBulletRange').rename('maxbulletrange')
+        cls.var('m_fFireRate').rename('firerate')
+        cls.var('m_vBulletSpread').rename('bulletspread')
+        cls.var('m_fOverrideAmmoDamage').rename('overrideammodamage')
+        cls.var('m_fMaxBulletRange').rename('maxbulletrange')
+        cls.var('m_iMinBurst').rename('minburst')
+        cls.var('m_iMaxBurst').rename('maxburst')
+        cls.var('m_fMinRestTime').rename('minresttime')
+        cls.var('m_fMaxRestTime').rename('maxresttime')
+        cls.var('m_bEnableBurst').rename('enableburst')
+        cls.var('m_nBurstShotsRemaining').rename('burstshotsremaining')
+        
+        # For c++ only
+        #cls.mem_fun('GetMinBurst').exclude()
+        #cls.mem_fun('GetMaxBurst').exclude()
+        #cls.mem_fun('GetMinRestTime').exclude()
+        #cls.mem_fun('GetMaxRestTime').exclude()
         
         if self.isClient:
             cls.vars('m_vTracerColor').rename('tracercolor')

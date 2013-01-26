@@ -1030,6 +1030,42 @@ void register_C_WarsWeapon_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::C_WarsWeapon::GetMaxBurst
+        
+            typedef int ( ::C_WarsWeapon::*GetMaxBurst_function_type )(  ) ;
+            
+            C_WarsWeapon_exposer.def( 
+                "GetMaxBurst"
+                , GetMaxBurst_function_type( &::C_WarsWeapon::GetMaxBurst ) );
+        
+        }
+        { //::C_WarsWeapon::GetMaxRestTime
+        
+            typedef float ( ::C_WarsWeapon::*GetMaxRestTime_function_type )(  ) ;
+            
+            C_WarsWeapon_exposer.def( 
+                "GetMaxRestTime"
+                , GetMaxRestTime_function_type( &::C_WarsWeapon::GetMaxRestTime ) );
+        
+        }
+        { //::C_WarsWeapon::GetMinBurst
+        
+            typedef int ( ::C_WarsWeapon::*GetMinBurst_function_type )(  ) ;
+            
+            C_WarsWeapon_exposer.def( 
+                "GetMinBurst"
+                , GetMinBurst_function_type( &::C_WarsWeapon::GetMinBurst ) );
+        
+        }
+        { //::C_WarsWeapon::GetMinRestTime
+        
+            typedef float ( ::C_WarsWeapon::*GetMinRestTime_function_type )(  ) ;
+            
+            C_WarsWeapon_exposer.def( 
+                "GetMinRestTime"
+                , GetMinRestTime_function_type( &::C_WarsWeapon::GetMinRestTime ) );
+        
+        }
         { //::C_WarsWeapon::GetMuzzleAttachEntity
         
             typedef ::C_BaseEntity * ( ::C_WarsWeapon::*GetMuzzleAttachEntity_function_type )(  ) ;
@@ -1247,9 +1283,15 @@ void register_C_WarsWeapon_class(){
                 , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
         
         }
+        C_WarsWeapon_exposer.def_readwrite( "enableburst", &C_WarsWeapon::m_bEnableBurst );
         C_WarsWeapon_exposer.def_readwrite( "firerate", &C_WarsWeapon::m_fFireRate );
         C_WarsWeapon_exposer.def_readwrite( "maxbulletrange", &C_WarsWeapon::m_fMaxBulletRange );
+        C_WarsWeapon_exposer.def_readwrite( "maxresttime", &C_WarsWeapon::m_fMaxRestTime );
+        C_WarsWeapon_exposer.def_readwrite( "minresttime", &C_WarsWeapon::m_fMinRestTime );
         C_WarsWeapon_exposer.def_readwrite( "overrideammodamage", &C_WarsWeapon::m_fOverrideAmmoDamage );
+        C_WarsWeapon_exposer.def_readwrite( "maxburst", &C_WarsWeapon::m_iMaxBurst );
+        C_WarsWeapon_exposer.def_readwrite( "minburst", &C_WarsWeapon::m_iMinBurst );
+        C_WarsWeapon_exposer.def_readwrite( "burstshotsremaining", &C_WarsWeapon::m_nBurstShotsRemaining );
         C_WarsWeapon_exposer.def_readwrite( "bulletspread", &C_WarsWeapon::m_vBulletSpread );
         C_WarsWeapon_exposer.def_readwrite( "tracercolor", &C_WarsWeapon::m_vTracerColor );
         { //::C_BaseCombatWeapon::Activate

@@ -1265,6 +1265,42 @@ void register_CWarsWeapon_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::CWarsWeapon::GetMaxBurst
+        
+            typedef int ( ::CWarsWeapon::*GetMaxBurst_function_type )(  ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "GetMaxBurst"
+                , GetMaxBurst_function_type( &::CWarsWeapon::GetMaxBurst ) );
+        
+        }
+        { //::CWarsWeapon::GetMaxRestTime
+        
+            typedef float ( ::CWarsWeapon::*GetMaxRestTime_function_type )(  ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "GetMaxRestTime"
+                , GetMaxRestTime_function_type( &::CWarsWeapon::GetMaxRestTime ) );
+        
+        }
+        { //::CWarsWeapon::GetMinBurst
+        
+            typedef int ( ::CWarsWeapon::*GetMinBurst_function_type )(  ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "GetMinBurst"
+                , GetMinBurst_function_type( &::CWarsWeapon::GetMinBurst ) );
+        
+        }
+        { //::CWarsWeapon::GetMinRestTime
+        
+            typedef float ( ::CWarsWeapon::*GetMinRestTime_function_type )(  ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "GetMinRestTime"
+                , GetMinRestTime_function_type( &::CWarsWeapon::GetMinRestTime ) );
+        
+        }
         { //::CWarsWeapon::GetPyNetworkType
         
             typedef int ( *GetPyNetworkType_function_type )(  );
@@ -1402,11 +1438,15 @@ void register_CWarsWeapon_class(){
                 , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
         
         }
-        CWarsWeapon_exposer.def_readwrite( "m_PrimaryAttackActivity", &CWarsWeapon::m_PrimaryAttackActivity );
-        CWarsWeapon_exposer.def_readwrite( "m_SecondaryAttackActivity", &CWarsWeapon::m_SecondaryAttackActivity );
+        CWarsWeapon_exposer.def_readwrite( "enableburst", &CWarsWeapon::m_bEnableBurst );
         CWarsWeapon_exposer.def_readwrite( "firerate", &CWarsWeapon::m_fFireRate );
         CWarsWeapon_exposer.def_readwrite( "maxbulletrange", &CWarsWeapon::m_fMaxBulletRange );
+        CWarsWeapon_exposer.def_readwrite( "maxresttime", &CWarsWeapon::m_fMaxRestTime );
+        CWarsWeapon_exposer.def_readwrite( "minresttime", &CWarsWeapon::m_fMinRestTime );
         CWarsWeapon_exposer.def_readwrite( "overrideammodamage", &CWarsWeapon::m_fOverrideAmmoDamage );
+        CWarsWeapon_exposer.def_readwrite( "maxburst", &CWarsWeapon::m_iMaxBurst );
+        CWarsWeapon_exposer.def_readwrite( "minburst", &CWarsWeapon::m_iMinBurst );
+        CWarsWeapon_exposer.def_readwrite( "burstshotsremaining", &CWarsWeapon::m_nBurstShotsRemaining );
         CWarsWeapon_exposer.def_readwrite( "bulletspread", &CWarsWeapon::m_vBulletSpread );
         { //::CBaseCombatWeapon::Activate
         

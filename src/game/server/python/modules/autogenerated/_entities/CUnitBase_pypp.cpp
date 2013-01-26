@@ -1887,6 +1887,24 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pUnit")=bp::object() ) );
         
         }
+        { //::CUnitBase::DispatchBurstFinished
+        
+            typedef void ( ::CUnitBase::*DispatchBurstFinished_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "DispatchBurstFinished"
+                , DispatchBurstFinished_function_type( &::CUnitBase::DispatchBurstFinished ) );
+        
+        }
+        { //::CUnitBase::DispatchOutOfAmmo
+        
+            typedef void ( ::CUnitBase::*DispatchOutOfAmmo_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "DispatchOutOfAmmo"
+                , DispatchOutOfAmmo_function_type( &::CUnitBase::DispatchOutOfAmmo ) );
+        
+        }
         { //::CUnitBase::DoImpactEffect
         
             typedef void ( ::CUnitBase::*DoImpactEffect_function_type )( ::trace_t &,int ) ;

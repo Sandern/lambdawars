@@ -10,6 +10,7 @@
 #include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
 #include "animation.h"
+#include "src_python.h"
 
 #ifdef CLIENT_DLL
 	#include "c_hl2wars_player.h"
@@ -99,7 +100,7 @@ UnitListInfo *GetUnitListForOwnernumber(int iOwnerNumber)
 	return NULL;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void MapUnits( boost::python::object method )
 {
 	CUnitBase *pUnit;
@@ -113,7 +114,7 @@ void MapUnits( boost::python::object method )
 		}
 	}
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 Disposition_t g_playerrelationships[MAX_PLAYERS][MAX_PLAYERS];
@@ -548,7 +549,7 @@ public:
 		if ( !pEntity )
 			return false;
 
-		if( m_pUnit->IRelationType(pEntity) != D_HT && m_pUnit->GetCommander() == NULL )
+		if( m_pUnit->AllowNavIgnore() && m_pUnit->IRelationType(pEntity) != D_HT && m_pUnit->GetCommander() == NULL )
 			return false;
 
 		return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
@@ -704,6 +705,34 @@ bool CUnitBase::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trac
 	return BaseClass::TestHitboxes( ray, fContentsMask, tr );
 #endif // 0
 }
+
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::DispatchOutOfAmmo( void )
+{
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run<const char *>( 
+		SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
+		"OnOutOfAmmo"
+	);
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::DispatchBurstFinished( void )
+{
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run<const char *>( 
+		SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
+		"OnBurstFinished"
+	);
+#endif // ENABLE_PYTHON
+}
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: 

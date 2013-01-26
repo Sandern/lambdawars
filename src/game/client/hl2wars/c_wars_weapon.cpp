@@ -263,6 +263,9 @@ bool CWarsWeapon::GetShootPosition( Vector &vOrigin, QAngle &vAngles )
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseEntity * CWarsWeapon::GetMuzzleAttachEntity()
 {
 	if( !GetOwner() )

@@ -54,9 +54,20 @@ CHL2WarsPlayer* CWarsWeapon::GetCommander()
 //-----------------------------------------------------------------------------
 void CWarsWeapon::PrimaryAttack( void )
 {
-	CBaseCombatCharacter *pOwner = GetOwner()  ? GetOwner()->MyCombatCharacterPointer() : NULL;
+	CUnitBase *pOwner = GetOwner()  ? GetOwner()->MyUnitPointer() : NULL;
 	if( !pOwner )
 		return;
+
+#ifndef CLIENT_DLL
+	if( m_bEnableBurst )
+	{
+		// Auto reset burst shots next time we fire
+		if( m_nBurstShotsRemaining <= 0 )
+		{
+			m_nBurstShotsRemaining = GetRandomBurst();
+		}
+	}
+#endif // CLIENT_DLL
 
 	pOwner->DoMuzzleFlash();
 	
@@ -97,6 +108,19 @@ void CWarsWeapon::PrimaryAttack( void )
 	info.m_flDamage = m_fOverrideAmmoDamage;
 
 	pOwner->FireBullets( info );
+
+#ifndef CLIENT_DLL
+	if( m_bEnableBurst )
+	{
+		m_nBurstShotsRemaining -= shots;
+		// Dispatch burst finished event if we have no shots left
+		// It's up to the AI to rest
+		if( m_nBurstShotsRemaining <= 0 )
+		{
+			pOwner->DispatchBurstFinished();
+		}
+	}
+#endif // CLIENT_DLL
 
 	// Add our view kick in
 	AddViewKick();
@@ -153,19 +177,6 @@ void CWarsWeapon::GetShootOriginAndDirection( Vector &vShootOrigin, Vector &vSho
 	CBaseEntity *pOwner = GetOwner();
 	if( !pOwner )
 		return;
-
-#if 0
-	if( pOwner->IsPlayer() )
-	{
-		//CBasePlayer *pPlayer = ToBasePlayer(pOwner);
-		//vShootOrigin = pPlayer->Weapon_ShootPosition();
-		//AngleVectors( pPlayer->GetAbsAngles(), &vShootDirection );
-		QAngle vAngles;
-		GetShootPosition( vShootOrigin, vAngles );
-		AngleVectors( vAngles, &vShootDirection );
-		return;
-	}
-#endif // 0
 
 	CUnitBase *pUnit = pOwner->MyUnitPointer();
 	if( !pUnit )
