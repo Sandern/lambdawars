@@ -26,6 +26,10 @@
 
 #include "wars_mesh_builder.h"
 
+#include "fx_envelope.h"
+
+#include "c_strider_fx.h"
+
 #include "effect_dispatch_data.h"
 
 #include "src_python_te.h"
@@ -35,6 +39,60 @@
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
+
+struct C_EnvelopeFX_wrapper : C_EnvelopeFX, bp::wrapper< C_EnvelopeFX > {
+
+    C_EnvelopeFX_wrapper( )
+    : C_EnvelopeFX( )
+      , bp::wrapper< C_EnvelopeFX >(){
+        // null constructor
+    
+    }
+
+    void RemoveRenderable(  ){
+        C_EnvelopeFX::RemoveRenderable(  );
+    }
+
+    virtual void GetRenderBounds( ::Vector & mins, ::Vector & maxs ){
+        bp::override func_GetRenderBounds = this->get_override( "GetRenderBounds" );
+        try {
+            func_GetRenderBounds( boost::ref(mins), boost::ref(maxs) );
+        } catch(bp::error_already_set &) {
+            throw boost::python::error_already_set();
+        }
+    }
+
+};
+
+struct C_StriderFX_wrapper : C_StriderFX, bp::wrapper< C_StriderFX > {
+
+    C_StriderFX_wrapper(C_StriderFX const & arg )
+    : C_StriderFX( arg )
+      , bp::wrapper< C_StriderFX >(){
+        // copy constructor
+        
+    }
+
+    C_StriderFX_wrapper( )
+    : C_StriderFX( )
+      , bp::wrapper< C_StriderFX >(){
+        // null constructor
+    
+    }
+
+    static ::C_BaseEntity * get_m_pOwner(C_StriderFX const & inst ){
+        return inst.m_pOwner;
+    }
+    
+    static void set_m_pOwner( C_StriderFX & inst, ::C_BaseEntity * new_value ){ 
+        inst.m_pOwner = new_value;
+    }
+
+    void RemoveRenderable(  ){
+        C_EnvelopeFX::RemoveRenderable(  );
+    }
+
+};
 
 struct PyClientSideEffect_wrapper : PyClientSideEffect, bp::wrapper< PyClientSideEffect > {
 
@@ -197,6 +255,113 @@ BOOST_PYTHON_MODULE(_te){
         .def( 
             "Update"
             , (void ( ::CTempEnts::* )(  ) )( &::CTempEnts::Update ) );
+
+    bp::class_< C_EnvelopeFX_wrapper, boost::noncopyable >( "C_EnvelopeFX", bp::init< >() )    
+        .def( 
+            "ComputeTranslucencyType"
+            , (::RenderableTranslucencyType_t ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::ComputeTranslucencyType ) )    
+        .def( 
+            "EffectInit"
+            , (void ( ::C_EnvelopeFX::* )( int,int ) )( &::C_EnvelopeFX::EffectInit )
+            , ( bp::arg("entityIndex"), bp::arg("attachment") ) )    
+        .def( 
+            "EffectShutdown"
+            , (void ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::EffectShutdown ) )    
+        .def( 
+            "GetRenderAngles"
+            , (::QAngle const & ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::GetRenderAngles )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GetRenderOrigin"
+            , (::Vector const & ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::GetRenderOrigin )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "IsActive"
+            , (bool ( ::C_EnvelopeFX::* )(  ) const)( &::C_EnvelopeFX::IsActive ) )    
+        .def( 
+            "LimitTime"
+            , (void ( ::C_EnvelopeFX::* )( float ) )( &::C_EnvelopeFX::LimitTime )
+            , ( bp::arg("tmax") ) )    
+        .def( 
+            "PyAllocate"
+            , (void * (*)( ::PyObject *,::size_t,::size_t ))( &::C_EnvelopeFX::PyAllocate )
+            , ( bp::arg("self_"), bp::arg("holder_offset"), bp::arg("holder_size") )
+            , bp::return_value_policy< bp::return_opaque_pointer >() )    
+        .def( 
+            "PyDeallocate"
+            , (void (*)( ::PyObject *,void * ))( &::C_EnvelopeFX::PyDeallocate )
+            , ( bp::arg("self_"), bp::arg("storage") ) )    
+        .def( 
+            "RemoveRenderable"
+            , (void ( C_EnvelopeFX_wrapper::* )(  ) )(&C_EnvelopeFX_wrapper::RemoveRenderable) )    
+        .def( 
+            "RenderableToWorldTransform"
+            , (::matrix3x4_t const & ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::RenderableToWorldTransform )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "SetActive"
+            , (void ( ::C_EnvelopeFX::* )( bool ) )( &::C_EnvelopeFX::SetActive )
+            , ( bp::arg("state")=(bool)(true) ) )    
+        .def( 
+            "SetRenderOrigin"
+            , (void ( ::C_EnvelopeFX::* )( ::Vector const & ) )( &::C_EnvelopeFX::SetRenderOrigin )
+            , ( bp::arg("origin") ) )    
+        .def( 
+            "SetTime"
+            , (void ( ::C_EnvelopeFX::* )( float ) )( &::C_EnvelopeFX::SetTime )
+            , ( bp::arg("t") ) )    
+        .def( 
+            "ShouldDraw"
+            , (bool ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::ShouldDraw ) )    
+        .def( 
+            "ShouldReceiveProjectedTextures"
+            , (bool ( ::C_EnvelopeFX::* )( int ) )( &::C_EnvelopeFX::ShouldReceiveProjectedTextures )
+            , ( bp::arg("flags") ) )    
+        .def( 
+            "Update"
+            , (void ( ::C_EnvelopeFX::* )(  ) )( &::C_EnvelopeFX::Update ) )    
+        .def( 
+            "GetRenderBounds"
+            , bp::pure_virtual( (void ( ::IClientRenderable::* )( ::Vector &,::Vector & ) )(&::IClientRenderable::GetRenderBounds) )
+            , ( bp::arg("mins"), bp::arg("maxs") ) )    
+        .staticmethod( "PyAllocate" )    
+        .staticmethod( "PyDeallocate" );
+
+    bp::class_< C_StriderFX_wrapper, bp::bases< C_EnvelopeFX > >( "C_StriderFX", bp::init< >() )    
+        .def( 
+            "DrawModel"
+            , (int ( ::C_StriderFX::* )( int ) )( &::C_StriderFX::DrawModel )
+            , ( bp::arg("flags") ) )    
+        .def( 
+            "EffectInit"
+            , (void ( ::C_StriderFX::* )( int,int ) )( &::C_StriderFX::EffectInit )
+            , ( bp::arg("entityIndex"), bp::arg("attachment") ) )    
+        .def( 
+            "EffectShutdown"
+            , (void ( ::C_StriderFX::* )(  ) )( &::C_StriderFX::EffectShutdown ) )    
+        .def( 
+            "GetRenderBounds"
+            , (void ( ::C_StriderFX::* )( ::Vector &,::Vector & ) )( &::C_StriderFX::GetRenderBounds )
+            , ( bp::arg("mins"), bp::arg("maxs") ) )    
+        .def( 
+            "LimitTime"
+            , (void ( ::C_StriderFX::* )( float ) )( &::C_StriderFX::LimitTime )
+            , ( bp::arg("tmax") ) )    
+        .def( 
+            "Update"
+            , (void ( ::C_StriderFX::* )( ::C_BaseEntity *,::Vector const & ) )( &::C_StriderFX::Update )
+            , ( bp::arg("pOwner"), bp::arg("targetPos") ) )    
+        .def_readwrite( "m_beamEndPosition", &C_StriderFX::m_beamEndPosition )    
+        .def_readwrite( "m_limitHitTime", &C_StriderFX::m_limitHitTime )    
+        .add_property( "m_pOwner"
+                    , bp::make_function( (::C_BaseEntity * (*)( ::C_StriderFX const & ))(&C_StriderFX_wrapper::get_m_pOwner), bp::return_internal_reference< >() )
+                    , bp::make_function( (void (*)( ::C_StriderFX &,::C_BaseEntity * ))(&C_StriderFX_wrapper::set_m_pOwner), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
+        .def_readwrite( "m_queryHandleBeamEnd", &C_StriderFX::m_queryHandleBeamEnd )    
+        .def_readwrite( "m_queryHandleGun", &C_StriderFX::m_queryHandleGun )    
+        .def_readwrite( "m_targetPosition", &C_StriderFX::m_targetPosition )    
+        .def( 
+            "RemoveRenderable"
+            , (void ( C_StriderFX_wrapper::* )(  ) )(&C_StriderFX_wrapper::RemoveRenderable) );
 
     bp::class_< ITempEntsSystem, boost::noncopyable >( "ITempEntsSystem", bp::no_init )    
         .def( 

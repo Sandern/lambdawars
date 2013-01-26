@@ -2243,6 +2243,12 @@
     <ClCompile Include="cef\src_cef_js.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
+    <ClCompile Include="hl2wars\c_strider_fx.cpp">
+      <Filter>Source Files\wars</Filter>
+    </ClCompile>
+    <ClCompile Include="hl2wars\coreorigin_proxy.cpp">
+      <Filter>Source Files\wars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\src_python_util.h">
@@ -4593,6 +4599,9 @@
     </ClInclude>
     <ClInclude Include="cef\src_cef_js.h">
       <Filter>Source Files\cef</Filter>
+    </ClInclude>
+    <ClInclude Include="hl2wars\c_strider_fx.h">
+      <Filter>Source Files\wars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

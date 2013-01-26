@@ -1341,6 +1341,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="core_dx9.cpp" />
     <ClCompile Include="debugmorphaccumulator_dx9.cpp" />
     <ClCompile Include="debugmrttexture.cpp" />
     <ClCompile Include="DebugTextureView.cpp" />

@@ -206,9 +206,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, s_TexCoordSize, 0 );
 		int nShadowFilterMode = g_pHardwareConfig->GetShadowFilterMode();
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			DECLARE_STATIC_VERTEX_SHADER( multiblend_vs20 );
 			SET_STATIC_VERTEX_SHADER_COMBO( SPECULAR, !bUsingEditor );
@@ -236,7 +234,6 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 				SET_STATIC_PIXEL_SHADER( multiblend_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			// The vertex shader uses the vertex id stream
@@ -257,7 +254,6 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
 			SET_STATIC_PIXEL_SHADER( multiblend_ps30 );
 		}
-#endif
 
 		pShader->DefaultFog();
 
@@ -422,9 +418,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 
 		bool bFlashlightShadows = false;
 
-#ifndef _X360
 		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
 		{
 			DECLARE_DYNAMIC_VERTEX_SHADER( multiblend_vs20 );
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
@@ -444,7 +438,6 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 				SET_DYNAMIC_PIXEL_SHADER( multiblend_ps20 );
 			}
 		}
-#ifndef _X360
 		else
 		{
 			DECLARE_DYNAMIC_VERTEX_SHADER( multiblend_vs30 );
@@ -454,7 +447,6 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 			DECLARE_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
 			SET_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
 		}
-#endif
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, info.m_nBaseTextureTransform );
 

@@ -347,6 +347,9 @@
     <ClCompile Include="fogofwar_im.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core_dx9.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\dx9sdk\lib\d3dx9.lib">

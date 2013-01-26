@@ -9,35 +9,21 @@ from pygccxml.declarations import matchers
 class TE(GenerateModuleSemiShared):
     module_name = '_te'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
+    client_files = [
+        'videocfg/videocfg.h',
 
-            'cbase.h',
-            'tempent.h',
-            'c_te_legacytempents.h',
-            'c_te_effect_dispatch.h',
-            'fx.h',
-            'fx_quad.h',
-            'fx_line.h',
-            'clientsideeffects.h',
-            'wars_mesh_builder.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-        
-            'tempent.h',
-            'c_te_legacytempents.h',
-            'c_te_effect_dispatch.h',
-            'fx.h',
-            'fx_quad.h',
-            'fx_line.h',
-            'clientsideeffects.h',
-            'wars_mesh_builder.h',
-        ]
+        'cbase.h',
+        'tempent.h',
+        'c_te_legacytempents.h',
+        'c_te_effect_dispatch.h',
+        'fx.h',
+        'fx_quad.h',
+        'fx_line.h',
+        'clientsideeffects.h',
+        'wars_mesh_builder.h',
+        'fx_envelope.h',
+        'c_strider_fx.h',
+    ]
     
     server_files = [
         'cbase.h',
@@ -178,6 +164,15 @@ class TE(GenerateModuleSemiShared):
         '}\r\n'), False)
         
         mb.free_function('AddToClientEffectList').include()
+        
+        # FX Envelope + strider fx
+        cls = mb.class_('C_EnvelopeFX')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual' 
+        
+        cls = mb.class_('C_StriderFX')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual' 
         
         # //--------------------------------------------------------------------------------------------------------------------------------
         mb.add_registration_code( "bp::scope().attr( \"FTENT_NONE\" ) = (int)FTENT_NONE;" )

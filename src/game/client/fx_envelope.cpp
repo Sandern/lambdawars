@@ -80,3 +80,29 @@ void C_EnvelopeFX::EffectShutdown( void )
 	m_active = 0;
 	m_t = 0;
 }
+
+#ifdef ENABLE_PYTHON
+//------------------------------------------------------------------------------
+// Purpose: Python memory allocation. Same as new.
+//------------------------------------------------------------------------------
+void *C_EnvelopeFX::PyAllocate(PyObject* self_, std::size_t holder_offset, std::size_t holder_size)
+{
+	Assert( holder_size != 0 );	
+	MEM_ALLOC_CREDIT();
+	void *pMem = malloc( holder_size );
+	memset( pMem, 0, holder_size );
+	return pMem;	
+}
+
+void C_EnvelopeFX::PyDeallocate(PyObject* self_, void *storage)
+{
+#ifdef _DEBUG
+	// set the memory to a known value
+	int size = g_pMemAlloc->GetSize( storage );
+	Q_memset( storage, 0xdd, size );
+#endif
+
+	// get the engine to free the memory
+	g_pMemAlloc->Free( storage );
+}	
+#endif // ENABLE_PYTHON

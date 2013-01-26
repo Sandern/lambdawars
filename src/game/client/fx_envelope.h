@@ -43,6 +43,12 @@ public:
 	virtual void EffectInit( int entityIndex, int attachment );
 	virtual void EffectShutdown( void );
 
+#ifdef ENABLE_PYTHON
+	// Python
+	static void *PyAllocate(PyObject* self_, std::size_t holder_offset, std::size_t holder_size);
+	static void PyDeallocate(PyObject* self_, void *storage);
+#endif // ENABLE_PYTHON
+
 protected:
 
 	void RemoveRenderable();
