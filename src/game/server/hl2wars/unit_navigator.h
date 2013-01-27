@@ -62,6 +62,7 @@ enum CheckGoalStatus_t
 	CHS_EDGEDOWN, // Fall down, likely a small gap between the two navigation meshes too.
 	CHS_EDGEDOWNDEST,
 	CHS_BLOCKED, // Indicates we are currently blocked and are trying to resolve it
+	CHS_NOSIMPLIFY, // For waypoints, indicates reactive path should not skip this point
 };
 
 // Status of being blocked
@@ -353,7 +354,7 @@ public:
 	float				CalculateAvgDistHistory();
 
 	// Path updating
-	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist );
+	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist );
 	virtual bool		IsInRangeGoal( UnitBaseMoveCommand &MoveCommand );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint();
 	Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
@@ -384,7 +385,7 @@ public:
 	virtual float		GetGoalDistance( void );
 
 	// Path finding
-	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f );
+	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, CBaseEntity *pTarget=NULL );
 	virtual bool		DoFindPathToPos();
 	virtual bool		DoFindPathToPosInRange();
 

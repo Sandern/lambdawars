@@ -1426,6 +1426,16 @@ void register_CFuncUnit_class(){
                 , GetEnergy_function_type( &::CFuncUnit::GetEnergy ) );
         
         }
+        { //::CFuncUnit::GetEnterOffset
+        
+            typedef ::Vector const & ( ::CFuncUnit::*GetEnterOffset_function_type )(  ) ;
+            
+            CFuncUnit_exposer.def( 
+                "GetEnterOffset"
+                , GetEnterOffset_function_type( &::CFuncUnit::GetEnterOffset )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::CFuncUnit::GetIMouse
         
             typedef ::IMouse * ( ::CFuncUnit::*GetIMouse_function_type )(  ) ;
@@ -1473,6 +1483,15 @@ void register_CFuncUnit_class(){
             CFuncUnit_exposer.def( 
                 "GetUnitType"
                 , GetUnitType_function_type( &::CFuncUnit::GetUnitType ) );
+        
+        }
+        { //::CFuncUnit::HasEnterOffset
+        
+            typedef bool ( ::CFuncUnit::*HasEnterOffset_function_type )(  ) ;
+            
+            CFuncUnit_exposer.def( 
+                "HasEnterOffset"
+                , HasEnterOffset_function_type( &::CFuncUnit::HasEnterOffset ) );
         
         }
         { //::CFuncUnit::IRelationPriority
@@ -1568,6 +1587,16 @@ void register_CFuncUnit_class(){
                 "SetEnergy"
                 , SetEnergy_function_type( &::CFuncUnit::SetEnergy )
                 , ( bp::arg("iEnergy") ) );
+        
+        }
+        { //::CFuncUnit::SetEnterOffset
+        
+            typedef void ( ::CFuncUnit::*SetEnterOffset_function_type )( ::Vector const & ) ;
+            
+            CFuncUnit_exposer.def( 
+                "SetEnterOffset"
+                , SetEnterOffset_function_type( &::CFuncUnit::SetEnterOffset )
+                , ( bp::arg("enteroffset") ) );
         
         }
         { //::CFuncUnit::SetMaxEnergy

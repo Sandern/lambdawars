@@ -251,6 +251,11 @@ public:
 	// UNDONE: Make this data?
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
 
+	// Special code for moving to target buildings
+	virtual bool				HasEnterOffset( void );
+	virtual const Vector &		GetEnterOffset( void );
+	virtual void				SetEnterOffset( const Vector &enteroffset );
+
 #ifndef CLIENT_DLL
 	virtual int			OnTakeDamage( const CTakeDamageInfo &info );
 	int					TakeHealth( float flHealth, int bitsDamageType );
@@ -431,6 +436,9 @@ private:
 	// Entity relationships
 	CUtlVector<UnitRelationship_t>		m_Relationship;
 
+	bool m_bHasEnterOffset;
+	Vector m_vEnterOffset; 
+
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
 	CNetworkString(	m_NetworkedUnitType, MAX_PATH );
@@ -557,22 +565,30 @@ inline UnitBaseNavigator *CUnitBase::GetNavigator()
 	return m_pNavigator; 
 }
 
-/*
-inline boost::python::object CUnitBase::PyGetExpresser()
-{ 
-	return m_pyExpresser; 
-}
-*/
-
 inline bool CUnitBase::FastLOSCheck( const Vector &vTargetPos )
 {
 	CTraceFilterWorldOnly filter;
 	trace_t tr;
-	UTIL_TraceHull( GetAbsOrigin(), vTargetPos, WorldAlignMins(), WorldAlignMaxs(), m_iAttackLOSMask, 
-		&filter, &tr);
+	UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &filter, &tr);
 	return !tr.DidHit();
 }
 
 #endif // CLIENT_DLL
+
+inline bool CUnitBase::HasEnterOffset( void ) 
+{ 
+	return m_bHasEnterOffset; 
+}
+
+inline const Vector &CUnitBase::GetEnterOffset( void ) 
+{ 
+	return m_vEnterOffset; 
+}
+
+inline void CUnitBase::SetEnterOffset( const Vector &enteroffset )
+{ 
+	m_bHasEnterOffset = true;
+	m_vEnterOffset = enteroffset; 
+}
 
 #endif // UNIT_BASE_SHARED_H

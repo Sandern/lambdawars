@@ -76,6 +76,10 @@ public:
 	// Relationships
 	virtual Disposition_t		IRelationType( CBaseEntity *pTarget )						= 0;
 	virtual int					IRelationPriority( CBaseEntity *pTarget )					= 0;
+
+	// Special code for moving to target buildings
+	virtual bool				HasEnterOffset( void )										= 0;
+	virtual const Vector &		GetEnterOffset( void )										= 0;
 };
 
 #endif // IUNIT_H

@@ -1553,6 +1553,16 @@ void register_C_UnitBase_class(){
                 , GetEnergy_function_type( &::C_UnitBase::GetEnergy ) );
         
         }
+        { //::C_UnitBase::GetEnterOffset
+        
+            typedef ::Vector const & ( ::C_UnitBase::*GetEnterOffset_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "GetEnterOffset"
+                , GetEnterOffset_function_type( &::C_UnitBase::GetEnterOffset )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::C_UnitBase::GetIMouse
         
             typedef ::IMouse * ( ::C_UnitBase::*GetIMouse_function_type )(  ) ;
@@ -1651,6 +1661,15 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.def( 
                 "GetUnitType"
                 , GetUnitType_function_type( &::C_UnitBase::GetUnitType ) );
+        
+        }
+        { //::C_UnitBase::HasEnterOffset
+        
+            typedef bool ( ::C_UnitBase::*HasEnterOffset_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "HasEnterOffset"
+                , HasEnterOffset_function_type( &::C_UnitBase::HasEnterOffset ) );
         
         }
         { //::C_UnitBase::IRelationPriority
@@ -1897,6 +1916,16 @@ void register_C_UnitBase_class(){
                 "SetDefaultEyeOffset"
                 , SetDefaultEyeOffset_function_type( &::C_UnitBase::SetDefaultEyeOffset )
                 , ( bp::arg("pCustomOfset")=bp::object() ) );
+        
+        }
+        { //::C_UnitBase::SetEnterOffset
+        
+            typedef void ( ::C_UnitBase::*SetEnterOffset_function_type )( ::Vector const & ) ;
+            
+            C_UnitBase_exposer.def( 
+                "SetEnterOffset"
+                , SetEnterOffset_function_type( &::C_UnitBase::SetEnterOffset )
+                , ( bp::arg("enteroffset") ) );
         
         }
         { //::C_UnitBase::SetUseCustomCanBeSeenCheck

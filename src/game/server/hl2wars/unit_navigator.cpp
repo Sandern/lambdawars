@@ -1064,7 +1064,7 @@ float UnitBaseNavigator::CalculateAvgDistHistory()
 // Purpose: Do goal checks and update our path
 //			Returns the new goal status.
 //-----------------------------------------------------------------------------
-CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist )
+CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist )
 {
 	// Reset here, because it might not regenerate the list
 	m_iConsiderSize = 0;
@@ -1174,7 +1174,18 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				bPathBlocked = UpdateReactivePath();
 			}
 
-			fGoalDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
+			if( /*GetPath()->CurWaypointIsGoal() &&*/ m_fGoalDistance < GetPath()->m_fMinRange )
+			{
+				// Back off if too close
+				vPathDir = GetAbsOrigin() - GetPath()->m_vGoalPos;
+				vPathDir.z = 0.0f;
+				fWaypointDist = VectorNormalize( vPathDir );
+			}
+			else
+			{
+				// Calculate path direction to next waypoint
+				fWaypointDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
+			}
 		}
 
 		// Path might be blocked. Recompute or add density seeds
@@ -1397,7 +1408,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint()
 
 	if( GetPath()->CurWaypointIsGoal() )
 	{
-		if( waypointDist <= MIN(tolerance, GetPath()->m_fGoalTolerance) )
+		if( waypointDist <= MIN(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
 		{
 			if( unit_navigator_debug.GetInt() > 1 )
 				DevMsg("#%d: In range goal waypoint (distance: %f, tol: %f, goaltol: %f)\n", 
@@ -1806,7 +1817,7 @@ void UnitBaseNavigator::UpdateBlockedStatus()
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::SetGoal( Vector &destination, float goaltolerance, int goalflags, bool avoidenemies )
 {
-	bool bResult = FindPath(GOALTYPE_POSITION, destination, goaltolerance, goalflags);
+	bool bResult = FindPath( GOALTYPE_POSITION, destination, goaltolerance, goalflags );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
@@ -1828,8 +1839,8 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 #endif // ENABLE_PYTHON
 		return false;
 	}
-	bool bResult = FindPath(GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags);
 	GetPath()->m_hTarget = pTarget;
+	bool bResult = FindPath( GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags, 0, 0, pTarget );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
@@ -1845,7 +1856,7 @@ bool UnitBaseNavigator::SetGoalInRange( Vector &destination, float maxrange, flo
 {
 	//CalculateDestinationInRange(&destination, destination, minrange, maxrange);
 
-	bool bResult = FindPath(GOALTYPE_POSITION_INRANGE, destination, goaltolerance, goalflags, minrange, maxrange);
+	bool bResult = FindPath( GOALTYPE_POSITION_INRANGE, destination, goaltolerance, goalflags, minrange, maxrange );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
@@ -1869,8 +1880,7 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 	}
 
 	// Find a path
-	bool bResult = FindPath(GOALTYPE_TARGETENT_INRANGE, pTarget->EyePosition(), goaltolerance, goalflags, minrange, maxrange);
-	GetPath()->m_hTarget = pTarget;
+	bool bResult = FindPath( GOALTYPE_TARGETENT_INRANGE, pTarget->EyePosition(), goaltolerance, goalflags, minrange, maxrange, pTarget );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
@@ -1987,7 +1997,7 @@ float UnitBaseNavigator::GetGoalDistance( void )
 //-----------------------------------------------------------------------------
 // Purpose: Creates, builds and finds a new path.
 //-----------------------------------------------------------------------------
-bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float fGoalTolerance, int iGoalFlags, float fMinRange, float fMaxRange)
+bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float fGoalTolerance, int iGoalFlags, float fMinRange, float fMaxRange, CBaseEntity *pTarget )
 {
 	if( unit_navigator_debug.GetBool() )
 	{
@@ -2055,8 +2065,9 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 	//GetPath()->m_waypointTolerance = (WorldAlignSize().x+WorldAlignSize().y)/2.0f;
 	GetPath()->m_waypointTolerance = GetEntityBoundingRadius( m_pOuter );
 	GetPath()->m_iGoalFlags = iGoalFlags;
-	GetPath()->m_fMinRange = 0.0f; //fMinRange; // TODO: Add support for minimum range.
+	GetPath()->m_fMinRange = fMinRange;
 	GetPath()->m_fMaxRange = fMaxRange;
+	GetPath()->m_hTarget = pTarget;
 	GetPath()->m_bSuccess = false;
 
 	if( GetPath()->m_iGoalType == GOALTYPE_POSITION ||
@@ -2382,7 +2393,10 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( const Vector &vGoalPos )
 
 	// If the startArea is the goalArea we are done.
 	if( startArea == goalArea )
+	{
+		NavDbgMsg("#%d BuildNavAreaPath: Start area is goal area, going direct\n", GetOuter()->entindex());
 		return new UnitBaseWaypoint(vGoalPos);
+	}
 
 	// Build route from navigation mesh
 	CUtlSymbol unittype( GetOuter()->GetUnitType() );
@@ -2428,15 +2442,36 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute()
 		return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
 	}
 
-	// Cheap: try to do trace from start to goal
-	waypoints = BuildLocalPath( GetPath()->m_vGoalPos );
-	if( waypoints )
-		return waypoints;
+	IUnit *pUnit = GetPath()->m_hTarget ? GetPath()->m_hTarget->GetIUnit() : NULL;
+	if( pUnit && pUnit->HasEnterOffset() )
+	{
+		Vector vOffset = pUnit->GetEnterOffset();
+		VectorYawRotate( vOffset, GetPath()->m_hTarget->GetAbsAngles()[YAW], vOffset );
+		Vector vEnterPoint = GetPath()->m_hTarget->GetAbsOrigin() + vOffset;
 
-	// Expensive: use nav mesh
-	waypoints = BuildNavAreaPath( GetPath()->m_vGoalPos );
-	if( waypoints )
+		NavDbgMsg("#%d BuildNavAreaPath: Building route to target enter point\n", GetOuter()->entindex());
+
+		// Expensive: use nav mesh
+		waypoints = BuildNavAreaPath( vEnterPoint );
+		
+		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( GetPath()->m_vGoalPos );
+		pEndWaypoint->SpecialGoalStatus = CHS_NOSIMPLIFY;
+		UnitBaseWaypoint *pLast = waypoints->GetLast();
+		pLast->SetNext( pEndWaypoint );
 		return waypoints;
+	}
+	else
+	{
+		// Cheap: try to do trace from start to goal
+		waypoints = BuildLocalPath( GetPath()->m_vGoalPos );
+		if( waypoints )
+			return waypoints;
+
+		// Expensive: use nav mesh
+		waypoints = BuildNavAreaPath( GetPath()->m_vGoalPos );
+		if( waypoints )
+			return waypoints;
+	}
 
 	// Fallback to a direct path
 	return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
@@ -2597,4 +2632,5 @@ void UnitBaseNavigator::DrawDebugInfo()
 	m_pOuter->EntityText( 4, UTIL_VarArgs("Threshold: %f\n", THRESHOLD), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 5, UTIL_VarArgs("DiscomfortWeight: %f\n", m_fDiscomfortWeight), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 6, UTIL_VarArgs("m_BlockedStatus: %d\n", m_BlockedStatus), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 7, UTIL_VarArgs("m_GoalStatus: %d\n", m_LastGoalStatus), 0, 255, 0, 0, 255 );
 }

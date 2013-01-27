@@ -1370,6 +1370,16 @@ void register_C_FuncUnit_class(){
                 , GetEnergy_function_type( &::C_FuncUnit::GetEnergy ) );
         
         }
+        { //::C_FuncUnit::GetEnterOffset
+        
+            typedef ::Vector const & ( ::C_FuncUnit::*GetEnterOffset_function_type )(  ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "GetEnterOffset"
+                , GetEnterOffset_function_type( &::C_FuncUnit::GetEnterOffset )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::C_FuncUnit::GetIMouse
         
             typedef ::IMouse * ( ::C_FuncUnit::*GetIMouse_function_type )(  ) ;
@@ -1417,6 +1427,15 @@ void register_C_FuncUnit_class(){
             C_FuncUnit_exposer.def( 
                 "GetUnitType"
                 , GetUnitType_function_type( &::C_FuncUnit::GetUnitType ) );
+        
+        }
+        { //::C_FuncUnit::HasEnterOffset
+        
+            typedef bool ( ::C_FuncUnit::*HasEnterOffset_function_type )(  ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "HasEnterOffset"
+                , HasEnterOffset_function_type( &::C_FuncUnit::HasEnterOffset ) );
         
         }
         { //::C_FuncUnit::IRelationPriority
@@ -1535,6 +1554,16 @@ void register_C_FuncUnit_class(){
                 "SetCanBeSeen"
                 , SetCanBeSeen_function_type( &::C_FuncUnit::SetCanBeSeen )
                 , ( bp::arg("canbeseen") ) );
+        
+        }
+        { //::C_FuncUnit::SetEnterOffset
+        
+            typedef void ( ::C_FuncUnit::*SetEnterOffset_function_type )( ::Vector const & ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "SetEnterOffset"
+                , SetEnterOffset_function_type( &::C_FuncUnit::SetEnterOffset )
+                , ( bp::arg("enteroffset") ) );
         
         }
         { //::C_FuncUnit::Spawn

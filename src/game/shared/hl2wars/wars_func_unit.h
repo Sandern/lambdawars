@@ -152,6 +152,11 @@ public:
 	virtual void		SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
 #endif // CLIENT_DLL
 
+	// Special code for moving to target buildings
+	virtual bool				HasEnterOffset( void );
+	virtual const Vector &		GetEnterOffset( void );
+	virtual void				SetEnterOffset( const Vector &enteroffset );
+
 public:
 	int m_iMaxHealth;
 
@@ -163,6 +168,9 @@ private:
 	int m_iAttackPriority;
 
 	bool m_bCanBeSeen;
+
+	bool m_bHasEnterOffset;
+	Vector m_vEnterOffset; 
 
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
@@ -216,5 +224,22 @@ inline void CFuncUnit::SetAttackPriority( int priority )
 {
 	m_iAttackPriority = priority;
 }
+
+inline bool CFuncUnit::HasEnterOffset( void ) 
+{ 
+	return m_bHasEnterOffset; 
+}
+
+inline const Vector &CFuncUnit::GetEnterOffset( void ) 
+{ 
+	return m_vEnterOffset; 
+}
+
+inline void CFuncUnit::SetEnterOffset( const Vector &enteroffset )
+{ 
+	m_bHasEnterOffset = true;
+	m_vEnterOffset = enteroffset; 
+}
+
 
 #endif // WARS_FUNC_UNIT_H

@@ -2004,6 +2004,16 @@ void register_CUnitBase_class(){
                 , GetEnergy_function_type( &::CUnitBase::GetEnergy ) );
         
         }
+        { //::CUnitBase::GetEnterOffset
+        
+            typedef ::Vector const & ( ::CUnitBase::*GetEnterOffset_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "GetEnterOffset"
+                , GetEnterOffset_function_type( &::CUnitBase::GetEnterOffset )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::CUnitBase::GetIMouse
         
             typedef ::IMouse * ( ::CUnitBase::*GetIMouse_function_type )(  ) ;
@@ -2092,6 +2102,15 @@ void register_CUnitBase_class(){
                 "HandleAnimEvent"
                 , HandleAnimEvent_function_type( &::CUnitBase::HandleAnimEvent )
                 , ( bp::arg("pEvent") ) );
+        
+        }
+        { //::CUnitBase::HasEnterOffset
+        
+            typedef bool ( ::CUnitBase::*HasEnterOffset_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "HasEnterOffset"
+                , HasEnterOffset_function_type( &::CUnitBase::HasEnterOffset ) );
         
         }
         { //::CUnitBase::HasRangeAttackLOS
@@ -2340,6 +2359,16 @@ void register_CUnitBase_class(){
                 "SetEnergy"
                 , SetEnergy_function_type( &::CUnitBase::SetEnergy )
                 , ( bp::arg("iEnergy") ) );
+        
+        }
+        { //::CUnitBase::SetEnterOffset
+        
+            typedef void ( ::CUnitBase::*SetEnterOffset_function_type )( ::Vector const & ) ;
+            
+            CUnitBase_exposer.def( 
+                "SetEnterOffset"
+                , SetEnterOffset_function_type( &::CUnitBase::SetEnterOffset )
+                , ( bp::arg("enteroffset") ) );
         
         }
         { //::CUnitBase::SetMaxEnergy
