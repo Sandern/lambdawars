@@ -1825,6 +1825,9 @@
     <ClCompile Include="..\shared\hl2wars\wars_plat_misc_win32.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="hl2\weapon_cguard.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\src_python_util.h">

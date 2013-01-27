@@ -58,6 +58,9 @@ public:
 
 #else
 
+// Creates a concussive blast effect
+void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, CBaseEntity *pOwner, float magnitude );
+
 #endif // CLIENT_DLL
 
 #endif // SRC_PYTHON_TE_H

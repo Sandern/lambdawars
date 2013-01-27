@@ -17,7 +17,7 @@
 class UnitBaseAirLocomotion : public UnitBaseLocomotion
 {
 public:
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseAirLocomotion( boost::python::object outer );
 #endif // DISABLE_PYTHON
 

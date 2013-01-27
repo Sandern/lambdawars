@@ -36,8 +36,8 @@
 # include <boost/python/object/value_holder.hpp>
 
 // List of forward declarations that have custom memory allocation.
-class IHandleEntity;
-class IParticleEffect;
+class IClientEntity;
+class IServerEntity;
 
 namespace boost { namespace python { namespace objects {
 
@@ -96,18 +96,18 @@ struct make_holder<N>
 #endif
             BOOST_PP_ENUM_TRAILING_BINARY_PARAMS_Z(1, N, t, a))
         {
-			typedef is_base_of<IHandleEntity, Holder::value_type> is_IHandleEntity;
-			typedef is_base_of<IParticleEffect, Holder::value_type> is_IParticleEffect;
+			typedef is_base_of<IClientEntity, Holder::value_type> is_IClientEntity;
+			typedef is_base_of<IServerEntity, Holder::value_type> is_IServerEntity;
 
 			typedef typename mpl::if_<
-				is_IHandleEntity
+				is_IClientEntity
 				, value_holder_custom<Holder::value_type>
 				, Holder
 			>::type NewHolder;
 
 			typedef typename mpl::if_<
-				is_IParticleEffect
-				, Holder
+				is_IServerEntity
+				, value_holder_custom<Holder::value_type>
 				, NewHolder
 			>::type NewHolder2;
 

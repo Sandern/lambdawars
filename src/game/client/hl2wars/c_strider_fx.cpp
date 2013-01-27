@@ -296,7 +296,7 @@ void Strider_DrawLine( const Vector &start, const Vector &end, float width, IMat
 	FX_DrawLineFade( start, end, width, pMaterial, color, 8.0f );
 }
 
-int	C_StriderFX::DrawModel( int )
+int	C_StriderFX::DrawModel( int flags, const RenderableInstance_t &instance )
 {
 	static color32 white = {255,255,255,255};
 	Vector params[STRIDERFX_PARAMETERS];

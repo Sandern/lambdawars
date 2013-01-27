@@ -2249,6 +2249,9 @@
     <ClCompile Include="hl2wars\coreorigin_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
+    <ClCompile Include="hl2\c_te_concussiveexplosion.cpp">
+      <Filter>Source Files\From HL2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\src_python_util.h">

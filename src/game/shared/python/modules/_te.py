@@ -43,6 +43,8 @@ class TE(GenerateModuleSemiShared):
     def ParseServer(self, mb):
         mb.class_('CEffectData').vars('m_nEntIndex').exclude()
         
+        mb.free_function('CreateConcussiveBlast').include()
+        
     def ParseClient(self, mb):
         # Don't care
         mb.class_('CEffectData').mem_funs().exclude()

@@ -56,7 +56,7 @@ public:
 		BaseClass::EffectShutdown();
 	}
 
-	virtual int	DrawModel( int flags );
+	virtual int	DrawModel( int flags, const RenderableInstance_t &instance );
 	virtual void LimitTime( float tmax ) 
 	{ 
 		float dt = tmax - m_t;

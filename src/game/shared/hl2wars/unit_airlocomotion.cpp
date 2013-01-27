@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "unit_airlocomotion.h"
 #include "movevars_shared.h"
+#include "coordsize.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -14,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitBaseAirLocomotion::UnitBaseAirLocomotion( boost::python::object outer )
 	:UnitBaseLocomotion(outer)
 {
@@ -24,7 +25,7 @@ UnitBaseAirLocomotion::UnitBaseAirLocomotion( boost::python::object outer )
 	m_fFlyCurNoise = 0.0f;
 	m_bFlyNoiseUp = true;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // 
@@ -63,7 +64,7 @@ void UnitBaseAirLocomotion::FullAirMove()
 		else
 			mv->velocity.z = MIN(fDiff, mv->maxspeed);
 
-		if( m_fFlyNoiseZ && mv->sidemove == 0.0f && mv->forwardmove == 0.0f  )
+		if( m_fFlyNoiseZ > DIST_EPSILON && mv->sidemove == 0.0f && mv->forwardmove == 0.0f  )
 		{
 			if( m_bFlyNoiseUp )
 			{

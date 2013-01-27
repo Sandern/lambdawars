@@ -283,15 +283,6 @@ BOOST_PYTHON_MODULE(_te){
             , (void ( ::C_EnvelopeFX::* )( float ) )( &::C_EnvelopeFX::LimitTime )
             , ( bp::arg("tmax") ) )    
         .def( 
-            "PyAllocate"
-            , (void * (*)( ::PyObject *,::size_t,::size_t ))( &::C_EnvelopeFX::PyAllocate )
-            , ( bp::arg("self_"), bp::arg("holder_offset"), bp::arg("holder_size") )
-            , bp::return_value_policy< bp::return_opaque_pointer >() )    
-        .def( 
-            "PyDeallocate"
-            , (void (*)( ::PyObject *,void * ))( &::C_EnvelopeFX::PyDeallocate )
-            , ( bp::arg("self_"), bp::arg("storage") ) )    
-        .def( 
             "RemoveRenderable"
             , (void ( C_EnvelopeFX_wrapper::* )(  ) )(&C_EnvelopeFX_wrapper::RemoveRenderable) )    
         .def( 
@@ -323,15 +314,13 @@ BOOST_PYTHON_MODULE(_te){
         .def( 
             "GetRenderBounds"
             , bp::pure_virtual( (void ( ::IClientRenderable::* )( ::Vector &,::Vector & ) )(&::IClientRenderable::GetRenderBounds) )
-            , ( bp::arg("mins"), bp::arg("maxs") ) )    
-        .staticmethod( "PyAllocate" )    
-        .staticmethod( "PyDeallocate" );
+            , ( bp::arg("mins"), bp::arg("maxs") ) );
 
     bp::class_< C_StriderFX_wrapper, bp::bases< C_EnvelopeFX > >( "C_StriderFX", bp::init< >() )    
         .def( 
             "DrawModel"
-            , (int ( ::C_StriderFX::* )( int ) )( &::C_StriderFX::DrawModel )
-            , ( bp::arg("flags") ) )    
+            , (int ( ::C_StriderFX::* )( int,::RenderableInstance_t const & ) )( &::C_StriderFX::DrawModel )
+            , ( bp::arg("flags"), bp::arg("instance") ) )    
         .def( 
             "EffectInit"
             , (void ( ::C_StriderFX::* )( int,int ) )( &::C_StriderFX::EffectInit )
@@ -1368,6 +1357,17 @@ BOOST_PYTHON_MODULE(_te){
             "WorldDecal"
             , (void ( ::ITempEntsSystem::* )( ::IRecipientFilter &,float,::Vector const *,int ) )( &::ITempEntsSystem::WorldDecal )
             , ( bp::arg("filer"), bp::arg("delay"), bp::arg("pos"), bp::arg("index") ) );
+
+    { //::CreateConcussiveBlast
+    
+        typedef void ( *CreateConcussiveBlast_function_type )( ::Vector const &,::Vector const &,::CBaseEntity *,float );
+        
+        bp::def( 
+            "CreateConcussiveBlast"
+            , CreateConcussiveBlast_function_type( &::CreateConcussiveBlast )
+            , ( bp::arg("origin"), bp::arg("surfaceNormal"), bp::arg("pOwner"), bp::arg("magnitude") ) );
+    
+    }
 
     { //::DispatchEffect
     
