@@ -111,18 +111,35 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 #define ROUND_TO_TICKS( t )		( TICK_INTERVAL * TIME_TO_TICKS( t ) )
 #define TICK_NEVER_THINK		(-1)
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void UnitBaseLocomotion::PerformMovement( UnitBaseMoveCommand &mv )
 {
 	VPROF_BUDGET( "UnitBaseLocomotion::PerformMovement", VPROF_BUDGETGROUP_UNITS );
-
-	//static Vector vDebugOrigin = vec3_origin;
-	//Msg("Diff last origin: %f\n", (vDebugOrigin-GetLocalOrigin()).Length());
-	//vDebugOrigin = GetLocalOrigin();
-	//mv->interval = mv->interval; //ROUND_TO_TICKS(mv->interval);
 	SetupMove(mv);
 	Move(mv.interval, mv);
 	FinishMove(mv);
 }
+
+//-----------------------------------------------------------------------------
+// Purpose
+//-----------------------------------------------------------------------------
+void UnitBaseLocomotion::PerformMovementFacingOnly( UnitBaseMoveCommand &move_command )
+{
+	VPROF_BUDGET( "UnitBaseLocomotion::PerformMovementFacingOnly", VPROF_BUDGETGROUP_UNITS );
+	SetupMove(move_command);
+	
+	mv = &move_command;
+
+	mv->interval = move_command.interval;
+	mv->outwishvel.Init();
+
+	MoveFacing();
+
+	FinishMove(move_command);
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Setup/Finish a move

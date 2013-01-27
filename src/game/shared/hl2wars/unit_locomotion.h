@@ -119,6 +119,7 @@ public:
 
 	// Main function
 	virtual void PerformMovement( UnitBaseMoveCommand &mv );
+	virtual void PerformMovementFacingOnly( UnitBaseMoveCommand &mv );
 
 	// Facing
 	virtual void	MoveFacing();
@@ -213,15 +214,9 @@ inline void UnitBaseLocomotion::TraceUnitBBox( const Vector& start, const Vector
 	ray.Init( start, end, m_vecMins, m_vecMaxs );
 	CTraceFilterUnitNav filter(m_pOuter, m_pOuter, collisionGroup);
 	//CTraceFilterSimple filter(m_pOuter, collisionGroup);
-#ifdef HL2WARS_ASW_DLL
 	if ( m_pTraceListData && m_pTraceListData->CanTraceRay(ray) )
 	{
 		enginetrace->TraceRayAgainstLeafAndEntityList( ray, m_pTraceListData, fMask, &filter, &pm );
-#else
-	if ( m_pTraceListData )
-	{
-		enginetrace->TraceRayAgainstLeafAndEntityList( ray, *m_pTraceListData, fMask, &filter, &pm );
-#endif // HL2WARS_ASW_DLL
 	}
 	else
 	{

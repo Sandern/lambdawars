@@ -19,9 +19,9 @@ class UnitBaseSense : public UnitComponent
 public:
 	friend class CUnitBase;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseSense( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	void PerformSensing();
 	void ForcePerformSensing();
@@ -42,13 +42,16 @@ public:
 	CBaseEntity *GetEnemy( int idx );
 	CBaseEntity *GetOther( int idx );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	bp::object PyGetEnemy( int idx );
 	bp::object PyGetOther( int idx );
 
 	bp::list PyGetEnemies( const char *unittype = NULL );
 	bp::list PyGetOthers( const char *unittype = NULL );
-#endif // DISABLE_PYTHON
+
+	bool AddEnenmyInRangeCallback( boost::python::object callback, int range, float frequency );
+	bool RemoveEnemyInRangeCallback( boost::python::object callback, int range = -1 );
+#endif // ENABLE_PYTHON
 
 	int CountEnemiesInRange( float range );
 	int CountOthersInRange( float range );
@@ -76,6 +79,14 @@ private:
 	float m_fViewCone;
 	float m_fNextSenseTime;
 	bool m_bTestLOS;
+
+	struct RangeCallback_t {
+		boost::python::object callback;
+		int range; 
+		float frequency;
+		float nextchecktime;
+	};
+	CUtlVector<RangeCallback_t> m_Callbacks;
 };
 
 // Inlines
@@ -134,7 +145,7 @@ inline CBaseEntity *UnitBaseSense::GetOther( int idx )
 	return m_SeenOther.Element(idx).entity;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 inline bp::object UnitBaseSense::PyGetEnemy( int idx )
 {
 	CBaseEntity *pEnt = GetEnemy(idx);
@@ -146,6 +157,6 @@ inline bp::object UnitBaseSense::PyGetOther( int idx )
 	CBaseEntity *pEnt = GetOther(idx);
 	return pEnt ? pEnt->GetPyHandle() : bp::object();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #endif // UNITSENSE_H

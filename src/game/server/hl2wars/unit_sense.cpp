@@ -129,7 +129,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	{
 		pOther = ppUnits[i];
 
-		otherDist = origin.DistToSqr(pOther->GetAbsOrigin());
+		//otherDist = origin.DistToSqr(pOther->GetAbsOrigin());
+		otherDist = origin.AsVector2D().DistToSqr(pOther->GetAbsOrigin().AsVector2D());
 		if( otherDist > distSqr )
 			continue;
 
@@ -168,7 +169,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		if( !TestEntity( pFuncOther ) )
 			continue;
 
-		otherDist = origin.DistToSqr(pFuncOther->GetAbsOrigin());
+		otherDist = origin.AsVector2D().DistToSqr(pFuncOther->GetAbsOrigin().AsVector2D());
+		//otherDist = origin.DistToSqr(pFuncOther->GetAbsOrigin());
 		if( otherDist > distSqr )
 			continue;
 
@@ -203,7 +205,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		if( pEntOther && !pEntOther->IsUnit() && 
 			GetOuter()->m_Relationship[i].disposition == D_HT )
 		{
-			otherDist = origin.DistToSqr(pEntOther->GetAbsOrigin());
+			otherDist = origin.AsVector2D().DistToSqr(pEntOther->GetAbsOrigin().AsVector2D());
+			//otherDist = origin.DistToSqr(pEntOther->GetAbsOrigin());
 			if( otherDist > distSqr )
 				continue;
 
@@ -232,6 +235,22 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			}
 		}
 	}
+
+	// Execute callback if within enemy range
+#ifdef ENABLE_PYTHON
+	for( int i = m_Callbacks.Count()-1; i >= 0; i-- )
+	{
+		RangeCallback_t &callback = m_Callbacks[i];
+		if( callback.nextchecktime > gpGlobals->curtime )
+			continue;
+
+		if( fBestEnemyDist < (callback.range*callback.range) )
+		{
+			callback.nextchecktime = gpGlobals->curtime + callback.frequency;
+			callback.callback();
+		}
+	}
+#endif // ENABLE_PYTHON
 
 	return CountSeen();
 }
@@ -290,7 +309,7 @@ CBaseEntity *UnitBaseSense::GetNearestOther()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 {
 	bp::list units;
@@ -325,4 +344,44 @@ bp::list UnitBaseSense::PyGetOthers( const char *unittype )
 	}
 	return units;
 }
-#endif // DISABLE_PYTHON
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool UnitBaseSense::AddEnenmyInRangeCallback( boost::python::object callback, int range, float frequency )
+{
+	for( int i = 0; i < m_Callbacks.Count(); i++ )
+	{
+		if( m_Callbacks[i] == callback && m_Callbacks[i].range == range )
+			return false;
+	}
+
+	m_Callbacks.AddToTail();
+	RangeCallback_t &callbackinfo = m_Callbacks.Tail();
+
+	callbackinfo.callback = callback;
+	callbackinfo.range = range;
+	callbackinfo.frequency = frequency;
+	callbackinfo.nextchecktime = gpGlobals->curtime;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool UnitBaseSense::RemoveEnemyInRangeCallback( boost::python::object callback, int range )
+{
+	for( int i = 0; i < m_Callbacks.Count(); i++ )
+	{
+		if( m_Callbacks[i] == callback && m_Callbacks[i].range == range )
+		{
+			m_Callbacks.Remove( i );
+			return true;
+		}
+	}
+	return false;
+}
+
+#endif // ENABLE_PYTHON
+

@@ -1435,6 +1435,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("mv") ) );
         
         }
+        { //::UnitBaseLocomotion::PerformMovementFacingOnly
+        
+            typedef void ( ::UnitBaseLocomotion::*PerformMovementFacingOnly_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "PerformMovementFacingOnly"
+                , PerformMovementFacingOnly_function_type( &::UnitBaseLocomotion::PerformMovementFacingOnly )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //::UnitBaseLocomotion::SetupMove
         
             typedef void ( ::UnitBaseLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -4925,6 +4935,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("mv") ) );
         
         }
+        { //::UnitBaseLocomotion::PerformMovementFacingOnly
+        
+            typedef void ( ::UnitBaseLocomotion::*PerformMovementFacingOnly_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "PerformMovementFacingOnly"
+                , PerformMovementFacingOnly_function_type( &::UnitBaseLocomotion::PerformMovementFacingOnly )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //::UnitBaseLocomotion::SetupMove
         
             typedef void ( ::UnitBaseLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -5617,6 +5637,16 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseSense_exposer_t UnitBaseSense_exposer = UnitBaseSense_exposer_t( "UnitBaseSense", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseSense_scope( UnitBaseSense_exposer );
         bp::implicitly_convertible< bp::object, UnitBaseSense >();
+        { //::UnitBaseSense::AddEnenmyInRangeCallback
+        
+            typedef bool ( ::UnitBaseSense::*AddEnenmyInRangeCallback_function_type )( ::boost::python::object,int,float ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "AddEnenmyInRangeCallback"
+                , AddEnenmyInRangeCallback_function_type( &::UnitBaseSense::AddEnenmyInRangeCallback )
+                , ( bp::arg("callback"), bp::arg("range"), bp::arg("frequency") ) );
+        
+        }
         { //::UnitBaseSense::CountEnemiesInRange
         
             typedef int ( ::UnitBaseSense::*CountEnemiesInRange_function_type )( float ) ;
@@ -5750,6 +5780,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "GetOthers"
                 , GetOthers_function_type( &::UnitBaseSense::PyGetOthers )
                 , ( bp::arg("unittype")=bp::object() ) );
+        
+        }
+        { //::UnitBaseSense::RemoveEnemyInRangeCallback
+        
+            typedef bool ( ::UnitBaseSense::*RemoveEnemyInRangeCallback_function_type )( ::boost::python::object,int ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "RemoveEnemyInRangeCallback"
+                , RemoveEnemyInRangeCallback_function_type( &::UnitBaseSense::RemoveEnemyInRangeCallback )
+                , ( bp::arg("callback"), bp::arg("range")=(int)(-0x000000001) ) );
         
         }
         { //::UnitBaseSense::SetUseLimitedViewCone
