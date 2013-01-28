@@ -168,6 +168,8 @@ CUnitBase::CUnitBase() : m_bUseCheapShotSimulation(true), m_fAccuracy(1.0f), m_b
 	m_bFOWFilterFriendly = true;
 #else
 	SetPredictionEligible( true );
+
+	m_bUpdateClientAnimations = true;
 #endif // CLIENT_DLL
 
 	AddToUnitList();

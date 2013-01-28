@@ -276,26 +276,29 @@ bool CUnitBase::ShouldDraw( void )
 
 void CUnitBase::UpdateClientSideAnimation()
 {
-	// Yaw and Pitch are updated in UserCmd if the unit has a commander
-	if( !GetCommander() )
+	if( m_bUpdateClientAnimations )
 	{
-		if( GetActiveWeapon() )
+		// Yaw and Pitch are updated in UserCmd if the unit has a commander
+		if( !GetCommander() )
 		{
-			AimGun();
+			if( GetActiveWeapon() )
+			{
+				AimGun();
+			}
+			else
+			{
+				m_fEyePitch = EyeAngles()[PITCH];
+				m_fEyeYaw = EyeAngles()[YAW];
+			}
 		}
-		else
+
+		if( GetSequence() != -1 )
+			FrameAdvance(gpGlobals->frametime);
+
+		if( m_pAnimState )
 		{
-			m_fEyePitch = EyeAngles()[PITCH];
-			m_fEyeYaw = EyeAngles()[YAW];
+			m_pAnimState->Update(m_fEyeYaw, m_fEyePitch);
 		}
-	}
-
-	if( GetSequence() != -1 )
-		FrameAdvance(gpGlobals->frametime);
-
-	if( m_pAnimState )
-	{
-		m_pAnimState->Update(m_fEyeYaw, m_fEyePitch);
 	}
 
 	if( GetSequence() != -1 )

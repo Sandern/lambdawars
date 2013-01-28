@@ -414,6 +414,9 @@ public:
 #else
 	// CLIENT VARIABLES
 	int m_iMaxHealth;
+
+	// Animation
+	bool m_bUpdateClientAnimations;
 #endif // CLIENT_DLL
 
 protected:

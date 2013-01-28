@@ -2010,6 +2010,7 @@ void register_C_UnitBase_class(){
         
         }
         C_UnitBase_exposer.def_readwrite( "fowfilterfriendly", &C_UnitBase::m_bFOWFilterFriendly );
+        C_UnitBase_exposer.def_readwrite( "updateclientanimations", &C_UnitBase::m_bUpdateClientAnimations );
         C_UnitBase_exposer.def_readwrite( "usecheapshotsimulation", &C_UnitBase::m_bUseCheapShotSimulation );
         C_UnitBase_exposer.def_readwrite( "accuracy", &C_UnitBase::m_fAccuracy );
         C_UnitBase_exposer.def_readwrite( "eyepitch", &C_UnitBase::m_fEyePitch );

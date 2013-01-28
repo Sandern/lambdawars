@@ -1273,6 +1273,8 @@ class Entities(GenerateModuleSemiShared):
                              , cls.mem_fun('IsCrouching')) 
             cls.add_property( 'climbing'
                              , cls.mem_fun('IsClimbing')) 
+                             
+            cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
         else:
             cls.mem_funs('EnemyDistance').exclude() 
             AddWrapReg( mb, 'CUnitBase', cls.mem_fun('EnemyDistance'), [CreateEntityArg('pEnemy')] )
