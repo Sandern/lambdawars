@@ -21,7 +21,7 @@ Py++ is used to generate the actually bindings. You can find more information at
 http://sourceforge.net/projects/pygccxml/
 
 Generating the modules (requires Python 2.7):
-Open a commmand prompt and go to the srcpypp folder.
+Open a command prompt and go to the srcpypp folder.
 From here you can run a few commands:
 - Generate bindings for all modules: python generate_mods
 - Generate bindings for a single module: python generate_mods -m module_name
