@@ -543,7 +543,7 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 		return;
 
 	// Don't change enemy if very nearby
-	if( pBest && pEnemy && pEnemy->GetAbsOrigin().DistToSqr( pBest->GetAbsOrigin() ) < (128.0*128.0f) )
+	if( pBest && pEnemy && pEnemy->GetAbsOrigin().DistToSqr( pBest->GetAbsOrigin() ) < m_fEnemyChangeToleranceSqr )
 		return;
 
 	SetEnemy(pBest);

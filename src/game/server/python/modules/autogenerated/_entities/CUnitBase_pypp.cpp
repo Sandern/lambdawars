@@ -2510,6 +2510,7 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.def_readwrite( "usecheapshotsimulation", &CUnitBase::m_bUseCheapShotSimulation );
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
         CUnitBase_exposer.def_readwrite( "deathdrop", &CUnitBase::m_fDeathDrop );
+        CUnitBase_exposer.def_readwrite( "enemychangetolerancesqr", &CUnitBase::m_fEnemyChangeToleranceSqr );
         CUnitBase_exposer.def_readwrite( "eyepitch", &CUnitBase::m_fEyePitch );
         CUnitBase_exposer.def_readwrite( "eyeyaw", &CUnitBase::m_fEyeYaw );
         CUnitBase_exposer.def_readwrite( "maxclimbheight", &CUnitBase::m_fMaxClimbHeight );

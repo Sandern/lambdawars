@@ -411,6 +411,9 @@ public:
 	float m_fMaxClimbHeight;
 	float m_fTestRouteStartHeight;
 	float m_fMinSlope;
+
+	// Enemy related
+	float m_fEnemyChangeToleranceSqr;
 #else
 	// CLIENT VARIABLES
 	int m_iMaxHealth;

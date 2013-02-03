@@ -1285,6 +1285,8 @@ class Entities(GenerateModuleSemiShared):
             cls.vars('m_fTestRouteStartHeight').rename('testroutestartheight')
             cls.vars('m_fMinSlope').rename('minslope')
             
+            cls.vars('m_fEnemyChangeToleranceSqr').rename('enemychangetolerancesqr')
+            
             cls.mem_funs('SetEnemy').exclude() 
             cls.add_property( 'enemy'
                              , cls.mem_fun('GetEnemy')
