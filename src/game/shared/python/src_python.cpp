@@ -332,6 +332,7 @@ void CSrcPython::ExtraShutdown( void )
 	// Finalize
 	m_bPythonIsFinalizing = true;
 	PyErr_Clear(); // Make sure it does not hold any references...
+	GarbageCollect();
 	Py_Finalize();
 #ifdef WIN32
 	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash.

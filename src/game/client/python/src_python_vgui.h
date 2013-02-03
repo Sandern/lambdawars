@@ -180,7 +180,7 @@ public:
 
 #ifdef HL2WARS_ASW_DLL
 PyObject *GetPyPanel( Panel *pPanel );
-void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel );
+void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx = -1 );
 
 //=============================================================================
 // Message handling. Can't be merged in Panel, since we do not have the source code :(

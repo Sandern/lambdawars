@@ -174,12 +174,12 @@ void PyPanel::DrawFromSBuffer( CallBuffer_t &CallBuffer )
 //-----------------------------------------------------------------------------
 void DestroyPyPanels()
 {
-#if 0 // Just crash. Screw this.
+#if 1 // Just crash. Screw this.
 	DevMsg("Clearing %d python panels\n", g_PyPanels.Count());
 
 	for( int i = g_PyPanels.Count()-1; i >= 0; i-- )
 	{
-		PyDeletePanel( dynamic_cast<Panel *>(g_PyPanels[i]), g_PyPanels[i]->GetPySelf() ); 
+		PyDeletePanel( dynamic_cast<Panel *>(g_PyPanels[i]), g_PyPanels[i]->GetPySelf(), i ); 
 	}
 
 	vgui::ivgui()->RunFrame();
@@ -244,7 +244,7 @@ PyObject *GetPyPanel( Panel *pPanel )
 	return NULL;
 }
 
-void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel )
+void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 {
 	if( !pPanel || !pPyPanel )
 	{
@@ -262,7 +262,10 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel )
 	pIPyPanel->m_bPyDeleted = true;
 	//Msg("Removing py panel (%d active)\n", g_PyPanels.Count());
 	// Remove from list
-	g_PyPanels.FindAndRemove( pIPyPanel );
+	if( iRemoveIdx != -1 )
+		g_PyPanels.Remove( iRemoveIdx );
+	else
+		g_PyPanels.FindAndRemove( pIPyPanel );
 
 	if( !SrcPySystem()->IsPythonRunning() )
 	{
