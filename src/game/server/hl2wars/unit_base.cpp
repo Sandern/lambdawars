@@ -419,6 +419,8 @@ void CUnitBase::Spawn( void )
 {
 	BaseClass::Spawn();
 
+	SetGlobalFadeScale( 0.0f );
+
 	// If owernumber wasn't changed yet, trigger on change once
 	if( GetOwnerNumber() == 0 )
 		OnChangeOwnerNumber(0);

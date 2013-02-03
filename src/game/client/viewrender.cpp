@@ -1298,13 +1298,11 @@ void CViewRender::GetScreenFadeDistances( float *pMin, float *pMax )
 	if ( pMin )
 	{
 		*pMin = m_FadeData.m_flPixelMin;
-		Msg("Min fade distance: %f\n", *pMin);
 	}
 
 	if ( pMax )
 	{
 		*pMax = m_FadeData.m_flPixelMax;
-		Msg("Max fade distance: %f\n", *pMax);
 	}
 
 	// A complete, brutal hack, necessitated by our next-week ship date. 
@@ -1330,7 +1328,6 @@ void CViewRender::GetScreenFadeDistances( float *pMin, float *pMax )
 			}
 		}
 	}
-
 }
 
 void CViewRender::OnScreenFadeMinSize( const CCommand &args )

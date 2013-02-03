@@ -175,6 +175,17 @@ void CUnitBase::OnHoverPaint()
 // Purpose: 
 // Input  : updateType - 
 //-----------------------------------------------------------------------------
+void CUnitBase::Spawn( )
+{
+	BaseClass::Spawn();
+
+	SetGlobalFadeScale( 0.0f );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : updateType - 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );

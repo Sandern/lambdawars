@@ -161,8 +161,9 @@ public:
 	CUnitBase *GetNext() { return m_pNext; }
 	virtual void OnChangeOwnerNumberInternal( int old_owner_number );
 
-#ifndef CLIENT_DLL
 	virtual void Spawn( void );
+
+#ifndef CLIENT_DLL
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 
 	Class_T Classify ( void );

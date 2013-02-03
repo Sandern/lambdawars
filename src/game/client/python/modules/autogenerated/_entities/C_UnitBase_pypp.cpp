@@ -472,6 +472,36 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
         return C_UnitBase::ShouldDraw( );
     }
 
+    virtual void Spawn(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling Spawn(  ) of Class: C_UnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_Spawn = this->get_override( "Spawn" );
+        if( func_Spawn.ptr() != Py_None )
+            try {
+                func_Spawn(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_UnitBase::Spawn(  );
+            }
+        else
+            this->C_UnitBase::Spawn(  );
+    }
+    
+    void default_Spawn(  ) {
+        C_UnitBase::Spawn( );
+    }
+
     virtual void UpdateOnRemove(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1018,36 +1048,6 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
     
     bool default_Simulate(  ) {
         return C_BaseAnimating::Simulate( );
-    }
-
-    virtual void Spawn(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: C_BaseFlex\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Spawn = this->get_override( "Spawn" );
-        if( func_Spawn.ptr() != Py_None )
-            try {
-                func_Spawn(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_BaseFlex::Spawn(  );
-            }
-        else
-            this->C_BaseFlex::Spawn(  );
-    }
-    
-    void default_Spawn(  ) {
-        C_BaseFlex::Spawn( );
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
@@ -1958,6 +1958,17 @@ void register_C_UnitBase_class(){
                 , ShouldPredict_function_type( &::C_UnitBase::ShouldPredict ) );
         
         }
+        { //::C_UnitBase::Spawn
+        
+            typedef void ( ::C_UnitBase::*Spawn_function_type )(  ) ;
+            typedef void ( C_UnitBase_wrapper::*default_Spawn_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "Spawn"
+                , Spawn_function_type(&::C_UnitBase::Spawn)
+                , default_Spawn_function_type(&C_UnitBase_wrapper::default_Spawn) );
+        
+        }
         { //::C_UnitBase::TraceAttack
         
             typedef void ( ::C_UnitBase::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
@@ -2221,17 +2232,6 @@ void register_C_UnitBase_class(){
                 "Simulate"
                 , Simulate_function_type(&::C_BaseAnimating::Simulate)
                 , default_Simulate_function_type(&C_UnitBase_wrapper::default_Simulate) );
-        
-        }
-        { //::C_BaseFlex::Spawn
-        
-            typedef void ( ::C_BaseFlex::*Spawn_function_type )(  ) ;
-            typedef void ( C_UnitBase_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            C_UnitBase_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::C_BaseFlex::Spawn)
-                , default_Spawn_function_type(&C_UnitBase_wrapper::default_Spawn) );
         
         }
         { //::C_BaseEntity::StartTouch
