@@ -567,6 +567,8 @@ private:
 //-----------------------------------------------------------------------------
 void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 {
+	VPROF_BUDGET( "CUnitBase::FireBullets", VPROF_BUDGETGROUP_UNITS );
+
 	static int	tracerCount;
 	trace_t		tr;
 	CAmmoDef*	pAmmoDef	= GetAmmoDef();

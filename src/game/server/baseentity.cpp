@@ -4203,7 +4203,6 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
 
 	// HL2Wars: Don't send when in the fow for the recv player.
-	//Msg("%s Send? FOWFLAGS: %d, ShouldTransmitInFOW(): %d, recipient owner: %d, my owner: %d\n", GetClassname(), (GetFOWFlags() & FOWFLAG_NOTRANSMIT), ShouldTransmitInFOW( pRecipientPlayer->GetOwnerNumber() ), pRecipientPlayer->GetOwnerNumber(), GetOwnerNumber());
 	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
 		return FL_EDICT_DONTSEND;

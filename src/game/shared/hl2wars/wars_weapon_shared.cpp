@@ -54,6 +54,8 @@ CHL2WarsPlayer* CWarsWeapon::GetCommander()
 //-----------------------------------------------------------------------------
 void CWarsWeapon::PrimaryAttack( void )
 {
+	VPROF_BUDGET( "CWarsWeapon::PrimaryAttack", VPROF_BUDGETGROUP_UNITS );
+
 	CUnitBase *pOwner = GetOwner()  ? GetOwner()->MyUnitPointer() : NULL;
 	if( !pOwner )
 		return;

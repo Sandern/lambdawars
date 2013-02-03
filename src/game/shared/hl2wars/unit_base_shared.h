@@ -167,6 +167,10 @@ public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 
 	Class_T Classify ( void );
+	
+	virtual int ShouldTransmit( const CCheckTransmitInfo *pInfo );
+
+	bool UseMinimalSendTable(); // Only used by proxies
 #endif // CLIENT_DLL
 
 	// IMouse implementation
@@ -450,6 +454,8 @@ private:
 	string_t						m_UnitType;
 	CNetworkString(	m_NetworkedUnitType, MAX_PATH );
 
+	bool m_bUseMinimalSendTable;
+
 	bool m_bHasEnemy;
 
 	bool m_bHasRangeAttackLOS;
@@ -580,6 +586,10 @@ inline bool CUnitBase::FastLOSCheck( const Vector &vTargetPos )
 	return !tr.DidHit();
 }
 
+inline bool CUnitBase::UseMinimalSendTable()
+{
+	return m_bUseMinimalSendTable;
+}
 #endif // CLIENT_DLL
 
 inline bool CUnitBase::HasEnterOffset( void ) 

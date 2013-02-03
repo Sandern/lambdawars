@@ -125,9 +125,12 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
 END_RECV_TABLE()
 
-IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
+	//RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
+END_RECV_TABLE()
 
-BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropString(  RECVINFO( m_NetworkedUnitType ) ),
 
 	RecvPropInt		(RECVINFO(m_iHealth)),
@@ -139,16 +142,22 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropEHandle		( RECVINFO( m_hSquadUnit ) ),
 	RecvPropEHandle		( RECVINFO( m_hCommander ) ),
 	RecvPropEHandle		( RECVINFO( m_hEnemy ) ),
-	RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
+	//RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
 	RecvPropBool( RECVINFO( m_bCrouching ) ),
 	RecvPropBool( RECVINFO( m_bClimbing ) ),
 
 	RecvPropInt		(RECVINFO(m_iEnergy)),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
+END_RECV_TABLE()
 
+IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
+
+BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
 	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
+	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
+	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
 END_RECV_TABLE()
 
 

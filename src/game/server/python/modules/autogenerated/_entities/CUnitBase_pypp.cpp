@@ -2482,6 +2482,15 @@ void register_CUnitBase_class(){
                 , UseCustomCanBeSeenCheck_function_type( &::CUnitBase::UseCustomCanBeSeenCheck ) );
         
         }
+        { //::CUnitBase::UseMinimalSendTable
+        
+            typedef bool ( ::CUnitBase::*UseMinimalSendTable_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "UseMinimalSendTable"
+                , UseMinimalSendTable_function_type( &::CUnitBase::UseMinimalSendTable ) );
+        
+        }
         { //::CUnitBase::UserCmd
         
             typedef void ( ::CUnitBase::*UserCmd_function_type )( ::CUserCmd * ) ;

@@ -25,6 +25,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static ConVar g_debug_rangeattacklos("g_debug_rangeattacklos", "0", FCVAR_CHEAT);
+static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
+static ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Grenade tossing
@@ -32,7 +35,6 @@
 //
 //	FIXME: Create this in a better fashion!
 //
-ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
 extern ConVar sv_gravity;
 Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance, int iCollisionGroup )
 {
@@ -297,15 +299,22 @@ void* SendProxy_SendCommanderDataTable( const SendProp *pProp, const void *pStru
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		// Only send this chunk of data to the commander of the unit
-		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-		if ( pPlayer )
+		if( pUnit->UseMinimalSendTable() )
 		{
-			pRecipients->SetOnly( pPlayer->GetClientIndex() );
+			pRecipients->ClearAllRecipients();
 		}
 		else
 		{
-			pRecipients->ClearAllRecipients();
+			// Only send this chunk of data to the commander of the unit
+			CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
+			if ( pPlayer )
+			{
+				pRecipients->SetOnly( pPlayer->GetClientIndex() );
+			}
+			else
+			{
+				pRecipients->ClearAllRecipients();
+			}
 		}
 	}
 
@@ -319,17 +328,53 @@ void* SendProxy_SendNormalDataTable( const SendProp *pProp, const void *pStruct,
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		// Send this table to all players except the commander
-		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-		if ( pPlayer )
+		if( pUnit->UseMinimalSendTable() )
 		{
-			pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
+			pRecipients->ClearAllRecipients();
+		}
+		else
+		{
+			// Send this table to all players except the commander
+			CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
+			if ( pPlayer )
+			{
+				pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
+			}
 		}
 	}
 
 	return (void*)pVarData;
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendNormalDataTable );
+
+void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+{
+	// Get the unit entity
+	CUnitBase *pUnit = (CUnitBase*)pVarData;
+	if ( pUnit )
+	{
+		if( !pUnit->UseMinimalSendTable() )
+			pRecipients->ClearAllRecipients();
+	}
+
+	return (void*)pVarData;
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendMinimalDataTable );
+
+void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+{
+	// Get the unit entity
+	CUnitBase *pUnit = (CUnitBase*)pVarData;
+	if ( pUnit )
+	{
+		if( pUnit->UseMinimalSendTable() )
+			pRecipients->ClearAllRecipients();
+	}
+
+	return (void*)pVarData;
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendFullDataTable );
+
 
 //-----------------------------------------------------------------------------
 // Purpose:  Send tables
@@ -367,7 +412,13 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 
 END_SEND_TABLE()
 
-IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
+// Table used when out of PVS (this is the only table being send then)
+BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+	//SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
+END_SEND_TABLE()
+
+BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
 
 	SendPropInt		(SENDINFO(m_iHealth), 15, SPROP_UNSIGNED ),
@@ -378,17 +429,19 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
 	SendPropInt		(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
 
-	SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 	SendPropEHandle		( SENDINFO( m_hSquadUnit ) ),
 	SendPropEHandle		( SENDINFO( m_hCommander ) ),
 	SendPropEHandle		( SENDINFO( m_hEnemy ) ),
+	//SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),
 
 	SendPropInt		(SENDINFO(m_iEnergy), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_iMaxEnergy), 15, SPROP_UNSIGNED ),
+END_SEND_TABLE()
 
+IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
 
@@ -410,6 +463,10 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
 	// Data that gets sent to all other players
 	SendPropDataTable( "normaldata", 0, &REFERENCE_SEND_TABLE(DT_NormalExclusive), SendProxy_SendNormalDataTable ),
+	// Data that gets sent when unit is outside the pvs (and no other table is send)
+	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
+	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
+	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
 END_SEND_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -438,6 +495,55 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	return BaseClass::KeyValue( szKeyName, szValue );
 }
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
+//  objects ( prob. players ) that are not in the pvs.
+// Input  : **ppSendTable - 
+//			*recipient - 
+//			*pvs - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
+{
+	m_bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool();
+
+	int fFlags = DispatchUpdateTransmitState();
+
+	if ( fFlags & FL_EDICT_ALWAYS )
+	{
+		return FL_EDICT_ALWAYS;
+	}
+	else if ( fFlags & FL_EDICT_DONTSEND )
+	{
+		return FL_EDICT_DONTSEND;
+	}
+
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+
+	Assert( pRecipientEntity->IsPlayer() );
+	
+	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
+
+	// Don't send when in the fow for the recv player.
+	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
+	{
+		return FL_EDICT_DONTSEND;
+	}
+
+	if( m_bUseMinimalSendTable )
+		return FL_EDICT_ALWAYS;
+	
+	// by default do a PVS check
+	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
+	netProp->RecomputePVSInformation();
+	m_bUseMinimalSendTable = !netProp->IsInPVS( pInfo );
+	//return FL_EDICT_PVSCHECK;
+	return FL_EDICT_ALWAYS;
+}
+
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -476,7 +582,6 @@ void CUnitBase::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-static ConVar g_debug_rangeattacklos("g_debug_rangeattacklos", "0", FCVAR_CHEAT);
 bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 {
 	if( GetActiveWeapon() )
@@ -537,6 +642,8 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 //-----------------------------------------------------------------------------
 void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 {
+	VPROF_BUDGET( "CUnitBase::UpdateEnemy", VPROF_BUDGETGROUP_UNITS );
+
 	CheckEnemyAlive();
 
 	CBaseEntity *pEnemy = GetEnemy();
@@ -556,6 +663,8 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 //-----------------------------------------------------------------------------
 void CUnitBase::CheckEnemyAlive()
 {
+	VPROF_BUDGET( "CUnitBase::UpdateEnemy", VPROF_BUDGETGROUP_UNITS );
+
 	if( m_bHasEnemy )
 	{
 		if( !m_hEnemy || !m_hEnemy->FOWShouldShow( GetOwnerNumber() ) )
