@@ -2134,6 +2134,7 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 	const Vector &vOrigin = GetAbsOrigin();
 
 	bool bPathReused = false;
+#if 0
 	if( pPath->m_pWaypointHead && (pPath->m_vGoalPos - vDestination).Length2D() < 512.0f &&
 		(pPath->m_pWaypointHead->GetPos() - vOrigin).Length2D() < 512.0f )
 	{
@@ -2141,6 +2142,7 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 		bPathReused = true;
 		NavDbgMsg("#%d FindPath: reusing previous path\n", GetOuter()->entindex());
 	}
+#endif // 0
 
 	pPath->m_vStartPosition = vOrigin;
 	pPath->m_iGoalType = goaltype;
