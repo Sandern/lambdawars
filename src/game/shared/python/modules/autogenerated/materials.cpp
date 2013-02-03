@@ -217,6 +217,8 @@ BOOST_PYTHON_MODULE(materials){
         }
     }
 
+    bp::scope().attr( "glowobjectmanager" ) = boost::ref(g_GlowObjectManager);
+
     bp::class_< PyProceduralTexture, boost::noncopyable >( "ProceduralTexture", bp::init< char const *, char const *, int, int, ImageFormat, int >(( bp::arg("pTextureName"), bp::arg("pTextureGroupName"), bp::arg("w"), bp::arg("h"), bp::arg("fmt"), bp::arg("nFlags") )) )    
         .def( 
             "Download"
@@ -252,18 +254,6 @@ BOOST_PYTHON_MODULE(materials){
         .def( 
             "Shutdown"
             , (void ( ::PyProceduralTexture::* )(  ) )( &::PyProceduralTexture::Shutdown ) );
-
-    bp::scope().attr( "glowobjectmanager" ) = boost::ref(g_GlowObjectManager);
-
-    { //::PyIsDeferredRenderingEnabled
-    
-        typedef bool ( *IsDeferredRenderingEnabled_function_type )(  );
-        
-        bp::def( 
-            "IsDeferredRenderingEnabled"
-            , IsDeferredRenderingEnabled_function_type( &::PyIsDeferredRenderingEnabled ) );
-    
-    }
 }
 
 #else

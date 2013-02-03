@@ -13,15 +13,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef HL2WARS_ASW_DLL
-#ifdef CLIENT_DLL
-bool PyIsDeferredRenderingEnabled()
-{
-	return false; //GetDeferredManager()->IsDeferredRenderingEnabled();
-}
-#endif // CLIENT_DLL
-#endif // HL2WARS_ASW_DLL
-
 #ifdef CLIENT_DLL
 
 static ConVar g_debug_pyproceduralmaterial("g_debug_pyproceduralmaterial", "0", FCVAR_CHEAT);

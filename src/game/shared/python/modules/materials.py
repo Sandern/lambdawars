@@ -61,10 +61,6 @@ class Materials(GenerateModuleSemiShared):
             # #mb.add_registration_code( "bp::scope().attr( \"bik\" ) = boost::ref(bik);" )
             
         if self.isClient:
-            if settings.ASW_CODE_BASE:
-                mb.free_function('PyIsDeferredRenderingEnabled').include()
-                mb.free_function('PyIsDeferredRenderingEnabled').rename('IsDeferredRenderingEnabled')
-            
             cls = mb.class_('CGlowObjectManager')
             cls.include()
             cls.mem_funs().virtuality = 'not virtual'
