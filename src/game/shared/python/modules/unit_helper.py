@@ -232,6 +232,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_bSuccess').rename('success')
         
         mb.enum('UnitGoalFlags').include()
+        mb.enum('UnitGoalTypes').include()
         
         # Special air version
         cls = mb.class_('UnitBaseAirNavigator')

@@ -2407,6 +2407,16 @@ BOOST_PYTHON_MODULE(unit_helper){
         .export_values()
         ;
 
+    bp::enum_< UnitGoalTypes>("UnitGoalTypes")
+        .value("GOALTYPE_NONE", GOALTYPE_NONE)
+        .value("GOALTYPE_INVALID", GOALTYPE_INVALID)
+        .value("GOALTYPE_POSITION", GOALTYPE_POSITION)
+        .value("GOALTYPE_TARGETENT", GOALTYPE_TARGETENT)
+        .value("GOALTYPE_POSITION_INRANGE", GOALTYPE_POSITION_INRANGE)
+        .value("GOALTYPE_TARGETENT_INRANGE", GOALTYPE_TARGETENT_INRANGE)
+        .export_values()
+        ;
+
     { //::AnimEventMap
         typedef bp::class_< AnimEventMap, boost::noncopyable > AnimEventMap_exposer_t;
         AnimEventMap_exposer_t AnimEventMap_exposer = AnimEventMap_exposer_t( "AnimEventMap", bp::init< >() );

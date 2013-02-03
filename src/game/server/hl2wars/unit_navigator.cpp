@@ -2187,7 +2187,7 @@ bool UnitBaseNavigator::DoFindPathToPos( UnitBasePath *pPath )
 
 	pPath->SetWaypoint(NULL);
 
-	UnitBaseWaypoint *waypoints = BuildRoute();
+	UnitBaseWaypoint *waypoints = BuildRoute( pPath );
 	if( !waypoints )
 		return false;
 
@@ -2537,29 +2537,29 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( const Vector &vGoalPos )
 //-----------------------------------------------------------------------------
 // Purpose: Tries to build a route using either a direct trace or the nav mesh.
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint *UnitBaseNavigator::BuildRoute()
+UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 {
 	UnitBaseWaypoint *waypoints;
 
 	// Special case
-	if( GetPath()->m_iGoalFlags & GF_DIRECTPATH )
+	if( pPath->m_iGoalFlags & GF_DIRECTPATH )
 	{
-		return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
+		return new UnitBaseWaypoint( pPath->m_vGoalPos );
 	}
 
-	IUnit *pUnit = GetPath()->m_hTarget ? GetPath()->m_hTarget->GetIUnit() : NULL;
+	IUnit *pUnit = pPath->m_hTarget ? pPath->m_hTarget->GetIUnit() : NULL;
 	if( pUnit && pUnit->HasEnterOffset() )
 	{
 		Vector vOffset = pUnit->GetEnterOffset();
-		VectorYawRotate( vOffset, GetPath()->m_hTarget->GetAbsAngles()[YAW], vOffset );
-		Vector vEnterPoint = GetPath()->m_hTarget->GetAbsOrigin() + vOffset;
+		VectorYawRotate( vOffset, pPath->m_hTarget->GetAbsAngles()[YAW], vOffset );
+		Vector vEnterPoint = pPath->m_hTarget->GetAbsOrigin() + vOffset;
 
 		NavDbgMsg("#%d BuildNavAreaPath: Building route to target enter point\n", GetOuter()->entindex());
 
 		// Expensive: use nav mesh
 		waypoints = BuildNavAreaPath( vEnterPoint );
 		
-		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( GetPath()->m_vGoalPos );
+		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( pPath->m_vGoalPos );
 		pEndWaypoint->SpecialGoalStatus = CHS_NOSIMPLIFY;
 		UnitBaseWaypoint *pLast = waypoints->GetLast();
 		pLast->SetNext( pEndWaypoint );
@@ -2568,18 +2568,18 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute()
 	else
 	{
 		// Cheap: try to do trace from start to goal
-		waypoints = BuildLocalPath( GetPath()->m_vGoalPos );
+		waypoints = BuildLocalPath( pPath->m_vGoalPos );
 		if( waypoints )
 			return waypoints;
 
 		// Expensive: use nav mesh
-		waypoints = BuildNavAreaPath( GetPath()->m_vGoalPos );
+		waypoints = BuildNavAreaPath( pPath->m_vGoalPos );
 		if( waypoints )
 			return waypoints;
 	}
 
 	// Fallback to a direct path
-	return new UnitBaseWaypoint( GetPath()->m_vGoalPos );
+	return new UnitBaseWaypoint( pPath->m_vGoalPos );
 }
 
 #ifdef ENABLE_PYTHON

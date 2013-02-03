@@ -446,7 +446,7 @@ protected:
 	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
 	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute(CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1);
 	virtual UnitBaseWaypoint *	BuildNavAreaPath( const Vector &pos );
-	virtual UnitBaseWaypoint *	BuildRoute();
+	virtual UnitBaseWaypoint *	BuildRoute( UnitBasePath *pPath );
 
 public:
 	// Facing settings
