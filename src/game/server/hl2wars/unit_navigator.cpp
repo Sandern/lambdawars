@@ -100,12 +100,15 @@ ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
 ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
 ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
+ConVar unit_navigator_debug_show("unit_navigator_debug_show", "0", 0, "Shows debug information about the unit navigator");
 
 #define THRESHOLD unit_potential_threshold.GetFloat()
 #define THRESHOLD_MIN (THRESHOLD+(GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmin_offset.GetFloat() : unit_potential_nogoal_tmin_offset.GetFloat()) )
 #define THRESHOLD_MAX (GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmax.GetFloat() : unit_potential_nogoal_tmax.GetFloat())
 
 float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &pDirection );
+
+int UnitBaseNavigator::m_iCurPathRecomputations = 0;
 
 //-----------------------------------------------------------------------------
 // Purpose: Alternative path direction function that computes the direction using
@@ -344,6 +347,19 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	UpdateBlockedStatus();
 
 	m_vLastPosition = GetAbsOrigin();
+
+	if( unit_navigator_debug_show.GetBool() )
+	{
+		static float sNextUpdateNavStats = 0.0f;
+		if( sNextUpdateNavStats < gpGlobals->curtime )
+		{
+			engine->Con_NPrintf( 1, "Path Recomputations last second: %d", m_iCurPathRecomputations );
+
+			// Reset
+			sNextUpdateNavStats = gpGlobals->curtime + 1.0f;
+			m_iCurPathRecomputations = 0;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2163,6 +2179,8 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 bool UnitBaseNavigator::DoFindPathToPos( UnitBasePath *pPath )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::DoFindPathToPos", VPROF_BUDGETGROUP_UNITS );
+
+	m_iCurPathRecomputations++;
 
 	//Warning("#%d UnitNavigator: DoFindPathToPos. Computing path...\n", 
 	//		GetOuter()->entindex() );

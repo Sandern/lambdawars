@@ -535,7 +535,10 @@ private:
 	};
 	CUtlVector<seed_entry_t> m_Seeds;
 
+	// Debug variables
 	Vector m_vDebugVelocity;
+
+	static int m_iCurPathRecomputations;
 };
 
 // ---------------------------------------------------------------
