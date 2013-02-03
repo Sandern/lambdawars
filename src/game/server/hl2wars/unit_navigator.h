@@ -198,7 +198,7 @@ inline void UnitBaseWaypoint::SetNext( UnitBaseWaypoint *p )
 class UnitBasePath
 {
 public:
-	UnitBasePath() 
+	UnitBasePath() : m_pWaypointHead(NULL)
 	{
 		Clear();
 	}
@@ -206,13 +206,15 @@ public:
 	{
 		m_iGoalType = src.m_iGoalType;
 		m_vGoalPos = src.m_vGoalPos;
-		m_vGoalInRangePos = src.m_vGoalInRangePos;
 		m_waypointTolerance = src.m_waypointTolerance;
 		m_fGoalTolerance = src.m_fGoalTolerance;
 		m_iGoalFlags = src.m_iGoalFlags;
 		m_fMinRange = src.m_fMinRange;
+		m_fMaxRange = src.m_fMaxRange;
 		m_hTarget = src.m_hTarget;
 		m_bAvoidEnemies = src.m_bAvoidEnemies;
+		m_vStartPosition = src.m_vStartPosition;
+		m_fMaxMoveDist = src.m_fMaxMoveDist;
 		m_bSuccess = src.m_bSuccess;
 
 		// Copy waypoints
@@ -233,6 +235,16 @@ public:
 		else
 		{
 			m_pWaypointHead = NULL;
+		}
+	}
+
+	~UnitBasePath()
+	{
+		while( m_pWaypointHead )
+		{
+			UnitBaseWaypoint *pCur = m_pWaypointHead;
+			m_pWaypointHead = m_pWaypointHead->GetNext();
+			delete pCur;
 		}
 	}
 
@@ -262,6 +274,13 @@ public:
 
 	void SetWaypoint( UnitBaseWaypoint *pWayPoint )
 	{
+		while( m_pWaypointHead )
+		{
+			UnitBaseWaypoint *pCur = m_pWaypointHead;
+			m_pWaypointHead = m_pWaypointHead->GetNext();
+			delete pCur;
+		}
+
 		m_pWaypointHead = pWayPoint;
 	}
 
@@ -296,7 +315,6 @@ public:
 	int m_iGoalType;
 	UnitBaseWaypoint *m_pWaypointHead;
 	Vector m_vGoalPos;
-	Vector m_vGoalInRangePos;
 	float m_waypointTolerance;
 	float m_fGoalTolerance;
 	int m_iGoalFlags;
@@ -320,9 +338,9 @@ class UnitBaseNavigator : public UnitComponent
 public:
 	friend class CUnitBase;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseNavigator( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Core
 	virtual void		Reset();
@@ -385,21 +403,23 @@ public:
 	virtual float		GetGoalDistance( void );
 
 	// Path finding
-	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, CBaseEntity *pTarget=NULL );
+	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
+									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
+	virtual bool		DoFindPathToPos( UnitBasePath *pPath );
+	virtual bool		DoFindPathToPosInRange( UnitBasePath *pPath );
 	virtual bool		DoFindPathToPos();
 	virtual bool		DoFindPathToPosInRange();
 
-	// Route buiding
-	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
-	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute(CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1);
-	virtual UnitBaseWaypoint *	BuildNavAreaPath( const Vector &pos );
-	virtual UnitBaseWaypoint *	BuildRoute();
+#ifdef ENABLE_PYTHON
+	virtual boost::python::object FindPathAsResult( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
+									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
+#endif // ENABLE_PYTHON
 
 	// Getters/Setters for path
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	void SetPath( boost::python::object path );
 	inline boost::python::object PyGetPath() { return m_refPath; }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	inline UnitBasePath *GetPath() { return m_pPath; }
 
 	// Facing
@@ -418,6 +438,15 @@ public:
 	// Debug
 	virtual void		DrawDebugRouteOverlay();	
 	virtual void		DrawDebugInfo();
+
+protected:
+	// Route buiding
+	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
+									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
+	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
+	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute(CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1);
+	virtual UnitBaseWaypoint *	BuildNavAreaPath( const Vector &pos );
+	virtual UnitBaseWaypoint *	BuildRoute();
 
 public:
 	// Facing settings
@@ -445,9 +474,9 @@ private:
 
 	// Path and pathfinding
 	UnitBasePath *m_pPath;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_refPath;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	float m_fGoalDistance;
 	Vector m_vGoalDir;
 
@@ -552,6 +581,26 @@ inline void UnitBaseNavigator::SetFacingTargetPos( Vector &vFacingTargetPos )
 {
 	m_vFacingTargetPos = vFacingTargetPos;
 	m_bFacingFaceTarget = false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds a path to a position in range of the goal position. 
+//			This is the same as DoFindPathToPos for now...
+//-----------------------------------------------------------------------------
+inline bool UnitBaseNavigator::DoFindPathToPosInRange( UnitBasePath *pPath )
+{
+	return DoFindPathToPos( pPath );
+}
+
+inline bool UnitBaseNavigator::DoFindPathToPosInRange()
+{
+	return DoFindPathToPosInRange( GetPath() );
+}
+
+inline bool UnitBaseNavigator::DoFindPathToPos()
+{
+	m_fLastPathRecomputation = gpGlobals->curtime;
+	return DoFindPathToPos( GetPath() );
 }
 
 #endif // UNIT_NAVIGATOR_H

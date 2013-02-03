@@ -167,6 +167,7 @@ class UnitHelper(GenerateModuleSemiShared):
         # Main class
         cls = mb.class_('UnitBaseNavigator')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs().exclude()
         cls.mem_funs('TestRoute').include()
         cls.mem_fun('Reset').include()
@@ -180,6 +181,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.mem_fun('SetGoalInRange').include()
         cls.mem_fun('SetGoalTargetInRange').include()
         cls.mem_fun('SetVectorGoal').include()
+        cls.mem_fun('FindPathAsResult').include()
         cls.mem_fun('UpdateGoalInRange').include()
         cls.mem_fun('UpdateGoalTarget').include()
         cls.mem_fun('GetGoalDistance').include()
@@ -218,7 +220,6 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_iGoalType').rename('goaltype')
         cls.var('m_pWaypointHead').exclude()
         cls.var('m_vGoalPos').rename('goalpos')
-        cls.var('m_vGoalInRangePos').rename('goalinrangepos')
         cls.var('m_waypointTolerance').rename('waypointtolerance')
         cls.var('m_fGoalTolerance').rename('goaltolerance')
         cls.var('m_iGoalFlags').rename('goalflags')
@@ -235,6 +236,7 @@ class UnitHelper(GenerateModuleSemiShared):
         # Special air version
         cls = mb.class_('UnitBaseAirNavigator')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs().exclude()
         cls.mem_funs('TestRoute').include()
         cls.add_property( 'testroutemask'

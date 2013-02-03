@@ -87,7 +87,7 @@ ConVar unit_cost_nonavareacheck("unit_cost_nonavareacheck", "0", FCVAR_CHEAT, ""
 ConVar unit_nogoal_mindiff("unit_nogoal_mindiff", "0.25");
 ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
 
-ConVar unit_testroute_stepsize("unit_testroute_stepsize", "16");
+ConVar unit_testroute_stepsize("unit_testroute_stepsize", "48.0");
 ConVar unit_testroute_bloatscale("unit_testroute_bloatscale", "1.2");
 
 ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "1.5");
@@ -171,7 +171,7 @@ UnitBaseWaypoint *	UnitBaseWaypoint::GetLast()
 UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 		: UnitComponent(outer)
 {
-	SetPath( boost::python::object() );
+	SetPath( boost::python::object() ); // Create initial path object
 	Reset();
 
 	m_fIdealYaw = -1;
@@ -182,6 +182,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_bFacingFaceTarget = false;
 	m_bNoAvoid = false;
 	m_bNoNavAreasNearby = false;
+	m_fNextAllowPathRecomputeTime = 0.0f;
 }
 #endif // ENABLE_PYTHON
 
@@ -222,7 +223,7 @@ void UnitBaseNavigator::StopMoving()
 #ifdef ENABLE_PYTHON
 	boost::python::object path = m_refPath;
 	UnitBasePath *pPath = m_pPath;
-	SetPath(boost::python::object());
+	GetPath()->m_iGoalType = GOALTYPE_NONE; // Just clear goal, so we can reuse it if needed
 
 	GetPath()->m_vGoalPos = pPath-> m_vGoalPos;
 #endif // ENABLE_PYTHON
@@ -439,7 +440,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		m_LastGoalStatus = GoalStatus;
 	}
 	else
-#endif //DISABLE_PYTHON
+#endif //ENABLE_PYTHON
 	{
 		if( unit_navigator_debug.GetBool() )
 			DevMsg( "#%d UnitNavigator: Goal changed during dispatching goal events. Not updating last goal status.\n", 
@@ -1096,16 +1097,18 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		CNavArea *pTargetArea, *pGoalArea;
 		const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition();
 
-		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 0.8f )
+		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 8.0f )
 		{
 			pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
 			pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos, true, 256.0f, false, false );
 
-			if( pTargetArea != pGoalArea )
+			if( pTargetArea && pGoalArea && pTargetArea != pGoalArea )
 			{
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
 						GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
+
+				//UnitBaseWaypoint * pGoalWayPoint = GetPath()->m_pWaypointHead->GetLast();
 
 				// Update goal target position and recompute
 				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
@@ -1120,6 +1123,12 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
 				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 			}
+		}
+		else
+		{
+			// Just update goal target position and update the last waypoint
+			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
 	}
 
@@ -1528,7 +1537,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
 		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
 	testPos = tr.endpos;
-	testPos.z += GetOuter()->GetDefaultEyeOffset().z + 2.0f;
+	//testPos.z += GetOuter()->GetDefaultEyeOffset().z + 2.0f;
 
 	const Vector &origin = GetOuter()->EyePosition();
 
@@ -1540,7 +1549,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 	{
 		// Just test the head waypoint
 		endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
-		endPos.z += GetOuter()->GetDefaultEyeOffset().z;
+		//endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
 		if( !TestRouteEnd( GetPath()->m_pWaypointHead ) && !TestRoute( testPos, endPos ) ) {
 			bBlocked = true;
@@ -1575,7 +1584,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 			}
 
 			endPos = ComputeWaypointTarget( testPos, pCur );
-			endPos.z += GetOuter()->GetDefaultEyeOffset().z;
+			//endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
 			if( !TestRouteEnd( pCur ) && !TestRoute(testPos, endPos) ) 
 			{
@@ -1665,6 +1674,9 @@ bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
 //#define DEBUG_TESTROUTE
 bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
 {
+	VPROF_BUDGET( "UnitBaseNavigator::TestRoute", VPROF_BUDGETGROUP_UNITS );
+
+#if 0
 	Vector vDir, vDirCross, vPrevPos, vPos;
 	float fDist, fCur, fRadius, teststepsize;
 	CNavArea *pCur, *pTo;
@@ -1766,6 +1778,60 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 		vPos.z += 16.0f;
 	}
 	return true;
+#else
+	Vector vNewStart( vStartPos );
+	vNewStart.z += 16.0f;
+	Vector nNewEnd( vEndPos );
+	nNewEnd.z += 16.0f;
+
+	// First do a trace. This detects if something is blocking.
+	CTraceFilterWorldOnly filter;
+	trace_t tr;
+	UTIL_TraceHull( vNewStart, nNewEnd, 
+		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
+		GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
+	if( tr.fraction != 1 )
+	{
+#ifdef DEBUG_TESTROUTE
+		NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 255, 0, 0, 0, 0.5f );
+#endif // DEBUG_TESTROUTE
+		return false;
+	}
+
+#ifdef DEBUG_TESTROUTE
+		NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
+#endif // DEBUG_TESTROUTE
+
+	// Second test, take rough steps along the path and check if there is a nav area below
+	CNavArea *pCur;
+	float fDist, fCur, teststepsize;
+	Vector vDir, vPos;
+	
+	vDir = nNewEnd - vNewStart;
+	vDir.z = 0.0f;
+	fDist = VectorNormalize(vDir);
+	fCur = 16.0f;
+	vPos = vNewStart;
+	vPos.z += 16.0f;
+
+	teststepsize = unit_testroute_stepsize.GetFloat();
+
+	do
+	{
+		vPos += vDir * teststepsize;
+		vPos.z += 16.0f;
+
+		pCur = TheNavMesh->GetNavArea(vPos, 120.0f);
+		if( !pCur )
+			return false;
+
+		vPos.z = pCur->GetZ(vPos);
+
+		fCur += teststepsize;
+	} while( fCur < fDist );
+
+	return true;
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -1817,12 +1883,11 @@ void UnitBaseNavigator::UpdateBlockedStatus()
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::SetGoal( Vector &destination, float goaltolerance, int goalflags, bool avoidenemies )
 {
-	bool bResult = FindPath( GOALTYPE_POSITION, destination, goaltolerance, goalflags );
+	bool bResult = FindPath( GOALTYPE_POSITION, destination, goaltolerance, goalflags, 0, 0, NULL, avoidenemies );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
 	}
-	GetPath()->m_bAvoidEnemies = avoidenemies;
 	return bResult;
 }
 
@@ -1839,13 +1904,11 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 #endif // ENABLE_PYTHON
 		return false;
 	}
-	GetPath()->m_hTarget = pTarget;
-	bool bResult = FindPath( GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags, 0, 0, pTarget );
+	bool bResult = FindPath( GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags, 0, 0, pTarget, avoidenemies );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
 	}
-	GetPath()->m_bAvoidEnemies = avoidenemies;
 	return bResult;
 }
 
@@ -1856,12 +1919,11 @@ bool UnitBaseNavigator::SetGoalInRange( Vector &destination, float maxrange, flo
 {
 	//CalculateDestinationInRange(&destination, destination, minrange, maxrange);
 
-	bool bResult = FindPath( GOALTYPE_POSITION_INRANGE, destination, goaltolerance, goalflags, minrange, maxrange );
+	bool bResult = FindPath( GOALTYPE_POSITION_INRANGE, destination, goaltolerance, goalflags, minrange, maxrange, NULL, avoidenemies );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
 	}
-	GetPath()->m_bAvoidEnemies = avoidenemies;
 	return bResult;
 }
 
@@ -1880,12 +1942,11 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 	}
 
 	// Find a path
-	bool bResult = FindPath( GOALTYPE_TARGETENT_INRANGE, pTarget->EyePosition(), goaltolerance, goalflags, minrange, maxrange, pTarget );
+	bool bResult = FindPath( GOALTYPE_TARGETENT_INRANGE, pTarget->EyePosition(), goaltolerance, goalflags, minrange, maxrange, pTarget, avoidenemies );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
 	}
-	GetPath()->m_bAvoidEnemies = avoidenemies;
 	return bResult;
 }
 
@@ -1997,7 +2058,7 @@ float UnitBaseNavigator::GetGoalDistance( void )
 //-----------------------------------------------------------------------------
 // Purpose: Creates, builds and finds a new path.
 //-----------------------------------------------------------------------------
-bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float fGoalTolerance, int iGoalFlags, float fMinRange, float fMaxRange, CBaseEntity *pTarget )
+bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int iGoalFlags, float fMinRange, float fMaxRange, CBaseEntity *pTarget, bool bAvoidEnemies )
 {
 	if( unit_navigator_debug.GetBool() )
 	{
@@ -2052,30 +2113,46 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 
 	Reset();
 
-#ifdef ENABLE_PYTHON
-	SetPath( boost::python::object() ); // Clear current path
-#endif // ENABLE_PYTHON
-
 	m_LastGoalStatus = CHS_HASGOAL;
 
-	GetPath()->m_vStartPosition = GetAbsOrigin();
-	GetPath()->m_iGoalType = goaltype;
-	GetPath()->m_vGoalPos = vDestination;
-	GetPath()->m_fGoalTolerance = fGoalTolerance;
-	//GetPath()->m_waypointTolerance = (WorldAlignSize().x+WorldAlignSize().y)/2.0f;
-	GetPath()->m_waypointTolerance = GetEntityBoundingRadius( m_pOuter );
-	GetPath()->m_iGoalFlags = iGoalFlags;
-	GetPath()->m_fMinRange = fMinRange;
-	GetPath()->m_fMaxRange = fMaxRange;
-	GetPath()->m_hTarget = pTarget;
-	GetPath()->m_bSuccess = false;
+	const Vector &vOrigin = GetAbsOrigin();
 
-	if( GetPath()->m_iGoalType == GOALTYPE_POSITION ||
-			GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
-		return DoFindPathToPos();
-	else if( GetPath()->m_iGoalType == GOALTYPE_POSITION_INRANGE ||
-			GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
-		return DoFindPathToPosInRange();
+	bool bPathReused = false;
+	if( pPath->m_pWaypointHead && (pPath->m_vGoalPos - vDestination).Length2D() < 512.0f &&
+		(pPath->m_pWaypointHead->GetPos() - vOrigin).Length2D() < 512.0f )
+	{
+		// Reuse path
+		bPathReused = true;
+		NavDbgMsg("#%d FindPath: reusing previous path\n", GetOuter()->entindex());
+	}
+
+	pPath->m_vStartPosition = vOrigin;
+	pPath->m_iGoalType = goaltype;
+	pPath->m_vGoalPos = vDestination;
+	pPath->m_fGoalTolerance = fGoalTolerance;
+	pPath->m_waypointTolerance = GetEntityBoundingRadius( m_pOuter );
+	pPath->m_iGoalFlags = iGoalFlags;
+	pPath->m_fMinRange = fMinRange;
+	pPath->m_fMaxRange = fMaxRange;
+	pPath->m_hTarget = pTarget;
+	pPath->m_bSuccess = false;
+	pPath->m_bAvoidEnemies = bAvoidEnemies;
+
+	if( !bPathReused )
+	{
+		if( pPath->m_iGoalType == GOALTYPE_POSITION ||
+				pPath->m_iGoalType == GOALTYPE_TARGETENT )
+			return DoFindPathToPos( pPath );
+		else if( pPath->m_iGoalType == GOALTYPE_POSITION_INRANGE ||
+				pPath->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
+			return DoFindPathToPosInRange( pPath );
+	}
+	else
+	{
+		// Just need to update the last waypoint
+		pPath->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
+		return true;
+	}
 
 	return false;
 }
@@ -2083,40 +2160,50 @@ bool UnitBaseNavigator::FindPath(int goaltype, const Vector &vDestination, float
 //-----------------------------------------------------------------------------
 // Purpose: Finds a path to the goal position.
 //-----------------------------------------------------------------------------
-bool UnitBaseNavigator::DoFindPathToPos()
+bool UnitBaseNavigator::DoFindPathToPos( UnitBasePath *pPath )
 {
-	m_fLastPathRecomputation = gpGlobals->curtime;
+	VPROF_BUDGET( "UnitBaseNavigator::DoFindPathToPos", VPROF_BUDGETGROUP_UNITS );
 
-	GetPath()->SetWaypoint(NULL);
+	//Warning("#%d UnitNavigator: DoFindPathToPos. Computing path...\n", 
+	//		GetOuter()->entindex() );
+
+	pPath->SetWaypoint(NULL);
 
 	UnitBaseWaypoint *waypoints = BuildRoute();
 	if( !waypoints )
 		return false;
 
-	GetPath()->SetWaypoint(waypoints);
-	if( unit_reactivepath.GetBool() ) UpdateReactivePath( true );
-	return true;
-}	
-
-//-----------------------------------------------------------------------------
-// Purpose: Finds a path to a position in range of the goal position.
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::DoFindPathToPosInRange()
-{
-	m_fLastPathRecomputation = gpGlobals->curtime;
-
-	// Might already be in range?
-	GetPath()->SetWaypoint(NULL);
-
-	// Just build a full route to the target position.
-	UnitBaseWaypoint *waypoints = BuildRoute();
-	if( !waypoints )
-		return false;
-
-	GetPath()->SetWaypoint(waypoints);
-	if( unit_reactivepath.GetBool() ) UpdateReactivePath( true );
+	pPath->SetWaypoint(waypoints);
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Creates, builds and finds a new path and sets it as new path for 
+//			the unit.
+//-----------------------------------------------------------------------------
+bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int iGoalFlags, float fMinRange, float fMaxRange, CBaseEntity *pTarget, bool bAvoidEnemies )
+{
+	if( FindPathInternal( GetPath(), goaltype, vDestination, fGoalTolerance, iGoalFlags, fMinRange, fMaxRange, pTarget, bAvoidEnemies ) )
+	{
+		if( unit_reactivepath.GetBool() ) UpdateReactivePath( true );
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Creates, builds and finds a new path and returns it as result.
+//-----------------------------------------------------------------------------
+boost::python::object UnitBaseNavigator::FindPathAsResult( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags, float fMinRange, float fMaxRange, CBaseEntity *pTarget, bool bAvoidEnemies )
+{
+	bp::object refPath = SrcPySystem()->RunT<boost::python::object>( SrcPySystem()->Get("UnitBasePath", unit_helper), boost::python::object() );
+	UnitBasePath *pPath = boost::python::extract<UnitBasePath *>(refPath);
+
+	FindPathInternal( pPath, goaltype, vDestination, fGoalTolerance, goalflags, fMinRange, fMaxRange, pTarget, bAvoidEnemies );
+
+	return refPath;
+}
+
 // Route buiding
 //-----------------------------------------------------------------------------
 // Purpose: 
