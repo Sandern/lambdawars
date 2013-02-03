@@ -49,12 +49,8 @@
 #include "renderparm.h"
 #include "modelrendersystem.h"
 #include "vgui/ISurface.h"
-//#include "deferred/cdeferred_manager_client.h"
 
 #define PARTICLE_USAGE_DEMO									// uncomment to get particle bar thing
-
-
-//#include "shadereditor/shadereditorsystem.h"
 
 
 #if defined( HL2_CLIENT_DLL ) || defined( INFESTED_DLL )
@@ -93,9 +89,6 @@ extern ConVar vcollide_wireframe;
 extern ConVar mat_motion_blur_enabled;
 extern ConVar r_depthoverlay;
 extern ConVar r_shadow_deferred;
-
-// @Deferred - Biohazard
-// lots of stuff must not be file scope for the other IViewRender implementation to work
 
 //-----------------------------------------------------------------------------
 // Convars related to controlling rendering
@@ -411,12 +404,6 @@ private:
 };
 
 CWorldListCache g_WorldListCache;
-
-// @Deferred - Biohazard
-void FlushWorldLists()
-{
-	g_WorldListCache.Flush();
-}
 
 //-----------------------------------------------------------------------------
 // Standard 3d skybox view
@@ -967,15 +954,11 @@ void CSimpleRenderExecutor::AddView( CRendering3dView *pView )
 	m_pMainView->SetActiveRenderer( pPrevRenderer );
 }
 
-// @Deferred - Biohazard
-// this is allocated differently now
-#ifndef DEFERRED_ENABLED
 static CViewRender g_ViewRender;
 IViewRender *GetViewRenderInstance()
 {
 	return &g_ViewRender;
 }
-#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1315,11 +1298,13 @@ void CViewRender::GetScreenFadeDistances( float *pMin, float *pMax )
 	if ( pMin )
 	{
 		*pMin = m_FadeData.m_flPixelMin;
+		Msg("Min fade distance: %f\n", *pMin);
 	}
 
 	if ( pMax )
 	{
 		*pMax = m_FadeData.m_flPixelMax;
+		Msg("Max fade distance: %f\n", *pMax);
 	}
 
 	// A complete, brutal hack, necessitated by our next-week ship date. 
@@ -3652,14 +3637,7 @@ void CRendering3dView::BuildRenderableRenderLists( int viewID )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-// @Deferred - Biohazard
-// skip stuff
-	const bool bUpdateLightmaps = viewID != VIEW_SHADOW_DEPTH_TEXTURE 
-#ifdef DEFERRED_ENABLED
-		&&
-		!GetDeferredManager()->IsDeferredRenderingEnabled()
-#endif // DEFERRED_ENABLED
-		;
+	const bool bUpdateLightmaps = viewID != VIEW_SHADOW_DEPTH_TEXTURE;
 
 	if ( bUpdateLightmaps )
 	{

@@ -8,10 +8,6 @@
 #include "cbase.h"
 #include "src_python_materials.h"
 
-#ifdef HL2WARS_ASW_DLL
-	//#include "deferred/deferred_shared_common.h"
-#endif // HL2WARS_ASW_DLL
-
 #include "materialsystem/ITexture.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

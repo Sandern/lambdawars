@@ -144,9 +144,9 @@
 #include "tier1/UtlDict.h"
 #include "keybindinglistener.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #include "hl2wars/fowmgr.h"
 #include "wars_mount_system.h"
@@ -155,10 +155,6 @@
 #ifdef ENABLE_CEF
 	#include "cef/src_cef.h"
 #endif // ENABLE_CEF
-
-// @Deferred - Biohazard
-// For cookie string table
-//#include "deferred/deferred_shared_common.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1971,11 +1967,6 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableClientSideChoreoScenes = NULL;
 
 	g_pStringTablePyModules = NULL;
-	
-#ifdef DEFERRED_ENABLED
-// @Deferred - Biohazard
-	g_pStringTable_LightCookies = NULL;
-#endif // DEFERRED_ENABLED
 }
 
 //-----------------------------------------------------------------------------
@@ -2255,15 +2246,6 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 	{
 		g_pStringTablePyModules = networkstringtable->FindTable( tableName );
 	}
-#ifdef DEFERRED_ENABLED
-// @Deferred - Biohazard
-	else if ( !Q_strcasecmp( tableName, COOKIE_STRINGTBL_NAME ) )
-	{
-		g_pStringTable_LightCookies = networkstringtable->FindTable( tableName );
-
-		g_pStringTable_LightCookies->SetStringChangedCallback( NULL, OnCookieTableChanged );
-	}
-#endif // DEFERRED_ENABLED
 	else
 	{
 		// Pass tablename to gamerules last if all other checks fail

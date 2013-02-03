@@ -121,15 +121,10 @@
 #include "hl2wars/wars_plat_misc.h"
 #include "hl2wars/wars_mount_system.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	#include "src_python_networkvar.h"
-#endif // DISABLE_PYTHON
-
-// @Deferred - Biohazard
-// for cookie string table
-//#include "deferred/deferred_shared_common.h"
-
+#endif // ENABLE_PYTHON
 
 #ifdef _WIN32
 #include "IGameUIFuncs.h"
@@ -1555,11 +1550,6 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 
 	g_pStringTablePyModules = networkstringtable->CreateStringTable( "PyModules", MAX_CHOREO_SCENES_STRINGS );
 
-#ifdef DEFERRED_ENABLED
-// @Deferred - Biohazard
-	g_pStringTable_LightCookies = networkstringtable->CreateStringTable( COOKIE_STRINGTBL_NAME, MAX_COOKIE_TEXTURES, 0, 0, NSF_DICTIONARY_ENABLED );
-#endif // DEFERRED_ENABLED
-
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
 			g_pStringTableVguiScreen &&
@@ -1568,11 +1558,6 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 			g_pStringTableClientSideChoreoScenes &&
 			g_pStringTableExtraParticleFiles &&
 			g_pStringTablePyModules 
-#ifdef DEFERRED_ENABLED
-			&&
-// @Deferred - Biohazard
-			g_pStringTable_LightCookies
-#endif // DEFERRED_ENABLED
 			);
 
 	// Need this so we have the error material always handy
