@@ -1226,7 +1226,8 @@ class Entities(GenerateModuleSemiShared):
         mb.vars('m_fEyePitch').rename('eyepitch')
         mb.vars('m_fEyeYaw').rename('eyeyaw')
         
-        mb.vars('m_bUseCheapShotSimulation').rename('usecheapshotsimulation')
+        mb.vars('m_bNeverIgnoreAttacks').rename('neverignoreattacks')
+        
         mb.vars('m_fAccuracy').rename('accuracy')
         
         # List of overridables

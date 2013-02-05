@@ -43,6 +43,7 @@ CBaseFuncMapBoundary *GetMapBoundaryList()
 
 CBaseFuncMapBoundary::CBaseFuncMapBoundary()
 {
+	SetBlocksLOS( false );
 	m_fBloat = -32.0f;
 	g_FuncMapBounderiesList.Insert( this );
 }

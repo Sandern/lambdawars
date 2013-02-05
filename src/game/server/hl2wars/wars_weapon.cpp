@@ -163,13 +163,21 @@ public:
 			}
 		}*/
 
+#if 0
+		CBaseEntity *pOwner = (CBaseEntity *)EntityFromEntityHandle( GetPassEntity() );
 		IUnit *pUnit = pEntity->GetIUnit();
-		if( pUnit && pUnit->IRelationType((CBaseEntity *)GetPassEntity()) != D_HT )
+		if( pUnit && pOwner && pUnit->AreAttacksPassable( pOwner ) )
 		{
 			return false;
 		}
+#endif // 0
+		if( !BaseClass::ShouldHitEntity( pServerEntity, contentsMask ) )
+			return false;
 
-		return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
+		if( !pEntity->BlocksLOS() )
+			return false;
+
+		return true;
 	}
 
 private:
@@ -197,16 +205,13 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	trace_t tr;
 	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT, &traceFilter, &tr );
 
-	if( g_debug_wars_weapon.GetBool() )
-		NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
-
 	// See if we completed the trace without interruption
 	if ( tr.fraction == 1.0 )
 	{
-		/*if ( ai_debug_shoot_positions.GetBool() )
+		if ( g_debug_wars_weapon.GetBool() )
 		{
 			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
-		}*/
+		}
 
 		return true;
 	}
@@ -230,16 +235,17 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	// Hitting our enemy is a success case
 	if ( pHitEnt == npcOwner->GetEnemy() )
 	{
-		/*if ( ai_debug_shoot_positions.GetBool() )
+		if ( g_debug_wars_weapon.GetBool() )
 		{
 			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
-		}*/
+		}
 
 		return true;
 	}
 
 	// If a vehicle is blocking the view, grab its driver and use that as the combat character
 	
+#if 0
 	CBaseCombatCharacter *pBCC;
 	/*IServerVehicle *pVehicle = pHitEnt->GetServerVehicle();
 	if ( pVehicle )
@@ -252,12 +258,17 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	}
 
 
-	if ( pBCC ) 
+	if ( pBCC && !pBCC->BlocksLOS() ) 
 	{
 		if ( npcOwner->IRelationType( pBCC ) == D_HT )
 			return true;
 	}
+#endif // 0
 
+	if ( g_debug_wars_weapon.GetBool() )
+	{
+		NDebugOverlay::Line( barrelPos, targetPos, 255, 0, 0, false, 1.0 );
+	}
 
 	return false;
 }

@@ -1420,6 +1420,16 @@ void register_C_UnitBase_class(){
                 , AimGun_function_type( &::C_UnitBase::AimGun ) );
         
         }
+        { //::C_UnitBase::AreAttacksPassable
+        
+            typedef bool ( ::C_UnitBase::*AreAttacksPassable_function_type )( ::C_BaseEntity * ) ;
+            
+            C_UnitBase_exposer.def( 
+                "AreAttacksPassable"
+                , AreAttacksPassable_function_type( &::C_UnitBase::AreAttacksPassable )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::C_UnitBase::Blink
         
             typedef void ( ::C_UnitBase::*Blink_function_type )( float ) ;
@@ -2021,8 +2031,8 @@ void register_C_UnitBase_class(){
         
         }
         C_UnitBase_exposer.def_readwrite( "fowfilterfriendly", &C_UnitBase::m_bFOWFilterFriendly );
+        C_UnitBase_exposer.def_readwrite( "neverignoreattacks", &C_UnitBase::m_bNeverIgnoreAttacks );
         C_UnitBase_exposer.def_readwrite( "updateclientanimations", &C_UnitBase::m_bUpdateClientAnimations );
-        C_UnitBase_exposer.def_readwrite( "usecheapshotsimulation", &C_UnitBase::m_bUseCheapShotSimulation );
         C_UnitBase_exposer.def_readwrite( "accuracy", &C_UnitBase::m_fAccuracy );
         C_UnitBase_exposer.def_readwrite( "eyepitch", &C_UnitBase::m_fEyePitch );
         C_UnitBase_exposer.def_readwrite( "eyeyaw", &C_UnitBase::m_fEyeYaw );

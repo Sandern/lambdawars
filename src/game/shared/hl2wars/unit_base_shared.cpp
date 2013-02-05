@@ -32,7 +32,6 @@
 extern void	SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, float flDamage);
 
 ConVar unit_cheaphitboxtest("unit_cheaphitboxtest", "1", FCVAR_CHEAT|FCVAR_REPLICATED, "Enables/disables testing against hitboxes of an unit, regardless of whether they have hitboxes");
-ConVar unit_cheapshotsimulation("unit_cheapshotsimulation", "1", FCVAR_CHEAT|FCVAR_REPLICATED, "Enables/disables cheap shooting.");
 
 #ifdef CLIENT_DLL
 ConVar unit_debugfirebullets("cl_unit_debugfirebullets", "0", FCVAR_CHEAT, "");
@@ -145,7 +144,7 @@ Disposition_t GetPlayerRelationShip(int p1, int p2)
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CUnitBase::CUnitBase() : m_bUseCheapShotSimulation(true), m_fAccuracy(1.0f), m_bCanBeSeen(true)
+CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 {
 	SetAllowNavIgnore(true);
 
@@ -553,14 +552,34 @@ public:
 		if ( !pEntity )
 			return false;
 
-		if( m_pUnit->AllowNavIgnore() && m_pUnit->IRelationType(pEntity) != D_HT && m_pUnit->GetCommander() == NULL )
+		IUnit *pUnit = pEntity->GetIUnit();
+		if( pUnit && pUnit->AreAttacksPassable(m_pUnit) && m_pUnit->GetCommander() == NULL )
+		{
 			return false;
+		}
 
 		return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
 	}
 private:
 	CUnitBase *m_pUnit;
 };
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CUnitBase::AreAttacksPassable( CBaseEntity *pTarget )
+{
+	if( m_bNeverIgnoreAttacks )
+		return false;
+
+	if( pTarget )
+	{
+		IUnit *pUnit = pTarget->GetIUnit();
+		return pUnit && pUnit->IRelationType( this ) != D_HT;
+	}
+
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -598,24 +617,14 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 	traceFilter.AddEntityToIgnore( info.m_pAdditionalIgnoreEnt );
 
 	CShotManipulator Manipulator( info.m_vecDirShooting );
-	if( m_bUseCheapShotSimulation && unit_cheapshotsimulation.GetBool() )
+
+	iNumShots = info.m_iShots;
+	flActualDamage = info.m_flDamage;
+	if ( flActualDamage == 0.0 )
 	{
-		iNumShots = 1;
-		flActualDamage = info.m_flDamage * info.m_iShots;
-		if ( flActualDamage == 0.0 )
-		{
-			flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType ) * info.m_iShots;
-		}
+		flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType );
 	}
-	else
-	{
-		iNumShots = info.m_iShots;
-		flActualDamage = info.m_flDamage;
-		if ( flActualDamage == 0.0 )
-		{
-			flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType );
-		}
-	}
+
 	flActualDamage *= m_fAccuracy; // Pretty much a damage modifier
 
 	for (int iShot = 0; iShot < iNumShots; iShot++)

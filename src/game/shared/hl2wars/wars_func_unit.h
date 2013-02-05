@@ -95,6 +95,8 @@ public:
 	bool				CanBeSeen( CUnitBase *pUnit = NULL ) { return m_bCanBeSeen; }
 
 	// IUnit
+	virtual bool		AreAttacksPassable( CBaseEntity *pTarget ) { return false; }
+
 	const char *		GetUnitType();
 #ifndef CLIENT_DLL
 	virtual bool		KeyValue( const char *szKeyName, const char *szValue );

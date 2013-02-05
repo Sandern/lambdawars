@@ -1827,6 +1827,16 @@ void register_CUnitBase_class(){
                 , AimGun_function_type( &::CUnitBase::AimGun ) );
         
         }
+        { //::CUnitBase::AreAttacksPassable
+        
+            typedef bool ( ::CUnitBase::*AreAttacksPassable_function_type )( ::CBaseEntity * ) ;
+            
+            CUnitBase_exposer.def( 
+                "AreAttacksPassable"
+                , AreAttacksPassable_function_type( &::CUnitBase::AreAttacksPassable )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::CUnitBase::BodyTarget
         
             typedef ::Vector ( ::CUnitBase::*BodyTarget_function_type )( ::Vector const &,bool ) ;
@@ -2516,7 +2526,7 @@ void register_CUnitBase_class(){
         
         }
         CUnitBase_exposer.def_readwrite( "fowfilterfriendly", &CUnitBase::m_bFOWFilterFriendly );
-        CUnitBase_exposer.def_readwrite( "usecheapshotsimulation", &CUnitBase::m_bUseCheapShotSimulation );
+        CUnitBase_exposer.def_readwrite( "neverignoreattacks", &CUnitBase::m_bNeverIgnoreAttacks );
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
         CUnitBase_exposer.def_readwrite( "deathdrop", &CUnitBase::m_fDeathDrop );
         CUnitBase_exposer.def_readwrite( "enemychangetolerancesqr", &CUnitBase::m_fEnemyChangeToleranceSqr );

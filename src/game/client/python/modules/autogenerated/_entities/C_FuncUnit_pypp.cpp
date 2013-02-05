@@ -1310,6 +1310,16 @@ void register_C_FuncUnit_class(){
         typedef bp::class_< C_FuncUnit_wrapper, bp::bases< C_FuncBrush >, boost::noncopyable > C_FuncUnit_exposer_t;
         C_FuncUnit_exposer_t C_FuncUnit_exposer = C_FuncUnit_exposer_t( "C_FuncUnit", bp::init< >() );
         bp::scope C_FuncUnit_scope( C_FuncUnit_exposer );
+        { //::C_FuncUnit::AreAttacksPassable
+        
+            typedef bool ( ::C_FuncUnit::*AreAttacksPassable_function_type )( ::C_BaseEntity * ) ;
+            
+            C_FuncUnit_exposer.def( 
+                "AreAttacksPassable"
+                , AreAttacksPassable_function_type( &::C_FuncUnit::AreAttacksPassable )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::C_FuncUnit::Blink
         
             typedef void ( ::C_FuncUnit::*Blink_function_type )( float ) ;

@@ -197,6 +197,8 @@ public:
 	virtual void		DoMuzzleFlash();
 
 	// IUnit implementation
+	virtual bool		AreAttacksPassable( CBaseEntity *pTarget );
+
 	const char *		GetUnitType();
 #ifndef CLIENT_DLL
 	void				SetUnitType( const char *unit_type );
@@ -394,8 +396,8 @@ public:
 	bool m_bFOWFilterFriendly;
 
 	float m_fEyePitch, m_fEyeYaw;
+	bool m_bNeverIgnoreAttacks;
 
-	bool m_bUseCheapShotSimulation;
 	float m_fAccuracy;
 
 #ifndef CLIENT_DLL

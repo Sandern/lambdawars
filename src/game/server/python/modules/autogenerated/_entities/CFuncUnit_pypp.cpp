@@ -1387,6 +1387,16 @@ void register_CFuncUnit_class(){
         typedef bp::class_< CFuncUnit_wrapper, bp::bases< CFuncBrush >, boost::noncopyable > CFuncUnit_exposer_t;
         CFuncUnit_exposer_t CFuncUnit_exposer = CFuncUnit_exposer_t( "CFuncUnit", bp::init< >() );
         bp::scope CFuncUnit_scope( CFuncUnit_exposer );
+        { //::CFuncUnit::AreAttacksPassable
+        
+            typedef bool ( ::CFuncUnit::*AreAttacksPassable_function_type )( ::CBaseEntity * ) ;
+            
+            CFuncUnit_exposer.def( 
+                "AreAttacksPassable"
+                , AreAttacksPassable_function_type( &::CFuncUnit::AreAttacksPassable )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::CFuncUnit::CanBeSeen
         
             typedef bool ( ::CFuncUnit::*CanBeSeen_function_type )( ::CUnitBase * ) ;
