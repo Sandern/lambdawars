@@ -1684,7 +1684,7 @@ bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
 		trace_t tr;
 		UTIL_TraceHull( GetAbsOrigin() + Vector(0, 0, 16), GetPath()->m_vGoalPos + Vector(0, 0, 16), 
 			WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
-			GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
+			GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
 		if( tr.fraction == 1.0f || tr.m_pEnt == GetPath()->m_hTarget )
 		{
 			while( GetPath()->m_pWaypointHead->GetNext() )
@@ -1817,21 +1817,21 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 	nNewEnd.z += 16.0f;
 
 	// First do a trace. This detects if something is blocking.
-	CTraceFilterWorldOnly filter;
+	//CTraceFilterWorldOnly filter;
 	trace_t tr;
 	UTIL_TraceHull( vNewStart, nNewEnd, 
 		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
 		GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
-	if( tr.fraction != 1 )
+	if( tr.fraction != 1.0f )
 	{
 #ifdef DEBUG_TESTROUTE
-		NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 255, 0, 0, 0, 0.5f );
+		NDebugOverlay::SweptBox( vNewStart, tr.endpos, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 255, 0, 0, 0, 0.5f );
 #endif // DEBUG_TESTROUTE
 		return false;
 	}
 
 #ifdef DEBUG_TESTROUTE
-		NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
+	NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
 #endif // DEBUG_TESTROUTE
 
 	// Second test, take rough steps along the path and check if there is a nav area below
