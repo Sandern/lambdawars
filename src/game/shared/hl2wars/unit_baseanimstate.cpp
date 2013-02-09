@@ -16,19 +16,11 @@
 #ifndef DISABLE_PYTHON
 UnitBaseAnimState::UnitBaseAnimState(boost::python::object outer) : UnitComponent(outer)
 {
-#ifdef CLIENT_DLL
-	if( m_pOuter->m_pAnimState )
-		Warning("#%d: Clearing duplicate animstate\n", m_pOuter->entindex());
-	m_pOuter->m_pAnimState = this;
-#endif // CLIENT_DLL
 }
 #endif // DISABLE_PYTHON
 
 UnitBaseAnimState::~UnitBaseAnimState()
 {
-#ifdef CLIENT_DLL
-	m_pOuter->m_pAnimState = NULL;
-#endif // CLIENT_DLL
 }
 
 float UnitBaseAnimState::GetAnimTimeInterval( void ) const

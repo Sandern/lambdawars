@@ -2297,6 +2297,17 @@ void register_C_UnitBase_class(){
                 , fget( &::C_UnitBase::GetMaxEnergy ) );
         
         }
+        { //property "animstate"[fget=::C_UnitBase::PyGetAnimState, fset=::C_UnitBase::SetAnimState]
+        
+            typedef ::boost::python::object ( ::C_UnitBase::*fget )(  ) ;
+            typedef void ( ::C_UnitBase::*fset )( ::boost::python::object ) ;
+            
+            C_UnitBase_exposer.add_property( 
+                "animstate"
+                , fget( &::C_UnitBase::PyGetAnimState )
+                , fset( &::C_UnitBase::SetAnimState ) );
+        
+        }
         { //property "enemy"[fget=::C_UnitBase::GetEnemy]
         
             typedef ::C_BaseEntity * ( ::C_UnitBase::*fget )(  ) ;

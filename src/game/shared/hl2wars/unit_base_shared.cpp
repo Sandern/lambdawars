@@ -859,3 +859,29 @@ void CUnitBase::OnUserControl( CHL2WarsPlayer *pPlayer )
 		GetActiveWeapon()->SetViewModel();
 #endif // CLIENT_DLL
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+#ifdef ENABLE_PYTHON
+void CUnitBase::SetAnimState( boost::python::object animstate )
+{
+	if( animstate.ptr() == Py_None )
+	{
+		m_pAnimState = NULL;
+		m_pyAnimState = boost::python::object();
+		return;
+	}
+
+	try {
+		m_pAnimState = boost::python::extract<UnitBaseAnimState *>(animstate);
+		m_pyAnimState = animstate;
+	} catch(boost::python::error_already_set &) {
+		PyErr_Print();
+		PyErr_Clear();
+		m_pAnimState = NULL;
+		m_pyAnimState = boost::python::object();
+		return;
+	}
+}
+#endif // ENABLE_PYTHON

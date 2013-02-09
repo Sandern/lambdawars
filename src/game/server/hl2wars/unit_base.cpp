@@ -13,6 +13,7 @@
 #include "unit_navigator.h"
 #include "hl2wars_player.h"
 #include "animation.h"
+#include "unit_baseanimstate.h"
 
 #ifdef HL2WARS_ASW_DLL
 	#include "sendprop_priorities.h"
@@ -28,6 +29,7 @@
 static ConVar g_debug_rangeattacklos("g_debug_rangeattacklos", "0", FCVAR_CHEAT);
 static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
 static ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
+static ConVar unit_nextserveranimupdatetime("unit_nextserveranimupdatetime", "0.2", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Grenade tossing
@@ -564,6 +566,35 @@ void CUnitBase::SetUnitType( const char *unit_type )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CUnitBase::UpdateServerAnimation( void )
+{
+	VPROF_BUDGET( "CUnitBase::UpdateServerAnimation", VPROF_BUDGETGROUP_UNITS );
+
+	if( !GetAnimState() )
+		return;
+
+	if( m_fNextServerAnimStateTime > gpGlobals->curtime )
+		return;
+
+	if( GetActiveWeapon() )
+	{
+		if( !GetCommander() )
+			AimGun();
+		GetAnimState()->Update( m_fEyeYaw, m_fEyePitch );
+		
+	}
+	else
+	{
+		const QAngle &eyeangles = EyeAngles();
+		GetAnimState()->Update( eyeangles[YAW], eyeangles[PITCH] );
+	}
+
+	m_fNextServerAnimStateTime = gpGlobals->curtime + unit_nextserveranimupdatetime.GetFloat();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 float CUnitBase::GetDensityMultiplier()
 {
 	if( GetNavigator() )
@@ -837,7 +868,7 @@ void CUnitBase::SetCommander( CHL2WarsPlayer *player )
 	m_hCommander = player;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void CUnitBase::SetNavigator( boost::python::object navigator )
 {
 	if( navigator.ptr() == Py_None )
@@ -858,7 +889,7 @@ void CUnitBase::SetNavigator( boost::python::object navigator )
 		return;
 	}
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 /*
 void CUnitBase::SetExpresser( boost::python::object expresser )

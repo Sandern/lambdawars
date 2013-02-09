@@ -303,21 +303,23 @@ void CUnitBase::UpdateClientSideAnimation()
 {
 	if( m_bUpdateClientAnimations )
 	{
-#if 0
+#if 1
 		static ConVar cl_simulationtime_updaterate("cl_simulationtime_updaterate", "0.1");
+		static ConVar cl_simulationtime_offset("cl_simulationtime_offset", "0.05");
 		if( GetSimulationTime() < (gpGlobals->curtime - cl_simulationtime_updaterate.GetFloat()) )
 		{
-			m_flOldSimulationTime = GetSimulationTime();
-			SetSimulationTime( gpGlobals->curtime );
-
-			float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
+			//m_flOldSimulationTime = GetSimulationTime();
+			//PreDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
+			//SetSimulationTime( gpGlobals->curtime - cl_simulationtime_offset.GetFloat() );
+			//PostDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
+			/*float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
 			if ( flTimeDelta > 0 )
 			{
 				Vector newVelo = (GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
 				SetAbsVelocity( newVelo);
 			}
 
-			OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
+			OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );*/
 		}
 #endif // 0
 

@@ -1253,12 +1253,12 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::GetBoxSelection
         
-            typedef void ( ::C_HL2WarsPlayer::*GetBoxSelection_function_type )( int,int,int,int,::CUtlVector< CHandle< C_BaseEntity >, CUtlMemory< CHandle< C_BaseEntity >, int > > & ) ;
+            typedef void ( ::C_HL2WarsPlayer::*GetBoxSelection_function_type )( int,int,int,int,::CUtlVector< CHandle< C_BaseEntity >, CUtlMemory< CHandle< C_BaseEntity >, int > > &,char const * ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "GetBoxSelection"
                 , GetBoxSelection_function_type( &::C_HL2WarsPlayer::GetBoxSelection )
-                , ( bp::arg("iXMin"), bp::arg("iYMin"), bp::arg("iXMax"), bp::arg("iYMax"), bp::arg("selection") ) );
+                , ( bp::arg("iXMin"), bp::arg("iYMin"), bp::arg("iXMax"), bp::arg("iYMax"), bp::arg("selection"), bp::arg("pUnitType")=bp::object() ) );
         
         }
         { //::C_HL2WarsPlayer::GetCamAcceleration

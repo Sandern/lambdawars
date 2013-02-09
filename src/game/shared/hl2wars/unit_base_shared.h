@@ -125,7 +125,6 @@ public:
 	friend class UnitBaseLocomotion;
 	friend class UnitBaseNavigator;
 	friend class UnitBaseSense;
-	friend class UnitBaseAnimState;
 
 	//-----------------------------------------------------
 	//
@@ -263,7 +262,16 @@ public:
 	virtual const Vector &		GetEnterOffset( void );
 	virtual void				SetEnterOffset( const Vector &enteroffset );
 
+	// Anim state
+#ifdef ENABLE_PYTHON
+	boost::python::object PyGetAnimState();
+	void				SetAnimState( boost::python::object animstate );
+#endif // ENABLE_PYTHON
+	UnitBaseAnimState*	GetAnimState();
+
 #ifndef CLIENT_DLL
+	virtual void		UpdateServerAnimation( void );
+	
 	virtual int			OnTakeDamage( const CTakeDamageInfo &info );
 	int					TakeHealth( float flHealth, int bitsDamageType );
 	virtual void		OnFullHealth( void ) {}
@@ -452,6 +460,12 @@ private:
 	bool m_bHasEnterOffset;
 	Vector m_vEnterOffset; 
 
+	// Animstate
+	UnitBaseAnimState *m_pAnimState;
+#ifdef ENABLE_PYTHON
+	boost::python::object m_pyAnimState;
+#endif // ENABLE_PYTHON
+
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
 	CNetworkString(	m_NetworkedUnitType, MAX_PATH );
@@ -482,6 +496,8 @@ private:
 	boost::python::object m_pyAnimEventMap; // Keeps m_pAnimEventMap valid
 #endif // ENABLE_PYTHON
 
+	float m_fNextServerAnimStateTime;
+
 	// Animation state
 	CNetworkVar(bool, m_bCrouching );
 	CNetworkVar(bool, m_bClimbing );
@@ -490,9 +506,6 @@ private:
 	CNetworkVar(int, m_iEnergy );
 	CNetworkVar(int, m_iMaxEnergy );
 #else
-	// Animstate
-	UnitBaseAnimState *m_pAnimState;
-
 	string_t m_UnitType;
 	char m_NetworkedUnitType[MAX_PATH];
 	CHandle< CHL2WarsPlayer > m_hOldCommander;
@@ -560,6 +573,18 @@ inline int CUnitBase::GetAttackPriority()
 inline void CUnitBase::SetAttackPriority( int priority )
 {
 	m_iAttackPriority = priority;
+}
+
+#ifdef ENABLE_PYTHON
+inline boost::python::object CUnitBase::PyGetAnimState() 
+{
+	return m_pyAnimState;
+}
+#endif // ENABLE_PYTHON
+
+inline UnitBaseAnimState *CUnitBase::GetAnimState() 
+{ 
+	return m_pAnimState; 
 }
 
 #ifndef CLIENT_DLL

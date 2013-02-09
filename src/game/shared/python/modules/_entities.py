@@ -1263,6 +1263,13 @@ class Entities(GenerateModuleSemiShared):
         
         self.ParseUnitBaseShared(mb, cls_name)
         
+        cls.mem_funs('PyGetAnimState').exclude() 
+        cls.mem_funs('GetAnimState').exclude() 
+        cls.mem_funs('SetAnimState').exclude() 
+        cls.add_property( 'animstate'
+                         , cls.mem_fun('PyGetAnimState')
+                         , cls.mem_fun('SetAnimState') )
+        
         cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetEnemy').exclude() 
         if self.isClient:

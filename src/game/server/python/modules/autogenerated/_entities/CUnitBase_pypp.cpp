@@ -2483,6 +2483,15 @@ void register_CUnitBase_class(){
                 , default_UpdateOnRemove_function_type(&CUnitBase_wrapper::default_UpdateOnRemove) );
         
         }
+        { //::CUnitBase::UpdateServerAnimation
+        
+            typedef void ( ::CUnitBase::*UpdateServerAnimation_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "UpdateServerAnimation"
+                , UpdateServerAnimation_function_type( &::CUnitBase::UpdateServerAnimation ) );
+        
+        }
         { //::CUnitBase::UseCustomCanBeSeenCheck
         
             typedef bool ( ::CUnitBase::*UseCustomCanBeSeenCheck_function_type )(  ) ;
@@ -2939,6 +2948,17 @@ void register_CUnitBase_class(){
                 "maxenergy"
                 , fget( &::CUnitBase::GetMaxEnergy )
                 , fset( &::CUnitBase::SetMaxEnergy ) );
+        
+        }
+        { //property "animstate"[fget=::CUnitBase::PyGetAnimState, fset=::CUnitBase::SetAnimState]
+        
+            typedef ::boost::python::object ( ::CUnitBase::*fget )(  ) ;
+            typedef void ( ::CUnitBase::*fset )( ::boost::python::object ) ;
+            
+            CUnitBase_exposer.add_property( 
+                "animstate"
+                , fget( &::CUnitBase::PyGetAnimState )
+                , fset( &::CUnitBase::SetAnimState ) );
         
         }
         { //property "enemy"[fget=::CUnitBase::GetEnemy, fset=::CUnitBase::SetEnemy]
