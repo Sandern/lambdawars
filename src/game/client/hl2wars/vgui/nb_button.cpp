@@ -108,17 +108,17 @@ void CNB_Button::PaintBackground()
 	if ( IsArmed() || IsDepressed() )
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 20, 59, 96, 255 ), 1.0f, true, Color( 28, 80, 130, 255 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 96, 96, 96, 255 ), 1.0f, true, Color( 130, 130, 130, 255 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 192, 143, 59, 255 ), 1.0f, true, Color( 130, 130, 130, 255 ) );
 	}
 	else if ( IsEnabled() )
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 24, 43, 66, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 66, 66, 66, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 128, 91, 40, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
 	}
 	else
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 65, 78, 91, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 91, 91, 91, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 102, 73, 32, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
 	}
 }
 

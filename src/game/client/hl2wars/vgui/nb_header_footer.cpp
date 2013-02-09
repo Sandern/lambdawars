@@ -428,7 +428,8 @@ void CNB_Gradient_Bar::PaintBackground()
 	vgui::surface()->DrawFilledRect( 0, y, wide, y + tall );
 
 	//vgui::surface()->DrawSetColor( Color( 53, 86, 117, 255 * flAlpha ) );
-	vgui::surface()->DrawSetColor( Color( 117, 117, 117, 255 * flAlpha ) );
+	//vgui::surface()->DrawSetColor( Color( 117, 117, 117, 255 * flAlpha ) );
+	vgui::surface()->DrawSetColor( Color( 192, 143, 59, 255 * flAlpha ) );
 
 	int nBarPosY = y + YRES( 4 );
 	int nBarHeight = tall - YRES( 8 );

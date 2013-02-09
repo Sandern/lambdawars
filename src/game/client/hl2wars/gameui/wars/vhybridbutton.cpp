@@ -375,19 +375,22 @@ void BaseModHybridButton::PaintButtonEx()
 			if ( m_nStyle == BUTTON_RED || m_nStyle == BUTTON_REDMAIN )
 			{
 				//col.SetColor( 0, 128, 128, 255 );
-				col.SetColor( 169, 213, 255, 255 );
+				col.SetColor( 192, 143, 59, 255 );
 			}
 			else if ( m_nStyle == BUTTON_ALIENSWARMMENUBUTTON || m_nStyle == BUTTON_ALIENSWARMMENUBUTTONSMALL )
 			{
 				//col.SetColor( 135, 170, 193, 255 );
 				//col.SetColor( 255, 255, 255, 255 );
-				col.SetColor( 200, 200, 200, 255 );
+				//col.SetColor( 200, 200, 200, 255 );
+				col.SetColor( 225, 225, 225, 255 );
+				
 			}
 			else
 			{
-				col.SetColor( 200, 200, 200, 255 );
+				//col.SetColor( 200, 200, 200, 255 );
 				//col.SetColor( 125, 125, 125, 255 );
 				//col.SetColor( 83, 148, 192, 255 );
+				col.SetColor( 225, 225, 225, 255 );
 			}
 			break;
 		case Disabled:

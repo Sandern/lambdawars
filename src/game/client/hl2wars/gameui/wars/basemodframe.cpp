@@ -881,7 +881,7 @@ void CBaseModFrame::DrawGenericBackground()
 	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 255 * flAlpha ) );
 	vgui::surface()->DrawFilledRect( 0, 0, GetWide(), GetTall() );
 
-	vgui::surface()->DrawSetColor( Color( 117, 117, 117, 255 * flAlpha ) );
+	vgui::surface()->DrawSetColor( Color( 192, 143, 59, 255 * flAlpha ) );
 	//vgui::surface()->DrawSetColor( Color( 53, 86, 117, 255 * flAlpha ) );
 	//vgui::surface()->DrawFilledRect( 0, YRES( 4 ), wide, tall - YRES( 4 ) );
 
