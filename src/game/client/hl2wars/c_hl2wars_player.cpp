@@ -443,15 +443,15 @@ C_BaseCombatWeapon *C_HL2WarsPlayer::GetWeapon( int i ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMax,  CUtlVector< EHANDLE > &selection )
+void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMax,  CUtlVector< EHANDLE > &selection, const char *pUnitType )
 {
 	UnitListInfo *pUnitList;
 	CUnitBase *pUnit;
 	int iX, iY, i;
 	bool bInScreen;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::list pytargetselection;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	CUtlVector< EHANDLE > targetselection;
 
 	// See which units we will select
@@ -462,25 +462,29 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 	{
 		if( !pUnit->IsAlive() )
 			continue;
+
+		// Filter on unit type if specified
+		if( pUnitType && Q_stricmp( pUnitType, pUnit->GetUnitType() ) )
+			continue;
+
 		bInScreen = GetVectorInScreenSpace(pUnit->GetAbsOrigin(), iX, iY);
 		if( bInScreen && iX >= iXMin && iY >= iYMin && iX <= iXMax && iY <= iYMax )
 			targetselection.AddToTail(pUnit);
 	}
 
 	// For each unit see if it wants to be selected in this group
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	pytargetselection = UtlVectorToListByValue< EHANDLE >(targetselection);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	for(i=0; i<targetselection.Count(); i++)
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( targetselection[i]->GetIUnit()->IsSelectableByPlayer(this, pytargetselection) )
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		{
 			selection.AddToTail(targetselection[i]);
 		}
 	}
-
 }
 
 //-----------------------------------------------------------------------------
@@ -511,7 +515,6 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 		if( n >= maxn )
 		{
 			// Send and reset
-			//DevMsg("Sending command of length %d: %s\n", Q_strlen( buf ), buf );
 			engine->ServerCmd( buf );
 			n = 0;
 			buf[0] = '\0';
@@ -522,7 +525,6 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 	// Send remaining
 	if( n > 0 )
 	{
-		//DevMsg("Sending command of length %d: %s\n", Q_strlen( buf ), buf );
 		engine->ServerCmd( buf );
 	}
 
@@ -534,7 +536,6 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 //-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::SelectBox( int iXMin, int iYMin, int iXMax, int iYMax )
 {
-	//Msg("Select box xmin: %d, ymin: %d, xmax: %d, ymax: %d\n", iXMin, iYMin, iXMax, iYMax);
 	if( !g_pUnitListHead )
 	{
 		ClearSelection();
@@ -561,37 +562,22 @@ void C_HL2WarsPlayer::SelectBox( int iXMin, int iYMin, int iXMax, int iYMax )
 //-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::SelectAllUnitsOfTypeInScreen(const char *pUnitType)
 {
-	UnitListInfo *pUnitList;
-	CUnitBase *pUnit;
-	int iX, iY;
-	bool bInScreen;
-	CUtlVector< EHANDLE > selection;
-
 	if( !g_pUnitListHead )
-		return;
-
-	pUnitList = GetUnitListForOwnernumber(GetOwnerNumber());
-	if( !pUnitList )
 	{
 		ClearSelection();
 		engine->ServerCmd("player_clearselection");
 		return;
 	}
 
-	ClearSelection( false ); // Do not trigger on selection changed, since we do that below too already.
-	engine->ServerCmd("player_clearselection");
+	CUtlVector< EHANDLE > selection;
+	GetBoxSelection( 0, 0, ScreenWidth(), ScreenHeight(), selection, pUnitType ); 
 
-	for( pUnit=pUnitList->m_pHead; pUnit; pUnit=pUnit->GetNext() )
-	{
-		if( !pUnit->IsAlive() || Q_stricmp( pUnitType, pUnit->GetUnitType() ) )
-			continue;
+	if( cl_selection_noclear.GetBool() && selection.Count() == 0 )
+		return;
 
-		bInScreen = GetVectorInScreenSpace(pUnit->GetLocalOrigin(), iX, iY);
-		if( !bInScreen || iX < 0 || iX >= ScreenWidth() || iY < 0 || iY >= ScreenHeight() ) {
-			continue;
-		}
-
-		selection.AddToTail( pUnit );
+	if( (m_nButtons & IN_SPEED) == 0 ) {
+		ClearSelection( false ); // Do not trigger on selection changed, since we do that below too already.
+		engine->ServerCmd("player_clearselection");
 	}
 
 	MakeSelection( selection );

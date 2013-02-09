@@ -99,7 +99,7 @@ public:
 	void							OrderUnits();
 	void							ScheduleSelectionChangedSignal();
 
-	void							GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMax,  CUtlVector< EHANDLE > &selection );
+	void							GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMax,  CUtlVector< EHANDLE > &selection, const char *pUnitType = NULL );
 	void							SelectBox( int xmin, int ymin, int xmax, int ymax );
 	void							SelectAllUnitsOfTypeInScreen( const char *pUnitType );
 	void							SimulateOrderUnits( Vector &vStart, Vector &vEnd, CBaseEntity *pHitEnt );
