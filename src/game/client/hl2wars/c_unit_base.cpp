@@ -95,9 +95,10 @@ void RecvProxy_Unit_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, 
 //-----------------------------------------------------------------------------
 // Purpose: Recv tables
 //-----------------------------------------------------------------------------
-void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut );
-void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut );
-void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut );
+extern void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut );
+extern void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut );
+extern void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut );
+extern void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void *pOut );
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	// Hi res origin and angle
@@ -131,6 +132,8 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
+	RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
+
 	RecvPropString(  RECVINFO( m_NetworkedUnitType ) ),
 
 	RecvPropInt		(RECVINFO(m_iHealth)),
@@ -154,14 +157,16 @@ END_RECV_TABLE()
 IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
 
 BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
-	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
-	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
 	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
+	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
+	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
 END_RECV_TABLE()
 
 
 BEGIN_PREDICTION_DATA( CUnitBase )
+	//DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+
 	//DEFINE_PRED_FIELD( m_vecVelocity, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	//DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),	
@@ -298,6 +303,24 @@ void CUnitBase::UpdateClientSideAnimation()
 {
 	if( m_bUpdateClientAnimations )
 	{
+#if 0
+		static ConVar cl_simulationtime_updaterate("cl_simulationtime_updaterate", "0.1");
+		if( GetSimulationTime() < (gpGlobals->curtime - cl_simulationtime_updaterate.GetFloat()) )
+		{
+			m_flOldSimulationTime = GetSimulationTime();
+			SetSimulationTime( gpGlobals->curtime );
+
+			float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
+			if ( flTimeDelta > 0 )
+			{
+				Vector newVelo = (GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
+				SetAbsVelocity( newVelo);
+			}
+
+			OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
+		}
+#endif // 0
+
 		// Yaw and Pitch are updated in UserCmd if the unit has a commander
 		if( !GetCommander() )
 		{
@@ -434,6 +457,7 @@ bool CUnitBase::ShouldPredict( void )
 
 void CUnitBase::EstimateAbsVelocity( Vector& vel )
 {
+#if 1
 	// FIXME: Unit velocity doesn't seems correct
 	if( ShouldPredict() )
 	{
@@ -441,6 +465,9 @@ void CUnitBase::EstimateAbsVelocity( Vector& vel )
 		return;
 	}
 	return BaseClass::EstimateAbsVelocity(vel);
+#else
+	vel = GetAbsVelocity();
+#endif // 0
 }
 
 #if 0

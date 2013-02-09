@@ -375,6 +375,7 @@ void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, c
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendFullDataTable );
 
+extern void SendProxy_SimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID );
 
 //-----------------------------------------------------------------------------
 // Purpose:  Send tables
@@ -419,6 +420,8 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
 END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
+	SendPropInt		(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime, SENDPROP_SIMULATION_TIME_PRIORITY ),
+
 	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
 
 	SendPropInt		(SENDINFO(m_iHealth), 15, SPROP_UNSIGNED ),
@@ -442,6 +445,8 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
+	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
+
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
 

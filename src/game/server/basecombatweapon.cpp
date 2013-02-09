@@ -232,13 +232,7 @@ bool CBaseCombatWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector
 	// --------------------
 	// Check for occlusion
 	// --------------------
-#ifdef HL2WARS_DLL
-	if( !m_hOwner.Get()->IsUnit() )
-		return true;
-	CUnitBase *npcOwner = (CUnitBase *)(m_hOwner.Get().Get());
-#else
 	CAI_BaseNPC* npcOwner = m_hOwner.Get()->MyNPCPointer();
-#endif // HL2WARS_DLL
 
 	// Find its relative shoot position
 	Vector vecRelativeShootPosition;
@@ -305,7 +299,6 @@ bool CBaseCombatWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector
 	{
 		if ( npcOwner->IRelationType( pBCC ) == D_HT )
 			return true;
-#ifndef HL2WARS_DLL
 		if ( bSetConditions )
 		{
 			npcOwner->SetCondition( COND_WEAPON_BLOCKED_BY_FRIEND );
@@ -320,7 +313,6 @@ bool CBaseCombatWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector
 		{
 			NDebugOverlay::Line( tr.startpos, tr.endpos, 255, 0, 0, false, 1.0 );
 		}
-#endif // HL2WARS_DLL
 	}
 
 	return false;

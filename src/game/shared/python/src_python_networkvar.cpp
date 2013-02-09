@@ -18,6 +18,9 @@
 ConVar g_debug_pynetworkvar("g_debug_pynetworkvar", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 #ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback )
 	: m_bChangedCallback(changedcallback)
 {
@@ -36,6 +39,9 @@ CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, 
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CPythonNetworkVarBase::~CPythonNetworkVarBase()
 {
 	CBaseEntity *pEnt = NULL;
@@ -50,6 +56,9 @@ CPythonNetworkVarBase::~CPythonNetworkVarBase()
 		pEnt->m_utlPyNetworkVars.FindAndRemove(this);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkVarBase::NetworkStateChanged( void )
 {
 	m_PlayerUpdateBits.SetAll();
@@ -58,6 +67,9 @@ void CPythonNetworkVarBase::NetworkStateChanged( void )
 void CPythonNetworkVarBase::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient ) {}
 
 //---------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CPythonNetworkVar::CPythonNetworkVar( bp::object ent, const char *name, bp::object data, 
 									 bool bInitStateChanged, bool changedcallback )
 			: CPythonNetworkVarBase(ent, name, changedcallback)
@@ -67,6 +79,9 @@ CPythonNetworkVar::CPythonNetworkVar( bp::object ent, const char *name, bp::obje
 		NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkVar::Set( bp::object data )
 {
 	if( data.ptr() == m_dataInternal.ptr() )
@@ -75,11 +90,17 @@ void CPythonNetworkVar::Set( bp::object data )
 	NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::object CPythonNetworkVar::Get( void )
 {
 	return m_dataInternal;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
 	bp::object type = __builtin__.attr("type");
@@ -117,6 +138,9 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 }
 
 //---------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CPythonNetworkArray::CPythonNetworkArray( bp::object ent, const char *name, bp::list data, 
 										 bool bInitStateChanged, bool changedcallback )
 : CPythonNetworkVarBase(ent, name, changedcallback)
@@ -129,6 +153,9 @@ CPythonNetworkArray::CPythonNetworkArray( bp::object ent, const char *name, bp::
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkArray::SetItem( int idx, bp::object data )
 {
 	if( data == boost::python::object(m_dataInternal[idx]) )
@@ -137,17 +164,26 @@ void CPythonNetworkArray::SetItem( int idx, bp::object data )
 	NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::object CPythonNetworkArray::GetItem( int idx )
 {
 	return m_dataInternal[idx];
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkArray::Set( bp::list data )
 {
 	m_dataInternal = data;
 	NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
 	bp::object type = __builtin__.attr("type");
@@ -199,6 +235,9 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 }
 
 //---------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CPythonNetworkDict::CPythonNetworkDict( bp::object ent, const char *name, bp::dict data, 
 									   bool bInitStateChanged, bool changedcallback )
 : CPythonNetworkVarBase(ent, name, changedcallback)
@@ -211,6 +250,9 @@ CPythonNetworkDict::CPythonNetworkDict( bp::object ent, const char *name, bp::di
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkDict::SetItem( bp::object key, bp::object data )
 {
 	try {
@@ -227,17 +269,26 @@ void CPythonNetworkDict::SetItem( bp::object key, bp::object data )
 	NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bp::object CPythonNetworkDict::GetItem( bp::object key )
 {
 	return m_dataInternal[key];
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkDict::Set( bp::dict data )
 {
 	m_dataInternal = data;
 	NetworkStateChanged();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
 	bp::object type = __builtin__.attr("type");
@@ -311,6 +362,9 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 }
 
 //---------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict )
 {
 	if( pEnt->m_utlPyNetworkVars.Count() == 0 )
