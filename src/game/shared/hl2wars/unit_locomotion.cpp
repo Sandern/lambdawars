@@ -19,6 +19,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar unit_nolocomotion("unit_nolocomotion", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+
 #define	MAX_CLIP_PLANES	5
 
 float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &pDirection )
@@ -117,6 +119,10 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 void UnitBaseLocomotion::PerformMovement( UnitBaseMoveCommand &mv )
 {
 	VPROF_BUDGET( "UnitBaseLocomotion::PerformMovement", VPROF_BUDGETGROUP_UNITS );
+
+	if( unit_nolocomotion.GetBool() )
+		return;
+
 	SetupMove(mv);
 	Move(mv.interval, mv);
 	FinishMove(mv);
@@ -128,6 +134,10 @@ void UnitBaseLocomotion::PerformMovement( UnitBaseMoveCommand &mv )
 void UnitBaseLocomotion::PerformMovementFacingOnly( UnitBaseMoveCommand &move_command )
 {
 	VPROF_BUDGET( "UnitBaseLocomotion::PerformMovementFacingOnly", VPROF_BUDGETGROUP_UNITS );
+
+	if( unit_nolocomotion.GetBool() )
+		return;
+
 	SetupMove(move_command);
 	
 	mv = &move_command;

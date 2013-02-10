@@ -61,6 +61,7 @@
 ConVar unit_reactivepath("unit_reactivepath", "1", 0, "Optimize the current path each update.");
 ConVar unit_reactivepath_maxlookahead("unit_reactivepath_maxlookahead", "2048.0", 0, "Max distance a path is optimized each update.");
 ConVar unit_reactivepath_maxwaypointsahead("unit_reactivepath_maxwaypointsahead", "5", 0, "Max number of waypoints being looked ahead.");
+ConVar unit_nonavigator("unit_nonavigator", "0", 0, "Do not perform navigation");
 ConVar unit_navigator_eattest("unit_navigator_eattest", "0", 0, "Perform navigation, but do not output the calculated move values.");
 ConVar unit_route_requirearea("unit_route_requirearea", "1", 0, "Only try to build a route though the nav mesh if a start and goal area can be found");
 
@@ -274,6 +275,9 @@ void UnitBaseNavigator::DispatchOnNavFailed()
 void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::Update", VPROF_BUDGETGROUP_UNITS );
+
+	if( unit_nonavigator.GetBool() )
+		return;
 
 	// Check goal and update path
 	Vector vPathDir;
