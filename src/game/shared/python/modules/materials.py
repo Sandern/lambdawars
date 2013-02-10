@@ -15,6 +15,7 @@ class Materials(GenerateModuleSemiShared):
     client_files.extend( [
         'cdll_client_int.h',
         'viewpostprocess.h',
+        'hl2wars/teamcolor_proxy.h',
     ] )
         
     server_files = []
@@ -73,6 +74,8 @@ class Materials(GenerateModuleSemiShared):
             cls.include()
             
             mb.enum('ImageFormat').include()
+            
+            mb.free_function('SetUITeamColor').include()
 
         
         # Remove any protected function 

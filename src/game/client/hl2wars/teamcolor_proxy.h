@@ -11,5 +11,6 @@
 #pragma once
 #endif
 
+void SetUITeamColor( const Vector &vTeamColor );
 
 #endif // TEAMCOLOR_PROXY_H

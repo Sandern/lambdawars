@@ -79,6 +79,8 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 		SHADER_PARAM( SHADERSRGBREAD360, SHADER_PARAM_TYPE_BOOL, "0", "Simulate srgb read in shader code")
 
+		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "", "FoW Render Target" )
+
 		// vertexlitgeneric tree sway animation control
 		SHADER_PARAM( TREESWAY, SHADER_PARAM_TYPE_INTEGER, "0", "" );
 		SHADER_PARAM( TREESWAYHEIGHT, SHADER_PARAM_TYPE_FLOAT, "1000", "" );
@@ -96,7 +98,9 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		SHADER_PARAM( TREESWAYSPEEDLERPSTART, SHADER_PARAM_TYPE_FLOAT, "3", "" );
 		SHADER_PARAM( TREESWAYSPEEDLERPEND, SHADER_PARAM_TYPE_FLOAT, "6", "" );
 
-		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "", "FoW Render Target" )
+		// Team coloring
+		SHADER_PARAM( TEAMCOLOR, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "Team color" )
+		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
 	END_SHADER_PARAMS
 
 	void SetupVars( VertexLitGeneric_DX9_Vars_t& info )
@@ -198,6 +202,9 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		info.m_nTreeSwaySpeedLerpEnd = TREESWAYSPEEDLERPEND;
 
 		info.m_nFoW = FOW;
+
+		info.m_nTeamColor = TEAMCOLOR;
+		info.m_nTeamColorTexture = TEAMCOLORMAP;
 	}
 
 	SHADER_INIT_PARAMS()
