@@ -124,11 +124,15 @@ protected:
 	void				ClearFogOfWarTo( FOWSIZE_TYPE state );
 	void				ClearNewPositions( FOWListInfo *pFOWList, int iOwner, bool bClear = true );
 	
-	void				FillLine( int x1, int x2, int y, FOWSIZE_TYPE state, FOWSIZE_TYPE clearmask = FOWCLEAR_MASK );
-	void				UpdateFogOfWarState( int x, int y, int radius, FOWSIZE_TYPE mask, FOWSIZE_TYPE clearmask = FOWCLEAR_MASK );
+	void				FillLine( int x1, int x2, int y, FOWSIZE_TYPE mask );
+	void				UpdateFogOfWarState( int x, int y, int radius, FOWSIZE_TYPE mask );
 
 	void				ShadowCast( int cx, int cy, int row, float start, float end,
-									int radius, int xx, int xy, int yx, int yys, FOWSIZE_TYPE mask, float eyez, CUtlVector< FowPos_t > &EndPos );
+									int radius, int xx, int xy, int yx, int yys, FOWSIZE_TYPE mask, float eyez
+#ifdef CLIENT_DLL
+									, CUtlVector< FowPos_t > &EndPos, bool bInverseSlope 
+#endif // CLIENT_DLL		
+						);
 	void				DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE mask );
 
 public:
@@ -185,7 +189,7 @@ private:
 
 	int			m_nGridSize, m_nTileSize;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWar;
-	CUtlVector< float > m_TileHeights;
+	CUtlVector< int > m_TileHeights;
 	
 	FOWListInfo *m_pFogUpdaterListHead;
 	CUtlVector<CBaseEntity *> m_FogEntities;
@@ -271,6 +275,15 @@ inline void CFogOfWarMgr::ResetToUnknown( int iPlayerIndex )
 inline void CFogOfWarMgr::ResetToKnown( int iPlayerIndex )
 {
 	m_KnownEntities[iPlayerIndex].SetAll();
+}
+#else
+//-----------------------------------------------------------------------------
+// Purpose: Clears all
+//-----------------------------------------------------------------------------
+inline void CFogOfWarMgr::RenderFowClear()
+{
+	BeginRenderFow( false );
+	EndRenderFow();
 }
 #endif // CLIENT_DLL
 

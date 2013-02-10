@@ -18,6 +18,7 @@
 	#include "materialsystem/imaterialvar.h"
 	#include "renderparm.h"
 	#include "tex_fogofwar.h"
+	#include "videocfg/videocfg.h"
 #else
 	#include "hl2wars/hl2wars_player.h"
 #endif
@@ -31,7 +32,12 @@
 #include "tier0/memdbgon.h"
 
 // Increment this to force rebuilding all heightmaps
-#define	 HEIGHTMAP_VERSION_NUMBER	3
+#define	 HEIGHTMAP_VERSION_NUMBER	4
+
+#ifdef CLIENT_DLL
+	#undef VPROF_BUDGETGROUP_FOGOFWAR
+	#define VPROF_BUDGETGROUP_FOGOFWAR					_T("Client:Fog of War")
+#endif // CLIENT_DLL
 
 // #define FOW_USE_PROCTEX
 
@@ -48,7 +54,7 @@ ConVar sv_fogofwar_tilesize( "sv_fogofwar_tilesize", "64", FCVAR_CHEAT | FCVAR_R
 // Split update rate on the server and client
 // Client will have an higher update rate to make it visually look better
 #ifdef CLIENT_DLL
-	ConVar cl_fogofwar_updaterate( "cl_fogofwar_updaterate", "0.1", 0, "Rate at which the fog of war visuals update." );
+	ConVar cl_fogofwar_updaterate( "cl_fogofwar_updaterate", "0.125", 0, "Rate at which the fog of war visuals update." );
 	#define FOW_UPDATERATE cl_fogofwar_updaterate.GetFloat()
 
 #ifdef FOW_USE_PROCTEX
@@ -189,6 +195,13 @@ void CFogOfWarMgr::Shutdown()
 void CFogOfWarMgr::LevelInitPreEntity()
 {
 #ifdef CLIENT_DLL
+	CPULevel_t level = GetCPULevel();
+	if( level == CPU_LEVEL_LOW )
+		cl_fogofwar_updaterate.SetValue( 0.25f );
+	else if( level == CPU_LEVEL_MEDIUM )
+		cl_fogofwar_updaterate.SetValue( 0.18f );
+	else
+		cl_fogofwar_updaterate.Revert();
 #if 0
 	// Read fog of war color from map resource file
 	ConVarRef mat_fogofwar_r("mat_fogofwar_r");
@@ -328,7 +341,7 @@ void CFogOfWarMgr::CalculateHeightMap()
 				tilez += tr.endpos.z;
 
 				//Msg("start: %f %f %f, end: %f %f %f, x: %d, y: %d, end: %f\n", x, y, tr.endpos.z);
-				m_TileHeights[FOWINDEX(x, y)] = tilez / 4.0f;
+				m_TileHeights[FOWINDEX(x, y)] = (int)(tilez / 4.0f);
 			}
 		}
 
@@ -341,7 +354,7 @@ void CFogOfWarMgr::CalculateHeightMap()
 		{
 			for( int y = 0; y < m_nGridSize; y++ )
 			{
-				m_TileHeights[FOWINDEX(x, y)] = -MAX_COORD_FLOAT;
+				m_TileHeights[FOWINDEX(x, y)] = MIN_COORD_INTEGER;
 			}
 		}
 	}
@@ -389,7 +402,7 @@ void CFogOfWarMgr::SaveHeightMap()
 		int i;
 		for ( i = 0; i < m_nGridSize*m_nGridSize; i++)
 		{
-			buf.PutFloat( m_TileHeights[i] );
+			buf.PutInt( m_TileHeights[i] );
 		}
 	}
 
@@ -487,12 +500,12 @@ void CFogOfWarMgr::LoadHeightMap()
 	if( bHasHeightMap )
 	{
 		for ( i = 0; i < gridsize*gridsize; i++)
-			m_TileHeights[i] = buf.GetFloat();
+			m_TileHeights[i] = buf.GetInt();
 	}
 	else
 	{
 		for ( i = 0; i < gridsize*gridsize; i++)
-			m_TileHeights[i] = -MAX_COORD_FLOAT;
+			m_TileHeights[i] = MIN_COORD_INTEGER;
 	}
 
 	DevMsg("CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime);
@@ -506,7 +519,7 @@ void CFogOfWarMgr::ModifyHeightAtTile( int x, int y, float fHeight )
 {
 	int idx = FOWINDEX(x, y);
 	if( m_TileHeights.IsValidIndex( idx ) )
-		m_TileHeights[idx] = fHeight;
+		m_TileHeights[idx] = (int)fHeight;
 }
 
 //-----------------------------------------------------------------------------
@@ -777,7 +790,11 @@ void CFogOfWarMgr::Update( float frametime )
 	if( !m_bActive )
 		return;
 
+#ifdef CLIENT_DLL
+	VPROF_BUDGET( "Client:CFogOfWarMgr::Update", VPROF_BUDGETGROUP_FOGOFWAR );
+#else
 	VPROF_BUDGET( "CFogOfWarMgr::Update", VPROF_BUDGETGROUP_FOGOFWAR );
+#endif // CLIENT_DLL
 
 	UpdateShared();
 
@@ -901,6 +918,8 @@ static inline bool SetMaterialVarFloat( IMaterial* pMat, const char* pVarName, f
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::RenderFogOfWar( float frametime )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::RenderFogOfWar", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	CMatRenderContextPtr pRenderContext( materials );
 
 	pRenderContext->SetFloatRenderingParameter( FLOAT_RENDERPARM_GLOBAL_FOW_RATEIN, frametime * mat_fow_converge_ratein.GetFloat() );
@@ -992,6 +1011,8 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::BeginRenderFow", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	if( !m_RenderBufferIM || !m_RenderBufferIM.IsValid() ) 
 	{
 		Msg("RenderFogOfWar: No render buffer\b");
@@ -1044,11 +1065,15 @@ void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 	m_bRenderingFOW = true;
 }
 
+static float s_FOWDebugHeight;
+
 //-----------------------------------------------------------------------------
 // Purpose: Render a single unit to the fow render target
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::RenderFow", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	if( !m_bRenderingFOW )
 		return;
 
@@ -1057,13 +1082,54 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 	CMatRenderContextPtr pRenderContext( materials );
 
 	//IMaterial *black_mat = materials->FindMaterial( "Tools/toolsblack", TEXTURE_GROUP_OTHER, true );
-	IMaterial *white_mat = materials->FindMaterial( "vgui/white", TEXTURE_GROUP_OTHER, true );
+	IMaterial *white_mat = materials->FindMaterial( "fow/fow_clear", TEXTURE_GROUP_OTHER, true );
 
 	pRenderContext->Bind( white_mat );
 	IMesh* pMesh = pRenderContext->GetDynamicMesh( true );
 
 	CMeshBuilder meshBuilder;
 
+	int nDebug = fow_shadowcast_debug.GetInt();
+
+	meshBuilder.Begin( pMesh, MATERIAL_POLYGON, EndPos.Count() );
+
+	for( int i = 0; i < EndPos.Count(); i++ )
+	{
+		x = EndPos[i].x * (iFOWRenderSize / (float)m_nGridSize);
+		y = EndPos[i].y * (iFOWRenderSize / (float)m_nGridSize);
+
+		meshBuilder.Position3f( x, y, 0.0f );
+		meshBuilder.TexCoord2f( 0, 0.0f, 1.0f );
+		meshBuilder.Color4ub( 255, 255, 255, 255 );
+		meshBuilder.AdvanceVertex();
+
+		if( nDebug > 0 )
+		{
+			int i2 = 0;
+			if( i+1 < EndPos.Count() )
+				i2 = i+1;
+
+			Vector vPos = ComputeWorldPosition(EndPos[i].x, EndPos[i].y);
+			vPos.z = s_FOWDebugHeight;
+			Vector vPos2 = ComputeWorldPosition(EndPos[i2].x, EndPos[i2].y);
+			vPos2.z = s_FOWDebugHeight;
+			NDebugOverlay::Line( vPos, vPos2, MIN(i*22, 255), MAX(255-(i*22), 0), 0, true, 0.2f );
+
+			if( nDebug > 1 )
+			{
+				char buf[15];
+				Q_snprintf( buf, sizeof(buf), "%d", i );
+				NDebugOverlay::Text(vPos, buf, false, 0.2f);
+			}
+
+		}
+	}
+
+	meshBuilder.End();
+	pMesh->Draw();
+
+
+#if 0
 	int nDebug = fow_shadowcast_debug.GetInt();
 
 	if( nDebug == 0 )
@@ -1136,6 +1202,7 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 		meshBuilder.End();
 		pMesh->Draw();
 	}
+#endif // 0
 
 	pRenderContext.SafeRelease();
 }
@@ -1145,6 +1212,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::EndRenderFow()
 {
+	VPROF_BUDGET( "CFogOfWarMgr::EndRenderFow", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	if( !m_bRenderingFOW )
 		return;
 
@@ -1157,15 +1226,6 @@ void CFogOfWarMgr::EndRenderFow()
 	render->PopView( m_Frustum );
 
 	m_bRenderingFOW = false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Clears all
-//-----------------------------------------------------------------------------
-void CFogOfWarMgr::RenderFowClear()
-{
-	BeginRenderFow( false );
-	EndRenderFow();
 }
 #endif // CLIENT_DLL
 
@@ -1328,7 +1388,7 @@ void CFogOfWarMgr::ClearNewPositions( FOWListInfo *pFOWList, int iOwner, bool bC
 		if( sv_fogofwar_shadowcast.GetBool() )
 			DoShadowCasting( pEnt, radius, visMask );
 		else
-			UpdateFogOfWarState( pEnt->m_iFOWPosX, pEnt->m_iFOWPosY, radius, visMask, bClear ? FOWCLEAR_MASK : FOWHIDDEN_MASK);
+			UpdateFogOfWarState( pEnt->m_iFOWPosX, pEnt->m_iFOWPosY, radius, visMask );
 	}
 }
 
@@ -1351,16 +1411,23 @@ FOWSIZE_TYPE CFogOfWarMgr::CalculatePlayerVisibilityMask( int iOwner )
 //-----------------------------------------------------------------------------
 // Purpose: Set the state of a row in the fog of war
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::FillLine( int x1, int x2, int y, FOWSIZE_TYPE state, FOWSIZE_TYPE clearmask )
+void CFogOfWarMgr::FillLine( int x1, int x2, int y, FOWSIZE_TYPE mask )
 {
-	std::fill( m_FogOfWar.Base()+FOWINDEX(x1, y), m_FogOfWar.Base()+FOWINDEX(x2+1, y), clearmask );
+#ifdef CLIENT_DLL
+	std::fill( m_FogOfWar.Base()+FOWINDEX(x1, y), m_FogOfWar.Base()+FOWINDEX(x2+1, y), FOWCLEAR_MASK );
+#else
+	for( int i = x1; i < x2 + 1; i++ )
+		m_FogOfWar[i] |= mask;
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Clears the fog of war at the given coordinates and radius
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::UpdateFogOfWarState( int x0, int y0, int radius, FOWSIZE_TYPE state, FOWSIZE_TYPE clearmask )
+void CFogOfWarMgr::UpdateFogOfWarState( int x0, int y0, int radius, FOWSIZE_TYPE mask )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::UpdateFogOfWarState", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	// Midpoint circle algorithm
 	int f = 1 - radius;
 	int ddF_x = 1;
@@ -1368,7 +1435,7 @@ void CFogOfWarMgr::UpdateFogOfWarState( int x0, int y0, int radius, FOWSIZE_TYPE
 	int x = 0;
 	int y = radius;
 
-	FillLine( x0 - radius, x0 + radius, y0, state, clearmask );
+	FillLine( x0 - radius, x0 + radius, y0, mask );
 
 	while( x < y )
 	{
@@ -1385,25 +1452,84 @@ void CFogOfWarMgr::UpdateFogOfWarState( int x0, int y0, int radius, FOWSIZE_TYPE
 		ddF_x += 2;
 		f += ddF_x;
 
-		FillLine( x0 - x, x0 + x, y0 + y, state, clearmask );
-		FillLine( x0 - x, x0 + x, y0 - y, state, clearmask );
-		FillLine( x0 - y, x0 + y, y0 + x, state, clearmask );
-		FillLine( x0 - y, x0 + y, y0 - x, state, clearmask );
+		FillLine( x0 - x, x0 + x, y0 + y, mask );
+		FillLine( x0 - x, x0 + x, y0 - y, mask );
+		FillLine( x0 - y, x0 + y, y0 + x, mask );
+		FillLine( x0 - y, x0 + y, y0 - x, mask );
 	}
 }
+
+#ifdef CLIENT_DLL
+static void FOWInsertPos( CUtlVector< FowPos_t > &EndPos, FowPos_t &pos, int &curidx )
+{
+	VPROF_BUDGET( "FOWInsertPos", VPROF_BUDGETGROUP_FOGOFWAR );
+
+	if( EndPos.Count() == 0 )
+	{
+		EndPos.AddToTail( pos );
+	}
+	else
+	{
+		do
+		{
+			if( EndPos.Count() == curidx ) // At the end of the list
+			{
+				EndPos.AddToTail( pos );
+				break;
+			}
+			else if( curidx == -1 ) // At the start of the list
+			{
+				EndPos.InsertBefore( curidx+1, pos );
+				curidx++;
+				break;
+			}
+			else if( EndPos[curidx].sortslope == pos.sortslope )
+			{
+				EndPos.InsertAfter( curidx, pos );
+				curidx++;
+				break;
+			}
+			else if( curidx+1 < EndPos.Count() && EndPos[curidx].sortslope < pos.sortslope && EndPos[curidx+1].sortslope > pos.sortslope ) 
+			{
+				EndPos.InsertAfter( curidx, pos );
+				curidx++;
+				break;
+			}
+			else if( EndPos[curidx].sortslope > pos.sortslope ) // Need to go back
+			{
+				curidx--;
+			}
+			else if( EndPos[curidx].sortslope < pos.sortslope ) // Need to go forward
+			{
+				curidx++;
+			}
+		} while( true ); 
+	}
+}
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: See DoShadowCasting.
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::ShadowCast( int cx, int cy, int row, float start, float end,
-								int radius, int xx, int xy, int yx, int yy, FOWSIZE_TYPE mask, float eyez, CUtlVector< FowPos_t > &EndPos )
+								int radius, int xx, int xy, int yx, int yy, FOWSIZE_TYPE mask, float eyez
+#ifdef CLIENT_DLL
+								, CUtlVector< FowPos_t > &EndPos, bool bInverseSlope 
+#endif // CLIENT_DLL
+								)
 {
+	VPROF_BUDGET( "CFogOfWarMgr::ShadowCast", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	if( start < end )
 		return;
 
 	bool blocked;
 	int j, dx, dy, radius_squared, X, Y;
 	float l_slope, r_slope, new_start;
+
+#ifdef CLIENT_DLL
+	int curidx = 0; // Index for inserting
+#endif // CLIENT_DLL
 
 	new_start = start;
 	radius_squared = radius*radius;
@@ -1437,16 +1563,20 @@ void CFogOfWarMgr::ShadowCast( int cx, int cy, int row, float start, float end,
 					m_FogOfWar[FOWINDEX(X, Y)] |= mask;
 #endif // CLIENT_DLL
 				}
+#ifdef CLIENT_DLL
 				else
 				{
 					int sqrdist2 =  dx*dx + (dy+1)*(dy+1);
 					if( sqrdist2 < radius_squared )
 					{
-						EndPos.AddToTail();
-						EndPos.Tail().x = X;
-						EndPos.Tail().y = Y;
+						FowPos_t pos;
+						pos.x = X;
+						pos.y = Y;
+						pos.sortslope = bInverseSlope ? -r_slope : r_slope;
+						FOWInsertPos( EndPos, pos, curidx ); 
 					}
 				}
+#endif // CLIENT_DLL
 
 				if( blocked )
 				{
@@ -1466,14 +1596,22 @@ void CFogOfWarMgr::ShadowCast( int cx, int cy, int row, float start, float end,
 				{
 					if( m_TileHeights[FOWINDEX(X, Y)] > eyez && j < radius )
 					{
-						EndPos.AddToTail();
-						EndPos.Tail().x = X;
-						EndPos.Tail().y = Y;
+#ifdef CLIENT_DLL
+						FowPos_t pos;
+						pos.x = X;
+						pos.y = Y;
+						pos.sortslope = bInverseSlope ? -r_slope : r_slope;
+						FOWInsertPos( EndPos, pos, curidx ); 
+#endif // CLIENT_DLL
 
                         // This is a blocking square, start a child scan:
                         blocked = true;
                         ShadowCast(cx, cy, j+1, start, l_slope,
-                                         radius, xx, xy, yx, yy, mask, eyez, EndPos );
+                                         radius, xx, xy, yx, yy, mask, eyez
+#ifdef CLIENT_DLL
+										 , EndPos, bInverseSlope
+#endif // CLIENT_DLL
+								  );
                         new_start = r_slope;
 					}
 				}
@@ -1494,23 +1632,7 @@ const static int ShadowCastMult[4][8] = {
 	{1,  0,  0, -1, -1,  0,  0,  1},
 };
 
-ConVar fow_test_printendpos("fow_test_printendpos", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 ConVar fow_test_singleoct("fow_test_singleoct", "-1", FCVAR_CHEAT|FCVAR_REPLICATED);
-
-//-----------------------------------------------------------------------------
-// Purpose: Sort clockwise
-//-----------------------------------------------------------------------------
-static FowPos_t s_FowCenterSortPoint;
-int FowPointSort( FowPos_t const *a, FowPos_t const *b )
-{
-    double angle1 = atan2((float)(a->y - s_FowCenterSortPoint.y), (float)(a->x - s_FowCenterSortPoint.x));
-    double angle2 = atan2((float)(b->y - s_FowCenterSortPoint.y), (float)(b->x - s_FowCenterSortPoint.x));
-
-	if (angle1 < angle2) return -1;
-	else if (angle2 < angle1) return 1;
-
-    return 0;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Performs shadow casting.
@@ -1518,61 +1640,59 @@ int FowPointSort( FowPos_t const *a, FowPos_t const *b )
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE mask )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::DoShadowCasting", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	// Own tile is always lit
 	int X = pEnt->m_iFOWPosX;
 	int Y = pEnt->m_iFOWPosY;
+
 #ifdef CLIENT_DLL
-					m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;
-#else
-					m_FogOfWar[FOWINDEX(X, Y)] |= mask;
-#endif // CLIENT_DLL
+	m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;
 
+	s_FOWDebugHeight = pEnt->GetAbsOrigin().z;
+	CUtlVector< FowPos_t > Points;
+	Points.EnsureCapacity( 200 ); // Usually no more than X elements
 	CUtlVector< FowPos_t > EndPos;
-
+	EndPos.EnsureCapacity( 25 ); // Usually no more than X elements
+#else
+	m_FogOfWar[FOWINDEX(X, Y)] |= mask;
+#endif // CLIENT_DLL
 
 	if( fow_test_singleoct.GetInt() < 0 || fow_test_singleoct.GetInt() > 7  )
 	{
 		int oct;
 		for( oct = 0; oct < 8; oct++ )
 		{
+#ifdef CLIENT_DLL
+			EndPos.RemoveAll();
 			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f, EndPos );
+					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f, EndPos, oct % 2 == 1 );
+			Points.AddVectorToTail( EndPos );
+#else
+			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
+					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
+					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f  );
+#endif // CLIENT_DLL
 		}
 	}
 	else
 	{
 		int oct = fow_test_singleoct.GetInt();
+#ifdef CLIENT_DLL
+		
 		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f, EndPos );
+				ShadowCastMult[2][oct], ShadowCastMult[3][oct],  mask, pEnt->EyePosition().z + 16.0f, Points, false );
+#else
+		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
+				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
+				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f );
+#endif // CLIENT_DLL
 	}
 
 #ifdef CLIENT_DLL
-#if 1
-	s_FowCenterSortPoint.x = X;
-	s_FowCenterSortPoint.y = Y;
-#else
-	s_FowCenterSortPoint.x = 0;
-	s_FowCenterSortPoint.y = 0;
-	for( int i = 0; i < EndPos.Count(); i++ )
-	{
-		s_FowCenterSortPoint.x += EndPos[i].x;
-		s_FowCenterSortPoint.y += EndPos[i].y;
-	}
-	s_FowCenterSortPoint.x /= EndPos.Count();
-	s_FowCenterSortPoint.y /= EndPos.Count();
-#endif // 0
-	EndPos.Sort( FowPointSort );
-	RenderFow( EndPos, X, Y );
-
-	if( fow_test_printendpos.GetBool() )
-	{
-		Msg("Printing end pos (%d count). Sort center: %d %d\n", EndPos.Count(), s_FowCenterSortPoint.x, s_FowCenterSortPoint.y );
-		for( int i = 0; i < EndPos.Count(); i++ )
-			Msg( "%d: %d %d\n", i, EndPos[i].x, EndPos[i].y );
-		fow_test_printendpos.SetValue( false );
-	}
+	RenderFow( Points, X, Y );
 #endif // CLIENT_DLL
 }
 
@@ -1581,6 +1701,8 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::UpdateVisibility( void )
 {
+	VPROF_BUDGET( "CFogOfWarMgr::UpdateVisibility", VPROF_BUDGETGROUP_FOGOFWAR );
+
 	int i;
 	CBaseEntity *pEnt;
 	Vector origin;

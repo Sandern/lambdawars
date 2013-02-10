@@ -447,6 +447,15 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
+	// Data that only gets sent to the player controlling this unit
+	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
+	// Data that gets sent to all other players
+	SendPropDataTable( "normaldata", 0, &REFERENCE_SEND_TABLE(DT_NormalExclusive), SendProxy_SendNormalDataTable ),
+	// Data that gets sent when unit is outside the pvs (and no other table is send)
+	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
+	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
+	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
+
 	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
@@ -465,15 +474,6 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	// Something with the legs ?
 	SendPropExclude( "DT_BaseFlex" , "m_vecLean" ),
 	SendPropExclude( "DT_BaseFlex" , "m_vecShift" ),
-
-	// Data that only gets sent to the player controlling this unit
-	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
-	// Data that gets sent to all other players
-	SendPropDataTable( "normaldata", 0, &REFERENCE_SEND_TABLE(DT_NormalExclusive), SendProxy_SendNormalDataTable ),
-	// Data that gets sent when unit is outside the pvs (and no other table is send)
-	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
-	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
-	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
 END_SEND_TABLE()
 
 //-----------------------------------------------------------------------------

@@ -45,12 +45,12 @@ enum warsteams_e
 typedef struct FowPos_t {
 	int x;
 	int y;
+#ifdef CLIENT_DLL
+	float sortslope;
+#endif // CLIENT_DLL
 } FowPos_t;
 
-// NOTE: When changing these values, also update the constants in the fow shaders!
-//#define FOW_TILESIZE 64		// tile size in units
 #define FOW_WORLDSIZE 32768
-//#define FOW_SIZE ( FOW_WORLDSIZE / FOW_TILESIZE ) 
 #define FOWMAXPLAYERS 16
 
 #define FOWFLAG_HIDDEN			( 1 << 0 )
