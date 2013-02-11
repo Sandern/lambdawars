@@ -128,7 +128,7 @@ protected:
 	void				UpdateFogOfWarState( int x, int y, int radius, FOWSIZE_TYPE mask );
 
 	void				ShadowCast( int cx, int cy, int row, float start, float end,
-									int radius, int xx, int xy, int yx, int yys, FOWSIZE_TYPE mask, float eyez
+									int radius, int xx, int xy, int yx, int yys, FOWSIZE_TYPE mask, int eyez
 #ifdef CLIENT_DLL
 									, CUtlVector< FowPos_t > &EndPos, bool bInverseSlope 
 #endif // CLIENT_DLL		

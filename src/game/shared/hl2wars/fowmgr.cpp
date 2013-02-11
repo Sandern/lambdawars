@@ -1081,7 +1081,7 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 
 	CMatRenderContextPtr pRenderContext( materials );
 
-	//IMaterial *black_mat = materials->FindMaterial( "Tools/toolsblack", TEXTURE_GROUP_OTHER, true );
+	// The "Clear" material is basically just a white texture
 	IMaterial *white_mat = materials->FindMaterial( "fow/fow_clear", TEXTURE_GROUP_OTHER, true );
 
 	pRenderContext->Bind( white_mat );
@@ -1113,7 +1113,7 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 			vPos.z = s_FOWDebugHeight;
 			Vector vPos2 = ComputeWorldPosition(EndPos[i2].x, EndPos[i2].y);
 			vPos2.z = s_FOWDebugHeight;
-			NDebugOverlay::Line( vPos, vPos2, MIN(i*22, 255), MAX(255-(i*22), 0), 0, true, 0.2f );
+			NDebugOverlay::Line( vPos, vPos2, MIN(i*3, 255), MAX(255-(i*3), 0), 0, true, 0.2f );
 
 			if( nDebug > 1 )
 			{
@@ -1127,82 +1127,6 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 
 	meshBuilder.End();
 	pMesh->Draw();
-
-
-#if 0
-	int nDebug = fow_shadowcast_debug.GetInt();
-
-	if( nDebug == 0 )
-	{
-		meshBuilder.Begin( pMesh, MATERIAL_POLYGON, EndPos.Count() );
-
-		for( int i = 0; i < EndPos.Count(); i++ )
-		{
-			x = EndPos[i].x * (iFOWRenderSize / (float)m_nGridSize);
-			y = EndPos[i].y * (iFOWRenderSize / (float)m_nGridSize);
-
-			meshBuilder.Position3f( x, y, 0.0f );
-			meshBuilder.TexCoord2f( 0, 0.0f, 1.0f );
-			meshBuilder.Color4ub( 255, 255, 255, 255 );
-			meshBuilder.AdvanceVertex();
-		}
-
-		meshBuilder.End();
-		pMesh->Draw();
-	}
-	else if( nDebug == 1 )
-	{
-		for( int i = 0; i < EndPos.Count(); i++ )
-		{
-			x = EndPos[i].x;
-			y = EndPos[i].y;
-
-			pRenderContext->DrawScreenSpaceRectangle( white_mat, x, y, 1, 1,
-				0, 0, m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight(),
-				m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight() );
-		}
-	}
-	else if( nDebug == 2 )
-	{
-		FOWSIZE_TYPE *fowData = m_FogOfWar.Base();
-		int idx;
-		for( int i = x - 20; i < x +  20; i++ )
-		{
-			for( int j = y - 20; j < y +  20; j++ )
-			{
-				idx = FOWINDEX(i, j);
-
-				if( fowData[idx] == 255 )
-				{
-					pRenderContext->DrawScreenSpaceRectangle( white_mat, i, j, 1, 1,
-						0, 0, m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight(),
-						m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight() );
-				}
-			}
-		}
-	}
-	else if( nDebug == 3 )
-	{
-		int c = fow_debug_draw_max.GetInt() > 0 ? fow_debug_draw_max.GetInt() : EndPos.Count();
-		c = MIN( EndPos.Count(), c );
-
-		meshBuilder.Begin( pMesh, MATERIAL_LINE_STRIP, c );
-
-		for( int i = 0; i < c; i++ )
-		{
-			x = EndPos[i].x;
-			y = EndPos[i].y;
-
-			meshBuilder.Position3f( x, y, 0.0f );
-			meshBuilder.TexCoord2f( 0, 0.0f, 0.0f );
-			meshBuilder.Color4ub( 0, 255, 0, 255 );
-			meshBuilder.AdvanceVertex();
-		}
-
-		meshBuilder.End();
-		pMesh->Draw();
-	}
-#endif // 0
 
 	pRenderContext.SafeRelease();
 }
@@ -1371,7 +1295,7 @@ void CFogOfWarMgr::ClearNewPositions( FOWListInfo *pFOWList, int iOwner, bool bC
 	FOWSIZE_TYPE visMask = CalculatePlayerVisibilityMask( iOwner );
 
 	// Clear units
-	for( i=0; i<pFOWList->m_EntityList.Count(); i++ )
+	for( i=0; i< pFOWList->m_EntityList.Count(); i++ )
 	{
 		pEnt =  pFOWList->m_EntityList.Element(i);
 		if( !pEnt )
@@ -1512,7 +1436,7 @@ static void FOWInsertPos( CUtlVector< FowPos_t > &EndPos, FowPos_t &pos, int &cu
 // Purpose: See DoShadowCasting.
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::ShadowCast( int cx, int cy, int row, float start, float end,
-								int radius, int xx, int xy, int yx, int yy, FOWSIZE_TYPE mask, float eyez
+								int radius, int xx, int xy, int yx, int yy, FOWSIZE_TYPE mask, int eyez
 #ifdef CLIENT_DLL
 								, CUtlVector< FowPos_t > &EndPos, bool bInverseSlope 
 #endif // CLIENT_DLL
@@ -1645,6 +1569,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 	// Own tile is always lit
 	int X = pEnt->m_iFOWPosX;
 	int Y = pEnt->m_iFOWPosY;
+	int iEyeZ = (int)(pEnt->EyePosition().z + 16.0f);
 
 #ifdef CLIENT_DLL
 	m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;
@@ -1667,12 +1592,12 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 			EndPos.RemoveAll();
 			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f, EndPos, oct % 2 == 1 );
+					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ, EndPos, oct % 2 == 1 );
 			Points.AddVectorToTail( EndPos );
 #else
 			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f  );
+					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ  );
 #endif // CLIENT_DLL
 		}
 	}
@@ -1683,11 +1608,11 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 		
 		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-				ShadowCastMult[2][oct], ShadowCastMult[3][oct],  mask, pEnt->EyePosition().z + 16.0f, Points, false );
+				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ, Points, false );
 #else
 		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, pEnt->EyePosition().z + 16.0f );
+				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ );
 #endif // CLIENT_DLL
 	}
 
