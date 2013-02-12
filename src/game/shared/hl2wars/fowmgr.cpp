@@ -1093,7 +1093,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 
 	meshBuilder.Begin( pMesh, MATERIAL_POLYGON, EndPos.Count() );
 
-	for( int i = 0; i < EndPos.Count(); i++ )
+	//for( int i = 0; i < EndPos.Count(); i++ )
+	for( int i = EndPos.Count() - 1; i >= 0; i-- )
 	{
 		x = EndPos[i].x * (iFOWRenderSize / (float)m_nGridSize);
 		y = EndPos[i].y * (iFOWRenderSize / (float)m_nGridSize);
@@ -1108,6 +1109,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 			int i2 = 0;
 			if( i+1 < EndPos.Count() )
 				i2 = i+1;
+			else if( i+1 == 0 )
+				i2 = EndPos.Count() - 1;
 
 			Vector vPos = ComputeWorldPosition(EndPos[i].x, EndPos[i].y);
 			vPos.z = s_FOWDebugHeight;
