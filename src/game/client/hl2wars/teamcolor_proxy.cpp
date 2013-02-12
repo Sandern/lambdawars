@@ -63,10 +63,18 @@ EXPOSE_MATERIAL_PROXY( CTeamColorProxy, TeamColor );
 // Purpose: Team Color proxy for VGUI materials
 //-----------------------------------------------------------------------------
 static Vector s_UITeamColor = Vector( 1.0f, 1.0f, 1.0f );
+static bool s_bProxyUITeamColorSet = false;
+static Vector s_ProxyUITeamColor = Vector( 1.0f, 1.0f, 1.0f );
 
 void SetUITeamColor( const Vector &vTeamColor )
 {
 	s_UITeamColor = vTeamColor;
+}
+
+void SetProxyUITeamColor( const Vector &vTeamColor )
+{
+	s_bProxyUITeamColorSet = true;
+	s_ProxyUITeamColor = vTeamColor;
 }
 
 class CUITeamColorProxy : public IMaterialProxy
@@ -97,7 +105,15 @@ void CUITeamColorProxy::OnBind( void *pRenderable )
 	if( !m_pColorTextureVar )
 		return;
 
-	m_pColorTextureVar->SetVecValue( s_UITeamColor[0], s_UITeamColor[1], s_UITeamColor[2], 1.0f );
+	if( s_bProxyUITeamColorSet )
+	{
+		m_pColorTextureVar->SetVecValue( s_ProxyUITeamColor[0], s_ProxyUITeamColor[1], s_ProxyUITeamColor[2], 1.0f );
+		s_bProxyUITeamColorSet = false;
+	}
+	else
+	{
+		m_pColorTextureVar->SetVecValue( s_UITeamColor[0], s_UITeamColor[1], s_UITeamColor[2], 1.0f );
+	}
 }
 
 EXPOSE_MATERIAL_PROXY( CUITeamColorProxy, UITeamColor );

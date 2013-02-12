@@ -299,6 +299,8 @@ public:
 	void SetClipRect( int x0, int y0, int x1, int y1 );
 
 	void DrawTexturedRectEx( DrawTexturedRectParms_t *pDrawParms );
+
+	void SetProxyUITeamColor( const Vector &vTeamColor );
 };
 
 extern ISurface *g_pVGuiSurfaceBuffered;

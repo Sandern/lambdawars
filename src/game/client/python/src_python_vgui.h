@@ -47,6 +47,9 @@ public:
 	virtual PyObject *GetPySelf() const = 0;
 
 public:
+	void ClearSBuffer( CallBuffer_t &CallBuffer );
+	void ClearAllSBuffers();
+
 	void EnableSBuffer( bool bUseBuffer ) { m_bUseSurfaceCallBuffer = bUseBuffer; }
 	bool IsSBufferEnabled( void );
 	void FlushSBuffer( void );
@@ -74,6 +77,12 @@ protected:
 	CallBuffer_t m_PaintCallBuffer;
 	CallBuffer_t m_PaintBackgroundCallBuffer;
 };
+
+inline void PyPanel::ClearAllSBuffers()
+{
+	ClearSBuffer( m_PaintCallBuffer );
+	ClearSBuffer( m_PaintBackgroundCallBuffer );
+}
 
 void DestroyPyPanels();
 
@@ -178,7 +187,6 @@ public:
 	bool NonZero() { return false; }
 };
 
-#ifdef HL2WARS_ASW_DLL
 PyObject *GetPyPanel( Panel *pPanel );
 void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx = -1 );
 
@@ -198,7 +206,6 @@ typedef struct py_message_entry_t {
 	int secondParamType;
 } py_message_entry_t;
 bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, const KeyValues *params, VPANEL fromPanel);
-#endif // HL2WARS_ASW_DLL
 
 //=============================================================================
 // ISurface for Python
@@ -241,9 +248,6 @@ public:
 	inline int	 DrawGetTextureId( char const *filename ) { return surface()->DrawGetTextureId(filename); }
 	inline bool DrawGetTextureFile(int id, char *filename, int maxlen ) { return surface()->DrawGetTextureFile(id, filename, maxlen); }
 	inline void DrawSetTextureFile(int id, const char *filename, int hardwareFilter, bool forceReload) { surface()->DrawSetTextureFile(id, filename, hardwareFilter, forceReload); }
-#ifndef HL2WARS_ASW_DLL
-	inline void DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload) { surface()->DrawSetTextureRGBA(id, rgba, wide, tall, hardwareFilter, forceReload); }
-#endif // HL2WARS_ASW_DLL
 	inline void DrawSetTexture(int id) { surface()->DrawSetTexture(id); }
 	inline void DrawGetTextureSize(int id, int &wide, int &tall) { surface()->DrawGetTextureSize(id, wide, tall); }
 	inline void DrawTexturedRect(int x0, int y0, int x1, int y1) { surface()->DrawTexturedRect(x0, y0, x1, y1); }
@@ -274,7 +278,6 @@ public:
 	inline bool HasFocus() { return surface()->HasFocus(); }
 
 	// returns true if the surface supports minimize & maximize capabilities
-#ifdef HL2WARS_ASW_DLL
 	enum SurfaceFeature_t
 	{
 		ANTIALIASED_FONTS = FONT_FEATURE_ANTIALIASED_FONTS,
@@ -286,20 +289,6 @@ public:
 		DIRECT_HWND_RENDER		= 7,
 	};
 	inline bool SupportsFeature( SurfaceFeature_t feature ) { return surface()->SupportsFeature((vgui::ISurface::SurfaceFeature_t)feature); }
-#else
-	enum SurfaceFeature_e
-
-	{
-		ANTIALIASED_FONTS	= 1,
-		DROPSHADOW_FONTS	= 2,
-		ESCAPE_KEY			= 3,
-		OPENING_NEW_HTML_WINDOWS = 4,
-		FRAME_MINIMIZE_MAXIMIZE	 = 5,
-		OUTLINE_FONTS	= 6,
-		DIRECT_HWND_RENDER		= 7,
-	};
-	inline bool SupportsFeature(SurfaceFeature_e feature) { return surface()->SupportsFeature((vgui::ISurface::SurfaceFeature_e)feature); }
-#endif // HL2WARS_ASW_DLL
 	
 
 	// restricts what gets drawn to one panel and it's children
@@ -406,13 +395,8 @@ public:
 	inline void SetWorkspaceInsets( int left, int top, int right, int bottom ) { surface()->SetWorkspaceInsets(left, top, right, bottom); }
 
 	// Lower level char drawing code, call DrawGet then pass in info to DrawRender
-#ifdef HL2WARS_ASW_DLL
 	inline bool DrawGetUnicodeCharRenderInfo( wchar_t ch, FontCharRenderInfo& info ) { return surface()->DrawGetUnicodeCharRenderInfo(ch, info); }
 	inline void DrawRenderCharFromInfo( const FontCharRenderInfo& info ) { surface()->DrawRenderCharFromInfo(info); }
-#else
-	inline bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info ) { return surface()->DrawGetUnicodeCharRenderInfo(ch, info); }
-	inline void DrawRenderCharFromInfo( const CharRenderInfo& info ) { surface()->DrawRenderCharFromInfo(info); }
-#endif // HL2WARS_ASW_DLL
 
 	// global alpha setting functions
 	// affect all subsequent draw calls - shouldn't normally be used directly, only in Panel::PaintTraverse()
@@ -437,9 +421,7 @@ public:
 	// From the Xbox
 	inline void SetPanelForInput( VPANEL vpanel ) { surface()->SetPanelForInput( vpanel ); }
 	inline void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) { surface()->DrawFilledRectFade( x0, y0, x1, y1, alpha0, alpha1, bHorizontal ); }
-#ifndef HL2WARS_ASW_DLL
-	inline void DrawSetTextureRGBAEx(int id, const unsigned char *rgba, int wide, int tall, ImageFormat imageFormat ) { surface()->DrawSetTextureRGBAEx( id, rgba, wide, tall, imageFormat ); }
-#endif // HL2WARS_ASW_DLL
+
 	inline void DrawSetTextScale(float sx, float sy) { surface()->DrawSetTextScale( sx, sy ); }
 	inline bool SetBitmapFontGlyphSet(HFont font, const char *windowsFontName, float scalex, float scaley, int flags) { return surface()->SetBitmapFontGlyphSet( font, windowsFontName, scalex, scaley, flags ); }
 	// adds a bitmap font file
@@ -456,7 +438,6 @@ public:
 	// Console-only.  Get the string to use for the current video mode for layout files.
 	inline const char *GetResolutionKey( void ) const { return surface()->GetResolutionKey(); }
 
-#ifdef HL2WARS_ASW_DLL
 	inline const char *GetFontName( HFont font ) { return surface()->GetFontName( font ); }
 
 	inline bool ForceScreenSizeOverride( bool bState, int wide, int tall ) { return surface()->ForceScreenSizeOverride( bState, wide, tall ); }
@@ -482,7 +463,9 @@ public:
 	inline void SetClipRect( int x0, int y0, int x1, int y1 ) { surface()->SetClipRect( x0, y0, x1, y1 ); }
 
 	//inline void DrawTexturedRectEx( DrawTexturedRectParms_t *pDrawParms )  { return surface()->DrawTexturedRectEx( pDrawParms ); }
-#endif // HL2WARS_ASW_DLL
+
+	void SetProxyUITeamColor( const Vector &vTeamColor );
+
 };
 
 CWrapSurface *wrapsurface();

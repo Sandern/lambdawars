@@ -16,6 +16,7 @@
 #include <vgui_controls/Controls.h>
 
 #include "src_python_vgui.h"
+#include "hl2wars/teamcolor_proxy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -985,4 +986,24 @@ void CSurfaceBuffered::SetClipRect( int x0, int y0, int x1, int y1 )
 void CSurfaceBuffered::DrawTexturedRectEx( DrawTexturedRectParms_t *pDrawParms ) 
 {
 	pRealVGuiSurface->DrawTexturedRectEx( pDrawParms );
+}
+
+class BufferCallSetProxyUITeamColor : public BaseBufferCall
+{
+public:
+	BufferCallSetProxyUITeamColor( const Vector& a1 ) : a1(a1) {}
+
+	void Draw() { ::SetProxyUITeamColor( a1 ); }
+
+private:
+	Vector a1;
+};
+
+void CSurfaceBuffered::SetProxyUITeamColor( const Vector &vTeamColor )
+{
+	::SetProxyUITeamColor( vTeamColor );
+
+	g_pActiveSurfaceBuffer->AddToTail( 
+		new BufferCallSetProxyUITeamColor( vTeamColor )
+	);
 }

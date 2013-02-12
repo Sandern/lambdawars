@@ -13,4 +13,6 @@
 
 void SetUITeamColor( const Vector &vTeamColor );
 
+void SetProxyUITeamColor( const Vector &vTeamColor );
+
 #endif // TEAMCOLOR_PROXY_H

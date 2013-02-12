@@ -3327,6 +3327,16 @@ BOOST_PYTHON_MODULE(_vgui){
                 , ( bp::arg("panel"), bp::arg("state") ) );
         
         }
+        { //::CWrapSurface::SetProxyUITeamColor
+        
+            typedef void ( ::CWrapSurface::*SetProxyUITeamColor_function_type )( ::Vector const & ) ;
+            
+            ISurface_exposer.def( 
+                "SetProxyUITeamColor"
+                , SetProxyUITeamColor_function_type( &::CWrapSurface::SetProxyUITeamColor )
+                , ( bp::arg("vTeamColor") ) );
+        
+        }
         { //::CWrapSurface::SetTitle
         
             typedef void ( ::CWrapSurface::*SetTitle_function_type )( ::vgui::VPANEL,wchar_t const * ) ;

@@ -15,6 +15,7 @@
 
 #include "hl2wars/hl2wars_baseminimap.h"
 #include "hl2wars/vgui_video_general.h"
+#include "hl2wars/teamcolor_proxy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -63,6 +64,7 @@ PyPanel::PyPanel()
 PyPanel::~PyPanel()
 {
 	g_PyPanels.FindAndRemove( this );
+	ClearAllSBuffers();
 	//m_bPyDeleted = true;
 }
 
@@ -72,6 +74,13 @@ static ConVar cl_sbuffernodraw( "cl_sbuffernodraw", "0", 0 );
 bool PyPanel::IsSBufferEnabled( void )
 {
 	return m_bUseSurfaceCallBuffer && !cl_disablesbuffer.GetBool();
+}
+
+void PyPanel::ClearSBuffer( CallBuffer_t &CallBuffer )
+{
+	for( int i = 0; i < CallBuffer.m_SCallBuffer.Count(); i++ )
+		CallBuffer.m_SCallBuffer[i].PurgeAndDeleteElements();
+	CallBuffer.m_SCallBuffer.Purge();
 }
 
 void PyPanel::FlushSBuffer( void ) 
@@ -107,17 +116,15 @@ bool PyPanel::ShouldRecordSBuffer( CallBuffer_t &CallBuffer )
 	// Decide if we should record or draw from the buffer
 	if( !CallBuffer.m_bShouldRecordBuffer )
 	{
-		//Msg("Paint from buffer %s %s %d\n", GetName(), GetClassName(), m_SurfaceCallBuffer.Count() );
+		//DevMsg("Paint from buffer %s %s %d\n", GetName(), GetClassName(), m_SurfaceCallBuffer.Count() );
 		return false;
 	}
 
 	// Clear buffer
-	//Msg("Flushing sbuffer %f %s %s\n", m_SurfaceCallRecordFrameTime, GetName(), GetClassName());
+	//DevMsg("Flushing sbuffer %f %s %s\n", m_SurfaceCallRecordFrameTime, GetName(), GetClassName());
 	CallBuffer.m_SurfaceCallRecordFrameTime = vgui::system()->GetFrameTime();
 
-	for( int i = 0; i < CallBuffer.m_SCallBuffer.Count(); i++ )
-		CallBuffer.m_SCallBuffer[i].PurgeAndDeleteElements();
-	CallBuffer.m_SCallBuffer.Purge();
+	ClearSBuffer( CallBuffer );
 	CallBuffer.m_SCallBuffer.AddToTail();
 
 	// Subsequent calls will check the tick, so we can set it to false
@@ -260,6 +267,7 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 
 	// Allow c++ code to cleanup
 	pIPyPanel->m_bPyDeleted = true;
+	pIPyPanel->ClearAllSBuffers();
 	//Msg("Removing py panel (%d active)\n", g_PyPanels.Count());
 	// Remove from list
 	if( iRemoveIdx != -1 )
@@ -592,6 +600,15 @@ void CWrapSurface::DrawUnicodeString( boost::python::object unistr, FontDrawType
 	surface()->DrawUnicodeString(/*PyUnicode_AsUnicode(unistr.ptr())*/w, drawType);
 
 	delete w;
+}
+
+void CWrapSurface::SetProxyUITeamColor( const Vector &vTeamColor )
+{
+	CSurfaceBuffered *pBufferSurface = dynamic_cast<CSurfaceBuffered *> ( surface() );
+	if( pBufferSurface )
+		pBufferSurface->SetProxyUITeamColor( vTeamColor );
+	else
+		::SetProxyUITeamColor( vTeamColor );
 }
 
 //=============================================================================
