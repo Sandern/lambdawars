@@ -130,14 +130,12 @@ boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center
 boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask );
 #endif 
 
-#ifdef HL2WARS_ASW_DLL
 // Simple trace filter for python
 class CPyTraceFilterSimple : public CTraceFilterSimple
 {
 public:
 	CPyTraceFilterSimple( const IHandleEntity *passentity, int collisionGroup ) : CTraceFilterSimple( passentity, collisionGroup ) {}
 };
-#endif // HL2WARS_ASW_DLL
 
 // Unit filters
 class CTraceFilterOnlyUnitsAndPlayer : public CTraceFilterSimple

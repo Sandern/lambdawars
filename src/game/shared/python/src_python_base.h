@@ -200,10 +200,8 @@ public:
 	// Process conditional keys for widescreen support.
 	//bool ProcessResolutionKeys( const char *pResString );
 
-#ifdef HL2WARS_ASW_DLL
 	// Assign keyvalues from a string
 	static KeyValues * FromString( char const *szName, char const *szStringVal, char const **ppEndOfParse = NULL );
-#endif // HL2WARS_ASW_DLL
 
 private:
 	KeyValues *m_realKeyValues;

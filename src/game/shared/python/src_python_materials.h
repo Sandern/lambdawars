@@ -15,13 +15,6 @@
 	#include "bitmap/imageformat.h" //ImageFormat enum definition
 #endif // CLIENT_DLL
 
-// Deferred
-#ifdef HL2WARS_ASW_DLL
-#ifdef CLIENT_DLL
-bool PyIsDeferredRenderingEnabled();
-#endif // CLIENT_DLL
-#endif // HL2WARS_ASW_DLL
-
 #ifdef CLIENT_DLL
 class CPyTextureRegen;
 

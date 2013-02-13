@@ -393,11 +393,7 @@ public:
 	inline bool		IsInEditMode( void ) { return engine->IsInEditMode(); }
 
 	// current screen aspect ratio (eg. 4.0f/3.0f, 16.0f/9.0f)
-#ifdef HL2WARS_ASW_DLL
 	inline float		GetScreenAspectRatio( int viewportWidth, int viewportHeight ) { return engine->GetScreenAspectRatio(viewportWidth, viewportHeight); }
-#else
-	inline float		GetScreenAspectRatio( int viewportWidth, int viewportHeight ) { return engine->GetScreenAspectRatio(); }
-#endif // HL2WARS_ASW_DLL
 
 	// allow other modules to know about engine versioning (one use is a proxy for network compatability)
 	inline unsigned int	GetEngineBuildNumber() { return engine->GetEngineBuildNumber(); } // engines build

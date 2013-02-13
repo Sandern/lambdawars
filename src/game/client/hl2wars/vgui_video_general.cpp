@@ -51,15 +51,6 @@ VideoGeneralPanel::~VideoGeneralPanel( void )
 	StopVideo();
 }
 
-#ifndef HL2WARS_ASW_DLL
-void VideoGeneralPanel::PyDeletePanel(void)
-{
-	StopVideo();
-	BaseClass::PyDeletePanel();
-}
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

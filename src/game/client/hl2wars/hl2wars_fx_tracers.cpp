@@ -22,14 +22,6 @@ extern void FX_TracerSound( const Vector &start, const Vector &end, int iTracerT
 
 extern ConVar muzzleflash_light;
 
-#ifndef HL2WARS_ASW_DLL
-#include "ClientEffectPrecacheSystem.h"
-CLIENTEFFECT_REGISTER_BEGIN( PrecacheTracers )
-CLIENTEFFECT_MATERIAL( "effects/combinemuzzle1" )
-CLIENTEFFECT_MATERIAL( "effects/combinemuzzle2_nocull" )
-CLIENTEFFECT_REGISTER_END()
-#endif // HL2WARS_ASW_DLL
-
 //-----------------------------------------------------------------------------
 // Purpose: Gunship's Tracer
 //-----------------------------------------------------------------------------

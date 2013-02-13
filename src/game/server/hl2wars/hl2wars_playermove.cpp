@@ -90,10 +90,8 @@ void CHL2WarsPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHe
 	//CASW_MoveData *pASWMove = static_cast<CASW_MoveData*>( move );
 	//pASWMove->m_iForcedAction = ucmd->forced_action;
 
-#ifdef HL2WARS_ASW_DLL
 	// setup trace optimization
 	g_pGameMovement->SetupMovementBounds( move );
-#endif // HL2WARS_ASW_DLL
 }
 
 extern void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... );

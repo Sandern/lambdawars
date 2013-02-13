@@ -20,22 +20,12 @@ enum AppStatus {
 };
 
 enum MountApps {
-#ifdef HL2WARS_ASW_DLL
 	APP_L4D1 = 0,
 	APP_L4D2,
 	APP_PORTAL2,
 	APP_DOTA,
 	APP_CSGO,
 	APP_DEARESTHER,
-#else
-	APP_EP2 = 0,
-	APP_EP1,
-	APP_TF2,
-	APP_PORTAL,
-	APP_CSS,
-	APP_HL1,
-	APP_DODS,
-#endif // 0
 
 	NUM_APPS,
 };

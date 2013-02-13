@@ -405,15 +405,11 @@ void __MsgFunc_PyMessage( bf_read &msg )
 // register message handler once
 void HookPyMessage() 
 {
-#ifdef HL2WARS_ASW_DLL
 	for ( int hh = 0; hh < MAX_SPLITSCREEN_PLAYERS; ++hh )
 	{
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( hh );
 		usermessages->HookMessage( "PyMessage", __MsgFunc_PyMessage );
 	}
-#else
-	usermessages->HookMessage( "PyMessage", __MsgFunc_PyMessage );
-#endif // HL2WARS_ASW_DEV
 }
 
 #endif // CLIENT_DLL

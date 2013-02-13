@@ -8,10 +8,7 @@
 #include "teamcolor_proxy.h"
 #include "materialsystem/IMaterialProxy.h"
 #include "materialsystem/IMaterialVar.h"
-
-#ifdef HL2WARS_ASW_DLL
-	#include "imaterialproxydict.h"
-#endif // HL2WARS_ASW_DLL
+#include "imaterialproxydict.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

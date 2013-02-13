@@ -69,7 +69,7 @@ inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return UI_BASEMOD_PAN
 inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return * new UI_BASEMOD_PANEL_CLASS(); }
 class IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 
-#elif defined( HL2WARS_ASW_DLL )
+#elif defined( HL2WARS_DLL )
 
 #include "wars/basemodpanel.h"
 #include "wars/basemodui.h"

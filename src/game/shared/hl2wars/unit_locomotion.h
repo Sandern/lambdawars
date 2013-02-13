@@ -195,11 +195,7 @@ protected:
 private:
 	Vector m_vecMins, m_vecMaxs;
 
-#ifdef HL2WARS_ASW_DLL
 	ITraceListData	*m_pTraceListData;
-#else
-	CTraceListData *m_pTraceListData;
-#endif // HL2WARS_ASW_DLL
 };
 
 //-----------------------------------------------------------------------------
@@ -231,7 +227,7 @@ inline void UnitBaseLocomotion::TraceUnitBBox( const Vector& start, const Vector
 
 	CTraceFilterUnitNav filter(m_pOuter, false, m_pOuter, collisionGroup);
 	UTIL_TraceEntity(m_pOuter, start, end, unitsolidmask, &filter, &pm );
-#endif // HL2WARS_ASW_DLL
+#endif 
 }
 
 #endif // UNIT_LOCOMOTION_H

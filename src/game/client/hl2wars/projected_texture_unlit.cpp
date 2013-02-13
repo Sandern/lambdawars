@@ -41,7 +41,7 @@ ProjectedTexture::~ProjectedTexture()
 	if( m_shadowHandle != CLIENTSHADOW_INVALID_HANDLE )
 		Shutdown();
 }
-#if 0 //def HL2WARS_ASW_DLL
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: Init
 //-----------------------------------------------------------------------------
@@ -406,4 +406,4 @@ void ProjectedTexture::SetColor( int r, int g, int b, int a )
 
 	UpdateShadow();
 }
-#endif // HL2WARS_ASW_DLL
+#endif

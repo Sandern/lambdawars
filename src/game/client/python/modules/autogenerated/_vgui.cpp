@@ -4742,17 +4742,6 @@ BOOST_PYTHON_MODULE(_vgui){
     
     }
 
-    { //::PySetLoadingBackgroundDialog
-    
-        typedef void ( *SetLoadingBackgroundDialog_function_type )( ::boost::python::object );
-        
-        bp::def( 
-            "SetLoadingBackgroundDialog"
-            , SetLoadingBackgroundDialog_function_type( &::PySetLoadingBackgroundDialog )
-            , ( bp::arg("panel") ) );
-    
-    }
-
     { //::vgui::input
     
         typedef ::vgui::IInput * ( *vgui_input_function_type )(  );

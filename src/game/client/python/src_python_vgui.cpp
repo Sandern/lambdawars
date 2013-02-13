@@ -181,7 +181,6 @@ void PyPanel::DrawFromSBuffer( CallBuffer_t &CallBuffer )
 //-----------------------------------------------------------------------------
 void DestroyPyPanels()
 {
-#if 1 // Just crash. Screw this.
 	DevMsg("Clearing %d python panels\n", g_PyPanels.Count());
 
 	for( int i = g_PyPanels.Count()-1; i >= 0; i-- )
@@ -190,7 +189,6 @@ void DestroyPyPanels()
 	}
 
 	vgui::ivgui()->RunFrame();
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -224,7 +222,6 @@ const PyBaseVGUIHandle& PyBaseVGUIHandle::Set( IClientPanel *pPanel )
 	return *this; 
 }
 
-#ifdef HL2WARS_ASW_DLL
 #define TEST_PANEL( type, pPanel ) \
 	{							   \
 	bp::wrapper< type > *wrapper = dynamic_cast<bp::wrapper< type > *>( pPanel ); \
@@ -277,7 +274,7 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 
 	if( !SrcPySystem()->IsPythonRunning() )
 	{
-		//Msg("PyDeletePanel called while python is not running (%s)\n", pPanel->GetName());
+		//DevMsg("PyDeletePanel called while python is not running (%s)\n", pPanel->GetName());
 		pPanel->SetParent((VPANEL)NULL);
 		while (ipanel()->GetChildCount(pPanel->GetVPanel()))
 		{
@@ -290,7 +287,7 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 
 	if( SrcPySystem()->IsPythonFinalizing() )
 	{
-		//Msg("PyDeletePanel: Python is finalizing. Not bothering to clean up panel\n");
+		//DevMsg("PyDeletePanel: Python is finalizing. Not bothering to clean up panel\n");
 		pPanel->SetParent((VPANEL)NULL);
 		return;
 	}
@@ -484,7 +481,6 @@ bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, cons
 	}
 	return true;
 }
-#endif // HL2WARS_ASW_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Maybe not very efficient, but it's nice and safe for python usage
@@ -552,6 +548,10 @@ void CWrapSurface::DrawTexturedPolyLine( boost::python::list vertices )
 
 	delete pVertices;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWrapSurface::DrawTexturedPolygon( boost::python::list vertices )
 {
 	int i, n;
@@ -573,6 +573,9 @@ void CWrapSurface::DrawTexturedPolygon( boost::python::list vertices )
 	delete pVertices;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWrapSurface::DrawUnicodeString( boost::python::object unistr, FontDrawType_t drawType )
 {
 	if (!PyString_Check(unistr.ptr()))
@@ -592,16 +595,14 @@ void CWrapSurface::DrawUnicodeString( boost::python::object unistr, FontDrawType
 		w[i] = value[i];
 	}
 	w[l] = '\0';
-	/*if (!PyUnicode_Check(unistr.ptr()))
-	{
-		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: First argument must be a string.");
-		throw boost::python::error_already_set(); 
-	}*/
-	surface()->DrawUnicodeString(/*PyUnicode_AsUnicode(unistr.ptr())*/w, drawType);
+	surface()->DrawUnicodeString(w, drawType);
 
 	delete w;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWrapSurface::SetProxyUITeamColor( const Vector &vTeamColor )
 {
 	CSurfaceBuffered *pBufferSurface = dynamic_cast<CSurfaceBuffered *> ( surface() );
@@ -650,13 +651,6 @@ boost::python::object PyLocalize::ConstructString(StringIndex_t unlocalizedTextS
 //=============================================================================
 // Misc
 //=============================================================================
-void PySetLoadingBackgroundDialog( boost::python::object panel )
-{
-#ifndef HL2WARS_ASW_DLL
-	GetClientModeHL2WarsNormal()->SetLoadingBackgroundDialog(panel);
-#endif // HL2WARS_ASW_DLL
-}
-
 bool PyIsGameUIVisible()
 {
 	return enginevgui->IsGameUIVisible();
@@ -666,13 +660,6 @@ VPANEL PyGetPanel( VGuiPanel_t type )
 {
 	return enginevgui->GetPanel( type );
 }
-
-#if 0
-CON_COMMAND(list_py_notsbufferedpanels, "Debug command for listening non surface buffered panels.")
-{
-	Panel::DebugPrintNoneSBufferedPyPanels();
-}
-#endif // 0
 
 CON_COMMAND(py_debug_panel_count, "Debug command for getting the number of python panels.")
 {

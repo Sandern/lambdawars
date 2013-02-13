@@ -179,12 +179,7 @@ C_LocalTempEntity *PyTempEnts::PyTempEntAlloc( const Vector& org, model_t *model
 	pTemp->priority = TENTPRIORITY_LOW;
 	pTemp->SetAbsOrigin( org );
 
-#ifdef HL2WARS_ASW_DLL
 	pTemp->AddToLeafSystem();
-#else
-	pTemp->m_RenderGroup = RENDER_GROUP_OTHER;
-	pTemp->AddToLeafSystem( pTemp->m_RenderGroup );
-#endif // HL2WARS_ASW_DLL
 
 	return pTemp;
 }

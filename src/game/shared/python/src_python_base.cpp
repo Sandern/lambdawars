@@ -226,15 +226,13 @@ KeyValues* PyKeyValues::GetNextValue()
 	return m_realKeyValues->GetNextValue();
 }
 
-#ifdef HL2WARS_ASW_DLL
-	// Assign keyvalues from a string
-	KeyValues * PyKeyValues::FromString( char const *szName, char const *szStringVal, char const **ppEndOfParse )
-	{
-		return KeyValues::FromString( szName, szStringVal, ppEndOfParse );
-	}
-#endif // HL2WARS_ASW_DLL
+// Assign keyvalues from a string
+KeyValues * PyKeyValues::FromString( char const *szName, char const *szStringVal, char const **ppEndOfParse )
+{
+	return KeyValues::FromString( szName, szStringVal, ppEndOfParse );
+}
 
-#endif // 0
+#endif // 1
 
 #ifndef CLIENT_DLL
 	static ConVar py_disable_protect_path("py_disable_protect_path", "0", FCVAR_CHEAT);

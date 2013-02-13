@@ -27,9 +27,7 @@ void RegisterUserMessages()
 	usermessages->Register( "VGUIMenu", -1 );	// Show VGUI menu
 	usermessages->Register( "Rumble", 3 );	// Send a rumble to a controller
 	usermessages->Register( "CloseCaption", -1 ); // Show a caption (by string id number)(duration in 10th of a second)
-#ifdef HL2WARS_ASW_DLL
 	usermessages->Register( "CloseCaptionDirect", -1 ); // Show a forced caption (by string id number)(duration in 10th of a second)
-#endif // HL2WARS_ASW_DLL
 
 	usermessages->Register( "SendAudio", -1 );	// play radion command
 
@@ -50,10 +48,8 @@ void RegisterUserMessages()
 
 	usermessages->Register( "UpdateRadar", -1 );
 
-#ifdef HL2WARS_ASW_DLL
 	usermessages->Register( "CurrentTimescale", 4 );	// Send one float for the new timescale
 	usermessages->Register( "DesiredTimescale", 13 );	// Send timescale and some blending vars
-#endif // HL2WARS_ASW_DLL
 
 	// Used to send a sample HUD message
 	usermessages->Register( "GameMessage", -1 );

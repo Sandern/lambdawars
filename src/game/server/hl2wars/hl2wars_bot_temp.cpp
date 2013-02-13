@@ -145,7 +145,7 @@ CON_COMMAND_F( bot_add, "Add a bot.", FCVAR_CHEAT )
 //-----------------------------------------------------------------------------
 void Bot_RunAll( void )
 {
-#ifndef HL2WARS_ASW_DLL
+#if 0
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( i ) );
@@ -158,7 +158,7 @@ void Bot_RunAll( void )
 				Bot_Think( pBot );
 		}
 	}
-#endif // HL2WARS_ASW_DLL
+#endif // 
 }
 
 bool Bot_RunMimicCommand( CUserCmd& cmd )

@@ -643,7 +643,6 @@ void CFogOfWarMgr::AllocateFogOfWar()
 
 	// IMPORTANT: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specifiy
 	//				a sub rect when calling ->Download()).
-#ifdef HL2WARS_ASW_DLL
 	m_RenderBuffer.InitProceduralTexture( "__rt_fow", TEXTURE_GROUP_CLIENT_EFFECTS, m_nGridSize, m_nGridSize, IMAGE_FORMAT_I8, 
 		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_SINGLECOPY|
 		TEXTUREFLAGS_TRILINEAR|TEXTUREFLAGS_PRE_SRGB|TEXTUREFLAGS_NODEPTHBUFFER|TEXTUREFLAGS_PWL_CORRECTED );
@@ -651,14 +650,9 @@ void CFogOfWarMgr::AllocateFogOfWar()
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	pRenderContext->SetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MINS, Vector(MIN_COORD_FLOAT, MIN_COORD_FLOAT, MIN_COORD_FLOAT) );
 	pRenderContext->SetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MAXS, Vector(MAX_COORD_FLOAT, MAX_COORD_FLOAT, MAX_COORD_FLOAT) );
-#else
-	m_RenderBuffer.InitProceduralTexture( "__rt_fow", TEXTURE_GROUP_CLIENT_EFFECTS, m_nGridSize, m_nGridSize, IMAGE_FORMAT_I8, 
-		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_SINGLECOPY|
-		TEXTUREFLAGS_TRILINEAR|TEXTUREFLAGS_NODEPTHBUFFER );
-#endif // HL2WARS_ASW_DLL
+
 	m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-#else
-#endif // 0
+#endif // FOW_USE_PROCTEX
 
 	// Must have one reference to a material using the fog of war texture (otherwise ->Download does not take effect).
 	m_FOWMaterial.Init("fow/fow", TEXTURE_GROUP_CLIENT_EFFECTS);

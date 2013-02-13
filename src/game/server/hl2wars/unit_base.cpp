@@ -15,13 +15,11 @@
 #include "animation.h"
 #include "unit_baseanimstate.h"
 
-#ifdef HL2WARS_ASW_DLL
-	#include "sendprop_priorities.h"
-#endif // HL2WARS_ASW_DLL
+#include "sendprop_priorities.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

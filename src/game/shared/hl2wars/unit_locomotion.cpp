@@ -1880,11 +1880,7 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	}
 	else
 	{
-#ifdef HL2WARS_ASW_DLL
 		m_pTraceListData = enginetrace->AllocTraceListData();
-#else
-		m_pTraceListData = new CTraceListData();
-#endif // HL2WARS_ASW_DLL
 	}
 
 	Vector moveMins, moveMaxs;
@@ -1903,9 +1899,5 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	AddPointToBounds( start + boxMaxs + bloat, moveMins, moveMaxs );
 	AddPointToBounds( start + boxMins - bloat, moveMins, moveMaxs );
 	// now build an optimized trace within these bounds
-#ifdef HL2WARS_ASW_DLL
 	enginetrace->SetupLeafAndEntityListBox( moveMins, moveMaxs, m_pTraceListData );
-#else
-	enginetrace->SetupLeafAndEntityListBox( moveMins, moveMaxs, (*m_pTraceListData) );
-#endif // HL2WARS_ASW_DLL
 }

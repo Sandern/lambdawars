@@ -23,12 +23,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef HL2WARS_ASW_DLL
 #ifdef GAME_DLL
 // link clientside sprite to CSprite - can remove this if we fixup all the maps to not have _clientside ones (do when we're sure we don't need clientside sprites)
 LINK_ENTITY_TO_CLASS( env_sprite_clientside, CSprite );
 #endif
-#endif // HL2WARS_ASW_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: 

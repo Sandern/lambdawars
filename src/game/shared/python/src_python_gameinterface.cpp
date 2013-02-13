@@ -247,28 +247,6 @@ void PyConVar::Shutdown()
 	BaseClass::Shutdown();
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void PyConVar::Create( const char *pName, const char *pDefaultValue, int flags,
-									const char *pHelpString, bool bMin, float fMin,
-									bool bMax, float fMax, FnChangeCallback_t callback )
-{
-	Msg("CREATING %s\n", pName);
-	// Find if there is an existing convar with this name and unregister that one.
-	ConVar *pConVar = cvar->FindVar( GetName() );
-	if( pConVar )
-	{
-		Warning("Shutting down existing ConVar and replacing with new one %s\n", GetName());
-		pConVar->Shutdown();
-	}
-
-	BaseClass::Create( pName, pDefaultValue, flags, pHelpString, bMin, fMin, bMax, fMax, callback );
-}
-#endif // 0
-
-#ifdef HL2WARS_ASW_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Bit ugly, but need to call the call the python callback.
 //-----------------------------------------------------------------------------
@@ -325,64 +303,6 @@ void PyConVar::SetValue( int value )
 
 	stackfree( pszOldValue );
 }
-#else
-//-----------------------------------------------------------------------------
-// Purpose: Bit ugly, but need to call the call the python callback.
-//-----------------------------------------------------------------------------
-void PyConVar::SetValue( const char *value )
-{
-	float flOldValue = m_fValue;
- 	char* pszOldValue = (char*)stackalloc( m_StringLength );
-	memcpy( pszOldValue, m_pszString, m_StringLength );
-
-	BaseClass::SetValue(value);
-
-	// Invoke any necessary callback function
-	if ( m_pyChangeCallback.ptr() != Py_None )
-	{
-		// Invoke any necessary callback function
-		SrcPySystem()->Run<pointer_wrapper<PyConVar *>, const char *, float>(m_pyChangeCallback, ptr(this), pszOldValue, flOldValue );
-	}
-
-	stackfree( pszOldValue );
-}
-
-void PyConVar::SetValue( float value )
-{
-	float flOldValue = m_fValue;
- 	char* pszOldValue = (char*)stackalloc( m_StringLength );
-	memcpy( pszOldValue, m_pszString, m_StringLength );
-
-	BaseClass::SetValue(value);
-
-	// Invoke any necessary callback function
-	if ( m_pyChangeCallback.ptr() != Py_None )
-	{
-		// Invoke any necessary callback function
-		SrcPySystem()->Run<pointer_wrapper<PyConVar *>, const char *, float>(m_pyChangeCallback, ptr(this), pszOldValue, flOldValue );
-	}
-
-	stackfree( pszOldValue );
-}
-
-void PyConVar::SetValue( int value )
-{
-	float flOldValue = m_fValue;
- 	char* pszOldValue = (char*)stackalloc( m_StringLength );
-	memcpy( pszOldValue, m_pszString, m_StringLength );
-
-	BaseClass::SetValue(value);
-
-	// Invoke any necessary callback function
-	if ( m_pyChangeCallback.ptr() != Py_None )
-	{
-		// Invoke any necessary callback function
-		SrcPySystem()->Run<pointer_wrapper<PyConVar *>, const char *, float>(m_pyChangeCallback, ptr(this), pszOldValue, flOldValue );
-	}
-
-	stackfree( pszOldValue );
-}
-#endif // HL2WARS_ASW_DLL
 
 // -------------------------------------------------------------------------------
 PyGameEvent::PyGameEvent() 

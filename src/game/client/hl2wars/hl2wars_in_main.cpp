@@ -27,10 +27,6 @@
 #include "checksum_md5.h"
 #include "hltvcamera.h"
 
-#ifdef HL2WARS_ASW_DLL
-	//#include "deferred/deferred_shared_common.h"
-#endif // HL2WARS_ASW_DLL
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -749,12 +745,7 @@ void CHL2WarsInput::ControllerMove ( int nSlot, float frametime, CUserCmd *cmd )
 {
 	// If the gameui is open, disable mouse input and do not update mouse aim
 	// This way it will keep being at the last position (in case you type something in the console)
-#if defined(HL2WARS_ASW_DLL) && defined(DEFERRED_ENABLED)
-	CLightingEditor *pLightEditor = GetLightingEditor();
-	if( enginevgui->IsGameUIVisible() || pLightEditor->IsEditorActive() )
-#else
 	if( enginevgui->IsGameUIVisible() )
-#endif // HL2WARS_ASW_DLL
 	{
 		DeactivateMouseClipping();
 
@@ -1004,7 +995,7 @@ void CHL2WarsInput::ClampAngles( QAngle& viewangles )
 //-----------------------------------------------------------------------------
 void CHL2WarsInput::ActivateMouseClipping( void )
 {
-#ifdef HL2WARS_ASW_DLL
+#if 1
 	engine->SetMouseWindowLock( true );
 #else
 	int x, y, w, h, offsetx, offsety;
@@ -1025,16 +1016,16 @@ void CHL2WarsInput::ActivateMouseClipping( void )
 	r.top = offsety;
 	r.bottom = offsety + h;
 	ClipCursor( &r );
-#endif // HL2WARS_ASW_DLL
+#endif
 }
 
 void CHL2WarsInput::DeactivateMouseClipping( void )
 {
-#ifdef HL2WARS_ASW_DLL
+#if 1
 	engine->SetMouseWindowLock( false );
 #else
 	ClipCursor( NULL );
-#endif // HL2WARS_ASW_DLL
+#endif
 }
 
 //-----------------------------------------------------------------------------

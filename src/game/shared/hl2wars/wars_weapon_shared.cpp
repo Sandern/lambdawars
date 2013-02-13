@@ -133,9 +133,6 @@ void CWarsWeapon::PrimaryAttack( void )
 //-----------------------------------------------------------------------------
 void CWarsWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
-#ifndef HL2WARS_ASW_DLL
-	BaseClass::MakeTracer( vecTracerSrc, tr, iTracerType );
-#else
 #if 0
 	const char* tracer = "ASWUTracer";
 	//if (GetActiveASWWeapon())
@@ -168,7 +165,6 @@ void CWarsWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 	ASWUTracer( GetOwner(), tr.endpos, m_vTracerColor );
 #endif
 #endif // 0
-#endif // HL2WARS_ASW_DLL
 }
 
 //-----------------------------------------------------------------------------

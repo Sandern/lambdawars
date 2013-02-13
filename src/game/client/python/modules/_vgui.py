@@ -237,10 +237,6 @@ class VGUI(GenerateModuleClient):
         mb.add_registration_code( 'bp::def( "AddTickSignal", wrap_AddTickSignal, (bp::arg("panel"), bp::arg("intervalMilliseconds")=0 ) );' )
         mb.add_registration_code( 'bp::def( "RemoveTickSignal", wrap_RemoveTickSignal, bp::arg("panel") );' )
         
-        # Setting a loading background
-        mb.free_function('PySetLoadingBackgroundDialog').include()
-        mb.free_function('PySetLoadingBackgroundDialog').rename('SetLoadingBackgroundDialog')
-            
         # Gameui open?
         mb.free_function('PyIsGameUIVisible').include()
         mb.free_function('PyIsGameUIVisible').rename('IsGameUIVisible')

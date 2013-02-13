@@ -22,10 +22,6 @@ public:
 	VideoGeneralPanel( vgui::Panel *pParent, const char *pPanelName, const char *pFileName=NULL );
 	~VideoGeneralPanel();
 
-#ifndef HL2WARS_ASW_DLL
-	virtual void PyDeletePanel(void);
-#endif // HL2WARS_ASW_DLL
-
 	bool SetVideo( const char *pFileName );
 	virtual void OnVideoOver( void );
 	void StopVideo( void );

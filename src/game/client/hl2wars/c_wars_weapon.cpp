@@ -165,11 +165,7 @@ void CWarsWeapon::EnsureCorrectRenderingModel()
 	C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
 	if ( localplayer && 
 		localplayer == GetCommander() &&
-#ifdef HL2WARS_ASW_DLL
 		!localplayer->ShouldDrawLocalPlayer() )
-#else
-		!C_BasePlayer::ShouldDrawLocalPlayer() )
-#endif // HL2WARS_ASW_DLL
 	{
 		return;
 	}

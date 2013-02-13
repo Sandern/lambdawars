@@ -45,7 +45,7 @@ public:
 	void SetColor( int r = 255, int g = 255, int b = 255, int a = 255 );
 
 private:
-#if 0 //def  HL2WARS_ASW_DLL
+#if 0
 	void SharedInit( Vector vMin = Vector(), Vector vMax = Vector(), 
 		Vector vOrigin = Vector(), QAngle qAngle = QAngle(0,0,0),
 		int r = 255, int g = 255, int b = 255, int a = 255 );
@@ -55,7 +55,7 @@ private:
 	FlashlightState_t m_Info;
 #else
 	ProjectTextureUnlitInfo_t m_Info;
-#endif // HL2WARS_ASW_DLL
+#endif
 	ClientShadowHandle_t m_shadowHandle;
 };
 

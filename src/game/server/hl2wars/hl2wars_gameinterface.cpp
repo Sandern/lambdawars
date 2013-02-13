@@ -13,13 +13,11 @@
 
 #include "fmtstr.h"
 #include "gameinterface.h"
-#ifdef HL2WARS_ASW_DLL
-	#include "matchmaking/swarm/imatchext_swarm.h"
-#endif // HL2WARS_ASW_DLL
+#include "matchmaking/swarm/imatchext_swarm.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -109,7 +107,6 @@ void CServerGameDLL::LevelInit_ParseAllEntities( const char *pMapEntities )
 {
 }
 
-#ifdef HL2WARS_ASW_DLL
 bool g_bOfflineGame = false;
 
 void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
@@ -203,17 +200,16 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	else
 	{
 		bool bSuccess = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		try {
 			bSuccess = bp::extract<bool>(gamemgr.attr("_ApplyGameSettings")( PyKeyValuesToDict( pKV ) ));
 		} catch( boost::python::error_already_set & ) {
 			Warning("ApplyGameSettings: Error occurred while letting Python apply game settings\n");
 			PyErr_Print();
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 		if( !bSuccess )
 			Warning( "ApplyGameSettings: Unknown game mode!\n" );
 	}
 }
-#endif // HL2WARS_ASW_DLL
