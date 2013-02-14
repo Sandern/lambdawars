@@ -25,7 +25,6 @@
 #include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
-	extern void	PySetLoadingBackgroundDialog( boost::python::object panel );
 	extern void DestroyPyPanels();
 #endif // CLIENT_DLL
 
@@ -294,9 +293,6 @@ void CSrcPython::ExtraShutdown( void )
 		return;
 
 #ifdef CLIENT_DLL
-	// Clear loading dialog
-	PySetLoadingBackgroundDialog( bp::object() );
-
 	// Clear python panels
 	DestroyPyPanels();
 #endif // CLIENT_DLL

@@ -100,9 +100,6 @@ dsymbols = [
     'PYPP_GENERATION',
 ]
 
-if settings.ASW_CODE_BASE:
-    dsymbols.append( 'HL2WARS_ASW_DLL' )
-
 dsymbols_client = [ 
     'CLIENT_DLL' 
 ]

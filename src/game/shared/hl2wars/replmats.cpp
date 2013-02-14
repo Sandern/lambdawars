@@ -13,20 +13,11 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/ITexture.h"
 
-#ifdef HL2WARS_ASW_DLL
-	#include "deferred/cdeferred_manager_client.h"
-#endif // HL2WARS_ASW_DLL
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-//#if !defined( SWARM_DLL ) && !( HL2WARS_ASW_DLL )
-	#define REPLMAT_WRITE_MATERIAL
-//#endif 
-
-#ifdef HL2WARS_ASW_DLL
-	#define REPLMAT_USE_REPL_NAME
-#endif // HL2WARS_ASW_DLL
+#define REPLMAT_WRITE_MATERIAL
+#define REPLMAT_USE_REPL_NAME
 
 static ConVar g_debug_replmat("g_debug_replmat", "0", FCVAR_CHEAT);
 
@@ -37,36 +28,20 @@ extern bool CheckMaterial( const char *pMaterial );
 //-----------------------------------------------------------------------------
 #ifndef REPLMAT_WRITE_MATERIAL
 static const char *pszShaderReplaceDict[][2] = {
-#ifdef HL2WARS_ASW_DLL
-	"globallitsimple",			"DEFERRED_MODEL",
-	"vertexlitgeneric",			"DEFERRED_MODEL",
-	"lightmappedgeneric",		"DEFERRED_BRUSH",
-	"worldvertextransition",	"DEFERRED_BRUSH",
-	"multiblend",				"DEFERRED_BRUSH",
-#else
 	"globallitsimple",			"VertexLitGeneric",
 	"vertexlitgeneric",			"SDK_VertexLitGeneric",
 	"lightmappedgeneric",		"SDK_LightmappedGeneric",
 	"worldvertextransition",	"SDK_WorldVertexTransition",
 	"WorldVertexTransition_DX9", "SDK_WorldVertexTransition",
 	"water",					"SDK_Water",
-#endif // HL2WARS_ASW_DLL
 };
 #else
 static const char *pszShaderReplaceDict[][2] = {
-#ifndef HL2WARS_ASW_DLL
 	"globallitsimple",				"\"SDK_VertexLitGeneric\"",
 	"vertexlitgeneric",			"\"SDK_VertexLitGeneric\"",
 	"lightmappedgeneric",		"\"SDK_LightmappedGeneric\"",
 	"worldvertextransition",	"\"SDK_WorldVertexTransition\"",
 	"water",					"\"SDK_Water\"",
-#else
-	"globallitsimple",			"\"DEFERRED_MODEL\"",
-	"vertexlitgeneric",			"\"DEFERRED_MODEL\"",
-	"lightmappedgeneric",		"\"DEFERRED_BRUSH\"",
-	"worldvertextransition",	"\"DEFERRED_BRUSH\"",
-	"multiblend",				"\"DEFERRED_BRUSH\"",
-#endif // HL2WARS_ASW_DLL
 };
 #endif 
 static const int iNumShaderReplaceDict = ARRAYSIZE( pszShaderReplaceDict );
@@ -575,12 +550,6 @@ void ReplacementSystem::Enable()
 		return;
 
 	return;
-
-#ifdef HL2WARS_ASW_DLL
-	bool bDeferredRendering = GetDeferredManager()->IsDeferredRenderingEnabled();
-	if( !bDeferredRendering )
-		return;
-#endif // HL2WARS_ASW_DLL
 
 	Msg("Enabled material replacement system\n");
 #ifdef REPLMAT_WRITE_MATERIAL

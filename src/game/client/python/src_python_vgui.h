@@ -632,7 +632,6 @@ extern PyLocalize *g_pylocalize;
 //=============================================================================
 // Misc
 //=============================================================================
-void	PySetLoadingBackgroundDialog( boost::python::object panel );
 bool	PyIsGameUIVisible();
 VPANEL  PyGetPanel( VGuiPanel_t type );
 
