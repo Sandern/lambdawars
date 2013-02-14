@@ -99,11 +99,11 @@ public:
 		operator delete( pMem );
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Default placement versions of operator new.
 	inline void* operator new(std::size_t, void* __p) throw() { Msg("CHudElement new\n");return __p; }
 	inline void* operator new[](std::size_t, void* __p) throw() { Msg("CHudElement new[]\n");return __p; }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	void SetNeedsRemove( bool needsremove );
 
@@ -142,10 +142,10 @@ private:
 	CUtlVector< int >			m_HudRenderGroups;
 	CHud						*m_pHud;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 public:
 	boost::python::object		m_pyInstance;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 #include "utlpriorityqueue.h"

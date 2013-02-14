@@ -25,13 +25,13 @@
 #include "branchingsingleton.h"
 #include "bittools.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include <boost/python.hpp>
 	#include "src_python_physics.h"
 
 	namespace bp = boost::python;
-#endif // DISABLE_PYTHON
-#include "src_python_server_class.h" // Replaced by stubs if DISABLE_PYTHON
+#endif // ENABLE_PYTHON
+#include "src_python_server_class.h" // Replaced by stubs if ENABLE_PYTHON
 
 #include "density_weight_map.h"
 #include "hl2wars_shareddefs.h"
@@ -266,10 +266,10 @@ struct thinkfunc_t
 
 	DECLARE_SIMPLE_DATADESC();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// MUST BE LAST
 	bp::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 struct EmitSound_t;
@@ -1947,7 +1947,7 @@ public:
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Python generic
 	virtual PyObject *GetPySelf() const { return NULL; }
 
@@ -2030,7 +2030,7 @@ public:
 
 	// This bit vector tells to who we may send data
 	CBitVec<ABSOLUTE_PLAYER_LIMIT> m_PyNetworkVarsPlayerTransmitBits;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 public:
 	int PyGetPropInt1() { return m_iPySendProp1; }
@@ -2053,13 +2053,13 @@ private:
 	CNetworkVar( int,		m_iPySendProp1 );
 	CNetworkVar( int,		m_iPySendProp2 );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	bp::object m_pyInstance;		// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
 	bp::object m_pyHandle;			// Holds a ref to a handle to the instance. 
 	bp::object m_pyTouchMethod;
 	bp::object m_pyThink;
 	bp::object m_pyPhysObj;			// Holds a ref to the physic object
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	DensityWeightsMap m_DensityMap;
 
@@ -3000,7 +3000,7 @@ inline CBaseEntity *CBaseEntity::GetMousePassEntity( )
 	return m_hMousePassEntity.Get();
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 inline bp::object CBaseEntity::GetPyInstance() const 
 { 
 	return m_pyInstance; 
@@ -3037,7 +3037,7 @@ inline void CBaseEntity::PySetTakeDamage( int takedamage )
 {
 	m_takedamage = takedamage;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // 

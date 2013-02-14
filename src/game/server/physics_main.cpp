@@ -1065,7 +1065,7 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 	VPROF_EXIT_SCOPE();
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: Called when it's time for a physically moved objects (plats, doors, etc)
 //			to run it's game code.
@@ -1155,7 +1155,7 @@ void CBaseEntity::PhysicsPyDispatchThink( bp::object thinkFunc )
 
 	VPROF_EXIT_SCOPE();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: Does not change the entities velocity at all

@@ -8,9 +8,9 @@
 #include "iclassmap.h"
 #include "utldict.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python_entities.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -23,9 +23,9 @@ public:
 		mapname[ 0 ] = 0;
 		factory = 0;
 		size = -1;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		pyfactory = 0;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 
 	char const *GetMapName() const
@@ -41,9 +41,9 @@ public:
 	DISPATCHFUNCTION	factory;
 	int					size;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	PyEntityFactory		*pyfactory;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 private:
 	char				mapname[ 40 ];
 };
@@ -56,12 +56,12 @@ public:
 	virtual C_BaseEntity	*CreateEntity( const char *mapname );
 	virtual int				GetClassSize( const char *classname );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual void			PyAdd( const char *mapname, const char *classname, int size, PyEntityFactory *factory );
 	virtual void			PyRemove( const char *classname );
 	virtual PyEntityFactory* PyGetFactory( const char *classname );
 	virtual PyEntityFactory* PyGetFactoryByMapName( const char *classname );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 private:
 	CUtlDict< classentry_t, unsigned short > m_ClassDict;
@@ -120,7 +120,7 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 		if ( Q_stricmp( lookup->GetMapName(), mapname ) )
 			continue;
 
-#ifdef DISABLE_PYTHON
+#ifndef ENABLE_PYTHON
 		if ( !lookup->factory )
 		{
 #if defined( _DEBUG )
@@ -171,7 +171,7 @@ int CClassMap::GetClassSize( const char *classname )
 	return -1;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void CClassMap::PyAdd( const char *mapname, const char *classname, int size, PyEntityFactory *factory )
 {
 	if( !factory )
@@ -224,4 +224,4 @@ PyEntityFactory* CClassMap::PyGetFactoryByMapName( const char *mapname )
 	}
 	return NULL;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

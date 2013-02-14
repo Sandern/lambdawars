@@ -16,9 +16,9 @@
 #include "tier0/vprof.h"
 #include "particles_new.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python_te.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -101,7 +101,7 @@ void DispatchEffectToCallback( const char *pEffectName, const CEffectData &m_Eff
 	UtlSymId_t nSym = map.Find( pEffectName );
 	if ( nSym == UTL_INVAL_SYMBOL )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		// Loop though all the python registered callbacks
 		for ( PyClientEffectRegistration *pReg = PyClientEffectRegistration::s_pHead; pReg; pReg = pReg->m_pNext )
 		{
@@ -118,7 +118,7 @@ void DispatchEffectToCallback( const char *pEffectName, const CEffectData &m_Eff
 				return;
 			}
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 		Warning("DispatchEffect: effect \"%s\" not found on client\n", pEffectName );
 		return;

@@ -983,9 +983,9 @@ bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 #endif
 
 	IGameSystem::Add( FogOfWarMgr() );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	IGameSystem::Add( SrcPySystem() );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	ActivityList_Init();
 	ActivityList_Free();
@@ -1360,9 +1360,9 @@ void CHLClient::Shutdown( void )
 		GetHud().Shutdown();
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->ExtraShutdown(); // before vgui, so we delete all python panels first
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	VGui_Shutdown();
 	
@@ -1452,9 +1452,9 @@ void CHLClient::HudUpdate( bool bActive )
 	{
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
 		IGameSystem::UpdateAllSystems( frametime );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		SrcPySystem()->CleanupDeleteList(); // Might kill a GameSystem, so moved outside Update function of SrcPySystem
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 
 	// run vgui animations
@@ -2000,9 +2000,9 @@ void CHLClient::LevelShutdown( void )
 
 	// Now release/delete the entities
 	cl_entitylist->Release();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->CleanupDeleteList();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	C_BaseEntityClassList *pClassList = s_pClassLists;
 	while ( pClassList )

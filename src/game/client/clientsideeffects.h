@@ -35,13 +35,13 @@ public:
 	// Sets the effect to inactive so it can be destroed
 	virtual void		Destroy( void );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Get python instance
 	bp::object			GetPyInstance();
 protected:
 	// Python allocated?
 	bp::object			m_pyRef;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 private:
 	// Name of effect ( static data )

@@ -1919,10 +1919,10 @@ bool CBaseEntity::PhysicsRunThink( thinkmethods_t thinkMethod )
 
 		if( m_aThinkFunctions[i].m_pfnThink )
 			bAlive = PhysicsRunSpecificThink( i, m_aThinkFunctions[i].m_pfnThink );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		else if( m_aThinkFunctions[i].m_pyThink.ptr() != Py_None )
 			bAlive = PhysicsPyRunSpecificThink( i, m_aThinkFunctions[i].m_pyThink );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #ifdef _DEBUG
 		// Clear our context
@@ -2116,7 +2116,7 @@ bool CBaseEntity::PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc 
 	return ( !IsMarkedForDeletion() );
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: Almost the same as above, but only with a reference to a python method
 //-----------------------------------------------------------------------------
@@ -2151,7 +2151,7 @@ bool CBaseEntity::PhysicsPyRunSpecificThink( int nContextIndex, bp::object think
 	// Return whether entity is still valid
 	return ( !IsMarkedForDeletion() );
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 void CBaseEntity::SetGroundEntity( CBaseEntity *ground )
 {

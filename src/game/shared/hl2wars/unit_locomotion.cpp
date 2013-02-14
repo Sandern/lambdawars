@@ -87,7 +87,7 @@ bool CTraceFilterUnitNav::ShouldHitEntity( IHandleEntity *pHandleEntity, int con
 //-----------------------------------------------------------------------------
 // Movement class
 //-----------------------------------------------------------------------------
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComponent(outer)
 {
 	surfacefriction = 1.0;
@@ -103,7 +103,7 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 
 	m_pTraceListData = NULL;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #define TICK_INTERVAL			(gpGlobals->interval_per_tick)
 

@@ -16,7 +16,7 @@
 #pragma once
 #endif
 
-#ifdef DISABLE_PYTHON
+#ifndef ENABLE_PYTHON
 	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name )
 	#define DECLARE_CREATEPYHANDLE( name )
 	#define IMPLEMENT_CREATEPYHANDLE( name )	
@@ -132,6 +132,6 @@ void PyResetAllNetworkTables();
 		return CreatePyHandleHelper(this, #name "HANDLE");												\
 	}
 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #endif // SRC_PYTHON_SERVER_CLASS_H

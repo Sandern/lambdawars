@@ -761,9 +761,9 @@ C_BaseAnimating::C_BaseAnimating() :
 //-----------------------------------------------------------------------------
 C_BaseAnimating::~C_BaseAnimating()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		Assert( !g_bInThreadedBoneSetup );
 		if ( m_iMostRecentBoneSetupRequest == g_iPreviousBoneCounter )
@@ -795,7 +795,7 @@ C_BaseAnimating::~C_BaseAnimating()
 	}
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void C_BaseAnimating::ClearPyInstance()
 {
 	Assert( !g_bInThreadedBoneSetup );
@@ -828,7 +828,7 @@ void C_BaseAnimating::ClearPyInstance()
 
 	BaseClass::ClearPyInstance();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 int C_BaseAnimating::GetRenderFlags( void )
 {

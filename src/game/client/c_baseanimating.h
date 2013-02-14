@@ -118,9 +118,9 @@ public:
 public:
 	C_BaseAnimating();
 	~C_BaseAnimating();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual void					ClearPyInstance();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual C_BaseAnimating*		GetBaseAnimating() { return this; }
 

@@ -44,9 +44,9 @@
 #include "wars_mapboundary.h"
 #include "iunit.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 extern ConVar cl_leveloverviewmarker;
 
@@ -318,7 +318,7 @@ void HL2WarsViewport::Paint()
 	if( !pPlayer || (!pPlayer->IsStrategicModeOn() && !(pPlayer->m_nButtons & IN_SPEED) ) )
 		return;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( pPlayer->GetSingleActiveAbility().ptr() != Py_None ) 
 	{
 		SrcPySystem()->Run( SrcPySystem()->Get("Paint", pPlayer->GetSingleActiveAbility()) );
@@ -326,7 +326,7 @@ void HL2WarsViewport::Paint()
 	else if( pPlayer->GetMouseCapture() != NULL )
 #else
 	if( pPlayer->GetMouseCapture() != NULL )
-#endif // #endif // DISABLE_PYTHON
+#endif // #endif // ENABLE_PYTHON
 	{
 		pPlayer->GetMouseCapture()->GetIMouse()->OnHoverPaint();
 	}
@@ -447,14 +447,14 @@ void HL2WarsViewport::UpdateCursor()
 	if( !pPlayer )
 		return;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Active abilities are override the cursor as first
 	if( pPlayer->GetSingleActiveAbility().ptr() != Py_None )
 	{
 		SetCursor( SrcPySystem()->RunT<unsigned long>( SrcPySystem()->Get("GetCursor", pPlayer->GetSingleActiveAbility()), m_iDefaultMouseCursor ) );
 		return;
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// If there is an entity with a mouse interface under our pointer it overrides our cursor
 	if( pPlayer->GetMouseData().m_hEnt.Get() && pPlayer->GetMouseData().m_hEnt.Get()->GetIMouse() )

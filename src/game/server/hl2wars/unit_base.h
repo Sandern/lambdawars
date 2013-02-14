@@ -55,9 +55,9 @@ private:
 // Managing the map
 struct animeventhandler_t
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_pyInstance;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	BaseAnimEventHandler *m_pHandler;
 };
 
@@ -68,13 +68,13 @@ public:
 
 	AnimEventMap();
 	AnimEventMap( AnimEventMap &animeventmap );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	AnimEventMap( AnimEventMap &animeventmap, boost::python::dict d );
 	AnimEventMap( boost::python::dict d );
 
 	void AddAnimEventHandlers( boost::python::dict d );
 	void SetAnimEventHandler( int event, boost::python::object handler );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 private:
 	CUtlMap<int, animeventhandler_t> m_AnimEventMap;

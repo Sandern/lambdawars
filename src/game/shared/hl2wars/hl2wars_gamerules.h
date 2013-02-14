@@ -120,9 +120,9 @@ public:
 
 	// Called each frame. This just forwards the call to Think().
 	virtual void FrameUpdatePostEntityThink();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual PyObject *GetPySelf() const { return NULL; }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual void Think();
 
@@ -176,10 +176,10 @@ public:
 
 	int SelectDefaultTeam( void );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// ...
 	virtual boost::python::object GetNextLevelName( bool bRandom = false );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual void ChangeLevel( void ) { BaseClass::ChangeLevel(); }
 	virtual void GoToIntermission( void ) { BaseClass::GoToIntermission(); }

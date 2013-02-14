@@ -19,7 +19,7 @@ class UnitBaseAirLocomotion : public UnitBaseLocomotion
 public:
 #ifdef ENABLE_PYTHON
 	UnitBaseAirLocomotion( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual void	Move( float interval, UnitBaseMoveCommand &mv );
 

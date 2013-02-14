@@ -12,7 +12,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ UnitBaseAirNavigator::UnitBaseAirNavigator( boost::python::object outer )
 	m_iTestRouteMask = MASK_NPCSOLID_BRUSHONLY;
 	m_bUseSimplifiedRouteBuilding = true;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -75,12 +75,12 @@
 #include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	#include "src_python_util.h"
 	#include "src_python_networkvar.h"
 	#include "src_python_usermessage.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -782,9 +782,9 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 	else
 		memset(&m_bInFOW, 0, sizeof(bool)*FOWMAXPLAYERS);
 	DensityMap()->Init(this);
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	m_pyInstance = bp::object();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -810,9 +810,9 @@ extern bool g_bDisableEhandleAccess;
 //-----------------------------------------------------------------------------
 CBaseEntity::~CBaseEntity( )
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		if( m_nFOWFlags & FOWFLAG_UPDATER )
 			FogOfWarMgr()->RemoveFogUpdater( m_iOwnerNumber, this );
@@ -889,7 +889,7 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 	CheckHasThinkFunction( false );
 	CheckHasGamePhysicsSimulation();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// In case this is not created through a factory in python, retrieve the reference here.
 	if( GetPySelf() && m_pyInstance.ptr() == Py_None )
 	{
@@ -936,7 +936,7 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 			}
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -2480,10 +2480,10 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_KEYFIELD( m_bLagCompensate, FIELD_BOOLEAN, "LagCompensate" ),
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// HL2Wars data
 	DEFINE_THINKFUNC( PyThink ),
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	DEFINE_FIELD( m_iOwnerNumber, FIELD_INTEGER ),
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "ChangeOwner", InputChangeOwnerNumber ),
@@ -2729,7 +2729,7 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 	if ( m_pfnTouch ) {
 		(this->*m_pfnTouch)( pOther );
 	}
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	else if( m_pyTouchMethod.ptr() != Py_None ) {
 		try {
 			m_pyTouchMethod( *pOther );
@@ -2738,7 +2738,7 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 			PyErr_Clear();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// notify parent of touch
 	if ( m_pParent != NULL )
@@ -4606,7 +4606,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 		}
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Check Python input map
 	if( m_pyInstance.ptr() != Py_None )
 	{
@@ -4681,7 +4681,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 			PyErr_Print();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	DevMsg( 2, "unhandled input: (%s) -> (%s,%s)\n", szInputName, STRING(m_iClassname), GetDebugName()/*,", from (%s,%s)" STRING(pCaller->m_iClassname), STRING(pCaller->m_iName)*/ );
 	return false;
@@ -8834,7 +8834,7 @@ void CBaseEntity::FOWForceUpdate( int iPlayerIndex )
 	FogOfWarMgr()->MarkEntityUnKnown( iPlayerIndex, entindex() );
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
@@ -9029,4 +9029,4 @@ void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
 		}
 	MessageEnd();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

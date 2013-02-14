@@ -14,9 +14,9 @@
 
 #include "imouse.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 #include <boost/python.hpp>
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 class CHL2WarsPlayer;
 
@@ -32,9 +32,9 @@ public:
 #endif 
 
 	// Selection
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual bool IsSelectableByPlayer( CHL2WarsPlayer *pPlayer, boost::python::object targetselection = boost::python::object() ) = 0;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual void Select( CHL2WarsPlayer *pPlayer, bool bTriggerOnSel = true )				= 0;
 	virtual void OnSelected( CHL2WarsPlayer *pPlayer )										= 0;
 	virtual void OnDeSelected( CHL2WarsPlayer *pPlayer )									= 0;

@@ -597,10 +597,10 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 	// Add sound emitter
 	IGameSystem::Add( SoundEmitterSystem() );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Add python system
 	IGameSystem::Add( SrcPySystem() );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Init the fog of war system
 	IGameSystem::Add( FogOfWarMgr() );
@@ -948,9 +948,9 @@ void CServerGameDLL::DLLShutdown( void )
 	// SteamAPI_Shutdown(); << Steam shutdown is controlled by engine
 #endif
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->ExtraShutdown();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
@@ -1176,7 +1176,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	//  to be parsed (the above code has loaded all point_template entities)
 	PrecachePointTemplates();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Import map script (find better place?)
 	char buf[_MAX_PATH];
 	Q_snprintf(buf, _MAX_PATH, "maps/%s.py", pMapName);
@@ -1184,7 +1184,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	{
 		SrcPySystem()->Import(pMapName);
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// load MOTD from file into stringtable
 	LoadMessageOfTheDay();
@@ -1357,11 +1357,11 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	Physics_RunThinkFunctions( simulating );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Note: Because gamesystems might be cleaned up here, we are not
 	//		 doing this in SrcPySystem.
 	SrcPySystem()->CleanupDeleteList(); 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	IGameSystem::FrameUpdatePostEntityThinkAllSystems();
 
@@ -1502,9 +1502,9 @@ void CServerGameDLL::LevelShutdown( void )
 	ClearDebugHistory();
 
 	gEntList.Clear();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->CleanupDeleteList();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	InvalidateQueryCache();
 
@@ -2807,11 +2807,11 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				if ( !pEnt )
 					break;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 				// Python networkvars: mark player as transmit
 				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( ENTINDEX(pInfo->m_pClientEnt) );
 				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), ENTINDEX(pInfo->m_pClientEnt) );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 				CServerNetworkProperty *pParent = pEnt->GetNetworkParent();
 				if ( !pParent )
@@ -2976,7 +2976,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients, INTERF
 //-----------------------------------------------------------------------------
 bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 {	
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// The client must directly be informed about the python classes to avoid recv/send table mismatches
 	// NOTE: Usermessages don't work here. However it is possible to send client commands
 	// NOTE2: Dedicated servers send the message in the client active. They seem to check against CBaseEntity recv table.
@@ -2985,7 +2985,7 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 		//Msg("CServerGameClients::ClientConnect FullClientUpdatePyNetworkClsByEdict\n");
 		FullClientUpdatePyNetworkClsByEdict(pEdict);
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Reset known entities for the new player
 	FogOfWarMgr()->ResetToKnown( ENTINDEX(pEdict) - 1 );

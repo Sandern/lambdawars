@@ -97,10 +97,10 @@ void CBaseMinimap::RemoveEntityObject( CBaseEntity *pEnt )
 			break;
 		}
 	}
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	PyErr_SetString(PyExc_ValueError, "CBaseMinimap.RemoveEntityObject: x not in entity object list" );
 	throw boost::python::error_already_set(); 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------

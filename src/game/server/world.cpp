@@ -36,11 +36,11 @@
 #include "vscript/ivscript.h"
 #include "vscript_server.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	#include "src_python_gamerules.h"
 	#include "src_python_entities.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -632,18 +632,18 @@ CWorld::~CWorld()
 	if ( g_pGameRules )
 	{
 		g_pGameRules->LevelShutdown();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();	
 		else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			delete g_pGameRules;
 		g_pGameRules = NULL;
 	}
 	g_WorldEntity = NULL;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	g_bDoNotInitPythonClasses = true;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 
@@ -762,11 +762,11 @@ void CWorld::Precache( void )
 	Assert( !g_pGameRules );
 	if (g_pGameRules)
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();	
 		else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			delete g_pGameRules;
 		g_pGameRules = NULL;
 	}
@@ -860,11 +860,11 @@ void CWorld::Precache( void )
 	// Call the gamerules precache after the AI precache so that games can precache NPCs that are always loaded
 	g_pGameRules->Precache();
 	
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Python classes init
 	g_bDoNotInitPythonClasses = false;
 	InitAllPythonEntities();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if ( m_iszChapterTitle != NULL_STRING )
 	{

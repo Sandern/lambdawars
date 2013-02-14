@@ -19,9 +19,9 @@ class UnitBaseAirNavigator : public UnitBaseNavigator
 	DECLARE_CLASS(UnitBaseAirNavigator, UnitBaseNavigator);
 
 public:
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseAirNavigator( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual void		Update( UnitBaseMoveCommand &mv );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint();

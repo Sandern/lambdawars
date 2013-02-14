@@ -15,9 +15,9 @@
 
 #include "c_playerresource.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #include "c_hl2wars_player.h"
 #include "cdll_client_int.h"
@@ -142,7 +142,7 @@ Color CHudChat::GetClientColor( int clientIndex )
 		return g_ColorYellow;
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	int ownernumber = g_PR->GetOwnerNumber(clientIndex);
 
 	try	{	
@@ -151,7 +151,7 @@ Color CHudChat::GetClientColor( int clientIndex )
 		PyErr_Print();	
 		PyErr_Clear();	
 	}		
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	return g_ColorYellow;
 }
 

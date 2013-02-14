@@ -14,7 +14,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 
 WarsVGUIScreen::WarsVGUIScreen() : m_pPanel(NULL)
 {
@@ -191,4 +191,4 @@ void WarsVGUIScreen::Draw()
 	//DrawScreenOverlay();
 }
 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 
 class WarsVGUIScreen
 {
@@ -65,6 +65,6 @@ private:
 	CMaterialReference	m_OverlayMaterial;
 };
 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #endif // WARS_VGUI_SCREEN_H

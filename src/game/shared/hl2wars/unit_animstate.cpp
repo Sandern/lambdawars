@@ -61,7 +61,7 @@ TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap )
 	}
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 TranslateActivityMap::TranslateActivityMap( bp::dict d)
 {
 	SetDefLessFunc( m_translateActivityMap );
@@ -99,7 +99,7 @@ void TranslateActivityMap::AddTranslations( bp::dict d )
 		AddTranslation(a, atrans);
 	}
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 void TranslateActivityMap::DebugPrint()
 {
@@ -113,7 +113,7 @@ void TranslateActivityMap::DebugPrint()
 // ------------------------------------------------------------------------------------------------ //
 // UnitAnimState implementation.
 // ------------------------------------------------------------------------------------------------ //
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animconfig) : UnitBaseAnimState(outer)
 {
 	m_flEyeYaw = 0.0f;
@@ -175,7 +175,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 	m_sAimLayerSequence = MAKE_STRING("gesture_shoot_smg1");
 	ClearAnimationState();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 UnitAnimState::~UnitAnimState()
 {
@@ -834,7 +834,7 @@ void UnitAnimState::SetCustomSpecificActPlaybackRate( float playbackrate )
 	m_fSpecMainPlaybackRate = playbackrate;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void UnitAnimState::SetActivityMap( boost::python::object activitymap )
 {
 	if( activitymap.ptr() == Py_None )
@@ -846,7 +846,7 @@ void UnitAnimState::SetActivityMap( boost::python::object activitymap )
 	m_pActivityMap = boost::python::extract<TranslateActivityMap *>(activitymap);
 	m_pyActivityMap = activitymap;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 Activity UnitAnimState::TranslateActivity( Activity actDesired )
 { 

@@ -6,14 +6,14 @@
 
 #include "cbase.h"
 #include "wars_mesh_builder.h"
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 // Python mesh builder
 PyMeshBuilder::PyMeshBuilder( const char *pMaterialName, MaterialPrimitiveType_t type )
 	: m_nType(type)
@@ -203,4 +203,4 @@ void AddToClientEffectList( bp::object effect )
 
 	pEffect->AddToEffectList(effect);
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

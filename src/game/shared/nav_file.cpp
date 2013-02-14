@@ -18,9 +18,9 @@
 
 #include "tier1/lzmaDecoder.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -1492,10 +1492,10 @@ NavErrorType CNavMesh::Load( void )
 
 	WarnIfMeshNeedsAnalysis();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Fire loaded signal
 	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "navmeshloaded", "core.signals", true ) );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	return loadResult;
 }

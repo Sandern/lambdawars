@@ -14,9 +14,9 @@
 #include "predicted_viewmodel.h"
 #include "world.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -553,12 +553,12 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 	if( pUnit && m_hControlledUnit.Get() == pUnit )
 		return;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Setup dict for sending a signal
 	bp::dict kwargs;
 	kwargs["sender"] = bp::object();
 	kwargs["player"] = GetPyHandle();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Tell old unit we left control
 	if( m_hControlledUnit.Get() )
@@ -568,11 +568,11 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 		m_Local.m_iHideHUD |= HIDEHUD_UNIT;
 		HideViewModels();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		kwargs["unit"] = m_hControlledUnit->GetPyHandle();
 		bp::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 		// Dispatch event
 		IGameEvent * event = gameeventmanager->CreateEvent( "player_leftcontrol_unit" );
@@ -614,12 +614,12 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 		m_Local.m_iHideHUD &= ~HIDEHUD_UNIT;
 		m_Local.m_iHideHUD &= ~HIDEHUD_CROSSHAIR;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		// Dispatch signal
 		kwargs["unit"] = m_hControlledUnit->GetPyHandle();
 		bp::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 		// Dispatch event
 		IGameEvent * event = gameeventmanager->CreateEvent( "player_control_unit" );

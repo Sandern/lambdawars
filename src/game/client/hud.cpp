@@ -429,11 +429,11 @@ void CHud::Shutdown( void )
 	int iMax = GetHudList().Count();
 	for ( int i = iMax-1; i >= 0; i-- )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( GetHudList()[i]->m_pyInstance.ptr() != Py_None ) {
 			continue; // Do not delete python panels
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		delete GetHudList()[i];
 	}
 	GetHudList().Purge();
@@ -763,7 +763,7 @@ void CHud::AddHudElement( CHudElement *pHudElement )
 	GetHudList().AddToTail( pHudElement );
 
 	vgui::Panel *pPanel;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( pHudElement->m_pyInstance.ptr() != Py_None )
 	{
 		pPanel = boost::python::extract< vgui::Panel * >( pHudElement->m_pyInstance );
@@ -773,7 +773,7 @@ void CHud::AddHudElement( CHudElement *pHudElement )
 		}
 	}
 	else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		pPanel= dynamic_cast< vgui::Panel * >( pHudElement );
 		if ( !pPanel )
@@ -794,13 +794,13 @@ void CHud::AddHudElement( CHudElement *pHudElement )
 void CHud::RemoveHudElement( CHudElement *pHudElement ) 
 {
 	GetHudList().FindAndRemove( pHudElement );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( pHudElement->m_pyInstance.ptr() != Py_None )
 	{
 		GetHudPanelList().FindAndRemove( boost::python::extract< vgui::Panel * >( pHudElement->m_pyInstance ) );
 	}
 	else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		GetHudPanelList().FindAndRemove( dynamic_cast< vgui::Panel * >( pHudElement ) );
 	}

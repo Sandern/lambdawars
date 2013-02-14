@@ -16,9 +16,9 @@
 #include "studio.h"
 #include "sequence_transitioner.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include <boost/python.hpp>
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #ifdef CLIENT_DLL
 	class C_BaseAnimatingOverlay;
@@ -48,12 +48,12 @@ class TranslateActivityMap
 public:
 	TranslateActivityMap() {SetDefLessFunc( m_translateActivityMap );}
 	TranslateActivityMap( TranslateActivityMap &activitymap );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	TranslateActivityMap( bp::dict d );
 	TranslateActivityMap( TranslateActivityMap &activitymap, bp::dict d );
 
 	void AddTranslations( bp::dict d );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	void AddTranslation(Activity act, Activity act_translated) { m_translateActivityMap.Insert(act, act_translated); }
 
 	void DebugPrint();
@@ -103,9 +103,9 @@ public:
 		TURN_LEFT,
 		TURN_RIGHT
 	};
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 						UnitAnimState( boost::python::object outer, UnitAnimConfig &animconfig );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual ~UnitAnimState();
 
 	// Update() and DoAnimationEvent() together maintain the entire player's animation state.
@@ -205,11 +205,11 @@ public:
 	// internal ACT comparisons using the base activity
 	virtual Activity TranslateActivity( Activity actDesired );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Translate activity map
 	void SetActivityMap( boost::python::object activitymap );
 	bp::object GetActivityMap();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Aim layer sequence
 	void SetAimLayerSequence( const char *pAimLayerSequence );
@@ -370,9 +370,9 @@ private:
 	string_t m_sAimLayerSequence;
 	
 	TranslateActivityMap *m_pActivityMap;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object m_pyActivityMap; // Keeps m_pActivityMap not NULL
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	float m_flMaxGroundSpeed;
 
@@ -407,12 +407,12 @@ private:
 
 extern float g_flLastBodyPitch, g_flLastBodyYaw, m_flLastMoveYaw;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 inline bp::object UnitAnimState::GetActivityMap()
 {
 	return m_pyActivityMap;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 inline Activity UnitAnimState::GetCurrentMainSequenceActivity() const
 {

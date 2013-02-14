@@ -34,9 +34,9 @@ public:
 
 	CBaseAnimating();
 	~CBaseAnimating();
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual void		ClearPyInstance();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	DECLARE_PREDICTABLE();
 
@@ -52,9 +52,9 @@ public:
 	DECLARE_PYSERVERCLASS( CBaseAnimating );
 
 	virtual void SetModel( const char *szModelName );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	virtual void PySetModel( const char *szModelName );		// Python safe version
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	virtual void Activate();
 	virtual void Spawn();
 	virtual void Precache();

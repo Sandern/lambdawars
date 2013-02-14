@@ -16,9 +16,9 @@
 class UnitExpresser : public UnitComponent, public CAI_Expresser
 {
 public:
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitExpresser( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 #endif // UNIT_EXPRESSER_H

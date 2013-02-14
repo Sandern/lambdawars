@@ -22,9 +22,9 @@
 	#include "hl2wars_team.h"
 #endif
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -597,14 +597,14 @@ const char *CHL2WarsGameRules::GetChatFormat( bool bTeamOnly, CBasePlayer *pPlay
 	return pszFormat;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 boost::python::object CHL2WarsGameRules::GetNextLevelName( bool bRandom )
 {
 	char buf[MAX_PATH];
 	BaseClass::GetNextLevelName(buf, MAX_PATH, bRandom);
 	return boost::python::object(buf);
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #endif
 

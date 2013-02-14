@@ -498,7 +498,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	// Entities shouldn't reference other entities in their destructors
 	//  that type of code should only occur in an UpdateOnRemove call
 	g_bDisableEhandleAccess = true;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( oldObj->GetPyInstance().ptr() != Py_None )
 	{
 		// Remove ourself from the global list, but don't delete
@@ -509,7 +509,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 		oldObj->ClearPyInstance();
 	}
 	else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		delete oldObj;
 	}

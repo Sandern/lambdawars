@@ -43,10 +43,10 @@
 #include "cellcoord.h"
 #include "gamestringpool.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	#include "src_python_usermessage.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #include "hl2wars/fowmgr.h"
 
@@ -1136,9 +1136,9 @@ void C_BaseEntity::CleanUpAlphaProperty()
 //-----------------------------------------------------------------------------
 C_BaseEntity::~C_BaseEntity()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{	
 		if( m_nFOWFlags & FOWFLAG_UPDATER )
 			FogOfWarMgr()->RemoveFogUpdater( m_iOwnerNumber, this );
@@ -1286,7 +1286,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	m_hScriptInstance = NULL;
 	
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
 
@@ -1322,7 +1322,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 			}
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	return true;
 }
@@ -1375,7 +1375,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 		Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// If we are a python entity, then grab our reference
 	if( GetPySelf() )
 	{
@@ -1389,7 +1389,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 	// Create handle for python
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Add the client entity to the spatial partition. (Collidable)
 	CollisionProp()->CreatePartitionHandle();
@@ -1494,13 +1494,13 @@ void C_BaseEntity::Release()
 
 	UpdateOnRemove();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( m_pyInstance.ptr() != Py_None )
 	{
 		ClearPyInstance();	
 	}
 	else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		delete this;
 	}
@@ -1846,10 +1846,10 @@ void C_BaseEntity::ReceiveMessage( int classID, bf_read &msg )
 	{
 		case BASEENTITY_MSG_REMOVE_DECALS:	RemoveAllDecals();
 											break;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		case BASEENTITY_MSG_PYTHON: PyReceiveMessageInternal(classID, msg); 
 											break;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 }
 
@@ -2544,9 +2544,9 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 		break;
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	PyNotifyShouldTransmit(state);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -6646,7 +6646,7 @@ Vector &CBaseEntity::GetTeamColor( bool bDirect )
 	return m_vCurTeamColor; 
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //------------------------------------------------------------------------------
 void C_BaseEntity::ClearPyInstance()
 {
@@ -6788,7 +6788,7 @@ void C_BaseEntity::PyDeallocate(PyObject* self_, void *storage)
 	// get the engine to free the memory
 	g_pMemAlloc->Free( storage );
 }	
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //------------------------------------------------------------------------------
 void CC_CL_Find_Ent( const CCommand& args )

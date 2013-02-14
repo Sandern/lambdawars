@@ -48,9 +48,9 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #include "fowmgr.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -521,7 +521,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 
 #endif
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Check Python keyvalues map
 	if( m_pyInstance.ptr() != Py_None )
 	{
@@ -551,7 +551,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 			PyErr_Print();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// key hasn't been handled
 	return false;
@@ -814,11 +814,11 @@ int CBaseEntity::RegisterThinkContext( const char *szContext )
 
 	// Make a new think func
 	thinkfunc_t sNewFunc;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	Q_memset( &sNewFunc, 0, sizeof( sNewFunc ) - sizeof( bp::object ) );	//  m_pyThink is last in struct. DON'T SET TO NULL!
 #else
 	Q_memset( &sNewFunc, 0, sizeof( sNewFunc ) );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	sNewFunc.m_pfnThink = NULL;
 	sNewFunc.m_nNextThinkTick = 0;
 	sNewFunc.m_iszContext = AllocPooledString(szContext);
@@ -846,9 +846,9 @@ BASEPTR	CBaseEntity::ThinkSet( BASEPTR func, float thinkTime, const char *szCont
 	if ( !szContext )
 	{
 		m_pfnThink = func;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		m_pyThink = boost::python::object();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
 		FunctionCheck( *(reinterpret_cast<void **>(&m_pfnThink)), "BaseThinkFunc" ); 
@@ -865,9 +865,9 @@ BASEPTR	CBaseEntity::ThinkSet( BASEPTR func, float thinkTime, const char *szCont
 	}
 
 	m_aThinkFunctions[ iIndex ].m_pfnThink = func;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	m_aThinkFunctions[ iIndex ].m_pyThink = boost::python::object();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
 	FunctionCheck( *(reinterpret_cast<void **>(&m_aThinkFunctions[ iIndex ].m_pfnThink)), szContext ); 
@@ -1368,7 +1368,7 @@ void CBaseEntity::VPhysicsDestroyObject( void )
 		PhysDestroyObject( m_pPhysicsObject, this );
 		m_pPhysicsObject = NULL;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( m_pyPhysObj.ptr() != Py_None )
 		{
 			try {
@@ -1380,7 +1380,7 @@ void CBaseEntity::VPhysicsDestroyObject( void )
 			}
 			m_pyPhysObj = bp::object();
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 }
 
@@ -2820,7 +2820,7 @@ void CBaseEntity::RecalculateFOWFlags()
 }
 #endif // CLIENT_DLL
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -3014,4 +3014,4 @@ bp::object CBaseEntity::PyVPhysicsInitShadow( bool allowPhysicsMovement, bool al
 	VPhysicsInitShadow(allowPhysicsMovement, allowPhysicsRotation, pSolid); 
 	return PyVPhysicsGetObject(); 
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitBaseSense::UnitBaseSense( boost::python::object outer ) : 
 	UnitComponent(outer), m_fSenseDistance(-1), m_bUseLimitedViewCone(false), 
 	m_fSenseRate(0.4f), m_fNextSenseTime(0.0f), m_bTestLOS(false)
@@ -23,7 +23,7 @@ UnitBaseSense::UnitBaseSense( boost::python::object outer ) :
 	m_SeenEnemies.EnsureCapacity(512);
 	m_SeenOther.EnsureCapacity(512);
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -17,9 +17,9 @@ class UnitBaseAnimState : public UnitComponent
 public:
 	DECLARE_CLASS_NOBASE( UnitBaseAnimState );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseAnimState( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	virtual ~UnitBaseAnimState();
 

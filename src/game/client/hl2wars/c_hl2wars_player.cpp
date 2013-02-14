@@ -19,9 +19,9 @@
 #include "wars_mapboundary.h"
 #include "hl2wars_in_main.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -96,14 +96,14 @@ void C_HL2WarsPlayer::Spawn()
 	BaseClass::Spawn( );
 
 	// Hook spawn to a signal
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Setup dict for sending a signal
 	bp::dict kwargs;
 	kwargs["sender"] = bp::object();
 	kwargs["client"] = GetPyHandle();
 	bp::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
 	SrcPySystem()->CallSignal( signal, kwargs );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ bool C_HL2WarsPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 		UpdateButtonState( pCmd->buttons );
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// If we have an active ability, it overrides our mouse actions
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
@@ -164,7 +164,7 @@ bool C_HL2WarsPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	{
 		SrcPySystem()->Run( SrcPySystem()->Get("_update", activeAbilities[i]) );	
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Calculate the camera offset
 	if( input->CAM_IsThirdPerson() )
@@ -251,12 +251,12 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 	}
 	if( m_hOldControlledUnit != m_hControlledUnit )
 	{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		// Setup dict for sending a signal
 		bp::dict kwargs;
 		kwargs["sender"] = bp::object();
 		kwargs["player"] = GetPyHandle();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 		if( m_hOldControlledUnit )
 		{
@@ -274,11 +274,11 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 				vm->SetWeaponModel( NULL, NULL );
 			}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 			kwargs["unit"] = m_hOldControlledUnit->GetPyHandle();
 			bp::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
 			SrcPySystem()->CallSignal( signal, kwargs );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		}
 		if( m_hControlledUnit )
 		{
@@ -292,11 +292,11 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 				pUnit->GetActiveWeapon()->Deploy();
 			}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 			kwargs["unit"] = m_hControlledUnit->GetPyHandle();
 			bp::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
 			SrcPySystem()->CallSignal( signal, kwargs );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		}
 		m_hOldControlledUnit = m_hControlledUnit;
 	}

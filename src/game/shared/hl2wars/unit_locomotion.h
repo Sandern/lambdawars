@@ -113,9 +113,9 @@ class UnitBaseLocomotion : public UnitComponent
 {
 public:
 	//friend class CUnitBase;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitBaseLocomotion( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Main function
 	virtual void PerformMovement( UnitBaseMoveCommand &mv );

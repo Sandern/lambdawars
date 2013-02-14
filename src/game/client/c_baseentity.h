@@ -40,11 +40,11 @@
 #include "vscript_shared.h"
 #include "hl2wars_shareddefs.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include <boost/python.hpp>
 	#include "src_python_physics.h"
 	namespace bp = boost::python;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 #include "src_python_client_class.h" // Provides stubs
 
 class C_Team;
@@ -180,10 +180,10 @@ struct thinkfunc_t
 	int			m_nNextThinkTick;
 	int			m_nLastThinkTick;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// MUST BE LAST
 	bp::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 #define CREATE_PREDICTED_ENTITY( className )	\
@@ -1899,7 +1899,7 @@ public:
 	void							SetTeamColor( Vector &vTeamColor );
 	Vector &						GetTeamColor( bool bDirect=true );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Python generic
 	static void *PyAllocate(PyObject* self_, std::size_t holder_offset, std::size_t holder_size);
 	static void PyDeallocate(PyObject* self_, void *storage);
@@ -1968,7 +1968,7 @@ public:
 	void PySetTakeDamage( int takedamage );
 
 	virtual void PyNotifyShouldTransmit( ShouldTransmitState_t state ) {}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
@@ -2010,7 +2010,7 @@ private:
 	int m_iPySendProp1;
 	int m_iPySendProp2;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 protected:
 	bool		m_bPyManaged;
 
@@ -2023,7 +2023,7 @@ public:
 	// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
 	bp::object m_pyInstance;	
 	bp::object m_pyHandle;	
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 EXTERN_RECV_TABLE(DT_BaseEntity);
@@ -2607,7 +2607,7 @@ inline ShouldTransmitState_t CBaseEntity::GetLastShouldTransmitState()
 	return m_LastShouldTransmitState; 
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -2647,7 +2647,7 @@ inline void CBaseEntity::PySetTakeDamage( int takedamage )
 {
 	m_takedamage = takedamage;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

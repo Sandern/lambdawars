@@ -29,10 +29,10 @@
 #include "hl2wars_gamerules.h"
 #include "tier0/vprof.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	#include "src_python_gamerules.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -107,7 +107,7 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( CBaseEntity::Instance( pEdict ) );
 	FinishClientPutInServer( pPlayer );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Give a full update of the networked python entities
 	// NOTE: Only dedicated servers and the listened host. Listened and clients are done in ClientConnect
 	if( engine->IsDedicatedServer() || ENTINDEX(pEdict) > 1 )
@@ -151,7 +151,7 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 			PyErr_Print();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	// Notify gamerules
 	if( HL2WarsGameRules() )
@@ -231,7 +231,7 @@ void GameStartFrame( void )
 //=========================================================
 void InstallGameRules()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Install python gamerules
 	if( SrcPySystem()->IsPythonRunning() )
 	{
@@ -244,7 +244,7 @@ void InstallGameRules()
 			PyErr_Clear();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if( g_pGameRules == NULL )	// Fallback
 		CreateGameRulesObject( "CHL2WarsGameRules" );

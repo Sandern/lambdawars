@@ -32,9 +32,9 @@
 #include "collisionutils.h"
 #include "toolframework/itoolframework.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python_util.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -312,9 +312,9 @@ CBaseAnimating::CBaseAnimating()
 
 CBaseAnimating::~CBaseAnimating()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	{
 		Studio_DestroyBoneCache( m_boneCacheHandle );
 		delete m_pIk;
@@ -323,7 +323,7 @@ CBaseAnimating::~CBaseAnimating()
 	}
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void CBaseAnimating::ClearPyInstance()
 {
 	Studio_DestroyBoneCache( m_boneCacheHandle );
@@ -333,7 +333,7 @@ void CBaseAnimating::ClearPyInstance()
 
 	BaseClass::ClearPyInstance();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 void CBaseAnimating::Precache()
 {
@@ -2771,7 +2771,7 @@ void CBaseAnimating::SetModel( const char *szModelName )
 
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *szModelName - 
@@ -2814,7 +2814,7 @@ void CBaseAnimating::PySetModel( const char *szModelName )
 
 	PopulatePoseParameters();
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

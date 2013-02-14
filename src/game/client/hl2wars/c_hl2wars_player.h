@@ -85,9 +85,9 @@ public:
 
 	// selection management
 	void							UpdateSelection( void );
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::list				GetSelection( void );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	CBaseEntity*					GetUnit( int idx );
 	void							AddUnit( CBaseEntity *pUnit, bool bTriggerOnSel=true );
 	int								FindUnit( CBaseEntity *pUnit );
@@ -122,7 +122,7 @@ public:
 	void							CleanupGroups( void );
 	const CUtlVector< EHANDLE > &	GetGroup( int group );
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Abilities
 	void							AddActiveAbility( bp::object ability );
 	void							RemoveActiveAbility( bp::object ability );
@@ -130,7 +130,7 @@ public:
 	void							ClearActiveAbilities();
 	void							SetSingleActiveAbility( bp::object ability );
 	bp::object						GetSingleActiveAbility();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	CBaseEntity *					GetControlledUnit();
 
@@ -242,9 +242,9 @@ private:
 	int m_iLastSelectedGroup;
 
 	// Ability
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> m_vecActiveAbilities;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 // Inlines

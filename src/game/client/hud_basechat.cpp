@@ -32,9 +32,9 @@
 #include "xbox/xbox_win32stubs.h"
 #endif
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1764,13 +1764,13 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, .
 	if ( !*pmsg )
 		return;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		// Tell python
 		SrcPySystem()->Run<int, int, const char *>(SrcPySystem()->Get("_OnChatPrintf", "srcmgr"), iPlayerIndex, iFilter, pmsg);
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	CBaseHudChatLine *line = (CBaseHudChatLine *)FindUnusedChatLine();
 	if ( !line )

@@ -201,7 +201,7 @@ void EmitSoundAnimEventHandler::HandleEvent(CUnitBase *pUnit, animevent_t *event
 	pUnit->EmitSound(m_SoundScript, event->eventtime);   
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -288,7 +288,7 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 	handler.m_pyInstance = pyhandler;
 	m_AnimEventMap.Insert(event, handler);
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose:  Send proxies
@@ -647,12 +647,12 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 			// Did have an enemy, but is now cleared
 			m_hEnemy = NULL;
 			m_bHasEnemy = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 			SrcPySystem()->Run<const char *>( 
 				SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
 				"OnEnemyLost"
 			);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		}
 		return;
 	}
@@ -663,12 +663,12 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 	// New not null enemy
 	m_hEnemy = pEnemy;
 	m_bHasEnemy = true;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	SrcPySystem()->Run<const char *, boost::python::object>( 
 		SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
 		"OnNewEnemy", pEnemy->GetPyHandle()
 	);
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -747,10 +747,10 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 {
 	if( !pEnemy )
 	{		
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		PyErr_SetString(PyExc_Exception, "Invalid enemy" );
 		throw boost::python::error_already_set(); 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		return 0.0f;
 	}
 
@@ -924,7 +924,7 @@ IResponseSystem *CUnitBase::GetResponseSystem()
 	return g_pResponseSystem;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 void CUnitBase::SetAnimEventMap( boost::python::object animeventmap )
 {
 	if( animeventmap.ptr() == Py_None )
@@ -936,7 +936,7 @@ void CUnitBase::SetAnimEventMap( boost::python::object animeventmap )
 	m_pAnimEventMap = boost::python::extract<AnimEventMap *>(animeventmap);
 	m_pyAnimEventMap = animeventmap;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 {
@@ -951,7 +951,7 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 			}
 			else
 			{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 				// Assume it's an unbound method
 				try {
 					m_pAnimEventMap->m_AnimEventMap[idx].m_pyInstance(GetPyInstance(), pEvent);
@@ -959,7 +959,7 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 					PyErr_Print();
 					PyErr_Clear();
 				}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			}
 			return;
 		}

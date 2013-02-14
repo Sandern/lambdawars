@@ -7,9 +7,9 @@
 #include "cbase.h"
 #include "gamerules_register.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 #include "src_python_gamerules.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -68,11 +68,11 @@ CGameRulesRegister* CGameRulesRegister::FindByName( const char *pName )
 		void const *newData )
 	{
 		// The server has created a new CGameRules object.
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();		// Python managed	
 		else 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 		{
 			delete g_pGameRules;
 			g_pGameRules = NULL;
@@ -120,11 +120,11 @@ CGameRulesRegister* CGameRulesRegister::FindByName( const char *pName )
 	void CreateGameRulesObject( const char *pClassName )
 	{
 		// Delete the old game rules object.
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();	
 		else
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 			delete g_pGameRules;
 		g_pGameRules = NULL;
 

@@ -9,9 +9,9 @@
 #include "wars_mapboundary.h"
 
 #include "nav_mesh.h"
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python_navmesh.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #ifdef GAME_DLL
 	#include "Sprite.h"
@@ -87,11 +87,11 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 
 		if( TheNavMesh->IsLoaded() )
 		{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 			vEndPos = NavMeshGetPositionNearestNavArea(vecTest, info.m_fBeneathLimit);
 #else
 			vEndPos = vec3_origin;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
             if( vEndPos == vec3_origin )
                 continue;
             vEndPos.z += 8.0f;
@@ -148,11 +148,11 @@ void UTIL_FindPosition( positioninfo_t &info )
 
 		if( TheNavMesh->IsLoaded() )
 		{
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 			vEndPos = NavMeshGetPositionNearestNavArea(info.m_vPosition, info.m_fBeneathLimit);
 #else
 			vEndPos= vec3_origin;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
             if( vEndPos != vec3_origin )
 				vEndPos.z += 8.0f;
 		}

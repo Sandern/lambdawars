@@ -10,10 +10,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitExpresser::UnitExpresser( boost::python::object outer ) : UnitComponent(outer)
 {
 	SetOuter( UnitComponent::GetOuter() );
 	Connect( UnitComponent::GetOuter() );
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

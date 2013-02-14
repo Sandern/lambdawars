@@ -11,9 +11,9 @@
 #pragma once
 #endif
 
-#ifdef DISABLE_PYTHON
+#ifndef ENABLE_PYTHON
 #error Python is disabled. Don't include this!
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #include <boost/python.hpp>
 

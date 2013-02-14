@@ -346,7 +346,7 @@ void C_BaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 	}
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: Called when it's time for a physically moved objects (plats, doors, etc)
 //			to run it's game code.
@@ -401,4 +401,4 @@ void C_BaseEntity::PhysicsPyDispatchThink( bp::object thinkFunc )
 		}
 	}
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON

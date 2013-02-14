@@ -17,15 +17,15 @@ class UnitComponent
 {
 	DECLARE_CLASS_NOBASE(UnitComponent);
 public:
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	UnitComponent( boost::python::object outer );
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	CUnitBase *					GetOuter();
 	const CUnitBase *			GetOuter() const;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	boost::python::object		GetPyOuter();
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 public:
 	//
@@ -78,10 +78,10 @@ public:
 protected:
 	CUnitBase *m_pOuter;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 private:
 	boost::python::object m_pyOuter;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 };
 
 //-----------------------------------------------------------------------------
@@ -95,12 +95,12 @@ inline const CUnitBase *UnitComponent::GetOuter() const
 	return m_pOuter; 
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 inline boost::python::object UnitComponent::GetPyOuter()		
 { 
 	return m_pyOuter; 
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 

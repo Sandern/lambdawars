@@ -87,11 +87,11 @@
 #include "basetoggle.h"
 #include "igameevents.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	// Python 
 	#include <boost/python.hpp>
 	#include "src_python_server_class.h"
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // saverestore.h declarations
 class ISave;

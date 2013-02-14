@@ -13,11 +13,11 @@
 // ------------------------------------------------------------------------------------------------ //
 // UnitBaseAnimState implementation.
 // ------------------------------------------------------------------------------------------------ //
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 UnitBaseAnimState::UnitBaseAnimState(boost::python::object outer) : UnitComponent(outer)
 {
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 UnitBaseAnimState::~UnitBaseAnimState()
 {

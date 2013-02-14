@@ -15,7 +15,7 @@
 
 #include "clientsideeffects.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 
 // Vertex 
 class PyMeshVertex
@@ -91,6 +91,6 @@ private:
 // Must add to list
 void AddToClientEffectList( bp::object effect );
 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #endif // WARS_MESH_BUILDER_H

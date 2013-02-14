@@ -85,7 +85,7 @@ void CClientSideEffect::Destroy( void )
 	m_bActive = false;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: If we can delete this effect
 //-----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ bp::object CClientSideEffect::GetPyInstance()
 {
 	return m_pyRef;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #define MAX_EFFECTS 256
 
@@ -190,7 +190,7 @@ void CEffectsList::RemoveEffect( int effectIndex )
 
 	pEffect->Destroy();
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( pEffect->GetPyInstance().ptr() == Py_None ) // Python allocated entities should not be deleted 
 	{
 		delete pEffect;	//FIXME: Yes, no?
@@ -201,7 +201,7 @@ void CEffectsList::RemoveEffect( int effectIndex )
 	}
 #else
 	delete pEffect;	//FIXME: Yes, no?
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------

@@ -27,10 +27,10 @@
 #include "hl2wars_util_shared.h"
 #include "wars_mapboundary.h"
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	#include "src_python.h"
 	namespace bp = boost::python;
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -346,7 +346,7 @@ void CHL2WarsPlayer::UpdateButtonState( int nUserCmdButtonMask )
 	if( buttonsChanged == 0 )
 		return;
 	
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		bp::dict kwargs;
@@ -366,7 +366,7 @@ void CHL2WarsPlayer::UpdateButtonState( int nUserCmdButtonMask )
 			SrcPySystem()->CallSignal( signal, kwargs );
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if( GetControlledUnit() && GetControlledUnit()->GetIUnit() )
 	{
@@ -496,14 +496,14 @@ void CHL2WarsPlayer::OnLeftMouseButtonPressed( const MouseTraceData_t &data )
 {
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonPressed", activeAbilities[i]), false ) || bEatMouse;
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if( bEatMouse )
 		return;
@@ -525,14 +525,14 @@ void CHL2WarsPlayer::OnLeftMouseButtonDoublePressed( const MouseTraceData_t &dat
 {
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonDoublePressed", activeAbilities[i]), false ) || bEatMouse;
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	if( bEatMouse )
 		return;
 
@@ -568,14 +568,14 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 
 	// If we have an active ability it overrides our mouse actions
 	bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonReleased", activeAbilities[i]), false ) || bEatMouse;
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if( bEatMouse )
 		return;
@@ -627,9 +627,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 					}
 					else
 					{	
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 						if( pIUnit->IsSelectableByPlayer(this, GetSelection()) ) 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 						{
 							pIUnit->Select(this);
 							engine->ServerCmd( VarArgs("player_addunit %ld", EncodeEntity(pMouseEnt)) );
@@ -640,9 +640,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 				{
 					ClearSelection();
 					engine->ServerCmd("player_clearselection");
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 					if( pIUnit->IsSelectableByPlayer(this, GetSelection()) ) 
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 					{
 						pIUnit->Select(this);
 						engine->ServerCmd( VarArgs("player_addunit %ld", EncodeEntity(pMouseEnt)) );
@@ -680,14 +680,14 @@ void CHL2WarsPlayer::OnRightMouseButtonPressed( const MouseTraceData_t &data )
 {
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonPressed", activeAbilities[i]), false ) || bEatMouse;
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	if( bEatMouse )
 		return;
 
@@ -708,14 +708,14 @@ void CHL2WarsPlayer::OnRightMouseButtonDoublePressed( const MouseTraceData_t &da
 {
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonDoublePressed", activeAbilities[i]), false ) || bEatMouse;	
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	if( bEatMouse )
 		return;
 
@@ -749,14 +749,14 @@ void CHL2WarsPlayer::OnRightMouseButtonReleased( const MouseTraceData_t &data )
 
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonReleased", activeAbilities[i]), false ) || bEatMouse;	
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	if( bEatMouse )
 		return;
 
@@ -832,7 +832,7 @@ void CHL2WarsPlayer::ChangeFaction( const char *faction )
 
 	m_FactionName = AllocPooledString(faction);
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		// Dispatch changed faction signal
@@ -847,7 +847,7 @@ void CHL2WarsPlayer::ChangeFaction( const char *faction )
 			PyErr_Print();
 		}
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	if( pszOldValue )
 		stackfree( pszOldValue );
@@ -887,7 +887,7 @@ void CHL2WarsPlayer::UpdateSelection( void )
 		OnSelectionChanged();
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 boost::python::list	CHL2WarsPlayer::GetSelection( void )
 {
 	if( m_bRebuildPySelection )
@@ -908,7 +908,7 @@ boost::python::list	CHL2WarsPlayer::GetSelection( void )
 
 	return m_pySelection;
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 CBaseEntity *CHL2WarsPlayer::GetUnit( int idx )
 {
@@ -1024,7 +1024,7 @@ void CHL2WarsPlayer::ClearSelection( bool bTriggerOnSel )
 
 void CHL2WarsPlayer::OnSelectionChanged()
 {
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		bp::dict kwargs;
@@ -1033,7 +1033,7 @@ void CHL2WarsPlayer::OnSelectionChanged()
 		bp::object signal = SrcPySystem()->Get("selectionchanged", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	m_bSelectionChangedSignalScheduled = false;
 }
@@ -1042,7 +1042,7 @@ void CHL2WarsPlayer::OrderUnits()
 {
 	int i;
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		bp::dict kwargs;
@@ -1051,7 +1051,7 @@ void CHL2WarsPlayer::OrderUnits()
 		bp::object signal = SrcPySystem()->Get("pre_orderunits", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 	for( i=0; i<m_hSelectedUnits.Count(); i++ )
 	{
@@ -1061,7 +1061,7 @@ void CHL2WarsPlayer::OrderUnits()
 		m_hSelectedUnits.Element(i)->GetIUnit()->Order(this);
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		bp::dict kwargs;
@@ -1070,7 +1070,7 @@ void CHL2WarsPlayer::OrderUnits()
 		bp::object signal = SrcPySystem()->Get("post_orderunits", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 void CHL2WarsPlayer::ScheduleSelectionChangedSignal()
@@ -1107,7 +1107,7 @@ void CHL2WarsPlayer::MakeCurrentSelectionGroup( int iGroup, bool bClearGroup )
 		m_Groups[iGroup].m_Group.AddToTail(m_hSelectedUnits[i]);
 	}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		bp::dict kwargs;
@@ -1117,7 +1117,7 @@ void CHL2WarsPlayer::MakeCurrentSelectionGroup( int iGroup, bool bClearGroup )
 		bp::object signal = SrcPySystem()->Get("groupchanged", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 }
 
 void CHL2WarsPlayer::SelectGroup( int iGroup )
@@ -1188,7 +1188,7 @@ void CHL2WarsPlayer::CleanupGroups( void )
 			bChanged = true;
 		}
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 		if( bChanged )
 		{
 			if( SrcPySystem()->IsPythonRunning() )
@@ -1201,7 +1201,7 @@ void CHL2WarsPlayer::CleanupGroups( void )
 				SrcPySystem()->CallSignal( signal, kwargs );
 			}
 		}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 	}
 }
 
@@ -1213,7 +1213,7 @@ const CUtlVector< EHANDLE > & CHL2WarsPlayer::GetGroup( int iGroup )
 	return m_Groups[iGroup].m_Group;
 }
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
@@ -1269,7 +1269,7 @@ bp::object CHL2WarsPlayer::GetSingleActiveAbility()
 		return bp::object();
 	return m_vecActiveAbilities[0];
 }
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -1286,7 +1286,7 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 {
 	BaseClass::OnChangeOwnerNumber(old_owner_number);
 
-#ifndef DISABLE_PYTHON
+#ifdef ENABLE_PYTHON
 #ifdef CLIENT_DLL
 	char pLevelName[_MAX_PATH];
 	Q_FileBase(engine->GetLevelName(), pLevelName, _MAX_PATH);
@@ -1307,7 +1307,7 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 		signal = SrcPySystem()->Get("map_playerchangedownernumber", "core.signals", true)[pLevelName];
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
-#endif // DISABLE_PYTHON
+#endif // ENABLE_PYTHON
 
 #ifndef CLIENT_DLL
 	// Inform gamerules
