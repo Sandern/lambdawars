@@ -25,72 +25,7 @@ float4 main( PS_INPUT i ) : COLOR
     float4 result;
   
  #if FOW
-	/*
-    // Take neighbooring states into account to make it look smoother.
-#if defined(SHADER_MODEL_PS_2_0)
-    const int NUM = 9;              
-    const float3 gTexCoordsWeights[NUM] = {
-                float3(-0.001953125, 0.001953125, 0.0625), 
-                float3( 0.00 ,     0.001953125, 0.0625),
-                float3( 0.001953125, 0.001953125, 0.0625),
-                float3(-0.001953125, 0.00, 0.0625 ),
-                float3( 0.0,       0.0, 0.5),
-                float3( 0.001953125, 0.001953125, 0.0625 ),
-                float3(-0.001953125,-0.001953125, 0.0625),
-                float3( 0.00 ,    -0.001953125, 0.0625),
-                float3( 0.001953125,-0.001953125, 0.0625)
-        }; 
-#else
-    const int NUM = 25;
-    const float3 gTexCoordsWeights[NUM] = {
-        // First row
-        float3(-0.00390625, -0.00390625, 0.0002),
-        float3(-0.001953125, -0.00390625, 0.0033),
-        float3(0.00, -0.00390625, 0.0081),
-        float3(0.001953125, -0.00390625, 0.0033),
-        float3(0.00390625, -0.00390625, 0.0002),
-        
-        // Second row
-        float3(-0.00390625, -0.001953125, 0.0033),
-        float3(-0.001953125, -0.001953125, 0.0479),
-        float3(0.00, -0.001953125, 0.1164),
-        float3(0.001953125, -0.001953125, 0.0479),
-        float3(0.00390625, -0.001953125, 0.0033),
-        
-        // Third middle row
-        float3(-0.00390625, 0.0, 0.0081),
-        float3(-0.001953125, 0.0, 0.1164),
-        float3(0.00, 0.0, 0.2831),
-        float3(0.001953125, 0.0, 0.1164),
-        float3(0.00390625, 0.0, 0.0081),
-        
-        // Fourth row
-        float3(-0.00390625, 0.001953125, 0.0033),
-        float3(-0.001953125, 0.001953125, 0.0479),
-        float3(0.00, 0.001953125, 0.1164),
-        float3(0.001953125, 0.001953125, 0.0479),
-        float3(0.00390625, 0.001953125, 0.0033),
-        
-        // Last fifth row
-        float3(-0.00390625, 0.00390625, 0.0002),
-        float3(-0.001953125, 0.00390625, 0.0033),
-        float3(0.00, 0.00390625, 0.0081),
-        float3(0.001953125, 0.00390625, 0.0033),
-        float3(0.00390625, 0.00390625, 0.0002),
-    };
-#endif
-	
-
-    float fowvalue = 0.0f;
-    int idx;
-    for (idx=0; idx < NUM; idx++) {
-        fowvalue += tex2D( FogOfWarSampler, i.vTexCoord0.xy + gTexCoordsWeights[idx].xy ).r * gTexCoordsWeights[idx].z;
-    }
-    fowvalue /= 0.5;
-    fowvalue = 1.0f - max(min(1.0, fowvalue), 0.0);
-	*/
-
-	float fowvalue = 1.0f - tex2D( FogOfWarSampler, i.vTexCoord0.xy ).r;
+    float fowvalue = 1.0f - tex2D( FogOfWarSampler, i.vTexCoord0.xy ).r;
     
     result = float4(0.15, 0.15, 0.15, fowvalue);
     result = ( result * FOW_GRAY_FACTOR	 * FOW_DARKNESS_VALUE ) + ( result * FOW_COLOR_FACTOR * FOW_DARKNESS_VALUE );
