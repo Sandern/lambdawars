@@ -42,6 +42,8 @@
 
 #include "beam_shared.h"
 
+#include "shot_manipulator.h"
+
 #include "src_python_converters_ents.h"
 
 #include "src_python.h"
@@ -1889,6 +1891,85 @@ BOOST_PYTHON_MODULE(_entities_misc){
             , (void ( ::CMultiDamage::* )( ::C_BaseEntity * ) )( &::CMultiDamage::SetTarget )
             , ( bp::arg("pTarget") ) );
 
+    { //::CShotManipulator
+        typedef bp::class_< CShotManipulator > CShotManipulator_exposer_t;
+        CShotManipulator_exposer_t CShotManipulator_exposer = CShotManipulator_exposer_t( "CShotManipulator", bp::init< Vector const & >(( bp::arg("vecForward") )) );
+        bp::scope CShotManipulator_scope( CShotManipulator_exposer );
+        bp::implicitly_convertible< Vector const &, CShotManipulator >();
+        { //::CShotManipulator::ApplyAngularSpread
+        
+            typedef ::Vector const & ( ::CShotManipulator::*ApplyAngularSpread_function_type )( ::Vector const &,float ) ;
+            
+            CShotManipulator_exposer.def( 
+                "ApplyAngularSpread"
+                , ApplyAngularSpread_function_type( &::CShotManipulator::ApplyAngularSpread )
+                , ( bp::arg("vecSpread"), bp::arg("bias")=1.0e+0 )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::ApplySpread
+        
+            typedef ::Vector const & ( ::CShotManipulator::*ApplySpread_function_type )( ::Vector const &,float ) ;
+            
+            CShotManipulator_exposer.def( 
+                "ApplySpread"
+                , ApplySpread_function_type( &::CShotManipulator::ApplySpread )
+                , ( bp::arg("vecSpread"), bp::arg("bias")=1.0e+0 )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetResult
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetResult_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetResult"
+                , GetResult_function_type( &::CShotManipulator::GetResult )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetRightVector
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetRightVector_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetRightVector"
+                , GetRightVector_function_type( &::CShotManipulator::GetRightVector )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetShotDirection
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetShotDirection_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetShotDirection"
+                , GetShotDirection_function_type( &::CShotManipulator::GetShotDirection )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetUpVector
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetUpVector_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetUpVector"
+                , GetUpVector_function_type( &::CShotManipulator::GetUpVector )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::SetShootDir
+        
+            typedef void ( ::CShotManipulator::*SetShootDir_function_type )( ::Vector const & ) ;
+            
+            CShotManipulator_exposer.def( 
+                "SetShootDir"
+                , SetShootDir_function_type( &::CShotManipulator::SetShootDir )
+                , ( bp::arg("vecForward") ) );
+        
+        }
+    }
+
     bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
         .def( 
             "pszName"
@@ -2379,6 +2460,8 @@ BOOST_PYTHON_MODULE(_entities_misc){
 #include "props_shared.h"
 
 #include "beam_shared.h"
+
+#include "shot_manipulator.h"
 
 #include "src_python_converters_ents.h"
 
@@ -4481,6 +4564,85 @@ BOOST_PYTHON_MODULE(_entities_misc){
             "Set"
             , (void ( ::CPythonNetworkVar::* )( ::boost::python::object ) )( &::CPythonNetworkVar::Set )
             , ( bp::arg("data") ) );
+
+    { //::CShotManipulator
+        typedef bp::class_< CShotManipulator > CShotManipulator_exposer_t;
+        CShotManipulator_exposer_t CShotManipulator_exposer = CShotManipulator_exposer_t( "CShotManipulator", bp::init< Vector const & >(( bp::arg("vecForward") )) );
+        bp::scope CShotManipulator_scope( CShotManipulator_exposer );
+        bp::implicitly_convertible< Vector const &, CShotManipulator >();
+        { //::CShotManipulator::ApplyAngularSpread
+        
+            typedef ::Vector const & ( ::CShotManipulator::*ApplyAngularSpread_function_type )( ::Vector const &,float ) ;
+            
+            CShotManipulator_exposer.def( 
+                "ApplyAngularSpread"
+                , ApplyAngularSpread_function_type( &::CShotManipulator::ApplyAngularSpread )
+                , ( bp::arg("vecSpread"), bp::arg("bias")=1.0e+0 )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::ApplySpread
+        
+            typedef ::Vector const & ( ::CShotManipulator::*ApplySpread_function_type )( ::Vector const &,float ) ;
+            
+            CShotManipulator_exposer.def( 
+                "ApplySpread"
+                , ApplySpread_function_type( &::CShotManipulator::ApplySpread )
+                , ( bp::arg("vecSpread"), bp::arg("bias")=1.0e+0 )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetResult
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetResult_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetResult"
+                , GetResult_function_type( &::CShotManipulator::GetResult )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetRightVector
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetRightVector_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetRightVector"
+                , GetRightVector_function_type( &::CShotManipulator::GetRightVector )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetShotDirection
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetShotDirection_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetShotDirection"
+                , GetShotDirection_function_type( &::CShotManipulator::GetShotDirection )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::GetUpVector
+        
+            typedef ::Vector const & ( ::CShotManipulator::*GetUpVector_function_type )(  ) ;
+            
+            CShotManipulator_exposer.def( 
+                "GetUpVector"
+                , GetUpVector_function_type( &::CShotManipulator::GetUpVector )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CShotManipulator::SetShootDir
+        
+            typedef void ( ::CShotManipulator::*SetShootDir_function_type )( ::Vector const & ) ;
+            
+            CShotManipulator_exposer.def( 
+                "SetShootDir"
+                , SetShootDir_function_type( &::CShotManipulator::SetShootDir )
+                , ( bp::arg("vecForward") ) );
+        
+        }
+    }
 
     bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
         .def( 

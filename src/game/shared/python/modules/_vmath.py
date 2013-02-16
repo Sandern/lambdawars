@@ -8,7 +8,7 @@ from pygccxml.declarations import matchers
 import settings
 
 class VMath(GenerateModulePureShared):
-    module_name = 'vmath'
+    module_name = '_vmath'
     
     files = [
         'fmtstr.h',

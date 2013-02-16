@@ -13,7 +13,7 @@ using namespace boost::python;
 // The init method is in one of the generated files declared
 #ifdef _WIN32
 extern "C" __declspec(dllexport) void initsrcbase();
-extern "C" __declspec(dllexport) void initvmath();
+extern "C" __declspec(dllexport) void init_vmath();
 extern "C" __declspec(dllexport) void init_entities();
 extern "C" __declspec(dllexport) void init_entities_misc();
 extern "C" __declspec(dllexport) void init_gameinterface();
@@ -34,7 +34,7 @@ extern "C" __declspec(dllexport) void init_srctests();
 extern "C" __declspec(dllexport) void initmatchmaking();
 #else
 extern "C"  void initsrcbase();
-extern "C"  void initvmath();
+extern "C"  void init_vmath();
 extern "C"  void init_entities();
 extern "C"  void init_entities_misc();
 extern "C"  void init_gameinterface();
@@ -59,7 +59,7 @@ extern "C"  void initmatchmaking();
 void AppendSharedModules()
 {
 	APPEND_MODULE(srcbase)
-	APPEND_MODULE(vmath)
+	APPEND_MODULE(_vmath)
 	APPEND_MODULE(_entities)
 	APPEND_MODULE(_entities_misc)
 	APPEND_MODULE(_gameinterface)

@@ -21,6 +21,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         'imouse.h',
         'props_shared.h',
         'beam_shared.h',
+        'shot_manipulator.h',
     ]
     
     if settings.ASW_CODE_BASE:
@@ -351,8 +352,8 @@ class EntitiesMisc(GenerateModuleSemiShared):
         
         # //--------------------------------------------------------------------------------------------------------------------------------
         # FireBulletsInfo_t
-        mb.class_('FireBulletsInfo_t').include()
         cls = mb.class_('FireBulletsInfo_t')
+        cls.include()
         cls.var('m_iShots').rename('shots')
         cls.var('m_vecSrc').rename('vecsrc')
         cls.var('m_vecDirShooting').rename('vecdirshooting')
@@ -367,6 +368,10 @@ class EntitiesMisc(GenerateModuleSemiShared):
         cls.var('m_bPrimaryAttack').rename('primaryattack')
         cls.var('m_flDamage').rename('damage')
         cls.var('m_flPlayerDamage').rename('playerdamage')
+        
+        # CShotManipulator
+        cls = mb.class_('CShotManipulator')
+        cls.include()
         
         if self.isServer:
             # //--------------------------------------------------------------------------------------------------------------------------------
