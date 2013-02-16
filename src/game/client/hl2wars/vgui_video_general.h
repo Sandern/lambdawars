@@ -31,14 +31,19 @@ public:
 	virtual void Paint( void );
 	virtual void GetPanelPos( int &xpos, int &ypos );
 
-	bool IsLooped( void ) { return m_bLooped; }
-	void SetLooped( bool bLooped ) { m_bLooped = bLooped; }
+	void SetVideoFlags( int flags );
+	int GetVideoFlags();
 
 private:
 	bool CreateBINKVideo( const char *pFileName );
 	bool CreateAVIVideo( const char *pFileName );
 
+	void UpdateVideo( bool bForce = false );
+
 private:
+	char			m_VideoPath[MAX_PATH];
+	bool			m_bUpdateVideoVariables;
+
 	BIKMaterial_t	m_BIKHandle;
 	AVIMaterial_t	m_AVIHandle;
 	IMaterial		*m_pMaterial;
@@ -56,10 +61,20 @@ private:
 	int				m_iFrameNumber;
 	float			m_fNextFrameUpdate;
 
-	bool m_bLooped;
+	int m_iVideoFlags;
 
 	// Cropping
 	float m_fCropLeft, m_fCropRight, m_fCropTop, m_fCropBottom;
 };
+
+inline void VideoGeneralPanel::SetVideoFlags( int flags )
+{
+	m_iVideoFlags = flags;
+}
+
+inline int VideoGeneralPanel::GetVideoFlags()
+{
+	return m_iVideoFlags;
+}
 
 #endif // VGUI_VIDEO_GENERAL_H

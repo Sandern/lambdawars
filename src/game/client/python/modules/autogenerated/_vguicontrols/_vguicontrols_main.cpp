@@ -827,6 +827,12 @@ BOOST_PYTHON_MODULE(_vguicontrols){
 
     handle_to_VideoGeneralPanel();
 
+    bp::scope().attr( "BIK_LOOP" ) = BIK_LOOP;
+
+    bp::scope().attr( "BIK_PRELOAD" ) = BIK_PRELOAD;
+
+    bp::scope().attr( "BIK_NO_AUDIO" ) = BIK_NO_AUDIO;
+
     register_Tooltip_class();
 }
 

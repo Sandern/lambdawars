@@ -765,26 +765,16 @@ class VGUIControls(GenerateModuleClient):
         cls = mb.class_('VideoGeneralPanel')
         cls.mem_funs('OnVideoOver').virtuality = 'virtual'
         
-        '''
-        cls = mb.class_('WebView')
-        cls.mem_funs('GetWebViewInternal').exclude()
+        cls.mem_funs('SetVideoFlags').exclude()
+        cls.mem_funs('GetVideoFlags').exclude()
         
-        cls.mem_funs('OnChangeTitle').exclude()
-        cls.mem_funs('OnChangeAddressBar').exclude()
-        cls.mem_funs('OnChangeTooltip').exclude()
-        cls.mem_funs('OnChangeTargetURL').exclude()
-        cls.mem_funs('OnChangeCursor').exclude()
-        cls.mem_funs('OnShowCreatedWebView').exclude()
-        
-        cls.mem_funs('OnBeginLoadingFrame').exclude()
-        cls.mem_funs('OnFailLoadingFrame').exclude()
-        cls.mem_funs('OnFinishLoadingFrame').exclude()
-        cls.mem_funs('OnDocumentReady').exclude()
-        
-        cls.mem_funs('OnUnresponsive').exclude()
-        cls.mem_funs('OnResponsive').exclude()
-        cls.mem_funs('OnCrashed').exclude()
-        '''
+        mb.class_('VideoGeneralPanel').add_property( 'videoflags'
+                         , cls.member_function( 'GetVideoFlags' )
+                         , cls.member_function( 'SetVideoFlags' ) )
+                         
+        mb.add_registration_code( "bp::scope().attr( \"BIK_LOOP\" ) = BIK_LOOP;" )
+        mb.add_registration_code( "bp::scope().attr( \"BIK_PRELOAD\" ) = BIK_PRELOAD;" )
+        mb.add_registration_code( "bp::scope().attr( \"BIK_NO_AUDIO\" ) = BIK_NO_AUDIO;" )
 
     def Parse(self, mb):
         # Exclude everything by default

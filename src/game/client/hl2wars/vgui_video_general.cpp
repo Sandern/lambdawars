@@ -25,12 +25,15 @@ VideoGeneralPanel::VideoGeneralPanel( vgui::Panel *pParent, const char *pPanelNa
 		m_AVIHandle( AVIMATERIAL_INVALID ),
 		m_nPlaybackWidth( 0 ),
 		m_nPlaybackHeight( 0 ),
-		m_bLooped(false),
+		m_iVideoFlags(0),
 		m_fCropLeft(0.0f),
 		m_fCropRight(0.0f),
 		m_fCropTop(0.0f),
-		m_fCropBottom(0.0f)
+		m_fCropBottom(0.0f),
+		m_pMaterial(NULL)
 {
+	m_VideoPath[0] = '\0';
+
 	SetProportional( false );
 	SetVisible( true );
 	SetPaintBackgroundEnabled( false );
@@ -59,11 +62,16 @@ bool VideoGeneralPanel::SetVideo( const char *pFileName )
 	// Destroy any previously allocated video
 	StopVideo();
 
+	Q_strcpy( m_VideoPath, pFileName );
+
 	// Filename
 	char strExtension[8];
 
 	Q_ExtractFileExtension(pFileName, strExtension, 8);
 
+	m_bUpdateVideoVariables = true;
+
+	// Create the video
 	if( !Q_strncmp(strExtension, "bik", 3) )
 	{
 		return CreateBINKVideo(pFileName);
@@ -78,6 +86,7 @@ bool VideoGeneralPanel::SetVideo( const char *pFileName )
 		char strFullpath[MAX_PATH];
 		Q_strncat( strFullpath, pFileName, MAX_PATH );
 		Q_strncat( strFullpath, ".bik", MAX_PATH );		// Assume we're a .bik extension type
+
 		return CreateBINKVideo(strFullpath);
 	}
 
@@ -90,9 +99,25 @@ bool VideoGeneralPanel::SetVideo( const char *pFileName )
 bool VideoGeneralPanel::CreateBINKVideo( const char *pFileName )
 {
 	// Load and create our BINK video
-	m_BIKHandle = bik->CreateMaterial( "VideoBIKMaterial", pFileName, "GAME" );
+	char szMaterialName[ MAX_PATH ];
+	Q_snprintf( szMaterialName, sizeof( szMaterialName ), "PortraitBIKMaterial%i", g_pBIK->GetGlobalMaterialAllocationNumber() );
+	m_BIKHandle = bik->CreateMaterial( szMaterialName, pFileName, "GAME", m_iVideoFlags );
 	if ( m_BIKHandle == BIKHANDLE_INVALID )
 		return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void VideoGeneralPanel::UpdateVideo( bool bForce )
+{
+	if( !bForce && !m_bUpdateVideoVariables )
+		return;
+
+	if ( m_BIKHandle == BIKHANDLE_INVALID )
+		return;
 
 	int nWidth, nHeight;
 	bik->GetFrameSize( m_BIKHandle, &nWidth, &nHeight );
@@ -128,7 +153,7 @@ bool VideoGeneralPanel::CreateBINKVideo( const char *pFileName )
 
 */
 
-	return true;
+	m_bUpdateVideoVariables = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,18 +205,15 @@ bool VideoGeneralPanel::CreateAVIVideo( const char *pFileName )
 //-----------------------------------------------------------------------------
 void VideoGeneralPanel::OnVideoOver()
 {
-	if( m_bLooped )
+	if ( m_BIKHandle != BIKHANDLE_INVALID )
 	{
-		if ( m_BIKHandle != BIKHANDLE_INVALID )
-		{
-			bik->SetFrame( m_BIKHandle, 0 );
-		}
-		else if ( m_AVIHandle != AVIMATERIAL_INVALID ) 
-		{
-			avi->SetFrame(m_AVIHandle, 0);
-			m_iFrameNumber = 0;
-			m_fNextFrameUpdate = gpGlobals->curtime + ( 1.0f / avi->GetFrameRate(m_AVIHandle) );
-		}
+		bik->SetFrame( m_BIKHandle, 0 );
+	}
+	else if ( m_AVIHandle != AVIMATERIAL_INVALID ) 
+	{
+		avi->SetFrame(m_AVIHandle, 0);
+		m_iFrameNumber = 0;
+		m_fNextFrameUpdate = gpGlobals->curtime + ( 1.0f / avi->GetFrameRate(m_AVIHandle) );
 	}
 }
 
@@ -211,6 +233,8 @@ void VideoGeneralPanel::StopVideo()
 		avi->DestroyAVIMaterial( m_AVIHandle );
 		m_AVIHandle = AVIMATERIAL_INVALID;
 	}
+	m_pMaterial = NULL;
+	m_VideoPath[0] = '\0';
 }
 
 //-----------------------------------------------------------------------------
@@ -225,6 +249,8 @@ void VideoGeneralPanel::SetCropVideo( float fCropLeft, float fCropRight, float f
 
 	m_nCroppedPlaybackWidth = m_nPlaybackWidth * (1.0f - (m_fCropLeft+m_fCropRight));
 	m_nCroppedPlaybackHeight = m_nPlaybackHeight * (1.0f - (m_fCropTop+m_fCropBottom));
+
+	m_bUpdateVideoVariables = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -234,14 +260,18 @@ void VideoGeneralPanel::Paint( void )
 {
 	BaseClass::Paint();
 
+	UpdateVideo();
 	
 	if ( m_BIKHandle != BIKHANDLE_INVALID )
 	{
-		// Update our frame
-		if ( bik->Update( m_BIKHandle ) == false )
+		if ( g_pBIK->ReadyForSwap( m_BIKHandle ) )
 		{
-			// Issue a close command
-			OnVideoOver();
+			// Update our frame
+			if ( bik->Update( m_BIKHandle ) == false )
+			{
+				// Issue a close command
+				OnVideoOver();
+			}
 		}
 	}
 	else if(  m_AVIHandle != AVIMATERIAL_INVALID ) 
@@ -268,7 +298,8 @@ void VideoGeneralPanel::Paint( void )
 		return;
 	}	
 
-
+	if( !m_pMaterial )
+		return;
 
 	// Sit in the "center"
 	int xpos, ypos;

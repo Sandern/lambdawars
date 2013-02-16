@@ -1442,15 +1442,6 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("xpos"), bp::arg("ypos") ) );
         
         }
-        { //::VideoGeneralPanel::IsLooped
-        
-            typedef bool ( ::VideoGeneralPanel::*IsLooped_function_type )(  ) ;
-            
-            VideoGeneralPanel_exposer.def( 
-                "IsLooped"
-                , IsLooped_function_type( &::VideoGeneralPanel::IsLooped ) );
-        
-        }
         { //::VideoGeneralPanel::OnVideoOver
         
             typedef void ( ::VideoGeneralPanel::*OnVideoOver_function_type )(  ) ;
@@ -1470,16 +1461,6 @@ void register_VideoGeneralPanel_class(){
                 "SetCropVideo"
                 , SetCropVideo_function_type( &::VideoGeneralPanel::SetCropVideo )
                 , ( bp::arg("fCropLeft"), bp::arg("fCropRight"), bp::arg("fCropTop"), bp::arg("fCropBottom") ) );
-        
-        }
-        { //::VideoGeneralPanel::SetLooped
-        
-            typedef void ( ::VideoGeneralPanel::*SetLooped_function_type )( bool ) ;
-            
-            VideoGeneralPanel_exposer.def( 
-                "SetLooped"
-                , SetLooped_function_type( &::VideoGeneralPanel::SetLooped )
-                , ( bp::arg("bLooped") ) );
         
         }
         { //::VideoGeneralPanel::SetVideo
@@ -2159,6 +2140,17 @@ void register_VideoGeneralPanel_class(){
         }
         VideoGeneralPanel_exposer.staticmethod( "GetPanelBaseClassName" );
         VideoGeneralPanel_exposer.staticmethod( "GetPanelClassName" );
+        { //property "videoflags"[fget=::VideoGeneralPanel::GetVideoFlags, fset=::VideoGeneralPanel::SetVideoFlags]
+        
+            typedef int ( ::VideoGeneralPanel::*fget )(  ) ;
+            typedef void ( ::VideoGeneralPanel::*fset )( int ) ;
+            
+            VideoGeneralPanel_exposer.add_property( 
+                "videoflags"
+                , fget( &::VideoGeneralPanel::GetVideoFlags )
+                , fset( &::VideoGeneralPanel::SetVideoFlags ) );
+        
+        }
         { //::vgui::VideoGeneralPanel::Paint
 
         typedef void ( ::vgui::Panel::*Paint_function_type )(  ) ;
