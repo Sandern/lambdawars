@@ -97,22 +97,14 @@ class TE(GenerateModuleSemiShared):
         cls.mem_funs().virtuality = 'not virtual' 
         cls.calldefs( matchers.access_type_matcher_t( 'protected' ), allow_empty=True ).exclude()
         
-        cls = mb.class_('PyTempEnts')
-        cls.include()
-        cls.calldefs().virtuality = 'not virtual' 
-        cls.calldefs( matchers.access_type_matcher_t( 'protected' ), allow_empty=True ).exclude()
+        mb.add_registration_code( 'bp::scope().attr( "tempents" ) = boost::ref(tempents);' )
         
-        mb.add_registration_code( 'bp::scope().attr( "tempents" ) = boost::ref(pytempents);' )
-        
-        mb.mem_funs('PySpawnTempModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('DefaultSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('TempSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('ClientProjectile').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
         mb.mem_funs('RicochetSprite').exclude()
         mb.mem_funs('SpawnTempModel').exclude()
-        #mb.mem_funs('PySpawnTempModel').exclude()
-        mb.mem_funs('PySpawnTempModel').rename('SpawnTempModel')
         mb.mem_funs('ClientProjectile').exclude() # Debug mode problem
         mb.mem_funs('DefaultSprite').exclude() # Debug mode problem
         mb.mem_funs('TempSprite').exclude() # Debug mode problem

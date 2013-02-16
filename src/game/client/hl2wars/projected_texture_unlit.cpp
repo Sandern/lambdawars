@@ -313,7 +313,7 @@ void ProjectedTexture::Init( CMaterialReference &ref, Vector vMin, Vector vMax,
 	}
 
 	// Create the shadow
-	m_shadowHandle = g_pClientShadowMgr->CreatePTUnlit( m_Info, INVALID_CLIENTENTITY_HANDLE, SHADOW_FLAGS_SHADOW|SHADOW_FLAGS_PROJECTTEXTUREUNLIT);
+	m_shadowHandle = g_pClientShadowMgr->CreatePTUnlit( m_Info, INVALID_CLIENTENTITY_HANDLE, SHADOW_FLAGS_SHADOW|SHADOW_FLAGS_PROJECTTEXTUREUNLIT );
 	if( m_shadowHandle == CLIENTSHADOW_INVALID_HANDLE ) {
 		Warning("ProjectedTexture::Init: Invalid shadow handle on creation!\n");
 	}
@@ -344,7 +344,7 @@ void ProjectedTexture::UpdateShadow()
 		Warning("ProjectedTexture::UpdateShadow: Invalid shadow handle on update!\n");
 		return;
 	}
-	g_pClientShadowMgr->UpdatePTUnlitState(m_shadowHandle, m_Info, true);
+	g_pClientShadowMgr->UpdatePTUnlitState( m_shadowHandle, m_Info, true );
 	g_pClientShadowMgr->SetFlashlightTarget( m_shadowHandle, NULL );
 }
 

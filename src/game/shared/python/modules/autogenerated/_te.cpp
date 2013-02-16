@@ -682,24 +682,6 @@ BOOST_PYTHON_MODULE(_te){
         }
     }
 
-    bp::class_< PyTempEnts, bp::bases< CTempEnts >, boost::noncopyable >( "PyTempEnts", bp::no_init )    
-        .def( 
-            "Clear"
-            , (void ( ::PyTempEnts::* )(  ) )( &::PyTempEnts::Clear ) )    
-        .def( 
-            "SpawnTempModel"
-            , (::boost::python::object ( ::PyTempEnts::* )( ::model_t *,::Vector const &,::QAngle const &,::Vector const &,float,int ) )( &::PyTempEnts::PySpawnTempModel )
-            , ( bp::arg("pModel"), bp::arg("vecOrigin"), bp::arg("vecAngles"), bp::arg("vecVelocity"), bp::arg("flLifeTime"), bp::arg("iFlags") )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "SpawnTempModel"
-            , (::boost::python::object ( ::PyTempEnts::* )( char const *,::Vector const &,::QAngle const &,::Vector const &,float,int ) )( &::PyTempEnts::PySpawnTempModel )
-            , ( bp::arg("model_name"), bp::arg("vecOrigin"), bp::arg("vecAngles"), bp::arg("vecVelocity"), bp::arg("flLifeTime"), bp::arg("iFlags") )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "Update"
-            , (void ( ::PyTempEnts::* )(  ) )( &::PyTempEnts::Update ) );
-
     { //::AddToClientEffectList
     
         typedef void ( *AddToClientEffectList_function_type )( ::boost::python::object );
@@ -1076,7 +1058,7 @@ BOOST_PYTHON_MODULE(_te){
 
     bp::scope().attr( "te" ) = boost::ref(te);
 
-    bp::scope().attr( "tempents" ) = boost::ref(pytempents);
+    bp::scope().attr( "tempents" ) = boost::ref(tempents);
 
     bp::scope().attr( "FTENT_NONE" ) = (int)FTENT_NONE;
 

@@ -54,8 +54,6 @@ class Entities(GenerateModuleSemiShared):
             'SpriteTrail.h',
             'c_smoke_trail.h',
             'c_wars_weapon.h',
-            
-            'tempent.h',
     ]
 
     server_files = [
@@ -1366,10 +1364,6 @@ class Entities(GenerateModuleSemiShared):
                 '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
                 ') \r\n' % (clsname, clsname)
             )
-        
-    def ParseTempEnts(self, mb):
-        mb.class_('C_LocalTempEntity').include()
-        mb.class_('C_LocalTempEntity').mem_funs('Prepare').exclude()
 
     def ParseBaseCombatWeapon(self, mb):
         cls_name = 'C_BaseCombatWeapon' if self.isClient else 'CBaseCombatWeapon'
@@ -1760,8 +1754,6 @@ class Entities(GenerateModuleSemiShared):
         self.ParseBasePlayer(mb)
         self.ParseHL2WarsPlayer(mb)
         self.ParseUnitBase(mb)
-        if self.isClient:
-            self.ParseTempEnts(mb)
         if self.isServer:
             self.ParseTriggers(mb)
         self.ParseBaseCombatWeapon(mb)

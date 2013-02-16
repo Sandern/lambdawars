@@ -66,12 +66,10 @@ ConVar func_break_max_pieces( "func_break_max_pieces", "15", FCVAR_ARCHIVE | FCV
 
 ConVar cl_fasttempentcollision( "cl_fasttempentcollision", "5" );
 
-#ifndef ENABLE_PYTHON
 // Temp entity interface
 static CTempEnts g_TempEnts;
 // Expose to rest of the client .dll
 ITempEnts *tempents = ( ITempEnts * )&g_TempEnts;
-#endif // ENABLE_PYTHON
 
 
 C_LocalTempEntity::C_LocalTempEntity()

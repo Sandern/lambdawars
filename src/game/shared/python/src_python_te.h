@@ -18,28 +18,6 @@
 struct model_t;
 
 //-----------------------------------------------------------------------------
-// Purpose: Python implementation of the temp entity interface
-//-----------------------------------------------------------------------------
-class PyTempEnts : public CTempEnts
-{
-public:
-	virtual void				Clear( void );
-	virtual void				Update( void );
-
-	virtual boost::python::object PySpawnTempModel( model_t *pModel, const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, float flLifeTime, int iFlags );
-	virtual boost::python::object PySpawnTempModel( const char *model_name, const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, float flLifeTime, int iFlags );
-
-	// Internal methods also available to children
-protected:
-	C_LocalTempEntity		*PyTempEntAlloc( const Vector& org, model_t *model );
-
-private:
-	CUtlVector<boost::python::object> m_pyTempEnts;
-};
-
-extern PyTempEnts *pytempents;
-
-//-----------------------------------------------------------------------------
 // Purpose: Registering new effects. Basically it just unregisters from the list.
 //-----------------------------------------------------------------------------
 class PyClientEffectRegistration
