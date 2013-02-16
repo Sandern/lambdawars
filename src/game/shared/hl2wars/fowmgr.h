@@ -113,7 +113,7 @@ private:
 	void				UpdateTexture( bool bConverge, float fTime = 0.0f );
 	
 	void				BeginRenderFow( bool bStartShrouded = true );
-	void				RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y );
+	void				RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, int n, int cx, int cy );
 	void				EndRenderFow();
 	void				RenderFowClear();
 	void				RenderFogOfWar( float frametime );

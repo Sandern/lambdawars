@@ -703,14 +703,22 @@ void CFogOfWarMgr::DeallocateFogOfWar()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+#define FOW_RT_SIZE_HIGH 2048
 #define FOW_RT_SIZE 1024
 #define FOW_RT_SIZE_LOW 512
 #define FOW_RT_SIZE_VERY_LOW 256
 
 int CFogOfWarMgr::CalculateRenderTargetSize( void )
 {
-	int iSize = (ScreenHeight() < 1024 || ScreenWidth() < 1024) ? FOW_RT_SIZE_LOW : FOW_RT_SIZE;
-	return (ScreenHeight() < 512 || ScreenWidth() < 512) ? FOW_RT_SIZE_VERY_LOW : iSize;
+	int iMinScreenSize = MIN( ScreenHeight(), ScreenWidth() );
+
+	if( iMinScreenSize > FOW_RT_SIZE_HIGH )
+		return FOW_RT_SIZE_HIGH;
+	else if( iMinScreenSize > FOW_RT_SIZE )
+		return FOW_RT_SIZE;
+	else if( iMinScreenSize > FOW_RT_SIZE_LOW )
+		return FOW_RT_SIZE_LOW;
+	return FOW_RT_SIZE_VERY_LOW;
 }
 
 void CFogOfWarMgr::InitRenderTargets( void )
@@ -718,7 +726,7 @@ void CFogOfWarMgr::InitRenderTargets( void )
 #ifndef FOW_USE_PROCTEX
 	int iSize = CalculateRenderTargetSize();
 
-	unsigned int fowFlags =	TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
+	unsigned int fowFlags =	/*TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT |*/ TEXTUREFLAGS_RENDERTARGET;
 	ImageFormat fmt = IMAGE_FORMAT_RGBA8888;
 
 	m_RenderBuffer.Init( materials->CreateNamedRenderTargetTextureEx2(
@@ -1064,11 +1072,11 @@ static float s_FOWDebugHeight;
 //-----------------------------------------------------------------------------
 // Purpose: Render a single unit to the fow render target
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
+void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, int n, int cx, int cy )
 {
 	VPROF_BUDGET( "CFogOfWarMgr::RenderFow", VPROF_BUDGETGROUP_FOGOFWAR );
 
-	if( !m_bRenderingFOW )
+	if( !m_bRenderingFOW || DrawPoints.Count() == 0 )
 		return;
 
 	int iFOWRenderSize = m_RenderBuffer->GetActualWidth();
@@ -1085,40 +1093,81 @@ void CFogOfWarMgr::RenderFow( CUtlVector< FowPos_t > &EndPos, int x, int y )
 
 	int nDebug = fow_shadowcast_debug.GetInt();
 
-	meshBuilder.Begin( pMesh, MATERIAL_POLYGON, EndPos.Count() );
+	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, (n * 2) - 2 );
 
-	//for( int i = 0; i < EndPos.Count(); i++ )
-	for( int i = EndPos.Count() - 1; i >= 0; i-- )
+	int x, y;
+	float wx, wy;
+	float wcx, wcy;
+
+	wcx = cx * (iFOWRenderSize / (float)m_nGridSize);
+	wcy = cy * (iFOWRenderSize / (float)m_nGridSize);
+
+	for( int j = 0; j < DrawPoints.Count(); j++ )
 	{
-		x = EndPos[i].x * (iFOWRenderSize / (float)m_nGridSize);
-		y = EndPos[i].y * (iFOWRenderSize / (float)m_nGridSize);
-
-		meshBuilder.Position3f( x, y, 0.0f );
-		meshBuilder.TexCoord2f( 0, 0.0f, 1.0f );
-		meshBuilder.Color4ub( 255, 255, 255, 255 );
-		meshBuilder.AdvanceVertex();
-
-		if( nDebug > 0 )
+		CUtlVector< FowPos_t > &DrawList = DrawPoints[j];
+		for( int i = 0; i < DrawList.Count(); i++ )
 		{
-			int i2 = 0;
-			if( i+1 < EndPos.Count() )
-				i2 = i+1;
-			else if( i+1 == 0 )
-				i2 = EndPos.Count() - 1;
+			x = DrawList[i].x;
+			y = DrawList[i].y;
 
-			Vector vPos = ComputeWorldPosition(EndPos[i].x, EndPos[i].y);
-			vPos.z = s_FOWDebugHeight;
-			Vector vPos2 = ComputeWorldPosition(EndPos[i2].x, EndPos[i2].y);
-			vPos2.z = s_FOWDebugHeight;
-			NDebugOverlay::Line( vPos, vPos2, MIN(i*3, 255), MAX(255-(i*3), 0), 0, true, 0.2f );
+			wx = x * (iFOWRenderSize / (float)m_nGridSize);
+			wy = y * (iFOWRenderSize / (float)m_nGridSize);
 
-			if( nDebug > 1 )
+			meshBuilder.Position3f( wx, wy, 0.0f );
+			meshBuilder.TexCoord2f( 0, 0.0f, 0.0f );
+			meshBuilder.Color4ub( 255, 255, 255, 255 );
+			meshBuilder.AdvanceVertex();
+
+			meshBuilder.Position3f( wcx, wcy, 0.0f );
+			meshBuilder.TexCoord2f( 0, 0.0f, 0.0f );
+			meshBuilder.Color4ub( 255, 255, 255, 255 );
+			meshBuilder.AdvanceVertex();
+		}
+	}
+
+	// Draw outline for debugging purpose
+	if( nDebug > 0 )
+	{
+		int k = 0;
+
+		int lastx = -1, lasty = -1;
+		for( int j = 0; j < DrawPoints.Count(); j++ )
+		{
+			CUtlVector< FowPos_t > &DrawList = DrawPoints[j];
+			for( int i = 0; i < DrawList.Count()-1; i++ )
 			{
-				char buf[15];
-				Q_snprintf( buf, sizeof(buf), "%d", i );
-				NDebugOverlay::Text(vPos, buf, false, 0.2f);
-			}
+				x = DrawList[i].x;
+				y = DrawList[i].y;
 
+				if( i == 0 && lastx != -1 )
+				{
+					Vector vPos = ComputeWorldPosition(x, y);
+					vPos.z = s_FOWDebugHeight;
+					Vector vPos2 = ComputeWorldPosition(lastx, lasty);
+					vPos2.z = s_FOWDebugHeight;
+					NDebugOverlay::Line( vPos, vPos2, MIN(k*3, 255), MAX(255-(k*3), 0), 0, true, 0.2f );
+				}
+
+				int i2 = i+1;
+
+				Vector vPos = ComputeWorldPosition(x, y);
+				vPos.z = s_FOWDebugHeight;
+				Vector vPos2 = ComputeWorldPosition(DrawList[i2].x, DrawList[i2].y);
+				vPos2.z = s_FOWDebugHeight;
+				NDebugOverlay::Line( vPos, vPos2, MIN(k*3, 255), MAX(255-(k*3), 0), 0, true, 0.2f );
+
+				if( nDebug > 1 )
+				{
+					char buf[15];
+					Q_snprintf( buf, sizeof(buf), "%d", k );
+					NDebugOverlay::Text(vPos, buf, false, 0.2f);
+				}
+
+				k++;
+
+				lastx = DrawList[i2].x;
+				lasty = DrawList[i2].y;
+			}
 		}
 	}
 
@@ -1572,10 +1621,16 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 	m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;
 
 	s_FOWDebugHeight = pEnt->GetAbsOrigin().z;
-	CUtlVector< FowPos_t > Points;
-	Points.EnsureCapacity( 200 ); // Usually no more than X elements
-	CUtlVector< FowPos_t > EndPos;
-	EndPos.EnsureCapacity( 25 ); // Usually no more than X elements
+
+	int n = 0;
+	CUtlVector< CUtlVector< FowPos_t > > DrawPoints;
+	DrawPoints.EnsureCapacity( 8 );
+	for( int i = 0; i < 8; i++ )
+	{
+		DrawPoints.AddToTail();
+		DrawPoints.Tail().EnsureCapacity( 25 );
+	}
+
 #else
 	m_FogOfWar[FOWINDEX(X, Y)] |= mask;
 #endif // CLIENT_DLL
@@ -1586,11 +1641,13 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 		for( oct = 0; oct < 8; oct++ )
 		{
 #ifdef CLIENT_DLL
-			EndPos.RemoveAll();
+			CUtlVector< FowPos_t > &EndPos = DrawPoints[oct];
+
 			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
 					ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ, EndPos, oct % 2 == 1 );
-			Points.AddVectorToTail( EndPos );
+
+			n += EndPos.Count();
 #else
 			ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 					ShadowCastMult[0][oct], ShadowCastMult[1][oct],
@@ -1602,10 +1659,13 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 	{
 		int oct = fow_test_singleoct.GetInt();
 #ifdef CLIENT_DLL
-		
+		CUtlVector< FowPos_t > &EndPos = DrawPoints[0];
+
 		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
-				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ, Points, false );
+				ShadowCastMult[2][oct], ShadowCastMult[3][oct], mask, iEyeZ, EndPos, false );
+
+		n += EndPos.Count();
 #else
 		ShadowCast( X, Y, 1, 1.0f, 0.0f, radius,
 				ShadowCastMult[0][oct], ShadowCastMult[1][oct],
@@ -1614,7 +1674,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 	}
 
 #ifdef CLIENT_DLL
-	RenderFow( Points, X, Y );
+	RenderFow( DrawPoints, n, X, Y );
 #endif // CLIENT_DLL
 }
 
