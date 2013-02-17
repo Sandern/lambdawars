@@ -17,6 +17,7 @@
 #include "tier0/memdbgon.h"
 
 ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+ConVar g_pynavmesh_debug_hidespot("g_pynavmesh_debug_hidespot", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -484,6 +485,8 @@ CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 }
 #endif // CLIENT_DLL
 
+#define HIDESPOT_DEBUG_DURATION 0.25f
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -499,13 +502,29 @@ typedef struct HidingSpotResult_t
 class HidingSpotCollector
 {
 public:
-	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit)
+	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL)
 	{
 #ifndef USE_NAVAREA_BASED_DIST
 		m_fRadiusSqr = fRadius * fRadius;
 #else
 		m_fRadius = fRadius;
-		m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, false);
+
+		//if( pUnit )
+		//	m_pOrderArea = TheNavMesh->GetNearestNavArea(pUnit->GetAbsOrigin(), false, fRadius, false, false);
+		//if( !m_pOrderArea )
+		m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, true);
+
+		if( g_pynavmesh_debug_hidespot.GetBool() )
+		{
+			if( m_pOrderArea )
+			{
+				NDebugOverlay::Text( m_pOrderArea->GetCenter(), "HidingSpotCollector: HAS nav mesh!", false, HIDESPOT_DEBUG_DURATION );
+			}
+			else
+			{
+				NDebugOverlay::Text( vPos, "HidingSpotCollector: no nav mesh!", false, HIDESPOT_DEBUG_DURATION );
+			}
+		}
 #endif // USE_NAVAREA_BASED_DIST
 	}
 
@@ -517,41 +536,64 @@ public:
 		float fSlope = DotProduct( normal, Vector(0, 0, 1) );
 		if( fSlope < 0.83f )
 		{
-			return false;
+			if( g_pynavmesh_debug_hidespot.GetBool() )
+				NDebugOverlay::Text( area->GetCenter(), "HidingSpotCollector: skipping area due slope", false, HIDESPOT_DEBUG_DURATION );
+			return true;
 		}
 
 		const HidingSpotVector *spots = area->GetHidingSpots();
 
+		// Area must be reachable
+		float fPathDist;
+		if( !m_pUnit )
+		{
+			ShortestPathCost costFunc;
+			fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, area, costFunc, m_fRadius * 2.0f );
+		}
+		else
+		{
+			UnitShortestPathCost costFunc( m_pUnit, false );
+			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, m_fRadius * 2.0f );
+		}
+		if( fPathDist < 0 )
+		{
+			if( g_pynavmesh_debug_hidespot.GetBool() )
+			{
+				for( int i = 0; i < spots->Count(); i++ )
+					NDebugOverlay::Box( spots->Element( i )->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, true, HIDESPOT_DEBUG_DURATION );
+			}
+
+			return true;
+		}
+
+		// Collect spots in range
 		for( int i = 0; i < spots->Count(); i++ )
 		{
 			HidingSpot *pSpot = spots->Element( i );
 			const Vector &vPos = pSpot->GetPosition();
 			float fDist = (vPos - m_vPos).Length2D();
 
+			//if( !pSpot->HasGoodCover() )
+			//	continue;
+
 #ifndef USE_NAVAREA_BASED_DIST
 			float fDist = (vPos - m_vPos).LengthSqr();
 			if( fDist < m_fRadiusSqr )
 				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
 #else
-			CNavArea *pTestArea = TheNavMesh->GetNearestNavArea( vPos, false, m_fRadius, false, false );
-
-			float fPathDist;
-			if( !m_pUnit )
+			if( fDist < m_fRadius )
 			{
-				ShortestPathCost costFunc;
-				fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius * 2.0f );
+				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
+				if( g_pynavmesh_debug_hidespot.GetBool() )
+					NDebugOverlay::Box( pSpot->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, true, HIDESPOT_DEBUG_DURATION );
 			}
 			else
 			{
-				UnitShortestPathCost costFunc( m_pUnit, false );
-				fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, pTestArea, costFunc, m_fRadius * 2.0f );
+				if( g_pynavmesh_debug_hidespot.GetBool() )
+				{
+					NDebugOverlay::Box( pSpot->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, true, HIDESPOT_DEBUG_DURATION );
+				}
 			}
-
-			if( fPathDist >= 0 && fDist < m_fRadius )
-			{
-				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
-			}
-
 #endif // USE_NAVAREA_BASED_DIST
 		}
 
