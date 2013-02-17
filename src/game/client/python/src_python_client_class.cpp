@@ -415,38 +415,51 @@ void NetworkedClass::AttachClientClass( PyClientClassBase *pClientClass )
 	}
 }
 
+#define PYNETCLS_BUFSIZE 512
+
 // Message handler for PyNetworkCls
 void __MsgFunc_PyNetworkCls( bf_read &msg )
 {
-#define BUFSIZE 512
+	char clientClass[PYNETCLS_BUFSIZE];
+	char networkName[PYNETCLS_BUFSIZE];
 
-	char buf[BUFSIZE];
 	int iType = msg.ReadByte();
+	msg.ReadString(clientClass, PYNETCLS_BUFSIZE);
+	msg.ReadString(networkName, PYNETCLS_BUFSIZE);
+
+	// Get module path
+	const char *pch = Q_strrchr( networkName, '.' );
+	if( !pch )
+	{
+		Warning( "Invalid python class name %s\n", networkName );
+		return;
+	}
+	int n = pch - networkName + 1;
+
+	char modulePath[MAX_PATH];
+	Q_strncpy( modulePath, networkName, n );
 
 	// Make sure the client class is imported
-	msg.ReadString(buf, BUFSIZE);
-	SrcPySystem()->Import(buf);
+	SrcPySystem()->Import( modulePath );
 
 	// Read which client class we are modifying
-	msg.ReadString(buf, BUFSIZE);
-//	Msg("Incoming python network class message %s\n", buf);
-	PyClientClassBase *p = FindPyClientClass(buf);
+	//Msg("Incoming python network class message %s\n", clientClass);
+	PyClientClassBase *p = FindPyClientClass( clientClass );
 	if( !p )
 	{
-		Warning("__MsgFunc_PyNetworkCls: Invalid networked class %s\n", buf);
+		Warning( "__MsgFunc_PyNetworkCls: Invalid networked class %s\n", clientClass );
 		return;
 	}
 	
 	// Set type
-	p->SetType(iType );
-	SetupClientClassRecv(p, iType);
+	p->SetType( iType );
+	SetupClientClassRecv( p, iType );
 
 	// Read network class name
-	msg.ReadString(buf, BUFSIZE);
-	Q_strncpy(p->m_strPyNetworkedClassName, buf, BUFSIZE);
+	Q_strncpy( p->m_strPyNetworkedClassName, networkName, PYNETCLS_BUFSIZE );
 
 	// Attach if a network class exists
-	unsigned short lookup = m_NetworkClassDatabase.Find( buf );
+	unsigned short lookup = m_NetworkClassDatabase.Find( networkName );
 	if ( lookup != m_NetworkClassDatabase.InvalidIndex() )
 	{
 		m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );
@@ -466,12 +479,26 @@ void HookPyNetworkCls()
 CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 {
 	int iType = atoi(args[1]);
-	//Msg("register_py_class: Incoming python network class message %d %s %s %s\n", iType, args[2], args[3], args[4]);
-	SrcPySystem()->Import(args[2]);
-	PyClientClassBase *p = FindPyClientClass(args[3]);
+	//Msg("register_py_class: Incoming python network class message %d %s %s\n", iType, args[2], args[3]);
+
+	// Get module path
+	const char *pch = Q_strrchr( args[3], '.' );
+	if( !pch )
+	{
+		Warning("Invalid python class name %s\n", args[3] );
+		return;
+	}
+	int n = pch - args[3] + 1;
+
+	char modulePath[MAX_PATH];
+	Q_strncpy( modulePath, args[3], n );
+	//Msg("Module path: %s\n", modulePath );
+
+	SrcPySystem()->Import( modulePath );
+	PyClientClassBase *p = FindPyClientClass(args[2]);
 	if( !p )
 	{
-		Warning("register_py_class: Invalid networked class %s\n", args[3]);
+		Warning("register_py_class: Invalid networked class %s\n", args[2]);
 		return;
 	}
 
@@ -479,10 +506,10 @@ CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 	p->SetType(iType );
 	SetupClientClassRecv(p, iType);
 
-	Q_strncpy(p->m_strPyNetworkedClassName, args[4], 512);
+	Q_strncpy(p->m_strPyNetworkedClassName, args[3], 512);
 
 	// Attach if a network class exists
-	unsigned short lookup = m_NetworkClassDatabase.Find( args[4] );
+	unsigned short lookup = m_NetworkClassDatabase.Find( args[3] );
 	if ( lookup != m_NetworkClassDatabase.InvalidIndex() )
 	{
 		m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );

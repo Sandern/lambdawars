@@ -4734,7 +4734,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
         }
     }
 
-    bp::class_< NetworkedClass >( "NetworkedClass", bp::init< char const *, bp::object, char const * >(( bp::arg("pNetworkName"), bp::arg("cls_type"), bp::arg("pClientModuleName") )) )    
+    bp::class_< NetworkedClass >( "NetworkedClass", bp::init< char const *, bp::object >(( bp::arg("pNetworkName"), bp::arg("cls_type") )) )    
         .def( 
             "SetupServerClass"
             , (void ( ::NetworkedClass::* )(  ) )( &::NetworkedClass::SetupServerClass ) )    

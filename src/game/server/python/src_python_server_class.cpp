@@ -193,12 +193,9 @@ PyServerClass *FindPyServerClass( const char *pName )
 //			Send a message to the clients to claim a client class and set it to
 //			the right type.
 //-----------------------------------------------------------------------------
-NetworkedClass::NetworkedClass( 
-							   const char *pNetworkName, boost::python::object cls_type, 
-							   const char *pClientModuleName )
+NetworkedClass::NetworkedClass( const char *pNetworkName, boost::python::object cls_type )
 {
 	m_pNetworkName = strdup( pNetworkName );
-	m_pClientModuleName = strdup( pClientModuleName );
 	m_pServerClass = NULL;
 	PyServerClass *p;
 	// See if there is already an entity with this network name
@@ -256,8 +253,6 @@ NetworkedClass::~NetworkedClass()
 
 	free( (void *)m_pNetworkName );
 	m_pNetworkName = NULL;
-	free( (void *)m_pClientModuleName );
-	m_pClientModuleName = NULL;
 }
 
 extern edict_t *g_pForceAttachEdict;
@@ -278,7 +273,6 @@ void NetworkedClass::SetupServerClass()
 	CReliableBroadcastRecipientFilter filter;
 	UserMessageBegin(filter, "PyNetworkCls");
 	WRITE_BYTE(iType);
-	WRITE_STRING(m_pClientModuleName);
 	WRITE_STRING(m_pServerClass->GetName());
 	WRITE_STRING(m_pServerClass->m_pNetworkedClass->m_pNetworkName);
 	MessageEnd();
@@ -315,7 +309,6 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 		// Send message
 		UserMessageBegin(filter, "PyNetworkCls");
 		WRITE_BYTE(p->m_iType);
-		WRITE_STRING(p->m_pNetworkedClass->m_pClientModuleName);
 		WRITE_STRING(p->m_pNetworkName);
 		WRITE_STRING(p->m_pNetworkedClass->m_pNetworkName);
 		MessageEnd();
@@ -345,9 +338,9 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 		}
 
 		// Send message
-		//Msg("Sending update: %d %s %s\n", p->m_iType, p->m_pNetworkedClass->m_pClientModuleName, p->m_pNetworkName );
-		engine->ClientCommand( pEdict, "rpc %d %s %s %s\n", p->m_iType,
-			p->m_pNetworkedClass->m_pClientModuleName, p->m_pNetworkName, p->m_pNetworkedClass->m_pNetworkName);
+		//Msg("Sending update: %d %s %s\n", p->m_iType, p->m_pNetworkName );
+		engine->ClientCommand( pEdict, "rpc %d %s %s\n", p->m_iType,
+			p->m_pNetworkName, p->m_pNetworkedClass->m_pNetworkName);
 		engine->ServerExecute(); // Send immediately to avoid an overflow when having too many
 
 		// Next

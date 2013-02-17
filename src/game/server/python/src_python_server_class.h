@@ -55,7 +55,7 @@ public:
 class NetworkedClass
 {
 public:
-	NetworkedClass( const char *pNetworkName, boost::python::object cls_type, const char *pClientModuleName );
+	NetworkedClass( const char *pNetworkName, boost::python::object cls_type );
 	~NetworkedClass();
 
 	void SetupServerClass();
@@ -63,7 +63,6 @@ public:
 public:
 	boost::python::object m_PyClass;
 	const char *m_pNetworkName;
-	const char *m_pClientModuleName;
 
 	PyServerClass *m_pServerClass;
 };
