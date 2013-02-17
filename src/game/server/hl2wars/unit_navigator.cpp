@@ -374,7 +374,19 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 	// Move dispatch complete/failed to the end of the Update in case we are at the goal
 	// This way the event can clear the move command if it wants
 	// It's also more clear to keep all event dispatching here, since they might result in a new
-	// goal being set. In this case we should not update m_LastGoalStatus.
+	// goal being set.
+	CheckGoalStatus_t LastGoalStatus = m_LastGoalStatus;
+	m_LastGoalStatus = GoalStatus;
+
+	if( unit_navigator_debug.GetBool() )
+	{
+		if( LastGoalStatus != GoalStatus )
+		{
+			DevMsg( "#%d UnitNavigator: Goal status changed from %d to %d (goalflags %d)\n", 
+				GetOuter()->entindex(), LastGoalStatus, GoalStatus, GetPath()->m_iGoalFlags );
+		}
+	}
+
 #ifdef ENABLE_PYTHON
 	boost::python::object curPath = m_refPath;
 #endif // ENABLE_PYTHON
@@ -389,7 +401,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		else
 		{
 			// Notify AI we are at our goal
-			if( m_LastGoalStatus != CHS_ATGOAL )
+			if( LastGoalStatus != CHS_ATGOAL )
 			{
  				GetPath()->m_bSuccess = true;
 
@@ -409,7 +421,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		if( GetPath()->m_iGoalFlags & GF_NOCLEAR )
 		{
 			// Notify AI we lost our goal
-			if( m_LastGoalStatus == CHS_ATGOAL )
+			if( LastGoalStatus == CHS_ATGOAL )
 			{
 				GetPath()->m_bSuccess = false;
 
@@ -442,31 +454,6 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		);
 #endif // ENABLE_PYTHON
 	}
-
-	// Do not update last goal status in case the path changed.
-	// A new path will already set m_LastGoalStatus to something appropriate.
-#ifdef ENABLE_PYTHON
-	if( curPath == m_refPath )
-	{
-		if( unit_navigator_debug.GetBool() )
-		{
-			if( m_LastGoalStatus != GoalStatus )
-			{
-				DevMsg( "#%d UnitNavigator: Goal status changed from %d to %d (goalflags %d)\n", 
-					GetOuter()->entindex(), m_LastGoalStatus, GoalStatus, GetPath()->m_iGoalFlags );
-			}
-		}
-
-		m_LastGoalStatus = GoalStatus;
-	}
-	else
-#endif //ENABLE_PYTHON
-	{
-		if( unit_navigator_debug.GetBool() )
-			DevMsg( "#%d UnitNavigator: Goal changed during dispatching goal events. Not updating last goal status.\n", 
-				GetOuter()->entindex() );
-	}
-
 }
 
 //-----------------------------------------------------------------------------
