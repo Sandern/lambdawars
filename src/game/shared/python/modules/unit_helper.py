@@ -243,6 +243,9 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.add_property( 'testroutemask'
                          , cls.mem_fun('GetTestRouteMask')
                          , cls.mem_fun('SetTestRouteMask') )
+        cls.add_property( 'testrouteworldonly'
+                         , cls.mem_fun('GetTestRouteWorldOnly')
+                         , cls.mem_fun('SetTestRouteWorldOnly') )
         cls.add_property( 'usesimplifiedroutebuilding'
                          , cls.mem_fun('GetUseSimplifiedRouteBuilding')
                          , cls.mem_fun('SetUseSimplifiedRouteBuilding') )

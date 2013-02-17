@@ -35,12 +35,16 @@ public:
 	int GetTestRouteMask();
 	void SetTestRouteMask( int mask );
 
-	int GetUseSimplifiedRouteBuilding();
+	bool GetTestRouteWorldOnly();
+	void SetTestRouteWorldOnly( bool enable );
+
+	bool GetUseSimplifiedRouteBuilding();
 	void SetUseSimplifiedRouteBuilding( bool enable );
 
 private:
 	float m_fCurrentHeight;
 	int m_iTestRouteMask;
+	bool m_bTestRouteWorldOnly;
 	bool m_bUseSimplifiedRouteBuilding;
 };
 
@@ -60,7 +64,17 @@ inline void UnitBaseAirNavigator::SetTestRouteMask( int mask )
 	m_iTestRouteMask = mask;
 }
 
-inline int UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding()
+inline bool UnitBaseAirNavigator::GetTestRouteWorldOnly()
+{
+	return m_bTestRouteWorldOnly;
+}
+
+inline void UnitBaseAirNavigator::SetTestRouteWorldOnly( bool enable )
+{
+	m_bTestRouteWorldOnly = enable;
+}
+
+inline bool UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding()
 {
 	return m_bUseSimplifiedRouteBuilding;
 }

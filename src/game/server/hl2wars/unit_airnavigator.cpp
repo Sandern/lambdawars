@@ -21,6 +21,7 @@ UnitBaseAirNavigator::UnitBaseAirNavigator( boost::python::object outer )
 {
 	m_iTestRouteMask = MASK_NPCSOLID_BRUSHONLY;
 	m_bUseSimplifiedRouteBuilding = true;
+	m_bTestRouteWorldOnly = true;
 }
 #endif // ENABLE_PYTHON
 
@@ -80,12 +81,21 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 	Vector vEnd = vEndPos;
 	vEnd.z += m_fCurrentHeight;
 
-	//CTraceFilterSkipFriendly filter( GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), GetOuter() );
-	//CTraceFilterSimple filter( GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup() );
-	CTraceFilterWorldOnly filter;
 	trace_t tr;
-	UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-		&filter, &tr);
+
+	if( m_bTestRouteWorldOnly )
+	{
+		CTraceFilterWorldOnly filter;
+		UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
+			&filter, &tr);
+	}
+	else
+	{
+		CTraceFilterSimple filter( GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS );
+		UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
+			&filter, &tr);
+	}
+
 	//NDebugOverlay::Line( vStart, tr.endpos, 255, 0, 0,  true, 1.0f );
 	if( tr.DidHit() )
 		return false;
@@ -101,11 +111,20 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildLocalPath( const Vector &vGoalPos )
 	{
 		// Do a simple trace, always do this for air units
 		trace_t tr;
-		CTraceFilterWorldOnly filter;
-		UTIL_TraceHull( GetAbsOrigin(), vGoalPos, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-			&filter, &tr);
-		//UTIL_TraceHull(GetAbsOrigin()+Vector(0,0,16.0), vGoalPos+Vector(0,0,16.0), 
-		//	WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
+
+		if( m_bTestRouteWorldOnly )
+		{
+			CTraceFilterWorldOnly filter;
+			UTIL_TraceHull( GetAbsOrigin(), vGoalPos, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
+				&filter, &tr);
+		}
+		else
+		{
+			CTraceFilterSimple filter( GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS );
+			UTIL_TraceHull( GetAbsOrigin(), vGoalPos, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
+				&filter, &tr);
+		}
+
 		if( tr.DidHit() && (!GetPath()->m_hTarget || !tr.m_pEnt || tr.m_pEnt != GetPath()->m_hTarget) )
 			return NULL;
 

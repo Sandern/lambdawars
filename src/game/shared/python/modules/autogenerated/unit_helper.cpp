@@ -4446,9 +4446,20 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , fset( &::UnitBaseAirNavigator::SetTestRouteMask ) );
         
         }
+        { //property "testrouteworldonly"[fget=::UnitBaseAirNavigator::GetTestRouteWorldOnly, fset=::UnitBaseAirNavigator::SetTestRouteWorldOnly]
+        
+            typedef bool ( ::UnitBaseAirNavigator::*fget )(  ) ;
+            typedef void ( ::UnitBaseAirNavigator::*fset )( bool ) ;
+            
+            UnitBaseAirNavigator_exposer.add_property( 
+                "testrouteworldonly"
+                , fget( &::UnitBaseAirNavigator::GetTestRouteWorldOnly )
+                , fset( &::UnitBaseAirNavigator::SetTestRouteWorldOnly ) );
+        
+        }
         { //property "usesimplifiedroutebuilding"[fget=::UnitBaseAirNavigator::GetUseSimplifiedRouteBuilding, fset=::UnitBaseAirNavigator::SetUseSimplifiedRouteBuilding]
         
-            typedef int ( ::UnitBaseAirNavigator::*fget )(  ) ;
+            typedef bool ( ::UnitBaseAirNavigator::*fget )(  ) ;
             typedef void ( ::UnitBaseAirNavigator::*fset )( bool ) ;
             
             UnitBaseAirNavigator_exposer.add_property( 

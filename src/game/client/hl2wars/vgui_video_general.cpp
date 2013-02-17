@@ -258,7 +258,7 @@ void VideoGeneralPanel::SetCropVideo( float fCropLeft, float fCropRight, float f
 //-----------------------------------------------------------------------------
 void VideoGeneralPanel::Paint( void )
 {
-	BaseClass::Paint();
+	//BaseClass::Paint();
 
 	UpdateVideo();
 	
