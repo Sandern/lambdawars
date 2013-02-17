@@ -23,11 +23,11 @@ struct PS_INPUT
 float4 main( PS_INPUT i ) : COLOR
 {
 	float4 result = float4(0, 0, 0, 1.0);
-	float current = tex2D( FogOfWarSampler, i.vTexCoord0 ).r;
-	float target = tex2D( FogOfWarSampler_im, i.vTexCoord0 ).r;
-	float diff = clamp( target - current, -g_FowParams.r, g_FowParams.g );
+	float2 current = tex2D( FogOfWarSampler, i.vTexCoord0 ).rg;
+	float2 target = tex2D( FogOfWarSampler_im, i.vTexCoord0 ).rg;
+	float2 diff = clamp( target.rg - current.rg, -g_FowParams.r, g_FowParams.g );
 
-	if( current != target )
+	if( current.r != target.r || current.g != target.g )
 	{
 		/*
 		bool neighborvis = tex2D( FogOfWarSampler, i.vTexCoord0 + float2(g_FowParams.b, 0) ).r > 0.5f || 
@@ -45,11 +45,11 @@ float4 main( PS_INPUT i ) : COLOR
 		else if( target > current && neighbornotvis ) // Become visible
 			result.r = current + diff;
 		*/
-		result.r = current + diff;
+		result.rg = current + diff;
 	}
 	else
 	{
-		result.r = current;
+		result.rg = current.rg;
 	}
 
 	return result;

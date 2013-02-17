@@ -1367,6 +1367,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="floattoscreen.cpp" />
     <ClCompile Include="floattoscreen_vanilla.cpp" />
     <ClCompile Include="fogofwar.cpp" />
+    <ClCompile Include="fogofwar_cpe.cpp" />
     <ClCompile Include="fogofwar_im.cpp" />
     <ClCompile Include="gamecontrols.cpp" />
     <ClCompile Include="HDRCombineTo16Bit.cpp" />

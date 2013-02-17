@@ -25,7 +25,8 @@ float3 CalcFoW( const sampler FoWSampler, const float2 vFoWCoords, const float3 
 	float	vFoWResult = tex2D( FoWSampler, vFoWCoords.xy ).r;
 
 	float3	vGray = pow( dot( CurrentColor, g_FoWToGray ), FOW_GRAY_HILIGHTS );
-	float3	vFinalColor = ( vGray * FOW_GRAY_FACTOR	 * FOW_DARKNESS_VALUE ) + ( CurrentColor * FOW_COLOR_FACTOR * FOW_DARKNESS_VALUE );
+	float fDarknessValue = FOW_DARKNESS_VALUE - (0.35 - (0.35 * tex2D( FoWSampler, vFoWCoords.xy ).g));
+	float3	vFinalColor = ( vGray * FOW_GRAY_FACTOR	 * fDarknessValue ) + ( CurrentColor * FOW_COLOR_FACTOR * fDarknessValue );
 
 	return ( vFinalColor * ( 1.0 - vFoWResult ) ) + ( CurrentColor * vFoWResult );
 }

@@ -112,11 +112,15 @@ private:
 #ifdef CLIENT_DLL
 	void				UpdateTexture( bool bConverge, float fTime = 0.0f );
 	
-	void				BeginRenderFow( bool bStartShrouded = true );
+	void				BeginRenderFow( void );
 	void				RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, int n, int cx, int cy );
 	void				EndRenderFow();
 	void				RenderFowClear();
 	void				RenderFogOfWar( float frametime );
+
+	void				ResetExplored( void );
+	void				CopyExploredToRenderBuffer( CTextureReference &RenderBuffer );
+	void				CopyCurrentStateToExplored( void );
 #endif // CLIENT_DLL
 
 protected:
@@ -208,10 +212,11 @@ private:
 	CMaterialReference m_FOWMaterial;
 	CMaterialReference m_FOWImMaterial;
 	CMaterialReference m_FOWBlurMaterial;
+	CMaterialReference m_FOWExploredMaterial;
 	CTextureReference m_RenderBuffer;
 	CTextureReference m_RenderBufferBlur;
 	CTextureReference m_RenderBufferIM;
-
+	CTextureReference m_RenderBufferExplored;
 
 	CFOWTextureRegen *m_pTextureRegen;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWarTextureData;
@@ -275,15 +280,6 @@ inline void CFogOfWarMgr::ResetToUnknown( int iPlayerIndex )
 inline void CFogOfWarMgr::ResetToKnown( int iPlayerIndex )
 {
 	m_KnownEntities[iPlayerIndex].SetAll();
-}
-#else
-//-----------------------------------------------------------------------------
-// Purpose: Clears all
-//-----------------------------------------------------------------------------
-inline void CFogOfWarMgr::RenderFowClear()
-{
-	BeginRenderFow( false );
-	EndRenderFow();
 }
 #endif // CLIENT_DLL
 

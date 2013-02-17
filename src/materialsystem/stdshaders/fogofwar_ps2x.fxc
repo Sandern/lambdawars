@@ -28,7 +28,8 @@ float4 main( PS_INPUT i ) : COLOR
     float fowvalue = 1.0f - tex2D( FogOfWarSampler, i.vTexCoord0.xy ).r;
     
     result = float4(0.15, 0.15, 0.15, fowvalue);
-    result = ( result * FOW_GRAY_FACTOR	 * FOW_DARKNESS_VALUE ) + ( result * FOW_COLOR_FACTOR * FOW_DARKNESS_VALUE );
+    float fDarknessValue = FOW_DARKNESS_VALUE + (0.2 - (0.2 * tex2D( FogOfWarSampler, i.vTexCoord0.xy ).g));
+    result = ( result * FOW_GRAY_FACTOR	 * fDarknessValue ) + ( result * FOW_COLOR_FACTOR * fDarknessValue );
 
     return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
 #else

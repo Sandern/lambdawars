@@ -266,7 +266,7 @@ void CFogOfWarMgr::LevelInitPostEntity()
 	}
 
 #ifdef CLIENT_DLL
-	//UpdateTexture( false );
+	ResetExplored();
 #endif // CLIENT_DLL
 
 	UpdateVisibility();
@@ -658,6 +658,7 @@ void CFogOfWarMgr::AllocateFogOfWar()
 	m_FOWMaterial.Init("fow/fow", TEXTURE_GROUP_CLIENT_EFFECTS);
 	m_FOWImMaterial.Init("fow/fow_im", TEXTURE_GROUP_CLIENT_EFFECTS);
 	m_FOWBlurMaterial.Init("fow/fow_blur", TEXTURE_GROUP_CLIENT_EFFECTS);
+	m_FOWExploredMaterial.Init("fow/fow_cpe", TEXTURE_GROUP_CLIENT_EFFECTS);
 
 	static bool bFirstLoad = true;
 	if( !bFirstLoad )
@@ -750,6 +751,13 @@ void CFogOfWarMgr::InitRenderTargets( void )
 		fmt,
 		MATERIAL_RT_DEPTH_NONE,
 		fowFlags, 0 ) );
+	m_RenderBufferExplored.Init( materials->CreateNamedRenderTargetTextureEx2(
+		"__rt_fow_explored",
+		iSize, iSize,
+		RT_SIZE_NO_CHANGE,
+		fmt,
+		MATERIAL_RT_DEPTH_NONE,
+		fowFlags, 0 ) );
 
 #endif // FOW_USE_PROCTEX
 }
@@ -760,6 +768,7 @@ void CFogOfWarMgr::ShutdownRenderTargets( void )
 	m_RenderBuffer.Shutdown();
 	m_RenderBufferBlur.Shutdown();
 	m_RenderBufferIM.Shutdown();
+	m_RenderBufferExplored.Shutdown();
 #endif // FOW_USE_PROCTEX
 }
 
@@ -896,6 +905,9 @@ void CFogOfWarMgr::UpdateTexture( bool bConverge, float fTime )
 }
 #endif
 
+//-----------------------------------------------------------------------------
+// Purpose: Helper function for setting a material var
+//-----------------------------------------------------------------------------
 static inline bool SetMaterialVarFloat( IMaterial* pMat, const char* pVarName, float flValue )
 {
 	Assert( pMat != NULL );
@@ -1006,12 +1018,23 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 	render->PopView( m_Frustum );
 
 	pRenderContext.SafeRelease();
+
+	// Store last explored state
+	if( sv_fogofwar.GetBool() )
+		CopyCurrentStateToExplored();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Clears all
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::RenderFowClear()
+{
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Start rendering the fow state to a render target
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
+void CFogOfWarMgr::BeginRenderFow( void )
 {
 	VPROF_BUDGET( "CFogOfWarMgr::BeginRenderFow", VPROF_BUDGETGROUP_FOGOFWAR );
 
@@ -1028,6 +1051,9 @@ void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 		Msg("RenderFogOfWar: No fow data\n");
 		return;
 	}
+
+	if( sv_fogofwar.GetBool() ) 
+		CopyExploredToRenderBuffer( m_RenderBufferIM );
 
 	int iFOWRenderSize = m_RenderBuffer->GetActualWidth();
 
@@ -1053,14 +1079,6 @@ void CFogOfWarMgr::BeginRenderFow( bool bStartShrouded )
 
 	pRenderContext->SetRenderTarget( m_RenderBufferIM );
 	pRenderContext->Viewport(0,0,m_RenderBufferIM->GetActualWidth(), m_RenderBufferIM->GetActualHeight());
-
-	// Render fog of war
-	if( bStartShrouded )
-		pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); // Default to shrouded
-	else
-		pRenderContext->ClearColor4ub( 255, 255, 255, 255 ); // Cleared
-
-	pRenderContext->ClearBuffers( true, false );
 
 	pRenderContext.SafeRelease();
 
@@ -1102,6 +1120,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 	wcx = cx * (iFOWRenderSize / (float)m_nGridSize);
 	wcy = cy * (iFOWRenderSize / (float)m_nGridSize);
 
+	int iPackedColor = meshBuilder.PackColor4( 255, 255, 255, 255 );
+
 	for( int j = 0; j < DrawPoints.Count(); j++ )
 	{
 		CUtlVector< FowPos_t > &DrawList = DrawPoints[j];
@@ -1115,12 +1135,12 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 
 			meshBuilder.Position3f( wx, wy, 0.0f );
 			meshBuilder.TexCoord2f( 0, 0.0f, 0.0f );
-			meshBuilder.Color4ub( 255, 255, 255, 255 );
+			meshBuilder.Color4Packed( iPackedColor );
 			meshBuilder.AdvanceVertex();
 
 			meshBuilder.Position3f( wcx, wcy, 0.0f );
 			meshBuilder.TexCoord2f( 0, 0.0f, 0.0f );
-			meshBuilder.Color4ub( 255, 255, 255, 255 );
+			meshBuilder.Color4Packed( iPackedColor );
 			meshBuilder.AdvanceVertex();
 		}
 	}
@@ -1197,6 +1217,125 @@ void CFogOfWarMgr::EndRenderFow()
 
 	m_bRenderingFOW = false;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::ResetExplored( void )
+{
+	if( !m_RenderBufferExplored.IsValid() )
+		return;
+
+	CMatRenderContextPtr pRenderContext( materials );
+
+	int iFOWRenderSize = m_RenderBufferExplored->GetActualWidth();
+
+	// Setup view
+	CViewSetup setup;
+	setup.x = setup.y = 0;
+	setup.width = iFOWRenderSize;
+	setup.height = iFOWRenderSize;
+	setup.m_bOrtho = false;
+	setup.m_flAspectRatio = 1;
+	setup.fov = 90;
+	setup.zFar = 9999;
+	setup.zNear = 10;
+
+	// Setup view and render target
+	render->Push2DView( setup, 0, m_RenderBufferExplored, m_Frustum );
+
+	pRenderContext->PushRenderTargetAndViewport();
+
+	pRenderContext->SetRenderTarget( m_RenderBufferExplored );
+
+	pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); // Make everything shrouded
+	pRenderContext->ClearBuffers( true, false );
+
+	pRenderContext->PopRenderTargetAndViewport();
+
+	render->PopView( m_Frustum );
+
+	pRenderContext.SafeRelease();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::CopyExploredToRenderBuffer( CTextureReference &RenderBuffer )
+{
+	CMatRenderContextPtr pRenderContext( materials );
+
+	int iFOWRenderSize = m_RenderBufferExplored->GetActualWidth();
+
+	// Setup view
+	CViewSetup setup;
+	setup.x = setup.y = 0;
+	setup.width = iFOWRenderSize;
+	setup.height = iFOWRenderSize;
+	setup.m_bOrtho = false;
+	setup.m_flAspectRatio = 1;
+	setup.fov = 90;
+	setup.zFar = 9999;
+	setup.zNear = 10;
+
+	// Setup view and render target
+	render->Push2DView( setup, 0, m_RenderBufferExplored, m_Frustum );
+
+	pRenderContext->PushRenderTargetAndViewport();
+
+	pRenderContext->SetRenderTarget( m_RenderBufferExplored );
+
+	pRenderContext->CopyRenderTargetToTextureEx( RenderBuffer, 0, NULL, NULL );
+
+	pRenderContext->PopRenderTargetAndViewport();
+
+	render->PopView( m_Frustum );
+
+	pRenderContext.SafeRelease();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::CopyCurrentStateToExplored( void )
+{
+	CMatRenderContextPtr pRenderContext( materials );
+
+	int iFOWRenderSize = m_RenderBufferExplored->GetActualWidth();
+
+	// Setup view
+	CViewSetup setup;
+	setup.x = setup.y = 0;
+	setup.width = iFOWRenderSize;
+	setup.height = iFOWRenderSize;
+	setup.m_bOrtho = false;
+	setup.m_flAspectRatio = 1;
+	setup.fov = 90;
+	setup.zFar = 9999;
+	setup.zNear = 10;
+
+	int nSrcWidth = m_RenderBufferExplored->GetActualWidth();
+	int nSrcHeight = m_RenderBufferExplored->GetActualHeight();
+
+	// Setup view and render target
+	render->Push2DView( setup, 0, m_RenderBufferExplored, m_Frustum );
+
+	pRenderContext->PushRenderTargetAndViewport();
+
+	pRenderContext->SetRenderTarget( m_RenderBufferExplored );
+
+	pRenderContext->DrawScreenSpaceRectangle(
+		m_FOWExploredMaterial, 0, 0, nSrcWidth, nSrcHeight,
+		0, 0, m_RenderBufferExplored->GetActualWidth()-1, m_RenderBufferExplored->GetActualHeight()-1,
+		m_RenderBufferExplored->GetActualWidth(), m_RenderBufferExplored->GetActualHeight() );
+
+	pRenderContext->PopRenderTargetAndViewport();
+
+	render->PopView( m_Frustum );
+
+	pRenderContext.SafeRelease();
+}
+
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
