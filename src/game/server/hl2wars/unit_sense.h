@@ -58,6 +58,7 @@ public:
 
 	CBaseEntity *GetNearestOther();
 	CBaseEntity *GetNearestEnemy();
+	CBaseEntity *GetNearestFriendly();
 
 private:
 	int 			LookForUnits( int iDistance );
@@ -74,6 +75,7 @@ private:
 	CUtlVector<SeenObject_t> m_SeenEnemies;
 	CUtlVector<SeenObject_t> m_SeenOther;
 	EHANDLE m_NearestEnemy; // Cache nearest enemy while sensing
+	EHANDLE m_NearestFriendly; // Cache nearest friendly while sensing
 
 	bool m_bUseLimitedViewCone;
 	float m_fViewCone;
@@ -136,6 +138,11 @@ inline CBaseEntity *UnitBaseSense::GetEnemy( int idx )
 inline CBaseEntity *UnitBaseSense::GetNearestEnemy()
 {
 	return m_NearestEnemy;
+}
+
+inline CBaseEntity *UnitBaseSense::GetNearestFriendly()
+{
+	return m_NearestFriendly;
 }
 
 inline CBaseEntity *UnitBaseSense::GetOther( int idx )

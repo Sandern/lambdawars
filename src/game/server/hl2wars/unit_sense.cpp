@@ -112,6 +112,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	CBaseEntity *pEntOther;
 
 	float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
+	float fBestFriendlyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
 	int iAttackPriority, iBestAttackPriority;
 
 	m_NearestEnemy = NULL;
@@ -137,7 +138,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		if( !TestEntity( pOther ) || !TestUnit( pOther ) )
 			continue;
 
-		if( m_pOuter->IRelationType( pOther ) == D_HT )
+		Disposition_t relation = m_pOuter->IRelationType( pOther );
+		if( relation == D_HT )
 		{
 			m_SeenEnemies.AddToTail();
 			m_SeenEnemies.Tail().entity = pOther;
@@ -158,6 +160,16 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			m_SeenOther.AddToTail();
 			m_SeenOther.Tail().entity = pOther;
 			m_SeenOther.Tail().distancesqr = otherDist;
+
+			// Test if nearest friendly
+			if( relation == D_LI )
+			{
+				if( otherDist < fBestFriendlyDist )
+				{
+					fBestFriendlyDist = otherDist;
+					m_NearestFriendly = pOther;
+				}
+			}
 		}
 	}
 
@@ -174,7 +186,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		if( otherDist > distSqr )
 			continue;
 
-		if( m_pOuter->IRelationType( pFuncOther ) == D_HT )
+		Disposition_t relation = m_pOuter->IRelationType( pOther );
+		if( relation == D_HT )
 		{
 			m_SeenEnemies.AddToTail();
 			m_SeenEnemies.Tail().entity = pFuncOther;
@@ -195,6 +208,16 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			m_SeenOther.AddToTail();
 			m_SeenOther.Tail().entity = pFuncOther;
 			m_SeenOther.Tail().distancesqr = otherDist;
+
+			// Test if nearest friendly
+			if( relation == D_LI )
+			{
+				if( otherDist < fBestFriendlyDist )
+				{
+					fBestFriendlyDist = otherDist;
+					m_NearestFriendly = pFuncOther;
+				}
+			}
 		}
 	}
 

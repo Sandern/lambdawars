@@ -4594,6 +4594,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::UnitBaseSense::GetNearestFriendly
+        
+            typedef ::CBaseEntity * ( ::UnitBaseSense::*GetNearestFriendly_function_type )(  ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "GetNearestFriendly"
+                , GetNearestFriendly_function_type( &::UnitBaseSense::GetNearestFriendly )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::UnitBaseSense::GetNearestOther
         
             typedef ::CBaseEntity * ( ::UnitBaseSense::*GetNearestOther_function_type )(  ) ;

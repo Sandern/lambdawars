@@ -278,6 +278,7 @@ class UnitHelper(GenerateModuleSemiShared):
         
         cls.mem_funs('GetNearestOther').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         cls.mem_funs('GetNearestEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        cls.mem_funs('GetNearestFriendly').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
         cls.vars('m_fSenseDistance').rename('sensedistance')
         cls.vars('m_fSenseRate').rename('senserate')

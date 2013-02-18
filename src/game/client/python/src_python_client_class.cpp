@@ -197,7 +197,7 @@ void PyResetAllNetworkTables()
 	}
 }
 
-IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_type, int entnum, int serialNum)
+IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_type, int entnum, int serialNum )
 {
 	try	
 	{						
