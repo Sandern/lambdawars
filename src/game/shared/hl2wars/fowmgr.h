@@ -122,6 +122,8 @@ private:
 
 	void				CopyExploredToRenderBuffer( CTextureReference &RenderBuffer );
 	void				CopyCurrentStateToExplored( void );
+
+	void				ClearRenderBuffer( CTextureReference &RenderBuffer );
 #endif // CLIENT_DLL
 
 protected:

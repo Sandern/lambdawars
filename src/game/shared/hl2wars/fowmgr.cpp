@@ -1018,10 +1018,6 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 	render->PopView( m_Frustum );
 
 	pRenderContext.SafeRelease();
-
-	// Store last explored state
-	if( sv_fogofwar.GetBool() )
-		CopyCurrentStateToExplored();
 }
 
 //-----------------------------------------------------------------------------
@@ -1215,6 +1211,10 @@ void CFogOfWarMgr::EndRenderFow()
 
 	render->PopView( m_Frustum );
 
+	// Store last explored state
+	if( sv_fogofwar.GetBool() )
+		CopyCurrentStateToExplored();
+
 	m_bRenderingFOW = false;
 }
 
@@ -1226,9 +1226,19 @@ void CFogOfWarMgr::ResetExplored( void )
 	if( !m_RenderBufferExplored.IsValid() )
 		return;
 
+	ClearRenderBuffer( m_RenderBufferExplored );
+
+	ClearRenderBuffer( m_RenderBufferIM );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::ClearRenderBuffer( CTextureReference &RenderBuffer )
+{
 	CMatRenderContextPtr pRenderContext( materials );
 
-	int iFOWRenderSize = m_RenderBufferExplored->GetActualWidth();
+	int iFOWRenderSize = RenderBuffer->GetActualWidth();
 
 	// Setup view
 	CViewSetup setup;
@@ -1242,11 +1252,11 @@ void CFogOfWarMgr::ResetExplored( void )
 	setup.zNear = 10;
 
 	// Setup view and render target
-	render->Push2DView( setup, 0, m_RenderBufferExplored, m_Frustum );
+	render->Push2DView( setup, 0, RenderBuffer, m_Frustum );
 
 	pRenderContext->PushRenderTargetAndViewport();
 
-	pRenderContext->SetRenderTarget( m_RenderBufferExplored );
+	pRenderContext->SetRenderTarget( RenderBuffer );
 
 	pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); // Make everything shrouded
 	pRenderContext->ClearBuffers( true, false );
