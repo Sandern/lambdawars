@@ -53,7 +53,10 @@ BOOST_PYTHON_MODULE(_fow){
         .def( 
             "ModifyHeightAtTile"
             , (void ( ::CFogOfWarMgr::* )( int,int,float ) )( &::CFogOfWarMgr::ModifyHeightAtTile )
-            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight") ) );
+            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight") ) )    
+        .def( 
+            "ResetExplored"
+            , (void ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::ResetExplored ) );
 
     { //::FogOfWarMgr
     

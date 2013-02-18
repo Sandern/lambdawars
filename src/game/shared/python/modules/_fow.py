@@ -48,6 +48,8 @@ class FOW(GenerateModuleSemiShared):
         
         if self.isServer:
             cls.mem_fun('PointInFOW').include()
+        if self.isClient:
+            cls.mem_fun('ResetExplored').include()
                 
         mb.free_function('FogOfWarMgr').include()
         mb.free_function('FogOfWarMgr').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )

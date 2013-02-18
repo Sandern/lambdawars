@@ -105,6 +105,8 @@ public: // CBaseGameSystem overrides
 
 	virtual bool		NeedsUpdate();
 
+	void				ResetExplored( void );
+
 private:
 	void				AllocateFogOfWar();
 	void				DeallocateFogOfWar();
@@ -118,7 +120,6 @@ private:
 	void				RenderFowClear();
 	void				RenderFogOfWar( float frametime );
 
-	void				ResetExplored( void );
 	void				CopyExploredToRenderBuffer( CTextureReference &RenderBuffer );
 	void				CopyCurrentStateToExplored( void );
 #endif // CLIENT_DLL
