@@ -1227,8 +1227,6 @@ void CFogOfWarMgr::ResetExplored( void )
 		return;
 
 	ClearRenderBuffer( m_RenderBufferExplored );
-
-	ClearRenderBuffer( m_RenderBufferIM );
 }
 
 //-----------------------------------------------------------------------------
