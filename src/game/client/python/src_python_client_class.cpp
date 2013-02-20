@@ -427,6 +427,8 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	msg.ReadString(clientClass, PYNETCLS_BUFSIZE);
 	msg.ReadString(networkName, PYNETCLS_BUFSIZE);
 
+	DbgStrPyMsg( "__MsgFunc_PyNetworkCls: Registering Python network class message %d %s %s\n", iType, clientClass, networkName );
+
 	// Get module path
 	const char *pch = Q_strrchr( networkName, '.' );
 	if( !pch )
@@ -436,14 +438,13 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	}
 	int n = pch - networkName + 1;
 
-	char modulePath[MAX_PATH];
+	char modulePath[PYNETCLS_BUFSIZE];
 	Q_strncpy( modulePath, networkName, n );
 
 	// Make sure the client class is imported
 	SrcPySystem()->Import( modulePath );
 
 	// Read which client class we are modifying
-	//Msg("Incoming python network class message %s\n", clientClass);
 	PyClientClassBase *p = FindPyClientClass( clientClass );
 	if( !p )
 	{
@@ -464,6 +465,10 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	{
 		m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );
 	}
+	else
+	{
+		Warning( "__MsgFunc_PyNetworkCls: Invalid networked class %s\n", networkName );
+	}
 }
 
 // register message handler once
@@ -479,7 +484,8 @@ void HookPyNetworkCls()
 CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 {
 	int iType = atoi(args[1]);
-	//Msg("register_py_class: Incoming python network class message %d %s %s\n", iType, args[2], args[3]);
+
+	DbgStrPyMsg( "register_py_class: Registering Python network class message %d %s %s\n", iType, args[2], args[3] );
 
 	// Get module path
 	const char *pch = Q_strrchr( args[3], '.' );
@@ -490,7 +496,7 @@ CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 	}
 	int n = pch - args[3] + 1;
 
-	char modulePath[MAX_PATH];
+	char modulePath[PYNETCLS_BUFSIZE];
 	Q_strncpy( modulePath, args[3], n );
 	//Msg("Module path: %s\n", modulePath );
 
@@ -513,6 +519,10 @@ CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 	if ( lookup != m_NetworkClassDatabase.InvalidIndex() )
 	{
 		m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );
+	}
+	else
+	{
+		Warning( "register_py_class: Invalid networked class %s\n", args[3] );
 	}
 }
 
