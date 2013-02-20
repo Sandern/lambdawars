@@ -66,8 +66,7 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 // Purpose: Client App
 //-----------------------------------------------------------------------------
 class ClientApp : public CefApp,
-					public CefBrowserProcessHandler,
-					public CefProxyHandler
+					public CefBrowserProcessHandler
 {
 public:
 	ClientApp();

@@ -47,7 +47,8 @@ extern "C" {
 
 ///
 // Implement this structure to handle events related to browser life span. The
-// functions of this structure will be called on the UI thread.
+// functions of this structure will be called on the UI thread unless otherwise
+// indicated.
 ///
 typedef struct _cef_life_span_handler_t {
   ///
@@ -56,22 +57,23 @@ typedef struct _cef_life_span_handler_t {
   cef_base_t base;
 
   ///
-  // Called before a new popup window is created. The |parentBrowser| parameter
-  // will point to the parent browser window. The |popupFeatures| parameter will
-  // contain information about the style of popup window requested. Return false
-  // (0) to have the framework create the new popup window based on the
-  // parameters in |windowInfo|. Return true (1) to cancel creation of the popup
-  // window. By default, a newly created popup window will have the same client
-  // and settings as the parent window. To change the client for the new window
-  // modify the object that |client| points to. To change the settings for the
-  // new window modify the |settings| structure.
-  ///
+  // Called on the IO thread before a new popup window is created. The |browser|
+  // and |frame| parameters represent the source of the popup request. The
+  // |target_url| and |target_frame_name| values may be NULL if none were
+  // specified with the request. The |popupFeatures| structure contains
+  // information about the requested popup window. To allow creation of the
+  // popup window optionally modify |windowInfo|, |client|, |settings| and
+  // |no_javascript_access| and return false (0). To cancel creation of the
+  // popup window return true (1). The |client| and |settings| values will
+  // default to the source browser's values. The |no_javascript_access| value
+  // indicates whether the new browser window should be scriptable and in the
+  // same process as the source browser.
   int (CEF_CALLBACK *on_before_popup)(struct _cef_life_span_handler_t* self,
-      struct _cef_browser_t* parentBrowser,
+      struct _cef_browser_t* browser, struct _cef_frame_t* frame,
+      const cef_string_t* target_url, const cef_string_t* target_frame_name,
       const struct _cef_popup_features_t* popupFeatures,
-      struct _cef_window_info_t* windowInfo, const cef_string_t* url,
-      struct _cef_client_t** client,
-      struct _cef_browser_settings_t* settings);
+      struct _cef_window_info_t* windowInfo, struct _cef_client_t** client,
+      struct _cef_browser_settings_t* settings, int* no_javascript_access);
 
   ///
   // Called after a new window is created.

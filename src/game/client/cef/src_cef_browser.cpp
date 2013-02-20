@@ -318,7 +318,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	
 	// Browser settings
     CefBrowserSettings settings;
-	settings.web_security_disabled = true;
+	settings.web_security = STATE_DISABLED;
 
     // Creat the new child browser window
 	if( g_debug_cef.GetBool() )
