@@ -90,10 +90,8 @@ namespace bp = boost::python;
 //-----------------------------------------------------------------------------
 PyServerClass::PyServerClass(char *pNetworkName) : ServerClass(pNetworkName, NULL), m_pNetworkedClass(NULL)
 {
-	// Create send props
 	m_pTable = &(DT_BaseEntity::g_SendTable); // Default
 
-	// Link it in
 	m_pPyNext				= g_pPyServerClassHead;
 	g_pPyServerClassHead	= this;
 	m_bFree = true;
@@ -198,6 +196,7 @@ NetworkedClass::NetworkedClass( const char *pNetworkName, boost::python::object 
 	m_pNetworkName = strdup( pNetworkName );
 	m_pServerClass = NULL;
 	PyServerClass *p;
+
 	// See if there is already an entity with this network name
 	unsigned short lookup = m_ServerClassInfoDatabase.Find( pNetworkName );
 	if ( lookup != m_ServerClassInfoDatabase.InvalidIndex() )
@@ -214,14 +213,13 @@ NetworkedClass::NetworkedClass( const char *pNetworkName, boost::python::object 
 	}
 	else
 	{
-		// Find a free one
+		// Find a free server class and add it to the database
 		p = FindFreePyServerClass();
 		if( !p ) {
 			Warning("Couldn't create PyServerClass %s: Out of free PyServerClasses\n", pNetworkName);
 			return;
 		}
 
-		// Add to database
 		lookup = m_ServerClassInfoDatabase.Insert(pNetworkName, p->GetName());
 	}
 
@@ -235,19 +233,15 @@ NetworkedClass::NetworkedClass( const char *pNetworkName, boost::python::object 
 
 NetworkedClass::~NetworkedClass()
 {
-	//Msg("Destroying old server networked class %s (%d)\n", m_pNetworkName, m_pServerClass);
 	if( m_pServerClass )
 	{
-		//if( m_pServerClass->m_pNetworkedClass == this )
-		{
-			m_pServerClass->m_bFree = true;
-			m_pServerClass->SetupServerClass(PN_NONE);
+		m_pServerClass->m_bFree = true;
+		m_pServerClass->SetupServerClass(PN_NONE);
 
-			unsigned short lookup = m_ServerClassInfoDatabase.Find( m_pNetworkName );
-			if ( lookup != m_ServerClassInfoDatabase.InvalidIndex() )
-			{
-				m_ServerClassInfoDatabase.Remove( m_pNetworkName );
-			}
+		unsigned short lookup = m_ServerClassInfoDatabase.Find( m_pNetworkName );
+		if ( lookup != m_ServerClassInfoDatabase.InvalidIndex() )
+		{
+			m_ServerClassInfoDatabase.Remove( m_pNetworkName );
 		}
 	}
 
@@ -256,15 +250,17 @@ NetworkedClass::~NetworkedClass()
 }
 
 extern edict_t *g_pForceAttachEdict;
+
 void NetworkedClass::SetupServerClass()
 {
 	int iType = PN_NONE;
-	try {
-		//Msg("Networktype for %s is: %d\n", pNetworkName, boost::python::call_method<int>(cls_type.ptr(), "GetPyNetworkType") );
+	try 
+	{
 		iType = boost::python::call_method<int>(m_PyClass.ptr(), "GetPyNetworkType");
 		m_pServerClass->SetupServerClass( iType );
 		PyObject_SetAttrString(m_PyClass.ptr(), "pyServerClass", bp::object(bp::ptr((ServerClass *)m_pServerClass)).ptr());
-	} catch(bp::error_already_set &) {
+	} catch(bp::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 	}
@@ -290,13 +286,10 @@ void FullClientUpdatePyNetworkCls( CBasePlayer *pPlayer )
 void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 {
 	if( !SrcPySystem()->IsPythonRunning() )
-	{
-		//Msg("FullClientUpdatePyNetworkClsByFilter: Python is not running\n");
 		return;
-	}
 
-	//Msg("FullClientUpdatePyNetworkClsByFilter: %d\n", g_SetupNetworkTablesOnHold);
 	Assert(g_SetupNetworkTablesOnHold == false);
+
 	// Send messages about each server class
 	PyServerClass *p = g_pPyServerClassHead;
 	while( p )
@@ -313,7 +306,6 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 		WRITE_STRING(p->m_pNetworkedClass->m_pNetworkName);
 		MessageEnd();
 
-		// Next
 		p = p->m_pPyNext;
 	}
 }
@@ -322,12 +314,12 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 {
 	if( !SrcPySystem()->IsPythonRunning() )
 	{
-		Msg("FullClientUpdatePyNetworkClsByEdict: Python is not running\n");
+		DevMsg("FullClientUpdatePyNetworkClsByEdict: Python is not running\n");
 		return;
 	}
 
-	//Msg("FullClientUpdatePyNetworkClsByEdict: %d\n", g_SetupNetworkTablesOnHold);
 	Assert(g_SetupNetworkTablesOnHold == false);
+
 	// Send messages about each server class
 	PyServerClass *p = g_pPyServerClassHead;
 	while( p )
@@ -338,12 +330,10 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 		}
 
 		// Send message
-		//Msg("Sending update: %d %s %s\n", p->m_iType, p->m_pNetworkName );
 		engine->ClientCommand( pEdict, "rpc %d %s %s\n", p->m_iType,
 			p->m_pNetworkName, p->m_pNetworkedClass->m_pNetworkName);
 		engine->ServerExecute(); // Send immediately to avoid an overflow when having too many
 
-		// Next
 		p = p->m_pPyNext;
 	}
 }
@@ -395,8 +385,6 @@ bool SetupNetworkTablesRelease()
 		info.ent->edict()->m_pNetworkable = info.ent->NetworkProp();
 		info.ent->SetTransmitState(FL_FULL_EDICT_CHANGED|FL_EDICT_DIRTY_PVS_INFORMATION);
 		info.ent->DispatchUpdateTransmitState();
-		//DispatchSpawn(info.ent);
-		//info.ent->Activate();
 	}
 	g_SetupNetworkTablesOnHoldList.RemoveAll();
 	return true;

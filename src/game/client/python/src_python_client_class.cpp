@@ -200,8 +200,7 @@ void PyResetAllNetworkTables()
 IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_type, int entnum, int serialNum )
 {
 	try	
-	{						
-		//Msg("Spawning %s class\n", PyString_AsString(bp::str(cls_type).ptr()));
+	{
 		boost::python::object inst = cls_type();
 		C_BaseEntity *pRet = boost::python::extract<C_BaseEntity *>(inst);
 		if( !pRet ) {
@@ -315,7 +314,7 @@ PyClientClassBase *FindPyClientClassToNetworkClass( const char *pNetworkName )
 	return NULL;
 }
 
-void CheckEntities(PyClientClassBase *pCC, boost::python::object pyClass )
+void CheckEntities( PyClientClassBase *pCC, boost::python::object pyClass )
 {
 	int iHighest = ClientEntityList().GetHighestEntityIndex();
 	for ( int i=0; i <= iHighest; i++ )
@@ -498,7 +497,6 @@ CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 
 	char modulePath[PYNETCLS_BUFSIZE];
 	Q_strncpy( modulePath, args[3], n );
-	//Msg("Module path: %s\n", modulePath );
 
 	SrcPySystem()->Import( modulePath );
 	PyClientClassBase *p = FindPyClientClass(args[2]);
