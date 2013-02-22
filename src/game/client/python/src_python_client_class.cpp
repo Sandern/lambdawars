@@ -1,4 +1,4 @@
-//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Represents a Python Network class.
 //			A large number of static empty classes are initialized to get around

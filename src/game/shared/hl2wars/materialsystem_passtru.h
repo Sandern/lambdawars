@@ -1,4 +1,4 @@
-//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Implementation of IMaterialSystem interface which "passes tru" all 
 //			function calls to the real interface. Can be used to override

@@ -1,4 +1,4 @@
-//====== Copyright © 2007-2012 Sandern Corporation, All rights reserved. ======//
+//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Two safe wrappers for IPhysicObject in python
 //			One bound to the lifetime to an entity (used with VGetPhysicObject())

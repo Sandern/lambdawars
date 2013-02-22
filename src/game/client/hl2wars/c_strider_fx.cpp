@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: 
 //
