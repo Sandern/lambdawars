@@ -1,4 +1,4 @@
-//====== Copyright 20xx, Sander Corporation, All rights reserved. =======
+//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: 
 //
