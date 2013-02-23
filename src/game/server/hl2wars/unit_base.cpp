@@ -614,6 +614,61 @@ void CUnitBase::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: LOS tracing filter for units
+//-----------------------------------------------------------------------------
+class CUnitLOSFilter : public CTraceFilterSkipTwoEntities
+{
+	DECLARE_CLASS( CUnitLOSFilter, CTraceFilterSkipTwoEntities );
+public:
+	CUnitLOSFilter( IHandleEntity *pHandleEntity, IHandleEntity *pHandleEntity2, int collisionGroup ) :
+	  CTraceFilterSkipTwoEntities( pHandleEntity, pHandleEntity2, collisionGroup ), m_pVehicle( NULL )
+	{
+		// If the tracing entity is in a vehicle, then ignore it
+		if ( pHandleEntity != NULL )
+		{
+			CBaseCombatCharacter *pBCC = ((CBaseEntity *)pHandleEntity)->MyCombatCharacterPointer();
+			if ( pBCC != NULL )
+			{
+				m_pVehicle = pBCC->GetVehicleEntity();
+			}
+		}
+	}
+	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
+	{
+		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
+		if ( !pEntity )
+			return false;
+
+		if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
+			return false;
+
+		// Don't collide with the tracing entity's vehicle (if it exists)
+		if ( pServerEntity == m_pVehicle )
+			return false;
+
+		/*if ( pEntity->GetHealth() > 0 )
+		{
+			CBreakable *pBreakable = dynamic_cast<CBreakable *>(pEntity);
+			if ( pBreakable  && pBreakable->IsBreakable() && pBreakable->GetMaterialType() == matGlass)
+			{
+				return false;
+			}
+		}*/
+
+		if( !BaseClass::ShouldHitEntity( pServerEntity, contentsMask ) )
+			return false;
+
+		if( !pEntity->BlocksLOS() )
+			return false;
+
+		return true;
+	}
+
+private:
+	CBaseEntity *m_pVehicle;
+};
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
@@ -625,7 +680,7 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 	else
 	{
 		trace_t result;
-		CTraceFilterNoNPCsOrPlayer traceFilter( this, COLLISION_GROUP_NONE );
+		CUnitLOSFilter traceFilter( this, GetEnemy(), GetCollisionGroup() );
 		UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &traceFilter, &result );
 		if( g_debug_rangeattacklos.GetBool() )
 			NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );

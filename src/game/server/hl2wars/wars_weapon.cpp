@@ -163,14 +163,6 @@ public:
 			}
 		}*/
 
-#if 0
-		CBaseEntity *pOwner = (CBaseEntity *)EntityFromEntityHandle( GetPassEntity() );
-		IUnit *pUnit = pEntity->GetIUnit();
-		if( pUnit && pOwner && pUnit->AreAttacksPassable( pOwner ) )
-		{
-			return false;
-		}
-#endif // 0
 		if( !BaseClass::ShouldHitEntity( pServerEntity, contentsMask ) )
 			return false;
 
