@@ -15,6 +15,7 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+DEFINE_FALLBACK_SHADER( GlobalLitSimple, VertexLitGeneric )
 
 BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 	BEGIN_SHADER_PARAMS
