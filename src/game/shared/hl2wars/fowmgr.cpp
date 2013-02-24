@@ -1116,6 +1116,13 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 	wcx = cx * (iFOWRenderSize / (float)m_nGridSize);
 	wcy = cy * (iFOWRenderSize / (float)m_nGridSize);
 
+	if( nDebug > 0 )
+	{
+		Vector vCenterPos = ComputeWorldPosition(cx, cy);
+		vCenterPos.z = s_FOWDebugHeight;
+		NDebugOverlay::Box( vCenterPos, -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 120, 0.2f );
+	}
+
 	int iPackedColor = meshBuilder.PackColor4( 255, 255, 255, 255 );
 
 	for( int j = 0; j < DrawPoints.Count(); j++ )
@@ -1767,7 +1774,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 #ifdef CLIENT_DLL
 	m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;
 
-	s_FOWDebugHeight = pEnt->GetAbsOrigin().z;
+	s_FOWDebugHeight = iEyeZ;
 
 	int n = 0;
 	CUtlVector< CUtlVector< FowPos_t > > DrawPoints;
