@@ -725,8 +725,9 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 		{
 
 			if( Q_strncmp(pFilename, ".", 1) != 0 &&
-					Q_strncmp(pFilename, "..", 2) != 0 &&
-					filesystem->FindIsDirectory(findHandle) ) {
+				Q_strncmp(pFilename, "..", 2) != 0 &&
+				filesystem->FindIsDirectory(findHandle) ) 
+			{
 				char path2[MAX_PATH];
 				Q_snprintf( path2, sizeof( path2 ), "%s//%s", path, pFilename );
 				SysAppendPath(path2, inclsubdirs);
