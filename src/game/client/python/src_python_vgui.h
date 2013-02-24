@@ -465,6 +465,7 @@ public:
 	//inline void DrawTexturedRectEx( DrawTexturedRectParms_t *pDrawParms )  { return surface()->DrawTexturedRectEx( pDrawParms ); }
 
 	void SetProxyUITeamColor( const Vector &vTeamColor );
+	void ClearProxyUITeamColor( void );
 
 };
 

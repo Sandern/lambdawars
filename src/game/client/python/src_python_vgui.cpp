@@ -428,6 +428,13 @@ bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, cons
 						entry.method( *((Panel *)param1->GetPtr()) );
 						break;
 					}
+					else
+					{
+						char buf[512];
+						Q_snprintf( buf, 512, "DATATYPE_PTR: vgui python message function with argument name %s unsupported", entry.firstParamName );
+						PyErr_SetString(PyExc_Exception, buf);
+						throw boost::python::error_already_set(); 
+					}
 
 				default:
 					//Assert(!("No handler for vgui message function"));
@@ -456,7 +463,19 @@ bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, cons
 				}
 				else if ( (DATATYPE_PTR == entry.firstParamType) && (DATATYPE_INT == entry.secondParamType) )
 				{
-					entry.method( param1->GetInt(), param2->GetInt() );
+					if (!stricmp(entry.firstParamName, "panel"))
+					{
+						// Use this as a special case. Always assume 'panel' is a Panel
+						entry.method( *((Panel *)param1->GetPtr()), param2->GetInt() );
+						break;
+					}
+					else
+					{
+						char buf[512];
+						Q_snprintf( buf, 512, "DATATYPE_PTR: vgui python message function with argument name %s unsupported", entry.firstParamName );
+						PyErr_SetString(PyExc_Exception, buf);
+						throw boost::python::error_already_set(); 
+					}
 				}
 				else if ( (DATATYPE_CONSTCHARPTR == entry.firstParamType) && (DATATYPE_INT == entry.secondParamType) )
 				{
@@ -610,6 +629,18 @@ void CWrapSurface::SetProxyUITeamColor( const Vector &vTeamColor )
 		pBufferSurface->SetProxyUITeamColor( vTeamColor );
 	else
 		::SetProxyUITeamColor( vTeamColor );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWrapSurface::ClearProxyUITeamColor( void )
+{
+	CSurfaceBuffered *pBufferSurface = dynamic_cast<CSurfaceBuffered *> ( surface() );
+	if( pBufferSurface )
+		pBufferSurface->ClearProxyUITeamColor();
+	else
+		::ClearProxyUITeamColor();
 }
 
 //=============================================================================

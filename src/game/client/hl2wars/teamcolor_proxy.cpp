@@ -74,6 +74,11 @@ void SetProxyUITeamColor( const Vector &vTeamColor )
 	s_ProxyUITeamColor = vTeamColor;
 }
 
+void ClearProxyUITeamColor()
+{
+	s_bProxyUITeamColorSet = false;
+}
+
 class CUITeamColorProxy : public IMaterialProxy
 {
 public:
@@ -102,10 +107,10 @@ void CUITeamColorProxy::OnBind( void *pRenderable )
 	if( !m_pColorTextureVar )
 		return;
 
+	// Color can either be set through "Surface()->" or by setting a global color
 	if( s_bProxyUITeamColorSet )
 	{
 		m_pColorTextureVar->SetVecValue( s_ProxyUITeamColor[0], s_ProxyUITeamColor[1], s_ProxyUITeamColor[2], 1.0f );
-		s_bProxyUITeamColorSet = false;
 	}
 	else
 	{

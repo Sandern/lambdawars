@@ -999,11 +999,28 @@ private:
 	Vector a1;
 };
 
+class BufferCallClearProxyUITeamColor : public BaseBufferCall
+{
+public:
+	BufferCallClearProxyUITeamColor() {}
+
+	void Draw() { ::ClearProxyUITeamColor(); }
+};
+
 void CSurfaceBuffered::SetProxyUITeamColor( const Vector &vTeamColor )
 {
 	::SetProxyUITeamColor( vTeamColor );
 
 	g_pActiveSurfaceBuffer->AddToTail( 
 		new BufferCallSetProxyUITeamColor( vTeamColor )
+	);
+}
+
+void CSurfaceBuffered::ClearProxyUITeamColor( void )
+{
+	::ClearProxyUITeamColor();
+
+	g_pActiveSurfaceBuffer->AddToTail( 
+		new BufferCallClearProxyUITeamColor( )
 	);
 }

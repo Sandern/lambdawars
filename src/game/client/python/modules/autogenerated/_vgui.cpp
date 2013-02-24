@@ -2203,6 +2203,15 @@ BOOST_PYTHON_MODULE(_vgui){
                 , CalculateMouseVisible_function_type( &::CWrapSurface::CalculateMouseVisible ) );
         
         }
+        { //::CWrapSurface::ClearProxyUITeamColor
+        
+            typedef void ( ::CWrapSurface::*ClearProxyUITeamColor_function_type )(  ) ;
+            
+            ISurface_exposer.def( 
+                "ClearProxyUITeamColor"
+                , ClearProxyUITeamColor_function_type( &::CWrapSurface::ClearProxyUITeamColor ) );
+        
+        }
         { //::CWrapSurface::ClearTemporaryFontCache
         
             typedef void ( ::CWrapSurface::*ClearTemporaryFontCache_function_type )(  ) ;

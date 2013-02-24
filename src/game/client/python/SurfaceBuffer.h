@@ -301,6 +301,7 @@ public:
 	void DrawTexturedRectEx( DrawTexturedRectParms_t *pDrawParms );
 
 	void SetProxyUITeamColor( const Vector &vTeamColor );
+	void ClearProxyUITeamColor( void );
 };
 
 extern ISurface *g_pVGuiSurfaceBuffered;
