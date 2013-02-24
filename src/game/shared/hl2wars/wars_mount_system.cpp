@@ -38,24 +38,6 @@ AppStatus GetAppStatus( MountApps app )
 	return g_AppStatus[app];
 }
 
-// GCF File Header
-// http://www.wunderboy.org/docs/gcfformat.php
-// http://wiki.steamwhore.com/GCF_Format_Documentation
-struct CacheHeader
-{
-    DWORD2 HeaderVersion;
-    DWORD2 CacheType;
-    DWORD2 FormatVersion;
-    DWORD2 ApplicationID;
-    DWORD2 ApplicationVersion;
-    DWORD2 IsMounted;
-    DWORD2 Dummy0;
-    DWORD2 FileSize;
-    DWORD2 SectorSize;
-    DWORD2 SectorCount;
-    DWORD2 Checksum;
-};
-
 #define STEAMAPP_ROOT "../../"
 
 // Helpers
@@ -117,41 +99,6 @@ void MountExtraContent()
 		
 		pMountList->SaveToFile( filesystem, "mountlist.txt", "MOD" );
 	}
-#if 0
-	// Build list of games that require extraction
-	// Mark as "need extraction" in case not done.
-	// Otherwise available
-	// Try to mount Episode two content
-	MountMsg("Mounting Episode 2 content...");
-	if( VerifyContentFiles( pEpisode2Files, ARRAYSIZE(pEpisode2Files), "ep2", pMountList ) )
-	{
-		if( VerifyHaveAddonVPK( pEpisode2Files, ARRAYSIZE(pEpisode2Files), "ep2", pMountList ) )
-		{
-			g_AppStatus[APP_EP2] = AS_AVAILABLE;
-			MountMsg("succeeded\n");
-		}
-		else
-		{
-			g_AppStatus[APP_EP2] = AS_AVAILABLE_REQUIRES_EXTRACTION;
-			MountMsg("failed, requires extraction\n");
-		}
-	}
-
-	MountMsg("Mounting Episode 1 content...");
-	if( VerifyContentFiles( pEpisode1Files, ARRAYSIZE(pEpisode1Files), "episodic", pMountList ) )
-	{
-		if( VerifyHaveAddonVPK( pEpisode1Files, ARRAYSIZE(pEpisode1Files), "episodic", pMountList ) )
-		{
-			g_AppStatus[APP_EP1] = AS_AVAILABLE;
-			MountMsg("succeeded\n");
-		}
-		else
-		{
-			g_AppStatus[APP_EP1] = AS_AVAILABLE_REQUIRES_EXTRACTION;
-			MountMsg("failed, requires extraction\n");
-		}
-	}
-#endif // 0
 
 	if( pMountList )
 	{
@@ -160,14 +107,14 @@ void MountExtraContent()
 	}
 }
 
-void TryMountVPKGame( const char *pName, const char *pPath, int id, const char *pMountID, KeyValues *pMountList = NULL )
+bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *pMountID, KeyValues *pMountList = NULL )
 {
 	MountMsg("Adding %s to search path...", pName);
 
 	if( pMountList && pMountList->GetInt( pMountID, 0 ) == 0 )
 	{
 		MountMsg("failed (disabled in mount list)\n");
-		return;
+		return false;
 	}
 
 	// Dedicated servers always succeed for now...
@@ -176,21 +123,26 @@ void TryMountVPKGame( const char *pName, const char *pPath, int id, const char *
 	{
 		Msg("succeeded (dedicated server)\n");
 		g_AppStatus[id] = AS_AVAILABLE;
-		return;
+		return true;
 	}
 #endif // GAME_DLL
 
 	if( filesystem->IsDirectory( pPath, "GAME" ) ) 
 	{
-		AddSearchPath( pPath, "GAME" );
+		AddSearchPath( pPath, "GAME", PATH_ADD_TO_HEAD );
 		g_AppStatus[id] = AS_AVAILABLE;
 		MountMsg("succeeded\n");
+		return true;
 	}
 	else
 	{
 		MountMsg("failed\n");
 	}
+	return false;
 }
+
+#define VPKBIN "../../common/left 4 dead 2/bin/vpk.exe"
+void PostProcessDota2( const char *pPath );
 
 void PostInitExtraContent()
 {
@@ -204,7 +156,8 @@ void PostInitExtraContent()
 	// Add Left 4 Dead 1 + 2 to the search paths
 	// Note: VPK files override base mod files
 	//		 So we don't add it earlier, otherwise it loads up some l4d files like modevents, scripts, etc.
-	TryMountVPKGame( "DOTA", "../../common/dota 2 beta/dota", APP_DOTA, "dota", pMountList );
+	if( TryMountVPKGame( "DOTA", "../../common/dota 2 beta/dota", APP_DOTA, "dota", pMountList ) )
+		PostProcessDota2( "models" );
 	TryMountVPKGame( "Portal 2", "../../common/portal 2/portal2", APP_PORTAL2, "portal2", pMountList );
 	TryMountVPKGame( "Left 4 Dead 2", "../../common/left 4 dead 2/left4dead2", APP_L4D2, "left4dead2", pMountList );
 	TryMountVPKGame( "Left 4 Dead", "../../common/left 4 dead/left4dead", APP_L4D1, "left4dead", pMountList );
@@ -219,51 +172,149 @@ void PostInitExtraContent()
 }
 
 #if 0
-#ifdef CLIENT_DLL
-CON_COMMAND_F( cl_test_mount_system, "", FCVAR_CHEAT)
-#else
-CON_COMMAND_F( test_mount_system, "", FCVAR_CHEAT)
-#endif // CLIENT_DLL
+static bool CanFindFile( const char *pPath, const char *pathID = 0, char **ppszResolvedFilename = NULL )
 {
-	MountExtraContent();
-
-	/*
-	FileHandle_t f = filesystem->Open("../../team fortress 2 content.gcf", "rb");
+	FileHandle_t f = filesystem->OpenEx(pPath, "rb", 0, pathID, ppszResolvedFilename );
 	if( f == FILESYSTEM_INVALID_HANDLE ) 
 	{
-		Warning("No such file\n");
-		return;
+		return false;
 	}
-
-	unsigned int fileSize = filesystem->Size( f );
-	if( fileSize < sizeof(CacheHeader) )
-	{
-		filesystem->Close(f);
-		Warning("Invalid gcf file (no header)\n");
-		return;
-	}
-
-	struct CacheHeader header;
-	filesystem->Read(&header, sizeof(CacheHeader), f);
 	filesystem->Close(f);
+	return true;
+}
 
-	Msg("../team fortress 2 content.gcf info (filesize: %u): \n", fileSize);
-	Msg("HeaderVersion: %lu\n", header.HeaderVersion);
-	Msg("CacheType: %lu\n", header.CacheType);
-	Msg("FormatVersion: %lu\n", header.FormatVersion);
-	Msg("ApplicationID: %lu\n", header.ApplicationID);
-	Msg("ApplicationVersion: %lu\n", header.ApplicationVersion);
-	Msg("IsMounted: %lu\n", header.IsMounted);
-	Msg("Dummy0: %lu\n", header.Dummy0);
-	Msg("FileSize: %lu\n", header.FileSize);
-	Msg("SectorSize: %lu\n", header.SectorSize);
-	Msg("SectorCount: %lu\n", header.SectorCount);
-	Msg("Checksum: %lu\n", header.Checksum);
-	*/
+#include <windows.h>
+
+typedef struct extractvpkfile_t
+{
+	extractvpkfile_t( const char *pPath ) { Q_strncpy( path, pPath, MAX_PATH ); }
+	char path[MAX_PATH];
+} extractvpkfile_t;
+
+static void RecursiveParsePath( const char *pPath, CUtlVector<extractvpkfile_t> &worklist, const char *pathID = 0 )
+{
+	char wildcard[MAX_PATH];
+	FileFindHandle_t findHandle;
+		
+	Q_snprintf( wildcard, sizeof( wildcard ), "%s/*.dx90.vtx", pPath );
+	const char *pFilename = filesystem->FindFirstEx( wildcard, "DOTA", &findHandle );
+	while ( pFilename != NULL )
+	{
+
+		if( Q_strncmp(pFilename, ".", 1) != 0 &&
+				Q_strncmp(pFilename, "..", 2) != 0 ) 
+		{
+			char fullpath[MAX_PATH];
+			Q_snprintf( fullpath, MAX_PATH, "%s/%s", pPath, pFilename );
+			if( filesystem->FindIsDirectory( findHandle ) )
+			{
+				RecursiveParsePath( fullpath, worklist, pathID );
+			}
+			else
+			{
+				char resolvedFilename[MAX_PATH];
+				resolvedFilename[0] = '\0';
+				char *ppszResolvedFilename = resolvedFilename;
+				bool bFound = CanFindFile( fullpath, pathID, &(ppszResolvedFilename) );
+				if( !bFound )
+				{
+					// Make sure the directory exists
+					if( filesystem->FileExists(pPath, "MOD") == false )
+					{
+						filesystem->CreateDirHierarchy(pPath, "MOD");
+					}
+
+					char buf[MAX_PATH];
+					Q_snprintf( buf, MAX_PATH, "\"%s\"", fullpath );
+					worklist.AddToTail( extractvpkfile_t( buf ) );
+				}
+			}
+		}
+		pFilename = filesystem->FindNext( findHandle );
+	}
+	filesystem->FindClose( findHandle );
+}
+
+void PostProcessDota2( const char *pPath )
+{
+#ifdef CLIENT_DLL
+	return;
+#endif // CLIENT_DLL
+
+	float start = Plat_FloatTime();
+
+	if( !filesystem->FileExists( VPKBIN ) )
+	{
+		Warning("PostProcessDota2: %s does not exists. Unable to parse models. Please install the Left 4 Dead 2 SDK\n", VPKBIN);
+		return;
+	}
+	filesystem->AddSearchPath( "../../common/dota 2 beta/dota", "DOTA", PATH_ADD_TO_TAIL );
+
+	Msg("PostProcessDota2...\n");
+
+	CUtlVector<extractvpkfile_t> worklist;
+	RecursiveParsePath( pPath, worklist, "DOTA" );
+
+	Msg( "worklist: %d\n", worklist.Count() );
+
+	#define MAX_COMMAND_SIZE 32768
+	char args[MAX_COMMAND_SIZE];
+	args[0] = '\0';
+
+	Q_strcat( args, "x \"../../common/dota 2 beta/dota/pak01_dir.vpk\"", MAX_COMMAND_SIZE );
+
+	Msg("Extracting files...\n");
+
+	for( int i = 0; i < worklist.Count(); i++ )
+	{
+		Q_strcat( args, " ", MAX_COMMAND_SIZE );
+		Q_strcat( args, worklist[i].path, MAX_COMMAND_SIZE );
+
+		if( i % 20 == 0 )
+		{
+			SHELLEXECUTEINFO ShExecInfo = {0};
+			ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+			ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+			ShExecInfo.hwnd = NULL;
+			ShExecInfo.lpVerb = NULL;
+			ShExecInfo.lpFile = VPKBIN;		
+			ShExecInfo.lpParameters = args;	
+			ShExecInfo.lpDirectory = NULL;
+			ShExecInfo.nShow = SW_SHOW;
+			ShExecInfo.hInstApp = NULL;	
+			ShellExecuteEx(&ShExecInfo);
+			ShowWindow(ShExecInfo.hwnd, SW_HIDE);
+			WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+
+			args[0] = '\0';
+			Q_strcat( args, "x \"../../common/dota 2 beta/dota/pak01_dir.vpk\"", MAX_COMMAND_SIZE );
+		}
+	}
+
+	SHELLEXECUTEINFO ShExecInfo = {0};
+	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+	ShExecInfo.hwnd = NULL;
+	ShExecInfo.lpVerb = NULL;
+	ShExecInfo.lpFile = VPKBIN;		
+	ShExecInfo.lpParameters = args;	
+	ShExecInfo.lpDirectory = NULL;
+	ShExecInfo.nShow = SW_SHOW;
+	ShExecInfo.hInstApp = NULL;	
+	ShellExecuteEx(&ShExecInfo);
+	WaitForSingleObject(ShExecInfo.hProcess,INFINITE);
+
+	filesystem->RemoveSearchPaths( "DOTA" );
+
+	Msg("PostProcessDota2: %f seconds\n", Plat_FloatTime() - start );
+}
+#else
+void PostProcessDota2( const char *pPath )
+{
 }
 #endif // 0
 
-#if 0
+#if 1
 CON_COMMAND_F( test_open_file, "", FCVAR_CHEAT)
 {
 	char path[_MAX_PATH];
