@@ -31,6 +31,8 @@
 // For debugging
 ConVar g_debug_python( "g_debug_python", "0", FCVAR_REPLICATED );
 
+extern ConVar g_debug_pynetworkvar;
+
 const Color g_PythonColor( 0, 255, 0, 255 );
 
 // The thread ID in which python is initialized
@@ -468,9 +470,6 @@ void CSrcPython::LevelShutdownPostEntity()
 
 	// Reset all send/recv tables
 	PyResetAllNetworkTables();
-#ifndef CLIENT_DLL
-	//SetupNetworkTablesOnHold();
-#endif // CLIENT_DLL
 
 	m_bActive = false;
 }
@@ -561,6 +560,9 @@ object CSrcPython::Import( const char *pModule )
 	return object();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 object CSrcPython::ImportSilent( const char *pModule )
 {
 	// Import into the main space
@@ -794,6 +796,9 @@ int CSrcPython::GetModuleIndex( const char *pModule )
 	return INVALID_STRING_INDEX;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 const char * CSrcPython::GetModuleNameFromIndex( int nModuleIndex )
 {
 	if ( nModuleIndex >= 0 && nModuleIndex < g_pStringTablePyModules->GetMaxStrings() )
@@ -801,6 +806,9 @@ const char * CSrcPython::GetModuleNameFromIndex( int nModuleIndex )
 	return "error";
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::CallSignalNoArgs( bp::object signal )
 {
 	try {
@@ -813,6 +821,9 @@ void CSrcPython::CallSignalNoArgs( bp::object signal )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::CallSignal( bp::object signal, bp::dict kwargs )
 {
 	try {
@@ -822,20 +833,6 @@ void CSrcPython::CallSignal( bp::object signal, bp::dict kwargs )
 		PyErr_Print();
 	}
 }
-
-#if 0
-void CSrcPython::SignalCheckResponses( PyObject *pResponses )
-{
-	// TODO: Write a c version
-	try {
-		bp::object checkmethod = SrcPySystem()->Get("_CheckReponses", "core.signals", true);
-		PyEval_CallObject( checkmethod.ptr(), pResponses );
-	} catch( error_already_set & ) {
-		Warning("SignalCheckResponses:\n");
-		PyErr_Print();
-	}
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Retrieving basic type values
@@ -874,7 +871,9 @@ void CSrcPython::AddToDelayedUpdateList( EHANDLE hEnt, char *name, bp::object da
 	py_delayed_data_update_list.AddToTail( v );
 }
 
-extern ConVar g_debug_pynetworkvar;
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::CleanupDelayedUpdateList()
 {
 	for( int i=py_delayed_data_update_list.Count()-1; i >= 0; i-- )
@@ -884,7 +883,7 @@ void CSrcPython::CleanupDelayedUpdateList()
 		{	
 			if( g_debug_pynetworkvar.GetBool() )
 			{
-				Msg("#%d Cleaning up delayed PyNetworkVar update %s\n", 
+				DevMsg("#%d Cleaning up delayed PyNetworkVar update %s\n", 
 					h.GetEntryIndex(),
 					py_delayed_data_update_list[i].name);
 			}
@@ -901,7 +900,7 @@ void CSrcPython::CleanupDelayedUpdateList()
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
-// 
+// Purpose: 
 //-----------------------------------------------------------------------------
 void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool looped )
 {
@@ -922,6 +921,9 @@ void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool l
 	m_methodTickList.AddToTail(tickmethod);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::UnregisterTickMethod( bp::object method )
 {
 	int i;
@@ -937,6 +939,9 @@ void CSrcPython::UnregisterTickMethod( bp::object method )
 	throw boost::python::error_already_set(); 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 boost::python::list CSrcPython::GetRegisteredTickMethods()
 {
 	boost::python::list methodlist;
@@ -948,6 +953,9 @@ boost::python::list CSrcPython::GetRegisteredTickMethods()
 	return methodlist;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::RegisterPerFrameMethod( bp::object method )
 {
 	int i;
@@ -962,6 +970,9 @@ void CSrcPython::RegisterPerFrameMethod( bp::object method )
 	m_methodPerFrameList.AddToTail(method);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 {
 	int i;
@@ -977,6 +988,9 @@ void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 	throw boost::python::error_already_set(); 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 {
 	boost::python::list methodlist;
@@ -1050,8 +1064,6 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 	char basemodulepath[MAX_PATH];
 	basemodulepath[0] = '\0';
 
-	//Msg("Command: %s, rest: %s, modulesnames: %d\n", pCommand, pRest, modulesnames.Count() );
-
 	// Add modules to path + remember base module path, stripping the last module
 	for( int i = 0; i < modulesnames.Count(); i++ )
 	{
@@ -1072,8 +1084,6 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 	char wildcard[MAX_PATH];
 	Q_snprintf( wildcard, MAX_PATH, "%s\\*", finalpath );
 
-	//Msg("Final path: %s, wildcard: %s\n", finalpath, wildcard );
-
 	// List directories/filenames
 	FileFindHandle_t findHandle;
 	const char *filename = filesystem->FindFirstEx( wildcard, "MOD", &findHandle );
@@ -1081,8 +1091,6 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 	{
 		char fullpath[MAX_PATH];
 		Q_snprintf( fullpath, MAX_PATH, "%s/%s", finalpath, filename );
-
-		//Msg("filename: %s, fullpath: %s\n", filename, fullpath );
 
 		if( Q_strncmp( filename, ".", 1 ) == 0 || Q_strncmp( filename, "..", 2 ) == 0 )
 		{
@@ -1096,13 +1104,11 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 			// Add directory if __init__.py inside
 			char initpath[MAX_PATH];
 			Q_snprintf( initpath, MAX_PATH, "%s\\__init__.py", fullpath );
-			//Msg("Is dir, testing for %s\n", initpath);
 			if( filesystem->FileExists( initpath, "MOD" ) )
 			{
 				
 				
 				Q_snprintf( newmodulepath, MAX_PATH, "%s%s", basemodulepath, filename );
-				//Msg("is package. Testing: %s starts with %s\n", newmodulepath, pRest );
 				if( Q_strncmp( pRest, newmodulepath, Q_strlen(pRest) ) == 0 )
 					Q_snprintf( commands[ numMatches++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", pCommand, newmodulepath );
 			}
@@ -1119,7 +1125,6 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 				Q_StripExtension( filename, noextfilename, MAX_PATH );
 
 				Q_snprintf( newmodulepath, MAX_PATH, "%s%s", basemodulepath, noextfilename );
-				//Msg("is file. Testing: %s starts with %s\n", newmodulepath, pRest );
 				if( Q_strncmp( pRest, newmodulepath, Q_strlen(pRest) ) == 0 )
 					Q_snprintf( commands[ numMatches++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", pCommand, newmodulepath );
 			}
