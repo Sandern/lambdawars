@@ -21,9 +21,7 @@
 // STATIC: "WORLD_NORMAL"				"0..0"						[ps20b] [PC]
 // STATIC: "WORLD_NORMAL"				"0..1"						[ps30] [PC]
 // STATIC: "WORLD_NORMAL"				"0..0"						[XBOX]
-// STATIC: "FOW"						"0..0"						[ps20] [PC]
-// STATIC: "FOW"						"0..1"						[ps20b] [PC]
-// STATIC: "FOW"						"0..1"						[ps30] [PC]
+// STATIC: "FOW"						"0..1"						[PC]
 
 // DYNAMIC: "WRITEWATERFOGTODESTALPHA"	"0..1"
 // DYNAMIC: "NUM_LIGHTS"				"0..2"						[ps20]
