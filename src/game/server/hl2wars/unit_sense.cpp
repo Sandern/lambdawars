@@ -130,7 +130,6 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	{
 		pOther = ppUnits[i];
 
-		//otherDist = origin.DistToSqr(pOther->GetAbsOrigin());
 		otherDist = origin.AsVector2D().DistToSqr(pOther->GetAbsOrigin().AsVector2D());
 		if( otherDist > distSqr )
 			continue;
@@ -182,11 +181,10 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			continue;
 
 		otherDist = origin.AsVector2D().DistToSqr(pFuncOther->GetAbsOrigin().AsVector2D());
-		//otherDist = origin.DistToSqr(pFuncOther->GetAbsOrigin());
 		if( otherDist > distSqr )
 			continue;
 
-		Disposition_t relation = m_pOuter->IRelationType( pOther );
+		Disposition_t relation = m_pOuter->IRelationType( pFuncOther );
 		if( relation == D_HT )
 		{
 			m_SeenEnemies.AddToTail();
@@ -228,8 +226,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		if( pEntOther && !pEntOther->IsUnit() && 
 			GetOuter()->m_Relationship[i].disposition == D_HT )
 		{
-			otherDist = origin.AsVector2D().DistToSqr(pEntOther->GetAbsOrigin().AsVector2D());
-			//otherDist = origin.DistToSqr(pEntOther->GetAbsOrigin());
+			otherDist = origin.AsVector2D().DistToSqr( pEntOther->GetAbsOrigin().AsVector2D() );
 			if( otherDist > distSqr )
 				continue;
 
