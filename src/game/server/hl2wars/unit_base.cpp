@@ -944,34 +944,6 @@ void CUnitBase::SetNavigator( boost::python::object navigator )
 }
 #endif // ENABLE_PYTHON
 
-/*
-void CUnitBase::SetExpresser( boost::python::object expresser )
-{
-	if( expresser.ptr() == Py_None )
-	{
-		m_pExpresser = NULL;
-		m_pyExpresser = boost::python::object();
-		return;
-	}
-
-	try {
-		m_pExpresser = boost::python::extract<UnitExpresser *>(expresser);
-		m_pyExpresser = expresser;
-	} catch(boost::python::error_already_set &) {
-		PyErr_Print();
-		PyErr_Clear();
-		m_pExpresser = NULL;
-		m_pyExpresser = boost::python::object();
-		return;
-	}
-}
-
-UnitExpresser *CUnitBase::GetExpresser() 
-{ 
-	return m_pExpresser; 
-}
-*/
-
 IResponseSystem *CUnitBase::GetResponseSystem()
 {
 	extern IResponseSystem *g_pResponseSystem;

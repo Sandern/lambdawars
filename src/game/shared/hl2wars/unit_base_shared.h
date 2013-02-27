@@ -311,11 +311,6 @@ public:
 	UnitBaseNavigator*	GetNavigator();
 
 	// Expresser
-	/*
-	boost::python::object PyGetExpresser();
-	UnitExpresser *		GetExpresser();
-	void				SetExpresser( boost::python::object expresser );
-	*/
 	IResponseSystem *	GetResponseSystem();
 
 	// Anim Event map

@@ -209,7 +209,6 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastPathRecomputation = 0.0f;
 	m_fNextReactivePathUpdate = 0.0f;
-	//m_fNextAllowPathRecomputeTime = 0.0f;
 	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
@@ -1387,15 +1386,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 
 		if( (GetPath()->m_iGoalFlags & GF_NOLOSREQUIRED) == 0 )
 		{
-			// TODO: Make visibility checks optional
-			// Check cur area visibility
-			// NOTE: IsPotentiallyVisible not working?
 			Vector vTestPos = GetPath()->m_vGoalPos;
-			/*CNavArea *pArea = TheNavMesh->GetNavArea(m_pOuter->EyePosition(), 2000.0f);
-			CNavArea *pAreaTarget = TheNavMesh->GetNavArea(vTestPos, 2000.0f);
-			if( !pArea->IsPotentiallyVisible(pAreaTarget) )
-				return false;
-			*/
 
 			// Check own los
 			trace_t result;
@@ -1560,7 +1551,6 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
 		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
 	testPos = tr.endpos;
-	//testPos.z += GetOuter()->GetDefaultEyeOffset().z + 2.0f;
 
 	const Vector &origin = GetOuter()->EyePosition();
 
@@ -1572,7 +1562,6 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 	{
 		// Just test the head waypoint
 		endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
-		//endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
 		if( !TestRouteEnd( GetPath()->m_pWaypointHead ) && !TestRoute( testPos, endPos ) ) {
 			bBlocked = true;
@@ -1607,7 +1596,6 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 			}
 
 			endPos = ComputeWaypointTarget( testPos, pCur );
-			//endPos.z += GetOuter()->GetDefaultEyeOffset().z;
 
 			if( !TestRouteEnd( pCur ) && !TestRoute(testPos, endPos) ) 
 			{
@@ -2190,9 +2178,6 @@ bool UnitBaseNavigator::DoFindPathToPos( UnitBasePath *pPath )
 	VPROF_BUDGET( "UnitBaseNavigator::DoFindPathToPos", VPROF_BUDGETGROUP_UNITS );
 
 	m_iCurPathRecomputations++;
-
-	//Warning("#%d UnitNavigator: DoFindPathToPos. Computing path...\n", 
-	//		GetOuter()->entindex() );
 
 	pPath->SetWaypoint(NULL);
 

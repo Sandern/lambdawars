@@ -96,7 +96,6 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 			&filter, &tr);
 	}
 
-	//NDebugOverlay::Line( vStart, tr.endpos, 255, 0, 0,  true, 1.0f );
 	if( tr.DidHit() )
 		return false;
 	return true;
