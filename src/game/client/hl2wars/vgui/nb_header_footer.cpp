@@ -413,6 +413,13 @@ CNB_Gradient_Bar::CNB_Gradient_Bar( vgui::Panel *parent, const char *name ) : Ba
 {
 }
 
+void CNB_Gradient_Bar::ApplySchemeSettings( vgui::IScheme *pScheme )
+{
+	BaseClass::ApplySchemeSettings( pScheme );
+
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
+}
+
 void CNB_Gradient_Bar::PaintBackground()
 {
 	int wide, tall;
@@ -429,7 +436,7 @@ void CNB_Gradient_Bar::PaintBackground()
 
 	//vgui::surface()->DrawSetColor( Color( 53, 86, 117, 255 * flAlpha ) );
 	//vgui::surface()->DrawSetColor( Color( 117, 117, 117, 255 * flAlpha ) );
-	vgui::surface()->DrawSetColor( Color( 192, 143, 59, 255 * flAlpha ) );
+	vgui::surface()->DrawSetColor( Color( m_MainMenuColor.r(), m_MainMenuColor.g(), m_MainMenuColor.b(), 255 * flAlpha ) );
 
 	int nBarPosY = y + YRES( 4 );
 	int nBarHeight = tall - YRES( 8 );

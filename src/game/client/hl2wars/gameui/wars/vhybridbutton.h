@@ -157,6 +157,8 @@ private:
 	int			m_iSelectedArrowSize;		// size to draw the arrow
 
 	int			m_nWideAtOpen;
+
+	Color m_MainMenuColor;
 };
 
 }; //namespace BaseModUI

@@ -580,6 +580,8 @@ void CBaseModFrame::ApplySchemeSettings( IScheme *pScheme )
 
 	m_smearColor = pScheme->GetColor( "Frame.SmearColor", Color( 0, 0, 0, 225 ) );
 
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
+
 	LoadLayout();
 	DisableFadeEffect();
 }
@@ -880,8 +882,8 @@ void CBaseModFrame::DrawGenericBackground()
 	// fill background
 	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 255 * flAlpha ) );
 	vgui::surface()->DrawFilledRect( 0, 0, GetWide(), GetTall() );
-
-	vgui::surface()->DrawSetColor( Color( 192, 143, 59, 255 * flAlpha ) );
+	
+	vgui::surface()->DrawSetColor( Color( m_MainMenuColor.r(), m_MainMenuColor.g(), m_MainMenuColor.b(), 255 * flAlpha ) );
 	//vgui::surface()->DrawSetColor( Color( 53, 86, 117, 255 * flAlpha ) );
 	//vgui::surface()->DrawFilledRect( 0, YRES( 4 ), wide, tall - YRES( 4 ) );
 

@@ -161,6 +161,8 @@ namespace BaseModUI {
 		int m_nBottomBorderImageId;
 		Color m_smearColor;
 
+		Color m_MainMenuColor;
+
 	protected:
 		CPanelAnimationVarAliasType( int, m_iHeaderY, "header_y", "19", "proportional_int" );
 		CPanelAnimationVarAliasType( int, m_iHeaderTall, "header_tall", "41", "proportional_int" );

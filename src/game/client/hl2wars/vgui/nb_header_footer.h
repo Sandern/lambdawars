@@ -112,7 +112,12 @@ class CNB_Gradient_Bar : public vgui::EditablePanel
 public:
 	CNB_Gradient_Bar( vgui::Panel *parent, const char *name );
 
+	virtual void ApplySchemeSettings( vgui::IScheme *pScheme );
+
 	virtual void PaintBackground();
+
+private:
+	Color m_MainMenuColor;
 };
 
 #endif // _INCLUDED_NB_HEADER_FOOTER_H

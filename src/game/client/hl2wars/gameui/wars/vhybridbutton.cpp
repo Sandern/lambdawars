@@ -375,7 +375,7 @@ void BaseModHybridButton::PaintButtonEx()
 			if ( m_nStyle == BUTTON_RED || m_nStyle == BUTTON_REDMAIN )
 			{
 				//col.SetColor( 0, 128, 128, 255 );
-				col.SetColor( 192, 143, 59, 255 );
+				col = m_MainMenuColor;
 			}
 			else if ( m_nStyle == BUTTON_ALIENSWARMMENUBUTTON || m_nStyle == BUTTON_ALIENSWARMMENUBUTTONSMALL )
 			{
@@ -912,6 +912,8 @@ void BaseModHybridButton::ApplySchemeSettings( vgui::IScheme *pScheme )
 	BaseClass::ApplySchemeSettings( pScheme );
 
 	SetReleasedSound( CBaseModPanel::GetSingleton().GetUISoundName( UISOUND_ACCEPT ) );
+
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
 
 	const char *pImageName;
 

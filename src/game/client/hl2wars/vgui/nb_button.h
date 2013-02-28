@@ -35,6 +35,11 @@ public:
 	CPanelAnimationVarAliasType( int, m_nNBBgTextureId2, "NBTexture2", "vgui/hud/800corner2", "textureid" );
 	CPanelAnimationVarAliasType( int, m_nNBBgTextureId3, "NBTexture3", "vgui/hud/800corner3", "textureid" );
 	CPanelAnimationVarAliasType( int, m_nNBBgTextureId4, "NBTexture4", "vgui/hud/800corner4", "textureid" );
+
+private:
+	Color m_MainMenuColor;
+	Color m_MainMenuDarkColor;
+	Color m_MainMenuDarkestColor;
 };
 
 #endif // _INCLUDED_NB_BUTTON_H

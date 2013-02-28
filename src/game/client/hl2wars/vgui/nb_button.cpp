@@ -27,11 +27,13 @@ CNB_Button::~CNB_Button()
 
 void CNB_Button::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
-	BaseClass::ApplySchemeSettings( pScheme );
-
-	SetButtonBorderEnabled( false );
+	BaseClass::ApplySchemeSettings( pScheme );	SetButtonBorderEnabled( false );
 
 	SetReleasedSound( "UI/menu_accept.wav" );
+
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkColor = pScheme->GetColor( "MainMenu.MainDarkColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkestColor = pScheme->GetColor( "MainMenu.MainDarkestColor", Color( 0, 0, 0, 225 ) );
 }
 
 void CNB_Button::PerformLayout()
@@ -108,17 +110,17 @@ void CNB_Button::PaintBackground()
 	if ( IsArmed() || IsDepressed() )
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 20, 59, 96, 255 ), 1.0f, true, Color( 28, 80, 130, 255 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 192, 143, 59, 255 ), 1.0f, true, Color( 130, 130, 130, 255 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, m_MainMenuColor, 1.0f, true, Color( 130, 130, 130, 255 ) );
 	}
 	else if ( IsEnabled() )
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 24, 43, 66, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 128, 91, 40, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, m_MainMenuDarkColor, 1.0f, false, Color( 0, 0, 0, 0 ) );
 	}
 	else
 	{
 		//DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 65, 78, 91, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
-		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, Color( 102, 73, 32, 255 ), 1.0f, false, Color( 0, 0, 0, 0 ) );
+		DrawRoundedBox( nBorder, nBorder, GetWide() - nBorder * 2, GetTall() - nBorder * 2, m_MainMenuDarkestColor, 1.0f, false, Color( 0, 0, 0, 0 ) );
 	}
 }
 
