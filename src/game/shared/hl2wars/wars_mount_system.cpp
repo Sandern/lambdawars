@@ -21,7 +21,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-typedef unsigned long DWORD2;
+#define VPKBIN "../../common/left 4 dead 2/bin/vpk.exe"
 
 AppStatus g_AppStatus[NUM_APPS];
 bool HasApp( MountApps app )
@@ -82,31 +82,6 @@ bool VerifyHaveAddonVPK( const char *pFileList[], int iArraySize, const char *pM
 	return true;
 }
 
-void MountExtraContent()
-{
-	memset(g_AppStatus, 0, sizeof(g_AppStatus));
-
-	KeyValues *pMountList = new KeyValues( "MountList" );
-	if( !pMountList->LoadFromFile( filesystem, "mountlist.txt" ) )
-	{
-		// Create default
-		pMountList->SetString( "dota", "0" );
-		pMountList->SetString( "left4dead", "0" );
-		pMountList->SetString( "left4dead2", "0" );
-		pMountList->SetString( "portal2", "0" );
-		pMountList->SetString( "csgo", "0" );
-		pMountList->SetString( "dearesther", "0" );
-		
-		pMountList->SaveToFile( filesystem, "mountlist.txt", "MOD" );
-	}
-
-	if( pMountList )
-	{
-		pMountList->deleteThis();
-		pMountList = NULL;
-	}
-}
-
 bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *pMountID, KeyValues *pMountList = NULL )
 {
 	MountMsg("Adding %s to search path...", pName);
@@ -129,7 +104,7 @@ bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *
 
 	if( filesystem->IsDirectory( pPath, "GAME" ) ) 
 	{
-		AddSearchPath( pPath, "GAME", PATH_ADD_TO_HEAD );
+		AddSearchPath( pPath, "GAME", PATH_ADD_TO_TAIL_ATINDEX );
 		g_AppStatus[id] = AS_AVAILABLE;
 		MountMsg("succeeded\n");
 		return true;
@@ -141,21 +116,24 @@ bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *
 	return false;
 }
 
-#define VPKBIN "../../common/left 4 dead 2/bin/vpk.exe"
-void PostProcessDota2( const char *pPath );
-
-void PostInitExtraContent()
+void MountExtraContent()
 {
-	KeyValues *pMountList = new KeyValues("MountList");
-	if( !pMountList->LoadFromFile(filesystem, "mountlist.txt") )
+	memset(g_AppStatus, 0, sizeof(g_AppStatus));
+
+	KeyValues *pMountList = new KeyValues( "MountList" );
+	if( !pMountList->LoadFromFile( filesystem, "mountlist.txt" ) )
 	{
-		pMountList->deleteThis();
-		pMountList = NULL;
+		// Create default
+		pMountList->SetString( "dota", "0" );
+		pMountList->SetString( "left4dead", "0" );
+		pMountList->SetString( "left4dead2", "0" );
+		pMountList->SetString( "portal2", "0" );
+		pMountList->SetString( "csgo", "0" );
+		pMountList->SetString( "dearesther", "0" );
+		
+		pMountList->SaveToFile( filesystem, "mountlist.txt", "MOD" );
 	}
 
-	// Add Left 4 Dead 1 + 2 to the search paths
-	// Note: VPK files override base mod files
-	//		 So we don't add it earlier, otherwise it loads up some l4d files like modevents, scripts, etc.
 	if( TryMountVPKGame( "DOTA", "../../common/dota 2 beta/dota", APP_DOTA, "dota", pMountList ) )
 		PostProcessDota2( "models" );
 	TryMountVPKGame( "Portal 2", "../../common/portal 2/portal2", APP_PORTAL2, "portal2", pMountList );

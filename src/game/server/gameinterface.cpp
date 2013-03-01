@@ -874,8 +874,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 void CServerGameDLL::PostInit()
 {
-	PostInitExtraContent();
-
 	IGameSystem::PostInitAllSystems();
 
 #ifdef SERVER_USES_VGUI
