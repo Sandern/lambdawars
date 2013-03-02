@@ -4584,6 +4584,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ForcePerformSensing_function_type( &::UnitBaseSense::ForcePerformSensing ) );
         
         }
+        { //::UnitBaseSense::GetNearestAttackedFriendly
+        
+            typedef ::CBaseEntity * ( ::UnitBaseSense::*GetNearestAttackedFriendly_function_type )(  ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "GetNearestAttackedFriendly"
+                , GetNearestAttackedFriendly_function_type( &::UnitBaseSense::GetNearestAttackedFriendly )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::UnitBaseSense::GetNearestEnemy
         
             typedef ::CBaseEntity * ( ::UnitBaseSense::*GetNearestEnemy_function_type )(  ) ;

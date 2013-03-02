@@ -363,6 +363,36 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::OnTakeDamage( boost::ref(info) );
     }
 
+    virtual int OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnTakeDamage_Alive: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnTakeDamage_Alive( boost::ref(info) ) of Class: CUnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnTakeDamage_Alive = this->get_override( "OnTakeDamage_Alive" );
+        if( func_OnTakeDamage_Alive.ptr() != Py_None )
+            try {
+                return func_OnTakeDamage_Alive( boost::ref(info) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::OnTakeDamage_Alive( boost::ref(info) );
+            }
+        else
+            return this->CUnitBase::OnTakeDamage_Alive( boost::ref(info) );
+    }
+    
+    int default_OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
+        return CUnitBase::OnTakeDamage_Alive( boost::ref(info) );
+    }
+
     virtual void OnUnitTypeChanged( char const * old_unit_type ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1111,36 +1141,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     void default_OnSequenceSet( int nOldSequence ) {
         CBaseAnimating::OnSequenceSet( nOldSequence );
-    }
-
-    virtual int OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnTakeDamage_Alive: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnTakeDamage_Alive( boost::ref(info) ) of Class: CBaseCombatCharacter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnTakeDamage_Alive = this->get_override( "OnTakeDamage_Alive" );
-        if( func_OnTakeDamage_Alive.ptr() != Py_None )
-            try {
-                return func_OnTakeDamage_Alive( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
-            }
-        else
-            return this->CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
-    }
-    
-    int default_OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
     }
 
     virtual void PostClientActive(  ) {
@@ -2250,6 +2250,18 @@ void register_CUnitBase_class(){
                 , ( bp::arg("info") ) );
         
         }
+        { //::CUnitBase::OnTakeDamage_Alive
+        
+            typedef int ( ::CUnitBase::*OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef int ( CUnitBase_wrapper::*default_OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnTakeDamage_Alive"
+                , OnTakeDamage_Alive_function_type(&::CUnitBase::OnTakeDamage_Alive)
+                , default_OnTakeDamage_Alive_function_type(&CUnitBase_wrapper::default_OnTakeDamage_Alive)
+                , ( bp::arg("info") ) );
+        
+        }
         { //::CUnitBase::OnUnitTypeChanged
         
             typedef void ( ::CUnitBase::*OnUnitTypeChanged_function_type )( char const * ) ;
@@ -2766,18 +2778,6 @@ void register_CUnitBase_class(){
                 , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
                 , default_OnSequenceSet_function_type(&CUnitBase_wrapper::default_OnSequenceSet)
                 , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseCombatCharacter::OnTakeDamage_Alive
-        
-            typedef int ( ::CBaseCombatCharacter::*OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CUnitBase_wrapper::*default_OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CUnitBase_exposer.def( 
-                "OnTakeDamage_Alive"
-                , OnTakeDamage_Alive_function_type(&::CBaseCombatCharacter::OnTakeDamage_Alive)
-                , default_OnTakeDamage_Alive_function_type(&CUnitBase_wrapper::default_OnTakeDamage_Alive)
-                , ( bp::arg("info") ) );
         
         }
         { //::CBaseEntity::PostClientActive

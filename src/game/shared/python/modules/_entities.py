@@ -1284,6 +1284,7 @@ class Entities(GenerateModuleSemiShared):
         else:
             cls.mem_funs('EnemyDistance').exclude() 
             AddWrapReg( mb, 'CUnitBase', cls.mem_fun('EnemyDistance'), [CreateEntityArg('pEnemy')] )
+            cls.mem_funs('GetLastTakeDamageTime').exclude()
                  
             cls.vars('m_fDeathDrop').rename('deathdrop')
             cls.vars('m_fSaveDrop').rename('savedrop')

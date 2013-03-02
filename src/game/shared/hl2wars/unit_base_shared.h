@@ -273,6 +273,7 @@ public:
 	virtual void		UpdateServerAnimation( void );
 	
 	virtual int			OnTakeDamage( const CTakeDamageInfo &info );
+	virtual int			OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	int					TakeHealth( float flHealth, int bitsDamageType );
 	virtual void		OnFullHealth( void ) {}
 	virtual void		OnLostFullHealth( void ) {}
@@ -291,17 +292,16 @@ public:
 	void				CheckEnemyAlive( void );
 	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
 
-	// Useful
+	// Enemy/attack related
 	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos );
 	virtual float		EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit=true );
 	virtual float		TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit=true );
 	virtual bool		FInAimCone( CBaseEntity *pEntity, float fMinDot=0.994f );
 	virtual bool		FInAimCone( const Vector &vecSpot, float fMinDot=0.994f );
-
 	void				SetAttackLOSMask( int iMask ) { m_iAttackLOSMask = iMask; }
 	int					GetAttackLOSMask() { return m_iAttackLOSMask; }
-
 	bool				FastLOSCheck( const Vector &vTargetPos );
+	float				GetLastTakeDamageTime() { return m_fLastTakeDamageTime; }
 
 	// Navigator
 #ifdef ENABLE_PYTHON
@@ -472,6 +472,7 @@ private:
 	bool m_bHasRangeAttackLOS;
 	float m_fLastRangeAttackLOSTime;
 	int m_iAttackLOSMask;
+	float m_fLastTakeDamageTime;
 
 	// Navigator
 	UnitBaseNavigator *m_pNavigator;

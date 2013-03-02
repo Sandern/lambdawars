@@ -160,6 +160,7 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 
 	m_fLastRangeAttackLOSTime = -1;
 	m_iAttackLOSMask = MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE;
+	m_fLastTakeDamageTime = 0.0f;
 
 	m_fEnemyChangeToleranceSqr = 128.0f * 128.0f;
 

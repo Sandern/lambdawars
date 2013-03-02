@@ -105,17 +105,20 @@ bool UnitBaseSense::TestUnit( CUnitBase *pUnit )
 //-----------------------------------------------------------------------------
 int UnitBaseSense::LookForUnits( int iDistance )
 {
-	int i;
+	int i, iAttackPriority, iBestAttackPriority;
 	float distSqr, otherDist;
 	CUnitBase *pOther;
 	CFuncUnit *pFuncOther;
 	CBaseEntity *pEntOther;
 
 	float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
-	float fBestFriendlyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
-	int iAttackPriority, iBestAttackPriority;
+	float fBestFriendlyDist = fBestEnemyDist;
+	float fBestAttackedFriendlyDist = fBestEnemyDist;
 
-	m_NearestEnemy = NULL;
+	m_hNearestEnemy = NULL;
+	m_hNearestFriendly = NULL;
+	m_hNearestAttackedFriendly = NULL;
+
 	iBestAttackPriority = -666;
 
 	m_SeenEnemies.RemoveAll();
@@ -150,7 +153,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 			{
 				fBestEnemyDist = otherDist;
-				m_NearestEnemy = pOther;
+				m_hNearestEnemy = pOther;
 				iBestAttackPriority = iAttackPriority;
 			}
 		}
@@ -166,7 +169,12 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				if( otherDist < fBestFriendlyDist )
 				{
 					fBestFriendlyDist = otherDist;
-					m_NearestFriendly = pOther;
+					m_hNearestFriendly = pOther;
+				}
+				if( (gpGlobals->curtime - pOther->GetLastTakeDamageTime()) < 2.0 && otherDist < fBestAttackedFriendlyDist )
+				{
+					fBestAttackedFriendlyDist = otherDist;
+					m_hNearestAttackedFriendly = pOther;
 				}
 			}
 		}
@@ -197,7 +205,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 			{
 				fBestEnemyDist = otherDist;
-				m_NearestEnemy = pFuncOther;
+				m_hNearestEnemy = pFuncOther;
 				iBestAttackPriority = iAttackPriority;
 			}
 		}
@@ -213,7 +221,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				if( otherDist < fBestFriendlyDist )
 				{
 					fBestFriendlyDist = otherDist;
-					m_NearestFriendly = pFuncOther;
+					m_hNearestFriendly = pFuncOther;
 				}
 			}
 		}
@@ -243,7 +251,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				if( otherDist < fBestEnemyDist )
 				{
 					fBestEnemyDist = otherDist;
-					m_NearestEnemy = pEntOther;
+					m_hNearestEnemy = pEntOther;
 					iBestAttackPriority = 666;//iAttackPriority;
 				}
 			}

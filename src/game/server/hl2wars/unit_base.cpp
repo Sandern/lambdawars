@@ -845,6 +845,9 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 	return enemyDelta.Length();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit )
 {
 	Vector enemyDelta = pTarget->WorldSpaceCenter() - pos;
@@ -885,6 +888,9 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 	return enemyDelta.Length();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::FInAimCone( CBaseEntity *pEntity, float fMinDot/*==0.994f*/ )
 {
 	if( !pEntity )
@@ -892,6 +898,9 @@ bool CUnitBase::FInAimCone( CBaseEntity *pEntity, float fMinDot/*==0.994f*/ )
 	return FInAimCone( pEntity->BodyTarget( EyePosition() ), fMinDot );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::FInAimCone( const Vector &vecSpot, float fMinDot/*=0.994f*/ )
 {
 	Vector los = ( vecSpot - GetAbsOrigin() );
@@ -910,7 +919,9 @@ bool CUnitBase::FInAimCone( const Vector &vecSpot, float fMinDot/*=0.994f*/ )
 	return false;
 }
 
-// sets which player commands this unit
+//-----------------------------------------------------------------------------
+// Purpose: sets which player commands this unit
+//-----------------------------------------------------------------------------
 void CUnitBase::SetCommander( CHL2WarsPlayer *player )
 {
 	if ( m_hCommander.Get() == player )
@@ -922,6 +933,9 @@ void CUnitBase::SetCommander( CHL2WarsPlayer *player )
 }
 
 #ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::SetNavigator( boost::python::object navigator )
 {
 	if( navigator.ptr() == Py_None )
@@ -944,6 +958,9 @@ void CUnitBase::SetNavigator( boost::python::object navigator )
 }
 #endif // ENABLE_PYTHON
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 IResponseSystem *CUnitBase::GetResponseSystem()
 {
 	extern IResponseSystem *g_pResponseSystem;
@@ -952,6 +969,9 @@ IResponseSystem *CUnitBase::GetResponseSystem()
 }
 
 #ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::SetAnimEventMap( boost::python::object animeventmap )
 {
 	if( animeventmap.ptr() == Py_None )
@@ -965,6 +985,9 @@ void CUnitBase::SetAnimEventMap( boost::python::object animeventmap )
 }
 #endif // ENABLE_PYTHON
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 {
 	if( m_pAnimEventMap )
@@ -1007,16 +1030,25 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::SetCrouching( bool crouching )
 {
 	m_bCrouching = crouching;	
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::SetClimbing( bool climbing )
 {
 	m_bClimbing = climbing;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int	CUnitBase::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	bool bFullHealth = (m_iHealth >= m_iMaxHealth);
@@ -1026,6 +1058,20 @@ int	CUnitBase::OnTakeDamage( const CTakeDamageInfo &info )
 	return rv;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CUnitBase::OnTakeDamage_Alive( const CTakeDamageInfo &info )
+{
+	if( info.GetAttacker() )
+		m_fLastTakeDamageTime = gpGlobals->curtime;
+
+	return BaseClass::OnTakeDamage_Alive( info );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CUnitBase::TakeHealth( float flHealth, int bitsDamageType )
 {
 	bool bFullHealth = (m_iHealth >= m_iMaxHealth);
