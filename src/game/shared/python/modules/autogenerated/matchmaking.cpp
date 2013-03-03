@@ -18,86 +18,121 @@
 
 namespace bp = boost::python;
 
-struct PySearchManager_wrapper : PySearchManager, bp::wrapper< PySearchManager > {
+struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEventsSink > {
 
-    PySearchManager_wrapper(PySearchManager const & arg )
-    : PySearchManager( arg )
-      , bp::wrapper< PySearchManager >(){
+    PyMatchEventsSink_wrapper(PyMatchEventsSink const & arg )
+    : PyMatchEventsSink( arg )
+      , bp::wrapper< PyMatchEventsSink >(){
         // copy constructor
         
     }
 
-    PySearchManager_wrapper( )
-    : PySearchManager( )
-      , bp::wrapper< PySearchManager >(){
+    PyMatchEventsSink_wrapper()
+    : PyMatchEventsSink()
+      , bp::wrapper< PyMatchEventsSink >(){
         // null constructor
-    
+        
     }
 
-    virtual void EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+    virtual void OnEvent( ::KeyValues * pEvent ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
         Assert( GetCurrentThreadId() == g_hPythonThreadID );
         #elif defined(PY_CHECKTHREADID)
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "EnableResultsUpdate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+            Error( "OnEvent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
         #endif // _DEBUG/PY_CHECKTHREADID
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) ) of Class: PySearchManager\n");
+            Msg("Calling OnEvent( boost::python::ptr(pEvent) ) of Class: PyMatchEventsSink\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_EnableResultsUpdate = this->get_override( "EnableResultsUpdate" );
-        if( func_EnableResultsUpdate.ptr() != Py_None )
+        bp::override func_OnEvent = this->get_override( "OnEvent" );
+        if( func_OnEvent.ptr() != Py_None )
             try {
-                func_EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+                func_OnEvent( boost::python::ptr(pEvent) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+                this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
             }
         else
-            this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
     }
     
-    void default_EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
-        PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
-    }
-
-    virtual int GetNumResults(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetNumResults: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetNumResults(  ) of Class: PySearchManager\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetNumResults = this->get_override( "GetNumResults" );
-        if( func_GetNumResults.ptr() != Py_None )
-            try {
-                return func_GetNumResults(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->PySearchManager::GetNumResults(  );
-            }
-        else
-            return this->PySearchManager::GetNumResults(  );
-    }
-    
-    int default_GetNumResults(  ) {
-        return PySearchManager::GetNumResults( );
+    void default_OnEvent( ::KeyValues * pEvent ) {
+        PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
     }
 
 };
 
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
+
+    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
+        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
+        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
+        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
+        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
+        .export_values()
+        ;
+
+    bp::class_< PyMatchEventsSink_wrapper >( "MatchEventsSink" )    
+        .def( 
+            "OnEvent"
+            , (void ( ::PyMatchEventsSink::* )( ::KeyValues * ) )(&::PyMatchEventsSink::OnEvent)
+            , (void ( PyMatchEventsSink_wrapper::* )( ::KeyValues * ) )(&PyMatchEventsSink_wrapper::default_OnEvent)
+            , ( bp::arg("pEvent") ) );
+
+    bp::class_< PyMatchEventsSubscription >( "matcheventssubscription" )    
+        .def( 
+            "BroadcastEvent"
+            , (void (*)( ::KeyValues * ))( &::PyMatchEventsSubscription::BroadcastEvent )
+            , ( bp::arg("pEvent") ) )    
+        .def( 
+            "GetEventData"
+            , (::KeyValues * (*)( char const * ))( &::PyMatchEventsSubscription::GetEventData )
+            , ( bp::arg("szEventDataKey") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "RegisterEventData"
+            , (void (*)( ::KeyValues * ))( &::PyMatchEventsSubscription::RegisterEventData )
+            , ( bp::arg("pEventData") ) )    
+        .def( 
+            "Subscribe"
+            , (void (*)( ::PyMatchEventsSink * ))( &::PyMatchEventsSubscription::Subscribe )
+            , ( bp::arg("sink") ) )    
+        .def( 
+            "Unsubscribe"
+            , (void (*)( ::PyMatchEventsSink * ))( &::PyMatchEventsSubscription::Unsubscribe )
+            , ( bp::arg("sink") ) )    
+        .staticmethod( "BroadcastEvent" )    
+        .staticmethod( "GetEventData" )    
+        .staticmethod( "RegisterEventData" )    
+        .staticmethod( "Subscribe" )    
+        .staticmethod( "Unsubscribe" );
+
+    bp::class_< PyMatchSearchResult >( "MatchSearchResult", bp::init< >() )    
+        .def( 
+            "GetGameDetails"
+            , (::KeyValues * ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetGameDetails )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetOnlineId"
+            , (::boost::python::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
+        .def( 
+            "IsJoinable"
+            , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsJoinable ) )    
+        .def( 
+            "IsValid"
+            , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsValid ) )    
+        .def( 
+            "Join"
+            , (void ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::Join ) )    
+        .def( 
+            "SetMatchResultInternal"
+            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
+            , ( bp::arg("pMatchResult"), bp::arg("weakref") ) );
 
     bp::class_< PyMatchSession >( "matchsession" )    
         .def( 
@@ -128,16 +163,35 @@ BOOST_PYTHON_MODULE(matchmaking){
             , ( bp::arg("pSettings") ) )    
         .staticmethod( "CreateGameSearchManager" );
 
-    bp::class_< PySearchManager_wrapper >( "SearchManager", bp::init< >() )    
+    bp::class_< PySearchManager >( "SearchManager", bp::init< >() )    
+        .def( 
+            "Destroy"
+            , (void ( ::PySearchManager::* )(  ) )( &::PySearchManager::Destroy ) )    
         .def( 
             "EnableResultsUpdate"
-            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )(&::PySearchManager::EnableResultsUpdate)
-            , (void ( PySearchManager_wrapper::* )( bool,::KeyValues * ) )(&PySearchManager_wrapper::default_EnableResultsUpdate)
+            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )( &::PySearchManager::EnableResultsUpdate )
             , ( bp::arg("bEnable"), bp::arg("pSearchParams")=bp::object() ) )    
         .def( 
             "GetNumResults"
-            , (int ( ::PySearchManager::* )(  ) )(&::PySearchManager::GetNumResults)
-            , (int ( PySearchManager_wrapper::* )(  ) )(&PySearchManager_wrapper::default_GetNumResults) );
+            , (int ( ::PySearchManager::* )(  ) )( &::PySearchManager::GetNumResults ) )    
+        .def( 
+            "GetResultByIndex"
+            , (::boost::python::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
+            , ( bp::arg("iResultIdx") ) )    
+        .def( 
+            "GetResultByOnlineId"
+            , (::boost::python::object ( ::PySearchManager::* )( ::boost::python::object ) )( &::PySearchManager::GetResultByOnlineId )
+            , ( bp::arg("xuidResultOnline") ) )    
+        .def( 
+            "IsValid"
+            , (bool ( ::PySearchManager::* )(  ) )( &::PySearchManager::IsValid ) );
+
+    bp::class_< PySteamMatchmaking >( "steammatchmaking" )    
+        .def( 
+            "AddRequestLobbyListDistanceFilter"
+            , (void (*)( ::ELobbyDistanceFilter ))( &::PySteamMatchmaking::AddRequestLobbyListDistanceFilter )
+            , ( bp::arg("eLobbyDistanceFilter") ) )    
+        .staticmethod( "AddRequestLobbyListDistanceFilter" );
 
     { //::PyMKCloseSession
     
@@ -186,86 +240,121 @@ BOOST_PYTHON_MODULE(matchmaking){
 
 namespace bp = boost::python;
 
-struct PySearchManager_wrapper : PySearchManager, bp::wrapper< PySearchManager > {
+struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEventsSink > {
 
-    PySearchManager_wrapper(PySearchManager const & arg )
-    : PySearchManager( arg )
-      , bp::wrapper< PySearchManager >(){
+    PyMatchEventsSink_wrapper(PyMatchEventsSink const & arg )
+    : PyMatchEventsSink( arg )
+      , bp::wrapper< PyMatchEventsSink >(){
         // copy constructor
         
     }
 
-    PySearchManager_wrapper( )
-    : PySearchManager( )
-      , bp::wrapper< PySearchManager >(){
+    PyMatchEventsSink_wrapper()
+    : PyMatchEventsSink()
+      , bp::wrapper< PyMatchEventsSink >(){
         // null constructor
-    
+        
     }
 
-    virtual void EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+    virtual void OnEvent( ::KeyValues * pEvent ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
         Assert( GetCurrentThreadId() == g_hPythonThreadID );
         #elif defined(PY_CHECKTHREADID)
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "EnableResultsUpdate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+            Error( "OnEvent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
         #endif // _DEBUG/PY_CHECKTHREADID
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) ) of Class: PySearchManager\n");
+            Msg("Calling OnEvent( boost::python::ptr(pEvent) ) of Class: PyMatchEventsSink\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_EnableResultsUpdate = this->get_override( "EnableResultsUpdate" );
-        if( func_EnableResultsUpdate.ptr() != Py_None )
+        bp::override func_OnEvent = this->get_override( "OnEvent" );
+        if( func_OnEvent.ptr() != Py_None )
             try {
-                func_EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+                func_OnEvent( boost::python::ptr(pEvent) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+                this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
             }
         else
-            this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
     }
     
-    void default_EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
-        PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
-    }
-
-    virtual int GetNumResults(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetNumResults: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetNumResults(  ) of Class: PySearchManager\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetNumResults = this->get_override( "GetNumResults" );
-        if( func_GetNumResults.ptr() != Py_None )
-            try {
-                return func_GetNumResults(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->PySearchManager::GetNumResults(  );
-            }
-        else
-            return this->PySearchManager::GetNumResults(  );
-    }
-    
-    int default_GetNumResults(  ) {
-        return PySearchManager::GetNumResults( );
+    void default_OnEvent( ::KeyValues * pEvent ) {
+        PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
     }
 
 };
 
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
+
+    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
+        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
+        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
+        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
+        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
+        .export_values()
+        ;
+
+    bp::class_< PyMatchEventsSink_wrapper >( "MatchEventsSink" )    
+        .def( 
+            "OnEvent"
+            , (void ( ::PyMatchEventsSink::* )( ::KeyValues * ) )(&::PyMatchEventsSink::OnEvent)
+            , (void ( PyMatchEventsSink_wrapper::* )( ::KeyValues * ) )(&PyMatchEventsSink_wrapper::default_OnEvent)
+            , ( bp::arg("pEvent") ) );
+
+    bp::class_< PyMatchEventsSubscription >( "matcheventssubscription" )    
+        .def( 
+            "BroadcastEvent"
+            , (void (*)( ::KeyValues * ))( &::PyMatchEventsSubscription::BroadcastEvent )
+            , ( bp::arg("pEvent") ) )    
+        .def( 
+            "GetEventData"
+            , (::KeyValues * (*)( char const * ))( &::PyMatchEventsSubscription::GetEventData )
+            , ( bp::arg("szEventDataKey") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "RegisterEventData"
+            , (void (*)( ::KeyValues * ))( &::PyMatchEventsSubscription::RegisterEventData )
+            , ( bp::arg("pEventData") ) )    
+        .def( 
+            "Subscribe"
+            , (void (*)( ::PyMatchEventsSink * ))( &::PyMatchEventsSubscription::Subscribe )
+            , ( bp::arg("sink") ) )    
+        .def( 
+            "Unsubscribe"
+            , (void (*)( ::PyMatchEventsSink * ))( &::PyMatchEventsSubscription::Unsubscribe )
+            , ( bp::arg("sink") ) )    
+        .staticmethod( "BroadcastEvent" )    
+        .staticmethod( "GetEventData" )    
+        .staticmethod( "RegisterEventData" )    
+        .staticmethod( "Subscribe" )    
+        .staticmethod( "Unsubscribe" );
+
+    bp::class_< PyMatchSearchResult >( "MatchSearchResult", bp::init< >() )    
+        .def( 
+            "GetGameDetails"
+            , (::KeyValues * ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetGameDetails )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetOnlineId"
+            , (::boost::python::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
+        .def( 
+            "IsJoinable"
+            , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsJoinable ) )    
+        .def( 
+            "IsValid"
+            , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsValid ) )    
+        .def( 
+            "Join"
+            , (void ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::Join ) )    
+        .def( 
+            "SetMatchResultInternal"
+            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
+            , ( bp::arg("pMatchResult"), bp::arg("weakref") ) );
 
     bp::class_< PyMatchSession >( "matchsession" )    
         .def( 
@@ -296,16 +385,35 @@ BOOST_PYTHON_MODULE(matchmaking){
             , ( bp::arg("pSettings") ) )    
         .staticmethod( "CreateGameSearchManager" );
 
-    bp::class_< PySearchManager_wrapper >( "SearchManager", bp::init< >() )    
+    bp::class_< PySearchManager >( "SearchManager", bp::init< >() )    
+        .def( 
+            "Destroy"
+            , (void ( ::PySearchManager::* )(  ) )( &::PySearchManager::Destroy ) )    
         .def( 
             "EnableResultsUpdate"
-            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )(&::PySearchManager::EnableResultsUpdate)
-            , (void ( PySearchManager_wrapper::* )( bool,::KeyValues * ) )(&PySearchManager_wrapper::default_EnableResultsUpdate)
+            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )( &::PySearchManager::EnableResultsUpdate )
             , ( bp::arg("bEnable"), bp::arg("pSearchParams")=bp::object() ) )    
         .def( 
             "GetNumResults"
-            , (int ( ::PySearchManager::* )(  ) )(&::PySearchManager::GetNumResults)
-            , (int ( PySearchManager_wrapper::* )(  ) )(&PySearchManager_wrapper::default_GetNumResults) );
+            , (int ( ::PySearchManager::* )(  ) )( &::PySearchManager::GetNumResults ) )    
+        .def( 
+            "GetResultByIndex"
+            , (::boost::python::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
+            , ( bp::arg("iResultIdx") ) )    
+        .def( 
+            "GetResultByOnlineId"
+            , (::boost::python::object ( ::PySearchManager::* )( ::boost::python::object ) )( &::PySearchManager::GetResultByOnlineId )
+            , ( bp::arg("xuidResultOnline") ) )    
+        .def( 
+            "IsValid"
+            , (bool ( ::PySearchManager::* )(  ) )( &::PySearchManager::IsValid ) );
+
+    bp::class_< PySteamMatchmaking >( "steammatchmaking" )    
+        .def( 
+            "AddRequestLobbyListDistanceFilter"
+            , (void (*)( ::ELobbyDistanceFilter ))( &::PySteamMatchmaking::AddRequestLobbyListDistanceFilter )
+            , ( bp::arg("eLobbyDistanceFilter") ) )    
+        .staticmethod( "AddRequestLobbyListDistanceFilter" );
 
     { //::PyMKCloseSession
     
