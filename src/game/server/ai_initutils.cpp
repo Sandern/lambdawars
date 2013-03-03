@@ -205,6 +205,16 @@ int CNodeEnt::Spawn( const char *pMapData )
 		m_NodeData.minState = NPC_STATE_IDLE;
 	if ( m_NodeData.maxState == NPC_STATE_NONE )
 		m_NodeData.maxState = NPC_STATE_COMBAT;
+
+	// ---------------------------------------------------------------------------------
+	//  No AI network, so just remove this node
+	// ---------------------------------------------------------------------------------
+	if( !g_pBigAINet )
+	{
+		UTIL_RemoveImmediate( this );
+		return -1;
+	}
+
 	// ---------------------------------------------------------------------------------
 	//  If just a hint node (not used for navigation) just create a hint and bail
 	// ---------------------------------------------------------------------------------
