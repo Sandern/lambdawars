@@ -12,13 +12,35 @@
 #endif
 
 class KeyValues;
+class ISearchManager;
 
-// Entry point to create session
+// IMatchFramework wrappers
 void PyMKCreateSession( KeyValues *pSettings );
-
-// Entry point to match into a session
 void PyMKMatchSession( KeyValues *pSettings );
+void PyMKCloseSession();
 
+// Python Search Manager
+class PySearchManager
+{
+public:
+	PySearchManager();
+	~PySearchManager();
+
+	virtual void EnableResultsUpdate( bool bEnable, KeyValues *pSearchParams = NULL );
+
+	virtual int GetNumResults();
+
+	//virtual IMatchSearchResult* GetResultByIndex( int iResultIdx ) = 0;
+	//virtual IMatchSearchResult* GetResultByOnlineId( XUID xuidResultOnline ) = 0;
+
+	// Not for python
+	void SetSearchManagerInternal( ISearchManager *pSearchManager );
+
+private:
+	ISearchManager *m_pSearchManager;
+};
+
+// Accessors
 class PyMatchSession
 {
 public:
@@ -26,6 +48,12 @@ public:
 	static KeyValues * GetSessionSettings();
 	static void UpdateSessionSettings( KeyValues *pSettings );
 	static void Command( KeyValues *pCommand );
+};
+
+class PyMatchSystem
+{
+public:
+	static bp::object CreateGameSearchManager( KeyValues *pSettings );
 };
 
 #endif // SRC_PYTHON_MATCHMAKING_H

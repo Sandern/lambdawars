@@ -19,6 +19,7 @@ class MatchMaking(GenerateModuleSemiShared):
     files = [
         'cbase.h',
         'src_python_matchmaking.h',
+        #'matchmaking/imatchframework.h',
     ]
     
     def GetFiles(self):
@@ -28,13 +29,15 @@ class MatchMaking(GenerateModuleSemiShared):
         
     def Parse(self, mb):
         # Exclude everything, then add what we need
-        # Otherwise we get very big source code and dll's
         mb.decls().exclude() 
+        
         
         mb.free_function('PyMKCreateSession').include()
         mb.free_function('PyMKCreateSession').rename('CreateSession')
         mb.free_function('PyMKMatchSession').include()
         mb.free_function('PyMKMatchSession').rename('MatchSession')
+        mb.free_function('PyMKCloseSession').include()
+        mb.free_function('PyMKCloseSession').rename('CloseSession')
 
         cls = mb.class_('PyMatchSession')
         cls.include()
@@ -42,3 +45,11 @@ class MatchMaking(GenerateModuleSemiShared):
         cls.mem_fun('GetSessionSystemData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         cls.mem_fun('GetSessionSettings').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
+        cls = mb.class_('PyMatchSystem')
+        cls.include()
+        cls.rename('matchsystem')
+        
+        cls = mb.class_('PySearchManager')
+        cls.include()
+        cls.rename('SearchManager')
+        cls.mem_fun('SetSearchManagerInternal').exclude()

@@ -59,6 +59,7 @@ bp::object _entities;
 bp::object unit_helper;
 bp::object _particles;
 bp::object _physics;
+bp::object matchmaking;
 
 #ifdef CLIENT_DLL
 	boost::python::object _vguicontrols;
@@ -241,6 +242,7 @@ bool CSrcPython::Init( )
 	unit_helper = Import("unit_helper");
 	_particles = Import("_particles");
 	_physics = Import("_physics");
+	matchmaking = Import("matchmaking");
 #ifdef CLIENT_DLL
 	Run( "import input" );		// Registers buttons
 	_vguicontrols = Import("_vguicontrols");
@@ -323,6 +325,7 @@ void CSrcPython::ExtraShutdown( void )
 	unit_helper = bp::object();
 	_particles = bp::object();
 	_physics = bp::object();
+	matchmaking = bp::object();
 #ifdef CLIENT_DLL
 	_vguicontrols = bp::object();
 #endif // CLIENT_DLL

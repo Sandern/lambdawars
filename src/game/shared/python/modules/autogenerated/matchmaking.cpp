@@ -18,6 +18,84 @@
 
 namespace bp = boost::python;
 
+struct PySearchManager_wrapper : PySearchManager, bp::wrapper< PySearchManager > {
+
+    PySearchManager_wrapper(PySearchManager const & arg )
+    : PySearchManager( arg )
+      , bp::wrapper< PySearchManager >(){
+        // copy constructor
+        
+    }
+
+    PySearchManager_wrapper( )
+    : PySearchManager( )
+      , bp::wrapper< PySearchManager >(){
+        // null constructor
+    
+    }
+
+    virtual void EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "EnableResultsUpdate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) ) of Class: PySearchManager\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_EnableResultsUpdate = this->get_override( "EnableResultsUpdate" );
+        if( func_EnableResultsUpdate.ptr() != Py_None )
+            try {
+                func_EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            }
+        else
+            this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+    }
+    
+    void default_EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+        PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+    }
+
+    virtual int GetNumResults(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetNumResults: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetNumResults(  ) of Class: PySearchManager\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_GetNumResults = this->get_override( "GetNumResults" );
+        if( func_GetNumResults.ptr() != Py_None )
+            try {
+                return func_GetNumResults(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->PySearchManager::GetNumResults(  );
+            }
+        else
+            return this->PySearchManager::GetNumResults(  );
+    }
+    
+    int default_GetNumResults(  ) {
+        return PySearchManager::GetNumResults( );
+    }
+
+};
+
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
 
@@ -42,6 +120,34 @@ BOOST_PYTHON_MODULE(matchmaking){
         .staticmethod( "GetSessionSettings" )    
         .staticmethod( "GetSessionSystemData" )    
         .staticmethod( "UpdateSessionSettings" );
+
+    bp::class_< PyMatchSystem >( "matchsystem" )    
+        .def( 
+            "CreateGameSearchManager"
+            , (::boost::python::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
+            , ( bp::arg("pSettings") ) )    
+        .staticmethod( "CreateGameSearchManager" );
+
+    bp::class_< PySearchManager_wrapper >( "SearchManager", bp::init< >() )    
+        .def( 
+            "EnableResultsUpdate"
+            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )(&::PySearchManager::EnableResultsUpdate)
+            , (void ( PySearchManager_wrapper::* )( bool,::KeyValues * ) )(&PySearchManager_wrapper::default_EnableResultsUpdate)
+            , ( bp::arg("bEnable"), bp::arg("pSearchParams")=bp::object() ) )    
+        .def( 
+            "GetNumResults"
+            , (int ( ::PySearchManager::* )(  ) )(&::PySearchManager::GetNumResults)
+            , (int ( PySearchManager_wrapper::* )(  ) )(&PySearchManager_wrapper::default_GetNumResults) );
+
+    { //::PyMKCloseSession
+    
+        typedef void ( *CloseSession_function_type )(  );
+        
+        bp::def( 
+            "CloseSession"
+            , CloseSession_function_type( &::PyMKCloseSession ) );
+    
+    }
 
     { //::PyMKCreateSession
     
@@ -80,6 +186,84 @@ BOOST_PYTHON_MODULE(matchmaking){
 
 namespace bp = boost::python;
 
+struct PySearchManager_wrapper : PySearchManager, bp::wrapper< PySearchManager > {
+
+    PySearchManager_wrapper(PySearchManager const & arg )
+    : PySearchManager( arg )
+      , bp::wrapper< PySearchManager >(){
+        // copy constructor
+        
+    }
+
+    PySearchManager_wrapper( )
+    : PySearchManager( )
+      , bp::wrapper< PySearchManager >(){
+        // null constructor
+    
+    }
+
+    virtual void EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "EnableResultsUpdate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) ) of Class: PySearchManager\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_EnableResultsUpdate = this->get_override( "EnableResultsUpdate" );
+        if( func_EnableResultsUpdate.ptr() != Py_None )
+            try {
+                func_EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+            }
+        else
+            this->PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+    }
+    
+    void default_EnableResultsUpdate( bool bEnable, ::KeyValues * pSearchParams=0 ) {
+        PySearchManager::EnableResultsUpdate( bEnable, boost::python::ptr(pSearchParams) );
+    }
+
+    virtual int GetNumResults(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetNumResults: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetNumResults(  ) of Class: PySearchManager\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_GetNumResults = this->get_override( "GetNumResults" );
+        if( func_GetNumResults.ptr() != Py_None )
+            try {
+                return func_GetNumResults(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->PySearchManager::GetNumResults(  );
+            }
+        else
+            return this->PySearchManager::GetNumResults(  );
+    }
+    
+    int default_GetNumResults(  ) {
+        return PySearchManager::GetNumResults( );
+    }
+
+};
+
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
 
@@ -104,6 +288,34 @@ BOOST_PYTHON_MODULE(matchmaking){
         .staticmethod( "GetSessionSettings" )    
         .staticmethod( "GetSessionSystemData" )    
         .staticmethod( "UpdateSessionSettings" );
+
+    bp::class_< PyMatchSystem >( "matchsystem" )    
+        .def( 
+            "CreateGameSearchManager"
+            , (::boost::python::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
+            , ( bp::arg("pSettings") ) )    
+        .staticmethod( "CreateGameSearchManager" );
+
+    bp::class_< PySearchManager_wrapper >( "SearchManager", bp::init< >() )    
+        .def( 
+            "EnableResultsUpdate"
+            , (void ( ::PySearchManager::* )( bool,::KeyValues * ) )(&::PySearchManager::EnableResultsUpdate)
+            , (void ( PySearchManager_wrapper::* )( bool,::KeyValues * ) )(&PySearchManager_wrapper::default_EnableResultsUpdate)
+            , ( bp::arg("bEnable"), bp::arg("pSearchParams")=bp::object() ) )    
+        .def( 
+            "GetNumResults"
+            , (int ( ::PySearchManager::* )(  ) )(&::PySearchManager::GetNumResults)
+            , (int ( PySearchManager_wrapper::* )(  ) )(&PySearchManager_wrapper::default_GetNumResults) );
+
+    { //::PyMKCloseSession
+    
+        typedef void ( *CloseSession_function_type )(  );
+        
+        bp::def( 
+            "CloseSession"
+            , CloseSession_function_type( &::PyMKCloseSession ) );
+    
+    }
 
     { //::PyMKCreateSession
     
