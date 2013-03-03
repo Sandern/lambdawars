@@ -286,13 +286,20 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 	bool bHasTeamColorTexture = ( info.m_nTeamColorTexture != -1 ) && params[info.m_nTeamColorTexture]->IsTexture() && g_pHardwareConfig->HasFastVertexTextures();
 
 	bool bHasFoW = ( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
+	bool bFOWValidTexture = true;
 	if ( bHasFoW == true )
 	{
 		ITexture *pTexture = params[ info.m_nFoW ]->GetTextureValue();
 		if ( ( pTexture->GetFlags() & TEXTUREFLAGS_RENDERTARGET ) == 0 )
 		{
-			bHasFoW = false;
+			bHasFoW = true;
+			bFOWValidTexture = false;
 		}
+	}
+	else
+	{
+		bHasFoW = true;
+		bFOWValidTexture = false;
 	}
 
 	if( pShader->IsSnapshotting() )
@@ -997,7 +1004,10 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		if ( bHasFoW )
 		{
-			pShader->BindTexture( SHADER_SAMPLER9, info.m_nFoW, -1 );
+			if( bFOWValidTexture )
+				pShader->BindTexture( SHADER_SAMPLER9, info.m_nFoW, -1 );
+			else
+				pShaderAPI->BindStandardTexture( SHADER_SAMPLER9, TEXTURE_WHITE );
 
 			float	vFoWSize[ 4 ];
 			Vector	vMins = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MINS );
