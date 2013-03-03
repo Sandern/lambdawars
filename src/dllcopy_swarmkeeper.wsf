@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<job>
+  <runtime>
+    <description>This script automatically detects the mod installation 
+    directory and copies the specified file into an internaly specified
+    subdirectory.</description>
+    <unnamed name="src" helpstring="The file to copy." required="true" />
+    <unnamed name="dst" helpstring="The name of the file after it is copied." 
+             required="true" />
+    <example>Example: dllcopy.wsf game\client\Debug\client.dll client.dll</example>
+  </runtime>
+  <!-- Script Constants: -->
+  <object id="fsObject" progid="Scripting.FileSystemObject" />
+  <object id="wshShell" progid="WScript.Shell" />
+  <resource id="mod directory">swarmkeeper_dev</resource>
+  <resource id="subdirectory">bin</resource>
+  <!-- For Source mods: -->
+  <resource id="reg value">HKCU\Software\Valve\Steam\SourceModInstallPath</resource>
+  <!-- For GoldSrc mods:
+  <resource id="reg value">HKCU\Software\Valve\Steam\ModInstallPath</resource>
+  -->
+  <!-- Script Code: -->
+  <script language="JScript">
+  <![CDATA[
+// Program Code:
+var tgtBase = wshShell.RegRead( getResource( "reg value" ) );
+
+// Check if there are enough arguments.
+if( WScript.Arguments.Unnamed.Length < 2 ) {
+  WScript.Arguments.ShowUsage();
+  WScript.Quit(1);
+}
+
+// Retrieve source path.
+var srcPath = WScript.Arguments.Unnamed.Item( 0 );
+// Check if srcPath exists.
+if( !fsObject.FileExists( srcPath ) ) {
+	WScript.Quit(1);
+}
+
+// Get target filename.
+srcFilename = WScript.Arguments.Unnamed.Item( 1 );
+// Build path of target directory.
+var tgtPath = fsObject.BuildPath(
+                fsObject.BuildPath( tgtBase,
+                  getResource( "mod directory" ) ),
+                  getResource( "subdirectory" ) );
+// Check if target directory exists.
+if( !fsObject.FolderExists( tgtPath ) ) {
+	WScript.Quit(1);
+}
+// Build complete target path.
+tgtPath = fsObject.BuildPath( tgtPath, srcFilename );
+// Check if target file exists.
+/*
+if( fsObject.FileExists( tgtPath ) ) {
+	// Check if target file is locked.
+	if( ...? ) {
+	}
+}
+*/
+// Run file copy.
+fsObject.CopyFile( srcPath, tgtPath, true );
+
+WScript.Echo("        1 file(s) copied.");
+
+// Exit.
+WScript.Quit(0);
+  ]]>
+  </script>
+</job>

@@ -762,6 +762,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// Mount any game that is available to us
 	MountExtraContent();
 
+#ifndef SWARMKEEPER_DLL
 	if ( !CommandLine()->CheckParm( "-noep2check") )
 	{
 		if( !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp(420) == false )
@@ -770,6 +771,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 			Error("This mod requires Half-Life 2: Episode Two.");
 		}
 	}
+#endif // SWARMKEEPER_DLL
 
 	if ( CommandLine()->FindParm( "-headtracking" ) )
 		g_bHeadTrackingEnabled = true;

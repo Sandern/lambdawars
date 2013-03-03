@@ -13,38 +13,41 @@
   <PropertyGroup Label="Globals">
     <ProjectName>client</ProjectName>
     <ProjectGuid>{A5D13CC4-3030-475A-9849-6B635E688FDD}</ProjectGuid>
+    <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and $(VisualStudioVersion) == ''">$(VCTargetsPath11)</VCTargetsPath>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_sdk\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_sdk\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_swarmkeeper\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_swarmkeeper\</IntDir>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PreBuildEventUseInBuild>
     <PreLinkEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PreLinkEventUseInBuild>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IgnoreImportLibrary>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PostBuildEventUseInBuild>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_sdk\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_sdk\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_swarmkeeper\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_swarmkeeper\</IntDir>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PreBuildEventUseInBuild>
     <PreLinkEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PreLinkEventUseInBuild>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
@@ -54,18 +57,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>if EXIST "D:\Steam\SteamApps\sourcemods\scratch\bin\.\$(TargetFileName)" for /f "delims=" %%A in (%27attrib "D:\Steam\SteamApps\sourcemods\scratch\bin\.\$(TargetFileName)"%27) do set valveTmpIsReadOnly="%%A"
-set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%
-if "%valveTmpIsReadOnlyLetter%"=="R" del /q "$(TargetDir)"$(TargetFileName)
-if exist ..\..\devtools\bin\vpccrccheck.exe ..\..\devtools\bin\vpccrccheck.exe -crc2 test_swarm.vcproj
-if ERRORLEVEL 1 exit 1
-</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\hl2;.\sdk;.\sdk\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\sdk;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\sdk\gameui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;SPLIT_SCREEN_STUBS;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\hl2;.\hl2wars;.\hl2wars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\hl2wars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\hl2wars\gameui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;USE_DETAIL_SHAPES;HL2WARS_DLL;HL2WARS_ASW_DLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;CHROMIUM_BUILD;USING_CEF_SHARED;ENABLE_CEF;ENABLE_PYTHON;SWARMKEEPER_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
@@ -91,13 +90,15 @@ if ERRORLEVEL 1 exit 1
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>CompileAsCpp</CompileAs>
       <ErrorReporting>Prompt</ErrorReporting>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python27_d.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -124,27 +125,15 @@ if ERRORLEVEL 1 exit 1
       <OutputFile>$(OutDir)client.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Message>Publishing to D:\Steam\SteamApps\sourcemods\sometest3\bin\.</Message>
-      <Command>if exist "D:\Steam\SteamApps\sourcemods\scratch\bin\." goto ValveStart
-mkdir "D:\Steam\SteamApps\sourcemods\scratch\bin\."
-:ValveStart
-copy "$(TargetDir)"$(TargetFileName) "D:\Steam\SteamApps\sourcemods\scratch\bin\.\$(TargetFileName)"
-if ERRORLEVEL 1 goto BuildEventFailed
-if exist "$(TargetDir)"$(TargetName).map copy "$(TargetDir)"$(TargetName).map "D:\Steam\SteamApps\sourcemods\scratch\bin\.\$(TargetName).map"
-copy "$(TargetDir)"$(TargetName).pdb "D:\Steam\SteamApps\sourcemods\scratch\bin\.\$(TargetName).pdb"
-if ERRORLEVEL 1 goto BuildEventFailed
-goto BuildEventOK
-:BuildEventFailed
-echo *** ERROR! PostBuildStep FAILED for $(ProjectName)! EXE or DLL is probably running. ***
-del /q "$(TargetDir)"$(TargetFileName)
-exit 1
-:BuildEventOK
-</Command>
+      <Message>
+      </Message>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>copy "$(TargetPath)" "$(TargetDir)dummy.$(TargetFileName)"
-cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetPath)" "$(TargetFileName)"
-cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).pdb"
+cscript //nologo ..\..\dllcopy_swarmkeeper.wsf "$(TargetPath)" "$(TargetFileName)"
+cscript //nologo ..\..\dllcopy_swarmkeeper.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).pdb"
 </Command>
       <Message>Running Output Script</Message>
       <Outputs>$(TargetDir)dummy.$(TargetFileName);%(Outputs)</Outputs>
@@ -162,8 +151,8 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>.\hl2;.\sdk;.\sdk\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\sdk;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\sdk\gameui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;SPLIT_SCREEN_STUBS;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\hl2;.\hl2wars;.\hl2wars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\hl2wars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\hl2wars\gameui;..\..\game\client\hl2wars\vgui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;HL2WARS_DLL;USE_DETAIL_SHAPES;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_NO_PY_SIGNATURES;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_ENABLE_SHARED;Py_BUILD_CORE;CHROMIUM_BUILD;USING_CEF_SHARED;ENABLE_CEF;ENABLE_PYTHON;SWARMKEEPER_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -194,7 +183,7 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python27.lib;libcef.lib;libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -230,41 +219,572 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>copy "$(TargetPath)" "$(TargetDir)dummy.$(TargetFileName)"
-cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetPath)" "$(TargetFileName)"
-cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).pdb"
+cscript //nologo ..\..\dllcopy_swarmkeeper.wsf "$(TargetPath)" "$(TargetFileName)"
+cscript //nologo ..\..\dllcopy_swarmkeeper.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).pdb"
 </Command>
-      <Message>Running Output Script</Message>
       <Outputs>$(TargetDir)dummy.$(TargetFileName);%(Outputs)</Outputs>
       <Inputs>$(TargetFileName)</Inputs>
+      <Message>Running Output Script</Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="client_base.vpc" />
-    <None Include="client_swarm.vpc" />
-    <None Include="..\..\vpc_scripts\loadaddress.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
-    <None Include="..\..\vpc_scripts\version.vpc" />
     <None Include="vscript_client.nut" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\shared\python\modules\autogenerated\_vmath.cpp" />
+    <ClCompile Include="cef\src_cef_js.cpp" />
+    <ClCompile Include="hl2wars\coreorigin_proxy.cpp" />
+    <ClCompile Include="hl2wars\c_strider_fx.cpp" />
+    <ClCompile Include="hl2\c_te_concussiveexplosion.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_cef.cpp" />
+    <ClCompile Include="cef\src_cef.cpp" />
+    <ClCompile Include="cef\src_cef_browser.cpp" />
+    <ClCompile Include="cef\src_cef_osrenderer.cpp" />
+    <ClCompile Include="cef\src_cef_python.cpp" />
+    <ClCompile Include="cef\src_cef_texgen.cpp" />
+    <ClCompile Include="cef\src_cef_vgui_panel.cpp" />
+    <ClCompile Include="hl2wars\gameui\backgroundmenubutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\basesavegamedialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\bitmapimagepanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\commandcheckbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\contentcontroldialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\createmultiplayergamebotpage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\createmultiplayergamedialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\createmultiplayergamegameplaypage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\createmultiplayergameserverpage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\customtabexplanationdialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\cvarnegatecheckbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\cvarslider.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\cvartextentry.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\cvartogglecheckbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\gameconsole.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\gameconsoledialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\gameui_interface.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\gameui_util.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\keytogglecheckbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\labeledcommandcombobox.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\loadingdialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\loadingtippanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\logofile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\modinfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\mousemessageforwardingpanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\multiplayeradvanceddialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionsdialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubaudio.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubdifficulty.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubgame.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubkeyboard.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubmouse.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubmultiplayer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubportal.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubvideo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\optionssubvoice.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\panellistpanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\playerlistdialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\rungameengine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\scriptobject.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\sys_utils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\textentrybox.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\urlbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\vcontrolslistpanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\vguisystemmoduleloader.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\basemodframe.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\basemodpanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\gamemodes.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\uiavatarimage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\uigamedata.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\uigamedata_invite.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\uigamedata_storage.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vachievements.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vaddonassociation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vaddons.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vattractscreen.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vaudio.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vaudiovideo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vcloud.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionssticks.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vcustomcampaigns.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vdownloadcampaign.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vdownloads.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vdropdownmenu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vflyoutmenu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vfooterpanel.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vfoundgames.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vfoundgroupgames.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vfoundpublicgames.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgamelobby.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgamelobbychat.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgameoptions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgamesettings.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgenericconfirmation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgenericpanellist.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgenericwaitscreen.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vgetlegacydata.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vhybridbutton.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vingamechapterselect.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vingamedifficultyselect.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vingamekickplayerlist.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vingamemainmenu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vjukebox.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vkeyboard.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vkeyboardmouse.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vleaderboard.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vloadingprogress.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vmainmenu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vmenubackground.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vmultiplayer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\voptions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vpasswordentry.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vquickjoin.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vquickjoingroups.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vsignindialog.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vslidercontrol.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vspinnercontrol.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vsteamcloudconfirmation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vtransitionscreen.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vvideo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hl2wars\gameui\wars\vvoteoptions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="python\modules\autogenerated\_entities\C_Sprite_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\matchmaking.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\PyHandle_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_navmesh.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\_entities__entities_free_functions_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseAnimatingOverlay_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\DeadEntity_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_FuncUnit_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_PlayerResource_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_SpriteTrail_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\isteam.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_te.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseEntity_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseCombatCharacter_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\DeadPanel_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\CBaseHandle_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\materials.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\_vguicontrols_main.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BasePlayer_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\TextImage_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\vprof.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_particles.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\Image_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_animation.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\AvatarImage_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_gameinterface.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\EditablePanel_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseFuncMapBoundary_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\src_append_client.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\unit_helper.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\RichText_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\BitmapImage_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\_entities_main.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\AnimationController_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_RocketTrail_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_srctests.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\Frame_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_entities_misc.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\src_append_shared.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseAnimating_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_input.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_Beam_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseCombatWeapon_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_physics.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_LocalTempEntity_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\TextEntry_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_HL2WarsPlayer_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\IImage_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseGrenade_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\Tooltip_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_ndebugoverlay.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\Panel_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vgui.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\IBorder_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_SmokeTrail_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseParticleEntity_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_gamerules.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\ScrollBar_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\_entities__entities_enumerations_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_FuncBrush_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\srcbase.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_WarsWeapon_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_sound.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_UnitBase_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_entities\C_BaseFlex_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\PyBaseVGUIHandle_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_fow.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\VideoGeneralPanel_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\ScrollBarSlider_pypp.cpp" />
+    <ClCompile Include="python\modules\autogenerated\_vguicontrols\CBaseMinimap_pypp.cpp" />
+    <ClCompile Include="..\shared\python\modules\autogenerated\_utils.cpp" />
+    <ClCompile Include="..\shared\hl2wars\wars_plat_misc_win32.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_scoreboard.cpp" />
+    <ClCompile Include="hl2wars\vgui\vgui_news.cpp" />
+    <ClCompile Include="hl2wars\videocfgext.cpp" />
+    <ClCompile Include="..\shared\python\src_python_networkvar.cpp" />
+    <ClCompile Include="hl2wars\c_wars_fx.cpp" />
+    <ClCompile Include="..\shared\python\src_python_base.cpp" />
+    <ClCompile Include="..\shared\python\src_python_matchmaking.cpp" />
+    <ClCompile Include="..\shared\python\src_python_tests.cpp" />
+    <ClCompile Include="..\shared\python\src_python_sound.cpp" />
+    <ClCompile Include="..\shared\python\src_python_gameinterface.cpp" />
+    <ClCompile Include="..\shared\python\src_python_gamerules.cpp" />
+    <ClCompile Include="..\shared\python\src_python_materials.cpp" />
+    <ClCompile Include="..\shared\python\src_python_particles.cpp" />
+    <ClCompile Include="..\shared\python\src_python_physics.cpp" />
+    <ClCompile Include="..\shared\python\src_python_navmesh.cpp" />
+    <ClCompile Include="..\shared\python\src_python_usermessage.cpp" />
+    <ClCompile Include="..\shared\python\src_python_class_shared.cpp" />
+    <ClCompile Include="..\shared\python\src_python_animation.cpp" />
+    <ClCompile Include="..\shared\python\src_python_scclasses.cpp" />
+    <ClCompile Include="python\src_python_hud.cpp" />
+    <ClCompile Include="..\shared\python\src_python_entities.cpp" />
+    <ClCompile Include="python\src_python_vgui.cpp" />
+    <ClCompile Include="..\shared\python\src_python_te.cpp" />
+    <ClCompile Include="..\shared\python\src_python_util.cpp" />
+    <ClCompile Include="python\src_python_client_class.cpp" />
+    <ClCompile Include="..\shared\python\src_python.cpp" />
     <ClCompile Include="..\..\common\language.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\density_weight_map.cpp" />
+    <ClCompile Include="..\shared\hl2wars\fowmgr.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_gamemovement.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_gamerules.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_player_shared.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_shareddefs.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_usermessages.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_util_shared.cpp" />
+    <ClCompile Include="..\shared\hl2wars\hl2wars_weapon_parse.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_airlocomotion.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_animstate.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_baseanimstate.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_base_shared.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_component.cpp" />
+    <ClCompile Include="..\shared\hl2wars\unit_locomotion.cpp" />
+    <ClCompile Include="..\shared\hl2wars\wars_func_unit.cpp" />
+    <ClCompile Include="..\shared\hl2wars\wars_mapboundary.cpp" />
+    <ClCompile Include="..\shared\hl2wars\wars_mount_system.cpp" />
+    <ClCompile Include="..\shared\hl2wars\wars_weapon_shared.cpp" />
+    <ClCompile Include="..\shared\nav_area.cpp" />
+    <ClCompile Include="..\shared\nav_colors.cpp" />
+    <ClCompile Include="..\shared\nav_file.cpp" />
+    <ClCompile Include="..\shared\nav_ladder.cpp" />
+    <ClCompile Include="..\shared\nav_merge.cpp" />
+    <ClCompile Include="..\shared\nav_mesh.cpp" />
+    <ClCompile Include="..\shared\nav_mesh_factory.cpp" />
+    <ClCompile Include="..\shared\nav_node.cpp" />
     <ClCompile Include="..\shared\predicted_viewmodel.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_fx_shared.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_gamemovement.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_gamerules.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_playeranimstate.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_player_shared.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_usermessages.cpp" />
-    <ClCompile Include="..\shared\sdk\sdk_weapon_parse.cpp" />
-    <ClCompile Include="..\shared\sdk\weapon_mp5.cpp" />
-    <ClCompile Include="..\shared\sdk\weapon_pistol.cpp" />
-    <ClCompile Include="..\shared\sdk\weapon_sdkbase.cpp" />
     <ClCompile Include="achievement_notification_panel.cpp" />
     <ClCompile Include="..\shared\achievement_saverestore.cpp" />
     <ClCompile Include="..\shared\achievementmgr.cpp" />
@@ -332,6 +852,41 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClCompile Include="c_func_conveyor.cpp" />
     <ClCompile Include="c_func_dust.cpp" />
     <ClCompile Include="c_func_lod.cpp" />
+    <ClCompile Include="hl2wars\clientmode_wars.cpp" />
+    <ClCompile Include="hl2wars\c_asw_fx_proxy.cpp" />
+    <ClCompile Include="hl2wars\c_env_dklight.cpp" />
+    <ClCompile Include="hl2wars\c_hl2wars_player.cpp" />
+    <ClCompile Include="hl2wars\c_hl2wars_team.cpp" />
+    <ClCompile Include="hl2wars\c_unit_base.cpp" />
+    <ClCompile Include="hl2wars\c_wars_jukebox.cpp" />
+    <ClCompile Include="hl2wars\c_wars_lesson.cpp" />
+    <ClCompile Include="hl2wars\c_wars_weapon.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_backgroundpanel.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_baseminimap.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_fx_impacts.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_fx_tracers.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_hud_chat.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_hud_weaponselection.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_in_camera.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_in_main.cpp" />
+    <ClCompile Include="hl2wars\hl2wars_prediction.cpp" />
+    <ClCompile Include="hl2wars\projected_texture_unlit.cpp" />
+    <ClCompile Include="hl2wars\teamcolor_proxy.cpp" />
+    <ClCompile Include="hl2wars\tex_fogofwar.cpp" />
+    <ClCompile Include="hl2wars\tf2_proxy.cpp" />
+    <ClCompile Include="hl2wars\vgui\hl2warsviewport.cpp" />
+    <ClCompile Include="hl2wars\vgui\nb_button.cpp" />
+    <ClCompile Include="hl2wars\vgui\nb_header_footer.cpp" />
+    <ClCompile Include="hl2wars\vgui\nb_horiz_list.cpp" />
+    <ClCompile Include="hl2wars\vgui\nb_select_level_entry.cpp" />
+    <ClCompile Include="hl2wars\vgui\nb_select_level_panel.cpp" />
+    <ClCompile Include="hl2wars\vgui\wars_loading_panel.cpp" />
+    <ClCompile Include="hl2wars\vgui\wars_logo_panel.cpp" />
+    <ClCompile Include="hl2wars\vgui\wars_vgui_music_importer.cpp" />
+    <ClCompile Include="hl2wars\vgui_rootpanel_wars.cpp" />
+    <ClCompile Include="hl2wars\vgui_video_general.cpp" />
+    <ClCompile Include="hl2wars\wars_mesh_builder.cpp" />
+    <ClCompile Include="hl2wars\wars_vgui_screen.cpp" />
     <ClCompile Include="hl2\C_Func_Monitor.cpp" />
     <ClCompile Include="c_func_movelinear.cpp" />
     <ClCompile Include="c_func_occluder.cpp" />
@@ -632,6 +1187,7 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClCompile Include="ProxyHealth.cpp" />
     <ClCompile Include="proxyplayer.cpp" />
     <ClCompile Include="proxypupil.cpp" />
+    <ClCompile Include="python\SurfaceBuffer.cpp" />
     <ClCompile Include="ragdoll.cpp" />
     <ClCompile Include="..\shared\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\common\randoverride.cpp">
@@ -683,441 +1239,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="sdk\clientmode_sdk.cpp" />
-    <ClCompile Include="sdk\c_sdk_jukebox.cpp" />
-    <ClCompile Include="sdk\c_sdk_lesson.cpp" />
-    <ClCompile Include="sdk\c_sdk_player.cpp" />
-    <ClCompile Include="sdk\gameui\backgroundmenubutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\basesavegamedialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\bitmapimagepanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\commandcheckbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\contentcontroldialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\createmultiplayergamebotpage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\createmultiplayergamedialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\createmultiplayergamegameplaypage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\createmultiplayergameserverpage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\customtabexplanationdialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\cvarnegatecheckbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\cvarslider.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\cvartextentry.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\cvartogglecheckbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\gameconsole.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\gameconsoledialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\gameui_interface.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\gameui_util.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\keytogglecheckbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\labeledcommandcombobox.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\loadingdialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\loadingtippanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\logofile.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\modinfo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\mousemessageforwardingpanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\multiplayeradvanceddialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionsdialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubaudio.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubdifficulty.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubgame.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubkeyboard.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubmouse.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubmultiplayer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubportal.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubvideo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\optionssubvoice.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\panellistpanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\playerlistdialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\rungameengine.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\scriptobject.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\basemodframe.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\basemodpanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\gamemodes.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\uiavatarimage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\uigamedata.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\uigamedata_invite.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\uigamedata_storage.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vachievements.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vaddonassociation.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vaddons.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vattractscreen.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vaudio.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vaudiovideo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vcloud.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vcontrolleroptions.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vcontrolleroptionsbuttons.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vcontrolleroptionssticks.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vcustomcampaigns.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vdownloadcampaign.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vdownloads.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vdropdownmenu.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vflyoutmenu.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vfooterpanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vfoundgames.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vfoundgroupgames.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vfoundpublicgames.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgamelobby.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgamelobbychat.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgameoptions.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgamesettings.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgenericconfirmation.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgenericpanellist.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgenericwaitscreen.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vgetlegacydata.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vhybridbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vingamechapterselect.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vingamedifficultyselect.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vingamekickplayerlist.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vingamemainmenu.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vjukebox.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vkeyboard.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vkeyboardmouse.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vleaderboard.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vloadingprogress.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vmainmenu.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vmenubackground.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vmultiplayer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\voptions.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vpasswordentry.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vquickjoin.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vquickjoingroups.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vsignindialog.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vslidercontrol.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vspinnercontrol.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vsteamcloudconfirmation.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vtransitionscreen.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vvideo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sdk\vvoteoptions.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\sys_utils.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\textentrybox.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\urlbutton.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\vcontrolslistpanel.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\gameui\vguisystemmoduleloader.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="sdk\sdk_fx_impacts.cpp" />
-    <ClCompile Include="sdk\sdk_fx_tracers.cpp" />
-    <ClCompile Include="sdk\sdk_fx_weaponfx.cpp" />
-    <ClCompile Include="sdk\sdk_input.cpp" />
-    <ClCompile Include="sdk\sdk_prediction.cpp" />
-    <ClCompile Include="sdk\vgui\nb_button.cpp" />
-    <ClCompile Include="sdk\vgui\nb_header_footer.cpp" />
-    <ClCompile Include="sdk\vgui\nb_horiz_list.cpp" />
-    <ClCompile Include="sdk\vgui\nb_select_level_entry.cpp" />
-    <ClCompile Include="sdk\vgui\nb_select_level_panel.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_hud_ammo.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_hud_chat.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_hud_health.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_hud_weaponselection.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_loading_panel.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_logo_panel.cpp" />
-    <ClCompile Include="sdk\vgui\sdk_vgui_music_importer.cpp" />
-    <ClCompile Include="sdk\vgui_rootpanel_sdk.cpp" />
     <ClCompile Include="simple_keys.cpp" />
     <ClCompile Include="..\..\public\simple_physics.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1302,14 +1423,172 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClCompile Include="toolframework_client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\shared\hl2wars\wars_plat_misc.h" />
+    <ClInclude Include="..\shared\python\src_python_util.h" />
+    <ClInclude Include="..\shared\python\src_python_sound.h" />
+    <ClInclude Include="cef\src_cef.h" />
+    <ClInclude Include="cef\src_cef_browser.h" />
+    <ClInclude Include="cef\src_cef_js.h" />
+    <ClInclude Include="cef\src_cef_osrenderer.h" />
+    <ClInclude Include="cef\src_cef_python.h" />
+    <ClInclude Include="cef\src_cef_texgen.h" />
+    <ClInclude Include="cef\src_cef_vgui_panel.h" />
+    <ClInclude Include="hl2wars\c_strider_fx.h" />
+    <ClInclude Include="hl2wars\gameui\backgroundmenubutton.h" />
+    <ClInclude Include="hl2wars\gameui\basepanel.h" />
+    <ClInclude Include="hl2wars\gameui\basesavegamedialog.h" />
+    <ClInclude Include="hl2wars\gameui\bitmapimagepanel.h" />
+    <ClInclude Include="hl2wars\gameui\cdkeyentrydialog.h" />
+    <ClInclude Include="hl2wars\gameui\commandcheckbutton.h" />
+    <ClInclude Include="hl2wars\gameui\contentcontroldialog.h" />
+    <ClInclude Include="hl2wars\gameui\createmultiplayergamebotpage.h" />
+    <ClInclude Include="hl2wars\gameui\createmultiplayergamedialog.h" />
+    <ClInclude Include="hl2wars\gameui\createmultiplayergamegameplaypage.h" />
+    <ClInclude Include="hl2wars\gameui\createmultiplayergameserverpage.h" />
+    <ClInclude Include="hl2wars\gameui\customtabexplanationdialog.h" />
+    <ClInclude Include="hl2wars\gameui\cvarnegatecheckbutton.h" />
+    <ClInclude Include="hl2wars\gameui\cvarslider.h" />
+    <ClInclude Include="hl2wars\gameui\cvartextentry.h" />
+    <ClInclude Include="hl2wars\gameui\cvartogglecheckbutton.h" />
+    <ClInclude Include="hl2wars\gameui\engineinterface.h" />
+    <ClInclude Include="hl2wars\gameui\gameconsole.h" />
+    <ClInclude Include="hl2wars\gameui\gameconsoledialog.h" />
+    <ClInclude Include="hl2wars\gameui\gameui_interface.h" />
+    <ClInclude Include="hl2wars\gameui\gameui_util.h" />
+    <ClInclude Include="hl2wars\gameui\keytogglecheckbutton.h" />
+    <ClInclude Include="hl2wars\gameui\labeledcommandcombobox.h" />
+    <ClInclude Include="hl2wars\gameui\loadingdialog.h" />
+    <ClInclude Include="hl2wars\gameui\loadingtippanel.h" />
+    <ClInclude Include="hl2wars\gameui\modinfo.h" />
+    <ClInclude Include="hl2wars\gameui\mousemessageforwardingpanel.h" />
+    <ClInclude Include="hl2wars\gameui\multiplayeradvanceddialog.h" />
+    <ClInclude Include="hl2wars\gameui\optionsdialog.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubaudio.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubdifficulty.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubgame.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubkeyboard.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubmouse.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubmultiplayer.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubportal.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubvideo.h" />
+    <ClInclude Include="hl2wars\gameui\optionssubvoice.h" />
+    <ClInclude Include="hl2wars\gameui\panellistpanel.h" />
+    <ClInclude Include="hl2wars\gameui\playerlistdialog.h" />
+    <ClInclude Include="hl2wars\gameui\rungameengine.h" />
+    <ClInclude Include="hl2wars\gameui\scriptobject.h" />
+    <ClInclude Include="hl2wars\gameui\sys_utils.h" />
+    <ClInclude Include="hl2wars\gameui\textentrybox.h" />
+    <ClInclude Include="hl2wars\gameui\urlbutton.h" />
+    <ClInclude Include="hl2wars\gameui\vcontrolslistpanel.h" />
+    <ClInclude Include="hl2wars\gameui\vguisystemmoduleloader.h" />
+    <ClInclude Include="hl2wars\gameui\wars\basemodframe.h" />
+    <ClInclude Include="hl2wars\gameui\wars\basemodpanel.h" />
+    <ClInclude Include="hl2wars\gameui\wars\basemodui.h" />
+    <ClInclude Include="hl2wars\gameui\wars\gamemodes.h" />
+    <ClInclude Include="hl2wars\gameui\wars\uiavatarimage.h" />
+    <ClInclude Include="hl2wars\gameui\wars\uigamedata.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vachievements.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vaddonassociation.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vaddons.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vattractscreen.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vaudio.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vaudiovideo.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vcloud.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptions.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionssticks.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vcustomcampaigns.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vdownloadcampaign.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vdownloads.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vdropdownmenu.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vflyoutmenu.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vfooterpanel.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vfoundgames.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vfoundgroupgames.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vfoundpublicgames.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgamelobby.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgamelobbychat.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgameoptions.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgamesettings.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgenericconfirmation.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgenericpanellist.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgenericwaitscreen.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vgetlegacydata.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vhybridbutton.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vingamechapterselect.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vingamedifficultyselect.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vingamekickplayerlist.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vingamemainmenu.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vjukebox.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vkeyboard.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vkeyboardmouse.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vleaderboard.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vloadingprogress.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vmainmenu.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vmultiplayer.h" />
+    <ClInclude Include="hl2wars\gameui\wars\voptions.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vpasswordentry.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vquickjoin.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vquickjoingroups.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vsignindialog.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vslidercontrol.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vspinnercontrol.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vsteamcloudconfirmation.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vtransitionscreen.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vvideo.h" />
+    <ClInclude Include="hl2wars\gameui\wars\vvoteoptions.h" />
+    <ClInclude Include="hl2wars\hl2wars_in_main.h" />
+    <ClInclude Include="hl2wars\hl2wars_scoreboard.h" />
+    <ClInclude Include="hl2wars\vgui\vgui_news.h" />
+    <ClInclude Include="hl2wars\videocfgext.h" />
+    <ClInclude Include="python\src_python_client_class.h" />
+    <ClInclude Include="..\shared\python\src_python_usermessage.h" />
+    <ClInclude Include="..\shared\python\src_python_materials.h" />
+    <ClInclude Include="..\shared\python\src_python.h" />
+    <ClInclude Include="..\shared\python\src_python_particles.h" />
+    <ClInclude Include="..\shared\python\src_python_gamerules.h" />
+    <ClInclude Include="..\shared\python\src_python_class_shared.h" />
+    <ClInclude Include="..\shared\python\src_python_physics.h" />
+    <ClInclude Include="..\shared\python\src_python_tests.h" />
+    <ClInclude Include="..\shared\python\src_python_navmesh.h" />
+    <ClInclude Include="..\shared\python\src_python_networkvar.h" />
+    <ClInclude Include="python\src_python_hud.h" />
+    <ClInclude Include="..\shared\python\src_python_gameinterface.h" />
+    <ClInclude Include="..\shared\python\src_python_converters_ents.h" />
+    <ClInclude Include="..\shared\python\src_python_base.h" />
+    <ClInclude Include="..\shared\python\src_python_animation.h" />
+    <ClInclude Include="..\shared\python\src_python_converters.h" />
+    <ClInclude Include="..\shared\python\src_python_te.h" />
+    <ClInclude Include="..\shared\python\src_python_gameinterface_converters.h" />
+    <ClInclude Include="..\shared\python\src_python_matchmaking.h" />
+    <ClInclude Include="python\src_python_vgui.h" />
+    <ClInclude Include="..\shared\python\src_python_entities.h" />
+    <ClInclude Include="..\shared\hl2wars\density_weight_map.h" />
+    <ClInclude Include="..\shared\hl2wars\fowmgr.h" />
+    <ClInclude Include="..\shared\hl2wars\hl2wars_gamerules.h" />
+    <ClInclude Include="..\shared\hl2wars\hl2wars_player_shared.h" />
+    <ClInclude Include="..\shared\hl2wars\hl2wars_shareddefs.h" />
+    <ClInclude Include="..\shared\hl2wars\hl2wars_util_shared.h" />
+    <ClInclude Include="..\shared\hl2wars\imouse.h" />
+    <ClInclude Include="..\shared\hl2wars\iunit.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_airlocomotion.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_animstate.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_baseanimstate.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_base_shared.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_component.h" />
+    <ClInclude Include="..\shared\hl2wars\unit_locomotion.h" />
+    <ClInclude Include="..\shared\hl2wars\wars_func_unit.h" />
+    <ClInclude Include="..\shared\hl2wars\wars_mapboundary.h" />
+    <ClInclude Include="..\shared\hl2wars\wars_mount_system.h" />
+    <ClInclude Include="..\shared\hl2wars\wars_weapon_shared.h" />
+    <ClInclude Include="..\shared\nav.h" />
+    <ClInclude Include="..\shared\nav_area.h" />
+    <ClInclude Include="..\shared\nav_colors.h" />
+    <ClInclude Include="..\shared\nav_ladder.h" />
+    <ClInclude Include="..\shared\nav_mesh.h" />
+    <ClInclude Include="..\shared\nav_node.h" />
+    <ClInclude Include="..\shared\nav_pathfind.h" />
     <ClInclude Include="..\shared\predicted_viewmodel.h" />
-    <ClInclude Include="..\shared\sdk\sdk_fx_shared.h" />
-    <ClInclude Include="..\shared\sdk\sdk_gamerules.h" />
-    <ClInclude Include="..\shared\sdk\sdk_movedata.h" />
-    <ClInclude Include="..\shared\sdk\sdk_playeranimstate.h" />
-    <ClInclude Include="..\shared\sdk\sdk_player_shared.h" />
-    <ClInclude Include="..\shared\sdk\sdk_weapon_parse.h" />
-    <ClInclude Include="..\shared\sdk\weapon_sdkbase.h" />
     <ClInclude Include="achievement_notification_panel.h" />
     <ClInclude Include="..\shared\achievement_saverestore.h" />
     <ClInclude Include="..\shared\achievementmgr.h" />
@@ -1333,6 +1612,31 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="commentary_modelviewer.h" />
     <ClInclude Include="foundryhelpers_client.h" />
     <ClInclude Include="..\shared\game_timescale_shared.h" />
+    <ClInclude Include="hl2wars\clientmode_wars.h" />
+    <ClInclude Include="hl2wars\c_hl2wars_player.h" />
+    <ClInclude Include="hl2wars\c_hl2wars_team.h" />
+    <ClInclude Include="hl2wars\c_unit_base.h" />
+    <ClInclude Include="hl2wars\c_wars_jukebox.h" />
+    <ClInclude Include="hl2wars\c_wars_weapon.h" />
+    <ClInclude Include="hl2wars\hl2wars_backgroundpanel.h" />
+    <ClInclude Include="hl2wars\hl2wars_baseminimap.h" />
+    <ClInclude Include="hl2wars\hl2wars_hud_chat.h" />
+    <ClInclude Include="hl2wars\playerandunitenumerator.h" />
+    <ClInclude Include="hl2wars\projected_texture_unlit.h" />
+    <ClInclude Include="hl2wars\teamcolor_proxy.h" />
+    <ClInclude Include="hl2wars\tex_fogofwar.h" />
+    <ClInclude Include="hl2wars\vgui\hl2warsviewport.h" />
+    <ClInclude Include="hl2wars\vgui\nb_button.h" />
+    <ClInclude Include="hl2wars\vgui\nb_header_footer.h" />
+    <ClInclude Include="hl2wars\vgui\nb_horiz_list.h" />
+    <ClInclude Include="hl2wars\vgui\nb_select_level_entry.h" />
+    <ClInclude Include="hl2wars\vgui\nb_select_level_panel.h" />
+    <ClInclude Include="hl2wars\vgui\wars_loading_panel.h" />
+    <ClInclude Include="hl2wars\vgui\wars_logo_panel.h" />
+    <ClInclude Include="hl2wars\vgui\wars_vgui_music_importer.h" />
+    <ClInclude Include="hl2wars\vgui_video_general.h" />
+    <ClInclude Include="hl2wars\wars_mesh_builder.h" />
+    <ClInclude Include="hl2wars\wars_vgui_screen.h" />
     <ClInclude Include="hud_locator_target.h" />
     <ClInclude Include="..\..\engine\iblackbox.h" />
     <ClInclude Include="modelrendersystem.h" />
@@ -1341,122 +1645,7 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="..\shared\point_bonusmaps_accessor.h" />
     <ClInclude Include="..\shared\postprocess_shared.h" />
     <ClInclude Include="..\shared\sharedvar.h" />
-    <ClInclude Include="sdk\clientmode_sdk.h" />
-    <ClInclude Include="sdk\c_sdk_jukebox.h" />
-    <ClInclude Include="sdk\c_sdk_player.h" />
-    <ClInclude Include="sdk\gameui\backgroundmenubutton.h" />
-    <ClInclude Include="sdk\gameui\basepanel.h" />
-    <ClInclude Include="sdk\gameui\basesavegamedialog.h" />
-    <ClInclude Include="sdk\gameui\bitmapimagepanel.h" />
-    <ClInclude Include="sdk\gameui\cdkeyentrydialog.h" />
-    <ClInclude Include="sdk\gameui\commandcheckbutton.h" />
-    <ClInclude Include="sdk\gameui\contentcontroldialog.h" />
-    <ClInclude Include="sdk\gameui\createmultiplayergamebotpage.h" />
-    <ClInclude Include="sdk\gameui\createmultiplayergamedialog.h" />
-    <ClInclude Include="sdk\gameui\createmultiplayergamegameplaypage.h" />
-    <ClInclude Include="sdk\gameui\createmultiplayergameserverpage.h" />
-    <ClInclude Include="sdk\gameui\customtabexplanationdialog.h" />
-    <ClInclude Include="sdk\gameui\cvarnegatecheckbutton.h" />
-    <ClInclude Include="sdk\gameui\cvarslider.h" />
-    <ClInclude Include="sdk\gameui\cvartextentry.h" />
-    <ClInclude Include="sdk\gameui\cvartogglecheckbutton.h" />
-    <ClInclude Include="sdk\gameui\engineinterface.h" />
-    <ClInclude Include="sdk\gameui\gameconsole.h" />
-    <ClInclude Include="sdk\gameui\gameconsoledialog.h" />
-    <ClInclude Include="sdk\gameui\gameui_interface.h" />
-    <ClInclude Include="sdk\gameui\gameui_util.h" />
-    <ClInclude Include="sdk\gameui\keytogglecheckbutton.h" />
-    <ClInclude Include="sdk\gameui\labeledcommandcombobox.h" />
-    <ClInclude Include="sdk\gameui\loadingdialog.h" />
-    <ClInclude Include="sdk\gameui\loadingtippanel.h" />
-    <ClInclude Include="sdk\gameui\modinfo.h" />
-    <ClInclude Include="sdk\gameui\mousemessageforwardingpanel.h" />
-    <ClInclude Include="sdk\gameui\multiplayeradvanceddialog.h" />
-    <ClInclude Include="sdk\gameui\optionsdialog.h" />
-    <ClInclude Include="sdk\gameui\optionssubaudio.h" />
-    <ClInclude Include="sdk\gameui\optionssubdifficulty.h" />
-    <ClInclude Include="sdk\gameui\optionssubgame.h" />
-    <ClInclude Include="sdk\gameui\optionssubkeyboard.h" />
-    <ClInclude Include="sdk\gameui\optionssubmouse.h" />
-    <ClInclude Include="sdk\gameui\optionssubmultiplayer.h" />
-    <ClInclude Include="sdk\gameui\optionssubportal.h" />
-    <ClInclude Include="sdk\gameui\optionssubvideo.h" />
-    <ClInclude Include="sdk\gameui\optionssubvoice.h" />
-    <ClInclude Include="sdk\gameui\panellistpanel.h" />
-    <ClInclude Include="sdk\gameui\playerlistdialog.h" />
-    <ClInclude Include="sdk\gameui\rungameengine.h" />
-    <ClInclude Include="sdk\gameui\scriptobject.h" />
-    <ClInclude Include="sdk\gameui\sdk\basemodframe.h" />
-    <ClInclude Include="sdk\gameui\sdk\basemodpanel.h" />
-    <ClInclude Include="sdk\gameui\sdk\basemodui.h" />
-    <ClInclude Include="sdk\gameui\sdk\gamemodes.h" />
-    <ClInclude Include="sdk\gameui\sdk\uiavatarimage.h" />
-    <ClInclude Include="sdk\gameui\sdk\uigamedata.h" />
-    <ClInclude Include="sdk\gameui\sdk\vachievements.h" />
-    <ClInclude Include="sdk\gameui\sdk\vaddonassociation.h" />
-    <ClInclude Include="sdk\gameui\sdk\vaddons.h" />
-    <ClInclude Include="sdk\gameui\sdk\vattractscreen.h" />
-    <ClInclude Include="sdk\gameui\sdk\vaudio.h" />
-    <ClInclude Include="sdk\gameui\sdk\vaudiovideo.h" />
-    <ClInclude Include="sdk\gameui\sdk\vcloud.h" />
-    <ClInclude Include="sdk\gameui\sdk\vcontrolleroptions.h" />
-    <ClInclude Include="sdk\gameui\sdk\vcontrolleroptionsbuttons.h" />
-    <ClInclude Include="sdk\gameui\sdk\vcontrolleroptionssticks.h" />
-    <ClInclude Include="sdk\gameui\sdk\vcustomcampaigns.h" />
-    <ClInclude Include="sdk\gameui\sdk\vdownloadcampaign.h" />
-    <ClInclude Include="sdk\gameui\sdk\vdownloads.h" />
-    <ClInclude Include="sdk\gameui\sdk\vdropdownmenu.h" />
-    <ClInclude Include="sdk\gameui\sdk\vflyoutmenu.h" />
-    <ClInclude Include="sdk\gameui\sdk\vfooterpanel.h" />
-    <ClInclude Include="sdk\gameui\sdk\vfoundgames.h" />
-    <ClInclude Include="sdk\gameui\sdk\vfoundgroupgames.h" />
-    <ClInclude Include="sdk\gameui\sdk\vfoundpublicgames.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgamelobby.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgamelobbychat.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgameoptions.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgamesettings.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgenericconfirmation.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgenericpanellist.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgenericwaitscreen.h" />
-    <ClInclude Include="sdk\gameui\sdk\vgetlegacydata.h" />
-    <ClInclude Include="sdk\gameui\sdk\vhybridbutton.h" />
-    <ClInclude Include="sdk\gameui\sdk\vingamechapterselect.h" />
-    <ClInclude Include="sdk\gameui\sdk\vingamedifficultyselect.h" />
-    <ClInclude Include="sdk\gameui\sdk\vingamekickplayerlist.h" />
-    <ClInclude Include="sdk\gameui\sdk\vingamemainmenu.h" />
-    <ClInclude Include="sdk\gameui\sdk\vjukebox.h" />
-    <ClInclude Include="sdk\gameui\sdk\vkeyboard.h" />
-    <ClInclude Include="sdk\gameui\sdk\vkeyboardmouse.h" />
-    <ClInclude Include="sdk\gameui\sdk\vleaderboard.h" />
-    <ClInclude Include="sdk\gameui\sdk\vloadingprogress.h" />
-    <ClInclude Include="sdk\gameui\sdk\vmainmenu.h" />
-    <ClInclude Include="sdk\gameui\sdk\vmultiplayer.h" />
-    <ClInclude Include="sdk\gameui\sdk\voptions.h" />
-    <ClInclude Include="sdk\gameui\sdk\vpasswordentry.h" />
-    <ClInclude Include="sdk\gameui\sdk\vquickjoin.h" />
-    <ClInclude Include="sdk\gameui\sdk\vquickjoingroups.h" />
-    <ClInclude Include="sdk\gameui\sdk\vsignindialog.h" />
-    <ClInclude Include="sdk\gameui\sdk\vslidercontrol.h" />
-    <ClInclude Include="sdk\gameui\sdk\vspinnercontrol.h" />
-    <ClInclude Include="sdk\gameui\sdk\vsteamcloudconfirmation.h" />
-    <ClInclude Include="sdk\gameui\sdk\vtransitionscreen.h" />
-    <ClInclude Include="sdk\gameui\sdk\vvideo.h" />
-    <ClInclude Include="sdk\gameui\sdk\vvoteoptions.h" />
-    <ClInclude Include="sdk\gameui\sys_utils.h" />
-    <ClInclude Include="sdk\gameui\textentrybox.h" />
-    <ClInclude Include="sdk\gameui\urlbutton.h" />
-    <ClInclude Include="sdk\gameui\vcontrolslistpanel.h" />
-    <ClInclude Include="sdk\gameui\vguisystemmoduleloader.h" />
-    <ClInclude Include="sdk\sdk_input.h" />
-    <ClInclude Include="sdk\vgui\nb_button.h" />
-    <ClInclude Include="sdk\vgui\nb_header_footer.h" />
-    <ClInclude Include="sdk\vgui\nb_horiz_list.h" />
-    <ClInclude Include="sdk\vgui\nb_select_level_entry.h" />
-    <ClInclude Include="sdk\vgui\nb_select_level_panel.h" />
-    <ClInclude Include="sdk\vgui\sdk_hud_chat.h" />
-    <ClInclude Include="sdk\vgui\sdk_loading_panel.h" />
-    <ClInclude Include="sdk\vgui\sdk_logo_panel.h" />
-    <ClInclude Include="sdk\vgui\sdk_vgui_music_importer.h" />
+    <ClInclude Include="python\SurfaceBuffer.h" />
     <ClInclude Include="spatialentitymgr.h" />
     <ClInclude Include="vgui_avatarimage.h" />
     <ClInclude Include="viewdebug.h" />
@@ -1546,7 +1735,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="functionproxy.h" />
     <ClInclude Include="fx.h" />
     <ClInclude Include="fx_blood.h" />
-    <ClInclude Include="cstrike\fx_cs_blood.h" />
     <ClInclude Include="fx_discreetline.h" />
     <ClInclude Include="fx_envelope.h" />
     <ClInclude Include="fx_explosion.h" />
@@ -1578,7 +1766,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="hud_macros.h" />
     <ClInclude Include="hud_numericdisplay.h" />
     <ClInclude Include="hud_pdump.h" />
-    <ClInclude Include="cstrike\hud_radar.h" />
     <ClInclude Include="hud_vehicle.h" />
     <ClInclude Include="hudelement.h" />
     <ClInclude Include="hudtexturehandle.h" />
@@ -1900,7 +2087,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="..\shared\animation.h" />
     <ClInclude Include="..\shared\apparent_velocity_helper.h" />
     <ClInclude Include="..\shared\base_playeranimstate.h" />
-    <ClInclude Include="..\shared\cstrike\basecsgrenade_projectile.h" />
     <ClInclude Include="..\shared\baseentity_shared.h" />
     <ClInclude Include="..\shared\basegrenade_shared.h" />
     <ClInclude Include="..\shared\hl2\basehlcombatweapon_shared.h" />
@@ -1928,7 +2114,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="..\shared\eventlist.h" />
     <ClInclude Include="..\shared\func_dust_shared.h" />
     <ClInclude Include="..\shared\func_ladder.h" />
-    <ClInclude Include="..\shared\cstrike\fx_cs_shared.h" />
     <ClInclude Include="..\shared\gameeventdefs.h" />
     <ClInclude Include="..\shared\gamemovement.h" />
     <ClInclude Include="..\shared\gamerules.h" />
@@ -2007,9 +2192,6 @@ cscript //nologo ..\..\scratch_dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(T
     <ClInclude Include="..\shared\voice_gamemgr.h" />
     <ClInclude Include="..\shared\voice_status.h" />
     <ClInclude Include="..\shared\vphysics_sound.h" />
-    <ClInclude Include="..\shared\cstrike\weapon_flashbang.h" />
-    <ClInclude Include="..\shared\cstrike\weapon_hegrenade.h" />
-    <ClInclude Include="..\shared\weapon_ifmsteadycam.h" />
     <ClInclude Include="..\shared\weapon_parse.h" />
     <ClInclude Include="..\shared\weapon_proficiency.h" />
     <ClInclude Include="game_controls\baseviewport.h" />

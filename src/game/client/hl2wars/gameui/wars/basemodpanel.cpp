@@ -1845,7 +1845,11 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 
 	char filename[MAX_PATH];
 	//V_snprintf( filename, sizeof( filename ), "VGUI/swarm/loading/BGFX01" ); // TODO: engine->GetStartupImage( filename, sizeof( filename ), screenWide, screenTall );
+#ifdef SWARMKEEPER_DLL
+	V_snprintf( filename, sizeof( filename ), "console/swarmkeeper_bg1_widescreen" );
+#else
 	V_snprintf( filename, sizeof( filename ), "console/hl2wars_bg1_widescreen" ); // TODO
+#endif // SWARMKEEPER_DLL
 	m_iBackgroundImageID = surface()->CreateNewTextureID();
 	surface()->DrawSetTextureFile( m_iBackgroundImageID, filename, true, false );
 
@@ -1876,6 +1880,17 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 	m_nProductImageWide = vgui::scheme()->GetProportionalScaledValue( logoW );
 	m_nProductImageTall = vgui::scheme()->GetProportionalScaledValue( logoH );
 
+#ifdef SWARMKEEPER_DLL
+	if ( aspectRatio >= 1.6f )
+	{
+		// use the widescreen version
+		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "swarmkeeper_bg1" );
+	}
+	else
+	{
+		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "swarmkeeper_bg1" );
+	}
+#else
 	if ( aspectRatio >= 1.6f )
 	{
 		// use the widescreen version
@@ -1885,6 +1900,7 @@ void CBaseModPanel::ApplySchemeSettings(IScheme *pScheme)
 	{
 		Q_snprintf( m_szFadeFilename, sizeof( m_szFadeFilename ), "materials/console/%s_widescreen.vtf", "hl2wars_bg1" );
 	}
+#endif // SWARMKEEPER_DLL
 
 	// TODO: GetBackgroundMusic
 #if 0

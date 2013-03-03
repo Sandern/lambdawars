@@ -81,25 +81,15 @@ void CSDK_Loading_Panel::Init( void )
 	m_pDetailsPanel->SetVisible( false );
 
 	// choose pic
-	static char pics[14][64] = {
-		"console/hl2wars_bg1_widescreen",
-		/*
-		//"swarm/loading/Loading_Vereon",
-		"swarm/loading/Loading_Labs1",
-		"swarm/loading/Loading_Labs2",
-		"swarm/loading/Loading_LandingBay",
-		"swarm/loading/Loading_Mine1",
-		"swarm/loading/Loading_Mine2",
-		"swarm/loading/Loading_Mine3",
-		"swarm/loading/Loading_Office",
-		"swarm/loading/Loading_Plant1",
-		"swarm/loading/Loading_Plant2",
-		"swarm/loading/Loading_Plant3",
-		"swarm/loading/Loading_Sewers1",
-		"swarm/loading/Loading_Sewers2",
-		"swarm/loading/Loading_Sewers3",
-		"swarm/loading/Loading_Sewers4"*/
+#ifdef SWARMKEEPER_DLL
+	static char pics[1][64] = {
+		"console/swarmkeeper_bg1_widescreen",
 	};
+#else
+	static char pics[1][64] = {
+		"console/hl2wars_bg1_widescreen",
+	};
+#endif // 
 
 	int iChosen = RandomInt(0,13);
 	Q_snprintf(m_szLoadingPic, sizeof(m_szLoadingPic), pics[iChosen]);
