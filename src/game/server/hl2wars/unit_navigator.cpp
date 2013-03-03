@@ -1341,7 +1341,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 			// Check LOS
 			if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
 			{
-				if( !m_pOuter->HasRangeAttackLOS(GetPath()->m_hTarget->WorldSpaceCenter()) )
+				if( !m_pOuter->HasRangeAttackLOS( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ) ) )
 				{
 					if( unit_navigator_debug_inrange.GetBool() )
 						DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS to target using HasRangeAttackLOS\n", GetOuter()->entindex() );
@@ -1353,7 +1353,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 				// Check own los
 				trace_t result;
 				CTraceFilterNoNPCsOrPlayer traceFilter( GetPath()->m_hTarget, COLLISION_GROUP_NONE );
-				UTIL_TraceLine( m_pOuter->EyePosition(), GetPath()->m_hTarget->WorldSpaceCenter(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &result );
+				UTIL_TraceLine( m_pOuter->EyePosition(), GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &result );
 				if (result.fraction != 1.0f)
 				{
 					if( unit_navigator_debug_inrange.GetBool() )

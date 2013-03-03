@@ -202,7 +202,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	{
 		if ( g_debug_wars_weapon.GetBool() )
 		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
+			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
 		}
 
 		return true;
@@ -229,7 +229,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	{
 		if ( g_debug_wars_weapon.GetBool() )
 		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, false, 1.0 );
+			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
 		}
 
 		return true;
@@ -259,7 +259,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 
 	if ( g_debug_wars_weapon.GetBool() )
 	{
-		NDebugOverlay::Line( barrelPos, targetPos, 255, 0, 0, false, 1.0 );
+		NDebugOverlay::Line( barrelPos, targetPos, 255, 0, 0, true, 1.0 );
 	}
 
 	return false;
