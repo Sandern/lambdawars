@@ -4,13 +4,11 @@
 //
 //=============================================================================//
 
-#ifndef HL2Wars_SHAREDDEFS_H
-#define HL2Wars_SHAREDDEFS_H
+#ifndef WARS_SHAREDDEFS_H
+#define WARS_SHAREDDEFS_H
 #ifdef _WIN32
 #pragma once
 #endif
-
-#define SELECTBOX_THRESHOLD	32.0f
 
 #define WARS_COLLISION_SUPPORTED_UNITS 16
 enum WarsCollision_Group_t
@@ -80,4 +78,4 @@ struct fogofwar_t
 	float		m_fLifeTime;		// usage: lifetime = gpGlobals->curtime + lifetime; Use -1 for live forever.
 };
 
-#endif // HL2Wars_SHAREDDEFS_H
+#endif // WARS_SHAREDDEFS_H
