@@ -18,7 +18,6 @@ class C_BaseEntity;
 class C_BaseObject;
 class CBaseTechnology;
 
-//Tony; so we can call this from shared code!
 #define CHL2WarsTeam C_HL2WarsTeam
 
 //-----------------------------------------------------------------------------

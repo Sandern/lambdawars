@@ -2,12 +2,6 @@
 //
 // Purpose:		
 //
-// $Workfile:     $
-// $Date:         $
-//
-//-----------------------------------------------------------------------------
-// $Log: $
-//
 // $NoKeywords: $
 //=============================================================================//
 
@@ -40,13 +34,13 @@ public:
 
 	float GetBloat() { return m_fBloat; }
 
-	#if defined( GAME_DLL )
+#if defined( GAME_DLL )
 	int UpdateTransmitState()
 	{
 		// transmit if in PVS for clientside prediction
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
-	#endif
+#endif
 
 public:
 	CBaseFuncMapBoundary			*m_pNext;
@@ -56,7 +50,5 @@ private:
 };
 
 CBaseFuncMapBoundary *GetMapBoundaryList();
-
-
 
 #endif // WARS_BASEMAPBOUNDARY_H
