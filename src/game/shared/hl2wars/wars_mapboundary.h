@@ -37,7 +37,6 @@ public:
 #if defined( GAME_DLL )
 	int UpdateTransmitState()
 	{
-		// transmit if in PVS for clientside prediction
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
 #endif
