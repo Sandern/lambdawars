@@ -33,8 +33,9 @@ public:
 
 	void SetEnt( CBaseEntity *pEnt ) { m_hEnt = pEnt; }
 	CBaseEntity *GetEnt() { return m_hEnt.Get(); }
-};
 
+	virtual void Draw( CMeshBuilder &builder );
+};
 
 // Python mesh builder element
 class PyMeshBuilder
@@ -43,20 +44,47 @@ public:
 						PyMeshBuilder( const char *pMaterialName, MaterialPrimitiveType_t type = MATERIAL_POINTS );
 						~PyMeshBuilder();
 
-	void				Draw( double frametime );
+	virtual void		Draw( double frametime );
 
 	void				AddVertex( PyMeshVertex &vertex ); 
 
 	void				SetMaterial( const char *pMaterialName );
 
-private:
+protected:
 	int					GetNumPrimitives();
 
-private:
+protected:
 	IMaterial *m_pMaterial;
 	MaterialPrimitiveType_t m_nType;
 
 	CUtlVector< PyMeshVertex > m_pyMeshVertices;
+};
+
+class PyMeshRallyLine : public PyMeshBuilder
+{
+public:
+	PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ) {}
+
+	void				Draw( double frametime );
+
+	void SetEnt1( CBaseEntity *pEnt ) { m_hEnt1 = pEnt; }
+	CBaseEntity *GetEnt1() { return m_hEnt1.Get(); }
+
+	void SetEnt2( CBaseEntity *pEnt ) { m_hEnt2 = pEnt; }
+	CBaseEntity *GetEnt2() { return m_hEnt2.Get(); }
+public:
+	Color color;
+	Vector point1;
+	Vector point2;
+	float size;
+	float texturex;
+	float texturey;
+	float texturexscale;
+	float textureyscale;
+
+protected:
+	EHANDLE m_hEnt1;
+	EHANDLE m_hEnt2;
 };
 
 // Python client effect

@@ -115,7 +115,7 @@ class TE(GenerateModuleSemiShared):
         cls.rename('MeshVertex')
         
         cls.var('m_hEnt').exclude()
-        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         cls.add_property( 'ent'
                          , cls.member_function( 'GetEnt' )
                          , cls.member_function( 'SetEnt' ) )
@@ -124,6 +124,20 @@ class TE(GenerateModuleSemiShared):
         cls.include()
         cls.rename('MeshBuilder')
         cls.mem_funs().virtuality = 'not virtual' 
+        
+        cls = mb.class_('PyMeshRallyLine')
+        cls.include()
+        cls.rename('MeshRallyLine')
+        cls.mem_funs().virtuality = 'not virtual' 
+        
+        cls.mem_funs('GetEnt1').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.add_property( 'ent1'
+                         , cls.member_function( 'GetEnt1' )
+                         , cls.member_function( 'SetEnt1' ) )
+        cls.mem_funs('GetEnt2').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.add_property( 'ent2'
+                         , cls.member_function( 'GetEnt2' )
+                         , cls.member_function( 'SetEnt2' ) )
         
         mb.enum('MaterialPrimitiveType_t').include()
         

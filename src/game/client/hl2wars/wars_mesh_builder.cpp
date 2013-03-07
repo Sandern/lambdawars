@@ -14,6 +14,18 @@
 #include "tier0/memdbgon.h"
 
 #ifdef ENABLE_PYTHON
+void PyMeshVertex::Draw( CMeshBuilder &builder )
+{
+	Vector drawpos = position;
+	if( m_hEnt )
+		drawpos += m_hEnt->GetAbsOrigin();		
+
+	builder.Position3fv( drawpos.Base() );
+	builder.Normal3fv( normal.Base() );
+	builder.TexCoord2f( stage, s, t );
+	builder.Color4ub( color[0], color[1], color[2], color[3] );
+}
+
 // Python mesh builder
 PyMeshBuilder::PyMeshBuilder( const char *pMaterialName, MaterialPrimitiveType_t type )
 	: m_nType(type)
@@ -57,19 +69,10 @@ void PyMeshBuilder::Draw( double frametime )
 	builder.Begin(pMesh, m_nType, GetNumPrimitives());
 	
 	// Draw the vertex list
-	Vector position;
 	for( int i = 0; i < m_pyMeshVertices.Count(); i++ )
 	{
 		PyMeshVertex &vertex = m_pyMeshVertices[i];
-
-		position = vertex.position;
-		if( vertex.m_hEnt )
-			position += vertex.m_hEnt->GetAbsOrigin();		
-
-		builder.Position3fv( position.Base() );
-		builder.Normal3fv( vertex.normal.Base() );
-		builder.TexCoord2f( vertex.stage, vertex.s, vertex.t );
-		builder.Color4ub( vertex.color[0], vertex.color[1], vertex.color[2], vertex.color[3] );
+		vertex.Draw( builder );
 		builder.AdvanceVertex();
 	}
 
@@ -123,6 +126,66 @@ void PyMeshBuilder::SetMaterial( const char *pMaterialName )
 	{
 		m_pMaterial->IncrementReferenceCount();
 	}
+}
+
+void PyMeshRallyLine::Draw( double frametime )
+{
+	Vector drawpoint1 = point1;
+	Vector drawpoint2 = point2;
+	if( m_hEnt1 )
+		drawpoint1 += m_hEnt1->GetAbsOrigin();
+	if( m_hEnt2 )
+		drawpoint2 += m_hEnt2->GetAbsOrigin();
+
+	CMatRenderContextPtr pRenderContext( materials );
+
+	pRenderContext->Bind( m_pMaterial );
+
+	IMesh *pMesh = pRenderContext->GetDynamicMesh();
+	
+	CMeshBuilder builder;
+	builder.Begin( pMesh, MATERIAL_QUADS, 1 );
+
+	Vector dir = drawpoint1 - drawpoint2;
+	VectorNormalize(dir);
+        
+	Vector vRight = CrossProduct( dir, Vector(0, 0, 1) );
+	VectorNormalize( vRight );
+
+	int stage = 0;
+
+	Vector normal(0, 0, 0);
+
+	float fLineLength = (drawpoint2 - drawpoint1).Length();
+
+	// Setup the four points
+	builder.Position3fv( ( drawpoint1 + (vRight * size) ).Base() );
+	builder.Normal3fv( normal.Base() );
+	builder.TexCoord2f( stage, 0.0f, 0.0f );
+	builder.Color4ub( color[0], color[1], color[2], color[3] );
+	builder.AdvanceVertex();
+
+	builder.Position3fv( ( drawpoint2 + (vRight * size) ).Base() );
+	builder.Normal3fv( normal.Base() );
+	builder.TexCoord2f( stage, fLineLength / (texturey/textureyscale), 0.0f );
+	builder.Color4ub( color[0], color[1], color[2], color[3] );
+	builder.AdvanceVertex();
+
+	builder.Position3fv( ( drawpoint2 + (vRight * -size) ).Base() );
+	builder.Normal3fv( normal.Base() );
+	builder.TexCoord2f( stage, fLineLength / (texturey/textureyscale), 1.0f );
+	builder.Color4ub( color[0], color[1], color[2], color[3] );
+	builder.AdvanceVertex();
+
+	builder.Position3fv( ( drawpoint1 + (vRight * -size) ).Base() );
+	builder.Normal3fv( normal.Base() );
+	builder.TexCoord2f( stage, 0.0f, 1.0f );
+	builder.Color4ub( color[0], color[1], color[2], color[3] );
+	builder.AdvanceVertex();
+
+	// Draw the mesh
+	builder.End();
+	pMesh->Draw();
 }
 
 // Client effect

@@ -135,6 +135,84 @@ struct PyClientSideEffect_wrapper : PyClientSideEffect, bp::wrapper< PyClientSid
 
 };
 
+struct PyMeshBuilder_wrapper : PyMeshBuilder, bp::wrapper< PyMeshBuilder > {
+
+    PyMeshBuilder_wrapper(char const * pMaterialName, ::MaterialPrimitiveType_t type=::MATERIAL_POINTS )
+    : PyMeshBuilder( pMaterialName, type )
+      , bp::wrapper< PyMeshBuilder >(){
+        // constructor
+    
+    }
+
+    int GetNumPrimitives(  ){
+        return PyMeshBuilder::GetNumPrimitives(  );
+    }
+
+};
+
+struct PyMeshRallyLine_wrapper : PyMeshRallyLine, bp::wrapper< PyMeshRallyLine > {
+
+    PyMeshRallyLine_wrapper(char const * pMaterialName )
+    : PyMeshRallyLine( pMaterialName )
+      , bp::wrapper< PyMeshRallyLine >(){
+        // constructor
+    
+    }
+
+    int GetNumPrimitives(  ){
+        return PyMeshBuilder::GetNumPrimitives(  );
+    }
+
+};
+
+struct PyMeshVertex_wrapper : PyMeshVertex, bp::wrapper< PyMeshVertex > {
+
+    PyMeshVertex_wrapper(PyMeshVertex const & arg )
+    : PyMeshVertex( arg )
+      , bp::wrapper< PyMeshVertex >(){
+        // copy constructor
+        
+    }
+
+    PyMeshVertex_wrapper( )
+    : PyMeshVertex( )
+      , bp::wrapper< PyMeshVertex >(){
+        // null constructor
+    
+    }
+
+    virtual void Draw( ::CMeshBuilder & builder ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "Draw: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling Draw( boost::ref(builder) ) of Class: PyMeshVertex\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_Draw = this->get_override( "Draw" );
+        if( func_Draw.ptr() != Py_None )
+            try {
+                func_Draw( boost::ref(builder) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMeshVertex::Draw( boost::ref(builder) );
+            }
+        else
+            this->PyMeshVertex::Draw( boost::ref(builder) );
+    }
+    
+    void default_Draw( ::CMeshBuilder & builder ) {
+        PyMeshVertex::Draw( boost::ref(builder) );
+    }
+
+};
+
 BOOST_PYTHON_MODULE(_te){
     bp::docstring_options doc_options( true, true, false );
 
@@ -601,7 +679,7 @@ BOOST_PYTHON_MODULE(_te){
     }
 
     { //::PyMeshBuilder
-        typedef bp::class_< PyMeshBuilder, boost::noncopyable > MeshBuilder_exposer_t;
+        typedef bp::class_< PyMeshBuilder_wrapper, boost::noncopyable > MeshBuilder_exposer_t;
         MeshBuilder_exposer_t MeshBuilder_exposer = MeshBuilder_exposer_t( "MeshBuilder", bp::init< char const *, bp::optional< MaterialPrimitiveType_t > >(( bp::arg("pMaterialName"), bp::arg("type")=::MATERIAL_POINTS )) );
         bp::scope MeshBuilder_scope( MeshBuilder_exposer );
         bp::implicitly_convertible< char const *, PyMeshBuilder >();
@@ -625,6 +703,15 @@ BOOST_PYTHON_MODULE(_te){
                 , ( bp::arg("frametime") ) );
         
         }
+        { //::PyMeshBuilder::GetNumPrimitives
+        
+            typedef int ( PyMeshBuilder_wrapper::*GetNumPrimitives_function_type )(  ) ;
+            
+            MeshBuilder_exposer.def( 
+                "GetNumPrimitives"
+                , GetNumPrimitives_function_type( &PyMeshBuilder_wrapper::GetNumPrimitives ) );
+        
+        }
         { //::PyMeshBuilder::SetMaterial
         
             typedef void ( ::PyMeshBuilder::*SetMaterial_function_type )( char const * ) ;
@@ -637,10 +724,122 @@ BOOST_PYTHON_MODULE(_te){
         }
     }
 
+    { //::PyMeshRallyLine
+        typedef bp::class_< PyMeshRallyLine_wrapper, bp::bases< PyMeshBuilder >, boost::noncopyable > MeshRallyLine_exposer_t;
+        MeshRallyLine_exposer_t MeshRallyLine_exposer = MeshRallyLine_exposer_t( "MeshRallyLine", bp::init< char const * >(( bp::arg("pMaterialName") )) );
+        bp::scope MeshRallyLine_scope( MeshRallyLine_exposer );
+        bp::implicitly_convertible< char const *, PyMeshRallyLine >();
+        { //::PyMeshRallyLine::Draw
+        
+            typedef void ( ::PyMeshRallyLine::*Draw_function_type )( double ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "Draw"
+                , Draw_function_type( &::PyMeshRallyLine::Draw )
+                , ( bp::arg("frametime") ) );
+        
+        }
+        { //::PyMeshRallyLine::GetEnt1
+        
+            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*GetEnt1_function_type )(  ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "GetEnt1"
+                , GetEnt1_function_type( &::PyMeshRallyLine::GetEnt1 )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::PyMeshRallyLine::GetEnt2
+        
+            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*GetEnt2_function_type )(  ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "GetEnt2"
+                , GetEnt2_function_type( &::PyMeshRallyLine::GetEnt2 )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::PyMeshRallyLine::SetEnt1
+        
+            typedef void ( ::PyMeshRallyLine::*SetEnt1_function_type )( ::C_BaseEntity * ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "SetEnt1"
+                , SetEnt1_function_type( &::PyMeshRallyLine::SetEnt1 )
+                , ( bp::arg("pEnt") ) );
+        
+        }
+        { //::PyMeshRallyLine::SetEnt2
+        
+            typedef void ( ::PyMeshRallyLine::*SetEnt2_function_type )( ::C_BaseEntity * ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "SetEnt2"
+                , SetEnt2_function_type( &::PyMeshRallyLine::SetEnt2 )
+                , ( bp::arg("pEnt") ) );
+        
+        }
+        MeshRallyLine_exposer.def_readwrite( "color", &PyMeshRallyLine::color );
+        MeshRallyLine_exposer.def_readwrite( "point1", &PyMeshRallyLine::point1 );
+        MeshRallyLine_exposer.def_readwrite( "point2", &PyMeshRallyLine::point2 );
+        MeshRallyLine_exposer.def_readwrite( "size", &PyMeshRallyLine::size );
+        MeshRallyLine_exposer.def_readwrite( "texturex", &PyMeshRallyLine::texturex );
+        MeshRallyLine_exposer.def_readwrite( "texturexscale", &PyMeshRallyLine::texturexscale );
+        MeshRallyLine_exposer.def_readwrite( "texturey", &PyMeshRallyLine::texturey );
+        MeshRallyLine_exposer.def_readwrite( "textureyscale", &PyMeshRallyLine::textureyscale );
+        { //::PyMeshBuilder::GetNumPrimitives
+        
+            typedef int ( PyMeshRallyLine_wrapper::*GetNumPrimitives_function_type )(  ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "GetNumPrimitives"
+                , GetNumPrimitives_function_type( &PyMeshRallyLine_wrapper::GetNumPrimitives ) );
+        
+        }
+        { //property "ent1"[fget=::PyMeshRallyLine::GetEnt1, fset=::PyMeshRallyLine::SetEnt1]
+        
+            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*fget )(  ) ;
+            typedef void ( ::PyMeshRallyLine::*fset )( ::C_BaseEntity * ) ;
+            
+            MeshRallyLine_exposer.add_property( 
+                "ent1"
+                , bp::make_function( 
+                      fget( &::PyMeshRallyLine::GetEnt1 )
+                    , bp::return_value_policy< bp::return_by_value >() ) 
+                , fset( &::PyMeshRallyLine::SetEnt1 ) );
+        
+        }
+        { //property "ent2"[fget=::PyMeshRallyLine::GetEnt2, fset=::PyMeshRallyLine::SetEnt2]
+        
+            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*fget )(  ) ;
+            typedef void ( ::PyMeshRallyLine::*fset )( ::C_BaseEntity * ) ;
+            
+            MeshRallyLine_exposer.add_property( 
+                "ent2"
+                , bp::make_function( 
+                      fget( &::PyMeshRallyLine::GetEnt2 )
+                    , bp::return_value_policy< bp::return_by_value >() ) 
+                , fset( &::PyMeshRallyLine::SetEnt2 ) );
+        
+        }
+    }
+
     { //::PyMeshVertex
-        typedef bp::class_< PyMeshVertex > MeshVertex_exposer_t;
+        typedef bp::class_< PyMeshVertex_wrapper > MeshVertex_exposer_t;
         MeshVertex_exposer_t MeshVertex_exposer = MeshVertex_exposer_t( "MeshVertex", bp::init< >() );
         bp::scope MeshVertex_scope( MeshVertex_exposer );
+        { //::PyMeshVertex::Draw
+        
+            typedef void ( ::PyMeshVertex::*Draw_function_type )( ::CMeshBuilder & ) ;
+            typedef void ( PyMeshVertex_wrapper::*default_Draw_function_type )( ::CMeshBuilder & ) ;
+            
+            MeshVertex_exposer.def( 
+                "Draw"
+                , Draw_function_type(&::PyMeshVertex::Draw)
+                , default_Draw_function_type(&PyMeshVertex_wrapper::default_Draw)
+                , ( bp::arg("builder") ) );
+        
+        }
         { //::PyMeshVertex::GetEnt
         
             typedef ::C_BaseEntity * ( ::PyMeshVertex::*GetEnt_function_type )(  ) ;
