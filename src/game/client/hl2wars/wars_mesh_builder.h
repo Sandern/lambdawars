@@ -63,7 +63,9 @@ protected:
 class PyMeshRallyLine : public PyMeshBuilder
 {
 public:
-	PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ) {}
+	PyMeshRallyLine( const char *pMaterialName );
+
+	void				Init();
 
 	void				Draw( double frametime );
 
@@ -85,6 +87,9 @@ public:
 protected:
 	EHANDLE m_hEnt1;
 	EHANDLE m_hEnt2;
+
+private:
+	float m_fLineLength;
 };
 
 // Python client effect

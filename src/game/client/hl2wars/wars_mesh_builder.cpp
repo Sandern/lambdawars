@@ -128,6 +128,24 @@ void PyMeshBuilder::SetMaterial( const char *pMaterialName )
 	}
 }
 
+PyMeshRallyLine::PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ), m_hEnt1(NULL), m_hEnt2(NULL)
+{
+
+}
+	
+
+void PyMeshRallyLine::Init()
+{
+	Vector drawpoint1 = point1;
+	Vector drawpoint2 = point2;
+	if( m_hEnt1 )
+		drawpoint1 += m_hEnt1->GetAbsOrigin();
+	if( m_hEnt2 )
+		drawpoint2 += m_hEnt2->GetAbsOrigin();
+
+	m_fLineLength = (drawpoint1 - drawpoint2).Length();
+}
+
 void PyMeshRallyLine::Draw( double frametime )
 {
 	Vector drawpoint1 = point1;
@@ -158,28 +176,32 @@ void PyMeshRallyLine::Draw( double frametime )
 
 	float fLineLength = (drawpoint2 - drawpoint1).Length();
 
+	float l = fLineLength / m_fLineLength;
+	float send = m_fLineLength / (texturey/textureyscale);
+	float sstart = (1.0f - l) * send;
+
 	// Setup the four points
 	builder.Position3fv( ( drawpoint1 + (vRight * size) ).Base() );
 	builder.Normal3fv( normal.Base() );
-	builder.TexCoord2f( stage, 0.0f, 0.0f );
+	builder.TexCoord2f( stage, sstart, 0.0f );
 	builder.Color4ub( color[0], color[1], color[2], color[3] );
 	builder.AdvanceVertex();
 
 	builder.Position3fv( ( drawpoint2 + (vRight * size) ).Base() );
 	builder.Normal3fv( normal.Base() );
-	builder.TexCoord2f( stage, fLineLength / (texturey/textureyscale), 0.0f );
+	builder.TexCoord2f( stage, send, 0.0f );
 	builder.Color4ub( color[0], color[1], color[2], color[3] );
 	builder.AdvanceVertex();
 
 	builder.Position3fv( ( drawpoint2 + (vRight * -size) ).Base() );
 	builder.Normal3fv( normal.Base() );
-	builder.TexCoord2f( stage, fLineLength / (texturey/textureyscale), 1.0f );
+	builder.TexCoord2f( stage, send, 1.0f );
 	builder.Color4ub( color[0], color[1], color[2], color[3] );
 	builder.AdvanceVertex();
 
 	builder.Position3fv( ( drawpoint1 + (vRight * -size) ).Base() );
 	builder.Normal3fv( normal.Base() );
-	builder.TexCoord2f( stage, 0.0f, 1.0f );
+	builder.TexCoord2f( stage, sstart, 1.0f );
 	builder.Color4ub( color[0], color[1], color[2], color[3] );
 	builder.AdvanceVertex();
 

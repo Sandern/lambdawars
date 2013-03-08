@@ -759,6 +759,15 @@ BOOST_PYTHON_MODULE(_te){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::PyMeshRallyLine::Init
+        
+            typedef void ( ::PyMeshRallyLine::*Init_function_type )(  ) ;
+            
+            MeshRallyLine_exposer.def( 
+                "Init"
+                , Init_function_type( &::PyMeshRallyLine::Init ) );
+        
+        }
         { //::PyMeshRallyLine::SetEnt1
         
             typedef void ( ::PyMeshRallyLine::*SetEnt1_function_type )( ::C_BaseEntity * ) ;
