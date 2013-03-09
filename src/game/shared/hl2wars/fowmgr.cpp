@@ -810,8 +810,16 @@ void CFogOfWarMgr::Update( float frametime )
 	UpdateShared();
 
 #ifndef FOW_USE_PROCTEX
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if( !pPlayer )
+		return;
+
 	if( cl_fogofwar_notextureupdate.GetBool() == false )
+	{
+		if( pPlayer->IsObserver() || (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0)  )
+			RenderFowClear();
 		RenderFogOfWar( frametime );
+	}
 #else
 	if( sv_fogofwar.GetBool() && cl_fogofwar_noconverge.GetBool() == false )
 	{
@@ -1025,6 +1033,11 @@ void CFogOfWarMgr::RenderFogOfWar( float frametime )
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::RenderFowClear()
 {
+	CMatRenderContextPtr pRenderContext( materials );
+	BeginRenderFow();
+	pRenderContext->ClearColor4ub( 255, 255, 255, 255 ); // Make everything visible
+	pRenderContext->ClearBuffers( true, false );
+	EndRenderFow();
 }
 
 //-----------------------------------------------------------------------------
@@ -1383,7 +1396,7 @@ void CFogOfWarMgr::UpdateShared()
 	// look if fog of war is disabled, and if we need to clear the fog then
 	if( !sv_fogofwar.GetBool() 
 #ifdef CLIENT_DLL
-		|| (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0) 
+		|| pPlayer->IsObserver() || (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0) 
 #endif // CLIENT_DLL
 		)
 	{
@@ -1411,7 +1424,6 @@ void CFogOfWarMgr::UpdateShared()
 
 	// Generate fog at the old positions of the units
 	// Memset will do the same. Might be a bit slower when there are hardly units.
-	// But we can avoid switching between lists this way and having to lookup the relationship table.
 	ClearFogOfWarTo( FOWHIDDEN_MASK );
 
 	// Update positions
