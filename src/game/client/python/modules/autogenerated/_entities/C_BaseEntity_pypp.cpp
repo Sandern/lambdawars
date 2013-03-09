@@ -6344,6 +6344,50 @@ void register_C_BaseEntity_class(){
                 , fset( &::C_BaseEntity::PySetTakeDamage ) );
         
         }
+        { //property "propfloat1"[fget=::C_BaseEntity::PyGetPropFloat1, fset=::C_BaseEntity::PySetPropFloat1]
+        
+            typedef float ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( float ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propfloat1"
+                , fget( &::C_BaseEntity::PyGetPropFloat1 )
+                , fset( &::C_BaseEntity::PySetPropFloat1 ) );
+        
+        }
+        { //property "propfloat2"[fget=::C_BaseEntity::PyGetPropFloat2, fset=::C_BaseEntity::PySetPropFloat2]
+        
+            typedef float ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( float ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propfloat2"
+                , fget( &::C_BaseEntity::PyGetPropFloat2 )
+                , fset( &::C_BaseEntity::PySetPropFloat2 ) );
+        
+        }
+        { //property "propfloat3"[fget=::C_BaseEntity::PyGetPropFloat3, fset=::C_BaseEntity::PySetPropFloat3]
+        
+            typedef float ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( float ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propfloat3"
+                , fget( &::C_BaseEntity::PyGetPropFloat3 )
+                , fset( &::C_BaseEntity::PySetPropFloat3 ) );
+        
+        }
+        { //property "propfloat4"[fget=::C_BaseEntity::PyGetPropFloat4, fset=::C_BaseEntity::PySetPropFloat4]
+        
+            typedef float ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( float ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propfloat4"
+                , fget( &::C_BaseEntity::PyGetPropFloat4 )
+                , fset( &::C_BaseEntity::PySetPropFloat4 ) );
+        
+        }
         { //property "propint1"[fget=::C_BaseEntity::PyGetPropInt1, fset=::C_BaseEntity::PySetPropInt1]
         
             typedef int ( ::C_BaseEntity::*fget )(  ) ;
@@ -6364,6 +6408,28 @@ void register_C_BaseEntity_class(){
                 "propint2"
                 , fget( &::C_BaseEntity::PyGetPropInt2 )
                 , fset( &::C_BaseEntity::PySetPropInt2 ) );
+        
+        }
+        { //property "propint3"[fget=::C_BaseEntity::PyGetPropInt3, fset=::C_BaseEntity::PySetPropInt3]
+        
+            typedef int ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( int ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propint3"
+                , fget( &::C_BaseEntity::PyGetPropInt3 )
+                , fset( &::C_BaseEntity::PySetPropInt3 ) );
+        
+        }
+        { //property "propint4"[fget=::C_BaseEntity::PyGetPropInt4, fset=::C_BaseEntity::PySetPropInt4]
+        
+            typedef int ( ::C_BaseEntity::*fget )(  ) ;
+            typedef void ( ::C_BaseEntity::*fset )( int ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "propint4"
+                , fget( &::C_BaseEntity::PyGetPropInt4 )
+                , fset( &::C_BaseEntity::PySetPropInt4 ) );
         
         }
         { //property "viewdistance"[fget=::C_BaseEntity::GetViewDistance]

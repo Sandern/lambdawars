@@ -2033,10 +2033,33 @@ public:
 #endif // ENABLE_PYTHON
 
 public:
-	int PyGetPropInt1() { return m_iPySendProp1; }
-	void PySetPropInt1( int value ) { m_iPySendProp1 = value; }
-	int PyGetPropInt2() { return m_iPySendProp2; }
-	void PySetPropInt2( int value ) { m_iPySendProp2 = value; }
+	// Free Python sendprops
+	float PyGetPropFloat1() { return m_PySendPropFloat1; }
+	void PySetPropFloat1( float value ) { m_PySendPropFloat1 = value; }
+	float PyGetPropFloat2() { return m_PySendPropFloat2; }
+	void PySetPropFloat2( float value ) { m_PySendPropFloat2 = value; }
+	float PyGetPropFloat3() { return m_PySendPropFloat3; }
+	void PySetPropFloat3( float value ) { m_PySendPropFloat3 = value; }
+	float PyGetPropFloat4() { return m_PySendPropFloat4; }
+	void PySetPropFloat4( float value ) { m_PySendPropFloat4 = value; }
+	int PyGetPropInt1() { return m_PySendPropInt1; }
+	void PySetPropInt1( int value ) { m_PySendPropInt1 = value; }
+	int PyGetPropInt2() { return m_PySendPropInt2; }
+	void PySetPropInt2( int value ) { m_PySendPropInt2 = value; }
+	int PyGetPropInt3() { return m_PySendPropInt3; }
+	void PySetPropInt3( int value ) { m_PySendPropInt3 = value; }
+	int PyGetPropInt4() { return m_PySendPropInt4; }
+	void PySetPropInt4( int value ) { m_PySendPropInt4 = value; }
+
+private:
+	CNetworkVar( float,		m_PySendPropFloat1 );
+	CNetworkVar( float,		m_PySendPropFloat2 );
+	CNetworkVar( float,		m_PySendPropFloat3 );
+	CNetworkVar( float,		m_PySendPropFloat4 );
+	CNetworkVar( int,		m_PySendPropInt1 );
+	CNetworkVar( int,		m_PySendPropInt2 );
+	CNetworkVar( int,		m_PySendPropInt3 );
+	CNetworkVar( int,		m_PySendPropInt4 );
 
 private:
 	bool					m_bAllowNavIgnore;
@@ -2048,10 +2071,6 @@ private:
 	CNetworkVar( float,		m_fViewDistance );
 	int m_iFOWOldPosX, m_iFOWOldPosY;
 	int m_iFOWPosX, m_iFOWPosY;
-
-	// Free Python sendprops
-	CNetworkVar( int,		m_iPySendProp1 );
-	CNetworkVar( int,		m_iPySendProp2 );
 
 #ifdef ENABLE_PYTHON
 	bp::object m_pyInstance;		// Holds a ref to the instance. Keeps the object always alive util Remove() is called.

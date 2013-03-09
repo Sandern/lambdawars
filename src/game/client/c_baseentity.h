@@ -1974,10 +1974,34 @@ public:
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
 
 public:
-	int PyGetPropInt1() { return m_iPySendProp1; }
-	void PySetPropInt1( int value ) { m_iPySendProp1 = value; }
-	int PyGetPropInt2() { return m_iPySendProp2; }
-	void PySetPropInt2( int value ) { m_iPySendProp2 = value; }
+	// Free Python sendprops
+	float PyGetPropFloat1() { return m_PySendPropFloat1; }
+	void PySetPropFloat1( float value ) { m_PySendPropFloat1 = value; }
+	float PyGetPropFloat2() { return m_PySendPropFloat2; }
+	void PySetPropFloat2( float value ) { m_PySendPropFloat2 = value; }
+	float PyGetPropFloat3() { return m_PySendPropFloat3; }
+	void PySetPropFloat3( float value ) { m_PySendPropFloat3 = value; }
+	float PyGetPropFloat4() { return m_PySendPropFloat4; }
+	void PySetPropFloat4( float value ) { m_PySendPropFloat4 = value; }
+	int PyGetPropInt1() { return m_PySendPropInt1; }
+	void PySetPropInt1( int value ) { m_PySendPropInt1 = value; }
+	int PyGetPropInt2() { return m_PySendPropInt2; }
+	void PySetPropInt2( int value ) { m_PySendPropInt2 = value; }
+	int PyGetPropInt3() { return m_PySendPropInt3; }
+	void PySetPropInt3( int value ) { m_PySendPropInt3 = value; }
+	int PyGetPropInt4() { return m_PySendPropInt4; }
+	void PySetPropInt4( int value ) { m_PySendPropInt4 = value; }
+
+private:
+	 // Python recv props
+	 float m_PySendPropFloat1;
+	 float m_PySendPropFloat2;
+	 float m_PySendPropFloat3;
+	 float m_PySendPropFloat4;
+	 int m_PySendPropInt1;
+	 int m_PySendPropInt2;
+	 int m_PySendPropInt3;
+	 int m_PySendPropInt4;
 
 private:
 	string_t m_iszOverrideClassname; 
@@ -2005,10 +2029,6 @@ private:
 	ShouldTransmitState_t m_LastShouldTransmitState;
 
 	bool m_bDoNotRegisterEntity;
-
-	// Python recv props
-	int m_iPySendProp1;
-	int m_iPySendProp2;
 
 #ifdef ENABLE_PYTHON
 protected:

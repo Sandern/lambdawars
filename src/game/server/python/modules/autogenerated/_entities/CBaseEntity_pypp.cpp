@@ -6705,6 +6705,50 @@ void register_CBaseEntity_class(){
                 , fset( &::CBaseEntity::SetRenderMode ) );
         
         }
+        { //property "propfloat1"[fget=::CBaseEntity::PyGetPropFloat1, fset=::CBaseEntity::PySetPropFloat1]
+        
+            typedef float ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( float ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propfloat1"
+                , fget( &::CBaseEntity::PyGetPropFloat1 )
+                , fset( &::CBaseEntity::PySetPropFloat1 ) );
+        
+        }
+        { //property "propfloat2"[fget=::CBaseEntity::PyGetPropFloat2, fset=::CBaseEntity::PySetPropFloat2]
+        
+            typedef float ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( float ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propfloat2"
+                , fget( &::CBaseEntity::PyGetPropFloat2 )
+                , fset( &::CBaseEntity::PySetPropFloat2 ) );
+        
+        }
+        { //property "propfloat3"[fget=::CBaseEntity::PyGetPropFloat3, fset=::CBaseEntity::PySetPropFloat3]
+        
+            typedef float ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( float ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propfloat3"
+                , fget( &::CBaseEntity::PyGetPropFloat3 )
+                , fset( &::CBaseEntity::PySetPropFloat3 ) );
+        
+        }
+        { //property "propfloat4"[fget=::CBaseEntity::PyGetPropFloat4, fset=::CBaseEntity::PySetPropFloat4]
+        
+            typedef float ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( float ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propfloat4"
+                , fget( &::CBaseEntity::PyGetPropFloat4 )
+                , fset( &::CBaseEntity::PySetPropFloat4 ) );
+        
+        }
         { //property "propint1"[fget=::CBaseEntity::PyGetPropInt1, fset=::CBaseEntity::PySetPropInt1]
         
             typedef int ( ::CBaseEntity::*fget )(  ) ;
@@ -6725,6 +6769,28 @@ void register_CBaseEntity_class(){
                 "propint2"
                 , fget( &::CBaseEntity::PyGetPropInt2 )
                 , fset( &::CBaseEntity::PySetPropInt2 ) );
+        
+        }
+        { //property "propint3"[fget=::CBaseEntity::PyGetPropInt3, fset=::CBaseEntity::PySetPropInt3]
+        
+            typedef int ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( int ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propint3"
+                , fget( &::CBaseEntity::PyGetPropInt3 )
+                , fset( &::CBaseEntity::PySetPropInt3 ) );
+        
+        }
+        { //property "propint4"[fget=::CBaseEntity::PyGetPropInt4, fset=::CBaseEntity::PySetPropInt4]
+        
+            typedef int ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( int ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "propint4"
+                , fget( &::CBaseEntity::PyGetPropInt4 )
+                , fset( &::CBaseEntity::PySetPropInt4 ) );
         
         }
         { //property "viewdistance"[fget=::CBaseEntity::GetViewDistance, fset=::CBaseEntity::SetViewDistance]

@@ -611,9 +611,15 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropInt( RECVINFO( m_nFOWFlags ) ),
 	RecvPropFloat( RECVINFO( m_fViewDistance ) ),
 
-	// Free python recv props
-	RecvPropInt( RECVINFO( m_iPySendProp1 ) ),
-	RecvPropInt( RECVINFO( m_iPySendProp2 ) ),
+	 // Free python recv props
+	 RecvPropFloat( RECVINFO( m_PySendPropFloat1 ) ),
+	 RecvPropFloat( RECVINFO( m_PySendPropFloat2 ) ),
+	 RecvPropFloat( RECVINFO( m_PySendPropFloat3 ) ),
+	 RecvPropFloat( RECVINFO( m_PySendPropFloat4 ) ),
+	 RecvPropInt( RECVINFO( m_PySendPropInt1 ) ),
+	 RecvPropInt( RECVINFO( m_PySendPropInt2 ) ),
+	 RecvPropInt( RECVINFO( m_PySendPropInt3 ) ),
+	 RecvPropInt( RECVINFO( m_PySendPropInt4 ) ),
 END_RECV_TABLE()
 
 const float coordTolerance = 2.0f / (float)( 1 << COORD_FRACTIONAL_BITS );

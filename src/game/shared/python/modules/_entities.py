@@ -359,9 +359,16 @@ class Entities(GenerateModuleSemiShared):
     def ParseBaseEntity(self, mb):
         cls = mb.class_('C_BaseEntity') if self.isClient else mb.class_('CBaseEntity')
     
-        # Properties
-        self.SetupProperty(mb, cls, 'propint1', 'PyGetPropInt1', 'PySetPropInt1')
-        self.SetupProperty(mb, cls, 'propint2', 'PyGetPropInt2', 'PySetPropInt2')
+        # Free Send Properties
+        count = 4
+        datatypes = [
+            { 'name' : 'Float', 'type' : 'float'}, 
+            { 'name' : 'Int', 'type' : 'int'}, 
+        ]
+        
+        for d in datatypes:
+            for i in range(1, count+1):
+                self.SetupProperty(mb, cls, 'prop%s%d' % (d['type'], i), 'PyGetProp%s%d' % (d['name'], i), 'PySetProp%s%d' % (d['name'], i))
         
         # Exclude operators
         mb.global_ns.mem_opers('new').exclude()
