@@ -14,6 +14,9 @@
 #include "tier0/memdbgon.h"
 
 #ifdef ENABLE_PYTHON
+//=============================================================================
+// PyMeshVertex
+//=============================================================================
 void PyMeshVertex::Draw( CMeshBuilder &builder )
 {
 	Vector drawpos = position;
@@ -26,7 +29,9 @@ void PyMeshVertex::Draw( CMeshBuilder &builder )
 	builder.Color4ub( color[0], color[1], color[2], color[3] );
 }
 
+//=============================================================================
 // Python mesh builder
+//=============================================================================
 PyMeshBuilder::PyMeshBuilder( const char *pMaterialName, MaterialPrimitiveType_t type )
 	: m_nType(type)
 {
@@ -128,6 +133,9 @@ void PyMeshBuilder::SetMaterial( const char *pMaterialName )
 	}
 }
 
+//=============================================================================
+// Python rally line mesh builder
+//=============================================================================
 PyMeshRallyLine::PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ), m_hEnt1(NULL), m_hEnt2(NULL)
 {
 
@@ -210,7 +218,9 @@ void PyMeshRallyLine::Draw( double frametime )
 	pMesh->Draw();
 }
 
-// Client effect
+//=============================================================================
+// Python Client Side effect
+//=============================================================================
 PyClientSideEffect::PyClientSideEffect( const char *name )
 : CClientSideEffect( name )
 {
@@ -218,7 +228,6 @@ PyClientSideEffect::PyClientSideEffect( const char *name )
 
 PyClientSideEffect::~PyClientSideEffect( void )
 {
-	//Msg("Python effect cleaned up %s\n", GetName());
 }
 
 void PyClientSideEffect::Draw( double frametime )

@@ -17,7 +17,9 @@
 
 #ifdef ENABLE_PYTHON
 
-// Vertex 
+//=============================================================================
+// PyMeshVertex
+//=============================================================================
 class PyMeshVertex
 {
 public:
@@ -37,7 +39,9 @@ public:
 	virtual void Draw( CMeshBuilder &builder );
 };
 
-// Python mesh builder element
+//=============================================================================
+// Python mesh builder
+//=============================================================================
 class PyMeshBuilder
 {
 public:
@@ -60,6 +64,9 @@ protected:
 	CUtlVector< PyMeshVertex > m_pyMeshVertices;
 };
 
+//=============================================================================
+// Python rally line mesh builder
+//=============================================================================
 class PyMeshRallyLine : public PyMeshBuilder
 {
 public:
@@ -92,7 +99,9 @@ private:
 	float m_fLineLength;
 };
 
-// Python client effect
+//=============================================================================
+// Python Client Side effect
+//=============================================================================
 class PyClientSideEffect : public CClientSideEffect
 {
 public:

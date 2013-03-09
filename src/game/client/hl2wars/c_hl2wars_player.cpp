@@ -661,7 +661,7 @@ void C_HL2WarsPlayer::UpdateSelectedUnitType( void )
 
 	int i;
 	CBaseEntity *pUnit;
-	for(i=0; i<CountUnits(); i++)
+	for( i = 0; i < CountUnits(); i++ )
 	{
 		 pUnit = GetUnit(i);
 		 if( !pUnit )
