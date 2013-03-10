@@ -30,7 +30,7 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs );
 // Nav mesh editing
 int CreateNavArea( const Vector &corner, const Vector &otherCorner );
 int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, const Vector &seCorner, const Vector &swCorner );
-void DestroyNavArea( int id );
+void DestroyNavArea( unsigned int id );
 void DestroyAllNavAreas();
 
 int GetActiveNavMesh();
@@ -48,7 +48,8 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 // Hiding/cover spot functions
 bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit=NULL );
 
-int CreateHidingSpot( const Vector &pos, bool notsaved = false );
+int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved = false );
 bool DestroyHidingSpot( const Vector &pos, float tolerance );
+bool DestroyHidingSpotByID( unsigned int navareaid, unsigned int hidespotid );
 
 #endif // SRC_PYTHON_NAVMESH_H

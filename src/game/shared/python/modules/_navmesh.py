@@ -1,5 +1,6 @@
 from generate_mods_helper import GenerateModuleSemiShared
 from pyplusplus.module_builder import call_policies
+from pyplusplus import function_transformers as FT
 import settings
 #from src_helper import *
 
@@ -55,5 +56,7 @@ class NavMesh(GenerateModuleSemiShared):
         
         mb.free_function('GetHidingSpotsInRadius').include()
         mb.free_function('CreateHidingSpot').include()
+        mb.free_function('CreateHidingSpot').add_transformation( FT.output('navareaid') )
         mb.free_function('DestroyHidingSpot').include()
+        mb.free_function('DestroyHidingSpotByID').include()
         

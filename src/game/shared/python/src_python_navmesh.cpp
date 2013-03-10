@@ -119,10 +119,9 @@ int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, cons
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void DestroyNavArea( int id )
+void DestroyNavArea( unsigned int id )
 {
-	CNavArea *area;
-	area = TheNavMesh->GetNavAreaByID( id );
+	CNavArea *area = TheNavMesh->GetNavAreaByID( id );
 	if( area )
 	{
 		TheNavAreas.FindAndRemove( area );
@@ -675,7 +674,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CreateHidingSpot( const Vector &pos, bool notsaved )
+int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved )
 {
 	CNavArea *pArea = TheNavMesh->GetNearestNavArea( pos + Vector( 0, 0, HalfHumanHeight ), false, 10000.0f, true );
 	if( !pArea )
@@ -686,6 +685,7 @@ int CreateHidingSpot( const Vector &pos, bool notsaved )
 	spot->SetFlags( notsaved ? HidingSpot::IN_COVER|HidingSpot::NOTSAVED : HidingSpot::IN_COVER );
 	pArea->AddHidingSpot( spot );
 
+	navareaid = pArea->GetID();
 	return spot->GetID();
 }
 
@@ -750,4 +750,29 @@ bool DestroyHidingSpot( const Vector &pos, float tolerance )
 		return false;
 
 	return pBestArea->RemoveHidingSpot( pBestSpot );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool DestroyHidingSpotByID( unsigned int navareaid, unsigned int hidespotid )
+{
+	CNavArea *area = TheNavMesh->GetNavAreaByID( navareaid );
+	if( !area )
+		return false;
+
+	bool deleted = false;
+
+	const HidingSpotVector *spots = area->GetHidingSpots();
+	for( int i = 0; i < spots->Count(); i++ )
+	{
+		HidingSpot *pSpot = spots->Element( i );
+		if( pSpot->GetID() != hidespotid )
+			continue;
+
+		deleted = area->RemoveHidingSpot( pSpot );
+		break;
+	}
+
+	return deleted;
 }

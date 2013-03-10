@@ -6,6 +6,10 @@
 
 #include "boost/python.hpp"
 
+#include "__convenience.pypp.hpp"
+
+#include "__call_policies.pypp.hpp"
+
 #include "videocfg/videocfg.h"
 
 #include "cbase.h"
@@ -18,16 +22,22 @@
 
 namespace bp = boost::python;
 
+static boost::python::tuple CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8( ::Vector const & pos, bool notsaved=false ){
+    int navareaid2;
+    int result = ::CreateHidingSpot(pos, navareaid2, notsaved);
+    return bp::make_tuple( result, navareaid2 );
+}
+
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
     { //::CreateHidingSpot
     
-        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &::CreateHidingSpot )
+            , CreateHidingSpot_function_type( &CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8 )
             , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
     
     }
@@ -75,9 +85,20 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::DestroyHidingSpotByID
+    
+        typedef bool ( *DestroyHidingSpotByID_function_type )( unsigned int,unsigned int );
+        
+        bp::def( 
+            "DestroyHidingSpotByID"
+            , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
+            , ( bp::arg("navareaid"), bp::arg("hidespotid") ) );
+    
+    }
+
     { //::DestroyNavArea
     
-        typedef void ( *DestroyNavArea_function_type )( int );
+        typedef void ( *DestroyNavArea_function_type )( unsigned int );
         
         bp::def( 
             "DestroyNavArea"
@@ -252,6 +273,10 @@ BOOST_PYTHON_MODULE(_navmesh){
 
 #include "boost/python.hpp"
 
+#include "__convenience.pypp.hpp"
+
+#include "__call_policies.pypp.hpp"
+
 #include "cbase.h"
 
 #include "src_python_navmesh.h"
@@ -262,16 +287,22 @@ BOOST_PYTHON_MODULE(_navmesh){
 
 namespace bp = boost::python;
 
+static boost::python::tuple CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8( ::Vector const & pos, bool notsaved=false ){
+    int navareaid2;
+    int result = ::CreateHidingSpot(pos, navareaid2, notsaved);
+    return bp::make_tuple( result, navareaid2 );
+}
+
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
     { //::CreateHidingSpot
     
-        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &::CreateHidingSpot )
+            , CreateHidingSpot_function_type( &CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8 )
             , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
     
     }
@@ -319,9 +350,20 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::DestroyHidingSpotByID
+    
+        typedef bool ( *DestroyHidingSpotByID_function_type )( unsigned int,unsigned int );
+        
+        bp::def( 
+            "DestroyHidingSpotByID"
+            , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
+            , ( bp::arg("navareaid"), bp::arg("hidespotid") ) );
+    
+    }
+
     { //::DestroyNavArea
     
-        typedef void ( *DestroyNavArea_function_type )( int );
+        typedef void ( *DestroyNavArea_function_type )( unsigned int );
         
         bp::def( 
             "DestroyNavArea"
