@@ -276,6 +276,8 @@ void CNavArea::Save( CUtlBuffer &fileBuffer, unsigned int version ) const
 	FOR_EACH_VEC( m_hidingSpots, hit )
 	{
 		HidingSpot *spot = m_hidingSpots[ hit ];
+		if( spot->IsNotSaved() )
+			continue;
 		
 		spot->Save( fileBuffer, version );
 

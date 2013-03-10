@@ -42,6 +42,9 @@ class NavMesh(GenerateModuleSemiShared):
         mb.free_function('RandomNavAreaPositionWithin').include()
         mb.free_function('DestroyAllNavAreas').include()
         
+        mb.free_function('GetActiveNavMesh').include()
+        mb.free_function('GetEditingCursor').include()
+        
         mb.free_function('GetNavAreaAt').include()
         mb.free_function('GetNavAreasAtBB').include()
         mb.free_function('SplitAreasAtBB').include()
@@ -51,3 +54,6 @@ class NavMesh(GenerateModuleSemiShared):
         mb.free_function('TryMergeSurrounding').include()
         
         mb.free_function('GetHidingSpotsInRadius').include()
+        mb.free_function('CreateHidingSpot').include()
+        mb.free_function('DestroyHidingSpot').include()
+        

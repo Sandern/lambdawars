@@ -117,13 +117,15 @@ public:
 		IN_COVER			= 0x01,							// in a corner with good hard cover nearby
 		GOOD_SNIPER_SPOT	= 0x02,							// had at least one decent sniping corridor
 		IDEAL_SNIPER_SPOT	= 0x04,							// can see either very far, or a large area, or both
-		EXPOSED				= 0x08							// spot in the open, usually on a ledge or cliff
+		EXPOSED				= 0x08,							// spot in the open, usually on a ledge or cliff
+		NOTSAVED			= 0x10							// Discarded when saving the navigation mesh (hide spot created during game)
 	};
 
 	bool HasGoodCover( void ) const			{ return (m_flags & IN_COVER) ? true : false; }	// return true if hiding spot in in cover
 	bool IsGoodSniperSpot( void ) const		{ return (m_flags & GOOD_SNIPER_SPOT) ? true : false; }
 	bool IsIdealSniperSpot( void ) const	{ return (m_flags & IDEAL_SNIPER_SPOT) ? true : false; }
 	bool IsExposed( void ) const			{ return (m_flags & EXPOSED) ? true : false; }	
+	bool IsNotSaved( void ) const			{ return (m_flags & NOTSAVED) ? true : false; }
 
 	int GetFlags( void ) const		{ return m_flags; }
 
@@ -379,6 +381,9 @@ public:
 
 	SpotEncounter *GetSpotEncounter( const CNavArea *from, const CNavArea *to );	// given the areas we are moving between, return the spots we will encounter
 	int GetSpotEncounterCount( void ) const				{ return m_spotEncounters.Count(); }
+
+	void AddHidingSpot( HidingSpot *spot );
+	bool RemoveHidingSpot( HidingSpot *spot );
 
 	//- "danger" ----------------------------------------------------------------------------------------
 	void IncreaseDanger( int teamID, float amount );			// increase the danger of this area for the given team

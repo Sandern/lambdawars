@@ -198,6 +198,26 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+int GetActiveNavMesh()
+{
+	CNavArea *pArea = TheNavMesh->GetSelectedArea();
+	if( !pArea )
+		return -1;
+
+	return pArea->GetID();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Vector GetEditingCursor()
+{
+	return TheNavMesh->GetEditCursorPosition();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int GetNavAreaAt( const Vector &pos, float beneathlimit )
 {
 	CNavArea *pArea = TheNavMesh->GetNavArea( pos, beneathlimit );
@@ -518,7 +538,9 @@ public:
 		{
 			if( m_pOrderArea )
 			{
-				NDebugOverlay::Text( m_pOrderArea->GetCenter(), "HidingSpotCollector: HAS nav mesh!", false, HIDESPOT_DEBUG_DURATION );
+				char buf[512];
+				Q_snprintf( buf, 512, "HidingSpotCollector: HAS nav mesh! %d spots", m_pOrderArea->GetHidingSpots()->Count() );
+				NDebugOverlay::Text( m_pOrderArea->GetCenter(), buf, false, HIDESPOT_DEBUG_DURATION );
 			}
 			else
 			{
@@ -542,6 +564,13 @@ public:
 		}
 
 		const HidingSpotVector *spots = area->GetHidingSpots();
+
+		if( g_pynavmesh_debug_hidespot.GetBool() && area != m_pOrderArea )
+		{
+			char buf[512];
+			Q_snprintf( buf, 512, "HidingSpotCollector: Nav mesh with %d spots", spots->Count() );
+			NDebugOverlay::Text( area->GetCenter(), buf, false, HIDESPOT_DEBUG_DURATION );
+		}
 
 		// Area must be reachable
 		float fPathDist;
@@ -631,7 +660,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 	// Get hiding spots in radius
 	CUtlVector< HidingSpotResult_t > HidingSpots;
 	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
-	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, radius * 2.0f ); // Use a larger radius for testing the areas
+	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, MAX(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
 
 	// Sort based on distance
 	HidingSpots.Sort( HidingSpotCompare );
@@ -641,4 +670,84 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 		l.append( bp::make_tuple( HidingSpots[i].pSpot->GetID(), HidingSpots[i].pSpot->GetPosition() ) );
 
 	return l;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CreateHidingSpot( const Vector &pos, bool notsaved )
+{
+	CNavArea *pArea = TheNavMesh->GetNearestNavArea( pos + Vector( 0, 0, HalfHumanHeight ), false, 10000.0f, true );
+	if( !pArea )
+		return -1;
+
+	HidingSpot *spot = TheNavMesh->CreateHidingSpot();
+	spot->SetPosition( pos );
+	spot->SetFlags( notsaved ? HidingSpot::IN_COVER|HidingSpot::NOTSAVED : HidingSpot::IN_COVER );
+	pArea->AddHidingSpot( spot );
+
+	return spot->GetID();
+}
+
+typedef struct HidingSpotAllResult_t
+{
+	HidingSpotAllResult_t( HidingSpot *spot, CNavArea *area ) : pSpot(spot), pArea(area) {}
+
+	HidingSpot *pSpot;
+	CNavArea *pArea;
+} HidingSpotAllResult_t;
+
+class HidingSpotCollectorAll
+{
+public:
+	HidingSpotCollectorAll( CUtlVector<HidingSpotAllResult_t> &hidingspots ) : m_hidingSpots( hidingspots )
+	{
+	}
+
+	bool operator() ( CNavArea *area )
+	{
+		const HidingSpotVector *spots = area->GetHidingSpots();
+		for( int i = 0; i < spots->Count(); i++ )
+		{
+			HidingSpot *pSpot = spots->Element( i );
+			m_hidingSpots.AddToTail( HidingSpotAllResult_t(pSpot, area) );
+		}
+
+		return true;
+	}
+
+private:
+	CUtlVector<HidingSpotAllResult_t> &m_hidingSpots;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool DestroyHidingSpot( const Vector &pos, float tolerance )
+{
+	CUtlVector<HidingSpotAllResult_t> hidingspots;
+	HidingSpotCollectorAll collector( hidingspots );
+	TheNavMesh->ForAllAreasInRadius< HidingSpotCollectorAll >( collector, pos, 1250.0f );
+
+	HidingSpot *pBestSpot = NULL;
+	float fBestDist = MAX_COORD_FLOAT;
+	CNavArea *pBestArea = NULL;
+	for( int i = 0; i < hidingspots.Count(); i++ )
+	{
+		HidingSpot *pSpot = hidingspots[i].pSpot;
+
+		float fDist = (pSpot->GetPosition() - pos).Length();
+
+		if( !pBestSpot || fDist < fBestDist )
+		{
+			pBestSpot = pSpot;
+			fBestDist = fDist;
+			pBestArea = hidingspots[i].pArea;
+		}
+	}
+
+	if( !pBestSpot || !pBestArea || fBestDist > tolerance )
+		return false;
+
+	return pBestArea->RemoveHidingSpot( pBestSpot );
 }

@@ -21,6 +21,17 @@ namespace bp = boost::python;
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
+    { //::CreateHidingSpot
+    
+        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        
+        bp::def( 
+            "CreateHidingSpot"
+            , CreateHidingSpot_function_type( &::CreateHidingSpot )
+            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
+    
+    }
+
     { //::CreateNavArea
     
         typedef int ( *CreateNavArea_function_type )( ::Vector const &,::Vector const & );
@@ -53,6 +64,17 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::DestroyHidingSpot
+    
+        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float );
+        
+        bp::def( 
+            "DestroyHidingSpot"
+            , DestroyHidingSpot_function_type( &::DestroyHidingSpot )
+            , ( bp::arg("pos"), bp::arg("tolerance") ) );
+    
+    }
+
     { //::DestroyNavArea
     
         typedef void ( *DestroyNavArea_function_type )( int );
@@ -61,6 +83,26 @@ BOOST_PYTHON_MODULE(_navmesh){
             "DestroyNavArea"
             , DestroyNavArea_function_type( &::DestroyNavArea )
             , ( bp::arg("id") ) );
+    
+    }
+
+    { //::GetActiveNavMesh
+    
+        typedef int ( *GetActiveNavMesh_function_type )(  );
+        
+        bp::def( 
+            "GetActiveNavMesh"
+            , GetActiveNavMesh_function_type( &::GetActiveNavMesh ) );
+    
+    }
+
+    { //::GetEditingCursor
+    
+        typedef ::Vector ( *GetEditingCursor_function_type )(  );
+        
+        bp::def( 
+            "GetEditingCursor"
+            , GetEditingCursor_function_type( &::GetEditingCursor ) );
     
     }
 
@@ -223,6 +265,17 @@ namespace bp = boost::python;
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
+    { //::CreateHidingSpot
+    
+        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        
+        bp::def( 
+            "CreateHidingSpot"
+            , CreateHidingSpot_function_type( &::CreateHidingSpot )
+            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
+    
+    }
+
     { //::CreateNavArea
     
         typedef int ( *CreateNavArea_function_type )( ::Vector const &,::Vector const & );
@@ -255,6 +308,17 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::DestroyHidingSpot
+    
+        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float );
+        
+        bp::def( 
+            "DestroyHidingSpot"
+            , DestroyHidingSpot_function_type( &::DestroyHidingSpot )
+            , ( bp::arg("pos"), bp::arg("tolerance") ) );
+    
+    }
+
     { //::DestroyNavArea
     
         typedef void ( *DestroyNavArea_function_type )( int );
@@ -263,6 +327,26 @@ BOOST_PYTHON_MODULE(_navmesh){
             "DestroyNavArea"
             , DestroyNavArea_function_type( &::DestroyNavArea )
             , ( bp::arg("id") ) );
+    
+    }
+
+    { //::GetActiveNavMesh
+    
+        typedef int ( *GetActiveNavMesh_function_type )(  );
+        
+        bp::def( 
+            "GetActiveNavMesh"
+            , GetActiveNavMesh_function_type( &::GetActiveNavMesh ) );
+    
+    }
+
+    { //::GetEditingCursor
+    
+        typedef ::Vector ( *GetEditingCursor_function_type )(  );
+        
+        bp::def( 
+            "GetEditingCursor"
+            , GetEditingCursor_function_type( &::GetEditingCursor ) );
     
     }
 

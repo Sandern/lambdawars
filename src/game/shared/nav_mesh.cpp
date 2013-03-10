@@ -2312,7 +2312,6 @@ void CommandNavLadderFlip( void )
 }
 static ConCommand nav_ladder_flip( "nav_ladder_flip", CommandNavLadderFlip, "Flips the selected ladder's direction.", FCVAR_GAMEDLL | FCVAR_CHEAT );
 
-
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavGenerate( void )
 {

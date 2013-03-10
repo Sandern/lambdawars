@@ -3993,6 +3993,24 @@ void CNavArea::ComputeSniperSpots( void )
 
 //--------------------------------------------------------------------------------------------------------------
 /**
+ * Adds a hiding spot
+ */
+void CNavArea::AddHidingSpot( HidingSpot *spot )
+{
+	m_hidingSpots.AddToTail( spot );
+}
+
+//--------------------------------------------------------------------------------------------------------------
+/**
+ * Removes a hiding spot
+ */
+bool CNavArea::RemoveHidingSpot( HidingSpot *spot )
+{
+	return m_hidingSpots.FindAndRemove( spot );
+}
+
+//--------------------------------------------------------------------------------------------------------------
+/**
  * Given the areas we are moving between, return the spots we will encounter
  */
 SpotEncounter *CNavArea::GetSpotEncounter( const CNavArea *from, const CNavArea *to )

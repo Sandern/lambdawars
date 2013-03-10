@@ -2464,7 +2464,6 @@ void CNavMesh::CommandNavMakeSniperSpots( void )
 	m_markedCorner = NUM_CORNERS;	// clear the corner selection
 }
 
-
 //--------------------------------------------------------------------------------------------------------------
 void CNavMesh::CommandNavMerge( void )
 {
