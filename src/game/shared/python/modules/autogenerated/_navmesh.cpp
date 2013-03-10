@@ -22,9 +22,9 @@
 
 namespace bp = boost::python;
 
-static boost::python::tuple CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8( ::Vector const & pos, bool notsaved=false ){
+static boost::python::tuple CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72( ::Vector const & pos, bool notsaved=false, bool checkground=true ){
     int navareaid2;
-    int result = ::CreateHidingSpot(pos, navareaid2, notsaved);
+    int result = ::CreateHidingSpot(pos, navareaid2, notsaved, checkground);
     return bp::make_tuple( result, navareaid2 );
 }
 
@@ -33,12 +33,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::CreateHidingSpot
     
-        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8 )
-            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
+            , CreateHidingSpot_function_type( &CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72 )
+            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false), bp::arg("checkground")=(bool)(true) ) );
     
     }
 
@@ -287,9 +287,9 @@ BOOST_PYTHON_MODULE(_navmesh){
 
 namespace bp = boost::python;
 
-static boost::python::tuple CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8( ::Vector const & pos, bool notsaved=false ){
+static boost::python::tuple CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72( ::Vector const & pos, bool notsaved=false, bool checkground=true ){
     int navareaid2;
-    int result = ::CreateHidingSpot(pos, navareaid2, notsaved);
+    int result = ::CreateHidingSpot(pos, navareaid2, notsaved, checkground);
     return bp::make_tuple( result, navareaid2 );
 }
 
@@ -298,12 +298,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::CreateHidingSpot
     
-        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool );
+        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &CreateHidingSpot_a92b846decc94be4662d7d8aeb50e9f8 )
-            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false) ) );
+            , CreateHidingSpot_function_type( &CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72 )
+            , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false), bp::arg("checkground")=(bool)(true) ) );
     
     }
 

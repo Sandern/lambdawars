@@ -48,7 +48,7 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 // Hiding/cover spot functions
 bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit=NULL );
 
-int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved = false );
+int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved = false, bool checkground = true );
 bool DestroyHidingSpot( const Vector &pos, float tolerance );
 bool DestroyHidingSpotByID( unsigned int navareaid, unsigned int hidespotid );
 

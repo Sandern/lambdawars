@@ -572,6 +572,9 @@ public:
 		}
 
 		// Area must be reachable
+		// Temporary disable blocked for this area if the spot is in this area
+		//int attributes = area->GetAttributes();
+		//area->SetAttributes( attributes&(~NAV_MESH_NAV_BLOCKER) );
 		float fPathDist;
 		if( !m_pUnit )
 		{
@@ -583,6 +586,8 @@ public:
 			UnitShortestPathCost costFunc( m_pUnit, false );
 			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, m_fRadius * 2.0f );
 		}
+		//area->SetAttributes( attributes );
+
 		if( fPathDist < 0 )
 		{
 			if( g_pynavmesh_debug_hidespot.GetBool() )
@@ -674,9 +679,9 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved )
+int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved, bool checkground )
 {
-	CNavArea *pArea = TheNavMesh->GetNearestNavArea( pos + Vector( 0, 0, HalfHumanHeight ), false, 10000.0f, true );
+	CNavArea *pArea = TheNavMesh->GetNearestNavArea( pos + Vector( 0, 0, HalfHumanHeight ), false, 10000.0f, checkground );
 	if( !pArea )
 		return -1;
 
