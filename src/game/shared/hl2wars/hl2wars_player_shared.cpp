@@ -136,7 +136,8 @@ private:
 // Purpose: Called when we received a new mouse aim vector or when moving around
 //			Calculate new mouse data, so we only need to do this once.
 //-----------------------------------------------------------------------------
-#define MOUSE_TRACE_BOX Vector(8.0, 8.0, 8.0)
+#define MOUSE_TRACE_BOX_MINS Vector(-8.0, -8.0, 0.0)
+#define MOUSE_TRACE_BOX_MAXS Vector(8.0, 8.0, 8.0)
 void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 {
 	if( g_debug_mouse_noupdate.GetBool() )
@@ -158,11 +159,11 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 #if 0
 	// Don't need a trace hull, already doing an extra check below
 	UTIL_TraceHull( vStartPos, vEndPos,
-			-MOUSE_TRACE_BOX, MOUSE_TRACE_BOX, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
+			MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
 #else
 	// First version takes triggers into account with mouse interface
 	Ray_t ray;
-	ray.Init( vStartPos, vEndPos, -MOUSE_TRACE_BOX, MOUSE_TRACE_BOX );
+	ray.Init( vStartPos, vEndPos, MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS );
 
 	CMouseCollideList collideList( &ray, this, MASK_SOLID );
 	enginetrace->EnumerateEntities( ray, true, &collideList );
@@ -175,7 +176,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	{
 		// Fallback, so it hits the world
 		UTIL_TraceHull( vStartPos, vEndPos,
-				-MOUSE_TRACE_BOX, MOUSE_TRACE_BOX, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
+				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
 	}
 #endif // 0
 
@@ -192,7 +193,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	// Check world only
 	CTraceFilterWorldOnly filter;
 	UTIL_TraceHull( Weapon_ShootPosition()+GetCameraOffset(), Weapon_ShootPosition()+GetCameraOffset() + (m_vMouseAim *  8192),
-		-MOUSE_TRACE_BOX, MOUSE_TRACE_BOX, MASK_SOLID_BRUSHONLY, &filter, &tr ); 
+		MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID_BRUSHONLY, &filter, &tr ); 
 	m_MouseData.m_vWorldOnlyEndPos = tr.endpos;
 	m_MouseData.m_vWorldOnlyNormal = tr.plane.normal;
 	
@@ -277,7 +278,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	if( g_debug_mouse_aim.GetBool() )
 	{
 		NDebugOverlay::SweptBox(vStartPos,  vStartPos + (m_vMouseAim *  8192), 
-				-MOUSE_TRACE_BOX, MOUSE_TRACE_BOX, QAngle(), 255, 0, 0, 200, 0.05f);
+				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, QAngle(), 255, 0, 0, 200, 0.05f);
 		if( m_MouseData.GetEnt() )
 		{
 #ifndef CLIENT_DLL
