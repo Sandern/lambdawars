@@ -1,14 +1,14 @@
-Half-Life 2: Wars code (Alien Swarm engine). WIP README.
+Half-Life 2: Wars code (Alien Swarm engine).
 
 ==============================================================
 Description
 ==============================================================
-
+Source code of Half-Life 2: Wars (http://hl2wars.com/)
 
 ==============================================================
 Compiling
 ==============================================================
-Requires Visual Studio 2010 SP1
+Tested with Visual Studio 2010 SP1
 
 ==============================================================
 Generating Python bindings
@@ -31,7 +31,6 @@ Compiling shaders
 ==============================================================
 - Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
 - Update paths buildsdkshaders_wars.bat
-
 
 ==============================================================
 License
