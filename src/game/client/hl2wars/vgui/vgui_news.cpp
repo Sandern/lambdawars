@@ -43,7 +43,9 @@ void WebNews::OnContextCreated()
 	SetMouseInputEnabled( true );
 	SetUseMouseCapture( false );
 
-	m_CurVersion = SrcPySystem()->RunT< const char * >( SrcPySystem()->Get("_GetVersion", "srcmgr"), "" );
+#ifdef ENABLE_PYTHON
+	m_CurVersion = SrcPySystem()->IsPythonRunning() ? SrcPySystem()->RunT< const char * >( SrcPySystem()->Get("_GetVersion", "srcmgr"), "" ) : "";
+#endif // ENABLE_PYTHON
 
 	// Create global interface object
 	m_InterfaceObj = CreateGlobalObject("interface");

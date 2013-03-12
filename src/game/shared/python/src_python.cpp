@@ -144,6 +144,7 @@ CSrcPython::CSrcPython()
 bool CSrcPython::Init( )
 {
 	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablepython") == 0;
+	const bool bToolsMode = !CommandLine() || CommandLine()->FindParm("-tools") != 0;
 
 	if( !bEnabled )
 	{
@@ -159,14 +160,14 @@ bool CSrcPython::Init( )
 	if( m_bPythonRunning )
 		return true;
 
-#ifndef _LINUX
-	// Change working directory	
-	// FIXME: On linux this causes very weird crashes	
-	char moddir[_MAX_PATH];
-	filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
-	V_FixupPathName(moddir, _MAX_PATH, moddir);	
-	V_SetCurrentDirectory(moddir);
-#endif // _LINUX
+	//if( !bToolsMode )
+	{
+		// Change working directory	
+		char moddir[_MAX_PATH];
+		filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
+		V_FixupPathName(moddir, _MAX_PATH, moddir);	
+		V_SetCurrentDirectory(moddir);
+	}
 
 	m_bPythonRunning = true;
 

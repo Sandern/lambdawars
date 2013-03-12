@@ -97,12 +97,15 @@ void C_HL2WarsPlayer::Spawn()
 
 	// Hook spawn to a signal
 #ifdef ENABLE_PYTHON
-	// Setup dict for sending a signal
-	bp::dict kwargs;
-	kwargs["sender"] = bp::object();
-	kwargs["client"] = GetPyHandle();
-	bp::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
-	SrcPySystem()->CallSignal( signal, kwargs );
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		// Setup dict for sending a signal
+		bp::dict kwargs;
+		kwargs["sender"] = bp::object();
+		kwargs["client"] = GetPyHandle();
+		bp::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
+		SrcPySystem()->CallSignal( signal, kwargs );
+	}
 #endif // ENABLE_PYTHON
 }
 

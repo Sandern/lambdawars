@@ -12,6 +12,7 @@
 #include "src_cef_js.h"
 
 #ifdef ENABLE_PYTHON
+	#include "src_python.h"
 	#include "src_cef_python.h"
 #endif // ENABLE_PYTHON
 
@@ -433,6 +434,9 @@ void SrcCefBrowser::OnAfterCreated( void )
 void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 {
 #ifdef ENABLE_PYTHON
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+
 	try
 	{
 		PyOnLoadStart( bp::object( PyCefFrame( frame ) ) );
@@ -450,6 +454,9 @@ void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
 {
 #ifdef ENABLE_PYTHON
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+
 	try
 	{
 		PyOnLoadEnd( bp::object( PyCefFrame( frame ) ), httpStatusCode );
@@ -467,6 +474,9 @@ void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
 void SrcCefBrowser::OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl )
 {
 #ifdef ENABLE_PYTHON
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+
 	try
 	{
 		PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, errorText, failedUrl );
@@ -889,6 +899,9 @@ CefRefPtr<JSObject> SrcCefBrowser::InvokeWithResult( CefRefPtr<JSObject> object,
 void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
 {
 #ifdef ENABLE_PYTHON
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+
 	try
 	{
 		PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? bp::object( *pCallbackID ) : bp::object() );

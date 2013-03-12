@@ -1496,7 +1496,8 @@ NavErrorType CNavMesh::Load( void )
 
 #ifdef ENABLE_PYTHON
 	// Fire loaded signal
-	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "navmeshloaded", "core.signals", true ) );
+	if( SrcPySystem()->IsPythonRunning() )
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "navmeshloaded", "core.signals", true ) );
 #endif // ENABLE_PYTHON
 
 	return loadResult;
