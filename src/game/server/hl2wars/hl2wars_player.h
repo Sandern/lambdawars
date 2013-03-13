@@ -218,7 +218,9 @@ private:
 	CUtlVector< EHANDLE >		m_hSelectedUnits;
 	bool				m_bSelectionChangedSignalScheduled;
 	bool				m_bRebuildPySelection;
+#ifdef ENABLE_PYTHON
 	bp::list			m_pySelection;
+#endif // ENABLE_PYTHON
 
 	// Group data
 	unitgroup_t m_Groups[PLAYER_MAX_GROUPS];

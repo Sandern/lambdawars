@@ -86,6 +86,7 @@ private:
 	float m_fNextSenseTime;
 	bool m_bTestLOS;
 
+#ifdef ENABLE_PYTHON
 	struct RangeCallback_t {
 		boost::python::object callback;
 		int range; 
@@ -93,6 +94,7 @@ private:
 		float nextchecktime;
 	};
 	CUtlVector<RangeCallback_t> m_Callbacks;
+#endif // ENABLE_PYTHON
 };
 
 // Inlines

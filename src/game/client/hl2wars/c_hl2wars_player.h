@@ -229,7 +229,9 @@ private:
 	bool				m_bSelectionChangedSignalScheduled;
 	CNetworkHandle( C_BaseEntity, m_hControlledUnit );	
 	bool				m_bRebuildPySelection;
+#ifdef ENABLE_PYTHON
 	bp::list			m_pySelection;
+#endif // ENABLE_PYTHON
 
 	// Selected unittype data
 	string_t			m_pSelectedUnitType;

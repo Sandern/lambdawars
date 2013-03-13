@@ -2203,6 +2203,7 @@ bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, floa
 	return false;
 }
 
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: Creates, builds and finds a new path and returns it as result.
 //-----------------------------------------------------------------------------
@@ -2215,6 +2216,7 @@ boost::python::object UnitBaseNavigator::FindPathAsResult( int goaltype, const V
 
 	return refPath;
 }
+#endif // ENABLE_PYTHON
 
 // Route buiding
 //-----------------------------------------------------------------------------

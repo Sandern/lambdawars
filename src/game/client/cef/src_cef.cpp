@@ -8,6 +8,7 @@
 #include "src_cef.h"
 #include "src_cef_browser.h"
 #include "src_cef_osrenderer.h"
+#include <filesystem.h>
 
 #include <vgui/IInput.h>
 

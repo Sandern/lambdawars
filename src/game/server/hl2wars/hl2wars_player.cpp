@@ -327,12 +327,14 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		m_MouseDataLeftPressed = mousedata;
 		m_MouseDataLeftReleased = mousedata;
 
+#ifdef ENABLE_PYTHON
 		CUtlVector<bp::object> activeAbilities;
 		activeAbilities = m_vecActiveAbilities;
 		for(int i=0; i< activeAbilities.Count(); i++)
 		{
 			SrcPySystem()->RunT<bool, MouseTraceData_t>( SrcPySystem()->Get("OnMinimapClick", activeAbilities[i]), false, mousedata );
 		}
+#endif // ENABLE_PYTHON
 
 		return true;
 	}

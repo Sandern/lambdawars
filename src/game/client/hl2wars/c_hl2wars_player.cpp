@@ -623,12 +623,14 @@ void C_HL2WarsPlayer::MinimapClick( Vector &vStart, Vector &vEnd, CBaseEntity *p
 	m_MouseDataLeftPressed = mousedata;
 	m_MouseDataLeftReleased = mousedata;
 
+#ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
 		SrcPySystem()->RunT<bool, MouseTraceData_t>( SrcPySystem()->Get("OnMinimapClick", activeAbilities[i]), false, mousedata );
 	}
+#endif // ENABLE_PYTHON
 
 	engine->ServerCmd( VarArgs("minimap_lm %f %f %f %f %f %f %lu", vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z, pHitEnt ? pHitEnt->index : -1) );
 }
