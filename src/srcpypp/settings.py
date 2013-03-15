@@ -62,38 +62,6 @@ modules_asw = [
 ]
 #modules_asw = []
 
-modules_2007 = [
-    # Base
-    ('srcbase', 'SrcBase'),
-    ('vmath', 'VMath'),
-    ('_entities', 'Entities'),
-    ('_entities_misc', 'EntitiesMisc'),
-    ('_gameinterface', 'GameInterface'),
-    ('_utils', 'Utils'),
-    ('_physics', 'Physics'),
-    ('_sound', 'Sound'),
-    ('_particles', 'Particles'),
-    ('materials', 'Materials'),
-    ('_animation', 'Animation'),
-    ('_te', 'TE'),
-    
-    # Client
-    ('isteam', 'ISteam'),
-    ('_input', 'Input'),
-    ('_vgui', 'VGUI'),
-    ('_vguicontrols', 'VGUIControls'),
-    
-    # Game
-    ('_gamerules', 'GameRules'),
-    ('unit_helper', 'UnitHelper'),
-    
-    # Misc
-    ('_navmesh', 'NavMesh'),
-    ('_ndebugoverlay', 'NDebugOverlay'),
-    ('vprof', 'VProf'),
-    ('_srctests', '_SrcTests'),
-]
-
 # Base files (in case you want to make use automatically updating the vcxproj)
 pythonfiles_shared = [
     '../shared/python/src_python.cpp',
@@ -147,6 +115,8 @@ pythonfiles_client = [
     'python/src_python_vgui.h',
     'python/SurfaceBuffer.cpp',
     'python/SurfaceBuffer.h',
+    'cef/src_cef_python.cpp',
+    'cef/src_cef_python.h',
 ]
 
 pythonfiles_server = [
@@ -154,4 +124,3 @@ pythonfiles_server = [
     'python/src_python_server_class.h',
 ]
 
-#pythonfiles_shared = pythonfiles_client = pythonfiles_server = []
