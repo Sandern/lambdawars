@@ -125,9 +125,10 @@ bool CCefSystem::Init()
 
 	// Settings
 	CefSettings settings;
-	settings.single_process = 0;
-	settings.multi_threaded_message_loop = 0;
+	settings.single_process = false;
+	settings.multi_threaded_message_loop = false;
 	settings.log_severity = LOGSEVERITY_ERROR_REPORT;
+	//settings.pack_loading_disabled = true;
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
