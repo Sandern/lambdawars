@@ -1816,6 +1816,15 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("msg") ) );
         
         }
+        { //::C_BaseAnimating::GetUseFastPath
+        
+            typedef bool ( ::C_BaseAnimating::*GetUseFastPath_function_type )(  ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetUseFastPath"
+                , GetUseFastPath_function_type( &::C_BaseAnimating::GetUseFastPath ) );
+        
+        }
         { //::C_BaseAnimating::HitboxToWorldTransforms
         
             typedef bool ( ::C_BaseAnimating::*HitboxToWorldTransforms_function_type )( ::matrix3x4_t * * ) ;

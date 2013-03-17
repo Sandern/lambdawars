@@ -462,6 +462,7 @@ public:
 
 	// Override
 	void							ForceUseFastPath( bool bUseFastPath ) { m_bCanUseFastPath = bUseFastPath; }
+	bool							GetUseFastPath() { return m_bCanUseFastPath; }
 
 protected:
 	// View models scale their attachment positions to account for FOV. To get the unmodified
