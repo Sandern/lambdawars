@@ -148,6 +148,11 @@ void CCefSystem::Shutdown()
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 		m_CefBrowsers[i]->Destroy();
+	CefDoMessageLoopWork();
+
+	// Temp fix: Give cef threads some time to shutdown browsers
+	// Otherwise it might crash in case it's still processing an url...
+	//Sleep( 100 );
 
 	// Shut down CEF.
 	CefShutdown();
