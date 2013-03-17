@@ -685,10 +685,10 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat(SENDINFO(m_fViewDistance),				0, SPROP_COORD),
 
 	// Free Python sendprops
-	SendPropFloat	(SENDINFO( m_PySendPropFloat1 ),				15, 0 ),
-	SendPropFloat	(SENDINFO( m_PySendPropFloat2 ),				15, 0 ),
-	SendPropFloat	(SENDINFO( m_PySendPropFloat3 ),				15, 0 ),
-	SendPropFloat	(SENDINFO( m_PySendPropFloat4 ),				15, 0 ),
+	SendPropFloat	(SENDINFO( m_PySendPropFloat1 ),				0, SPROP_NOSCALE ),
+	SendPropFloat	(SENDINFO( m_PySendPropFloat2 ),				0, SPROP_NOSCALE ),
+	SendPropFloat	(SENDINFO( m_PySendPropFloat3 ),				0, SPROP_NOSCALE ),
+	SendPropFloat	(SENDINFO( m_PySendPropFloat4 ),				0, SPROP_NOSCALE ),
 	SendPropInt	(SENDINFO( m_PySendPropInt1 ),				15, 0 ),
 	SendPropInt	(SENDINFO( m_PySendPropInt2 ),				15, 0 ),
 	SendPropInt	(SENDINFO( m_PySendPropInt3 ),				15, 0 ),
