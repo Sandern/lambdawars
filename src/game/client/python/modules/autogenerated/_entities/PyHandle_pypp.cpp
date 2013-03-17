@@ -145,6 +145,15 @@ void register_PyHandle_class(){
                 , ( bp::arg("name"), bp::arg("v") ) );
         
         }
+        { //::PyHandle::Str
+        
+            typedef ::boost::python::object ( ::PyHandle::*__str___function_type )(  ) ;
+            
+            PyHandle_exposer.def( 
+                "__str__"
+                , __str___function_type( &::PyHandle::Str ) );
+        
+        }
         PyHandle_exposer.def( bp::self != bp::other< bp::object >() );
         PyHandle_exposer.def( bp::self != bp::self );
         { //::PyHandle::operator=

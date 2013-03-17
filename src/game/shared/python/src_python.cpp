@@ -144,7 +144,7 @@ CSrcPython::CSrcPython()
 bool CSrcPython::Init( )
 {
 	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablepython") == 0;
-	const bool bToolsMode = !CommandLine() || CommandLine()->FindParm("-tools") != 0;
+	//const bool bToolsMode = !CommandLine() || CommandLine()->FindParm("-tools") != 0;
 
 	if( !bEnabled )
 	{

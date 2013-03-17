@@ -112,7 +112,7 @@ bp::object PyHandle::GetAttribute( const char *name )
 		boost::python::handle<>(
 		boost::python::borrowed(GetPySelf())
 		)
-		);
+	);
 	Assert( self.ptr() != NULL );
 	return __builtin__.attr("object").attr("__getattribute__")(self, name);	
 }
@@ -120,6 +120,16 @@ bp::object PyHandle::GetAttribute( const char *name )
 void PyHandle::SetAttr( const char *name, bp::object v )
 {
 	PyGet().attr("__setattr__")(name, v);
+}
+
+boost::python::object PyHandle::Str()
+{
+	if( Get() )
+	{
+		bp::object pyinst = PyGet();
+		return pyinst.attr("__str__")();
+	}
+	return boost::python::object( "None" );
 }
 
 bp::object CreatePyHandle( int iEntry, int iSerialNumber )

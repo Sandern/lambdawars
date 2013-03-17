@@ -139,6 +139,8 @@ public:
 	bool NonZero() { return PyGet().ptr() != Py_None; }
 
 	virtual PyObject *GetPySelf() { return NULL; }
+
+	boost::python::object Str();
 };
 
 inline int PyHandle::Cmp( bp::object other )

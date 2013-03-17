@@ -1750,6 +1750,7 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_fun('SetAttr').rename('__setattr__')
         cls.mem_fun('Cmp').rename('__cmp__')
         cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_fun('Str').rename('__str__')
         cls.mem_funs('GetPySelf').exclude()
         
         cls.add_wrapper_code(
