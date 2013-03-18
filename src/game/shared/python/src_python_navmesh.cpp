@@ -18,6 +18,7 @@
 
 ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 ConVar g_pynavmesh_debug_hidespot("g_pynavmesh_debug_hidespot", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+ConVar g_pynavmesh_hidespot_searchmethod("g_pynavmesh_hidespot_searchmethod", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -535,15 +536,16 @@ public:
 
 		if( g_pynavmesh_debug_hidespot.GetBool() )
 		{
+			char buf[512];
 			if( m_pOrderArea )
 			{
-				char buf[512];
-				Q_snprintf( buf, 512, "HidingSpotCollector: HAS nav mesh! %d spots", m_pOrderArea->GetHidingSpots()->Count() );
+				Q_snprintf( buf, 512, "HidingSpotCollector: HAS nav mesh! %d spots. Test Radius: %f", m_pOrderArea->GetHidingSpots()->Count(), m_fRadius );
 				NDebugOverlay::Text( m_pOrderArea->GetCenter(), buf, false, HIDESPOT_DEBUG_DURATION );
 			}
 			else
 			{
-				NDebugOverlay::Text( vPos, "HidingSpotCollector: no nav mesh!", false, HIDESPOT_DEBUG_DURATION );
+				Q_snprintf( buf, 512, "HidingSpotCollector: no nav mesh! Test Radius: %f", m_fRadius );
+				NDebugOverlay::Text( vPos, buf, false, HIDESPOT_DEBUG_DURATION );
 			}
 		}
 #endif // USE_NAVAREA_BASED_DIST
@@ -579,12 +581,12 @@ public:
 		if( !m_pUnit )
 		{
 			ShortestPathCost costFunc;
-			fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, area, costFunc, m_fRadius * 2.0f );
+			fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, area, costFunc, 1250.0f + m_fRadius );
 		}
 		else
 		{
 			UnitShortestPathCost costFunc( m_pUnit, false );
-			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, m_fRadius * 2.0f );
+			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, 1250.0f + m_fRadius );
 		}
 		//area->SetAttributes( attributes );
 
@@ -664,7 +666,17 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 	// Get hiding spots in radius
 	CUtlVector< HidingSpotResult_t > HidingSpots;
 	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
-	TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, MAX(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
+	if( g_pynavmesh_hidespot_searchmethod.GetInt() == 1 )
+	{
+		TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, MAX(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
+	}
+	else
+	{
+		Extent extent;
+		extent.lo = Vector(pos.x - radius, pos.y - radius, pos.z - 128.0f );
+		extent.hi = Vector(pos.x + radius, pos.y + radius, pos.z + 128.0f );
+		TheNavMesh->ForAllAreasOverlappingExtent( collector, extent );
+	}
 
 	// Sort based on distance
 	HidingSpots.Sort( HidingSpotCompare );
