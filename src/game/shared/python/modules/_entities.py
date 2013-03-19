@@ -920,7 +920,13 @@ class Entities(GenerateModuleSemiShared):
             else:
                 mb.mem_funs('GetBoneArrayForWrite').exclude()
                 mb.mem_funs('CreateClientRagdoll').exclude()
-            mb.mem_funs('GetBoneForWrite').exclude() # Don't care for now        
+            mb.mem_funs('GetBoneForWrite').exclude() # Don't care for now     
+
+            cls.add_property( 'customlightingoffset',
+                               cls.mem_fun('GetCustomLightingOffset'),
+                               cls.mem_fun('SetCustomLightingOffset')) 
+            cls.mem_fun('GetCustomLightingOffset').exclude()
+            cls.mem_fun('SetCustomLightingOffset').exclude()
         else:
             mb.mem_funs('PyOnNewModel').include()
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
@@ -1287,6 +1293,8 @@ class Entities(GenerateModuleSemiShared):
             cls.add_property( 'climbing'
                              , cls.mem_fun('IsClimbing')) 
                              
+            cls.add_property( 'crouching'
+                             , cls.mem_fun('IsCrouching'))    
             cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
         else:
             cls.mem_funs('EnemyDistance').exclude() 

@@ -3559,6 +3559,17 @@ int C_BaseAnimating::InternalDrawModel( int flags, const RenderableInstance_t &i
 			AngleMatrix( pInfo->angles, pInfo->origin, pInfo->modelToWorld );
 		}
 
+		if( m_bCustomLightingOffset )
+		{
+			if ( !pInfo->pLightingOffset )
+			{
+				pInfo->pLightingOffset = &pInfo->lightingOffset;
+
+				// Turns the origin + angles into a matrix
+				AngleMatrix( pInfo->angles, m_vCustomLightingOffset, pInfo->lightingOffset );
+			}
+		}
+
 		// Suppress unlocking
 		CMatRenderDataReference rd( pRenderContext );
 		DrawModelState_t state;

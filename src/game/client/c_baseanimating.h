@@ -169,8 +169,12 @@ public:
 	virtual bool OnPostInternalDrawModel( ClientModelRenderInfo_t *pInfo );
 	void		DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawModelState_t *pState, matrix3x4_t *pBoneToWorldArray = NULL );
 
-	// Allow Python to override the material
+	// Allow overriding the base material
 	void					ForcedMaterialOverride( const char *newMaterial, OverrideType_t nOverrideType = OVERRIDE_NORMAL );
+
+	// Option for specifying a lighting offset
+	void					SetCustomLightingOffset( const Vector &offset );
+	const Vector &			GetCustomLightingOffset( void );
 
 	//
 	virtual CMouthInfo *GetMouth();
@@ -673,6 +677,10 @@ private:
 	// Material overriding
 	IMaterial *				m_pOverrideMaterial;
 	OverrideType_t			m_nOverrideMaterialType;
+
+	// Custom lighting offset
+	bool					m_bCustomLightingOffset;
+	Vector					m_vCustomLightingOffset;
 };
 
 enum 
@@ -844,6 +852,19 @@ inline float C_BaseAnimating::SequenceDuration( void )
 	return SequenceDuration( GetSequence() ); 
 }
 
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+inline void C_BaseAnimating::SetCustomLightingOffset( const Vector &offset )
+{
+	m_bCustomLightingOffset = offset != vec3_origin;
+	m_vCustomLightingOffset = offset;
+}
+
+inline const Vector &C_BaseAnimating::GetCustomLightingOffset( void )
+{
+	return m_vCustomLightingOffset;
+}
 
 //-----------------------------------------------------------------------------
 // Mouth

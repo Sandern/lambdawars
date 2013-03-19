@@ -192,6 +192,8 @@ public:
 	//virtual bool			SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 	void					Blink( float blink_time = 3.0f );
 
+	virtual const Vector&			GetRenderOrigin( void );
+
 #endif // CLIENT_DLL
 	virtual void		DoMuzzleFlash();
 

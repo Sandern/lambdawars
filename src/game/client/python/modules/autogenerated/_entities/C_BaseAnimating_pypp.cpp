@@ -2986,6 +2986,19 @@ void register_C_BaseAnimating_class(){
                 , fset( &::C_BaseAnimating::SetSkin ) );
         
         }
+        { //property "customlightingoffset"[fget=::C_BaseAnimating::GetCustomLightingOffset, fset=::C_BaseAnimating::SetCustomLightingOffset]
+        
+            typedef ::Vector const & ( ::C_BaseAnimating::*fget )(  ) ;
+            typedef void ( ::C_BaseAnimating::*fset )( ::Vector const & ) ;
+            
+            C_BaseAnimating_exposer.add_property( 
+                "customlightingoffset"
+                , bp::make_function( 
+                      fget( &::C_BaseAnimating::GetCustomLightingOffset )
+                    , bp::return_value_policy< bp::copy_const_reference >() ) 
+                , fset( &::C_BaseAnimating::SetCustomLightingOffset ) );
+        
+        }
         { //::C_BaseAnimating::TestCollision
             
                 typedef bool ( ::C_BaseAnimating::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;

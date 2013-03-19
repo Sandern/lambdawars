@@ -265,6 +265,16 @@ int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )
 	return BaseClass::DrawModel( flags, instance );
 }
 
+const Vector& CUnitBase::GetRenderOrigin( void )
+{
+	//if( m_pAnimState )
+	//	return m_pAnimState->GetRenderOrigin();
+	return BaseClass::GetRenderOrigin(); 
+	//if( m_bCustomLightingOrigin )
+	//	return BaseClass::GetRenderOrigin() + m_vCustomLightingOrigin;
+	//return BaseClass::GetRenderOrigin(); 
+}
+
 #if 0
 bool CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
@@ -302,7 +312,7 @@ void CUnitBase::UpdateClientSideAnimation()
 {
 	if( m_bUpdateClientAnimations )
 	{
-#if 1
+#if 0
 		static ConVar cl_simulationtime_updaterate("cl_simulationtime_updaterate", "0.1");
 		static ConVar cl_simulationtime_offset("cl_simulationtime_offset", "0.05");
 		if( GetSimulationTime() < (gpGlobals->curtime - cl_simulationtime_updaterate.GetFloat()) )

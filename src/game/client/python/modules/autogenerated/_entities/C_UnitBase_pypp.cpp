@@ -1632,6 +1632,16 @@ void register_C_UnitBase_class(){
                 , GetPyNetworkType_function_type( &::C_UnitBase::GetPyNetworkType ) );
         
         }
+        { //::C_UnitBase::GetRenderOrigin
+        
+            typedef ::Vector const & ( ::C_UnitBase::*GetRenderOrigin_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "GetRenderOrigin"
+                , GetRenderOrigin_function_type( &::C_UnitBase::GetRenderOrigin )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::C_UnitBase::GetShootEnemyDir
         
             typedef ::Vector ( ::C_UnitBase::*GetShootEnemyDir_function_type )( ::Vector &,bool ) ;
@@ -2334,6 +2344,15 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.add_property( 
                 "climbing"
                 , fget( &::C_UnitBase::IsClimbing ) );
+        
+        }
+        { //property "crouching"[fget=::C_UnitBase::IsCrouching]
+        
+            typedef bool ( ::C_UnitBase::*fget )(  ) ;
+            
+            C_UnitBase_exposer.add_property( 
+                "crouching"
+                , fget( &::C_UnitBase::IsCrouching ) );
         
         }
         { //::C_UnitBase::TestCollision
