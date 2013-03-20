@@ -592,8 +592,17 @@ PyVEngineServer *pyengine = &pypyengine;
 boost::python::tuple PyVModelInfo::GetModelBounds(model_t *pModel)
 {
 	Vector mins, maxs;
-	modelinfo->GetModelBounds(pModel, mins, maxs);
+	if( modelinfo )
+		modelinfo->GetModelBounds(pModel, mins, maxs);
 	return boost::python::make_tuple(mins, maxs);
+}
+
+boost::python::object PyVModelInfo::GetModelName( model_t *model )
+{
+	if( !model )
+		return bp::object();
+	const char *pModelName = modelinfo->GetModelName( model );
+	return bp::object( pModelName );
 }
 
 model_t *PyVModelInfo::FindOrLoadModel( const char *name )

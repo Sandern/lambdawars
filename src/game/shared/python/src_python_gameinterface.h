@@ -731,13 +731,11 @@ extern PyVEngineServer *pyengine;
 class PyVModelInfo
 {
 public:
-	inline model_t			*GetModel( int modelindex ) { return (model_t *)modelinfo->GetModel(modelindex); }
-	// Returns index of model by name
-	inline int						GetModelIndex( const char *name ) { return modelinfo->GetModelIndex(name); }
-
-	boost::python::tuple GetModelBounds(model_t *pModel);
-
-	model_t				*FindOrLoadModel( const char *name );
+	inline model_t *			GetModel( int modelindex ) { return (model_t *)modelinfo->GetModel(modelindex); }
+	inline int					GetModelIndex( const char *name ) { return modelinfo->GetModelIndex(name); }
+	boost::python::tuple		GetModelBounds( model_t *pModel );
+	boost::python::object		GetModelName( model_t *model );
+	model_t *					FindOrLoadModel( const char *name );
 };
 extern PyVModelInfo *pymodelinfo;
 
