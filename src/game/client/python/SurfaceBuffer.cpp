@@ -680,7 +680,6 @@ public:
 	{ 
 		bool bPaintBackground, bPaint, bPaintBorder;
 		int rposx, rposy, rsizex, rsizey;
-		VPANEL rparent;
 
 		Panel *pPanel = ipanel()->GetPanel(panel, GetControlsModuleName());
 
@@ -692,11 +691,9 @@ public:
 
 			pPanel->GetPos(rposx, rposy);
 			pPanel->GetSize(rsizex, rsizey);
-			//rparent = pPanel->GetVParent();
 
 			pPanel->SetPos(posx, posy);
 			pPanel->SetSize(sizex, sizey);
-			//pPanel->SetParent(parent);
 
 			pPanel->SetPaintBackgroundEnabled( m_bPaintBackground );
 			pPanel->SetPaintEnabled( m_bPaint );
@@ -706,7 +703,6 @@ public:
 		{
 			bPaintBackground = bPaint = bPaintBorder = false;
 			rposx = rposy = rsizex = rsizey = 0;
-			rparent = 0;
 		}
 
 		// SolveTraverse will update the panel in relation to the pos and size
@@ -719,7 +715,6 @@ public:
 		{
 			pPanel->SetPos(rposx, rposy);
 			pPanel->SetSize(rsizex, rsizey);
-			//pPanel->SetParent(rparent);
 
 			pPanel->SetPaintBackgroundEnabled( bPaintBackground );
 			pPanel->SetPaintEnabled( bPaint );
@@ -727,7 +722,7 @@ public:
 		}
 	}
 private:
-	 VPANEL panel, parent;
+	 VPANEL panel;
 	 int posx, posy, sizex, sizey;
 	 bool m_bPaint, m_bPaintBackground, m_bPaintBorder;
 };
