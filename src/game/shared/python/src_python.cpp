@@ -1007,7 +1007,11 @@ boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 }
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Commands follow here
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Purpose: 
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
 CON_COMMAND( py_runfile, "Run a python script")
@@ -1024,6 +1028,9 @@ CON_COMMAND_F( cl_py_runfile, "Run a python script", FCVAR_CHEAT)
 	g_SrcPythonSystem.ExecuteFile( args.ArgS() );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
 CON_COMMAND( py_run, "Run a string on the python interpreter")
 #else
@@ -1039,6 +1046,24 @@ CON_COMMAND_F( cl_py_run, "Run a string on the python interpreter", FCVAR_CHEAT)
 	g_SrcPythonSystem.Run( args.ArgS(), "consolespace" );
 }
 
+#ifndef CLIENT_DLL
+CON_COMMAND( spy, "Run a string on the python interpreter")
+#else
+CON_COMMAND_F( cpy, "Run a string on the python interpreter", FCVAR_CHEAT)
+#endif // CLIENT_DLL
+{
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+#ifndef CLIENT_DLL
+	if( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+	g_SrcPythonSystem.Run( args.ArgS(), "consolespace" );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
 	int numMatches = 0;
@@ -1144,6 +1169,9 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 	return numMatches;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
 CON_COMMAND_F_COMPLETION( py_import, "Import a python module", 0, PyModuleAutocomplete )
 #else
@@ -1161,6 +1189,9 @@ CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, P
 	g_SrcPythonSystem.Run( command, "consolespace" );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
 CON_COMMAND_F_COMPLETION( py_reload, "Reload a python module", 0, PyModuleAutocomplete )
 #else
