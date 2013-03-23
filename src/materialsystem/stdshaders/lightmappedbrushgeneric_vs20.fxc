@@ -1,0 +1,71 @@
+//========== Copyright (c) Sandern Corporation, All rights reserved. ==========//
+//
+// Purpose: 
+//
+//===========================================================================//
+
+#include "common_fog_vs_fxc.h"
+//	DYNAMIC: "SKINNING"			"0..1"
+//  DYNAMIC: "MORPHING"			"0..1" [vs30] [ = pShaderAPI->IsHWMorphingEnabled() ]
+//  STATIC: "FOW"				"0..1"
+
+#include "common_vs_fxc.h"
+#include "fow_vs_fxc.h"
+
+static const bool g_bSkinning		= SKINNING ? true : false;
+static const int g_FogType			= DOWATERFOG;
+
+const float4 g_vFoWWorldSize						: register( c26 );
+const float4 g_vLightDir							: register( c29 );	// xyz = light dir, w = spec power
+
+
+struct VS_INPUT
+{
+	float3 vPos							: POSITION;
+	float4 vNormal						: NORMAL;
+	float2 vBaseTexCoord				: TEXCOORD0;
+	float2 vLightmapTexCoord			: TEXCOORD1;
+	float2 vLightmapTexCoordOffset		: TEXCOORD2;
+};
+
+struct VS_OUTPUT
+{
+	float4 vProjPos							: POSITION;	
+	float4 vBaseTexCoord					: TEXCOORD0;	// xy = blend 1 coord, zw = lightmap cord
+	float4 worldPos_projPosZ				: TEXCOORD1;
+	float2 vFowCoord						: TEXCOORD3;	// xy = fow
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o;
+
+	float3 vObjNormal;
+	DecompressVertex_Normal( v.vNormal, vObjNormal );
+
+	float4 vProjPos;
+	float3 vWorldPos;
+
+	vProjPos = mul( float4( v.vPos, 1 ), cModelViewProj );
+	o.vProjPos = vProjPos;
+
+	vWorldPos = mul( float4( v.vPos, 1 ), cModel[0] );
+	
+	o.worldPos_projPosZ.w = vProjPos.z;
+	o.worldPos_projPosZ.xyz = vWorldPos;
+	
+#if ( FOW == 1 )
+	o.vFowCoord.xy = CalcFoWCoord( g_vFoWWorldSize, vWorldPos.xy );
+#else
+	o.vFowCoord.xy = float2( 0.0, 0.0 );
+#endif
+
+	float3 vWorldNormal = mul( vObjNormal, ( float3x3 )cModel[0] );
+
+	o.vBaseTexCoord.xy = v.vBaseTexCoord;
+	
+	o.vBaseTexCoord.zw = v.vLightmapTexCoord + v.vLightmapTexCoordOffset;
+	
+
+	return o;
+}

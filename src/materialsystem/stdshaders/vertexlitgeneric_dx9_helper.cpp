@@ -1088,7 +1088,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			// Team color constant + sampler
 			static const float kDefaultTeamColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			const float *vecTeamColor = (bHasTeamColorTexture && IS_PARAM_DEFINED( info.m_nTeamColor )) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor;
-			//pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 0, IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor, 1 );
 			pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 19, vecTeamColor, 1 );
 			if( bHasTeamColorTexture ) pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER12, info.m_nTeamColorTexture, -1 );
 			

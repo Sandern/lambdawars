@@ -353,6 +353,12 @@
     <ClCompile Include="fogofwar_cpe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lightmappedbrushgeneric.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lightmappedbrushgeneric_dx9_helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\dx9sdk\lib\d3dx9.lib">

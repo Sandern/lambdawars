@@ -1,0 +1,94 @@
+//========== Copyright (c) Sandern Corporation, All rights reserved. ==========//
+
+// STATIC: "LIGHTING_PREVIEW"			"0..2"
+// STATIC: "FOW"						"0..1"
+// STATIC: "TEAMCOLORTEXTURE"			"0..1"
+
+#include "shader_constant_register_map.h"
+#include "common_fog_ps_fxc.h"
+#include "fow_ps_fxc.h"
+#include "common_flashlight_fxc.h"
+#include "common_teamcolor.h"
+
+sampler BaseSampler						: register( s1 );
+sampler LightmapSampler					: register( s5 );
+
+const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
+const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );
+
+#if LIGHTING_PREVIEW == 0
+
+static const float3 g_cAmbientColor = float3( 0.0, 0.0, 0.0 );
+const float4 g_TintValuesTimesLightmapScale	: register( PSREG_CONSTANT_21 );
+
+#endif
+
+
+#if ( FOW == 1 )
+
+sampler FoWSampler					: register( s10 );	// Fog of War
+
+#endif
+
+#if ( TEAMCOLORTEXTURE == 1 )
+
+sampler TeamColorSampler		: register( s2 );
+
+const float4 g_TeamColor						: register( c19 );
+
+#endif // TEAMCOLORTEXTURE
+
+
+// free floats: texcoord2 ( 4 xyzw ), texcoord7( 1 w ), vBaseTexCoord( 2 zw ) ( when we remove lightmaps )
+struct PS_INPUT
+{
+	float4 vProjPos							: POSITION;	
+	float4 vBaseTexCoord					: TEXCOORD0;	// xy = blend 1 coord, zw = lightmap cord
+	float4 worldPos_projPosZ				: TEXCOORD1;
+	float2 vFowCoord						: TEXCOORD3;	// xy = fow
+};
+
+#if LIGHTING_PREVIEW == 2
+LPREVIEW_PS_OUT main( PS_INPUT i ) : COLOR
+#else
+float4 main( PS_INPUT i ) : COLOR
+#endif
+{
+	float3 vResult = tex2D( BaseSampler, i.vBaseTexCoord.xy );
+
+	float3 worldSpaceNormal = float3( 0, 0, 1 );
+    
+#if TEAMCOLORTEXTURE
+	if( g_TeamColor.a > 0.0 )
+	{
+		vResult.rgb = ApplyTeamColor( TeamColorSampler, GammaToLinear(g_TeamColor), i.vBaseTexCoord.xy, float4(vResult, 1.0));
+	}
+#endif
+
+#if LIGHTING_PREVIEW == 0
+	float3 lightmapColor = tex2D( LightmapSampler, i.vBaseTexCoord.zw );
+	float3 diffuseLighting = lightmapColor * g_TintValuesTimesLightmapScale.rgb;
+	diffuseLighting += g_cAmbientColor;
+	
+	vResult.rgb *= diffuseLighting;
+    
+#if ( FOW == 1 )
+	vResult.rgb = CalcFoW( FoWSampler, i.vFowCoord.xy, vResult.rgb );
+#endif
+
+	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.xyz, i.worldPos_projPosZ.xyz, i.worldPos_projPosZ.w );
+	
+	return FinalOutput( float4( vResult, fogFactor ), fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR );
+#elif ( LIGHTING_PREVIEW == 1 )
+	float dotprod = 0.7+0.25 * dot( worldSpaceNormal, normalize( float3( 1, 2, -.5 ) ) );
+	return FinalOutput( float4( dotprod*vResult.xyz, 1.0f ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+#elif ( LIGHTING_PREVIEW == 2 )
+	LPREVIEW_PS_OUT ret;
+	ret.color = float4( vResult.xyz, 1.0f );
+	ret.normal = float4( worldSpaceNormal, i.worldPos_projPosZ.w );
+	ret.position = float4( i.worldPos_projPosZ.xyz, 1.0f );
+	ret.flags = float4( 1, 1, 1, 1.0f );
+	
+	return FinalOutput( ret, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+#endif
+}

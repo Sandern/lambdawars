@@ -1375,6 +1375,8 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="hsl_filmgrain_pass1.cpp" />
     <ClCompile Include="hsl_filmgrain_pass2.cpp" />
     <ClCompile Include="hsv.cpp" />
+    <ClCompile Include="lightmappedbrushgeneric.cpp" />
+    <ClCompile Include="lightmappedbrushgeneric_dx9_helper.cpp" />
     <ClCompile Include="lightmappedgeneric_dx9.cpp" />
     <ClCompile Include="lightmappedgeneric_dx9_helper.cpp" />
     <ClCompile Include="lightmappedpaint_dx9_helper.cpp" />
