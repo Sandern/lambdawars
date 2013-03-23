@@ -138,6 +138,7 @@ private:
 //-----------------------------------------------------------------------------
 #define MOUSE_TRACE_BOX_MINS Vector(-8.0, -8.0, 0.0)
 #define MOUSE_TRACE_BOX_MAXS Vector(8.0, 8.0, 8.0)
+#define MOUSE_ENT_TOLERANCE 64.0f 
 void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 {
 	if( g_debug_mouse_noupdate.GetBool() )
@@ -214,7 +215,6 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	}
 
 	// If we hit the world or nothing, do a larger scan for entities
-#define MOUSE_ENT_TOLERANCE 64.0f 
 	if( (!m_MouseData.GetEnt() || m_MouseData.GetEnt()->GetRefEHandle().GetEntryIndex() == 0) && !g_debug_mouse_noradiuscheck.GetBool() )
 	{
 		// Do not use UTIL_EntitiesInSphere around corners. It causes about infinitive cpu load
@@ -252,7 +252,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 				fSpeed = pEnt->GetSmoothedVelocity().Length();
 #endif // CLIENT_DLL
 				fDist = (tr.endpos - pEnt->GetAbsOrigin()).Length();
-				if( fDist < MOUSE_ENT_TOLERANCE * MAX(1.0, (fSpeed/125.0)) )
+				if( fDist < MOUSE_ENT_TOLERANCE * MAX(0.1, (fSpeed/125.0)) )
 				{
 					if( pBest )
 					{
