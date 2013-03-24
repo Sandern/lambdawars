@@ -227,7 +227,5 @@ END_SHADER_PARAMS
 				Draw( false );
 			}
 		}
-
-		//DrawFogOfWarBlendedPass( this, params, pShaderAPI, pShaderShadow, s_fowinfo, vertexCompression );
 	}
 END_SHADER

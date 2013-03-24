@@ -28,6 +28,13 @@ struct LightmappedBrushGeneric_DX9_Vars_t
 	LightmappedBrushGeneric_DX9_Vars_t() { memset( this, 0xFF, sizeof( *this ) ); }
 
 	int			m_nBaseTexture;
+	int			m_nBaseTextureFrame;
+	int			m_nBumpmap;
+	int			m_nBumpFrame;
+	int			m_nEnvmap;
+	int			m_nEnvmapFrame;
+	int			m_nEnvmapTint;
+
 	int			m_nFoW;
 	int			m_nTeamColor;
 	int			m_nTeamColorTexture;

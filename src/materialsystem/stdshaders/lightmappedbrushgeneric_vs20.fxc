@@ -5,18 +5,16 @@
 //===========================================================================//
 
 #include "common_fog_vs_fxc.h"
-//	DYNAMIC: "SKINNING"			"0..1"
-//  DYNAMIC: "MORPHING"			"0..1" [vs30] [ = pShaderAPI->IsHWMorphingEnabled() ]
 //  STATIC: "FOW"				"0..1"
 
 #include "common_vs_fxc.h"
 #include "fow_vs_fxc.h"
 
-static const bool g_bSkinning		= SKINNING ? true : false;
-static const int g_FogType			= DOWATERFOG;
+//static const bool g_bSkinning		= SKINNING ? true : false;
+//static const int g_FogType			= DOWATERFOG;
 
 const float4 g_vFoWWorldSize						: register( c26 );
-const float4 g_vLightDir							: register( c29 );	// xyz = light dir, w = spec power
+//const float4 g_vLightDir							: register( c29 );	// xyz = light dir, w = spec power
 
 
 struct VS_INPUT
@@ -26,6 +24,8 @@ struct VS_INPUT
 	float2 vBaseTexCoord				: TEXCOORD0;
 	float2 vLightmapTexCoord			: TEXCOORD1;
 	float2 vLightmapTexCoordOffset		: TEXCOORD2;
+	float3 vTangentS					: TANGENT;
+	float3 vTangentT					: BINORMAL;
 };
 
 struct VS_OUTPUT
@@ -33,7 +33,11 @@ struct VS_OUTPUT
 	float4 vProjPos							: POSITION;	
 	float4 vBaseTexCoord					: TEXCOORD0;	// xy = blend 1 coord, zw = lightmap cord
 	float4 worldPos_projPosZ				: TEXCOORD1;
-	float2 vFowCoord						: TEXCOORD3;	// xy = fow
+	float2 vFowCoord						: TEXCOORD4;	// xy = fow
+    
+	float3x3 tangentSpaceTranspose	: TEXCOORD5;
+	// tangentSpaceTranspose		: TEXCOORD6
+	// tangentSpaceTranspose		: TEXCOORD7
 };
 
 VS_OUTPUT main( const VS_INPUT v )
@@ -65,7 +69,13 @@ VS_OUTPUT main( const VS_INPUT v )
 	o.vBaseTexCoord.xy = v.vBaseTexCoord;
 	
 	o.vBaseTexCoord.zw = v.vLightmapTexCoord + v.vLightmapTexCoordOffset;
-	
+    
+	float3 worldTangentS = mul( v.vTangentS, ( const float3x3 )cModel[0] );
+	float3 worldTangentT = mul( v.vTangentT, ( const float3x3 )cModel[0] );
+
+	o.tangentSpaceTranspose[0] = worldTangentS;
+	o.tangentSpaceTranspose[1] = worldTangentT;
+	o.tangentSpaceTranspose[2] = vWorldNormal;
 
 	return o;
 }

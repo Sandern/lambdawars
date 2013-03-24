@@ -450,7 +450,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, info.m_nBaseTextureTransform );
 
-		pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
+		//pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
 
 		// Pack phong exponent in with the eye position
 		float vEyePos_SpecExponent[4];
