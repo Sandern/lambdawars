@@ -470,6 +470,7 @@ private:
 	bool m_bUseMinimalSendTable;
 
 	bool m_bHasEnemy;
+	float m_fLastEnemyChangeTime;
 
 	bool m_bHasRangeAttackLOS;
 	float m_fLastRangeAttackLOSTime;

@@ -702,6 +702,8 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 			// Did have an enemy, but is now cleared
 			m_hEnemy = NULL;
 			m_bHasEnemy = false;
+			m_fLastEnemyChangeTime = gpGlobals->curtime;
+
 #ifdef ENABLE_PYTHON
 			SrcPySystem()->Run<const char *>( 
 				SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
@@ -718,6 +720,8 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 	// New not null enemy
 	m_hEnemy = pEnemy;
 	m_bHasEnemy = true;
+	m_fLastEnemyChangeTime = gpGlobals->curtime;
+
 #ifdef ENABLE_PYTHON
 	SrcPySystem()->Run<const char *, boost::python::object>( 
 		SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
