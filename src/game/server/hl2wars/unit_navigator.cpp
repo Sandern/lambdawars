@@ -2222,7 +2222,7 @@ boost::python::object UnitBaseNavigator::FindPathAsResult( int goaltype, const V
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( const Vector &vGoalPos )
+UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const Vector &vGoalPos )
 {
 	if( !unit_route_local_paths.GetBool() )
 		return NULL;
@@ -2237,7 +2237,10 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( const Vector &vGoalPos )
 			return NULL;
 
 		NavDbgMsg("#%d BuildLocalPath: builded local route\n", GetOuter()->entindex());
-		return new UnitBaseWaypoint(vGoalPos);
+		UnitBaseWaypoint *pWayPoint = new UnitBaseWaypoint(vGoalPos);
+		pWayPoint->flToleranceX = pPath->m_waypointTolerance + 1.0f;
+		pWayPoint->flToleranceY = pPath->m_waypointTolerance + 1.0f;
+		return pWayPoint;
 	}
 	return NULL;
 }
@@ -2246,7 +2249,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( const Vector &vGoalPos )
 // Purpose: 
 //-----------------------------------------------------------------------------
 #define WAYPOINT_UP_Z 8.0f
-UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir)
+UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPath, CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir )
 {
 	if( !goalArea || !goalArea->GetParent() )
 		return pWayPoint;
@@ -2305,13 +2308,13 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 
 		if( dir == WEST || dir == EAST )
 		{
-			pNewWayPoint->flToleranceX = GetPath()->m_waypointTolerance + 1.0f;
+			pNewWayPoint->flToleranceX = pPath->m_waypointTolerance + 1.0f;
 			pNewWayPoint->flToleranceY = MIN(fGoalTolX, fFromTolX);
 		}
 		else
 		{
 			pNewWayPoint->flToleranceX = MIN(fGoalTolY, fFromTolY);
-			pNewWayPoint->flToleranceY = GetPath()->m_waypointTolerance + 1.0f;
+			pNewWayPoint->flToleranceY = pPath->m_waypointTolerance + 1.0f;
 		}
 	}
 	else 
@@ -2347,13 +2350,13 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 		if( dir == WEST || dir == EAST )
 		{
 			pGoalAreaWayPoint->flToleranceX = fTolerance;
-			pGoalAreaWayPoint->flToleranceY = GetPath()->m_waypointTolerance;
+			pGoalAreaWayPoint->flToleranceY = pPath->m_waypointTolerance;
 
 			pGoalAreaWayPoint->areaSlope = (goalArea->GetCorner( SOUTH_WEST ) - goalArea->GetCorner( NORTH_WEST ));
 		}
 		else
 		{
-			pGoalAreaWayPoint->flToleranceX = GetPath()->m_waypointTolerance;
+			pGoalAreaWayPoint->flToleranceX = pPath->m_waypointTolerance;
 			pGoalAreaWayPoint->flToleranceY = fTolerance;
 
 			pGoalAreaWayPoint->areaSlope = (goalArea->GetCorner( SOUTH_EAST ) - goalArea->GetCorner( SOUTH_WEST ));
@@ -2387,13 +2390,13 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 		if( dir == WEST || dir == EAST )
 		{
 			pFromAreaWayPoint->flToleranceX = fTolerance;
-			pFromAreaWayPoint->flToleranceY = GetPath()->m_waypointTolerance;
+			pFromAreaWayPoint->flToleranceY = pPath->m_waypointTolerance;
 
 			pFromAreaWayPoint->areaSlope = (fromArea->GetCorner( SOUTH_WEST ) - fromArea->GetCorner( NORTH_WEST ));
 		}
 		else
 		{
-			pFromAreaWayPoint->flToleranceX = GetPath()->m_waypointTolerance;
+			pFromAreaWayPoint->flToleranceX = pPath->m_waypointTolerance;
 			pFromAreaWayPoint->flToleranceY = fTolerance;
 
 			pFromAreaWayPoint->areaSlope = (fromArea->GetCorner( SOUTH_EAST ) - fromArea->GetCorner( SOUTH_WEST ));
@@ -2444,14 +2447,14 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute(CNavArea *goalArea,
 		pWayPoint = pFromAreaWayPoint;
 	}
 
-	return BuildWayPointsFromRoute( fromArea, pWayPoint, dir );  
+	return BuildWayPointsFromRoute( pPath, fromArea, pWayPoint, dir );  
 
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( const Vector &vGoalPos )
+UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, const Vector &vGoalPos )
 {
 	if( !unit_route_navmesh_paths.GetBool() )
 		return NULL;
@@ -2521,8 +2524,10 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( const Vector &vGoalPos )
 				NDebugOverlay::Box( closestArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, true, 5.0f );
 		}
 		CNavArea::SetCachedPath( unittype, startArea->GetID(), goalArea->GetID(), closestArea->GetID() );
-		UnitBaseWaypoint *end = new UnitBaseWaypoint(vGoalPos);
-		return BuildWayPointsFromRoute(closestArea, end);
+		UnitBaseWaypoint *pEnd = new UnitBaseWaypoint(vGoalPos);
+		pEnd->flToleranceX = pPath->m_waypointTolerance + 1.0f;
+		pEnd->flToleranceY = pPath->m_waypointTolerance + 1.0f;
+		return BuildWayPointsFromRoute( pPath, closestArea, pEnd );
 	}
 
 	// Fall back
@@ -2553,7 +2558,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 		NavDbgMsg("#%d BuildNavAreaPath: Building route to target enter point\n", GetOuter()->entindex());
 
 		// Expensive: use nav mesh
-		waypoints = BuildNavAreaPath( vEnterPoint );
+		waypoints = BuildNavAreaPath( pPath, vEnterPoint );
 		
 		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( pPath->m_vGoalPos );
 		pEndWaypoint->SpecialGoalStatus = CHS_NOSIMPLIFY;
@@ -2564,12 +2569,12 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	else
 	{
 		// Cheap: try to do trace from start to goal
-		waypoints = BuildLocalPath( pPath->m_vGoalPos );
+		waypoints = BuildLocalPath( pPath, pPath->m_vGoalPos );
 		if( waypoints )
 			return waypoints;
 
 		// Expensive: use nav mesh
-		waypoints = BuildNavAreaPath( pPath->m_vGoalPos );
+		waypoints = BuildNavAreaPath( pPath, pPath->m_vGoalPos );
 		if( waypoints )
 			return waypoints;
 	}

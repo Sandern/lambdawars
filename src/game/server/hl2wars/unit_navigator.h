@@ -443,9 +443,9 @@ protected:
 	// Route buiding
 	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
-	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
-	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute(CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1);
-	virtual UnitBaseWaypoint *	BuildNavAreaPath( const Vector &pos );
+	virtual UnitBaseWaypoint *	BuildLocalPath( UnitBasePath *pPath, const Vector &pos );
+	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute( UnitBasePath *pPath, CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1 );
+	virtual UnitBaseWaypoint *	BuildNavAreaPath( UnitBasePath *pPath, const Vector &pos );
 	virtual UnitBaseWaypoint *	BuildRoute( UnitBasePath *pPath );
 
 public:
