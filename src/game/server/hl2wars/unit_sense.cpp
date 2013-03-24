@@ -380,7 +380,7 @@ bool UnitBaseSense::AddEnenmyInRangeCallback( boost::python::object callback, in
 {
 	for( int i = 0; i < m_Callbacks.Count(); i++ )
 	{
-		if( m_Callbacks[i] == callback && m_Callbacks[i].range == range )
+		if( m_Callbacks[i].callback == callback && m_Callbacks[i].range == range )
 			return false;
 	}
 
