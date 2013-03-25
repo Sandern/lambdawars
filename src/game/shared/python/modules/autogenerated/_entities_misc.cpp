@@ -2178,7 +2178,6 @@ BOOST_PYTHON_MODULE(_entities_misc){
         breakablepropparams_t_exposer.def( "get_origin"
                 , (::Vector const & (*)( ::breakablepropparams_t & ))(&breakablepropparams_t_wrapper::get_origin)
                 , bp::return_value_policy< bp::copy_const_reference >() );
-        breakablepropparams_t_exposer.def_readwrite( "useThisRawVelocity", &breakablepropparams_t::useThisRawVelocity );
         breakablepropparams_t_exposer.def( "get_velocity"
                 , (::Vector const & (*)( ::breakablepropparams_t & ))(&breakablepropparams_t_wrapper::get_velocity)
                 , bp::return_value_policy< bp::copy_const_reference >() );
@@ -4530,6 +4529,10 @@ BOOST_PYTHON_MODULE(_entities_misc){
 
     bp::class_< CPythonNetworkArray >( "NetworkArrayInternal", bp::init< bp::object, char const *, bp::optional< bp::list, bool, bool > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::list(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false) )) )    
         .def( 
+            "__delitem__"
+            , (void ( ::CPythonNetworkArray::* )( ::boost::python::object ) )( &::CPythonNetworkArray::DelItem )
+            , ( bp::arg("key") ) )    
+        .def( 
             "__getitem__"
             , (::boost::python::object ( ::CPythonNetworkArray::* )( int ) )( &::CPythonNetworkArray::GetItem )
             , ( bp::arg("idx") ) )    
@@ -4912,7 +4915,6 @@ BOOST_PYTHON_MODULE(_entities_misc){
         breakablepropparams_t_exposer.def( "get_origin"
                 , (::Vector const & (*)( ::breakablepropparams_t & ))(&breakablepropparams_t_wrapper::get_origin)
                 , bp::return_value_policy< bp::copy_const_reference >() );
-        breakablepropparams_t_exposer.def_readwrite( "useThisRawVelocity", &breakablepropparams_t::useThisRawVelocity );
         breakablepropparams_t_exposer.def( "get_velocity"
                 , (::Vector const & (*)( ::breakablepropparams_t & ))(&breakablepropparams_t_wrapper::get_velocity)
                 , bp::return_value_policy< bp::copy_const_reference >() );

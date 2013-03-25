@@ -175,28 +175,28 @@ void C_PhysPropClientside::DestroyAll()
 
 //-----------------------------------------------------------------------------
 // Purpose: Parse this prop's data from the model, if it has a keyvalues section.
-//			Returns true only if this prop is using a model that has a prop_data section that's invalid.
+//                      Returns true only if this prop is using a model that has a prop_data section that's invalid.
 //-----------------------------------------------------------------------------
 int C_PhysPropClientside::ParsePropData( void )
 {
-	KeyValues *modelKeyValues = new KeyValues("");
-	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
-	{
-		modelKeyValues->deleteThis();
-		return PARSE_FAILED_NO_DATA;
-	}
-
-	// Do we have a props section?
-	KeyValues *pkvPropData = modelKeyValues->FindKey("prop_data");
-	if ( !pkvPropData )
-	{
-		modelKeyValues->deleteThis();
-		return PARSE_FAILED_NO_DATA;
-	}
-
-	int iResult = g_PropDataSystem.ParsePropFromKV( this, pkvPropData, modelKeyValues );
-	modelKeyValues->deleteThis();
-	return iResult;
+        KeyValues *modelKeyValues = new KeyValues("");
+        if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+        {
+                modelKeyValues->deleteThis();
+                return PARSE_FAILED_NO_DATA;
+        }
+ 
+        // Do we have a props section?
+        KeyValues *pkvPropData = modelKeyValues->FindKey("prop_data");
+        if ( !pkvPropData )
+        {
+                modelKeyValues->deleteThis();
+                return PARSE_FAILED_NO_DATA;
+        }
+ 
+        int iResult = g_PropDataSystem.ParsePropFromKV( this, this, pkvPropData, modelKeyValues );
+        modelKeyValues->deleteThis();
+        return iResult;
 }
 
 bool C_PhysPropClientside::Initialize()

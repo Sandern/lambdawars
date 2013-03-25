@@ -67,6 +67,7 @@ public:
 
 	void SetItem( int idx, bp::object data );
 	bp::object GetItem( int idx );
+	void DelItem( bp::object key );
 
 	void Set( bp::list data );
 

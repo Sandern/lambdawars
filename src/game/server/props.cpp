@@ -43,6 +43,7 @@
 #include "GameStats.h"
 #include "vehicle_base.h"
 #include "tier0/icommandline.h"
+#include "pushentity.h"
 
 
 
@@ -70,11 +71,10 @@ int g_interactionHitByPlayerThrownPhysObj = 0;
 int	g_interactionPlayerPuntedHeavyObject = 0;
 
 int g_ActiveGibCount = 0;
-ConVar prop_active_gib_limit( "prop_active_gib_limit", "999999" );
-ConVar prop_active_gib_max_fade_time( "prop_active_gib_max_fade_time", "999999" );
+ConVar prop_active_gib_limit( "prop_active_gib_limit", IsX360() ? "32" : "64" );
+ConVar prop_active_gib_max_fade_time( "prop_active_gib_max_fade_time", "12" );
 #define ACTIVE_GIB_LIMIT prop_active_gib_limit.GetInt()
 #define ACTIVE_GIB_FADE prop_active_gib_max_fade_time.GetInt()
-
 
 // Damage type modifiers for breakable objects.
 ConVar func_breakdmg_bullet( "func_breakdmg_bullet", "0.5" );
@@ -84,6 +84,7 @@ ConVar func_breakdmg_explosive( "func_breakdmg_explosive", "1.25" );
 ConVar sv_turbophysics( "sv_turbophysics", "0", FCVAR_REPLICATED, "Turns on turbo physics" );
 
 
+	ConVar prop_break_disable_float( "prop_break_disable_float", "0" );
 
 #ifdef HL2_EPISODIC
 	#define PROP_FLARE_LIFETIME 30.0f
@@ -91,19 +92,6 @@ ConVar sv_turbophysics( "sv_turbophysics", "0", FCVAR_REPLICATED, "Turns on turb
 	CBaseEntity *CreateFlare( Vector vOrigin, QAngle Angles, CBaseEntity *pOwner, float flDuration );
 	void KillFlare( CBaseEntity *pOwnerEntity, CBaseEntity *pEntity, float flKillTime );
 #endif
-
-//--------------------------------------------------------------------------------------------------------
-// Scale damage force by mass to get a velocity the damage should impart to the physics object
-Vector GetVelocityFromDamageForce( const CTakeDamageInfo &info, const CBaseEntity *pEntity )
-{
-	if ( !pEntity || pEntity->VPhysicsGetNonShadowMass() <= 0.0f )
-		return vec3_origin;
-
-	Vector force = info.GetDamageForce();
-	float invMass = 1 / pEntity->VPhysicsGetNonShadowMass();
-	return force * invMass;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Breakable objects take different levels of damage based upon the damage type.
@@ -370,7 +358,7 @@ int CBaseProp::ParsePropData( void )
 		return PARSE_FAILED_NO_DATA;
 	}
 
-	int iResult = g_PropDataSystem.ParsePropFromKV( this, pkvPropData, modelKeyValues );
+	int iResult = g_PropDataSystem.ParsePropFromKV( this, dynamic_cast<IBreakableWithPropData *>(this), pkvPropData, modelKeyValues );
 	modelKeyValues->deleteThis();
 	return iResult;
 }
@@ -755,10 +743,19 @@ void CC_Prop_Debug( void )
 }
 static ConCommand prop_debug("prop_debug", CC_Prop_Debug, "Toggle prop debug mode. If on, props will show colorcoded bounding boxes. Red means ignore all damage. White means respond physically to damage but never break. Green maps health in the range of 100 down to 1.", FCVAR_CHEAT);
 
+void SendProxy_UnmodifiedQAngles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
+{
+	QAngle *v = (QAngle*)pData;
+	pOut->m_Vector[0] = v->x;
+	pOut->m_Vector[1] = v->y;
+	pOut->m_Vector[2] = v->z;
+}
+
 //=============================================================================================================
 // BREAKABLE PROPS
 //=============================================================================================================
 IMPLEMENT_SERVERCLASS_ST(CBreakableProp, DT_BreakableProp)
+	SendPropQAngles( SENDINFO( m_qPreferredPlayerCarryAngles ), 0, SPROP_NOSCALE, SendProxy_UnmodifiedQAngles ),
 	SendPropBool( SENDINFO( m_bClientPhysics ) ),
 END_SEND_TABLE()
 
@@ -843,9 +840,12 @@ CBreakableProp::CBreakableProp()
 	SetGlobalFadeScale( 1.0f );
 	m_flDefaultFadeScale = 1;
 	m_mpBreakMode = MULTIPLAYER_BREAK_DEFAULT;
-	
+	// this is the default unless we are a prop_physics_multiplayer
+	SetPhysicsMode( PHYSICS_MULTIPLAYER_SOLID );
+
 	// This defaults to on. Most times mapmakers won't specify a punt sound to play.
 	m_bUsePuntSound = true;
+	m_qPreferredPlayerCarryAngles.GetForModify().Init( FLT_MAX, FLT_MAX, FLT_MAX );
 }
 
 //-----------------------------------------------------------------------------
@@ -862,6 +862,12 @@ void CBreakableProp::Spawn()
 	m_flDmgModExplosive = 1.0;
 	m_flDmgModFire = 1.0f;
 	
+	//jmd: I am guessing that the call to Spawn will set any flags that should be set anyway; this
+	//clears flags we don't want (specifically the FL_ONFIRE for explosive barrels in HL2MP)]
+#ifdef HL2MP
+	ClearFlags();
+#endif 
+
 	BaseClass::Spawn();
 	
 	if ( IsMarkedForDeletion() )
@@ -1678,7 +1684,9 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		}
 		if ( bSmashed )
 		{
+			#if !defined( _X360 ) && !defined( NO_STEAM )
 			gamestats->Event_CrateSmashed();
+			#endif
 		}
 	}
 
@@ -1874,8 +1882,10 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			}
 		}
 	}
-
+	
+#ifndef HL2MP
 	UTIL_Remove( this );
+#endif
 }
 
 
@@ -1901,21 +1911,24 @@ BEGIN_DATADESC( CDynamicProp )
 	DEFINE_KEYFIELD( m_bStartDisabled, FIELD_BOOLEAN, "StartDisabled" ),
 	DEFINE_FIELD(	 m_bUseHitboxesForRenderBox, FIELD_BOOLEAN ),
 	DEFINE_FIELD(	m_nPendingSequence, FIELD_SHORT ),
-	DEFINE_KEYFIELD( m_bUpdateAttachedChildren, FIELD_BOOLEAN, "updatechildren" ),
 	DEFINE_KEYFIELD( m_bDisableBoneFollowers, FIELD_BOOLEAN, "DisableBoneFollowers" ),
+	DEFINE_FIELD(	m_bAnimationDone, FIELD_BOOLEAN ),
 	DEFINE_KEYFIELD( m_bHoldAnimation, FIELD_BOOLEAN, "HoldAnimation" ),
+	DEFINE_KEYFIELD( m_bAnimateEveryFrame, FIELD_BOOLEAN, "AnimateEveryFrame" ),
 	
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_STRING,	"SetAnimation",	InputSetAnimation ),
 	DEFINE_INPUTFUNC( FIELD_STRING,	"SetAnimationNoReset",	InputSetAnimationNoReset ),
 	DEFINE_INPUTFUNC( FIELD_STRING,	"SetDefaultAnimation",	InputSetDefaultAnimation ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"TurnOn",		InputTurnOn ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"TurnOff",		InputTurnOff ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"Enable",		InputTurnOn ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"Disable",		InputTurnOff ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"EnableCollision",	InputEnableCollision ),
-	DEFINE_INPUTFUNC( FIELD_VOID,		"DisableCollision",	InputDisableCollision ),
-	DEFINE_INPUTFUNC( FIELD_FLOAT,		"SetPlaybackRate",	InputSetPlaybackRate ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"TurnOn",		InputTurnOn ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"TurnOff",		InputTurnOff ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"Enable",		InputTurnOn ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"Disable",		InputTurnOff ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"EnableCollision",	InputEnableCollision ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"DisableCollision",	InputDisableCollision ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT,	"SetPlaybackRate",	InputSetPlaybackRate ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"BecomeRagdoll", InputBecomeRagdoll ),
+	DEFINE_INPUTFUNC( FIELD_VOID,	"FadeAndKill", InputFadeAndKill ),
 
 	// Outputs
 	DEFINE_OUTPUT( m_pOutputAnimBegun, "OnAnimationBegun" ),
@@ -2014,6 +2027,11 @@ void CDynamicProp::Spawn( )
 	if ( HasSpawnFlags( SF_DYNAMICPROP_DISABLE_COLLISION ) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
+	}
+
+	if( m_bAnimateEveryFrame )
+	{
+		SetAnimatedEveryTick( true );
 	}
 
 	//m_debugOverlays |= OVERLAY_ABSBOX_BIT;
@@ -2241,17 +2259,30 @@ void CDynamicProp::AnimThink( void )
 		m_flNextRandAnim = gpGlobals->curtime + random->RandomFloat( m_flMinRandAnimTime, m_flMaxRandAnimTime );
 	}
 
-	if ( ((m_iTransitionDirection > 0 && GetCycle() >= 0.999f) || (m_iTransitionDirection < 0 && GetCycle() <= 0.0f)) && !SequenceLoops() )
+	float flPlaybackRate = GetPlaybackRate();
+	bool bPlayingForward = (flPlaybackRate >= 0.0f);
+	
+	// if transition is negative, assert that playbackrate is also negative
+	Assert( (m_iTransitionDirection > 0) || (flPlaybackRate < 0) );
+
+	bool bPropFinished = ((bPlayingForward && GetCycle() >= 0.999f) || (!bPlayingForward && GetCycle() <= 0.0f)) && !SequenceLoops();
+
+	if ( bPropFinished )
 	{
 		Assert( m_iGoalSequence >= 0 );
 		if (GetSequence() != m_iGoalSequence)
 		{
 			PropSetSequence( m_iGoalSequence );
+			bPropFinished = false;
 		}
 		else
 		{
 			// Fire output
-			m_pOutputAnimOver.FireOutput(NULL,this);
+			if ( !m_bAnimationDone )
+			{
+				m_bAnimationDone = true;
+				m_pOutputAnimOver.FireOutput(NULL,this);
+			}
 
 			// If I'm a random animator, think again when it's time to change sequence
 			if ( m_bRandomAnimator )
@@ -2263,6 +2294,7 @@ void CDynamicProp::AnimThink( void )
 				if ( m_iszDefaultAnim != NULL_STRING && m_bHoldAnimation == false )
 				{
 					PropSetAnim( STRING( m_iszDefaultAnim ) );
+					bPropFinished = false;
 				}
 
 				// We need to wait for an animation change to come in
@@ -2275,21 +2307,31 @@ void CDynamicProp::AnimThink( void )
 	}
 	else
 	{
+		m_bAnimationDone = false;
 		SetNextThink( gpGlobals->curtime + 0.1f );
+	}
+
+	if( m_bAnimateEveryFrame )
+	{
+		SetNextThink( gpGlobals->curtime );
+	}
+
+	// if we've already stopped animating and have nothing left to do, skip the rest
+	if ( bPropFinished && m_nPendingSequence == -1 && IsSequenceFinished() )
+	{
+		// DevMsg("%6.2f (%d) : paused\n", gpGlobals->curtime, entindex() );
+		return;
 	}
 
 	StudioFrameAdvance();
 	DispatchAnimEvents(this);
 	UpdateBoneFollowers();
 
-	// Update any SetParentAttached children
-	if ( m_bUpdateAttachedChildren )
+	// Queue any SetParentAttached children to update at the end of the frame
+	for ( CBaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
-		for ( CBaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
-		{
-			pChild->PhysicsTouchTriggers();
-		}		
-	}
+		pChild->PhysicsTouchTriggers();
+	}		
 }
 
 //------------------------------------------------------------------------------
@@ -2308,7 +2350,12 @@ void CDynamicProp::PropSetAnim( const char *szAnim )
 	if ( !szAnim )
 		return;
 
-	int nSequence = LookupSequence( szAnim );
+	// short circuit looking up sequence name
+	int nSequence = GetSequence();
+	if ( V_stricmp( szAnim, GetSequenceName( nSequence ) ) )
+	{
+		nSequence = LookupSequence( szAnim );
+	}
 
 	// Set to the desired anim, or default anim if the desired is not present
 	if ( nSequence > ACTIVITY_NOT_AVAILABLE )
@@ -2359,7 +2406,17 @@ void CDynamicProp::InputSetDefaultAnimation( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CDynamicProp::InputSetPlaybackRate( inputdata_t &inputdata )
 {
-	SetPlaybackRate( inputdata.value.Float() );
+	float flPlaybackRate = inputdata.value.Float();
+	if ( GetPlaybackRate() != flPlaybackRate )
+	{
+		SetPlaybackRate( flPlaybackRate );
+
+		if ( GetNextThink() <= gpGlobals->curtime )
+		{
+			SetThink( &CDynamicProp::AnimThink );
+			SetNextThink( gpGlobals->curtime );
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2422,6 +2479,19 @@ void CDynamicProp::InputDisableCollision( inputdata_t &inputdata )
 void CDynamicProp::InputEnableCollision( inputdata_t &inputdata )
 {
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CDynamicProp::InputBecomeRagdoll( inputdata_t &inputdata )
+{
+	BecomeRagdollOnClient( vec3_origin );
+}
+
+void CDynamicProp::InputFadeAndKill( inputdata_t &inputdata )
+{
+	SUB_StartFadeOutInstant();
 }
 
 //-----------------------------------------------------------------------------
@@ -2506,7 +2576,7 @@ void COrnamentProp::InputDetach( inputdata_t &inputdata )
 //=============================================================================
 // PHYSICS PROPS
 //=============================================================================
-#ifndef INFESTED_DLL
+#ifndef HL2_DLL
 LINK_ENTITY_TO_CLASS( physics_prop, CPhysicsProp );
 LINK_ENTITY_TO_CLASS( prop_physics, CPhysicsProp );	
 LINK_ENTITY_TO_CLASS( prop_physics_override, CPhysicsProp );	
@@ -2664,14 +2734,14 @@ void CPhysicsProp::Spawn( )
 	}
 	
 	// Set the AI AddOn from the QC key values
-	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
+	KeyValues *pModelKV = new KeyValues("");
+	if ( pModelKV->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
-		KeyValues *pkvPropData = modelKeyValues->FindKey( "ai_addon" );
+		KeyValues *pkvPropData = pModelKV->FindKey( "ai_addon" );
 		if ( pkvPropData )
 		{
 			SetAIAddOn( AllocPooledString( pkvPropData->GetString() ) );
-			modelKeyValues->deleteThis();
+			pModelKV->deleteThis();
 			return;
 		}
 		else
@@ -2684,7 +2754,7 @@ void CPhysicsProp::Spawn( )
 		}
 	}
 
-	modelKeyValues->deleteThis();
+	pModelKV->deleteThis();
 
 	// Do prop_physics_multiplayer stuff here
 	// if no physicsmode was defined by .QC or propdata.txt, 
@@ -2733,8 +2803,12 @@ void CPhysicsProp::Spawn( )
 	{
 		TheNavMesh->RegisterAvoidanceObstacle( this );
 	}
-	
-	DensityMap()->SetType( DENSITY_GAUSSIAN );
+
+	QAngle qPreffered;
+	if( GetPropDataAngles( "preferred_carryangles", qPreffered ) )
+	{
+		m_qPreferredPlayerCarryAngles = qPreffered;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -3032,52 +3106,6 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Get the specified key's angles for this prop from the QC's physgun_interactions
-//-----------------------------------------------------------------------------
-bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
-{
-	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
-	{
-		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
-		if ( pkvPropData )
-		{
-			char const *pszBase = pkvPropData->GetString( pKeyName );
-			if ( pszBase && pszBase[0] )
-			{
-				UTIL_StringToVector( vecAngles.Base(), pszBase );
-				modelKeyValues->deleteThis();
-				return true;
-			}
-		}
-	}
-
-	modelKeyValues->deleteThis();
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-float CPhysicsProp::GetCarryDistanceOffset( void )
-{
-	KeyValues *modelKeyValues = new KeyValues("");
-	if ( modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
-	{
-		KeyValues *pkvPropData = modelKeyValues->FindKey( "physgun_interactions" );
-		if ( pkvPropData )
-		{
-			float flDistance = pkvPropData->GetFloat( "carry_distance_offset", 0 );
-			modelKeyValues->deleteThis();
-			return flDistance;
-		}
-	}
-
-	modelKeyValues->deleteThis();
-	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -3651,9 +3679,14 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 			pEntity->AddSpawnFlags( SF_PHYSPROP_IS_GIB );
 		}
 		pEntity->Spawn();
+		
+		if ( prop_break_disable_float.GetBool() )
+		{
+			PhysEnableFloating( pEntity->VPhysicsGetObject(), false );
+		}
 
 		// If we're burning, break into burning pieces
-		CBaseAnimating *pAnimating = dynamic_cast<CBreakableProp *>(pOwner);
+		CBaseAnimating *pAnimating = pOwner ? pOwner->GetBaseAnimating() : NULL;
 		if ( pAnimating && pAnimating->IsOnFire() )
 		{
 			CEntityFlame *pOwnerFlame = dynamic_cast<CEntityFlame*>( pAnimating->GetEffectEntity() );
@@ -3825,14 +3858,12 @@ int PropBreakablePrecacheAll( string_t modelName )
 	return iBreakables;
 }
 
-bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics, const breakablepropparams_t &params, CBaseEntity *pEntity, int iPrecomputedBreakableCount = -1 )
+bool PropBreakableCapEdictsOnCreateAll( CUtlVector<breakmodel_t> &list, IPhysicsObject *pPhysics, const breakablepropparams_t &params, CBaseEntity *pEntity, int iPrecomputedBreakableCount = -1 )
 {
 	// @Note (toml 10-07-03): this is stop-gap to prevent this function from crashing the engine
 	const int BREATHING_ROOM = 64;
+	int nCurrentEntityCount = engine->GetEntityCount();
 
-	CUtlVector<breakmodel_t> list;
-	BreakModelList( list, modelindex, params.defBurstScale, params.defCollisionGroup );
-	
 	int numToCreate = 0;
 
 	if ( iPrecomputedBreakableCount != -1 )
@@ -3843,12 +3874,21 @@ bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics,
 	{
 		if ( list.Count() ) 
 		{
-			for ( int i = 0; i < list.Count(); i++ )
+			// if there are enough don't bother checking each piece
+			int nCurrentAvailable = MAX_EDICTS - (nCurrentEntityCount + BREATHING_ROOM);
+			if ( nCurrentAvailable > list.Count() )
 			{
-				int modelIndex = modelinfo->GetModelIndex( list[i].modelName );
-				if ( modelIndex <= 0 )
-					continue;
-				numToCreate++;
+				numToCreate = list.Count();
+			}
+			else
+			{
+				for ( int i = 0; i < list.Count(); i++ )
+				{
+					int modelIndex = modelinfo->GetModelIndex( list[i].modelName );
+					if ( modelIndex <= 0 )
+						continue;
+					numToCreate++;
+				}
 			}
 		}
 		// Then see if the propdata specifies any breakable pieces
@@ -3862,7 +3902,7 @@ bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics,
 		}
 	}
 
-	return ( !numToCreate || ( engine->GetEntityCount() + numToCreate + BREATHING_ROOM < MAX_EDICTS ) );
+	return ( !numToCreate || ( nCurrentEntityCount + numToCreate + BREATHING_ROOM < MAX_EDICTS ) );
 }
 
 
@@ -5167,6 +5207,7 @@ private:
 	doorCheck_e	GetOpenState( void );
 
 	void	InputSetRotationDistance ( inputdata_t &inputdata );			// Set the degree difference between open and closed
+	void	InputMoveToRotationDistance ( inputdata_t &inputdata );			// Set the degree difference between open and closed and move to open
 
 	void	CalcOpenAngles ( void );		// Subroutine to setup the m_angRotation QAngles based on the m_flDistance variable
 
@@ -5188,6 +5229,8 @@ private:
 	Vector	m_vecBackBoundsMin;
 	Vector	m_vecBackBoundsMax;
 
+	COutputEvent m_OnRotationDone;		// Triggered when we finish rotating.
+
 	CHandle<CEntityBlocker>	m_hDoorBlocker;
 };
 
@@ -5204,7 +5247,9 @@ BEGIN_DATADESC(CPropDoorRotating)
 	DEFINE_FIELD( m_angGoal, FIELD_VECTOR ),
 	DEFINE_FIELD( m_hDoorBlocker, FIELD_EHANDLE ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetRotationDistance", InputSetRotationDistance ),
+	DEFINE_INPUTFUNC( FIELD_FLOAT, "MoveToRotationDistance", InputMoveToRotationDistance ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetSpeed", InputSetSpeed ),
+	DEFINE_OUTPUT( m_OnRotationDone, "OnRotationDone" ),
 	//m_vecForwardBoundsMin
 	//m_vecForwardBoundsMax
 	//m_vecBackBoundsMin
@@ -5611,6 +5656,8 @@ void CPropDoorRotating::MoveDone()
 	SetLocalAngularVelocity(vec3_angle);
 	SetMoveDoneTime(-1);
 	BaseClass::MoveDone();
+
+	m_OnRotationDone.FireOutput(this, this);
 }
 
 
@@ -5943,6 +5990,16 @@ void CPropDoorRotating::InputSetRotationDistance( inputdata_t &inputdata )
 	CalcOpenAngles();
 	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
 	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Change this door's distance (in degrees) between open and closed and moves to the open position
+//-----------------------------------------------------------------------------
+void CPropDoorRotating::InputMoveToRotationDistance( inputdata_t &inputdata )
+{
+	InputSetRotationDistance( inputdata );
+
+	BeginOpening(NULL);
 }
 
 // Debug sphere

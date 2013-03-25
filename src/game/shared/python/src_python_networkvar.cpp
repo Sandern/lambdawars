@@ -175,6 +175,15 @@ bp::object CPythonNetworkArray::GetItem( int idx )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CPythonNetworkArray::DelItem( bp::object key )
+{
+	m_dataInternal.attr("__delitem__")(key);
+	NetworkStateChanged();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkArray::Set( bp::list data )
 {
 	m_dataInternal = data;

@@ -148,6 +148,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         cls.mem_funs('NetworkVarsUpdateClient').exclude()
         cls.mem_funs('GetItem').rename('__getitem__')
         cls.mem_funs('SetItem').rename('__setitem__')
+        cls.mem_funs('DelItem').rename('__delitem__')
         
         cls = mb.class_('CPythonNetworkDict')
         cls.include()
