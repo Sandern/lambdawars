@@ -1229,7 +1229,8 @@ bool CNavMesh::GetGroundHeight( const Vector &pos, float *height, Vector *normal
 	trace_t result;
 	Vector to( pos.x, pos.y, pos.z - 10000.0f );
 	Vector from( pos.x, pos.y, pos.z + HalfHumanHeight + 1e-3 );
-	while( to.z - pos.z < flMaxOffset ) 
+	int n = 0;
+	while( to.z - pos.z < flMaxOffset && n < 5 ) 
 	{
 		UTIL_TraceLine( from, to, MASK_NPCSOLID_BRUSHONLY, &filter, &result );
 		if ( !result.startsolid && (( result.fraction == 1.0f ) || ( ( from.z - result.endpos.z ) >= HalfHumanHeight ) ) )
@@ -1243,7 +1244,11 @@ bool CNavMesh::GetGroundHeight( const Vector &pos, float *height, Vector *normal
 		}	  
 		to.z = ( result.startsolid ) ? from.z : result.endpos.z;
 		from.z = to.z + HalfHumanHeight + 1e-3;
+		n++;
 	}
+
+	if( n >= 5 )
+		Warning("CNavMesh::GetGroundHeight: too many iterations needed to get the ground height. Faulty input position? %f %f %f\n", pos.x, pos.y, pos.z);
 
 	*height = 0.0f;
 	if ( normal )
