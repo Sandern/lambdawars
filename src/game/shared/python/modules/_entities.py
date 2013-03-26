@@ -1291,10 +1291,7 @@ class Entities(GenerateModuleSemiShared):
             cls.add_property( 'crouching'
                              , cls.mem_fun('IsCrouching')) 
             cls.add_property( 'climbing'
-                             , cls.mem_fun('IsClimbing')) 
-                             
-            cls.add_property( 'crouching'
-                             , cls.mem_fun('IsCrouching'))    
+                             , cls.mem_fun('IsClimbing'))    
             cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
         else:
             cls.mem_funs('EnemyDistance').exclude() 

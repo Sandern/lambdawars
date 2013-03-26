@@ -264,6 +264,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_removeunit" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_removeunit: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 #ifdef CLIENTSENDEHANDLE
 		long iEncodedEHandle = atol(args[1]);
 		int iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
@@ -285,16 +291,32 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "make_group" ) )
 	{
+		if( args.ArgC() < 3 )
+		{
+			Warning( "select_group: not enough arguments (only %d provided, while 3 needed)\n", args.ArgC() );
+			return true;
+		}
 		MakeCurrentSelectionGroup(atoi(args[1]), (bool)atoi(args[2]) );
 		return true;
 	}
 	else if( !Q_stricmp( args[0], "select_group" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "select_group: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
 		SelectGroup(atoi(args[1]));
 		return true;
 	}
 	else if( !Q_stricmp( args[0], "player_orderunits" ) )
 	{
+		if( args.ArgC() < 7 )
+		{
+			Warning( "player_orderunits: not enough arguments (only %d provided, while 7 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata;
 		mousedata.m_vStartPos = Vector(atof(args[1]), atof(args[2]), atof(args[3]));
 		mousedata.m_vEndPos = Vector(atof(args[4]), atof(args[5]), atof(args[6]));
@@ -313,6 +335,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "minimap_lm" ) )
 	{
+		if( args.ArgC() < 7 )
+		{
+			Warning( "minimap_lm: not enough arguments (only %d provided, while 7 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata;
 		mousedata.m_vStartPos = Vector(atof(args[1]), atof(args[2]), atof(args[3]));
 		mousedata.m_vEndPos = Vector(atof(args[4]), atof(args[5]), atof(args[6]));
@@ -340,6 +368,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_lmp" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_lmp: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);
@@ -350,6 +384,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_lmdp" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_lmdp: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);
@@ -360,6 +400,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_lmr" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_lmr: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);
@@ -370,6 +416,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_rmp" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_rmp: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);
@@ -380,6 +432,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_rmdp" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_rmdp: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);
@@ -390,6 +448,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 	}
 	else if( !Q_stricmp( args[0], "player_rmr" ) )
 	{
+		if( args.ArgC() < 2 )
+		{
+			Warning( "player_rmr: not enough arguments (only %d provided, while 2 needed)\n", args.ArgC() );
+			return true;
+		}
+
 		MouseTraceData_t mousedata = GetMouseData();
 
 		int idx = atol(args[1]);

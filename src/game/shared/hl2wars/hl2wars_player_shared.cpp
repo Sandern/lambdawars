@@ -941,7 +941,7 @@ void CHL2WarsPlayer::AddUnit( CBaseEntity *pUnit, bool bTriggerOnSel )
 	iIndex = -1;
 	iMyPriority = pIUnit->GetSelectionPriority();
 	iFirstInsertPriority = -1;
-	for( int i=0; i<m_hSelectedUnits.Count(); i++ )
+	for( int i = 0; i < m_hSelectedUnits.Count(); i++ )
 	{
 		if( m_hSelectedUnits[i] == NULL )
 			continue;
@@ -1012,7 +1012,7 @@ int CHL2WarsPlayer::CountUnits()
 void CHL2WarsPlayer::ClearSelection( bool bTriggerOnSel )
 {
 	int i;
-	for( i=0; i<m_hSelectedUnits.Count(); i++ )
+	for( i = 0; i < m_hSelectedUnits.Count(); i++ )
 	{
 		if( m_hSelectedUnits.Element(i) )
 			m_hSelectedUnits.Element(i)->GetIUnit()->OnDeSelected(this);
@@ -1054,12 +1054,13 @@ void CHL2WarsPlayer::OrderUnits()
 	}
 #endif // ENABLE_PYTHON
 
-	for( i=0; i<m_hSelectedUnits.Count(); i++ )
+	for( i = 0; i < m_hSelectedUnits.Count(); i++ )
 	{
-		if( m_hSelectedUnits.Element(i) == NULL )
+		CBaseEntity *pUnit = m_hSelectedUnits[i];
+		if( !pUnit || !pUnit->GetIUnit() )
 			continue;
 
-		m_hSelectedUnits.Element(i)->GetIUnit()->Order(this);
+		pUnit->GetIUnit()->Order(this);
 	}
 
 #ifdef ENABLE_PYTHON

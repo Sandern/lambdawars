@@ -2346,15 +2346,6 @@ void register_C_UnitBase_class(){
                 , fget( &::C_UnitBase::IsClimbing ) );
         
         }
-        { //property "crouching"[fget=::C_UnitBase::IsCrouching]
-        
-            typedef bool ( ::C_UnitBase::*fget )(  ) ;
-            
-            C_UnitBase_exposer.add_property( 
-                "crouching"
-                , fget( &::C_UnitBase::IsCrouching ) );
-        
-        }
         { //::C_UnitBase::TestCollision
             
                 typedef bool ( ::C_UnitBase::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;

@@ -33,7 +33,7 @@ void PyMeshVertex::Draw( CMeshBuilder &builder )
 // Python mesh builder
 //=============================================================================
 PyMeshBuilder::PyMeshBuilder( const char *pMaterialName, MaterialPrimitiveType_t type )
-	: m_nType(type)
+	: m_nType(type), m_pMaterial(NULL)
 {
 	// Check material name
 	if( !pMaterialName )
@@ -182,10 +182,10 @@ void PyMeshRallyLine::Draw( double frametime )
 
 	Vector normal(0, 0, 0);
 
-	float fLineLength = (drawpoint2 - drawpoint1).Length();
+	float fLineLength = MAX(1.0f, (drawpoint2 - drawpoint1).Length());
 
 	float l = fLineLength / m_fLineLength;
-	float send = m_fLineLength / (texturey/textureyscale);
+	float send = m_fLineLength / MAX(0.01f, texturey/textureyscale);
 	float sstart = (1.0f - l) * send;
 
 	// Setup the four points
