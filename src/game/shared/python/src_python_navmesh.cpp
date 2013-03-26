@@ -522,17 +522,18 @@ typedef struct HidingSpotResult_t
 class HidingSpotCollector
 {
 public:
-	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL)
+	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : 
+			m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL)
 	{
 #ifndef USE_NAVAREA_BASED_DIST
 		m_fRadiusSqr = fRadius * fRadius;
 #else
 		m_fRadius = fRadius;
 
-		//if( pUnit )
-		//	m_pOrderArea = TheNavMesh->GetNearestNavArea(pUnit->GetAbsOrigin(), false, fRadius, false, false);
-		//if( !m_pOrderArea )
-		m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, true);
+		if( vPos.IsValid() )
+			m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, true);
+		else
+			Warning( "HidingSpotCollector: Invalid input position %f %f %f\n", vPos.x, vPos.y, vPos.z );
 
 		if( g_pynavmesh_debug_hidespot.GetBool() )
 		{
