@@ -115,8 +115,6 @@ pythonfiles_client = [
     'python/src_python_vgui.h',
     'python/SurfaceBuffer.cpp',
     'python/SurfaceBuffer.h',
-    'cef/src_cef_python.cpp',
-    'cef/src_cef_python.h',
 ]
 
 pythonfiles_server = [

@@ -19,6 +19,7 @@ testpaths = [
 if settings.addpythonfiles:
     testpaths.extend( [
         '../shared/python/',
+        '../client/cef/',
         '../client/python/',
         '../server/python/',
         'python/',
@@ -37,20 +38,6 @@ def FindCLCompiles(dom, tagname='ClCompile'):
 
     return clcompilesgroups[0]
     
-'''
-def FindCLIncludes(dom):
-    project = dom.getElementsByTagName('Project')[0]
-    itemgroups = project.getElementsByTagName('ItemGroup')
-    clincludegroups = []
-    for itemgroup in itemgroups:
-        clinclude = itemgroup.getElementsByTagName('ClInclude')
-        if clinclude:
-            clincludegroups.append(itemgroup)
-            
-    assert(1 == len(clincludegroups))
-
-    return clincludegroups[0]
-'''
 
 def FindFiltersNames(dom):
     project = dom.getElementsByTagName('Project')[0]
@@ -245,69 +232,6 @@ def UpdateChanged(files, vcxproj):
     if not updatedcompiles and not updatedincludes:
         print('vcxprojupdate: nothing to do for project file %s' % (vcxproj))
         return
-    '''
-    # Project
-    itemgroup = FindCLCompiles(dom)
-    clcompiles = FindPythonNodes(itemgroup)
-    clincludesgroup = FindCLIncludes(dom)
-    filtergroup = FindCLCompiles(domfilters)
-    filternamegroup = FindFiltersNames(domfilters)
-    includepaths = set(map(lambda clcompile: os.path.normpath(clcompile.getAttribute('Include')), clcompiles))
-    
-    # Filters
-    itemgroupfilters = FindCLCompiles(domfilters)
-    clcompilesfilters = FindPythonNodes(itemgroupfilters)
-
-    # Report files and includes (debug)
-    if printfiles:
-        print('All files: ')
-        for f in files:
-            print('\t%s' % (f))
-    if printincludes:
-        print('Current includes: ')
-        for f in includepaths:
-            print('\t%s' % (f))
-    
-    newfiles = files.difference(includepaths)
-    removeincludes = includepaths.difference(files)
-    
-    # Report changes
-    if printnewfiles:
-        print('New files: ')
-        for f in newfiles:
-            print('\t%s' % (f))
-            
-    if printremoveincludes:
-        print('Includes to be removed: ')
-        for f in removeincludes:
-            print('\t%s' % (f))
-            
-    # Only need to update if something changed
-    if not newfiles and not removeincludes:
-        print('vcxprojupdate: nothing to do for project file %s' % (vcxproj))
-        return
-        
-    # Start updating vcxproj project
-    for f in removeincludes:
-        RemoveCLCompile(itemgroup, f)
-    for f in newfiles:
-        AddCLCompile(dom, itemgroup, f)
-        
-    # Now update filters
-    filternames = set()
-    for f in newfiles:
-        filtername = GetFilterName(f)
-        filternames.add(filtername)
-        AddCLCompileFilter(domfilters, itemgroupfilters, f, filtername)
-    for f in removeincludes:
-        RemoveCLCompileFilter(itemgroupfilters, f)
-        
-    # Add new filters
-    for f in filternames:
-        AddFilterNameIfNotExist(domfilters, filternamegroup, f)
-        if printfilters:
-            print 'Detected filter: %s' % (f)
-    '''
     
     if dryrun:
         print('Not updated vcxproj. Dry run')
