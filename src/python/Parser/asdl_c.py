@@ -1033,7 +1033,7 @@ class ObjVisitor(PickleVisitor):
             self.emit("case %s:" % t.name, 2)
             self.emit("Py_INCREF(%s_singleton);" % t.name, 3)
             self.emit("return %s_singleton;" % t.name, 3)
-        self.emit("default:" % name, 2)
+        self.emit("default:", 2)
         self.emit('/* should never happen, but just in case ... */', 3)
         code = "PyErr_Format(PyExc_SystemError, \"unknown %s found\");" % name
         self.emit(code, 3, reflow=False)
@@ -1117,10 +1117,18 @@ PyObject* PyAST_mod2obj(mod_ty t)
 mod_ty PyAST_obj2mod(PyObject* ast, PyArena* arena, int mode)
 {
     mod_ty res;
-    PyObject *req_type[] = {(PyObject*)Module_type, (PyObject*)Expression_type,
-                            (PyObject*)Interactive_type};
-    char *req_name[] = {"Module", "Expression", "Interactive"};
+    PyObject *req_type[3];
+    char *req_name[3];
     int isinstance;
+
+    req_type[0] = (PyObject*)Module_type;
+    req_type[1] = (PyObject*)Expression_type;
+    req_type[2] = (PyObject*)Interactive_type;
+
+    req_name[0] = "Module";
+    req_name[1] = "Expression";
+    req_name[2] = "Interactive";
+
     assert(0 <= mode && mode <= 2);
 
     init_types();

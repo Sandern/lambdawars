@@ -51,12 +51,25 @@ static PyObject *
 md5_update(md5object *self, PyObject *args)
 {
     Py_buffer view;
+    Py_ssize_t n;
+    unsigned char *buf;
 
     if (!PyArg_ParseTuple(args, "s*:update", &view))
         return NULL;
 
-    md5_append(&self->md5, (unsigned char*)view.buf,
-               Py_SAFE_DOWNCAST(view.len, Py_ssize_t, unsigned int));
+    n = view.len;
+    buf = (unsigned char *) view.buf;
+    while (n > 0) {
+        Py_ssize_t nbytes;
+        if (n > INT_MAX)
+            nbytes = INT_MAX;
+        else
+            nbytes = n;
+        md5_append(&self->md5, buf,
+                   Py_SAFE_DOWNCAST(nbytes, Py_ssize_t, unsigned int));
+        buf += nbytes;
+        n -= nbytes;
+    }
 
     PyBuffer_Release(&view);
     Py_RETURN_NONE;
@@ -262,6 +275,8 @@ MD5_new(PyObject *self, PyObject *args)
 {
     md5object *md5p;
     Py_buffer view = { 0 };
+    Py_ssize_t n;
+    unsigned char *buf;
 
     if (!PyArg_ParseTuple(args, "|s*:new", &view))
         return NULL;
@@ -271,9 +286,18 @@ MD5_new(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    if (view.len > 0) {
-        md5_append(&md5p->md5, (unsigned char*)view.buf,
-               Py_SAFE_DOWNCAST(view.len, Py_ssize_t, unsigned int));
+    n = view.len;
+    buf = (unsigned char *) view.buf;
+    while (n > 0) {
+        Py_ssize_t nbytes;
+        if (n > INT_MAX)
+            nbytes = INT_MAX;
+        else
+            nbytes = n;
+        md5_append(&md5p->md5, buf,
+                   Py_SAFE_DOWNCAST(nbytes, Py_ssize_t, unsigned int));
+        buf += nbytes;
+        n -= nbytes;
     }
     PyBuffer_Release(&view);
 

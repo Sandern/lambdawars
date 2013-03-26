@@ -327,11 +327,15 @@ type_set_abstractmethods(PyTypeObject *type, PyObject *value, void *context)
        abc.ABCMeta.__new__, so this function doesn't do anything
        special to update subclasses.
     */
-    int res;
+    int abstract, res;
     if (value != NULL) {
+        abstract = PyObject_IsTrue(value);
+        if (abstract < 0)
+            return -1;
         res = PyDict_SetItemString(type->tp_dict, "__abstractmethods__", value);
     }
     else {
+        abstract = 0;
         res = PyDict_DelItemString(type->tp_dict, "__abstractmethods__");
         if (res && PyErr_ExceptionMatches(PyExc_KeyError)) {
             PyErr_SetString(PyExc_AttributeError, "__abstractmethods__");
@@ -340,12 +344,10 @@ type_set_abstractmethods(PyTypeObject *type, PyObject *value, void *context)
     }
     if (res == 0) {
         PyType_Modified(type);
-        if (value && PyObject_IsTrue(value)) {
+        if (abstract)
             type->tp_flags |= Py_TPFLAGS_IS_ABSTRACT;
-        }
-        else {
+        else
             type->tp_flags &= ~Py_TPFLAGS_IS_ABSTRACT;
-        }
     }
     return res;
 }
@@ -684,8 +686,10 @@ type_repr(PyTypeObject *type)
         mod = NULL;
     }
     name = type_name(type, NULL);
-    if (name == NULL)
+    if (name == NULL) {
+        Py_XDECREF(mod);
         return NULL;
+    }
 
     if (type->tp_flags & Py_TPFLAGS_HEAPTYPE)
         kind = "class";
@@ -876,8 +880,13 @@ subtype_clear(PyObject *self)
         assert(base);
     }
 
-    /* There's no need to clear the instance dict (if any);
-       the collector will call its tp_clear handler. */
+    /* Clear the instance dict (if any), to break cycles involving only
+       __dict__ slots (as in the case 'self.__dict__ is self'). */
+    if (type->tp_dictoffset != base->tp_dictoffset) {
+        PyObject **dictptr = _PyObject_GetDictPtr(self);
+        if (dictptr && *dictptr)
+            Py_CLEAR(*dictptr);
+    }
 
     if (baseclear)
         return baseclear(self);
@@ -889,6 +898,7 @@ subtype_dealloc(PyObject *self)
 {
     PyTypeObject *type, *base;
     destructor basedealloc;
+    PyThreadState *tstate = PyThreadState_GET();
 
     /* Extract the type; we expect it to be a heap type */
     type = Py_TYPE(self);
@@ -938,8 +948,10 @@ subtype_dealloc(PyObject *self)
     /* See explanation at end of function for full disclosure */
     PyObject_GC_UnTrack(self);
     ++_PyTrash_delete_nesting;
+    ++ tstate->trash_delete_nesting;
     Py_TRASHCAN_SAFE_BEGIN(self);
     --_PyTrash_delete_nesting;
+    -- tstate->trash_delete_nesting;
     /* DO NOT restore GC tracking at this point.  weakref callbacks
      * (if any, and whether directly here or indirectly in something we
      * call) may trigger GC, and if self is tracked at that point, it
@@ -1018,8 +1030,10 @@ subtype_dealloc(PyObject *self)
 
   endlabel:
     ++_PyTrash_delete_nesting;
+    ++ tstate->trash_delete_nesting;
     Py_TRASHCAN_SAFE_END(self);
     --_PyTrash_delete_nesting;
+    -- tstate->trash_delete_nesting;
 
     /* Explanation of the weirdness around the trashcan macros:
 
@@ -2525,6 +2539,13 @@ type_getattro(PyTypeObject *type, PyObject *name)
     PyObject *meta_attribute, *attribute;
     descrgetfunc meta_get;
 
+    if (!PyString_Check(name)) {
+        PyErr_Format(PyExc_TypeError,
+                     "attribute name must be string, not '%.200s'",
+                     name->ob_type->tp_name);
+        return NULL;
+    }
+
     /* Initialize this type (we'll assume the metatype is initialized) */
     if (type->tp_dict == NULL) {
         if (PyType_Ready(type) < 0)
@@ -2876,14 +2897,14 @@ object_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
             type->tp_init != object_init)
         {
             err = PyErr_WarnEx(PyExc_DeprecationWarning,
-                       "object.__new__() takes no parameters",
+                       "object() takes no parameters",
                        1);
         }
         else if (type->tp_new != object_new ||
                  type->tp_init == object_init)
         {
             PyErr_SetString(PyExc_TypeError,
-                "object.__new__() takes no parameters");
+                "object() takes no parameters");
             err = -1;
         }
     }
@@ -2963,8 +2984,10 @@ object_repr(PyObject *self)
         mod = NULL;
     }
     name = type_name(type, NULL);
-    if (name == NULL)
+    if (name == NULL) {
+        Py_XDECREF(mod);
         return NULL;
+    }
     if (mod != NULL && strcmp(PyString_AS_STRING(mod), "__builtin__"))
         rtn = PyString_FromFormat("<%s.%s object at %p>",
                                   PyString_AS_STRING(mod),
@@ -2984,7 +3007,7 @@ object_str(PyObject *self)
     unaryfunc f;
 
     f = Py_TYPE(self)->tp_repr;
-    if (f == NULL || f == object_str)
+    if (f == NULL)
         f = object_repr;
     return f(self);
 }
@@ -3553,6 +3576,7 @@ add_methods(PyTypeObject *type, PyMethodDef *meth)
 
     for (; meth->ml_name != NULL; meth++) {
         PyObject *descr;
+        int err;
         if (PyDict_GetItemString(dict, meth->ml_name) &&
             !(meth->ml_flags & METH_COEXIST))
                 continue;
@@ -3576,9 +3600,10 @@ add_methods(PyTypeObject *type, PyMethodDef *meth)
         }
         if (descr == NULL)
             return -1;
-        if (PyDict_SetItemString(dict, meth->ml_name, descr) < 0)
-            return -1;
+        err = PyDict_SetItemString(dict, meth->ml_name, descr);
         Py_DECREF(descr);
+        if (err < 0)
+            return -1;
     }
     return 0;
 }
@@ -6131,7 +6156,8 @@ update_one_slot(PyTypeObject *type, slotdef *p)
             }
             continue;
         }
-        if (Py_TYPE(descr) == &PyWrapperDescr_Type) {
+        if (Py_TYPE(descr) == &PyWrapperDescr_Type &&
+            ((PyWrapperDescrObject *)descr)->d_base->name_strobj == p->name_strobj) {
             void **tptr = resolve_slotdups(type, p->name_strobj);
             if (tptr == NULL || tptr == ptr)
                 generic = p->function;
@@ -6653,8 +6679,8 @@ super_init(PyObject *self, PyObject *args, PyObject *kwds)
 }
 
 PyDoc_STRVAR(super_doc,
-"super(type) -> unbound super object\n"
 "super(type, obj) -> bound super object; requires isinstance(obj, type)\n"
+"super(type) -> unbound super object\n"
 "super(type, type2) -> bound super object; requires issubclass(type2, type)\n"
 "Typical use to call a cooperative superclass method:\n"
 "class C(B):\n"

@@ -53,8 +53,12 @@ builtin___import__(PyObject *self, PyObject *args, PyObject *kwds)
 PyDoc_STRVAR(import_doc,
 "__import__(name, globals={}, locals={}, fromlist=[], level=-1) -> module\n\
 \n\
-Import a module.  The globals are only used to determine the context;\n\
-they are not modified.  The locals are currently unused.  The fromlist\n\
+Import a module. Because this function is meant for use by the Python\n\
+interpreter and not for general use it is better to use\n\
+importlib.import_module() to programmatically import a module.\n\
+\n\
+The globals argument is only used to determine the context;\n\
+they are not modified.  The locals argument is unused.  The fromlist\n\
 should be a list of names to emulate ``from name import ...'', or an\n\
 empty list to emulate ``import name''.\n\
 When importing a module from a package, note that __import__('A.B', ...)\n\
@@ -116,7 +120,8 @@ builtin_all(PyObject *self, PyObject *v)
 PyDoc_STRVAR(all_doc,
 "all(iterable) -> bool\n\
 \n\
-Return True if bool(x) is True for all values x in the iterable.");
+Return True if bool(x) is True for all values x in the iterable.\n\
+If the iterable is empty, return True.");
 
 static PyObject *
 builtin_any(PyObject *self, PyObject *v)
@@ -158,7 +163,8 @@ builtin_any(PyObject *self, PyObject *v)
 PyDoc_STRVAR(any_doc,
 "any(iterable) -> bool\n\
 \n\
-Return True if bool(x) is True for any x in the iterable.");
+Return True if bool(x) is True for any x in the iterable.\n\
+If the iterable is empty, return False.");
 
 static PyObject *
 builtin_apply(PyObject *self, PyObject *args)
@@ -309,7 +315,7 @@ builtin_filter(PyObject *self, PyObject *args)
             ok = PyObject_IsTrue(good);
             Py_DECREF(good);
         }
-        if (ok) {
+        if (ok > 0) {
             if (j < len)
                 PyList_SET_ITEM(result, j, item);
             else {
@@ -320,8 +326,11 @@ builtin_filter(PyObject *self, PyObject *args)
             }
             ++j;
         }
-        else
+        else {
             Py_DECREF(item);
+            if (ok < 0)
+                goto Fail_result_it;
+        }
     }
 
 
@@ -516,6 +525,8 @@ builtin_compile(PyObject *self, PyObject *args, PyObject *kwds)
             mod_ty mod;
 
             arena = PyArena_New();
+            if (arena == NULL)
+                return NULL;
             mod = PyAST_obj2mod(cmd, arena, mode);
             if (mod == NULL) {
                 PyArena_Free(arena);
@@ -1578,6 +1589,7 @@ builtin_print(PyObject *self, PyObject *args, PyObject *kwds)
             Py_CLEAR(str_newline);
             return NULL;
         }
+#ifdef Py_USING_UNICODE
         unicode_newline = PyUnicode_FromString("\n");
         if (unicode_newline == NULL) {
             Py_CLEAR(str_newline);
@@ -1591,6 +1603,7 @@ builtin_print(PyObject *self, PyObject *args, PyObject *kwds)
             Py_CLEAR(unicode_space);
             return NULL;
         }
+#endif
     }
     if (!PyArg_ParseTupleAndKeywords(dummy_args, kwds, "|OOO:print",
                                      kwlist, &sep, &end, &file))
@@ -1993,7 +2006,8 @@ builtin_range(PyObject *self, PyObject *args)
 }
 
 PyDoc_STRVAR(range_doc,
-"range([start,] stop[, step]) -> list of integers\n\
+"range(stop) -> list of integers\n\
+range(start, stop[, step]) -> list of integers\n\
 \n\
 Return a list containing an arithmetic progression of integers.\n\
 range(i, j) returns [i, i+1, i+2, ..., j-1]; start (!) defaults to 0.\n\
@@ -2778,12 +2792,15 @@ filtertuple(PyObject *func, PyObject *tuple)
         }
         ok = PyObject_IsTrue(good);
         Py_DECREF(good);
-        if (ok) {
+        if (ok > 0) {
             if (PyTuple_SetItem(result, j++, item) < 0)
                 goto Fail_1;
         }
-        else
+        else {
             Py_DECREF(item);
+            if (ok < 0)
+                goto Fail_1;
+        }
     }
 
     if (_PyTuple_Resize(&result, j) < 0)
@@ -2845,7 +2862,7 @@ filterstring(PyObject *func, PyObject *strobj)
             ok = PyObject_IsTrue(good);
             Py_DECREF(good);
         }
-        if (ok) {
+        if (ok > 0) {
             Py_ssize_t reslen;
             if (!PyString_Check(item)) {
                 PyErr_SetString(PyExc_TypeError, "can't filter str to str:"
@@ -2911,6 +2928,8 @@ filterstring(PyObject *func, PyObject *strobj)
                     }
         }
         Py_DECREF(item);
+        if (ok < 0)
+            goto Fail_1;
     }
 
     if (j < outlen)
@@ -2971,7 +2990,7 @@ filterunicode(PyObject *func, PyObject *strobj)
             ok = PyObject_IsTrue(good);
             Py_DECREF(good);
         }
-        if (ok) {
+        if (ok > 0) {
             Py_ssize_t reslen;
             if (!PyUnicode_Check(item)) {
                 PyErr_SetString(PyExc_TypeError,
@@ -3026,6 +3045,8 @@ filterunicode(PyObject *func, PyObject *strobj)
                     }
         }
         Py_DECREF(item);
+        if (ok < 0)
+            goto Fail_1;
     }
 
     if (j < outlen)

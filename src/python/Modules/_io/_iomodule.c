@@ -58,8 +58,8 @@ PyDoc_STRVAR(module_doc,
 "\n"
 "At the top of the I/O hierarchy is the abstract base class IOBase. It\n"
 "defines the basic interface to a stream. Note, however, that there is no\n"
-"seperation between reading and writing to streams; implementations are\n"
-"allowed to throw an IOError if they do not support a given operation.\n"
+"separation between reading and writing to streams; implementations are\n"
+"allowed to raise an IOError if they do not support a given operation.\n"
 "\n"
 "Extending IOBase is RawIOBase which deals simply with the reading and\n"
 "writing of raw bytes to a stream. FileIO subclasses RawIOBase to provide\n"
@@ -300,7 +300,8 @@ io_open(PyObject *self, PyObject *args, PyObject *kwds)
     int text = 0, binary = 0, universal = 0;
 
     char rawmode[5], *m;
-    int line_buffering, isatty;
+    int line_buffering;
+    long isatty;
 
     PyObject *raw, *modeobj = NULL, *buffer = NULL, *wrapper = NULL;
 
@@ -443,12 +444,12 @@ io_open(PyObject *self, PyObject *args, PyObject *kwds)
 #ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
         {
             struct stat st;
-            long fileno;
+            int fileno;
             PyObject *res = PyObject_CallMethod(raw, "fileno", NULL);
             if (res == NULL)
                 goto error;
 
-            fileno = PyInt_AsLong(res);
+            fileno = _PyInt_AsInt(res);
             Py_DECREF(res);
             if (fileno == -1 && PyErr_Occurred())
                 goto error;

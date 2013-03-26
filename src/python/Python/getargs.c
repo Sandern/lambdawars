@@ -1410,7 +1410,7 @@ getbuffer(PyObject *arg, Py_buffer *view, char **errmsg)
         *errmsg = "convertible to a buffer";
         return count;
     }
-    PyBuffer_FillInfo(view, NULL, buf, count, 1, 0);
+    PyBuffer_FillInfo(view, arg, buf, count, 1, 0);
     return 0;
 }
 
@@ -1837,6 +1837,7 @@ PyArg_UnpackTuple(PyObject *args, const char *name, Py_ssize_t min, Py_ssize_t m
     assert(min >= 0);
     assert(min <= max);
     if (!PyTuple_Check(args)) {
+        va_end(vargs);
         PyErr_SetString(PyExc_SystemError,
             "PyArg_UnpackTuple() argument list is not a tuple");
         return 0;

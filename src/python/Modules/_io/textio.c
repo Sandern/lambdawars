@@ -236,6 +236,21 @@ incrementalnewlinedecoder_dealloc(nldecoder_object *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+static int
+check_decoded(PyObject *decoded)
+{
+    if (decoded == NULL)
+        return -1;
+    if (!PyUnicode_Check(decoded)) {
+        PyErr_Format(PyExc_TypeError,
+                     "decoder should return a string result, not '%.200s'",
+                     Py_TYPE(decoded)->tp_name);
+        Py_DECREF(decoded);
+        return -1;
+    }
+    return 0;
+}
+
 #define SEEN_CR   1
 #define SEEN_LF   2
 #define SEEN_CRLF 4
@@ -265,14 +280,8 @@ _PyIncrementalNewlineDecoder_decode(PyObject *_self,
         Py_INCREF(output);
     }
 
-    if (output == NULL)
+    if (check_decoded(output) < 0)
         return NULL;
-
-    if (!PyUnicode_Check(output)) {
-        PyErr_SetString(PyExc_TypeError,
-                        "decoder should return a string result");
-        goto error;
-    }
 
     output_len = PyUnicode_GET_SIZE(output);
     if (self->pendingcr && (final || output_len > 0)) {
@@ -622,15 +631,22 @@ PyDoc_STRVAR(textiowrapper_doc,
     "errors determines the strictness of encoding and decoding (see the\n"
     "codecs.register) and defaults to \"strict\".\n"
     "\n"
-    "newline can be None, '', '\\n', '\\r', or '\\r\\n'.  It controls the\n"
-    "handling of line endings. If it is None, universal newlines is\n"
-    "enabled.  With this enabled, on input, the lines endings '\\n', '\\r',\n"
-    "or '\\r\\n' are translated to '\\n' before being returned to the\n"
-    "caller. Conversely, on output, '\\n' is translated to the system\n"
-    "default line seperator, os.linesep. If newline is any other of its\n"
-    "legal values, that newline becomes the newline when the file is read\n"
-    "and it is returned untranslated. On output, '\\n' is converted to the\n"
-    "newline.\n"
+    "newline controls how line endings are handled. It can be None, '',\n"
+    "'\\n', '\\r', and '\\r\\n'.  It works as follows:\n"
+    "\n"
+    "* On input, if newline is None, universal newlines mode is\n"
+    "  enabled. Lines in the input can end in '\\n', '\\r', or '\\r\\n', and\n"
+    "  these are translated into '\\n' before being returned to the\n"
+    "  caller. If it is '', universal newline mode is enabled, but line\n"
+    "  endings are returned to the caller untranslated. If it has any of\n"
+    "  the other legal values, input lines are only terminated by the given\n"
+    "  string, and the line ending is returned to the caller untranslated.\n"
+    "\n"
+    "* On output, if newline is None, any '\\n' characters written are\n"
+    "  translated to the system default line separator, os.linesep. If\n"
+    "  newline is '', no translation takes place. If newline is any of the\n"
+    "  other legal values, any '\\n' characters written are translated to\n"
+    "  the given string.\n"
     "\n"
     "If line_buffering is True, a call to flush is implied when a call to\n"
     "write contains a newline character."
@@ -1006,8 +1022,11 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
     res = PyObject_CallMethod(buffer, "seekable", NULL);
     if (res == NULL)
         goto error;
-    self->seekable = self->telling = PyObject_IsTrue(res);
+    r = PyObject_IsTrue(res);
     Py_DECREF(res);
+    if (r < 0)
+        goto error;
+    self->seekable = self->telling = r;
 
     self->encoding_start_of_stream = 0;
     if (self->seekable && self->encoder) {
@@ -1203,8 +1222,11 @@ _textiowrapper_writeflush(textio *self)
     Py_DECREF(pending);
     if (b == NULL)
         return -1;
-    ret = PyObject_CallMethodObjArgs(self->buffer,
-                                     _PyIO_str_write, b, NULL);
+    ret = NULL;
+    do {
+        ret = PyObject_CallMethodObjArgs(self->buffer,
+                                         _PyIO_str_write, b, NULL);
+    } while (ret == NULL && _PyIO_trap_eintr());
     Py_DECREF(b);
     if (ret == NULL)
         return -1;
@@ -1404,7 +1426,12 @@ textiowrapper_read_chunk(textio *self)
     Py_DECREF(chunk_size);
     if (input_chunk == NULL)
         goto fail;
-    assert(PyBytes_Check(input_chunk));
+    if (!PyBytes_Check(input_chunk)) {
+        PyErr_Format(PyExc_TypeError,
+                     "underlying read1() should have returned a bytes object, "
+                     "not '%.200s'", Py_TYPE(input_chunk)->tp_name);
+        goto fail;
+    }
 
     eof = (PyBytes_Size(input_chunk) == 0);
 
@@ -1417,8 +1444,7 @@ textiowrapper_read_chunk(textio *self)
             _PyIO_str_decode, input_chunk, eof ? Py_True : Py_False, NULL);
     }
 
-    /* TODO sanity check: isinstance(decoded_chars, unicode) */
-    if (decoded_chars == NULL)
+    if (check_decoded(decoded_chars) < 0)
         goto fail;
     textiowrapper_set_decoded_chars(self, decoded_chars);
     if (PyUnicode_GET_SIZE(decoded_chars) > 0)
@@ -1431,7 +1457,14 @@ textiowrapper_read_chunk(textio *self)
         PyObject *next_input = PyNumber_Add(dec_buffer, input_chunk);
         if (next_input == NULL)
             goto fail;
-        assert (PyBytes_Check(next_input));
+        if (!PyBytes_Check(next_input)) {
+            PyErr_Format(PyExc_TypeError,
+                         "decoder getstate() should have returned a bytes "
+                         "object, not '%.200s'",
+                         Py_TYPE(next_input)->tp_name);
+            Py_DECREF(next_input);
+            goto fail;
+        }
         Py_DECREF(dec_buffer);
         Py_CLEAR(self->snapshot);
         self->snapshot = Py_BuildValue("NN", dec_flags, next_input);
@@ -1477,7 +1510,7 @@ textiowrapper_read(textio *self, PyObject *args)
         decoded = PyObject_CallMethodObjArgs(self->decoder, _PyIO_str_decode,
                                              bytes, Py_True, NULL);
         Py_DECREF(bytes);
-        if (decoded == NULL)
+        if (check_decoded(decoded) < 0)
             goto fail;
 
         result = textiowrapper_get_decoded_chars(self, -1);
@@ -1508,8 +1541,14 @@ textiowrapper_read(textio *self, PyObject *args)
         /* Keep reading chunks until we have n characters to return */
         while (remaining > 0) {
             res = textiowrapper_read_chunk(self);
-            if (res < 0)
+            if (res < 0) {
+                /* NOTE: PyErr_SetFromErrno() calls PyErr_CheckSignals()
+                   when EINTR occurs so we needn't do it ourselves. */
+                if (_PyIO_trap_eintr()) {
+                    continue;
+                }
                 goto fail;
+            }
             if (res == 0)  /* EOF */
                 break;
             if (chunks == NULL) {
@@ -1668,8 +1707,14 @@ _textiowrapper_readline(textio *self, Py_ssize_t limit)
         while (!self->decoded_chars ||
                !PyUnicode_GET_SIZE(self->decoded_chars)) {
             res = textiowrapper_read_chunk(self);
-            if (res < 0)
+            if (res < 0) {
+                /* NOTE: PyErr_SetFromErrno() calls PyErr_CheckSignals()
+                   when EINTR occurs so we needn't do it ourselves. */
+                if (_PyIO_trap_eintr()) {
+                    continue;
+                }
                 goto error;
+            }
             if (res == 0)
                 break;
         }
@@ -2085,7 +2130,14 @@ textiowrapper_seek(textio *self, PyObject *args)
         if (input_chunk == NULL)
             goto fail;
 
-        assert (PyBytes_Check(input_chunk));
+        if (!PyBytes_Check(input_chunk)) {
+            PyErr_Format(PyExc_TypeError,
+                         "underlying read() should have returned a bytes "
+                         "object, not '%.200s'",
+                         Py_TYPE(input_chunk)->tp_name);
+            Py_DECREF(input_chunk);
+            goto fail;
+        }
 
         self->snapshot = Py_BuildValue("iN", cookie.dec_flags, input_chunk);
         if (self->snapshot == NULL) {
@@ -2096,7 +2148,7 @@ textiowrapper_seek(textio *self, PyObject *args)
         decoded = PyObject_CallMethod(self->decoder, "decode",
                                       "Oi", input_chunk, (int)cookie.need_eof);
 
-        if (decoded == NULL)
+        if (check_decoded(decoded) < 0)
             goto fail;
 
         textiowrapper_set_decoded_chars(self, decoded);
@@ -2220,9 +2272,8 @@ textiowrapper_tell(textio *self, PyObject *args)
 
         PyObject *decoded = PyObject_CallMethod(
             self->decoder, "decode", "s#", input, 1);
-        if (decoded == NULL)
+        if (check_decoded(decoded) < 0)
             goto fail;
-        assert (PyUnicode_Check(decoded));
         chars_decoded += PyUnicode_GET_SIZE(decoded);
         Py_DECREF(decoded);
 
@@ -2254,9 +2305,8 @@ textiowrapper_tell(textio *self, PyObject *args)
         /* We didn't get enough decoded data; signal EOF to get more. */
         PyObject *decoded = PyObject_CallMethod(
             self->decoder, "decode", "si", "", /* final = */ 1);
-        if (decoded == NULL)
+        if (check_decoded(decoded) < 0)
             goto fail;
-        assert (PyUnicode_Check(decoded));
         chars_decoded += PyUnicode_GET_SIZE(decoded);
         Py_DECREF(decoded);
         cookie.need_eof = 1;
@@ -2415,19 +2465,31 @@ textiowrapper_close(textio *self, PyObject *args)
     Py_DECREF(res);
     if (r < 0)
         return NULL;
-    
+
     if (r > 0) {
         Py_RETURN_NONE; /* stream already closed */
     }
     else {
+        PyObject *exc = NULL, *val, *tb;
         res = PyObject_CallMethod((PyObject *)self, "flush", NULL);
-        if (res == NULL) {
-            return NULL;
-        }
+        if (res == NULL)
+            PyErr_Fetch(&exc, &val, &tb);
         else
             Py_DECREF(res);
 
-        return PyObject_CallMethod(self->buffer, "close", NULL);
+        res = PyObject_CallMethod(self->buffer, "close", NULL);
+        if (exc != NULL) {
+            if (res != NULL) {
+                Py_CLEAR(res);
+                PyErr_Restore(exc, val, tb);
+            }
+            else {
+                Py_DECREF(exc);
+                Py_XDECREF(val);
+                Py_XDECREF(tb);
+            }
+        }
+        return res;
     }
 }
 

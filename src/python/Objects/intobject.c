@@ -189,6 +189,20 @@ PyInt_AsLong(register PyObject *op)
     return val;
 }
 
+int
+_PyInt_AsInt(PyObject *obj)
+{
+    long result = PyInt_AsLong(obj);
+    if (result == -1 && PyErr_Occurred())
+        return -1;
+    if (result > INT_MAX || result < INT_MIN) {
+        PyErr_SetString(PyExc_OverflowError,
+                        "Python int too large to convert to C int");
+        return -1;
+    }
+    return (int)result;
+}
+
 Py_ssize_t
 PyInt_AsSsize_t(register PyObject *op)
 {
@@ -1059,8 +1073,14 @@ int_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oi:int", kwlist,
                                      &x, &base))
         return NULL;
-    if (x == NULL)
+    if (x == NULL) {
+        if (base != -909) {
+            PyErr_SetString(PyExc_TypeError,
+                            "int() missing string argument");
+            return NULL;
+        }
         return PyInt_FromLong(0L);
+    }
     if (base == -909)
         return PyNumber_Int(x);
     if (PyString_Check(x)) {
@@ -1334,15 +1354,20 @@ static PyGetSetDef int_getset[] = {
 };
 
 PyDoc_STRVAR(int_doc,
-"int(x[, base]) -> integer\n\
+"int(x=0) -> int or long\n\
+int(x, base=10) -> int or long\n\
 \n\
-Convert a string or number to an integer, if possible.  A floating point\n\
-argument will be truncated towards zero (this does not include a string\n\
-representation of a floating point number!)  When converting a string, use\n\
-the optional base.  It is an error to supply a base when converting a\n\
-non-string.  If base is zero, the proper base is guessed based on the\n\
-string content.  If the argument is outside the integer range a\n\
-long object will be returned instead.");
+Convert a number or string to an integer, or return 0 if no arguments\n\
+are given.  If x is floating point, the conversion truncates towards zero.\n\
+If x is outside the integer range, the function returns a long instead.\n\
+\n\
+If x is not a number or if base is given, then x must be a string or\n\
+Unicode object representing an integer literal in the given base.  The\n\
+literal can be preceded by '+' or '-' and be surrounded by whitespace.\n\
+The base defaults to 10.  Valid bases are 0 and 2-36.  Base 0 means to\n\
+interpret the base from the string as an integer literal.\n\
+>>> int('0b100', base=0)\n\
+4");
 
 static PyNumberMethods int_as_number = {
     (binaryfunc)int_add,        /*nb_add*/

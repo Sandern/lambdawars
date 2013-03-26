@@ -907,19 +907,20 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
 {
     PyObject *m, *d, *v;
     const char *ext;
-    int set_file_name = 0, ret, len;
+    int set_file_name = 0, len, ret = -1;
 
     m = PyImport_AddModule("__main__");
     if (m == NULL)
         return -1;
+    Py_INCREF(m);
     d = PyModule_GetDict(m);
     if (PyDict_GetItemString(d, "__file__") == NULL) {
         PyObject *f = PyString_FromString(filename);
         if (f == NULL)
-            return -1;
+            goto done;
         if (PyDict_SetItemString(d, "__file__", f) < 0) {
             Py_DECREF(f);
-            return -1;
+            goto done;
         }
         set_file_name = 1;
         Py_DECREF(f);
@@ -932,7 +933,6 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
             fclose(fp);
         if ((fp = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "python: Can't reopen .pyc file\n");
-            ret = -1;
             goto done;
         }
         /* Turn on optimization if a .pyo file is given */
@@ -945,7 +945,6 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
     }
     if (v == NULL) {
         PyErr_Print();
-        ret = -1;
         goto done;
     }
     Py_DECREF(v);
@@ -955,6 +954,7 @@ PyRun_SimpleFileExFlags(FILE *fp, const char *filename, int closeit,
   done:
     if (set_file_name && PyDict_DelItemString(d, "__file__"))
         PyErr_Clear();
+    Py_DECREF(m);
     return ret;
 }
 
@@ -989,55 +989,67 @@ parse_syntax_error(PyObject *err, PyObject **message, const char **filename,
         return PyArg_ParseTuple(err, "O(ziiz)", message, filename,
                                 lineno, offset, text);
 
+    *message = NULL;
+
     /* new style errors.  `err' is an instance */
-
-    if (! (v = PyObject_GetAttrString(err, "msg")))
+    *message = PyObject_GetAttrString(err, "msg");
+    if (!*message)
         goto finally;
-    *message = v;
 
-    if (!(v = PyObject_GetAttrString(err, "filename")))
+    v = PyObject_GetAttrString(err, "filename");
+    if (!v)
         goto finally;
-    if (v == Py_None)
+    if (v == Py_None) {
+        Py_DECREF(v);
         *filename = NULL;
-    else if (! (*filename = PyString_AsString(v)))
-        goto finally;
+    }
+    else {
+        *filename = PyString_AsString(v);
+        Py_DECREF(v);
+        if (!*filename)
+            goto finally;
+    }
 
-    Py_DECREF(v);
-    if (!(v = PyObject_GetAttrString(err, "lineno")))
+    v = PyObject_GetAttrString(err, "lineno");
+    if (!v)
         goto finally;
     hold = PyInt_AsLong(v);
     Py_DECREF(v);
-    v = NULL;
     if (hold < 0 && PyErr_Occurred())
         goto finally;
     *lineno = (int)hold;
 
-    if (!(v = PyObject_GetAttrString(err, "offset")))
+    v = PyObject_GetAttrString(err, "offset");
+    if (!v)
         goto finally;
     if (v == Py_None) {
         *offset = -1;
         Py_DECREF(v);
-        v = NULL;
     } else {
         hold = PyInt_AsLong(v);
         Py_DECREF(v);
-        v = NULL;
         if (hold < 0 && PyErr_Occurred())
             goto finally;
         *offset = (int)hold;
     }
 
-    if (!(v = PyObject_GetAttrString(err, "text")))
+    v = PyObject_GetAttrString(err, "text");
+    if (!v)
         goto finally;
-    if (v == Py_None)
+    if (v == Py_None) {
+        Py_DECREF(v);
         *text = NULL;
-    else if (! (*text = PyString_AsString(v)))
-        goto finally;
-    Py_DECREF(v);
+    }
+    else {
+        *text = PyString_AsString(v);
+        Py_DECREF(v);
+        if (!*text)
+            goto finally;
+    }
     return 1;
 
 finally:
-    Py_XDECREF(v);
+    Py_XDECREF(*message);
     return 0;
 }
 

@@ -22,6 +22,9 @@ the expense of doing their own locking).
 #endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifdef WITH_THREAD
 #include "pythread.h"
@@ -29,10 +32,6 @@ static PyThread_type_lock head_mutex = NULL; /* Protects interp->tstate_head */
 #define HEAD_INIT() (void)(head_mutex || (head_mutex = PyThread_allocate_lock()))
 #define HEAD_LOCK() PyThread_acquire_lock(head_mutex, WAIT_LOCK)
 #define HEAD_UNLOCK() PyThread_release_lock(head_mutex)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* The single PyInterpreterState used by this process'
    GILState implementation
@@ -192,6 +191,9 @@ new_threadstate(PyInterpreterState *interp, int init)
         tstate->c_tracefunc = NULL;
         tstate->c_profileobj = NULL;
         tstate->c_traceobj = NULL;
+
+        tstate->trash_delete_nesting = 0;
+        tstate->trash_delete_later = NULL;
 
         if (init)
             _PyThreadState_Init(tstate);
@@ -654,10 +656,10 @@ PyGILState_Release(PyGILState_STATE oldstate)
         PyEval_SaveThread();
 }
 
+#endif /* WITH_THREAD */
+
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* WITH_THREAD */
 
 

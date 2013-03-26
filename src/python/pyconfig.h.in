@@ -1,4 +1,4 @@
-/* pyconfig.h.in.  Generated from configure.in by autoheader.  */
+/* pyconfig.h.in.  Generated from configure.ac by autoheader.  */
 
 
 #ifndef Py_PYCONFIG_H
@@ -97,10 +97,13 @@
 /* define to 1 if your sem_getvalue is broken. */
 #undef HAVE_BROKEN_SEM_GETVALUE
 
+/* Define if `unsetenv` does not return an int. */
+#undef HAVE_BROKEN_UNSETENV
+
 /* Define this if you have the type _Bool. */
 #undef HAVE_C99_BOOL
 
-/* Define to 1 if you have the `chflags' function. */
+/* Define to 1 if you have the 'chflags' function. */
 #undef HAVE_CHFLAGS
 
 /* Define to 1 if you have the `chown' function. */
@@ -158,10 +161,10 @@
 /* Define to 1 if you have the device macros. */
 #undef HAVE_DEVICE_MACROS
 
-/* Define if we have /dev/ptc. */
+/* Define to 1 if you have the /dev/ptc device file. */
 #undef HAVE_DEV_PTC
 
-/* Define if we have /dev/ptmx. */
+/* Define to 1 if you have the /dev/ptmx device file. */
 #undef HAVE_DEV_PTMX
 
 /* Define to 1 if you have the <direct.h> header file. */
@@ -367,6 +370,12 @@
 /* Define to 1 if you have the `initgroups' function. */
 #undef HAVE_INITGROUPS
 
+/* Define if your compiler provides int32_t. */
+#undef HAVE_INT32_T
+
+/* Define if your compiler provides int64_t. */
+#undef HAVE_INT64_T
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -391,7 +400,7 @@
    Solaris and Linux, the necessary defines are already defined.) */
 #undef HAVE_LARGEFILE_SUPPORT
 
-/* Define to 1 if you have the `lchflags' function. */
+/* Define to 1 if you have the 'lchflags' function. */
 #undef HAVE_LCHFLAGS
 
 /* Define to 1 if you have the `lchmod' function. */
@@ -844,6 +853,12 @@
 /* Define this if you have tcl and TCL_UTF_MAX==6 */
 #undef HAVE_UCS4_TCL
 
+/* Define if your compiler provides uint32_t. */
+#undef HAVE_UINT32_T
+
+/* Define if your compiler provides uint64_t. */
+#undef HAVE_UINT64_T
+
 /* Define to 1 if the system has the type `uintptr_t'. */
 #undef HAVE_UINTPTR_T
 
@@ -1136,6 +1151,9 @@
 
 /* This must be defined on some systems to enable large file support. */
 #undef _LARGEFILE_SOURCE
+
+/* This must be defined on AIX systems to enable large file support. */
+#undef _LARGE_FILES
 
 /* Define to 1 if on MINIX. */
 #undef _MINIX

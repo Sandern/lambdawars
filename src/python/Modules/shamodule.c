@@ -429,12 +429,25 @@ static PyObject *
 SHA_update(SHAobject *self, PyObject *args)
 {
     Py_buffer view;
+    Py_ssize_t n;
+    unsigned char *buf;
 
     if (!PyArg_ParseTuple(args, "s*:update", &view))
         return NULL;
 
-    sha_update(self, (unsigned char*)view.buf,
-               Py_SAFE_DOWNCAST(view.len, Py_ssize_t, unsigned int));
+    n = view.len;
+    buf = (unsigned char *) view.buf;
+    while (n > 0) {
+        Py_ssize_t nbytes;
+        if (n > INT_MAX)
+            nbytes = INT_MAX;
+        else
+            nbytes = n;
+        sha_update(self, buf,
+                   Py_SAFE_DOWNCAST(nbytes, Py_ssize_t, unsigned int));
+        buf += nbytes;
+        n -= nbytes;
+    }
 
     PyBuffer_Release(&view);
     Py_RETURN_NONE;
@@ -536,6 +549,8 @@ SHA_new(PyObject *self, PyObject *args, PyObject *kwdict)
     static char *kwlist[] = {"string", NULL};
     SHAobject *new;
     Py_buffer view = { 0 };
+    Py_ssize_t n;
+    unsigned char *buf;
 
     if (!PyArg_ParseTupleAndKeywords(args, kwdict, "|s*:new", kwlist,
                                      &view)) {
@@ -554,10 +569,21 @@ SHA_new(PyObject *self, PyObject *args, PyObject *kwdict)
         PyBuffer_Release(&view);
         return NULL;
     }
-    if (view.len > 0) {
-        sha_update(new, (unsigned char*)view.buf,
-                   Py_SAFE_DOWNCAST(view.len, Py_ssize_t, unsigned int));
+
+    n = view.len;
+    buf = (unsigned char *) view.buf;
+    while (n > 0) {
+        Py_ssize_t nbytes;
+        if (n > INT_MAX)
+            nbytes = INT_MAX;
+        else
+            nbytes = n;
+        sha_update(new, buf,
+                   Py_SAFE_DOWNCAST(nbytes, Py_ssize_t, unsigned int));
+        buf += nbytes;
+        n -= nbytes;
     }
+
     PyBuffer_Release(&view);
 
     return (PyObject *)new;

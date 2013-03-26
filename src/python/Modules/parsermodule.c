@@ -169,9 +169,33 @@ typedef struct {
 
 
 static void parser_free(PyST_Object *st);
+static PyObject* parser_sizeof(PyST_Object *, void *);
 static int parser_compare(PyST_Object *left, PyST_Object *right);
 static PyObject *parser_getattr(PyObject *self, char *name);
+static PyObject* parser_compilest(PyST_Object *, PyObject *, PyObject *);
+static PyObject* parser_isexpr(PyST_Object *, PyObject *, PyObject *);
+static PyObject* parser_issuite(PyST_Object *, PyObject *, PyObject *);
+static PyObject* parser_st2list(PyST_Object *, PyObject *, PyObject *);
+static PyObject* parser_st2tuple(PyST_Object *, PyObject *, PyObject *);
 
+#define PUBLIC_METHOD_TYPE (METH_VARARGS|METH_KEYWORDS)
+
+static PyMethodDef
+parser_methods[] = {
+    {"compile",         (PyCFunction)parser_compilest,  PUBLIC_METHOD_TYPE,
+        PyDoc_STR("Compile this ST object into a code object.")},
+    {"isexpr",          (PyCFunction)parser_isexpr,     PUBLIC_METHOD_TYPE,
+        PyDoc_STR("Determines if this ST object was created from an expression.")},
+    {"issuite",         (PyCFunction)parser_issuite,    PUBLIC_METHOD_TYPE,
+        PyDoc_STR("Determines if this ST object was created from a suite.")},
+    {"tolist",          (PyCFunction)parser_st2list,    PUBLIC_METHOD_TYPE,
+        PyDoc_STR("Creates a list-tree representation of this ST.")},
+    {"totuple",         (PyCFunction)parser_st2tuple,   PUBLIC_METHOD_TYPE,
+        PyDoc_STR("Creates a tuple-tree representation of this ST.")},
+    {"__sizeof__",      (PyCFunction)parser_sizeof,     METH_NOARGS,
+        PyDoc_STR("Returns size in memory, in bytes.")},
+    {NULL, NULL, 0, NULL}
+};
 
 static
 PyTypeObject PyST_Type = {
@@ -200,7 +224,14 @@ PyTypeObject PyST_Type = {
     Py_TPFLAGS_DEFAULT,                 /* tp_flags             */
 
     /* __doc__ */
-    "Intermediate representation of a Python parse tree."
+    "Intermediate representation of a Python parse tree.",
+    0,                                  /* tp_traverse */
+    0,                                  /* tp_clear */
+    0,                                  /* tp_richcompare */
+    0,                                  /* tp_weaklistoffset */
+    0,                                  /* tp_iter */
+    0,                                  /* tp_iternext */
+    parser_methods,                     /* tp_methods */
 };  /* PyST_Type */
 
 
@@ -319,10 +350,14 @@ parser_st2tuple(PyST_Object *self, PyObject *args, PyObject *kw)
         int lineno = 0;
         int col_offset = 0;
         if (line_option != NULL) {
-            lineno = (PyObject_IsTrue(line_option) != 0) ? 1 : 0;
+            lineno = PyObject_IsTrue(line_option);
+            if (lineno < 0)
+                return NULL;
         }
         if (col_option != NULL) {
-            col_offset = (PyObject_IsTrue(col_option) != 0) ? 1 : 0;
+            col_offset = PyObject_IsTrue(col_option);
+            if (col_offset < 0)
+                return NULL;
         }
         /*
          *  Convert ST into a tuple representation.  Use Guido's function,
@@ -370,10 +405,14 @@ parser_st2list(PyST_Object *self, PyObject *args, PyObject *kw)
         int lineno = 0;
         int col_offset = 0;
         if (line_option != 0) {
-            lineno = PyObject_IsTrue(line_option) ? 1 : 0;
+            lineno = PyObject_IsTrue(line_option);
+            if (lineno < 0)
+                return NULL;
         }
-        if (col_option != NULL) {
-            col_offset = (PyObject_IsTrue(col_option) != 0) ? 1 : 0;
+        if (col_option != 0) {
+            col_offset = PyObject_IsTrue(col_option);
+            if (col_offset < 0)
+                return NULL;
         }
         /*
          *  Convert ST into a tuple representation.  Use Guido's function,
@@ -492,25 +531,6 @@ parser_issuite(PyST_Object *self, PyObject *args, PyObject *kw)
     }
     return (res);
 }
-
-
-#define PUBLIC_METHOD_TYPE (METH_VARARGS|METH_KEYWORDS)
-
-static PyMethodDef
-parser_methods[] = {
-    {"compile",         (PyCFunction)parser_compilest,  PUBLIC_METHOD_TYPE,
-        PyDoc_STR("Compile this ST object into a code object.")},
-    {"isexpr",          (PyCFunction)parser_isexpr,     PUBLIC_METHOD_TYPE,
-        PyDoc_STR("Determines if this ST object was created from an expression.")},
-    {"issuite",         (PyCFunction)parser_issuite,    PUBLIC_METHOD_TYPE,
-        PyDoc_STR("Determines if this ST object was created from a suite.")},
-    {"tolist",          (PyCFunction)parser_st2list,    PUBLIC_METHOD_TYPE,
-        PyDoc_STR("Creates a list-tree representation of this ST.")},
-    {"totuple",         (PyCFunction)parser_st2tuple,   PUBLIC_METHOD_TYPE,
-        PyDoc_STR("Creates a tuple-tree representation of this ST.")},
-
-    {NULL, NULL, 0, NULL}
-};
 
 
 static PyObject*
@@ -678,7 +698,7 @@ parser_tuple2st(PyST_Object *self, PyObject *args, PyObject *kw)
             err_string("parse tree does not use a valid start symbol");
         }
     }
-    /*  Make sure we throw an exception on all errors.  We should never
+    /*  Make sure we raise an exception on all errors.  We should never
      *  get this, but we'd do well to be sure something is done.
      */
     if (st == NULL && !PyErr_Occurred())
@@ -693,6 +713,15 @@ parser_tuple2ast(PyST_Object *self, PyObject *args, PyObject *kw)
     if (PyErr_WarnPy3k("tuple2ast is removed in 3.x; use tuple2st", 1) < 0)
         return NULL;
     return parser_tuple2st(self, args, kw);
+}
+
+static PyObject *
+parser_sizeof(PyST_Object *st, void *unused)
+{
+    Py_ssize_t res;
+
+    res = sizeof(PyST_Object) + _PyNode_SizeOf(st->st_node);
+    return PyLong_FromSsize_t(res);
 }
 
 
@@ -784,7 +813,7 @@ build_node_children(PyObject *tuple, node *root, int *line_num)
         else if (!ISNONTERMINAL(type)) {
             /*
              *  It has to be one or the other; this is an error.
-             *  Throw an exception.
+             *  Raise an exception.
              */
             PyObject *err = Py_BuildValue("os", elem, "unknown node type.");
             PyErr_SetObject(parser_error, err);
@@ -834,7 +863,7 @@ build_node_tree(PyObject *tuple)
     if (ISTERMINAL(num)) {
         /*
          *  The tuple is simple, but it doesn't start with a start symbol.
-         *  Throw an exception now and be done with it.
+         *  Raise an exception now and be done with it.
          */
         tuple = Py_BuildValue("os", tuple,
                     "Illegal syntax-tree; cannot start with terminal symbol.");
