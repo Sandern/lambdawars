@@ -2804,6 +2804,8 @@ void CPhysicsProp::Spawn( )
 		TheNavMesh->RegisterAvoidanceObstacle( this );
 	}
 
+	DensityMap()->SetType( DENSITY_GAUSSIAN );
+
 	QAngle qPreffered;
 	if( GetPropDataAngles( "preferred_carryangles", qPreffered ) )
 	{
