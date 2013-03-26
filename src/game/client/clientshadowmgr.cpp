@@ -2634,7 +2634,7 @@ void CClientShadowMgr::DestroyProjection( ClientShadowHandle_t shadowHandle )
 ClientShadowHandle_t CClientShadowMgr::CreatePTUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int flags )
 {
 	flags &= ~SHADOW_FLAGS_PROJECTED_TEXTURE_TYPE_MASK;
-	flags |= SHADOW_FLAGS_SHADOW | SHADOW_FLAGS_TEXTURE_DIRTY;
+	flags |= SHADOW_FLAGS_PROJECTTEXTUREUNLIT | SHADOW_FLAGS_SHADOW | SHADOW_FLAGS_TEXTURE_DIRTY;
 	ClientShadowHandle_t shadowHandle = CreateProjectedTextureUnlit( info, entity, -1, flags, NULL );
 
 	// NOTE: We *have* to call the version that takes a shadow handle
