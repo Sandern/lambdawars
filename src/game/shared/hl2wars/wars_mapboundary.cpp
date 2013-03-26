@@ -96,7 +96,7 @@ void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ 
 {
 	Vector mins, maxs;
 	float fNearestZ = MAX_COORD_FLOAT;
-	vPoint.z = MAX_COORD_FLOAT; // Default to max coord float
+	vPoint.z = MAX( MIN_COORD_FLOAT, MIN( MAX_COORD_FLOAT, vPoint.z ) ); // Clamp within valid bounds
 
 	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
 	{
