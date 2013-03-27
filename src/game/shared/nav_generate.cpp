@@ -39,7 +39,7 @@ ConVar nav_generate_fencetops( "nav_generate_fencetops", "1", FCVAR_CHEAT, "Auto
 ConVar nav_generate_fixup_jump_areas( "nav_generate_fixup_jump_areas", "1", FCVAR_CHEAT, "Convert obsolete jump areas into 2-way connections" );
 ConVar nav_generate_incremental_range( "nav_generate_incremental_range", "2000", FCVAR_CHEAT );
 ConVar nav_generate_incremental_tolerance( "nav_generate_incremental_tolerance", "0", FCVAR_CHEAT, "Z tolerance for adding new nav areas." );
-ConVar nav_area_max_size( "nav_area_max_size", "50", FCVAR_CHEAT, "Max area size created in nav generation" );
+extern ConVar nav_area_max_size;
 
 ConVar nav_generate_skip_viscomp("nav_generate_skip_viscomp", "1", FCVAR_CHEAT);
 
@@ -2201,137 +2201,6 @@ void CNavMesh::MergeGeneratedAreas( void )
 		}
 	}
 	while( merged );
-}
-
-bool CNavMesh::TryMergeSingleArea( CNavArea *area, float fTolerance )
-{
-	
-
-	if ( area->GetAttributes() & NAV_MESH_NO_MERGE )
-	{
-		//Warning("TryMergeSingleArea: no nodes\n");
-		return false;
-	}
-
-	bool merged;
-
-	do
-	{
-		merged = false;
-
-		// north edge
-		FOR_EACH_VEC( area->m_connect[ NORTH ], nit )
-		{
-			CNavArea *adjArea = area->m_connect[ NORTH ][ nit ].area;
-			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
-			//	continue;
-
-			if ( area->GetSizeY() + adjArea->GetSizeY() > GenerationStepSize * nav_area_max_size.GetInt() )
-				continue;
-
-			if (VectorsAreEqual(area->GetCorner( NORTH_WEST ), adjArea->GetCorner( SOUTH_WEST ), fTolerance) &&
-				VectorsAreEqual(area->GetCorner( NORTH_EAST ), adjArea->GetCorner( SOUTH_EAST ), fTolerance) &&
-				area->GetAttributes() == adjArea->GetAttributes() &&
-				area->IsCoplanar( adjArea ) )
-			{
-				merged = true;
-				//Msg( "  Merged (north) areas #%d and #%d\n", area->m_id, adjArea->m_id );
-
-				area->FinishMergeOnTheFly( adjArea );
-
-				// restart scan - iterator is invalidated
-				break;
-			}
-		}
-
-		if (merged)
-			break;
-
-		// south edge
-		FOR_EACH_VEC( area->m_connect[ SOUTH ], sit )
-		{
-			CNavArea *adjArea = area->m_connect[ SOUTH ][ sit ].area;
-			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
-			//	continue;
-
-			if ( area->GetSizeY() + adjArea->GetSizeY() > GenerationStepSize * nav_area_max_size.GetInt() )
-				continue;
-
-			if (VectorsAreEqual(adjArea->GetCorner( NORTH_WEST ), area->GetCorner( SOUTH_WEST ), fTolerance) &&
-				VectorsAreEqual(adjArea->GetCorner( NORTH_EAST ), area->GetCorner( SOUTH_EAST ), fTolerance) &&
-				area->GetAttributes() == adjArea->GetAttributes() &&
-				area->IsCoplanar( adjArea ))
-			{
-				merged = true;
-				//Msg( "  Merged (south) areas #%d and #%d\n", area->m_id, adjArea->m_id );
-
-				area->FinishMergeOnTheFly( adjArea );
-
-				// restart scan - iterator is invalidated
-				break;
-			}
-
-		}
-
-		if (merged)
-			break;
-
-		// west edge
-		FOR_EACH_VEC( area->m_connect[ WEST ], wit )
-		{
-			CNavArea *adjArea = area->m_connect[ WEST ][ wit ].area;
-			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
-			//	continue;
-
-			if ( area->GetSizeX() + adjArea->GetSizeX() > GenerationStepSize * nav_area_max_size.GetInt() )
-				continue;
-
-			if (VectorsAreEqual(area->GetCorner( NORTH_WEST ), adjArea->GetCorner( NORTH_EAST ), fTolerance) &&
-				VectorsAreEqual(area->GetCorner( SOUTH_WEST ), adjArea->GetCorner( SOUTH_EAST ), fTolerance) &&
-				area->GetAttributes() == adjArea->GetAttributes() &&
-				area->IsCoplanar( adjArea ))
-			{
-				merged = true;
-				//Msg( "  Merged (west) areas #%d and #%d\n", area->m_id, adjArea->m_id );
-
-				area->FinishMergeOnTheFly( adjArea );
-
-				// restart scan - iterator is invalidated
-				break;
-			}
-
-		}
-
-		if (merged)
-			break;
-
-		// east edge
-		FOR_EACH_VEC( area->m_connect[ EAST ], eit )
-		{
-			CNavArea *adjArea = area->m_connect[ EAST ][ eit ].area;
-			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
-			//	continue;
-
-			if ( area->GetSizeX() + adjArea->GetSizeX() > GenerationStepSize * nav_area_max_size.GetInt() )
-				continue;
-
-			if (VectorsAreEqual(adjArea->GetCorner( NORTH_WEST ), area->GetCorner( NORTH_EAST ), fTolerance) &&
-				VectorsAreEqual(adjArea->GetCorner( SOUTH_WEST ), area->GetCorner( SOUTH_EAST ), fTolerance) &&
-				area->GetAttributes() == adjArea->GetAttributes() &&
-				area->IsCoplanar( adjArea ))
-			{
-				merged = true;
-				//Msg( "  Merged (east) areas #%d and #%d\n", area->m_id, adjArea->m_id );
-
-				area->FinishMergeOnTheFly( adjArea );
-
-				// restart scan - iterator is invalidated
-				break;
-			}
-		}
-	} while( merged );
-	
-	return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------

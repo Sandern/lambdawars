@@ -455,6 +455,7 @@ public:
 	void DrawDragSelectionSet( Color &dragSelectionSetColor ) const;
 	void DrawConnectedAreas( void ) const;
 	void DrawHidingSpots( void ) const;
+#endif // CLIENT_DLL
 	bool SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha = NULL, CNavArea **outBeta = NULL );	// split this area into two areas at the given edge
 	bool MergeEdit( CNavArea *adj );							// merge this area and given adjacent area 
 	bool SpliceEdit( CNavArea *other );							// create a new area between this area and given area 
@@ -463,7 +464,6 @@ public:
 	NavCornerType GetCornerUnderCursor( void ) const;
 	bool GetCornerHotspot( NavCornerType corner, Vector hotspot[NUM_CORNERS] ) const;	// returns true if the corner is under the cursor
 	void Shift( const Vector &shift );							// shift the nav area
-#endif // CLIENT_DLL
 
 	//- ladders -----------------------------------------------------------------------------------------
 	void AddLadderUp( CNavLadder *ladder );

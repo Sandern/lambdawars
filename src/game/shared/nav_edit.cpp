@@ -17,18 +17,25 @@
 #include "Color.h"
 #include "tier0/vprof.h"
 #include "collisionutils.h"
-#include "world.h"
 #include "functorutils.h"
-#include "team.h"
 
-#include "hl2wars_player.h"
+#ifndef CLIENT_DLL
+	#include "world.h"
+	#include "team.h"
+
+	#include "hl2wars_player.h"
+#endif // CLIENT_DLL
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+ConVar nav_snap_to_grid( "nav_snap_to_grid", "0", FCVAR_CHEAT|FCVAR_REPLICATED, "Snap to the nav generation grid when creating new nav areas" );
+
+ConVar nav_area_max_size( "nav_area_max_size", "50", FCVAR_CHEAT|FCVAR_REPLICATED, "Max area size created in nav generation" );
+
+#ifndef CLIENT_DLL
 
 ConVar nav_show_area_info( "nav_show_area_info", "0.5", FCVAR_CHEAT, "Duration in seconds to show nav area ID and attributes while editing" );
-ConVar nav_snap_to_grid( "nav_snap_to_grid", "0", FCVAR_CHEAT, "Snap to the nav generation grid when creating new nav areas" );
 ConVar nav_create_place_on_ground( "nav_create_place_on_ground", "0", FCVAR_CHEAT, "If true, nav areas will be placed flush with the ground when created by hand." );
 #ifdef DEBUG
 ConVar nav_draw_limit( "nav_draw_limit", "50", FCVAR_CHEAT, "The maximum number of areas to draw in edit mode" );
@@ -54,7 +61,7 @@ extern ConVar nav_show_nodes;
 //--------------------------------------------------------------------------------------------------------------
 
 
-
+#endif // CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
 int GetGridSize( bool forceGrid = false )
@@ -91,7 +98,6 @@ int GetGridSize( bool forceGrid = false )
 
 	return scale;
 }
-
 
 //--------------------------------------------------------------------------------------------------------------
 Vector CNavMesh::SnapToGrid( const Vector& in, bool snapX, bool snapY, bool forceGrid ) const
@@ -131,6 +137,7 @@ float CNavMesh::SnapToGrid( float x, bool forceGrid ) const
 	return x;
 }
 
+#ifndef CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
 void CNavMesh::GetEditVectors( Vector *pos, Vector *forward )
@@ -3861,6 +3868,135 @@ void CNavMesh::OnEditDestroyNotify( CNavLadder *deadLadder )
 {
 }
 
+#endif // CLIENT_DLL
 
+bool CNavMesh::TryMergeSingleArea( CNavArea *area, float fTolerance )
+{
+	
 
+	if ( area->GetAttributes() & NAV_MESH_NO_MERGE )
+	{
+		//Warning("TryMergeSingleArea: no nodes\n");
+		return false;
+	}
 
+	bool merged;
+
+	do
+	{
+		merged = false;
+
+		// north edge
+		FOR_EACH_VEC( area->m_connect[ NORTH ], nit )
+		{
+			CNavArea *adjArea = area->m_connect[ NORTH ][ nit ].area;
+			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
+			//	continue;
+
+			if ( area->GetSizeY() + adjArea->GetSizeY() > GenerationStepSize * nav_area_max_size.GetInt() )
+				continue;
+
+			if (VectorsAreEqual(area->GetCorner( NORTH_WEST ), adjArea->GetCorner( SOUTH_WEST ), fTolerance) &&
+				VectorsAreEqual(area->GetCorner( NORTH_EAST ), adjArea->GetCorner( SOUTH_EAST ), fTolerance) &&
+				area->GetAttributes() == adjArea->GetAttributes() &&
+				area->IsCoplanar( adjArea ) )
+			{
+				merged = true;
+				//Msg( "  Merged (north) areas #%d and #%d\n", area->m_id, adjArea->m_id );
+
+				area->FinishMergeOnTheFly( adjArea );
+
+				// restart scan - iterator is invalidated
+				break;
+			}
+		}
+
+		if (merged)
+			break;
+
+		// south edge
+		FOR_EACH_VEC( area->m_connect[ SOUTH ], sit )
+		{
+			CNavArea *adjArea = area->m_connect[ SOUTH ][ sit ].area;
+			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
+			//	continue;
+
+			if ( area->GetSizeY() + adjArea->GetSizeY() > GenerationStepSize * nav_area_max_size.GetInt() )
+				continue;
+
+			if (VectorsAreEqual(adjArea->GetCorner( NORTH_WEST ), area->GetCorner( SOUTH_WEST ), fTolerance) &&
+				VectorsAreEqual(adjArea->GetCorner( NORTH_EAST ), area->GetCorner( SOUTH_EAST ), fTolerance) &&
+				area->GetAttributes() == adjArea->GetAttributes() &&
+				area->IsCoplanar( adjArea ))
+			{
+				merged = true;
+				//Msg( "  Merged (south) areas #%d and #%d\n", area->m_id, adjArea->m_id );
+
+				area->FinishMergeOnTheFly( adjArea );
+
+				// restart scan - iterator is invalidated
+				break;
+			}
+
+		}
+
+		if (merged)
+			break;
+
+		// west edge
+		FOR_EACH_VEC( area->m_connect[ WEST ], wit )
+		{
+			CNavArea *adjArea = area->m_connect[ WEST ][ wit ].area;
+			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
+			//	continue;
+
+			if ( area->GetSizeX() + adjArea->GetSizeX() > GenerationStepSize * nav_area_max_size.GetInt() )
+				continue;
+
+			if (VectorsAreEqual(area->GetCorner( NORTH_WEST ), adjArea->GetCorner( NORTH_EAST ), fTolerance) &&
+				VectorsAreEqual(area->GetCorner( SOUTH_WEST ), adjArea->GetCorner( SOUTH_EAST ), fTolerance) &&
+				area->GetAttributes() == adjArea->GetAttributes() &&
+				area->IsCoplanar( adjArea ))
+			{
+				merged = true;
+				//Msg( "  Merged (west) areas #%d and #%d\n", area->m_id, adjArea->m_id );
+
+				area->FinishMergeOnTheFly( adjArea );
+
+				// restart scan - iterator is invalidated
+				break;
+			}
+
+		}
+
+		if (merged)
+			break;
+
+		// east edge
+		FOR_EACH_VEC( area->m_connect[ EAST ], eit )
+		{
+			CNavArea *adjArea = area->m_connect[ EAST ][ eit ].area;
+			//if ( !area->IsAbleToMergeWith( adjArea ) ) // pre-existing areas in incremental generates won't have nodes
+			//	continue;
+
+			if ( area->GetSizeX() + adjArea->GetSizeX() > GenerationStepSize * nav_area_max_size.GetInt() )
+				continue;
+
+			if (VectorsAreEqual(adjArea->GetCorner( NORTH_WEST ), area->GetCorner( NORTH_EAST ), fTolerance) &&
+				VectorsAreEqual(adjArea->GetCorner( SOUTH_WEST ), area->GetCorner( SOUTH_EAST ), fTolerance) &&
+				area->GetAttributes() == adjArea->GetAttributes() &&
+				area->IsCoplanar( adjArea ))
+			{
+				merged = true;
+				//Msg( "  Merged (east) areas #%d and #%d\n", area->m_id, adjArea->m_id );
+
+				area->FinishMergeOnTheFly( adjArea );
+
+				// restart scan - iterator is invalidated
+				break;
+			}
+		}
+	} while( merged );
+	
+	return true;
+}

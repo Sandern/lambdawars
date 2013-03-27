@@ -1052,7 +1052,6 @@ public:
 	}
 };
 
-#ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 /**
  * Split this area into two areas at the given edge.
@@ -1180,6 +1179,7 @@ bool CNavArea::SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha
 	if (outBeta)
 		*outBeta = beta;
 
+#ifndef CLIENT_DLL
 	TheNavMesh->OnEditCreateNotify( alpha );
 	TheNavMesh->OnEditCreateNotify( beta );
 	if ( TheNavMesh->IsInSelectedSet( this ) )
@@ -1187,16 +1187,20 @@ bool CNavArea::SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha
 		TheNavMesh->AddToSelectedSet( alpha );
 		TheNavMesh->AddToSelectedSet( beta );
 	}
+#endif // CLIENT_DLL
 
 	// remove original area
+#ifndef CLIENT_DLL
 	TheNavMesh->OnEditDestroyNotify( this );
+#endif // CLIENT_DLL
 	TheNavAreas.FindAndRemove( this );
+#ifndef CLIENT_DLL
 	TheNavMesh->RemoveFromSelectedSet( this );
+#endif // CLIENT_DLL
 	TheNavMesh->DestroyArea( this );
 
 	return true;
 }
-#endif // CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -1318,7 +1322,6 @@ void CNavArea::AddIncomingConnection( CNavArea *source, NavDirType incomingEdgeD
 	}	
 }
 
-#ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 /**
  * Given the portion of the original area, update its internal data
@@ -1642,11 +1645,12 @@ bool CNavArea::SpliceEdit( CNavArea *other )
 	TheNavAreas.AddToTail( newArea );
 	TheNavMesh->AddNavArea( newArea );
 	
+#ifndef CLIENT_DLL
 	TheNavMesh->OnEditCreateNotify( newArea );
+#endif // CLIENT_DLL
 
 	return true;
 }
-#endif // CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -4356,6 +4360,8 @@ CON_COMMAND_F( nav_update_lighting, "Recomputes lighting values", FCVAR_CHEAT )
 	DevMsg( "Computed lighting for %d/%d areas\n", numComputed, TheNavAreas.Count() );
 }
 
+#endif // CLIENT_DLL
+
 //--------------------------------------------------------------------------------------------------------------
 /**
  * Raise/lower a corner
@@ -4459,7 +4465,6 @@ void CNavArea::RaiseCorner( NavCornerType corner, int amount, bool raiseAdjacent
 		}
 	}
 }
-#endif // CLIENT_DLL
 
 //--------------------------------------------------------------------------------------------------------------
 /**
@@ -4546,7 +4551,6 @@ float FindGroundZ( const Vector& original, const Vector& corner1, const Vector& 
 	return first;
 }
 
-#ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 /**
  * Places a corner (or all corners if corner == NUM_CORNERS) on the ground
@@ -4604,6 +4608,7 @@ void CNavArea::Shift( const Vector &shift )
 	m_center += shift;
 }
 
+#ifndef CLIENT_DLL
 //--------------------------------------------------------------------------------------------------------------
 static void CommandNavUpdateBlocked( void )
 {

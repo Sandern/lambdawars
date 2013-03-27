@@ -85,6 +85,9 @@
     <Filter Include="Source Files\cef">
       <UniqueIdentifier>{39090810-52f3-42d7-a821-48b9b5a8ef1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\keeper">
+      <UniqueIdentifier>{d0e45501-f79a-40bc-a719-61ae334aea16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vscript_client.nut">
@@ -2251,6 +2254,12 @@
     </ClCompile>
     <ClCompile Include="hl2wars\vgui_video_general.cpp">
       <Filter>Source Files\wars\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\nav_edit.cpp">
+      <Filter>Source Files\Nav Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\keeper\tilebase.cpp">
+      <Filter>Source Files\keeper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -4605,6 +4614,9 @@
     </ClInclude>
     <ClInclude Include="hl2wars\vgui_video_general.h">
       <Filter>Source Files\wars\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\keeper\tilebase.h">
+      <Filter>Source Files\keeper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

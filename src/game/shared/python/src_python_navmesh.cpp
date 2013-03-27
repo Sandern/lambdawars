@@ -192,7 +192,7 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs )
 	if( g_pynavmesh_debug.GetBool() )
 		DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
 
-	return pArea->GetCenter();
+	return vRandomPoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -274,7 +274,6 @@ bp::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs )
 //-----------------------------------------------------------------------------
 void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 {
-#ifndef CLIENT_DLL
 	CNavArea *area, *other;
 	Extent extent;
 	Vector vAbsMins2, vAbsMaxs2;
@@ -342,7 +341,6 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 		ids.AddToTail(area->GetID());
 		//TheNavMesh->StripNavigationAreas();
 	}
-#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -447,9 +445,6 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 //-----------------------------------------------------------------------------
 bool TryMergeSurrounding( int id, float tolerance )
 {
-#ifdef CLIENT_DLL
-	return false;
-#else
 	CNavArea *pArea = TheNavMesh->GetNavAreaByID( id );
 	if( !pArea )
 	{
@@ -458,7 +453,6 @@ bool TryMergeSurrounding( int id, float tolerance )
 	}
 
 	return TheNavMesh->TryMergeSingleArea( pArea, tolerance );
-#endif // CLIENT_DLL
 }
 
 #ifndef CLIENT_DLL
