@@ -2039,6 +2039,7 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pCmd") ) );
         
         }
+        C_UnitBase_exposer.def_readwrite( "bodytargetoriginbased", &C_UnitBase::m_bBodyTargetOriginBased );
         C_UnitBase_exposer.def_readwrite( "fowfilterfriendly", &C_UnitBase::m_bFOWFilterFriendly );
         C_UnitBase_exposer.def_readwrite( "neverignoreattacks", &C_UnitBase::m_bNeverIgnoreAttacks );
         C_UnitBase_exposer.def_readwrite( "updateclientanimations", &C_UnitBase::m_bUpdateClientAnimations );

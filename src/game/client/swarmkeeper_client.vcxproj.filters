@@ -2252,6 +2252,9 @@
     <ClCompile Include="hl2wars\vgui_video_general.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\nav_edit.cpp">
+      <Filter>Source Files\Nav Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\src_python_util.h">

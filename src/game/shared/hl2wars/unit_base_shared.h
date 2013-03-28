@@ -402,6 +402,7 @@ public:
 
 	float m_fEyePitch, m_fEyeYaw;
 	bool m_bNeverIgnoreAttacks;
+	bool m_bBodyTargetOriginBased;
 
 	float m_fAccuracy;
 

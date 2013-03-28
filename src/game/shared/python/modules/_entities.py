@@ -1238,6 +1238,7 @@ class Entities(GenerateModuleSemiShared):
         mb.vars('m_fEyeYaw').rename('eyeyaw')
         
         mb.vars('m_bNeverIgnoreAttacks').rename('neverignoreattacks')
+        mb.vars('m_bBodyTargetOriginBased').rename('bodytargetoriginbased')
         
         mb.vars('m_fAccuracy').rename('accuracy')
         

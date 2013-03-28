@@ -825,20 +825,39 @@ Vector CUnitBase::GetShootEnemyDir( Vector &shootOrigin, bool noisy )
 //-----------------------------------------------------------------------------
 Vector CUnitBase::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
-	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetAbsOrigin() ) * .25;
-	Vector high = EyePosition();
-	Vector delta = high - low;
 	Vector result;
-	if ( bNoisy )
+	if( m_bBodyTargetOriginBased )
 	{
-		// bell curve
-		float rand1 = random->RandomFloat( 0.0, 0.5 );
-		float rand2 = random->RandomFloat( 0.0, 0.5 );
-		result = low + delta * rand1 + delta * rand2;
+		const Vector &low = GetAbsOrigin();
+		Vector high = EyePosition();
+		Vector delta = high - low;
+	
+		if ( bNoisy )
+		{
+			// bell curve
+			float rand1 = random->RandomFloat( 0.0, 0.5 );
+			float rand2 = random->RandomFloat( 0.0, 0.5 );
+			result = low + delta * rand1 + delta * rand2;
+		}
+		else
+			result = low + delta * 0.5; 
 	}
 	else
-		result = low + delta * 0.5; 
-
+	{
+		Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetAbsOrigin() ) * .25;
+		Vector high = EyePosition();
+		Vector delta = high - low;
+	
+		if ( bNoisy )
+		{
+			// bell curve
+			float rand1 = random->RandomFloat( 0.0, 0.5 );
+			float rand2 = random->RandomFloat( 0.0, 0.5 );
+			result = low + delta * rand1 + delta * rand2;
+		}
+		else
+			result = low + delta * 0.5; 
+	}
 	return result;
 }
 

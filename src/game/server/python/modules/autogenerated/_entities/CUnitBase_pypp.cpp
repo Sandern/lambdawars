@@ -2546,6 +2546,7 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pWeapon") ) );
         
         }
+        CUnitBase_exposer.def_readwrite( "bodytargetoriginbased", &CUnitBase::m_bBodyTargetOriginBased );
         CUnitBase_exposer.def_readwrite( "fowfilterfriendly", &CUnitBase::m_bFOWFilterFriendly );
         CUnitBase_exposer.def_readwrite( "neverignoreattacks", &CUnitBase::m_bNeverIgnoreAttacks );
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
