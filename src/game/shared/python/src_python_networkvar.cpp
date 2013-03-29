@@ -156,20 +156,20 @@ CPythonNetworkArray::CPythonNetworkArray( bp::object ent, const char *name, bp::
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPythonNetworkArray::SetItem( int idx, bp::object data )
+void CPythonNetworkArray::SetItem( bp::object key, bp::object data )
 {
-	if( data == boost::python::object(m_dataInternal[idx]) )
+	if( data == boost::python::object(m_dataInternal[key]) )
 		return;
-	m_dataInternal[idx] = data;
+	m_dataInternal[key] = data;
 	NetworkStateChanged();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::object CPythonNetworkArray::GetItem( int idx )
+bp::object CPythonNetworkArray::GetItem( bp::object key )
 {
-	return m_dataInternal[idx];
+	return m_dataInternal[key];
 }
 
 //-----------------------------------------------------------------------------

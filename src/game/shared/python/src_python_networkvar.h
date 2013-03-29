@@ -65,8 +65,8 @@ public:
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
-	void SetItem( int idx, bp::object data );
-	bp::object GetItem( int idx );
+	void SetItem( bp::object key, bp::object data );
+	bp::object GetItem( bp::object key );
 	void DelItem( bp::object key );
 
 	void Set( bp::list data );

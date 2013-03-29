@@ -4534,16 +4534,16 @@ BOOST_PYTHON_MODULE(_entities_misc){
             , ( bp::arg("key") ) )    
         .def( 
             "__getitem__"
-            , (::boost::python::object ( ::CPythonNetworkArray::* )( int ) )( &::CPythonNetworkArray::GetItem )
-            , ( bp::arg("idx") ) )    
+            , (::boost::python::object ( ::CPythonNetworkArray::* )( ::boost::python::object ) )( &::CPythonNetworkArray::GetItem )
+            , ( bp::arg("key") ) )    
         .def( 
             "Set"
             , (void ( ::CPythonNetworkArray::* )( ::boost::python::list ) )( &::CPythonNetworkArray::Set )
             , ( bp::arg("data") ) )    
         .def( 
             "__setitem__"
-            , (void ( ::CPythonNetworkArray::* )( int,::boost::python::object ) )( &::CPythonNetworkArray::SetItem )
-            , ( bp::arg("idx"), bp::arg("data") ) );
+            , (void ( ::CPythonNetworkArray::* )( ::boost::python::object,::boost::python::object ) )( &::CPythonNetworkArray::SetItem )
+            , ( bp::arg("key"), bp::arg("data") ) );
 
     bp::class_< CPythonNetworkDict >( "NetworkDictInternal", bp::init< bp::object, char const *, bp::optional< bp::dict, bool, bool > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false) )) )    
         .def( 

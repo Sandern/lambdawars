@@ -32,6 +32,7 @@ enum PyType{
 	PYTYPE_LIST,
 	PYTYPE_DICT,
 	PYTYPE_TUPLE,
+	PYTYPE_SET,
 };
 
 #ifndef CLIENT_DLL
@@ -45,30 +46,26 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 	{
 		w.type = PYTYPE_INT;
 		w.writeint = boost::python::extract<int>(data);
-		return;
 	}
 	else if( type(data) == types.attr("FloatType") )
 	{
 		w.type = PYTYPE_FLOAT;
 		w.writefloat = boost::python::extract<float>(data);
-		return;
 	}
 	else if( type(data) == types.attr("StringType") )
 	{
 		w.type = PYTYPE_STRING;
 		w.writestr = boost::python::extract<const char *>(data);
-		return;
 	}
 	else if( type(data) == types.attr("BooleanType") )
 	{
 		w.type = PYTYPE_BOOL;
 		w.writebool = boost::python::extract<bool>(data);
-		return;
 	}
 	else if( type(data) == types.attr("NoneType") )
 	{
 		w.type = PYTYPE_NONE;
-		return;
+
 	}
 	else if( type(data) == types.attr("ListType") )
 	{
@@ -81,8 +78,20 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 			PyFillWriteElement(write, data[i], type );
 			w.writelist.AddToTail(write);
 		}
+	}
+	else if( type(data) == __builtin__.attr("set") )
+	{
+		w.type = PYTYPE_SET;
 
-		return;
+		bp::list items( data );
+
+		int length = boost::python::len(data);
+		for(int i=0; i<length; i++)
+		{
+			pywrite write;
+			PyFillWriteElement(write, data[i], type );
+			w.writelist.AddToTail(write);
+		}
 	}
 	else if( type(data) == types.attr("TupleType") )
 	{
@@ -95,8 +104,6 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 			PyFillWriteElement(write, data[i], type );
 			w.writelist.AddToTail(write);
 		}
-
-		return;
 	}
 	else if( type(data) == types.attr("DictType") )
 	{
@@ -119,21 +126,17 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 			PyFillWriteElement(write2, objectValue, type );
 			w.writelist.AddToTail(write2);
 		}
-
-		return;
 	}
 	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "Vector", 6 ) )
 	{
 		w.type = PYTYPE_VECTOR;
 		w.writevector = boost::python::extract<Vector>(data);
-		return;
 	}
 	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "QAngle", 6 ) )
 	{
 		w.type = PYTYPE_QANGLE;
 		QAngle angle = boost::python::extract<QAngle>(data);
 		w.writevector = Vector(angle.x, angle.y, angle.z);
-		return;
 	}
 	else
 	{
@@ -155,7 +158,6 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 		}
 		PyErr_SetString(PyExc_ValueError, "Unsupported type in message list" );
 		throw boost::python::error_already_set(); 
-		return;
 	}
 }
 
@@ -185,6 +187,7 @@ void PyWriteElement( pywrite &w )
 	case PYTYPE_LIST:
 	case PYTYPE_DICT:
 	case PYTYPE_TUPLE:
+	case PYTYPE_SET:
 		WRITE_SHORT(w.writelist.Count());
 		for( int i = 0; i < w.writelist.Count(); i++ )
 			PyWriteElement( w.writelist[i] );
@@ -229,6 +232,7 @@ void PyPrintElement( pywrite &w )
 	case PYTYPE_LIST:
 	case PYTYPE_DICT:
 	case PYTYPE_TUPLE:
+	case PYTYPE_SET:
 		for( int i = 0; i < w.writelist.Count(); i++ )
 			PyPrintElement( w.writelist[i] );
 		break;
@@ -360,6 +364,11 @@ bp::object PyReadElement( bf_read &msg )
 		for( int i = 0; i < length; i++ )
 			embeddedlist.append( PyReadElement(msg) );
 		return bp::tuple(embeddedlist);
+	case PYTYPE_SET:
+		length = msg.ReadShort();
+		for( int i = 0; i < length; i++ )
+			embeddedlist.append( PyReadElement(msg) );
+		return __builtin__.attr("set")(embeddedlist);
 	case PYTYPE_DICT:
 		length = msg.ReadShort();
 		for( int i = 0; i < length; i++ )
