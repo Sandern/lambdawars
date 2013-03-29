@@ -1929,10 +1929,12 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	}
 #endif
 
+#ifndef SWARMKEEPER_DLL
 #ifndef _XBOX
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
+#endif // SWARMKEEPER_DLL
 }
 
 
