@@ -21,7 +21,7 @@ static const float3 g_FoWToGray		= float3( 0.3, 0.59, 0.11 );
 #define FOW_GRAY_HILIGHTS	2.0
 
 // Make explored full dark, instead of darker
-#define EXPLORED_FULLDARK 0 
+#define EXPLORED_FULLDARK 0
 
 float3 CalcFoW( const sampler FoWSampler, const float2 vFoWCoords, const float3 CurrentColor )
 {
