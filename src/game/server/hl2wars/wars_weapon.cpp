@@ -197,6 +197,19 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	trace_t tr;
 	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT, &traceFilter, &tr );
 
+	CBaseEntity	*pHitEnt = tr.m_pEnt;
+
+	// Hitting our enemy is a success case
+	if ( pHitEnt == npcOwner->GetEnemy() )
+	{
+		if ( g_debug_wars_weapon.GetBool() )
+		{
+			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+		}
+
+		return true;
+	}
+
 	// See if we completed the trace without interruption
 	if ( tr.fraction == 1.0 )
 	{
@@ -207,8 +220,6 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 
 		return true;
 	}
-
-	CBaseEntity	*pHitEnt = tr.m_pEnt;
 
 	/*
 	CBasePlayer *pEnemyPlayer = ToBasePlayer( npcOwner->GetEnemy() );
@@ -223,17 +234,6 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 		if ( pHitEnt == pVehicle || pHitEnt->GetOwnerEntity() == pVehicle )
 			return true;
 	}*/
-
-	// Hitting our enemy is a success case
-	if ( pHitEnt == npcOwner->GetEnemy() )
-	{
-		if ( g_debug_wars_weapon.GetBool() )
-		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
-		}
-
-		return true;
-	}
 
 	// If a vehicle is blocking the view, grab its driver and use that as the combat character
 	
