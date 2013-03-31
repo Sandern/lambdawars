@@ -60,7 +60,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "CreateNavAreaByCorners"
             , CreateNavAreaByCorners_function_type( &::CreateNavAreaByCorners )
-            , ( bp::arg("nwCorner"), bp::arg("neCorner"), bp::arg("seCorner"), bp::arg("swCorner") ) );
+            , ( bp::arg("nwcorner"), bp::arg("necorner"), bp::arg("secorner"), bp::arg("swcorner") ) );
     
     }
 
@@ -129,12 +129,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase * );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase *,bool );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("pUnit")=bp::object() ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true) ) );
     
     }
 
@@ -167,7 +167,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "IsBBCoveredByNavAreas"
             , IsBBCoveredByNavAreas_function_type( &::IsBBCoveredByNavAreas )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("bRequireIsFlat")=(bool)(true), bp::arg("fFlatTol")=6.99999988079071044921875e-1f ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("requireisflat")=(bool)(true), bp::arg("flattol")=6.99999988079071044921875e-1f ) );
     
     }
 
@@ -188,7 +188,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "NavMeshGetPathDistance"
             , NavMeshGetPathDistance_function_type( &::NavMeshGetPathDistance )
-            , ( bp::arg("vStart"), bp::arg("vGoal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("start"), bp::arg("goal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
     
     }
 
@@ -325,7 +325,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "CreateNavAreaByCorners"
             , CreateNavAreaByCorners_function_type( &::CreateNavAreaByCorners )
-            , ( bp::arg("nwCorner"), bp::arg("neCorner"), bp::arg("seCorner"), bp::arg("swCorner") ) );
+            , ( bp::arg("nwcorner"), bp::arg("necorner"), bp::arg("secorner"), bp::arg("swcorner") ) );
     
     }
 
@@ -394,12 +394,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase * );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase *,bool );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("pUnit")=bp::object() ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true) ) );
     
     }
 
@@ -432,7 +432,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "IsBBCoveredByNavAreas"
             , IsBBCoveredByNavAreas_function_type( &::IsBBCoveredByNavAreas )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("bRequireIsFlat")=(bool)(true), bp::arg("fFlatTol")=6.99999988079071044921875e-1f ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("requireisflat")=(bool)(true), bp::arg("flattol")=6.99999988079071044921875e-1f ) );
     
     }
 
@@ -453,7 +453,7 @@ BOOST_PYTHON_MODULE(_navmesh){
         bp::def( 
             "NavMeshGetPathDistance"
             , NavMeshGetPathDistance_function_type( &::NavMeshGetPathDistance )
-            , ( bp::arg("vStart"), bp::arg("vGoal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("start"), bp::arg("goal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
     
     }
 

@@ -613,7 +613,7 @@ public:
 #else
 			if( fDist < m_fRadius )
 			{
-				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
+				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, /*m_pUnit ? (vPos - m_pUnit->GetAbsOrigin()).LengthSqr() :*/ fDist ) );
 				if( g_pynavmesh_debug_hidespot.GetBool() )
 					NDebugOverlay::Box( pSpot->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, true, HIDESPOT_DEBUG_DURATION );
 			}
@@ -654,7 +654,7 @@ static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotRe
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit )
+bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort )
 {
 	bp::list l;
 
@@ -673,8 +673,11 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 		TheNavMesh->ForAllAreasOverlappingExtent( collector, extent );
 	}
 
-	// Sort based on distance
-	HidingSpots.Sort( HidingSpotCompare );
+	if( bSort )
+	{
+		// Sort based on distance
+		HidingSpots.Sort( HidingSpotCompare );
+	}
 
 	// Python return result
 	for( int i = 0; i < HidingSpots.Count(); i++ )
