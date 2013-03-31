@@ -91,8 +91,8 @@ ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
 ConVar unit_testroute_stepsize("unit_testroute_stepsize", "48.0");
 ConVar unit_testroute_bloatscale("unit_testroute_bloatscale", "1.2");
 
-ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "1.5");
-ConVar unit_seed_density("unit_seed_density", "0.1");
+ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "1.6");
+ConVar unit_seed_density("unit_seed_density", "0.12");
 ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
@@ -345,9 +345,11 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	VectorAngles( vDir, vAngles );
 	CalcMove( MoveCommand, vAngles, fSpeed );
 
-	UpdateGoalStatus( MoveCommand, GoalStatus );
+	UpdateBlockedStatus( MoveCommand );
+	if( GoalStatus == CHS_HASGOAL && GetBlockedStatus() == BS_GIVEUP )
+		GoalStatus = CHS_FAILED;
 
-	UpdateBlockedStatus();
+	UpdateGoalStatus( MoveCommand, GoalStatus );
 
 	m_vLastPosition = GetAbsOrigin();
 
@@ -1066,6 +1068,19 @@ float UnitBaseNavigator::CalculateAvgDistHistory()
 	m_DistHistory.RemoveAll();
 	return fAvgDist;
 }
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::InsertSeed( const Vector &vPos )
+{
+	m_Seeds.AddToTail( seed_entry_t( vPos.AsVector2D(), gpGlobals->curtime ) );
+	if( unit_navigator_debug.GetBool() )
+	{
+		if( unit_navigator_debug.GetInt() > 1 )
+			NDebugOverlay::Box( vPos, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, 255, 1.0f );
+		NavDbgMsg("#%d: InsertSeed: Added density seed (total seeds: %d)\n", GetOuter()->entindex(), m_Seeds.Count() );
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Do goal checks and update our path
@@ -1181,7 +1196,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE )
 	{
 		// Advance path
-		GoalStatus = MoveUpdateWaypoint();
+		GoalStatus = MoveUpdateWaypoint( MoveCommand );
 		if( GoalStatus != CHS_ATGOAL )
 		{
 			if( unit_reactivepath.GetBool() && m_fNextReactivePathUpdate < gpGlobals->curtime ) {
@@ -1225,6 +1240,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					DoFindPathToPosInRange();
 				else
 					DoFindPathToPos();
+				m_iBlockedPathRecomputations++;
 
 				// Don't allow too many recomputations
 				if( GetBlockedStatus() >= BS_STUCK )
@@ -1239,17 +1255,12 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 			// Apparently we are stuck, so try to add a seed that serves as density point
 			// TODO/FIXME: what if you get blocked due the place of the waypoint? In this case it might insert a seed that is undesirable.
-			if( MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsWorld() )
+			if( MoveCommand.m_hBlocker ) // && MoveCommand.m_hBlocker->IsWorld() )
 			{
 				Vector vHitPos = MoveCommand.blocker_hitpos + MoveCommand.blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
-				m_Seeds.AddToTail( seed_entry_t( vHitPos.AsVector2D(), gpGlobals->curtime ) );
-				if( unit_navigator_debug.GetBool() )
-				{
-					if( unit_navigator_debug.GetInt() > 1 )
-						NDebugOverlay::Box( vHitPos, -Vector(2, 2, 2), Vector(2, 2, 2), 0, 255, 0, 255, 1.0f );
-					DevMsg("#%d: UpdateGoalAndPath: Added density seed due path blocked (total seeds: %d)\n", GetOuter()->entindex(), m_Seeds.Count() );
-				}
+				InsertSeed( vHitPos );
 			}
+			InsertSeed( GetAbsOrigin() );
 		}
 	}
 
@@ -1421,16 +1432,24 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 //			Then looks at the type of the new waypoint to determine if a special
 //			action needs to be taken.
 //-----------------------------------------------------------------------------
-CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint()
+CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand )
 {
 	Vector vDir;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	float waypointDist = UnitComputePathDirection2(GetAbsOrigin(), pCurWaypoint, vDir);
-	float tolerance = GetPath()->m_waypointTolerance;
+	
 	CheckGoalStatus_t SpecialGoalStatus = CHS_NOGOAL;
 
 	if( GetPath()->CurWaypointIsGoal() )
 	{
+		// Use full tolerance when blocked a bit and we have a blocker unit
+		// Otherwise use waypoint tolerance (so we get as close as possible)
+		float tolerance;
+		if( GetBlockedStatus() > BS_NONE && MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsUnit() && MoveCommand.m_hBlocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
+			tolerance = MAX( GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance );
+		else
+			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
+
 		if( waypointDist <= MIN(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
 		{
 			if( unit_navigator_debug.GetInt() > 1 )
@@ -1530,6 +1549,8 @@ void UnitBaseNavigator::AdvancePath()
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
 	m_fLastAvgDist = -1;
+
+	ResetBlockedStatus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1851,41 +1872,71 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 void UnitBaseNavigator::ResetBlockedStatus()
 {
 	m_BlockedStatus = BS_NONE;
-	m_fBlockedStartTime = 0.0f;
+
+	m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
+	m_bBlockedLongDistanceDetected = false;
+	m_vBlockedLastPosition = GetAbsOrigin();
+	m_fLowVelocityStartTime = 0.0f;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Update blocked status based on the last position.
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::UpdateBlockedStatus()
+void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand )
 {
+	// Blocked status update only means something if we have a goal
+	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL )
+		return;
+
 	// Determine if we are stuck:
 	//		  * Should have a goal and we are not at our goal yet
 	//		  * Not moving from our position. Either real stuck or we think we can't move
 	// UNDONE * Detect moving back and forth between two positions
 	//		    Something like that should also be classified as stuck
-	if( !m_bNoPathVelocity && m_LastGoalStatus == CHS_HASGOAL && 
-		(m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0 )
-	{
-		if( m_BlockedStatus == BS_NONE )
-		{
-			m_fBlockedStartTime = gpGlobals->curtime;
-		}
+	float fVelocity2dSqr = GetAbsVelocity().Length2DSqr();
 
-		float fBlockedTime = gpGlobals->curtime - m_fBlockedStartTime;
-		if( fBlockedTime < 3.0f )
-			m_BlockedStatus = BS_LITTLE;
-		else if( fBlockedTime < 10.0f )
-			m_BlockedStatus = BS_MUCH;
-		else if( fBlockedTime < 20.f )
-			m_BlockedStatus = BS_STUCK;
-		else
-			m_BlockedStatus = BS_GIVEUP;
+	if( fVelocity2dSqr < 4.0 )
+	{
+		if( m_fLowVelocityStartTime != 0 )
+			m_fLowVelocityStartTime = gpGlobals->curtime;
 	}
 	else
 	{
-		ResetBlockedStatus();
+		m_fLowVelocityStartTime = 0;
 	}
+
+	// Check long distance if needed
+	if( m_fBlockedNextPositionCheck < gpGlobals->curtime )
+	{
+		float fDistSqr = (m_vBlockedLastPosition - GetAbsOrigin()).Length2DSqr();
+		float fMaxSpeedSqr = MoveCommand.maxspeed * MoveCommand.maxspeed;
+		float fMinDistMovedSqr = (fMaxSpeedSqr * 3.0f * 3.0f) / 4.0f;
+		m_bBlockedLongDistanceDetected = fDistSqr < fMinDistMovedSqr;
+		m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
+		m_vBlockedLastPosition = GetAbsOrigin();
+	}
+
+	if( (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f || !m_bBlockedLongDistanceDetected )
+		return;
+
+	// Only execute this part if blocked...
+	if( m_BlockedStatus == BS_NONE )
+	{
+		ResetBlockedStatus();
+
+		m_iBlockedPathRecomputations = 0;
+		m_fBlockedStartTime = gpGlobals->curtime;
+	}
+
+	float fBlockedTime = gpGlobals->curtime - m_fBlockedStartTime;
+	if( fBlockedTime < 2.5f )
+		m_BlockedStatus = BS_LITTLE;
+	else if( fBlockedTime < 6.0f )
+		m_BlockedStatus = BS_MUCH;
+	else if( fBlockedTime < 12.f )
+		m_BlockedStatus = BS_STUCK;
+	else
+		m_BlockedStatus = BS_GIVEUP;
 }
 
 // Goals

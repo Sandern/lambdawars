@@ -59,7 +59,7 @@ void UnitBaseAirNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint()
+CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand )
 {
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	if( pCurWaypoint->SpecialGoalStatus == CHS_CLIMBDEST )
@@ -68,7 +68,7 @@ CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint()
 		if( GetPath()->GetCurWaypoint()->GetPos().z + 4.0f > GetAbsOrigin().z )
 			return pCurWaypoint->SpecialGoalStatus;
 	}
-	return BaseClass::MoveUpdateWaypoint();
+	return BaseClass::MoveUpdateWaypoint( MoveCommand );
 }
 
 //-----------------------------------------------------------------------------

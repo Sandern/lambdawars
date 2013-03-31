@@ -374,7 +374,7 @@ public:
 	// Path updating
 	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist );
 	virtual bool		IsInRangeGoal( UnitBaseMoveCommand &MoveCommand );
-	virtual CheckGoalStatus_t	MoveUpdateWaypoint();
+	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
 	Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
 	virtual void		AdvancePath();
 	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
@@ -386,7 +386,7 @@ public:
 
 	BlockedStatus_t		GetBlockedStatus( void );
 	virtual void		ResetBlockedStatus( void );
-	virtual void		UpdateBlockedStatus( void );
+	virtual void		UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand );
 
 	// Goals
 	virtual bool		SetGoal( Vector &destination, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
@@ -440,6 +440,8 @@ public:
 	virtual void		DrawDebugInfo();
 
 protected:
+	virtual	void		InsertSeed( const Vector &vPos );
+
 	// Route buiding
 	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
@@ -483,7 +485,12 @@ private:
 	// Position checking
 	BlockedStatus_t m_BlockedStatus;
 	float m_fBlockedStartTime;
-	float m_fNextLastPositionCheck;
+	int m_iBlockedPathRecomputations;
+	float m_fBlockedNextPositionCheck;
+	Vector m_vBlockedLastPosition;
+	bool m_bBlockedLongDistanceDetected;
+	float m_fLowVelocityStartTime;
+
 	float m_fLastPathRecomputation;
 	float m_fNextReactivePathUpdate;
 	float m_fNextAllowPathRecomputeTime;

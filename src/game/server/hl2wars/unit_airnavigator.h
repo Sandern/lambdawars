@@ -24,7 +24,7 @@ public:
 #endif // ENABLE_PYTHON
 
 	virtual void		Update( UnitBaseMoveCommand &mv );
-	virtual CheckGoalStatus_t	MoveUpdateWaypoint();
+	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
 
 	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
 
