@@ -603,6 +603,7 @@ void __MsgFunc_PyNetworkDictElement( bf_read &msg )
 	}
 
 	h->PyUpdateNetworkVar( buf, data );
+	h->PyNetworkVarCallChangedCallback( buf );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
@@ -646,6 +647,7 @@ void __MsgFunc_PyNetworkDictFull( bf_read &msg )
 	}
 
 	h->PyUpdateNetworkVar( buf, data );
+	h->PyNetworkVarCallChangedCallback( buf );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
