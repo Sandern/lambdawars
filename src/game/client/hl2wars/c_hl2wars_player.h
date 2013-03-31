@@ -159,9 +159,10 @@ public:
 	virtual void					StopDirectMove();
 	virtual void					SnapCameraTo( const Vector &vPos ); // Positions camera correctly, uses SetDirectMove
 	
-	virtual void					CamFollowEntity( CBaseEntity *pEnt );
-	virtual void					CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities );
-	virtual void					CamFollowRelease();
+	virtual void					CamFollowEntity( CBaseEntity *pEnt, bool forced = false );
+	virtual void					CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities, bool forced = false );
+	virtual void					PyCamFollowGroup( boost::python::list entities, bool forced = false );
+	virtual void					CamFollowRelease( bool forced = false );
 	virtual Vector					CamCalculateGroupOrigin();
 
 	// Inventory
@@ -219,6 +220,7 @@ private:
 
 	EHANDLE				m_hCamFollowEntity;
 	CUtlVector< EHANDLE > m_CamFollowEntities;
+	bool				m_bForcedFollowEntity;
 
 	// Player data
 	string_t			m_FactionName;

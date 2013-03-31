@@ -358,40 +358,69 @@ void C_HL2WarsPlayer::StopDirectMove()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::CamFollowEntity( CBaseEntity *pEnt )
+void C_HL2WarsPlayer::CamFollowEntity( CBaseEntity *pEnt, bool bForced )
 {
+	if( !bForced && m_bForcedFollowEntity )
+		return;
+
 	if( !pEnt )
 	{
-		CamFollowRelease();
+		CamFollowRelease( bForced );
+		m_bForcedFollowEntity = false;
 		return;
 	}
 
 	m_CamFollowEntities.RemoveAll();
 	m_hCamFollowEntity = pEnt;
 	SnapCameraTo( m_hCamFollowEntity->GetAbsOrigin() );
+	m_bForcedFollowEntity = bForced;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities )
+void C_HL2WarsPlayer::CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities, bool bForced )
 {
+	if( !bForced && m_bForcedFollowEntity )
+		return;
+
 	if( m_Entities.Count() == 0 )
 	{
-		CamFollowRelease();
+		CamFollowRelease( bForced );
+		m_bForcedFollowEntity = false;
 		return;
 	}
 
 	m_hCamFollowEntity = NULL;
 	m_CamFollowEntities = m_Entities;
 	SnapCameraTo( CamCalculateGroupOrigin() );
+	m_bForcedFollowEntity = bForced;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::CamFollowRelease()
+void C_HL2WarsPlayer::PyCamFollowGroup( boost::python::list pyentities, bool forced )
 {
+	CUtlVector< EHANDLE > entities;
+
+	for( int i = 0; i < bp::len(pyentities); i++ )
+	{
+		CBaseEntity *pEnt = bp::extract<CBaseEntity *>( pyentities[i] );
+		entities.AddToTail( pEnt );
+	}
+
+	CamFollowGroup( entities, forced );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::CamFollowRelease( bool bForced )
+{
+	if( !bForced && m_bForcedFollowEntity )
+		return;
+
 	m_hCamFollowEntity = NULL;
 	m_CamFollowEntities.RemoveAll();
 	m_bDirectMoveActive = false;

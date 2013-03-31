@@ -1098,31 +1098,22 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::CamFollowEntity
         
-            typedef void ( ::C_HL2WarsPlayer::*CamFollowEntity_function_type )( ::C_BaseEntity * ) ;
+            typedef void ( ::C_HL2WarsPlayer::*CamFollowEntity_function_type )( ::C_BaseEntity *,bool ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "CamFollowEntity"
                 , CamFollowEntity_function_type( &::C_HL2WarsPlayer::CamFollowEntity )
-                , ( bp::arg("pEnt") ) );
-        
-        }
-        { //::C_HL2WarsPlayer::CamFollowGroup
-        
-            typedef void ( ::C_HL2WarsPlayer::*CamFollowGroup_function_type )( ::CUtlVector< CHandle< C_BaseEntity >, CUtlMemory< CHandle< C_BaseEntity >, int > > const & ) ;
-            
-            C_HL2WarsPlayer_exposer.def( 
-                "CamFollowGroup"
-                , CamFollowGroup_function_type( &::C_HL2WarsPlayer::CamFollowGroup )
-                , ( bp::arg("m_Entities") ) );
+                , ( bp::arg("pEnt"), bp::arg("forced")=(bool)(false) ) );
         
         }
         { //::C_HL2WarsPlayer::CamFollowRelease
         
-            typedef void ( ::C_HL2WarsPlayer::*CamFollowRelease_function_type )(  ) ;
+            typedef void ( ::C_HL2WarsPlayer::*CamFollowRelease_function_type )( bool ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "CamFollowRelease"
-                , CamFollowRelease_function_type( &::C_HL2WarsPlayer::CamFollowRelease ) );
+                , CamFollowRelease_function_type( &::C_HL2WarsPlayer::CamFollowRelease )
+                , ( bp::arg("forced")=(bool)(false) ) );
         
         }
         { //::C_HL2WarsPlayer::ChangeFaction
@@ -1742,6 +1733,16 @@ void register_C_HL2WarsPlayer_class(){
                 "PostDataUpdate"
                 , PostDataUpdate_function_type( &::C_HL2WarsPlayer::PostDataUpdate )
                 , ( bp::arg("updateType") ) );
+        
+        }
+        { //::C_HL2WarsPlayer::PyCamFollowGroup
+        
+            typedef void ( ::C_HL2WarsPlayer::*CamFollowGroup_function_type )( ::boost::python::list,bool ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "CamFollowGroup"
+                , CamFollowGroup_function_type( &::C_HL2WarsPlayer::PyCamFollowGroup )
+                , ( bp::arg("entities"), bp::arg("forced")=(bool)(false) ) );
         
         }
         { //::C_HL2WarsPlayer::RemoveActiveAbility
