@@ -3067,6 +3067,15 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("posSrc") ) );
         
         }
+        { //::CBaseEntity::HealthFraction
+        
+            typedef float ( ::CBaseEntity::*HealthFraction_function_type )(  ) const;
+            
+            CBaseEntity_exposer.def( 
+                "HealthFraction"
+                , HealthFraction_function_type( &::CBaseEntity::HealthFraction ) );
+        
+        }
         { //::CBaseEntity::ImpactTrace
         
             typedef void ( ::CBaseEntity::*ImpactTrace_function_type )( ::trace_t *,int,char * ) ;

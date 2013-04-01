@@ -1654,20 +1654,6 @@ bool C_BaseEntity::VPhysicsIsFlesh( void )
 }
 
 //-----------------------------------------------------------------------------
-// Returns the health fraction
-//-----------------------------------------------------------------------------
-float C_BaseEntity::HealthFraction() const
-{
-	if (GetMaxHealth() == 0)
-		return 1.0f;
-
-	float flFraction = (float)GetHealth() / (float)GetMaxHealth();
-	flFraction = clamp( flFraction, 0.0f, 1.0f );
-	return flFraction;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Retrieves the coordinate frame for this entity.
 // Input  : forward - Receives the entity's forward vector.
 //			right - Receives the entity's right vector.

@@ -1059,6 +1059,9 @@ public:
 	int		GetHealth() const		{ return m_iHealth; }
 	virtual void	SetHealth( int amt )	{ m_iHealth = amt; }
 
+	// Returns the health fraction
+	float							HealthFraction() const;
+
 	// Ugly code to lookup all functions to make sure they are in the table when set.
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, const char *name );

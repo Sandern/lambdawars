@@ -2675,6 +2675,18 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 #endif
 }
 
+//-----------------------------------------------------------------------------
+// Returns the health fraction
+//-----------------------------------------------------------------------------
+float CBaseEntity::HealthFraction() const
+{
+	if (GetMaxHealth() == 0)
+		return 1.0f;
+
+	float flFraction = (float)GetHealth() / (float)GetMaxHealth();
+	flFraction = clamp( flFraction, 0.0f, 1.0f );
+	return flFraction;
+}
 
 //------------------------------------------------------------------------------
 // HL2Wars additions
