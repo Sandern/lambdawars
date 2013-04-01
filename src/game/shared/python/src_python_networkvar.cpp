@@ -347,7 +347,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 	CRecipientFilter filter;
 	filter.MakeReliable();
 	filter.AddRecipient(iClient);
-	UserMessageBegin( filter, "PyNetworkDictFull");
+	UserMessageBegin( filter, m_bChangedCallback ? "PyNetworkDictFullCC" : "PyNetworkDictFull" );
 	WRITE_EHANDLE(pEnt);
 	WRITE_STRING(m_Name);
 	WRITE_BYTE((int)length);
@@ -468,7 +468,7 @@ void __MsgFunc_PyNetworkVarChangedCallback( bf_read &msg )
 	{
 		if( g_debug_pynetworkvar.GetBool() )
 		{
-			Msg("#%d Received PyNetworkVar %s, but entity NULL\n", h.GetEntryIndex(), buf);
+			Msg("#%d Received PyNetworkVarChangedCC %s, but entity NULL\n", h.GetEntryIndex(), buf);
 		}
 		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
 		return;
@@ -479,7 +479,7 @@ void __MsgFunc_PyNetworkVarChangedCallback( bf_read &msg )
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d Received PyNetworkVar %s\n", h->entindex(), buf);
+		Msg("#%d Received PyNetworkVarCC %s\n", h->entindex(), buf);
 	}
 }
 
@@ -554,7 +554,7 @@ void __MsgFunc_PyNetworkArrayFullChangedCallback( bf_read &msg )
 	{
 		if( g_debug_pynetworkvar.GetBool() )
 		{
-			Msg("#%d Received PyNetworkArrayFull %s, but entity NULL\n", h.GetEntryIndex(), buf);
+			Msg("#%d Received PyNetworkArrayFullCC %s, but entity NULL\n", h.GetEntryIndex(), buf);
 		}
 		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
 		return;
@@ -565,7 +565,7 @@ void __MsgFunc_PyNetworkArrayFullChangedCallback( bf_read &msg )
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d Received PyNetworkArrayFull %s\n", h->entindex(), buf);
+		Msg("#%d Received PyNetworkArrayFullCC %s\n", h->entindex(), buf);
 	}
 }
 
@@ -603,7 +603,6 @@ void __MsgFunc_PyNetworkDictElement( bf_read &msg )
 	}
 
 	h->PyUpdateNetworkVar( buf, data );
-	h->PyNetworkVarCallChangedCallback( buf );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
@@ -647,7 +646,6 @@ void __MsgFunc_PyNetworkDictFull( bf_read &msg )
 	}
 
 	h->PyUpdateNetworkVar( buf, data );
-	h->PyNetworkVarCallChangedCallback( buf );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
@@ -684,7 +682,7 @@ void __MsgFunc_PyNetworkDictFullChangedCallback( bf_read &msg )
 	{
 		if( g_debug_pynetworkvar.GetBool() )
 		{
-			Msg("#%d Received PyNetworkDictFull %s, but entity NULL\n", h.GetEntryIndex(), buf);
+			Msg("#%d Received PyNetworkDictFullCC %s, but entity NULL\n", h.GetEntryIndex(), buf);
 		}
 		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
 		return;
@@ -695,7 +693,7 @@ void __MsgFunc_PyNetworkDictFullChangedCallback( bf_read &msg )
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d Received PyNetworkDictFull %s (length: %d)\n", h->entindex(), buf, length);
+		Msg("#%d Received PyNetworkDictFullCC %s (length: %d)\n", h->entindex(), buf, length);
 	}
 }
 
