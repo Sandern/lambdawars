@@ -468,7 +468,7 @@ void __MsgFunc_PyNetworkVarChangedCallback( bf_read &msg )
 	{
 		if( g_debug_pynetworkvar.GetBool() )
 		{
-			Msg("#%d Received PyNetworkVarChangedCC %s, but entity NULL\n", h.GetEntryIndex(), buf);
+			Msg("#%d Received PyNetworkVarCC %s, but entity NULL\n", h.GetEntryIndex(), buf);
 		}
 		SrcPySystem()->AddToDelayedUpdateList( h, buf, data, true );
 		return;

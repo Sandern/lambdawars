@@ -887,9 +887,10 @@ void CSrcPython::CleanupDelayedUpdateList()
 		{	
 			if( g_debug_pynetworkvar.GetBool() )
 			{
-				DevMsg("#%d Cleaning up delayed PyNetworkVar update %s\n", 
+				DevMsg("#%d Cleaning up delayed PyNetworkVar update %s (callback: %d)\n", 
 					h.GetEntryIndex(),
-					py_delayed_data_update_list[i].name);
+					py_delayed_data_update_list[i].name,
+					py_delayed_data_update_list[i].callchanged );
 			}
 			h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
 				py_delayed_data_update_list[i].data );
