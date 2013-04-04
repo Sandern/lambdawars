@@ -38,6 +38,8 @@ enum PyNetworkTypes
 	PN_BASECOMBATWEAPON,
 	PN_WARSWEAPON,
 	PN_FUNCUNIT,
+	PN_BASETOGGLE,
+	PN_BASETRIGGER,
 };
 
 boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char *handlename );

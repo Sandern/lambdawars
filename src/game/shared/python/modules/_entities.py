@@ -54,6 +54,8 @@ class Entities(GenerateModuleSemiShared):
             'SpriteTrail.h',
             'c_smoke_trail.h',
             'c_wars_weapon.h',
+            'c_basetoggle.h',
+            'c_triggers.h',
     ]
 
     server_files = [
@@ -115,6 +117,8 @@ class Entities(GenerateModuleSemiShared):
         'C_BaseCombatWeapon',
         'C_WarsWeapon',
         'C_FuncBrush',
+        'C_BaseToggle',
+        'C_BaseTrigger',
         'C_BaseFuncMapBoundary',
     ]
     
@@ -1357,30 +1361,36 @@ class Entities(GenerateModuleSemiShared):
             cls.vars('m_iMaxHealth').rename('maxhealth')
             
     def ParseTriggers(self, mb):
-        mb.class_('CBaseTrigger').no_init = False
-        mb.class_('CTriggerMultiple').no_init = False
-        mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.vars('m_bDisabled').rename('disabled')
-        mb.vars('m_hFilter').rename('filter')
-        mb.vars('m_hFilter').exclude()
-        mb.vars('m_iFilterName').rename('filtername')
-        
-        if settings.ASW_CODE_BASE:
+        cls_name = 'C_BaseTrigger' if self.isClient else 'CBaseTrigger'
+        cls = mb.class_(cls_name)
+        cls.no_init = False
+
+        if self.isServer:
+            cls = mb.class_('CTriggerMultiple')
+            mb.class_('CTriggerMultiple').no_init = False
+            mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+            mb.vars('m_bDisabled').rename('disabled')
+            mb.vars('m_hFilter').rename('filter')
+            mb.vars('m_hFilter').exclude()
+            mb.vars('m_iFilterName').rename('filtername')
+            
             mb.mem_funs('GetTouchingEntities').exclude()
-        
-        for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
-            triggers = mb.class_(clsname)
-            triggers.add_wrapper_code(    
-            'virtual boost::python::list GetTouchingEntities( void ) {\r\n' + \
-            '    return UtlVectorToListByValue<EHANDLE>(m_hTouchingEntities);\r\n' + \
-            '}\r\n'        
-            )
-            triggers.add_registration_code(
-                'def( \r\n'
-                '    "GetTouchingEntities"\r\n'
-                '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
-                ') \r\n' % (clsname, clsname)
-            )
+            
+            for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
+                triggers = mb.class_(clsname)
+                triggers.add_wrapper_code(    
+                'virtual boost::python::list GetTouchingEntities( void ) {\r\n' + \
+                '    return UtlVectorToListByValue<EHANDLE>(m_hTouchingEntities);\r\n' + \
+                '}\r\n'        
+                )
+                triggers.add_registration_code(
+                    'def( \r\n'
+                    '    "GetTouchingEntities"\r\n'
+                    '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
+                    ') \r\n' % (clsname, clsname)
+                )
+        else:
+            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
 
     def ParseBaseCombatWeapon(self, mb):
         cls_name = 'C_BaseCombatWeapon' if self.isClient else 'CBaseCombatWeapon'
@@ -1772,8 +1782,7 @@ class Entities(GenerateModuleSemiShared):
         self.ParseBasePlayer(mb)
         self.ParseHL2WarsPlayer(mb)
         self.ParseUnitBase(mb)
-        if self.isServer:
-            self.ParseTriggers(mb)
+        self.ParseTriggers(mb)
         self.ParseBaseCombatWeapon(mb)
         self.ParseProps(mb)
         self.ParseRemainingEntities(mb)

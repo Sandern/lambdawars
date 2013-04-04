@@ -4335,28 +4335,6 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
-    { //::UTIL_EntitiesAlongRay
-    
-        typedef int ( *UTIL_EntitiesAlongRay_function_type )( ::C_BaseEntity * *,int,::Ray_t const &,int );
-        
-        bp::def( 
-            "UTIL_EntitiesAlongRay"
-            , UTIL_EntitiesAlongRay_function_type( &::UTIL_EntitiesAlongRay )
-            , ( bp::arg("pList"), bp::arg("listMax"), bp::arg("ray"), bp::arg("flagMask") ) );
-    
-    }
-
-    { //::UTIL_EntitiesAlongRay
-    
-        typedef int ( *UTIL_EntitiesAlongRay_function_type )( ::Ray_t const &,::CFlaggedEntitiesEnum * );
-        
-        bp::def( 
-            "UTIL_EntitiesAlongRay"
-            , UTIL_EntitiesAlongRay_function_type( &::UTIL_EntitiesAlongRay )
-            , ( bp::arg("ray"), bp::arg("pEnum") ) );
-    
-    }
-
     { //::UTIL_EntityFromUserMessageEHandle
     
         typedef ::C_BaseEntity * ( *UTIL_EntityFromUserMessageEHandle_function_type )( long int );
@@ -4677,6 +4655,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_PyEntitiesAlongRay
+    
+        typedef ::boost::python::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
+        
+        bp::def( 
+            "UTIL_EntitiesAlongRay"
+            , UTIL_EntitiesAlongRay_function_type( &::UTIL_PyEntitiesAlongRay )
+            , ( bp::arg("listMax"), bp::arg("ray"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_CLIENT_NON_STATIC_EDICTS) ) );
+    
+    }
+
     { //::UTIL_PyEntitiesInBox
     
         typedef ::boost::python::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
@@ -4684,7 +4673,7 @@ BOOST_PYTHON_MODULE(_utils){
         bp::def( 
             "UTIL_EntitiesInBox"
             , UTIL_EntitiesInBox_function_type( &::UTIL_PyEntitiesInBox )
-            , ( bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs"), bp::arg("flagMask"), bp::arg("partitionMask")=int(::PARTITION_CLIENT_NON_STATIC_EDICTS) ) );
+            , ( bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_CLIENT_NON_STATIC_EDICTS) ) );
     
     }
 
@@ -4695,7 +4684,7 @@ BOOST_PYTHON_MODULE(_utils){
         bp::def( 
             "UTIL_EntitiesInSphere"
             , UTIL_EntitiesInSphere_function_type( &::UTIL_PyEntitiesInSphere )
-            , ( bp::arg("listMax"), bp::arg("center"), bp::arg("radius"), bp::arg("flagMask"), bp::arg("partitionMask")=int(::PARTITION_CLIENT_NON_STATIC_EDICTS) ) );
+            , ( bp::arg("listMax"), bp::arg("center"), bp::arg("radius"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_CLIENT_NON_STATIC_EDICTS) ) );
     
     }
 
@@ -10231,34 +10220,34 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesAlongRay
     
-        typedef ::boost::python::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int );
+        typedef ::boost::python::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesAlongRay"
             , UTIL_EntitiesAlongRay_function_type( &::UTIL_PyEntitiesAlongRay )
-            , ( bp::arg("listMax"), bp::arg("ray"), bp::arg("flagMask") ) );
+            , ( bp::arg("listMax"), bp::arg("ray"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_ENGINE_NON_STATIC_EDICTS) ) );
     
     }
 
     { //::UTIL_PyEntitiesInBox
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int );
+        typedef ::boost::python::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesInBox"
             , UTIL_EntitiesInBox_function_type( &::UTIL_PyEntitiesInBox )
-            , ( bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs"), bp::arg("flagMask") ) );
+            , ( bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_ENGINE_NON_STATIC_EDICTS) ) );
     
     }
 
     { //::UTIL_PyEntitiesInSphere
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int );
+        typedef ::boost::python::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int,int );
         
         bp::def( 
             "UTIL_EntitiesInSphere"
             , UTIL_EntitiesInSphere_function_type( &::UTIL_PyEntitiesInSphere )
-            , ( bp::arg("listMax"), bp::arg("center"), bp::arg("radius"), bp::arg("flagMask") ) );
+            , ( bp::arg("listMax"), bp::arg("center"), bp::arg("radius"), bp::arg("flagMask"), bp::arg("partitionmask")=int(::PARTITION_ENGINE_NON_STATIC_EDICTS) ) );
     
     }
 

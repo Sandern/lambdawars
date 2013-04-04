@@ -21,6 +21,8 @@
 #include "SpriteTrail.h"
 #include "c_smoke_trail.h"
 #include "c_wars_weapon.h"
+#include "c_basetoggle.h"
+#include "c_triggers.h"
 #include "shared_classnames.h"
 #include "npcevent.h"
 #include "studio.h"

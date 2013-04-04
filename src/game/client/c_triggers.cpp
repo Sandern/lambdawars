@@ -18,6 +18,9 @@ IMPLEMENT_CLIENTCLASS_DT( C_BaseTrigger, DT_BaseTrigger, CBaseTrigger )
 	RecvPropInt( RECVINFO( m_spawnflags ) ),
 END_RECV_TABLE()
 
+// This class is exposed in python and networkable
+IMPLEMENT_PYCLIENTCLASS( C_BaseTrigger, PN_BASETRIGGER )
+
 //-----------------------------------------------------------------------------
 // Purpose: Disables auto movement on players that touch it
 //-----------------------------------------------------------------------------

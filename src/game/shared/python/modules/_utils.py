@@ -183,8 +183,8 @@ class Utils(GenerateModuleSemiShared):
         mb.free_functions('UTIL_PyEntitiesInSphere').rename('UTIL_EntitiesInSphere')
         mb.free_functions('UTIL_PyEntitiesInBox').rename('UTIL_EntitiesInBox')
         
-        if self.isServer:
-            mb.free_functions('UTIL_PyEntitiesAlongRay').rename('UTIL_EntitiesAlongRay')
+        mb.free_functions('UTIL_EntitiesAlongRay').exclude()
+        mb.free_functions('UTIL_PyEntitiesAlongRay').rename('UTIL_EntitiesAlongRay')
 
         # Enums
         mb.enum('ShakeCommand_t').include()

@@ -40,17 +40,17 @@
 #include "src_python_converters_ents.h"
 #include "src_python.h"
 #include "tier0/memdbgon.h"
-#include "C_BaseCombatCharacter_pypp.hpp"
+#include "C_BaseTrigger_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_BaseCombatCharacter > {
+struct C_BaseTrigger_wrapper : C_BaseTrigger, bp::wrapper< C_BaseTrigger > {
 
-    C_BaseCombatCharacter_wrapper( )
-    : C_BaseCombatCharacter( )
-      , bp::wrapper< C_BaseCombatCharacter >(){
+    C_BaseTrigger_wrapper()
+    : C_BaseTrigger()
+      , bp::wrapper< C_BaseTrigger >(){
         // null constructor
-    
+        
     }
 
     virtual void Activate(  ) {
@@ -249,7 +249,7 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling GetCollideType(  ) of Class: C_BaseAnimating\n");
+            Msg("Calling GetCollideType(  ) of Class: C_BaseEntity\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_GetCollideType = this->get_override( "GetCollideType" );
         if( func_GetCollideType.ptr() != Py_None )
@@ -257,14 +257,14 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
                 return func_GetCollideType(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseAnimating::GetCollideType(  );
+                return this->C_BaseEntity::GetCollideType(  );
             }
         else
-            return this->C_BaseAnimating::GetCollideType(  );
+            return this->C_BaseEntity::GetCollideType(  );
     }
     
     ::CollideType_t default_GetCollideType(  ) {
-        return C_BaseAnimating::GetCollideType( );
+        return C_BaseEntity::GetCollideType( );
     }
 
     virtual ::IMouse * GetIMouse(  ) {
@@ -507,7 +507,7 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         C_BaseEntity::OnChangeOwnerNumber( old_owner_number );
     }
 
-    virtual void OnDataChanged( ::DataUpdateType_t updateType ) {
+    virtual void OnDataChanged( ::DataUpdateType_t type ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
@@ -519,22 +519,22 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnDataChanged( updateType ) of Class: C_BaseAnimating\n");
+            Msg("Calling OnDataChanged( type ) of Class: C_BaseEntity\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnDataChanged = this->get_override( "OnDataChanged" );
         if( func_OnDataChanged.ptr() != Py_None )
             try {
-                func_OnDataChanged( updateType );
+                func_OnDataChanged( type );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseAnimating::OnDataChanged( updateType );
+                this->C_BaseEntity::OnDataChanged( type );
             }
         else
-            this->C_BaseAnimating::OnDataChanged( updateType );
+            this->C_BaseEntity::OnDataChanged( type );
     }
     
-    void default_OnDataChanged( ::DataUpdateType_t updateType ) {
-        C_BaseAnimating::OnDataChanged( updateType );
+    void default_OnDataChanged( ::DataUpdateType_t type ) {
+        C_BaseEntity::OnDataChanged( type );
     }
 
     virtual void Precache(  ) {
@@ -595,36 +595,6 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
     
     void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
         C_BaseEntity::PyNotifyShouldTransmit( state );
-    }
-
-    virtual void PyOnNewModel(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnNewModel: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnNewModel(  ) of Class: C_BaseAnimating\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
-        if( func_OnNewModel.ptr() != Py_None )
-            try {
-                func_OnNewModel(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_BaseAnimating::PyOnNewModel(  );
-            }
-        else
-            this->C_BaseAnimating::PyOnNewModel(  );
-    }
-    
-    void default_OnNewModel(  ) {
-        C_BaseAnimating::PyOnNewModel( );
     }
 
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
@@ -703,7 +673,7 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Simulate(  ) of Class: C_BaseAnimating\n");
+            Msg("Calling Simulate(  ) of Class: C_BaseEntity\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Simulate = this->get_override( "Simulate" );
         if( func_Simulate.ptr() != Py_None )
@@ -711,14 +681,14 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
                 return func_Simulate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseAnimating::Simulate(  );
+                return this->C_BaseEntity::Simulate(  );
             }
         else
-            return this->C_BaseAnimating::Simulate(  );
+            return this->C_BaseEntity::Simulate(  );
     }
     
     bool default_Simulate(  ) {
-        return C_BaseAnimating::Simulate( );
+        return C_BaseEntity::Simulate( );
     }
 
     virtual void Spawn(  ) {
@@ -733,7 +703,7 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: C_BaseFlex\n");
+            Msg("Calling Spawn(  ) of Class: C_BaseEntity\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
@@ -741,14 +711,14 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
                 func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseFlex::Spawn(  );
+                this->C_BaseEntity::Spawn(  );
             }
         else
-            this->C_BaseFlex::Spawn(  );
+            this->C_BaseEntity::Spawn(  );
     }
     
     void default_Spawn(  ) {
-        C_BaseFlex::Spawn( );
+        C_BaseEntity::Spawn( );
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
@@ -813,11 +783,11 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
 
     virtual ClientClass* GetClientClass() {
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseCombatCharacter::GetClientClass();
+            return C_BaseTrigger::GetClientClass();
         ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>("pyClientClass", GetPyInstance(), NULL, true);
         if( pClientClass )
             return pClientClass;
-        return C_BaseCombatCharacter::GetClientClass();
+        return C_BaseTrigger::GetClientClass();
     }
 
     virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
@@ -831,7 +801,7 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
                 #endif // _WIN32
                 #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
                 if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_BaseCombatCharacter\n");
+                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_BaseTrigger\n");
                 #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
                 bp::override func_TestCollision = this->get_override( "TestCollision" );
                 if( func_TestCollision.ptr() != Py_None )
@@ -839,671 +809,344 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
                         return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
                     } catch(bp::error_already_set &) {
                         PyErr_Print();
-                        return this->C_BaseCombatCharacter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                        return this->C_BaseTrigger::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
                     }
                 else
-                    return this->C_BaseCombatCharacter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                    return this->C_BaseTrigger::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
             }
             
             bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_BaseCombatCharacter::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
+                return C_BaseTrigger::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
             }
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
 };
 
-void register_C_BaseCombatCharacter_class(){
+void register_C_BaseTrigger_class(){
 
-    { //::C_BaseCombatCharacter
-        typedef bp::class_< C_BaseCombatCharacter_wrapper, bp::bases< C_BaseFlex >, boost::noncopyable > C_BaseCombatCharacter_exposer_t;
-        C_BaseCombatCharacter_exposer_t C_BaseCombatCharacter_exposer = C_BaseCombatCharacter_exposer_t( "C_BaseCombatCharacter", bp::init< >() );
-        bp::scope C_BaseCombatCharacter_scope( C_BaseCombatCharacter_exposer );
-        bp::enum_< C_BaseCombatCharacter::FieldOfViewCheckType>("FieldOfViewCheckType")
-            .value("USE_FOV", C_BaseCombatCharacter::USE_FOV)
-            .value("DISREGARD_FOV", C_BaseCombatCharacter::DISREGARD_FOV)
-            .export_values()
-            ;
-        bp::enum_< C_BaseCombatCharacter::LineOfSightCheckType>("LineOfSightCheckType")
-            .value("IGNORE_NOTHING", C_BaseCombatCharacter::IGNORE_NOTHING)
-            .value("IGNORE_ACTORS", C_BaseCombatCharacter::IGNORE_ACTORS)
-            .export_values()
-            ;
-        { //::C_BaseCombatCharacter::BloodColor
-        
-            typedef int ( ::C_BaseCombatCharacter::*BloodColor_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "BloodColor"
-                , BloodColor_function_type( &::C_BaseCombatCharacter::BloodColor ) );
-        
-        }
-        { //::C_BaseCombatCharacter::DoMuzzleFlash
-        
-            typedef void ( ::C_BaseCombatCharacter::*DoMuzzleFlash_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "DoMuzzleFlash"
-                , DoMuzzleFlash_function_type( &::C_BaseCombatCharacter::DoMuzzleFlash ) );
-        
-        }
-        { //::C_BaseCombatCharacter::GetAmmoCount
-        
-            typedef int ( ::C_BaseCombatCharacter::*GetAmmoCount_function_type )( int ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "GetAmmoCount"
-                , GetAmmoCount_function_type( &::C_BaseCombatCharacter::GetAmmoCount )
-                , ( bp::arg("iAmmoIndex") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::GetAmmoCount
-        
-            typedef int ( ::C_BaseCombatCharacter::*GetAmmoCount_function_type )( char * ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "GetAmmoCount"
-                , GetAmmoCount_function_type( &::C_BaseCombatCharacter::GetAmmoCount )
-                , ( bp::arg("szName") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::GetNextAttack
-        
-            typedef float ( ::C_BaseCombatCharacter::*GetNextAttack_function_type )(  ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "GetNextAttack"
-                , GetNextAttack_function_type( &::C_BaseCombatCharacter::GetNextAttack ) );
-        
-        }
-        { //::C_BaseCombatCharacter::GetPyNetworkType
+    { //::C_BaseTrigger
+        typedef bp::class_< C_BaseTrigger_wrapper, bp::bases< C_BaseToggle >, boost::noncopyable > C_BaseTrigger_exposer_t;
+        C_BaseTrigger_exposer_t C_BaseTrigger_exposer = C_BaseTrigger_exposer_t( "C_BaseTrigger" );
+        bp::scope C_BaseTrigger_scope( C_BaseTrigger_exposer );
+        { //::C_BaseTrigger::GetPyNetworkType
         
             typedef int ( *GetPyNetworkType_function_type )(  );
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseCombatCharacter::GetPyNetworkType ) );
+                , GetPyNetworkType_function_type( &::C_BaseTrigger::GetPyNetworkType ) );
         
         }
-        { //::C_BaseCombatCharacter::GetWeapon
-        
-            typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatCharacter::*GetWeapon_function_type )( int ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "GetWeapon"
-                , GetWeapon_function_type( &::C_BaseCombatCharacter::GetWeapon )
-                , ( bp::arg("i") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseCombatCharacter::IsAbleToSee
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsAbleToSee_function_type )( ::C_BaseEntity const *,::C_BaseCombatCharacter::FieldOfViewCheckType ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsAbleToSee"
-                , IsAbleToSee_function_type( &::C_BaseCombatCharacter::IsAbleToSee )
-                , ( bp::arg("entity"), bp::arg("checkFOV") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsAbleToSee
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsAbleToSee_function_type )( ::C_BaseCombatCharacter *,::C_BaseCombatCharacter::FieldOfViewCheckType ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsAbleToSee"
-                , IsAbleToSee_function_type( &::C_BaseCombatCharacter::IsAbleToSee )
-                , ( bp::arg("pBCC"), bp::arg("checkFOV") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsBaseCombatCharacter
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsBaseCombatCharacter_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsBaseCombatCharacter"
-                , IsBaseCombatCharacter_function_type( &::C_BaseCombatCharacter::IsBaseCombatCharacter ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsInFieldOfView
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsInFieldOfView_function_type )( ::C_BaseEntity * ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsInFieldOfView"
-                , IsInFieldOfView_function_type( &::C_BaseCombatCharacter::IsInFieldOfView )
-                , ( bp::arg("entity") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsInFieldOfView
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsInFieldOfView_function_type )( ::Vector const & ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsInFieldOfView"
-                , IsInFieldOfView_function_type( &::C_BaseCombatCharacter::IsInFieldOfView )
-                , ( bp::arg("pos") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsLineOfSightClear
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsLineOfSightClear_function_type )( ::C_BaseEntity *,::C_BaseCombatCharacter::LineOfSightCheckType ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsLineOfSightClear"
-                , IsLineOfSightClear_function_type( &::C_BaseCombatCharacter::IsLineOfSightClear )
-                , ( bp::arg("entity"), bp::arg("checkType")=::C_BaseCombatCharacter::IGNORE_NOTHING ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsLineOfSightClear
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsLineOfSightClear_function_type )( ::Vector const &,::C_BaseCombatCharacter::LineOfSightCheckType,::C_BaseEntity * ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsLineOfSightClear"
-                , IsLineOfSightClear_function_type( &::C_BaseCombatCharacter::IsLineOfSightClear )
-                , ( bp::arg("pos"), bp::arg("checkType")=::C_BaseCombatCharacter::IGNORE_NOTHING, bp::arg("entityToIgnore")=bp::object() ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsLookingTowards
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsLookingTowards_function_type )( ::C_BaseEntity const *,float ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsLookingTowards"
-                , IsLookingTowards_function_type( &::C_BaseCombatCharacter::IsLookingTowards )
-                , ( bp::arg("target"), bp::arg("cosTolerance")=8.9999997615814208984375e-1f ) );
-        
-        }
-        { //::C_BaseCombatCharacter::IsLookingTowards
-        
-            typedef bool ( ::C_BaseCombatCharacter::*IsLookingTowards_function_type )( ::Vector const &,float ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "IsLookingTowards"
-                , IsLookingTowards_function_type( &::C_BaseCombatCharacter::IsLookingTowards )
-                , ( bp::arg("target"), bp::arg("cosTolerance")=8.9999997615814208984375e-1f ) );
-        
-        }
-        { //::C_BaseCombatCharacter::RemoveAllAmmo
-        
-            typedef void ( ::C_BaseCombatCharacter::*RemoveAllAmmo_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "RemoveAllAmmo"
-                , RemoveAllAmmo_function_type( &::C_BaseCombatCharacter::RemoveAllAmmo ) );
-        
-        }
-        { //::C_BaseCombatCharacter::RemoveAmmo
-        
-            typedef void ( ::C_BaseCombatCharacter::*RemoveAmmo_function_type )( int,int ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "RemoveAmmo"
-                , RemoveAmmo_function_type( &::C_BaseCombatCharacter::RemoveAmmo )
-                , ( bp::arg("iCount"), bp::arg("iAmmoIndex") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::RemoveAmmo
-        
-            typedef void ( ::C_BaseCombatCharacter::*RemoveAmmo_function_type )( int,char const * ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "RemoveAmmo"
-                , RemoveAmmo_function_type( &::C_BaseCombatCharacter::RemoveAmmo )
-                , ( bp::arg("iCount"), bp::arg("szName") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::SetAmmoCount
-        
-            typedef void ( ::C_BaseCombatCharacter::*SetAmmoCount_function_type )( int,int ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "SetAmmoCount"
-                , SetAmmoCount_function_type( &::C_BaseCombatCharacter::SetAmmoCount )
-                , ( bp::arg("iCount"), bp::arg("iAmmoIndex") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::SetBloodColor
-        
-            typedef void ( ::C_BaseCombatCharacter::*SetBloodColor_function_type )( int ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "SetBloodColor"
-                , SetBloodColor_function_type( &::C_BaseCombatCharacter::SetBloodColor )
-                , ( bp::arg("nBloodColor") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::SetNextAttack
-        
-            typedef void ( ::C_BaseCombatCharacter::*SetNextAttack_function_type )( float ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "SetNextAttack"
-                , SetNextAttack_function_type( &::C_BaseCombatCharacter::SetNextAttack )
-                , ( bp::arg("flWait") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::SwitchToNextBestWeapon
-        
-            typedef bool ( ::C_BaseCombatCharacter::*SwitchToNextBestWeapon_function_type )( ::C_BaseCombatWeapon * ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "SwitchToNextBestWeapon"
-                , SwitchToNextBestWeapon_function_type( &::C_BaseCombatCharacter::SwitchToNextBestWeapon )
-                , ( bp::arg("pCurrent") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::WeaponCount
-        
-            typedef int ( ::C_BaseCombatCharacter::*WeaponCount_function_type )(  ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "WeaponCount"
-                , WeaponCount_function_type( &::C_BaseCombatCharacter::WeaponCount ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_CanSwitchTo
-        
-            typedef bool ( ::C_BaseCombatCharacter::*Weapon_CanSwitchTo_function_type )( ::C_BaseCombatWeapon * ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_CanSwitchTo"
-                , Weapon_CanSwitchTo_function_type( &::C_BaseCombatCharacter::Weapon_CanSwitchTo )
-                , ( bp::arg("pWeapon") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_FrameUpdate
-        
-            typedef void ( ::C_BaseCombatCharacter::*Weapon_FrameUpdate_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_FrameUpdate"
-                , Weapon_FrameUpdate_function_type( &::C_BaseCombatCharacter::Weapon_FrameUpdate ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_GetSlot
-        
-            typedef int ( ::C_BaseCombatCharacter::*Weapon_GetSlot_function_type )( char const *,int ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_GetSlot"
-                , Weapon_GetSlot_function_type( &::C_BaseCombatCharacter::Weapon_GetSlot )
-                , ( bp::arg("pszWeapon"), bp::arg("iSubType")=(int)(0) ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_OwnsThisType
-        
-            typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatCharacter::*Weapon_OwnsThisType_function_type )( char const *,int ) const;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_OwnsThisType"
-                , Weapon_OwnsThisType_function_type( &::C_BaseCombatCharacter::Weapon_OwnsThisType )
-                , ( bp::arg("pszWeapon"), bp::arg("iSubType")=(int)(0) )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_SetActivity
-        
-            typedef void ( ::C_BaseCombatCharacter::*Weapon_SetActivity_function_type )( ::Activity,float ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_SetActivity"
-                , Weapon_SetActivity_function_type( &::C_BaseCombatCharacter::Weapon_SetActivity )
-                , ( bp::arg("newActivity"), bp::arg("duration") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_ShootPosition
-        
-            typedef ::Vector ( ::C_BaseCombatCharacter::*Weapon_ShootPosition_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_ShootPosition"
-                , Weapon_ShootPosition_function_type( &::C_BaseCombatCharacter::Weapon_ShootPosition ) );
-        
-        }
-        { //::C_BaseCombatCharacter::Weapon_Switch
-        
-            typedef bool ( ::C_BaseCombatCharacter::*Weapon_Switch_function_type )( ::C_BaseCombatWeapon *,int ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "Weapon_Switch"
-                , Weapon_Switch_function_type( &::C_BaseCombatCharacter::Weapon_Switch )
-                , ( bp::arg("pWeapon"), bp::arg("viewmodelindex")=(int)(0) ) );
-        
-        }
-        C_BaseCombatCharacter_exposer.def_readwrite( "hackedgunpos", &C_BaseCombatCharacter::m_HackedGunPos );
-        C_BaseCombatCharacter_exposer.def_readwrite( "m_flNextAttack", &C_BaseCombatCharacter::m_flNextAttack );
+        C_BaseTrigger_exposer.def_readwrite( "clientsidepredicted", &C_BaseTrigger::m_bClientSidePredicted );
         { //::C_BaseEntity::Activate
         
             typedef void ( ::C_BaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_Activate_function_type )(  ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_Activate_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "Activate"
                 , Activate_function_type(&::C_BaseEntity::Activate)
-                , default_Activate_function_type(&C_BaseCombatCharacter_wrapper::default_Activate) );
+                , default_Activate_function_type(&C_BaseTrigger_wrapper::default_Activate) );
         
         }
         { //::C_BaseEntity::AddToEntityList
         
-            typedef void ( C_BaseCombatCharacter_wrapper::*AddToEntityList_function_type )( ::entity_list_ids_t ) ;
+            typedef void ( C_BaseTrigger_wrapper::*AddToEntityList_function_type )( ::entity_list_ids_t ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "AddToEntityList"
-                , AddToEntityList_function_type( &C_BaseCombatCharacter_wrapper::AddToEntityList )
+                , AddToEntityList_function_type( &C_BaseTrigger_wrapper::AddToEntityList )
                 , ( bp::arg("listId") ) );
         
         }
         { //::C_BaseEntity::ClientThink
         
             typedef void ( ::C_BaseEntity::*ClientThink_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_ClientThink_function_type )(  ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_ClientThink_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "ClientThink"
                 , ClientThink_function_type(&::C_BaseEntity::ClientThink)
-                , default_ClientThink_function_type(&C_BaseCombatCharacter_wrapper::default_ClientThink) );
+                , default_ClientThink_function_type(&C_BaseTrigger_wrapper::default_ClientThink) );
         
         }
         { //::C_BaseEntity::ComputeWorldSpaceSurroundingBox
         
             typedef void ( ::C_BaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "ComputeWorldSpaceSurroundingBox"
                 , ComputeWorldSpaceSurroundingBox_function_type(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&C_BaseCombatCharacter_wrapper::default_ComputeWorldSpaceSurroundingBox)
+                , default_ComputeWorldSpaceSurroundingBox_function_type(&C_BaseTrigger_wrapper::default_ComputeWorldSpaceSurroundingBox)
                 , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
         
         }
         { //::C_BaseEntity::CreateVPhysics
         
             typedef bool ( ::C_BaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_CreateVPhysics_function_type )(  ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_CreateVPhysics_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "CreateVPhysics"
                 , CreateVPhysics_function_type(&::C_BaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&C_BaseCombatCharacter_wrapper::default_CreateVPhysics) );
+                , default_CreateVPhysics_function_type(&C_BaseTrigger_wrapper::default_CreateVPhysics) );
         
         }
         { //::C_BaseEntity::DoImpactEffect
         
             typedef void ( ::C_BaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "DoImpactEffect"
                 , DoImpactEffect_function_type(&::C_BaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&C_BaseCombatCharacter_wrapper::default_DoImpactEffect)
+                , default_DoImpactEffect_function_type(&C_BaseTrigger_wrapper::default_DoImpactEffect)
                 , ( bp::arg("tr"), bp::arg("nDamageType") ) );
         
         }
         { //::C_BaseEntity::EndTouch
         
             typedef void ( ::C_BaseEntity::*EndTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_EndTouch_function_type )( ::C_BaseEntity * ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_EndTouch_function_type )( ::C_BaseEntity * ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "EndTouch"
                 , EndTouch_function_type(&::C_BaseEntity::EndTouch)
-                , default_EndTouch_function_type(&C_BaseCombatCharacter_wrapper::default_EndTouch)
+                , default_EndTouch_function_type(&C_BaseTrigger_wrapper::default_EndTouch)
                 , ( bp::arg("pOther") ) );
         
         }
-        { //::C_BaseAnimating::GetCollideType
+        { //::C_BaseEntity::GetCollideType
         
-            typedef ::CollideType_t ( ::C_BaseAnimating::*GetCollideType_function_type )(  ) ;
-            typedef ::CollideType_t ( C_BaseCombatCharacter_wrapper::*default_GetCollideType_function_type )(  ) ;
+            typedef ::CollideType_t ( ::C_BaseEntity::*GetCollideType_function_type )(  ) ;
+            typedef ::CollideType_t ( C_BaseTrigger_wrapper::*default_GetCollideType_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "GetCollideType"
-                , GetCollideType_function_type(&::C_BaseAnimating::GetCollideType)
-                , default_GetCollideType_function_type(&C_BaseCombatCharacter_wrapper::default_GetCollideType) );
+                , GetCollideType_function_type(&::C_BaseEntity::GetCollideType)
+                , default_GetCollideType_function_type(&C_BaseTrigger_wrapper::default_GetCollideType) );
         
         }
         { //::C_BaseEntity::GetIMouse
         
             typedef ::IMouse * ( ::C_BaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( C_BaseCombatCharacter_wrapper::*default_GetIMouse_function_type )(  ) ;
+            typedef ::IMouse * ( C_BaseTrigger_wrapper::*default_GetIMouse_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "GetIMouse"
                 , GetIMouse_function_type(&::C_BaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&C_BaseCombatCharacter_wrapper::default_GetIMouse)
+                , default_GetIMouse_function_type(&C_BaseTrigger_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::C_BaseEntity::GetTracerType
         
             typedef char const * ( ::C_BaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( C_BaseCombatCharacter_wrapper::*default_GetTracerType_function_type )(  ) ;
+            typedef char const * ( C_BaseTrigger_wrapper::*default_GetTracerType_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "GetTracerType"
                 , GetTracerType_function_type(&::C_BaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&C_BaseCombatCharacter_wrapper::default_GetTracerType) );
+                , default_GetTracerType_function_type(&C_BaseTrigger_wrapper::default_GetTracerType) );
         
         }
         { //::C_BaseEntity::KeyValue
         
             typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatCharacter_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&C_BaseTrigger_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
         
         }
         { //::C_BaseEntity::KeyValue
         
             typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatCharacter_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&C_BaseTrigger_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
         
         }
         { //::C_BaseEntity::KeyValue
         
             typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatCharacter_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&C_BaseTrigger_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
         
         }
         { //::C_BaseEntity::KeyValue
         
             typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "KeyValue"
                 , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatCharacter_wrapper::default_KeyValue)
+                , default_KeyValue_function_type(&C_BaseTrigger_wrapper::default_KeyValue)
                 , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
         
         }
         { //::C_BaseEntity::MakeTracer
         
             typedef void ( ::C_BaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "MakeTracer"
                 , MakeTracer_function_type(&::C_BaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&C_BaseCombatCharacter_wrapper::default_MakeTracer)
+                , default_MakeTracer_function_type(&C_BaseTrigger_wrapper::default_MakeTracer)
                 , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
         
         }
         { //::C_BaseEntity::OnChangeOwnerNumber
         
             typedef void ( ::C_BaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "OnChangeOwnerNumber"
                 , OnChangeOwnerNumber_function_type(&::C_BaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&C_BaseCombatCharacter_wrapper::default_OnChangeOwnerNumber)
+                , default_OnChangeOwnerNumber_function_type(&C_BaseTrigger_wrapper::default_OnChangeOwnerNumber)
                 , ( bp::arg("old_owner_number") ) );
         
         }
-        { //::C_BaseAnimating::OnDataChanged
+        { //::C_BaseEntity::OnDataChanged
         
-            typedef void ( ::C_BaseAnimating::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_OnDataChanged_function_type )( ::DataUpdateType_t ) ;
+            typedef void ( ::C_BaseEntity::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_OnDataChanged_function_type )( ::DataUpdateType_t ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "OnDataChanged"
-                , OnDataChanged_function_type(&::C_BaseAnimating::OnDataChanged)
-                , default_OnDataChanged_function_type(&C_BaseCombatCharacter_wrapper::default_OnDataChanged)
-                , ( bp::arg("updateType") ) );
+                , OnDataChanged_function_type(&::C_BaseEntity::OnDataChanged)
+                , default_OnDataChanged_function_type(&C_BaseTrigger_wrapper::default_OnDataChanged)
+                , ( bp::arg("type") ) );
         
         }
         { //::C_BaseEntity::Precache
         
             typedef void ( ::C_BaseEntity::*Precache_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_Precache_function_type )(  ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_Precache_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "Precache"
                 , Precache_function_type(&::C_BaseEntity::Precache)
-                , default_Precache_function_type(&C_BaseCombatCharacter_wrapper::default_Precache) );
+                , default_Precache_function_type(&C_BaseTrigger_wrapper::default_Precache) );
         
         }
         { //::C_BaseEntity::PyNotifyShouldTransmit
         
             typedef void ( ::C_BaseEntity::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "NotifyShouldTransmit"
                 , NotifyShouldTransmit_function_type(&::C_BaseEntity::PyNotifyShouldTransmit)
-                , default_NotifyShouldTransmit_function_type(&C_BaseCombatCharacter_wrapper::default_NotifyShouldTransmit)
+                , default_NotifyShouldTransmit_function_type(&C_BaseTrigger_wrapper::default_NotifyShouldTransmit)
                 , ( bp::arg("state") ) );
-        
-        }
-        { //::C_BaseAnimating::PyOnNewModel
-        
-            typedef void ( ::C_BaseAnimating::*OnNewModel_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_OnNewModel_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type(&::C_BaseAnimating::PyOnNewModel)
-                , default_OnNewModel_function_type(&C_BaseCombatCharacter_wrapper::default_OnNewModel) );
         
         }
         { //::C_BaseEntity::PyReceiveMessage
         
             typedef void ( ::C_BaseEntity::*ReceiveMessage_function_type )( ::boost::python::list ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_ReceiveMessage_function_type )( ::boost::python::list ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_ReceiveMessage_function_type )( ::boost::python::list ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "ReceiveMessage"
                 , ReceiveMessage_function_type(&::C_BaseEntity::PyReceiveMessage)
-                , default_ReceiveMessage_function_type(&C_BaseCombatCharacter_wrapper::default_ReceiveMessage)
+                , default_ReceiveMessage_function_type(&C_BaseTrigger_wrapper::default_ReceiveMessage)
                 , ( bp::arg("msg") ) );
         
         }
         { //::C_BaseEntity::RemoveFromEntityList
         
-            typedef void ( C_BaseCombatCharacter_wrapper::*RemoveFromEntityList_function_type )( ::entity_list_ids_t ) ;
+            typedef void ( C_BaseTrigger_wrapper::*RemoveFromEntityList_function_type )( ::entity_list_ids_t ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "RemoveFromEntityList"
-                , RemoveFromEntityList_function_type( &C_BaseCombatCharacter_wrapper::RemoveFromEntityList )
+                , RemoveFromEntityList_function_type( &C_BaseTrigger_wrapper::RemoveFromEntityList )
                 , ( bp::arg("listId") ) );
         
         }
         { //::C_BaseEntity::ShouldDraw
         
             typedef bool ( ::C_BaseEntity::*ShouldDraw_function_type )(  ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_ShouldDraw_function_type )(  ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_ShouldDraw_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "ShouldDraw"
                 , ShouldDraw_function_type(&::C_BaseEntity::ShouldDraw)
-                , default_ShouldDraw_function_type(&C_BaseCombatCharacter_wrapper::default_ShouldDraw) );
+                , default_ShouldDraw_function_type(&C_BaseTrigger_wrapper::default_ShouldDraw) );
         
         }
-        { //::C_BaseAnimating::Simulate
+        { //::C_BaseEntity::Simulate
         
-            typedef bool ( ::C_BaseAnimating::*Simulate_function_type )(  ) ;
-            typedef bool ( C_BaseCombatCharacter_wrapper::*default_Simulate_function_type )(  ) ;
+            typedef bool ( ::C_BaseEntity::*Simulate_function_type )(  ) ;
+            typedef bool ( C_BaseTrigger_wrapper::*default_Simulate_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "Simulate"
-                , Simulate_function_type(&::C_BaseAnimating::Simulate)
-                , default_Simulate_function_type(&C_BaseCombatCharacter_wrapper::default_Simulate) );
+                , Simulate_function_type(&::C_BaseEntity::Simulate)
+                , default_Simulate_function_type(&C_BaseTrigger_wrapper::default_Simulate) );
         
         }
-        { //::C_BaseFlex::Spawn
+        { //::C_BaseEntity::Spawn
         
-            typedef void ( ::C_BaseFlex::*Spawn_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_Spawn_function_type )(  ) ;
+            typedef void ( ::C_BaseEntity::*Spawn_function_type )(  ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_Spawn_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "Spawn"
-                , Spawn_function_type(&::C_BaseFlex::Spawn)
-                , default_Spawn_function_type(&C_BaseCombatCharacter_wrapper::default_Spawn) );
+                , Spawn_function_type(&::C_BaseEntity::Spawn)
+                , default_Spawn_function_type(&C_BaseTrigger_wrapper::default_Spawn) );
         
         }
         { //::C_BaseEntity::StartTouch
         
             typedef void ( ::C_BaseEntity::*StartTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_StartTouch_function_type )( ::C_BaseEntity * ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_StartTouch_function_type )( ::C_BaseEntity * ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "StartTouch"
                 , StartTouch_function_type(&::C_BaseEntity::StartTouch)
-                , default_StartTouch_function_type(&C_BaseCombatCharacter_wrapper::default_StartTouch)
+                , default_StartTouch_function_type(&C_BaseTrigger_wrapper::default_StartTouch)
                 , ( bp::arg("pOther") ) );
         
         }
         { //::C_BaseEntity::UpdateOnRemove
         
             typedef void ( ::C_BaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( C_BaseCombatCharacter_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
+            typedef void ( C_BaseTrigger_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
             
-            C_BaseCombatCharacter_exposer.def( 
+            C_BaseTrigger_exposer.def( 
                 "UpdateOnRemove"
                 , UpdateOnRemove_function_type(&::C_BaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&C_BaseCombatCharacter_wrapper::default_UpdateOnRemove) );
+                , default_UpdateOnRemove_function_type(&C_BaseTrigger_wrapper::default_UpdateOnRemove) );
         
         }
-        C_BaseCombatCharacter_exposer.staticmethod( "GetPyNetworkType" );
-        { //property "activeweapon"[fget=::C_BaseCombatCharacter::GetActiveWeapon]
-        
-            typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatCharacter::*fget )(  ) const;
+        C_BaseTrigger_exposer.staticmethod( "GetPyNetworkType" );
+        { //::C_BaseTrigger::TestCollision
             
-            C_BaseCombatCharacter_exposer.add_property( 
-                "activeweapon"
-                , bp::make_function( 
-                      fget( &::C_BaseCombatCharacter::GetActiveWeapon )
-                    , bp::return_value_policy< bp::return_by_value >() )  );
-        
-        }
-        { //::C_BaseCombatCharacter::TestCollision
-            
-                typedef bool ( ::C_BaseCombatCharacter::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_BaseCombatCharacter_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
+                typedef bool ( ::C_BaseTrigger::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
+                typedef bool ( C_BaseTrigger_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
 
-                C_BaseCombatCharacter_exposer.def( 
+                C_BaseTrigger_exposer.def( 
                     "TestCollision"
-                    , TestCollision_function_type(&::C_BaseCombatCharacter::TestCollision)
-                    , default_TestCollision_function_type(&C_BaseCombatCharacter_wrapper::default_TestCollision)
+                    , TestCollision_function_type(&::C_BaseTrigger::TestCollision)
+                    , default_TestCollision_function_type(&C_BaseTrigger_wrapper::default_TestCollision)
                     , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
 
             }

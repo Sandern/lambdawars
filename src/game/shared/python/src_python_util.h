@@ -121,13 +121,14 @@ boost::python::list UTIL_ListDir( const char *path, const char *pathid=NULL, con
 // Wrappers
 #ifdef CLIENT_DLL
 boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, 
-										  int flagMask, int partitionMask = PARTITION_CLIENT_NON_STATIC_EDICTS );
+										  int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
 boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, 
-											 int flagMask, int partitionMask = PARTITION_CLIENT_NON_STATIC_EDICTS );
+											 int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
+boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
 #else
-boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, int flagMask );
-boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask );
-boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask );
+boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
+boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
+boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
 #endif 
 
 // Simple trace filter for python

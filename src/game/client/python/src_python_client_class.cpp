@@ -26,6 +26,8 @@
 #include "basecombatweapon_shared.h"
 #include "c_wars_weapon.h"
 #include "wars_func_unit.h"
+#include "c_basetoggle.h"
+#include "c_triggers.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -98,6 +100,16 @@ namespace DT_FuncUnit
 	extern RecvTable g_RecvTable;
 }
 
+namespace DT_BaseToggle 
+{
+	extern RecvTable g_RecvTable;
+}
+
+namespace DT_BaseTrigger 
+{
+	extern RecvTable g_RecvTable;
+}
+
 // A lot of factories
 #define IMPLEMENT_FALLBACK_FACTORY( clientClassName ) \
 	static IClientNetworkable* _PN##clientClassName##_CreateObject( int entnum, int serialNum ) \
@@ -127,6 +139,8 @@ IMPLEMENT_FALLBACK_FACTORY(C_Beam)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatWeapon)
 IMPLEMENT_FALLBACK_FACTORY(C_WarsWeapon)
 IMPLEMENT_FALLBACK_FACTORY(C_FuncUnit)
+IMPLEMENT_FALLBACK_FACTORY(C_BaseToggle)
+IMPLEMENT_FALLBACK_FACTORY(C_BaseTrigger)
 
 // Set the right recv table
 void SetupClientClassRecv( PyClientClassBase *p, int iType  )
@@ -177,6 +191,12 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 		break;
 	case PN_FUNCUNIT:
 		p->m_pRecvTable = &(DT_FuncUnit::g_RecvTable);
+		break;
+	case PN_BASETOGGLE:
+		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
+		break;
+	case PN_BASETRIGGER:
+		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
 		break;
 	default:
 		p->m_pRecvTable = &(DT_BaseEntity::g_RecvTable);
@@ -262,6 +282,12 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 			break;
 		case PN_FUNCUNIT:
 			pResult = CALL_FALLBACK_FACTORY( C_FuncUnit, entnum, serialNum );
+			break;
+		case PN_BASETOGGLE:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseToggle, entnum, serialNum );
+			break;
+		case PN_BASETRIGGER:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseTrigger, entnum, serialNum );
 			break;
 		default:
 			Warning("No default fallback for networktype %d. Warn a dev.\n");

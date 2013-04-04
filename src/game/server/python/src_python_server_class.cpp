@@ -83,6 +83,16 @@ namespace DT_FuncUnit
 	extern SendTable g_SendTable;
 }
 
+namespace DT_BaseToggle
+{
+	extern SendTable g_SendTable;
+}
+
+namespace DT_BaseTrigger
+{
+	extern SendTable g_SendTable;
+}
+
 namespace bp = boost::python;
 
 //-----------------------------------------------------------------------------
@@ -148,6 +158,12 @@ void PyServerClass::SetupServerClass( int iType )
 		break;
 	case PN_FUNCUNIT:
 		m_pTable = &(DT_FuncUnit::g_SendTable);
+		break;
+	case PN_BASETOGGLE:
+		m_pTable = &(DT_BaseToggle::g_SendTable);
+		break;
+	case PN_BASETRIGGER:
+		m_pTable = &(DT_BaseTrigger::g_SendTable);
 		break;
 	default:
 		m_pTable = &(DT_BaseEntity::g_SendTable);

@@ -124,81 +124,72 @@ boost::python::list UTIL_ListDir( const char *pPath, const char *pPathID, const 
 }
 
 // Python fixed up versions
-#ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, 
-					   int flagMask, int partitionMask )
+					   int flagMask, int partitionmask )
 {
 	int i, n;
-	C_BaseEntity **pList;
+	CBaseEntity **pList;
 	boost::python::list pylist = boost::python::list();
 
-	pList = (C_BaseEntity **)malloc(listMax*sizeof(C_BaseEntity *));
-	n = UTIL_EntitiesInBox(pList, listMax, mins, maxs, flagMask, partitionMask);
+	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
+	CFlaggedEntitiesEnum boxEnum( pList, listMax, flagMask );
+	partition->EnumerateElementsInBox( partitionmask, mins, maxs, false, &boxEnum );
+	n = boxEnum.GetCount();
 	for( i=0; i < n; i++)
 		pylist.append(*pList[i]);
 	free(pList);
 	return pylist;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, 
-						  int flagMask, int partitionMask )
+						  int flagMask, int partitionmask )
 {
 	int i, n;
-	C_BaseEntity **pList;
+	CBaseEntity **pList;
 	boost::python::list pylist = boost::python::list();
 
-	pList = (C_BaseEntity **)malloc(listMax*sizeof(C_BaseEntity *));
-	n = UTIL_EntitiesInSphere(pList, listMax, center, radius, flagMask, partitionMask);
+	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
+
+	CFlaggedEntitiesEnum sphereEnum( pList, listMax, flagMask );
+	partition->EnumerateElementsInSphere( partitionmask, center, radius, false, &sphereEnum );
+	n = sphereEnum.GetCount();
 	for( i=0; i < n; i++)
 		pylist.append(*pList[i]);
 	free(pList);
 	return pylist;
-}
+} 
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask )
+{
+	int i, n;
+	CBaseEntity **pList;
+	boost::python::list pylist = boost::python::list();
+
+	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
+
+	CFlaggedEntitiesEnum rayEnum( pList, listMax, flagMask );
+#if defined( CLIENT_DLL )
+	partition->EnumerateElementsAlongRay( partitionmask, ray.ToRay(), false, &rayEnum );
 #else
-boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, int flagMask )
-{
-	int i, n;
-	CBaseEntity **pList;
-	boost::python::list pylist = boost::python::list();
+	partition->EnumerateElementsAlongRay( partitionmask, ray.ToRay(), false, &rayEnum );
+#endif
+	n = rayEnum.GetCount();
 
-	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
-	n = UTIL_EntitiesInBox(pList, listMax, mins, maxs, flagMask);
-	for( i=0; i < n; i++)
-		pylist.append(*pList[i]);
-	free(pList);
-	return pylist;
-}
-
-boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask )
-{
-	int i, n;
-	CBaseEntity **pList;
-	boost::python::list pylist = boost::python::list();
-
-	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
-	n = UTIL_EntitiesInSphere(pList, listMax, center, radius, flagMask);
-	for( i=0; i < n; i++)
-		pylist.append(*pList[i]);
-	free(pList);
-	return pylist;
-}
-
-boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask )
-{
-	int i, n;
-	CBaseEntity **pList;
-	boost::python::list pylist = boost::python::list();
-
-	pList = (CBaseEntity **)malloc(listMax*sizeof(CBaseEntity *));
-	//n = UTIL_EntitiesAlongRay(pList, listMax, *(ray.ray), flagMask);
-	n = UTIL_EntitiesAlongRay(pList, listMax, ray.ToRay(), flagMask);
 	for( i=0; i < n; i++)
 		pylist.append(*pList[i]);
 
 	free(pList);
 	return pylist;
 }
-#endif 
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Trace filter that only hits Units and the player
