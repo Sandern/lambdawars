@@ -155,6 +155,8 @@ END_DATADESC()
 IMPLEMENT_SERVERCLASS_ST(CBaseToggle, DT_BaseToggle)
 END_SEND_TABLE()
 
+// This class is exposed in python and networkable
+IMPLEMENT_PYSERVERCLASS( CBaseToggle, PN_BASETOGGLE )
 
 CBaseToggle::CBaseToggle()
 {

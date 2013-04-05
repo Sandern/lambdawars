@@ -21,6 +21,8 @@ public:
 	DECLARE_CLIENTCLASS();
 	DECLARE_PYCLIENTCLASS( C_BaseTrigger );
 
+	virtual void UpdatePartitionListEntry();
+
 public:
 
 	bool	m_bClientSidePredicted;

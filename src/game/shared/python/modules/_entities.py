@@ -1361,10 +1361,22 @@ class Entities(GenerateModuleSemiShared):
             cls.vars('m_iMaxHealth').rename('maxhealth')
             
     def ParseTriggers(self, mb):
+        # CBaseTrigger
         cls_name = 'C_BaseTrigger' if self.isClient else 'CBaseTrigger'
         cls = mb.class_(cls_name)
         cls.no_init = False
+        
+        if self.isServer:
+            cls.mem_funs('GetTouchingEntities').exclude()
+            cls.mem_funs('GetClientSidePredicted').exclude() 
+            cls.mem_funs('SetClientSidePredicted').exclude() 
+            cls.add_property( 'clientsidepredicted'
+                             , cls.mem_fun('GetClientSidePredicted')
+                             , cls.mem_fun('SetClientSidePredicted') )
+        else:
+            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
 
+        # CTriggerMultiple
         if self.isServer:
             cls = mb.class_('CTriggerMultiple')
             mb.class_('CTriggerMultiple').no_init = False
@@ -1373,8 +1385,6 @@ class Entities(GenerateModuleSemiShared):
             mb.vars('m_hFilter').rename('filter')
             mb.vars('m_hFilter').exclude()
             mb.vars('m_iFilterName').rename('filtername')
-            
-            mb.mem_funs('GetTouchingEntities').exclude()
             
             for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
                 triggers = mb.class_(clsname)
@@ -1389,8 +1399,6 @@ class Entities(GenerateModuleSemiShared):
                     '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
                     ') \r\n' % (clsname, clsname)
                 )
-        else:
-            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
 
     def ParseBaseCombatWeapon(self, mb):
         cls_name = 'C_BaseCombatWeapon' if self.isClient else 'CBaseCombatWeapon'

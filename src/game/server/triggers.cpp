@@ -132,6 +132,9 @@ IMPLEMENT_SERVERCLASS_ST( CBaseTrigger, DT_BaseTrigger )
 	SendPropInt( SENDINFO(m_spawnflags), -1, SPROP_NOSCALE )
 END_SEND_TABLE()
 
+// This class is exposed in python and networkable
+IMPLEMENT_PYSERVERCLASS( CBaseTrigger, PN_BASETRIGGER )
+
 CBaseTrigger::CBaseTrigger()
 {
 	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );

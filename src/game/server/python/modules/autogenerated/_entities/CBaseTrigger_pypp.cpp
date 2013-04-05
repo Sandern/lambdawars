@@ -1598,6 +1598,17 @@ void register_CBaseTrigger_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
+        { //property "clientsidepredicted"[fget=::CBaseTrigger::GetClientSidePredicted, fset=::CBaseTrigger::SetClientSidePredicted]
+        
+            typedef bool ( ::CBaseTrigger::*fget )(  ) ;
+            typedef void ( ::CBaseTrigger::*fset )( bool ) ;
+            
+            CBaseTrigger_exposer.add_property( 
+                "clientsidepredicted"
+                , fget( &::CBaseTrigger::GetClientSidePredicted )
+                , fset( &::CBaseTrigger::SetClientSidePredicted ) );
+        
+        }
         { //::CBaseTrigger::TestCollision
             
                 typedef bool ( ::CBaseTrigger::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;

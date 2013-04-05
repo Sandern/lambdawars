@@ -838,6 +838,15 @@ void register_C_BaseTrigger_class(){
                 , GetPyNetworkType_function_type( &::C_BaseTrigger::GetPyNetworkType ) );
         
         }
+        { //::C_BaseTrigger::UpdatePartitionListEntry
+        
+            typedef void ( ::C_BaseTrigger::*UpdatePartitionListEntry_function_type )(  ) ;
+            
+            C_BaseTrigger_exposer.def( 
+                "UpdatePartitionListEntry"
+                , UpdatePartitionListEntry_function_type( &::C_BaseTrigger::UpdatePartitionListEntry ) );
+        
+        }
         C_BaseTrigger_exposer.def_readwrite( "clientsidepredicted", &C_BaseTrigger::m_bClientSidePredicted );
         { //::C_BaseEntity::Activate
         

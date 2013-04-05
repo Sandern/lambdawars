@@ -24,7 +24,7 @@ class CBaseTrigger : public CBaseToggle
 {
 	DECLARE_CLASS( CBaseTrigger, CBaseToggle );
 	DECLARE_SERVERCLASS();
-	DECLARE_PYCLASS( CBaseTrigger );
+	DECLARE_PYSERVERCLASS( CBaseTrigger );
 
 public:
 	CBaseTrigger();
@@ -75,6 +75,9 @@ public:
 		return &m_hTouchingEntities;
 	}
 
+	bool GetClientSidePredicted( void );
+	void SetClientSidePredicted( bool bClientSidePredicted );
+
 protected:
 
 	// Outputs
@@ -93,6 +96,16 @@ protected:
 	// True if trigger participates in client side prediction
 	CNetworkVar( bool, m_bClientSidePredicted );
 };
+
+inline bool CBaseTrigger::GetClientSidePredicted( void ) 
+{ 
+	return m_bClientSidePredicted; 
+}
+
+inline void CBaseTrigger::SetClientSidePredicted( bool bClientSidePredicted ) 
+{ 
+	m_bClientSidePredicted = bClientSidePredicted; 
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Variable sized repeatable trigger.  Must be targeted at one or more entities.

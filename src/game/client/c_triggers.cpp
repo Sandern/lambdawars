@@ -22,6 +22,23 @@ END_RECV_TABLE()
 IMPLEMENT_PYCLIENTCLASS( C_BaseTrigger, PN_BASETRIGGER )
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_BaseTrigger::UpdatePartitionListEntry()
+{
+	if ( !m_bClientSidePredicted )
+	{
+		BaseClass::UpdatePartitionListEntry();
+		return;
+	}
+
+	partition->RemoveAndInsert( 
+		PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS,  // remove
+		PARTITION_CLIENT_TRIGGER_ENTITIES,  // add
+		CollisionProp()->GetPartitionHandle() );
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Disables auto movement on players that touch it
 //-----------------------------------------------------------------------------
 class C_TriggerPlayerMovement : public C_BaseTrigger
@@ -35,10 +52,6 @@ public:
 
 	void StartTouch( C_BaseEntity *pOther );
 	void EndTouch( C_BaseEntity *pOther );
-
-protected:
-
-	virtual void UpdatePartitionListEntry();
 
 public:
 	C_TriggerPlayerMovement	*m_pNext;
@@ -146,21 +159,6 @@ void TouchTriggerPlayerMovement( C_BaseEntity *pEntity )
 {
 	CFastTouchTriggers< C_TriggerPlayerMovement > helper( pEntity, g_TriggerPlayerMovementList.m_pClassList );
 	helper.Run();
-}
-
-
-void C_TriggerPlayerMovement::UpdatePartitionListEntry()
-{
-	if ( !m_bClientSidePredicted )
-	{
-		BaseClass::UpdatePartitionListEntry();
-		return;
-	}
-
-	partition->RemoveAndInsert( 
-		PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS,  // remove
-		PARTITION_CLIENT_TRIGGER_ENTITIES,  // add
-		CollisionProp()->GetPartitionHandle() );
 }
 
 void C_TriggerPlayerMovement::StartTouch( C_BaseEntity *pOther )
