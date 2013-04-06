@@ -134,11 +134,11 @@ def GetTopDeclaration( mb, cls_name, decl_name, args = None ):
     return decl
     
 # ...
-def AddWrapRegs( mb, cls_name, declarations, args_mod_in ):
+def AddWrapRegs(mb, cls_name, declarations, args_mod_in):
     for decl in declarations:
         AddWrapReg( mb, cls_name, decl, args_mod_in )
         
-def AddWrapReg( mb, cls_name, declaration, args_mod_in ):
+def AddWrapReg(mb, cls_name, declaration, args_mod_in, nobasefn=False):
     if type(cls_name) != str:
         cls = cls_name
         cls_name = cls.name # or alias?
@@ -157,10 +157,12 @@ def AddWrapReg( mb, cls_name, declaration, args_mod_in ):
     template.append( wrapper.indent(wrapper.indent('%(return_)sfunc_%(alias)s( %(args_mod_in)s );' ) ) )
     template.append( wrapper.indent('} catch(...) {') )
     template.append( wrapper.indent(wrapper.indent('PyErr_Print();')) )
-    template.append( wrapper.indent(wrapper.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') ) )
-    template.append( wrapper.indent( '}' ) )    
-    template.append( 'else' )
-    template.append( wrapper.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') )
+    if not nobasefn:
+        template.append( wrapper.indent(wrapper.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') ) )
+    template.append( wrapper.indent( '}' ) )
+    if not nobasefn:    
+        template.append( 'else' )
+        template.append( wrapper.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') )
     
     template = os.linesep.join( template )
 
@@ -185,22 +187,29 @@ def AddWrapReg( mb, cls_name, declaration, args_mod_in ):
         os.linesep.join( answer )
     )
     
-    # Add default body
-    cls.add_wrapper_code( wrapper.create_default_function() )
+    if not nobasefn:
+        # Add default body
+        cls.add_wrapper_code( wrapper.create_default_function() )
     
     # Add registration code
-    reg = calldef.mem_fun_v_t( declaration, wrapper )
+    if nobasefn:
+        reg = calldef.mem_fun_pv_t(declaration, wrapper)
+    else:
+        reg = calldef.mem_fun_v_t(declaration, wrapper)
     # WTF, why does it needs to be a code_creator instance. It only uses it for full_name
     cc = hackcodecreator_t(cls_name+'_wrapper')      
     wrapper.parent = cc
     cls.add_registration_code( reg._create_impl(), True )
     
-def CreateEntityArg( entity_arg ):
+def CreateEntityArg(entity_arg):
     return '%s ? %s->GetPyHandle() : bp::object()' % (entity_arg, entity_arg)
+    
+def CreateIHandleEntityArg(entity_arg):
+    return 'ConvertIHandleEntity( %s )' % (entity_arg)
     
 # ---------------------------------------------------------
 # Add a network variable as property to a class
-def AddNetworkVarProperty( mb, expose_name, var_name, type, cls_name, isclient=False ):
+def AddNetworkVarProperty(mb, expose_name, var_name, type, cls_name, isclient=False):
     if not isclient:
         mb.class_(cls_name).add_wrapper_code( type + ' ' + var_name + '_Get() {\r\n' + \
         '   return ' + var_name + '.Get();\r\n' + \

@@ -68,44 +68,18 @@ struct CTraceFilter_wrapper : CTraceFilter, bp::wrapper< CTraceFilter > {
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        try {
-            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
 
 };
 
@@ -118,124 +92,21 @@ struct CTraceFilterSimple_wrapper : CTraceFilterSimple, bp::wrapper< CTraceFilte
         
     }
 
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -256,125 +127,18 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        if( func_ShouldHitEntity.ptr() != Py_None )
-            try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            }
-        else
-            return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-    
-    bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
 
 };
 
@@ -395,63 +159,20 @@ struct CTraceFilterChain_wrapper : CTraceFilterChain, bp::wrapper< CTraceFilterC
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterChain\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -465,44 +186,18 @@ struct CTraceFilterEntitiesOnly_wrapper : CTraceFilterEntitiesOnly, bp::wrapper<
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterEntitiesOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterEntitiesOnly::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilterEntitiesOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterEntitiesOnly::GetTraceType( );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        try {
-            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
 
 };
 
@@ -523,63 +218,20 @@ struct CTraceFilterHitAll_wrapper : CTraceFilterHitAll, bp::wrapper< CTraceFilte
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterHitAll\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -601,123 +253,20 @@ struct CTraceFilterIgnoreTeam_wrapper : CTraceFilterIgnoreTeam, bp::wrapper< CTr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterIgnoreTeam\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -738,154 +287,21 @@ struct CTraceFilterSkipTwoEntities_wrapper : CTraceFilterSkipTwoEntities, bp::wr
     
     }
 
-    virtual void SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity2: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity2( boost::python::ptr(pPassEntity2) ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity2 = this->get_override( "SetPassEntity2" );
-        if( func_SetPassEntity2.ptr() != Py_None )
-            try {
-                func_SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            }
-        else
-            this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-    
-    void default_SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -907,153 +323,20 @@ struct CTraceFilterLOS_wrapper : CTraceFilterLOS, bp::wrapper< CTraceFilterLOS >
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterLOS\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
-    virtual void SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity2: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity2( boost::python::ptr(pPassEntity2) ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity2 = this->get_override( "SetPassEntity2" );
-        if( func_SetPassEntity2.ptr() != Py_None )
-            try {
-                func_SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            }
-        else
-            this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-    
-    void default_SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
     }
 
 };
@@ -1075,123 +358,20 @@ struct CTraceFilterNoNPCsOrPlayer_wrapper : CTraceFilterNoNPCsOrPlayer, bp::wrap
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterNoNPCsOrPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1213,123 +393,20 @@ struct CTraceFilterNoUnitsOrPlayer_wrapper : CTraceFilterNoUnitsOrPlayer, bp::wr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterNoUnitsOrPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1350,124 +427,21 @@ struct CTraceFilterOnlyNPCsAndPlayer_wrapper : CTraceFilterOnlyNPCsAndPlayer, bp
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterOnlyNPCsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterOnlyNPCsAndPlayer::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterOnlyNPCsAndPlayer::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterOnlyNPCsAndPlayer::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterOnlyNPCsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1488,124 +462,21 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterOnlyUnitsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterOnlyUnitsAndPlayer::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterOnlyUnitsAndPlayer::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterOnlyUnitsAndPlayer::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterOnlyUnitsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1620,123 +491,20 @@ struct CTraceFilterSimpleClassnameList_wrapper : CTraceFilterSimpleClassnameList
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimpleClassnameList\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1751,123 +519,20 @@ struct CTraceFilterSimpleList_wrapper : CTraceFilterSimpleList, bp::wrapper< CTr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimpleList\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -1889,123 +554,20 @@ struct CTraceFilterSkipClassname_wrapper : CTraceFilterSkipClassname, bp::wrappe
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipClassname\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -2027,123 +589,20 @@ struct CTraceFilterSkipEnemies_wrapper : CTraceFilterSkipEnemies, bp::wrapper< C
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipEnemies\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -2165,123 +624,20 @@ struct CTraceFilterSkipFriendly_wrapper : CTraceFilterSkipFriendly, bp::wrapper<
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipFriendly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -2303,123 +659,20 @@ struct CTraceFilterSkipTwoClassnames_wrapper : CTraceFilterSkipTwoClassnames, bp
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipTwoClassnames\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -2440,124 +693,21 @@ struct CTraceFilterWars_wrapper : CTraceFilterWars, bp::wrapper< CTraceFilterWar
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWars\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWars::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWars::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWars::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterWars\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -2578,62 +728,19 @@ struct CTraceFilterWorldAndPropsOnly_wrapper : CTraceFilterWorldAndPropsOnly, bp
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWorldAndPropsOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWorldAndPropsOnly::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWorldAndPropsOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWorldAndPropsOnly::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterWorldAndPropsOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
@@ -2656,62 +763,19 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWorldOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWorldOnly::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWorldOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWorldOnly::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterWorldOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
@@ -2811,12 +875,11 @@ BOOST_PYTHON_MODULE(_utils){
     bp::class_< CTraceFilter_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilter_wrapper::* )(  ) const)(&CTraceFilter_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
-            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
-            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilter_wrapper::* )( ::IHandleEntity *,int ) )(&::CTraceFilter_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimple_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterSimpleInternal", bp::no_init )    
         .def( 
@@ -2825,97 +888,53 @@ BOOST_PYTHON_MODULE(_utils){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSimple_wrapper::* )( int ) )(&CTraceFilterSimple_wrapper::default_SetCollisionGroup)
+            , (void ( ::CTraceFilterSimple::* )( int ) )( &::CTraceFilterSimple::SetCollisionGroup )
             , ( bp::arg("iCollisionGroup") ) )    
         .def( 
             "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSimple_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSimple_wrapper::default_SetPassEntity)
+            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )( &::CTraceFilterSimple::SetPassEntity )
             , ( bp::arg("pPassEntity") ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
             , (bool ( CTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimple_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSimple_wrapper::* )(  ) const)(&CTraceFilterSimple_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CPyTraceFilterSimple_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSimple", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CPyTraceFilterSimple_wrapper::* )(  ) const)(&CPyTraceFilterSimple_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CPyTraceFilterSimple_wrapper::* )( int ) )(&CPyTraceFilterSimple_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity const * ) )(&CPyTraceFilterSimple_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) )    
-        .def( 
             "ShouldHitEntity"
-            , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
-            , (bool ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CPyTraceFilterSimple_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&::CPyTraceFilterSimple_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterChain_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterChain::* )( ::IHandleEntity *,int ) )(&::CTraceFilterChain::ShouldHitEntity)
             , (bool ( CTraceFilterChain_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterChain_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterChain_wrapper::* )(  ) const)(&CTraceFilterChain_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterEntitiesOnly_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)(&::CTraceFilterEntitiesOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterEntitiesOnly_wrapper::* )(  ) const)(&CTraceFilterEntitiesOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
-            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
-            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilterEntitiesOnly_wrapper::* )( ::IHandleEntity *,int ) )(&::CTraceFilterEntitiesOnly_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterHitAll_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterHitAll" )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterHitAll::* )( ::IHandleEntity *,int ) )(&::CTraceFilterHitAll::ShouldHitEntity)
             , (bool ( CTraceFilterHitAll_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterHitAll_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterHitAll_wrapper::* )(  ) const)(&CTraceFilterHitAll_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterIgnoreTeam_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterIgnoreTeam", bp::init< IHandleEntity const *, int, int >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("ownernumber") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterIgnoreTeam::* )( ::IHandleEntity *,int ) )(&::CTraceFilterIgnoreTeam::ShouldHitEntity)
             , (bool ( CTraceFilterIgnoreTeam_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterIgnoreTeam_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterIgnoreTeam_wrapper::* )(  ) const)(&CTraceFilterIgnoreTeam_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterIgnoreTeam_wrapper::* )( int ) )(&CTraceFilterIgnoreTeam_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterIgnoreTeam_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterIgnoreTeam_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     { //::CTraceFilterSkipTwoEntities
         typedef bp::class_< CTraceFilterSkipTwoEntities_wrapper, bp::bases< CTraceFilterSimple > > CTraceFilterSkipTwoEntities_exposer_t;
@@ -2925,62 +944,18 @@ BOOST_PYTHON_MODULE(_utils){
         { //::CTraceFilterSkipTwoEntities::SetPassEntity2
         
             typedef void ( ::CTraceFilterSkipTwoEntities::*SetPassEntity2_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetPassEntity2_function_type )( ::IHandleEntity const * ) ;
             
             CTraceFilterSkipTwoEntities_exposer.def( 
                 "SetPassEntity2"
-                , SetPassEntity2_function_type(&::CTraceFilterSkipTwoEntities::SetPassEntity2)
-                , default_SetPassEntity2_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetPassEntity2)
+                , SetPassEntity2_function_type( &::CTraceFilterSkipTwoEntities::SetPassEntity2 )
                 , ( bp::arg("pPassEntity2") ) );
         
         }
-        { //::CTraceFilterSkipTwoEntities::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterSkipTwoEntities::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterSkipTwoEntities_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterSkipTwoEntities::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterSkipTwoEntities_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterSkipTwoEntities_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterSkipTwoEntities::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipTwoEntities::ShouldHitEntity)
+            , (bool ( CTraceFilterSkipTwoEntities_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipTwoEntities_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterLOS_wrapper, bp::bases< CTraceFilterSkipTwoEntities > >( "CTraceFilterLOS", bp::init< IHandleEntity *, int, bp::optional< IHandleEntity * > >(( bp::arg("pHandleEntity"), bp::arg("collisionGroup"), bp::arg("pHandleEntity2")=bp::object() )) )    
@@ -2988,79 +963,18 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterLOS::* )( ::IHandleEntity *,int ) )(&::CTraceFilterLOS::ShouldHitEntity)
             , (bool ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterLOS_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterLOS_wrapper::* )(  ) const)(&CTraceFilterLOS_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterLOS_wrapper::* )( int ) )(&CTraceFilterLOS_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterLOS_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) )    
-        .def( 
-            "SetPassEntity2"
-            , (void ( ::CTraceFilterSkipTwoEntities::* )( ::IHandleEntity const * ) )(&::CTraceFilterSkipTwoEntities::SetPassEntity2)
-            , (void ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterLOS_wrapper::default_SetPassEntity2)
-            , ( bp::arg("pPassEntity2") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     { //::CTraceFilterNoNPCsOrPlayer
         typedef bp::class_< CTraceFilterNoNPCsOrPlayer_wrapper, bp::bases< CTraceFilterSimple > > CTraceFilterNoNPCsOrPlayer_exposer_t;
         CTraceFilterNoNPCsOrPlayer_exposer_t CTraceFilterNoNPCsOrPlayer_exposer = CTraceFilterNoNPCsOrPlayer_exposer_t( "CTraceFilterNoNPCsOrPlayer", bp::init< bp::optional< IHandleEntity const *, int > >(( bp::arg("passentity")=bp::object(), bp::arg("collisionGroup")=int(::COLLISION_GROUP_NONE) )) );
         bp::scope CTraceFilterNoNPCsOrPlayer_scope( CTraceFilterNoNPCsOrPlayer_exposer );
         bp::implicitly_convertible< IHandleEntity const *, CTraceFilterNoNPCsOrPlayer >();
-        { //::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterNoNPCsOrPlayer::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterNoNPCsOrPlayer_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterNoNPCsOrPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity)
+            , (bool ( CTraceFilterNoNPCsOrPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterNoNPCsOrPlayer_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterNoUnitsOrPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterNoUnitsOrPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
@@ -3068,63 +982,27 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterNoUnitsOrPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterNoUnitsOrPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterNoUnitsOrPlayer_wrapper::* )(  ) const)(&CTraceFilterNoUnitsOrPlayer_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( int ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterOnlyNPCsAndPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterOnlyNPCsAndPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterOnlyNPCsAndPlayer::* )(  ) const)(&::CTraceFilterOnlyNPCsAndPlayer::GetTraceType)
-            , (::TraceType_t ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )(  ) const)(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterOnlyNPCsAndPlayer::* )(  ) const)( &::CTraceFilterOnlyNPCsAndPlayer::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterOnlyNPCsAndPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( int ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterOnlyUnitsAndPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterOnlyUnitsAndPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterOnlyUnitsAndPlayer::* )(  ) const)(&::CTraceFilterOnlyUnitsAndPlayer::GetTraceType)
-            , (::TraceType_t ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )(  ) const)(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterOnlyUnitsAndPlayer::* )(  ) const)( &::CTraceFilterOnlyUnitsAndPlayer::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterOnlyUnitsAndPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( int ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimpleClassnameList_wrapper, bp::bases< CTraceFilterSimple >, boost::noncopyable >( "CTraceFilterSimpleClassnameList", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
@@ -3135,21 +1013,7 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSimpleClassnameList::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimpleClassnameList::ShouldHitEntity)
             , (bool ( CTraceFilterSimpleClassnameList_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimpleClassnameList_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSimpleClassnameList_wrapper::* )(  ) const)(&CTraceFilterSimpleClassnameList_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSimpleClassnameList_wrapper::* )( int ) )(&CTraceFilterSimpleClassnameList_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSimpleClassnameList_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSimpleClassnameList_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     { //::CTraceFilterSimpleList
         typedef bp::class_< CTraceFilterSimpleList_wrapper, bp::bases< CTraceFilterSimple >, boost::noncopyable > CTraceFilterSimpleList_exposer_t;
@@ -3176,53 +1040,11 @@ BOOST_PYTHON_MODULE(_utils){
                 , ( bp::arg("pEntity") ) );
         
         }
-        { //::CTraceFilterSimpleList::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterSimpleList::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterSimpleList_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterSimpleList::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterSimpleList_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterSimpleList_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterSimpleList_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterSimpleList_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterSimpleList_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSimpleList_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterSimpleList_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterSimpleList_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterSimpleList::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimpleList::ShouldHitEntity)
+            , (bool ( CTraceFilterSimpleList_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimpleList_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterSkipClassname_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipClassname", bp::init< IHandleEntity const *, char const *, int >(( bp::arg("passentity"), bp::arg("pchClassname"), bp::arg("collisionGroup") )) )    
@@ -3230,127 +1052,58 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipClassname::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipClassname::ShouldHitEntity)
             , (bool ( CTraceFilterSkipClassname_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipClassname_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipClassname_wrapper::* )(  ) const)(&CTraceFilterSkipClassname_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipClassname_wrapper::* )( int ) )(&CTraceFilterSkipClassname_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipClassname_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipClassname_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipEnemies_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipEnemies", bp::init< IHandleEntity const *, int, C_UnitBase * >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("pUnit") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipEnemies::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipEnemies::ShouldHitEntity)
             , (bool ( CTraceFilterSkipEnemies_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipEnemies_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipEnemies_wrapper::* )(  ) const)(&CTraceFilterSkipEnemies_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipEnemies_wrapper::* )( int ) )(&CTraceFilterSkipEnemies_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipEnemies_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipEnemies_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipFriendly_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipFriendly", bp::init< IHandleEntity const *, int, C_UnitBase * >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("pUnit") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipFriendly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipFriendly::ShouldHitEntity)
             , (bool ( CTraceFilterSkipFriendly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipFriendly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipFriendly_wrapper::* )(  ) const)(&CTraceFilterSkipFriendly_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipFriendly_wrapper::* )( int ) )(&CTraceFilterSkipFriendly_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipFriendly_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipFriendly_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipTwoClassnames_wrapper, bp::bases< CTraceFilterSkipClassname > >( "CTraceFilterSkipTwoClassnames", bp::init< IHandleEntity const *, char const *, char const *, int >(( bp::arg("passentity"), bp::arg("pchClassname"), bp::arg("pchClassname2"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipTwoClassnames::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipTwoClassnames::ShouldHitEntity)
             , (bool ( CTraceFilterSkipTwoClassnames_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipTwoClassnames_wrapper::* )(  ) const)(&CTraceFilterSkipTwoClassnames_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipTwoClassnames_wrapper::* )( int ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipTwoClassnames_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWars_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterWars", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWars::* )(  ) const)(&::CTraceFilterWars::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWars_wrapper::* )(  ) const)(&CTraceFilterWars_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWars::* )(  ) const)( &::CTraceFilterWars::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWars::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWars::ShouldHitEntity)
             , (bool ( CTraceFilterWars_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWars_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterWars_wrapper::* )( int ) )(&CTraceFilterWars_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterWars_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterWars_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWorldAndPropsOnly_wrapper, bp::bases< ITraceFilter > >( "CTraceFilterWorldAndPropsOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWorldAndPropsOnly::* )(  ) const)(&::CTraceFilterWorldAndPropsOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWorldAndPropsOnly_wrapper::* )(  ) const)(&CTraceFilterWorldAndPropsOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWorldAndPropsOnly::* )(  ) const)( &::CTraceFilterWorldAndPropsOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldAndPropsOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldAndPropsOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldAndPropsOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldAndPropsOnly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWorldOnly_wrapper, bp::bases< ITraceFilter > >( "CTraceFilterWorldOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWorldOnly::* )(  ) const)(&::CTraceFilterWorldOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWorldOnly_wrapper::* )(  ) const)(&CTraceFilterWorldOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWorldOnly::* )(  ) const)( &::CTraceFilterWorldOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     { //::ProjectedTexture
         typedef bp::class_< ProjectedTexture, boost::noncopyable > ProjectedTexture_exposer_t;
@@ -4324,6 +2077,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_EmitAmbientSound
+    
+        typedef void ( *UTIL_EmitAmbientSound_function_type )( int,::Vector const &,char const *,float,::soundlevel_t,int,int,float,float * );
+        
+        bp::def( 
+            "UTIL_EmitAmbientSound"
+            , UTIL_EmitAmbientSound_function_type( &::UTIL_EmitAmbientSound )
+            , ( bp::arg("entindex"), bp::arg("vecOrigin"), bp::arg("samp"), bp::arg("vol"), bp::arg("soundlevel"), bp::arg("fFlags"), bp::arg("pitch"), bp::arg("soundtime")=0.0f, bp::arg("duration")=bp::object() ) );
+    
+    }
+
     { //::UTIL_EncodeICE
     
         typedef void ( *UTIL_EncodeICE_function_type )( unsigned char *,unsigned int,unsigned char const * );
@@ -5055,44 +2819,18 @@ struct CTraceFilter_wrapper : CTraceFilter, bp::wrapper< CTraceFilter > {
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        try {
-            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
 
 };
 
@@ -5105,124 +2843,21 @@ struct CTraceFilterSimple_wrapper : CTraceFilterSimple, bp::wrapper< CTraceFilte
         
     }
 
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -5243,125 +2878,18 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        if( func_ShouldHitEntity.ptr() != Py_None )
-            try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            }
-        else
-            return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-    
-    bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
 
 };
 
@@ -5382,63 +2910,20 @@ struct CTraceFilterChain_wrapper : CTraceFilterChain, bp::wrapper< CTraceFilterC
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterChain\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterChain::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -5452,44 +2937,18 @@ struct CTraceFilterEntitiesOnly_wrapper : CTraceFilterEntitiesOnly, bp::wrapper<
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterEntitiesOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterEntitiesOnly::GetTraceType(  );
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
+                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+                if( func_ShouldHitEntity.ptr() != Py_None )
+                {
+                    try {
+                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
+                    } catch(...) {
+                        PyErr_Print();
+                    }
+                }
+                return false;
             }
-        else
-            return this->CTraceFilterEntitiesOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterEntitiesOnly::GetTraceType( );
-    }
-
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-        try {
-            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
 
 };
 
@@ -5510,63 +2969,20 @@ struct CTraceFilterHitAll_wrapper : CTraceFilterHitAll, bp::wrapper< CTraceFilte
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterHitAll\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterHitAll::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
     }
 
 };
@@ -5588,123 +3004,20 @@ struct CTraceFilterIgnoreTeam_wrapper : CTraceFilterIgnoreTeam, bp::wrapper< CTr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterIgnoreTeam\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterIgnoreTeam::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -5725,154 +3038,21 @@ struct CTraceFilterSkipTwoEntities_wrapper : CTraceFilterSkipTwoEntities, bp::wr
     
     }
 
-    virtual void SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity2: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity2( boost::python::ptr(pPassEntity2) ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity2 = this->get_override( "SetPassEntity2" );
-        if( func_SetPassEntity2.ptr() != Py_None )
-            try {
-                func_SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            }
-        else
-            this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-    
-    void default_SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipTwoEntities::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -5894,153 +3074,20 @@ struct CTraceFilterLOS_wrapper : CTraceFilterLOS, bp::wrapper< CTraceFilterLOS >
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterLOS\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterLOS::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-
-    virtual void SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity2: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity2( boost::python::ptr(pPassEntity2) ) of Class: CTraceFilterSkipTwoEntities\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity2 = this->get_override( "SetPassEntity2" );
-        if( func_SetPassEntity2.ptr() != Py_None )
-            try {
-                func_SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-            }
-        else
-            this->CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
-    }
-    
-    void default_SetPassEntity2( ::IHandleEntity const * pPassEntity2 ) {
-        CTraceFilterSkipTwoEntities::SetPassEntity2( boost::python::ptr(pPassEntity2) );
     }
 
 };
@@ -6108,36 +3155,6 @@ struct CTraceFilterMelee_wrapper : CTraceFilterMelee, bp::wrapper< CTraceFilterM
         inst.m_pPassEnt = new_value;
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterEntitiesOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterEntitiesOnly::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterEntitiesOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterEntitiesOnly::GetTraceType( );
-    }
-
     CTraceFilterMelee_wrapper(::CBaseEntity const * passentity, int collisionGroup, ::CTakeDamageInfo * dmgInfo, float flForceScale, bool bDamageAnyNPC )
         : CTraceFilterMelee( boost::python::ptr(passentity), collisionGroup, boost::python::ptr(dmgInfo), flForceScale, bDamageAnyNPC )
         , bp::wrapper< CTraceFilterMelee >(){
@@ -6163,123 +3180,20 @@ struct CTraceFilterNoNPCsOrPlayer_wrapper : CTraceFilterNoNPCsOrPlayer, bp::wrap
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterNoNPCsOrPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterNoNPCsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6301,123 +3215,20 @@ struct CTraceFilterNoUnitsOrPlayer_wrapper : CTraceFilterNoUnitsOrPlayer, bp::wr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterNoUnitsOrPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterNoUnitsOrPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6438,124 +3249,21 @@ struct CTraceFilterOnlyNPCsAndPlayer_wrapper : CTraceFilterOnlyNPCsAndPlayer, bp
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterOnlyNPCsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterOnlyNPCsAndPlayer::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterOnlyNPCsAndPlayer::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterOnlyNPCsAndPlayer::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterOnlyNPCsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6576,124 +3284,21 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterOnlyUnitsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterOnlyUnitsAndPlayer::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterOnlyUnitsAndPlayer::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterOnlyUnitsAndPlayer::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterOnlyUnitsAndPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6708,123 +3313,20 @@ struct CTraceFilterSimpleClassnameList_wrapper : CTraceFilterSimpleClassnameList
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimpleClassnameList\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimpleClassnameList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6839,123 +3341,20 @@ struct CTraceFilterSimpleList_wrapper : CTraceFilterSimpleList, bp::wrapper< CTr
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSimpleList\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSimpleList::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -6977,123 +3376,20 @@ struct CTraceFilterSkipClassname_wrapper : CTraceFilterSkipClassname, bp::wrappe
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipClassname\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipClassname::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -7115,123 +3411,20 @@ struct CTraceFilterSkipEnemies_wrapper : CTraceFilterSkipEnemies, bp::wrapper< C
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipEnemies\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipEnemies::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -7253,123 +3446,20 @@ struct CTraceFilterSkipFriendly_wrapper : CTraceFilterSkipFriendly, bp::wrapper<
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipFriendly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipFriendly::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -7391,123 +3481,20 @@ struct CTraceFilterSkipTwoClassnames_wrapper : CTraceFilterSkipTwoClassnames, bp
     }
 
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterSkipTwoClassnames\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterSkipTwoClassnames::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilter\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilter::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilter::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilter::GetTraceType( );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -7528,124 +3515,21 @@ struct CTraceFilterWars_wrapper : CTraceFilterWars, bp::wrapper< CTraceFilterWar
     
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWars\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWars::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWars::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWars::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask ) of Class: CTraceFilterWars\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
         else
             return this->CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
         return CTraceFilterWars::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
-    }
-
-    virtual void SetCollisionGroup( int iCollisionGroup ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCollisionGroup: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCollisionGroup( iCollisionGroup ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetCollisionGroup = this->get_override( "SetCollisionGroup" );
-        if( func_SetCollisionGroup.ptr() != Py_None )
-            try {
-                func_SetCollisionGroup( iCollisionGroup );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-            }
-        else
-            this->CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-    
-    void default_SetCollisionGroup( int iCollisionGroup ) {
-        CTraceFilterSimple::SetCollisionGroup( iCollisionGroup );
-    }
-
-    virtual void SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPassEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPassEntity( boost::python::ptr(pPassEntity) ) of Class: CTraceFilterSimple\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_SetPassEntity = this->get_override( "SetPassEntity" );
-        if( func_SetPassEntity.ptr() != Py_None )
-            try {
-                func_SetPassEntity( boost::python::ptr(pPassEntity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-            }
-        else
-            this->CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
-    }
-    
-    void default_SetPassEntity( ::IHandleEntity const * pPassEntity ) {
-        CTraceFilterSimple::SetPassEntity( boost::python::ptr(pPassEntity) );
     }
 
 };
@@ -7666,62 +3550,19 @@ struct CTraceFilterWorldAndPropsOnly_wrapper : CTraceFilterWorldAndPropsOnly, bp
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWorldAndPropsOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWorldAndPropsOnly::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWorldAndPropsOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWorldAndPropsOnly::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterWorldAndPropsOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterWorldAndPropsOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
@@ -7744,62 +3585,19 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
         
     }
 
-    virtual ::TraceType_t GetTraceType(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTraceType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTraceType(  ) of Class: CTraceFilterWorldOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_GetTraceType = this->get_override( "GetTraceType" );
-        if( func_GetTraceType.ptr() != Py_None )
-            try {
-                return func_GetTraceType(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CTraceFilterWorldOnly::GetTraceType(  );
-            }
-        else
-            return this->CTraceFilterWorldOnly::GetTraceType(  );
-    }
-    
-    ::TraceType_t default_GetTraceType(  ) const  {
-        return CTraceFilterWorldOnly::GetTraceType( );
-    }
-
     virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldHitEntity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask ) of Class: CTraceFilterWorldOnly\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
         if( func_ShouldHitEntity.ptr() != Py_None )
             try {
-                return func_ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
-            } catch(bp::error_already_set &) {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pServerEntity ), contentsMask );
+            } catch(...) {
                 PyErr_Print();
                 return this->CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
             }
         else
             return this->CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
-    
+
     bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
         return CTraceFilterWorldOnly::ShouldHitEntity( boost::python::ptr(pServerEntity), contentsMask );
     }
@@ -7885,12 +3683,11 @@ BOOST_PYTHON_MODULE(_utils){
     bp::class_< CTraceFilter_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilter_wrapper::* )(  ) const)(&CTraceFilter_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
-            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
-            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilter_wrapper::* )( ::IHandleEntity *,int ) )(&::CTraceFilter_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimple_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterSimpleInternal", bp::no_init )    
         .def( 
@@ -7899,97 +3696,53 @@ BOOST_PYTHON_MODULE(_utils){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSimple_wrapper::* )( int ) )(&CTraceFilterSimple_wrapper::default_SetCollisionGroup)
+            , (void ( ::CTraceFilterSimple::* )( int ) )( &::CTraceFilterSimple::SetCollisionGroup )
             , ( bp::arg("iCollisionGroup") ) )    
         .def( 
             "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSimple_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSimple_wrapper::default_SetPassEntity)
+            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )( &::CTraceFilterSimple::SetPassEntity )
             , ( bp::arg("pPassEntity") ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
             , (bool ( CTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimple_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSimple_wrapper::* )(  ) const)(&CTraceFilterSimple_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CPyTraceFilterSimple_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSimple", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CPyTraceFilterSimple_wrapper::* )(  ) const)(&CPyTraceFilterSimple_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CPyTraceFilterSimple_wrapper::* )( int ) )(&CPyTraceFilterSimple_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity const * ) )(&CPyTraceFilterSimple_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) )    
-        .def( 
             "ShouldHitEntity"
-            , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
-            , (bool ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CPyTraceFilterSimple_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&::CPyTraceFilterSimple_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterChain_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterChain::* )( ::IHandleEntity *,int ) )(&::CTraceFilterChain::ShouldHitEntity)
             , (bool ( CTraceFilterChain_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterChain_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterChain_wrapper::* )(  ) const)(&CTraceFilterChain_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterEntitiesOnly_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)(&::CTraceFilterEntitiesOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterEntitiesOnly_wrapper::* )(  ) const)(&CTraceFilterEntitiesOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
-            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
-            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilterEntitiesOnly_wrapper::* )( ::IHandleEntity *,int ) )(&::CTraceFilterEntitiesOnly_wrapper::ShouldHitEntity)
+            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterHitAll_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterHitAll" )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterHitAll::* )( ::IHandleEntity *,int ) )(&::CTraceFilterHitAll::ShouldHitEntity)
             , (bool ( CTraceFilterHitAll_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterHitAll_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterHitAll_wrapper::* )(  ) const)(&CTraceFilterHitAll_wrapper::default_GetTraceType) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterIgnoreTeam_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterIgnoreTeam", bp::init< IHandleEntity const *, int, int >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("ownernumber") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterIgnoreTeam::* )( ::IHandleEntity *,int ) )(&::CTraceFilterIgnoreTeam::ShouldHitEntity)
             , (bool ( CTraceFilterIgnoreTeam_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterIgnoreTeam_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterIgnoreTeam_wrapper::* )(  ) const)(&CTraceFilterIgnoreTeam_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterIgnoreTeam_wrapper::* )( int ) )(&CTraceFilterIgnoreTeam_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterIgnoreTeam_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterIgnoreTeam_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     { //::CTraceFilterSkipTwoEntities
         typedef bp::class_< CTraceFilterSkipTwoEntities_wrapper, bp::bases< CTraceFilterSimple > > CTraceFilterSkipTwoEntities_exposer_t;
@@ -7999,62 +3752,18 @@ BOOST_PYTHON_MODULE(_utils){
         { //::CTraceFilterSkipTwoEntities::SetPassEntity2
         
             typedef void ( ::CTraceFilterSkipTwoEntities::*SetPassEntity2_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetPassEntity2_function_type )( ::IHandleEntity const * ) ;
             
             CTraceFilterSkipTwoEntities_exposer.def( 
                 "SetPassEntity2"
-                , SetPassEntity2_function_type(&::CTraceFilterSkipTwoEntities::SetPassEntity2)
-                , default_SetPassEntity2_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetPassEntity2)
+                , SetPassEntity2_function_type( &::CTraceFilterSkipTwoEntities::SetPassEntity2 )
                 , ( bp::arg("pPassEntity2") ) );
         
         }
-        { //::CTraceFilterSkipTwoEntities::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterSkipTwoEntities::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterSkipTwoEntities_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterSkipTwoEntities::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterSkipTwoEntities_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSkipTwoEntities_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterSkipTwoEntities_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterSkipTwoEntities_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterSkipTwoEntities_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterSkipTwoEntities::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipTwoEntities::ShouldHitEntity)
+            , (bool ( CTraceFilterSkipTwoEntities_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipTwoEntities_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterLOS_wrapper, bp::bases< CTraceFilterSkipTwoEntities > >( "CTraceFilterLOS", bp::init< IHandleEntity *, int, bp::optional< IHandleEntity * > >(( bp::arg("pHandleEntity"), bp::arg("collisionGroup"), bp::arg("pHandleEntity2")=bp::object() )) )    
@@ -8062,26 +3771,7 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterLOS::* )( ::IHandleEntity *,int ) )(&::CTraceFilterLOS::ShouldHitEntity)
             , (bool ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterLOS_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterLOS_wrapper::* )(  ) const)(&CTraceFilterLOS_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterLOS_wrapper::* )( int ) )(&CTraceFilterLOS_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterLOS_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) )    
-        .def( 
-            "SetPassEntity2"
-            , (void ( ::CTraceFilterSkipTwoEntities::* )( ::IHandleEntity const * ) )(&::CTraceFilterSkipTwoEntities::SetPassEntity2)
-            , (void ( CTraceFilterLOS_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterLOS_wrapper::default_SetPassEntity2)
-            , ( bp::arg("pPassEntity2") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterMelee_wrapper, bp::bases< CTraceFilterEntitiesOnly > >( "CTraceFilterMelee", bp::no_init )    
         .def( 
@@ -8101,10 +3791,6 @@ BOOST_PYTHON_MODULE(_utils){
         .add_property( "m_pPassEnt"
                     , bp::make_function( (::IHandleEntity const * (*)( ::CTraceFilterMelee const & ))(&CTraceFilterMelee_wrapper::get_m_pPassEnt), bp::return_internal_reference< >() )
                     , bp::make_function( (void (*)( ::CTraceFilterMelee &,::IHandleEntity const * ))(&CTraceFilterMelee_wrapper::set_m_pPassEnt), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)(&::CTraceFilterEntitiesOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterMelee_wrapper::* )(  ) const)(&CTraceFilterMelee_wrapper::default_GetTraceType) )    
         .def( bp::init< CBaseEntity const *, int, CTakeDamageInfo *, float, bool >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("dmgInfo"), bp::arg("flForceScale"), bp::arg("bDamageAnyNPC") )) );
 
     { //::CTraceFilterNoNPCsOrPlayer
@@ -8112,53 +3798,11 @@ BOOST_PYTHON_MODULE(_utils){
         CTraceFilterNoNPCsOrPlayer_exposer_t CTraceFilterNoNPCsOrPlayer_exposer = CTraceFilterNoNPCsOrPlayer_exposer_t( "CTraceFilterNoNPCsOrPlayer", bp::init< bp::optional< IHandleEntity const *, int > >(( bp::arg("passentity")=bp::object(), bp::arg("collisionGroup")=int(::COLLISION_GROUP_NONE) )) );
         bp::scope CTraceFilterNoNPCsOrPlayer_scope( CTraceFilterNoNPCsOrPlayer_exposer );
         bp::implicitly_convertible< IHandleEntity const *, CTraceFilterNoNPCsOrPlayer >();
-        { //::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterNoNPCsOrPlayer::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterNoNPCsOrPlayer_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterNoNPCsOrPlayer_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterNoNPCsOrPlayer_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterNoNPCsOrPlayer_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterNoNPCsOrPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterNoNPCsOrPlayer::ShouldHitEntity)
+            , (bool ( CTraceFilterNoNPCsOrPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterNoNPCsOrPlayer_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterNoUnitsOrPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterNoUnitsOrPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
@@ -8166,63 +3810,27 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterNoUnitsOrPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterNoUnitsOrPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterNoUnitsOrPlayer_wrapper::* )(  ) const)(&CTraceFilterNoUnitsOrPlayer_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( int ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterNoUnitsOrPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterNoUnitsOrPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterOnlyNPCsAndPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterOnlyNPCsAndPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterOnlyNPCsAndPlayer::* )(  ) const)(&::CTraceFilterOnlyNPCsAndPlayer::GetTraceType)
-            , (::TraceType_t ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )(  ) const)(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterOnlyNPCsAndPlayer::* )(  ) const)( &::CTraceFilterOnlyNPCsAndPlayer::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterOnlyNPCsAndPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterOnlyNPCsAndPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( int ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterOnlyNPCsAndPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterOnlyNPCsAndPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterOnlyUnitsAndPlayer_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterOnlyUnitsAndPlayer", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterOnlyUnitsAndPlayer::* )(  ) const)(&::CTraceFilterOnlyUnitsAndPlayer::GetTraceType)
-            , (::TraceType_t ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )(  ) const)(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterOnlyUnitsAndPlayer::* )(  ) const)( &::CTraceFilterOnlyUnitsAndPlayer::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterOnlyUnitsAndPlayer::* )( ::IHandleEntity *,int ) )(&::CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity)
             , (bool ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( int ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterOnlyUnitsAndPlayer_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterOnlyUnitsAndPlayer_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimpleClassnameList_wrapper, bp::bases< CTraceFilterSimple >, boost::noncopyable >( "CTraceFilterSimpleClassnameList", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
@@ -8233,21 +3841,7 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSimpleClassnameList::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimpleClassnameList::ShouldHitEntity)
             , (bool ( CTraceFilterSimpleClassnameList_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimpleClassnameList_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSimpleClassnameList_wrapper::* )(  ) const)(&CTraceFilterSimpleClassnameList_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSimpleClassnameList_wrapper::* )( int ) )(&CTraceFilterSimpleClassnameList_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSimpleClassnameList_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSimpleClassnameList_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     { //::CTraceFilterSimpleList
         typedef bp::class_< CTraceFilterSimpleList_wrapper, bp::bases< CTraceFilterSimple >, boost::noncopyable > CTraceFilterSimpleList_exposer_t;
@@ -8274,53 +3868,11 @@ BOOST_PYTHON_MODULE(_utils){
                 , ( bp::arg("pEntity") ) );
         
         }
-        { //::CTraceFilterSimpleList::ShouldHitEntity
-        
-            typedef bool ( ::CTraceFilterSimpleList::*ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            typedef bool ( CTraceFilterSimpleList_wrapper::*default_ShouldHitEntity_function_type )( ::IHandleEntity *,int ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "ShouldHitEntity"
-                , ShouldHitEntity_function_type(&::CTraceFilterSimpleList::ShouldHitEntity)
-                , default_ShouldHitEntity_function_type(&CTraceFilterSimpleList_wrapper::default_ShouldHitEntity)
-                , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) );
-        
-        }
-        { //::CTraceFilter::GetTraceType
-        
-            typedef ::TraceType_t ( ::CTraceFilter::*GetTraceType_function_type )(  ) const;
-            typedef ::TraceType_t ( CTraceFilterSimpleList_wrapper::*default_GetTraceType_function_type )(  ) const;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "GetTraceType"
-                , GetTraceType_function_type(&::CTraceFilter::GetTraceType)
-                , default_GetTraceType_function_type(&CTraceFilterSimpleList_wrapper::default_GetTraceType) );
-        
-        }
-        { //::CTraceFilterSimple::SetCollisionGroup
-        
-            typedef void ( ::CTraceFilterSimple::*SetCollisionGroup_function_type )( int ) ;
-            typedef void ( CTraceFilterSimpleList_wrapper::*default_SetCollisionGroup_function_type )( int ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "SetCollisionGroup"
-                , SetCollisionGroup_function_type(&::CTraceFilterSimple::SetCollisionGroup)
-                , default_SetCollisionGroup_function_type(&CTraceFilterSimpleList_wrapper::default_SetCollisionGroup)
-                , ( bp::arg("iCollisionGroup") ) );
-        
-        }
-        { //::CTraceFilterSimple::SetPassEntity
-        
-            typedef void ( ::CTraceFilterSimple::*SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            typedef void ( CTraceFilterSimpleList_wrapper::*default_SetPassEntity_function_type )( ::IHandleEntity const * ) ;
-            
-            CTraceFilterSimpleList_exposer.def( 
-                "SetPassEntity"
-                , SetPassEntity_function_type(&::CTraceFilterSimple::SetPassEntity)
-                , default_SetPassEntity_function_type(&CTraceFilterSimpleList_wrapper::default_SetPassEntity)
-                , ( bp::arg("pPassEntity") ) );
-        
-        }
+        CTraceFilterSimpleList_exposer.def( 
+            "ShouldHitEntity"
+            , (bool ( ::CTraceFilterSimpleList::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimpleList::ShouldHitEntity)
+            , (bool ( CTraceFilterSimpleList_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSimpleList_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
     }
 
     bp::class_< CTraceFilterSkipClassname_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipClassname", bp::init< IHandleEntity const *, char const *, int >(( bp::arg("passentity"), bp::arg("pchClassname"), bp::arg("collisionGroup") )) )    
@@ -8328,127 +3880,58 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipClassname::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipClassname::ShouldHitEntity)
             , (bool ( CTraceFilterSkipClassname_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipClassname_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipClassname_wrapper::* )(  ) const)(&CTraceFilterSkipClassname_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipClassname_wrapper::* )( int ) )(&CTraceFilterSkipClassname_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipClassname_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipClassname_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipEnemies_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipEnemies", bp::init< IHandleEntity const *, int, CUnitBase * >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("pUnit") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipEnemies::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipEnemies::ShouldHitEntity)
             , (bool ( CTraceFilterSkipEnemies_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipEnemies_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipEnemies_wrapper::* )(  ) const)(&CTraceFilterSkipEnemies_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipEnemies_wrapper::* )( int ) )(&CTraceFilterSkipEnemies_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipEnemies_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipEnemies_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipFriendly_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSkipFriendly", bp::init< IHandleEntity const *, int, CUnitBase * >(( bp::arg("passentity"), bp::arg("collisionGroup"), bp::arg("pUnit") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipFriendly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipFriendly::ShouldHitEntity)
             , (bool ( CTraceFilterSkipFriendly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipFriendly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipFriendly_wrapper::* )(  ) const)(&CTraceFilterSkipFriendly_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipFriendly_wrapper::* )( int ) )(&CTraceFilterSkipFriendly_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipFriendly_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipFriendly_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSkipTwoClassnames_wrapper, bp::bases< CTraceFilterSkipClassname > >( "CTraceFilterSkipTwoClassnames", bp::init< IHandleEntity const *, char const *, char const *, int >(( bp::arg("passentity"), bp::arg("pchClassname"), bp::arg("pchClassname2"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterSkipTwoClassnames::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSkipTwoClassnames::ShouldHitEntity)
             , (bool ( CTraceFilterSkipTwoClassnames_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)(&::CTraceFilter::GetTraceType)
-            , (::TraceType_t ( CTraceFilterSkipTwoClassnames_wrapper::* )(  ) const)(&CTraceFilterSkipTwoClassnames_wrapper::default_GetTraceType) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterSkipTwoClassnames_wrapper::* )( int ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterSkipTwoClassnames_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterSkipTwoClassnames_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWars_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterWars", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWars::* )(  ) const)(&::CTraceFilterWars::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWars_wrapper::* )(  ) const)(&CTraceFilterWars_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWars::* )(  ) const)( &::CTraceFilterWars::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWars::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWars::ShouldHitEntity)
             , (bool ( CTraceFilterWars_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWars_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pHandleEntity"), bp::arg("contentsMask") ) )    
-        .def( 
-            "SetCollisionGroup"
-            , (void ( ::CTraceFilterSimple::* )( int ) )(&::CTraceFilterSimple::SetCollisionGroup)
-            , (void ( CTraceFilterWars_wrapper::* )( int ) )(&CTraceFilterWars_wrapper::default_SetCollisionGroup)
-            , ( bp::arg("iCollisionGroup") ) )    
-        .def( 
-            "SetPassEntity"
-            , (void ( ::CTraceFilterSimple::* )( ::IHandleEntity const * ) )(&::CTraceFilterSimple::SetPassEntity)
-            , (void ( CTraceFilterWars_wrapper::* )( ::IHandleEntity const * ) )(&CTraceFilterWars_wrapper::default_SetPassEntity)
-            , ( bp::arg("pPassEntity") ) );
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWorldAndPropsOnly_wrapper, bp::bases< ITraceFilter > >( "CTraceFilterWorldAndPropsOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWorldAndPropsOnly::* )(  ) const)(&::CTraceFilterWorldAndPropsOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWorldAndPropsOnly_wrapper::* )(  ) const)(&CTraceFilterWorldAndPropsOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWorldAndPropsOnly::* )(  ) const)( &::CTraceFilterWorldAndPropsOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldAndPropsOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldAndPropsOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldAndPropsOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldAndPropsOnly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterWorldOnly_wrapper, bp::bases< ITraceFilter > >( "CTraceFilterWorldOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterWorldOnly::* )(  ) const)(&::CTraceFilterWorldOnly::GetTraceType)
-            , (::TraceType_t ( CTraceFilterWorldOnly_wrapper::* )(  ) const)(&CTraceFilterWorldOnly_wrapper::default_GetTraceType) )    
+            , (::TraceType_t ( ::CTraceFilterWorldOnly::* )(  ) const)( &::CTraceFilterWorldOnly::GetTraceType ) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
-            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+            , ( boost::python::arg("pServerEntity"), boost::python::arg("contentsMask") ) );
 
     { //::PyRay_t
         typedef bp::class_< PyRay_t > Ray_t_exposer_t;

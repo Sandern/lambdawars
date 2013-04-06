@@ -192,6 +192,22 @@ boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, 
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object ConvertIHandleEntity( IHandleEntity *pHandleEntity )
+{
+	boost::python::object ret;
+
+	CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
+	if( pEntity )
+	{
+		ret = pEntity->GetPyHandle();
+	}
+
+	return ret;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Trace filter that only hits Units and the player
 //-----------------------------------------------------------------------------
 bool CTraceFilterOnlyUnitsAndPlayer::ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )

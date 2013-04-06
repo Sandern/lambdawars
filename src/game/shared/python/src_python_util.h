@@ -120,16 +120,18 @@ boost::python::list UTIL_ListDir( const char *path, const char *pathid=NULL, con
 
 // Wrappers
 #ifdef CLIENT_DLL
-boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, 
-										  int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
-boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, 
-											 int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
-boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = PARTITION_CLIENT_NON_STATIC_EDICTS );
+	#define DEFAULT_PARTITION_MASK PARTITION_CLIENT_NON_STATIC_EDICTS
 #else
-boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
-boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
-boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = PARTITION_ENGINE_NON_STATIC_EDICTS );
-#endif 
+	#define DEFAULT_PARTITION_MASK PARTITION_ENGINE_NON_STATIC_EDICTS
+#endif // CLIENT_DLL
+
+boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, const Vector &maxs, int flagMask, int partitionmask = DEFAULT_PARTITION_MASK );
+boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask, int partitionmask = DEFAULT_PARTITION_MASK );
+boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = DEFAULT_PARTITION_MASK );
+
+
+// Converter IHandleEntity
+boost::python::object ConvertIHandleEntity( IHandleEntity *entity );
 
 // Simple trace filter for python
 class CPyTraceFilterSimple : public CTraceFilterSimple
