@@ -1112,6 +1112,15 @@ void register_CBaseToggle_class(){
                 , GetDelay_function_type( &::CBaseToggle::GetDelay ) );
         
         }
+        { //::CBaseToggle::GetPyNetworkType
+        
+            typedef int ( *GetPyNetworkType_function_type )(  );
+            
+            CBaseToggle_exposer.def( 
+                "GetPyNetworkType"
+                , GetPyNetworkType_function_type( &::CBaseToggle::GetPyNetworkType ) );
+        
+        }
         { //::CBaseToggle::IsLockedByMaster
         
             typedef bool ( ::CBaseToggle::*IsLockedByMaster_function_type )(  ) ;
@@ -1537,6 +1546,7 @@ void register_CBaseToggle_class(){
         }
         CBaseToggle_exposer.staticmethod( "AxisDelta" );
         CBaseToggle_exposer.staticmethod( "AxisValue" );
+        CBaseToggle_exposer.staticmethod( "GetPyNetworkType" );
         { //::CBaseToggle::TestCollision
             
                 typedef bool ( ::CBaseToggle::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;

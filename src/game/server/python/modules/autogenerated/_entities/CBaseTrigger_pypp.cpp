@@ -1111,6 +1111,15 @@ void register_CBaseTrigger_class(){
                 , ( bp::arg("pOther") ) );
         
         }
+        { //::CBaseTrigger::GetPyNetworkType
+        
+            typedef int ( *GetPyNetworkType_function_type )(  );
+            
+            CBaseTrigger_exposer.def( 
+                "GetPyNetworkType"
+                , GetPyNetworkType_function_type( &::CBaseTrigger::GetPyNetworkType ) );
+        
+        }
         { //::CBaseTrigger::GetTouchedEntityOfType
         
             typedef ::CBaseEntity * ( ::CBaseTrigger::*GetTouchedEntityOfType_function_type )( char const * ) ;
@@ -1598,6 +1607,7 @@ void register_CBaseTrigger_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
+        CBaseTrigger_exposer.staticmethod( "GetPyNetworkType" );
         { //property "clientsidepredicted"[fget=::CBaseTrigger::GetClientSidePredicted, fset=::CBaseTrigger::SetClientSidePredicted]
         
             typedef bool ( ::CBaseTrigger::*fget )(  ) ;
