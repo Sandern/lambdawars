@@ -828,7 +828,9 @@ Vector CUnitBase::BodyTarget( const Vector &posSrc, bool bNoisy )
 	Vector result;
 	if( m_bBodyTargetOriginBased )
 	{
-		const Vector &low = GetAbsOrigin();
+		Vector vUpdatedWorldSpaceCenter = GetAbsOrigin();
+		vUpdatedWorldSpaceCenter.z = GetAbsOrigin().z + (CollisionProp()->OBBMaxs().z / 2.0f);
+		Vector low = vUpdatedWorldSpaceCenter - ( vUpdatedWorldSpaceCenter - GetAbsOrigin() ) * .25;
 		Vector high = EyePosition();
 		Vector delta = high - low;
 	
