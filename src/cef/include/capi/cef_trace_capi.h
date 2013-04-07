@@ -69,7 +69,7 @@ CEF_EXPORT int cef_begin_tracing(struct _cef_trace_client_t* client,
 // Get the maximum trace buffer percent full state across all processes.
 //
 // cef_trace_client_t::OnTraceBufferPercentFullReply will be called
-// asynchronously after the value is determibed. When any child process reaches
+// asynchronously after the value is determined. When any child process reaches
 // 100% full tracing will end automatically and
 // cef_trace_client_t::OnEndTracingComplete will be called. This function fails
 // and returns false (0) if trace is ending or disabled, no cef_trace_client_t
@@ -89,6 +89,13 @@ CEF_EXPORT int cef_get_trace_buffer_percent_full_async();
 // This function must be called on the browser process UI thread.
 ///
 CEF_EXPORT int cef_end_tracing_async();
+
+///
+// Returns the current system trace time or, if none is defined, the current
+// high-res time. Can be used by clients to synchronize with the time
+// information in trace events.
+///
+CEF_EXPORT int64 cef_now_from_system_trace_time();
 
 ///
 // Implement this structure to receive trace notifications. The functions of

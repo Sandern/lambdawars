@@ -219,15 +219,24 @@ typedef struct _cef_browser_host_t {
   ///
   // Call this function before destroying a contained browser window. This
   // function performs any internal cleanup that may be needed before the
-  // browser window is destroyed.
+  // browser window is destroyed. See cef_life_span_handler_t::do_close()
+  // documentation for additional usage information.
   ///
   void (CEF_CALLBACK *parent_window_will_close)(
       struct _cef_browser_host_t* self);
 
   ///
-  // Closes this browser window.
+  // Request that the browser close. The JavaScript 'onbeforeunload' event will
+  // be fired. If |force_close| is false (0) the event handler, if any, will be
+  // allowed to prompt the user and the user can optionally cancel the close. If
+  // |force_close| is true (1) the prompt will not be displayed and the close
+  // will proceed. Results in a call to cef_life_span_handler_t::do_close() if
+  // the event handler allows the close or if |force_close| is true (1). See
+  // cef_life_span_handler_t::do_close() documentation for additional usage
+  // information.
   ///
-  void (CEF_CALLBACK *close_browser)(struct _cef_browser_host_t* self);
+  void (CEF_CALLBACK *close_browser)(struct _cef_browser_host_t* self,
+      int force_close);
 
   ///
   // Set focus for the browser window. If |enable| is true (1) focus will be set
@@ -305,6 +314,18 @@ typedef struct _cef_browser_host_t {
       const cef_string_t* url);
 
   ///
+  // Set whether mouse cursor change is disabled.
+  ///
+  void (CEF_CALLBACK *set_mouse_cursor_change_disabled)(
+      struct _cef_browser_host_t* self, int disabled);
+
+  ///
+  // Returns true (1) if mouse cursor change is disabled.
+  ///
+  int (CEF_CALLBACK *is_mouse_cursor_change_disabled)(
+      struct _cef_browser_host_t* self);
+
+  ///
   // Returns true (1) if window rendering is disabled.
   ///
   int (CEF_CALLBACK *is_window_rendering_disabled)(
@@ -317,6 +338,13 @@ typedef struct _cef_browser_host_t {
   // function is only used when window rendering is disabled.
   ///
   void (CEF_CALLBACK *was_resized)(struct _cef_browser_host_t* self);
+
+  ///
+  // Notify the browser that it has been hidden or shown. Layouting and
+  // cef_render_handler_t::OnPaint notification will stop when the browser is
+  // hidden. This function is only used when window rendering is disabled.
+  ///
+  void (CEF_CALLBACK *was_hidden)(struct _cef_browser_host_t* self, int hidden);
 
   ///
   // Invalidate the |dirtyRect| region of the view. The browser will call
