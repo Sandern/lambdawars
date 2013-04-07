@@ -24,15 +24,26 @@ float4 main( PS_INPUT i ) : COLOR
 {
     float4 result;
   
- #if FOW
+#if FOW
     float fowvalue = 1.0f - tex2D( FogOfWarSampler, i.vTexCoord0.xy ).r;
     
+#if EXPLORED_FULLDARK == 0
     result = float4(0.15, 0.15, 0.15, fowvalue);
     float fDarknessValue = FOW_DARKNESS_VALUE + (0.2 - (0.2 * tex2D( FogOfWarSampler, i.vTexCoord0.xy ).g));
     result = ( result * FOW_GRAY_FACTOR	 * fDarknessValue ) + ( result * FOW_COLOR_FACTOR * fDarknessValue );
 
     return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
 #else
-	return float4(0.0, 0.0, 0.0, 0.0);
+    result = float4(0.15, 0.15, 0.15, fowvalue);
+    float fDarknessValue = FOW_DARKNESS_VALUE + (0.2 - (0.2 * tex2D( FogOfWarSampler, i.vTexCoord0.xy ).g));
+    result = ( result * FOW_GRAY_FACTOR	 * fDarknessValue ) + ( result * FOW_COLOR_FACTOR * fDarknessValue );
+
+    float fExplored = tex2D( FogOfWarSampler, i.vTexCoord0.xy ).g;
+    result = (result * fExplored ) + ( float4(0,0,0, 1) * ( 1.0f - fExplored ) );
+    return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+#endif // EXPLORED_FULLDARK
+    
+#else
+    return float4(0.0, 0.0, 0.0, 0.0);
 #endif
 }
