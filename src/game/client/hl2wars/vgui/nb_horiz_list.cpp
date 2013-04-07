@@ -54,6 +54,10 @@ void CNB_Horiz_List::ApplySchemeSettings( vgui::IScheme *pScheme )
 	
 	LoadControlSettings( "resource/ui/nb_horiz_list.res" );
 
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkColor = pScheme->GetColor( "MainMenu.MainDarkColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkestColor = pScheme->GetColor( "MainMenu.MainDarkestColor", Color( 0, 0, 0, 225 ) );
+
 	color32 regular;
 	regular.r = 224;
 	regular.g = 224;

@@ -224,6 +224,10 @@ void CNB_Header_Footer::ApplySchemeSettings( vgui::IScheme *pScheme )
 	
 	LoadControlSettings( "resource/ui/nb_header_footer.res" );
 
+	m_MainMenuColor = pScheme->GetColor( "MainMenu.MainColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkColor = pScheme->GetColor( "MainMenu.MainDarkColor", Color( 0, 0, 0, 225 ) );
+	m_MainMenuDarkestColor = pScheme->GetColor( "MainMenu.MainDarkestColor", Color( 0, 0, 0, 225 ) );
+
 	// TODO: Different image in widescreen to avoid stretching
 	// this image is no longer used
 	//m_pBackgroundImage->SetImage( "lobby/swarm_background01" );

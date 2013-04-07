@@ -24,6 +24,8 @@ CNB_Select_Level_Panel::CNB_Select_Level_Panel( vgui::Panel *parent, const char 
 	m_pHeaderFooter->SetHeaderEnabled( false );
 
 	m_pMapListFile = pMapListFile;
+
+	SetScheme( vgui::scheme()->LoadSchemeFromFileEx( 0, "resource/basemodui_scheme.res", "BaseModUIScheme" ) );
 }
 
 CNB_Select_Level_Panel::~CNB_Select_Level_Panel()

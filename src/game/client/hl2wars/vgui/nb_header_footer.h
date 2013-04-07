@@ -104,6 +104,11 @@ public:
 
 	NB_Title_Style m_nTitleStyle;
 	NB_Background_Style m_nBackgroundStyle;
+
+private:
+	Color m_MainMenuColor;
+	Color m_MainMenuDarkColor;
+	Color m_MainMenuDarkestColor;
 };
 
 class CNB_Gradient_Bar : public vgui::EditablePanel

@@ -58,6 +58,11 @@ public:
 
 	float m_fScrollVelocity;
 	float m_fScrollChange;
+
+private:
+	Color m_MainMenuColor;
+	Color m_MainMenuDarkColor;
+	Color m_MainMenuDarkestColor;
 };
 
 #endif // _INCLUDED_NB_HORIZ_LIST_H
