@@ -1,6 +1,39 @@
 Python News
 +++++++++++
 
+What's New in Python 2.7.4?
+===========================
+
+*Release date: 2013-04-06*
+
+Build
+-----
+
+- Issue #17550: Fix the --enable-profiling configure switch.
+
+Core and Builtins
+-----------------
+
+- Issue #15801 (again): With string % formatting, relax the type check for a
+  mapping such that any type with a __getitem__ can be used on the right hand
+  side.
+
+Library
+-------
+
+- Issue #17625: In IDLE, close the replace dialog after it is used.
+
+- Issue #17531: Fix tests that thought group and user ids were always the int
+  type. Also, always allow -1 as a valid group and user id.
+
+- Issue #17533: Fix test_xpickle with older versions of Python 2.5.
+
+Documentation
+-------------
+
+- Issue 17538: Document XML vulnerabilties
+
+
 What's New in Python 2.7.4 release candidate 1
 ==============================================
 
