@@ -35,6 +35,8 @@ extern ConVar g_debug_cef;
 class CCefSystem : public CAutoGameSystemPerFrame
 {
 public:
+	CCefSystem();
+
 	virtual bool Init();
 	virtual void Shutdown();
 	virtual void Update( float frametime );
@@ -62,7 +64,11 @@ public:
 
 	CUtlVector< SrcCefBrowser * > &GetBrowsers();
 
+	bool IsRunning();
+
 private:
+	bool m_bIsRunning;
+
 	CefKeyEvent m_LastKeyUpEvent;
 	CefKeyEvent m_LastKeyDownEvent;
 	CefKeyEvent m_LastKeyCharEvent;
@@ -120,6 +126,14 @@ inline const CefKeyEvent &CCefSystem::GetLastKeyCharEvent()
 inline CUtlVector< SrcCefBrowser * > &CCefSystem::GetBrowsers()
 {
 	return m_CefBrowsers;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline bool CCefSystem::IsRunning()
+{
+	return m_bIsRunning;
 }
 
 CCefSystem &CEFSystem();

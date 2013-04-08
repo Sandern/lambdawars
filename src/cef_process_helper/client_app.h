@@ -20,6 +20,9 @@ public:
 		return this;
 	}
 
+	// CefApp
+	virtual void OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line );
+
 	// Messages from/to main process
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 										CefProcessId source_process,

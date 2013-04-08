@@ -123,6 +123,14 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 }
 
 //-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line )
+{
+	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void ClientApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser)

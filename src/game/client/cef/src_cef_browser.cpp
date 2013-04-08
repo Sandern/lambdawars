@@ -298,7 +298,7 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), 
-	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false)
+	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL)
 {
 	m_Name = name ? name : "";
 
@@ -307,6 +307,12 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 
 	// Initialize browser
 	CEFSystem().AddBrowser( this );
+
+	if( !CEFSystem().IsRunning() )
+	{
+		Warning("CEFSystem not running, not creating browser\n");
+		return;
+	}
 
 	m_URL = pURL ? pURL : "";
 	m_CefClientHandler = new CefClientHandler( this );

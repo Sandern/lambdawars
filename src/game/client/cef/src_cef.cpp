@@ -80,6 +80,8 @@ private:
 	// CefApp methods.
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() { return this; }
 
+	virtual void OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line );
+
 private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
 
@@ -103,10 +105,33 @@ void ClientApp::OnContextInitialized()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line )
+{
+	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
+	DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+CCefSystem::CCefSystem() : m_bIsRunning(false)
+{
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: SrcCEF system
 //-----------------------------------------------------------------------------
 bool CCefSystem::Init() 
 {
+	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablecef") == 0;
+	if( !bEnabled )
+	{
+		Warning("CCefSystem: Not initializing, disabled in command line\n");
+		return true;
+	}
+
 	DevMsg("Initializing CEF\n");
 
 	// Get path to subprocess browser
@@ -128,12 +153,15 @@ bool CCefSystem::Init()
 	settings.single_process = false;
 	settings.multi_threaded_message_loop = false;
 	settings.log_severity = LOGSEVERITY_ERROR_REPORT;
+	settings.command_line_args_disabled = true;
 	//settings.pack_loading_disabled = true;
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
 	// Initialize CEF.
 	CefInitialize( main_args, settings, g_pClientApp.get() );
+
+	m_bIsRunning = true;
 
 	return true; 
 }
