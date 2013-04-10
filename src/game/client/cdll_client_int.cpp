@@ -1234,15 +1234,6 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	if( !g_pMaterialSystemHardwareConfig )
 		return false;
 
-	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
-	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
-	if( nMaxDXLevel <= 92 )
-	{
-		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported max dx level: %d (cur setting: %d).", 
-				nMaxDXLevel, nDXLevel);
-		return false;
-	}
-
 	// Hook up the gaussian random number generator
 	s_GaussianRandomStream.AttachToStream( random );
 
@@ -1828,8 +1819,11 @@ void ConfigureCurrentSystemLevel()
 	char szModName[32] = "swarm";
 #elif defined ( HL2_EPISODIC )
 	char szModName[32] = "ep2";
-#elif defined ( SDK_CLIENT_DLL ) || defined( HL2WARS_DLL )
-	char szModName[32] = "swarm";//"sdk"; // TODO, FIXME. Need other ekv files?
+#elif defined( HL2WARS_DLL )
+	char szModName[32] = "wars";
+#elif defined ( SDK_CLIENT_DLL )
+	// See https://developer.valvesoftware.com/wiki/Encrypted_Key_Values
+	char szModName[32] = "swarm";
 #endif
 
 	UpdateSystemLevel( nCPULevel, nGPULevel, nMemLevel, nGPUMemLevel, VGui_IsSplitScreen(), szModName );
@@ -1837,6 +1831,16 @@ void ConfigureCurrentSystemLevel()
 	if ( engine )
 	{
 		engine->ConfigureSystemLevel( nCPULevel, nGPULevel );
+	}
+
+	// Check if the user supports at least pixel shader 2.0b
+	ConVarRef mat_dxlevel("mat_dxlevel");
+	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
+	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
+	if( nDXLevel < 92 )
+	{
+		Error( "Your graphics card does not seem to support shader model 2.0b or higher. Reported dx level: %d (max setting: %d).", 
+				nDXLevel, nMaxDXLevel );
 	}
 
 	C_BaseEntity::UpdateVisibilityAllEntities();
