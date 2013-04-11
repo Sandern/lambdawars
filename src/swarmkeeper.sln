@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost_python", "boost\libs\python\build\VisualStudio\boost_python.vcxproj", "{4086CE3F-2EFA-4029-8F04-D20576718A12}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaderlib", "materialsystem\shaderlib\shaderlib_sdk.vcxproj", "{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stdshader_dx9", "materialsystem\stdshaders\stdshader_dx9_sdk.vcxproj", "{C8D2DC83-E117-7576-7B43-10C844264C51}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "game\client\swarmkeeper_client.vcxproj", "{A5D13CC4-3030-475A-9849-6B635E688FDD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "game\server\swarmkeeper_server.vcxproj", "{A26C0361-6B09-9E3D-5194-C9CB89243710}"
@@ -21,14 +17,6 @@ Global
 		{4086CE3F-2EFA-4029-8F04-D20576718A12}.Debug|Win32.Build.0 = Debug|Win32
 		{4086CE3F-2EFA-4029-8F04-D20576718A12}.Release|Win32.ActiveCfg = Release|Win32
 		{4086CE3F-2EFA-4029-8F04-D20576718A12}.Release|Win32.Build.0 = Release|Win32
-		{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}.Debug|Win32.Build.0 = Debug|Win32
-		{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}.Release|Win32.ActiveCfg = Release|Win32
-		{1A1149D9-CB1B-BF85-19CA-C9C2996BFDE8}.Release|Win32.Build.0 = Release|Win32
-		{C8D2DC83-E117-7576-7B43-10C844264C51}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C8D2DC83-E117-7576-7B43-10C844264C51}.Debug|Win32.Build.0 = Debug|Win32
-		{C8D2DC83-E117-7576-7B43-10C844264C51}.Release|Win32.ActiveCfg = Release|Win32
-		{C8D2DC83-E117-7576-7B43-10C844264C51}.Release|Win32.Build.0 = Release|Win32
 		{A5D13CC4-3030-475A-9849-6B635E688FDD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A5D13CC4-3030-475A-9849-6B635E688FDD}.Debug|Win32.Build.0 = Debug|Win32
 		{A5D13CC4-3030-475A-9849-6B635E688FDD}.Release|Win32.ActiveCfg = Release|Win32
