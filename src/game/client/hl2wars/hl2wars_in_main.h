@@ -105,14 +105,6 @@ private:
 	Vector				m_vecCameraVelocity;
 	float				m_fLastOriginZ;
 
-	// Times (for game instructor)
-	float				m_fLastRotateTime;
-	float				m_fLastZoomTime;
-	float				m_fLastMoveTime;
-	bool				m_bRotateHintActive;
-	bool				m_bZoomHintActive;
-	bool				m_bMoveHintActive;
-
 	// What is the current camera offset from the view origin?
 	//Vector		m_vecCameraOffset;
 

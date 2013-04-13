@@ -108,9 +108,6 @@ void CHL2WarsInput::Init_All( void )
 {
 	CInput::Init_All();
 
-	m_bZoomHintActive = m_bZoomHintActive = m_bRotateHintActive = false;
-	m_fLastRotateTime = m_fLastZoomTime = m_fLastMoveTime = 0;
-
 	BuildWindowList();
 }
 
@@ -418,78 +415,8 @@ void CHL2WarsInput::ExtraMouseSample( float frametime, bool active )
 	// Use baseclass for none rts mode.
 	if( !pPlayer->IsStrategicModeOn() )
 	{
-		m_fLastRotateTime = m_fLastZoomTime = m_fLastMoveTime = gpGlobals->curtime;
-
 		CInput::ExtraMouseSample( frametime, active );
 		return;
-	}
-
-	// Drop hints if we didn't use the controls
-	// TODO: Could make this map specific, so we don't need the code here.
-	if( m_bRotateHintActive )
-	{
-		if( gpGlobals->curtime - m_fLastRotateTime < 45.0f )
-		{
-			if( cl_debug_movement_hint.GetBool() )
-				DevMsg("End rotate hint\n");
-			IGameEvent * event = gameeventmanager->CreateEvent( "controls_rotate_inactive_succ" );
-			if ( event ) gameeventmanager->FireEvent( event );
-			m_bRotateHintActive = false;
-		}
-	}
-	else if( m_fLastRotateTime == 0 && gpGlobals->curtime - m_fLastRotateTime > 45.0f )
-	{
-		if( cl_debug_movement_hint.GetBool() )
-			DevMsg("Start rotate hint\n");
-		IGameEvent * event = gameeventmanager->CreateEvent( "controls_rotate_inactive" );
-		if ( event ) gameeventmanager->FireEvent( event );
-		m_bRotateHintActive = true;
-	}
-
-	if( m_bZoomHintActive )
-	{
-		if( gpGlobals->curtime - m_fLastZoomTime < 60.0f )
-		{
-			if( cl_debug_movement_hint.GetBool() )
-				DevMsg("End zoom hint\n");
-			IGameEvent * event = gameeventmanager->CreateEvent( "controls_zoom_inactive_success" );
-			if ( event ) gameeventmanager->FireEvent( event );
-			m_bZoomHintActive = false;
-		}
-	}
-	else if( m_fLastZoomTime == 0 && gpGlobals->curtime - m_fLastZoomTime > 60.0f )
-	{
-		if( cl_debug_movement_hint.GetBool() )
-			DevMsg("Start zoom hint\n");
-		IGameEvent * event = gameeventmanager->CreateEvent( "controls_zoom_inactive" );
-		if ( event )
-		{
-			gameeventmanager->FireEvent( event );
-		}
-		m_bZoomHintActive = true;
-	}
-
-	if( m_bMoveHintActive )
-	{
-		if( gpGlobals->curtime - m_fLastMoveTime < 15.0f )
-		{
-			if( cl_debug_movement_hint.GetBool() )
-				DevMsg("End move hint\n");
-			IGameEvent * event = gameeventmanager->CreateEvent( "controls_move_inactive_success" );
-			if ( event ) gameeventmanager->FireEvent( event );
-			m_bMoveHintActive = false;
-		}
-	}
-	else if( m_fLastMoveTime == 0 && gpGlobals->curtime - m_fLastMoveTime > 15.0f )
-	{
-		IGameEvent * event = gameeventmanager->CreateEvent( "controls_move_inactive" );
-		if ( event )
-		{
-			if( cl_debug_movement_hint.GetBool() )
-				DevMsg("Start move hint\n");
-			gameeventmanager->FireEvent( event );
-		}
-		m_bMoveHintActive = true;
 	}
 
 	ASSERT_LOCAL_PLAYER_RESOLVABLE();
@@ -545,8 +472,6 @@ void CHL2WarsInput::ExtraMouseSample( float frametime, bool active )
 //-----------------------------------------------------------------------------
 void CHL2WarsInput::SetScrollTimeOut(bool forward)
 {
-	m_fLastZoomTime = gpGlobals->curtime;
-
 	if( forward )
 		m_flDesiredCameraDist += cl_strategic_cam_scrolldelta.GetFloat();
 	else
@@ -595,16 +520,8 @@ void CHL2WarsInput::CapAndSetSpeed( CUserCmd *cmd )
 
 	float fRotSpeed = (-100 * (in_lookspin.GetPerUser().state & 1)) + (100 * (in_zoom.GetPerUser().state & 1));
 
-	if( abs(fRotSpeed) > 0 )
-		m_fLastRotateTime = gpGlobals->curtime;
-
 	viewangles[YAW] = anglemod(viewangles[YAW] + (fRotSpeed * m_fCurrentSampleTime));
 	engine->SetViewAngles( viewangles );
-
-	if( abs(cmd->forwardmove) > 0 || abs(cmd->sidemove) > 0 )
-	{
-		m_fLastMoveTime = gpGlobals->curtime;
-	}
 
 	if( !GetMapBoundaryList() )
 	{
@@ -907,8 +824,6 @@ void CHL2WarsInput::UpdateMouseRotation()
 	viewangles[PITCH] = anglemod(fNewPitch);
 	viewangles[YAW] = anglemod(viewangles[YAW] - (cl_strategic_cam_rot_speed.GetFloat() * rotation_direction * m_fCurrentSampleTime));
 	engine->SetViewAngles( viewangles );
-
-	m_fLastRotateTime = gpGlobals->curtime;
 }
 
 /*
