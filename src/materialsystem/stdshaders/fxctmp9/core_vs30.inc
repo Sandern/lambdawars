@@ -1,50 +1,28 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// ( $MORPHING || $SKINNING || $COMPRESSED_VERTS ) && $TESSELLATION
-// ( $DOWATERFOG == 0 ) && ( $DOPIXELFOG && $HARDWAREFOGBLEND )
 // defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ( $DOWATERFOG == 0 ) && ( $DOPIXELFOG && $HARDWAREFOGBLEND )
 #include "shaderlib/cshader.h"
-class phong_vs20_Static_Index
+class core_vs30_Static_Index
 {
 private:
-	int m_nWORLD_NORMAL;
+	int m_nMODEL;
 #ifdef _DEBUG
-	bool m_bWORLD_NORMAL;
+	bool m_bMODEL;
 #endif
 public:
-	void SetWORLD_NORMAL( int i )
-	{
-		Assert( i >= 0 && i <= 0 );
-		m_nWORLD_NORMAL = i;
-#ifdef _DEBUG
-		m_bWORLD_NORMAL = true;
-#endif
-	}
-	void SetWORLD_NORMAL( bool i )
-	{
-		m_nWORLD_NORMAL = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bWORLD_NORMAL = true;
-#endif
-	}
-private:
-	int m_nFOW;
-#ifdef _DEBUG
-	bool m_bFOW;
-#endif
-public:
-	void SetFOW( int i )
+	void SetMODEL( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
-		m_nFOW = i;
+		m_nMODEL = i;
 #ifdef _DEBUG
-		m_bFOW = true;
+		m_bMODEL = true;
 #endif
 	}
-	void SetFOW( bool i )
+	void SetMODEL( bool i )
 	{
-		m_nFOW = i ? 1 : 0;
+		m_nMODEL = i ? 1 : 0;
 #ifdef _DEBUG
-		m_bFOW = true;
+		m_bMODEL = true;
 #endif
 	}
 private:
@@ -76,7 +54,7 @@ private:
 public:
 	void SetHARDWAREFOGBLEND( int i )
 	{
-		Assert( i >= 0 && i <= 1 );
+		Assert( i >= 0 && i <= 0 );
 		m_nHARDWAREFOGBLEND = i;
 #ifdef _DEBUG
 		m_bHARDWAREFOGBLEND = true;
@@ -91,16 +69,12 @@ public:
 	}
 public:
 	// CONSTRUCTOR
-	phong_vs20_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
+	core_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
-		m_bWORLD_NORMAL = false;
+		m_bMODEL = false;
 #endif // _DEBUG
-		m_nWORLD_NORMAL = 0;
-#ifdef _DEBUG
-		m_bFOW = false;
-#endif // _DEBUG
-		m_nFOW = 0;
+		m_nMODEL = 0;
 #ifdef _DEBUG
 		m_bDOPIXELFOG = true;
 #endif // _DEBUG
@@ -108,21 +82,21 @@ public:
 #ifdef _DEBUG
 		m_bHARDWAREFOGBLEND = true;
 #endif // _DEBUG
-		m_nHARDWAREFOGBLEND = !g_pHardwareConfig->SupportsPixelShaders_2_b() ;
+		m_nHARDWAREFOGBLEND = 0 ;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bWORLD_NORMAL && m_bFOW && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
+		bool bAllStaticVarsDefined = m_bMODEL && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 8 * m_nWORLD_NORMAL ) + ( 8 * m_nFOW ) + ( 16 * m_nDOPIXELFOG ) + ( 32 * m_nHARDWAREFOGBLEND ) + 0;
+		return ( 8 * m_nMODEL ) + ( 16 * m_nDOPIXELFOG ) + ( 32 * m_nHARDWAREFOGBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_phong_vs20 vsh_forgot_to_set_static_WORLD_NORMAL + vsh_forgot_to_set_static_FOW + 0
-class phong_vs20_Dynamic_Index
+#define shaderStaticTest_core_vs30 vsh_forgot_to_set_static_MODEL + 0
+class core_vs30_Dynamic_Index
 {
 private:
 	int m_nCOMPRESSED_VERTS;
@@ -167,27 +141,6 @@ public:
 #endif
 	}
 private:
-	int m_nTESSELLATION;
-#ifdef _DEBUG
-	bool m_bTESSELLATION;
-#endif
-public:
-	void SetTESSELLATION( int i )
-	{
-		Assert( i >= 0 && i <= 0 );
-		m_nTESSELLATION = i;
-#ifdef _DEBUG
-		m_bTESSELLATION = true;
-#endif
-	}
-	void SetTESSELLATION( bool i )
-	{
-		m_nTESSELLATION = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bTESSELLATION = true;
-#endif
-	}
-private:
 	int m_nDOWATERFOG;
 #ifdef _DEBUG
 	bool m_bDOWATERFOG;
@@ -210,7 +163,7 @@ public:
 	}
 public:
 	// CONSTRUCTOR
-	phong_vs20_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
+	core_vs30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 #ifdef _DEBUG
 		m_bCOMPRESSED_VERTS = false;
@@ -221,10 +174,6 @@ public:
 #endif // _DEBUG
 		m_nSKINNING = 0;
 #ifdef _DEBUG
-		m_bTESSELLATION = false;
-#endif // _DEBUG
-		m_nTESSELLATION = 0;
-#ifdef _DEBUG
 		m_bDOWATERFOG = true;
 #endif // _DEBUG
 		m_nDOWATERFOG = ( pShaderAPI->GetSceneFogMode() == MATERIAL_FOG_LINEAR_BELOW_FOG_Z ) ;
@@ -234,10 +183,10 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bTESSELLATION && m_bDOWATERFOG;
+		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nTESSELLATION ) + ( 4 * m_nDOWATERFOG ) + 0;
+		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nDOWATERFOG ) + 0;
 	}
 };
-#define shaderDynamicTest_phong_vs20 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_TESSELLATION + 0
+#define shaderDynamicTest_core_vs30 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + 0

@@ -1,11 +1,11 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
 // defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 #include "shaderlib/cshader.h"
-class fogofwar_vs20_Static_Index
+class fogofwar_cpe_vs30_Static_Index
 {
 public:
 	// CONSTRUCTOR
-	fogofwar_vs20_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
+	fogofwar_cpe_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 	}
 	int GetIndex()
@@ -17,12 +17,12 @@ public:
 		return 0;
 	}
 };
-#define shaderStaticTest_fogofwar_vs20 0
-class fogofwar_vs20_Dynamic_Index
+#define shaderStaticTest_fogofwar_cpe_vs30 0
+class fogofwar_cpe_vs30_Dynamic_Index
 {
 public:
 	// CONSTRUCTOR
-	fogofwar_vs20_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
+	fogofwar_cpe_vs30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 	}
 	int GetIndex()
@@ -34,4 +34,4 @@ public:
 		return 0;
 	}
 };
-#define shaderDynamicTest_fogofwar_vs20 0
+#define shaderDynamicTest_fogofwar_cpe_vs30 0

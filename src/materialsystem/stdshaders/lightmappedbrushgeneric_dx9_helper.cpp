@@ -11,9 +11,8 @@
 #include "..\shaderapidx9\locald3dtypes.h"												   
 #include "convar.h"
 #include "cpp_shader_constant_register_map.h"
-#include "lightmappedbrushgeneric_vs20.inc"
+
 #include "lightmappedbrushgeneric_vs30.inc"
-#include "lightmappedbrushgeneric_ps20b.inc"
 #include "lightmappedbrushgeneric_ps30.inc"
 
 // NOTE: This has to be the last file included!
@@ -82,8 +81,6 @@ void DrawLightmappedBrushGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** par
 				    IShaderShadow* pShaderShadow, LightmappedBrushGeneric_DX9_Vars_t &info, VertexCompressionType_t vertexCompression,
 					CBasePerMaterialContextData **pContextDataPtr )
 {
-	bool bDraw = true;
-
 	bool bHasFoW = ( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
 	if ( bHasFoW == true )
 	{
@@ -152,46 +149,21 @@ void DrawLightmappedBrushGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** par
 
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, 0, 0 );
 
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-		{
-			DECLARE_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs20 );
-			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs20 );
+		// The vertex shader uses the vertex id stream
+		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
 
-			// Bind ps_2_b shader so we can get Phong terms
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP, bHasBump );
-				SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
-				SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
-				SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE, bHasTeamColorTexture );
-				SET_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps20b );
-			}
-			else
-			{
-				bDraw = false;
-			}
-		}
-		else
-		{
-			// The vertex shader uses the vertex id stream
-			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		DECLARE_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
+		SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
+		SET_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
 
-			DECLARE_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
-			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
-
-			// Bind ps_2_b shader so we can get Phong terms
-			DECLARE_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
-			SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP, bHasBump );
-			SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
-			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
-			SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE, bHasTeamColorTexture );
-			SET_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
-		}
+		// Bind ps_2_b shader so we can get Phong terms
+		DECLARE_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
+		SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP, bHasBump );
+		SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
+		SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
+		SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
+		SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE, bHasTeamColorTexture );
+		SET_STATIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
 
 		pShader->DefaultFog();
 
@@ -246,33 +218,13 @@ void DrawLightmappedBrushGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** par
 		LightState_t lightState;
 		pShaderAPI->GetDX9LightState( &lightState );
 
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-		{
-			DECLARE_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs20 );
-			//SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs20 );
+		DECLARE_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
+		//SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
+		SET_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
 
-			// Bind ps_2_b shader so we can get Phong, rim and a cloudier refraction
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps20b );
-			}
-			else
-			{
-				bDraw = false;
-			}
-		}
-		else
-		{
-			DECLARE_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
-			//SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
+		DECLARE_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
+		SET_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
 
-			DECLARE_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER( lightmappedbrushgeneric_ps30 );
-		}
-		
 		pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
 
 		// Pack phong exponent in with the eye position
@@ -316,5 +268,5 @@ void DrawLightmappedBrushGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** par
 		params[info.m_nEnvmapTint]->GetVecValue( envmapTintVal, 3 );
 		pShaderAPI->SetPixelShaderConstant( PSREG_CONSTANT_18, envmapTintVal );
 	}
-	pShader->Draw( bDraw );
+	pShader->Draw();
 }

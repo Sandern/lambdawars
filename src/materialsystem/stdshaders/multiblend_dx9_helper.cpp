@@ -11,10 +11,7 @@
 #include "..\shaderapidx9\locald3dtypes.h"												   
 #include "convar.h"
 #include "cpp_shader_constant_register_map.h"
-#include "multiblend_vs20.inc"
 #include "multiblend_vs30.inc"
-#include "multiblend_ps20.inc"
-#include "multiblend_ps20b.inc"
 #include "multiblend_ps30.inc"
 
 // NOTE: This has to be the last file included!
@@ -206,54 +203,23 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, s_TexCoordSize, 0 );
 		int nShadowFilterMode = g_pHardwareConfig->GetShadowFilterMode();
 
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-		{
-			DECLARE_STATIC_VERTEX_SHADER( multiblend_vs20 );
-			SET_STATIC_VERTEX_SHADER_COMBO( SPECULAR, !bUsingEditor );
-			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
-			SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-			SET_STATIC_VERTEX_SHADER( multiblend_vs20 );
+		// The vertex shader uses the vertex id stream
+		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
 
-			// Bind ps_2_b shader so we can get Phong terms
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( multiblend_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
-				SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-				SET_STATIC_PIXEL_SHADER( multiblend_ps20b );
-			}
-			else
-			{
-				DECLARE_STATIC_PIXEL_SHADER( multiblend_ps20 );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
-				SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
-//				SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-				SET_STATIC_PIXEL_SHADER( multiblend_ps20 );
-			}
-		}
-		else
-		{
-			// The vertex shader uses the vertex id stream
-			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		DECLARE_STATIC_VERTEX_SHADER( multiblend_vs30 );
+		SET_STATIC_VERTEX_SHADER_COMBO( SPECULAR, !bUsingEditor );
+		SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
+		SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
+		SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
+		SET_STATIC_VERTEX_SHADER( multiblend_vs30 );
 
-			DECLARE_STATIC_VERTEX_SHADER( multiblend_vs30 );
-			SET_STATIC_VERTEX_SHADER_COMBO( SPECULAR, !bUsingEditor );
-			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
-			SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-			SET_STATIC_VERTEX_SHADER( multiblend_vs30 );
-
-			// Bind ps_2_b shader so we can get Phong terms
-			DECLARE_STATIC_PIXEL_SHADER( multiblend_ps30 );
-			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
-			SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
-			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
-			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-			SET_STATIC_PIXEL_SHADER( multiblend_ps30 );
-		}
+		// Bind ps_2_b shader so we can get Phong terms
+		DECLARE_STATIC_PIXEL_SHADER( multiblend_ps30 );
+		SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
+		SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
+		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
+		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+		SET_STATIC_PIXEL_SHADER( multiblend_ps30 );
 
 		pShader->DefaultFog();
 
@@ -416,37 +382,12 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		LightState_t lightState;
 		pShaderAPI->GetDX9LightState( &lightState );
 
-		bool bFlashlightShadows = false;
+		DECLARE_DYNAMIC_VERTEX_SHADER( multiblend_vs30 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
+		SET_DYNAMIC_VERTEX_SHADER( multiblend_vs30 );
 
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-		{
-			DECLARE_DYNAMIC_VERTEX_SHADER( multiblend_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER( multiblend_vs20 );
-
-			// Bind ps_2_b shader so we can get Phong, rim and a cloudier refraction
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( multiblend_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER( multiblend_ps20b );
-			}
-			else
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( multiblend_ps20 );
-//				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER( multiblend_ps20 );
-			}
-		}
-		else
-		{
-			DECLARE_DYNAMIC_VERTEX_SHADER( multiblend_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER( multiblend_vs30 );
-
-			DECLARE_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
-		}
+		DECLARE_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
+		SET_DYNAMIC_PIXEL_SHADER( multiblend_ps30 );
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, info.m_nBaseTextureTransform );
 

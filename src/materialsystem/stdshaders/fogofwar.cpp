@@ -9,10 +9,6 @@
 #include "BaseVSShader.h"
 
 // Auto generated inc files
-#include "fogofwar_vs20.inc"
-#include "fogofwar_ps20.inc"
-#include "fogofwar_ps20b.inc"
-
 #include "fogofwar_vs30.inc"
 #include "fogofwar_ps30.inc"
 
@@ -47,37 +43,14 @@ BEGIN_VS_SHADER( FogOfWar, "Help for FogOfWar" )
 			int userDataSize = 0;
 			pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, NULL, userDataSize );
 
-			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-			{
-				// Vertex Shader
-				DECLARE_STATIC_VERTEX_SHADER( fogofwar_vs20 );
-				SET_STATIC_VERTEX_SHADER( fogofwar_vs20 );
+			// Vertex Shader
+			DECLARE_STATIC_VERTEX_SHADER( fogofwar_vs30 );
+			SET_STATIC_VERTEX_SHADER( fogofwar_vs30 );
 
-				// Pixel Shader
-				if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-				{
-					DECLARE_STATIC_PIXEL_SHADER( fogofwar_ps20b );
-					SET_STATIC_PIXEL_SHADER_COMBO( FOW, true );
-					SET_STATIC_PIXEL_SHADER( fogofwar_ps20b );
-				}
-				else
-				{
-					DECLARE_STATIC_PIXEL_SHADER( fogofwar_ps20 );
-					SET_STATIC_PIXEL_SHADER_COMBO( FOW, true );
-					SET_STATIC_PIXEL_SHADER( fogofwar_ps20 );
-				}
-			}
-			else
-			{
-				// Vertex Shader
-				DECLARE_STATIC_VERTEX_SHADER( fogofwar_vs30 );
-				SET_STATIC_VERTEX_SHADER( fogofwar_vs30 );
-
-				// Pixel Shader
-				DECLARE_STATIC_PIXEL_SHADER( fogofwar_ps30 );
-				SET_STATIC_PIXEL_SHADER_COMBO( FOW, true );
-				SET_STATIC_PIXEL_SHADER( fogofwar_ps30 );
-			}
+			// Pixel Shader
+			DECLARE_STATIC_PIXEL_SHADER( fogofwar_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( FOW, true );
+			SET_STATIC_PIXEL_SHADER( fogofwar_ps30 );
 
 			// Textures
 			pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
@@ -101,34 +74,13 @@ BEGIN_VS_SHADER( FogOfWar, "Help for FogOfWar" )
 			// Reset render state
 			pShaderAPI->SetDefaultState();
 
-			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-			{
-				// Set Vertex Shader Combos
-				DECLARE_DYNAMIC_VERTEX_SHADER( fogofwar_vs20 );
-				SET_DYNAMIC_VERTEX_SHADER( fogofwar_vs20 );
+			// Set Vertex Shader Combos
+			DECLARE_DYNAMIC_VERTEX_SHADER( fogofwar_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( fogofwar_vs30 );
 
-				// Set Pixel Shader Combos
-				if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-				{
-					DECLARE_DYNAMIC_PIXEL_SHADER( fogofwar_ps20b );
-					SET_DYNAMIC_PIXEL_SHADER( fogofwar_ps20b );
-				}
-				else
-				{
-					DECLARE_DYNAMIC_PIXEL_SHADER( fogofwar_ps20 );
-					SET_DYNAMIC_PIXEL_SHADER( fogofwar_ps20 );
-				}
-			}
-			else
-			{
-				// Set Vertex Shader Combos
-				DECLARE_DYNAMIC_VERTEX_SHADER( fogofwar_vs30 );
-				SET_DYNAMIC_VERTEX_SHADER( fogofwar_vs30 );
-
-				// Set Pixel Shader Combos
-				DECLARE_DYNAMIC_PIXEL_SHADER( fogofwar_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER( fogofwar_ps30 );
-			}
+			// Set Pixel Shader Combos
+			DECLARE_DYNAMIC_PIXEL_SHADER( fogofwar_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER( fogofwar_ps30 );
 
 			// Bind textures
 			BindTexture( SHADER_SAMPLER0, BASETEXTURE );
