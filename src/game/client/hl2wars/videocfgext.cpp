@@ -72,8 +72,11 @@ CON_COMMAND( force_dxlevel_92, "" )
 
 CON_COMMAND( debug_print_dxlevel, "" )
 {
-	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
-	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
+	ConVarRef mat_dxlevel("mat_dxlevel");
 
-	Msg( "nDXLevel: %d, nMaxDXLevel: %d\n", nDXLevel, nMaxDXLevel );
+	Msg( "nDXLevel: %d, nMaxDXLevel: %d, mat_dxlevel: %d, hdr type: %d\n", 
+		g_pMaterialSystemHardwareConfig->GetDXSupportLevel(), 
+		g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel(), 
+		mat_dxlevel.GetInt(),
+		g_pMaterialSystemHardwareConfig->GetHDRType() );
 }

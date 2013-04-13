@@ -1839,9 +1839,9 @@ void ConfigureCurrentSystemLevel()
 	ConVarRef mat_dxlevel("mat_dxlevel");
 	int nDXLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
 	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
-	if( nDXLevel < 92 )
+	if( nDXLevel < 95 )
 	{
-		Error( "Your graphics card does not seem to support shader model 2.0b or higher. Reported dx level: %d (max setting: %d).", 
+		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported dx level: %d (max setting: %d).", 
 				nDXLevel, nMaxDXLevel );
 	}
 

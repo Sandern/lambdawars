@@ -429,12 +429,3 @@ void ClientModeSDK::OnColorCorrectionWeightsReset( void )
 		m_pCurrentColorCorrection = pNewColorCorrection;
 	}
 }
-
-/*
-CON_COMMAND(wars_test, "")
-{
-	Msg("HDR type: %d\n",  g_pMaterialSystemHardwareConfig->GetHDRType());
-	Msg("Supports hdr type float: %d\n", materials->SupportsHDRMode( HDR_TYPE_FLOAT ));
-	Msg("DX support level: %d\n", g_pMaterialSystemHardwareConfig->GetDXSupportLevel());
-}
-*/
