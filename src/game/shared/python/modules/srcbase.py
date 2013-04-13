@@ -35,10 +35,12 @@ class SrcBase(GenerateModulePureShared):
         mb.free_function('RegisterTickMethod').include()
         mb.free_function('UnregisterTickMethod').include()
         mb.free_function('GetRegisteredTickMethods').include()
+        mb.free_function('IsTickMethodRegistered').include()
         
         mb.free_function('RegisterPerFrameMethod').include()
         mb.free_function('UnregisterPerFrameMethod').include()
         mb.free_function('GetRegisteredPerFrameMethods').include()
+        mb.free_function('IsPerFrameMethodRegistered').include()
         
         # Linux model_t fix ( correct? )
         mb.add_declaration_code( '#ifdef _LINUX\r\n' + \

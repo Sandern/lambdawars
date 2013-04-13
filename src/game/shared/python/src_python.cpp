@@ -931,8 +931,7 @@ void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool l
 //-----------------------------------------------------------------------------
 void CSrcPython::UnregisterTickMethod( bp::object method )
 {
-	int i;
-	for(i=0; i<m_methodTickList.Count(); i++)
+	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
 		if( m_methodTickList[i].method == method )
 		{
@@ -950,12 +949,22 @@ void CSrcPython::UnregisterTickMethod( bp::object method )
 boost::python::list CSrcPython::GetRegisteredTickMethods()
 {
 	boost::python::list methodlist;
-	int i;
-	for(i=0; i<m_methodTickList.Count(); i++)
-	{
+	for( int i = 0; i < m_methodTickList.Count(); i++ )
 		methodlist.append(m_methodTickList[i].method);
-	}
 	return methodlist;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
+{
+	for( int i = 0; i < m_methodTickList.Count(); i++ )
+	{
+		if( m_methodTickList[i].method == method )
+			return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -963,8 +972,7 @@ boost::python::list CSrcPython::GetRegisteredTickMethods()
 //-----------------------------------------------------------------------------
 void CSrcPython::RegisterPerFrameMethod( bp::object method )
 {
-	int i;
-	for(i=0; i<m_methodPerFrameList.Count(); i++)
+	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )
 		{
@@ -980,8 +988,7 @@ void CSrcPython::RegisterPerFrameMethod( bp::object method )
 //-----------------------------------------------------------------------------
 void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 {
-	int i;
-	for(i=0; i<m_methodPerFrameList.Count(); i++)
+	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )
 		{
@@ -999,12 +1006,22 @@ void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 {
 	boost::python::list methodlist;
-	int i;
-	for(i=0; i<m_methodPerFrameList.Count(); i++)
-	{
-		methodlist.append(m_methodPerFrameList[i]);
-	}
+	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
+		methodlist.append( m_methodPerFrameList[i] );
 	return methodlist;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
+{
+	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
+	{
+		if( m_methodPerFrameList[i] == method )
+			return true;
+	}
+	return false;
 }
 
 //-----------------------------------------------------------------------------

@@ -1185,6 +1185,17 @@ BOOST_PYTHON_MODULE(srcbase){
     
     }
 
+    { //::IsPerFrameMethodRegistered
+    
+        typedef bool ( *IsPerFrameMethodRegistered_function_type )( ::boost::python::object );
+        
+        bp::def( 
+            "IsPerFrameMethodRegistered"
+            , IsPerFrameMethodRegistered_function_type( &::IsPerFrameMethodRegistered )
+            , ( bp::arg("method") ) );
+    
+    }
+
     { //::IsSolid
     
         typedef bool ( *IsSolid_function_type )( ::SolidType_t,int );
@@ -1193,6 +1204,17 @@ BOOST_PYTHON_MODULE(srcbase){
             "IsSolid"
             , IsSolid_function_type( &::IsSolid )
             , ( bp::arg("solidType"), bp::arg("nSolidFlags") ) );
+    
+    }
+
+    { //::IsTickMethodRegistered
+    
+        typedef bool ( *IsTickMethodRegistered_function_type )( ::boost::python::object );
+        
+        bp::def( 
+            "IsTickMethodRegistered"
+            , IsTickMethodRegistered_function_type( &::IsTickMethodRegistered )
+            , ( bp::arg("method") ) );
     
     }
 

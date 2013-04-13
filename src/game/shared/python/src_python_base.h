@@ -223,10 +223,12 @@ boost::python::object RelToAbs( const char *path );
 void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped = true );
 void UnregisterTickMethod( boost::python::object method );
 boost::python::list GetRegisteredTickMethods();
+bool IsTickMethodRegistered( boost::python::object method );
 
 void RegisterPerFrameMethod( boost::python::object method );
 void UnregisterPerFrameMethod( boost::python::object method );
 boost::python::list GetRegisteredPerFrameMethods();
+bool IsPerFrameMethodRegistered( boost::python::object method );
 
 //-----------------------------------------------------------------------------
 // Purpose: PyUtlRBTree
