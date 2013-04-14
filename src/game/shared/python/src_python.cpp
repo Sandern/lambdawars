@@ -123,6 +123,7 @@ CSrcPython::CSrcPython()
 {
 	m_bPythonRunning = false;
 	m_bPythonIsFinalizing = false;
+	m_bPathProtected = true;
 
 	double fStartTime = Plat_FloatTime();
 	// Before the python interpreter is initialized, the modules must be appended
@@ -145,6 +146,11 @@ bool CSrcPython::Init( )
 {
 	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablepython") == 0;
 	//const bool bToolsMode = !CommandLine() || CommandLine()->FindParm("-tools") != 0;
+
+	/*const char *pGameDir = COM_GetModDirectory();
+	const char *pDevModDir = "hl2wars_asw_dev";
+	if( Q_strncmp( pGameDir, pDevModDir, Q_strlen( pDevModDir ) ) != 0 )*/
+	m_bPathProtected = CommandLine() ? CommandLine()->FindParm("-nopathprotection") == 0 : true;
 
 	if( !bEnabled )
 	{

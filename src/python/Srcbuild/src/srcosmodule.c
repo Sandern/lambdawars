@@ -1499,9 +1499,8 @@ srcos_do_stat(PyObject *self, PyObject *args,
 
 
 	if( SrcPyGetFullPathSilent(path, fullPath, _MAX_PATH) == 0 ) {
-		 // TODO: Security? But dont want to break os.stat.
-		//srcos_error_outsidemodfolder();
-		//return NULL;
+		srcos_error_outsidemodfolder();
+		return NULL;
 	}
 
 	Py_BEGIN_ALLOW_THREADS

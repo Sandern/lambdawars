@@ -234,9 +234,6 @@ KeyValues * PyKeyValues::FromString( char const *szName, char const *szStringVal
 
 #endif // 1
 
-#ifndef CLIENT_DLL
-	static ConVar py_disable_protect_path("py_disable_protect_path", "0", FCVAR_CHEAT);
-#endif // CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Almost the same as V_FixupPathName, but does not lowercase
 //			Linux/Python fileobject does not like that.
@@ -250,25 +247,14 @@ void SrcPyFixupPathName( char *pOut )
 
 bool IsPathProtected()
 {
-	const char *pGameDir = COM_GetModDirectory();
-	const char *pDevModDir = "hl2wars_asw_dev";
-	if( Q_strncmp( pGameDir, pDevModDir, Q_strlen( pDevModDir ) ) != 0 )
-		return true;
-
-#ifndef CLIENT_DLL
-	return !py_disable_protect_path.GetBool();
-#else
-	return true;
-#endif // CLIENT_DLL
+	return SrcPySystem()->IsPathProtected();
 }
 
 extern  "C" {
 
 int SrcPyPathIsInGameFolder( const char *pPath )
 {
-#ifndef CLIENT_DLL
 	if( IsPathProtected() )
-#endif // CLIENT_DLL
 	{
 		// Verify the file is in the gamefolder
 		char searchPaths[_MAX_PATH];
@@ -319,9 +305,7 @@ int SrcPyGetFullPathSilent( const char *pAssumedRelativePath, char *pFullPath, i
 		Q_RemoveDotSlashes( pFullPath );
 		V_StripTrailingSlash( searchPaths );
 
-#ifndef CLIENT_DLL
 		if( IsPathProtected() )
-#endif // CLIENT_DLL
 		{
 			if( Q_strnicmp(pFullPath, searchPaths, Q_strlen(searchPaths)) != 0 )
 			{
@@ -331,9 +315,7 @@ int SrcPyGetFullPathSilent( const char *pAssumedRelativePath, char *pFullPath, i
 	}
 	else
 	{
-#ifndef CLIENT_DLL
 		if( IsPathProtected() )
-#endif // CLIENT_DLL
 		{
 			// We know the path we want is relative, so just concate with searchPaths
 			char temp[_MAX_PATH];
@@ -348,12 +330,10 @@ int SrcPyGetFullPathSilent( const char *pAssumedRelativePath, char *pFullPath, i
 				return 0;
 			}
 		}
-#ifndef CLIENT_DLL
 		else
 		{
 			filesystem->RelativePathToFullPath(pAssumedRelativePath, "MOD", pFullPath, size);
 		}
-#endif // CLIENT_DLL
 	}
 	return 1;
 }
