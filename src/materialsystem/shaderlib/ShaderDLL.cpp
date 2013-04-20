@@ -16,6 +16,8 @@
 #include "mathlib/mathlib.h"
 #include "tier2/tier2.h"
 
+#include "materialsystem/imaterialsystem.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -112,6 +114,18 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 	{
 		ConnectTier1Libraries( &factory, 1 );
   		InitShaderLibCVars( factory );
+	}
+
+	// Hack for model viewer: force dx level 100
+	// Shouldn't matter for the game dll, because it will update the video level anyway (and we always use dxlevel 100)
+	if( g_pMaterialSystem )
+	{
+		MaterialSystem_Config_t config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+		if( config.dxSupportLevel < 100 )
+		{
+			config.dxSupportLevel = 100;
+			g_pMaterialSystem->OverrideConfig( config, true );
+		}
 	}
 
 	return ( g_pConfig != NULL ) && (g_pHardwareConfig != NULL) && ( g_pSLShaderSystem != NULL );
