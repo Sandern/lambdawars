@@ -22,6 +22,9 @@
 #include "c_hl2wars_player.h"
 #include "src_cef.h"
 
+#include "vgui/surface_passthru.h"
+#include <vgui_controls/Controls.h>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -40,7 +43,48 @@ IClientMode *GetClientMode()
 }
 
 // --------------------------------------------------------------------------------- //
-// CASWModeManager.
+// Mouse cursor overriding.
+// --------------------------------------------------------------------------------- //
+extern vgui::ISurface *g_pVGuiSurface;
+
+class SurfaceCursorOverride : public CSurfacePassThru
+{
+public:
+	SurfaceCursorOverride();
+
+	virtual void InitPassThru( ISurface *pSurfacePassThru );
+
+	void SetCursor(HCursor cursor);
+
+private:
+	vgui::HCursor m_hArrow;
+};
+
+SurfaceCursorOverride::SurfaceCursorOverride()
+{
+}
+
+void SurfaceCursorOverride::InitPassThru( ISurface *pSurfacePassThru )
+{
+	CSurfacePassThru::InitPassThru( pSurfacePassThru );
+
+	m_hArrow = vgui::surface()->CreateCursorFromFile( "resource/arrows/default_cursor.cur" );
+}
+
+void SurfaceCursorOverride::SetCursor(HCursor cursor)
+{
+	if( cursor == dc_arrow )
+	{
+		cursor = m_hArrow;
+	}
+
+	CSurfacePassThru::SetCursor( cursor );
+}
+
+static SurfaceCursorOverride s_SurfacePassThru;
+
+// --------------------------------------------------------------------------------- //
+// CSDKModeManager.
 // --------------------------------------------------------------------------------- //
 
 class CSDKModeManager : public IVModeManager
@@ -227,10 +271,17 @@ void ClientModeSDK::Init()
 {
 	BaseClass::Init();
 
+	// Overrides dc_arrow (and possible other cursors)
+	s_SurfacePassThru.InitPassThru( g_pVGuiSurface );
+	g_pVGuiSurface = &s_SurfacePassThru;
+
 	gameeventmanager->AddListener( this, "game_newmap", false );
 }
 void ClientModeSDK::Shutdown()
 {
+	// Clear cursor overrider
+	g_pVGuiSurface = s_SurfacePassThru.GetRealSurface();
+
 	if ( SDKBackgroundMovie() )
 	{
 		SDKBackgroundMovie()->ClearCurrentMovie();

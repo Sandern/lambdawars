@@ -45,6 +45,8 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 	return true;
 }
 
+//static HANDLE g_hArrow;
+
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -55,7 +57,10 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 	case WM_SYSKEYUP:
 	case WM_KEYUP:
 	case WM_CHAR:
+	{
 		CEFSystem().ProcessKeyInput( message, wParam, lParam );
+		break;
+	}
 	default:
 		break;
 	}
@@ -101,7 +106,6 @@ ClientApp::ClientApp()
 //-----------------------------------------------------------------------------
 void ClientApp::OnContextInitialized()
 {
-	//Msg("ClientApp::OnContextInitialized\n" );
 }
 
 //-----------------------------------------------------------------------------
@@ -118,6 +122,7 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 CCefSystem::CCefSystem() : m_bIsRunning(false)
 {
+
 }
 
 //-----------------------------------------------------------------------------
