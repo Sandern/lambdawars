@@ -3566,7 +3566,7 @@ int C_BaseAnimating::InternalDrawModel( int flags, const RenderableInstance_t &i
 				pInfo->pLightingOffset = &pInfo->lightingOffset;
 
 				// Turns the origin + angles into a matrix
-				AngleMatrix( pInfo->angles, m_vCustomLightingOffset, pInfo->lightingOffset );
+				AngleMatrix( vec3_angle, m_vCustomLightingOffset, pInfo->lightingOffset );
 			}
 		}
 

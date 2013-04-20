@@ -189,6 +189,7 @@ public:
 
 	bool					IsPythonRunning();
 	bool					IsPythonFinalizing(); // Special case
+	bool					IsPathProtected(); // For file writing
 
 #ifdef CLIENT_DLL
 	// Gets called each frame
@@ -346,6 +347,7 @@ private:
 private:
 	bool m_bPythonRunning;
 	bool m_bPythonIsFinalizing;
+	bool m_bPathProtected;
 
 	bool m_bActive;
 	string_t m_LevelName;
@@ -379,6 +381,11 @@ inline bool CSrcPython::IsPythonRunning( void )
 inline bool CSrcPython::IsPythonFinalizing()
 {
 	return m_bPythonIsFinalizing;
+}
+
+inline bool CSrcPython::IsPathProtected()
+{
+	return m_bPathProtected;
 }
 
 inline int CSrcPython::GetInt(const char *name, const char *module, int default_value, bool report_error )
