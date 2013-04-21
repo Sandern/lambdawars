@@ -438,7 +438,8 @@ def GetIncludePath(path):
     elif path.startswith('..\game\server\\'):
         return path.replace('..\game\server\\', '') 
     elif path.startswith('..\game\client\\'):
-        return path.replace('..\game\client\\', '') 
+        return path.replace('..\game\client\\', '')
+    return path
         
 def GetFilenames(rm, isclient=False):
     rm.isClient = isclient
@@ -468,10 +469,6 @@ def ParseModules():
     server_filenames = []
     shared_filenames = []
     
-    pydoc_client_modules = []
-    pydoc_server_modules = []
-    pydoc_shared_modules = []
-    
     RegisterModules()
     
     # Parse
@@ -485,19 +482,12 @@ def ParseModules():
         # Builde module list
         if rm.module_type == 'client':
             client_modules.append(rm.module_name)
-            pydoc_client_modules.append(rm.module_name)
             client_filenames.extend(GetFilenames(rm))
         elif rm.module_type == 'server':
             server_modules.append(rm.module_name)
-            pydoc_server_modules.append(rm.module_name)
             server_filenames.extend(GetFilenames(rm))
         else:
             shared_modules.append(rm.module_name)
-            if rm.module_type == 'semi_shared':
-                pydoc_client_modules.append(rm.module_name)
-                pydoc_server_modules.append(rm.module_name)
-            else:
-                pydoc_shared_modules.append(rm.module_name)
             if rm.split:
                 client_filenames.extend(GetFilenames(rm, isclient=True))
                 server_filenames.extend(GetFilenames(rm, isclient=False))
@@ -505,21 +495,18 @@ def ParseModules():
                 shared_filenames.extend(GetFilenames(rm))
 
     # Generate new append code if needed
-    clientappendfile = GenerateAppendFile(settings.client_path, client_modules, pydoc_client_modules, 'client')
-    serverappendfile = GenerateAppendFile(settings.server_path, server_modules, pydoc_server_modules, 'server')
-    sharedappendfile = GenerateAppendFile(settings.shared_path, shared_modules, pydoc_shared_modules, 'shared')
+    clientappendfile = GenerateAppendFile(settings.client_path, client_modules, 'client')
+    serverappendfile = GenerateAppendFile(settings.server_path, server_modules, 'server')
+    sharedappendfile = GenerateAppendFile(settings.shared_path, shared_modules, 'shared')
     
     if settings.addpythonfiles:
         client_filenames.extend(map(os.path.normpath, settings.pythonfiles_client))
         server_filenames.extend(map(os.path.normpath, settings.pythonfiles_server))
         shared_filenames.extend(map(os.path.normpath, settings.pythonfiles_shared))
     
-    
     if client_filenames: client_filenames.append(GetIncludePath(clientappendfile))
     if server_filenames: server_filenames.append(GetIncludePath(serverappendfile))
     if shared_filenames: shared_filenames.append(GetIncludePath(sharedappendfile))
-    
-
     
     if settings.autoupdatevxproj:
         # Server
@@ -530,12 +517,11 @@ def ParseModules():
         allclientfilenames = shared_filenames+client_filenames
         vcxprojupdate.UpdateChanged(allclientfilenames, settings.vcxprojclient)
     
-def GenerateAppendFile(path, module_names, pydoc_module_names, dll_name):
+def GenerateAppendFile(path, module_names, dll_name):
     filename = 'src_append_%s.cpp' % (dll_name)
     path = os.path.join(path, filename)
     f = open(path, 'w+')
     GenerateAppendCode(f, module_names, dll_name)
-    #GeneratePydocCode(f, pydoc_module_names, dll_name)
     f.close()  
     return path
     
