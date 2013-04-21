@@ -16,6 +16,7 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <ienginevgui.h>
+#include "vgui_controls/Panel.h"
 
 #include "SurfaceBuffer.h"
 
@@ -27,6 +28,26 @@ using namespace vgui;
 
 extern int g_PythonPanelCount;
 
+//=============================================================================
+// Message handling. Can't be merged in Panel, since we do not have the source code :(
+//=============================================================================
+typedef struct py_message_entry_t {
+	int numParams;
+	boost::python::object method;
+
+	const char *firstParamName;
+	int firstParamSymbol;
+	int firstParamType;
+
+	const char *secondParamName;
+	int secondParamSymbol;
+	int secondParamType;
+} py_message_entry_t;
+bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, const KeyValues *params, VPANEL fromPanel);
+
+//-----------------------------------------------------------------------------
+// Purpose: PyPanel
+//-----------------------------------------------------------------------------
 class PyPanel
 {
 public:
@@ -44,7 +65,28 @@ public:
 	PyPanel();
 	~PyPanel();
 
+	virtual Panel *GetPanel() { return NULL; }
 	virtual PyObject *GetPySelf() const = 0;
+
+public:
+    /*void RegMessageMethod( const char *message, boost::python::object method, int numParams=0, 
+           const char *nameFirstParam="", int typeFirstParam=DATATYPE_VOID, 
+           const char *nameSecondParam="", int typeSecondParam=DATATYPE_VOID ) { 
+           py_message_entry_t entry;
+           entry.method = method;
+           entry.numParams = numParams;
+           entry.firstParamName = nameFirstParam;
+           entry.firstParamSymbol = KeyValuesSystem()->GetSymbolForString(nameFirstParam);
+           entry.firstParamType = typeFirstParam;
+           entry.secondParamName = nameSecondParam;
+           entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);
+           entry.secondParamType = typeSecondParam;
+    
+           m_PyMessageMap.Insert(message, entry);
+    }*/
+
+	CUtlDict<py_message_entry_t, short> &GetPyMessageMap() { return m_PyMessageMap; }
+	void ClearPyMessageMap() { m_PyMessageMap.Purge(); }
 
 public:
 	void ClearSBuffer( CallBuffer_t &CallBuffer );
@@ -73,6 +115,8 @@ public:
 	bool m_bPyDeleted;
 
 protected:
+	CUtlDict<py_message_entry_t, short> m_PyMessageMap;
+
 	//CallBuffer_t m_PaintBorderCallBuffer;
 	CallBuffer_t m_PaintCallBuffer;
 	CallBuffer_t m_PaintBackgroundCallBuffer;
@@ -108,6 +152,7 @@ public:
 protected:
 	HPanel m_hPanelHandle;
 };
+
 //-----------------------------------------------------------------------------
 // Purpose: Panel handle
 //-----------------------------------------------------------------------------
@@ -184,28 +229,11 @@ void PyVGUIHandle<T>::Set(T *pent)
 class DeadPanel 
 {
 public:
-	bool NonZero() { return false; }
+	static bool NonZero() { return false; }
 };
 
 PyObject *GetPyPanel( Panel *pPanel );
-void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx = -1 );
-
-//=============================================================================
-// Message handling. Can't be merged in Panel, since we do not have the source code :(
-//=============================================================================
-typedef struct py_message_entry_t {
-	int numParams;
-	boost::python::object method;
-
-	const char *firstParamName;
-	int firstParamSymbol;
-	int firstParamType;
-
-	const char *secondParamName;
-	int secondParamSymbol;
-	int secondParamType;
-} py_message_entry_t;
-bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, const KeyValues *params, VPANEL fromPanel);
+void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx = -1 );
 
 //=============================================================================
 // ISurface for Python

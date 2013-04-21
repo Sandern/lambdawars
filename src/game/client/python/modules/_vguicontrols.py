@@ -426,11 +426,33 @@ class VGUIControls(GenerateModuleClient):
                                      '       entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);\r\n' + \
                                      '       entry.secondParamType = typeSecondParam;\r\n' + \
                                      '\r\n' + \
+                                     '       GetPyMessageMap().Insert(message, entry);\r\n' + \
+                                     '}\r\n' + \
+                                     'virtual Panel *GetPanel() { return this; }\r\n'
+                                     )
+                '''cls.add_wrapper_code('virtual void OnMessage(const KeyValues *params, VPANEL fromPanel) {\r\n' +
+                                     '    if( Panel_DispatchMessage( m_PyMessageMap, params, fromPanel ) )\r\n' +
+                                     '        return;\r\n' +
+                                     '    Panel::OnMessage(params, fromPanel);\r\n' +
+                                     '}\r\n' + \
+                                     '\r\n' + \
+                                     'void RegMessageMethod( const char *message, boost::python::object method, int numParams=0, \r\n' + \
+                                     '       const char *nameFirstParam="", int typeFirstParam=DATATYPE_VOID, \r\n' + \
+                                     '       const char *nameSecondParam="", int typeSecondParam=DATATYPE_VOID ) { \r\n' + \
+                                     '       py_message_entry_t entry;\r\n' + \
+                                     '       entry.method = method;\r\n' + \
+                                     '       entry.numParams = numParams;\r\n' + \
+                                     '       entry.firstParamName = nameFirstParam;\r\n' + \
+                                     '       entry.firstParamSymbol = KeyValuesSystem()->GetSymbolForString(nameFirstParam);\r\n' + \
+                                     '       entry.firstParamType = typeFirstParam;\r\n' + \
+                                     '       entry.secondParamName = nameSecondParam;\r\n' + \
+                                     '       entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);\r\n' + \
+                                     '       entry.secondParamType = typeSecondParam;\r\n' + \
+                                     '\r\n' + \
                                      '       m_PyMessageMap.Insert(message, entry);\r\n' + \
                                      '}\r\n' + \
                                      'CUtlDict<py_message_entry_t, short> m_PyMessageMap;'
-                                    )
-                #cls.add_registration_code('def( "RegMessageMethod", (void (%s_wrapper::* )())( &%s_wrapper::RegMessageMethod) )' % (cls_name, cls_name))
+                                    )'''
                 cls.add_registration_code('def( "RegMessageMethod", &'+cls_name+'_wrapper::RegMessageMethod\r\n' + \
                                                ', ( bp::arg("message"), bp::arg("method"), bp::arg("numParams")=(int)(0), bp::arg("nameFirstParam")="", bp::arg("typeFirstParam")=int(::vgui::DATATYPE_VOID), bp::arg("nameSecondParam")="", bp::arg("typeSecondParam")=int(::vgui::DATATYPE_VOID) ))' )
                                                

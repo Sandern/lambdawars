@@ -1489,9 +1489,9 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
 
     virtual bool IsPythonManaged() { return true; }
 
-    ~ScrollBar_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, GetPySelf() );*/ }
+    ~ScrollBar_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }
 
-    void DeletePanel( void ) { ::PyDeletePanel( this, GetPySelf() ); }
+    void DeletePanel( void ) { ::PyDeletePanel( this, this ); }
 
     virtual void OnMessage(const KeyValues *params, VPANEL fromPanel) {
         if( Panel_DispatchMessage( m_PyMessageMap, params, fromPanel ) )
@@ -1512,9 +1512,9 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
            entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);
            entry.secondParamType = typeSecondParam;
     
-           m_PyMessageMap.Insert(message, entry);
+           GetPyMessageMap().Insert(message, entry);
     }
-    CUtlDict<py_message_entry_t, short> m_PyMessageMap;
+    virtual Panel *GetPanel() { return this; }
 
     virtual void EnableSBuffer( bool bUseBuffer ) { PyPanel::EnableSBuffer( bUseBuffer ); }
 

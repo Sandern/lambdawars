@@ -407,10 +407,10 @@ def AddVGUIConverter(mb, cls_name, novguilib):
     constructors = cls.constructors(name=cls_name)
     constructors.body = '\tg_PythonPanelCount++;'  
         
-    cls.add_wrapper_code( '~'+cls_name+'_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, GetPySelf() );*/ }' ) 
+    cls.add_wrapper_code( '~'+cls_name+'_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }' ) 
     
     if novguilib:
-        cls.add_wrapper_code( 'void DeletePanel( void ) { ::PyDeletePanel( this, GetPySelf() ); }' )
+        cls.add_wrapper_code( 'void DeletePanel( void ) { ::PyDeletePanel( this, this ); }' )
     else:
         cls.add_wrapper_code( 'void DeletePanel( void ) {}' )
     

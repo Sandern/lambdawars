@@ -181,14 +181,16 @@ void PyPanel::DrawFromSBuffer( CallBuffer_t &CallBuffer )
 //-----------------------------------------------------------------------------
 void DestroyPyPanels()
 {
-	DevMsg("Clearing %d python panels\n", g_PyPanels.Count());
+	DevMsg("Clearing %d python panels...\n", g_PyPanels.Count());
+
+	float fStartTime = Plat_FloatTime();
 
 	for( int i = g_PyPanels.Count()-1; i >= 0; i-- )
-	{
-		PyDeletePanel( dynamic_cast<Panel *>(g_PyPanels[i]), g_PyPanels[i]->GetPySelf(), i ); 
-	}
+		PyDeletePanel( g_PyPanels[i]->GetPanel(), g_PyPanels[i], i ); 
 
 	vgui::ivgui()->RunFrame();
+
+	DevMsg( "\tFinished clearing Python panels in %f seconds\n", Plat_FloatTime() - fStartTime );
 }
 
 //-----------------------------------------------------------------------------
@@ -248,7 +250,7 @@ PyObject *GetPyPanel( Panel *pPanel )
 	return NULL;
 }
 
-void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
+void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 {
 	if( !pPanel || !pPyPanel )
 	{
@@ -257,20 +259,27 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 	}
 
 	// Do not cleanup twice
-	PyPanel *pIPyPanel = dynamic_cast<PyPanel *>(pPanel);
 	//Msg("Is py deleted: %d\n", pIPyPanel->m_bPyDeleted);
-	if( pIPyPanel->m_bPyDeleted )
+	if( pPyPanel->m_bPyDeleted )
 		return;
 
+	PyObject *pPyObjPanel = pPyPanel->GetPySelf();
+	if( !pPyObjPanel )
+	{
+		Warning("PyDeletePanel called with NULL panel python object\n");
+		return;
+	}
+
 	// Allow c++ code to cleanup
-	pIPyPanel->m_bPyDeleted = true;
-	pIPyPanel->ClearAllSBuffers();
+	pPyPanel->m_bPyDeleted = true;
+	pPyPanel->ClearAllSBuffers();
+	pPyPanel->ClearPyMessageMap();
 	//Msg("Removing py panel (%d active)\n", g_PyPanels.Count());
 	// Remove from list
 	if( iRemoveIdx != -1 )
 		g_PyPanels.Remove( iRemoveIdx );
 	else
-		g_PyPanels.FindAndRemove( pIPyPanel );
+		g_PyPanels.FindAndRemove( pPyPanel );
 
 	if( !SrcPySystem()->IsPythonRunning() )
 	{
@@ -292,23 +301,27 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 		return;
 	}
 
-	bp::object pyPanel(bp::handle<>(boost::python::borrowed(pPyPanel)));
+	bp::object pyPanel(bp::handle<>(boost::python::borrowed(pPyObjPanel)));
+
+	// Cleanup as good as possible
+	pPanel->SetVisible( false );
+	pPanel->SetEnabled( false );
+	pPanel->SetPaintBackgroundEnabled( false );
+	pPanel->SetPaintEnabled( false );
+	pPanel->SetPaintBorderEnabled( false );
+	pPanel->SetMouseInputEnabled( false );
+	pPanel->SetKeyBoardInputEnabled( false );
 
 	// Tell panel it is being deleted
-	boost::python::object updateondelete;
-	try {
-		updateondelete = pyPanel.attr("UpdateOnDelete");
-	} catch(boost::python::error_already_set &) {
-		PyErr_Clear();
-	}
-	if( updateondelete.ptr() != Py_None )
+	try 
 	{
-		try {
-			updateondelete();
-		} catch(boost::python::error_already_set &) {
-			PyErr_Print();
-			PyErr_Clear();
-		}
+		if( PyObject_HasAttrString( pPyObjPanel, "UpdateOnDelete" ) )
+			pyPanel.attr("UpdateOnDelete")();
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
+		PyErr_Print();
+		PyErr_Clear();
 	}
 
 	// remove panel from any list
@@ -321,7 +334,12 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 		if (ipanel()->IsAutoDeleteSet(child))
 		{
 			//ipanel()->DeletePanel(child);
-			ipanel()->SetParent(child, NULL); // FIXME: can't do this if it's a python panel
+			Panel *pChild = ipanel()->GetPanel( child, pPanel->GetModuleName() );
+			PyPanel *pChildPyPanel = dynamic_cast<PyPanel *>( pChild );
+			if( pChild && pChildPyPanel )
+				PyDeletePanel( pChild, pChildPyPanel );
+			else
+				ipanel()->SetParent(child, NULL); // FIXME: can't do this if it's a python panel
 		}
 		else
 		{
@@ -332,23 +350,19 @@ void PyDeletePanel( Panel *pPanel, PyObject *pPyPanel, int iRemoveIdx )
 	// delete VPanel
 	// NOTE: Can't do this. Let's just make it invisible and remove any tick signal.
 	//ivgui()->FreePanel(pPanel->GetVPanel());
-	pPanel->SetVisible( false );
-	pPanel->SetEnabled( false );
-	pPanel->SetPaintBackgroundEnabled( false );
-	pPanel->SetPaintEnabled( false );
-	pPanel->SetPaintBorderEnabled( false );
-	pPanel->SetMouseInputEnabled( false );
-	pPanel->SetKeyBoardInputEnabled( false );
 	ivgui()->RemoveTickSignal( pPanel->GetVPanel() );
 
-	try {
+	try 
+	{
 		// Cause an attribute error when trying to access methods of this class
 		// Calling methods after deletion might be dangerous, this prevents that...
 		if( _vguicontrols.ptr() != Py_None )
 			setattr(pyPanel, "__class__",  _vguicontrols.attr("DeadPanel"));
 		else
 			Warning("PyDeletePanel: Python shutting down while destroying panel %s\n", pPanel->GetName());
-	} catch( boost::python::error_already_set &) {
+	} 
+	catch( boost::python::error_already_set &) 
+	{
 		Warning("PyDeletePanel: error occurred while deleting Python panel %s\n", pPanel->GetName());
 		PyErr_Print();
 		PyErr_Clear();

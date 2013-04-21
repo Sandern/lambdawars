@@ -35,6 +35,7 @@ void register_DeadPanel_class(){
     bp::class_< DeadPanel >( "DeadPanel" )    
         .def( 
             "__nonzero__"
-            , (bool ( ::DeadPanel::* )(  ) )( &::DeadPanel::NonZero ) );
+            , (bool (*)(  ))( &::DeadPanel::NonZero ) )    
+        .staticmethod( "__nonzero__" );
 
 }
