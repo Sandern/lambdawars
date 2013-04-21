@@ -816,6 +816,13 @@ CBaseEntity *CHL2WarsPlayer::GetMouseCapture()
 //-----------------------------------------------------------------------------
 void CHL2WarsPlayer::ChangeFaction( const char *faction )
 {
+	// Faction must be valid
+	if( !faction )
+	{
+		Warning("CHL2WarsPlayer::ChangeFaction: Invalid faction\n");
+		return;
+	}
+
 	// Check if the player's faction changed ( Might want to add a string table )
 	if( m_FactionName != NULL_STRING && Q_strncmp( STRING(m_FactionName), faction, MAX_PATH ) == 0 ) 
 		return;
