@@ -221,12 +221,24 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 {
 	try	
 	{
+		// Safety check. The base implementations must be match, otherwise it can result in incorrect behavior (crashes)
+		int iNetworkType = boost::python::extract<int>(cls_type.attr("GetPyNetworkType")());
+		if( iNetworkType != iType )
+		{
+			char buf[512];
+			Q_snprintf( buf, sizeof(buf), "Network type does not match client %d != server %d", iNetworkType, iType );
+			PyErr_SetString(PyExc_Exception, buf );
+			throw boost::python::error_already_set(); 
+		}
+
+		// Spawn and initialize the entity
 		boost::python::object inst = cls_type();
 		C_BaseEntity *pRet = boost::python::extract<C_BaseEntity *>(inst);
 		if( !pRet ) {
 			Warning("Invalid client entity\n" );
 			return NULL;
 		}
+
 		pRet->m_pyInstance = inst;
 		pRet->Init( entnum, serialNum );
 		return pRet;
@@ -237,7 +249,7 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 		PyErr_Print();
 		PyErr_Clear();
 		
-		// Call the correct factory
+		// Call the correct fallback factory
 		IClientNetworkable *pResult = NULL;
 		switch( iType )
 		{
