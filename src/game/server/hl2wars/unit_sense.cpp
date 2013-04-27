@@ -360,13 +360,21 @@ bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 bp::list UnitBaseSense::PyGetOthers( const char *unittype )
 {
 	bp::list units;
-	for( int i = 0; i < m_SeenOther.Count(); i++ )
+	if( unittype )
 	{
-		if( m_SeenOther[i].entity )
+		for( int i = 0; i < m_SeenOther.Count(); i++ )
 		{
-			if( unittype && m_SeenOther[i].entity->IsUnit() &&
-					Q_stricmp( unittype , m_SeenOther[i].entity->MyUnitPointer()->GetUnitType() ) != 0 )
+			if( !m_SeenOther[i].entity )
 				continue;
+
+			CUnitBase *pOtherUnit = m_SeenOther[i].entity->MyUnitPointer();
+			if( !pOtherUnit )
+				continue;
+
+			const char *pOtherUnitType = pOtherUnit->GetUnitType();
+			if( pOtherUnitType && Q_stricmp( unittype , pOtherUnitType ) != 0 )
+				continue;
+
 			units.append( m_SeenOther[i].entity->GetPyHandle() );	
 		}
 	}
