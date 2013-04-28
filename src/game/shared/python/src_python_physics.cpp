@@ -882,3 +882,21 @@ float PyCalculateDefaultPhysicsDamage( int index, gamevcollisionevent_t *pEvent,
 	return CalculateDefaultPhysicsDamage(index, pEvent, energyScale, allowStaticDamage, damageTypeOut, MAKE_STRING(iszDamageTableName), bDamageFromHeldObjects);
 }
 #endif // CLIENT_DLL
+
+void PyForcePhysicsSimulate()
+{
+	IGameSystemPerFrame *pPerFrame = dynamic_cast<IGameSystemPerFrame *>( PhysicsGameSystem() );
+	if( pPerFrame )
+	{
+#ifdef CLIENT_DLL
+		PhysicsSimulate();
+#else
+		pPerFrame->FrameUpdatePostEntityThink();
+#endif // CLIENT_DLL
+	}
+	else
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid game system" );
+		throw boost::python::error_already_set();
+	}
+}

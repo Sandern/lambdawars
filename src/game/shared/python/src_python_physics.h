@@ -425,6 +425,11 @@ void PyPhysCallbackRemove(CBaseEntity *pRemove);
 
 // Impact damage
 float PyCalculateDefaultPhysicsDamage( int index, gamevcollisionevent_t *pEvent, float energyScale, bool allowStaticDamage, int &damageTypeOut, const char *iszDamageTableName = NULL, bool bDamageFromHeldObjects = false );
+
+// For forcing an extra think (testing purposes)
+void Physics_RunThinkFunctions( bool simulating );
 #endif // CLIENT_DLL
+
+void PyForcePhysicsSimulate();
 
 #endif // SRC_PYTHON_PHYSICS_H

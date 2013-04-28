@@ -26,6 +26,7 @@ class Physics(GenerateModuleSemiShared):
         'cbase.h',
         'src_python_physics.h',
         'vphysics_interface.h',
+        'physics_shared.h',
     ]
     
     def GetFiles(self):
@@ -145,6 +146,7 @@ class Physics(GenerateModuleSemiShared):
         
         cls = mb.class_('PyPhysicsSurfaceProps')
         cls.rename('PhysicsSurfaceProps')
+        
         cls.include()
         cls.no_init = True
         cls.calldefs().virtuality = 'not virtual' 
@@ -153,4 +155,13 @@ class Physics(GenerateModuleSemiShared):
         if self.isServer:
             mb.free_function('PyCalculateDefaultPhysicsDamage').include()
             mb.free_function('PyCalculateDefaultPhysicsDamage').rename('CalculateDefaultPhysicsDamage')
+            
+        # Physics Hook
+        #mb.free_function('PhysicsGameSystem').include()
+        #mb.free_function('PhysicsGameSystem').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         
+        mb.free_function('PyForcePhysicsSimulate').include()
+        mb.free_function('PyForcePhysicsSimulate').rename('ForcePhysicsSimulate')
+        
+        if self.isServer:
+            mb.free_function('Physics_RunThinkFunctions').include()

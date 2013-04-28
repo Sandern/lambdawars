@@ -14,6 +14,8 @@
 
 #include "vphysics_interface.h"
 
+#include "physics_shared.h"
+
 #include "src_python.h"
 
 #include "tier0/memdbgon.h"
@@ -874,6 +876,16 @@ BOOST_PYTHON_MODULE(_physics){
         .def_readwrite( "walkStepLeft", &surfacesoundnames_t::walkStepLeft )    
         .def_readwrite( "walkStepRight", &surfacesoundnames_t::walkStepRight );
 
+    { //::PyForcePhysicsSimulate
+    
+        typedef void ( *ForcePhysicsSimulate_function_type )(  );
+        
+        bp::def( 
+            "ForcePhysicsSimulate"
+            , ForcePhysicsSimulate_function_type( &::PyForcePhysicsSimulate ) );
+    
+    }
+
     { //::PyPhysDestroyObject
     
         typedef void ( *PhysDestroyObject_function_type )( ::PyPhysicsObject *,::C_BaseEntity * );
@@ -932,6 +944,8 @@ BOOST_PYTHON_MODULE(_physics){
 #include "src_python_physics.h"
 
 #include "vphysics_interface.h"
+
+#include "physics_shared.h"
 
 #include "physics_impact_damage.h"
 
@@ -1805,6 +1819,17 @@ BOOST_PYTHON_MODULE(_physics){
     
     }
 
+    { //::Physics_RunThinkFunctions
+    
+        typedef void ( *Physics_RunThinkFunctions_function_type )( bool );
+        
+        bp::def( 
+            "Physics_RunThinkFunctions"
+            , Physics_RunThinkFunctions_function_type( &::Physics_RunThinkFunctions )
+            , ( bp::arg("simulating") ) );
+    
+    }
+
     { //::PyCalculateDefaultPhysicsDamage
     
         typedef float ( *CalculateDefaultPhysicsDamage_function_type )( int,::gamevcollisionevent_t *,float,bool,int &,char const *,bool );
@@ -1813,6 +1838,16 @@ BOOST_PYTHON_MODULE(_physics){
             "CalculateDefaultPhysicsDamage"
             , CalculateDefaultPhysicsDamage_function_type( &::PyCalculateDefaultPhysicsDamage )
             , ( bp::arg("index"), bp::arg("pEvent"), bp::arg("energyScale"), bp::arg("allowStaticDamage"), bp::arg("damageTypeOut"), bp::arg("iszDamageTableName")=bp::object(), bp::arg("bDamageFromHeldObjects")=(bool)(false) ) );
+    
+    }
+
+    { //::PyForcePhysicsSimulate
+    
+        typedef void ( *ForcePhysicsSimulate_function_type )(  );
+        
+        bp::def( 
+            "ForcePhysicsSimulate"
+            , ForcePhysicsSimulate_function_type( &::PyForcePhysicsSimulate ) );
     
     }
 

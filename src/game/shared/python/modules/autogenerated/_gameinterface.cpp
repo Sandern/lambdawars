@@ -1865,7 +1865,117 @@ BOOST_PYTHON_MODULE(_gameinterface){
         BSPHeader_t_exposer.def_readwrite( "mapRevision", &BSPHeader_t::mapRevision );
     }
 
-    bp::class_< CBaseGameSystem_wrapper >( "CBaseGameSystem" )    
+    bp::class_< IGameSystem, boost::noncopyable >( "IGameSystem", bp::no_init )    
+        .def( 
+            "Add"
+            , (void (*)( ::IGameSystem * ))( &::IGameSystem::Add )
+            , ( bp::arg("pSys") ) )    
+        .def( 
+            "Init"
+            , (bool ( ::IGameSystem::* )(  ) )( &::IGameSystem::Init ) )    
+        .def( 
+            "InitAllSystems"
+            , (bool (*)(  ))( &::IGameSystem::InitAllSystems ) )    
+        .def( 
+            "IsPerFrame"
+            , (bool ( ::IGameSystem::* )(  ) )( &::IGameSystem::IsPerFrame ) )    
+        .def( 
+            "LevelInitPostEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelInitPostEntity ) )    
+        .def( 
+            "LevelInitPostEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelInitPostEntityAllSystems ) )    
+        .def( 
+            "LevelInitPreEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelInitPreEntity ) )    
+        .def( 
+            "LevelInitPreEntityAllSystems"
+            , (void (*)( char const * ))( &::IGameSystem::LevelInitPreEntityAllSystems )
+            , ( bp::arg("pMapName") ) )    
+        .def( 
+            "LevelShutdownPostEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelShutdownPostEntity ) )    
+        .def( 
+            "LevelShutdownPostEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelShutdownPostEntityAllSystems ) )    
+        .def( 
+            "LevelShutdownPreEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelShutdownPreEntity ) )    
+        .def( 
+            "LevelShutdownPreEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelShutdownPreEntityAllSystems ) )    
+        .def( 
+            "MapName"
+            , (char const * (*)(  ))( &::IGameSystem::MapName ) )    
+        .def( 
+            "Name"
+            , (char const * ( ::IGameSystem::* )(  ) )( &::IGameSystem::Name ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::OnRestore ) )    
+        .def( 
+            "OnRestoreAllSystems"
+            , (void (*)(  ))( &::IGameSystem::OnRestoreAllSystems ) )    
+        .def( 
+            "OnSave"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::OnSave ) )    
+        .def( 
+            "OnSaveAllSystems"
+            , (void (*)(  ))( &::IGameSystem::OnSaveAllSystems ) )    
+        .def( 
+            "PostInit"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::PostInit ) )    
+        .def( 
+            "PostInitAllSystems"
+            , (void (*)(  ))( &::IGameSystem::PostInitAllSystems ) )    
+        .def( 
+            "PostRenderAllSystems"
+            , (void (*)(  ))( &::IGameSystem::PostRenderAllSystems ) )    
+        .def( 
+            "PreRenderAllSystems"
+            , (void (*)(  ))( &::IGameSystem::PreRenderAllSystems ) )    
+        .def( 
+            "Remove"
+            , (void (*)( ::IGameSystem * ))( &::IGameSystem::Remove )
+            , ( bp::arg("pSys") ) )    
+        .def( 
+            "RemoveAll"
+            , (void (*)(  ))( &::IGameSystem::RemoveAll ) )    
+        .def( 
+            "SafeRemoveIfDesired"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::SafeRemoveIfDesired ) )    
+        .def( 
+            "SafeRemoveIfDesiredAllSystems"
+            , (void (*)(  ))( &::IGameSystem::SafeRemoveIfDesiredAllSystems ) )    
+        .def( 
+            "Shutdown"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::Shutdown ) )    
+        .def( 
+            "ShutdownAllSystems"
+            , (void (*)(  ))( &::IGameSystem::ShutdownAllSystems ) )    
+        .def( 
+            "UpdateAllSystems"
+            , (void (*)( float ))( &::IGameSystem::UpdateAllSystems )
+            , ( bp::arg("frametime") ) )    
+        .staticmethod( "Add" )    
+        .staticmethod( "InitAllSystems" )    
+        .staticmethod( "LevelInitPostEntityAllSystems" )    
+        .staticmethod( "LevelInitPreEntityAllSystems" )    
+        .staticmethod( "LevelShutdownPostEntityAllSystems" )    
+        .staticmethod( "LevelShutdownPreEntityAllSystems" )    
+        .staticmethod( "MapName" )    
+        .staticmethod( "OnRestoreAllSystems" )    
+        .staticmethod( "OnSaveAllSystems" )    
+        .staticmethod( "PostInitAllSystems" )    
+        .staticmethod( "PostRenderAllSystems" )    
+        .staticmethod( "PreRenderAllSystems" )    
+        .staticmethod( "Remove" )    
+        .staticmethod( "RemoveAll" )    
+        .staticmethod( "SafeRemoveIfDesiredAllSystems" )    
+        .staticmethod( "ShutdownAllSystems" )    
+        .staticmethod( "UpdateAllSystems" );
+
+    bp::class_< CBaseGameSystem_wrapper, bp::bases< IGameSystem > >( "CBaseGameSystem" )    
         .def( 
             "Init"
             , (bool ( ::CBaseGameSystem::* )(  ) )(&::CBaseGameSystem::Init)
@@ -5406,7 +5516,126 @@ BOOST_PYTHON_MODULE(_gameinterface){
         BSPHeader_t_exposer.def_readwrite( "mapRevision", &BSPHeader_t::mapRevision );
     }
 
-    bp::class_< CBaseGameSystem_wrapper >( "CBaseGameSystem" )    
+    bp::class_< IGameSystem, boost::noncopyable >( "IGameSystem", bp::no_init )    
+        .def( 
+            "Add"
+            , (void (*)( ::IGameSystem * ))( &::IGameSystem::Add )
+            , ( bp::arg("pSys") ) )    
+        .def( 
+            "FrameUpdatePostEntityThinkAllSystems"
+            , (void (*)(  ))( &::IGameSystem::FrameUpdatePostEntityThinkAllSystems ) )    
+        .def( 
+            "FrameUpdatePreEntityThinkAllSystems"
+            , (void (*)(  ))( &::IGameSystem::FrameUpdatePreEntityThinkAllSystems ) )    
+        .def( 
+            "Init"
+            , (bool ( ::IGameSystem::* )(  ) )( &::IGameSystem::Init ) )    
+        .def( 
+            "InitAllSystems"
+            , (bool (*)(  ))( &::IGameSystem::InitAllSystems ) )    
+        .def( 
+            "IsPerFrame"
+            , (bool ( ::IGameSystem::* )(  ) )( &::IGameSystem::IsPerFrame ) )    
+        .def( 
+            "LevelInitPostEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelInitPostEntity ) )    
+        .def( 
+            "LevelInitPostEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelInitPostEntityAllSystems ) )    
+        .def( 
+            "LevelInitPreEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelInitPreEntity ) )    
+        .def( 
+            "LevelInitPreEntityAllSystems"
+            , (void (*)( char const * ))( &::IGameSystem::LevelInitPreEntityAllSystems )
+            , ( bp::arg("pMapName") ) )    
+        .def( 
+            "LevelShutdownPostEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelShutdownPostEntity ) )    
+        .def( 
+            "LevelShutdownPostEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelShutdownPostEntityAllSystems ) )    
+        .def( 
+            "LevelShutdownPreEntity"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::LevelShutdownPreEntity ) )    
+        .def( 
+            "LevelShutdownPreEntityAllSystems"
+            , (void (*)(  ))( &::IGameSystem::LevelShutdownPreEntityAllSystems ) )    
+        .def( 
+            "MapName"
+            , (char const * (*)(  ))( &::IGameSystem::MapName ) )    
+        .def( 
+            "Name"
+            , (char const * ( ::IGameSystem::* )(  ) )( &::IGameSystem::Name ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::OnRestore ) )    
+        .def( 
+            "OnRestoreAllSystems"
+            , (void (*)(  ))( &::IGameSystem::OnRestoreAllSystems ) )    
+        .def( 
+            "OnSave"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::OnSave ) )    
+        .def( 
+            "OnSaveAllSystems"
+            , (void (*)(  ))( &::IGameSystem::OnSaveAllSystems ) )    
+        .def( 
+            "PostInit"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::PostInit ) )    
+        .def( 
+            "PostInitAllSystems"
+            , (void (*)(  ))( &::IGameSystem::PostInitAllSystems ) )    
+        .def( 
+            "PreClientUpdateAllSystems"
+            , (void (*)(  ))( &::IGameSystem::PreClientUpdateAllSystems ) )    
+        .def( 
+            "Remove"
+            , (void (*)( ::IGameSystem * ))( &::IGameSystem::Remove )
+            , ( bp::arg("pSys") ) )    
+        .def( 
+            "RemoveAll"
+            , (void (*)(  ))( &::IGameSystem::RemoveAll ) )    
+        .def( 
+            "RunCommandPlayer"
+            , (::CBasePlayer * (*)(  ))( &::IGameSystem::RunCommandPlayer )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "RunCommandUserCmd"
+            , (::CUserCmd * (*)(  ))( &::IGameSystem::RunCommandUserCmd )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "SafeRemoveIfDesired"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::SafeRemoveIfDesired ) )    
+        .def( 
+            "SafeRemoveIfDesiredAllSystems"
+            , (void (*)(  ))( &::IGameSystem::SafeRemoveIfDesiredAllSystems ) )    
+        .def( 
+            "Shutdown"
+            , (void ( ::IGameSystem::* )(  ) )( &::IGameSystem::Shutdown ) )    
+        .def( 
+            "ShutdownAllSystems"
+            , (void (*)(  ))( &::IGameSystem::ShutdownAllSystems ) )    
+        .staticmethod( "Add" )    
+        .staticmethod( "FrameUpdatePostEntityThinkAllSystems" )    
+        .staticmethod( "FrameUpdatePreEntityThinkAllSystems" )    
+        .staticmethod( "InitAllSystems" )    
+        .staticmethod( "LevelInitPostEntityAllSystems" )    
+        .staticmethod( "LevelInitPreEntityAllSystems" )    
+        .staticmethod( "LevelShutdownPostEntityAllSystems" )    
+        .staticmethod( "LevelShutdownPreEntityAllSystems" )    
+        .staticmethod( "MapName" )    
+        .staticmethod( "OnRestoreAllSystems" )    
+        .staticmethod( "OnSaveAllSystems" )    
+        .staticmethod( "PostInitAllSystems" )    
+        .staticmethod( "PreClientUpdateAllSystems" )    
+        .staticmethod( "Remove" )    
+        .staticmethod( "RemoveAll" )    
+        .staticmethod( "RunCommandPlayer" )    
+        .staticmethod( "RunCommandUserCmd" )    
+        .staticmethod( "SafeRemoveIfDesiredAllSystems" )    
+        .staticmethod( "ShutdownAllSystems" );
+
+    bp::class_< CBaseGameSystem_wrapper, bp::bases< IGameSystem > >( "CBaseGameSystem" )    
         .def( 
             "Init"
             , (bool ( ::CBaseGameSystem::* )(  ) )(&::CBaseGameSystem::Init)

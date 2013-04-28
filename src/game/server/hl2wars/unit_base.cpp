@@ -14,6 +14,7 @@
 #include "hl2wars_player.h"
 #include "animation.h"
 #include "unit_baseanimstate.h"
+#include "wars_weapon_shared.h"
 
 #include "sendprop_priorities.h"
 
@@ -682,6 +683,32 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 		trace_t result;
 		CUnitLOSFilter traceFilter( this, GetEnemy(), GetCollisionGroup() );
 		UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &traceFilter, &result );
+		if( g_debug_rangeattacklos.GetBool() )
+			NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );
+		m_bHasRangeAttackLOS = (result.fraction == 1.0f);
+	}
+	m_fLastRangeAttackLOSTime = gpGlobals->curtime;
+	return m_bHasRangeAttackLOS;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CUnitBase::HasRangeAttackLOSTarget( CBaseEntity *pTarget )
+{
+	if( GetActiveWeapon() )
+	{
+		CWarsWeapon *pWeapon = dynamic_cast<CWarsWeapon *>( GetActiveWeapon() );
+		if( pWeapon )
+			m_bHasRangeAttackLOS = pWeapon->WeaponLOSCondition( GetLocalOrigin(), pTarget->BodyTarget( GetLocalOrigin() ), pTarget );
+		else
+			m_bHasRangeAttackLOS = false;
+	}
+	else
+	{
+		trace_t result;
+		CUnitLOSFilter traceFilter( this, pTarget, GetCollisionGroup() );
+		UTIL_TraceLine( EyePosition(), pTarget->BodyTarget( GetLocalOrigin() ), m_iAttackLOSMask, &traceFilter, &result );
 		if( g_debug_rangeattacklos.GetBool() )
 			NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );
 		m_bHasRangeAttackLOS = (result.fraction == 1.0f);

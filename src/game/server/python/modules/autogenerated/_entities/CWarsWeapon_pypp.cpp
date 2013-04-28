@@ -1428,6 +1428,16 @@ void register_CWarsWeapon_class(){
                 , ( bp::arg("ownerPos"), bp::arg("targetPos"), bp::arg("bSetConditions") ) );
         
         }
+        { //::CWarsWeapon::WeaponLOSCondition
+        
+            typedef bool ( ::CWarsWeapon::*WeaponLOSCondition_function_type )( ::Vector const &,::Vector const &,::CBaseEntity * ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "WeaponLOSCondition"
+                , WeaponLOSCondition_function_type( &::CWarsWeapon::WeaponLOSCondition )
+                , ( bp::arg("ownerPos"), bp::arg("targetPos"), bp::arg("pTarget")=bp::object() ) );
+        
+        }
         { //::CWarsWeapon::WeaponSound
         
             typedef void ( ::CWarsWeapon::*WeaponSound_function_type )( ::WeaponSound_t,float ) ;

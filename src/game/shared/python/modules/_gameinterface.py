@@ -296,11 +296,20 @@ class GameInterface(GenerateModuleSemiShared):
         mb.class_('CBaseGameSystemPerFrame').include()
         mb.class_('CAutoGameSystem').include()
         mb.class_('CAutoGameSystemPerFrame').include()
+        mb.mem_funs('IsPerFrame').virtuality = 'not virtual' 
+        mb.mem_funs('SafeRemoveIfDesired').virtuality = 'not virtual'
         mb.class_('CAutoGameSystem').rename('AutoGameSystem')
         mb.class_('CAutoGameSystemPerFrame').rename('AutoGameSystemPerFrame')
-        mb.mem_funs('IsPerFrame').virtuality = 'not virtual' 
-        mb.mem_funs('SafeRemoveIfDesired').virtuality = 'not virtual' 
         
+        cls = mb.class_('IGameSystem')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual' 
+        #cls.mem_funs('IsPerFrame').virtuality = 'virtual' 
+        #cls.mem_funs('SafeRemoveIfDesired').virtuality = 'virtual' 
+        if self.isServer:
+            cls.mem_funs('RunCommandPlayer').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            cls.mem_funs('RunCommandUserCmd').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            
         # Engine
         if self.isServer:
             cls = mb.class_('PyVEngineServer')

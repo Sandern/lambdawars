@@ -296,6 +296,7 @@ public:
 
 	// Enemy/attack related
 	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos );
+	virtual bool		HasRangeAttackLOSTarget( CBaseEntity *pTarget );
 	virtual float		EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit=true );
 	virtual float		TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit=true );
 	virtual bool		FInAimCone( CBaseEntity *pEntity, float fMinDot=0.994f );

@@ -2133,6 +2133,16 @@ void register_CUnitBase_class(){
                 , ( bp::arg("vTargetPos") ) );
         
         }
+        { //::CUnitBase::HasRangeAttackLOSTarget
+        
+            typedef bool ( ::CUnitBase::*HasRangeAttackLOSTarget_function_type )( ::CBaseEntity * ) ;
+            
+            CUnitBase_exposer.def( 
+                "HasRangeAttackLOSTarget"
+                , HasRangeAttackLOSTarget_function_type( &::CUnitBase::HasRangeAttackLOSTarget )
+                , ( bp::arg("pTarget") ) );
+        
+        }
         { //::CUnitBase::IRelationPriority
         
             typedef int ( ::CUnitBase::*IRelationPriority_function_type )( ::CBaseEntity * ) ;

@@ -54,7 +54,9 @@ public:
 	DECLARE_PREDICTABLE();
 	DECLARE_PYSERVERCLASS( CWarsWeapon );
 
-	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );	
+	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );
+
+	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, CBaseEntity *pTarget = NULL );	
 #endif // CLIENT_DLL
 
 	CHL2WarsPlayer*			GetCommander();
