@@ -116,6 +116,11 @@ CHL2WarsPlayer* CFuncUnit::GetCommander() const
 void CFuncUnit::UpdateOnRemove( void )
 {
 	int i;
+
+	i = g_FuncUnitList.Find( this );
+	if ( i != -1 )
+		g_FuncUnitList.FastRemove( i );
+	
 	for( i=0; i < m_SelectedByPlayers.Count(); i++ )
 	{
 		if( m_SelectedByPlayers[i] )
