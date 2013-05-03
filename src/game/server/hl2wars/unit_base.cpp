@@ -881,6 +881,15 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 //-----------------------------------------------------------------------------
 float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit )
 {
+	if( !pTarget )
+	{		
+#ifdef ENABLE_PYTHON
+		PyErr_SetString(PyExc_Exception, "Invalid target" );
+		throw boost::python::error_already_set(); 
+#endif // ENABLE_PYTHON
+		return 0.0f;
+	}
+
 	Vector enemyDelta = pTarget->WorldSpaceCenter() - pos;
 
 	// NOTE: We ignore rotation for computing height.  Assume it isn't an effect
