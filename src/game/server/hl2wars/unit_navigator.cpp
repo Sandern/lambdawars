@@ -42,7 +42,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_navigator.h"
-#include "unit_locomotion.h"
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
@@ -187,6 +186,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_bNoAvoid = false;
 	m_bNoNavAreasNearby = false;
 	m_fNextAllowPathRecomputeTime = 0.0f;
+	m_bLimitPositionActive = false;
 }
 #endif // ENABLE_PYTHON
 
@@ -690,6 +690,9 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 		float fRotate = 45.0f;
 		j = 0;
 		int jmax = GetBlockedStatus() == BS_STUCK ? 7 : 4; // Do full scan in case we are stuck
+		if( m_bLimitPositionActive )
+			jmax = 1;
+
 		while( j < jmax && ( GetBlockedStatus() != BS_NONE || m_Seeds.Count() || fTotalDensity > 0.01f ) )
 		{
 			m_iUsedTestDirections += 1;
@@ -751,7 +754,7 @@ bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 //-----------------------------------------------------------------------------
 // Purpose: Computes the density and average velocity for a given direction.
 //-----------------------------------------------------------------------------
-float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity )
+float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity, UnitBaseMoveCommand &MoveCommand )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeDensityAndAvgVelocity", VPROF_BUDGETGROUP_UNITS );
 
@@ -787,6 +790,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 		}
 	}	
 
+	// Consider navigation mesh
 	if( m_fIgnoreNavMeshTime < gpGlobals->curtime )
 	{
 		CBaseEntity *pGroundEntity = m_pOuter->GetGroundEntity();
@@ -808,11 +812,11 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 				CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
 				if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
 				{
-					float fDensity = 100.0f;
+					float fDensity = THRESHOLD_MAX / 2.0f;
 					fSumDensity += fDensity;
-					Vector vDir = m_vTestPositions[iPos] - GetAbsOrigin();
+					Vector vDir = GetAbsOrigin() - m_vTestPositions[iPos]; //m_vTestPositions[iPos] - GetAbsOrigin();
 					VectorNormalize(vDir);
-					*pAvgVelocity += fDensity * vDir * 500.0f;
+					*pAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
 				}
 			}
 
@@ -840,6 +844,22 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 		}
 	}
 
+	// If our position is limited, make the density very high outside our limited radius
+	if( m_bLimitPositionActive )
+	{
+		float fDistSqr2D = m_vLimitPositionCenter.AsVector2D().DistToSqr( m_vTestPositions[iPos].AsVector2D() );
+		float fDistSqrMax = m_fLimitPositionRadius * m_fLimitPositionRadius;
+		//if( fDistSqr2D > fDistSqrMax )
+		{
+			float fDensity = THRESHOLD_MAX * (fDistSqr2D / fDistSqrMax) / 2.0f;
+			//engine->Con_NPrintf( iPos, "iPos: %d, Density: %f, dist: %f", iPos, fDensity, m_vLimitPositionCenter.AsVector2D().DistTo( m_vTestPositions[iPos].AsVector2D() ));
+			fSumDensity += fDensity;
+			Vector vDir = m_vLimitPositionCenter - GetAbsOrigin();
+			VectorNormalize(vDir);
+			*pAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
+		}
+	}
+
 	// Average the velocity
 	// FIXME: Find out why the avg is sometimes invalid
 	if( fSumDensity == 0 || !(*pAvgVelocity).IsValid() )
@@ -864,23 +884,22 @@ float UnitBaseNavigator::ComputeEntityDensity( const Vector &vPos, CBaseEntity *
 // Purpose: Computes the cost for going in a test direction.
 //-----------------------------------------------------------------------------
 float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
-										 UnitBaseMoveCommand &MoveCommand, Vector &vGoalPathDir, float &fGoalDist )
+										 UnitBaseMoveCommand &MoveCommand, Vector &vGoalPathDir, float &fGoalDist, float &fDensity )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeUnitCost", VPROF_BUDGETGROUP_UNITS );
 
-	float fDensity, fSpeed;
+	float fSpeed, fDist;
 	Vector vFlowDir, vAvgVelocity, vPathVelocity, vFlowVelocity, vFinalVelocity, vPathDir;
 
 	// Dist to next waypoints + speed predicted position
-	float fDist = 0.0f;
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE )
 		fDist = UnitComputePathDirection2(m_vTestPositions[iPos], GetPath()->m_pWaypointHead, vPathDir);
 	else if( m_vForceGoalVelocity != vec3_origin )
 		fDist = ( (m_vForceGoalVelocity * 2) - m_vTestPositions[iPos] ).Length2D();
-	m_fLastComputedDist = fDist;
+	else
+		fDist = 0.0f;
 	
-	fDensity = ComputeDensityAndAvgVelocity( iPos, &vAvgVelocity );
-	m_fLastComputedDensity = fDensity;
+	fDensity = ComputeDensityAndAvgVelocity( iPos, &vAvgVelocity, MoveCommand );
 
 	// Compute path speed
 	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
@@ -897,28 +916,30 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	}
 
 	// Compute flow speed
-	if( GoalStatus == CHS_NOGOAL )
+	//if( GoalStatus == CHS_NOGOAL )
 		vFlowVelocity = vAvgVelocity;
-	else
-		vFlowVelocity = vAvgVelocity.Length2D() * m_vTestDirections[iPos];
+	//else
+	//	vFlowVelocity = vAvgVelocity.Length2D() * m_vTestDirections[iPos];
 
 	// Zero out flow velocity if too low. Otherwise it results in retarded movement.
 	if( vFlowVelocity.Length2D() < 15.0f )
 		vFlowVelocity.Zero();
 
 	// Depending on the thresholds use path, flow or interpolated speed
-	if( fDensity < THRESHOLD_MIN )
+	float fThresholdMin = THRESHOLD_MIN;
+	float fThresholdMax = THRESHOLD_MAX;
+	if( fDensity < fThresholdMin )
 	{
 		vFinalVelocity = vPathVelocity;
 	}
-	else if (fDensity > THRESHOLD_MAX )
+	else if (fDensity > fThresholdMax )
 	{
 		vFinalVelocity = vFlowVelocity;
 	}
 	else
 	{
 		// Computed interpolated speed
-		vFinalVelocity = vPathVelocity + ( (fDensity - THRESHOLD_MIN)/(THRESHOLD_MAX - THRESHOLD_MIN) ) * (vFlowVelocity - vPathVelocity);
+		vFinalVelocity = vPathVelocity + ( (fDensity - fThresholdMin)/(fThresholdMax - fThresholdMin) ) * (vFlowVelocity - vPathVelocity);
 	}
 
 	fSpeed = vFinalVelocity.Length2D();
@@ -929,7 +950,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 		return fDensity; 
 	}
 
-	// TODO: Should revise this
+	// Return weighted cost
 	return ( ( unit_cost_timeweight.GetFloat()*(fDist/fSpeed) ) + 
 		     ( unit_cost_distweight.GetFloat()*fDist ) + 
 			 ( m_fDiscomfortWeight*fDensity ) );
@@ -958,7 +979,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 	// By default we are moving into the direction of the next waypoint
 	// We now calculate the velocity based on current velocity, flow, density, etc
 	Vector vBestVel, vVelocity;
-	float fCost, fBestCost;
+	float fCost, fBestCost, fComputedDensity;
 	int i;
 
 	fBestCost = 999999999.0f;
@@ -975,13 +996,13 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		int pos = -1;
 		for( i=0; i<m_iUsedTestDirections; i++ )	
 		{
-			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist );
-			if( m_fLastComputedDensity > fHighestDensity )
-				fHighestDensity = m_fLastComputedDensity;
+			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist, fComputedDensity );
+			if( fComputedDensity > fHighestDensity )
+				fHighestDensity = fComputedDensity;
 			if( fCost < fBestCost )
 			{
 				fBestCost = fCost;
-				m_fLastBestDensity = m_fLastComputedDensity;
+				m_fLastBestDensity = fComputedDensity;
 				pos = i;
 			}
 		}
@@ -994,7 +1015,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		}
 		else
 		{
-			vBestVel = vec3_origin;
+			//vBestVel = vec3_origin;
 		}
 	}
 	else
@@ -1002,35 +1023,24 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		// Find best cost and use that speed + direction
 		for( i=0; i<m_iUsedTestDirections; i++ )	
 		{
-			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist );
+			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist, fComputedDensity );
 			if( fCost < fBestCost )
 			{
 				fBestCost = fCost;
-				m_fLastBestDensity = m_fLastComputedDensity;
+				m_fLastBestDensity = fComputedDensity;
 				vBestVel = vVelocity;
-				m_fLastBestDist = m_fLastComputedDist;
 			}
 		}
 
 		// Zero out velocity if density is too high in all directions
-		// TODO: Can this lock up the movement of an unit? Answer: Yes
-		// So only do this for units that have a goal.
-		/*if( m_fLastBestDensity >= 100.0 )
-		{
-			//Vector vPathDir;
-			//UnitComputePathDirection2(GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir);
-			vBestVel = vPathDir * MoveCommand.maxspeed;
-		}
-		else if( m_fLastBestDensity > unit_dens_all_nomove.GetFloat() )
-			vBestVel.Zero();*/
 		// Scale no move density to 1.0 depending on the cost weight
-		float fDensNoMove = unit_dens_all_nomove.GetFloat();
+		/*float fDensNoMove = unit_dens_all_nomove.GetFloat();
 		if( fDensNoMove < 1.0 )
 		{
 			float fWeight = (m_fDiscomfortWeight-unit_cost_discomfortweight_start.GetFloat()) / (unit_cost_discomfortweight_max.GetFloat()-unit_cost_discomfortweight_start.GetFloat());
 			fDensNoMove = fDensNoMove + (1.0-fDensNoMove)+fWeight;
-		}
-		if( m_fLastBestDensity > fDensNoMove )
+		}*/
+		//if( m_fLastBestDensity > fDensNoMove )
 		{
 			if( GetBlockedStatus() >= BS_STUCK && m_fLastBestDensity > 90.0f )
 			{
@@ -1039,12 +1049,17 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			}
 			else
 			{
-				vBestVel.Zero();
+				//vBestVel.Zero();
 			}
 		}
 	}
-	m_vDebugVelocity = vBestVel;
-	m_fLastBestCost = fBestCost;
+
+	if( GetOuter()->m_debugOverlays != 0 )
+	{
+		m_vDebugVelocity = vBestVel;
+		m_fDebugLastBestCost = fBestCost;
+		m_DebugLastMoveCommand = MoveCommand;
+	}
 
 	return vBestVel;
 }
@@ -1885,7 +1900,7 @@ void UnitBaseNavigator::ResetBlockedStatus()
 void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand )
 {
 	// Blocked status update only means something if we have a goal
-	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL )
+	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL || m_bLimitPositionActive )
 		return;
 
 	// Determine if we are stuck:
@@ -2772,7 +2787,7 @@ void UnitBaseNavigator::DrawDebugInfo()
 	Vector vAvgVel;
 	for( j = 0; j < m_iUsedTestDirections; j++ )
 	{
-		fDensity = ComputeDensityAndAvgVelocity(j, &vAvgVel);
+		fDensity = ComputeDensityAndAvgVelocity( j, &vAvgVel, m_DebugLastMoveCommand );
 		NDebugOverlay::HorzArrow(GetLocalOrigin(), m_vTestPositions[j], 
 							2.0f, fDensity*255, (1.0f-MIN(1.0f, MAX(0.0,fDensity)))*255, 0, 200, true, 0);
 		NDebugOverlay::Text( m_vTestPositions[j], UTIL_VarArgs("%f", fDensity), false, 0.0 );
@@ -2782,7 +2797,7 @@ void UnitBaseNavigator::DrawDebugInfo()
 	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vDebugVelocity, 
 						4.0f, 0, 0, 255, 200, true, 0);
 
-	m_pOuter->EntityText( 0, UTIL_VarArgs("BestCost: %f\n", m_fLastBestCost), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 0, UTIL_VarArgs("BestCost: %f\n", m_fDebugLastBestCost), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 1, UTIL_VarArgs("FinalVel: %f %f %f ( %f )\n", m_vDebugVelocity.x, m_vDebugVelocity.y, m_vDebugVelocity.z, m_vDebugVelocity.Length2D()), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 2, UTIL_VarArgs("Density: %f\n", m_fLastBestDensity), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 3, UTIL_VarArgs("BoundingRadius: %f\n", GetEntityBoundingRadius(m_pOuter)), 0, 255, 0, 0, 255 );

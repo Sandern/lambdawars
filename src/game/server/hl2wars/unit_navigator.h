@@ -12,6 +12,7 @@
 #endif
 
 #include "unit_component.h"
+#include "unit_locomotion.h"
 #include "nav.h"
 
 // Debug
@@ -362,11 +363,11 @@ public:
 	virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
 	virtual bool		ShouldConsiderNavMesh( void );
 
-	float				ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity );
+	float				ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity, UnitBaseMoveCommand &MoveCommand );
 	float				ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
 
 	float				ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
-								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist );
+								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist, float &fDensity );
 	Vector				ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist );
 
 	float				CalculateAvgDistHistory();
@@ -435,6 +436,9 @@ public:
 	bool				FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist=0 );
 	static void			CalculateDeflection( const Vector &start, const Vector &dir, const Vector &normal, Vector *pResult );
 
+	void				LimitPosition( const Vector &pos, float radius );
+	void				ClearLimitPosition( void );
+
 	// Debug
 	virtual void		DrawDebugRouteOverlay();	
 	virtual void		DrawDebugInfo();
@@ -498,9 +502,14 @@ private:
 	Vector m_vLastPosition;
 	float m_fIgnoreNavMeshTime;
 
-	// Misc
+	// Climbing
 	float m_fClimbHeight;
 	Vector m_vecClimbDirection;
+
+	// Position limiting
+	bool m_bLimitPositionActive;
+	Vector m_vLimitPositionCenter;
+	float m_fLimitPositionRadius;
 
 	// Flow
 	struct consider_pos_t {
@@ -518,11 +527,7 @@ private:
 	Vector m_vTestPositions[MAX_TESTDIRECTIONS];
 	int m_iUsedTestDirections;
 
-	float m_fLastComputedDensity;
 	float m_fLastBestDensity;
-	float m_fLastBestCost;
-	float m_fLastComputedDist;
-	float m_fLastBestDist;
 	Vector m_vLastWishVelocity;
 	float m_fDiscomfortWeight;
 
@@ -544,6 +549,8 @@ private:
 
 	// Debug variables
 	Vector m_vDebugVelocity;
+	float m_fDebugLastBestCost;
+	UnitBaseMoveCommand m_DebugLastMoveCommand;
 
 	static int m_iCurPathRecomputations;
 };
@@ -591,6 +598,18 @@ inline void UnitBaseNavigator::SetFacingTargetPos( Vector &vFacingTargetPos )
 {
 	m_vFacingTargetPos = vFacingTargetPos;
 	m_bFacingFaceTarget = false;
+}
+
+inline void UnitBaseNavigator::LimitPosition( const Vector &pos, float radius )
+{
+	m_bLimitPositionActive = true;
+	m_vLimitPositionCenter = pos;
+	m_fLimitPositionRadius = radius;
+}
+
+inline void UnitBaseNavigator::ClearLimitPosition( void )
+{
+	m_bLimitPositionActive = false;
 }
 
 //-----------------------------------------------------------------------------

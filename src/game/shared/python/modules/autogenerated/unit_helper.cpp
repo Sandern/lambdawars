@@ -4200,6 +4200,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("MoveCommand"), bp::arg("angles"), bp::arg("speed") ) );
         
         }
+        { //::UnitBaseNavigator::ClearLimitPosition
+        
+            typedef void ( ::UnitBaseNavigator::*ClearLimitPosition_function_type )(  ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "ClearLimitPosition"
+                , ClearLimitPosition_function_type( &::UnitBaseNavigator::ClearLimitPosition ) );
+        
+        }
         { //::UnitBaseNavigator::DrawDebugInfo
         
             typedef void ( ::UnitBaseNavigator::*DrawDebugInfo_function_type )(  ) ;
@@ -4235,6 +4244,16 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitBaseNavigator_exposer.def( 
                 "GetGoalDistance"
                 , GetGoalDistance_function_type( &::UnitBaseNavigator::GetGoalDistance ) );
+        
+        }
+        { //::UnitBaseNavigator::LimitPosition
+        
+            typedef void ( ::UnitBaseNavigator::*LimitPosition_function_type )( ::Vector const &,float ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "LimitPosition"
+                , LimitPosition_function_type( &::UnitBaseNavigator::LimitPosition )
+                , ( bp::arg("pos"), bp::arg("radius") ) );
         
         }
         { //::UnitBaseNavigator::RegenerateConsiderList

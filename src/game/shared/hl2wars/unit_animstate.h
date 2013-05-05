@@ -30,8 +30,8 @@
 // If a guy is moving slower than this, then he's considered to not be moving
 // (so he goes to his idle animation at full playback rate rather than his walk 
 // animation at low playback rate).
-#define MOVING_MINIMUM_SPEED 0.5f
-
+//#define MOVING_MINIMUM_SPEED 0.5f
+#define MOVING_MINIMUM_SPEED 10.0f
 
 #define MAIN_IDLE_SEQUENCE_LAYER 0	// For 8-way blended models, this layer blends an idle on top of the run/walk animation to simulate a 9-way blend.
 									// For 9-way blended models, we don't use this layer.
