@@ -7,7 +7,8 @@ import settings
 
 # Include directories
 incl_paths = [
-    'gccxml_bin/v09/linux2/share/gccxml-0.9/GCC/4.2',
+    #'gccxml_bin/v09/linux2/share/gccxml-0.9/GCC/4.2',
+    'Support/GCC/4.2',
     
     # System headers
     'usr/include/c++/4.3',
@@ -16,7 +17,7 @@ incl_paths = [
     'usr/local/include',
     'usr/lib/gcc/i486-linux-gnu/4.3/include',
     'usr/lib/gcc/i486-linux-gnu/4.3/include-fixed',
-    './usr/include',
+    'usr/include',
     
     # Game
     '../common',
@@ -24,9 +25,7 @@ incl_paths = [
     '../public/tier0',
     '../public/tier1',
     '../game/shared',
-    #'../utils/common',
     '../game/shared/hl2wars',
-    #'../game/shared/multiplayer',
     '../game/shared/python',
     
     # Python/Boost folders
@@ -145,7 +144,7 @@ class src_module_builder_t(module_builder.module_builder_t):
         module_builder.module_builder_t.__init__(
                     self
                     , files
-                    , gccxml_path='gccxml_bin/v09/win32/bin'
+                    , gccxml_path='gccxml_bin/win32'
                     , working_directory='.'
                     , include_paths=incl
                     , define_symbols=ds

@@ -1,7 +1,0 @@
-#if defined(__USING_STD_NAMES__)
-# include <gccxml_typeinfo.h>
-#else
-# define __USING_STD_NAMES__
-# include <gccxml_typeinfo.h>
-# undef __USING_STD_NAMES__
-#endif
