@@ -983,6 +983,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 	int i;
 
 	fBestCost = 999999999.0f;
+	vBestVel.Zero();
 
 	if( GoalStatus == CHS_NOGOAL )
 	{
@@ -990,8 +991,6 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		// Instead we try to find a position in which highest and lowest density surrounding us doesn't 
 		// differ too much.
 		// TODO: Cleanup. Remove ComputeUnitCost from this part and just calculate densities, since we don't use the other stuff.
-		vBestVel = vVelocity;
-
 		float fHighestDensity = 0.0f;
 		int pos = -1;
 		for( i=0; i<m_iUsedTestDirections; i++ )	
