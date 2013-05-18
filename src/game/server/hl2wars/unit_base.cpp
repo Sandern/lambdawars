@@ -842,6 +842,24 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 		return 0.0f;
 	}
 
+	// For large units (i.e. buildings) use a trace
+	float fBoundingRadius2D = pEnemy->CollisionProp()->BoundingRadius2D();
+	if( fBoundingRadius2D > 96.0f )
+	{
+		trace_t tr;
+		Ray_t ray;
+		ray.Init( WorldSpaceCenter(), pEnemy->WorldSpaceCenter() );
+		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pEnemy, &tr );
+		if( tr.DidHit() )
+		{
+			return (WorldSpaceCenter() - tr.endpos).Length2D();
+		}
+		else
+		{
+			Warning("CUnitBase::TargetDistance: Did not hit target!\n");
+		}
+	}
+
 	Vector enemyDelta = pEnemy->WorldSpaceCenter() - WorldSpaceCenter();
 
 	// NOTE: We ignore rotation for computing height.  Assume it isn't an effect
@@ -874,7 +892,7 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 	}
 
 	if( bConsiderSizeUnit )
-		return MAX(enemyDelta.Length() - pEnemy->CollisionProp()->BoundingRadius2D(), 0.0f);
+		return MAX(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
 	return enemyDelta.Length();
 }
 
@@ -890,6 +908,24 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 		throw boost::python::error_already_set(); 
 #endif // ENABLE_PYTHON
 		return 0.0f;
+	}
+
+	// For large units (i.e. buildings) use a trace
+	float fBoundingRadius2D = pTarget->CollisionProp()->BoundingRadius2D();
+	if( fBoundingRadius2D > 96.0f )
+	{
+		trace_t tr;
+		Ray_t ray;
+		ray.Init( pos, pTarget->WorldSpaceCenter() );
+		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pTarget, &tr );
+		if( tr.DidHit() )
+		{
+			return (pos - tr.endpos).Length2D();
+		}
+		else
+		{
+			Warning("CUnitBase::TargetDistance: Did not hit target!\n");
+		}
 	}
 
 	Vector enemyDelta = pTarget->WorldSpaceCenter() - pos;
@@ -924,9 +960,7 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 	}
 
 	if( bConsiderSizeUnit )
-	{
-		return enemyDelta.Length() - pTarget->CollisionProp()->BoundingRadius2D();
-	}
+		return MAX(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
 	return enemyDelta.Length();
 }
 
