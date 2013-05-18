@@ -150,7 +150,7 @@ void CefClientHandler::Destroy()
 {
 	if( GetBrowser() )
 	{
-		GetBrowser()->GetHost()->CloseBrowser( /*true*/ );
+		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
 
 	m_pSrcBrowser = NULL;
