@@ -8,6 +8,7 @@
 #include "src_python_networkvar.h"
 #include "src_python.h"
 #include "src_python_usermessage.h"
+#include "unit_base_shared.h"
 
 #ifndef CLIENT_DLL
 #include "enginecallback.h"
@@ -19,22 +20,53 @@ ConVar g_debug_pynetworkvar("g_debug_pynetworkvar", "0", FCVAR_CHEAT|FCVAR_REPLI
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
+// Purpose: Send proxies
+//-----------------------------------------------------------------------------
+bool CPythonSendProxyOwnerOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
+{
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient );
+	if( !pPlayer )
+		return false;
+
+	return pPlayer->GetOwnerNumber() == pEnt->GetOwnerNumber();
+}
+
+bool CPythonSendProxyAlliesOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
+{
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient );
+	if( !pPlayer )
+		return false;
+
+	return GetPlayerRelationShip( pEnt->GetOwnerNumber(), pPlayer->GetOwnerNumber() ) != D_HATE;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback )
+CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback, bp::object sendproxy )
 	: m_bChangedCallback(changedcallback)
 {
 	Q_snprintf(m_Name, PYNETVAR_MAX_NAME, name);
 	CBaseEntity *pEnt = NULL;
-	try {
+	m_pPySendProxy = NULL;
+	try 
+	{
 		pEnt = bp::extract<CBaseEntity *>(ent);
-	} catch(boost::python::error_already_set &) {
+		if( sendproxy.ptr() != Py_None )
+			m_pPySendProxy = bp::extract<CPythonSendProxyBase *>(sendproxy);
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
 	}
+
+	m_pySendProxyRef = sendproxy;
+
 	m_wrefEnt = SrcPySystem()->CreateWeakRef(ent);
-	if( pEnt ) {
+	if( pEnt ) 
+	{
 		pEnt->m_utlPyNetworkVars.AddToTail(this);
 	}
 }
@@ -44,16 +76,35 @@ CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, 
 //-----------------------------------------------------------------------------
 CPythonNetworkVarBase::~CPythonNetworkVarBase()
 {
+	if( m_wrefEnt.ptr() == Py_None )
+		return;
+
 	CBaseEntity *pEnt = NULL;
-	try {
+	try 
+	{
 		pEnt = bp::extract<CBaseEntity *>(m_wrefEnt());
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
 	}
-	if( pEnt )
-		pEnt->m_utlPyNetworkVars.FindAndRemove(this);
+
+	Remove( pEnt );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CPythonNetworkVarBase::Remove( CBaseEntity *pEnt )
+{
+	if( !pEnt )
+		return;
+
+	pEnt->m_utlPyNetworkVars.FindAndRemove( this );
+	m_wrefEnt = bp::object();
+	m_pySendProxyRef = bp::object();
 }
 
 //-----------------------------------------------------------------------------
@@ -64,15 +115,13 @@ void CPythonNetworkVarBase::NetworkStateChanged( void )
 	m_PlayerUpdateBits.SetAll();
 }
 
-void CPythonNetworkVarBase::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient ) {}
-
 //---------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 CPythonNetworkVar::CPythonNetworkVar( bp::object ent, const char *name, bp::object data, 
-									 bool bInitStateChanged, bool changedcallback )
-			: CPythonNetworkVarBase(ent, name, changedcallback)
+									 bool bInitStateChanged, bool changedcallback, bp::object sendproxy )
+			: CPythonNetworkVarBase( ent, name, changedcallback, sendproxy )
 {
 	m_dataInternal = data;
 	if( bInitStateChanged )
@@ -103,12 +152,18 @@ bp::object CPythonNetworkVar::Get( void )
 //-----------------------------------------------------------------------------
 void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	bp::object type = __builtin__.attr("type");
+	m_PlayerUpdateBits.Clear(iClient);
+
+	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
+		return;
 
 	pywrite write;
-	try {
-		PyFillWriteElement(write, Get(), type );
-	} catch(boost::python::error_already_set &) {
+	try 
+	{
+		PyFillWriteElement( write, Get() );
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		Warning("Failed to parse data for network variable %s:\n", m_Name );
 		PyErr_Print();
 		PyErr_Clear();
@@ -130,11 +185,9 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d - %f - PyNetworkVar: %s, Value -> ", pEnt->entindex(), gpGlobals->curtime, m_Name);
+		DevMsg("#%d:%s - %f - PyNetworkVar: %s, Value -> ", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name);
 		PyPrintElement(write);
 	}
-
-	m_PlayerUpdateBits.Clear(iClient);
 }
 
 //---------------------------------------------------------------------------------------
@@ -142,8 +195,8 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 // Purpose: 
 //-----------------------------------------------------------------------------
 CPythonNetworkArray::CPythonNetworkArray( bp::object ent, const char *name, bp::list data, 
-										 bool bInitStateChanged, bool changedcallback )
-: CPythonNetworkVarBase(ent, name, changedcallback)
+										 bool bInitStateChanged, bool changedcallback, bp::object sendproxy )
+: CPythonNetworkVarBase( ent, name, changedcallback, sendproxy )
 {
 	if(data.ptr() != Py_None)
 	{
@@ -195,20 +248,26 @@ void CPythonNetworkArray::Set( bp::list data )
 //-----------------------------------------------------------------------------
 void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	bp::object type = __builtin__.attr("type");
+	m_PlayerUpdateBits.Clear(iClient);
+
+	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
+		return;
 
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	try {
+	try 
+	{
 		length = boost::python::len(m_dataInternal);
 		for(int i=0; i<length; i++)
 		{
 			pywrite write;
-			PyFillWriteElement(write, boost::python::object(m_dataInternal[i]), type );
+			PyFillWriteElement( write, boost::python::object(m_dataInternal[i]) );
 			writelist.AddToTail(write);
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -232,15 +291,13 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d - %f - PyNetworkArray: %s\n", pEnt->entindex(), gpGlobals->curtime, m_Name);
+		DevMsg("#%d:%s - %f - PyNetworkArray: %s\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name);
 		for(int i=0; i<writelist.Count(); i++)
 		{
-			Msg("\t");
+			DevMsg("\t");
 			PyPrintElement(writelist.Element(i));
 		}
 	}
-
-	m_PlayerUpdateBits.Clear(iClient);
 }
 
 //---------------------------------------------------------------------------------------
@@ -248,8 +305,8 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 // Purpose: 
 //-----------------------------------------------------------------------------
 CPythonNetworkDict::CPythonNetworkDict( bp::object ent, const char *name, bp::dict data, 
-									   bool bInitStateChanged, bool changedcallback )
-: CPythonNetworkVarBase(ent, name, changedcallback)
+									   bool bInitStateChanged, bool changedcallback, bp::object sendproxy )
+: CPythonNetworkVarBase( ent, name, changedcallback, sendproxy )
 {
 	if(data.ptr() != Py_None)
 	{
@@ -300,14 +357,17 @@ void CPythonNetworkDict::Set( bp::dict data )
 //-----------------------------------------------------------------------------
 void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	bp::object type = __builtin__.attr("type");
+	m_PlayerUpdateBits.Clear(iClient);
+
+	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
+		return;
 
 	// Create write list
 	// TODO: Only write changed keys if possible
 	unsigned long length = 0;
 	CUtlVector<pywrite> writelist;
-	try {
-
+	try 
+	{
 #if 0
 		if( m_changedKeys.size() > 0 )
 		{
@@ -329,15 +389,17 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 				objectValue = objectValues.attr( "next" )();
 
 				pywrite write;
-				PyFillWriteElement(write, objectKey, type );
+				PyFillWriteElement( write, objectKey );
 				writelist.AddToTail(write);
 
 				pywrite write2;
-				PyFillWriteElement(write2, objectValue, type );
+				PyFillWriteElement( write2, objectValue );
 				writelist.AddToTail(write2);
 			}
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -359,15 +421,13 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		Msg("#%d - %f - PyNetworkDict: %s (length: %d)\n", pEnt->entindex(), gpGlobals->curtime, m_Name, (int)length);
+		DevMsg("#%d:%s - %f - PyNetworkDict: %s (length: %d)\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name, (int)length);
 		for(int i=0; i<writelist.Count(); i++)
 		{
-			Msg("\t");
+			DevMsg("\t");
 			PyPrintElement(writelist.Element(i));
 		}
 	}
-
-	m_PlayerUpdateBits.Clear(iClient);
 }
 
 //---------------------------------------------------------------------------------------
@@ -376,7 +436,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 //-----------------------------------------------------------------------------
 void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict )
 {
-	if( pEnt->m_utlPyNetworkVars.Count() == 0 )
+	if( !pEnt->m_utlPyNetworkVars.Count() )
 		return;
 
 	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get(iEdict) == false )
@@ -421,9 +481,12 @@ void __MsgFunc_PyNetworkVar( bf_read &msg )
 
 	msg.ReadString(buf, _MAX_PATH);
 
-	try {
+	try 
+	{
 		data = PyReadElement(msg);
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &)
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -456,9 +519,12 @@ void __MsgFunc_PyNetworkVarChangedCallback( bf_read &msg )
 
 	msg.ReadString(buf, _MAX_PATH);
 
-	try {
+	try 
+	{
 		data = PyReadElement(msg);
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -497,12 +563,15 @@ void __MsgFunc_PyNetworkArrayFull( bf_read &msg )
 	msg.ReadString(buf, _MAX_PATH);
 	length = msg.ReadByte();
 
-	try {
+	try 
+	{
 		for( i = 0; i < length; i++)
 		{
 			data.append( PyReadElement(msg) );
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -539,12 +608,15 @@ void __MsgFunc_PyNetworkArrayFullChangedCallback( bf_read &msg )
 	msg.ReadString(buf, _MAX_PATH);
 	length = msg.ReadByte();
 
-	try {
+	try 
+	{
 		for( i = 0; i < length; i++)
 		{
 			data.append( PyReadElement(msg) );
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -584,9 +656,12 @@ void __MsgFunc_PyNetworkDictElement( bf_read &msg )
 	msg.ReadString(buf, _MAX_PATH);
 
 	// Read single element
-	try {
+	try 
+	{
 		data[PyReadElement(msg)] = PyReadElement(msg);
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &)
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -624,12 +699,15 @@ void __MsgFunc_PyNetworkDictFull( bf_read &msg )
 	length = msg.ReadByte();
 
 	// Parse data
-	try {
+	try 
+	{
 		for( i = 0; i < length; i++)
 		{
 			data[PyReadElement(msg)] = PyReadElement(msg);
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -667,12 +745,15 @@ void __MsgFunc_PyNetworkDictFullChangedCallback( bf_read &msg )
 	length = msg.ReadByte();
 
 	// Parse data
-	try {
+	try 
+	{
 		for( i = 0; i < length; i++)
 		{
 			data[PyReadElement(msg)] = PyReadElement(msg);
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;

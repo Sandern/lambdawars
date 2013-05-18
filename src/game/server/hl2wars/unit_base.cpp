@@ -425,8 +425,8 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
 
-	SendPropInt		(SENDINFO(m_iHealth), 15, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_iMaxHealth), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_takedamage ), 3, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
 
@@ -443,6 +443,8 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	SendPropInt		(SENDINFO(m_iEnergy), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_iMaxEnergy), 15, SPROP_UNSIGNED ),
+
+	SendPropInt		(SENDINFO(m_iKills), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)

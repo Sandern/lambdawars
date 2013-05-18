@@ -359,7 +359,7 @@ def AddEntityConverter( mb, cls_name ):
     )
 
     # Add from python converter
-    # NOTE: Not sure if teh part where Py_None is returned is correct
+    # NOTE: Not sure if the part where Py_None is returned is correct
     # Returning NULL means it can't be converted. Returning Py_None seems to result in NULL being passed to the function.
     mb.add_declaration_code(
     'struct '+convert_from_py_name + '\r\n' + \

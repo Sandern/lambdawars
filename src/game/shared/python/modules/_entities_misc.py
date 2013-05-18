@@ -157,6 +157,21 @@ class EntitiesMisc(GenerateModuleSemiShared):
         cls.mem_funs('GetItem').rename('__getitem__')
         cls.mem_funs('SetItem').rename('__setitem__')
         
+        # Send proxies for python network variables
+        cls = mb.class_('CPythonSendProxyBase')
+        cls.rename('SendProxyBase') 
+        cls.include()
+        
+        cls = mb.class_('CPythonSendProxyOwnerOnly')
+        cls.rename('SendProxyOwnerOnly') 
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'
+        
+        cls = mb.class_('CPythonSendProxyAlliesOnly')
+        cls.rename('SendProxyAlliesOnly') 
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'
+        
         # Ugly globals
         mb.add_registration_code( "bp::scope().attr( \"g_vecAttackDir\" ) = boost::ref(g_vecAttackDir);" )
     

@@ -105,7 +105,15 @@ class GenerateModule(object):
         mb.code_creator.adopt_include( header )
         header = code_creators.include_t( 'tier0/memdbgon.h' )
         mb.code_creator.adopt_include(header)
-
+        
+    def AddProperty(self, cls, propertyname, getter, setter=''):
+        cls.mem_funs(getter).exclude()
+        if setter: cls.mem_funs(setter).exclude()
+        if setter:
+            cls.add_property(propertyname, cls.member_function( getter ), cls.member_function( setter ))
+        else:
+            cls.add_property(propertyname, cls.member_function( getter ))
+                             
 class GenerateModuleClient(GenerateModule):
     module_type = 'client'
     dll_name = 'Client'

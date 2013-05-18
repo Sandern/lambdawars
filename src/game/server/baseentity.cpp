@@ -8885,6 +8885,10 @@ void CBaseEntity::ClearPyInstance()
 	// Close collision property
 	m_Collision.DestroyPartitionHandle();
 
+	// Clear Python network vars
+	for( int i = m_utlPyNetworkVars.Count() - 1; i >= 0; i-- )
+		m_utlPyNetworkVars[i]->Remove( this );
+
 	// Dereference py think/touch functions
 	m_pyHandle = boost::python::object();
 	m_pyTouchMethod = boost::python::object();
@@ -9010,17 +9014,15 @@ void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	boost::python::object types = SrcPySystem()->Import("types");
-	boost::python::object type = SrcPySystem()->Get("type", "__builtin__");
 	try {
 		length = boost::python::len(msg);
-		for(int i=0; i<length; i++)
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
-			PyFillWriteElement(write, boost::python::object(msg[i]), type );
-			writelist.AddToTail(write);
+			PyFillWriteElement( write, boost::python::object(msg[i]) );
+			writelist.AddToTail( write );
 		}
-	} catch(boost::python::error_already_set &) {
+	} catch( boost::python::error_already_set & ) {
 		PyErr_Print();
 		PyErr_Clear();
 		return;

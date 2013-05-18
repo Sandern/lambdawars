@@ -2005,15 +2005,6 @@ void register_CUnitBase_class(){
                 , GetDensityMultiplier_function_type( &::CUnitBase::GetDensityMultiplier ) );
         
         }
-        { //::CUnitBase::GetEnergy
-        
-            typedef int ( ::CUnitBase::*GetEnergy_function_type )(  ) const;
-            
-            CUnitBase_exposer.def( 
-                "GetEnergy"
-                , GetEnergy_function_type( &::CUnitBase::GetEnergy ) );
-        
-        }
         { //::CUnitBase::GetEnterOffset
         
             typedef ::Vector const & ( ::CUnitBase::*GetEnterOffset_function_type )(  ) ;
@@ -2034,15 +2025,6 @@ void register_CUnitBase_class(){
                 , GetIMouse_function_type(&::CUnitBase::GetIMouse)
                 , default_GetIMouse_function_type(&CUnitBase_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CUnitBase::GetMaxEnergy
-        
-            typedef int ( ::CUnitBase::*GetMaxEnergy_function_type )(  ) const;
-            
-            CUnitBase_exposer.def( 
-                "GetMaxEnergy"
-                , GetMaxEnergy_function_type( &::CUnitBase::GetMaxEnergy ) );
         
         }
         { //::CUnitBase::GetNext
@@ -2383,16 +2365,6 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pCustomOfset")=bp::object() ) );
         
         }
-        { //::CUnitBase::SetEnergy
-        
-            typedef void ( ::CUnitBase::*SetEnergy_function_type )( int ) ;
-            
-            CUnitBase_exposer.def( 
-                "SetEnergy"
-                , SetEnergy_function_type( &::CUnitBase::SetEnergy )
-                , ( bp::arg("iEnergy") ) );
-        
-        }
         { //::CUnitBase::SetEnterOffset
         
             typedef void ( ::CUnitBase::*SetEnterOffset_function_type )( ::Vector const & ) ;
@@ -2401,16 +2373,6 @@ void register_CUnitBase_class(){
                 "SetEnterOffset"
                 , SetEnterOffset_function_type( &::CUnitBase::SetEnterOffset )
                 , ( bp::arg("enteroffset") ) );
-        
-        }
-        { //::CUnitBase::SetMaxEnergy
-        
-            typedef void ( ::CUnitBase::*SetMaxEnergy_function_type )( int ) ;
-            
-            CUnitBase_exposer.def( 
-                "SetMaxEnergy"
-                , SetMaxEnergy_function_type( &::CUnitBase::SetMaxEnergy )
-                , ( bp::arg("iMaxEnergy") ) );
         
         }
         { //::CUnitBase::SetSquad
@@ -2959,6 +2921,17 @@ void register_CUnitBase_class(){
                 "maxenergy"
                 , fget( &::CUnitBase::GetMaxEnergy )
                 , fset( &::CUnitBase::SetMaxEnergy ) );
+        
+        }
+        { //property "kills"[fget=::CUnitBase::GetKills, fset=::CUnitBase::SetKills]
+        
+            typedef int ( ::CUnitBase::*fget )(  ) const;
+            typedef void ( ::CUnitBase::*fset )( int ) ;
+            
+            CUnitBase_exposer.add_property( 
+                "kills"
+                , fget( &::CUnitBase::GetKills )
+                , fset( &::CUnitBase::SetKills ) );
         
         }
         { //property "animstate"[fget=::CUnitBase::PyGetAnimState, fset=::CUnitBase::SetAnimState]

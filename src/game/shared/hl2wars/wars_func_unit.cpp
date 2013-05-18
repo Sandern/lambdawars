@@ -41,6 +41,7 @@ BEGIN_NETWORK_TABLE(CFuncUnit, DT_FuncUnit)
 
 	RecvPropInt		(RECVINFO(m_iEnergy)),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
+	RecvPropInt		(RECVINFO(m_iKills)),
 #else
 	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
 
@@ -53,6 +54,7 @@ BEGIN_NETWORK_TABLE(CFuncUnit, DT_FuncUnit)
 
 	SendPropInt		(SENDINFO(m_iEnergy), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_iMaxEnergy), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO(m_iKills), 9, SPROP_UNSIGNED ),
 #endif
 END_NETWORK_TABLE()
 

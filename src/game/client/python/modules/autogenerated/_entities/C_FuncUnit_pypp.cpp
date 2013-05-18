@@ -1372,15 +1372,6 @@ void register_C_FuncUnit_class(){
                 , default_GetCursor_function_type(&C_FuncUnit_wrapper::default_GetCursor) );
         
         }
-        { //::C_FuncUnit::GetEnergy
-        
-            typedef int ( ::C_FuncUnit::*GetEnergy_function_type )(  ) const;
-            
-            C_FuncUnit_exposer.def( 
-                "GetEnergy"
-                , GetEnergy_function_type( &::C_FuncUnit::GetEnergy ) );
-        
-        }
         { //::C_FuncUnit::GetEnterOffset
         
             typedef ::Vector const & ( ::C_FuncUnit::*GetEnterOffset_function_type )(  ) ;
@@ -1401,15 +1392,6 @@ void register_C_FuncUnit_class(){
                 , GetIMouse_function_type(&::C_FuncUnit::GetIMouse)
                 , default_GetIMouse_function_type(&C_FuncUnit_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_FuncUnit::GetMaxEnergy
-        
-            typedef int ( ::C_FuncUnit::*GetMaxEnergy_function_type )(  ) const;
-            
-            C_FuncUnit_exposer.def( 
-                "GetMaxEnergy"
-                , GetMaxEnergy_function_type( &::C_FuncUnit::GetMaxEnergy ) );
         
         }
         { //::C_FuncUnit::GetPyNetworkType
@@ -1903,6 +1885,17 @@ void register_C_FuncUnit_class(){
             C_FuncUnit_exposer.add_property( 
                 "maxenergy"
                 , fget( &::C_FuncUnit::GetMaxEnergy ) );
+        
+        }
+        { //property "kills"[fget=::C_FuncUnit::GetKills, fset=::C_FuncUnit::SetKills]
+        
+            typedef int ( ::C_FuncUnit::*fget )(  ) const;
+            typedef void ( ::C_FuncUnit::*fset )( int ) ;
+            
+            C_FuncUnit_exposer.add_property( 
+                "kills"
+                , fget( &::C_FuncUnit::GetKills )
+                , fset( &::C_FuncUnit::SetKills ) );
         
         }
         { //::C_FuncUnit::TestCollision

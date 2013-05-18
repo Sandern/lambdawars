@@ -154,6 +154,10 @@ public:
 	virtual void		SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
 #endif // CLIENT_DLL
 
+	// Kills
+	int					GetKills() const { return m_iKills; }
+	void				SetKills( int iKills ) { m_iKills = iKills; }
+
 	// Special code for moving to target buildings
 	virtual bool				HasEnterOffset( void );
 	virtual const Vector &		GetEnterOffset( void );
@@ -185,6 +189,9 @@ private:
 	// Energy
 	CNetworkVar(int, m_iEnergy );
 	CNetworkVar(int, m_iMaxEnergy );
+
+	// Kills
+	CNetworkVar(int, m_iKills );
 #else
 	string_t m_UnitType;
 	char m_NetworkedUnitType[MAX_PATH];
@@ -196,6 +203,9 @@ private:
 	// Energy
 	int						m_iEnergy;
 	int						m_iMaxEnergy;
+
+	// Kills
+	int						m_iKills;
 #endif // CLIENT_DLL
 
 	CNetworkHandle( CBaseEntity, m_hSquadUnit );

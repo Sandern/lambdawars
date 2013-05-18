@@ -36,38 +36,37 @@ enum PyType{
 };
 
 #ifndef CLIENT_DLL
-extern bp::object types;
-extern bp::object __builtin__;
-
 // TODO: Could use some optimization probably
-void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
+void PyFillWriteElement( pywrite &w, bp::object data )
 {
-	if( type(data) == types.attr("IntType") )
+	bp::object datatype = fntype(data);
+
+	if( datatype == types.attr("IntType") )
 	{
 		w.type = PYTYPE_INT;
 		w.writeint = boost::python::extract<int>(data);
 	}
-	else if( type(data) == types.attr("FloatType") )
+	else if( datatype == types.attr("FloatType") )
 	{
 		w.type = PYTYPE_FLOAT;
 		w.writefloat = boost::python::extract<float>(data);
 	}
-	else if( type(data) == types.attr("StringType") )
+	else if( datatype == types.attr("StringType") )
 	{
 		w.type = PYTYPE_STRING;
 		w.writestr = boost::python::extract<const char *>(data);
 	}
-	else if( type(data) == types.attr("BooleanType") )
+	else if( datatype == types.attr("BooleanType") )
 	{
 		w.type = PYTYPE_BOOL;
 		w.writebool = boost::python::extract<bool>(data);
 	}
-	else if( type(data) == types.attr("NoneType") )
+	else if( datatype == types.attr("NoneType") )
 	{
 		w.type = PYTYPE_NONE;
 
 	}
-	else if( type(data) == types.attr("ListType") )
+	else if( datatype == types.attr("ListType") )
 	{
 		w.type = PYTYPE_LIST;
 
@@ -75,11 +74,11 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 		for(int i=0; i<length; i++)
 		{
 			pywrite write;
-			PyFillWriteElement(write, data[i], type );
+			PyFillWriteElement( write, data[i] );
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( type(data) == __builtin__.attr("set") )
+	else if( datatype == __builtin__.attr("set") )
 	{
 		w.type = PYTYPE_SET;
 
@@ -89,11 +88,11 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 		for(int i=0; i<length; i++)
 		{
 			pywrite write;
-			PyFillWriteElement(write, data[i], type );
+			PyFillWriteElement( write, data[i] );
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( type(data) == types.attr("TupleType") )
+	else if( datatype == types.attr("TupleType") )
 	{
 		w.type = PYTYPE_TUPLE;
 
@@ -101,11 +100,11 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 		for(int i=0; i<length; i++)
 		{
 			pywrite write;
-			PyFillWriteElement(write, data[i], type );
+			PyFillWriteElement( write, data[i] );
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( type(data) == types.attr("DictType") )
+	else if( datatype == types.attr("DictType") )
 	{
 		w.type = PYTYPE_DICT;
 
@@ -119,11 +118,11 @@ void PyFillWriteElement( pywrite &w, bp::object data, bp::object type )
 			objectValue = objectValues.attr( "next" )();
 
 			pywrite write;
-			PyFillWriteElement(write, objectKey, type );
+			PyFillWriteElement( write, objectKey );
 			w.writelist.AddToTail(write);
 
 			pywrite write2;
-			PyFillWriteElement(write2, objectValue, type );
+			PyFillWriteElement( write2, objectValue );
 			w.writelist.AddToTail(write2);
 		}
 	}
@@ -205,29 +204,29 @@ void PyPrintElement( pywrite &w )
 	switch(w.type)
 	{
 	case PYTYPE_INT:
-		Msg("Int: %ld\n", w.writeint);
+		DevMsg("Int: %ld\n", w.writeint);
 		break;
 	case PYTYPE_FLOAT:
-		Msg("Float: %f\n", w.writefloat);
+		DevMsg("Float: %f\n", w.writefloat);
 		break;
 	case PYTYPE_STRING:
-		Msg("String: %s\n", w.writestr);
+		DevMsg("String: %s\n", w.writestr);
 		break;
 	case PYTYPE_BOOL:
-		Msg("Bool: %d\n", w.writebool);
+		DevMsg("Bool: %d\n", w.writebool);
 		break;
 	case PYTYPE_VECTOR:
-		Msg("Vector: %f %f %f\n", w.writevector[0],
+		DevMsg("Vector: %f %f %f\n", w.writevector[0],
 			w.writevector[1],
 			w.writevector[2] );
 		break;
 	case PYTYPE_QANGLE:
-		Msg("QAngle: %f %f %f\n", w.writevector[0],
+		DevMsg("QAngle: %f %f %f\n", w.writevector[0],
 			w.writevector[1],
 			w.writevector[2] );
 		break;
 	case PYTYPE_NONE:
-		Msg("None\n");
+		DevMsg("None\n");
 		break;
 	case PYTYPE_LIST:
 	case PYTYPE_DICT:
@@ -237,7 +236,7 @@ void PyPrintElement( pywrite &w )
 			PyPrintElement( w.writelist[i] );
 		break;
 	case PYTYPE_HANDLE:
-		Msg("Handle: %d\n", w.writehandle.Get());
+		DevMsg("Handle: %d\n", w.writehandle.Get());
 		break;
 	}
 }
@@ -263,13 +262,12 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	boost::python::object type = __builtin__.attr("type");
 	try {
 		length = boost::python::len(msg);
 		for(int i=0; i<length; i++)
 		{
 			pywrite write;
-			PyFillWriteElement(write, boost::python::object(msg[i]), type );
+			PyFillWriteElement( write, boost::python::object(msg[i]) );
 			writelist.AddToTail(write);
 		}
 	} catch(boost::python::error_already_set &) {
@@ -289,12 +287,12 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 
 	if( g_debug_pyusermessage.GetBool() )
 	{
-		Msg("== PySendUserMessage: Sending message to %s, consisting of %d elements\n", messagename, writelist.Count());
+		DevMsg("== PySendUserMessage: Sending message to %s, consisting of %d elements\n", messagename, writelist.Count());
 		for(int i=0; i<writelist.Count(); i++)
 		{	
 			PyPrintElement(writelist.Element(i));
 		}
-		Msg("== End PySendUserMessage\n"); 
+		DevMsg("== End PySendUserMessage\n"); 
 	}
 }
 #else

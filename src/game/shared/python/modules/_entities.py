@@ -1218,17 +1218,12 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_fun('SetAttackPriority').exclude()
         
         if self.isClient:
-            cls.add_property( 'energy'
-                             , cls.member_function( 'GetEnergy' ) )
-            cls.add_property( 'maxenergy'
-                             , cls.member_function( 'GetMaxEnergy' ) )
+            self.AddProperty(cls, 'energy', 'GetEnergy')
+            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
         else:
-            cls.add_property( 'energy'
-                             , cls.member_function( 'GetEnergy' )
-                             , cls.member_function( 'SetEnergy' ) )
-            cls.add_property( 'maxenergy'
-                             , cls.member_function( 'GetMaxEnergy' )
-                             , cls.member_function( 'SetMaxEnergy' ) )
+            self.AddProperty(cls, 'energy', 'GetEnergy', 'SetEnergy')
+            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy', 'SetMaxEnergy')
+        self.AddProperty(cls, 'kills', 'GetKills', 'SetKills')
         
     def ParseUnitBase(self, mb):
         cls_name = 'C_UnitBase' if self.isClient else 'CUnitBase'

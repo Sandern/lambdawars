@@ -152,6 +152,7 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	RecvPropInt		(RECVINFO(m_iEnergy)),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
+	RecvPropInt		(RECVINFO(m_iKills)),
 END_RECV_TABLE()
 
 IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )

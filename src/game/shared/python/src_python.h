@@ -43,7 +43,7 @@ extern unsigned int g_hPythonThreadID;
 
 //-----------------------------------------------------------------------------
 // Global variables to some commonly used modules. This way you don't need to import
-// these modules, which saves a lot of time
+// these modules, which saves time
 //-----------------------------------------------------------------------------
 extern boost::python::object mainmodule;
 extern boost::python::object mainnamespace;
@@ -64,6 +64,8 @@ extern boost::python::object gamemgr;
 	extern boost::python::object _vguicontrols;
 #endif // CLIENT_DLL
 
+extern boost::python::object fntype;
+
 //-----------------------------------------------------------------------------
 // Purpose: Adding modules to python
 //-----------------------------------------------------------------------------
@@ -74,7 +76,7 @@ extern boost::python::object gamemgr;
 #define APPEND_MODULE( x )											\
 	if (PyImport_AppendInittab(STRINGIZE(x), PYINIT(x)) == -1)		\
 {																	\
-	Warning("[Python]Failed to init %s module\n", #x);				\
+	Warning("[Python]Failed to init " #x " module\n");				\
 }																	\
 
 //-----------------------------------------------------------------------------

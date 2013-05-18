@@ -65,6 +65,8 @@ bp::object matchmaking;
 	boost::python::object _vguicontrols;
 #endif // CLIENT_DLL
 
+boost::python::object fntype;
+
 static CSrcPython g_SrcPythonSystem;
 
 CSrcPython *SrcPySystem()
@@ -227,6 +229,8 @@ bool CSrcPython::Init( )
 	} catch( error_already_set & ) {
 		PyErr_Print();
 	}
+
+	fntype = __builtin__.attr("type");
 
 	// Add the maps directory to the modulse path
 	SysAppendPath("maps");

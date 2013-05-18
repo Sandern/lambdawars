@@ -34,7 +34,7 @@
 		CUtlVector< struct pywrite > writelist;
 	} pywrite;
 
-	void PyFillWriteElement( pywrite &w, bp::object data, bp::object type );
+	void PyFillWriteElement( pywrite &w, bp::object data );
 	void PyWriteElement( pywrite &w );
 	void PyPrintElement( pywrite &w );
 	void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg );

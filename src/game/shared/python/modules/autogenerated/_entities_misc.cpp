@@ -2555,6 +2555,54 @@ struct CGlobalEntityList_wrapper : CGlobalEntityList, bp::wrapper< CGlobalEntity
 
 };
 
+struct CPythonSendProxyBase_wrapper : CPythonSendProxyBase, bp::wrapper< CPythonSendProxyBase > {
+
+    CPythonSendProxyBase_wrapper(CPythonSendProxyBase const & arg )
+    : CPythonSendProxyBase( arg )
+      , bp::wrapper< CPythonSendProxyBase >(){
+        // copy constructor
+        
+    }
+
+    CPythonSendProxyBase_wrapper()
+    : CPythonSendProxyBase()
+      , bp::wrapper< CPythonSendProxyBase >(){
+        // null constructor
+        
+    }
+
+    virtual bool ShouldSend( ::CBaseEntity * pEnt, int iClient ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "ShouldSend: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling ShouldSend( boost::python::ptr(pEnt), iClient ) of Class: CPythonSendProxyBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_ShouldSend = this->get_override( "ShouldSend" );
+        if( func_ShouldSend.ptr() != Py_None )
+            try {
+                return func_ShouldSend( boost::python::ptr(pEnt), iClient );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+            }
+        else
+            return this->CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+    }
+    
+    bool default_ShouldSend( ::CBaseEntity * pEnt, int iClient ) {
+        return CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+    }
+
+};
+
 struct FireBulletsInfo_t_wrapper : FireBulletsInfo_t, bp::wrapper< FireBulletsInfo_t > {
 
     FireBulletsInfo_t_wrapper(FireBulletsInfo_t const & arg )
@@ -4527,7 +4575,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
             , (void ( ::CMultiDamage::* )( ::CBaseEntity * ) )( &::CMultiDamage::SetTarget )
             , ( bp::arg("pTarget") ) );
 
-    bp::class_< CPythonNetworkArray >( "NetworkArrayInternal", bp::init< bp::object, char const *, bp::optional< bp::list, bool, bool > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::list(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false) )) )    
+    bp::class_< CPythonNetworkArray >( "NetworkArrayInternal", bp::init< bp::object, char const *, bp::optional< bp::list, bool, bool, bp::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::list(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::object() )) )    
         .def( 
             "__delitem__"
             , (void ( ::CPythonNetworkArray::* )( ::boost::python::object ) )( &::CPythonNetworkArray::DelItem )
@@ -4545,7 +4593,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
             , (void ( ::CPythonNetworkArray::* )( ::boost::python::object,::boost::python::object ) )( &::CPythonNetworkArray::SetItem )
             , ( bp::arg("key"), bp::arg("data") ) );
 
-    bp::class_< CPythonNetworkDict >( "NetworkDictInternal", bp::init< bp::object, char const *, bp::optional< bp::dict, bool, bool > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false) )) )    
+    bp::class_< CPythonNetworkDict >( "NetworkDictInternal", bp::init< bp::object, char const *, bp::optional< bp::dict, bool, bool, bp::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::object() )) )    
         .def( 
             "__getitem__"
             , (::boost::python::object ( ::CPythonNetworkDict::* )( ::boost::python::object ) )( &::CPythonNetworkDict::GetItem )
@@ -4559,7 +4607,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
             , (void ( ::CPythonNetworkDict::* )( ::boost::python::object,::boost::python::object ) )( &::CPythonNetworkDict::SetItem )
             , ( bp::arg("key"), bp::arg("data") ) );
 
-    bp::class_< CPythonNetworkVar >( "NetworkVarInternal", bp::init< bp::object, char const *, bp::optional< bp::object, bool, bool > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::object(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false) )) )    
+    bp::class_< CPythonNetworkVar >( "NetworkVarInternal", bp::init< bp::object, char const *, bp::optional< bp::object, bool, bool, bp::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::object(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::object() )) )    
         .def( 
             "Get"
             , (::boost::python::object ( ::CPythonNetworkVar::* )(  ) )( &::CPythonNetworkVar::Get ) )    
@@ -4567,6 +4615,25 @@ BOOST_PYTHON_MODULE(_entities_misc){
             "Set"
             , (void ( ::CPythonNetworkVar::* )( ::boost::python::object ) )( &::CPythonNetworkVar::Set )
             , ( bp::arg("data") ) );
+
+    bp::class_< CPythonSendProxyBase_wrapper >( "SendProxyBase" )    
+        .def( 
+            "ShouldSend"
+            , (bool ( ::CPythonSendProxyBase::* )( ::CBaseEntity *,int ) )(&::CPythonSendProxyBase::ShouldSend)
+            , (bool ( CPythonSendProxyBase_wrapper::* )( ::CBaseEntity *,int ) )(&CPythonSendProxyBase_wrapper::default_ShouldSend)
+            , ( bp::arg("pEnt"), bp::arg("iClient") ) );
+
+    bp::class_< CPythonSendProxyAlliesOnly, bp::bases< CPythonSendProxyBase > >( "SendProxyAlliesOnly" )    
+        .def( 
+            "ShouldSend"
+            , (bool ( ::CPythonSendProxyAlliesOnly::* )( ::CBaseEntity *,int ) )( &::CPythonSendProxyAlliesOnly::ShouldSend )
+            , ( bp::arg("pEnt"), bp::arg("iClient") ) );
+
+    bp::class_< CPythonSendProxyOwnerOnly, bp::bases< CPythonSendProxyBase > >( "SendProxyOwnerOnly" )    
+        .def( 
+            "ShouldSend"
+            , (bool ( ::CPythonSendProxyOwnerOnly::* )( ::CBaseEntity *,int ) )( &::CPythonSendProxyOwnerOnly::ShouldSend )
+            , ( bp::arg("pEnt"), bp::arg("iClient") ) );
 
     { //::CShotManipulator
         typedef bp::class_< CShotManipulator > CShotManipulator_exposer_t;

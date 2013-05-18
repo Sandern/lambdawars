@@ -244,15 +244,18 @@ public:
 	virtual void		TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
 
 	// Energy
-	virtual int			GetEnergy() const { return m_iEnergy; }
-	virtual int			GetMaxEnergy()  const	{ return m_iMaxEnergy; }
+	int					GetEnergy() const { return m_iEnergy; }
+	int					GetMaxEnergy()  const	{ return m_iMaxEnergy; }
 #ifndef CLIENT_DLL
-	virtual void		SetEnergy( int iEnergy ) { m_iEnergy = iEnergy; }
-	virtual void		SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
+	void				SetEnergy( int iEnergy ) { m_iEnergy = iEnergy; }
+	void				SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
 #endif // CLIENT_DLL
 
-public:
+	// Kills
+	int					GetKills() const { return m_iKills; }
+	void				SetKills( int iKills ) { m_iKills = iKills; }
 
+public:
 	virtual void		FireBullets( const FireBulletsInfo_t &info );
 	virtual bool		TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 
@@ -506,6 +509,9 @@ private:
 	// Energy
 	CNetworkVar(int, m_iEnergy );
 	CNetworkVar(int, m_iMaxEnergy );
+
+	// Kills
+	CNetworkVar(int, m_iKills );
 #else
 	string_t m_UnitType;
 	char m_NetworkedUnitType[MAX_PATH];
@@ -526,6 +532,9 @@ private:
 	// Energy
 	int						m_iEnergy;
 	int						m_iMaxEnergy;
+
+	// Kills
+	int						m_iKills;
 #endif // CLIENT_DLL
 
 	CNetworkHandle( CBaseEntity, m_hSquadUnit );

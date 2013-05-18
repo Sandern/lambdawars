@@ -1427,15 +1427,6 @@ void register_CFuncUnit_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CFuncUnit::GetEnergy
-        
-            typedef int ( ::CFuncUnit::*GetEnergy_function_type )(  ) const;
-            
-            CFuncUnit_exposer.def( 
-                "GetEnergy"
-                , GetEnergy_function_type( &::CFuncUnit::GetEnergy ) );
-        
-        }
         { //::CFuncUnit::GetEnterOffset
         
             typedef ::Vector const & ( ::CFuncUnit::*GetEnterOffset_function_type )(  ) ;
@@ -1456,15 +1447,6 @@ void register_CFuncUnit_class(){
                 , GetIMouse_function_type(&::CFuncUnit::GetIMouse)
                 , default_GetIMouse_function_type(&CFuncUnit_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CFuncUnit::GetMaxEnergy
-        
-            typedef int ( ::CFuncUnit::*GetMaxEnergy_function_type )(  ) const;
-            
-            CFuncUnit_exposer.def( 
-                "GetMaxEnergy"
-                , GetMaxEnergy_function_type( &::CFuncUnit::GetMaxEnergy ) );
         
         }
         { //::CFuncUnit::GetPyNetworkType
@@ -1589,16 +1571,6 @@ void register_CFuncUnit_class(){
                 , ( bp::arg("player") ) );
         
         }
-        { //::CFuncUnit::SetEnergy
-        
-            typedef void ( ::CFuncUnit::*SetEnergy_function_type )( int ) ;
-            
-            CFuncUnit_exposer.def( 
-                "SetEnergy"
-                , SetEnergy_function_type( &::CFuncUnit::SetEnergy )
-                , ( bp::arg("iEnergy") ) );
-        
-        }
         { //::CFuncUnit::SetEnterOffset
         
             typedef void ( ::CFuncUnit::*SetEnterOffset_function_type )( ::Vector const & ) ;
@@ -1607,16 +1579,6 @@ void register_CFuncUnit_class(){
                 "SetEnterOffset"
                 , SetEnterOffset_function_type( &::CFuncUnit::SetEnterOffset )
                 , ( bp::arg("enteroffset") ) );
-        
-        }
-        { //::CFuncUnit::SetMaxEnergy
-        
-            typedef void ( ::CFuncUnit::*SetMaxEnergy_function_type )( int ) ;
-            
-            CFuncUnit_exposer.def( 
-                "SetMaxEnergy"
-                , SetMaxEnergy_function_type( &::CFuncUnit::SetMaxEnergy )
-                , ( bp::arg("iMaxEnergy") ) );
         
         }
         { //::CFuncUnit::SetSquad
@@ -2029,6 +1991,17 @@ void register_CFuncUnit_class(){
                 "maxenergy"
                 , fget( &::CFuncUnit::GetMaxEnergy )
                 , fset( &::CFuncUnit::SetMaxEnergy ) );
+        
+        }
+        { //property "kills"[fget=::CFuncUnit::GetKills, fset=::CFuncUnit::SetKills]
+        
+            typedef int ( ::CFuncUnit::*fget )(  ) const;
+            typedef void ( ::CFuncUnit::*fset )( int ) ;
+            
+            CFuncUnit_exposer.add_property( 
+                "kills"
+                , fget( &::CFuncUnit::GetKills )
+                , fset( &::CFuncUnit::SetKills ) );
         
         }
         { //::CFuncUnit::TestCollision

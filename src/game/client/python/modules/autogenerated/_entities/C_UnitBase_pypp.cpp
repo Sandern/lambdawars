@@ -1555,15 +1555,6 @@ void register_C_UnitBase_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        { //::C_UnitBase::GetEnergy
-        
-            typedef int ( ::C_UnitBase::*GetEnergy_function_type )(  ) const;
-            
-            C_UnitBase_exposer.def( 
-                "GetEnergy"
-                , GetEnergy_function_type( &::C_UnitBase::GetEnergy ) );
-        
-        }
         { //::C_UnitBase::GetEnterOffset
         
             typedef ::Vector const & ( ::C_UnitBase::*GetEnterOffset_function_type )(  ) ;
@@ -1584,15 +1575,6 @@ void register_C_UnitBase_class(){
                 , GetIMouse_function_type(&::C_UnitBase::GetIMouse)
                 , default_GetIMouse_function_type(&C_UnitBase_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_UnitBase::GetMaxEnergy
-        
-            typedef int ( ::C_UnitBase::*GetMaxEnergy_function_type )(  ) const;
-            
-            C_UnitBase_exposer.def( 
-                "GetMaxEnergy"
-                , GetMaxEnergy_function_type( &::C_UnitBase::GetMaxEnergy ) );
         
         }
         { //::C_UnitBase::GetNext
@@ -2307,6 +2289,17 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.add_property( 
                 "maxenergy"
                 , fget( &::C_UnitBase::GetMaxEnergy ) );
+        
+        }
+        { //property "kills"[fget=::C_UnitBase::GetKills, fset=::C_UnitBase::SetKills]
+        
+            typedef int ( ::C_UnitBase::*fget )(  ) const;
+            typedef void ( ::C_UnitBase::*fset )( int ) ;
+            
+            C_UnitBase_exposer.add_property( 
+                "kills"
+                , fget( &::C_UnitBase::GetKills )
+                , fset( &::C_UnitBase::SetKills ) );
         
         }
         { //property "animstate"[fget=::C_UnitBase::PyGetAnimState, fset=::C_UnitBase::SetAnimState]

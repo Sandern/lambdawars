@@ -20,15 +20,38 @@
 namespace bp = boost::python;
 
 #ifndef CLIENT_DLL
+
+// Python Send proxies
+class CPythonSendProxyBase
+{
+public:
+	virtual bool ShouldSend( CBaseEntity *pEnt, int iClient ) { return true; }
+};
+
+class CPythonSendProxyOwnerOnly : public CPythonSendProxyBase
+{
+public:
+	virtual bool ShouldSend( CBaseEntity *pEnt, int iClient );
+};
+
+class CPythonSendProxyAlliesOnly : public CPythonSendProxyBase
+{
+public:
+	virtual bool ShouldSend( CBaseEntity *pEnt, int iClient );
+};
+
+// Python network classes
 #define PYNETVAR_MAX_NAME 260
 class CPythonNetworkVarBase
 {
 public:
-	CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback=false );
+	CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback=false, bp::object sendproxy=bp::object() );
 	~CPythonNetworkVarBase();
 
+	void Remove( CBaseEntity *pEnt );
+
 	void NetworkStateChanged( void );
-	virtual void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
+	virtual void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient ) {}
 
 public:
 	// This bit vector contains the players who don't have the most up to date data
@@ -40,13 +63,15 @@ protected:
 
 	bp::object m_wrefEnt;
 
+	CPythonSendProxyBase *m_pPySendProxy;
+	bp::object m_pySendProxyRef;
 };
 
 class CPythonNetworkVar : CPythonNetworkVarBase
 {
 public:
 	CPythonNetworkVar( bp::object self, const char *name, bp::object data = bp::object(), 
-		bool initstatechanged=false, bool changedcallback=false );
+		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
@@ -61,7 +86,7 @@ class CPythonNetworkArray : CPythonNetworkVarBase
 {
 public:
 	CPythonNetworkArray( bp::object self, const char *name, bp::list data = bp::list(), 
-		bool initstatechanged=false, bool changedcallback=false );
+		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
@@ -79,7 +104,7 @@ class CPythonNetworkDict : CPythonNetworkVarBase
 {
 public:
 	CPythonNetworkDict( bp::object self, const char *name, bp::dict data = bp::dict(), 
-		bool initstatechanged=false, bool changedcallback=false );
+		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
