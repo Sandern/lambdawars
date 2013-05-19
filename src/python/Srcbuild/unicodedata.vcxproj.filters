@@ -21,7 +21,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\game\server\Release_sdk\Python27.lib" />
-  </ItemGroup>
 </Project>

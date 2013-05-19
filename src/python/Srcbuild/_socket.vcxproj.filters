@@ -18,7 +18,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\lib\public\python27.lib" />
-  </ItemGroup>
 </Project>

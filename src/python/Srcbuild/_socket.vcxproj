@@ -53,7 +53,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Client|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -196,7 +196,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;server.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\game\server\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\game\server\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1e1D0000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -248,7 +248,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ws2_32.lib;client.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\game\client\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\game\client\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1e1D0000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -267,9 +267,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Modules\socketmodule.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\lib\public\python27.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

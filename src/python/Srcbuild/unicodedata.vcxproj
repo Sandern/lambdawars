@@ -53,7 +53,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Client|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -193,7 +193,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>server.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\game\server\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\game\server\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1D120000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -240,7 +240,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>client.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\game\client\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\game\client\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1D120000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -259,9 +259,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Modules\unicodedata.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\game\server\Release_sdk\Python27.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

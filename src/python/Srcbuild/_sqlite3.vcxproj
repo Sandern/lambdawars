@@ -53,7 +53,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Client|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -202,7 +202,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>sqlite3.lib;server.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\sqlite3;..\..\game\server\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\sqlite3;..\..\game\server\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1e180000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -270,7 +270,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>sqlite3.lib;client.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\..\sqlite3;..\..\game\client\Release_sdk;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\sqlite3;..\..\game\client\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <BaseAddress>0x1e180000</BaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -309,9 +309,6 @@
     <ClCompile Include="..\Modules\_sqlite\row.c" />
     <ClCompile Include="..\Modules\_sqlite\statement.c" />
     <ClCompile Include="..\Modules\_sqlite\util.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\game\server\Release_sdk\Python27.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
