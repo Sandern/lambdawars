@@ -120,8 +120,12 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 	// Shouldn't matter for the game dll, because it will update the video level anyway (and we always use dxlevel 100)
 	if( g_pMaterialSystem )
 	{
+		// Hammer is started with the parameter "-disallowhwmorph", which will make "HasFastVertexTextures" return 0
+		// Due this, ps30 won't work correctly, so remove it.
+		CommandLine()->RemoveParm( "-disallowhwmorph" );
+
 		MaterialSystem_Config_t config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
-		if( config.dxSupportLevel < 100 )
+		if( /*!config.bEditMode &&*/ config.dxSupportLevel < 100 )
 		{
 			config.dxSupportLevel = 100;
 			g_pMaterialSystem->OverrideConfig( config, true );

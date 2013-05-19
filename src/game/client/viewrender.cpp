@@ -2276,6 +2276,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 	VPROF( "CViewRender::RenderView" );
 
+#if 0
 	// Don't want Left4Dead running less than DX 9
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 90 )
 	{
@@ -2292,6 +2293,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 			return;
 		}
 	}
+#endif // 0
 
 	{
 		// HACK: server-side weapons use the viewmodel model, and client-side weapons swap that out for

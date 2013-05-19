@@ -44,39 +44,15 @@ void SaveVideoCfgExt()
 	pConfig->deleteThis();
 }
 
-#if 0
-CON_COMMAND( force_dxlevel_92, "" )
-{
-	KeyValues *pConfigKeys = new KeyValues( "Data" );
-
-	//struct VidMatConfigData_t data;
-	//RecommendedConfig( data );
-
-	ReadCurrentVideoConfig( pConfigKeys );
-
-	//const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-	//materials->GetRecommendedConfigurationInfo( 0, pConfigKeys );
-
-	KeyValuesDumpAsDevMsg( pConfigKeys );
-
-	Msg("Cur mat_dxlevel: %d\n", pConfigKeys->GetInt( "settings.mat_dxlevel", -1 ) );
-
-	pConfigKeys->SetInt( "settings.mat_dxlevel", 92 );
-
-	Msg("New mat_dxlevel: %d\n", pConfigKeys->GetInt( "settings.mat_dxlevel", -1 ) );
-
-	//materials->
-	UpdateVideoConfigConVars( pConfigKeys );
-}
-#endif // 0
-
 CON_COMMAND( debug_print_dxlevel, "" )
 {
 	ConVarRef mat_dxlevel("mat_dxlevel");
 
-	Msg( "nDXLevel: %d, nMaxDXLevel: %d, mat_dxlevel: %d, hdr type: %d\n", 
+	Msg( "nDXLevel: %d, nMaxDXLevel: %d, mat_dxlevel: %d, hdr type: %d, HasFastVertexTextures: %d\n", 
 		g_pMaterialSystemHardwareConfig->GetDXSupportLevel(), 
 		g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel(), 
 		mat_dxlevel.GetInt(),
-		g_pMaterialSystemHardwareConfig->GetHDRType() );
+		g_pMaterialSystemHardwareConfig->GetHDRType(),
+		g_pMaterialSystemHardwareConfig->HasFastVertexTextures()
+		);
 }
