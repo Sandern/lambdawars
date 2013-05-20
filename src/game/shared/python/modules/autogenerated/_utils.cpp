@@ -127,18 +127,22 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     
     }
 
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
-                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-                if( func_ShouldHitEntity.ptr() != Py_None )
-                {
-                    try {
-                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
-                    } catch(...) {
-                        PyErr_Print();
-                    }
-                }
-                return false;
+    virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        if( func_ShouldHitEntity.ptr() != Py_None )
+            try {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
+                PyErr_Print();
+                return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
+        else
+            return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
+    }
+
+    bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
+        return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
+    }
 
 };
 
@@ -903,8 +907,9 @@ BOOST_PYTHON_MODULE(_utils){
     bp::class_< CPyTraceFilterSimple_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSimple", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
-            , (bool ( ::CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&::CPyTraceFilterSimple_wrapper::ShouldHitEntity)
-            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
+            , (bool ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CPyTraceFilterSimple_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterChain_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) )    
         .def( 
@@ -2878,18 +2883,22 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     
     }
 
-    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
-                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-                if( func_ShouldHitEntity.ptr() != Py_None )
-                {
-                    try {
-                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
-                    } catch(...) {
-                        PyErr_Print();
-                    }
-                }
-                return false;
+    virtual bool ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
+        boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        if( func_ShouldHitEntity.ptr() != Py_None )
+            try {
+                return func_ShouldHitEntity( ConvertIHandleEntity( pHandleEntity ), contentsMask );
+            } catch(...) {
+                PyErr_Print();
+                return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
             }
+        else
+            return this->CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
+    }
+
+    bool default_ShouldHitEntity( ::IHandleEntity * pHandleEntity, int contentsMask ) {
+        return CTraceFilterSimple::ShouldHitEntity( boost::python::ptr(pHandleEntity), contentsMask );
+    }
 
 };
 
@@ -3711,8 +3720,9 @@ BOOST_PYTHON_MODULE(_utils){
     bp::class_< CPyTraceFilterSimple_wrapper, bp::bases< CTraceFilterSimple > >( "CTraceFilterSimple", bp::init< IHandleEntity const *, int >(( bp::arg("passentity"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
-            , (bool ( ::CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&::CPyTraceFilterSimple_wrapper::ShouldHitEntity)
-            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) );
+            , (bool ( ::CTraceFilterSimple::* )( ::IHandleEntity *,int ) )(&::CTraceFilterSimple::ShouldHitEntity)
+            , (bool ( CPyTraceFilterSimple_wrapper::* )( ::IHandleEntity *,int ) )(&CPyTraceFilterSimple_wrapper::default_ShouldHitEntity)
+            , ( boost::python::arg("pHandleEntity"), boost::python::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterChain_wrapper, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) )    
         .def( 

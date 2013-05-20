@@ -186,6 +186,17 @@ class Utils(GenerateModuleSemiShared):
             "ShouldHitEntity"
             , (bool ( ::%s_wrapper::* )( ::IHandleEntity *,int ) )(&::%s_wrapper::ShouldHitEntity)
             , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) )''' % (clsname, clsname))
+            
+    def RecursiveFindDecl(self, cls, fnname):
+        try:
+            return cls.mem_fun('ShouldHitEntity')
+        except pygccxml.declarations.matcher.declaration_not_found_t:
+            for b in cls.bases:
+                print b.__dict__
+                ret = self.RecursiveFindDecl(b.related_class, fnname)
+                if ret:
+                    return ret
+        return None
         
     def SetupTraceFilter(self, mb, clsname):
         cls = mb.class_(clsname)
@@ -193,14 +204,11 @@ class Utils(GenerateModuleSemiShared):
         cls.mem_funs(allow_empty=True).virtuality = 'not virtual'
         
         try:
-            argname = cls.mem_fun('ShouldHitEntity').arguments[0].name
-            shouldhitentdecl = cls.mem_fun('ShouldHitEntity')
+            shouldhitentdecl = self.RecursiveFindDecl(cls, 'ShouldHitEntity')#cls.mem_fun('ShouldHitEntity')
+            argname = shouldhitentdecl.arguments[0].name
+            AddWrapReg(mb, clsname, shouldhitentdecl, [CreateIHandleEntityArg(argname), 'contentsMask'])
         except pygccxml.declarations.matcher.declaration_not_found_t:
-            cls2 = mb.class_('ITraceFilter')
-            argname = cls2.mem_fun('ShouldHitEntity').arguments[0].name
-            shouldhitentdecl = cls2.mem_fun('ShouldHitEntity')
-            
-        AddWrapReg(mb, clsname, shouldhitentdecl, [CreateIHandleEntityArg(argname), 'contentsMask'])
+            raise Exception('Must implement ShouldHitEntity for overriding..')
             
     def Parse(self, mb):
         # Exclude everything by default
@@ -263,7 +271,6 @@ class Utils(GenerateModuleSemiShared):
         
         # //--------------------------------------------------------------------------------------------------------------------------------
         # Trace Filters
-        
         # By default, it's not possible to override TraceFilter methods
         cls = mb.class_('ITraceFilter')
         cls.include()
@@ -273,7 +280,6 @@ class Utils(GenerateModuleSemiShared):
         
         tracefiltersnobase = [
             'CTraceFilter',
-            'CPyTraceFilterSimple',
             'CTraceFilterEntitiesOnly',
         ]
         for clsname in tracefiltersnobase:
@@ -299,6 +305,7 @@ class Utils(GenerateModuleSemiShared):
             'CTraceFilterSkipFriendly',
             'CTraceFilterSkipEnemies',
             'CTraceFilterWars',
+            'CPyTraceFilterSimple',
         ]
         for clsname in tracefilters:
             self.SetupTraceFilter(mb, clsname)
@@ -308,37 +315,7 @@ class Utils(GenerateModuleSemiShared):
         mb.class_('CTraceFilterSimple').rename('CTraceFilterSimpleInternal')
         mb.class_('CPyTraceFilterSimple').rename('CTraceFilterSimple')
         
-        '''
-        mb.class_('CTraceFilter').include()
-        mb.class_('CTraceFilterEntitiesOnly').include()
-        mb.class_('CTraceFilterWorldOnly').include()
-        mb.class_('CTraceFilterWorldAndPropsOnly').include()
-        mb.class_('CTraceFilterHitAll').include()
-
-        mb.class_('CTraceFilterSimple').include()
-        mb.class_('CTraceFilterSimple').rename('CTraceFilterSimpleInternal')
-        mb.class_('CPyTraceFilterSimple').include()
-        mb.class_('CPyTraceFilterSimple').rename('CTraceFilterSimple')
-        mb.class_('CTraceFilterSkipTwoEntities').include()
-        mb.class_('CTraceFilterSimpleList').include()
-        mb.class_('CTraceFilterOnlyNPCsAndPlayer').include()
-        mb.class_('CTraceFilterNoNPCsOrPlayer').include()
-        mb.class_('CTraceFilterLOS').include()
-        mb.class_('CTraceFilterSkipClassname').include()
-        mb.class_('CTraceFilterSkipTwoClassnames').include()
-        mb.class_('CTraceFilterSimpleClassnameList').include()
-        mb.class_('CTraceFilterChain').include()
-        
-        mb.class_('CTraceFilterOnlyUnitsAndPlayer').include()
-        mb.class_('CTraceFilterNoUnitsOrPlayer').include()
-        mb.class_('CTraceFilterIgnoreTeam').include()
-        
-        mb.class_('CTraceFilterSkipFriendly').include()
-        mb.class_('CTraceFilterSkipEnemies').include()
-        mb.class_('CTraceFilterWars').include()
-        '''
-        
-        mb.mem_funs('GetPassEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs('GetPassEntity').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         mb.class_('csurface_t').include()
         
