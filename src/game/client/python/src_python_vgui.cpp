@@ -277,9 +277,17 @@ void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 	//Msg("Removing py panel (%d active)\n", g_PyPanels.Count());
 	// Remove from list
 	if( iRemoveIdx != -1 )
+	{
 		g_PyPanels.Remove( iRemoveIdx );
+	}
 	else
-		g_PyPanels.FindAndRemove( pPyPanel );
+	{
+		if( !g_PyPanels.FindAndRemove( pPyPanel ) )
+		{
+			Warning("PyDeletePanel: No entry for python panel!\n");
+			return;
+		}
+	}
 
 	if( !SrcPySystem()->IsPythonRunning() )
 	{
@@ -328,8 +336,12 @@ void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 	pPanel->SetParent((VPANEL)NULL);
 
 	// Stop our children from pointing at us, and delete them if possible
-	while (ipanel()->GetChildCount(pPanel->GetVPanel()))
+	int childCount = ipanel()->GetChildCount(pPanel->GetVPanel());
+	for( int i = 0; i < childCount; i++ )
 	{
+		if( !ipanel()->GetChildCount(pPanel->GetVPanel()) )
+			break;
+
 		VPANEL child = ipanel()->GetChild(pPanel->GetVPanel(), 0);
 		if (ipanel()->IsAutoDeleteSet(child))
 		{
