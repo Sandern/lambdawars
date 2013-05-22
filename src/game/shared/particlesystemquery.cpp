@@ -28,6 +28,10 @@
 #include "asw_shareddefs.h"
 #endif
 
+#ifdef HL2WARS_DLL
+#include "hl2wars_shareddefs.h"
+#endif
+
 #ifdef GAME_DLL
 #include "ai_utils.h"
 #endif
@@ -731,6 +735,10 @@ static CollisionGroupNameRecord_t s_NameMap[]={
 #if defined( SWARM_DLL )
 	{ "SENTRYPROJ", ASW_COLLISION_GROUP_SENTRY_PROJECTILE },
 #endif
+
+#if defined( HL2WARS_DLL )
+	{ "IGNOREUNITS", WARS_COLLISION_GROUP_IGNORE_ALL_UNITS },
+#endif // HL2WARS_DLL
 };
 
 
