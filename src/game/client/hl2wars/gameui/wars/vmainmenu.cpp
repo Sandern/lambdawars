@@ -747,6 +747,29 @@ void MainMenu::OnCommand( const char *command )
 
 		g_pMatchFramework->CreateSession( pSettings );
 	}
+	else if ( !Q_strcmp( command, "CreateGameTutorial" ) )
+	{
+		KeyValues *pSettings = KeyValues::FromString(
+		"settings",
+		" system { "
+		" network offline "
+		" } "
+		" game { "
+		" mode mission "
+		" mission tutorial_annihilation_rebels "
+		" } "
+		);
+		KeyValues::AutoDelete autodelete( pSettings );
+
+		pSettings->SetString( "Game/difficulty", GameModeGetDefaultDifficulty( pSettings->GetString( "Game/mode" ) ) );
+
+		// Create Session and DIRECTLY start the game
+		g_pMatchFramework->CreateSession( pSettings );
+		if ( IMatchSession *pMatchSession = g_pMatchFramework->GetMatchSession() )
+		{
+			pMatchSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
+		}
+	}
 	else
 	{
 		const char *pchCommand = command;
