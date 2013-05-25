@@ -75,16 +75,17 @@ IMPLEMENT_NETWORKCLASS_ALIASED( HL2WarsGameRulesProxy, DT_HL2WarsGameRulesProxy 
 
 bool CHL2WarsGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
+	// Anything unit collision group + WARS_COLLISION_GROUP_IGNORE_ALL_UNITS will not collide
 	if( collisionGroup0 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS && 
-			( ( collisionGroup1 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup1 <= WARS_COLLISION_GROUP_UNIT_END ) || 
-			collisionGroup1 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS ) )
+			( collisionGroup1 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup1 <= WARS_COLLISION_GROUP_IGNORE_ALL_UNITS ) )
+		return false;
+	if( collisionGroup1 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS && 
+			( collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_ALL_UNITS ) )
 		return false;
 
+	// If the first collision group is one of the ignore groups, and the other group one of the unit groups, then don't collide
 	if( collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_UNIT_END )
 	{
-		if( collisionGroup1 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS )
-			return false;
-
 		if( collisionGroup1 >= WARS_COLLISION_GROUP_UNIT_START && collisionGroup1 <= WARS_COLLISION_GROUP_UNIT_END )
 		{
 			if( collisionGroup0 == collisionGroup1-WARS_COLLISION_SUPPORTED_UNITS-1 )
