@@ -82,6 +82,9 @@ bool CHL2WarsGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 
 
 	if( collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_UNIT_END )
 	{
+		if( collisionGroup1 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS )
+			return false;
+
 		if( collisionGroup1 >= WARS_COLLISION_GROUP_UNIT_START && collisionGroup1 <= WARS_COLLISION_GROUP_UNIT_END )
 		{
 			if( collisionGroup0 == collisionGroup1-WARS_COLLISION_SUPPORTED_UNITS-1 )
