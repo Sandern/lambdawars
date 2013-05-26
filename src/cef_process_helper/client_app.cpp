@@ -128,6 +128,9 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line )
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
+
+	command_line->AppendSwitch( CefString( "disable-sync" ) );
+	command_line->AppendSwitch( CefString( "disable-extensions" ) );
 }
 
 //-----------------------------------------------------------------------------

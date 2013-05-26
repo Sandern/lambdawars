@@ -10,6 +10,8 @@
 
 #include "cbase.h"
 
+#include "src_cef.h"
+
 #include "src_cef_browser.h"
 
 #include "src_cef_python.h"
@@ -707,6 +709,13 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
 BOOST_PYTHON_MODULE(_cef){
     bp::docstring_options doc_options( true, true, false );
 
+    bp::class_< CCefSystem, boost::noncopyable >( "CCefSystem", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "SetFocus"
+            , (void ( ::CCefSystem::* )( bool ) )( &::CCefSystem::SetFocus )
+            , ( bp::arg("focus") ) );
+
     { //::PyCefFrame
         typedef bp::class_< PyCefFrame > CefFrame_exposer_t;
         CefFrame_exposer_t CefFrame_exposer = CefFrame_exposer_t( "CefFrame", bp::no_init );
@@ -1247,5 +1256,16 @@ BOOST_PYTHON_MODULE(_cef){
                 , default_Unfocus_function_type(&SrcCefBrowser_wrapper::default_Unfocus) );
         
         }
+    }
+
+    { //::CEFSystem
+    
+        typedef ::CCefSystem & ( *CEFSystem_function_type )(  );
+        
+        bp::def( 
+            "CEFSystem"
+            , CEFSystem_function_type( &::CEFSystem )
+            , bp::return_value_policy< bp::reference_existing_object >() );
+    
     }
 }

@@ -14,9 +14,9 @@
 #include "include/internal/cef_ptr.h"
 
 
-#ifdef WIN32
-	#include <winlite.h>
-#endif // WIN32
+//#ifdef WIN32
+	//#include <winlite.h>
+//#endif // WIN32
 
 // Forward declarations
 class CefClientHandler;

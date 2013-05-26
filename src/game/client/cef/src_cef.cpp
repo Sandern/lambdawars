@@ -114,13 +114,16 @@ void ClientApp::OnContextInitialized()
 void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line )
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
+
+	command_line->AppendSwitch( CefString( "disable-sync" ) );
+	command_line->AppendSwitch( CefString( "disable-extensions" ) );
 	DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
 }
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CCefSystem::CCefSystem() : m_bIsRunning(false)
+CCefSystem::CCefSystem() : m_bIsRunning(false), m_bHasKeyFocus(false)
 {
 
 }
@@ -273,6 +276,12 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 //-----------------------------------------------------------------------------
 int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
+	// CEF has key focus, so don't process any keys (apart from the escape key)
+	if( m_bHasKeyFocus && keynum != KEY_ESCAPE )
+		return 0;
+
+	return 1;
+	/*
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() )
@@ -282,7 +291,7 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 		if( ret == 0 )
 			return 0;
 	}
-	return 1;
+	return 1;*/
 }
 
 

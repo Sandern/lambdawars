@@ -15,6 +15,7 @@ class CEF(GenerateModuleClient):
         
         'cbase.h',
         
+        'src_cef.h',
         'src_cef_browser.h',
         'src_cef_python.h',
     ]
@@ -23,6 +24,19 @@ class CEF(GenerateModuleClient):
         # Exclude everything by default
         mb.decls().exclude()  
         
+        # Cef System
+        cls = mb.class_('CCefSystem')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.no_init = True
+        
+        cls.mem_funs().exclude()
+        cls.mem_funs('SetFocus').include()
+        
+        mb.free_function('CEFSystem').include()
+        mb.free_function('CEFSystem').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
+       
+        # Cef browser
         cls = mb.class_('SrcCefBrowser')
         cls.include()
         
