@@ -340,16 +340,25 @@ CBaseEntity *UnitBaseSense::GetNearestOther()
 #ifdef ENABLE_PYTHON
 bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 {
+	CBaseEntity *pEnemy;
 	bp::list units;
 	for( int i = 0; i < m_SeenEnemies.Count(); i++ )
 	{
-		if( m_SeenEnemies[i].entity )
+		pEnemy = m_SeenEnemies[i].entity;
+		if( !pEnemy )
+			continue;
+
+		if( unittype )
 		{
-			if( unittype && m_SeenEnemies[i].entity->IsUnit() &&
-					Q_stricmp( unittype , m_SeenEnemies[i].entity->MyUnitPointer()->GetUnitType() ) != 0 )
+			CUnitBase *pEnemyUnit = pEnemy->MyUnitPointer();
+			if( !pEnemyUnit )
 				continue;
-			units.append( m_SeenEnemies[i].entity->GetPyHandle() );
+
+			if( Q_stricmp( unittype, pEnemyUnit->GetUnitType() ) != 0 )
+				continue;
 		}
+
+		units.append( pEnemy->GetPyHandle() );
 	}
 	return units;
 }
@@ -359,24 +368,26 @@ bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 //-----------------------------------------------------------------------------
 bp::list UnitBaseSense::PyGetOthers( const char *unittype )
 {
+	CBaseEntity *pOther;
 	bp::list units;
-	if( unittype )
+	for( int i = 0; i < m_SeenOther.Count(); i++ )
 	{
-		for( int i = 0; i < m_SeenOther.Count(); i++ )
-		{
-			if( !m_SeenOther[i].entity )
-				continue;
+		pOther = m_SeenOther[i].entity;
+		if( !pOther )
+			continue;
 
-			CUnitBase *pOtherUnit = m_SeenOther[i].entity->MyUnitPointer();
+		if( unittype )
+		{
+			CUnitBase *pOtherUnit = pOther->MyUnitPointer();
 			if( !pOtherUnit )
 				continue;
 
 			const char *pOtherUnitType = pOtherUnit->GetUnitType();
 			if( pOtherUnitType && Q_stricmp( unittype , pOtherUnitType ) != 0 )
 				continue;
-
-			units.append( m_SeenOther[i].entity->GetPyHandle() );	
 		}
+
+		units.append( pOther->GetPyHandle() );	
 	}
 	return units;
 }
