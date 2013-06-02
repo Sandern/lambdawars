@@ -18,6 +18,7 @@ public:
 	WebNews( vgui::Panel *pParent );
 
 	virtual void OnContextCreated( void );
+	virtual void OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode );
 	virtual void PerformLayout( void );
 	virtual void OnThink( void );
 

@@ -38,6 +38,13 @@ WebNews::WebNews( vgui::Panel *pParent ) : SrcCefBrowser( "MainMenu", "file:///u
 //-----------------------------------------------------------------------------
 void WebNews::OnContextCreated()
 {
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WebNews::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
+{
 	SetVisible( true );
 	SetZPos( -1 );
 	SetMouseInputEnabled( true );
@@ -56,7 +63,8 @@ void WebNews::OnContextCreated()
 
 	m_RetrieveVersionFunc = CreateFunction( "retrieveversion", m_InterfaceObj, true );
 	m_RetrieveDesuraFunc = CreateFunction( "retrievedesura", m_InterfaceObj, true );
-	
+
+	ExecuteJavaScript( "check_version();", "" );
 }
 
 //-----------------------------------------------------------------------------
@@ -89,6 +97,7 @@ void WebNews::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs,
 	{
 		Msg("Launching updater\n");
 
+#if 0
 		if( SrcHasProtocolHandler( "desura" ) )
 		{
 			SrcShellExecute( "desura://launch/mods/half-life-2-wars" );
@@ -100,6 +109,9 @@ void WebNews::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs,
 		{
 			SrcShellExecute( "http://www.desura.com/" );
 		}
+#else
+		SrcShellExecute( "http://www.hl2wars.com/" );
+#endif // 0
 
 		engine->ClientCmd( "exit" );
 	}
