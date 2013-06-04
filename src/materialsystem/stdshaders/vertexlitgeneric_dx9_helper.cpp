@@ -758,8 +758,11 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			if ( bHasBump || bHasDiffuseWarp )
 			{
 				// The vertex shader uses the vertex id stream
-				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-				SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+				if( g_pHardwareConfig->HasFastVertexTextures() )
+				{
+					SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+					SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+				}
 
 				DECLARE_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_bump_vs30 );
 				SET_STATIC_VERTEX_SHADER_COMBO( HALFLAMBERT, bHalfLambert);
@@ -808,8 +811,11 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				}
 
 				// The vertex shader uses the vertex id stream
-				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-				SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+				if( g_pHardwareConfig->HasFastVertexTextures() )
+				{
+					SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+					SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+				}
 
 				DECLARE_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 				SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, bHasVertexColor || bHasVertexAlpha );
@@ -1332,6 +1338,10 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			
 			// Also mutually exclusive with these in the non-bump case:
 			//$STATICLIGHT3 || $VERTEXCOLOR || $SEAMLESS_BASE || $SEAMLESS_DETAIL || $SEPARATE_DETAIL_UVS
+		}
+		else
+		{
+			nTessellationMode = TESSELLATION_MODE_DISABLED;
 		}
 #endif
 		int nLightingPreviewMode = pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_ENABLE_FIXED_LIGHTING );

@@ -100,8 +100,11 @@ void DrawProjected_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDy
 #ifndef _X360
 		else
 		{
-			// The vertex shader uses the vertex id stream
-			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+			if ( g_pHardwareConfig->HasFastVertexTextures() )
+			{
+				// The vertex shader uses the vertex id stream
+				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+			}
 
 			DECLARE_STATIC_VERTEX_SHADER( projected_vs30 );
 			SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );

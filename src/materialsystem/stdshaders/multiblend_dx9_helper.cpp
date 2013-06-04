@@ -203,8 +203,11 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, s_TexCoordSize, 0 );
 		int nShadowFilterMode = g_pHardwareConfig->GetShadowFilterMode();
 
-		// The vertex shader uses the vertex id stream
-		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		if ( g_pHardwareConfig->HasFastVertexTextures() )
+		{
+			// The vertex shader uses the vertex id stream
+			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		}
 
 		DECLARE_STATIC_VERTEX_SHADER( multiblend_vs30 );
 		SET_STATIC_VERTEX_SHADER_COMBO( SPECULAR, !bUsingEditor );

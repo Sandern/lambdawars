@@ -149,8 +149,11 @@ void DrawLightmappedBrushGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** par
 
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, 0, 0 );
 
-		// The vertex shader uses the vertex id stream
-		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		if ( g_pHardwareConfig->HasFastVertexTextures() )
+		{
+			// The vertex shader uses the vertex id stream
+			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+		}
 
 		DECLARE_STATIC_VERTEX_SHADER( lightmappedbrushgeneric_vs30 );
 		SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );

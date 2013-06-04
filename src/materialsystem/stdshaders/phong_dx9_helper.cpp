@@ -483,9 +483,12 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		// default behavior of forcing half lambert on.
 		bool bPhongHalfLambert = IS_PARAM_DEFINED( info.m_nPhongDisableHalfLambert ) ? ( params[ info.m_nPhongDisableHalfLambert ]->GetIntValue() == 0 ) : true;
 
-		// The vertex shader uses the vertex id stream
-		SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-		SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+		if ( g_pHardwareConfig->HasFastVertexTextures() )
+		{
+			// The vertex shader uses the vertex id stream
+			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+			SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
+		}
 
 		DECLARE_STATIC_VERTEX_SHADER( phong_vs30 );
 		SET_STATIC_VERTEX_SHADER_COMBO( WORLD_NORMAL, bWorldNormal );
@@ -1003,7 +1006,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		}
 
 		TessellationMode_t nTessellationMode = pShaderAPI->GetTessellationMode();
-		if ( nTessellationMode != TESSELLATION_MODE_DISABLED )
+		if ( nTessellationMode != TESSELLATION_MODE_DISABLED && g_pHardwareConfig->HasFastVertexTextures() )
 		{
 			pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER1, TEXTURE_SUBDIVISION_PATCHES );
 
@@ -1026,6 +1029,11 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			Assert( numBones == 0 );
 			Assert( vertexCompression == 0);
 		}
+		else
+		{
+			nTessellationMode = TESSELLATION_MODE_DISABLED;
+		}
+
 		DECLARE_DYNAMIC_VERTEX_SHADER( phong_vs30 );
 		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, ( numBones > 0) && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
 		SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );

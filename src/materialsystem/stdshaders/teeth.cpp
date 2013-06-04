@@ -98,76 +98,33 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 
 			if ( hasBump )
 			{
-#ifndef _X360
-				if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-				{
-					DECLARE_STATIC_VERTEX_SHADER( teeth_bump_vs20 );
-					SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( teeth_bump_vs20 );
-
-					// ps_2_b version which does phong
-					if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-					{
-						DECLARE_STATIC_PIXEL_SHADER( teeth_bump_ps20b );
-						SET_STATIC_PIXEL_SHADER( teeth_bump_ps20b );
-					}
-					else
-					{
-						DECLARE_STATIC_PIXEL_SHADER( teeth_bump_ps20 );
-						SET_STATIC_PIXEL_SHADER( teeth_bump_ps20 );
-					}
-				}
-#ifndef _X360
-				else
+				if ( g_pHardwareConfig->HasFastVertexTextures() )
 				{
 					// The vertex shader uses the vertex id stream
 					SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-
-					DECLARE_STATIC_VERTEX_SHADER( teeth_bump_vs30 );
-					SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( teeth_bump_vs30 );
-
-					DECLARE_STATIC_PIXEL_SHADER( teeth_bump_ps30 );
-					SET_STATIC_PIXEL_SHADER( teeth_bump_ps30 );
 				}
-#endif
+
+				DECLARE_STATIC_VERTEX_SHADER( teeth_bump_vs30 );
+				SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
+				SET_STATIC_VERTEX_SHADER( teeth_bump_vs30 );
+
+				DECLARE_STATIC_PIXEL_SHADER( teeth_bump_ps30 );
+				SET_STATIC_PIXEL_SHADER( teeth_bump_ps30 );
 			}
 			else
 			{
-#ifndef _X360
-				if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-				{
-					DECLARE_STATIC_VERTEX_SHADER( teeth_vs20 );
-					SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( teeth_vs20 );
-
-					if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-					{
-						DECLARE_STATIC_PIXEL_SHADER( teeth_ps20b );
-						SET_STATIC_PIXEL_SHADER( teeth_ps20b );
-					}
-					else
-					{
-						DECLARE_STATIC_PIXEL_SHADER( teeth_ps20 );
-						SET_STATIC_PIXEL_SHADER( teeth_ps20 );
-					}
-				}
-#ifndef _X360
-				else
+				if ( g_pHardwareConfig->HasFastVertexTextures() )
 				{
 					// The vertex shader uses the vertex id stream
 					SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-
-					DECLARE_STATIC_VERTEX_SHADER( teeth_vs30 );
-					SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( teeth_vs30 );
-
-					DECLARE_STATIC_PIXEL_SHADER( teeth_ps30 );
-					SET_STATIC_PIXEL_SHADER( teeth_ps30 );
 				}
-#endif
+
+				DECLARE_STATIC_VERTEX_SHADER( teeth_vs30 );
+				SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
+				SET_STATIC_VERTEX_SHADER( teeth_vs30 );
+
+				DECLARE_STATIC_PIXEL_SHADER( teeth_ps30 );
+				SET_STATIC_PIXEL_SHADER( teeth_ps30 );
 			}
 
 			// On DX9, do sRGB
@@ -359,41 +316,20 @@ BEGIN_VS_SHADER( Teeth_DX9, "Help for Teeth_DX9" )
 				nShadowFilterMode = g_pHardwareConfig->GetShadowFilterMode();	// Based upon vendor and device dependent formats
 			}
 
-#ifndef _X360
-			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-			{
-				DECLARE_STATIC_VERTEX_SHADER( teeth_flashlight_vs20 );
-				SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-				SET_STATIC_VERTEX_SHADER( teeth_flashlight_vs20 );
-
-				if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-				{
-					DECLARE_STATIC_PIXEL_SHADER( teeth_flashlight_ps20b );
-					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-					SET_STATIC_PIXEL_SHADER( teeth_flashlight_ps20b );
-				}
-				else
-				{
-					DECLARE_STATIC_PIXEL_SHADER( teeth_flashlight_ps20 );
-					SET_STATIC_PIXEL_SHADER( teeth_flashlight_ps20 );
-				}
-			}
-#ifndef _X360
-			else
+			if ( g_pHardwareConfig->HasFastVertexTextures() )
 			{
 				// The vertex shader uses the vertex id stream
 				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-
-				DECLARE_STATIC_VERTEX_SHADER( teeth_flashlight_vs30 );
-				SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
-				SET_STATIC_VERTEX_SHADER( teeth_flashlight_vs30 );
-
-				DECLARE_STATIC_PIXEL_SHADER( teeth_flashlight_ps30 );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
-				SET_STATIC_PIXEL_SHADER( teeth_flashlight_ps30 );
 			}
-#endif
+
+			DECLARE_STATIC_VERTEX_SHADER( teeth_flashlight_vs30 );
+			SET_STATIC_VERTEX_SHADER_COMBO( INTRO, params[INTRO]->GetIntValue() ? 1 : 0 );
+			SET_STATIC_VERTEX_SHADER( teeth_flashlight_vs30 );
+
+			DECLARE_STATIC_PIXEL_SHADER( teeth_flashlight_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+			SET_STATIC_PIXEL_SHADER( teeth_flashlight_ps30 );
+
 			// On DX9, do sRGB
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, true );
 			pShaderShadow->EnableSRGBWrite( true );

@@ -109,44 +109,20 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		pShaderShadow->VertexShaderVertexFormat( flags, nTexCoordCount, NULL, userDataSize );
 
-#ifndef _X360
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-		{
-			DECLARE_STATIC_VERTEX_SHADER( cloak_vs20 );
-			SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
-			SET_STATIC_VERTEX_SHADER( cloak_vs20 );
-
-			// Bind ps_2_b shader so we can get Phong terms
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( cloak_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, hasDiffuseWarp );
-				SET_STATIC_PIXEL_SHADER( cloak_ps20b );
-			}
-			else
-			{
-				DECLARE_STATIC_PIXEL_SHADER( cloak_ps20 );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, hasDiffuseWarp );
-				SET_STATIC_PIXEL_SHADER( cloak_ps20 );
-			}
-		}
-#ifndef _X360
-		else
+		if ( g_pHardwareConfig->HasFastVertexTextures() )
 		{
 			// The vertex shader uses the vertex id stream
 			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
-
-			DECLARE_STATIC_VERTEX_SHADER( cloak_vs30 );
-			SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
-			SET_STATIC_VERTEX_SHADER( cloak_vs30 );
-
-			// Bind ps_2_b shader so we can get Phong terms
-			DECLARE_STATIC_PIXEL_SHADER( cloak_ps30 );
-			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, hasDiffuseWarp );
-			SET_STATIC_PIXEL_SHADER( cloak_ps30 );
 		}
-#endif
+
+		DECLARE_STATIC_VERTEX_SHADER( cloak_vs30 );
+		SET_STATIC_VERTEX_SHADER_COMBO( MODEL,  bIsModel );
+		SET_STATIC_VERTEX_SHADER( cloak_vs30 );
+
+		// Bind ps_2_b shader so we can get Phong terms
+		DECLARE_STATIC_PIXEL_SHADER( cloak_ps30 );
+		SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, hasDiffuseWarp );
+		SET_STATIC_PIXEL_SHADER( cloak_ps30 );
 
 		pShader->DefaultFog();
 

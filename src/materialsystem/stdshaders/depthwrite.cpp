@@ -105,146 +105,75 @@ BEGIN_VS_SHADER_FLAGS( DepthWrite, "Help for Depth Write", SHADER_NOT_EDITABLE )
 				pShaderShadow->EnableVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, true );
 			}
 
-
-
-#ifndef _X360
-			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-			{
-				DECLARE_STATIC_VERTEX_SHADER( depthwrite_vs20 );
-				SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, !bAlphaClip && IsX360() ); //360 needs to know if it *shouldn't* output texture coordinates to avoid shader patches
-				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, nTreeSwayMode );
-				SET_STATIC_VERTEX_SHADER( depthwrite_vs20 );
-
-				if( bAlphaClip )
-				{
-					pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
-
-					if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-					{
-						DECLARE_STATIC_PIXEL_SHADER( depthwrite_ps20b );
-						SET_STATIC_PIXEL_SHADER( depthwrite_ps20b );
-					}
-					else
-					{
-						DECLARE_STATIC_PIXEL_SHADER( depthwrite_ps20 );
-						SET_STATIC_PIXEL_SHADER( depthwrite_ps20 );
-					}
-				}
-			}
-#ifndef _X360
-			else
+			if( g_pHardwareConfig->HasFastVertexTextures() )
 			{
 				SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
 				SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
-
-				DECLARE_STATIC_VERTEX_SHADER( depthwrite_vs30 );
-				SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, 0 ); //360 only combo, and this is a PC path
-				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, nTreeSwayMode );
-				SET_STATIC_VERTEX_SHADER( depthwrite_vs30 );
-
-				pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
-				pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, true );		// irrelevant, since we just need alpha
-
-				DECLARE_STATIC_PIXEL_SHADER( depthwrite_ps30 );
-				SET_STATIC_PIXEL_SHADER( depthwrite_ps30 );
 			}
-#endif
+
+			DECLARE_STATIC_VERTEX_SHADER( depthwrite_vs30 );
+			SET_STATIC_VERTEX_SHADER_COMBO( ONLY_PROJECT_POSITION, 0 ); //360 only combo, and this is a PC path
+			SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, nTreeSwayMode );
+			SET_STATIC_VERTEX_SHADER( depthwrite_vs30 );
+
+			pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
+			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER0, true );		// irrelevant, since we just need alpha
+
+			DECLARE_STATIC_PIXEL_SHADER( depthwrite_ps30 );
+			SET_STATIC_PIXEL_SHADER( depthwrite_ps30 );
 		}
 		DYNAMIC_STATE
 		{
-
-#ifndef _X360
-			if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
+			TessellationMode_t nTessellationMode = g_pHardwareConfig->HasFastVertexTextures() ? pShaderAPI->GetTessellationMode() : TESSELLATION_MODE_DISABLED;
+			if ( nTessellationMode != TESSELLATION_MODE_DISABLED )
 			{
-				DECLARE_DYNAMIC_VERTEX_SHADER( depthwrite_vs20 );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, pShaderAPI->GetCurrentNumBones() > 0 );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, ( int )vertexCompression );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, 0 );
-				SET_DYNAMIC_VERTEX_SHADER( depthwrite_vs20 );
+				pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER1, TEXTURE_SUBDIVISION_PATCHES );
 
-				if ( bAlphaClip )
+				float vSubDControls[4] = { 1.0f/pShaderAPI->GetSubDHeight(),
+					bHasDisplacement && mat_displacementmap.GetBool() ? 1.0f : 0.0f,
+					bHasDisplacementWrinkles && mat_displacementmap.GetBool() ? 1.0f : 0.0f, 0.0f };
+
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, vSubDControls );
+
+				if( bHasDisplacement )
 				{
-					BindTexture( SHADER_SAMPLER0, BASETEXTURE, FRAME );
-
-					float vAlphaThreshold[4] = {0.7f, 0.7f, 0.7f, 0.7f};
-					if ( ALPHATESTREFERENCE != -1 && ( params[ALPHATESTREFERENCE]->GetFloatValue() > 0.0f ) )
-					{
-						vAlphaThreshold[0] = vAlphaThreshold[1] = vAlphaThreshold[2] = vAlphaThreshold[3] = params[ALPHATESTREFERENCE]->GetFloatValue();
-					}
-
-					pShaderAPI->SetPixelShaderConstant( 0, vAlphaThreshold, 1 );
-				}
-
-				if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-				{
-					DECLARE_DYNAMIC_PIXEL_SHADER( depthwrite_ps20b );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( ALPHACLIP, bAlphaClip );
-					SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps20b );
+					BindVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, DISPLACEMENTMAP );
 				}
 				else
 				{
-					DECLARE_DYNAMIC_PIXEL_SHADER( depthwrite_ps20 );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( ALPHACLIP, bAlphaClip );
-					SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps20 );
+					pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, TEXTURE_BLACK );
 				}
+
+				// Currently, tessellation is mutually exclusive with any kind of GPU-side skinning, morphing or vertex compression
+				Assert( !pShaderAPI->IsHWMorphingEnabled() );
+				Assert( pShaderAPI->GetCurrentNumBones() == 0 );
+				Assert( vertexCompression == 0);
 			}
-#ifndef _X360
-			else // 3.0 shader case (PC only)
+
+			SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
+
+			DECLARE_DYNAMIC_VERTEX_SHADER( depthwrite_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, ( pShaderAPI->GetCurrentNumBones() > 0 ) && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
+			SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, nTessellationMode );
+			SET_DYNAMIC_VERTEX_SHADER( depthwrite_vs30 );
+
+			if ( bAlphaClip )
 			{
-				TessellationMode_t nTessellationMode = pShaderAPI->GetTessellationMode();
-				if ( nTessellationMode != TESSELLATION_MODE_DISABLED )
+				BindTexture( SHADER_SAMPLER0, BASETEXTURE, FRAME );
+
+				float vAlphaThreshold[4] = {0.7f, 0.7f, 0.7f, 0.7f};
+				if ( ALPHATESTREFERENCE != -1 && ( params[ALPHATESTREFERENCE]->GetFloatValue() > 0.0f ) )
 				{
-					pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER1, TEXTURE_SUBDIVISION_PATCHES );
-
-					float vSubDControls[4] = { 1.0f/pShaderAPI->GetSubDHeight(),
-						bHasDisplacement && mat_displacementmap.GetBool() ? 1.0f : 0.0f,
-						bHasDisplacementWrinkles && mat_displacementmap.GetBool() ? 1.0f : 0.0f, 0.0f };
-
-					pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, vSubDControls );
-
-					if( bHasDisplacement )
-					{
-						BindVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, DISPLACEMENTMAP );
-					}
-					else
-					{
-						pShaderAPI->BindStandardVertexTexture( SHADER_VERTEXTEXTURE_SAMPLER2, TEXTURE_BLACK );
-					}
-
-					// Currently, tessellation is mutually exclusive with any kind of GPU-side skinning, morphing or vertex compression
-					Assert( !pShaderAPI->IsHWMorphingEnabled() );
-					Assert( pShaderAPI->GetCurrentNumBones() == 0 );
-					Assert( vertexCompression == 0);
+					vAlphaThreshold[0] = vAlphaThreshold[1] = vAlphaThreshold[2] = vAlphaThreshold[3] = params[ALPHATESTREFERENCE]->GetFloatValue();
 				}
 
-				SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
-
-				DECLARE_DYNAMIC_VERTEX_SHADER( depthwrite_vs30 );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, ( pShaderAPI->GetCurrentNumBones() > 0 ) && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression && ( nTessellationMode == TESSELLATION_MODE_DISABLED ) );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( TESSELLATION, nTessellationMode );
-				SET_DYNAMIC_VERTEX_SHADER( depthwrite_vs30 );
-
-				if ( bAlphaClip )
-				{
-					BindTexture( SHADER_SAMPLER0, BASETEXTURE, FRAME );
-
-					float vAlphaThreshold[4] = {0.7f, 0.7f, 0.7f, 0.7f};
-					if ( ALPHATESTREFERENCE != -1 && ( params[ALPHATESTREFERENCE]->GetFloatValue() > 0.0f ) )
-					{
-						vAlphaThreshold[0] = vAlphaThreshold[1] = vAlphaThreshold[2] = vAlphaThreshold[3] = params[ALPHATESTREFERENCE]->GetFloatValue();
-					}
-
-					pShaderAPI->SetPixelShaderConstant( 0, vAlphaThreshold, 1 );
-				}
-
-				DECLARE_DYNAMIC_PIXEL_SHADER( depthwrite_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( ALPHACLIP, bAlphaClip );
-				SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps30 );
+				pShaderAPI->SetPixelShaderConstant( 0, vAlphaThreshold, 1 );
 			}
-#endif
+
+			DECLARE_DYNAMIC_PIXEL_SHADER( depthwrite_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( ALPHACLIP, bAlphaClip );
+			SET_DYNAMIC_PIXEL_SHADER( depthwrite_ps30 );
 
 			if ( nTreeSwayMode != 0 )
 			{

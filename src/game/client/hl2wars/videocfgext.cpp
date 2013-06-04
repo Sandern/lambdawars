@@ -11,6 +11,9 @@
 
 #include "videocfg/videocfg.h"
 
+#include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "materialsystem/materialsystem_config.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -55,4 +58,16 @@ CON_COMMAND( debug_print_dxlevel, "" )
 		g_pMaterialSystemHardwareConfig->GetHDRType(),
 		g_pMaterialSystemHardwareConfig->HasFastVertexTextures()
 		);
+}
+
+CON_COMMAND( debug_dxlevel_force, "" )
+{
+	MaterialSystem_Config_t config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+	Msg("Current dxlevel: %d\n", config.dxSupportLevel );
+
+	config.dxSupportLevel = atoi(args[1]);
+	g_pMaterialSystem->OverrideConfig( config, true );
+
+	config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+	Msg("New dxlevel: %d\n", config.dxSupportLevel );
 }

@@ -184,39 +184,18 @@ BEGIN_VS_SHADER( Modulate_DX9,
 
 				pShaderShadow->VertexShaderVertexFormat( flags, numTexCoords, NULL, userDataSize );
 
-#ifndef _X360
-				if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-				{
-					DECLARE_STATIC_VERTEX_SHADER( unlitgeneric_vs20 );
-					SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, bVertexColorOrAlpha ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( unlitgeneric_vs20 );
-
-					if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-					{
-						DECLARE_STATIC_PIXEL_SHADER( modulate_ps20b );
-						SET_STATIC_PIXEL_SHADER( modulate_ps20b );
-					}
-					else
-					{
-						DECLARE_STATIC_PIXEL_SHADER( modulate_ps20 );
-						SET_STATIC_PIXEL_SHADER( modulate_ps20 );
-					}
-				}
-#ifndef _X360
-				else
+				if ( g_pHardwareConfig->HasFastVertexTextures() )
 				{
 					SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
 					SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
-
-					DECLARE_STATIC_VERTEX_SHADER( unlitgeneric_vs30 );
-					SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, bVertexColorOrAlpha ? 1 : 0 );
-					SET_STATIC_VERTEX_SHADER( unlitgeneric_vs30 );
-
-					DECLARE_STATIC_PIXEL_SHADER( modulate_ps30 );
-					SET_STATIC_PIXEL_SHADER( modulate_ps30 );
 				}
-#endif
+
+				DECLARE_STATIC_VERTEX_SHADER( unlitgeneric_vs30 );
+				SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, bVertexColorOrAlpha ? 1 : 0 );
+				SET_STATIC_VERTEX_SHADER( unlitgeneric_vs30 );
+
+				DECLARE_STATIC_PIXEL_SHADER( modulate_ps30 );
+				SET_STATIC_PIXEL_SHADER( modulate_ps30 );
 
 				// We need to fog to *white* regardless of overbrighting...
 				if( bMod2X )

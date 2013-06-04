@@ -120,16 +120,37 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 	// Shouldn't matter for the game dll, because it will update the video level anyway (and we always use dxlevel 100)
 	if( g_pMaterialSystem )
 	{
-		// Hammer is started with the parameter "-disallowhwmorph", which will make "HasFastVertexTextures" return 0
-		// Due this, ps30 won't work correctly, so remove it.
-		CommandLine()->RemoveParm( "-disallowhwmorph" );
+		// mat_disablehwmorph is a dx10/11 feature, so when dxlevel is 95 it is disabled
+		//ConVarRef mat_disablehwmorph("mat_disablehwmorph");
 
 		MaterialSystem_Config_t config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
-		if( /*!config.bEditMode &&*/ config.dxSupportLevel < 100 )
+		//Msg("Current dxlevel: %d\n", config.dxSupportLevel );
+		if( CommandLine()->FindParm( "-force_dxlevel" ) )
 		{
+			config.dxSupportLevel = atoi( CommandLine()->ParmValue( "-force_dxlevel", "100" ) );
+			Msg( "Overriding dx level to %d", config.dxSupportLevel );
+			g_pMaterialSystem->OverrideConfig( config, true );
+		}
+		else if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
+		{
+			//Msg("Overriding dx level\n");
 			config.dxSupportLevel = 100;
 			g_pMaterialSystem->OverrideConfig( config, true );
 		}
+
+		if( config.dxSupportLevel >= 100 )
+		{
+			CommandLine()->RemoveParm( "-disallowhwmorph" );
+		}
+
+		config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+		if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
+		{
+			Error("Your graphics card is not supported\n");
+		}
+
+		bool hasFast = g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
+		//Msg("hasFast: %d\n", hasFast);
 	}
 
 	return ( g_pConfig != NULL ) && (g_pHardwareConfig != NULL) && ( g_pSLShaderSystem != NULL );
