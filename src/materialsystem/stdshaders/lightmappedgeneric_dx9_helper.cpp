@@ -14,8 +14,8 @@
 #include "lightmappedgeneric_vs20.inc"
 #include "lightmappedgeneric_ps20b.inc"
 
-#include "lightmappedgeneric_vs30.inc"
-#include "lightmappedgeneric_ps30.inc"
+//#include "lightmappedgeneric_vs30.inc"
+//#include "lightmappedgeneric_ps30.inc"
 
 #include "tier0/vprof.h"
 
@@ -646,6 +646,8 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 				bool bMaskedBlending=( (info.m_nMaskedBlending != -1) &&
 									   (params[info.m_nMaskedBlending]->GetIntValue() != 0) );
 
+
+#if 0
 				if( /*!g_pHardwareConfig->HasFastVertexTextures()*/ true )
 				{
 					DECLARE_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
@@ -703,7 +705,6 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 					}
 					else
 					{
-#if 0
 						DECLARE_STATIC_PIXEL_SHADER( lightmappedgeneric_ps20 );
 						SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE2, hasBaseTexture2 );
 						SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP,  bumpmap_variant );
@@ -729,8 +730,6 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 						SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
 						//SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 						SET_STATIC_PIXEL_SHADER( lightmappedgeneric_ps20 );
-#endif // 0
-						bDraw = false;
 					}
 				}
 				else
@@ -781,6 +780,52 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 					SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 					SET_STATIC_PIXEL_SHADER( lightmappedgeneric_ps30 );
 				}
+#else
+	
+				// PS20b only
+				DECLARE_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
+				SET_STATIC_VERTEX_SHADER_COMBO( ENVMAP_MASK,  hasEnvmapMask );
+				SET_STATIC_VERTEX_SHADER_COMBO( TANGENTSPACE,  params[info.m_nEnvmap]->IsTexture() );
+				SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP,  hasBump );
+				SET_STATIC_VERTEX_SHADER_COMBO( DIFFUSEBUMPMAP, hasDiffuseBumpmap );
+				SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, IS_FLAG_SET( MATERIAL_VAR_VERTEXCOLOR ) );
+				SET_STATIC_VERTEX_SHADER_COMBO( VERTEXALPHATEXBLENDFACTOR, hasBaseTexture2 || hasBump2 );
+				SET_STATIC_VERTEX_SHADER_COMBO( BUMPMASK, hasBumpMask );
+				SET_STATIC_VERTEX_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
+				SET_STATIC_VERTEX_SHADER_COMBO( PARALLAX_MAPPING, bParallaxMapping );
+				SET_STATIC_VERTEX_SHADER_COMBO( SEAMLESS, bSeamlessMapping );
+				SET_STATIC_VERTEX_SHADER_COMBO( DETAILTEXTURE, hasDetailTexture );
+				SET_STATIC_VERTEX_SHADER_COMBO( FANCY_BLENDING, bHasBlendModulateTexture );
+				SET_STATIC_VERTEX_SHADER_COMBO( SELFILLUM,  hasSelfIllum );
+				SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
+				SET_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
+
+				DECLARE_STATIC_PIXEL_SHADER( lightmappedgeneric_ps20b );
+				SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE2, hasBaseTexture2 );
+				SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP,  bumpmap_variant );
+				SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP2, hasBump2 );
+				SET_STATIC_PIXEL_SHADER_COMBO( BUMPMASK, hasBumpMask );
+				SET_STATIC_PIXEL_SHADER_COMBO( DIFFUSEBUMPMAP,  hasDiffuseBumpmap );
+				SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP,  envmap_variant );
+				SET_STATIC_PIXEL_SHADER_COMBO( ENVMAPMASK,  hasEnvmapMask );
+				SET_STATIC_PIXEL_SHADER_COMBO( BASEALPHAENVMAPMASK,  hasBaseAlphaEnvmapMask );
+				SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM,  hasSelfIllum );
+				SET_STATIC_PIXEL_SHADER_COMBO( NORMALMAPALPHAENVMAPMASK,  hasNormalMapAlphaEnvmapMask );
+				SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURENOENVMAP,  params[info.m_nBaseTextureNoEnvmap]->GetIntValue() );
+				SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE2NOENVMAP, params[info.m_nBaseTexture2NoEnvmap]->GetIntValue() );
+				SET_STATIC_PIXEL_SHADER_COMBO( WARPLIGHTING, hasLightWarpTexture );
+				SET_STATIC_PIXEL_SHADER_COMBO( FANCY_BLENDING, bHasBlendModulateTexture );
+				SET_STATIC_PIXEL_SHADER_COMBO( MASKEDBLENDING, bMaskedBlending);
+				SET_STATIC_PIXEL_SHADER_COMBO( SEAMLESS, bSeamlessMapping );
+				SET_STATIC_PIXEL_SHADER_COMBO( OUTLINE, bHasOutline );
+				SET_STATIC_PIXEL_SHADER_COMBO( SOFTEDGES, bHasSoftEdges );
+				SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
+				SET_STATIC_PIXEL_SHADER_COMBO( PARALLAX_MAPPING, bParallaxMapping );
+				SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
+				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
+				SET_STATIC_PIXEL_SHADER( lightmappedgeneric_ps20b );
+
+#endif // 0
 
 				// HACK HACK HACK - enable alpha writes all the time so that we have them for
 				// underwater stuff and writing depth to dest alpha

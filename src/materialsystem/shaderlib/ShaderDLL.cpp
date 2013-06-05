@@ -128,7 +128,9 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 		if( CommandLine()->FindParm( "-force_dxlevel" ) )
 		{
 			config.dxSupportLevel = atoi( CommandLine()->ParmValue( "-force_dxlevel", "100" ) );
-			Msg( "Overriding dx level to %d", config.dxSupportLevel );
+			Msg( "Overriding dx level to %d\n", config.dxSupportLevel );
+			if( config.dxSupportLevel <= 95 )
+				CommandLine()->AppendParm( "-disallowhwmorph", "" );
 			g_pMaterialSystem->OverrideConfig( config, true );
 		}
 		else if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
@@ -138,18 +140,18 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 			g_pMaterialSystem->OverrideConfig( config, true );
 		}
 
+		config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+
 		if( config.dxSupportLevel >= 100 )
 		{
 			CommandLine()->RemoveParm( "-disallowhwmorph" );
 		}
-
-		config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
-		if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
+		else if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
 		{
 			Error("Your graphics card is not supported\n");
 		}
 
-		bool hasFast = g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
+		/*bool hasFast = */g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
 		//Msg("hasFast: %d\n", hasFast);
 	}
 
