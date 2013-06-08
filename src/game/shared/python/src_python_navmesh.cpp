@@ -658,6 +658,9 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 {
 	bp::list l;
 
+	if( !TheNavMesh->IsLoaded() )
+		return l;
+
 	// Get hiding spots in radius
 	CUtlVector< HidingSpotResult_t > HidingSpots;
 	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
