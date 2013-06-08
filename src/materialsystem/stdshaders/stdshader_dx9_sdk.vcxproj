@@ -50,6 +50,7 @@
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PostBuildEventUseInBuild>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">game_shader_dx9</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">game_shader_dx9</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
@@ -57,10 +58,13 @@
       </Command>
     </PreBuildEvent>
     <CustomBuildStep>
-      <Message>Publishing to target directory (..\..\game\swarm\bin\)...</Message>
-      <Command>if exist "..\..\game\swarm\bin\game_shader_dx9.dll" attrib -r "..\..\game\swarm\bin\game_shader_dx9.dll"
+      <Message>Running Output Script</Message>
+      <Command>copy "$(TargetPath)" "$(TargetDir)dummy.$(TargetFileName)"
+cscript //nologo ..\..\dllcopy.wsf "$(TargetPath)" "$(TargetFileName)"
+cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).pdb"
 </Command>
-      <Outputs>..\..\game\swarm\bin\game_shader_dx9.dll;%(Outputs)</Outputs>
+      <Outputs>$(TargetDir)dummy.$(TargetFileName);%(Outputs)</Outputs>
+      <Inputs>$(TargetFileName)</Inputs>
     </CustomBuildStep>
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
