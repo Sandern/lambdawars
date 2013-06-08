@@ -2482,7 +2482,7 @@ void CDetailObjectSystem::RenderTranslucentDetailObjects( const DistanceFadeInfo
 	PushSinglePassFlashLightState( flashlightMode );
 	// Here, we must draw all detail objects back-to-front
 	CMatRenderContextPtr pRenderContext( materials );
-	Assert( m_pFastSortInfo );
+	//Assert( m_pFastSortInfo ); // Might not be be created if there are no "fast" objects, so this assert makes no sense to me
 	ICallQueue *pQueue = pRenderContext->GetCallQueue();
 	if ( pQueue && r_ThreadedDetailProps.GetInt() )
 	{
