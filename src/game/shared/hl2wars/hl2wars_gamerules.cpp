@@ -199,7 +199,7 @@ void InitBodyQue()
 CHL2WarsGameRules::CHL2WarsGameRules()
 {
 	m_bLevelInitialized = false;
-	InitTeams();
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -207,7 +207,11 @@ CHL2WarsGameRules::CHL2WarsGameRules()
 //-----------------------------------------------------------------------------
 CHL2WarsGameRules::~CHL2WarsGameRules()
 {
-	DestroyTeams();
+}
+
+void CHL2WarsGameRules::InitGamerules()
+{
+	InitTeams();
 }
 
 //-----------------------------------------------------------------------------

@@ -95,11 +95,12 @@ public:
 
 	//Tony; define a default encryption key.
 	virtual const unsigned char *GetEncryptionKey( void ) { return (unsigned char *)"a1b2c3d4"; }
-
-	virtual void InitGamerules() {}
+	
 #ifdef CLIENT_DLL
+	virtual void InitGamerules() {}
 	virtual void ShutdownGamerules() {}
 #else
+	virtual void InitGamerules();
 	virtual void ShutdownGamerules();
 #endif // CLIENT_DLL
 
