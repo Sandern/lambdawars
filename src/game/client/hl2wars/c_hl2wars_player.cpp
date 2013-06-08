@@ -242,6 +242,9 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 	if( m_bOldIsStrategicModeOn != IsStrategicModeOn() ) {
 		m_bOldIsStrategicModeOn = IsStrategicModeOn();
 
+		// Changing camera mode, so setup splitscreen guard
+		ACTIVE_SPLITSCREEN_PLAYER_GUARD( entindex() - 1 );
+
 		if( IsStrategicModeOn () ) {
 			Cmd_CAM_ToThirdPerson();
 			//input->CAM_ToThirdPerson();
@@ -260,6 +263,9 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 		kwargs["sender"] = bp::object();
 		kwargs["player"] = GetPyHandle();
 #endif // ENABLE_PYTHON
+
+		// Changing camera mode, so setup splitscreen guard
+		ACTIVE_SPLITSCREEN_PLAYER_GUARD( entindex() - 1 );
 
 		if( m_hOldControlledUnit )
 		{

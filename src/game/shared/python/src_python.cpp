@@ -168,6 +168,11 @@ bool CSrcPython::Init( )
 	if( m_bPythonRunning )
 		return true;
 
+#ifdef CLIENT_DLL
+	// WarsSplitscreen: only one player
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
+#endif // CLIENT_DLL
+
 	//if( !bToolsMode )
 	{
 		// Change working directory	
@@ -370,6 +375,9 @@ void CSrcPython::PostInit()
 
 	// Hook PyMessage
 #ifdef CLIENT_DLL
+	// WarsSplitscreen: only one player
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
+
 	HookPyMessage();
 	HookPyNetworkCls();
 	HookPyNetworkVar();

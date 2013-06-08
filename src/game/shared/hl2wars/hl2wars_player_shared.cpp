@@ -834,6 +834,12 @@ void CHL2WarsPlayer::ChangeFaction( const char *faction )
 		memcpy( pszOldValue, STRING(m_FactionName), len );
 
 	}
+
+#ifdef CLIENT_DLL
+	// Changing camera mode, so setup splitscreen guard
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD( entindex() - 1 );
+#endif // CLIENT_DLL
+
 #ifndef CLIENT_DLL
 	Q_strcpy( m_NetworkedFactionName.GetForModify(), faction );
 #endif // CLIENT_DLL

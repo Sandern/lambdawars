@@ -41,6 +41,9 @@ static int nexthigher( int k )
 SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pParent ) 
 	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bSizeChanged(false), m_pTextureRegen(NULL)
 {
+	// WarsSplitscreen: only one player
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
+
 	SetPaintBackgroundEnabled( false );
 
 	SetParent( pParent ? pParent : GetClientMode()->GetViewport() );
