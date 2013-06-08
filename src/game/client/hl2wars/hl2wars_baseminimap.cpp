@@ -113,9 +113,8 @@ void CBaseMinimap::DrawEntityObjects()
 	CBaseEntity *pEnt;
 	Color color;
 
+	// Draw entity outlines on minimap
 	count = m_EntityObjects.Count();
-
-
 	for( i=count-1; i>=0; i-- )
 	{
 		EntityObject &eo = m_EntityObjects.Element(i);
@@ -141,6 +140,8 @@ void CBaseMinimap::DrawEntityObjects()
 
 	}
 
+	// Draw entities on minimap
+	count = m_EntityObjects.Count();
 	for( i=count-1; i>=0; i-- )
 	{
 		EntityObject &eo = m_EntityObjects.Element(i);

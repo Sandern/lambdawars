@@ -891,7 +891,7 @@ void C_BasePlayer::OnRestore()
 	// For ammo history icons to current value so they don't flash on level transtions
 	int ammoTypes = GetAmmoDef()->NumAmmoTypes();
 	// ammodef is 1 based, use <=
-	for ( int i = 0; i <= ammoTypes; i++ )
+	for ( int i = 0; i < ammoTypes; i++ )
 	{
 		m_iOldAmmo[i] = GetAmmoCount(i);
 	}
@@ -923,7 +923,7 @@ void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 
 		// Check for Ammo pickups.
 		int ammoTypes = GetAmmoDef()->NumAmmoTypes();
-		for ( int i = 0; i <= ammoTypes; i++ )
+		for ( int i = 0; i < ammoTypes; i++ )
 		{
 			if ( GetAmmoCount(i) > m_iOldAmmo[i] )
 			{
