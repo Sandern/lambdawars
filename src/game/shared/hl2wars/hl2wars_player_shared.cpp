@@ -584,7 +584,7 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 	// If distance between released and pressed is larger than the threshold use the select box
 	// NOTE: This is client side, so we can use the pixel coordinates
 #ifdef CLIENT_DLL
-	if( abs( GetMouseDataLeftPressed().m_iX - GetMouseDataLeftReleased().m_iX ) > XRES( cl_mouse_selectionbox_threshold.GetInt() ) &&
+	if( abs( GetMouseDataLeftPressed().m_iX - GetMouseDataLeftReleased().m_iX ) > XRES( cl_mouse_selectionbox_threshold.GetInt() ) ||
 		abs( GetMouseDataLeftPressed().m_iY - GetMouseDataLeftReleased().m_iY ) > YRES( cl_mouse_selectionbox_threshold.GetInt() ) )
 	{
 		SelectBox(	MIN( GetMouseDataLeftPressed().m_iX, GetMouseDataLeftReleased().m_iX ), 

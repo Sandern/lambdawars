@@ -478,6 +478,19 @@ C_BaseCombatWeapon *C_HL2WarsPlayer::GetWeapon( int i ) const
 	return pUnit->GetWeapon( i );
 }
 
+static void UpdateMinMaxUnit( const Vector &vPoint, int &iXMin, int &iYMin, int &iXMax, int &iYMax )
+{
+	int iX, iY;
+	bool bInScreen = GetVectorInScreenSpace(vPoint, iX, iY);
+	if( !bInScreen )
+		return;
+
+	iXMin = MIN(iX, iXMin);
+	iYMin = MIN(iY, iYMin);
+	iXMax = MAX(iX, iXMax);
+	iYMax = MAX(iY, iYMax);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -485,7 +498,8 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 {
 	UnitListInfo *pUnitList;
 	CUnitBase *pUnit;
-	int iX, iY, i;
+	Vector mins, maxs;
+	int iX, iY, i, iXMinUnit, iYMinUnit, iXMaxUnit, iYMaxUnit;
 	bool bInScreen;
 #ifdef ENABLE_PYTHON
 	boost::python::list pytargetselection;
@@ -505,8 +519,22 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 		if( pUnitType && Q_stricmp( pUnitType, pUnit->GetUnitType() ) )
 			continue;
 
+		pUnit->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+
 		bInScreen = GetVectorInScreenSpace(pUnit->GetAbsOrigin(), iX, iY);
-		if( bInScreen && iX >= iXMin && iY >= iYMin && iX <= iXMax && iY <= iYMax )
+		if( !bInScreen )
+			continue;
+
+		iXMinUnit = iXMaxUnit = iX;
+		iYMinUnit = iYMaxUnit = iY;
+
+		UpdateMinMaxUnit( mins, iXMinUnit, iYMinUnit, iXMaxUnit, iYMaxUnit );
+		UpdateMinMaxUnit( Vector(maxs.x, maxs.y, mins.z), iXMinUnit, iYMinUnit, iXMaxUnit, iYMaxUnit );
+		UpdateMinMaxUnit( Vector(mins.x, maxs.y, mins.z), iXMinUnit, iYMinUnit, iXMaxUnit, iYMaxUnit );
+		UpdateMinMaxUnit( Vector(maxs.x, mins.y, mins.z), iXMinUnit, iYMinUnit, iXMaxUnit, iYMaxUnit );
+
+		// Only add to targetselection if the rectangles are overlapping
+		if (iXMinUnit < iXMax && iXMaxUnit > iXMin && iYMinUnit < iYMax && iYMaxUnit > iYMin)
 			targetselection.AddToTail(pUnit);
 	}
 

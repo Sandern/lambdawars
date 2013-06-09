@@ -360,7 +360,7 @@ void HL2WarsViewport::DrawSelectBox()
 	// Must be higher than the threshold
 	const MouseTraceData_t &leftpressed =  pPlayer->GetMouseDataLeftPressed();
 	const MouseTraceData_t &curdata =  pPlayer->GetMouseData();
-	if( abs( leftpressed.m_iX - curdata.m_iX ) <= XRES( cl_mouse_selectionbox_threshold.GetInt() ) ||
+	if( abs( leftpressed.m_iX - curdata.m_iX ) <= XRES( cl_mouse_selectionbox_threshold.GetInt() ) &&
 		abs( leftpressed.m_iY - curdata.m_iY ) <= YRES( cl_mouse_selectionbox_threshold.GetInt() ) )
 	{
 		ClearSelectionBox();
