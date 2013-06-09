@@ -38,14 +38,14 @@ public:
 
 	void	AttachToEntity( CBaseEntity *pTarget );
 	void	SetLifetime( float lifetime );
-	void	SetUseHitboxes( bool use );
+	//void	SetUseHitboxes( bool use );
 
-	void	SetNumHitboxFires( int iNumHitBoxFires );
-	void	SetHitboxFireScale( float flHitboxFireScale );
+	//void	SetNumHitboxFires( int iNumHitBoxFires );
+	//void	SetHitboxFireScale( float flHitboxFireScale );
 
 	float	GetRemainingLife( void ) const;
-	int		GetNumHitboxFires( void );
-	float	GetHitboxFireScale( void );
+	//int		GetNumHitboxFires( void );
+	//float	GetHitboxFireScale( void );
 
 	virtual void Precache();
 	virtual void UpdateOnRemove();
@@ -58,7 +58,13 @@ public:
 	void	SetSize( float size ) { m_flSize = size; }
 	
 	void	SetAttacker( CBaseEntity *pAttacker ) { m_hAttacker = pAttacker; }
-	CBaseEntity *GetAttacker( void ) const;
+	CBaseEntity *GetAttacker( void ) const { return m_hAttacker; }
+
+	void	SetFlameDamagePerSecond( float fDamage ) { m_fFlameDmgPerSecond = fDamage; }
+	float	GetFlameDamagePerSecond( void ) { return m_fFlameDmgPerSecond; }
+
+	void	SetFlameRadiusDamagePerSecond( float fDamage ) { m_fFlameRadiusDmgPerSecond = fDamage; }
+	float	GetFlameRadiusDamagePerSecond( void ) { return m_fFlameRadiusDmgPerSecond; }
 
 protected:
 	void	FlameThink( void );
@@ -80,6 +86,9 @@ protected:
 	bool m_bPlayingSound;
 	CUtlVector< CAI_Link * > m_DangerLinks;
 	Obstacle_t m_hObstacle;
+
+	float m_fFlameDmgPerSecond;
+	float m_fFlameRadiusDmgPerSecond;
 };
 
 #endif // ENTITYFLAME_H

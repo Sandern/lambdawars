@@ -89,6 +89,7 @@ class Entities(GenerateModuleSemiShared):
         'spark.h',
         'physics_prop_ragdoll.h',
         'filters.h',
+        'EntityFlame.h',
     ]
     
     def GetFiles(self):
@@ -156,6 +157,7 @@ class Entities(GenerateModuleSemiShared):
         'CPhysicsProp',
         'CRagdollProp',
         'CBaseFilter',
+        'CEntityFlame',
     ]
     
     def SetupProperty(self, mb, cls, pyname, gettername, settername):
@@ -286,7 +288,7 @@ class Entities(GenerateModuleSemiShared):
 
             # Check if the python class is networkable. Return the right serverclass.
             cls = mb.class_(cls_name)
-            if cls_name not in ['CPointEntity','CServerOnlyEntity', 'CServerOnlyPointEntity', 'CLogicalEntity', 'CFuncBrush', 'CBaseFilter']:
+            if cls_name not in ['CPointEntity','CServerOnlyEntity', 'CServerOnlyPointEntity', 'CLogicalEntity', 'CFuncBrush', 'CBaseFilter', 'CEntityFlame']:
                 cls.add_wrapper_code(   'virtual ServerClass* GetServerClass() {\r\n' + \
                                         '    #if defined(_WIN32)\r\n' + \
                                         '    #if defined(_DEBUG)\r\n' + \
@@ -1719,15 +1721,20 @@ class Entities(GenerateModuleSemiShared):
             mb.add_registration_code( "bp::scope().attr( \"SF_IGNORE_PLAYERUSE\" ) = (int)SF_IGNORE_PLAYERUSE;" )
             
             # Call poilicies
-            mb.free_functions('CreateRagGib').call_policies = call_policies.return_value_policy( call_policies.return_by_value )    
-            mb.mem_funs('GetSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value )    
-            mb.mem_funs('GetFlame').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+            mb.free_functions('CreateRagGib').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            mb.mem_funs('GetSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value)    
+            mb.mem_funs('GetFlame').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
         
             # Base filter
             cls = mb.class_('CBaseFilter')
             cls.no_init = False
             cls.mem_funs('PassesFilterImpl').virtuality = 'virtual' 
             cls.mem_funs('PassesDamageFilterImpl').virtuality = 'virtual' 
+            
+            # CEntityFlame
+            cls = mb.class_('CEntityFlame')
+            cls.mem_fun('Create').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            cls.mem_fun('GetAttacker').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         else:
             # C_PlayerResource
             mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )

@@ -64,6 +64,8 @@ CEntityFlame::CEntityFlame( void )
 	m_iDangerSound		= SOUNDLIST_EMPTY;
 	m_bCheapEffect		= false;
 	m_hObstacle			= OBSTACLE_INVALID;
+	m_fFlameDmgPerSecond		= FLAME_DIRECT_DAMAGE_PER_SEC;
+	m_fFlameRadiusDmgPerSecond	= FLAME_RADIUS_DAMAGE_PER_SEC;
 }
 
 void CEntityFlame::UpdateOnRemove()
@@ -292,14 +294,16 @@ void CEntityFlame::FlameThink( void )
 
 	if ( m_hEntAttached )
 	{
+		CBaseEntity *pAttacker = m_hAttacker ? m_hAttacker : this;
+
 		// Do radius damage ignoring the entity I'm attached to. This will harm things around me.
-		RadiusDamage( CTakeDamageInfo( this, this, 4.0f, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, m_hEntAttached );
+		RadiusDamage( CTakeDamageInfo( this, pAttacker, m_fFlameRadiusDmgPerSecond * FLAME_DAMAGE_INTERVAL, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, m_hEntAttached );
 
 		// Directly harm the entity I'm attached to. This is so we can precisely control how much damage the entity
 		// that is on fire takes without worrying about the flame's position relative to the bodytarget (which is the
 		// distance that the radius damage code uses to determine how much damage to inflict)
-		m_hEntAttached->TakeDamage( CTakeDamageInfo( this, this, FLAME_DIRECT_DAMAGE, DMG_BURN | DMG_DIRECT ) );
-
+		m_hEntAttached->TakeDamage( CTakeDamageInfo( this, pAttacker, m_fFlameDmgPerSecond * FLAME_DAMAGE_INTERVAL, DMG_BURN | DMG_DIRECT ) );
+		
 		if( !m_hEntAttached->IsNPC() && hl2_episodic.GetBool() )
 		{
 			const float ENTITYFLAME_MOVE_AWAY_DIST = 24.0f;
@@ -310,7 +314,7 @@ void CEntityFlame::FlameThink( void )
 	}
 	else
 	{
-		RadiusDamage( CTakeDamageInfo( this, this, FLAME_RADIUS_DAMAGE, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, this, m_fFlameRadiusDmgPerSecond * FLAME_DAMAGE_INTERVAL, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, NULL );
 	}
 
 	FireSystem_AddHeatInRadius( GetAbsOrigin(), m_flSize/2, 2.0f );
