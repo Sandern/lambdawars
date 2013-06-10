@@ -910,11 +910,13 @@ void CSrcPython::CleanupDelayedUpdateList()
 					py_delayed_data_update_list[i].name,
 					py_delayed_data_update_list[i].callchanged );
 			}
-			h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
-				py_delayed_data_update_list[i].data );
-
-			if( py_delayed_data_update_list[i].callchanged )
-				h->PyNetworkVarCallChangedCallback( py_delayed_data_update_list[i].name );
+			
+			if( h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
+				py_delayed_data_update_list[i].data ) )
+			{
+				if( py_delayed_data_update_list[i].callchanged )
+					h->PyNetworkVarCallChangedCallback( py_delayed_data_update_list[i].name );
+			}
 
 			py_delayed_data_update_list.Remove(i);
 		}

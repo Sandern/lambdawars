@@ -1920,7 +1920,7 @@ public:
 	void							PyReceiveMessageInternal( int classID, bf_read &msg );
 	virtual void					PyReceiveMessage( bp::list msg );
 
-	void							PyUpdateNetworkVar( const char *pName, bp::object data );
+	bool							PyUpdateNetworkVar( const char *pName, bp::object data );
 	void							PyNetworkVarCallChangedCallback( const char *pName );
 
 	// Functions which return *IPhysicsObject need to be wrapped in python

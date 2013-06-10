@@ -6729,19 +6729,24 @@ void C_BaseEntity::PyReceiveMessage( bp::list msg )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void C_BaseEntity::PyUpdateNetworkVar( const char *pName, bp::object data )
+bool C_BaseEntity::PyUpdateNetworkVar( const char *pName, bp::object data )
 {
 	// Set new var
 	try {
+		// Only set if changed.
+		if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
+			return false;
+
 		setattr(m_pyInstance, pName, data);
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
 		PyErr_Clear();
-		return;
+		return false;
 	}
 
 	// Mark as data changed
 	AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
+	return true;
 }
 
 //------------------------------------------------------------------------------
