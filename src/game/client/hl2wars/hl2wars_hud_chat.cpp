@@ -378,14 +378,17 @@ Color CHudChat::GetClientColor( int clientIndex )
 	}
 
 #ifdef ENABLE_PYTHON
-	int ownernumber = g_PR->GetOwnerNumber(clientIndex);
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		int ownernumber = g_PR->GetOwnerNumber(clientIndex);
 
-	try	{	
-		return boost::python::extract<Color>( SrcPySystem()->Get("_GetColorForOwnerNumber", "playermgr")(ownernumber) );
-	} catch(...) {	
-		PyErr_Print();	
-		PyErr_Clear();	
-	}		
+		try	{	
+			return boost::python::extract<Color>( SrcPySystem()->Get("_GetColorForOwnerNumber", "playermgr")(ownernumber) );
+		} catch(...) {	
+			PyErr_Print();	
+			PyErr_Clear();	
+		}		
+	}
 #endif // ENABLE_PYTHON
 	return g_ColorYellow;
 }

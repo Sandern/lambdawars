@@ -20,6 +20,9 @@
 
 using namespace boost::python;
 
+//-----------------------------------------------------------------------------
+// Purpose: Python function for deleting a file
+//-----------------------------------------------------------------------------
 void PyRemoveFile( char const* pRelativePath, const char *pathID )
 {
 	if( !SrcPyPathIsInGameFolder(pRelativePath) )
@@ -33,6 +36,9 @@ void PyRemoveFile( char const* pRelativePath, const char *pathID )
 	filesystem->RemoveFile( pRelativePath, pathID );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Python function for deleting a directory
+//-----------------------------------------------------------------------------
 void PyRemoveDirectory( char const* pPath, const char *pathID )
 {
 	char buf[512];
@@ -56,6 +62,20 @@ void PyRemoveDirectory( char const* pPath, const char *pathID )
 #endif // WIN32
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Python function for getting the mod path
+//-----------------------------------------------------------------------------
+bp::object PyGetModPath()
+{
+	char buf[_MAX_PATH];
+	filesystem->GetSearchPath( "MOD", true, buf, sizeof( buf ) );
+	V_StripTrailingSlash( buf );
+	return bp::object( buf );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void PyAsyncFinishAllWrites( void )
 {
 	filesystem->AsyncFinishAllWrites();

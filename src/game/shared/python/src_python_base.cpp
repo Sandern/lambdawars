@@ -381,7 +381,7 @@ boost::python::object AbsToRel( const char *path )
 boost::python::object RelToAbs( const char *path )
 {
 	char temp[_MAX_PATH];
-	filesystem->RelativePathToFullPath(path, "MOD", temp, _MAX_PATH);
+	SrcPyGetFullPathSilent( path, temp, _MAX_PATH );
 	return boost::python::object(temp);
 }
 

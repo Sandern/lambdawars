@@ -3394,6 +3394,16 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PyGetModPath
+    
+        typedef ::boost::python::object ( *GetModPath_function_type )(  );
+        
+        bp::def( 
+            "GetModPath"
+            , GetModPath_function_type( &::PyGetModPath ) );
+    
+    }
+
     { //::PyGetSearchPath
     
         typedef ::boost::python::object ( *GetSearchPath_function_type )( char const *,bool );
@@ -7282,6 +7292,16 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "GetMapHeader"
             , GetMapHeader_function_type( &::PyGetMapHeader )
             , ( bp::arg("mapname") ) );
+    
+    }
+
+    { //::PyGetModPath
+    
+        typedef ::boost::python::object ( *GetModPath_function_type )(  );
+        
+        bp::def( 
+            "GetModPath"
+            , GetModPath_function_type( &::PyGetModPath ) );
     
     }
 

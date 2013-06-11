@@ -154,6 +154,8 @@ bool CSrcPython::Init( )
 	if( Q_strncmp( pGameDir, pDevModDir, Q_strlen( pDevModDir ) ) != 0 )*/
 	m_bPathProtected = CommandLine() ? CommandLine()->FindParm("-nopathprotection") == 0 : true;
 
+	bool bNoChangeWorkingDirectory = CommandLine() ? CommandLine()->FindParm("-testnochangeworkingdir") != 0 : false;
+
 	if( !bEnabled )
 	{
 	#ifdef CLIENT_DLL
@@ -173,7 +175,8 @@ bool CSrcPython::Init( )
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
 #endif // CLIENT_DLL
 
-	//if( !bToolsMode )
+#if 1
+	if( !bNoChangeWorkingDirectory )
 	{
 		// Change working directory	
 		char moddir[_MAX_PATH];
@@ -181,6 +184,7 @@ bool CSrcPython::Init( )
 		V_FixupPathName(moddir, _MAX_PATH, moddir);	
 		V_SetCurrentDirectory(moddir);
 	}
+#endif // 0
 
 	m_bPythonRunning = true;
 
