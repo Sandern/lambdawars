@@ -118,41 +118,37 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 
 	// Hack for model viewer: force dx level 100
 	// Shouldn't matter for the game dll, because it will update the video level anyway (and we always use dxlevel 100)
-	if( g_pMaterialSystem )
+	if( g_pMaterialSystem && CommandLine()->FindParm( "-nodxleveloverride" ) == 0 )
 	{
 		// mat_disablehwmorph is a dx10/11 feature, so when dxlevel is 95 it is disabled
-		//ConVarRef mat_disablehwmorph("mat_disablehwmorph");
-
 		MaterialSystem_Config_t config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
-		//Msg("Current dxlevel: %d\n", config.dxSupportLevel );
-		if( CommandLine()->FindParm( "-force_dxlevel" ) )
+		
+		if( CommandLine()->FindParm( "-force_dxlevel" ) != 0 )
 		{
 			config.dxSupportLevel = atoi( CommandLine()->ParmValue( "-force_dxlevel", "100" ) );
 			Msg( "Overriding dx level to %d\n", config.dxSupportLevel );
-			if( config.dxSupportLevel <= 95 )
-				CommandLine()->AppendParm( "-disallowhwmorph", "" );
 			g_pMaterialSystem->OverrideConfig( config, true );
 		}
-		else if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
+		else if( config.dxSupportLevel < 95 )
 		{
 			//Msg("Overriding dx level\n");
 			config.dxSupportLevel = 100;
 			g_pMaterialSystem->OverrideConfig( config, true );
 		}
 
-		config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
+		const MaterialSystem_Config_t &newConfig = g_pMaterialSystem->GetCurrentConfigForVideoCard();
 
-		if( config.dxSupportLevel >= 100 )
+		if( newConfig.dxSupportLevel >= 100 )
 		{
-			CommandLine()->RemoveParm( "-disallowhwmorph" );
+			// remove -disallowhwmorph if specified
+			// Note: don't call RemoveParm without checking the parm exists (can result in strange behavior)
+			if( CommandLine()->FindParm( "-disallowhwmorph" ) != 0 )
+				CommandLine()->RemoveParm( "-disallowhwmorph" );
 		}
-		else if( /*!config.bEditMode &&*/ config.dxSupportLevel < 95 )
+		else if( newConfig.dxSupportLevel < 95 )
 		{
 			Error("Your graphics card is not supported\n");
 		}
-
-		/*bool hasFast = */g_pMaterialSystemHardwareConfig->HasFastVertexTextures();
-		//Msg("hasFast: %d\n", hasFast);
 	}
 
 	return ( g_pConfig != NULL ) && (g_pHardwareConfig != NULL) && ( g_pSLShaderSystem != NULL );
