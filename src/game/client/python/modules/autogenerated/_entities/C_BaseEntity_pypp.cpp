@@ -4512,7 +4512,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::PyUpdateNetworkVar
         
-            typedef void ( ::C_BaseEntity::*PyUpdateNetworkVar_function_type )( char const *,::boost::python::object ) ;
+            typedef bool ( ::C_BaseEntity::*PyUpdateNetworkVar_function_type )( char const *,::boost::python::object ) ;
             
             C_BaseEntity_exposer.def( 
                 "PyUpdateNetworkVar"
