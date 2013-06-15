@@ -57,7 +57,8 @@ public:
 	bool							IsStrategicModeOn() const { return GetMoveType() == MOVETYPE_STRATEGIC; }
 	const Vector &					GetMouseAim() const { return m_vMouseAim; }
 	const MouseTraceData_t &		GetMouseData() const { return m_MouseData; }
-	virtual void					UpdateMouseData( Vector &vMouseAim );
+	virtual void					CalculateMouseData( const Vector &vMouseAim, const Vector &vPos, const Vector &vCamOffset, MouseTraceData_t &mousedata ) const;
+	virtual void					UpdateMouseData( const Vector &vMouseAim );
 	virtual void					UpdateButtonState( int nUserCmdButtonMask );
 
 	const MouseTraceData_t &		GetMouseDataLeftPressed() const { return m_MouseDataLeftPressed; }
@@ -102,8 +103,8 @@ public:
 	void							GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMax,  CUtlVector< EHANDLE > &selection, const char *pUnitType = NULL );
 	void							SelectBox( int xmin, int ymin, int xmax, int ymax );
 	void							SelectAllUnitsOfTypeInScreen( const char *pUnitType );
-	void							SimulateOrderUnits( Vector &vStart, Vector &vEnd, CBaseEntity *pHitEnt );
-	void							MinimapClick( Vector &vStart, Vector &vEnd, CBaseEntity *pHitEnt );
+	void							SimulateOrderUnits( const MouseTraceData_t &mousedata );
+	void							MinimapClick( const MouseTraceData_t &mousedata );
 
 	// Selected unit type. Used by the hud and hotkeys to determine which abilities should be shown
 	const char *					GetSelectedUnitType( void );
@@ -132,7 +133,7 @@ public:
 	bp::object						GetSingleActiveAbility();
 #endif // ENABLE_PYTHON
 
-	CBaseEntity *					GetControlledUnit();
+	CBaseEntity *					GetControlledUnit() const;
 
 	// Mouse button checking
 	virtual void					OnLeftMouseButtonPressed( const MouseTraceData_t &data );

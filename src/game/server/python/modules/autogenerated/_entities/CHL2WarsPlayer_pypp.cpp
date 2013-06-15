@@ -1574,6 +1574,16 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("vPosition") ) );
         
         }
+        { //::CHL2WarsPlayer::CalculateMouseData
+        
+            typedef void ( ::CHL2WarsPlayer::*CalculateMouseData_function_type )( ::Vector const &,::Vector const &,::Vector const &,::MouseTraceData_t & ) const;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "CalculateMouseData"
+                , CalculateMouseData_function_type( &::CHL2WarsPlayer::CalculateMouseData )
+                , ( bp::arg("vMouseAim"), bp::arg("vPos"), bp::arg("vCamOffset"), bp::arg("mousedata") ) );
+        
+        }
         { //::CHL2WarsPlayer::ChangeFaction
         
             typedef void ( ::CHL2WarsPlayer::*ChangeFaction_function_type )( char const * ) ;
@@ -1756,7 +1766,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::GetControlledUnit
         
-            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*GetControlledUnit_function_type )(  ) ;
+            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*GetControlledUnit_function_type )(  ) const;
             
             CHL2WarsPlayer_exposer.def( 
                 "GetControlledUnit"
@@ -2338,7 +2348,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::UpdateMouseData
         
-            typedef void ( ::CHL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector & ) ;
+            typedef void ( ::CHL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "UpdateMouseData"
@@ -2839,7 +2849,7 @@ void register_CHL2WarsPlayer_class(){
         CHL2WarsPlayer_exposer.staticmethod( "GetPyNetworkType" );
         { //property "unit"[fget=::CHL2WarsPlayer::GetControlledUnit, fset=::CHL2WarsPlayer::SetControlledUnit]
         
-            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*fget )(  ) ;
+            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*fget )(  ) const;
             typedef void ( ::CHL2WarsPlayer::*fset )( ::CBaseEntity * ) ;
             
             CHL2WarsPlayer_exposer.add_property( 

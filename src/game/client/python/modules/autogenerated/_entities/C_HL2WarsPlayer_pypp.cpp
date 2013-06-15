@@ -1089,6 +1089,16 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("vPosition") ) );
         
         }
+        { //::C_HL2WarsPlayer::CalculateMouseData
+        
+            typedef void ( ::C_HL2WarsPlayer::*CalculateMouseData_function_type )( ::Vector const &,::Vector const &,::Vector const &,::MouseTraceData_t & ) const;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "CalculateMouseData"
+                , CalculateMouseData_function_type( &::C_HL2WarsPlayer::CalculateMouseData )
+                , ( bp::arg("vMouseAim"), bp::arg("vPos"), bp::arg("vCamOffset"), bp::arg("mousedata") ) );
+        
+        }
         { //::C_HL2WarsPlayer::CamCalculateGroupOrigin
         
             typedef ::Vector ( ::C_HL2WarsPlayer::*CamCalculateGroupOrigin_function_type )(  ) ;
@@ -1320,7 +1330,7 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::GetControlledUnit
         
-            typedef ::C_BaseEntity * ( ::C_HL2WarsPlayer::*GetControlledUnit_function_type )(  ) ;
+            typedef ::C_BaseEntity * ( ::C_HL2WarsPlayer::*GetControlledUnit_function_type )(  ) const;
             
             C_HL2WarsPlayer_exposer.def( 
                 "GetControlledUnit"
@@ -1605,12 +1615,12 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::MinimapClick
         
-            typedef void ( ::C_HL2WarsPlayer::*MinimapClick_function_type )( ::Vector &,::Vector &,::C_BaseEntity * ) ;
+            typedef void ( ::C_HL2WarsPlayer::*MinimapClick_function_type )( ::MouseTraceData_t const & ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "MinimapClick"
                 , MinimapClick_function_type( &::C_HL2WarsPlayer::MinimapClick )
-                , ( bp::arg("vStart"), bp::arg("vEnd"), bp::arg("pHitEnt") ) );
+                , ( bp::arg("mousedata") ) );
         
         }
         { //::C_HL2WarsPlayer::OnChangeOwnerNumber
@@ -1897,12 +1907,12 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::SimulateOrderUnits
         
-            typedef void ( ::C_HL2WarsPlayer::*SimulateOrderUnits_function_type )( ::Vector &,::Vector &,::C_BaseEntity * ) ;
+            typedef void ( ::C_HL2WarsPlayer::*SimulateOrderUnits_function_type )( ::MouseTraceData_t const & ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "SimulateOrderUnits"
                 , SimulateOrderUnits_function_type( &::C_HL2WarsPlayer::SimulateOrderUnits )
-                , ( bp::arg("vStart"), bp::arg("vEnd"), bp::arg("pHitEnt") ) );
+                , ( bp::arg("mousedata") ) );
         
         }
         { //::C_HL2WarsPlayer::SnapCameraTo
@@ -1957,7 +1967,7 @@ void register_C_HL2WarsPlayer_class(){
         }
         { //::C_HL2WarsPlayer::UpdateMouseData
         
-            typedef void ( ::C_HL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector & ) ;
+            typedef void ( ::C_HL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector const & ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "UpdateMouseData"
@@ -2268,7 +2278,7 @@ void register_C_HL2WarsPlayer_class(){
         C_HL2WarsPlayer_exposer.staticmethod( "GetPyNetworkType" );
         { //property "unit"[fget=::C_HL2WarsPlayer::GetControlledUnit]
         
-            typedef ::C_BaseEntity * ( ::C_HL2WarsPlayer::*fget )(  ) ;
+            typedef ::C_BaseEntity * ( ::C_HL2WarsPlayer::*fget )(  ) const;
             
             C_HL2WarsPlayer_exposer.add_property( 
                 "unit"

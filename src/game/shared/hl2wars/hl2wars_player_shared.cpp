@@ -82,7 +82,7 @@ Vector CHL2WarsPlayer::EyePosition(void)
 class CMouseCollideList : public IEntityEnumerator
 {
 public:
-	CMouseCollideList( Ray_t *pRay, CBaseEntity* pIgnoreEntity, int nContentsMask ) : 
+	CMouseCollideList( Ray_t *pRay, const CBaseEntity* pIgnoreEntity, int nContentsMask ) : 
 		m_pIgnoreEntity( pIgnoreEntity ), m_nContentsMask( nContentsMask ), m_pRay(pRay), didhit(false) {}
 
 	virtual bool EnumEntity( IHandleEntity *pHandleEntity )
@@ -127,41 +127,32 @@ public:
 	bool didhit;
 
 private:
-	CBaseEntity		*m_pIgnoreEntity;
-	int				m_nContentsMask;
-	Ray_t			*m_pRay;
+	const CBaseEntity	*m_pIgnoreEntity;
+	int					m_nContentsMask;
+	Ray_t				*m_pRay;
 };
 
-//-----------------------------------------------------------------------------
-// Purpose: Called when we received a new mouse aim vector or when moving around
-//			Calculate new mouse data, so we only need to do this once.
-//-----------------------------------------------------------------------------
+// Constants for updating the mouse data
 #define MOUSE_TRACE_BOX_MINS Vector(-8.0, -8.0, 0.0)
 #define MOUSE_TRACE_BOX_MAXS Vector(8.0, 8.0, 8.0)
 #define MOUSE_ENT_TOLERANCE 64.0f 
-void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
-{
-	if( g_debug_mouse_noupdate.GetBool() )
-		return;
 
+//-----------------------------------------------------------------------------
+// Purpose: Called when we received a new mouse aim vector or when moving around
+//			Calculate new mouse data into the passed argument. 
+//			Does not modify the player data.
+//-----------------------------------------------------------------------------
+void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &vPos, const Vector &vCamOffset, MouseTraceData_t &mousedata ) const
+{
 	trace_t tr;
 	Vector vStartPos, vEndPos;
-	CBaseEntity *pEnt, *pOldEnt;
-
-	// Copy mouse aim
-	m_vMouseAim = vMouseAim;
 
 	// Get information
 	// Note: Filter controlled unit rather then the player. 
 	//		 The player is already not traceable. When activating mouse in direct control we need to ignore the unit.
-	vStartPos = Weapon_ShootPosition()+GetCameraOffset();
-	vEndPos = vStartPos + (m_vMouseAim *  MAX_TRACE_LENGTH);
+	vStartPos = vPos + vCamOffset;
+	vEndPos = vStartPos + (vMouseAim *  MAX_TRACE_LENGTH);
 
-#if 0
-	// Don't need a trace hull, already doing an extra check below
-	UTIL_TraceHull( vStartPos, vEndPos,
-			MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
-#else
 	// First version takes triggers into account with mouse interface
 	Ray_t ray;
 	ray.Init( vStartPos, vEndPos, MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS );
@@ -179,48 +170,47 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 		UTIL_TraceHull( vStartPos, vEndPos,
 				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
 	}
-#endif // 0
 
 	// Store old
-	pOldEnt = m_MouseData.GetEnt();
+	//pOldEnt = mousedata.GetEnt();
 
 	// Update
-	m_MouseData.m_vStartPos = tr.startpos;
-	m_MouseData.m_vEndPos = tr.endpos;
-	m_MouseData.m_vNormal = tr.plane.normal;
-	m_MouseData.SetEnt( tr.m_pEnt );
-	m_MouseData.m_nHitBox = tr.hitbox;
+	mousedata.m_vStartPos = tr.startpos;
+	mousedata.m_vEndPos = tr.endpos;
+	mousedata.m_vNormal = tr.plane.normal;
+	mousedata.SetEnt( tr.m_pEnt );
+	mousedata.m_nHitBox = tr.hitbox;
 
 	// Check world only
 	CTraceFilterWorldOnly filter;
-	UTIL_TraceHull( Weapon_ShootPosition()+GetCameraOffset(), Weapon_ShootPosition()+GetCameraOffset() + (m_vMouseAim *  8192),
+	UTIL_TraceHull( vPos + vCamOffset, vPos + vCamOffset + (m_vMouseAim *  8192),
 		MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID_BRUSHONLY, &filter, &tr ); 
-	m_MouseData.m_vWorldOnlyEndPos = tr.endpos;
-	m_MouseData.m_vWorldOnlyNormal = tr.plane.normal;
+	mousedata.m_vWorldOnlyEndPos = tr.endpos;
+	mousedata.m_vWorldOnlyNormal = tr.plane.normal;
 	
 	// On Client: Update mouse x and y position
 #ifdef CLIENT_DLL
-	::input->GetFullscreenMousePos( &(m_MouseData.m_iX), &(m_MouseData.m_iY) );
+	::input->GetFullscreenMousePos( &(mousedata.m_iX), &(mousedata.m_iY) );
 #endif 
 
 	// Clear ent in case we are not supposed to see it with the mouse
-	if( m_MouseData.m_hEnt )
+	if( mousedata.m_hEnt )
 	{
 #ifdef CLIENT_DLL
-		if( !m_MouseData.m_hEnt->FOWShouldShow() )
+		if( !mousedata.m_hEnt->FOWShouldShow() )
 #else
-		if( !m_MouseData.m_hEnt->FOWShouldShow( this ) )
+		if( !mousedata.m_hEnt->FOWShouldShow( (CBasePlayer *)this ) )
 #endif // CLIENT_DLL
-			m_MouseData.SetEnt( NULL );
+			mousedata.SetEnt( NULL );
 	}
 
 	// If we hit the world or nothing, do a larger scan for entities
-	if( (!m_MouseData.GetEnt() || m_MouseData.GetEnt()->GetRefEHandle().GetEntryIndex() == 0) && !g_debug_mouse_noradiuscheck.GetBool() )
+	if( (!mousedata.GetEnt() || mousedata.GetEnt()->GetRefEHandle().GetEntryIndex() == 0) && !g_debug_mouse_noradiuscheck.GetBool() )
 	{
 		// Do not use UTIL_EntitiesInSphere around corners. It causes about infinitive cpu load
-		if( fabs(m_MouseData.m_vWorldOnlyEndPos.x)+513 < MAX_COORD_FLOAT &&
-			fabs(m_MouseData.m_vWorldOnlyEndPos.y)+513 < MAX_COORD_FLOAT &&
-			fabs(m_MouseData.m_vWorldOnlyEndPos.z)+513 < MAX_COORD_FLOAT)
+		if( fabs(mousedata.m_vWorldOnlyEndPos.x)+513 < MAX_COORD_FLOAT &&
+			fabs(mousedata.m_vWorldOnlyEndPos.y)+513 < MAX_COORD_FLOAT &&
+			fabs(mousedata.m_vWorldOnlyEndPos.z)+513 < MAX_COORD_FLOAT)
 		{
 			CBaseEntity *pList[512];
 			int i, n;
@@ -228,7 +218,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 			CBaseEntity *pEnt, *pBest;
 			pBest = NULL;
 			fBestDist = 512.0f;
-			n = UTIL_EntitiesInSphere(pList, 512, m_MouseData.m_vWorldOnlyEndPos, 512.0, 0);
+			n = UTIL_EntitiesInSphere(pList, 512, mousedata.m_vWorldOnlyEndPos, 512.0, 0);
 			for(i=0; i <n; i++)
 			{
 				pEnt = pList[i];
@@ -240,7 +230,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 				if( !pEnt->FOWShouldShow() )
 					continue;
 #else
-				if( !pEnt->FOWShouldShow( this ) )
+				if( !pEnt->FOWShouldShow( (CBasePlayer *)this ) )
 					continue;
 #endif // CLIENT_DLL
 
@@ -271,7 +261,7 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 				}
 			}
 			if( pBest )
-				m_MouseData.SetEnt( pBest );
+				mousedata.SetEnt( pBest );
 		}
 	}
 
@@ -279,27 +269,43 @@ void CHL2WarsPlayer::UpdateMouseData( Vector &vMouseAim )
 	{
 		NDebugOverlay::SweptBox(vStartPos,  vStartPos + (m_vMouseAim *  8192), 
 				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, QAngle(), 255, 0, 0, 200, 0.05f);
-		if( m_MouseData.GetEnt() )
+		if( mousedata.GetEnt() )
 		{
 #ifndef CLIENT_DLL
-			NDebugOverlay::BoxAngles(m_MouseData.GetEnt()->GetAbsOrigin(), m_MouseData.GetEnt()->WorldAlignMins(),
-				m_MouseData.GetEnt()->WorldAlignMaxs(), m_MouseData.GetEnt()->GetAbsAngles(), 0, 0, 255, 255, 0.05f);
+			NDebugOverlay::BoxAngles(mousedata.GetEnt()->GetAbsOrigin(), mousedata.GetEnt()->WorldAlignMins(),
+				mousedata.GetEnt()->WorldAlignMaxs(), mousedata.GetEnt()->GetAbsAngles(), 0, 0, 255, 255, 0.05f);
 #else
-			NDebugOverlay::BoxAngles(m_MouseData.GetEnt()->GetAbsOrigin(), m_MouseData.GetEnt()->WorldAlignMins(),
-				m_MouseData.GetEnt()->WorldAlignMaxs(), m_MouseData.GetEnt()->GetAbsAngles(), 0, 255, 0, 255, 0.05f);
+			NDebugOverlay::BoxAngles(mousedata.GetEnt()->GetAbsOrigin(), mousedata.GetEnt()->WorldAlignMins(),
+				mousedata.GetEnt()->WorldAlignMaxs(), mousedata.GetEnt()->GetAbsAngles(), 0, 255, 0, 255, 0.05f);
 #endif // CLIENT_DLL
 		}
 	}
 
 	// Check if entity is a dummy
-	pEnt = m_MouseData.GetEnt();
+	CBaseEntity *pEnt = mousedata.GetEnt();
 	if( pEnt && pEnt->IsUnit() &&pEnt->GetMousePassEntity() )
 	{
-		m_MouseData.SetEnt( pEnt->GetMousePassEntity() );
+		mousedata.SetEnt( pEnt->GetMousePassEntity() );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called when we received a new mouse aim vector or when moving around.
+//			Calculate new mouse data, so we only need to do this once.
+//-----------------------------------------------------------------------------
+void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
+{
+	if( g_debug_mouse_noupdate.GetBool() )
+		return;
+
+	CBaseEntity *pOldEnt = m_MouseData.GetEnt();
+
+	// Copy mouse aim and update mouse data
+	m_vMouseAim = vMouseAim;
+	CalculateMouseData( vMouseAim, Weapon_ShootPosition(), GetCameraOffset(), m_MouseData );
 
 	// Check entity change. Call OnCursorEntered/Exited if the entity is an IMouse entity.
-	pEnt = m_MouseData.GetEnt();
+	CBaseEntity *pEnt = m_MouseData.GetEnt();
 	if( pEnt != pOldEnt )
 	{
 		if( pOldEnt && pOldEnt->GetIMouse() )
@@ -1289,7 +1295,7 @@ bp::object CHL2WarsPlayer::GetSingleActiveAbility()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CBaseEntity *CHL2WarsPlayer::GetControlledUnit()
+CBaseEntity *CHL2WarsPlayer::GetControlledUnit() const
 {
 	return m_hControlledUnit.Get(); 
 }

@@ -652,34 +652,23 @@ void C_HL2WarsPlayer::SelectAllUnitsOfTypeInScreen(const char *pUnitType)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::SimulateOrderUnits( Vector &vStart, Vector &vEnd, CBaseEntity *pHitEnt )
+void C_HL2WarsPlayer::SimulateOrderUnits( const MouseTraceData_t &mousedata )
 {
-	MouseTraceData_t mousedata;
-	mousedata.m_vStartPos = vStart;
-	mousedata.m_vEndPos = vEnd;
-	mousedata.m_vWorldOnlyEndPos = vEnd;
-	mousedata.m_hEnt = pHitEnt;
-
 	m_MouseData = mousedata;
 	m_MouseDataRightPressed = mousedata;
 	m_MouseDataRightReleased = mousedata;
 			
 	OrderUnits();
 
-	engine->ServerCmd( VarArgs("player_orderunits %f %f %f %f %f %f %lu", vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z, pHitEnt ? pHitEnt->index : -1) );
+	engine->ServerCmd( VarArgs("player_orderunits %f %f %f %f %f %f %lu", mousedata.m_vStartPos.x, mousedata.m_vStartPos.y, mousedata.m_vStartPos.z, 
+		mousedata.m_vEndPos.x, mousedata.m_vEndPos.y, mousedata.m_vEndPos.z, mousedata.m_hEnt ? mousedata.m_hEnt->index : -1) );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_HL2WarsPlayer::MinimapClick( Vector &vStart, Vector &vEnd, CBaseEntity *pHitEnt )
+void C_HL2WarsPlayer::MinimapClick( const MouseTraceData_t &mousedata )
 {
-	MouseTraceData_t mousedata;
-	mousedata.m_vStartPos = vStart;
-	mousedata.m_vEndPos = vEnd;
-	mousedata.m_vWorldOnlyEndPos = vEnd;
-	mousedata.m_hEnt = pHitEnt;
-
 	m_MouseData = mousedata;
 	m_MouseDataRightPressed = mousedata;
 	m_MouseDataRightReleased = mousedata;
@@ -695,7 +684,8 @@ void C_HL2WarsPlayer::MinimapClick( Vector &vStart, Vector &vEnd, CBaseEntity *p
 	}
 #endif // ENABLE_PYTHON
 
-	engine->ServerCmd( VarArgs("minimap_lm %f %f %f %f %f %f %lu", vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z, pHitEnt ? pHitEnt->index : -1) );
+	engine->ServerCmd( VarArgs("minimap_lm %f %f %f %f %f %f %lu", mousedata.m_vStartPos.x, mousedata.m_vStartPos.y, mousedata.m_vStartPos.z, 
+		mousedata.m_vEndPos.x, mousedata.m_vEndPos.y, mousedata.m_vEndPos.z, mousedata.m_hEnt ? mousedata.m_hEnt->index : -1) );
 }
 
 //-----------------------------------------------------------------------------
