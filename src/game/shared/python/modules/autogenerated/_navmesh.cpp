@@ -216,22 +216,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::RandomNavAreaPosition
     
-        typedef ::Vector ( *RandomNavAreaPosition_function_type )(  );
+        typedef ::Vector ( *RandomNavAreaPosition_function_type )( float,int );
         
         bp::def( 
             "RandomNavAreaPosition"
-            , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition ) );
+            , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition )
+            , ( bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
     
     }
 
     { //::RandomNavAreaPositionWithin
     
-        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const & );
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,float,int );
         
         bp::def( 
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
     
     }
 
@@ -481,22 +482,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::RandomNavAreaPosition
     
-        typedef ::Vector ( *RandomNavAreaPosition_function_type )(  );
+        typedef ::Vector ( *RandomNavAreaPosition_function_type )( float,int );
         
         bp::def( 
             "RandomNavAreaPosition"
-            , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition ) );
+            , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition )
+            , ( bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
     
     }
 
     { //::RandomNavAreaPositionWithin
     
-        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const & );
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,float,int );
         
         bp::def( 
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
     
     }
 

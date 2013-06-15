@@ -141,7 +141,7 @@ void DestroyAllNavAreas()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector RandomNavAreaPosition( )
+Vector RandomNavAreaPosition( float minimumarea, int maxtries )
 {
 	if( !GetMapBoundaryList() )
 	{
@@ -165,20 +165,41 @@ Vector RandomNavAreaPosition( )
 		maxs.z = MAX(maxs.z, othermaxs.z);
 	}
 
-	return RandomNavAreaPositionWithin( mins, maxs );
+	return RandomNavAreaPositionWithin( mins, maxs, minimumarea, maxtries );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs )
+Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, float minimumarea, int maxtries )
 {
-	Vector random( 
-		mins.x + ((float)rand() / RAND_MAX) * (maxs.x - mins.x),
-		mins.y + ((float)rand() / RAND_MAX) * (maxs.y - mins.y),
-		maxs.z
-	);
-	CNavArea *pArea = TheNavMesh->GetNearestNavArea( random, false, 10000.0f, false, false );
+	if( maxtries < 0 )
+		maxtries = 1;
+
+	Vector random;
+	CNavArea *pArea = NULL;
+	Extent extent;
+
+	for( int i = 0; i < maxtries; i++ )
+	{
+		random.Init( 
+			mins.x + ((float)rand() / RAND_MAX) * (maxs.x - mins.x),
+			mins.y + ((float)rand() / RAND_MAX) * (maxs.y - mins.y),
+			maxs.z
+		);
+		pArea = TheNavMesh->GetNearestNavArea( random, false, 10000.0f, false, false );
+		if( pArea )
+		{
+			pArea->GetExtent( &extent );
+			if( extent.Area() >= minimumarea )
+				break;
+		}
+
+		// Reset
+		pArea = NULL;
+	}
+
+
 	if( !pArea )
 	{
 		if( g_pynavmesh_debug.GetBool() )
