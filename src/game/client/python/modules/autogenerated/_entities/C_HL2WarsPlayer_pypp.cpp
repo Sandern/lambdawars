@@ -1757,6 +1757,16 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("entities"), bp::arg("forced")=(bool)(false) ) );
         
         }
+        { //::C_HL2WarsPlayer::PyMakeSelection
+        
+            typedef void ( ::C_HL2WarsPlayer::*MakeSelection_function_type )( ::boost::python::list ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "MakeSelection"
+                , MakeSelection_function_type( &::C_HL2WarsPlayer::PyMakeSelection )
+                , ( bp::arg("selection") ) );
+        
+        }
         { //::C_HL2WarsPlayer::RemoveActiveAbility
         
             typedef void ( ::C_HL2WarsPlayer::*RemoveActiveAbility_function_type )( ::boost::python::object ) ;

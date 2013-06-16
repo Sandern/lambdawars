@@ -597,6 +597,25 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 	ScheduleSelectionChangedSignal();
 }
 
+#ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::PyMakeSelection( boost::python::list selection )
+{
+	CUtlVector< EHANDLE > newSelection;
+	int n = boost::python::len(selection);
+	for( int i = 0; i < n; i++ )
+	{
+		CBaseEntity *pEnt = boost::python::extract<CBaseEntity *>( selection[i] );
+		if( !pEnt )
+			continue;
+		newSelection.AddToTail( pEnt );
+	}
+	MakeSelection( newSelection );
+}
+#endif // ENABLE_PYTHON
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

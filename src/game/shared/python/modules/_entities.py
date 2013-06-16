@@ -1174,6 +1174,9 @@ class Entities(GenerateModuleSemiShared):
                              
             cls.mem_fun('CamFollowGroup').exclude()
             cls.mem_fun('PyCamFollowGroup').rename('CamFollowGroup')
+            
+            cls.mem_fun('MakeSelection').exclude()
+            cls.mem_fun('PyMakeSelection').rename('MakeSelection')
         else:
             mb.mem_funs('EntSelectSpawnPoint').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             

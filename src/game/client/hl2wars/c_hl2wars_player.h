@@ -105,6 +105,10 @@ public:
 	void							SelectAllUnitsOfTypeInScreen( const char *pUnitType );
 	void							SimulateOrderUnits( const MouseTraceData_t &mousedata );
 	void							MinimapClick( const MouseTraceData_t &mousedata );
+	void							MakeSelection( CUtlVector< EHANDLE > &selection );
+#ifdef ENABLE_PYTHON
+	void							PyMakeSelection( boost::python::list selection );
+#endif // ENABLE_PYTHON
 
 	// Selected unit type. Used by the hud and hotkeys to determine which abilities should be shown
 	const char *					GetSelectedUnitType( void );
@@ -180,8 +184,6 @@ private:
 	void					OnRightMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonDoublePressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data );	
-
-	void					MakeSelection( CUtlVector< EHANDLE > &selection );
 
 private:
 	bool m_bOldIsStrategicModeOn;

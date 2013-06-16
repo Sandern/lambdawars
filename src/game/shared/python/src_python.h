@@ -159,9 +159,17 @@ template< class T >
 boost::python::list UtlVectorToListByValue( CUtlVector<T> & vec )
 {
 	boost::python::list l;
-	for( int i=0; i < vec.Count(); i++ )
+	for( int i = 0; i < vec.Count(); i++ )
 		l.append( *vec[i] );
 	return l;
+}
+
+template< class T >
+void ListToUtlVectorByValue( boost::python::list listIn, CUtlVector<T> & outVec )
+{
+	int n = boost::python::len(listIn);
+	for( int i = 0; i < n; i++ )
+		outVec.AddToTail( boost::python::extract<T>( listIn[i] ) );
 }
 
 

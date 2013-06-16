@@ -210,6 +210,10 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 #endif // ENABLE_PYTHON
 
 		if( !bSuccess )
-			Warning( "ApplyGameSettings: Unknown game mode!\n" );
+		{
+			Warning( "ApplyGameSettings: Unknown game mode! Falling back to gamelobby.\n" );
+			engine->ServerCommand( CFmtStr( "%s gamelobby reserved\n",
+				szMapCommand ) );
+		}
 	}
 }
