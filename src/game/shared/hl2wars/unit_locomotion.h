@@ -148,6 +148,7 @@ public:
 	virtual void	AirMove( void );
 	virtual void	FullWalkMove();
 	virtual void	HandleJump() {}
+	virtual void	UpdateBlockerNoMove();
 
 	// Main ground move functions
 	void				GroundMove();

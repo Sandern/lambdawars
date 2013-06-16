@@ -407,7 +407,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
  				GetPath()->m_bSuccess = true;
 
 				if( unit_navigator_debug.GetBool() )
-					DevMsg("#%d UnitNavigator: At goal, but marked as no clear. Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
+					DevMsg("#%d UnitNavigator: At goal, but marked as \"no clear\". Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
 #ifdef ENABLE_PYTHON
 				SrcPySystem()->Run<const char *>( 
 					SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
@@ -424,6 +424,9 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we lost our goal
 			if( LastGoalStatus == CHS_ATGOAL )
 			{
+				// Reset blocked status, otherwise we might get an instant fail
+				ResetBlockedStatus();
+
 				GetPath()->m_bSuccess = false;
 
 				if( unit_navigator_debug.GetBool() )

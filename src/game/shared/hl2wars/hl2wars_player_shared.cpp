@@ -171,9 +171,6 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, MASK_SOLID, GetControlledUnit(), COLLISION_GROUP_NONE, &tr );
 	}
 
-	// Store old
-	//pOldEnt = mousedata.GetEnt();
-
 	// Update
 	mousedata.m_vStartPos = tr.startpos;
 	mousedata.m_vEndPos = tr.endpos;

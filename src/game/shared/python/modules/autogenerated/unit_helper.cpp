@@ -4159,31 +4159,72 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
-    bp::class_< UnitBasePath >( "UnitBasePath", bp::init< >() )    
-        .def( bp::init< UnitBasePath const & >(( bp::arg("src") )) )    
-        .def( 
-            "Advance"
-            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Advance ) )    
-        .def( 
-            "Clear"
-            , (void ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::Clear ) )    
-        .def( 
-            "CurWaypointIsGoal"
-            , (bool ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::CurWaypointIsGoal ) )    
-        .def( 
-            "GetToleranceCurWaypoint"
-            , (float ( ::UnitBasePath::* )(  ) )( &::UnitBasePath::GetToleranceCurWaypoint ) )    
-        .def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies )    
-        .def_readwrite( "success", &UnitBasePath::m_bSuccess )    
-        .def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance )    
-        .def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist )    
-        .def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange )    
-        .def_readwrite( "minrange", &UnitBasePath::m_fMinRange )    
-        .def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags )    
-        .def_readwrite( "goaltype", &UnitBasePath::m_iGoalType )    
-        .def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos )    
-        .def_readwrite( "startposition", &UnitBasePath::m_vStartPosition )    
-        .def_readwrite( "waypointtolerance", &UnitBasePath::m_waypointTolerance );
+    { //::UnitBasePath
+        typedef bp::class_< UnitBasePath > UnitBasePath_exposer_t;
+        UnitBasePath_exposer_t UnitBasePath_exposer = UnitBasePath_exposer_t( "UnitBasePath", bp::init< >() );
+        bp::scope UnitBasePath_scope( UnitBasePath_exposer );
+        UnitBasePath_exposer.def( bp::init< UnitBasePath const & >(( bp::arg("src") )) );
+        { //::UnitBasePath::Advance
+        
+            typedef void ( ::UnitBasePath::*Advance_function_type )(  ) ;
+            
+            UnitBasePath_exposer.def( 
+                "Advance"
+                , Advance_function_type( &::UnitBasePath::Advance ) );
+        
+        }
+        { //::UnitBasePath::Clear
+        
+            typedef void ( ::UnitBasePath::*Clear_function_type )(  ) ;
+            
+            UnitBasePath_exposer.def( 
+                "Clear"
+                , Clear_function_type( &::UnitBasePath::Clear ) );
+        
+        }
+        { //::UnitBasePath::CurWaypointIsGoal
+        
+            typedef bool ( ::UnitBasePath::*CurWaypointIsGoal_function_type )(  ) ;
+            
+            UnitBasePath_exposer.def( 
+                "CurWaypointIsGoal"
+                , CurWaypointIsGoal_function_type( &::UnitBasePath::CurWaypointIsGoal ) );
+        
+        }
+        { //::UnitBasePath::GetToleranceCurWaypoint
+        
+            typedef float ( ::UnitBasePath::*GetToleranceCurWaypoint_function_type )(  ) ;
+            
+            UnitBasePath_exposer.def( 
+                "GetToleranceCurWaypoint"
+                , GetToleranceCurWaypoint_function_type( &::UnitBasePath::GetToleranceCurWaypoint ) );
+        
+        }
+        UnitBasePath_exposer.def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies );
+        UnitBasePath_exposer.def_readwrite( "success", &UnitBasePath::m_bSuccess );
+        UnitBasePath_exposer.def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance );
+        UnitBasePath_exposer.def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist );
+        UnitBasePath_exposer.def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange );
+        UnitBasePath_exposer.def_readwrite( "minrange", &UnitBasePath::m_fMinRange );
+        UnitBasePath_exposer.def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags );
+        UnitBasePath_exposer.def_readwrite( "goaltype", &UnitBasePath::m_iGoalType );
+        UnitBasePath_exposer.def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos );
+        UnitBasePath_exposer.def_readwrite( "startposition", &UnitBasePath::m_vStartPosition );
+        UnitBasePath_exposer.def_readwrite( "waypointtolerance", &UnitBasePath::m_waypointTolerance );
+        { //property "target"[fget=::UnitBasePath::GetTarget, fset=::UnitBasePath::SetTarget]
+        
+            typedef ::CBaseEntity * ( ::UnitBasePath::*fget )(  ) ;
+            typedef void ( ::UnitBasePath::*fset )( ::CBaseEntity * ) ;
+            
+            UnitBasePath_exposer.add_property( 
+                "target"
+                , bp::make_function( 
+                      fget( &::UnitBasePath::GetTarget )
+                    , bp::return_value_policy< bp::return_by_value >() ) 
+                , fset( &::UnitBasePath::SetTarget ) );
+        
+        }
+    }
 
     { //::UnitBaseNavigator
         typedef bp::class_< UnitBaseNavigator, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseNavigator_exposer_t;

@@ -429,7 +429,10 @@ void UnitBaseLocomotion::WalkMove( void )
 	mv->velocity[2] = 0;
 
 	if( ShouldWalk() )
+	{
+		UpdateBlockerNoMove();
 		return;
+	}
 
 	// first try just moving to the destination	
 	//dest[0] = mv->origin[0] + mv->velocity[0]*mv->interval;
@@ -492,6 +495,16 @@ void UnitBaseLocomotion::WalkMove( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void UnitBaseLocomotion::UpdateBlockerNoMove()
+{
+	trace_t trace;
+	TraceUnitBBox( mv->origin, mv->origin+Vector(0,0,1), unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
+	mv->m_hBlocker = trace.m_pEnt;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseLocomotion::AirMove( void )
 {
 	int			i;
@@ -533,7 +546,10 @@ void UnitBaseLocomotion::AirMove( void )
 	AirAccelerate( wishdir, wishspeed, airacceleration );
 
 	if( ShouldWalk() )
+	{
+		UpdateBlockerNoMove();
 		return;
+	}
 
 	// first try just moving to the destination	
 	dest = mv->origin + mv->velocity*mv->interval;

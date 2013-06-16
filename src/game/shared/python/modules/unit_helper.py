@@ -197,7 +197,7 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.add_property( 'idealyaw'
                          , cls.mem_fun('GetIdealYaw')
                          , cls.mem_fun('SetIdealYaw') )
-        cls.mem_funs('GetFacingTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        cls.mem_funs('GetFacingTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         cls.add_property( 'facingtarget'
                          , cls.mem_fun('GetFacingTarget')
                          , cls.mem_fun('SetFacingTarget') )
@@ -232,6 +232,14 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.var('m_fMaxMoveDist').rename('maxmovedist')
         cls.var('m_vStartPosition').rename('startposition')
         cls.var('m_bSuccess').rename('success')
+        
+        cls.mem_fun('GetTarget').exclude()
+        cls.mem_fun('SetTarget').exclude()
+        cls.mem_fun('GetTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.add_property( 'target'
+                         , cls.mem_fun('GetTarget')
+                         , cls.mem_fun('SetTarget') )
+        
         
         mb.enum('UnitGoalFlags').include()
         mb.enum('UnitGoalTypes').include()

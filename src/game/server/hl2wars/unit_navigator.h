@@ -312,6 +312,9 @@ public:
 		}
 	}
 
+	void SetTarget( CBaseEntity *pTarget ) { m_hTarget = pTarget; }
+	CBaseEntity *GetTarget() { return m_hTarget; }
+
 public:
 	int m_iGoalType;
 	UnitBaseWaypoint *m_pWaypointHead;
