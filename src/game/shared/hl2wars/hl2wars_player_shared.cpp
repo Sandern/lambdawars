@@ -322,6 +322,10 @@ void CHL2WarsPlayer::SetCameraOffset( Vector &offs )
 {
 	m_vCameraOffset = offs;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 const Vector &CHL2WarsPlayer::GetCameraOffset() const
 {
 	return m_vCameraOffset;
@@ -365,6 +369,14 @@ void CHL2WarsPlayer::UpdateButtonState( int nUserCmdButtonMask )
 			kwargs["state"] = (bool)(m_nCorrectButtons &IN_SPEED)!= 0;
 			bp::object signal = SrcPySystem()->Get("keyspeed", "core.signals", true);
 			SrcPySystem()->CallSignal( signal, kwargs );
+
+			// Signal abilities the speed key changed
+			CUtlVector<bp::object> activeAbilities;
+			activeAbilities = m_vecActiveAbilities;
+			for(int i=0; i< activeAbilities.Count(); i++)
+			{
+				SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnSpeedButtonChanged", activeAbilities[i]), false );
+			}
 		}
 		else if( (buttonsChanged & IN_DUCK) != 0 )
 		{
@@ -398,6 +410,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonPressedInternal( const MouseTraceData_t &d
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::OnLeftMouseButtonDoublePressedInternal( const MouseTraceData_t &data )
 {
 	if( m_bIsMouseCleared )
@@ -418,6 +433,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonDoublePressedInternal( const MouseTraceDat
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::OnLeftMouseButtonReleasedInternal( const MouseTraceData_t &data )
 {
 	if( m_bIsMouseCleared )
@@ -441,6 +459,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleasedInternal( const MouseTraceData_t &
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::OnRightMouseButtonPressedInternal( const MouseTraceData_t &data )
 {
 	m_bIsMouseCleared = false;
@@ -454,6 +475,9 @@ void CHL2WarsPlayer::OnRightMouseButtonPressedInternal( const MouseTraceData_t &
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::OnRightMouseButtonDoublePressedInternal( const MouseTraceData_t &data )
 {
 	if( m_bIsMouseCleared )
@@ -474,6 +498,9 @@ void CHL2WarsPlayer::OnRightMouseButtonDoublePressedInternal( const MouseTraceDa
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data )
 {
 	if( m_bIsMouseCleared )
