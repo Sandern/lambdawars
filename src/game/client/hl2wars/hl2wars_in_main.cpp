@@ -745,7 +745,7 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	if( !pViewPort )
 		return;
 
-	if( m_bMouseRotationActive )
+	if( m_bMouseRotationActive || pPlayer->GetFlags() & FL_FROZEN )
 	{
 		if( pViewPort->IsMouseInputEnabled() )
 			pViewPort->SetMouseInputEnabled(false);
