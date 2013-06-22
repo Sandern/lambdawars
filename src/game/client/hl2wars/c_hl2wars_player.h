@@ -47,6 +47,7 @@ public:
 
 	virtual Vector					EyePosition(void);
 	virtual void					ThirdPersonSwitch( bool bThirdperson );
+	virtual void					UpdateCameraMode();
 
 	void							SetScrollTimeOut(bool forward);
 
@@ -188,6 +189,7 @@ private:
 private:
 	bool m_bOldIsStrategicModeOn;
 	EHANDLE				m_hOldControlledUnit;
+	EHANDLE				m_hOldViewEntity;
 
 	// Shared Mouse data
 	Vector				m_vMouseAim;

@@ -238,23 +238,20 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 		// We want to think every frame.
 		SetNextClientThink( CLIENT_THINK_ALWAYS );
 	}
+	
+	if( GetViewEntity() != m_hOldViewEntity )
+	{
+		m_hOldViewEntity = GetViewEntity();
+
+		UpdateCameraMode();
+	}
 
 	if( m_bOldIsStrategicModeOn != IsStrategicModeOn() ) {
 		m_bOldIsStrategicModeOn = IsStrategicModeOn();
 
-		// Changing camera mode, so setup splitscreen guard
-		ACTIVE_SPLITSCREEN_PLAYER_GUARD( entindex() - 1 );
-
-		if( IsStrategicModeOn () ) {
-			Cmd_CAM_ToThirdPerson();
-			//input->CAM_ToThirdPerson();
-			//ThirdPersonSwitch(true);
-		}
-		else {
-			Cmd_CAM_ToFirstPerson();
-			SetForceShowMouse( false ); // reset for next time
-		}
+		UpdateCameraMode();
 	}
+
 	if( m_hOldControlledUnit != m_hControlledUnit )
 	{
 #ifdef ENABLE_PYTHON
@@ -271,7 +268,7 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 		{
 			m_hOldControlledUnit->GetIUnit()->OnUserLeftControl( this );
 			m_hOldControlledUnit->UpdateVisibility();
-			Cmd_CAM_ToThirdPerson();
+			//Cmd_CAM_ToThirdPerson();
 
 			// Hide viewmodels
 			for ( int i = 0 ; i < MAX_VIEWMODELS; i++ )
@@ -292,7 +289,7 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 		if( m_hControlledUnit )
 		{
 			m_hControlledUnit->GetIUnit()->OnUserControl( this );
-			Cmd_CAM_ToThirdPerson();
+			//Cmd_CAM_ToThirdPerson();
 
 			CUnitBase *pUnit = m_hControlledUnit->MyUnitPointer();
 			if( pUnit->GetActiveWeapon() )
@@ -326,6 +323,25 @@ void C_HL2WarsPlayer::UpdateOnRemove( void )
 {
 	ClearSelection(); // Ensure selection changed signal is send
 	BaseClass::UpdateOnRemove();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Determines if the player should be in first or third person
+//-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::UpdateCameraMode()
+{
+	// Changing camera mode, so setup splitscreen guard
+	ACTIVE_SPLITSCREEN_PLAYER_GUARD( entindex() - 1 );
+
+	if( IsStrategicModeOn () && !GetViewEntity() ) {
+		Cmd_CAM_ToThirdPerson();
+		//input->CAM_ToThirdPerson();
+		//ThirdPersonSwitch(true);
+	}
+	else {
+		Cmd_CAM_ToFirstPerson();
+		SetForceShowMouse( false ); // reset for next time
+	}
 }
 
 //-----------------------------------------------------------------------------
