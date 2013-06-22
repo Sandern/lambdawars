@@ -9,7 +9,6 @@
 #include "src_python_vgui.h"
 #include "src_python.h"
 #include <vgui_controls/Panel.h>
-#include "clientmode_hl2wars.h"
 #include <ienginevgui.h>
 #include <vgui/ISystem.h>
 

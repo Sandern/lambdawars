@@ -33,7 +33,7 @@
 // viewport definitions
 #include <baseviewport.h>
 #include "hl2warsViewport.h"
-#include "hl2wars_scoreboard.h"
+//#include "hl2wars_scoreboard.h"
 
 #include "vguicenterprint.h"
 #include "text_message.h"
@@ -158,11 +158,11 @@ IViewPortPanel* HL2WarsViewport::CreatePanelByName(const char *szPanelName)
 {
 	IViewPortPanel* newpanel = NULL;
 
-	if ( Q_strcmp( PANEL_SCOREBOARD, szPanelName) == 0 )
+	/*if ( Q_strcmp( PANEL_SCOREBOARD, szPanelName) == 0 )
 	{
 		newpanel = new CHL2WarsScoreboard( this );
 	}
-	else
+	else*/
 	{
 		// create a generic base panel, don't add twice
 		newpanel = BaseClass::CreatePanelByName( szPanelName );
@@ -173,7 +173,7 @@ IViewPortPanel* HL2WarsViewport::CreatePanelByName(const char *szPanelName)
 
 void HL2WarsViewport::CreateDefaultPanels( void )
 {
-	AddNewPanel( CreatePanelByName( PANEL_SCOREBOARD ), "PANEL_SCOREBOARD" );
+	//AddNewPanel( CreatePanelByName( PANEL_SCOREBOARD ), "PANEL_SCOREBOARD" );
 	AddNewPanel( CreatePanelByName( PANEL_INFO ), "PANEL_INFO" );
 	//AddNewPanel( CreatePanelByName( PANEL_SPECGUI ), "PANEL_SPECGUI" );
 	//AddNewPanel( CreatePanelByName( PANEL_SPECMENU ), "PANEL_SPECMENU" );
