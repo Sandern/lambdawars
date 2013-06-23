@@ -497,6 +497,12 @@ void CSrcPython::LevelShutdownPostEntity()
 	// Reset all send/recv tables
 	PyResetAllNetworkTables();
 
+	// Clear all tick signals next times (level time based)
+	for( int i = m_methodTickList.Count() - 1; i >= 0; i--)
+	{
+		m_methodTickList[i].m_fNextTickTime = 0;
+	}
+
 	m_bActive = false;
 }
 
