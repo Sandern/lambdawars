@@ -71,6 +71,7 @@ enum EAvatarSize
 {
 	k_EAvatarSize32x32 = 0,
 	k_EAvatarSize64x64 = 1,
+	k_EAvatarSize184x184 = 2,
 };
 
 

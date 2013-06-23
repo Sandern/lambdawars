@@ -16,7 +16,7 @@
 #include "c_baseplayer.h"
 
 // Avatar images, and avatar images with friends, don't scale with resolution.
-#define AVATAR_INDENT_X			(22)
+#define AVATAR_INDENT_X			(32)
 #define AVATAR_INDENT_Y			(1)
 #define AVATAR_POSTDENT_X		(1)
 #define AVATAR_POSTDENT_Y		(1)

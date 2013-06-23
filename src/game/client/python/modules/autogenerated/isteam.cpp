@@ -45,6 +45,7 @@ BOOST_PYTHON_MODULE(isteam){
     bp::enum_< EAvatarSize>("EAvatarSize")
         .value("k_EAvatarSize32x32", k_EAvatarSize32x32)
         .value("k_EAvatarSize64x64", k_EAvatarSize64x64)
+        .value("k_EAvatarSize184x184", k_EAvatarSize184x184)
         .export_values()
         ;
 
