@@ -1680,6 +1680,26 @@ void register_CBaseCombatCharacter_class(){
                 , ( bp::arg("vecSpot") ) );
         
         }
+        { //::CBaseCombatCharacter::FInViewCone
+        
+            typedef bool ( ::CBaseCombatCharacter::*FInViewCone_function_type )( ::CBaseEntity * ) ;
+            
+            CBaseCombatCharacter_exposer.def( 
+                "FInViewCone"
+                , FInViewCone_function_type( &::CBaseCombatCharacter::FInViewCone )
+                , ( bp::arg("pEntity") ) );
+        
+        }
+        { //::CBaseCombatCharacter::FInViewCone
+        
+            typedef bool ( ::CBaseCombatCharacter::*FInViewCone_function_type )( ::Vector const & ) ;
+            
+            CBaseCombatCharacter_exposer.def( 
+                "FInViewCone"
+                , FInViewCone_function_type( &::CBaseCombatCharacter::FInViewCone )
+                , ( bp::arg("vecSpot") ) );
+        
+        }
         { //::CBaseCombatCharacter::FindHealthItem
         
             typedef ::CBaseEntity * ( ::CBaseCombatCharacter::*FindHealthItem_function_type )( ::Vector const &,::Vector const & ) ;

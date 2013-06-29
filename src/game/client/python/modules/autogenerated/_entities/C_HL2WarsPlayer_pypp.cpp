@@ -1975,6 +1975,15 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("nUserCmdButtonMask") ) );
         
         }
+        { //::C_HL2WarsPlayer::UpdateCameraMode
+        
+            typedef void ( ::C_HL2WarsPlayer::*UpdateCameraMode_function_type )(  ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "UpdateCameraMode"
+                , UpdateCameraMode_function_type( &::C_HL2WarsPlayer::UpdateCameraMode ) );
+        
+        }
         { //::C_HL2WarsPlayer::UpdateMouseData
         
             typedef void ( ::C_HL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector const & ) ;

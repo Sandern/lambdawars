@@ -1010,7 +1010,7 @@ class Entities(GenerateModuleSemiShared):
             #mb.mem_funs( lambda decl: HasArgType(decl, 'CBaseCombatWeapon') ).exclude() 
             mb.mem_funs('RemoveWeapon').exclude() # Declaration only, lol
             mb.mem_funs('CauseDeath').exclude()
-            mb.mem_funs('FInViewCone').exclude()
+            #mb.mem_funs('FInViewCone').exclude()
             mb.mem_funs('OnPursuedBy').exclude()
             mb.vars('m_DefaultRelationship').exclude()
 
