@@ -33,7 +33,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
+#if 0
 //--------------------------------------------------------------------------------------------------------
 BEGIN_DATADESC( CFuncNavBlocker )
 
@@ -259,7 +259,7 @@ bool CFuncNavBlocker::CalculateBlocked( bool *pResultByTeam, const Vector &vecMi
  	}
 	return bBlocked;
 }
-
+#endif // 0
 
 //-----------------------------------------------------------------------------------------------------
 /**

@@ -4769,6 +4769,8 @@ void CNavArea::MarkAsBlocked( int teamID, CBaseEntity *blocker, bool bGenerateEv
 void CNavArea::UpdateBlockedFromNavBlockers( void )
 {
 	VPROF( "CNavArea::UpdateBlockedFromNavBlockers" );
+
+#if 0
 	Extent bounds;
 	GetExtent( &bounds );
 
@@ -4818,6 +4820,7 @@ void CNavArea::UpdateBlockedFromNavBlockers( void )
 			TheNavMesh->OnAreaUnblocked( this );
 		}
 	}
+#endif // 0
 }
 
 

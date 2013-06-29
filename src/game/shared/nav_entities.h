@@ -12,6 +12,7 @@
 #ifndef NAV_ENTITIES_H
 #define NAV_ENTITIES_H
 
+#if 0
 //-----------------------------------------------------------------------------------------------------
 /**
   * An entity that can block/unblock nav areas.  This is meant for semi-transient areas that block
@@ -67,5 +68,6 @@ private:
 	Vector m_CachedMins, m_CachedMaxs;
 
 };
+#endif // 0
 
 #endif // NAV_ENTITIES_H
