@@ -138,14 +138,7 @@ bool CShaderDLL::Connect( CreateInterfaceFn factory, bool bIsMaterialSystem )
 
 		const MaterialSystem_Config_t &newConfig = g_pMaterialSystem->GetCurrentConfigForVideoCard();
 
-		if( newConfig.dxSupportLevel >= 100 )
-		{
-			// remove -disallowhwmorph if specified
-			// Note: don't call RemoveParm without checking the parm exists (can result in strange behavior)
-			if( CommandLine()->FindParm( "-disallowhwmorph" ) != 0 )
-				CommandLine()->RemoveParm( "-disallowhwmorph" );
-		}
-		else if( newConfig.dxSupportLevel < 95 )
+		if( newConfig.dxSupportLevel < 95 )
 		{
 			Error("Your graphics card is not supported\n");
 		}
