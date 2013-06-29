@@ -8,26 +8,17 @@ from pyplusplus.module_builder import call_policies
 class ISteam(GenerateModuleClient):
     module_name = 'isteam'
     
-    if settings.ASW_CODE_BASE:
-        files = [
-            'videocfg/videocfg.h',
+    files = [
+        'videocfg/videocfg.h',
 
-            'cbase.h',
-            'steam\steam_api.h',
-            'steam\isteamfriends.h',
-            'steam\isteamutils.h',
-            'steam\steamclientpublic.h'
-        ]
-    else:
-        files = [
-            'wchartypes.h',
-            'shake.h',  
-            'cbase.h',
-            'steam\steam_api.h',
-            'steam\isteamfriends.h',
-            'steam\isteamutils.h',
-            'steam\steamclientpublic.h'
-        ]
+        'cbase.h',
+        'steam\steam_api.h',
+        'steam\isteamfriends.h',
+        'steam\isteamutils.h',
+        'steam\steamclientpublic.h',
+        
+        'vgui_avatarimage.h',
+    ]
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -44,6 +35,11 @@ class ISteam(GenerateModuleClient):
         cls.mem_fun('SteamUserStats').exclude()
         cls.mem_fun('SteamApps').exclude()
         cls.mem_fun('SteamMatchmakingServers').exclude()
+        
+        cls.mem_fun('SteamHTTP').exclude()
+        cls.mem_fun('SteamScreenshots').exclude()
+        cls.mem_fun('SteamUnifiedMessages').exclude()
+        
         
         if settings.ASW_CODE_BASE:
             cls.mem_fun('SteamNetworking').exclude()
@@ -80,9 +76,6 @@ class ISteam(GenerateModuleClient):
         
         mb.enum('EFriendRelationship').include()
         mb.enum('EPersonaState').include()
-        mb.enum('EAvatarSize').include()
-        #if not settings.ASW_CODE_BASE:
-        #    mb.enum('k_EFriendFlags').include()
         mb.add_registration_code( "bp::scope().attr( \"k_cchPersonaNameMax\" ) = (int)k_cchPersonaNameMax;" )
         
         # Utils

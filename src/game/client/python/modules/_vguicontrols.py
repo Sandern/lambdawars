@@ -190,6 +190,8 @@ class VGUIControls(GenerateModuleClient):
         cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         cls.mem_funs( 'InitFromRGBA' ).exclude()
+        
+        mb.enum('EAvatarSize').include()
     
     def ParsePanelHandles(self, mb):
         # Base handle for Panels

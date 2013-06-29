@@ -180,6 +180,12 @@ inline bool V_isspace(int c)
 //
 // This means the last parameter can usually be a sizeof() of a string.
 void V_strncpy( char *pDest, const char *pSrc, int maxLen );
+
+// Ultimate safe strcpy function, for arrays only -- buffer size is inferred by the compiler
+template <size_t maxLenInChars> void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], const char *pSrc ) 
+{ 
+	V_strncpy( pDest, pSrc, (int)maxLenInChars ); 
+}
 int V_snprintf( char *pDest, int destLen, const char *pFormat, ... ) FMTFUNCTION( 3, 4 );
 void V_wcsncpy( wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes );
 int V_snwprintf( wchar_t *pDest, int destLen, const wchar_t *pFormat, ... );

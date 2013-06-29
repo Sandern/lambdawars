@@ -14,9 +14,17 @@
 #include "gamerules.h"
 #include "datacache/imdlcache.h"
 
-
+#ifdef TERROR
+#include "func_elevator.h"
+#endif
 
 #include "tier1/lzmaDecoder.h"
+
+#ifdef CSTRIKE_DLL
+#include "cs_shareddefs.h"
+#include "nav_pathfind.h"
+#include "cs_nav_area.h"
+#endif
 
 #ifdef ENABLE_PYTHON
 	#include "src_python.h"
@@ -46,146 +54,128 @@ const int NavCurrentVersion = 19;
 // into that directory, or zero if no place has been assigned to 
 // that area.
 //
-class PlaceDirectory
+PlaceDirectory::PlaceDirectory( void )
 {
-public:
+	Reset();
+}
 
-	typedef unsigned short IndexType;	// Loaded/Saved as UnsignedShort.  Change this and you'll have to version.
+void PlaceDirectory::Reset( void )
+{
+	m_directory.RemoveAll();
+	m_hasUnnamedAreas = false;
+}
 
-	PlaceDirectory( void )
+/// return true if this place is already in the directory
+bool PlaceDirectory::IsKnown( Place place ) const
+{
+	return m_directory.HasElement( place );
+}
+
+/// return the directory index corresponding to this Place (0 = no entry)
+PlaceDirectory::IndexType PlaceDirectory::GetIndex( Place place ) const
+{
+	if (place == UNDEFINED_PLACE)
+		return 0;
+
+	int i = m_directory.Find( place );
+
+	if (i < 0)
 	{
-		Reset();
+		AssertMsg( false, "PlaceDirectory::GetIndex failure" );
+		return 0;
 	}
-	void Reset( void )
+
+	return (IndexType)(i+1);
+}
+
+/// add the place to the directory if not already known
+void PlaceDirectory::AddPlace( Place place )
+{
+	if (place == UNDEFINED_PLACE)
 	{
-		m_directory.RemoveAll();
-		m_hasUnnamedAreas = false;
+		m_hasUnnamedAreas = true;
+		return;
 	}
 
-	/// return true if this place is already in the directory
-	bool IsKnown( Place place ) const
+	Assert( place < 1000 );
+
+	if (IsKnown( place ))
+		return;
+
+	m_directory.AddToTail( place );
+}
+
+/// given an index, return the Place
+Place PlaceDirectory::IndexToPlace( IndexType entry ) const
+{
+	if (entry == 0)
+		return UNDEFINED_PLACE;
+
+	int i = entry-1;
+
+	if (i >= m_directory.Count())
 	{
-		return m_directory.HasElement( place );
+		AssertMsg( false, "PlaceDirectory::IndexToPlace: Invalid entry" );
+		return UNDEFINED_PLACE;
 	}
 
-	/// return the directory index corresponding to this Place (0 = no entry)
-	IndexType GetIndex( Place place ) const
+	return m_directory[ i ];
+}
+
+/// store the directory
+void PlaceDirectory::Save( CUtlBuffer &fileBuffer )
+{
+	// store number of entries in directory
+	IndexType count = (IndexType)m_directory.Count();
+	fileBuffer.PutUnsignedShort( count );
+
+	// store entries		
+	for( int i=0; i<m_directory.Count(); ++i )
 	{
+		const char *placeName = TheNavMesh->PlaceToName( m_directory[i] );
+
+		// store string length followed by string itself
+		unsigned short len = (unsigned short)(strlen( placeName ) + 1);
+		fileBuffer.PutUnsignedShort( len );
+		fileBuffer.Put( placeName, len );
+	}
+
+	fileBuffer.PutUnsignedChar( m_hasUnnamedAreas );
+}
+
+/// load the directory
+void PlaceDirectory::Load( CUtlBuffer &fileBuffer, int version )
+{
+	// read number of entries
+	IndexType count = fileBuffer.GetUnsignedShort();
+
+	m_directory.RemoveAll();
+
+	// read each entry
+	char placeName[256];
+	unsigned short len;
+	for( int i=0; i<count; ++i )
+	{
+		len = fileBuffer.GetUnsignedShort();
+		fileBuffer.Get( placeName, MIN( sizeof( placeName ), len ) );
+
+		Place place = TheNavMesh->NameToPlace( placeName );
 		if (place == UNDEFINED_PLACE)
-			return 0;
-
-		int i = m_directory.Find( place );
-
-		if (i < 0)
 		{
-			AssertMsg( false, "PlaceDirectory::GetIndex failure" );
-			return 0;
+			Warning( "Warning: NavMesh place %s is undefined?\n", placeName );
 		}
-
-		return (IndexType)(i+1);
+		AddPlace( place );
 	}
 
-	/// add the place to the directory if not already known
-	void AddPlace( Place place )
+	if ( version > 11 )
 	{
-		if (place == UNDEFINED_PLACE)
-		{
-			m_hasUnnamedAreas = true;
-			return;
-		}
-
-		Assert( place < 1000 );
-
-		if (IsKnown( place ))
-			return;
-
-		m_directory.AddToTail( place );
+		m_hasUnnamedAreas = fileBuffer.GetUnsignedChar() != 0;
 	}
+}
 
-	/// given an index, return the Place
-	Place IndexToPlace( IndexType entry ) const
-	{
-		if (entry == 0)
-			return UNDEFINED_PLACE;
 
-		int i = entry-1;
 
-		if (i >= m_directory.Count())
-		{
-			AssertMsg( false, "PlaceDirectory::IndexToPlace: Invalid entry" );
-			return UNDEFINED_PLACE;
-		}
-
-		return m_directory[ i ];
-	}
-
-	/// store the directory
-	void Save( CUtlBuffer &fileBuffer )
-	{
-		// store number of entries in directory
-		IndexType count = (IndexType)m_directory.Count();
-		fileBuffer.PutUnsignedShort( count );
-
-		// store entries		
-		for( int i=0; i<m_directory.Count(); ++i )
-		{
-			const char *placeName = TheNavMesh->PlaceToName( m_directory[i] );
-
-			// store string length followed by string itself
-			unsigned short len = (unsigned short)(strlen( placeName ) + 1);
-			fileBuffer.PutUnsignedShort( len );
-			fileBuffer.Put( placeName, len );
-		}
-
-		fileBuffer.PutUnsignedChar( m_hasUnnamedAreas );
-	}
-
-	/// load the directory
-	void Load( CUtlBuffer &fileBuffer, int version )
-	{
-		// read number of entries
-		IndexType count = fileBuffer.GetUnsignedShort();
-
-		m_directory.RemoveAll();
-
-		// read each entry
-		char placeName[256];
-		unsigned short len;
-		for( int i=0; i<count; ++i )
-		{
-			len = fileBuffer.GetUnsignedShort();
-			fileBuffer.Get( placeName, MIN( sizeof( placeName ), len ) );
-
-			Place place = TheNavMesh->NameToPlace( placeName );
-			if (place == UNDEFINED_PLACE)
-			{
-				Warning( "Warning: NavMesh place %s is undefined?\n", placeName );
-			}
-			AddPlace( place );
-		}
-
-		if ( version > 11 )
-		{
-			m_hasUnnamedAreas = fileBuffer.GetUnsignedChar() != 0;
-		}
-	}
-
-	const CUtlVector< Place > *GetPlaces( void ) const
-	{
-		return &m_directory;
-	}
-
-	bool HasUnnamedPlaces( void ) const
-	{
-		return m_hasUnnamedAreas;
-	}
-
-private:
-	CUtlVector< Place > m_directory;
-	bool m_hasUnnamedAreas;
-};
-
-static PlaceDirectory placeDirectory;
+PlaceDirectory placeDirectory;
 
 #if defined( _X360 )
 	#define FORMAT_BSPFILE "maps\\%s.360.bsp"
@@ -821,6 +811,9 @@ NavErrorType CNavArea::PostLoad( void )
 	bad.area = NULL;
 	while( m_potentiallyVisibleAreas.FindAndRemove( bad ) );
 
+	// func avoid/prefer attributes are controlled by func_nav_cost entities
+	ClearAllNavCostEntities();
+
 	return error;
 }
 
@@ -880,12 +873,65 @@ float NavAreaTravelDistance( const Vector &startPos, const Vector &goalPos, Cost
  */
 void CNavArea::ComputeEarliestOccupyTimes( void )
 {
+#ifdef CSTRIKE_DLL
+	/// @todo Derive cstrike-specific navigation classes
 
+	for( int i=0; i<MAX_NAV_TEAMS; ++i )
+	{
+		// no spot in the map should take longer than this to reach
+		m_earliestOccupyTime[i] = 120.0f;
+	}
+
+	if (nav_quicksave.GetBool())
+		return;
+
+	// maximum player speed in units/second
+	const float playerSpeed = 240.0f;
+
+	ShortestPathCost cost;
+	CBaseEntity *spot;
+
+	// determine the shortest time it will take a Terrorist to reach this area
+	int team = TEAM_TERRORIST % MAX_NAV_TEAMS;
+	for( spot = gEntList.FindEntityByClassname( NULL, "info_player_terrorist" );
+		 spot;
+		 spot = gEntList.FindEntityByClassname( spot, "info_player_terrorist" ) )
+	{
+		float travelDistance = NavAreaTravelDistance( spot->GetAbsOrigin(), m_center, cost );
+		if (travelDistance < 0.0f)
+			continue;
+
+		float travelTime = travelDistance / playerSpeed;
+		if (travelTime < m_earliestOccupyTime[ team ])
+		{
+			m_earliestOccupyTime[ team ] = travelTime;
+		}
+	}
+
+
+	// determine the shortest time it will take a CT to reach this area
+	team = TEAM_CT % MAX_NAV_TEAMS;
+	for( spot = gEntList.FindEntityByClassname( NULL, "info_player_counterterrorist" );
+		 spot;
+		 spot = gEntList.FindEntityByClassname( spot, "info_player_counterterrorist" ) )
+	{
+		float travelDistance = NavAreaTravelDistance( spot->GetAbsOrigin(), m_center, cost );
+		if (travelDistance < 0.0f)
+			continue;
+
+		float travelTime = travelDistance / playerSpeed;
+		if (travelTime < m_earliestOccupyTime[ team ])
+		{
+			m_earliestOccupyTime[ team ] = travelTime;
+		}
+	}
+
+#else
 	for( int i=0; i<MAX_NAV_TEAMS; ++i )
 	{
 		m_earliestOccupyTime[i] = 0.0f;
 	}
-
+#endif
 }
 
 
@@ -896,7 +942,62 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 void CNavMesh::ComputeBattlefrontAreas( void )
 {
 #if 0
+#ifdef CSTRIKE_DLL
+	ShortestPathCost cost;
+	CBaseEntity *tSpawn, *ctSpawn;
 
+	for( tSpawn = gEntList.FindEntityByClassname( NULL, "info_player_terrorist" );
+		 tSpawn;
+		 tSpawn = gEntList.FindEntityByClassname( tSpawn, "info_player_terrorist" ) )
+	{
+		CNavArea *tArea = TheNavMesh->GetNavArea( tSpawn->GetAbsOrigin() );
+		if (tArea == NULL)
+			continue;
+
+		for( ctSpawn = gEntList.FindEntityByClassname( NULL, "info_player_counterterrorist" );
+			 ctSpawn;
+			 ctSpawn = gEntList.FindEntityByClassname( ctSpawn, "info_player_counterterrorist" ) )
+		{
+			CNavArea *ctArea = TheNavMesh->GetNavArea( ctSpawn->GetAbsOrigin() );
+
+			if (ctArea == NULL)
+				continue;
+
+			if (tArea == ctArea)
+			{
+				m_isBattlefront = true;
+				return;
+			}
+
+			// build path between these two spawn points - assume if path fails, it at least got close
+			// (ie: imagine spawn points that you jump down from - can't path to)
+			CNavArea *goalArea = NULL;
+			NavAreaBuildPath( tArea, ctArea, NULL, cost, &goalArea );
+
+			if (goalArea == NULL)
+				continue;
+
+
+/**
+ * @todo Need to enumerate ALL paths between all pairs of spawn points to find all battlefront areas
+ */
+
+			// find the area with the earliest overlapping occupy times
+			CNavArea *battlefront = NULL;
+			float earliestTime = 999999.9f;
+
+			const float epsilon = 1.0f;
+			CNavArea *area;
+			for( area = goalArea; area; area = area->GetParent() )
+			{
+				if (fabs(area->GetEarliestOccupyTime( TEAM_TERRORIST ) - area->GetEarliestOccupyTime( TEAM_CT )) < epsilon)
+				{
+				}
+				
+			}
+		}
+	}
+#endif
 #endif
 }
 
@@ -946,19 +1047,49 @@ inline void COM_FixSlashes( char *pname )
 }
 #endif // CLIENT_DLL
 
-static void WarnIfMeshNeedsAnalysis( void )
+static void WarnIfMeshNeedsAnalysis( int version )
 {
 	// Quick check to warn about needing to analyze: nav_strip, nav_delete, etc set
 	// every CNavArea's m_approachCount to 0, and delete their m_spotEncounterList.
 	// So, if no area has either, odds are good we need an analyze.
 
-	if ( !TheNavMesh->IsAnalyzed() )
+	if ( version >= 14 )
 	{
-		Warning( "The nav mesh needs a full nav_analyze\n" );
-		return;
+		if ( !TheNavMesh->IsAnalyzed() )
+		{
+			Warning( "The nav mesh needs a full nav_analyze\n" );
+			return;
+		}
 	}
+#ifdef CSTRIKE_DLL
+	else
+	{
+		bool hasApproachAreas = false;
+		bool hasSpotEncounters = false;
 
+		FOR_EACH_VEC( TheNavAreas, it )
+		{
+			CCSNavArea *area = dynamic_cast< CCSNavArea * >( TheNavAreas[ it ] );
+			if ( area )
+			{
+				if ( area->GetApproachInfoCount() )
+				{
+					hasApproachAreas = true;
+				}
 
+				if ( area->GetSpotEncounterCount() )
+				{
+					hasSpotEncounters = true;
+				}
+			}
+		}
+
+		if ( !hasApproachAreas || !hasSpotEncounters )
+		{
+			Warning( "The nav mesh needs a full nav_analyze\n" );
+		}
+	}
+#endif
 }
 
 #ifndef CLIENT_DLL
@@ -968,7 +1099,7 @@ static void WarnIfMeshNeedsAnalysis( void )
  */
 bool CNavMesh::Save( void ) const
 {
-	WarnIfMeshNeedsAnalysis();
+	WarnIfMeshNeedsAnalysis( NavCurrentVersion );
 
 	const char *filename = GetFilename();
 	if (filename == NULL)
@@ -1217,7 +1348,6 @@ const CUtlVector< Place > *CNavMesh::GetPlacesFromNavFile( bool *hasUnnamedPlace
 		}
 	}
 	
-#if 0 // FIX later
 	if ( IsX360() )
 	{
 		// 360 has compressed NAVs
@@ -1230,7 +1360,6 @@ const CUtlVector< Place > *CNavMesh::GetPlacesFromNavFile( bool *hasUnnamedPlace
 			fileBuffer.AssumeMemory( pOriginalData, originalSize, originalSize, CUtlBuffer::READ_ONLY );
 		}
 	}
-#endif // 0
 
 	// check magic number
 	unsigned int magic = fileBuffer.GetUnsignedInt();
@@ -1492,7 +1621,7 @@ NavErrorType CNavMesh::Load( void )
 	//
 	NavErrorType loadResult = PostLoad( version );
 
-	WarnIfMeshNeedsAnalysis();
+	WarnIfMeshNeedsAnalysis( version );
 
 #ifdef ENABLE_PYTHON
 	// Fire loaded signal

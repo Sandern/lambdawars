@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2008, Valve Corporation, All rights reserved. =======
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: interface to utility functions in Steam
 //
@@ -24,6 +24,23 @@ enum ESteamAPICallFailure
 	k_ESteamAPICallFailureInvalidHandle = 2,	// the SteamAPICall_t handle passed in no longer exists
 	k_ESteamAPICallFailureMismatchedCallback = 3,// GetAPICallResult() was called with the wrong callback type for this API call
 };
+
+
+// Input modes for the Big Picture gamepad text entry
+enum EGamepadTextInputMode
+{
+	k_EGamepadTextInputModeNormal = 0,
+	k_EGamepadTextInputModePassword = 1
+};
+
+
+// Controls number of allowed lines for the Big Picture gamepad text entry
+enum EGamepadTextInputLineMode
+{
+	k_EGamepadTextInputLineModeSingleLine = 0,
+	k_EGamepadTextInputLineModeMultipleLines = 1
+};
+
 
 // function prototype for warning message hook
 #if defined( POSIX )
@@ -109,15 +126,50 @@ public:
 	// refresh the screen with Present or SwapBuffers to allow the overlay to do it's work.
 	virtual bool BOverlayNeedsPresent() = 0;
 
-	// Asynchronous call to check if file is signed, result is returned in CheckFileSignature_t
+#ifndef _PS3
+	// Asynchronous call to check if an executable file has been signed using the public key set on the signing tab
+	// of the partner site, for example to refuse to load modified executable files.  
+	// The result is returned in CheckFileSignature_t.
+	//   k_ECheckFileSignatureNoSignaturesFoundForThisApp - This app has not been configured on the signing tab of the partner site to enable this function.
+	//   k_ECheckFileSignatureNoSignaturesFoundForThisFile - This file is not listed on the signing tab for the partner site.
+	//   k_ECheckFileSignatureFileNotFound - The file does not exist on disk.
+	//   k_ECheckFileSignatureInvalidSignature - The file exists, and the signing tab has been set for this file, but the file is either not signed or the signature does not match.
+	//   k_ECheckFileSignatureValidSignature - The file is signed and the signature is valid.
 	virtual SteamAPICall_t CheckFileSignature( const char *szFileName ) = 0;
+#endif
+
+#ifdef _PS3
+	virtual void PostPS3SysutilCallback( uint64_t status, uint64_t param, void* userdata ) = 0;
+	virtual bool BIsReadyToShutdown() = 0;
+	virtual bool BIsPSNOnline() = 0;
+
+	// Call this with localized strings for the language the game is running in, otherwise default english
+	// strings will be used by Steam.
+	virtual void SetPSNGameBootInviteStrings( const char *pchSubject, const char *pchBody ) = 0;
+#endif
+
+	// Activates the Big Picture text input dialog which only supports gamepad input
+	virtual bool ShowGamepadTextInput( EGamepadTextInputMode eInputMode, EGamepadTextInputLineMode eLineInputMode, const char *pchDescription, uint32 unCharMax ) = 0;
+
+	// Returns previously entered text & length
+	virtual uint32 GetEnteredGamepadTextLength() = 0;
+	virtual bool GetEnteredGamepadTextInput( char *pchText, uint32 cchText ) = 0;	
+
+	// returns the language the steam client is running in, you probably want ISteamApps::GetCurrentGameLanguage instead, this is for very special usage cases
+	virtual const char *GetSteamUILanguage() = 0;
 };
 
-#define STEAMUTILS_INTERFACE_VERSION "SteamUtils005"
+#define STEAMUTILS_INTERFACE_VERSION "SteamUtils006"
 
 
 // callbacks
+#if defined( VALVE_CALLBACK_PACK_SMALL )
+#pragma pack( push, 4 )
+#elif defined( VALVE_CALLBACK_PACK_LARGE )
 #pragma pack( push, 8 )
+#else
+#error isteamclient.h must be included
+#endif 
 
 //-----------------------------------------------------------------------------
 // Purpose: The country of the user changed
@@ -176,6 +228,76 @@ struct CheckFileSignature_t
 	enum { k_iCallback = k_iSteamUtilsCallbacks + 5 };
 	ECheckFileSignature m_eCheckFileSignature;
 };
+
+#ifdef _PS3
+//-----------------------------------------------------------------------------
+// callback for NetCtlNetStartDialog finishing on PS3
+//-----------------------------------------------------------------------------
+struct NetStartDialogFinished_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 6 };
+};
+
+//-----------------------------------------------------------------------------
+// callback for NetCtlNetStartDialog unloaded on PS3
+//-----------------------------------------------------------------------------
+struct NetStartDialogUnloaded_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 7 };
+};
+
+//-----------------------------------------------------------------------------
+// callback for system menu closing on PS3 - should trigger resyncronizing friends list, etc.
+//-----------------------------------------------------------------------------
+struct PS3SystemMenuClosed_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 8 };
+};
+
+//-----------------------------------------------------------------------------
+// callback for NP message being selected by user on PS3 - should trigger handling of message if it's a lobby invite, etc.
+//-----------------------------------------------------------------------------
+struct PS3NPMessageSelected_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 9 };
+	uint32 dataid;
+};
+
+//-----------------------------------------------------------------------------
+// callback for when the PS3 keyboard dialog closes
+//-----------------------------------------------------------------------------
+struct PS3KeyboardDialogFinished_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 10 };
+};
+
+// k_iSteamUtilsCallbacks + 11 is taken
+
+//-----------------------------------------------------------------------------
+// callback for PSN status changing on PS3
+//-----------------------------------------------------------------------------
+struct PS3PSNStatusChange_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 12 };
+	bool m_bPSNOnline;
+};
+
+#endif
+
+// k_iSteamUtilsCallbacks + 13 is taken
+
+
+//-----------------------------------------------------------------------------
+// Big Picture gamepad text input has been closed
+//-----------------------------------------------------------------------------
+struct GamepadTextInputDismissed_t
+{
+	enum { k_iCallback = k_iSteamUtilsCallbacks + 14 };
+	bool m_bSubmitted;										// true if user entered & accepted text (Call ISteamUtils::GetEnteredGamepadTextInput() for text), false if canceled input
+	uint32 m_unSubmittedText;
+};
+
+// k_iSteamUtilsCallbacks + 15 is taken
 
 #pragma pack( pop )
 

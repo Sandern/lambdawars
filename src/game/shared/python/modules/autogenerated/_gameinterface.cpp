@@ -5358,6 +5358,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_EAccountTypeContentServer", k_EAccountTypeContentServer)
         .value("k_EAccountTypeClan", k_EAccountTypeClan)
         .value("k_EAccountTypeChat", k_EAccountTypeChat)
+        .value("k_EAccountTypeConsoleUser", k_EAccountTypeConsoleUser)
         .value("k_EAccountTypeAnonUser", k_EAccountTypeAnonUser)
         .value("k_EAccountTypeMax", k_EAccountTypeMax)
         .export_values()
@@ -5369,8 +5370,12 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_EChatEntryTypeTyping", k_EChatEntryTypeTyping)
         .value("k_EChatEntryTypeInviteGame", k_EChatEntryTypeInviteGame)
         .value("k_EChatEntryTypeEmote", k_EChatEntryTypeEmote)
-        .value("k_EChatEntryTypeLobbyGameStart", k_EChatEntryTypeLobbyGameStart)
         .value("k_EChatEntryTypeLeftConversation", k_EChatEntryTypeLeftConversation)
+        .value("k_EChatEntryTypeEntered", k_EChatEntryTypeEntered)
+        .value("k_EChatEntryTypeWasKicked", k_EChatEntryTypeWasKicked)
+        .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
+        .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
+        .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
         .export_values()
         ;
 
@@ -5382,6 +5387,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_EChatRoomEnterResponseError", k_EChatRoomEnterResponseError)
         .value("k_EChatRoomEnterResponseBanned", k_EChatRoomEnterResponseBanned)
         .value("k_EChatRoomEnterResponseLimited", k_EChatRoomEnterResponseLimited)
+        .value("k_EChatRoomEnterResponseClanDisabled", k_EChatRoomEnterResponseClanDisabled)
+        .value("k_EChatRoomEnterResponseCommunityBan", k_EChatRoomEnterResponseCommunityBan)
+        .value("k_EChatRoomEnterResponseMemberBlockedYou", k_EChatRoomEnterResponseMemberBlockedYou)
+        .value("k_EChatRoomEnterResponseYouBlockedMember", k_EChatRoomEnterResponseYouBlockedMember)
         .export_values()
         ;
 
@@ -5460,6 +5469,29 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_EResultDataCorruption", k_EResultDataCorruption)
         .value("k_EResultDiskFull", k_EResultDiskFull)
         .value("k_EResultRemoteCallFailed", k_EResultRemoteCallFailed)
+        .value("k_EResultPasswordUnset", k_EResultPasswordUnset)
+        .value("k_EResultExternalAccountUnlinked", k_EResultExternalAccountUnlinked)
+        .value("k_EResultPSNTicketInvalid", k_EResultPSNTicketInvalid)
+        .value("k_EResultExternalAccountAlreadyLinked", k_EResultExternalAccountAlreadyLinked)
+        .value("k_EResultRemoteFileConflict", k_EResultRemoteFileConflict)
+        .value("k_EResultIllegalPassword", k_EResultIllegalPassword)
+        .value("k_EResultSameAsPreviousValue", k_EResultSameAsPreviousValue)
+        .value("k_EResultAccountLogonDenied", k_EResultAccountLogonDenied)
+        .value("k_EResultCannotUseOldPassword", k_EResultCannotUseOldPassword)
+        .value("k_EResultInvalidLoginAuthCode", k_EResultInvalidLoginAuthCode)
+        .value("k_EResultAccountLogonDeniedNoMail", k_EResultAccountLogonDeniedNoMail)
+        .value("k_EResultHardwareNotCapableOfIPT", k_EResultHardwareNotCapableOfIPT)
+        .value("k_EResultIPTInitError", k_EResultIPTInitError)
+        .value("k_EResultParentalControlRestricted", k_EResultParentalControlRestricted)
+        .value("k_EResultFacebookQueryError", k_EResultFacebookQueryError)
+        .value("k_EResultExpiredLoginAuthCode", k_EResultExpiredLoginAuthCode)
+        .value("k_EResultIPLoginRestrictionFailed", k_EResultIPLoginRestrictionFailed)
+        .value("k_EResultAccountLockedDown", k_EResultAccountLockedDown)
+        .value("k_EResultAccountLogonDeniedVerifiedEmailRequired", k_EResultAccountLogonDeniedVerifiedEmailRequired)
+        .value("k_EResultNoMatchingURL", k_EResultNoMatchingURL)
+        .value("k_EResultBadResponse", k_EResultBadResponse)
+        .value("k_EResultRequirePasswordReEntry", k_EResultRequirePasswordReEntry)
+        .value("k_EResultValueOutOfRange", k_EResultValueOutOfRange)
         .export_values()
         ;
 
@@ -5470,6 +5502,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_ESteamUserStatTypeAVGRATE", k_ESteamUserStatTypeAVGRATE)
         .value("k_ESteamUserStatTypeACHIEVEMENTS", k_ESteamUserStatTypeACHIEVEMENTS)
         .value("k_ESteamUserStatTypeGROUPACHIEVEMENTS", k_ESteamUserStatTypeGROUPACHIEVEMENTS)
+        .value("k_ESteamUserStatTypeMAX", k_ESteamUserStatTypeMAX)
         .export_values()
         ;
 
@@ -5479,7 +5512,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .value("k_EUniverseBeta", k_EUniverseBeta)
         .value("k_EUniverseInternal", k_EUniverseInternal)
         .value("k_EUniverseDev", k_EUniverseDev)
-        .value("k_EUniverseRC", k_EUniverseRC)
         .value("k_EUniverseMax", k_EUniverseMax)
         .export_values()
         ;
@@ -6239,6 +6271,15 @@ BOOST_PYTHON_MODULE(_gameinterface){
                 , BAnonAccount_function_type( &::CSteamID::BAnonAccount ) );
         
         }
+        { //::CSteamID::BAnonGameServerAccount
+        
+            typedef bool ( ::CSteamID::*BAnonGameServerAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BAnonGameServerAccount"
+                , BAnonGameServerAccount_function_type( &::CSteamID::BAnonGameServerAccount ) );
+        
+        }
         { //::CSteamID::BAnonUserAccount
         
             typedef bool ( ::CSteamID::*BAnonUserAccount_function_type )(  ) const;
@@ -6275,6 +6316,15 @@ BOOST_PYTHON_MODULE(_gameinterface){
                 , BClanAccount_function_type( &::CSteamID::BClanAccount ) );
         
         }
+        { //::CSteamID::BConsoleUserAccount
+        
+            typedef bool ( ::CSteamID::*BConsoleUserAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BConsoleUserAccount"
+                , BConsoleUserAccount_function_type( &::CSteamID::BConsoleUserAccount ) );
+        
+        }
         { //::CSteamID::BContentServerAccount
         
             typedef bool ( ::CSteamID::*BContentServerAccount_function_type )(  ) const;
@@ -6300,6 +6350,33 @@ BOOST_PYTHON_MODULE(_gameinterface){
             CSteamID_exposer.def( 
                 "BIndividualAccount"
                 , BIndividualAccount_function_type( &::CSteamID::BIndividualAccount ) );
+        
+        }
+        { //::CSteamID::BPersistentGameServerAccount
+        
+            typedef bool ( ::CSteamID::*BPersistentGameServerAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BPersistentGameServerAccount"
+                , BPersistentGameServerAccount_function_type( &::CSteamID::BPersistentGameServerAccount ) );
+        
+        }
+        { //::CSteamID::Clear
+        
+            typedef void ( ::CSteamID::*Clear_function_type )(  ) ;
+            
+            CSteamID_exposer.def( 
+                "Clear"
+                , Clear_function_type( &::CSteamID::Clear ) );
+        
+        }
+        { //::CSteamID::ClearIndividualInstance
+        
+            typedef void ( ::CSteamID::*ClearIndividualInstance_function_type )(  ) ;
+            
+            CSteamID_exposer.def( 
+                "ClearIndividualInstance"
+                , ClearIndividualInstance_function_type( &::CSteamID::ClearIndividualInstance ) );
         
         }
         { //::CSteamID::ConvertToUint64
@@ -6343,7 +6420,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
         }
         { //::CSteamID::GetAccountID
         
-            typedef ::uint32 ( ::CSteamID::*GetAccountID_function_type )(  ) const;
+            typedef ::AccountID_t ( ::CSteamID::*GetAccountID_function_type )(  ) const;
             
             CSteamID_exposer.def( 
                 "GetAccountID"
@@ -6384,6 +6461,15 @@ BOOST_PYTHON_MODULE(_gameinterface){
             CSteamID_exposer.def( 
                 "GetUnAccountInstance"
                 , GetUnAccountInstance_function_type( &::CSteamID::GetUnAccountInstance ) );
+        
+        }
+        { //::CSteamID::HasNoIndividualInstance
+        
+            typedef bool ( ::CSteamID::*HasNoIndividualInstance_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "HasNoIndividualInstance"
+                , HasNoIndividualInstance_function_type( &::CSteamID::HasNoIndividualInstance ) );
         
         }
         { //::CSteamID::InstancedSet
@@ -6432,6 +6518,16 @@ BOOST_PYTHON_MODULE(_gameinterface){
                 "SetAccountID"
                 , SetAccountID_function_type( &::CSteamID::SetAccountID )
                 , ( bp::arg("unAccountID") ) );
+        
+        }
+        { //::CSteamID::SetAccountInstance
+        
+            typedef void ( ::CSteamID::*SetAccountInstance_function_type )( ::uint32 ) ;
+            
+            CSteamID_exposer.def( 
+                "SetAccountInstance"
+                , SetAccountInstance_function_type( &::CSteamID::SetAccountInstance )
+                , ( bp::arg("unInstance") ) );
         
         }
         { //::CSteamID::SetEUniverse

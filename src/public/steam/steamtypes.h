@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2008, Valve LLC, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose:
 //
@@ -24,6 +24,11 @@ typedef unsigned char uint8;
 
 #if defined(__x86_64__) || defined(_WIN64)
 #define X64BITS
+#endif
+
+// Make sure VALVE_BIG_ENDIAN gets set on PS3, may already be set previously in Valve internal code.
+#if !defined(VALVE_BIG_ENDIAN) && defined(_PS3)
+#define VALVE_BIG_ENDIAN
 #endif
 
 typedef unsigned char uint8;
@@ -97,6 +102,12 @@ const PackageId_t k_uPackageIdInvalid = 0xFFFFFFFF;
 typedef uint32 AppId_t;
 const AppId_t k_uAppIdInvalid = 0x0;
 
+typedef uint64 AssetClassId_t;
+const AssetClassId_t k_ulAssetClassIdInvalid = 0x0;
+
+typedef uint32 PhysicalItemId_t;
+const PhysicalItemId_t k_uPhysicalItemIdInvalid = 0x0;
+
 
 // this is baked into client messages and interfaces as an int, 
 // make sure we never break this.  AppIds and DepotIDs also presently
@@ -117,7 +128,9 @@ const CellID_t k_uCellIDInvalid = 0xFFFFFFFF;
 typedef uint64 SteamAPICall_t;
 const SteamAPICall_t k_uAPICallInvalid = 0x0;
 
+typedef uint32 AccountID_t;
 
-
+typedef uint32 PartnerId_t;
+const PartnerId_t k_uPartnerIdInvalid = 0;
 
 #endif // STEAMTYPES_H

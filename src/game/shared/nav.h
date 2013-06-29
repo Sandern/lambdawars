@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -100,26 +100,27 @@ enum NavErrorType
 enum NavAttributeType
 {
 	NAV_MESH_INVALID		= 0,
-	NAV_MESH_CROUCH			= 0x0000001,				// must crouch to use this node/area
-	NAV_MESH_JUMP			= 0x0000002,				// must jump to traverse this area (only used during generation)
-	NAV_MESH_PRECISE		= 0x0000004,				// do not adjust for obstacles, just move along area
-	NAV_MESH_NO_JUMP		= 0x0000008,				// inhibit discontinuity jumping
-	NAV_MESH_STOP			= 0x0000010,				// must stop when entering this area
-	NAV_MESH_RUN			= 0x0000020,				// must run to traverse this area
-	NAV_MESH_WALK			= 0x0000040,				// must walk to traverse this area
-	NAV_MESH_AVOID			= 0x0000080,				// avoid this area unless alternatives are too dangerous
-	NAV_MESH_TRANSIENT		= 0x0000100,				// area may become blocked, and should be periodically checked
-	NAV_MESH_DONT_HIDE		= 0x0000200,				// area should not be considered for hiding spot generation
-	NAV_MESH_STAND			= 0x0000400,				// bots hiding in this area should stand
-	NAV_MESH_NO_HOSTAGES	= 0x0000800,				// hostages shouldn't use this area
-	NAV_MESH_STAIRS			= 0x0001000,				// this area represents stairs, do not attempt to climb or jump them - just walk up
-	NAV_MESH_NO_MERGE		= 0x0002000,				// don't merge this area with adjacent areas
-	NAV_MESH_OBSTACLE_TOP	= 0x0004000,				// this nav area is the climb point on the tip of an obstacle
-	NAV_MESH_CLIFF			= 0x0008000,				// this nav area is adjacent to a drop of at least CliffHeight
+	NAV_MESH_CROUCH			= 0x00000001,				// must crouch to use this node/area
+	NAV_MESH_JUMP			= 0x00000002,				// must jump to traverse this area (only used during generation)
+	NAV_MESH_PRECISE		= 0x00000004,				// do not adjust for obstacles, just move along area
+	NAV_MESH_NO_JUMP		= 0x00000008,				// inhibit discontinuity jumping
+	NAV_MESH_STOP			= 0x00000010,				// must stop when entering this area
+	NAV_MESH_RUN			= 0x00000020,				// must run to traverse this area
+	NAV_MESH_WALK			= 0x00000040,				// must walk to traverse this area
+	NAV_MESH_AVOID			= 0x00000080,				// avoid this area unless alternatives are too dangerous
+	NAV_MESH_TRANSIENT		= 0x00000100,				// area may become blocked, and should be periodically checked
+	NAV_MESH_DONT_HIDE		= 0x00000200,				// area should not be considered for hiding spot generation
+	NAV_MESH_STAND			= 0x00000400,				// bots hiding in this area should stand
+	NAV_MESH_NO_HOSTAGES	= 0x00000800,				// hostages shouldn't use this area
+	NAV_MESH_STAIRS			= 0x00001000,				// this area represents stairs, do not attempt to climb or jump them - just walk up
+	NAV_MESH_NO_MERGE		= 0x00002000,				// don't merge this area with adjacent areas
+	NAV_MESH_OBSTACLE_TOP	= 0x00004000,				// this nav area is the climb point on the tip of an obstacle
+	NAV_MESH_CLIFF			= 0x00008000,				// this nav area is adjacent to a drop of at least CliffHeight
 
 	NAV_MESH_FIRST_CUSTOM	= 0x00010000,				// apps may define custom app-specific bits starting with this value
 	NAV_MESH_LAST_CUSTOM	= 0x04000000,				// apps must not define custom app-specific bits higher than with this value
 
+	NAV_MESH_FUNC_COST		= 0x20000000,				// area has designer specified cost controlled by func_nav_cost entities
 	NAV_MESH_HAS_ELEVATOR	= 0x40000000,				// area is in an elevator's path
 	NAV_MESH_NAV_BLOCKER	= 0x80000000				// area is blocked by nav blocker ( Alas, needed to hijack a bit in the attributes to get within a cache line [7/24/2008 tom])
 };
@@ -221,7 +222,7 @@ struct Extent
 		Encompass( extent.hi );
 	}
 
-	/// return true if 'pos' is inside of this extent
+	// return true if 'pos' is inside of this extent
 	bool Contains( const Vector &pos ) const
 	{
 		return (pos.x >= lo.x && pos.x <= hi.x &&
@@ -229,12 +230,20 @@ struct Extent
 				pos.z >= lo.z && pos.z <= hi.z);
 	}
 	
-	/// return true if this extent overlaps the given one
+	// return true if this extent overlaps the given one
 	bool IsOverlapping( const Extent &other ) const
 	{
 		return (lo.x <= other.hi.x && hi.x >= other.lo.x &&
 				lo.y <= other.hi.y && hi.y >= other.lo.y &&
 				lo.z <= other.hi.z && hi.z >= other.lo.z);
+	}
+
+	// return true if this extent completely contains the given one
+	bool IsEncompassing( const Extent &other, float tolerance = 0.0f ) const
+	{
+		return (lo.x <= other.lo.x + tolerance && hi.x >= other.hi.x - tolerance &&
+				lo.y <= other.lo.y + tolerance && hi.y >= other.hi.y - tolerance &&
+				lo.z <= other.lo.z + tolerance && hi.z >= other.hi.z - tolerance);
 	}
 };
 
@@ -257,6 +266,7 @@ inline NavDirType OppositeDirection( NavDirType dir )
 		case SOUTH: return NORTH;
 		case EAST:	return WEST;
 		case WEST:	return EAST;
+		default: break;
 	}
 
 	return NORTH;
@@ -271,6 +281,7 @@ inline NavDirType DirectionLeft( NavDirType dir )
 		case SOUTH: return EAST;
 		case EAST:	return NORTH;
 		case WEST:	return SOUTH;
+		default: break;
 	}
 
 	return NORTH;
@@ -285,6 +296,7 @@ inline NavDirType DirectionRight( NavDirType dir )
 		case SOUTH: return WEST;
 		case EAST:	return SOUTH;
 		case WEST:	return NORTH;
+		default: break;
 	}
 
 	return NORTH;
@@ -299,6 +311,7 @@ inline void AddDirectionVector( Vector *v, NavDirType dir, float amount )
 		case SOUTH: v->y += amount; return;
 		case EAST:  v->x += amount; return;
 		case WEST:  v->x -= amount; return;
+		default: break;
 	}
 }
 
@@ -311,6 +324,7 @@ inline float DirectionToAngle( NavDirType dir )
 		case SOUTH:	return 90.0f;
 		case EAST:	return 0.0f;
 		case WEST:	return 180.0f;
+		default: break;
 	}
 
 	return 0.0f;
@@ -346,6 +360,7 @@ inline void DirectionToVector2D( NavDirType dir, Vector2D *v )
 		case SOUTH: v->x =  0.0f; v->y =  1.0f; break;
 		case EAST:  v->x =  1.0f; v->y =  0.0f; break;
 		case WEST:  v->x = -1.0f; v->y =  0.0f; break;
+		default: break;
 	}
 }
 
@@ -359,6 +374,7 @@ inline void CornerToVector2D( NavCornerType dir, Vector2D *v )
 		case NORTH_EAST: v->x =  1.0f; v->y = -1.0f; break;
 		case SOUTH_EAST: v->x =  1.0f; v->y =  1.0f; break;
 		case SOUTH_WEST: v->x = -1.0f; v->y =  1.0f; break;
+		default: break;
 	}
 
 	v->NormalizeInPlace();
@@ -386,6 +402,8 @@ inline void GetCornerTypesInDirection( NavDirType dir, NavCornerType *first, Nav
 	case WEST:
 		*first = NORTH_WEST;
 		*second = SOUTH_WEST;
+		break;
+	default:
 		break;
 	}
 }
@@ -421,10 +439,23 @@ inline bool IsEntityWalkable( CBaseEntity *entity, unsigned int flags )
 
 	// if we hit a door, assume its walkable because it will open when we touch it
 	if (FClassnameIs( entity, "func_door*" ))
+	{
+#ifdef PROBLEMATIC	// cp_dustbowl doors dont open by touch - they use surrounding triggers
+		if ( !entity->HasSpawnFlags( SF_DOOR_PTOUCH ) )
+		{
+			// this door is not opened by touching it, if it is closed, the area is blocked
+			CBaseDoor *door = (CBaseDoor *)entity;
+			return door->m_toggle_state == TS_AT_TOP;
+		}
+#endif // _DEBUG
+
 		return (flags & WALK_THRU_FUNC_DOORS) ? true : false;
+	}
 
 	if (FClassnameIs( entity, "prop_door*" ))
+	{
 		return (flags & WALK_THRU_PROP_DOORS) ? true : false;
+	}
 
 	// if we hit a clip brush, ignore it if it is not BRUSHSOLID_ALWAYS
 	if (FClassnameIs( entity, "func_brush" ))

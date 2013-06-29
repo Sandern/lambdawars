@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2008, Valve LLC, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -21,13 +21,26 @@
 #include <stdio.h>
 #include <string.h>
 
+//
+// Max size (in bytes of UTF-8 data, not in characters) of server fields, including null terminator.
+// WARNING: These cannot be changed easily, without breaking clients using old interfaces.
+//
+const int k_cbMaxGameServerGameDir = 32;
+const int k_cbMaxGameServerMapName = 32;
+const int k_cbMaxGameServerGameDescription = 64;
+const int k_cbMaxGameServerName = 64;
+const int k_cbMaxGameServerTags = 128;
+const int k_cbMaxGameServerGameData = 2048;
+
 struct MatchMakingKeyValuePair_t
 {
 	MatchMakingKeyValuePair_t() { m_szKey[0] = m_szValue[0] = 0; }
 	MatchMakingKeyValuePair_t( const char *pchKey, const char *pchValue )
 	{
 		strncpy( m_szKey, pchKey, sizeof(m_szKey) ); // this is a public header, use basic c library string funcs only!
+		m_szKey[ sizeof( m_szKey ) - 1 ] = '\0';
 		strncpy( m_szValue, pchValue, sizeof(m_szValue) );
+		m_szValue[ sizeof( m_szValue ) - 1 ] = '\0';
 	}
 	char m_szKey[ 256 ];
 	char m_szValue[ 256 ];
@@ -49,8 +62,7 @@ public:
 	
 	void	Init( unsigned int ip, uint16 usQueryPort, uint16 usConnectionPort );
 #ifdef NETADR_H
-	void	Init( const netadr_t &ipAndQueryPort, uint16 usConnectionPort );
-	netadr_t& GetIPAndQueryPort();
+	netadr_t	GetIPAndQueryPort();
 #endif
 	
 	// Access the query port.
@@ -95,17 +107,9 @@ inline void	servernetadr_t::Init( unsigned int ip, uint16 usQueryPort, uint16 us
 }
 
 #ifdef NETADR_H
-inline void	servernetadr_t::Init( const netadr_t &ipAndQueryPort, uint16 usConnectionPort )
+inline netadr_t servernetadr_t::GetIPAndQueryPort()
 {
-	Init( ipAndQueryPort.GetIP(), ipAndQueryPort.GetPort(), usConnectionPort );
-}
-
-inline netadr_t& servernetadr_t::GetIPAndQueryPort()
-{
-	static netadr_t netAdr;
-	netAdr.SetIP( m_unIP );
-	netAdr.SetPort( m_usQueryPort );
-	return netAdr;
+	return netadr_t( m_unIP, m_usQueryPort );
 }
 #endif
 
@@ -144,7 +148,11 @@ inline const char *servernetadr_t::ToString( uint32 unIP, uint16 usPort ) const
 	static char s[4][64];
 	static int nBuf = 0;
 	unsigned char *ipByte = (unsigned char *)&unIP;
-	_snprintf (s[nBuf], sizeof( s[nBuf] ), "%u.%u.%u.%u:%i", (int)(ipByte[3]), (int)(ipByte[2]), (int)(ipByte[1]), (int)(ipByte[0]), usPort );
+#ifdef VALVE_BIG_ENDIAN
+	Q_snprintf (s[nBuf], sizeof( s[nBuf] ), "%u.%u.%u.%u:%i", (int)(ipByte[0]), (int)(ipByte[1]), (int)(ipByte[2]), (int)(ipByte[3]), usPort );
+#else
+	Q_snprintf (s[nBuf], sizeof( s[nBuf] ), "%u.%u.%u.%u:%i", (int)(ipByte[3]), (int)(ipByte[2]), (int)(ipByte[1]), (int)(ipByte[0]), usPort );
+#endif
 	const char *pchRet = s[nBuf];
 	++nBuf;
 	nBuf %= ( (sizeof(s)/sizeof(s[0])) );
@@ -178,29 +186,34 @@ public:
 	void SetName( const char *pName );
 
 public:
-	servernetadr_t m_NetAdr;		// IP/Query Port/Connection Port for this server
-	int m_nPing;					// current ping time in milliseconds
-	bool m_bHadSuccessfulResponse;	// server has responded successfully in the past
-	bool m_bDoNotRefresh;			// server is marked as not responding and should no longer be refreshed
-	char m_szGameDir[32];			// current game directory
-	char m_szMap[32];				// current map
-	char m_szGameDescription[64];	// game description
-	uint32 m_nAppID;				// Steam App ID of this server
-	int m_nPlayers;					// current number of players on the server
-	int m_nMaxPlayers;				// Maximum players that can join this server
-	int m_nBotPlayers;				// Number of bots (i.e simulated players) on this server
-	bool m_bPassword;				// true if this server needs a password to join
-	bool m_bSecure;					// Is this server protected by VAC
-	uint32 m_ulTimeLastPlayed;		// time (in unix time) when this server was last played on (for favorite/history servers)
-	int	m_nServerVersion;			// server version as reported to Steam
+	servernetadr_t m_NetAdr;									///< IP/Query Port/Connection Port for this server
+	int m_nPing;												///< current ping time in milliseconds
+	bool m_bHadSuccessfulResponse;								///< server has responded successfully in the past
+	bool m_bDoNotRefresh;										///< server is marked as not responding and should no longer be refreshed
+	char m_szGameDir[k_cbMaxGameServerGameDir];					///< current game directory
+	char m_szMap[k_cbMaxGameServerMapName];						///< current map
+	char m_szGameDescription[k_cbMaxGameServerGameDescription];	///< game description
+	uint32 m_nAppID;											///< Steam App ID of this server
+	int m_nPlayers;												///< total number of players currently on the server.  INCLUDES BOTS!!
+	int m_nMaxPlayers;											///< Maximum players that can join this server
+	int m_nBotPlayers;											///< Number of bots (i.e simulated players) on this server
+	bool m_bPassword;											///< true if this server needs a password to join
+	bool m_bSecure;												///< Is this server protected by VAC
+	uint32 m_ulTimeLastPlayed;									///< time (in unix time) when this server was last played on (for favorite/history servers)
+	int	m_nServerVersion;										///< server version as reported to Steam
 
 private:
-	char m_szServerName[64];		//  Game server name
+
+	/// Game server name
+	char m_szServerName[k_cbMaxGameServerName];
 
 	// For data added after SteamMatchMaking001 add it here
 public:
-	char m_szGameTags[128];			// the tags this server exposes
-	CSteamID m_steamID;				// steamID of the game server - invalid if it's doesn't have one (old server, or not connected to Steam)
+	/// the tags this server exposes
+	char m_szGameTags[k_cbMaxGameServerTags];
+
+	/// steamID of the game server - invalid if it's doesn't have one (old server, or not connected to Steam)
+	CSteamID m_steamID;
 };
 
 
@@ -224,6 +237,7 @@ inline const char* gameserveritem_t::GetName() const
 inline void gameserveritem_t::SetName( const char *pName )
 {
 	strncpy( m_szServerName, pName, sizeof( m_szServerName ) );
+	m_szServerName[ sizeof( m_szServerName ) - 1 ] = '\0';
 }
 
 

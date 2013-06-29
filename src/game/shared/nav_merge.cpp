@@ -1,6 +1,6 @@
 // nav_merge.cpp
 // Save/merge for partial nav meshes
-// Copyright 2005 Turtle Rock Studios, Inc.
+//========= Copyright Valve Corporation, All rights reserved. ============//
 
 #include "cbase.h"
 #include "fmtstr.h"
@@ -157,6 +157,7 @@ void CNavMesh::CommandNavSaveSelected( const CCommand &args )
 	Msg( "Selected set saved to %s.  Use 'nav_merge_mesh %s_selected_%4.4d' to merge it into another mesh.\n", path, fname, i );
 	data->deleteThis();
 }
+
 
 //--------------------------------------------------------------------------------------------------------
 CON_COMMAND_F( nav_save_selected, "Writes the selected set to disk for merging into another mesh via nav_merge_mesh.", FCVAR_GAMEDLL | FCVAR_CHEAT )

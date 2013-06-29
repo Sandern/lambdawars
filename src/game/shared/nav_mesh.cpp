@@ -16,9 +16,12 @@
 #include "fmtstr.h"
 #include "utlbuffer.h"
 #include "tier0/vprof.h"
-//#include "shared_util.h"
-
+#ifdef TERROR
+#include "func_simpleladder.h"
+#endif
 #include "functorutils.h"
+
+// Missing: #include "NextBot/NavMeshEntities/func_nav_prerequisite.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -38,6 +41,8 @@ ConVar nav_quicksave( "nav_quicksave", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to
 ConVar nav_show_approach_points( "nav_show_approach_points", "0", FCVAR_GAMEDLL | FCVAR_CHEAT, "Show Approach Points in the Navigation Mesh." );
 ConVar nav_show_danger( "nav_show_danger", "0", FCVAR_GAMEDLL | FCVAR_CHEAT, "Show current 'danger' levels." );
 ConVar nav_show_player_counts( "nav_show_player_counts", "0", FCVAR_GAMEDLL | FCVAR_CHEAT, "Show current player counts in each area." );
+ConVar nav_show_func_nav_avoid( "nav_show_func_nav_avoid", "0", FCVAR_GAMEDLL | FCVAR_CHEAT, "Show areas of designer-placed bot avoidance due to func_nav_avoid entities" );
+ConVar nav_show_func_nav_prefer( "nav_show_func_nav_prefer", "0", FCVAR_GAMEDLL | FCVAR_CHEAT, "Show areas of designer-placed bot preference due to func_nav_prefer entities" );
 #endif // CLIENT_DLL
 ConVar nav_max_vis_delta_list_length( "nav_max_vis_delta_list_length", "64", FCVAR_CHEAT | FCVAR_REPLICATED );
 
@@ -115,6 +120,8 @@ void CNavMesh::Reset( void )
 	m_markedLadder = NULL;
 	m_selectedLadder = NULL;
 
+	m_updateBlockedAreasTimer.Invalidate();
+
 	if (m_spawnName)
 	{
 		delete [] m_spawnName;
@@ -151,6 +158,7 @@ void CNavMesh::DestroyNavigationMesh( bool incremental )
 {
 	m_blockedAreas.RemoveAll();
 	m_avoidanceObstacleAreas.RemoveAll();
+	m_transientAreas.RemoveAll();
 
 	if ( !incremental )
 	{
@@ -251,7 +259,16 @@ void CNavMesh::Update( void )
 		return; // don't bother trying to draw stuff while we're generating
 	}
 
-	//UpdateBlockedAreas();
+#ifndef HL2WARS_DLL
+	// Test all of the areas for blocked status
+	if ( m_updateBlockedAreasTimer.HasStarted() && m_updateBlockedAreasTimer.IsElapsed() )
+	{
+		TestAllAreasForBlockedStatus();
+		m_updateBlockedAreasTimer.Invalidate();
+	}
+
+	UpdateBlockedAreas();
+#endif // HL2WARS_DLL
 	UpdateAvoidanceObstacleAreas();
 
 	if (nav_edit.GetBool())
@@ -281,6 +298,16 @@ void CNavMesh::Update( void )
 	if (nav_show_player_counts.GetBool())
 	{
 		DrawPlayerCounts();
+	}
+
+	if ( nav_show_func_nav_avoid.GetBool() )
+	{
+		DrawFuncNavAvoid();
+	}
+
+	if ( nav_show_func_nav_prefer.GetBool() )
+	{
+		DrawFuncNavPrefer();
 	}
 
 	if ( nav_show_potentially_visible.GetBool() )
@@ -552,18 +579,66 @@ void CNavMesh::OnServerActivate( void )
 
 
 //--------------------------------------------------------------------------------------------------------------
+class CRegisterPrerequisite
+{
+public:
+	CRegisterPrerequisite( CFuncNavPrerequisite *prereq )
+	{
+		m_prereq = prereq;
+	}
+
+	bool operator() ( CNavArea *area )
+	{
+		area->AddPrerequisite( m_prereq );
+		return true;
+	}
+
+	CFuncNavPrerequisite *m_prereq;
+};
+
+//--------------------------------------------------------------------------------------------------------------
+/**
+* Test all areas for blocked status
+*/
+void CNavMesh::TestAllAreasForBlockedStatus( void )
+{
+#ifndef CLIENT_DLL
+	FOR_EACH_VEC( TheNavAreas, pit )
+	{
+		CNavArea *area = TheNavAreas[ pit ];
+		area->UpdateBlocked( true );
+	}
+#endif // CLIENT_DLL
+}
+
+//--------------------------------------------------------------------------------------------------------------
 /**
  * Invoked when a game round restarts
  */
 void CNavMesh::OnRoundRestart( void )
 {
 #ifndef CLIENT_DLL
-	// test all areas for blocked status
+	m_updateBlockedAreasTimer.Start( 1.0f );
+
 	FOR_EACH_VEC( TheNavAreas, pit )
 	{
 		CNavArea *area = TheNavAreas[ pit ];
-		area->UpdateBlocked( true );
+		area->RemoveAllPrerequisites();
 	}
+
+#if 0 // Missing
+	// attach prerequisites
+	CFuncNavPrerequisite *prereq = NULL;
+	while( ( prereq = (CFuncNavPrerequisite *)gEntList.FindEntityByClassname( prereq, "func_nav_prerequisite" ) ) != NULL )
+	{
+		Extent prereqExtent;
+		prereqExtent.Init( prereq );
+
+		CRegisterPrerequisite apply( prereq );
+
+		ForAllAreasOverlappingExtent( apply, prereqExtent );
+	}
+#endif // 0
 #endif // CLIENT_DLL
 }
 
@@ -1009,7 +1084,38 @@ void CNavMesh::LoadPlaceDatabase( void )
 {
 	m_placeCount = 0;
 
+#ifdef TERROR
+	// TODO: LoadPlaceDatabase happens during the constructor, so we can't override it!
+	// Population.txt holds all the info we need for place names in Left4Dead, so let's not
+	// make Phil edit yet another text file.
+	KeyValues *populationData = new KeyValues( "population" );
+	if ( populationData->LoadFromFile( filesystem, "scripts/population.txt" ) )
+	{
+		CUtlVector< char * > placeNames;
 
+		for ( KeyValues *key = populationData->GetFirstTrueSubKey(); key != NULL; key = key->GetNextTrueSubKey() )
+		{
+			if ( FStrEq( key->GetName(), "default" ) )	// default population is the undefined place
+				continue;
+
+			placeNames.AddToTail( CloneString( key->GetName() ) );
+		}
+
+		m_placeCount = placeNames.Count();
+
+		// allocate place name array
+		m_placeName = new char * [ m_placeCount ];
+		for ( unsigned int i=0; i<m_placeCount; ++i )
+		{
+			m_placeName[i] = placeNames[i];
+		}
+
+		populationData->deleteThis();
+		return;
+	}
+
+	populationData->deleteThis();
+#endif
 
 	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
 	filesystem->ReadFile("NavPlace.db", "GAME", buf);
@@ -1033,7 +1139,7 @@ void CNavMesh::LoadPlaceDatabase( void )
 		int len = V_strlen( buffer );
 		if ( len >= 2 )
 		{
-			if ( buffer[len-1] == '\n' )
+			if ( buffer[len-1] == '\n' || buffer[len-1] == '\r' )
 				buffer[len-1] = 0;
 			
 			if ( buffer[len-2] == '\r' )
@@ -1345,6 +1451,46 @@ void CNavMesh::DrawPlayerCounts( void ) const
 
 //--------------------------------------------------------------------------------------------------------------
 /**
+ * Draw bot avoidance areas from func_nav_avoid entities
+ */
+void CNavMesh::DrawFuncNavAvoid( void ) const
+{
+#ifndef CLIENT_DLL
+	FOR_EACH_VEC( TheNavAreas, it )
+	{
+		CNavArea *area = TheNavAreas[ it ];
+
+		if ( area->HasFuncNavAvoid() )
+		{
+			area->DrawFilled( 255, 0, 0, 255 );
+		}
+	}
+#endif // CLIENT_DLL
+}
+
+
+//--------------------------------------------------------------------------------------------------------------
+/**
+ * Draw bot preference areas from func_nav_prefer entities
+ */
+void CNavMesh::DrawFuncNavPrefer( void ) const
+{
+#ifndef CLIENT_DLL
+	FOR_EACH_VEC( TheNavAreas, it )
+	{
+		CNavArea *area = TheNavAreas[ it ];
+
+		if ( area->HasFuncNavPrefer() )
+		{
+			area->DrawFilled( 0, 255, 0, 255 );
+		}
+	}
+#endif // CLIENT_DLL
+}
+
+
+//--------------------------------------------------------------------------------------------------------------
+/**
  * Increase the danger of nav areas containing and near the given position
  */
 void CNavMesh::IncreaseDangerNearby( int teamID, float amount, CNavArea *startArea, const Vector &pos, float maxRadius, float dangerLimit )
@@ -1538,6 +1684,95 @@ void CommandNavClearSelectedSet( void )
 	TheNavMesh->CommandNavClearSelectedSet();
 }
 static ConCommand nav_clear_selected_set( "nav_clear_selected_set", CommandNavClearSelectedSet, "Clear the selected set.", FCVAR_GAMEDLL | FCVAR_CHEAT );
+
+
+//----------------------------------------------------------------------------------
+CON_COMMAND_F( nav_dump_selected_set_positions, "Write the (x,y,z) coordinates of the centers of all selected nav areas to a file.", FCVAR_GAMEDLL | FCVAR_CHEAT )
+{
+	const NavAreaVector &selectedSet = TheNavMesh->GetSelectedSet();
+
+	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::TEXT_BUFFER );
+
+	for( int i=0; i<selectedSet.Count(); ++i )
+	{
+		const Vector &center = selectedSet[i]->GetCenter();
+
+		fileBuffer.Printf( "%f %f %f\n", center.x, center.y, center.z );
+	}
+
+	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
+	char gamePath[256];
+	engine->GetGameDir( gamePath, 256 );
+
+	char filename[256];
+	Q_snprintf( filename, sizeof( filename ), "%s\\maps\\%s_xyz.txt", gamePath, STRING( gpGlobals->mapname ) );
+
+	if ( !filesystem->WriteFile( filename, "MOD", fileBuffer ) )
+	{
+		Warning( "Unable to save %d bytes to %s\n", fileBuffer.Size(), filename );
+	}
+	else
+	{
+		DevMsg( "Write %d nav area center positions to '%s'.\n", selectedSet.Count(), filename );
+	}
+};
+
+
+//----------------------------------------------------------------------------------
+CON_COMMAND_F( nav_show_dumped_positions, "Show the (x,y,z) coordinate positions of the given dump file.", FCVAR_GAMEDLL | FCVAR_CHEAT )
+{
+	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::TEXT_BUFFER );
+
+	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
+	char gamePath[256];
+	engine->GetGameDir( gamePath, 256 );
+
+	char filename[256];
+	Q_snprintf( filename, sizeof( filename ), "%s\\maps\\%s_xyz.txt", gamePath, STRING( gpGlobals->mapname ) );
+
+	if ( !filesystem->ReadFile( filename, "MOD", fileBuffer ) )
+	{
+		Warning( "Unable to read %s\n", filename );
+	}
+	else
+	{
+		while( true )
+		{
+			Vector center;
+			if ( fileBuffer.Scanf( "%f %f %f", &center.x, &center.y, &center.z ) <= 0 )
+			{
+				break;
+			}
+
+			NDebugOverlay::Cross3D( center, 5.0f, 255, 255, 0, true, 99999.9f );
+		}
+	}
+};
+
+
+//----------------------------------------------------------------------------------
+CON_COMMAND_F( nav_select_larger_than, "Select nav areas where both dimensions are larger than the given size.", FCVAR_GAMEDLL | FCVAR_CHEAT )
+{
+	if ( args.ArgC() > 1 )
+	{
+		float minSize = atof( args[1] );
+
+		int selectedCount = 0;
+
+		for( int i=0; i<TheNavAreas.Count(); ++i )
+		{
+			CNavArea *area = TheNavAreas[i];
+
+			if ( area->GetSizeX() > minSize && area->GetSizeY() > minSize )
+			{
+				TheNavMesh->AddToSelectedSet( area );
+				++selectedCount;
+			}
+		}
+
+		DevMsg( "Selected %d areas with dimensions larger than %3.2f units.\n", selectedCount, minSize );
+	}
+}
 
 
 //--------------------------------------------------------------------------------------------------------------
@@ -1778,6 +2013,16 @@ CON_COMMAND_F( nav_select_stairs, "Adds all stairway areas to the selected set",
 
 
 //--------------------------------------------------------------------------------------------------------------
+CON_COMMAND_F( nav_select_orphans, "Adds all orphan areas to the selected set (highlight a valid area first).", FCVAR_CHEAT )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
+	TheNavMesh->CommandNavSelectOrphans();
+}
+
+
+//--------------------------------------------------------------------------------------------------------------
 void CommandNavSplit( void )
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
@@ -1874,6 +2119,17 @@ void CommandNavDisconnect( void )
 	TheNavMesh->CommandNavDisconnect();
 }
 static ConCommand nav_disconnect( "nav_disconnect", CommandNavDisconnect, "To disconnect two Areas, mark an Area, highlight a second Area, then invoke the disconnect command. This will remove all connections between the two Areas.", FCVAR_GAMEDLL | FCVAR_CHEAT );
+
+
+//--------------------------------------------------------------------------------------------------------------
+void CommandNavDisconnectOutgoingOneWays( void )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
+	TheNavMesh->CommandNavDisconnectOutgoingOneWays();
+}
+static ConCommand nav_disconnect_outgoing_oneways( "nav_disconnect_outgoing_oneways", CommandNavDisconnectOutgoingOneWays, "For each area in the selected set, disconnect all outgoing one-way connections.", FCVAR_GAMEDLL | FCVAR_CHEAT );
 
 
 //--------------------------------------------------------------------------------------------------------------
@@ -2317,6 +2573,7 @@ void CommandNavLadderFlip( void )
 }
 static ConCommand nav_ladder_flip( "nav_ladder_flip", CommandNavLadderFlip, "Flips the selected ladder's direction.", FCVAR_GAMEDLL | FCVAR_CHEAT );
 
+
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavGenerate( void )
 {
@@ -2458,7 +2715,23 @@ static ConCommand nav_compress_id( "nav_compress_id", CommandNavCompressID, "Re-
 
 
 //--------------------------------------------------------------------------------------------------------------
+#ifdef TERROR
+void CommandNavShowLadderBounds( void )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
 
+	CFuncSimpleLadder *ladder = NULL;
+	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
+	{
+		Vector mins, maxs;
+		ladder->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+		ladder->m_debugOverlays |= OVERLAY_TEXT_BIT | OVERLAY_ABSBOX_BIT;
+		NDebugOverlay::Box( vec3_origin, mins, maxs, 0, 255, 0, 0, 600 );
+	}
+}
+static ConCommand nav_show_ladder_bounds( "nav_show_ladder_bounds", CommandNavShowLadderBounds, "Draws the bounding boxes of all func_ladders in the map.", FCVAR_GAMEDLL | FCVAR_CHEAT );
+#endif
 
 //--------------------------------------------------------------------------------------------------------------
 void CommandNavBuildLadder( void )
@@ -2517,7 +2790,10 @@ NavAttributeLookup TheNavAttributeTable[] =
 	{ "NO_MERGE", NAV_MESH_NO_MERGE },
 	{ "OBSTACLE_TOP", NAV_MESH_OBSTACLE_TOP },
 	{ "CLIFF", NAV_MESH_CLIFF },
-
+#ifdef TERROR
+	{ "PLAYERCLIP", (NavAttributeType)CNavArea::NAV_PLAYERCLIP },
+	{ "BREAKABLEWALL", (NavAttributeType)CNavArea::NAV_BREAKABLEWALL },
+#endif
 	{ NULL, NAV_MESH_INVALID }
 };
 

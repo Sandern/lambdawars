@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2008, Valve Corporation, All rights reserved. =======
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: interface to user account information in Steam
 //
@@ -14,7 +14,13 @@
 
 // structure that contains client callback data
 // see callbacks documentation for more details
+#if defined( VALVE_CALLBACK_PACK_SMALL )
+#pragma pack( push, 4 )
+#elif defined( VALVE_CALLBACK_PACK_LARGE )
 #pragma pack( push, 8 )
+#else
+#error isteamclient.h must be included
+#endif 
 struct CallbackMsg_t
 {
 	HSteamUser m_hSteamUser;
@@ -89,7 +95,9 @@ public:
 	// This provides both the compressed and uncompressed data. Please note that the uncompressed
 	// data is not the raw feed from the microphone: data may only be available if audible 
 	// levels of speech are detected.
-	virtual EVoiceResult GetAvailableVoice(uint32 *pcbCompressed, uint32 *pcbUncompressed) = 0;
+	// nUncompressedVoiceDesiredSampleRate is necessary to know the number of bytes to return in pcbUncompressed - can be set to 0 if you don't need uncompressed (the usual case)
+	// If you're upgrading from an older Steamworks API, you'll want to pass in 11025 to nUncompressedVoiceDesiredSampleRate
+	virtual EVoiceResult GetAvailableVoice(uint32 *pcbCompressed, uint32 *pcbUncompressed, uint32 nUncompressedVoiceDesiredSampleRate) = 0;
 
 	// Gets the latest voice data from the microphone. Compressed data is an arbitrary format, and is meant to be handed back to 
 	// DecompressVoice() for playback later as a binary blob. Uncompressed data is 16-bit, signed integer, 11025Hz PCM format.
@@ -101,14 +109,19 @@ public:
 	// You must grab both compressed and uncompressed here at the same time, if you want both.
 	// Matching data that is not read during this call will be thrown away.
 	// GetAvailableVoice() can be used to determine how much data is actually available.
-	virtual EVoiceResult GetVoice( bool bWantCompressed, void *pDestBuffer, uint32 cbDestBufferSize, uint32 *nBytesWritten, bool bWantUncompressed, void *pUncompressedDestBuffer, uint32 cbUncompressedDestBufferSize, uint32 *nUncompressBytesWritten ) = 0;
+	// If you're upgrading from an older Steamworks API, you'll want to pass in 11025 to nUncompressedVoiceDesiredSampleRate
+	virtual EVoiceResult GetVoice( bool bWantCompressed, void *pDestBuffer, uint32 cbDestBufferSize, uint32 *nBytesWritten, bool bWantUncompressed, void *pUncompressedDestBuffer, uint32 cbUncompressedDestBufferSize, uint32 *nUncompressBytesWritten, uint32 nUncompressedVoiceDesiredSampleRate ) = 0;
 
 	// Decompresses a chunk of compressed data produced by GetVoice().
 	// nBytesWritten is set to the number of bytes written to pDestBuffer unless the return value is k_EVoiceResultBufferTooSmall.
 	// In that case, nBytesWritten is set to the size of the buffer required to decompress the given
 	// data. The suggested buffer size for the destination buffer is 22 kilobytes.
-	// The output format of the data is 16-bit signed at 11025 samples per second.
-	virtual EVoiceResult DecompressVoice( const void *pCompressed, uint32 cbCompressed, void *pDestBuffer, uint32 cbDestBufferSize, uint32 *nBytesWritten ) = 0;
+	// The output format of the data is 16-bit signed at the requested samples per second.
+	// If you're upgrading from an older Steamworks API, you'll want to pass in 11025 to nDesiredSampleRate
+	virtual EVoiceResult DecompressVoice( const void *pCompressed, uint32 cbCompressed, void *pDestBuffer, uint32 cbDestBufferSize, uint32 *nBytesWritten, uint32 nDesiredSampleRate ) = 0;
+
+	// This returns the frequency of the voice data as it's stored internally; calling DecompressVoice() with this size will yield the best results
+	virtual uint32 GetVoiceOptimalSampleRate() = 0;
 
 	// Retrieve ticket to be sent to the entity who wishes to authenticate you. 
 	// pcbTicket retrieves the length of the actual ticket.
@@ -127,13 +140,74 @@ public:
 	// After receiving a user's authentication data, and passing it to BeginAuthSession, use this function
 	// to determine if the user owns downloadable content specified by the provided AppID.
 	virtual EUserHasLicenseForAppResult UserHasLicenseForApp( CSteamID steamID, AppId_t appID ) = 0;
+	
+	// returns true if this users looks like they are behind a NAT device. Only valid once the user has connected to steam 
+	// (i.e a SteamServersConnected_t has been issued) and may not catch all forms of NAT.
+	virtual bool BIsBehindNAT() = 0;
+
+	// set data to be replicated to friends so that they can join your game
+	// CSteamID steamIDGameServer - the steamID of the game server, received from the game server by the client
+	// uint32 unIPServer, uint16 usPortServer - the IP address of the game server
+	virtual void AdvertiseGame( CSteamID steamIDGameServer, uint32 unIPServer, uint16 usPortServer ) = 0;
+
+	// Requests a ticket encrypted with an app specific shared key
+	// pDataToInclude, cbDataToInclude will be encrypted into the ticket
+	// ( This is asynchronous, you must wait for the ticket to be completed by the server )
+	virtual SteamAPICall_t RequestEncryptedAppTicket( void *pDataToInclude, int cbDataToInclude ) = 0;
+
+	// retrieve a finished ticket
+	virtual bool GetEncryptedAppTicket( void *pTicket, int cbMaxTicket, uint32 *pcbTicket ) = 0;
+
+#ifdef _PS3
+	// Initiates PS3 Logon request using just PSN ticket.  
+	//
+	// PARAMS: bInteractive - If set tells Steam to go ahead and show the PS3 NetStart dialog if needed to
+	// prompt the user for network setup/PSN logon before initiating the Steam side of the logon.
+	//
+	// Listen for SteamServersConnected_t or SteamServerConnectFailure_t for status.  SteamServerConnectFailure_t
+	// may return with EResult k_EResultExternalAccountUnlinked if the PSN account is unknown to Steam.  You should
+	// then call LogOnAndLinkSteamAccountToPSN() after prompting the user for credentials to establish a link. 
+	// Future calls to LogOn() after the one time link call should succeed as long as the user is connected to PSN.
+	virtual void LogOn( bool bInteractive ) = 0;
+
+	// Initiates a request to logon with a specific steam username/password and create a PSN account link at 
+	// the same time.  Should call this only if LogOn() has failed and indicated the PSN account is unlinked.
+	//
+	// PARAMS: bInteractive - If set tells Steam to go ahead and show the PS3 NetStart dialog if needed to
+	// prompt the user for network setup/PSN logon before initiating the Steam side of the logon.  pchUserName 
+	// should be the users Steam username, and pchPassword should be the users Steam password.
+	// 
+	// Listen for SteamServersConnected_t or SteamServerConnectFailure_t for status.  SteamServerConnectFailure_t
+	// may return with EResult k_EResultOtherAccountAlreadyLinked if already linked to another account. 
+	virtual void LogOnAndLinkSteamAccountToPSN( bool bInteractive, const char *pchUserName, const char *pchPassword ) = 0;
+
+	// Final logon option for PS3, this logs into an existing account if already linked, but if not already linked
+	// creates a new account using the info in the PSN ticket to generate a unique account name.  The new account is
+	// then linked to the PSN ticket.  This is the faster option for new users who don't have an existing Steam account
+	// to get into multiplayer.
+	//
+	// PARAMS: bInteractive - If set tells Steam to go ahead and show the PS3 NetStart dialog if needed to
+	// prompt the user for network setup/PSN logon before initiating the Steam side of the logon.
+	virtual void LogOnAndCreateNewSteamAccountIfNeeded( bool bInteractive ) = 0;
+
+	// Returns a special SteamID that represents the user's PSN information. Can be used to query the user's PSN avatar,
+	// online name, etc. through the standard Steamworks interfaces.
+	virtual CSteamID GetConsoleSteamID() = 0;
+#endif
+
 };
 
-#define STEAMUSER_INTERFACE_VERSION "SteamUser013"
+#define STEAMUSER_INTERFACE_VERSION "SteamUser016"
 
 
 // callbacks
+#if defined( VALVE_CALLBACK_PACK_SMALL )
+#pragma pack( push, 4 )
+#elif defined( VALVE_CALLBACK_PACK_LARGE )
 #pragma pack( push, 8 )
+#else
+#error isteamclient.h must be included
+#endif 
 
 //-----------------------------------------------------------------------------
 // Purpose: called when a connections to the Steam back-end has been established
@@ -227,6 +301,38 @@ struct MicroTxnAuthorizationResponse_t
 	uint64 m_ulOrderID;			// OrderID provided for the microtransaction
 	uint8 m_bAuthorized;		// if user authorized transaction
 };
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Result from RequestEncryptedAppTicket
+//-----------------------------------------------------------------------------
+struct EncryptedAppTicketResponse_t
+{
+	enum { k_iCallback = k_iSteamUserCallbacks + 54 };
+
+	EResult m_eResult;
+};
+
+//-----------------------------------------------------------------------------
+// callback for GetAuthSessionTicket
+//-----------------------------------------------------------------------------
+struct GetAuthSessionTicketResponse_t
+{
+	enum { k_iCallback = k_iSteamUserCallbacks + 63 };
+	HAuthTicket m_hAuthTicket;
+	EResult m_eResult;
+};
+
+
+//-----------------------------------------------------------------------------
+// Purpose: sent to your game in response to a steam://gamewebcallback/ command
+//-----------------------------------------------------------------------------
+struct GameWebCallback_t
+{
+	enum { k_iCallback = k_iSteamUserCallbacks + 64 };
+	char m_szURL[256];
+};
+
 
 #pragma pack( pop )
 

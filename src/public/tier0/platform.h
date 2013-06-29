@@ -507,6 +507,8 @@ typedef unsigned int		uint;
 #define ALIGN128_POST
 #endif
 
+// Pull in the /analyze code annotations.
+#include "annotations.h"
 
 // This can be used to declare an abstract (interface only) class.
 // Classes marked abstract should not be instantiated.  If they are, and access violation will occur.

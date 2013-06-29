@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -20,6 +20,8 @@ enum { MAX_NAV_TEAMS = 2 };
 
 
 class CFuncElevator;
+class CFuncNavPrerequisite;
+class CFuncNavCost;
 
 class CNavVectorNoEditAllocator
 {
@@ -306,14 +308,25 @@ public:
 	virtual void UpdateBlocked( bool force = false, int teamID = TEAM_ANY );		// Updates the (un)blocked status of the nav area (throttled)
 #endif // CLIENT_DLL
 	virtual bool IsBlocked( int teamID = TEAM_ANY, bool ignoreNavBlockers = false ) const;
+	void UnblockArea( int teamID = TEAM_ANY );					// clear blocked status for the given team(s)
 
 	void CheckFloor( CBaseEntity *ignore );						// Checks if there is a floor under the nav area, in case a breakable floor is gone
-
 
 	void MarkObstacleToAvoid( float obstructionHeight );
 	void UpdateAvoidanceObstacles( void );
 	bool HasAvoidanceObstacle( float maxObstructionHeight = StepHeight ) const; // is there a large, immobile object obstructing this area
 	float GetAvoidanceObstacleHeight( void ) const; // returns the maximum height of the obstruction above the ground
+
+	bool HasPrerequisite( CBaseCombatCharacter *actor = NULL ) const;							// return true if this area has a prerequisite that applies to the given actor
+	const CUtlVector< CHandle< CFuncNavPrerequisite > > &GetPrerequisiteVector( void ) const;	// return vector of prerequisites that must be met before this area can be traversed
+	void RemoveAllPrerequisites( void );
+	void AddPrerequisite( CFuncNavPrerequisite *prereq );
+
+	void ClearAllNavCostEntities( void );							// clear set of func_nav_cost entities that affect this area
+	void AddFuncNavCostEntity( CFuncNavCost *cost );				// add the given func_nav_cost entity to the cost of this area
+	float ComputeFuncNavCost( CBaseCombatCharacter *who ) const;	// return the cost multiplier of this area's func_nav_cost entities for the given actor
+	bool HasFuncNavAvoid( void ) const;
+	bool HasFuncNavPrefer( void ) const;
 
 	void CheckWaterLevel( void );
 	bool IsUnderwater( void ) const		{ return m_isUnderwater; }
@@ -352,6 +365,7 @@ public:
 	int GetAdjacentCount( NavDirType dir ) const	{ return m_connect[ dir ].Count(); }	// return number of connected areas in given direction
 	CNavArea *GetAdjacentArea( NavDirType dir, int i ) const;	// return the i'th adjacent area in the given direction
 	CNavArea *GetRandomAdjacentArea( NavDirType dir ) const;
+	void CollectAdjacentAreas( CUtlVector< CNavArea * > *adjVector ) const;	// build a vector of all adjacent areas
 
 	const NavConnectVector *GetAdjacentAreas( NavDirType dir ) const	{ return &m_connect[dir]; }
 	bool IsConnected( const CNavArea *area, NavDirType dir ) const;	// return true if given area is connected in given direction
@@ -745,6 +759,8 @@ private:
 
 	void CalcDebugID();
 
+	CUtlVector< CHandle< CFuncNavPrerequisite > > m_prerequisiteVector;		// list of prerequisites that must be met before this area can be traversed
+
 	CNavArea *m_prevHash, *m_nextHash;							// for hash table in CNavMesh
 
 	void ConnectElevators( void );								// find elevator connections between areas
@@ -771,6 +787,8 @@ private:
 
 	uint32 m_nVisTestCounter;
 	static uint32 s_nCurrVisTestCounter;
+
+	CUtlVector< CHandle< CFuncNavCost > > m_funcNavCostVector;	// active, overlapping cost entities
 };
 
 typedef CUtlVector< CNavArea * > NavAreaVector;
@@ -782,6 +800,33 @@ extern NavAreaVector TheNavAreas;
 //
 // Inlines
 //
+
+//--------------------------------------------------------------------------------------------------------------
+inline bool CNavArea::HasPrerequisite( CBaseCombatCharacter *actor ) const
+{
+	return m_prerequisiteVector.Count() > 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------
+inline const CUtlVector< CHandle< CFuncNavPrerequisite > > &CNavArea::GetPrerequisiteVector( void ) const
+{
+	return m_prerequisiteVector;
+}
+
+//--------------------------------------------------------------------------------------------------------------
+inline void CNavArea::RemoveAllPrerequisites( void )
+{
+	m_prerequisiteVector.RemoveAll();
+}
+
+//--------------------------------------------------------------------------------------------------------------
+inline void CNavArea::AddPrerequisite( CFuncNavPrerequisite *prereq )
+{
+	if ( m_prerequisiteVector.Find( prereq ) == m_prerequisiteVector.InvalidIndex() )
+	{
+		m_prerequisiteVector.AddToTail( prereq );
+	}
+}
 
 //--------------------------------------------------------------------------------------------------------------
 inline float CNavArea::GetDangerDecayRate( void ) const

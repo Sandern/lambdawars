@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2008, Valve LLC, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose:
 //
@@ -80,6 +80,29 @@ enum EResult
 	k_EResultDataCorruption = 53,				// Operation canceled because data is ill formed or unrecoverable
 	k_EResultDiskFull = 54,						// Operation canceled - not enough disk space.
 	k_EResultRemoteCallFailed = 55,				// an remote call or IPC call failed
+	k_EResultPasswordUnset = 56,				// Password could not be verified as it's unset server side
+	k_EResultExternalAccountUnlinked = 57,		// External account (PSN, Facebook...) is not linked to a Steam account
+	k_EResultPSNTicketInvalid = 58,				// PSN ticket was invalid
+	k_EResultExternalAccountAlreadyLinked = 59,	// External account (PSN, Facebook...) is already linked to some other account, must explicitly request to replace/delete the link first
+	k_EResultRemoteFileConflict = 60,			// The sync cannot resume due to a conflict between the local and remote files
+	k_EResultIllegalPassword = 61,				// The requested new password is not legal
+	k_EResultSameAsPreviousValue = 62,			// new value is the same as the old one ( secret question and answer )
+	k_EResultAccountLogonDenied = 63,			// account login denied due to 2nd factor authentication failure
+	k_EResultCannotUseOldPassword = 64,			// The requested new password is not legal
+	k_EResultInvalidLoginAuthCode = 65,			// account login denied due to auth code invalid
+	k_EResultAccountLogonDeniedNoMail = 66,		// account login denied due to 2nd factor auth failure - and no mail has been sent
+	k_EResultHardwareNotCapableOfIPT = 67,		// 
+	k_EResultIPTInitError = 68,					// 
+	k_EResultParentalControlRestricted = 69,	// operation failed due to parental control restrictions for current user
+	k_EResultFacebookQueryError = 70,			// Facebook query returned an error
+	k_EResultExpiredLoginAuthCode = 71,			// account login denied due to auth code expired
+	k_EResultIPLoginRestrictionFailed = 72,
+	k_EResultAccountLockedDown = 73,
+	k_EResultAccountLogonDeniedVerifiedEmailRequired = 74,
+	k_EResultNoMatchingURL = 75,
+	k_EResultBadResponse = 76,					// parse failure, missing field, etc.
+	k_EResultRequirePasswordReEntry = 77,		// The user cannot complete the action until they re-enter their password
+	k_EResultValueOutOfRange = 78				// the value entered is outside the acceptable range
 };
 
 // Error codes for use with the voice functions
@@ -91,6 +114,9 @@ enum EVoiceResult
 	k_EVoiceResultNoData = 3,
 	k_EVoiceResultBufferTooSmall = 4,
 	k_EVoiceResultDataCorrupted = 5,
+	k_EVoiceResultRestricted = 6,
+	k_EVoiceResultUnsupportedCodec = 7,
+
 };
 
 // Result codes to GSHandleClientDeny/Kick
@@ -160,7 +186,7 @@ enum EUniverse
 	k_EUniverseBeta = 2,
 	k_EUniverseInternal = 3,
 	k_EUniverseDev = 4,
-	k_EUniverseRC = 5,
+	// k_EUniverseRC = 5,				// no such universe anymore
 	k_EUniverseMax
 };
 
@@ -176,11 +202,60 @@ enum EAccountType
 	k_EAccountTypeContentServer = 6,	// content server
 	k_EAccountTypeClan = 7,
 	k_EAccountTypeChat = 8,
-	// k_EAccountTypeP2PSuperSeeder = 9,	// unused
+	k_EAccountTypeConsoleUser = 9,		// Fake SteamID for local PSN account on PS3 or Live account on 360, etc.
 	k_EAccountTypeAnonUser = 10,
 
 	// Max of 16 items in this field
 	k_EAccountTypeMax
+};
+
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+enum EAppReleaseState
+{
+	k_EAppReleaseState_Unknown			= 0,	// unknown, required appinfo or license info is missing
+	k_EAppReleaseState_Unavailable		= 1,	// even if user 'just' owns it, can see game at all
+	k_EAppReleaseState_Prerelease		= 2,	// can be purchased and is visible in games list, nothing else. Common appInfo section released
+	k_EAppReleaseState_PreloadOnly		= 3,	// owners can preload app, not play it. AppInfo fully released.
+	k_EAppReleaseState_Released			= 4,	// owners can download and play app.
+};
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+enum EAppOwernshipFlags
+{
+	k_EAppOwernshipFlags_None				= 0,	// unknown
+	k_EAppOwernshipFlags_OwnsLicense		= 1,	// owns license for this game
+	k_EAppOwernshipFlags_FreeLicense		= 2,	// not paid for game
+	k_EAppOwernshipFlags_RegionRestricted	= 4,	// owns app, but not allowed to play in current region
+	k_EAppOwernshipFlags_LowViolence		= 8,	// only low violence version
+	k_EAppOwernshipFlags_InvalidPlatform	= 16,	// app not supported on current platform
+	k_EAppOwernshipFlags_DeviceLicense		= 32,	// license was granted by authorized local device
+};
+
+
+//-----------------------------------------------------------------------------
+// Purpose: designed as flags to allow filters masks
+//-----------------------------------------------------------------------------
+enum EAppType
+{
+	k_EAppType_Invalid				= 0x000,	// unknown / invalid
+	k_EAppType_Game					= 0x001,	// playable game, default type
+	k_EAppType_Application			= 0x002,	// software application
+	k_EAppType_Tool					= 0x004,	// SDKs, editors & dedicated servers
+	k_EAppType_Demo					= 0x008,	// game demo
+	k_EAppType_Media				= 0x010,	// media trailer
+	k_EAppType_DLC					= 0x020,	// down loadable content
+	k_EAppType_Guide				= 0x040,	// game guide, PDF etc
+	k_EAppType_Driver				= 0x080,	// hardware driver updater (ATI, Razor etc)
+	
+	k_EAppType_Shortcut				= 0x40000000,	// just a shortcut, client side only
+	k_EAppType_DepotOnly			= 0x80000000,	// placeholder since depots and apps share the same namespace
 };
 
 
@@ -197,6 +272,9 @@ enum ESteamUserStatType
 	k_ESteamUserStatTypeAVGRATE = 3,
 	k_ESteamUserStatTypeACHIEVEMENTS = 4,
 	k_ESteamUserStatTypeGROUPACHIEVEMENTS = 5,
+
+	// max, for sanity checks
+	k_ESteamUserStatTypeMAX
 };
 
 
@@ -209,10 +287,16 @@ enum EChatEntryType
 	k_EChatEntryTypeChatMsg = 1,		// Normal text message from another user
 	k_EChatEntryTypeTyping = 2,			// Another user is typing (not used in multi-user chat)
 	k_EChatEntryTypeInviteGame = 3,		// Invite from other user into that users current game
-	k_EChatEntryTypeEmote = 4,			// text emote message
-	k_EChatEntryTypeLobbyGameStart = 5,	// lobby game is starting
+	k_EChatEntryTypeEmote = 4,			// text emote message (deprecated, should be treated as ChatMsg)
+	//k_EChatEntryTypeLobbyGameStart = 5,	// lobby game is starting (dead - listen for LobbyGameCreated_t callback instead)
 	k_EChatEntryTypeLeftConversation = 6, // user has left the conversation ( closed chat window )
 	// Above are previous FriendMsgType entries, now merged into more generic chat entry types
+	k_EChatEntryTypeEntered = 7,		// user has entered the conversation (used in multi-user chat and group chat)
+	k_EChatEntryTypeWasKicked = 8,		// user was kicked (data: 64-bit steamid of actor performing the kick)
+	k_EChatEntryTypeWasBanned = 9,		// user was banned (data: 64-bit steamid of actor performing the ban)
+	k_EChatEntryTypeDisconnected = 10,	// user disconnected
+	k_EChatEntryTypeHistoricalChat = 11,	// a chat message from user's chat history or offilne message
+
 };
 
 
@@ -228,6 +312,13 @@ enum EChatRoomEnterResponse
 	k_EChatRoomEnterResponseError = 5,			// Unexpected Error
 	k_EChatRoomEnterResponseBanned = 6,			// You are banned from this chat room and may not join
 	k_EChatRoomEnterResponseLimited = 7,		// Joining this chat is not allowed because you are a limited user (no value on account)
+	k_EChatRoomEnterResponseClanDisabled = 8,	// Attempt to join a clan chat when the clan is locked or disabled
+	k_EChatRoomEnterResponseCommunityBan = 9,	// Attempt to join a chat when the user has a community lock on their account
+	k_EChatRoomEnterResponseMemberBlockedYou = 10, // Join failed - some member in the chat has blocked you from joining
+	k_EChatRoomEnterResponseYouBlockedMember = 11, // Join failed - you have blocked some member already in the chat
+	// k_EChatRoomEnterResponseNoRankingDataLobby = 12,  // No longer used
+	// k_EChatRoomEnterResponseNoRankingDataUser = 13,  //  No longer used
+	// k_EChatRoomEnterResponseRankOutOfRange = 14, //  No longer used
 };
 
 
@@ -236,18 +327,22 @@ enum EChatRoomEnterResponse
 //-----------------------------------------------------------------------------
 enum EStatusDepotVersion
 {
-	k_EStatusDepotVersionInvalid = 0,
-	k_EStatusDepotVersionCompleteDisabled = 1,
-	k_EStatusDepotVersionCompleteEnabledBeta = 2,
-	k_EStatusDepotVersionCompleteEnabledPublic = 3,
+	k_EStatusDepotVersionInvalid = 0,			
+	k_EStatusDepotVersionDisabled = 1,			// version was disabled, no manifest & content available
+	k_EStatusDepotVersionAvailable = 2,			// manifest & content is available, but not current
+	k_EStatusDepotVersionCurrent = 3,			// current depot version. The can be multiple, one for public and one for each beta key
 };
 
 
 typedef void (*PFNLegacyKeyRegistration)( const char *pchCDKey, const char *pchInstallPath );
 typedef bool (*PFNLegacyKeyInstalled)();
 
-const int k_unSteamAccountIDMask = 0xFFFFFFFF;
-const int k_unSteamAccountInstanceMask = 0x000FFFFF;
+const unsigned int k_unSteamAccountIDMask = 0xFFFFFFFF;
+const unsigned int k_unSteamAccountInstanceMask = 0x000FFFFF;
+// we allow 3 simultaneous user account instances right now, 1= desktop, 2 = console, 4 = web, 0 = all
+const unsigned int k_unSteamUserDesktopInstance	= 1;	 
+const unsigned int k_unSteamUserConsoleInstance	= 2;
+const unsigned int k_unSteamUserWebInstance		= 4;
 
 // Special flags for Chat accounts - they go in the top 8 bits
 // of the steam ID's "instance", leaving 12 for the actual instances
@@ -272,10 +367,13 @@ enum EMarketingMessageFlags
 	k_EMarketingMessageFlagsHighPriority = 1 << 0,
 	k_EMarketingMessageFlagsPlatformWindows = 1 << 1,
 	k_EMarketingMessageFlagsPlatformMac = 1 << 2,
+	k_EMarketingMessageFlagsPlatformLinux = 1 << 3,
 
 	//aggregate flags
 	k_EMarketingMessageFlagsPlatformRestrictions = 
-		k_EMarketingMessageFlagsPlatformWindows | k_EMarketingMessageFlagsPlatformMac,
+		k_EMarketingMessageFlagsPlatformWindows |
+        k_EMarketingMessageFlagsPlatformMac |
+        k_EMarketingMessageFlagsPlatformLinux,
 };
 
 
@@ -293,6 +391,8 @@ enum ENotificationPosition
 
 
 #pragma pack( push, 1 )		
+
+#define CSTEAMID_DEFINED
 
 // Steam ID structure (64 bits total)
 class CSteamID
@@ -333,7 +433,7 @@ public:
 	CSteamID( uint32 unAccountID, unsigned int unAccountInstance, EUniverse eUniverse, EAccountType eAccountType )
 	{
 #if defined(_SERVER) && defined(Assert)
-		Assert( ! ( ( k_EAccountTypeIndividual == eAccountType ) && ( 1 != unAccountInstance ) ) );	// enforce that for individual accounts, instance is always 1
+		Assert( ! ( ( k_EAccountTypeIndividual == eAccountType ) && ( unAccountInstance > k_unSteamUserWebInstance ) ) );	// enforce that for individual accounts, instance is always 1
 #endif // _SERVER
 		InstancedSet( unAccountID, unAccountInstance, eUniverse, eAccountType );
 	}
@@ -369,7 +469,8 @@ public:
 		}
 		else
 		{
-			m_steamid.m_comp.m_unAccountInstance = 1;
+			// by default we pick the desktop instance
+			m_steamid.m_comp.m_unAccountInstance = k_unSteamUserDesktopInstance;
 		}
 	}
 
@@ -395,8 +496,8 @@ public:
 	//-----------------------------------------------------------------------------
 	void FullSet( uint64 ulIdentifier, EUniverse eUniverse, EAccountType eAccountType )
 	{
-		m_steamid.m_comp.m_unAccountID = ( ulIdentifier & 0xFFFFFFFF );						// account ID is low 32 bits
-		m_steamid.m_comp.m_unAccountInstance = ( ( ulIdentifier >> 32 ) & 0xFFFFF );			// account instance is next 20 bits
+		m_steamid.m_comp.m_unAccountID = ( ulIdentifier & k_unSteamAccountIDMask );						// account ID is low 32 bits
+		m_steamid.m_comp.m_unAccountInstance = ( ( ulIdentifier >> 32 ) & k_unSteamAccountInstanceMask );			// account instance is next 20 bits
 		m_steamid.m_comp.m_EUniverse = eUniverse;
 		m_steamid.m_comp.m_EAccountType = eAccountType;
 	}
@@ -412,6 +513,18 @@ public:
 	}
 
 
+	//-----------------------------------------------------------------------------
+	// Purpose: Clear all fields, leaving an invalid ID.
+	//-----------------------------------------------------------------------------
+    void Clear()
+	{
+		m_steamid.m_comp.m_unAccountID = 0;
+		m_steamid.m_comp.m_EAccountType = k_EAccountTypeInvalid;
+		m_steamid.m_comp.m_EUniverse = k_EUniverseInvalid;
+		m_steamid.m_comp.m_unAccountInstance = 0;
+	}
+
+
 #if defined( INCLUDED_STEAM_COMMON_STEAMCOMMON_H ) 
 	//-----------------------------------------------------------------------------
 	// Purpose: Initializes a steam ID from a Steam2 ID structure
@@ -424,7 +537,7 @@ public:
 			pTSteamGlobalUserID->m_SteamLocalUserID.Split.High32bits;
 		m_steamid.m_comp.m_EUniverse = eUniverse;		// set the universe
 		m_steamid.m_comp.m_EAccountType = k_EAccountTypeIndividual; // Steam 2 accounts always map to account type of individual
-		m_steamid.m_comp.m_unAccountInstance = 1;	// individual accounts always have an account instance ID of 1
+		m_steamid.m_comp.m_unAccountInstance = k_unSteamUserDesktopInstance; // Steam2 only knew desktop instances
 	}
 
 	//-----------------------------------------------------------------------------
@@ -498,11 +611,27 @@ public:
 	}
 
 	//-----------------------------------------------------------------------------
-	// Purpose: Is this a game server account id?
+	// Purpose: Is this a game server account id?  (Either persistent or anonymous)
 	//-----------------------------------------------------------------------------
 	bool BGameServerAccount() const
 	{
 		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeGameServer || m_steamid.m_comp.m_EAccountType == k_EAccountTypeAnonGameServer;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Is this a persistent (not anonymous) game server account id?
+	//-----------------------------------------------------------------------------
+	bool BPersistentGameServerAccount() const
+	{
+		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeGameServer;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Is this an anonymous game server account id?
+	//-----------------------------------------------------------------------------
+	bool BAnonGameServerAccount() const
+	{
+		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeAnonGameServer;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -546,7 +675,7 @@ public:
 	//-----------------------------------------------------------------------------
 	bool BIndividualAccount() const
 	{
-		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeIndividual;
+		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeIndividual || m_steamid.m_comp.m_EAccountType == k_EAccountTypeConsoleUser;
 	}
 
 
@@ -566,10 +695,20 @@ public:
 		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeAnonUser;
 	}
 
+	//-----------------------------------------------------------------------------
+	// Purpose: Is this a faked up Steam ID for a PSN friend account?
+	//-----------------------------------------------------------------------------
+	bool BConsoleUserAccount() const
+	{
+		return m_steamid.m_comp.m_EAccountType == k_EAccountTypeConsoleUser;
+	}
 
 	// simple accessors
 	void SetAccountID( uint32 unAccountID )		{ m_steamid.m_comp.m_unAccountID = unAccountID; }
-	uint32 GetAccountID() const					{ return m_steamid.m_comp.m_unAccountID; }
+	void SetAccountInstance( uint32 unInstance ){ m_steamid.m_comp.m_unAccountInstance = unInstance; }
+	void ClearIndividualInstance()				{ if ( BIndividualAccount() ) m_steamid.m_comp.m_unAccountInstance = 0; }
+	bool HasNoIndividualInstance() const		{ return BIndividualAccount() && (m_steamid.m_comp.m_unAccountInstance==0); }
+	AccountID_t GetAccountID() const			{ return m_steamid.m_comp.m_unAccountID; }
 	uint32 GetUnAccountInstance() const			{ return m_steamid.m_comp.m_unAccountInstance; }
 	EAccountType GetEAccountType() const		{ return ( EAccountType ) m_steamid.m_comp.m_EAccountType; }
 	EUniverse GetEUniverse() const				{ return m_steamid.m_comp.m_EUniverse; }
@@ -582,6 +721,12 @@ public:
 	static const char * Render( uint64 ulSteamID );	// static method to render a uint64 representation of a steam ID to a string
 
 	void SetFromString( const char *pchSteamID, EUniverse eDefaultUniverse );
+    // SetFromString allows many partially-correct strings, constraining how
+    // we might be able to change things in the future.
+    // SetFromStringStrict requires the exact string forms that we support
+    // and is preferred when the caller knows it's safe to be strict.
+    // Returns whether the string parsed correctly.
+	bool SetFromStringStrict( const char *pchSteamID, EUniverse eDefaultUniverse );
 	bool SetFromSteam2String( const char *pchSteam2ID, EUniverse eUniverse );
 
 	inline bool operator==( const CSteamID &val ) const { return m_steamid.m_unAll64Bits == val.m_steamid.m_unAll64Bits; } 
@@ -605,10 +750,17 @@ private:
 	{
 		struct SteamIDComponent_t
 		{
+#ifdef VALVE_BIG_ENDIAN
+			EUniverse			m_EUniverse : 8;	// universe this account belongs to
+			unsigned int		m_EAccountType : 4;			// type of account - can't show as EAccountType, due to signed / unsigned difference
+			unsigned int		m_unAccountInstance : 20;	// dynamic instance ID
 			uint32				m_unAccountID : 32;			// unique account identifier
-			unsigned int		m_unAccountInstance : 20;	// dynamic instance ID (used for multiseat type accounts only)
+#else
+			uint32				m_unAccountID : 32;			// unique account identifier
+			unsigned int		m_unAccountInstance : 20;	// dynamic instance ID
 			unsigned int		m_EAccountType : 4;			// type of account - can't show as EAccountType, due to signed / unsigned difference
 			EUniverse			m_EUniverse : 8;	// universe this account belongs to
+#endif
 		} m_comp;
 
 		uint64 m_unAll64Bits;
@@ -625,7 +777,7 @@ inline bool CSteamID::IsValid() const
 
 	if ( m_steamid.m_comp.m_EAccountType == k_EAccountTypeIndividual )
 	{
-		if ( m_steamid.m_comp.m_unAccountID == 0 || m_steamid.m_comp.m_unAccountInstance != 1 )
+		if ( m_steamid.m_comp.m_unAccountID == 0 || m_steamid.m_comp.m_unAccountInstance > k_unSteamUserWebInstance )
 			return false;
 	}
 
@@ -634,24 +786,30 @@ inline bool CSteamID::IsValid() const
 		if ( m_steamid.m_comp.m_unAccountID == 0 || m_steamid.m_comp.m_unAccountInstance != 0 )
 			return false;
 	}
+
+	if ( m_steamid.m_comp.m_EAccountType == k_EAccountTypeGameServer )
+	{
+		if ( m_steamid.m_comp.m_unAccountID == 0 )
+			return false;
+		// Any limit on instances?  We use them for local users and bots
+	}
 	return true;
 }
 
-
 // generic invalid CSteamID
-const CSteamID k_steamIDNil;
+#define k_steamIDNil CSteamID()
 
 // This steamID comes from a user game connection to an out of date GS that hasnt implemented the protocol
 // to provide its steamID
-const CSteamID k_steamIDOutofDateGS( 0, 0, k_EUniverseInvalid, k_EAccountTypeInvalid );
+#define k_steamIDOutofDateGS CSteamID( 0, 0, k_EUniverseInvalid, k_EAccountTypeInvalid )
 // This steamID comes from a user game connection to an sv_lan GS
-const CSteamID k_steamIDLanModeGS( 0, 0, k_EUniversePublic, k_EAccountTypeInvalid );
+#define k_steamIDLanModeGS CSteamID( 0, 0, k_EUniversePublic, k_EAccountTypeInvalid )
 // This steamID can come from a user game connection to a GS that has just booted but hasnt yet even initialized
 // its steam3 component and started logging on.
-const CSteamID k_steamIDNotInitYetGS( 1, 0, k_EUniverseInvalid, k_EAccountTypeInvalid );
+#define k_steamIDNotInitYetGS CSteamID( 1, 0, k_EUniverseInvalid, k_EAccountTypeInvalid )
 // This steamID can come from a user game connection to a GS that isn't using the steam authentication system but still
 // wants to support the "Join Game" option in the friends list
-const CSteamID k_steamIDNonSteamGS( 2, 0, k_EUniverseInvalid, k_EAccountTypeInvalid );
+#define k_steamIDNonSteamGS CSteamID( 2, 0, k_EUniverseInvalid, k_EAccountTypeInvalid )
 
 
 #ifdef STEAM
@@ -787,6 +945,11 @@ public:
 		return &m_ulGameID;
 	}
 
+	void Set( uint64 ulGameID )
+	{
+		m_ulGameID = ulGameID;
+	}
+
 	bool IsMod() const
 	{
 		return ( m_gameID.m_nType == k_EGameIDTypeGameMod );
@@ -839,16 +1002,16 @@ public:
 		{
 		case k_EGameIDTypeApp:
 			return m_gameID.m_nAppID != k_uAppIdInvalid;
-			break;
+
 		case k_EGameIDTypeGameMod:
 			return m_gameID.m_nAppID != k_uAppIdInvalid && m_gameID.m_nModID & 0x80000000;
-			break;
+
 		case k_EGameIDTypeShortcut:
 			return (m_gameID.m_nModID & 0x80000000) != 0;
-			break;
+
 		case k_EGameIDTypeP2P:
 			return m_gameID.m_nAppID == k_uAppIdInvalid && m_gameID.m_nModID & 0x80000000;
-			break;
+
 		default:
 #if defined(Assert)
 			Assert(false);
@@ -877,9 +1040,15 @@ private:
 
 	struct GameID_t
 	{
+#ifdef VALVE_BIG_ENDIAN
+		unsigned int m_nModID : 32;
+		unsigned int m_nType : 8;
+		unsigned int m_nAppID : 24;
+#else
 		unsigned int m_nAppID : 24;
 		unsigned int m_nType : 8;
 		unsigned int m_nModID : 32;
+#endif
 	};
 
 	union

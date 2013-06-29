@@ -56,6 +56,12 @@ void register_AvatarImage_class(){
             "Evict"
             , (bool ( ::CAvatarImage::* )(  ) )( &::CAvatarImage::Evict ) )    
         .def( 
+            "GetAvatarTall"
+            , (int ( ::CAvatarImage::* )(  ) )( &::CAvatarImage::GetAvatarTall ) )    
+        .def( 
+            "GetAvatarWide"
+            , (int ( ::CAvatarImage::* )(  ) )( &::CAvatarImage::GetAvatarWide ) )    
+        .def( 
             "GetContentSize"
             , (boost::python::tuple (*)( ::CAvatarImage & ))( &GetContentSize_4018c511fb723e75e66d04698ae389d4 )
             , ( bp::arg("inst") ) )    
@@ -70,6 +76,9 @@ void register_AvatarImage_class(){
             , (boost::python::tuple (*)( ::CAvatarImage & ))( &GetSize_69f7f625b2d0bcaac60f977200868e1c )
             , ( bp::arg("inst") ) )    
         .def( 
+            "GetTall"
+            , (int ( ::CAvatarImage::* )(  ) )( &::CAvatarImage::GetTall ) )    
+        .def( 
             "GetWide"
             , (int ( ::CAvatarImage::* )(  ) )( &::CAvatarImage::GetWide ) )    
         .def( 
@@ -83,17 +92,21 @@ void register_AvatarImage_class(){
             , (void ( ::CAvatarImage::* )( int,int ) )( &::CAvatarImage::SetAvatarSize )
             , ( bp::arg("wide"), bp::arg("tall") ) )    
         .def( 
-            "SetAvatarSize"
-            , (void ( ::CAvatarImage::* )( ::EAvatarSize ) )( &::CAvatarImage::SetAvatarSize )
-            , ( bp::arg("size") ) )    
-        .def( 
             "SetAvatarSteamID"
-            , (bool ( ::CAvatarImage::* )( ::CSteamID ) )( &::CAvatarImage::SetAvatarSteamID )
-            , ( bp::arg("steamIDUser") ) )    
+            , (bool ( ::CAvatarImage::* )( ::CSteamID,::EAvatarSize ) )( &::CAvatarImage::SetAvatarSteamID )
+            , ( bp::arg("steamIDUser"), bp::arg("avatarSize")=::k_EAvatarSize32x32 ) )    
         .def( 
             "SetColor"
             , (void ( ::CAvatarImage::* )( ::Color ) )( &::CAvatarImage::SetColor )
             , ( bp::arg("col") ) )    
+        .def( 
+            "SetDefaultImage"
+            , (void ( ::CAvatarImage::* )( ::vgui::IImage * ) )( &::CAvatarImage::SetDefaultImage )
+            , ( bp::arg("pImage") ) )    
+        .def( 
+            "SetDrawFriend"
+            , (void ( ::CAvatarImage::* )( bool ) )( &::CAvatarImage::SetDrawFriend )
+            , ( bp::arg("drawFriend") ) )    
         .def( 
             "SetFrame"
             , (void ( ::CAvatarImage::* )( int ) )( &::CAvatarImage::SetFrame )

@@ -1,4 +1,4 @@
-//====== Copyright 1996-2008, Valve Corporation, All rights reserved. =======
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -19,6 +19,14 @@
 #include "isteamapps.h"
 #include "isteamnetworking.h"
 #include "isteamremotestorage.h"
+#include "isteamscreenshots.h"
+#include "isteamhttp.h"
+#include "isteamunifiedmessages.h"
+#include "isteamcontroller.h"
+
+#if defined( _PS3 )
+#include "steamps3params.h"
+#endif
 
 // Steam API export macro
 #if defined( _WIN32 ) && !defined( _X360 )
@@ -73,15 +81,6 @@ S_API bool SteamAPI_RestartAppIfNecessary( uint32 unOwnAppID );
 S_API void SteamAPI_WriteMiniDump( uint32 uStructuredExceptionCode, void* pvExceptionInfo, uint32 uBuildID );
 S_API void SteamAPI_SetMiniDumpComment( const char *pchMsg );
 
-// this should be called before the game initialized the steam APIs
-// pchDate should be of the format "Mmm dd yyyy" (such as from the __DATE__ macro )
-// pchTime should be of the format "hh:mm:ss" (such as from the __TIME__ macro )
-// bFullMemoryDumps (Win32 only) -- writes out a uuid-full.dmp in the client/dumps folder
-// pvContext-- can be NULL, will be the void * context passed into m_pfnPreMinidumpCallback
-// PFNPreMinidumpCallback m_pfnPreMinidumpCallback   -- optional callback which occurs just before a .dmp file is written during a crash.  Applications can hook this to allow adding additional information into the .dmp comment stream.
-S_API void SteamAPI_UseBreakpadCrashHandler( char const *pchVersion, char const *pchDate, char const *pchTime, bool bFullMemoryDumps, void *pvContext, PFNPreMinidumpCallback m_pfnPreMinidumpCallback );
-S_API void SteamAPI_SetBreakpadAppID( uint32 unAppID );
-
 // interface pointers, configured by SteamAPI_Init()
 S_API ISteamClient *SteamClient();
 
@@ -99,7 +98,12 @@ S_API ISteamClient *SteamClient();
 #ifdef VERSION_SAFE_STEAM_API_INTERFACES
 S_API bool SteamAPI_InitSafe();
 #else
+
+#if defined(_PS3)
+S_API bool SteamAPI_Init( SteamPS3Params_t *pParams );
+#else
 S_API bool SteamAPI_Init();
+#endif
 
 S_API ISteamUser *SteamUser();
 S_API ISteamFriends *SteamFriends();
@@ -110,6 +114,12 @@ S_API ISteamApps *SteamApps();
 S_API ISteamNetworking *SteamNetworking();
 S_API ISteamMatchmakingServers *SteamMatchmakingServers();
 S_API ISteamRemoteStorage *SteamRemoteStorage();
+S_API ISteamScreenshots *SteamScreenshots();
+S_API ISteamHTTP *SteamHTTP();
+S_API ISteamUnifiedMessages *SteamUnifiedMessages();
+#ifdef _PS3
+S_API ISteamPS3OverlayRender * SteamPS3OverlayRender();
+#endif
 #endif // VERSION_SAFE_STEAM_API_INTERFACES
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------//
@@ -207,6 +217,7 @@ public:
 		Cancel();
 	}
 
+	void SetGameserverFlag() { m_nCallbackFlags |= k_ECallbackFlagsGameServer; }
 private:
 	virtual void Run( void *pvParam )
 	{
@@ -238,7 +249,7 @@ private:
 //			template params: T = local class, P = parameter struct
 //-----------------------------------------------------------------------------
 template< class T, class P, bool bGameServer >
-class CCallback : private CCallbackBase
+class CCallback : protected CCallbackBase
 {
 public:
 	typedef void (T::*func_t)( P* );
@@ -288,7 +299,7 @@ public:
 	}
 
 	void SetGameserverFlag() { m_nCallbackFlags |= k_ECallbackFlagsGameServer; }
-private:
+protected:
 	virtual void Run( void *pvParam )
 	{
 		(m_pObj->*m_Func)( (P *)pvParam );
@@ -383,6 +394,12 @@ public:
 	ISteamMatchmakingServers*	SteamMatchmakingServers()	{ return m_pSteamMatchmakingServers; }
 	ISteamNetworking*	SteamNetworking()					{ return m_pSteamNetworking; }
 	ISteamRemoteStorage* SteamRemoteStorage()				{ return m_pSteamRemoteStorage; }
+	ISteamScreenshots*	SteamScreenshots()					{ return m_pSteamScreenshots; }
+	ISteamHTTP*			SteamHTTP()							{ return m_pSteamHTTP; }
+	ISteamUnifiedMessages*	SteamUnifiedMessages()			{ return m_pSteamUnifiedMessages; }
+#ifdef _PS3
+	ISteamPS3OverlayRender* SteamPS3OverlayRender()		{ return m_pSteamPS3OverlayRender; }
+#endif
 
 private:
 	ISteamUser		*m_pSteamUser;
@@ -394,6 +411,13 @@ private:
 	ISteamMatchmakingServers	*m_pSteamMatchmakingServers;
 	ISteamNetworking	*m_pSteamNetworking;
 	ISteamRemoteStorage *m_pSteamRemoteStorage;
+	ISteamScreenshots	*m_pSteamScreenshots;
+	ISteamHTTP			*m_pSteamHTTP;
+	ISteamUnifiedMessages*m_pSteamUnifiedMessages;
+	ISteamController	*m_pController;
+#ifdef _PS3
+	ISteamPS3OverlayRender *m_pSteamPS3OverlayRender;
+#endif
 };
 
 inline CSteamAPIContext::CSteamAPIContext()
@@ -412,6 +436,12 @@ inline void CSteamAPIContext::Clear()
 	m_pSteamMatchmakingServers = NULL;
 	m_pSteamNetworking = NULL;
 	m_pSteamRemoteStorage = NULL;
+	m_pSteamHTTP = NULL;
+	m_pSteamScreenshots = NULL;
+	m_pSteamUnifiedMessages = NULL;
+#ifdef _PS3
+	m_pSteamPS3OverlayRender = NULL;
+#endif
 }
 
 // This function must be inlined so the module using steam_api.dll gets the version names they want.
@@ -459,9 +489,36 @@ inline bool CSteamAPIContext::Init()
 	if ( !m_pSteamRemoteStorage )
 		return false;
 
+	m_pSteamScreenshots = SteamClient()->GetISteamScreenshots( hSteamUser, hSteamPipe, STEAMSCREENSHOTS_INTERFACE_VERSION );
+	if ( !m_pSteamScreenshots )
+		return false;
+
+	m_pSteamHTTP = SteamClient()->GetISteamHTTP( hSteamUser, hSteamPipe, STEAMHTTP_INTERFACE_VERSION );
+	if ( !m_pSteamHTTP )
+		return false;
+
+	m_pSteamUnifiedMessages = SteamClient()->GetISteamUnifiedMessages( hSteamUser, hSteamPipe, STEAMUNIFIEDMESSAGES_INTERFACE_VERSION );
+	if ( !m_pSteamUnifiedMessages )
+		return false;
+
+#ifdef _PS3
+	m_pSteamPS3OverlayRender = SteamClient()->GetISteamPS3OverlayRender();
+#endif
+
 	return true;
 }
 
 #endif // VERSION_SAFE_STEAM_API_INTERFACES
+
+#if defined(USE_BREAKPAD_HANDLER) || defined(STEAM_API_EXPORTS)
+// this should be called before the game initialized the steam APIs
+// pchDate should be of the format "Mmm dd yyyy" (such as from the __DATE__ macro )
+// pchTime should be of the format "hh:mm:ss" (such as from the __TIME__ macro )
+// bFullMemoryDumps (Win32 only) -- writes out a uuid-full.dmp in the client/dumps folder
+// pvContext-- can be NULL, will be the void * context passed into m_pfnPreMinidumpCallback
+// PFNPreMinidumpCallback m_pfnPreMinidumpCallback   -- optional callback which occurs just before a .dmp file is written during a crash.  Applications can hook this to allow adding additional information into the .dmp comment stream.
+S_API void SteamAPI_UseBreakpadCrashHandler( char const *pchVersion, char const *pchDate, char const *pchTime, bool bFullMemoryDumps, void *pvContext, PFNPreMinidumpCallback m_pfnPreMinidumpCallback );
+S_API void SteamAPI_SetBreakpadAppID( uint32 unAppID );
+#endif
 
 #endif // STEAM_API_H

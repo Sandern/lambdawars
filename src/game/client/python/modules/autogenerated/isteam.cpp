@@ -18,6 +18,8 @@
 
 #include "steam/steamclientpublic.h"
 
+#include "vgui_avatarimage.h"
+
 #include "src_python.h"
 
 #include "tier0/memdbgon.h"
@@ -37,15 +39,9 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EAccountTypeContentServer", k_EAccountTypeContentServer)
         .value("k_EAccountTypeClan", k_EAccountTypeClan)
         .value("k_EAccountTypeChat", k_EAccountTypeChat)
+        .value("k_EAccountTypeConsoleUser", k_EAccountTypeConsoleUser)
         .value("k_EAccountTypeAnonUser", k_EAccountTypeAnonUser)
         .value("k_EAccountTypeMax", k_EAccountTypeMax)
-        .export_values()
-        ;
-
-    bp::enum_< EAvatarSize>("EAvatarSize")
-        .value("k_EAvatarSize32x32", k_EAvatarSize32x32)
-        .value("k_EAvatarSize64x64", k_EAvatarSize64x64)
-        .value("k_EAvatarSize184x184", k_EAvatarSize184x184)
         .export_values()
         ;
 
@@ -55,8 +51,12 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EChatEntryTypeTyping", k_EChatEntryTypeTyping)
         .value("k_EChatEntryTypeInviteGame", k_EChatEntryTypeInviteGame)
         .value("k_EChatEntryTypeEmote", k_EChatEntryTypeEmote)
-        .value("k_EChatEntryTypeLobbyGameStart", k_EChatEntryTypeLobbyGameStart)
         .value("k_EChatEntryTypeLeftConversation", k_EChatEntryTypeLeftConversation)
+        .value("k_EChatEntryTypeEntered", k_EChatEntryTypeEntered)
+        .value("k_EChatEntryTypeWasKicked", k_EChatEntryTypeWasKicked)
+        .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
+        .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
+        .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
         .export_values()
         ;
 
@@ -68,6 +68,10 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EChatRoomEnterResponseError", k_EChatRoomEnterResponseError)
         .value("k_EChatRoomEnterResponseBanned", k_EChatRoomEnterResponseBanned)
         .value("k_EChatRoomEnterResponseLimited", k_EChatRoomEnterResponseLimited)
+        .value("k_EChatRoomEnterResponseClanDisabled", k_EChatRoomEnterResponseClanDisabled)
+        .value("k_EChatRoomEnterResponseCommunityBan", k_EChatRoomEnterResponseCommunityBan)
+        .value("k_EChatRoomEnterResponseMemberBlockedYou", k_EChatRoomEnterResponseMemberBlockedYou)
+        .value("k_EChatRoomEnterResponseYouBlockedMember", k_EChatRoomEnterResponseYouBlockedMember)
         .export_values()
         ;
 
@@ -99,6 +103,8 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EFriendRelationshipRequestInitiator", k_EFriendRelationshipRequestInitiator)
         .value("k_EFriendRelationshipIgnored", k_EFriendRelationshipIgnored)
         .value("k_EFriendRelationshipIgnoredFriend", k_EFriendRelationshipIgnoredFriend)
+        .value("k_EFriendRelationshipSuggested", k_EFriendRelationshipSuggested)
+        .value("k_EFriendRelationshipMax", k_EFriendRelationshipMax)
         .export_values()
         ;
 
@@ -108,6 +114,8 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EPersonaStateBusy", k_EPersonaStateBusy)
         .value("k_EPersonaStateAway", k_EPersonaStateAway)
         .value("k_EPersonaStateSnooze", k_EPersonaStateSnooze)
+        .value("k_EPersonaStateLookingToTrade", k_EPersonaStateLookingToTrade)
+        .value("k_EPersonaStateLookingToPlay", k_EPersonaStateLookingToPlay)
         .value("k_EPersonaStateMax", k_EPersonaStateMax)
         .export_values()
         ;
@@ -167,6 +175,29 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EResultDataCorruption", k_EResultDataCorruption)
         .value("k_EResultDiskFull", k_EResultDiskFull)
         .value("k_EResultRemoteCallFailed", k_EResultRemoteCallFailed)
+        .value("k_EResultPasswordUnset", k_EResultPasswordUnset)
+        .value("k_EResultExternalAccountUnlinked", k_EResultExternalAccountUnlinked)
+        .value("k_EResultPSNTicketInvalid", k_EResultPSNTicketInvalid)
+        .value("k_EResultExternalAccountAlreadyLinked", k_EResultExternalAccountAlreadyLinked)
+        .value("k_EResultRemoteFileConflict", k_EResultRemoteFileConflict)
+        .value("k_EResultIllegalPassword", k_EResultIllegalPassword)
+        .value("k_EResultSameAsPreviousValue", k_EResultSameAsPreviousValue)
+        .value("k_EResultAccountLogonDenied", k_EResultAccountLogonDenied)
+        .value("k_EResultCannotUseOldPassword", k_EResultCannotUseOldPassword)
+        .value("k_EResultInvalidLoginAuthCode", k_EResultInvalidLoginAuthCode)
+        .value("k_EResultAccountLogonDeniedNoMail", k_EResultAccountLogonDeniedNoMail)
+        .value("k_EResultHardwareNotCapableOfIPT", k_EResultHardwareNotCapableOfIPT)
+        .value("k_EResultIPTInitError", k_EResultIPTInitError)
+        .value("k_EResultParentalControlRestricted", k_EResultParentalControlRestricted)
+        .value("k_EResultFacebookQueryError", k_EResultFacebookQueryError)
+        .value("k_EResultExpiredLoginAuthCode", k_EResultExpiredLoginAuthCode)
+        .value("k_EResultIPLoginRestrictionFailed", k_EResultIPLoginRestrictionFailed)
+        .value("k_EResultAccountLockedDown", k_EResultAccountLockedDown)
+        .value("k_EResultAccountLogonDeniedVerifiedEmailRequired", k_EResultAccountLogonDeniedVerifiedEmailRequired)
+        .value("k_EResultNoMatchingURL", k_EResultNoMatchingURL)
+        .value("k_EResultBadResponse", k_EResultBadResponse)
+        .value("k_EResultRequirePasswordReEntry", k_EResultRequirePasswordReEntry)
+        .value("k_EResultValueOutOfRange", k_EResultValueOutOfRange)
         .export_values()
         ;
 
@@ -177,6 +208,7 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_ESteamUserStatTypeAVGRATE", k_ESteamUserStatTypeAVGRATE)
         .value("k_ESteamUserStatTypeACHIEVEMENTS", k_ESteamUserStatTypeACHIEVEMENTS)
         .value("k_ESteamUserStatTypeGROUPACHIEVEMENTS", k_ESteamUserStatTypeGROUPACHIEVEMENTS)
+        .value("k_ESteamUserStatTypeMAX", k_ESteamUserStatTypeMAX)
         .export_values()
         ;
 
@@ -186,7 +218,6 @@ BOOST_PYTHON_MODULE(isteam){
         .value("k_EUniverseBeta", k_EUniverseBeta)
         .value("k_EUniverseInternal", k_EUniverseInternal)
         .value("k_EUniverseDev", k_EUniverseDev)
-        .value("k_EUniverseRC", k_EUniverseRC)
         .value("k_EUniverseMax", k_EUniverseMax)
         .export_values()
         ;
@@ -216,6 +247,15 @@ BOOST_PYTHON_MODULE(isteam){
             CSteamID_exposer.def( 
                 "BAnonAccount"
                 , BAnonAccount_function_type( &::CSteamID::BAnonAccount ) );
+        
+        }
+        { //::CSteamID::BAnonGameServerAccount
+        
+            typedef bool ( ::CSteamID::*BAnonGameServerAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BAnonGameServerAccount"
+                , BAnonGameServerAccount_function_type( &::CSteamID::BAnonGameServerAccount ) );
         
         }
         { //::CSteamID::BAnonUserAccount
@@ -254,6 +294,15 @@ BOOST_PYTHON_MODULE(isteam){
                 , BClanAccount_function_type( &::CSteamID::BClanAccount ) );
         
         }
+        { //::CSteamID::BConsoleUserAccount
+        
+            typedef bool ( ::CSteamID::*BConsoleUserAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BConsoleUserAccount"
+                , BConsoleUserAccount_function_type( &::CSteamID::BConsoleUserAccount ) );
+        
+        }
         { //::CSteamID::BContentServerAccount
         
             typedef bool ( ::CSteamID::*BContentServerAccount_function_type )(  ) const;
@@ -279,6 +328,33 @@ BOOST_PYTHON_MODULE(isteam){
             CSteamID_exposer.def( 
                 "BIndividualAccount"
                 , BIndividualAccount_function_type( &::CSteamID::BIndividualAccount ) );
+        
+        }
+        { //::CSteamID::BPersistentGameServerAccount
+        
+            typedef bool ( ::CSteamID::*BPersistentGameServerAccount_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "BPersistentGameServerAccount"
+                , BPersistentGameServerAccount_function_type( &::CSteamID::BPersistentGameServerAccount ) );
+        
+        }
+        { //::CSteamID::Clear
+        
+            typedef void ( ::CSteamID::*Clear_function_type )(  ) ;
+            
+            CSteamID_exposer.def( 
+                "Clear"
+                , Clear_function_type( &::CSteamID::Clear ) );
+        
+        }
+        { //::CSteamID::ClearIndividualInstance
+        
+            typedef void ( ::CSteamID::*ClearIndividualInstance_function_type )(  ) ;
+            
+            CSteamID_exposer.def( 
+                "ClearIndividualInstance"
+                , ClearIndividualInstance_function_type( &::CSteamID::ClearIndividualInstance ) );
         
         }
         { //::CSteamID::ConvertToUint64
@@ -322,7 +398,7 @@ BOOST_PYTHON_MODULE(isteam){
         }
         { //::CSteamID::GetAccountID
         
-            typedef ::uint32 ( ::CSteamID::*GetAccountID_function_type )(  ) const;
+            typedef ::AccountID_t ( ::CSteamID::*GetAccountID_function_type )(  ) const;
             
             CSteamID_exposer.def( 
                 "GetAccountID"
@@ -363,6 +439,15 @@ BOOST_PYTHON_MODULE(isteam){
             CSteamID_exposer.def( 
                 "GetUnAccountInstance"
                 , GetUnAccountInstance_function_type( &::CSteamID::GetUnAccountInstance ) );
+        
+        }
+        { //::CSteamID::HasNoIndividualInstance
+        
+            typedef bool ( ::CSteamID::*HasNoIndividualInstance_function_type )(  ) const;
+            
+            CSteamID_exposer.def( 
+                "HasNoIndividualInstance"
+                , HasNoIndividualInstance_function_type( &::CSteamID::HasNoIndividualInstance ) );
         
         }
         { //::CSteamID::InstancedSet
@@ -413,6 +498,16 @@ BOOST_PYTHON_MODULE(isteam){
                 , ( bp::arg("unAccountID") ) );
         
         }
+        { //::CSteamID::SetAccountInstance
+        
+            typedef void ( ::CSteamID::*SetAccountInstance_function_type )( ::uint32 ) ;
+            
+            CSteamID_exposer.def( 
+                "SetAccountInstance"
+                , SetAccountInstance_function_type( &::CSteamID::SetAccountInstance )
+                , ( bp::arg("unInstance") ) );
+        
+        }
         { //::CSteamID::SetEUniverse
         
             typedef void ( ::CSteamID::*SetEUniverse_function_type )( ::EUniverse ) ;
@@ -450,8 +545,8 @@ BOOST_PYTHON_MODULE(isteam){
             , ( bp::arg("steamIDLobby") ) )    
         .def( 
             "ActivateGameOverlayToStore"
-            , (void ( ::ISteamFriends::* )( ::AppId_t ) )( &::ISteamFriends::ActivateGameOverlayToStore )
-            , ( bp::arg("nAppID") ) )    
+            , (void ( ::ISteamFriends::* )( ::AppId_t,::EOverlayToStoreFlag ) )( &::ISteamFriends::ActivateGameOverlayToStore )
+            , ( bp::arg("nAppID"), bp::arg("eFlag") ) )    
         .def( 
             "ActivateGameOverlayToUser"
             , (void ( ::ISteamFriends::* )( char const *,::CSteamID ) )( &::ISteamFriends::ActivateGameOverlayToUser )
@@ -461,9 +556,40 @@ BOOST_PYTHON_MODULE(isteam){
             , (void ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::ActivateGameOverlayToWebPage )
             , ( bp::arg("pchURL") ) )    
         .def( 
+            "ClearRichPresence"
+            , (void ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::ClearRichPresence ) )    
+        .def( 
+            "CloseClanChatWindowInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::CloseClanChatWindowInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "DownloadClanActivityCounts"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID *,int ) )( &::ISteamFriends::DownloadClanActivityCounts )
+            , ( bp::arg("psteamIDClans"), bp::arg("cClansToRequest") ) )    
+        .def( 
+            "EnumerateFollowingList"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::uint32 ) )( &::ISteamFriends::EnumerateFollowingList )
+            , ( bp::arg("unStartIndex") ) )    
+        .def( 
+            "GetChatMemberByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetChatMemberByIndex )
+            , ( bp::arg("steamIDClan"), bp::arg("iUser") ) )    
+        .def( 
+            "GetClanActivityCounts"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,int *,int *,int * ) )( &::ISteamFriends::GetClanActivityCounts )
+            , ( bp::arg("steamIDClan"), bp::arg("pnOnline"), bp::arg("pnInGame"), bp::arg("pnChatting") ) )    
+        .def( 
             "GetClanByIndex"
             , (::CSteamID ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetClanByIndex )
             , ( bp::arg("iClan") ) )    
+        .def( 
+            "GetClanChatMemberCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanChatMemberCount )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanChatMessage"
+            , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType *,::CSteamID * ) )( &::ISteamFriends::GetClanChatMessage )
+            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("arg4"), bp::arg("arg5") ) )    
         .def( 
             "GetClanCount"
             , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetClanCount ) )    
@@ -472,17 +598,44 @@ BOOST_PYTHON_MODULE(isteam){
             , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanName )
             , ( bp::arg("steamIDClan") ) )    
         .def( 
+            "GetClanOfficerByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetClanOfficerByIndex )
+            , ( bp::arg("steamIDClan"), bp::arg("iOfficer") ) )    
+        .def( 
+            "GetClanOfficerCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanOfficerCount )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanOwner"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanOwner )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
             "GetClanTag"
             , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanTag )
             , ( bp::arg("steamIDClan") ) )    
         .def( 
-            "GetFriendAvatar"
-            , (int ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendAvatar )
-            , ( bp::arg("steamIDFriend"), bp::arg("eAvatarSize") ) )    
+            "GetCoplayFriend"
+            , (::CSteamID ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetCoplayFriend )
+            , ( bp::arg("iCoplayFriend") ) )    
+        .def( 
+            "GetCoplayFriendCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetCoplayFriendCount ) )    
+        .def( 
+            "GetFollowerCount"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFollowerCount )
+            , ( bp::arg("steamID") ) )    
         .def( 
             "GetFriendByIndex"
             , (::CSteamID ( ::ISteamFriends::* )( int,int ) )( &::ISteamFriends::GetFriendByIndex )
             , ( bp::arg("iFriend"), bp::arg("iFriendFlags") ) )    
+        .def( 
+            "GetFriendCoplayGame"
+            , (::AppId_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendCoplayGame )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendCoplayTime"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendCoplayTime )
+            , ( bp::arg("steamIDFriend") ) )    
         .def( 
             "GetFriendCount"
             , (int ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendCount )
@@ -495,6 +648,10 @@ BOOST_PYTHON_MODULE(isteam){
             "GetFriendFromSourceByIndex"
             , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendFromSourceByIndex )
             , ( bp::arg("steamIDSource"), bp::arg("iFriend") ) )    
+        .def( 
+            "GetFriendMessage"
+            , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType * ) )( &::ISteamFriends::GetFriendMessage )
+            , ( bp::arg("steamIDFriend"), bp::arg("iMessageID"), bp::arg("pvData"), bp::arg("cubData"), bp::arg("peChatEntryType") ) )    
         .def( 
             "GetFriendPersonaName"
             , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendPersonaName )
@@ -512,31 +669,114 @@ BOOST_PYTHON_MODULE(isteam){
             , (::EFriendRelationship ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRelationship )
             , ( bp::arg("steamIDFriend") ) )    
         .def( 
+            "GetFriendRichPresence"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::GetFriendRichPresence )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetFriendRichPresenceKeyByIndex"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendRichPresenceKeyByIndex )
+            , ( bp::arg("steamIDFriend"), bp::arg("iKey") ) )    
+        .def( 
+            "GetFriendRichPresenceKeyCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetLargeFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetMediumFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetMediumFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
             "GetPersonaName"
             , (char const * ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaName ) )    
         .def( 
             "GetPersonaState"
             , (::EPersonaState ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaState ) )    
         .def( 
+            "GetSmallFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetSmallFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetUserRestrictions"
+            , (::uint32 ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetUserRestrictions ) )    
+        .def( 
             "HasFriend"
             , (bool ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::HasFriend )
             , ( bp::arg("steamIDFriend"), bp::arg("iFriendFlags") ) )    
+        .def( 
+            "InviteUserToGame"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::InviteUserToGame )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchConnectString") ) )    
+        .def( 
+            "IsClanChatAdmin"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,::CSteamID ) )( &::ISteamFriends::IsClanChatAdmin )
+            , ( bp::arg("steamIDClanChat"), bp::arg("steamIDUser") ) )    
+        .def( 
+            "IsClanChatWindowOpenInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::IsClanChatWindowOpenInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "IsFollowing"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::IsFollowing )
+            , ( bp::arg("steamID") ) )    
         .def( 
             "IsUserInSource"
             , (bool ( ::ISteamFriends::* )( ::CSteamID,::CSteamID ) )( &::ISteamFriends::IsUserInSource )
             , ( bp::arg("steamIDUser"), bp::arg("steamIDSource") ) )    
         .def( 
+            "JoinClanChatRoom"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::JoinClanChatRoom )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "LeaveClanChatRoom"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::LeaveClanChatRoom )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "OpenClanChatWindowInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::OpenClanChatWindowInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "ReplyToFriendMessage"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::ReplyToFriendMessage )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchMsgToSend") ) )    
+        .def( 
+            "RequestClanOfficerList"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::RequestClanOfficerList )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "RequestFriendRichPresence"
+            , (void ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::RequestFriendRichPresence )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "RequestUserInformation"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,bool ) )( &::ISteamFriends::RequestUserInformation )
+            , ( bp::arg("steamIDUser"), bp::arg("bRequireNameOnly") ) )    
+        .def( 
+            "SendClanChatMessage"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::SendClanChatMessage )
+            , ( bp::arg("steamIDClanChat"), bp::arg("pchText") ) )    
+        .def( 
             "SetInGameVoiceSpeaking"
             , (void ( ::ISteamFriends::* )( ::CSteamID,bool ) )( &::ISteamFriends::SetInGameVoiceSpeaking )
             , ( bp::arg("steamIDUser"), bp::arg("bSpeaking") ) )    
         .def( 
+            "SetListenForFriendsMessages"
+            , (bool ( ::ISteamFriends::* )( bool ) )( &::ISteamFriends::SetListenForFriendsMessages )
+            , ( bp::arg("bInterceptEnabled") ) )    
+        .def( 
             "SetPersonaName"
-            , (void ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::SetPersonaName )
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::SetPersonaName )
             , ( bp::arg("pchPersonaName") ) )    
         .def( 
             "SetPlayedWith"
             , (void ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::SetPlayedWith )
-            , ( bp::arg("steamIDUserPlayedWith") ) );
+            , ( bp::arg("steamIDUserPlayedWith") ) )    
+        .def( 
+            "SetRichPresence"
+            , (bool ( ::ISteamFriends::* )( char const *,char const * ) )( &::ISteamFriends::SetRichPresence )
+            , ( bp::arg("pchKey"), bp::arg("pchValue") ) );
 
     bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
 
@@ -576,6 +816,13 @@ BOOST_PYTHON_MODULE(isteam){
             "GetCurrentBatteryPower"
             , (::uint8 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetCurrentBatteryPower ) )    
         .def( 
+            "GetEnteredGamepadTextInput"
+            , (bool ( ::ISteamUtils::* )( char *,::uint32 ) )( &::ISteamUtils::GetEnteredGamepadTextInput )
+            , ( bp::arg("pchText"), bp::arg("cchText") ) )    
+        .def( 
+            "GetEnteredGamepadTextLength"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetEnteredGamepadTextLength ) )    
+        .def( 
             "GetIPCCallCount"
             , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetIPCCallCount ) )    
         .def( 
@@ -591,6 +838,9 @@ BOOST_PYTHON_MODULE(isteam){
             "GetServerRealTime"
             , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetServerRealTime ) )    
         .def( 
+            "GetSteamUILanguage"
+            , (char const * ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetSteamUILanguage ) )    
+        .def( 
             "IsAPICallCompleted"
             , (bool ( ::ISteamUtils::* )( ::SteamAPICall_t,bool * ) )( &::ISteamUtils::IsAPICallCompleted )
             , ( bp::arg("hSteamAPICall"), bp::arg("pbFailed") ) )    
@@ -603,5 +853,9 @@ BOOST_PYTHON_MODULE(isteam){
         .def( 
             "SetOverlayNotificationPosition"
             , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
-            , ( bp::arg("eNotificationPosition") ) );
+            , ( bp::arg("eNotificationPosition") ) )    
+        .def( 
+            "ShowGamepadTextInput"
+            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
+            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 }
