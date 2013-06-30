@@ -504,6 +504,8 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 	return BaseClass::KeyValue( szKeyName, szValue );
 }
 
+// FIXME: Does not work properly
+#define USE_MINIMAL_SENDTABLE 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
@@ -515,7 +517,17 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 //-----------------------------------------------------------------------------
 int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
+#ifdef USE_MINIMAL_SENDTABLE
+	if( g_unit_force_minimal_sendtable.GetInt() > 1 )
+	{
+		m_bUseMinimalSendTable = false;
+		return FL_EDICT_ALWAYS;
+	}
+
 	m_bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool();
+#else
+	m_bUseMinimalSendTable = false;
+#endif // USE_MINIMAL_SENDTABLE
 
 	int fFlags = DispatchUpdateTransmitState();
 
@@ -540,6 +552,7 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		return FL_EDICT_DONTSEND;
 	}
 
+#if USE_MINIMAL_SENDTABLE
 	if( m_bUseMinimalSendTable )
 		return FL_EDICT_ALWAYS;
 	
@@ -547,8 +560,10 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
 	netProp->RecomputePVSInformation();
 	m_bUseMinimalSendTable = !netProp->IsInPVS( pInfo );
-	//return FL_EDICT_PVSCHECK;
 	return FL_EDICT_ALWAYS;
+#else
+	return FL_EDICT_ALWAYS;
+#endif // 0
 }
 
 
