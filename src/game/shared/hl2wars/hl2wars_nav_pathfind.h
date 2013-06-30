@@ -28,13 +28,13 @@ public:
 	{
 		if( (area->GetAttributes() & NAV_MESH_JUMP) )
 		{
-			//Msg("#%d jump not supported\n", m_pUnit->entindex());
+			//Msg("#%d jump not supported (area %d)\n", m_pUnit->entindex(), area->GetID());
 			return false;
 		}
 
 		if( (area->GetAttributes() & NAV_MESH_CROUCH) )
 		{
-			//Msg("#%d crouch not supported\n", m_pUnit->entindex());
+			//Msg("#%d crouch not supported (area %d)\n", m_pUnit->entindex(), area->GetID());
 			return false;
 		}
 

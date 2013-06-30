@@ -204,6 +204,7 @@ CNavArea::CNavArea( void )
 	m_avoidanceObstacleHeight = 0.0f;
 
 	m_totalCost = 0.0f;
+	m_costSoFar = 0.0f;
 
 	ResetNodes();
 
@@ -1203,11 +1204,11 @@ bool CNavArea::SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha
 
 		beta->m_seCorner = m_seCorner;
 
-		alpha->ConnectTo( beta, SOUTH );
-		beta->ConnectTo( alpha, NORTH );
-
 		FinishSplitEdit( alpha, SOUTH );
 		FinishSplitEdit( beta, NORTH );
+
+		alpha->ConnectTo( beta, SOUTH );
+		beta->ConnectTo( alpha, NORTH );
 	}
 	else
 	{
@@ -1240,11 +1241,11 @@ bool CNavArea::SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha
 
 		beta->m_seCorner = m_seCorner;
 
-		alpha->ConnectTo( beta, EAST );
-		beta->ConnectTo( alpha, WEST );
-
 		FinishSplitEdit( alpha, EAST );
 		FinishSplitEdit( beta, WEST );
+
+		alpha->ConnectTo( beta, EAST );
+		beta->ConnectTo( alpha, WEST );
 	}
 
 	if ( !TheNavMesh->IsGenerating() && nav_split_place_on_ground.GetBool() )
@@ -4838,6 +4839,11 @@ void CNavArea::MarkAsBlocked( int teamID, CBaseEntity *blocker, bool bGenerateEv
 {
 	m_attributeFlags |= NAV_MESH_NAV_BLOCKER;
 
+		for ( int i=0; i<MAX_NAV_TEAMS; ++i )
+		{
+			m_isBlocked[ i ] = true;
+		}
+
 #if 0
 	if ( blocker && blocker->ClassMatches( "func_nav_blocker" ) )
 	{
@@ -4967,7 +4973,13 @@ void CNavArea::UpdateBlockedFromNavBlockers( void )
 //--------------------------------------------------------------------------------------------------------------
 void CNavArea::UnblockArea( void )
 {
-	m_attributeFlags &= ~m_attributeFlags;
+	m_attributeFlags &= ~NAV_MESH_NAV_BLOCKER;
+
+	for ( int i=0; i<MAX_NAV_TEAMS; ++i )
+	{
+		m_isBlocked[ i ] = false;
+	}
+
 #if 0
 	bool wasBlocked = IsBlocked( teamID );
 
@@ -6068,11 +6080,37 @@ Vector CNavArea::GetRandomPoint( void ) const
 
 
 
+#ifndef CLIENT_DLL
+CON_COMMAND_F( nav_area_debug_info, "", FCVAR_GAMEDLL | FCVAR_CHEAT )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
 
+	int id = atoi(args[1]);
+	CNavArea *pArea = TheNavMesh->GetNavAreaByID( id );
+	if( !pArea )
+	{
+		Warning("Could not find area with id %d\n", id );
+		return;
+	}
 
+	Msg("Area Info:\n");
+	Msg("\tCenter: %f %f %f\n", pArea->GetCenter().x, pArea->GetCenter().y, pArea->GetCenter().z );
+	Msg("\tAttributes: %d\n", pArea->GetAttributes() );
 
-
-
+	int dir = NORTH;
+	for( dir; dir < NUM_DIRECTIONS; dir++ )
+	{
+		const NavConnectVector *floorList = pArea->GetAdjacentAreas( (NavDirType)dir );
+		Msg("\tAdj Areas Count: %d\n", floorList->Count() );
+		for( int i = 0; i < floorList->Count(); i++ )
+		{
+			const NavConnect &floorConnect = floorList->Element( i );
+			Msg("\t\tAdjArea %d\n", floorConnect.area->GetID() );
+		}
+	}
+}
+#endif // CLIENT_DLL
 
 
 

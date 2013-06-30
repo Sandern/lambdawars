@@ -165,7 +165,9 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 
 		// don't consider blocked areas
 		if ( area->IsBlocked( teamID, ignoreNavBlockers ) )
+		{
 			continue;
+		}
 
 		// check if we have found the goal area or position
 		if (area == goalArea || (goalArea == NULL && goalPos && area->Contains( *goalPos )))
@@ -330,7 +332,6 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 				length = -1.0f;
 			}
 
-
 			// don't backtrack
 			Assert( newArea );
 			if ( newArea == area->GetParent() )
@@ -340,13 +341,17 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 
 			// don't consider blocked areas
 			if ( newArea->IsBlocked( teamID, ignoreNavBlockers ) )
+			{
 				continue;
+			}
 
 			float newCostSoFar = costFunc( newArea, area, ladder, elevator, length );
 			
 			// check if cost functor says this area is a dead-end
 			if ( newCostSoFar < 0.0f )
+			{
 				continue;
+			}
 
 			// Safety check against a bogus functor.  The cost of the path
 			// A...B, C should always be at least as big as the path A...B.
@@ -366,7 +371,9 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 				float deltaLength = ( newArea->GetCenter() - area->GetCenter() ).Length();
 				float newLengthSoFar = area->GetPathLengthSoFar() + deltaLength;
 				if ( newLengthSoFar > maxPathLength )
+				{
 					continue;
+				}
 				
 				newArea->SetPathLengthSoFar( newLengthSoFar );
 			}
