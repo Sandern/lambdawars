@@ -672,6 +672,12 @@ static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotRe
 	return 0;
 }
 
+#ifdef CLIENT_DLL
+	ConVar disable_hidingspots( "cl_disable_hidingspots", "0", FCVAR_CHEAT );
+#else
+	ConVar disable_hidingspots( "sv_disable_hidingspots", "0", FCVAR_CHEAT );
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -679,7 +685,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 {
 	bp::list l;
 
-	if( !TheNavMesh->IsLoaded() )
+	if( !TheNavMesh->IsLoaded() || disable_hidingspots.GetBool() )
 		return l;
 
 	// Get hiding spots in radius
