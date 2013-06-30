@@ -1517,9 +1517,10 @@ void CFogOfWarMgr::ClearNewPositions( FOWListInfo *pFOWList, int iOwner, bool bC
 
 		radius = view_distance / m_nTileSize;
 
-		//if( pEnt->m_iFOWPosX-radius < 0 || pEnt->m_iFOWPosX+radius >= m_iSizeFow || 
-		//		pEnt->m_iFOWPosY-radius < 0 || pEnt->m_iFOWPosY+radius >= m_iSizeFow )
-		//	continue;
+		// TODO: Bug out if outside the field, maybe reconsider to make the code clamp instead?
+		if( pEnt->m_iFOWPosX-radius < 0 || pEnt->m_iFOWPosX+radius >= m_nGridSize || 
+				pEnt->m_iFOWPosY-radius < 0 || pEnt->m_iFOWPosY+radius >= m_nGridSize )
+			continue;
 
 		if( sv_fogofwar_shadowcast.GetBool() )
 			DoShadowCasting( pEnt, radius, visMask );
