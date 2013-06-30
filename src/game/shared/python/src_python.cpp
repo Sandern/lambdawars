@@ -8,6 +8,7 @@
 #include "cbase.h"
 #include "src_python.h"
 #include "filesystem.h"
+#include "icommandline.h"
 #include "src_python_usermessage.h"
 #include "src_python_gamerules.h"
 #include "src_python_entities.h"
@@ -23,6 +24,9 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+// Shorter alias
+namespace bp = boost::python;
 
 #ifdef CLIENT_DLL
 	extern void DestroyPyPanels();
@@ -107,8 +111,6 @@ namespace boost
 		filesystem->Close(fh);
 	}
 }
-
-using namespace boost::python;
 
 // Append functions
 #ifdef CLIENT_DLL
@@ -206,10 +208,13 @@ bool CSrcPython::Init( )
 #endif // _WIN32
 
 	// get our main space
-	try {
-		mainmodule = import("__main__");
+	try 
+	{
+		mainmodule = bp::import("__main__");
 		mainnamespace = mainmodule.attr("__dict__");
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to import main namespace!\n");
 		PyErr_Print();
 		return false;
@@ -228,14 +233,17 @@ bool CSrcPython::Init( )
 	__builtin__ = Import("__builtin__");
 
 	// Set isclient and isserver globals to the right values
-	try {
+	try 
+	{
 #ifdef CLIENT_DLL
 		__builtin__.attr("isclient") = true;
 #else
 		__builtin__.attr("isserver") = true;
 #endif // CLIENT_DLL
 		__builtin__.attr("gpGlobals") = srcbase.attr("gpGlobals");
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		PyErr_Print();
 	}
 
@@ -423,10 +431,13 @@ void CSrcPython::LevelInitPreEntity()
 	Run<const char *>( Get("_LevelInitPreEntity", "srcmgr", true), pLevelName );
 	
 	// Send prelevelinit signal
-	try {
+	try 
+	{
 		CallSignalNoArgs( Get("prelevelinit", "core.signals", true) );
 		CallSignalNoArgs( Get("map_prelevelinit", "core.signals", true)[STRING(m_LevelName)] );
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to retrieve level signal:\n");
 		PyErr_Print();
 	}
@@ -444,10 +455,13 @@ void CSrcPython::LevelInitPostEntity()
 	Run( Get("_LevelInitPostEntity", "srcmgr", true) );
 
 	// Send postlevelinit signal
-	try {
+	try 
+	{
 		CallSignalNoArgs( Get("postlevelinit", "core.signals", true) );
 		CallSignalNoArgs( Get("map_postlevelinit", "core.signals", true)[STRING(m_LevelName)] );
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to retrieve level signal:\n");
 		PyErr_Print();
 	}
@@ -465,10 +479,13 @@ void CSrcPython::LevelShutdownPreEntity()
 	Run( Get("_LevelShutdownPreEntity", "srcmgr", true) );
 
 	// Send prelevelshutdown signal
-	try {
+	try 
+	{
 		CallSignalNoArgs( Get("prelevelshutdown", "core.signals", true) );
 		CallSignalNoArgs( Get("map_prelevelshutdown", "core.signals", true)[STRING(m_LevelName)] );
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to retrieve level signal:\n");
 		PyErr_Print();
 	}
@@ -486,10 +503,13 @@ void CSrcPython::LevelShutdownPostEntity()
 	Run( Get("_LevelShutdownPostEntity", "srcmgr", true) );
 
 	// Send postlevelshutdown signal
-	try {
+	try 
+	{
 		CallSignalNoArgs( Get("postlevelshutdown", "core.signals", true) );
 		CallSignalNoArgs( Get("map_postlevelshutdown", "core.signals", true)[STRING(m_LevelName)] );
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to retrieve level signal:\n");
 		PyErr_Print();
 	}
@@ -525,7 +545,8 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 	{
 		if( m_methodTickList[i].m_fNextTickTime < gpGlobals->curtime )
 		{
-			try {
+			try 
+			{
 				m_methodTickList[i].method();
 
 				// Method might have removed the method already
@@ -538,7 +559,8 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 					m_methodTickList.Remove(i);
 					continue;
 				}
-			} catch( error_already_set & ) {
+			} 
+			catch( bp::error_already_set & ) {
 				Warning("Unregistering tick method due the following exception (catch exception if you don't want this): \n");
 				PyErr_Print();
 				m_methodTickList.Remove(i);
@@ -551,9 +573,11 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 	// Update frame methods
 	for(i=m_methodPerFrameList.Count()-1; i>=0; i--)
 	{
-		try {
+		try 
+		{
 			m_methodPerFrameList[i]();
-		}catch( error_already_set & ) {
+		}
+		catch( bp::error_already_set & ) {
 			Warning("Unregistering per frame method due the following exception (catch exception if you don't want this): \n");
 			PyErr_Print();
 			m_methodPerFrameList.Remove(i);
@@ -571,14 +595,14 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-object CSrcPython::Import( const char *pModule )
+bp::object CSrcPython::Import( const char *pModule )
 {
 	// Import into the main space
 	try
 	{
-		return import(pModule);
+		return bp::import(pModule);
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 #ifdef CLIENT_DLL
 		DevMsg("CLIENT: ImportPyModuleIntern failed -> mod: %s\n", pModule );
@@ -589,35 +613,38 @@ object CSrcPython::Import( const char *pModule )
 		PyErr_Print();
 	}
 
-	return object();
+	return bp::object();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-object CSrcPython::ImportSilent( const char *pModule )
+bp::object CSrcPython::ImportSilent( const char *pModule )
 {
 	// Import into the main space
 	try
 	{
-		return import(pModule);
+		return bp::import(pModule);
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Clear();
 	}
 
-	return object();
+	return bp::object();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-object CSrcPython::Get( const char *pAttrName, object obj, bool bReport )
+bp::object CSrcPython::Get( const char *pAttrName, bp::object obj, bool bReport )
 {
-	try {
+	try 
+	{
 		return obj.attr(pAttrName);
-	} catch(error_already_set &) {
+	}
+	catch(bp::error_already_set &) 
+	{
 		if( bReport )
 			PyErr_Print();	
 		else
@@ -629,7 +656,7 @@ object CSrcPython::Get( const char *pAttrName, object obj, bool bReport )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-object CSrcPython::Get( const char *pAttrName, const char *pModule, bool bReport )
+bp::object CSrcPython::Get( const char *pAttrName, const char *pModule, bool bReport )
 {
 	return Get( pAttrName, Import(pModule), bReport );
 }
@@ -650,10 +677,10 @@ void CSrcPython::Run( const char *pString, const char *pModule )
 	// execute statement
 	try
 	{
-		object dict = (pModule ? Import(pModule).attr("__dict__") : mainnamespace);
-		exec( pString, dict, dict );
+		bp::object dict = pModule ? Import(pModule).attr("__dict__") : mainnamespace;
+		bp::exec( pString, dict, dict );
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -682,7 +709,7 @@ bool CSrcPython::ExecuteFile( const char* pScript )
 	{
 		exec_file(constcharpointer, mainnamespace, mainnamespace );
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 #ifdef CLIENT_DLL
 		DevMsg("CLIENT: ");
@@ -715,7 +742,7 @@ void CSrcPython::Reload( const char *pModule )
 		Q_snprintf( command, sizeof( command ), "reload(%s)", pModule );
 		exec(command, mainnamespace, mainnamespace );
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -735,7 +762,7 @@ void CSrcPython::GarbageCollect( void )
 void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 {
 	// First retrieve the append method
-	object append = Get("append", Get("path", "sys", true), true);
+	bp::object append = Get("append", Get("path", "sys", true), true);
 
 	// Fixup path
 	char char_output_full_filename[ _MAX_PATH ];
@@ -745,7 +772,7 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 	V_StrSubst(char_output_full_filename, "\\", "//", p_out, _MAX_PATH ); 
 
 	// Append
-	Run<const char *>(append, p_out, true);
+	Run<const char *>( append, p_out, true );
 
 	// Check for sub dirs
 	if( inclsubdirs )
@@ -775,17 +802,17 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 //-----------------------------------------------------------------------------
 // Purpose: Create a weakref using the weakref module
 //-----------------------------------------------------------------------------
-object CSrcPython::CreateWeakRef( object obj_ref )
+bp::object CSrcPython::CreateWeakRef( bp::object obj_ref )
 {
 	try
 	{
 		 return weakref.attr("ref")(obj_ref);
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Print();
 	}
-	return object();
+	return bp::object();
 }
 
 //-----------------------------------------------------------------------------
@@ -843,11 +870,14 @@ const char * CSrcPython::GetModuleNameFromIndex( int nModuleIndex )
 //-----------------------------------------------------------------------------
 void CSrcPython::CallSignalNoArgs( bp::object signal )
 {
-	try {
+	try 
+	{
 		srcmgr.attr("_CheckReponses")( 
 			signal.attr("send_robust")( bp::object() )
 		);
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to call signal:\n");
 		PyErr_Print();
 	}
@@ -858,9 +888,12 @@ void CSrcPython::CallSignalNoArgs( bp::object signal )
 //-----------------------------------------------------------------------------
 void CSrcPython::CallSignal( bp::object signal, bp::dict kwargs )
 {
-	try {
+	try 
+	{
 		srcmgr.attr("_CallSignal")( bp::object(signal.attr("send_robust")), kwargs );
-	} catch( error_already_set & ) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		Warning("Failed to call signal:\n");
 		PyErr_Print();
 	}
@@ -869,22 +902,22 @@ void CSrcPython::CallSignal( bp::object signal, bp::dict kwargs )
 //-----------------------------------------------------------------------------
 // Purpose: Retrieving basic type values
 //-----------------------------------------------------------------------------
-int	CSrcPython::GetInt(const char *name, object obj, int default_value, bool report_error )
+int	CSrcPython::GetInt(const char *name, bp::object obj, int default_value, bool report_error )
 {
 	return Get<int>(name, obj, default_value, report_error);
 }
 
-float CSrcPython::GetFloat(const char *name, object obj, float default_value, bool report_error )
+float CSrcPython::GetFloat(const char *name, bp::object obj, float default_value, bool report_error )
 {
 	return Get<float>(name, obj, default_value, report_error);
 }
 
-const char *CSrcPython::GetString( const char *name, object obj, const char *default_value, bool report_error )
+const char *CSrcPython::GetString( const char *name, bp::object obj, const char *default_value, bool report_error )
 {
 	return Get<const char *>(name, obj, default_value, report_error);
 }
 
-Vector CSrcPython::GetVector( const char *name, object obj, Vector default_value, bool report_error )
+Vector CSrcPython::GetVector( const char *name, bp::object obj, Vector default_value, bool report_error )
 {
 	return Get<Vector>(name, obj, default_value, report_error);
 }
@@ -1155,7 +1188,7 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 	}
 
 	char finalpath[MAX_PATH];
-	Q_FixupPathName( finalpath, MAX_PATH, path );
+	V_FixupPathName( finalpath, MAX_PATH, path );
 	
 	// Create whildcar
 	char wildcard[MAX_PATH];
