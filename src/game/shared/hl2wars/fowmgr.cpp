@@ -302,7 +302,7 @@ void CFogOfWarMgr::CalculateHeightMap()
 			Vector mins, maxs;
 			pEnt->GetMapBoundary( mins, maxs );
 
-			z = MAX(z, maxs.z);
+			z = Max(z, maxs.z);
 		}
 
 		float tilez;
@@ -711,7 +711,7 @@ void CFogOfWarMgr::DeallocateFogOfWar()
 
 int CFogOfWarMgr::CalculateRenderTargetSize( void )
 {
-	int iMinScreenSize = MIN( ScreenHeight(), ScreenWidth() );
+	int iMinScreenSize = Min( ScreenHeight(), ScreenWidth() );
 
 	if( iMinScreenSize > FOW_RT_SIZE_HIGH )
 		return FOW_RT_SIZE_HIGH;
@@ -846,8 +846,8 @@ void CFogOfWarMgr::UpdateTexture( bool bConverge, float fTime )
 	if( bConverge )
 	{
 		// Update target fow values on the client (to make it look visually good)
-		char deltaIn = MIN(255,MAX(1, cl_fogofwar_convergespeed_in.GetFloat() * fTime)); 
-		char deltaOut = MIN(255,MAX(1, cl_fogofwar_convergespeed_out.GetFloat() * fTime)); 
+		char deltaIn = Min( 255, Max( 1, cl_fogofwar_convergespeed_in.GetFloat() * fTime ) ); 
+		char deltaOut = Min( 255, Max( 1, cl_fogofwar_convergespeed_out.GetFloat() * fTime ) ); 
 
 		int x, y, idx;
 		int iMinX = m_nGridSize + 1;
@@ -865,19 +865,19 @@ void CFogOfWarMgr::UpdateTexture( bool bConverge, float fTime )
 				idx = FOWINDEX(x, y);
 				if( fowData[idx] > imageData[idx] )
 				{
-					imageData[idx] = MIN( FOWCLEAR_MASK, imageData[idx] + deltaOut );
-					iMinX = MIN( iMinX, x );
-					iMaxX = MAX( iMaxX, x );
-					iMinY = MIN( iMinY, y );
-					iMaxY = MAX( iMaxY, y );
+					imageData[idx] = Min( FOWCLEAR_MASK, imageData[idx] + deltaOut );
+					iMinX = Min( iMinX, x );
+					iMaxX = Max( iMaxX, x );
+					iMinY = Min( iMinY, y );
+					iMaxY = Max( iMaxY, y );
 				}
 				else if( fowData[idx] < imageData[idx] )
 				{
-					imageData[idx] = MAX( FOWHIDDEN_MASK, imageData[idx] - deltaIn );
-					iMinX = MIN( iMinX, x );
-					iMaxX = MAX( iMaxX, x );
-					iMinY = MIN( iMinY, y );
-					iMaxY = MAX( iMaxY, y );
+					imageData[idx] = Max( FOWHIDDEN_MASK, imageData[idx] - deltaIn );
+					iMinX = Min( iMinX, x );
+					iMaxX = Max( iMaxX, x );
+					iMinY = Min( iMinY, y );
+					iMaxY = Max( iMaxY, y );
 				}
 			}
 		}
@@ -1181,7 +1181,7 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 					vPos.z = s_FOWDebugHeight;
 					Vector vPos2 = ComputeWorldPosition(lastx, lasty);
 					vPos2.z = s_FOWDebugHeight;
-					NDebugOverlay::Line( vPos, vPos2, MIN(k*3, 255), MAX(255-(k*3), 0), 0, true, 0.2f );
+					NDebugOverlay::Line( vPos, vPos2, Min( k*3, 255 ), Max( 255-(k*3), 0 ), 0, true, 0.2f );
 				}
 
 				int i2 = i+1;
@@ -1190,7 +1190,7 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 				vPos.z = s_FOWDebugHeight;
 				Vector vPos2 = ComputeWorldPosition(DrawList[i2].x, DrawList[i2].y);
 				vPos2.z = s_FOWDebugHeight;
-				NDebugOverlay::Line( vPos, vPos2, MIN(k*3, 255), MAX(255-(k*3), 0), 0, true, 0.2f );
+				NDebugOverlay::Line( vPos, vPos2, Min( k*3, 255 ), Max( 255-(k*3), 0 ), 0, true, 0.2f );
 
 				if( nDebug > 1 )
 				{

@@ -17,6 +17,49 @@
 #ifndef ALIGN8_POST
 #define ALIGN8_POST
 #endif
+#ifdef DEBUG  // stop crashing edit-and-continue
+FORCEINLINE float clamp( float val, float minVal, float maxVal )
+{
+	if( val < minVal )
+		return minVal;
+	else if( val > maxVal )
+		return maxVal;
+	else
+		return val;
+}
+#else // DEBUG
+FORCEINLINE float clamp( float val, float minVal, float maxVal )
+{
+#if defined(__i386__) || defined(_M_IX86)
+	_mm_store_ss( &val,
+		_mm_min_ss(
+			_mm_max_ss(
+				_mm_load_ss(&val),
+				_mm_load_ss(&minVal) ),
+			_mm_load_ss(&maxVal) ) );
+#else
+	val = fpmin(maxVal, val);
+	val = fpmax(minVal, val);
+#endif
+	return val;
+}
+#endif // DEBUG
+
+//
+// Returns a clamped value in the range [min, max].
+//
+template< class T >
+inline T clamp( T const &val, T const &minVal, T const &maxVal )
+{
+	if( val < minVal )
+		return minVal;
+	else if( val > maxVal )
+		return maxVal;
+	else
+		return val;
+}
+
+
 // plane_t structure
 // !!! if this is changed, it must be changed in asm code too !!!
 // FIXME: does the asm code even exist anymore?
@@ -518,7 +561,7 @@ inline float RemapValClamped( float val, float A, float B, float C, float D)
 	if ( A == B )
 		return fsel( val - B , D , C );
 	float cVal = (val - A) / (B - A);
-	cVal = clamp<float>( cVal, 0.0f, 1.0f );
+	cVal = Clamp<float>( cVal, 0.0f, 1.0f );
 
 	return C + (D - C) * cVal;
 }
@@ -629,15 +672,10 @@ template <class T> FORCEINLINE T AVG(T a, T b)
 // XYZ macro, for printf type functions - ex printf("%f %f %f",XYZ(myvector));
 #define XYZ(v) (v).x,(v).y,(v).z
 
-//
-// Returns a clamped value in the range [min, max].
-//
-#define clamp(val, min, max) (((val) > (max)) ? (max) : (((val) < (min)) ? (min) : (val)))
 
 inline float Sign( float x )
 {
-	return fsel( x, 1.0f, -1.0f ); // x >= 0 ? 1.0f : -1.0f
-	//return (x <0.0f) ? -1.0f : 1.0f;
+	return (x <0.0f) ? -1.0f : 1.0f;
 }
 
 //
@@ -1094,7 +1132,7 @@ inline float SimpleSplineRemapValClamped( float val, float A, float B, float C, 
 	if ( A == B )
 		return val >= B ? D : C;
 	float cVal = (val - A) / (B - A);
-	cVal = clamp( cVal, 0.0f, 1.0f );
+	cVal = Clamp( cVal, 0.0f, 1.0f );
 	return C + (D - C) * SimpleSpline( cVal );
 }
 
@@ -2113,54 +2151,6 @@ FORCEINLINE unsigned int * PackNormal_UBYTE4( const float *pNormal, unsigned int
 	return PackNormal_UBYTE4( pNormal[0], pNormal[1], pNormal[2], pPackedNormal, bIsTangent, binormalSign );
 }
 
-FORCEINLINE void RGB2YUV( int &nR, int &nG, int &nB, float &fY, float &fU, float &fV, bool bApplySaturationCurve )
-{
-	// YUV conversion:
-	//  |Y|   |  0.299f     0.587f     0.114f   |   |R|
-	//  |U| = | -0.14713f  -0.28886f   0.436f   | x |G|
-	//  |V|   |  0.615f    -0.51499f  -0.10001f |   |B|
-	//
-	// The coefficients in the first row sum to one, whereas the 2nd and 3rd rows each sum to zero (UV (0,0) means greyscale).
-	// Ranges are Y [0,1], U [-0.436,+0.436] and V [-0.615,+0.615].
-	// We scale and offset to [0,1] and allow the caller to round as they please.
-
-	fY = (  0.29900f*nR +  0.58700f*nG +  0.11400f*nB ) / 255;
-	fU = ( -0.14713f*nR + -0.28886f*nG +  0.43600f*nB )*( 0.5f / 0.436f ) / 255 + 0.5f;
-	fV = (  0.61500f*nR + -0.51499f*nG + -0.10001f*nB )*( 0.5f / 0.615f ) / 255 + 0.5f;
-
-	if ( bApplySaturationCurve )
-	{
-		// Apply a curve to saturation, and snap-to-grey for low saturations
-		const float SNAP_TO_GREY = 0;//0.0125f; Disabled, saturation curve seems sufficient
-		float dX, dY, sat, scale;
-		dX    = 2*( fU - 0.5f );
-		dY    = 2*( fV - 0.5f );
-		sat   = sqrtf( dX*dX + dY*dY );
-		sat   = clamp( ( sat*( 1 + SNAP_TO_GREY ) - SNAP_TO_GREY ), 0, 1 );
-		scale = ( sat == 0 ) ? 0 : MIN( ( sqrtf( sat ) / sat ), 4.0f );
-		fU    = 0.5f + scale*( fU - 0.5f );
-		fV    = 0.5f + scale*( fV - 0.5f );
-	}
-}
-
-#ifdef _X360
-// Used for direct CPU access to VB data on 360 (used by shaderapi, studiorender and engine)
-struct VBCPU_AccessInfo_t
-{
-	// Points to the GPU data pointer in the CVertexBuffer struct (VB data can be relocated during level transitions)
-	const byte **ppBaseAddress;
-	// pBaseAddress should be computed from ppBaseAddress immediately before use
-	const byte  *pBaseAddress;
-	int          nStride;
-	int          nPositionOffset;
-	int          nTexCoord0_Offset;
-	int          nNormalOffset;
-	int          nBoneIndexOffset;
-	int          nBoneWeightOffset;
-	int          nCompressionType;
-	// TODO: if needed, add colour and tangents
-};
-#endif
 
 //-----------------------------------------------------------------------------
 // Convert RGB to HSV

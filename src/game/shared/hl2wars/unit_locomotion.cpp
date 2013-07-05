@@ -167,7 +167,7 @@ void UnitBaseLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 #endif // CLIENT_DLL
 
 	// Clamp maxspeed
-	mv.maxspeed = MIN(mv.maxspeed, 5000.0f);
+	mv.maxspeed = Min(mv.maxspeed, 5000.0f);
 
 	SetupMovementBounds( mv );
 }
@@ -701,7 +701,7 @@ void UnitBaseLocomotion::GroundMove()
 
 	// Calculate the max stepsize for this interval
 	// Assume we can move up/down stepsize per 48.0
-	fIntervalStepSize = MAX(stepsize, (stepsize*(mv->interval*mv->maxspeed/48.0)));
+	fIntervalStepSize = Max<float>( stepsize, (stepsize * ( mv->interval*mv->maxspeed/48.0 ) ) );
 
 	// Raise ourself stepsize
 	// Combine with testing the start position.
@@ -820,7 +820,7 @@ bool UnitBaseLocomotion::GroundMove( const Vector &vecActualStart, const Vector 
 	// TODO: Cleanup/debug this code.
 	for (;;)
 	{
-		float flStepSize = MIN( LOCAL_STEP_SIZE, mv->totaldistance - distClear );
+		float flStepSize = Min( LOCAL_STEP_SIZE, mv->totaldistance - distClear );
 		if ( flStepSize < 0.001 )
 			break;
 
@@ -1912,7 +1912,7 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	// bloat by traveling the max velocity in all directions, plus the stepsize up/down
 	Vector bloat;
 	bloat.Init(radius, radius, radius);
-	bloat.z += MAX(stepsize, (stepsize*(mv.interval*mv.maxspeed/48.0)));
+	bloat.z += Max<float>( stepsize, ( stepsize * ( mv.interval*mv.maxspeed/48.0 ) ) );
 	AddPointToBounds( start + boxMaxs + bloat, moveMins, moveMaxs );
 	AddPointToBounds( start + boxMins - bloat, moveMins, moveMaxs );
 	// now build an optimized trace within these bounds

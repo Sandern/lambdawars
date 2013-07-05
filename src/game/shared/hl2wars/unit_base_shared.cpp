@@ -363,9 +363,9 @@ void CUnitBase::SetDefaultEyeOffset( Vector *pCustomOfset )
 		m_vDefaultEyeOffset = vec3_origin;
 
 	// Clamp to values in dt
-	m_vDefaultEyeOffset.x = MAX(MIN(m_vDefaultEyeOffset.x, 256.0f), -256.0);
-	m_vDefaultEyeOffset.y = MAX(MIN(m_vDefaultEyeOffset.y, 256.0f), -256.0);
-	m_vDefaultEyeOffset.z = MAX(MIN(m_vDefaultEyeOffset.z, 1024.0f), -1.0f);
+	m_vDefaultEyeOffset.x = Max<float>( Min<float>( m_vDefaultEyeOffset.x, 256.0f ), -256.0 );
+	m_vDefaultEyeOffset.y = Max<float>( Min<float>( m_vDefaultEyeOffset.y, 256.0f ), -256.0 );
+	m_vDefaultEyeOffset.z = Max<float>( Min<float>( m_vDefaultEyeOffset.z, 1024.0f ), -1.0f );
 
 #ifndef CLIENT_DLL
 	SetViewOffset( m_vDefaultEyeOffset );

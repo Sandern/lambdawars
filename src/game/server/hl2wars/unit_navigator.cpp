@@ -323,12 +323,12 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	// Update discomfort weight
 	if( m_fLastBestDensity > unit_cost_discomfortweight_growthreshold.GetFloat() )
 	{
-		m_fDiscomfortWeight = MIN( m_fDiscomfortWeight+MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
+		m_fDiscomfortWeight = Min( m_fDiscomfortWeight+MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
 								   unit_cost_discomfortweight_max.GetFloat() );
 	}
 	else
 	{
-		m_fDiscomfortWeight = MAX( m_fDiscomfortWeight-MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
+		m_fDiscomfortWeight = Max( m_fDiscomfortWeight-MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
 								   unit_cost_discomfortweight_start.GetFloat() );
 	}
 
@@ -1463,11 +1463,11 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		// Otherwise use waypoint tolerance (so we get as close as possible)
 		float tolerance;
 		if( GetBlockedStatus() > BS_NONE && MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsUnit() && MoveCommand.m_hBlocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
-			tolerance = MAX( GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance );
+			tolerance = Max( GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance );
 		else
 			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
 
-		if( waypointDist <= MIN(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
+		if( waypointDist <= Min(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
 		{
 			if( unit_navigator_debug.GetInt() > 1 )
 				DevMsg("#%d: In range goal waypoint (distance: %f, tol: %f, goaltol: %f)\n", 
@@ -2101,7 +2101,7 @@ void UnitBaseNavigator::UpdateGoalInfo( void )
 		if( GetPath()->m_iGoalFlags & GF_USETARGETDIST )
 		{
 			m_fGoalDistance = m_pOuter->EnemyDistance( GetPath()->m_hTarget );
-			m_fGoalDistance = MAX(0.0f, m_fGoalDistance); // Negative distance makes no sense
+			m_fGoalDistance = Max(0.0f, m_fGoalDistance); // Negative distance makes no sense
 		}
 		else
 		{
@@ -2354,7 +2354,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 	fromfromdir = fromArea->GetParent() ? OppositeDirection((NavDirType)fromArea->GetParentHow()) : -1;
 
 	// Get tolerances
-	float fTolerance = MAX(halfWidth-hmargin, 0.0f);
+	float fTolerance = Max(halfWidth-hmargin, 0.0f);
 
 	// Calculate tolerance + new hookpos
 
@@ -2377,11 +2377,11 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 		if( dir == WEST || dir == EAST )
 		{
 			pNewWayPoint->flToleranceX = pPath->m_waypointTolerance + 1.0f;
-			pNewWayPoint->flToleranceY = MIN(fGoalTolX, fFromTolX);
+			pNewWayPoint->flToleranceY = Min(fGoalTolX, fFromTolX);
 		}
 		else
 		{
-			pNewWayPoint->flToleranceX = MIN(fGoalTolY, fFromTolY);
+			pNewWayPoint->flToleranceX = Min(fGoalTolY, fFromTolY);
 			pNewWayPoint->flToleranceY = pPath->m_waypointTolerance + 1.0f;
 		}
 	}
@@ -2791,7 +2791,7 @@ void UnitBaseNavigator::DrawDebugInfo()
 	{
 		fDensity = ComputeDensityAndAvgVelocity( j, &vAvgVel, m_DebugLastMoveCommand );
 		NDebugOverlay::HorzArrow(GetLocalOrigin(), m_vTestPositions[j], 
-							2.0f, fDensity*255, (1.0f-MIN(1.0f, MAX(0.0,fDensity)))*255, 0, 200, true, 0);
+							2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0);
 		NDebugOverlay::Text( m_vTestPositions[j], UTIL_VarArgs("%f", fDensity), false, 0.0 );
 	}
 

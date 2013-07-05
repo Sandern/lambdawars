@@ -907,7 +907,7 @@ float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 	}
 
 	if( bConsiderSizeUnit )
-		return MAX(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
+		return Max(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
 	return enemyDelta.Length();
 }
 
@@ -975,7 +975,7 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 	}
 
 	if( bConsiderSizeUnit )
-		return MAX(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
+		return Max(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
 	return enemyDelta.Length();
 }
 
