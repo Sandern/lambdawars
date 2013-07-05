@@ -1,4 +1,4 @@
-//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Tries to mount all available source engine games.
 //

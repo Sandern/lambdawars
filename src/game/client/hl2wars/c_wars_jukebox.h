@@ -1,4 +1,4 @@
-//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Handles construction of a user defined music playlist.
 //

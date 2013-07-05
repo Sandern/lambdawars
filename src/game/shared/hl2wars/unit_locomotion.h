@@ -1,4 +1,4 @@
-//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Defines the locomotion of a ground moving unit.
 //

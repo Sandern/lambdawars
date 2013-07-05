@@ -1,5 +1,11 @@
-#ifndef ASW_HUD_CHAT_H
-#define ASW_HUD_CHAT_H
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
+//
+// Purpose:  Wars version of hud_chat.cpp (exclude hud_chat.cpp from build)
+//
+//=============================================================================//
+
+#ifndef WARS_HUD_CHAT_H
+#define WARS_HUD_CHAT_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -19,7 +25,6 @@ public:
 	void			MsgFunc_SayText2( bf_read &msg );
 	void			MsgFunc_TextMsg(bf_read &msg);
 
-//#ifdef INFESTED_DLL
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void PerformLayout();
 	//virtual bool ShouldDraw( void ) { CHudElement::ShouldDraw(); }
@@ -46,7 +51,6 @@ public:
 
 	vgui::Panel *m_pSwarmBackground;
 	vgui::Panel *m_pSwarmBackgroundInner;
-//#endif
 };
 
-#endif	//ASW_HUD_CHAT_H
+#endif	//WARS_HUD_CHAT_H

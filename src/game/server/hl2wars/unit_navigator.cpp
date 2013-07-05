@@ -1,4 +1,4 @@
-//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: The unit navigator consist of two major components:
 //			1. Building a global path using the Navigation Mesh

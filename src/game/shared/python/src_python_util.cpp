@@ -1,4 +1,4 @@
-//====== Copyright © 2013 Sandern Corporation, All rights reserved. ===========//
+//====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Utility code. Merge with src_python_wrappers_util.h?
 //
