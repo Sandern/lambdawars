@@ -467,7 +467,7 @@ void CFogOfWarMgr::LoadHeightMap()
 	}
 
 	
-#ifndef CLIENT_DLL // FIXME
+#ifndef CLIENT_DLL
 	int mapversion = buf.GetInt();
 	if ( mapversion != gpGlobals->mapversion )
 	{
@@ -475,6 +475,7 @@ void CFogOfWarMgr::LoadHeightMap()
 		return;
 	}
 #else
+	// Skip check on client for now
 	buf.GetInt();
 #endif // CLIENT_DLL
 
