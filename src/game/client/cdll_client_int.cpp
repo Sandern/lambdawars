@@ -1836,11 +1836,8 @@ void ConfigureCurrentSystemLevel()
 	}
 
 	// Check if the user supports at least pixel shader 2.0b
-	// Assume mat_dxlevel gets slammed back if not supported, however I don't know if this is true.
 	ConVarRef mat_dxlevel("mat_dxlevel");
 	int nMaxDXLevel = g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel();
-	DevMsg("ConfigureCurrentSystemLevel -> mat_dxlevel %d\n", mat_dxlevel.GetInt());
-
 	if( mat_dxlevel.GetInt() < 95 )
 	{
 		Error( "Your graphics card does not seem to support shader model 3.0 or higher. Reported dx level: %d (max setting: %d).", 
