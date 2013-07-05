@@ -2005,6 +2005,26 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("owner") ) );
         
         }
+        { //::CBaseEntity::FVisible
+        
+            typedef bool ( ::CBaseEntity::*FVisible_function_type )( ::CBaseEntity *,int,::CBaseEntity * * ) ;
+            
+            CBaseEntity_exposer.def( 
+                "FVisible"
+                , FVisible_function_type( &::CBaseEntity::FVisible )
+                , ( bp::arg("pEntity"), bp::arg("traceMask")=(int)(16449), bp::arg("ppBlocker")=bp::object() ) );
+        
+        }
+        { //::CBaseEntity::FVisible
+        
+            typedef bool ( ::CBaseEntity::*FVisible_function_type )( ::Vector const &,int,::CBaseEntity * * ) ;
+            
+            CBaseEntity_exposer.def( 
+                "FVisible"
+                , FVisible_function_type( &::CBaseEntity::FVisible )
+                , ( bp::arg("vecTarget"), bp::arg("traceMask")=(int)(16449), bp::arg("ppBlocker")=bp::object() ) );
+        
+        }
         { //::CBaseEntity::FindContextByName
         
             typedef int ( ::CBaseEntity::*FindContextByName_function_type )( char const * ) const;

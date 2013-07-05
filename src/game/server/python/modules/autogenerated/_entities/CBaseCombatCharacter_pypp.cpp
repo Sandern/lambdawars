@@ -1700,6 +1700,26 @@ void register_CBaseCombatCharacter_class(){
                 , ( bp::arg("vecSpot") ) );
         
         }
+        { //::CBaseCombatCharacter::FVisible
+        
+            typedef bool ( ::CBaseCombatCharacter::*FVisible_function_type )( ::CBaseEntity *,int,::CBaseEntity * * ) ;
+            
+            CBaseCombatCharacter_exposer.def( 
+                "FVisible"
+                , FVisible_function_type( &::CBaseCombatCharacter::FVisible )
+                , ( bp::arg("pEntity"), bp::arg("traceMask")=(int)(16449), bp::arg("ppBlocker")=bp::object() ) );
+        
+        }
+        { //::CBaseCombatCharacter::FVisible
+        
+            typedef bool ( ::CBaseCombatCharacter::*FVisible_function_type )( ::Vector const &,int,::CBaseEntity * * ) ;
+            
+            CBaseCombatCharacter_exposer.def( 
+                "FVisible"
+                , FVisible_function_type( &::CBaseCombatCharacter::FVisible )
+                , ( bp::arg("vecTarget"), bp::arg("traceMask")=(int)(16449), bp::arg("ppBlocker")=bp::object() ) );
+        
+        }
         { //::CBaseCombatCharacter::FindHealthItem
         
             typedef ::CBaseEntity * ( ::CBaseCombatCharacter::*FindHealthItem_function_type )( ::Vector const &,::Vector const & ) ;

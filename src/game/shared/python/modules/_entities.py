@@ -774,7 +774,6 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('NotifySystemEvent').exclude()          # Don't care
             mb.mem_funs('Entity').exclude()          # Don't care
             
-            mb.mem_funs('FVisible').exclude()               # Don't care for now
             mb.mem_funs('EmitSentenceByIndex').exclude()    # Don't care for now
             
             mb.mem_funs('PhysicsTestEntityPosition').exclude()  # Don't care  
