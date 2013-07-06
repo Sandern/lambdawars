@@ -57,6 +57,7 @@ bp::object sys;
 bp::object srcmgr;
 bp::object gamemgr;
 bp::object weakref;
+bp::object srcbuiltins;
 bp::object srcbase;
 bp::object _entities_misc;
 bp::object _entities;
@@ -191,7 +192,7 @@ bool CSrcPython::Init( )
 	m_bPythonRunning = true;
 
 	double fStartTime = Plat_FloatTime();
-
+	
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
 #ifdef CLIENT_DLL
@@ -201,7 +202,7 @@ bool CSrcPython::Init( )
 #endif // CLIENT_DLL
 	ConColorMsg( g_PythonColor, "Initialized Python... (%f seconds)\n", Plat_FloatTime() - fStartTime );
 	fStartTime = Plat_FloatTime();
-
+	
 	// Save our thread ID
 #ifdef _WIN32
 	g_hPythonThreadID = GetCurrentThreadId();
@@ -220,15 +221,17 @@ bool CSrcPython::Init( )
 		return false;
 	}
 
-	// Redirect print
-	// TODO: Integrate this into python.
-	Run( "import redirect" );
-
 	// Import sys module
 	Run( "import sys" );
-	weakref = Import("weakref");
+	
 	sys = Import("sys");
 
+	// Redirect stdout/stderr to source print functions
+	srcbuiltins = Import("srcbuiltins");
+	sys.attr("stdout") = srcbuiltins.attr("SrcPyStdOut")();
+	sys.attr("stderr") = srcbuiltins.attr("SrcPyStdErr")();
+
+	weakref = Import("weakref");
 	srcbase = Import("srcbase");
 	__builtin__ = Import("__builtin__");
 
