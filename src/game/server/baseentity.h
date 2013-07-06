@@ -2080,7 +2080,7 @@ private:
 	bp::object m_pyHandle;			// Holds a ref to a handle to the instance. 
 	bp::object m_pyTouchMethod;
 	bp::object m_pyThink;
-	bp::object m_pyPhysObj;			// Holds a ref to the physic object
+	bp::object m_pyPhysObj;			// Holds a ref to the physic object wrapper
 #endif // ENABLE_PYTHON
 
 	DensityWeightsMap m_DensityMap;

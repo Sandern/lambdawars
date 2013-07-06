@@ -18,8 +18,6 @@
 
 #ifndef ENABLE_PYTHON
 	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name )
-	#define DECLARE_CREATEPYHANDLE( name )
-	#define IMPLEMENT_CREATEPYHANDLE( name )	
 	#define DECLARE_PYCLIENTCLASS( name )
 	#define IMPLEMENT_PYCLIENTCLASS( name, networkType )
 	#define DECLARE_PYCLASS( name )
@@ -131,54 +129,22 @@ public:
 	boost::python::object m_pyClass;
 };
 
-// Define an handle. Must be done if the entity is exposed to python to convert automatically to the right type
-#define DECLARE_CREATEPYHANDLE( name )																\
-	virtual boost::python::object CreatePyHandle( void );
-
-#define IMPLEMENT_CREATEPYHANDLE( name )															\
-	boost::python::object name::CreatePyHandle( void )												\
-	{																								\
-		boost::python::object clshandle;															\
-		if( GetPyInstance().ptr() != Py_None )														\
-		{																							\
-			try {																					\
-				clshandle = _entities.attr("PyHandle");												\
-			} catch(boost::python::error_already_set &) {											\
-				Warning("Failed to create a PyHandle\n");											\
-				PyErr_Print();																		\
-				PyErr_Clear();																		\
-				return boost::python::object();														\
-			}																						\
-			return clshandle(GetPyInstance());														\
-		}																							\
-		try {																						\
-			clshandle = _entities.attr(#name "HANDLE");												\
-		} catch(boost::python::error_already_set &) {												\
-			Warning("Failed to create handle %s\n", #name "HANDLE");								\
-			PyErr_Print();																			\
-			PyErr_Clear();																			\
-			return boost::python::object();															\
-		}																							\
-		return clshandle(boost::python::ptr(this));													\
-	}
-
-// Implement a networkable python class. Used to determine the right recv/send tables
-#define DECLARE_PYCLIENTCLASS( name )																\
-	public:																							\
-	DECLARE_CREATEPYHANDLE(name);																	\
-	static int GetPyNetworkType();
-
-#define IMPLEMENT_PYCLIENTCLASS( name, networkType )												\
-	IMPLEMENT_CREATEPYHANDLE(name)																	\
-	int name::GetPyNetworkType() { return networkType; }
-
 // Implement a python class. For python/c++ handle conversion
 #define DECLARE_PYCLASS( name )																		\
 	public:																							\
-	boost::python::object CreatePyHandle( void ) const												\
-{																								\
+	inline boost::python::object CreatePyHandle( void ) const										\
+{																									\
 	return CreatePyHandleHelper(this, #name "HANDLE");												\
 }
+
+// Implement a networkable python class. Used to determine the right recv/send tables
+#define DECLARE_PYCLIENTCLASS( name )																\
+	DECLARE_PYCLASS( name )																			\
+	public:																							\
+	static int GetPyNetworkType();
+
+#define IMPLEMENT_PYCLIENTCLASS( name, networkType )												\
+	int name::GetPyNetworkType() { return networkType; }
 
 #endif // ENABLE_PYTHON
 
