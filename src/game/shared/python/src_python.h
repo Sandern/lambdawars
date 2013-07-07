@@ -91,7 +91,6 @@ extern boost::python::object fntype;
 			return boost::python::extract<T>(obj.attr(attr_name) );								\
 		} catch(boost::python::error_already_set &) {											\
 			PyErr_Clear();																		\
-			PyErr_Clear();																		\
 		}																						\
 	}																							\
 	else																						\
