@@ -102,8 +102,6 @@ BEGIN_ENT_SCRIPTDESC( CBaseFlex, CBaseAnimating, "Animated characters who have v
 	DEFINE_SCRIPTFUNC_NAMED( ScriptGetSceneByIndex, "GetSceneByIndex", "Returns the instance of the scene entity at the specified index." )
 END_SCRIPTDESC();
 
-IMPLEMENT_PYSERVERCLASS( CBaseFlex, PN_BASEFLEX )
-
 LINK_ENTITY_TO_CLASS( funCBaseFlex, CBaseFlex ); // meaningless independant class!!
 
 CBaseFlex::CBaseFlex( void ) : 

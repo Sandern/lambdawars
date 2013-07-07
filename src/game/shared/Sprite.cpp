@@ -159,12 +159,6 @@ BEGIN_NETWORK_TABLE( CSprite, DT_Sprite )
 #endif
 END_NETWORK_TABLE()
 
-#ifdef CLIENT_DLL
-IMPLEMENT_PYCLIENTCLASS( C_Sprite, PN_SPRITE )
-#else
-IMPLEMENT_PYSERVERCLASS( CSprite, PN_SPRITE );
-#endif // CLIENT_DLL
-
 CSprite::CSprite()
 {
 	m_flGlowProxySize = 2.0f;

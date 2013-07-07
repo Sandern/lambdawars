@@ -55,9 +55,6 @@ BEGIN_PREDICTION_DATA( C_WarsWeapon )
 	DEFINE_PRED_FIELD( m_nResetEventsParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 END_PREDICTION_DATA()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYCLIENTCLASS( C_WarsWeapon, PN_WARSWEAPON )
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

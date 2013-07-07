@@ -1856,7 +1856,7 @@ private:
 
 	// hl2wars
 public:
-	DECLARE_PYCLIENTCLASS( C_BaseEntity );
+	DECLARE_PYCLIENTCLASS( C_BaseEntity, PN_BASEENTITY );
 
 	friend class CFogOfWarMgr;
 	friend class UnitBaseLocomotion;

@@ -2727,9 +2727,3 @@ int CBaseCombatWeapon::LookupAttachment( const char *pAttachmentName )
 	return BaseClass::LookupAttachment( pAttachmentName );
 }
 #endif
-
-#ifdef CLIENT_DLL
-	IMPLEMENT_PYCLIENTCLASS( C_BaseCombatWeapon, PN_BASECOMBATWEAPON )
-#else
-	IMPLEMENT_PYSERVERCLASS( CBaseCombatWeapon, PN_BASECOMBATWEAPON );
-#endif // CLIENT_DLL

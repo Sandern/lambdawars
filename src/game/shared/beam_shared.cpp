@@ -146,12 +146,6 @@ REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
 
 LINK_ENTITY_TO_CLASS( beam, CBeam );
 
-#ifdef CLIENT_DLL
-	IMPLEMENT_PYCLIENTCLASS( CBeam, PN_BEAM )
-#else
-	IMPLEMENT_PYSERVERCLASS( CBeam, PN_BEAM )
-#endif
-
 // This table encodes the CBeam data.
 IMPLEMENT_NETWORKCLASS_ALIASED( Beam, DT_Beam )
 

@@ -72,8 +72,6 @@ BEGIN_PREDICTION_DATA( C_BaseFlex )
 
 END_PREDICTION_DATA()
 
-IMPLEMENT_PYCLIENTCLASS( C_BaseFlex, PN_BASEFLEX )
-
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------

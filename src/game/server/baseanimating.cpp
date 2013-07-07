@@ -283,8 +283,6 @@ BEGIN_ENT_SCRIPTDESC( CBaseAnimating, CBaseEntity, "Animating models" )
 	DEFINE_SCRIPTFUNC( SetBodygroup, "Sets a bodygroup")
 END_SCRIPTDESC();
 
-IMPLEMENT_PYSERVERCLASS( CBaseAnimating, PN_BASEANIMATING )
-
 CBaseAnimating::CBaseAnimating()
 {
 	m_vecForce.GetForModify().Init();

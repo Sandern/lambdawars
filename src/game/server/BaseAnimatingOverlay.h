@@ -201,7 +201,7 @@ private:
 	//int				m_nActiveBaseLayers;
 
 public:
-	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay );
+	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY );
 	
 	virtual CBaseAnimatingOverlay *	GetBaseAnimatingOverlay() { return this; }
 	

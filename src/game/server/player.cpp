@@ -8007,8 +8007,6 @@ REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendNonLocalDataTable );
 
 	END_SEND_TABLE()
 
-	IMPLEMENT_PYSERVERCLASS( CBasePlayer, PN_BASEPLAYER )
-
 //=============================================================================
 //
 // Player Physics Shadow Code

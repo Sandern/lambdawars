@@ -1903,7 +1903,7 @@ public:
 
 	// HL2Wars/Python 
 public:
-	DECLARE_PYSERVERCLASS( CBaseEntity );
+	DECLARE_PYSERVERCLASS( CBaseEntity, PN_BASEENTITY );
 
 	friend class PyEntityFactory;
 	friend class CFogOfWarMgr;

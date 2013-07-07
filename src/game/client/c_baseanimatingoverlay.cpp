@@ -266,8 +266,6 @@ BEGIN_PREDICTION_DATA( C_BaseAnimatingOverlay )
 
 END_PREDICTION_DATA()
 
-IMPLEMENT_PYCLIENTCLASS( C_BaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY )
-
 CAnimationLayer* C_BaseAnimatingOverlay::GetAnimOverlay( int i )
 {
 	Assert( i >= 0 && i < MAX_OVERLAYS );

@@ -24,7 +24,7 @@ class CBaseTrigger : public CBaseToggle
 {
 	DECLARE_CLASS( CBaseTrigger, CBaseToggle );
 	DECLARE_SERVERCLASS();
-	DECLARE_PYSERVERCLASS( CBaseTrigger );
+	DECLARE_PYSERVERCLASS( CBaseTrigger, PN_BASETRIGGER );
 
 public:
 	CBaseTrigger();

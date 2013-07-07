@@ -101,9 +101,6 @@ IMPLEMENT_SERVERCLASS_ST(CWarsWeapon, DT_WarsWeapon)
 	SendPropInt( SENDINFO(m_iPrimaryAmmoType ), 8 ),
 END_SEND_TABLE()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYSERVERCLASS( CWarsWeapon, PN_WARSWEAPON );
-
 //---------------------------------------------------------
 // Save/Restore
 //---------------------------------------------------------

@@ -10,9 +10,6 @@
 IMPLEMENT_CLIENTCLASS_DT( C_BaseToggle, DT_BaseToggle, CBaseToggle )
 END_RECV_TABLE()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYCLIENTCLASS( C_BaseToggle, PN_BASETOGGLE )
-
 //--------------------------------------------------------------------------------------------------------
 // Returns the velocity imparted to players standing on us.
 void C_BaseToggle::GetGroundVelocityToApply( Vector &vecGroundVel )

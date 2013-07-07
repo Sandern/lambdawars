@@ -49,7 +49,7 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
 	DECLARE_ENT_SCRIPTDESC();
-	DECLARE_PYSERVERCLASS( CBaseAnimating );
+	DECLARE_PYSERVERCLASS( CBaseAnimating, PN_BASEANIMATING );
 
 	virtual void SetModel( const char *szModelName );
 #ifdef ENABLE_PYTHON

@@ -26,8 +26,6 @@
 #include "client_class.h"
 #include "src_python_class_shared.h"
 
-extern boost::python::object _entities;
-
 class NetworkedClass;
 
 // Forward declaration
@@ -41,13 +39,14 @@ namespace DT_BaseEntity
 	extern RecvTable g_RecvTable;
 }
 
-// Use as base for shared things
+// Use as base for client networked entities
 class PyClientClassBase : public ClientClass
 {
 public:
 	PyClientClassBase( char *pNetworkName ) : ClientClass(pNetworkName, NULL, NULL, NULL), m_pNetworkedClass(NULL)
 	{
-		m_pRecvTable = &(DT_BaseEntity::g_RecvTable);		// Default
+		// Default send table to BaseEntity
+		m_pRecvTable = &(DT_BaseEntity::g_RecvTable);
 		m_pPyNext				= g_pPyClientClassHead;
 		g_pPyClientClassHead	= this;
 		m_bFree = true;
@@ -138,13 +137,10 @@ public:
 }
 
 // Implement a networkable python class. Used to determine the right recv/send tables
-#define DECLARE_PYCLIENTCLASS( name )																\
+#define DECLARE_PYCLIENTCLASS( name, networkType )													\
 	DECLARE_PYCLASS( name )																			\
 	public:																							\
-	static int GetPyNetworkType();
-
-#define IMPLEMENT_PYCLIENTCLASS( name, networkType )												\
-	int name::GetPyNetworkType() { return networkType; }
+	static int GetPyNetworkType() { return networkType; }
 
 #endif // ENABLE_PYTHON
 

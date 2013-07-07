@@ -695,9 +695,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt	(SENDINFO( m_PySendPropInt4 ),				15, 0 ),
 END_SEND_TABLE()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYSERVERCLASS( CBaseEntity, PN_BASEENTITY )
-
 CBaseEntity::CBaseEntity( bool bServerOnly )
 {
 	COMPILE_TIME_ASSERT( MOVETYPE_LAST < (1 << MOVETYPE_MAX_BITS) );
@@ -2487,11 +2484,11 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_KEYFIELD( m_bLagCompensate, FIELD_BOOLEAN, "LagCompensate" ),
 
 #ifdef ENABLE_PYTHON
-	// HL2Wars data
 	DEFINE_THINKFUNC( PyThink ),
 #endif // ENABLE_PYTHON
 
 	DEFINE_FIELD( m_iOwnerNumber, FIELD_INTEGER ),
+
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "ChangeOwner", InputChangeOwnerNumber ),
 END_DATADESC()
 

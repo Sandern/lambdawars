@@ -58,14 +58,6 @@ BEGIN_NETWORK_TABLE(CFuncUnit, DT_FuncUnit)
 #endif
 END_NETWORK_TABLE()
 
-
-// This class is exposed in python and networkable
-#ifdef CLIENT_DLL
-	IMPLEMENT_PYCLIENTCLASS( C_FuncUnit, PN_FUNCUNIT )
-#else
-	IMPLEMENT_PYSERVERCLASS( CFuncUnit, PN_FUNCUNIT );
-#endif // CLIENT_DLL
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

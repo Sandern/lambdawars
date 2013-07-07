@@ -204,9 +204,6 @@ IMPLEMENT_SERVERCLASS_ST(CBaseCombatCharacter, DT_BaseCombatCharacter)
 
 END_SEND_TABLE()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYSERVERCLASS( CBaseCombatCharacter, PN_BASECOMBATCHARACTER )
-
 //-----------------------------------------------------------------------------
 // Interactions
 //-----------------------------------------------------------------------------

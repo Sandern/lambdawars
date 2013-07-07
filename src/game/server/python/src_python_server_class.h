@@ -27,8 +27,6 @@
 #include "dt_send.h"
 #include "src_python_class_shared.h"
 
-extern boost::python::object _entities;
-
 class NetworkedClass;
 class CBasePlayer;
 
@@ -89,13 +87,10 @@ void PyResetAllNetworkTables();
 	}
 
 // Implement a networkable python class. Used to determine the right recv/send tables
-#define DECLARE_PYSERVERCLASS( name )																\
+#define DECLARE_PYSERVERCLASS( name, networkType )													\
 	DECLARE_PYCLASS( name )																			\
 	public:																							\
-	static int GetPyNetworkType();
-
-#define IMPLEMENT_PYSERVERCLASS( name, networkType )												\
-	int name::GetPyNetworkType() { return networkType; }
+	static int GetPyNetworkType() { return networkType; }
 
 #endif // ENABLE_PYTHON
 

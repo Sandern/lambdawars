@@ -44,7 +44,7 @@ class C_BaseCombatCharacter : public C_BaseFlex
 public:
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
-	DECLARE_PYCLIENTCLASS( C_BaseCombatCharacter );
+	DECLARE_PYCLIENTCLASS( C_BaseCombatCharacter, PN_BASECOMBATCHARACTER );
 
 					C_BaseCombatCharacter( void );
 	virtual			~C_BaseCombatCharacter( void );

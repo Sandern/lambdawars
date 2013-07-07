@@ -87,9 +87,6 @@ IMPLEMENT_SERVERCLASS_ST( CBaseAnimatingOverlay, DT_BaseAnimatingOverlay )
 	SendPropDataTable( "overlay_vars", 0, &REFERENCE_SEND_TABLE( DT_OverlayVars ) )
 END_SEND_TABLE()
 
-IMPLEMENT_PYSERVERCLASS( CBaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY )
-
-
 CAnimationLayer::CAnimationLayer( )
 {
 	Init( NULL );

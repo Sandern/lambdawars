@@ -228,8 +228,6 @@ BEGIN_PREDICTION_DATA( C_BaseAnimating )
 
 END_PREDICTION_DATA()
 
-IMPLEMENT_PYCLIENTCLASS( C_BaseAnimating, PN_BASEANIMATING )
-
 LINK_ENTITY_TO_CLASS( client_ragdoll, C_ClientRagdoll );
 
 BEGIN_DATADESC( C_ClientRagdoll )

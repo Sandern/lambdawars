@@ -65,9 +65,6 @@ END_RECV_TABLE()
 BEGIN_PREDICTION_DATA( C_HL2WarsPlayer )
 END_PREDICTION_DATA()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYCLIENTCLASS( C_HL2WarsPlayer, PN_HL2WARSPLAYER )
-
 LINK_ENTITY_TO_CLASS( player, C_HL2WarsPlayer );
 
 

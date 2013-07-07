@@ -16,7 +16,7 @@ class CBaseToggle : public CBaseEntity
 {
 	DECLARE_CLASS( CBaseToggle, CBaseEntity );
 	DECLARE_SERVERCLASS();
-	DECLARE_PYSERVERCLASS( CBaseToggle );
+	DECLARE_PYSERVERCLASS( CBaseToggle, PN_BASETOGGLE );
 
 public:
 	CBaseToggle();

@@ -107,12 +107,6 @@ END_PREDICTION_DATA()
 
 #endif
 
-#ifdef CLIENT_DLL
-	IMPLEMENT_PYCLIENTCLASS( CBaseGrenade, PN_BASEGRENADE );
-#else
-	IMPLEMENT_PYSERVERCLASS( CBaseGrenade, PN_BASEGRENADE );
-#endif // CLIENT_DLL
-
 // Grenades flagged with this will be triggered when the owner calls detonateSatchelCharges
 #define SF_DETONATE		0x0001
 

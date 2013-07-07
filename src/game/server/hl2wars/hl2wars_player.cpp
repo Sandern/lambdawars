@@ -98,9 +98,6 @@ BEGIN_DATADESC( CHL2WarsPlayer )
 	//DEFINE_AUTO_ARRAY( m_NetworkedFactionName,    FIELD_CHARACTER ),
 END_DATADESC()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYSERVERCLASS( CHL2WarsPlayer, PN_HL2WARSPLAYER )
-
 CHL2WarsPlayer::CHL2WarsPlayer() : m_nMouseButtonsPressed(0)
 {
 	SetViewDistance(1500.0f);

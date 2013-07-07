@@ -16,7 +16,7 @@ class C_BaseToggle: public C_BaseEntity
 public:
 	DECLARE_CLASS( C_BaseToggle, C_BaseEntity );
 	DECLARE_CLIENTCLASS();
-	DECLARE_PYCLIENTCLASS( C_BaseToggle );
+	DECLARE_PYCLIENTCLASS( C_BaseToggle, PN_BASETOGGLE );
 
 	virtual void GetGroundVelocityToApply( Vector &vecGroundVel );
 };

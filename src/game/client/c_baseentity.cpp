@@ -716,9 +716,6 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 #endif
 END_PREDICTION_DATA()
 
-// This class is exposed in python and networkable
-IMPLEMENT_PYCLIENTCLASS( C_BaseEntity, PN_BASEENTITY )
-
 //-----------------------------------------------------------------------------
 // Helper functions.
 //-----------------------------------------------------------------------------

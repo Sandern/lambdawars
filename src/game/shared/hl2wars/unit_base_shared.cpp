@@ -132,13 +132,6 @@ Disposition_t GetPlayerRelationShip(int p1, int p2)
 	return g_playerrelationships[p1][p2];
 }
 
-// This class is exposed in python and networkable
-#ifdef CLIENT_DLL
-	IMPLEMENT_PYCLIENTCLASS( C_UnitBase, PN_UNITBASE )
-#else
-	IMPLEMENT_PYSERVERCLASS( CUnitBase, PN_UNITBASE );
-#endif // CLIENT_DLL
-
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 // Input  :
