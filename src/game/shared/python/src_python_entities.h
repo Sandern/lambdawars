@@ -25,6 +25,7 @@
 
 namespace bp = boost::python;
 
+extern boost::python::object _entities;
 
 //-----------------------------------------------------------------------------
 // Purpose: Python entity handle

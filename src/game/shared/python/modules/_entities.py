@@ -30,14 +30,8 @@ class Entities(GenerateModuleSemiShared):
         'wars_mapboundary.h',
     ]
     
-    if settings.ASW_CODE_BASE:
-        client_files = ['videocfg/videocfg.h']
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-    client_files = client_files + [
+    client_files = [
+            'videocfg/videocfg.h',
             'cbase.h',
             'takedamageinfo.h',
             'c_baseanimating.h',

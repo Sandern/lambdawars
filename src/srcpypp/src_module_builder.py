@@ -43,7 +43,6 @@ incl_paths_client = [
     '../game/client', 
     '../game/client/python',
     '../game/client/cef',
-    #'../Awesomium',
     '../cef',
 ]
 incl_paths_server = [
