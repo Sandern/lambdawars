@@ -447,7 +447,7 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropInt		(SENDINFO(m_iKills), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
-IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
+IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
 	// Data that gets sent to all other players
@@ -476,6 +476,25 @@ IMPLEMENT_SERVERCLASS_ST(CUnitBase, DT_UnitBase)
 	SendPropExclude( "DT_BaseFlex" , "m_vecLean" ),
 	SendPropExclude( "DT_BaseFlex" , "m_vecShift" ),
 END_SEND_TABLE()
+
+BEGIN_DATADESC( CUnitBase )
+	DEFINE_FIELD( m_bCanBeSeen, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bUseCustomCanBeSeenCheck, FIELD_BOOLEAN ),
+
+	DEFINE_FIELD( m_bHasEnterOffset, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_vEnterOffset, FIELD_VECTOR ),
+
+	DEFINE_FIELD( m_UnitType, FIELD_STRING ),
+	DEFINE_AUTO_ARRAY( m_NetworkedUnitType, FIELD_CHARACTER ),
+	DEFINE_FIELD( m_fLastTakeDamageTime, FIELD_FLOAT ),
+
+	DEFINE_FIELD( m_iEnergy, FIELD_INTEGER ),
+	DEFINE_FIELD( m_iMaxEnergy, FIELD_INTEGER ),
+	DEFINE_FIELD( m_iKills, FIELD_INTEGER ),
+
+	DEFINE_FIELD( m_hCommander, FIELD_EHANDLE ),
+	
+END_DATADESC()
 
 //-----------------------------------------------------------------------------
 // Purpose: 

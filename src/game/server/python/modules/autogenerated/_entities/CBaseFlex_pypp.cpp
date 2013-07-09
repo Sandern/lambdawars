@@ -664,6 +664,36 @@ struct CBaseFlex_wrapper : CBaseFlex, bp::wrapper< CBaseFlex > {
         CBaseEntity::OnChangeOwnerNumber( old_owner_number );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CBaseAnimatingOverlay\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimatingOverlay::OnRestore(  );
+            }
+        else
+            this->CBaseAnimatingOverlay::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CBaseAnimatingOverlay::OnRestore( );
+    }
+
     virtual void OnSequenceSet( int nOldSequence ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1531,6 +1561,17 @@ void register_CBaseFlex_class(){
                 , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
                 , default_OnChangeOwnerNumber_function_type(&CBaseFlex_wrapper::default_OnChangeOwnerNumber)
                 , ( bp::arg("old_owner_number") ) );
+        
+        }
+        { //::CBaseAnimatingOverlay::OnRestore
+        
+            typedef void ( ::CBaseAnimatingOverlay::*OnRestore_function_type )(  ) ;
+            typedef void ( CBaseFlex_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            CBaseFlex_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::CBaseAnimatingOverlay::OnRestore)
+                , default_OnRestore_function_type(&CBaseFlex_wrapper::default_OnRestore) );
         
         }
         { //::CBaseAnimating::OnSequenceSet

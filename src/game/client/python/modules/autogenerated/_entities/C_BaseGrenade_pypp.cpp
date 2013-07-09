@@ -567,6 +567,36 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         C_BaseAnimating::OnDataChanged( updateType );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: C_BaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseEntity::OnRestore(  );
+            }
+        else
+            this->C_BaseEntity::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        C_BaseEntity::OnRestore( );
+    }
+
     virtual void PyNotifyShouldTransmit( ::ShouldTransmitState_t state ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1269,6 +1299,17 @@ void register_C_BaseGrenade_class(){
                 , OnDataChanged_function_type(&::C_BaseAnimating::OnDataChanged)
                 , default_OnDataChanged_function_type(&C_BaseGrenade_wrapper::default_OnDataChanged)
                 , ( bp::arg("updateType") ) );
+        
+        }
+        { //::C_BaseEntity::OnRestore
+        
+            typedef void ( ::C_BaseEntity::*OnRestore_function_type )(  ) ;
+            typedef void ( C_BaseGrenade_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            C_BaseGrenade_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::C_BaseEntity::OnRestore)
+                , default_OnRestore_function_type(&C_BaseGrenade_wrapper::default_OnRestore) );
         
         }
         { //::C_BaseEntity::PyNotifyShouldTransmit

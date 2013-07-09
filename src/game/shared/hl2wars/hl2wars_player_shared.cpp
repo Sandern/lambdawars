@@ -982,23 +982,33 @@ void CHL2WarsPlayer::AddUnit( CBaseEntity *pUnit, bool bTriggerOnSel )
 	
 	// Find our insertion place ( maybe use a priority number, add this to IUnit? )
 	iIndex = -1;
-	iMyPriority = pIUnit->GetSelectionPriority();
 	iFirstInsertPriority = -1;
-	for( int i = 0; i < m_hSelectedUnits.Count(); i++ )
+
+	iMyPriority = pIUnit->GetSelectionPriority();
+	const char *pUnitType = pIUnit->GetUnitType();
+	
+	if( pUnitType )
 	{
-		if( m_hSelectedUnits[i] == NULL )
-			continue;
-		if( !Q_stricmp( m_hSelectedUnits[i]->GetIUnit()->GetUnitType(), pIUnit->GetUnitType() ) )
+		for( int i = 0; i < m_hSelectedUnits.Count(); i++ )
 		{
-			iIndex = i;
-			break;
-		}
-		else if( m_hSelectedUnits[i]->GetIUnit()->GetSelectionPriority() < iMyPriority )
-		{
-			iFirstInsertPriority = i;
-			break;
+			if( m_hSelectedUnits[i] == NULL )
+				continue;
+
+			const char *pUnitTypeOther = m_hSelectedUnits[i]->GetIUnit()->GetUnitType();
+
+			if( pUnitTypeOther && !Q_stricmp( pUnitTypeOther, pUnitType ) )
+			{
+				iIndex = i;
+				break;
+			}
+			else if( m_hSelectedUnits[i]->GetIUnit()->GetSelectionPriority() < iMyPriority )
+			{
+				iFirstInsertPriority = i;
+				break;
+			}
 		}
 	}
+
 	if( iIndex != -1 ) 
 	{   // Already units of this type in the list, insert after that unit
 		m_hSelectedUnits.InsertAfter(iIndex, pUnit);

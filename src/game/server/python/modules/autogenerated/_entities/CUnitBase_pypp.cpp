@@ -334,6 +334,36 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CUnitBase::OnLostFullHealth( );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CUnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnRestore(  );
+            }
+        else
+            this->CUnitBase::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CUnitBase::OnRestore( );
+    }
+
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2229,6 +2259,17 @@ void register_CUnitBase_class(){
                 "OnLostFullHealth"
                 , OnLostFullHealth_function_type(&::CUnitBase::OnLostFullHealth)
                 , default_OnLostFullHealth_function_type(&CUnitBase_wrapper::default_OnLostFullHealth) );
+        
+        }
+        { //::CUnitBase::OnRestore
+        
+            typedef void ( ::CUnitBase::*OnRestore_function_type )(  ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::CUnitBase::OnRestore)
+                , default_OnRestore_function_type(&CUnitBase_wrapper::default_OnRestore) );
         
         }
         { //::CUnitBase::OnTakeDamage

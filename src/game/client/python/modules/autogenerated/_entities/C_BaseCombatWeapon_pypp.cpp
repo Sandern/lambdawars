@@ -143,6 +143,36 @@ struct C_BaseCombatWeapon_wrapper : C_BaseCombatWeapon, bp::wrapper< C_BaseComba
         C_BaseCombatWeapon::OnDataChanged( updateType );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: C_BaseCombatWeapon\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseCombatWeapon::OnRestore(  );
+            }
+        else
+            this->C_BaseCombatWeapon::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        C_BaseCombatWeapon::OnRestore( );
+    }
+
     virtual void Precache(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2125,10 +2155,12 @@ void register_C_BaseCombatWeapon_class(){
         { //::C_BaseCombatWeapon::OnRestore
         
             typedef void ( ::C_BaseCombatWeapon::*OnRestore_function_type )(  ) ;
+            typedef void ( C_BaseCombatWeapon_wrapper::*default_OnRestore_function_type )(  ) ;
             
             C_BaseCombatWeapon_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type( &::C_BaseCombatWeapon::OnRestore ) );
+                , OnRestore_function_type(&::C_BaseCombatWeapon::OnRestore)
+                , default_OnRestore_function_type(&C_BaseCombatWeapon_wrapper::default_OnRestore) );
         
         }
         { //::C_BaseCombatWeapon::Operator_FrameUpdate

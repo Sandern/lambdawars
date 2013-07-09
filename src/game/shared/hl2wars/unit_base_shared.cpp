@@ -194,6 +194,15 @@ void CUnitBase::UpdateOnRemove( void )
 	BaseClass::UpdateOnRemove();
 }
 
+void CUnitBase::OnRestore()
+{
+	BaseClass::OnRestore();
+
+#ifndef CLIENT_DLL
+	OnUnitTypeChanged( GetUnitType() );
+#endif // CLIENT_DLL
+}
+
 void CUnitBase::OnChangeOwnerNumberInternal( int old_owner_number )
 {
 	BaseClass::OnChangeOwnerNumberInternal(old_owner_number);

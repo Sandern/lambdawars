@@ -538,6 +538,36 @@ struct C_BaseEntity_wrapper : C_BaseEntity, bp::wrapper< C_BaseEntity > {
         C_BaseEntity::OnDataChanged( type );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: C_BaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseEntity::OnRestore(  );
+            }
+        else
+            this->C_BaseEntity::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        C_BaseEntity::OnRestore( );
+    }
+
     virtual void Precache(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -3796,10 +3826,12 @@ void register_C_BaseEntity_class(){
         { //::C_BaseEntity::OnRestore
         
             typedef void ( ::C_BaseEntity::*OnRestore_function_type )(  ) ;
+            typedef void ( C_BaseEntity_wrapper::*default_OnRestore_function_type )(  ) ;
             
             C_BaseEntity_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type( &::C_BaseEntity::OnRestore ) );
+                , OnRestore_function_type(&::C_BaseEntity::OnRestore)
+                , default_OnRestore_function_type(&C_BaseEntity_wrapper::default_OnRestore) );
         
         }
         { //::C_BaseEntity::OnSave
@@ -4812,6 +4844,16 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("trace"), bp::arg("vecVelocity") ) );
         
         }
+        { //::C_BaseEntity::Restore
+        
+            typedef int ( ::C_BaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "Restore"
+                , Restore_function_type( &::C_BaseEntity::Restore )
+                , ( bp::arg("restore") ) );
+        
+        }
         { //::C_BaseEntity::RestoreData
         
             typedef void ( ::C_BaseEntity::*RestoreData_function_type )( char const *,int,int ) ;
@@ -4829,6 +4871,16 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "SUB_Remove"
                 , SUB_Remove_function_type( &::C_BaseEntity::SUB_Remove ) );
+        
+        }
+        { //::C_BaseEntity::Save
+        
+            typedef int ( ::C_BaseEntity::*Save_function_type )( ::ISave & ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "Save"
+                , Save_function_type( &::C_BaseEntity::Save )
+                , ( bp::arg("save") ) );
         
         }
         { //::C_BaseEntity::SaveData

@@ -138,7 +138,7 @@ public:
 
 	//---------------------------------
 #if !defined( CLIENT_DLL )
-	//DECLARE_DATADESC();
+	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
 #else
 	DECLARE_CLIENTCLASS();
@@ -161,6 +161,7 @@ public:
 	virtual void OnChangeOwnerNumberInternal( int old_owner_number );
 
 	virtual void Spawn( void );
+	virtual void OnRestore( void );
 
 #ifndef CLIENT_DLL
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );

@@ -254,7 +254,7 @@ extern  "C" {
 
 int SrcPyPathIsInGameFolder( const char *pPath )
 {
-	if( IsPathProtected() )
+	if( SrcPySystem()->IsPathProtected() )
 	{
 		// Verify the file is in the gamefolder
 		char searchPaths[_MAX_PATH];
@@ -305,7 +305,7 @@ int SrcPyGetFullPathSilent( const char *pAssumedRelativePath, char *pFullPath, i
 		Q_RemoveDotSlashes( pFullPath );
 		V_StripTrailingSlash( searchPaths );
 
-		if( IsPathProtected() )
+		if( SrcPySystem()->IsPathProtected() )
 		{
 			if( Q_strnicmp(pFullPath, searchPaths, Q_strlen(searchPaths)) != 0 )
 			{
@@ -315,7 +315,7 @@ int SrcPyGetFullPathSilent( const char *pAssumedRelativePath, char *pFullPath, i
 	}
 	else
 	{
-		if( IsPathProtected() )
+		if( SrcPySystem()->IsPathProtected() )
 		{
 			// We know the path we want is relative, so just concate with searchPaths
 			char temp[_MAX_PATH];

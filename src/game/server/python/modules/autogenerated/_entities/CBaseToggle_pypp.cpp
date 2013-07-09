@@ -664,6 +664,36 @@ struct CBaseToggle_wrapper : CBaseToggle, bp::wrapper< CBaseToggle > {
         CBaseEntity::OnChangeOwnerNumber( old_owner_number );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CBaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseEntity::OnRestore(  );
+            }
+        else
+            this->CBaseEntity::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CBaseEntity::OnRestore( );
+    }
+
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1407,6 +1437,17 @@ void register_CBaseToggle_class(){
                 , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
                 , default_OnChangeOwnerNumber_function_type(&CBaseToggle_wrapper::default_OnChangeOwnerNumber)
                 , ( bp::arg("old_owner_number") ) );
+        
+        }
+        { //::CBaseEntity::OnRestore
+        
+            typedef void ( ::CBaseEntity::*OnRestore_function_type )(  ) ;
+            typedef void ( CBaseToggle_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            CBaseToggle_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::CBaseEntity::OnRestore)
+                , default_OnRestore_function_type(&CBaseToggle_wrapper::default_OnRestore) );
         
         }
         { //::CBaseEntity::OnTakeDamage

@@ -499,8 +499,6 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('GetPySelf').exclude()
         
         # Don't give a shit about the following functions
-        mb.mem_funs( lambda decl: HasArgType(decl, 'IRestore') ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'ISave') ).exclude()
         mb.mem_funs( lambda decl: HasArgType(decl, 'CEntityMapData') ).exclude()
         mb.mem_funs( lambda decl: HasArgType(decl, 'CUserCmd') ).exclude()
         
@@ -532,6 +530,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('UpdateTransmitState').virtuality = 'virtual'
         mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
         #mb.mem_funs('TestCollision').virtuality = 'virtual'
+        mb.mem_funs('OnRestore').virtuality = 'virtual'
         
         if self.isClient:
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE

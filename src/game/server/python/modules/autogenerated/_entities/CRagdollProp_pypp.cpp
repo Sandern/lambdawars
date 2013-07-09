@@ -154,6 +154,36 @@ struct CRagdollProp_wrapper : CRagdollProp, bp::wrapper< CRagdollProp > {
         CRagdollProp::ModifyOrAppendCriteria( boost::ref(set) );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CRagdollProp\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CRagdollProp::OnRestore(  );
+            }
+        else
+            this->CRagdollProp::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CRagdollProp::OnRestore( );
+    }
+
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1369,10 +1399,12 @@ void register_CRagdollProp_class(){
         { //::CRagdollProp::OnRestore
         
             typedef void ( ::CRagdollProp::*OnRestore_function_type )(  ) ;
+            typedef void ( CRagdollProp_wrapper::*default_OnRestore_function_type )(  ) ;
             
             CRagdollProp_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type( &::CRagdollProp::OnRestore ) );
+                , OnRestore_function_type(&::CRagdollProp::OnRestore)
+                , default_OnRestore_function_type(&CRagdollProp_wrapper::default_OnRestore) );
         
         }
         { //::CRagdollProp::OnTakeDamage

@@ -2488,6 +2488,9 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 #endif // ENABLE_PYTHON
 
 	DEFINE_FIELD( m_iOwnerNumber, FIELD_INTEGER ),
+	DEFINE_FIELD( m_hMousePassEntity, FIELD_EHANDLE ),
+	DEFINE_FIELD( m_nFOWFlagsIntern, FIELD_INTEGER ),
+	DEFINE_FIELD( m_fViewDistance, FIELD_FLOAT ),
 
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "ChangeOwner", InputChangeOwnerNumber ),
 END_DATADESC()
@@ -3896,6 +3899,9 @@ void CBaseEntity::OnRestore()
 
 	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
 	NetworkProp()->MarkPVSInformationDirty();
+
+	// Readd entity to fow lists if needed
+	RecalculateFOWFlags();
 }
 
 

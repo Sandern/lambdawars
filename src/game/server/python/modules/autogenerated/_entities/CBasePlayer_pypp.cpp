@@ -3367,6 +3367,16 @@ void register_CBasePlayer_class(){
                 , ResetScores_function_type( &::CBasePlayer::ResetScores ) );
         
         }
+        { //::CBasePlayer::Restore
+        
+            typedef int ( ::CBasePlayer::*Restore_function_type )( ::IRestore & ) ;
+            
+            CBasePlayer_exposer.def( 
+                "Restore"
+                , Restore_function_type( &::CBasePlayer::Restore )
+                , ( bp::arg("restore") ) );
+        
+        }
         { //::CBasePlayer::RumbleEffect
         
             typedef void ( ::CBasePlayer::*RumbleEffect_function_type )( unsigned char,unsigned char,unsigned char ) ;
@@ -3384,6 +3394,16 @@ void register_CBasePlayer_class(){
             CBasePlayer_exposer.def( 
                 "RunNullCommand"
                 , RunNullCommand_function_type( &::CBasePlayer::RunNullCommand ) );
+        
+        }
+        { //::CBasePlayer::Save
+        
+            typedef int ( ::CBasePlayer::*Save_function_type )( ::ISave & ) ;
+            
+            CBasePlayer_exposer.def( 
+                "Save"
+                , Save_function_type( &::CBasePlayer::Save )
+                , ( bp::arg("save") ) );
         
         }
         { //::CBasePlayer::ScriptIsPlayerNoclipping

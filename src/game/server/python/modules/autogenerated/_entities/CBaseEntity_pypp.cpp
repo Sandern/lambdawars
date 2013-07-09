@@ -634,6 +634,36 @@ struct CBaseEntity_wrapper : CBaseEntity, bp::wrapper< CBaseEntity > {
         CBaseEntity::OnChangeOwnerNumber( old_owner_number );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CBaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseEntity::OnRestore(  );
+            }
+        else
+            this->CBaseEntity::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CBaseEntity::OnRestore( );
+    }
+
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -4124,10 +4154,12 @@ void register_CBaseEntity_class(){
         { //::CBaseEntity::OnRestore
         
             typedef void ( ::CBaseEntity::*OnRestore_function_type )(  ) ;
+            typedef void ( CBaseEntity_wrapper::*default_OnRestore_function_type )(  ) ;
             
             CBaseEntity_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type( &::CBaseEntity::OnRestore ) );
+                , OnRestore_function_type(&::CBaseEntity::OnRestore)
+                , default_OnRestore_function_type(&CBaseEntity_wrapper::default_OnRestore) );
         
         }
         { //::CBaseEntity::OnTakeDamage
@@ -4902,6 +4934,16 @@ void register_CBaseEntity_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::CBaseEntity::Restore
+        
+            typedef int ( ::CBaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "Restore"
+                , Restore_function_type( &::CBaseEntity::Restore )
+                , ( bp::arg("restore") ) );
+        
+        }
         { //::CBaseEntity::RunOnPostSpawnScripts
         
             typedef void ( ::CBaseEntity::*RunOnPostSpawnScripts_function_type )(  ) ;
@@ -5029,6 +5071,16 @@ void register_CBaseEntity_class(){
             CBaseEntity_exposer.def( 
                 "SUB_Vanish"
                 , SUB_Vanish_function_type( &::CBaseEntity::SUB_Vanish ) );
+        
+        }
+        { //::CBaseEntity::Save
+        
+            typedef int ( ::CBaseEntity::*Save_function_type )( ::ISave & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "Save"
+                , Save_function_type( &::CBaseEntity::Save )
+                , ( bp::arg("save") ) );
         
         }
         { //::CBaseEntity::ScriptEmitSound

@@ -413,6 +413,36 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
         C_UnitBase::OnOutSelectionBox( );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: C_UnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_UnitBase::OnRestore(  );
+            }
+        else
+            this->C_UnitBase::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        C_UnitBase::OnRestore( );
+    }
+
     virtual void OnUnitTypeChanged( char const * old_unit_type ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1820,6 +1850,17 @@ void register_C_UnitBase_class(){
                 "OnOutSelectionBox"
                 , OnOutSelectionBox_function_type(&::C_UnitBase::OnOutSelectionBox)
                 , default_OnOutSelectionBox_function_type(&C_UnitBase_wrapper::default_OnOutSelectionBox) );
+        
+        }
+        { //::C_UnitBase::OnRestore
+        
+            typedef void ( ::C_UnitBase::*OnRestore_function_type )(  ) ;
+            typedef void ( C_UnitBase_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::C_UnitBase::OnRestore)
+                , default_OnRestore_function_type(&C_UnitBase_wrapper::default_OnRestore) );
         
         }
         { //::C_UnitBase::OnUnitTypeChanged

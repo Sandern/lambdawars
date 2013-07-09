@@ -214,6 +214,36 @@ struct CBaseAnimating_wrapper : CBaseAnimating, bp::wrapper< CBaseAnimating > {
         CBaseAnimating::ModifyOrAppendCriteria( boost::ref(set) );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CBaseAnimating\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::OnRestore(  );
+            }
+        else
+            this->CBaseAnimating::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CBaseAnimating::OnRestore( );
+    }
+
     virtual void OnSequenceSet( int nOldSequence ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2488,10 +2518,12 @@ void register_CBaseAnimating_class(){
         { //::CBaseAnimating::OnRestore
         
             typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
+            typedef void ( CBaseAnimating_wrapper::*default_OnRestore_function_type )(  ) ;
             
             CBaseAnimating_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type( &::CBaseAnimating::OnRestore ) );
+                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
+                , default_OnRestore_function_type(&CBaseAnimating_wrapper::default_OnRestore) );
         
         }
         { //::CBaseAnimating::OnSequenceSet
@@ -2629,6 +2661,16 @@ void register_CBaseAnimating_class(){
             CBaseAnimating_exposer.def( 
                 "ResetSequenceInfo"
                 , ResetSequenceInfo_function_type( &::CBaseAnimating::ResetSequenceInfo ) );
+        
+        }
+        { //::CBaseAnimating::Restore
+        
+            typedef int ( ::CBaseAnimating::*Restore_function_type )( ::IRestore & ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "Restore"
+                , Restore_function_type( &::CBaseAnimating::Restore )
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseAnimating::Scorch

@@ -1054,6 +1054,36 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         CBaseAnimating::ModifyOrAppendCriteria( boost::ref(set) );
     }
 
+    virtual void OnRestore(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnRestore(  ) of Class: CBaseAnimatingOverlay\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnRestore = this->get_override( "OnRestore" );
+        if( func_OnRestore.ptr() != Py_None )
+            try {
+                func_OnRestore(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimatingOverlay::OnRestore(  );
+            }
+        else
+            this->CBaseAnimatingOverlay::OnRestore(  );
+    }
+    
+    void default_OnRestore(  ) {
+        CBaseAnimatingOverlay::OnRestore( );
+    }
+
     virtual void OnSequenceSet( int nOldSequence ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2671,6 +2701,17 @@ void register_CHL2WarsPlayer_class(){
                 , ModifyOrAppendCriteria_function_type(&::CBaseAnimating::ModifyOrAppendCriteria)
                 , default_ModifyOrAppendCriteria_function_type(&CHL2WarsPlayer_wrapper::default_ModifyOrAppendCriteria)
                 , ( bp::arg("set") ) );
+        
+        }
+        { //::CBaseAnimatingOverlay::OnRestore
+        
+            typedef void ( ::CBaseAnimatingOverlay::*OnRestore_function_type )(  ) ;
+            typedef void ( CHL2WarsPlayer_wrapper::*default_OnRestore_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "OnRestore"
+                , OnRestore_function_type(&::CBaseAnimatingOverlay::OnRestore)
+                , default_OnRestore_function_type(&CHL2WarsPlayer_wrapper::default_OnRestore) );
         
         }
         { //::CBaseAnimating::OnSequenceSet
