@@ -145,7 +145,7 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 			Msg( "No factory for %s/%s\n", lookup->GetMapName(), m_ClassDict.GetElementName( i ) );
 #endif
 		}
-#endif // 0
+#endif // ENABLE_PYTHON
 	}
 
 	return NULL;

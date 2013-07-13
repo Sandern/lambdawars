@@ -96,6 +96,9 @@ IEntityFactoryDictionary *EntityFactoryDictionary()
 
 void DumpEntityFactories_f()
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
 	if ( dict )
 	{
@@ -114,6 +117,9 @@ static ConCommand dumpentityfactories( "dumpentityfactories", DumpEntityFactorie
 //-----------------------------------------------------------------------------
 CON_COMMAND( dump_entity_sizes, "Print sizeof(entclass)" )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	((CEntityFactoryDictionary*)EntityFactoryDictionary())->ReportEntitySizes();
 }
 
@@ -303,7 +309,7 @@ private:
 //-----------------------------------------------------------------------------
 // Drops an entity onto the floor
 //-----------------------------------------------------------------------------
-int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgnore)
+int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgnore )
 {
 	// Assume no ground
 	pEntity->SetGroundEntity( NULL );
@@ -311,10 +317,13 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 	Assert( pEntity );
 
 	trace_t	trace;
+
+#ifndef HL2MP
 	// HACK: is this really the only sure way to detect crossing a terrain boundry?
 	UTIL_TraceEntity( pEntity, pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
 	if (trace.fraction == 0.0)
 		return -1;
+#endif // HL2MP
 
 	UTIL_TraceEntity( pEntity, pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin() - Vector(0,0,256), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
 
@@ -498,6 +507,9 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	// Entities shouldn't reference other entities in their destructors
 	//  that type of code should only occur in an UpdateOnRemove call
 	g_bDisableEhandleAccess = true;
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( oldObj->GetPyInstance().ptr() != Py_None )
 	{
@@ -510,6 +522,9 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	}
 	else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	{
 		delete oldObj;
 	}

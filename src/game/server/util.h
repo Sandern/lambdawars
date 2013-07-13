@@ -171,7 +171,7 @@ class CBasePlayer;
 // Misc useful
 inline bool FStrEq(const char *sz1, const char *sz2)
 {
-	return ( sz1 == sz2 || stricmp(sz1, sz2) == 0 );
+	return ( sz1 == sz2 || V_stricmp(sz1, sz2) == 0 );
 }
 
 #if 0
