@@ -540,8 +540,7 @@ void __MsgFunc_PyNetworkVarChangedCallback( bf_read &msg )
 		return;
 	}
 
-	if( h->PyUpdateNetworkVar( buf, data ) )
-		h->PyNetworkVarCallChangedCallback( buf );
+	h->PyUpdateNetworkVar( buf, data, true );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
@@ -632,8 +631,7 @@ void __MsgFunc_PyNetworkArrayFullChangedCallback( bf_read &msg )
 		return;
 	}
 
-	if( h->PyUpdateNetworkVar( buf, data ) )
-		h->PyNetworkVarCallChangedCallback( buf );
+	h->PyUpdateNetworkVar( buf, data, true );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
@@ -769,8 +767,7 @@ void __MsgFunc_PyNetworkDictFullChangedCallback( bf_read &msg )
 		return;
 	}
 
-	if( h->PyUpdateNetworkVar( buf, data ) )
-		h->PyNetworkVarCallChangedCallback( buf );
+	h->PyUpdateNetworkVar( buf, data, true );
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{

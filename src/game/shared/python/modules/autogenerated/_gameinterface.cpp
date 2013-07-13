@@ -1807,8 +1807,6 @@ struct py_player_info_s_wrapper : py_player_info_s, bp::wrapper< py_player_info_
 
 };
 
-extern void SysAppendPath(const char *path, bool inclsubdirs = false);
-
 #ifdef _LINUX
 typedef struct model_t {};
 #endif // _LINUX
@@ -3469,8 +3467,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , ( bp::arg("pName") ) );
     
     }
-
-    bp::def( "SysAppendPath", SysAppendPath, bp::arg("path"), bp::arg("inclsubdirs") );
 
     bp::scope().attr( "engine" ) = boost::ref(pyengine);
 
@@ -5331,8 +5327,6 @@ struct py_player_info_s_wrapper : py_player_info_s, bp::wrapper< py_player_info_
     }
 
 };
-
-extern void SysAppendPath(const char *path, bool inclsubdirs = false);
 
 #ifdef _LINUX
 typedef struct model_t {};
@@ -7488,8 +7482,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , ( bp::arg("pName") ) );
     
     }
-
-    bp::def( "SysAppendPath", SysAppendPath, bp::arg("path"), bp::arg("inclsubdirs") );
 
     bp::scope().attr( "engine" ) = boost::ref(pyengine);
 

@@ -6726,36 +6726,36 @@ void C_BaseEntity::PyReceiveMessage( bp::list msg )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-bool C_BaseEntity::PyUpdateNetworkVar( const char *pName, bp::object data )
+void C_BaseEntity::PyUpdateNetworkVar( const char *pName, bp::object data, bool callchanged )
 {
 	// Set new var
 	try {
 		// Only set if changed.
 		if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
-			return false;
+			return;
 
 		setattr(m_pyInstance, pName, data);
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
 		PyErr_Clear();
-		return false;
+		return;
 	}
 
 	// Mark as data changed
 	AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
-	return true;
-}
 
-//------------------------------------------------------------------------------
-// Purpose:
-//------------------------------------------------------------------------------
-void C_BaseEntity::PyNetworkVarCallChangedCallback( const char *pName )
-{
-	try {
-		getattr( m_pyInstance, (const char *)VarArgs( "__%s__Changed", pName ) )();
-	} catch( boost::python::error_already_set & ) {
-		PyErr_Print();
-		PyErr_Clear();
+	// Dispatch changed callback if needed
+	if( callchanged )
+	{
+		try 
+		{
+			getattr( m_pyInstance, (const char *)VarArgs( "__%s__Changed", pName ) )();
+		} 
+		catch( boost::python::error_already_set & ) 
+		{
+			PyErr_Print();
+			PyErr_Clear();
+		}
 	}
 }
 

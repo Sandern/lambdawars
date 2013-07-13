@@ -82,10 +82,6 @@ class GameInterface(GenerateModuleSemiShared):
         # Exclude everything by default
         mb.decls().exclude() 
         
-        # Sys path append
-        mb.add_declaration_code( "extern void SysAppendPath(const char *path, bool inclsubdirs = false);\n" )
-        mb.add_registration_code( 'bp::def( "SysAppendPath", SysAppendPath, bp::arg("path"), bp::arg("inclsubdirs") );' )
-        
         # Linux model_t fix ( correct? )
         mb.add_declaration_code( '#ifdef _LINUX\r\n' + \
                              'typedef struct model_t {};\r\n' + \

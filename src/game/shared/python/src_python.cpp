@@ -82,11 +82,6 @@ CSrcPython *SrcPySystem()
 // Prevent python classes from initializing
 bool g_bDoNotInitPythonClasses = true;
 
-void SysAppendPath( const char *path, bool inclsubdirs = false )
-{
-	SrcPySystem()->SysAppendPath(path, inclsubdirs);
-}
-
 #ifdef CLIENT_DLL
 extern void HookPyNetworkCls();
 #endif // CLIENT_DLL
@@ -281,11 +276,7 @@ bool CSrcPython::Init( )
 #endif	// CLIENT_DLL
 
 	//  initialize the module that manages the python side
-#ifndef CLIENT_DLL
 	Run( Get("_Init", "srcmgr", true) );
-#else
-	Run( Get("_Init", "srcmgr", true) );
-#endif	// CLIENT_DLL
 
 #ifdef CLIENT_DLL
 	DevMsg( "CLIENT: " );
@@ -957,12 +948,8 @@ void CSrcPython::CleanupDelayedUpdateList()
 					py_delayed_data_update_list[i].callchanged );
 			}
 			
-			if( h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
-				py_delayed_data_update_list[i].data ) )
-			{
-				if( py_delayed_data_update_list[i].callchanged )
-					h->PyNetworkVarCallChangedCallback( py_delayed_data_update_list[i].name );
-			}
+			h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
+				py_delayed_data_update_list[i].data, py_delayed_data_update_list[i].callchanged );
 
 			py_delayed_data_update_list.Remove(i);
 		}
