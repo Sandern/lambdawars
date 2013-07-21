@@ -81,7 +81,7 @@ void PyResetAllNetworkTables();
 // Implement a python class. For python/c++ handle conversion
 #define DECLARE_PYCLASS( name )																		\
 	public:																							\
-	boost::python::object CreatePyHandle( void ) const												\
+	virtual boost::python::object CreatePyHandle( void ) const										\
 	{																								\
 		return CreatePyHandleHelper(this, #name "HANDLE");											\
 	}
