@@ -409,6 +409,9 @@ void CGlobalEntityList::CleanupDeleteList( void )
 	g_bDisableEhandleAccess = true;
 	for ( int i = 0; i < g_DeleteList.Count(); i++ )
 	{
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 		if( g_DeleteList[i]->GetBaseEntity()->GetPyInstance().ptr() != Py_None )
 		{
@@ -417,6 +420,9 @@ void CGlobalEntityList::CleanupDeleteList( void )
 		}
 		else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 		{
 			g_DeleteList[i]->Release();
 		}
@@ -1890,6 +1896,9 @@ private:
 
 CON_COMMAND(report_entities, "Lists all entities")
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	CSortedEntityList list;
 	CBaseEntity *pEntity = gEntList.FirstEnt();
 	while ( pEntity )
@@ -1903,6 +1912,9 @@ CON_COMMAND(report_entities, "Lists all entities")
 
 CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	CSortedEntityList list;
 	CBaseEntity *pEntity = gEntList.FirstEnt();
 	const char *pClassname = NULL;
@@ -1932,6 +1944,9 @@ CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 
 CON_COMMAND(report_simthinklist, "Lists all simulating/thinking entities")
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	CBaseEntity *pTmp[NUM_ENT_ENTRIES];
 	int count = SimThink_ListCopy( pTmp, ARRAYSIZE(pTmp) );
 

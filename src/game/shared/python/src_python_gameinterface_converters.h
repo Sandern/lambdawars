@@ -53,8 +53,6 @@ struct wrap_model_t_to_model_t
 	}
 
 	static void* extract_model_t(PyObject* op) {
-		//if ( Q_strncmp( Py_TYPE(op)->tp_name, "model_t", 9 ) )
-		//	return (void *)0;
 		boost::python::object handle = boost::python::object(
 			boost::python::handle<>(
 			boost::python::borrowed(op)

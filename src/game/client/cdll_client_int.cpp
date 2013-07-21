@@ -2443,11 +2443,14 @@ void UpdatePVSNotifiers()
 	}
 }
 
+
 void OnRenderStart()
 {
 	VPROF( "OnRenderStart" );
 	MDLCACHE_CRITICAL_SECTION();
 	MDLCACHE_COARSE_LOCK();
+
+
 
 	partition->SuppressLists( PARTITION_ALL_CLIENT_EDICTS, true );
 	C_BaseEntity::SetAbsQueriesValid( false );
