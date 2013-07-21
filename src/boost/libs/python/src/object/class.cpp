@@ -27,8 +27,6 @@
 #include <new>
 #include <structmember.h>
 
-//#include "tier0/dbg.h"	// Uncomment for debugging (Msg())
-
 namespace boost { namespace python {
 
 # ifdef BOOST_PYTHON_SELF_IS_CLASS
