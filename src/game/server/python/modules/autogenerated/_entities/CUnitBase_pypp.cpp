@@ -1813,23 +1813,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CUnitBase::OnCursorExited( boost::python::ptr(player) );
     }
 
-    virtual float EnemyDistance( ::CBaseEntity * pEnemy, bool bConsiderSizeUnit=true ) {
-        boost::python::override func_EnemyDistance = this->get_override( "EnemyDistance" );
-        if( func_EnemyDistance.ptr() != Py_None )
-            try {
-                return func_EnemyDistance( pEnemy ? pEnemy->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                return this->CUnitBase::EnemyDistance( boost::python::ptr(pEnemy), bConsiderSizeUnit );
-            }
-        else
-            return this->CUnitBase::EnemyDistance( boost::python::ptr(pEnemy), bConsiderSizeUnit );
-    }
-
-    float default_EnemyDistance( ::CBaseEntity * pEnemy, bool bConsiderSizeUnit=true ) {
-        return CUnitBase::EnemyDistance( boost::python::ptr(pEnemy), bConsiderSizeUnit );
-    }
-
 };
 
 void register_CUnitBase_class(){
@@ -1965,6 +1948,16 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "DoMuzzleFlash"
                 , DoMuzzleFlash_function_type( &::CUnitBase::DoMuzzleFlash ) );
+        
+        }
+        { //::CUnitBase::EnemyDistance
+        
+            typedef float ( ::CUnitBase::*EnemyDistance_function_type )( ::CBaseEntity *,bool ) ;
+            
+            CUnitBase_exposer.def( 
+                "EnemyDistance"
+                , EnemyDistance_function_type( &::CUnitBase::EnemyDistance )
+                , ( bp::arg("pEnemy"), bp::arg("bConsiderSizeUnit")=(bool)(true) ) );
         
         }
         { //::CUnitBase::FInAimCone
@@ -3136,11 +3129,6 @@ void register_CUnitBase_class(){
             , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnCursorExited)
             , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnCursorExited)
             , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "EnemyDistance"
-            , (float ( ::CUnitBase::* )( ::CBaseEntity *,bool ) )(&::CUnitBase::EnemyDistance)
-            , (float ( CUnitBase_wrapper::* )( ::CBaseEntity *,bool ) )(&CUnitBase_wrapper::default_EnemyDistance)
-            , ( boost::python::arg("pEnemy"), boost::python::arg("bConsiderSizeUnit")=(bool)(true) ) );
     }
 
 }

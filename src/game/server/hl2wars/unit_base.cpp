@@ -861,76 +861,6 @@ bool CUnitBase::PassesDamageFilter( const CTakeDamageInfo &info )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Return dist. to enemy (closest of origin/head/feet)
-// Input  :
-// Output :
-//-----------------------------------------------------------------------------
-float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
-{
-	if( !pEnemy )
-	{		
-#ifdef ENABLE_PYTHON
-		PyErr_SetString(PyExc_Exception, "Invalid enemy" );
-		throw boost::python::error_already_set(); 
-#endif // ENABLE_PYTHON
-		return 0.0f;
-	}
-
-	// For large units (i.e. buildings) use a trace
-	float fBoundingRadius2D = pEnemy->CollisionProp()->BoundingRadius2D();
-	if( fBoundingRadius2D > 96.0f )
-	{
-		trace_t tr;
-		Ray_t ray;
-		ray.Init( WorldSpaceCenter(), pEnemy->WorldSpaceCenter() );
-		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pEnemy, &tr );
-		if( tr.DidHit() )
-		{
-			return (WorldSpaceCenter() - tr.endpos).Length2D();
-		}
-		else
-		{
-			Warning("CUnitBase::TargetDistance: Did not hit target!\n");
-		}
-	}
-
-	Vector enemyDelta = pEnemy->WorldSpaceCenter() - WorldSpaceCenter();
-
-	// NOTE: We ignore rotation for computing height.  Assume it isn't an effect
-	// we care about, so we simply use OBBSize().z for height.  
-	// Otherwise you'd do this:
-	// pEnemy->CollisionProp()->WorldSpaceSurroundingBounds( &enemyMins, &enemyMaxs );
-	// float enemyHeight = enemyMaxs.z - enemyMins.z;
-
-	float enemyHeight = pEnemy->CollisionProp()->OBBSize().z;
-	float myHeight = CollisionProp()->OBBSize().z;
-
-	// max distance our centers can be apart with the boxes still overlapping
-	float flMaxZDist = ( enemyHeight + myHeight ) * 0.5f;
-
-	// see if the enemy is closer to my head, feet or in between
-	if ( enemyDelta.z > flMaxZDist )
-	{
-		// enemy feet above my head, compute distance from my head to his feet
-		enemyDelta.z -= flMaxZDist;
-	}
-	else if ( enemyDelta.z < -flMaxZDist )
-	{
-		// enemy head below my feet, return distance between my feet and his head
-		enemyDelta.z += flMaxZDist;
-	}
-	else
-	{
-		// boxes overlap in Z, no delta
-		enemyDelta.z = 0;
-	}
-
-	if( bConsiderSizeUnit )
-		return Max(enemyDelta.Length() - fBoundingRadius2D, 0.0f);
-	return enemyDelta.Length();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit )
@@ -944,13 +874,15 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 		return 0.0f;
 	}
 
+	const Vector &targetPos = pTarget->WorldSpaceCenter();
+
 	// For large units (i.e. buildings) use a trace
 	float fBoundingRadius2D = pTarget->CollisionProp()->BoundingRadius2D();
 	if( fBoundingRadius2D > 96.0f )
 	{
 		trace_t tr;
 		Ray_t ray;
-		ray.Init( pos, pTarget->WorldSpaceCenter() );
+		ray.Init( pos, pTarget->EyePosition() ); // For buildings, the eye position is usually a better test position
 		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pTarget, &tr );
 		if( tr.DidHit() )
 		{
@@ -959,10 +891,12 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 		else
 		{
 			Warning("CUnitBase::TargetDistance: Did not hit target!\n");
+			if( g_debug_rangeattacklos.GetBool() )
+				NDebugOverlay::Line( pos, targetPos, 0, 255, 0, true, 1.0f );
 		}
 	}
 
-	Vector enemyDelta = pTarget->WorldSpaceCenter() - pos;
+	Vector enemyDelta = targetPos - pos;
 
 	// NOTE: We ignore rotation for computing height.  Assume it isn't an effect
 	// we care about, so we simply use OBBSize().z for height.  

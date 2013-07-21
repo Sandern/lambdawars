@@ -493,8 +493,6 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('SetPyThink').rename('SetThink')
         mb.mem_funs('GetPyThink').rename('GetThink')
         mb.mem_funs('CreatePyHandle').exclude() # Use GetHandle instead.
-        #mb.mem_funs('CreatePyHandle').rename('CreateHandle')
-        #mb.mem_funs('CreatePyHandle').virtuality = 'not virtual'
         mb.mem_funs('GetPyHandle').rename('GetHandle')
         mb.mem_funs('GetPySelf').exclude()
         
@@ -1294,8 +1292,8 @@ class Entities(GenerateModuleSemiShared):
                              , cls.mem_fun('IsClimbing'))    
             cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
         else:
-            cls.mem_funs('EnemyDistance').exclude() 
-            AddWrapReg( mb, 'CUnitBase', cls.mem_fun('EnemyDistance'), [CreateEntityArg('pEnemy')] )
+            #cls.mem_funs('EnemyDistance').exclude() 
+            #AddWrapReg( mb, 'CUnitBase', cls.mem_fun('EnemyDistance'), [CreateEntityArg('pEnemy')] )
             cls.mem_funs('GetLastTakeDamageTime').exclude()
                  
             cls.vars('m_fDeathDrop').rename('deathdrop')

@@ -301,7 +301,7 @@ public:
 	// Enemy/attack related
 	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos );
 	virtual bool		HasRangeAttackLOSTarget( CBaseEntity *pTarget );
-	virtual float		EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit=true );
+	float				EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit=true );
 	virtual float		TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit=true );
 	virtual bool		FInAimCone( CBaseEntity *pEntity, float fMinDot=0.994f );
 	virtual bool		FInAimCone( const Vector &vecSpot, float fMinDot=0.994f );
@@ -602,6 +602,14 @@ inline UnitBaseAnimState *CUnitBase::GetAnimState()
 inline Class_T CUnitBase::Classify ( void )
 {
 	return CLASS_PLAYER;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Return dist. to enemy (closest of origin/head/feet)
+//-----------------------------------------------------------------------------
+inline float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
+{
+	return TargetDistance( WorldSpaceCenter(), pEnemy, bConsiderSizeUnit );
 }
 
 #ifdef ENABLE_PYTHON
