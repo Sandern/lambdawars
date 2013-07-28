@@ -63,12 +63,9 @@ class UnitHelper(GenerateModuleSemiShared):
         mb.free_function('Unit_ClampYaw').include()
     
         cls = mb.class_('UnitBaseMoveCommand')
-        cls.include()
-        cls.var('m_hBlocker').exclude()
-        cls.mem_funs('GetBlocker').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetBlocker').exclude()
-        cls.add_property( 'blocker'
-                         , cls.mem_fun('GetBlocker') )       
+        cls.include() 
+        cls.var('blockers').exclude()
+        cls.var('pyblockers').rename('blockers')
        
         cls = mb.class_('UnitBaseLocomotion')
         cls.include()

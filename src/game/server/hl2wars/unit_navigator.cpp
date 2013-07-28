@@ -76,6 +76,7 @@ ConVar unit_dens_all_nomove("unit_dens_all_nomove", "0.5");
 
 ConVar unit_cost_distweight("unit_cost_distweight", "1.0");
 ConVar unit_cost_timeweight("unit_cost_timeweight", "1.0");
+ConVar unit_cost_lastdirweight("unit_cost_lastdirweight", "25.0");
 ConVar unit_cost_discomfortweight_start("unit_cost_discomfortweight_start", "1.0");
 ConVar unit_cost_discomfortweight_growthreshold("unit_cost_discomfortweight_growthreshold", "0.05");
 ConVar unit_cost_discomfortweight_growrate("unit_cost_discomfortweight_growrate", "500.0");
@@ -101,6 +102,8 @@ ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
 ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
 ConVar unit_navigator_debug_show("unit_navigator_debug_show", "0", 0, "Shows debug information about the unit navigator");
+ConVar unit_navigator_debugoverlay_ent("unit_navigator_debugoverlay_ent", "-1", 0, "Shows debug information only for specific unit");
+ConVar unit_navigator_notestnearbyunits("unit_navigator_notestnearbyunits", "0", 0, "Don't test nearby units for same goal");
 
 #define THRESHOLD unit_potential_threshold.GetFloat()
 #define THRESHOLD_MIN (THRESHOLD+(GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmin_offset.GetFloat() : unit_potential_nogoal_tmin_offset.GetFloat()) )
@@ -204,6 +207,7 @@ void UnitBaseNavigator::Reset()
 	m_bNoPathVelocity = false;
 	m_fIgnoreNavMeshTime = 0.0f;
 	m_bNoNavAreasNearby = true; // Reset, so we ignore nav meshes until we found a valid area again
+	m_vLastDirection = vec3_origin;
 
 	m_vLastWishVelocity.Init(0, 0, 0);
 
@@ -216,6 +220,8 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastBestDensity = 0.0f;
 	m_fDiscomfortWeight = unit_cost_discomfortweight_start.GetFloat();
+
+	m_hAtGoalDependencyEnt = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -280,20 +286,20 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 
 	// Check goal and update path
 	Vector vPathDir;
-	float fGoalDist;
+	float fWaypointDist;
 	CheckGoalStatus_t GoalStatus;
 
 	// Allow the AI to override the desired goal velocity
 	if( m_vForceGoalVelocity.IsValid() )
 	{
 		vPathDir = m_vForceGoalVelocity;
-		fGoalDist = VectorNormalize( vPathDir ) + 1000.0f;
+		fWaypointDist = VectorNormalize( vPathDir ) + 1000.0f;
 		GoalStatus = CHS_HASGOAL;
 		RegenerateConsiderList( vPathDir, GoalStatus );
 	}
 	else
 	{
-		GoalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fGoalDist );
+		GoalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fWaypointDist );
 	}
 
 	// TODO/CHECK: If at goal we should probably not move. Otherwise the unit might move away when trying to bump into a target entity (like an enemy).
@@ -302,15 +308,15 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		if( !m_bNoAvoid || GoalStatus == CHS_NOGOAL )
 		{
 			// Compute our wish velocity based on the flow velocity and path velocity (if any)
-			m_vLastWishVelocity = ComputeVelocity( GoalStatus, MoveCommand, vPathDir, fGoalDist );
+			m_vLastWishVelocity = ComputeVelocity( GoalStatus, MoveCommand, vPathDir, fWaypointDist );
 		}
 		else
 		{
 			float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
 
 			// TODO: If we are very close to the waypoint, should we always go to the waypoint?
-			if( (fGoalDist-MoveCommand.stopdistance) <= fMaxTravelDist /*&& GetPath()->CurWaypointIsGoal()*/ )
-				m_vLastWishVelocity = ((fGoalDist-MoveCommand.stopdistance)/MoveCommand.interval) * vPathDir;
+			if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
+				m_vLastWishVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * vPathDir;
 			else
 				m_vLastWishVelocity = MoveCommand.maxspeed * vPathDir;
 			}
@@ -345,9 +351,12 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	VectorAngles( vDir, vAngles );
 	CalcMove( MoveCommand, vAngles, fSpeed );
 
-	UpdateBlockedStatus( MoveCommand );
+	UpdateBlockedStatus( MoveCommand, fWaypointDist );
 	if( GoalStatus == CHS_HASGOAL && GetBlockedStatus() == BS_GIVEUP )
+	{
+		Warning("#%d UnitNavigator: Unit gives up on goal due being blocked!\n", GetOuter()->entindex());
 		GoalStatus = CHS_FAILED;
+	}
 
 	UpdateGoalStatus( MoveCommand, GoalStatus );
 
@@ -577,9 +586,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 	int n, i, j;
 	float fRadius;
 	CBaseEntity *pEnt;
-	//CUnitBase *pUnit;
 	CBaseEntity *pList[CONSIDER_SIZE];
-	//UnitBaseNavigator *pNavigator;
 
 	const Vector &origin = GetAbsOrigin();
 	fRadius = GetEntityBoundingRadius(m_pOuter);
@@ -591,7 +598,6 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 		fRadius *= 2.0f;
 
 	// Reset list information
-	//m_bUnitArrivedAtSameGoalNearby = false;
 	m_iUsedTestDirections = 0;
 
 	// Detect nearby entities
@@ -624,24 +630,10 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 
 		// Store general info
 		m_ConsiderList[m_iConsiderSize].m_pEnt = pEnt;
-#if 0
-		pUnit = pEnt->MyUnitPointer();
-		if( pUnit )
-		{
-			pNavigator = pUnit->GetNavigator();
-			if( pNavigator && pNavigator->GetPath()->m_iGoalType == GOALTYPE_NONE && 
-					(pNavigator->GetPath()->m_vGoalPos - GetPath()->m_vGoalPos).Length2DSqr() < (64.0f*64.0f) )
-			{
-				m_bUnitArrivedAtSameGoalNearby = true;
-				if( GetPath()->m_iGoalType == GOALTYPE_NONE )
-					continue;
-			}
-		}
-#endif // 0
-
 		m_iConsiderSize++;
 	}
 
+	// Compute densities
 	if( GoalStatus == CHS_NOGOAL )
 	{
 		m_pOuter->GetVectors(&m_vTestDirections[m_iUsedTestDirections], NULL, NULL); // Just use forward as start dir
@@ -887,7 +879,7 @@ float UnitBaseNavigator::ComputeEntityDensity( const Vector &vPos, CBaseEntity *
 // Purpose: Computes the cost for going in a test direction.
 //-----------------------------------------------------------------------------
 float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
-										 UnitBaseMoveCommand &MoveCommand, Vector &vGoalPathDir, float &fGoalDist, float &fDensity )
+										 UnitBaseMoveCommand &MoveCommand, Vector &vGoalPathDir, const float &fWaypointDist, float &fDensity )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeUnitCost", VPROF_BUDGETGROUP_UNITS );
 
@@ -907,9 +899,8 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// Compute path speed
 	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
 		float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
-		// TODO: If we are very close to the waypoint, should we always go to the waypoint?
-		if( (fGoalDist-MoveCommand.stopdistance) <= fMaxTravelDist /*&& GetPath()->CurWaypointIsGoal()*/ )
-			vPathVelocity = ((fGoalDist-MoveCommand.stopdistance)/MoveCommand.interval) * m_vTestDirections[iPos];
+		if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
+			vPathVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * m_vTestDirections[iPos];
 		else
 			vPathVelocity = MoveCommand.maxspeed * m_vTestDirections[iPos];
 	}
@@ -919,10 +910,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	}
 
 	// Compute flow speed
-	//if( GoalStatus == CHS_NOGOAL )
-		vFlowVelocity = vAvgVelocity;
-	//else
-	//	vFlowVelocity = vAvgVelocity.Length2D() * m_vTestDirections[iPos];
+	vFlowVelocity = vAvgVelocity;
 
 	// Zero out flow velocity if too low. Otherwise it results in retarded movement.
 	if( vFlowVelocity.Length2D() < 15.0f )
@@ -942,21 +930,28 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	else
 	{
 		// Computed interpolated speed
-		vFinalVelocity = vPathVelocity + ( (fDensity - fThresholdMin)/(fThresholdMax - fThresholdMin) ) * (vFlowVelocity - vPathVelocity);
+		vFinalVelocity = vPathVelocity + ( ( fDensity - fThresholdMin ) / ( fThresholdMax - fThresholdMin ) ) * ( vFlowVelocity - vPathVelocity );
 	}
 
 	fSpeed = vFinalVelocity.Length2D();
 	*pFinalVelocity = vFinalVelocity;
 
+	// Velocity when having no goal is solely based on the density (i.e. just move away if something is getting close)
 	if( GoalStatus == CHS_NOGOAL || fSpeed == 0 ) 
 	{
 		return fDensity; 
 	}
 
-	// Return weighted cost
-	return ( ( unit_cost_timeweight.GetFloat()*(fDist/fSpeed) ) + 
-		     ( unit_cost_distweight.GetFloat()*fDist ) + 
-			 ( m_fDiscomfortWeight*fDensity ) );
+	// Return weighted cost based on the following parameters:
+	// 1. The reducement in time it will take to reach the next waypoint when going in this direction (TODO: same as 2?)
+	// 2. The new distance to the next waypoint when going in this direction (TODO: same as 1?)
+	// 3. The disconform the unit feels due the density in the tested direction
+	// 4. The change in direction from the last direction we went. We slightly prefer to keep going in 
+	//	  the same direction as the last time (otherwise we might ping pong back and forth between two spots)
+	return ( ( unit_cost_timeweight.GetFloat() * ( fDist / fSpeed ) ) + 
+		     ( unit_cost_distweight.GetFloat() * fDist ) + 
+			 ( m_fDiscomfortWeight * fDensity ) ) +
+			 ( (vFinalVelocity.Normalized() - m_vLastDirection).Length2D() * unit_cost_lastdirweight.GetFloat() );
 }
 
 //-----------------------------------------------------------------------------
@@ -964,7 +959,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 //			The unit will try to move in the path direction, but prefers
 //			to go into a low density direction.
 //-----------------------------------------------------------------------------
-Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist )
+Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeVelocity", VPROF_BUDGETGROUP_UNITS );
 
@@ -998,7 +993,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		int pos = -1;
 		for( i=0; i<m_iUsedTestDirections; i++ )	
 		{
-			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist, fComputedDensity );
+			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fWaypointDist, fComputedDensity );
 			if( fComputedDensity > fHighestDensity )
 				fHighestDensity = fComputedDensity;
 			if( fCost < fBestCost )
@@ -1015,17 +1010,13 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		{
 			vBestVel = m_vTestDirections[pos] * (fHighestDensity-m_fLastBestDensity) * MoveCommand.maxspeed;
 		}
-		else
-		{
-			//vBestVel = vec3_origin;
-		}
 	}
 	else
 	{
 		// Find best cost and use that speed + direction
 		for( i=0; i<m_iUsedTestDirections; i++ )	
 		{
-			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fGoalDist, fComputedDensity );
+			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fWaypointDist, fComputedDensity );
 			if( fCost < fBestCost )
 			{
 				fBestCost = fCost;
@@ -1034,25 +1025,11 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			}
 		}
 
-		// Zero out velocity if density is too high in all directions
-		// Scale no move density to 1.0 depending on the cost weight
-		/*float fDensNoMove = unit_dens_all_nomove.GetFloat();
-		if( fDensNoMove < 1.0 )
+		if( GetBlockedStatus() >= BS_STUCK && m_fLastBestDensity > 90.0f )
 		{
-			float fWeight = (m_fDiscomfortWeight-unit_cost_discomfortweight_start.GetFloat()) / (unit_cost_discomfortweight_max.GetFloat()-unit_cost_discomfortweight_start.GetFloat());
-			fDensNoMove = fDensNoMove + (1.0-fDensNoMove)+fWeight;
-		}*/
-		//if( m_fLastBestDensity > fDensNoMove )
-		{
-			if( GetBlockedStatus() >= BS_STUCK && m_fLastBestDensity > 90.0f )
-			{
-				vBestVel = vPathDir * MoveCommand.maxspeed; // NOTE: Stuck because there are no nav areas around. Just try moving!
-				m_bNoNavAreasNearby = true;
-			}
-			else
-			{
-				//vBestVel.Zero();
-			}
+			// NOTE: Stuck because there are no nav areas around (density higher than 90). Just try moving!
+			vBestVel = vPathDir * MoveCommand.maxspeed; 
+			m_bNoNavAreasNearby = true;
 		}
 	}
 
@@ -1062,6 +1039,8 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		m_fDebugLastBestCost = fBestCost;
 		m_DebugLastMoveCommand = MoveCommand;
 	}
+
+	m_vLastDirection = vBestVel.Normalized();
 
 	return vBestVel;
 }
@@ -1108,6 +1087,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	// Reset here, because it might not regenerate the list
 	m_iConsiderSize = 0;
 	m_iUsedTestDirections = 0;
+
+	// Reset current goal dependency
+	m_hAtGoalDependencyEnt = NULL;
 
 	// Store distance and range
 	UpdateGoalInfo();
@@ -1185,13 +1167,11 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
 	{
 		// Goal is satisfied if our blocker is the target or if we are REALLY close
-		if( MoveCommand.m_hBlocker == GetPath()->m_hTarget || m_fGoalDistance < GetEntityBoundingRadius(m_pOuter)*2.0f )
+		if( MoveCommand.HasBlocker( GetPath()->m_hTarget ) || m_fGoalDistance < GetEntityBoundingRadius(m_pOuter)*2.0f || TestNearbyUnitsWithSameGoal( MoveCommand ) )
 		{
 			return CHS_ATGOAL;
 		}
-		else if( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && 
-				 MoveCommand.m_hBlocker && 
-				 MoveCommand.m_hBlocker->GetOwnerEntity() == GetPath()->m_hTarget )
+		else if( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && MoveCommand.HasBlockerWithOwnerEntity( GetPath()->m_hTarget ) )
 		{
 			return CHS_ATGOAL;
 		}
@@ -1221,7 +1201,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				bPathBlocked = UpdateReactivePath();
 			}
 
-			if( /*GetPath()->CurWaypointIsGoal() &&*/ m_fGoalDistance < GetPath()->m_fMinRange )
+			if( m_fGoalDistance < GetPath()->m_fMinRange )
 			{
 				// Back off if too close
 				vPathDir = GetAbsOrigin() - GetPath()->m_vGoalPos;
@@ -1247,8 +1227,14 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 						DevMsg("blocked");
 					if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
 						DevMsg(", no movement");
-					if( MoveCommand.m_hBlocker )
-						DevMsg(", blocked entity: #%d - %s", MoveCommand.m_hBlocker->entindex(), MoveCommand.m_hBlocker->GetClassname());
+					for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
+					{
+						CBaseEntity *pBlocker = MoveCommand.blockers[i].blocker;
+						if( !pBlocker )
+							continue;
+
+						DevMsg(", blocked entity: #%d - %s", pBlocker->entindex(), pBlocker->GetClassname());
+					}
 					DevMsg(")\n");
 				}
 
@@ -1270,14 +1256,19 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(3.0f, 5.0f);
 			}
 
-			// Apparently we are stuck, so try to add a seed that serves as density point
-			// TODO/FIXME: what if you get blocked due the place of the waypoint? In this case it might insert a seed that is undesirable.
-			if( MoveCommand.m_hBlocker ) // && MoveCommand.m_hBlocker->IsWorld() )
+			if( GetBlockedStatus() > BS_LITTLE )
 			{
-				Vector vHitPos = MoveCommand.blocker_hitpos + MoveCommand.blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
-				InsertSeed( vHitPos );
+				// Apparently we are stuck, so try to add a seed that serves as density point
+				for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
+				{
+					if( !MoveCommand.blockers[i].blocker )
+						continue;
+
+					Vector vHitPos = MoveCommand.blockers[i].blocker_hitpos + MoveCommand.blockers[i].blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
+					InsertSeed( vHitPos );
+				}
+				InsertSeed( GetAbsOrigin() );
 			}
-			InsertSeed( GetAbsOrigin() );
 		}
 	}
 
@@ -1335,6 +1326,59 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool UnitBaseNavigator::TestNearbyUnitsWithSameGoal( UnitBaseMoveCommand &MoveCommand )
+{
+	if( unit_navigator_notestnearbyunits.GetBool() )
+		return false;
+
+	// Only when at least slightly blocked, except when we are at our goal
+	// In that case we need to keep testing.
+	if( m_LastGoalStatus != CHS_ATGOAL && GetBlockedStatus() < BS_LITTLE )
+		return false;
+
+	// The current path must be the goal waypoint
+	if( !GetPath()->CurWaypointIsGoal() )
+		return false;
+
+	// Must be within goal tolerance
+	if( GetGoalDistance() > GetPath()->m_fGoalTolerance )
+		return false;
+
+	for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
+	{
+		CBaseEntity *pBlocker = MoveCommand.blockers[i].blocker;
+		if( !pBlocker )
+			continue;
+
+		CUnitBase *pUnit = pBlocker->MyUnitPointer();
+		if( !pUnit )
+			continue;
+
+		UnitBaseNavigator *pNavigator = pUnit->GetNavigator();
+		if( !pNavigator )
+			continue;
+
+		while( pNavigator->GetAtGoalDependencyEnt() )
+		{
+			pNavigator = pNavigator->GetAtGoalDependencyEnt()->GetNavigator();
+		}
+
+		if( pNavigator == this )
+			continue;
+
+		if( pNavigator->GetGoalStatus() == CHS_ATGOAL && GetPath()->HasSamegoal( pNavigator->GetPath() ) )
+		{
+			m_hAtGoalDependencyEnt = pUnit;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Checks if in range of our goal.
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
@@ -1346,9 +1390,8 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		{
 			// skip dist check if we have no minimum range and are bumping into the target or the dist is really close (might have the wrong blocker set), then we are in range
 			float fTargetTolerance = GetEntityBoundingRadius(m_pOuter)*2.0f;
-			bool bTouchingTarget = MoveCommand.m_hBlocker && ( MoveCommand.m_hBlocker == GetPath()->m_hTarget || 
-				( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && MoveCommand.m_hBlocker->GetOwnerEntity() == GetPath()->m_hTarget ) );
-			if( !bTouchingTarget && m_fGoalDistance > fTargetTolerance )
+			bool bTouchingTarget = MoveCommand.HasBlocker( GetPath()->m_hTarget ) || MoveCommand.HasBlockerWithOwnerEntity( GetPath()->m_hTarget );
+			if( !bTouchingTarget && m_fGoalDistance > fTargetTolerance && !TestNearbyUnitsWithSameGoal( MoveCommand ) )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: Not in range (dist: %f, min: %f, max: %f, tolerance: %f)\n", 
@@ -1462,7 +1505,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		// Use full tolerance when blocked a bit and we have a blocker unit
 		// Otherwise use waypoint tolerance (so we get as close as possible)
 		float tolerance;
-		if( GetBlockedStatus() > BS_NONE && MoveCommand.m_hBlocker && MoveCommand.m_hBlocker->IsUnit() && MoveCommand.m_hBlocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
+		if( GetBlockedStatus() > BS_NONE && MoveCommand.blockers.Count() > 0 && MoveCommand.blockers[0].blocker && MoveCommand.blockers[0].blocker->IsUnit() && MoveCommand.blockers[0].blocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
 			tolerance = Max( GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance );
 		else
 			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
@@ -1892,14 +1935,14 @@ void UnitBaseNavigator::ResetBlockedStatus()
 
 	m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
 	m_bBlockedLongDistanceDetected = false;
-	m_vBlockedLastPosition = GetAbsOrigin();
+	m_fLastWaypointDistance = MAX_COORD_FLOAT;
 	m_fLowVelocityStartTime = 0.0f;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Update blocked status based on the last position.
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand )
+void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, const float &fWaypointDist )
 {
 	// Blocked status update only means something if we have a goal
 	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL || m_bLimitPositionActive )
@@ -1923,14 +1966,27 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand )
 	}
 
 	// Check long distance if needed
+	// Per interval, we expect we at least move a proportion of the max speed we can move.
 	if( m_fBlockedNextPositionCheck < gpGlobals->curtime )
 	{
+#if 0
 		float fDistSqr = (m_vBlockedLastPosition - GetAbsOrigin()).Length2DSqr();
 		float fMaxSpeedSqr = MoveCommand.maxspeed * MoveCommand.maxspeed;
-		float fMinDistMovedSqr = (fMaxSpeedSqr * 3.0f * 3.0f) / 4.0f;
+		float fMinDistMovedSqr = (fMaxSpeedSqr * 3.0f * 3.0f) / 2.0f;
 		m_bBlockedLongDistanceDetected = fDistSqr < fMinDistMovedSqr;
 		m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
 		m_vBlockedLastPosition = GetAbsOrigin();
+#else
+		// Only perform this check if the target is not moving
+		if( GetPath()->m_hTarget && GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) )
+		{
+			m_bBlockedLongDistanceDetected = ( m_fLastWaypointDistance - fWaypointDist ) > ( (MoveCommand.maxspeed * 1.0f) / 4.0f );
+			m_fLastWaypointDistance = Min( m_fLastWaypointDistance, fWaypointDist );
+			//if( m_bBlockedLongDistanceDetected )
+			//	NavDbgMsg("#%d UpdateBlockedStatus: Long distance blocked detected.\n", GetOuter()->entindex());
+			m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
+		}
+#endif // 0
 	}
 
 	if( (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f || !m_bBlockedLongDistanceDetected )
@@ -2774,6 +2830,9 @@ void UnitBaseNavigator::DrawDebugInfo()
 {
 	float fDensity, fRadius;
 	int i, j;
+
+	if( unit_navigator_debugoverlay_ent.GetInt() != -1 && unit_navigator_debugoverlay_ent.GetInt() != GetOuter()->entindex() )
+		return;
 
 	fRadius = GetEntityBoundingRadius(m_pOuter);
 

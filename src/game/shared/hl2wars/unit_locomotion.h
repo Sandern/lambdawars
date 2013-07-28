@@ -20,6 +20,22 @@ float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &
 float Unit_ClampYaw( float yawSpeedPerSec, float current, float target, float time );
 
 //-----------------------------------------------------------------------------
+// Blocker information
+//-----------------------------------------------------------------------------
+typedef struct UnitBlocker_t
+{
+	UnitBlocker_t() : blocker(NULL) {}
+	UnitBlocker_t( EHANDLE blocker, const Vector &blocker_hitpos, const Vector &blocker_dir ) :
+		blocker(blocker), blocker_hitpos(blocker_hitpos), blocker_dir(blocker_dir)
+	{
+	}
+
+	EHANDLE blocker;
+	Vector blocker_hitpos;
+	Vector blocker_dir;
+} UnitBlocker_t;
+
+//-----------------------------------------------------------------------------
 // The movement command. This controls the movement.
 //-----------------------------------------------------------------------------
 class UnitBaseMoveCommand
@@ -27,7 +43,8 @@ class UnitBaseMoveCommand
 public:
 	UnitBaseMoveCommand()
 	{
-		memset( this, 0, sizeof(*this) );
+		blockers.EnsureCount( 10 );
+		Clear();
 	}
 
 	void Clear()
@@ -37,8 +54,6 @@ public:
 		upmove = 0.0f;
 		jump = false;
 	}
-
-	inline CBaseEntity *GetBlocker() { return m_hBlocker; }
 
 	// Command
 	float forwardmove;
@@ -57,15 +72,52 @@ public:
 	float totaldistance;
 	Vector outwishvel;
 	float outstepheight;
-	EHANDLE m_hBlocker;
-	Vector blocker_hitpos;
-	Vector blocker_dir;
 	float stopdistance;
+
+	// Out list of blockers
+	CUtlVector< UnitBlocker_t > blockers;
+	boost::python::list pyblockers;
 
 	// Settings
 	float maxspeed;
 	float yawspeed;
+
+	// Helper functions for testing blockers
+	bool HasBlocker( CBaseEntity *blocker );
+	bool HasBlockerWithOwnerEntity( CBaseEntity *blocker );
 };
+
+//-----------------------------------------------------------------------------
+// Purpose: Tests if the blockers list contains the tested entity
+//-----------------------------------------------------------------------------
+inline bool UnitBaseMoveCommand::HasBlocker( CBaseEntity *blocker )
+{
+	if( !blocker )
+		return false;
+	
+	for( int i = 0; i < blockers.Count(); i++ )
+	{
+		if( blockers[i].blocker && blockers[i].blocker == blocker )
+			return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Tests if one of the blockers is owned by the tested entity
+//-----------------------------------------------------------------------------
+inline bool UnitBaseMoveCommand::HasBlockerWithOwnerEntity( CBaseEntity *blocker )
+{
+	if( !blocker )
+		return false;
+	
+	for( int i = 0; i < blockers.Count(); i++ )
+	{
+		if( blockers[i].blocker && blockers[i].blocker->GetOwnerEntity() == blocker )
+			return true;
+	}
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Step argument and result structs
@@ -152,8 +204,6 @@ public:
 
 	// Main ground move functions
 	void				GroundMove();
-	//bool				GroundMove( const Vector &vecActualStart, const Vector &vecDesiredEnd, 
-	//	unsigned int collisionMask, unsigned flags );
 	bool				CheckStep( const UnitCheckStepArgs_t &args, UnitCheckStepResult_t *pResult );
 
 	// Tracing
@@ -175,6 +225,10 @@ public:
 	// 0x01 == floor
 	// 0x02 == step / wall
 	int				ClipVelocity( Vector& in, Vector& normal, Vector& out, float overbounce );
+
+	// Helpers for maintaining blockers list
+	void ClearBlockers();
+	void AddBlocker( CBaseEntity *pBlocker, const Vector &blocker_hitpos, const Vector &blocker_dir );
 
 	void SetupMovementBounds( UnitBaseMoveCommand &mv );
 
@@ -198,6 +252,19 @@ private:
 
 	ITraceListData	*m_pTraceListData;
 };
+
+//-----------------------------------------------------------------------------
+// Blockers list helper functions
+//-----------------------------------------------------------------------------
+inline void UnitBaseLocomotion::ClearBlockers()
+{
+	mv->blockers.RemoveAll();
+}
+
+inline void UnitBaseLocomotion::AddBlocker( CBaseEntity *pBlocker, const Vector &blocker_hitpos, const Vector &blocker_dir )
+{
+	mv->blockers.AddToTail( UnitBlocker_t( pBlocker, blocker_hitpos, blocker_dir ) );
+}
 
 //-----------------------------------------------------------------------------
 // Traces player movement + position

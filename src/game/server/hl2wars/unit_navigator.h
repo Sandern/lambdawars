@@ -312,6 +312,18 @@ public:
 		}
 	}
 
+	// Tests if two paths have similar goals
+	bool HasSamegoal( UnitBasePath *pPath )
+	{
+		// Note: don't test m_iGoalType
+		if( m_hTarget )
+		{
+			if( m_hTarget == pPath->m_hTarget )
+				return true;
+		}
+		return false;
+	}
+
 	void SetTarget( CBaseEntity *pTarget ) { m_hTarget = pTarget; }
 	CBaseEntity *GetTarget() { return m_hTarget; }
 
@@ -370,8 +382,8 @@ public:
 	float				ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
 
 	float				ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
-								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist, float &fDensity );
-	Vector				ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fGoalDist );
+								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist, float &fDensity );
+	Vector				ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist );
 
 	float				CalculateAvgDistHistory();
 
@@ -388,11 +400,14 @@ public:
 	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
+	bool				TestNearbyUnitsWithSameGoal( UnitBaseMoveCommand &MoveCommand );
+
 	BlockedStatus_t		GetBlockedStatus( void );
 	virtual void		ResetBlockedStatus( void );
-	virtual void		UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand );
+	virtual void		UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, const float &fWaypointDist );
 
 	// Goals
+	CheckGoalStatus_t	GetGoalStatus();
 	virtual bool		SetGoal( Vector &destination, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalTarget( CBaseEntity *pTarget, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalInRange( Vector &destination, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
@@ -405,6 +420,8 @@ public:
 	virtual void		UpdateGoalTarget( CBaseEntity *target, UnitBasePath *path = NULL );
 	virtual void		UpdateGoalInfo( void );
 	virtual float		GetGoalDistance( void );
+
+	CHandle<CUnitBase>	GetAtGoalDependencyEnt( void ) { return m_hAtGoalDependencyEnt; }
 
 	// Path finding
 	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
@@ -475,13 +492,17 @@ protected:
 	CheckGoalStatus_t m_LastGoalStatus;
 
 private:
-	// Facing
+	// =============================
+	// Facing variables
+	// =============================
 	float m_fIdealYaw;
 	EHANDLE m_hFacingTarget;
 	Vector m_vFacingTargetPos;
 	bool m_bFacingFaceTarget;
 
-	// Path and pathfinding
+	// =============================
+	// Path and goal variables
+	// =============================
 	UnitBasePath *m_pPath;
 #ifdef ENABLE_PYTHON
 	boost::python::object m_refPath;
@@ -489,12 +510,14 @@ private:
 	float m_fGoalDistance;
 	Vector m_vGoalDir;
 
-	// Position checking
+	// =============================
+	// Position checking variables
+	// =============================
 	BlockedStatus_t m_BlockedStatus;
 	float m_fBlockedStartTime;
 	int m_iBlockedPathRecomputations;
 	float m_fBlockedNextPositionCheck;
-	Vector m_vBlockedLastPosition;
+	float m_fLastWaypointDistance;
 	bool m_bBlockedLongDistanceDetected;
 	float m_fLowVelocityStartTime;
 
@@ -505,16 +528,11 @@ private:
 	Vector m_vLastPosition;
 	float m_fIgnoreNavMeshTime;
 
-	// Climbing
-	float m_fClimbHeight;
-	Vector m_vecClimbDirection;
+	CHandle<CUnitBase> m_hAtGoalDependencyEnt;
 
-	// Position limiting
-	bool m_bLimitPositionActive;
-	Vector m_vLimitPositionCenter;
-	float m_fLimitPositionRadius;
-
-	// Flow
+	// =============================
+	// Flow variables
+	// =============================
 	struct consider_pos_t {
 		float m_fDensity;
 	};
@@ -550,6 +568,20 @@ private:
 	};
 	CUtlVector<seed_entry_t> m_Seeds;
 
+	Vector m_vLastDirection;
+
+	// =============================
+	// Misc variables
+	// =============================
+	// Climbing
+	float m_fClimbHeight;
+	Vector m_vecClimbDirection;
+
+	// Position limiting
+	bool m_bLimitPositionActive;
+	Vector m_vLimitPositionCenter;
+	float m_fLimitPositionRadius;
+
 	// Debug variables
 	Vector m_vDebugVelocity;
 	float m_fDebugLastBestCost;
@@ -568,6 +600,11 @@ inline float UnitBaseNavigator::GetEntityBoundingRadius( CBaseEntity *pEnt )
 inline BlockedStatus_t UnitBaseNavigator::GetBlockedStatus( void )
 {
 	return m_BlockedStatus;
+}
+
+inline CheckGoalStatus_t UnitBaseNavigator::GetGoalStatus()
+{
+	return m_LastGoalStatus;
 }
 
 inline float UnitBaseNavigator::GetIdealYaw()

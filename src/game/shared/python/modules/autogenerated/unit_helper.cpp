@@ -1283,6 +1283,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("wishdir"), bp::arg("wishspeed"), bp::arg("accel") ) );
         
         }
+        { //::UnitBaseLocomotion::AddBlocker
+        
+            typedef void ( ::UnitBaseLocomotion::*AddBlocker_function_type )( ::C_BaseEntity *,::Vector const &,::Vector const & ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "AddBlocker"
+                , AddBlocker_function_type( &::UnitBaseLocomotion::AddBlocker )
+                , ( bp::arg("pBlocker"), bp::arg("blocker_hitpos"), bp::arg("blocker_dir") ) );
+        
+        }
         { //::UnitBaseLocomotion::AirAccelerate
         
             typedef void ( ::UnitBaseLocomotion::*AirAccelerate_function_type )( ::Vector &,float,float ) ;
@@ -1328,6 +1338,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "CheckStep"
                 , CheckStep_function_type( &::UnitBaseLocomotion::CheckStep )
                 , ( bp::arg("args"), bp::arg("pResult") ) );
+        
+        }
+        { //::UnitBaseLocomotion::ClearBlockers
+        
+            typedef void ( ::UnitBaseLocomotion::*ClearBlockers_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "ClearBlockers"
+                , ClearBlockers_function_type( &::UnitBaseLocomotion::ClearBlockers ) );
         
         }
         { //::UnitBaseLocomotion::ClipVelocity
@@ -1523,6 +1542,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("steptrace") ) );
         
         }
+        { //::UnitBaseLocomotion::UpdateBlockerNoMove
+        
+            typedef void ( ::UnitBaseLocomotion::*UpdateBlockerNoMove_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "UpdateBlockerNoMove"
+                , UpdateBlockerNoMove_function_type( &::UnitBaseLocomotion::UpdateBlockerNoMove ) );
+        
+        }
         { //::UnitBaseLocomotion::WalkMove
         
             typedef void ( ::UnitBaseLocomotion::*WalkMove_function_type )(  ) ;
@@ -1601,48 +1629,35 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
-    { //::UnitBaseMoveCommand
-        typedef bp::class_< UnitBaseMoveCommand > UnitBaseMoveCommand_exposer_t;
-        UnitBaseMoveCommand_exposer_t UnitBaseMoveCommand_exposer = UnitBaseMoveCommand_exposer_t( "UnitBaseMoveCommand", bp::init< >() );
-        bp::scope UnitBaseMoveCommand_scope( UnitBaseMoveCommand_exposer );
-        { //::UnitBaseMoveCommand::Clear
-        
-            typedef void ( ::UnitBaseMoveCommand::*Clear_function_type )(  ) ;
-            
-            UnitBaseMoveCommand_exposer.def( 
-                "Clear"
-                , Clear_function_type( &::UnitBaseMoveCommand::Clear ) );
-        
-        }
-        UnitBaseMoveCommand_exposer.def_readwrite( "blocker_dir", &UnitBaseMoveCommand::blocker_dir );
-        UnitBaseMoveCommand_exposer.def_readwrite( "blocker_hitpos", &UnitBaseMoveCommand::blocker_hitpos );
-        UnitBaseMoveCommand_exposer.def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles );
-        UnitBaseMoveCommand_exposer.def_readwrite( "interval", &UnitBaseMoveCommand::interval );
-        UnitBaseMoveCommand_exposer.def_readwrite( "jump", &UnitBaseMoveCommand::jump );
-        UnitBaseMoveCommand_exposer.def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed );
-        UnitBaseMoveCommand_exposer.def_readwrite( "origin", &UnitBaseMoveCommand::origin );
-        UnitBaseMoveCommand_exposer.def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight );
-        UnitBaseMoveCommand_exposer.def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel );
-        UnitBaseMoveCommand_exposer.def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance );
-        UnitBaseMoveCommand_exposer.def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance );
-        UnitBaseMoveCommand_exposer.def_readwrite( "upmove", &UnitBaseMoveCommand::upmove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "velocity", &UnitBaseMoveCommand::velocity );
-        UnitBaseMoveCommand_exposer.def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles );
-        UnitBaseMoveCommand_exposer.def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
-        { //property "blocker"[fget=::UnitBaseMoveCommand::GetBlocker]
-        
-            typedef ::C_BaseEntity * ( ::UnitBaseMoveCommand::*fget )(  ) ;
-            
-            UnitBaseMoveCommand_exposer.add_property( 
-                "blocker"
-                , bp::make_function( 
-                      fget( &::UnitBaseMoveCommand::GetBlocker )
-                    , bp::return_value_policy< bp::return_by_value >() )  );
-        
-        }
-    }
+    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "Clear"
+            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
+        .def( 
+            "HasBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
+            , ( bp::arg("blocker") ) )    
+        .def( 
+            "HasBlockerWithOwnerEntity"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
+            , ( bp::arg("blocker") ) )    
+        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
+        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
+        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
+        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
+        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
+        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
+        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
+        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
+        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
+        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
+        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
+        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
+        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
+        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
+        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
+        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
     { //::UnitComputePathDirection
     
@@ -3841,6 +3856,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("wishdir"), bp::arg("wishspeed"), bp::arg("accel") ) );
         
         }
+        { //::UnitBaseLocomotion::AddBlocker
+        
+            typedef void ( ::UnitBaseLocomotion::*AddBlocker_function_type )( ::CBaseEntity *,::Vector const &,::Vector const & ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "AddBlocker"
+                , AddBlocker_function_type( &::UnitBaseLocomotion::AddBlocker )
+                , ( bp::arg("pBlocker"), bp::arg("blocker_hitpos"), bp::arg("blocker_dir") ) );
+        
+        }
         { //::UnitBaseLocomotion::AirAccelerate
         
             typedef void ( ::UnitBaseLocomotion::*AirAccelerate_function_type )( ::Vector &,float,float ) ;
@@ -3886,6 +3911,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "CheckStep"
                 , CheckStep_function_type( &::UnitBaseLocomotion::CheckStep )
                 , ( bp::arg("args"), bp::arg("pResult") ) );
+        
+        }
+        { //::UnitBaseLocomotion::ClearBlockers
+        
+            typedef void ( ::UnitBaseLocomotion::*ClearBlockers_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "ClearBlockers"
+                , ClearBlockers_function_type( &::UnitBaseLocomotion::ClearBlockers ) );
         
         }
         { //::UnitBaseLocomotion::ClipVelocity
@@ -4081,6 +4115,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("steptrace") ) );
         
         }
+        { //::UnitBaseLocomotion::UpdateBlockerNoMove
+        
+            typedef void ( ::UnitBaseLocomotion::*UpdateBlockerNoMove_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "UpdateBlockerNoMove"
+                , UpdateBlockerNoMove_function_type( &::UnitBaseLocomotion::UpdateBlockerNoMove ) );
+        
+        }
         { //::UnitBaseLocomotion::WalkMove
         
             typedef void ( ::UnitBaseLocomotion::*WalkMove_function_type )(  ) ;
@@ -4198,6 +4241,16 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitBasePath_exposer.def( 
                 "GetToleranceCurWaypoint"
                 , GetToleranceCurWaypoint_function_type( &::UnitBasePath::GetToleranceCurWaypoint ) );
+        
+        }
+        { //::UnitBasePath::HasSamegoal
+        
+            typedef bool ( ::UnitBasePath::*HasSamegoal_function_type )( ::UnitBasePath * ) ;
+            
+            UnitBasePath_exposer.def( 
+                "HasSamegoal"
+                , HasSamegoal_function_type( &::UnitBasePath::HasSamegoal )
+                , ( bp::arg("pPath") ) );
         
         }
         UnitBasePath_exposer.def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies );
@@ -4530,48 +4583,35 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
-    { //::UnitBaseMoveCommand
-        typedef bp::class_< UnitBaseMoveCommand > UnitBaseMoveCommand_exposer_t;
-        UnitBaseMoveCommand_exposer_t UnitBaseMoveCommand_exposer = UnitBaseMoveCommand_exposer_t( "UnitBaseMoveCommand", bp::init< >() );
-        bp::scope UnitBaseMoveCommand_scope( UnitBaseMoveCommand_exposer );
-        { //::UnitBaseMoveCommand::Clear
-        
-            typedef void ( ::UnitBaseMoveCommand::*Clear_function_type )(  ) ;
-            
-            UnitBaseMoveCommand_exposer.def( 
-                "Clear"
-                , Clear_function_type( &::UnitBaseMoveCommand::Clear ) );
-        
-        }
-        UnitBaseMoveCommand_exposer.def_readwrite( "blocker_dir", &UnitBaseMoveCommand::blocker_dir );
-        UnitBaseMoveCommand_exposer.def_readwrite( "blocker_hitpos", &UnitBaseMoveCommand::blocker_hitpos );
-        UnitBaseMoveCommand_exposer.def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles );
-        UnitBaseMoveCommand_exposer.def_readwrite( "interval", &UnitBaseMoveCommand::interval );
-        UnitBaseMoveCommand_exposer.def_readwrite( "jump", &UnitBaseMoveCommand::jump );
-        UnitBaseMoveCommand_exposer.def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed );
-        UnitBaseMoveCommand_exposer.def_readwrite( "origin", &UnitBaseMoveCommand::origin );
-        UnitBaseMoveCommand_exposer.def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight );
-        UnitBaseMoveCommand_exposer.def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel );
-        UnitBaseMoveCommand_exposer.def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance );
-        UnitBaseMoveCommand_exposer.def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance );
-        UnitBaseMoveCommand_exposer.def_readwrite( "upmove", &UnitBaseMoveCommand::upmove );
-        UnitBaseMoveCommand_exposer.def_readwrite( "velocity", &UnitBaseMoveCommand::velocity );
-        UnitBaseMoveCommand_exposer.def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles );
-        UnitBaseMoveCommand_exposer.def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
-        { //property "blocker"[fget=::UnitBaseMoveCommand::GetBlocker]
-        
-            typedef ::CBaseEntity * ( ::UnitBaseMoveCommand::*fget )(  ) ;
-            
-            UnitBaseMoveCommand_exposer.add_property( 
-                "blocker"
-                , bp::make_function( 
-                      fget( &::UnitBaseMoveCommand::GetBlocker )
-                    , bp::return_value_policy< bp::return_by_value >() )  );
-        
-        }
-    }
+    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "Clear"
+            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
+        .def( 
+            "HasBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
+            , ( bp::arg("blocker") ) )    
+        .def( 
+            "HasBlockerWithOwnerEntity"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
+            , ( bp::arg("blocker") ) )    
+        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
+        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
+        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
+        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
+        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
+        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
+        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
+        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
+        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
+        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
+        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
+        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
+        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
+        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
+        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
+        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
     { //::UnitBaseSense
         typedef bp::class_< UnitBaseSense, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseSense_exposer_t;

@@ -192,11 +192,20 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 	// NOTE: This is to detect changes in ground entity as the movement code has optimized out
 	// ground checks.  So now we have to do a simple recheck to make sure we detect when we've 
 	// stepped onto a new entity.
-	if ( m_pOuter->GetFlags() & FL_ONGROUND )
+	/*if ( m_pOuter->GetFlags() & FL_ONGROUND )
 	{
 		m_pOuter->PhysicsStepRecheckGround();
-	}
+	}*/
 #endif // CLIENT_DLL
+
+	// For Python: keep list of blockers
+	mv.pyblockers = bp::list();
+	for( int i = 0; i < mv.blockers.Count(); i++ )
+	{
+		if( !mv.blockers[i].blocker )
+			continue;
+ 		mv.pyblockers.append( mv.blockers[i].blocker->GetPyHandle() );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -492,14 +501,25 @@ void UnitBaseLocomotion::WalkMove( void )
 
 }
 
+#define MAX_FIND_BLOCKERS 48
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void UnitBaseLocomotion::UpdateBlockerNoMove()
 {
-	trace_t trace;
-	TraceUnitBBox( mv->origin, mv->origin+Vector(0,0,1), unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
-	mv->m_hBlocker = trace.m_pEnt;
+	ClearBlockers();
+
+	float fBloat = 32.0f;
+	CBaseEntity *pList[MAX_FIND_BLOCKERS];
+	Ray_t ray;
+	ray.Init( mv->origin, mv->origin + Vector(0,0,1), m_vecMins - Vector(fBloat, fBloat, 0.0f), m_vecMaxs + Vector(fBloat, fBloat, 0.0f) );
+	int n = UTIL_EntitiesAlongRay( pList, MAX_FIND_BLOCKERS, ray, 0 );
+
+	for( int i = 0; i < n; i++ )
+	{
+		AddBlocker( pList[i], pList[i]->GetAbsOrigin(), vec3_origin );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -697,7 +717,7 @@ void UnitBaseLocomotion::GroundMove()
 	int i;
 
 	// Clear current blocker
-	mv->m_hBlocker = NULL;
+	ClearBlockers();
 
 	// Calculate the max stepsize for this interval
 	// Assume we can move up/down stepsize per 48.0
@@ -762,264 +782,6 @@ void UnitBaseLocomotion::GroundMove()
 	m_pOuter->EntityText(0, UTIL_VarArgs("vel: %f %f %f (%f)\n", mv->velocity.x, mv->velocity.y, mv->velocity.z, mv->velocity.Length()), 0.2f);
 #endif // !(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )
 }
-
-#if 0
-ConVar unit_try_ignore("unit_try_ignore", "1");
-ConVar unit_clip_velocity("unit_clip_velocity", "1");
-//-----------------------------------------------------------------------------
-// Checks a ground-based movement
-// NOTE: The movement will be based on an *actual* start position and
-// a *desired* end position; it works this way because the ground-based movement
-// is 2 1/2D, and we may end up on a ledge above or below the actual desired endpoint.
-//-----------------------------------------------------------------------------
-bool UnitBaseLocomotion::GroundMove( const Vector &vecActualStart, const Vector &vecDesiredEnd, 
-									  unsigned int collisionMask, unsigned flags )
-{
-	VPROF_BUDGET( "UnitBaseLocomotion::GroundMove", VPROF_BUDGETGROUP_UNITS );
-
-	Vector		dir;
-	float		d;
-	int			numplanes;
-	Vector		planes[MAX_CLIP_PLANES];
-	Vector		primal_velocity, original_velocity, new_velocity;
-	int i, j, k;
-
-	mv->m_hBlocker				= NULL;
-	mv->blocker_hitpos			= vec3_origin;
-	mv->outstepheight			= 0;
-
-	Vector vecMoveDir;
-	mv->totaldistance = UnitComputePathDirection( vecActualStart, vecDesiredEnd, vecMoveDir );
-	if (mv->totaldistance == 0.0f)
-	{
-		return true;
-	}
-
-	//  Take single steps towards the goal
-	float distClear = 0;
-
-	UnitCheckStepArgs_t checkStepArgs;
-	UnitCheckStepResult_t checkStepResult;
-
-	checkStepArgs.vecStart				= vecActualStart;
-	checkStepArgs.vecStepDir			= vecMoveDir;
-	checkStepArgs.stepSize				= 0;
-	checkStepArgs.stepHeight			= stepsize;
-	checkStepArgs.stepDownMultiplier	= 1.0f;
-	checkStepArgs.minStepLanding		= WorldAlignSize().x * 0.3333333f;
-	checkStepArgs.collisionMask			= collisionMask;
-
-	checkStepResult.endPoint = vecActualStart;
-	checkStepResult.hitNormal = vec3_origin;
-	checkStepResult.pBlocker = NULL;
-
-	bool bTryNavIgnore = ( ( vecActualStart - GetLocalOrigin() ).Length2DSqr() < 0.1 && fabsf(vecActualStart.z - GetLocalOrigin().z) < checkStepArgs.stepHeight * 0.5 );
-
-	CUtlVector<CBaseEntity *> ignoredEntities;
-
-	// TODO: Cleanup/debug this code.
-	for (;;)
-	{
-		float flStepSize = Min( LOCAL_STEP_SIZE, mv->totaldistance - distClear );
-		if ( flStepSize < 0.001 )
-			break;
-
-		checkStepArgs.stepSize = flStepSize;
-
-		if( unit_try_ignore.GetBool() )
-		{
-		// First ignore anything we should ignore
-		for ( i = 0; i < 16; i++ )
-		{
-			CheckStep( checkStepArgs, &checkStepResult );
-
-			if ( !bTryNavIgnore || !checkStepResult.pBlocker || !checkStepResult.fStartSolid )
-				break;
-
-			if ( checkStepResult.pBlocker->GetMoveType() != MOVETYPE_VPHYSICS && !checkStepResult.pBlocker->IsUnit() )
-				break;
-
-			if( checkStepResult.pBlocker->IsUnit() && !checkStepResult.pBlocker->AllowNavIgnore() )
-				break;
-
-			// Only permit pass through of objects initially embedded in
-			if ( vecActualStart != checkStepArgs.vecStart )
-			{
-				bTryNavIgnore = false;
-				break;
-			}
-
-			// Only allow move away from physics objects
-			if ( checkStepResult.pBlocker->GetMoveType() == MOVETYPE_VPHYSICS )
-			{
-				Vector vMoveDir = vecDesiredEnd - vecActualStart;
-				VectorNormalize( vMoveDir );
-
-				Vector vObstacleDir = (checkStepResult.pBlocker->WorldSpaceCenter() - GetOuter()->WorldSpaceCenter() );
-				VectorNormalize( vObstacleDir );
-
-				if ( vMoveDir.Dot( vObstacleDir ) >= 0 )
-					break;
-			}
-			
-			//Msg("Ignoring %s\n", checkStepResult.pBlocker->GetClassname());
-			ignoredEntities.AddToTail( checkStepResult.pBlocker );
-			checkStepResult.pBlocker->SetNavIgnore();
-		}
-		}
-
-#if 0
-		// Copy original velocity
-		VectorCopy (mv->velocity, original_velocity);
-		VectorCopy (mv->velocity, primal_velocity);
-		numplanes = 0;
-
-		int			bumpcount, numbumps;
-		numbumps = 4;
-		Vector vecAbsVelocity = mv->velocity;
-
-		if( unit_clip_velocity.GetBool() && checkStepResult.pBlocker ) 
-		{
-			for (bumpcount=0 ; bumpcount<numbumps ; bumpcount++)
-			{
-				if (vecAbsVelocity == vec3_origin)
-					break;
-
-				vecMoveDir = vecAbsVelocity;
-				VectorNormalize(vecMoveDir);
-				checkStepArgs.vecStepDir = vecMoveDir;
-				CheckStep( checkStepArgs, &checkStepResult );
-
-				if( checkStepResult.fStartSolid )
-				{
-					mv->velocity = vec3_origin;
-					break;
-				}
-
-				if( ( checkStepResult.endPoint - checkStepArgs.vecStart ).Length2D() >= flStepSize )
-					break;
-
-				if( checkStepResult.endPoint != checkStepArgs.vecStart )
-				{
-					//distClear += ( checkStepResult.endPoint - checkStepArgs.vecStart ).Length2D();
-					//checkStepArgs.vecStart = checkStepResult.endPoint;
-					mv->velocity = vecAbsVelocity;
-					numplanes = 0;
-				}
-
-				// clipped to another plane
-				if (numplanes >= MAX_CLIP_PLANES)
-				{	// this shouldn't really happen
-					mv->velocity = vec3_origin;
-					break;
-				}
-
-				VectorCopy (checkStepResult.hitNormal, planes[numplanes]);
-				numplanes++;
-
-				// modify original_velocity so it parallels all of the clip planes
-				if ( m_pOuter->GetMoveType() == MOVETYPE_WALK && (!(GetFlags() & FL_ONGROUND) || m_pOuter->GetFriction()!=1) )	// relfect m_pOuter velocity
-				{
-					for ( i = 0; i < numplanes; i++ )
-					{
-						if ( planes[i][2] > 0.7  )
-						{// floor or slope
-							ClipVelocity( original_velocity, planes[i], new_velocity, 1 );
-							VectorCopy( new_velocity, original_velocity );
-						}
-						else
-						{
-							ClipVelocity( original_velocity, planes[i], new_velocity, 1.0 + sv_bounce.GetFloat() * (1-m_pOuter->GetFriction()) );
-						}
-					}
-
-					VectorCopy( new_velocity, vecAbsVelocity );
-					VectorCopy( new_velocity, original_velocity );
-				}
-				else
-				{
-					for (i=0 ; i<numplanes ; i++)
-					{
-						ClipVelocity (original_velocity, planes[i], new_velocity, 1);
-						for (j=0 ; j<numplanes ; j++)
-							if (j != i)
-							{
-								if (DotProduct (new_velocity, planes[j]) < 0)
-									break;	// not ok
-							}
-						if (j == numplanes)
-							break;
-					}
-					
-					if (i != numplanes)
-					{	
-						// go along this plane
-						VectorCopy (new_velocity, vecAbsVelocity);
-					}
-					else
-					{	
-						// go along the crease
-						if (numplanes != 2)
-						{
-			//				Msg( "clip velocity, numplanes == %i\n",numplanes);
-							mv->velocity = vecAbsVelocity;
-							break;
-						}
-						CrossProduct (planes[0], planes[1], dir);
-						d = DotProduct (dir, vecAbsVelocity);
-						VectorScale (dir, d, vecAbsVelocity);
-					}
-
-					//
-					// if original velocity is against the original velocity, stop dead
-					// to avoid tiny oscillations in sloping corners
-					//
-					if (DotProduct (vecAbsVelocity, primal_velocity) <= 0)
-					{
-						mv->velocity = vec3_origin;
-						break;
-					}
-				}
-			}
-		}
-#endif // 0
-
-		//Msg("Blocked: %d (%s), start solid? %d\n", checkStepResult.pBlocker, (checkStepResult.pBlocker ? checkStepResult.pBlocker->GetClassname() : NULL), checkStepResult.fStartSolid);
-		// If we're being blocked by something, move as close as we can and stop
-		if ( checkStepResult.pBlocker )
-		{
-			distClear += ( checkStepResult.endPoint - checkStepArgs.vecStart ).Length2D();
-			break;
-		}
-
-		float dz = checkStepResult.endPoint.z - checkStepArgs.vecStart.z;
-		if ( dz < 0 )
-		{
-			dz = 0;
-		}
-
-		mv->outstepheight += dz;
-		distClear += flStepSize;
-		checkStepArgs.vecStart = checkStepResult.endPoint;
-	}
-
-	for ( i = 0; i < ignoredEntities.Count(); i++ )
-	{
-		ignoredEntities[i]->ClearNavIgnore();
-	}
-
-	mv->origin = checkStepResult.endPoint;
-
-	if (checkStepResult.pBlocker)
-	{
-		mv->m_hBlocker				= checkStepResult.pBlocker;	
-		mv->blocker_hitpos			= checkStepResult.hitPos;
-		mv->blocker_dir				= vecMoveDir;
-		return false;
-	}
-	return true;
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // CheckStep() is a fundamentally 2D operation!	vecEnd.z is ignored.
@@ -1329,9 +1091,6 @@ int UnitBaseLocomotion::UnitTryMove( trace_t *steptrace )
 	
 	time_left = mv->interval;
 
-	mv->blocker_hitpos = vec3_origin;
-	mv->m_hBlocker = NULL;
-
 	for (bumpcount=0 ; bumpcount<numbumps ; bumpcount++)
 	{
 		if (vecAbsVelocity == vec3_origin)
@@ -1357,7 +1116,7 @@ int UnitBaseLocomotion::UnitTryMove( trace_t *steptrace )
 		if (trace.fraction == 1)
 			 break;		// moved the entire distance
 
-		if (!trace.m_pEnt)
+		if ( !trace.m_pEnt )
 		{
 			mv->velocity = vecAbsVelocity;
 			Warning( "PhysicsTryMove: !trace.u.ent" );
@@ -1366,9 +1125,8 @@ int UnitBaseLocomotion::UnitTryMove( trace_t *steptrace )
 		}
 
 		// Save current blocker + hitpos
-		mv->m_hBlocker = trace.m_pEnt; 
-		mv->blocker_hitpos = trace.endpos; 
-		mv->blocker_dir = vecAbsVelocity.Normalized();
+		AddBlocker( trace.m_pEnt, trace.endpos, vecAbsVelocity.Normalized() );
+
 		/*if (trace.plane.normal[2] > 0.7)
 		{
 			blocked |= 1;		// floor
@@ -1906,8 +1664,8 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	float radius = ((mv.velocity.Length() + mv.maxspeed) * mv.interval) + 1.0f;
 
 	// NOTE: assumes the unducked bbox encloses the ducked bbox
-	Vector boxMins = m_vecMins;
-	Vector boxMaxs = m_vecMaxs;
+	const Vector &boxMins = m_vecMins;
+	const Vector &boxMaxs = m_vecMaxs;
 
 	// bloat by traveling the max velocity in all directions, plus the stepsize up/down
 	Vector bloat;
