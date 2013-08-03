@@ -520,17 +520,19 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	}
 
 #endif
-
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// Check Python keyvalues map
 	if( m_pyInstance.ptr() != Py_None )
 	{
-		bp::object keyvaluemap;
+		boost::python::object keyvaluemap;
 		try
 		{
 			keyvaluemap = m_pyInstance.attr("keyvaluemap");
 		} 
-		catch( bp::error_already_set & )
+		catch( boost::python::error_already_set & )
 		{
 			Warning("Python entity has no keyvaluesmap!\n");
 			PyErr_Clear();
@@ -538,20 +540,23 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 
 		try
 		{
-			bp::object field = keyvaluemap.attr("get")(szKeyName, bp::object());
+			boost::python::object field = keyvaluemap.attr("get")(szKeyName, boost::python::object());
 			if( field.ptr() != Py_None )
 			{
 				field.attr("Set")(m_pyInstance, szValue);
 				return true;
 			}
 		} 
-		catch( bp::error_already_set & )
+		catch( boost::python::error_already_set & )
 		{
 			Warning("Python entity has an invalid keyvalues map!\n");
 			PyErr_Print();
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// key hasn't been handled
 	return false;

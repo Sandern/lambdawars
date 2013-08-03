@@ -314,7 +314,6 @@ class PyPhysicsObject : public PyPhysicsObjectBase
 {
 public:
 	PyPhysicsObject();
-	//PyPhysicsObject( IPhysicsObject *pPhysObj );
 	PyPhysicsObject( CBaseEntity *pEnt );
 
 	~PyPhysicsObject();
