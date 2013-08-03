@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -23,7 +23,7 @@ enum debughistorycategories_t
 	MAX_HISTORY_CATEGORIES,
 };
 
-#undef DISABLE_DEBUG_HISTORY
+#define DISABLE_DEBUG_HISTORY
 
 #if defined(DISABLE_DEBUG_HISTORY)
 #define ADD_DEBUG_HISTORY( category, line )		((void)0)

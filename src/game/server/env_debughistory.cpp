@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2005, Valve Corporation, All rights reserved. =======
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -324,6 +324,9 @@ void AddDebugHistoryLine( int iCategory, const char *pszLine )
 //-----------------------------------------------------------------------------
 void CC_DebugHistory_AddLine( const CCommand &args )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	if ( args.ArgC() < 3 )
 	{
 		Warning("Incorrect parameters. Format: <category id> <line>\n");
@@ -341,6 +344,9 @@ static ConCommand dbghist_addline( "dbghist_addline", CC_DebugHistory_AddLine, "
 //-----------------------------------------------------------------------------
 void CC_DebugHistory_Dump( const CCommand &args )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	if ( args.ArgC() < 2 )
 	{
 		Warning("Incorrect parameters. Format: <category id>\n");
