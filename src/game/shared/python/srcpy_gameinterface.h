@@ -16,7 +16,7 @@
 #include <bspfile.h>
 #include "GameEventListener.h"
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 #ifndef CLIENT_DLL
 	#include "steam/steamclientpublic.h"

@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 #include "imouse.h"
 

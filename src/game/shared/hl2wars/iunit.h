@@ -15,7 +15,7 @@
 #include "imouse.h"
 
 #ifdef ENABLE_PYTHON
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 #endif // ENABLE_PYTHON
 
 class CHL2WarsPlayer;

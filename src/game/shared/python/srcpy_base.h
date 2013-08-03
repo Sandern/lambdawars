@@ -18,7 +18,7 @@
 #include <utlrbtree.h>
 #include <utlflags.h>
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 class CBasePlayer;
 

@@ -41,7 +41,7 @@
 #include "hl2wars_shareddefs.h"
 
 #ifdef ENABLE_PYTHON
-	#include <boost/python.hpp>
+	#include "srcpy_boostpython.h"
 	#include "srcpy_physics.h"
 	namespace bp = boost::python;
 #endif // ENABLE_PYTHON

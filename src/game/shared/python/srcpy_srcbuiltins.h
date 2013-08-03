@@ -12,7 +12,7 @@
 #endif
 
 #include <tier0/dbg.h>
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 // These classes redirect input to Msg and Warning respectively
 class SrcPyStdOut 

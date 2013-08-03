@@ -21,7 +21,7 @@
 	class CRagdollProp;
 #endif // CLIENT_DLL
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 namespace bp = boost::python;
 

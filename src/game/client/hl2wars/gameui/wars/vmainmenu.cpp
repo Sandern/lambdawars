@@ -40,7 +40,7 @@
 
 #include "matchmaking/swarm/imatchext_swarm.h"
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 #include "hl2wars/vgui/vgui_news.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

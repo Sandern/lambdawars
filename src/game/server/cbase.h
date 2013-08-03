@@ -89,7 +89,7 @@
 
 #ifdef ENABLE_PYTHON
 	// Python 
-	#include <boost/python.hpp>
+	#include "srcpy_boostpython.h"
 	#include "srcpy_server_class.h"
 #endif // ENABLE_PYTHON
 

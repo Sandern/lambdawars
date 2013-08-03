@@ -20,7 +20,7 @@
 
 #include "SurfaceBuffer.h"
 
-#include <boost/python.hpp>
+#include "srcpy_boostpython.h"
 
 extern const char *vgui::GetControlsModuleName();
 
