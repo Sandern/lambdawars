@@ -91,7 +91,7 @@ ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
 ConVar unit_testroute_stepsize("unit_testroute_stepsize", "48.0");
 ConVar unit_testroute_bloatscale("unit_testroute_bloatscale", "1.2");
 
-ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "1.6");
+ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "2.0");
 ConVar unit_seed_density("unit_seed_density", "0.12");
 ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
@@ -413,6 +413,9 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we are at our goal
 			if( LastGoalStatus != CHS_ATGOAL )
 			{
+				// Reset blocked status, otherwise we might get an instant fail if it changes back to has goal
+				ResetBlockedStatus();
+
  				GetPath()->m_bSuccess = true;
 
 				if( unit_navigator_debug.GetBool() )
@@ -433,9 +436,6 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we lost our goal
 			if( LastGoalStatus == CHS_ATGOAL )
 			{
-				// Reset blocked status, otherwise we might get an instant fail
-				ResetBlockedStatus();
-
 				GetPath()->m_bSuccess = false;
 
 				if( unit_navigator_debug.GetBool() )
@@ -943,13 +943,11 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	}
 
 	// Return weighted cost based on the following parameters:
-	// 1. The reducement in time it will take to reach the next waypoint when going in this direction (TODO: same as 2?)
-	// 2. The new distance to the next waypoint when going in this direction (TODO: same as 1?)
-	// 3. The disconform the unit feels due the density in the tested direction
-	// 4. The change in direction from the last direction we went. We slightly prefer to keep going in 
+	// 1. The new distance to the next waypoint when going in this direction
+	// 2. The disconform the unit feels due the density in the tested direction
+	// 3. The change in direction from the last direction we went. We slightly prefer to keep going in 
 	//	  the same direction as the last time (otherwise we might ping pong back and forth between two spots)
-	return ( ( unit_cost_timeweight.GetFloat() * ( fDist / fSpeed ) ) + 
-		     ( unit_cost_distweight.GetFloat() * fDist ) + 
+	return ( ( unit_cost_distweight.GetFloat() * fDist ) + 
 			 ( m_fDiscomfortWeight * fDensity ) ) +
 			 ( (vFinalVelocity.Normalized() - m_vLastDirection).Length2D() * unit_cost_lastdirweight.GetFloat() );
 }
@@ -1267,7 +1265,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					Vector vHitPos = MoveCommand.blockers[i].blocker_hitpos + MoveCommand.blockers[i].blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
 					InsertSeed( vHitPos );
 				}
-				InsertSeed( GetAbsOrigin() );
+				//InsertSeed( GetAbsOrigin() );
 			}
 		}
 	}
@@ -1610,7 +1608,12 @@ void UnitBaseNavigator::AdvancePath()
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
 	m_fLastAvgDist = -1;
 
-	ResetBlockedStatus();
+	// FIXME: When recomputing the path due being blocked, we will automatically advance path
+	// while we might still be blocked. Disabled for now..
+	// Just reset the waypoint distance
+	//ResetBlockedStatus();
+	m_fLastWaypointDistance = MAX_COORD_FLOAT;
+	m_bBlockedLongDistanceDetected = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1922,6 +1925,8 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 		fCur += teststepsize;
 	} while( fCur < fDist );
 
+	//NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
+
 	return true;
 #endif // 0
 }
@@ -1936,7 +1941,7 @@ void UnitBaseNavigator::ResetBlockedStatus()
 	m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
 	m_bBlockedLongDistanceDetected = false;
 	m_fLastWaypointDistance = MAX_COORD_FLOAT;
-	m_fLowVelocityStartTime = 0.0f;
+	m_bLowVelocityDetectionActive = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1957,12 +1962,15 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 
 	if( fVelocity2dSqr < 4.0 )
 	{
-		if( m_fLowVelocityStartTime != 0 )
+		if( !m_bLowVelocityDetectionActive )
+		{
 			m_fLowVelocityStartTime = gpGlobals->curtime;
+			m_bLowVelocityDetectionActive = true;
+		}
 	}
 	else
 	{
-		m_fLowVelocityStartTime = 0;
+		m_bLowVelocityDetectionActive = false;
 	}
 
 	// Check long distance if needed
@@ -1986,10 +1994,15 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 			//	NavDbgMsg("#%d UpdateBlockedStatus: Long distance blocked detected.\n", GetOuter()->entindex());
 			m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
 		}
+		else
+		{
+			// Target is moving, so always reset the distance to avoid incorrect blocked detection
+			m_fLastWaypointDistance = MAX_COORD_FLOAT;
+		}
 #endif // 0
 	}
 
-	if( (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f || !m_bBlockedLongDistanceDetected )
+	if( (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f && !m_bBlockedLongDistanceDetected )
 		return;
 
 	// Only execute this part if blocked...
@@ -2006,7 +2019,7 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 		m_BlockedStatus = BS_LITTLE;
 	else if( fBlockedTime < 6.0f )
 		m_BlockedStatus = BS_MUCH;
-	else if( fBlockedTime < 12.f )
+	else if( fBlockedTime < 16.f )
 		m_BlockedStatus = BS_STUCK;
 	else
 		m_BlockedStatus = BS_GIVEUP;

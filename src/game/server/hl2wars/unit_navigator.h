@@ -520,6 +520,7 @@ private:
 	float m_fLastWaypointDistance;
 	bool m_bBlockedLongDistanceDetected;
 	float m_fLowVelocityStartTime;
+	bool m_bLowVelocityDetectionActive;
 
 	float m_fLastPathRecomputation;
 	float m_fNextReactivePathUpdate;
