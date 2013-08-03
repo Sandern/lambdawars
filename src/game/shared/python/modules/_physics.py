@@ -24,7 +24,7 @@ class Physics(GenerateModuleSemiShared):
     
     files = [
         'cbase.h',
-        'src_python_physics.h',
+        'srcpy_physics.h',
         'vphysics_interface.h',
         'physics_shared.h',
     ]
@@ -55,7 +55,7 @@ class Physics(GenerateModuleSemiShared):
 
         # General version
         cls = mb.class_('PyPhysicsObject')
-        cls.rename('PhysicsObject') # NOTE: Name must match PyCreateEmptyPhysicsObject in src_python_physics.cpp!
+        cls.rename('PhysicsObject') # NOTE: Name must match PyCreateEmptyPhysicsObject in srcpy_physics.cpp!
         cls.include()
         cls.calldefs().virtuality = 'not virtual'  
         cls.mem_funs('SetEntity').exclude()

@@ -33,7 +33,7 @@
 #include "toolframework/itoolframework.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python_util.h"
+	#include "srcpy_util.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

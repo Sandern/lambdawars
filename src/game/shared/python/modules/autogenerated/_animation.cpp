@@ -18,9 +18,9 @@
 
 #include "npcevent.h"
 
-#include "src_python_animation.h"
+#include "srcpy_animation.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -323,9 +323,9 @@ BOOST_PYTHON_MODULE(_animation){
 
 #include "npcevent.h"
 
-#include "src_python_animation.h"
+#include "srcpy_animation.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

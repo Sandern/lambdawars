@@ -10,9 +10,9 @@
 
 #include "cbase.h"
 
-#include "src_python_tests.h"
+#include "srcpy_tests.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -50,9 +50,9 @@ BOOST_PYTHON_MODULE(_srctests){
 
 #include "cbase.h"
 
-#include "src_python_tests.h"
+#include "srcpy_tests.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

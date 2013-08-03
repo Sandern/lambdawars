@@ -20,7 +20,7 @@
 
 #include "mathlib/vmatrix.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

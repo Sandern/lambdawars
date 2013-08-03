@@ -28,9 +28,9 @@
 
 #include "particle_parse.h"
 
-#include "src_python_particles.h"
+#include "srcpy_particles.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -952,9 +952,9 @@ BOOST_PYTHON_MODULE(_particles){
 
 #include "particle_parse.h"
 
-#include "src_python_particles.h"
+#include "srcpy_particles.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

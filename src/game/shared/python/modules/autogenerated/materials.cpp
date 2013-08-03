@@ -20,11 +20,11 @@
 
 #include "materialsystem/MaterialSystemUtil.h"
 
-#include "python/src_python_materials.h"
+#include "python/srcpy_materials.h"
 
 #include "glow_outline_effect.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -279,9 +279,9 @@ BOOST_PYTHON_MODULE(materials){
 
 #include "materialsystem/MaterialSystemUtil.h"
 
-#include "python/src_python_materials.h"
+#include "python/srcpy_materials.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

@@ -145,7 +145,7 @@
 #include "keybindinglistener.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
+	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
 #include "hl2wars/fowmgr.h"

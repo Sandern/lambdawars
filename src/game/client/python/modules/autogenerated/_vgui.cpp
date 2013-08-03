@@ -42,17 +42,17 @@
 
 #include "ienginevgui.h"
 
-#include "src_python_vgui.h"
+#include "srcpy_vgui.h"
 
 #include "wars_vgui_screen.h"
 
-#include "src_python_hud.h"
+#include "srcpy_hud.h"
 
 #include "hud.h"
 
 #include "hudelement.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

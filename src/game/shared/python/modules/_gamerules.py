@@ -33,7 +33,7 @@ class GameRules(GenerateModuleSemiShared):
         'multiplay_gamerules.h',
         'teamplay_gamerules.h',
         'hl2wars_gamerules.h',
-        'src_python_gamerules.h',
+        'srcpy_gamerules.h',
         'ammodef.h',
     ]
     

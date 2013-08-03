@@ -17,7 +17,7 @@
 #include "particles_new.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python_te.h"
+	#include "srcpy_te.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

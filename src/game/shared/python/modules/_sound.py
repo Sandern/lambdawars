@@ -27,7 +27,7 @@ class Sound(GenerateModuleSemiShared):
         , 'string_t.h'
         , 'cbase.h'
         , 'shareddefs.h'
-        , 'src_python_sound.h'
+        , 'srcpy_sound.h'
         , 'soundflags.h'
     ]
     

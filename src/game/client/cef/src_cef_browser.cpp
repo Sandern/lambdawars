@@ -12,7 +12,7 @@
 #include "src_cef_js.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
+	#include "srcpy.h"
 	#include "src_cef_python.h"
 #endif // ENABLE_PYTHON
 

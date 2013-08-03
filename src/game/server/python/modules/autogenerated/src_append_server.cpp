@@ -3,7 +3,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "src_python.h"
+#include "srcpy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

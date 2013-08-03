@@ -32,7 +32,7 @@ class TE(GenerateModuleSemiShared):
     
     files = [
         'effect_dispatch_data.h',
-        'src_python_te.h',
+        'srcpy_te.h',
     ]
     
     def GetFiles(self):

@@ -13,7 +13,7 @@
 #include <vgui/IVGui.h>
 #include "vgui_controls/Controls.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "steam/steam_api.h"
 #include "steam/isteamfriends.h"

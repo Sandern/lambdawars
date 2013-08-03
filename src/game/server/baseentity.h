@@ -27,11 +27,11 @@
 
 #ifdef ENABLE_PYTHON
 	#include <boost/python.hpp>
-	#include "src_python_physics.h"
+	#include "srcpy_physics.h"
 
 	namespace bp = boost::python;
 #endif // ENABLE_PYTHON
-#include "src_python_server_class.h" // Replaced by stubs if ENABLE_PYTHON
+#include "srcpy_server_class.h" // Replaced by stubs if ENABLE_PYTHON
 
 #include "density_weight_map.h"
 #include "hl2wars_shareddefs.h"

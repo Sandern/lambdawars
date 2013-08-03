@@ -24,7 +24,7 @@
 
 #include "studio.h"
 
-#include "src_python_entities.h"
+#include "srcpy_entities.h"
 
 #include "isaverestore.h"
 
@@ -44,9 +44,9 @@
 
 #include "shot_manipulator.h"
 
-#include "src_python_converters_ents.h"
+#include "srcpy_converters_ents.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -2418,7 +2418,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
 
 #include "takedamageinfo.h"
 
-#include "src_python_networkvar.h"
+#include "srcpy_networkvar.h"
 
 #include "soundent.h"
 
@@ -2434,7 +2434,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
 
 #include "hl2wars_player.h"
 
-#include "src_python_base.h"
+#include "srcpy_base.h"
 
 #include "shared_classnames.h"
 
@@ -2442,7 +2442,7 @@ BOOST_PYTHON_MODULE(_entities_misc){
 
 #include "studio.h"
 
-#include "src_python_entities.h"
+#include "srcpy_entities.h"
 
 #include "isaverestore.h"
 
@@ -2462,9 +2462,9 @@ BOOST_PYTHON_MODULE(_entities_misc){
 
 #include "shot_manipulator.h"
 
-#include "src_python_converters_ents.h"
+#include "srcpy_converters_ents.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

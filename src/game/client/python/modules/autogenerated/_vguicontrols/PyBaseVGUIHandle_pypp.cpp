@@ -21,10 +21,10 @@
 #include "vgui/IBorder.h"
 #include "vgui_bitmapimage.h"
 #include "vgui_avatarimage.h"
-#include "src_python_vgui.h"
+#include "srcpy_vgui.h"
 #include "hl2wars/hl2wars_baseminimap.h"
 #include "hl2wars/vgui_video_general.h"
-#include "src_python.h"
+#include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "PyBaseVGUIHandle_pypp.hpp"
 

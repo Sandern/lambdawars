@@ -45,7 +45,7 @@
 #include "iunit.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
+	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
 extern ConVar cl_leveloverviewmarker;

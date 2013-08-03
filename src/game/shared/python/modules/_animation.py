@@ -10,7 +10,7 @@ class Animation(GenerateModuleSemiShared):
         'ai_activity.h',
         'activitylist.h',
         'npcevent.h',
-        'src_python_animation.h',
+        'srcpy_animation.h',
     ]
     
     def Parse(self, mb):

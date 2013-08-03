@@ -23,7 +23,7 @@ class Utils(GenerateModuleSemiShared):
         'cbase.h',
         'cdll_util.h',
         'util_shared.h',
-        #'src_python_util.h',
+        #'srcpy_util.h',
         'iclientshadowmgr.h',
         'projected_texture_unlit.h',
         'gametrace.h',
@@ -45,7 +45,7 @@ class Utils(GenerateModuleSemiShared):
     ]
     
     files = [
-        'src_python_util.h',
+        'srcpy_util.h',
         'hl2wars_util_shared.h',
     ]
     

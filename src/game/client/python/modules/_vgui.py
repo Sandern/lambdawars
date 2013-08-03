@@ -37,10 +37,10 @@ class VGUI(GenerateModuleClient):
         'vgui_controls/MessageMap.h',
         'ienginevgui.h',
         
-        'src_python_vgui.h',
+        'srcpy_vgui.h',
         'wars_vgui_screen.h',
         
-        'src_python_hud.h',
+        'srcpy_hud.h',
         'hud.h',
         'hudelement.h',
     ] )

@@ -40,7 +40,7 @@ class Particles(GenerateModuleSemiShared):
     
     files = [
         'particle_parse.h',
-        'src_python_particles.h',
+        'srcpy_particles.h',
     ]
     
     def GetFiles(self):
@@ -210,6 +210,6 @@ class Particles(GenerateModuleSemiShared):
     #def AddAdditionalCode(self, mb):
         #super(Particles, self).AddAdditionalCode(mb)
         #if self.isClient:
-            #header = code_creators.include_t( 'src_python_particles_converters.h' )
+            #header = code_creators.include_t( 'srcpy_particles_converters.h' )
             #mb.code_creator.adopt_include(header)   
     

@@ -10,7 +10,7 @@
 #include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
 #include "animation.h"
-#include "src_python.h"
+#include "srcpy.h"
 
 #ifdef CLIENT_DLL
 	#include "c_hl2wars_player.h"

@@ -16,7 +16,7 @@
 
 #include "Color.h"
 
-#include "src_python_base.h"
+#include "srcpy_base.h"
 
 #include "globalvars_base.h"
 
@@ -26,11 +26,11 @@
 
 #include "in_buttons.h"
 
-#include "src_python_converters.h"
+#include "srcpy_converters.h"
 
 #include "coordsize.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

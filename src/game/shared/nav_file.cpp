@@ -27,7 +27,7 @@
 #endif
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
+	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
 // NOTE: This has to be the last file included!

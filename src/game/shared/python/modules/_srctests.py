@@ -25,7 +25,7 @@ class _SrcTests(GenerateModuleSemiShared):
     ]
     
     files = [
-        'src_python_tests.h'
+        'srcpy_tests.h'
     ]
     
     def GetFiles(self):

@@ -14,8 +14,8 @@
 #include "precache_register.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
-	#include "src_python_gamerules.h"
+	#include "srcpy.h"
+	#include "srcpy_gamerules.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

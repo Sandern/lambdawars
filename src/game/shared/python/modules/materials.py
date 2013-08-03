@@ -24,7 +24,7 @@ class Materials(GenerateModuleSemiShared):
         'cbase.h',
         'materialsystem\imaterial.h',
         'materialsystem\MaterialSystemUtil.h',
-        'python\src_python_materials.h',
+        'python\srcpy_materials.h',
         #'avi/ibik.h',
     ]
     def GetFiles(self):

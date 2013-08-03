@@ -24,7 +24,7 @@
 
 #include "unit_animstate.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -1712,7 +1712,7 @@ BOOST_PYTHON_MODULE(unit_helper){
 
 #include "unit_animstate.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

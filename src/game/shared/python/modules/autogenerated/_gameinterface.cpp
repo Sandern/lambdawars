@@ -20,7 +20,7 @@
 
 #include "hl2wars_gamerules.h"
 
-#include "src_python_gamerules.h"
+#include "srcpy_gamerules.h"
 
 #include "c_recipientfilter.h"
 
@@ -32,15 +32,15 @@
 
 #include "irecipientfilter.h"
 
-#include "src_python_gameinterface.h"
+#include "srcpy_gameinterface.h"
 
 #include "cdll_int.h"
 
 #include "wars_mount_system.h"
 
-#include "src_python_gameinterface_converters.h"
+#include "srcpy_gameinterface_converters.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -3558,7 +3558,7 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
 #include "recipientfilter.h"
 
-#include "src_python_usermessage.h"
+#include "srcpy_usermessage.h"
 
 #include "hl2wars_gameinterface.h"
 
@@ -3572,15 +3572,15 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
 #include "irecipientfilter.h"
 
-#include "src_python_gameinterface.h"
+#include "srcpy_gameinterface.h"
 
 #include "cdll_int.h"
 
 #include "wars_mount_system.h"
 
-#include "src_python_gameinterface_converters.h"
+#include "srcpy_gameinterface_converters.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

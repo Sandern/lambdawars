@@ -77,7 +77,7 @@
 
 #include "studio.h"
 
-#include "src_python_entities.h"
+#include "srcpy_entities.h"
 
 #include "isaverestore.h"
 
@@ -99,9 +99,9 @@
 
 #include "wars_mapboundary.h"
 
-#include "src_python_converters_ents.h"
+#include "srcpy_converters_ents.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

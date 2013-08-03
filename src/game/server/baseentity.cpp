@@ -76,10 +76,10 @@
 #include "fowmgr.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
-	#include "src_python_util.h"
-	#include "src_python_networkvar.h"
-	#include "src_python_usermessage.h"
+	#include "srcpy.h"
+	#include "srcpy_util.h"
+	#include "srcpy_networkvar.h"
+	#include "srcpy_usermessage.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

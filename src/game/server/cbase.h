@@ -90,7 +90,7 @@
 #ifdef ENABLE_PYTHON
 	// Python 
 	#include <boost/python.hpp>
-	#include "src_python_server_class.h"
+	#include "srcpy_server_class.h"
 #endif // ENABLE_PYTHON
 
 // saverestore.h declarations

@@ -9,7 +9,7 @@
 #include "utldict.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python_entities.h"
+	#include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

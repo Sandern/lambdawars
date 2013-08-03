@@ -30,11 +30,11 @@
 
 #include "view.h"
 
-#include "src_python_util.h"
+#include "srcpy_util.h"
 
 #include "hl2wars_util_shared.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -2786,11 +2786,11 @@ BOOST_PYTHON_MODULE(_utils){
 
 #include "engine/IEngineTrace.h"
 
-#include "src_python_util.h"
+#include "srcpy_util.h"
 
 #include "hl2wars_util_shared.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

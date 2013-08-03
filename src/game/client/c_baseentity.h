@@ -42,10 +42,10 @@
 
 #ifdef ENABLE_PYTHON
 	#include <boost/python.hpp>
-	#include "src_python_physics.h"
+	#include "srcpy_physics.h"
 	namespace bp = boost::python;
 #endif // ENABLE_PYTHON
-#include "src_python_client_class.h" // Provides stubs
+#include "srcpy_client_class.h" // Provides stubs
 
 class C_Team;
 class IPhysicsObject;

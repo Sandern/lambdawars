@@ -22,7 +22,7 @@
 
 #include "src_cef_js.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

@@ -44,8 +44,8 @@
 #include "gamestringpool.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
-	#include "src_python_usermessage.h"
+	#include "srcpy.h"
+	#include "srcpy_usermessage.h"
 #endif // ENABLE_PYTHON
 
 #include "hl2wars/fowmgr.h"

@@ -12,7 +12,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         'shared_classnames.h',
         'npcevent.h',
         'studio.h',
-        'src_python_entities.h',
+        'srcpy_entities.h',
         'isaverestore.h',
         'saverestore.h',
         'mapentities_shared.h',
@@ -57,7 +57,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         'eventqueue.h',
         'entitylist.h',
         'takedamageinfo.h',
-        'src_python_networkvar.h',
+        'srcpy_networkvar.h',
         'soundent.h',
         'entityoutput.h',
         'SkyCamera.h',
@@ -66,7 +66,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         'physics_prop_ragdoll.h',
         
         'hl2wars_player.h',
-        'src_python_base.h',
+        'srcpy_base.h',
     ]
     
     if not settings.ASW_CODE_BASE:
@@ -544,6 +544,6 @@ class EntitiesMisc(GenerateModuleSemiShared):
         DisableKnownWarnings(mb)
         
     def AddAdditionalCode(self, mb):
-        header = code_creators.include_t( 'src_python_converters_ents.h' )
+        header = code_creators.include_t( 'srcpy_converters_ents.h' )
         mb.code_creator.adopt_include(header)
         super(EntitiesMisc, self).AddAdditionalCode(mb)

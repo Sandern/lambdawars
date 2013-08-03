@@ -18,7 +18,7 @@ class MatchMaking(GenerateModuleSemiShared):
         
     files = [
         'cbase.h',
-        'src_python_matchmaking.h',
+        'srcpy_matchmaking.h',
         #'steam/isteammatchmaking.h',
         #'matchmaking/imatchframework.h',
     ]

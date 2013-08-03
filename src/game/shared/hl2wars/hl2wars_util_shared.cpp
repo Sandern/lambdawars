@@ -10,7 +10,7 @@
 
 #include "nav_mesh.h"
 #ifdef ENABLE_PYTHON
-	#include "src_python_navmesh.h"
+	#include "srcpy_navmesh.h"
 #endif // ENABLE_PYTHON
 
 #ifdef GAME_DLL

@@ -122,8 +122,8 @@
 #include "hl2wars/wars_mount_system.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
-	#include "src_python_networkvar.h"
+	#include "srcpy.h"
+	#include "srcpy_networkvar.h"
 #endif // ENABLE_PYTHON
 
 #ifdef _WIN32

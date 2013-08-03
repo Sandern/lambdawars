@@ -19,7 +19,7 @@ class GameInterface(GenerateModuleSemiShared):
             'multiplay_gamerules.h',
             'teamplay_gamerules.h',
             'hl2wars_gamerules.h',
-            'src_python_gamerules.h',
+            'srcpy_gamerules.h',
             'c_recipientfilter.h',
             'tier0/icommandline.h',
         ]
@@ -33,7 +33,7 @@ class GameInterface(GenerateModuleSemiShared):
             'iservernetworkable.h',
             #'enginecallback.h',
             'recipientfilter.h',
-            'src_python_usermessage.h',
+            'srcpy_usermessage.h',
             'hl2wars_gameinterface.h',
             'mapentities.h',
             'tier0/icommandline.h',
@@ -47,7 +47,7 @@ class GameInterface(GenerateModuleSemiShared):
             'multiplay_gamerules.h',
             'teamplay_gamerules.h',
             'hl2wars_gamerules.h',
-            'src_python_gamerules.h',
+            'srcpy_gamerules.h',
             'c_recipientfilter.h',
         ]
     
@@ -59,7 +59,7 @@ class GameInterface(GenerateModuleSemiShared):
             'util.h',
             'iservernetworkable.h',
             'recipientfilter.h',
-            'src_python_usermessage.h',
+            'srcpy_usermessage.h',
             'hl2wars_gameinterface.h',
             'mapentities.h',
         ]
@@ -68,7 +68,7 @@ class GameInterface(GenerateModuleSemiShared):
         'convar.h',
         'igameevents.h',
         'irecipientfilter.h',
-        'src_python_gameinterface.h',
+        'srcpy_gameinterface.h',
         'cdll_int.h',
         'wars_mount_system.h',
     ]
@@ -425,7 +425,7 @@ class GameInterface(GenerateModuleSemiShared):
             mb.mem_funs( lambda decl: HasArgType(decl, 'CTeam') ).exclude()
             
     def AddAdditionalCode(self, mb):
-        header = code_creators.include_t( 'src_python_gameinterface_converters.h' )
+        header = code_creators.include_t( 'srcpy_gameinterface_converters.h' )
         mb.code_creator.adopt_include(header)
         super(GameInterface, self).AddAdditionalCode(mb)
         

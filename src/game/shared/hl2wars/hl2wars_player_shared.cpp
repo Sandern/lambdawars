@@ -28,7 +28,7 @@
 #include "wars_mapboundary.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
+	#include "srcpy.h"
 	namespace bp = boost::python;
 #endif // ENABLE_PYTHON
 

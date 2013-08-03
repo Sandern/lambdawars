@@ -17,7 +17,7 @@ class Entities(GenerateModuleSemiShared):
         'shared_classnames.h',
         'npcevent.h',
         'studio.h',
-        'src_python_entities.h',
+        'srcpy_entities.h',
         'isaverestore.h',
         'saverestore.h',
         'mapentities_shared.h',
@@ -1819,7 +1819,7 @@ class Entities(GenerateModuleSemiShared):
         DisableKnownWarnings(mb)
         
     def AddAdditionalCode(self, mb):
-        header = code_creators.include_t( 'src_python_converters_ents.h' )
+        header = code_creators.include_t( 'srcpy_converters_ents.h' )
         mb.code_creator.adopt_include(header)
         super(Entities, self).AddAdditionalCode(mb)
 

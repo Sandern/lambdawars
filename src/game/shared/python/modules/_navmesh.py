@@ -19,7 +19,7 @@ class NavMesh(GenerateModuleSemiShared):
         
     files = [
         'cbase.h',
-        'src_python_navmesh.h',
+        'srcpy_navmesh.h',
     ]
     
     def GetFiles(self):

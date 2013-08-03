@@ -37,9 +37,9 @@
 #include "vscript_server.h"
 
 #ifdef ENABLE_PYTHON
-	#include "src_python.h"
-	#include "src_python_gamerules.h"
-	#include "src_python_entities.h"
+	#include "srcpy.h"
+	#include "srcpy_gamerules.h"
+	#include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

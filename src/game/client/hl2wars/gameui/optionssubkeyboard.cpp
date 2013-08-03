@@ -38,7 +38,7 @@
 #ifdef ENABLE_PYTHON
 	#include "cbase.h"
 	#include "igamesystem.h"
-	#include "src_python.h"
+	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

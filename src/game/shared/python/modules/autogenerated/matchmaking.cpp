@@ -10,9 +10,9 @@
 
 #include "cbase.h"
 
-#include "src_python_matchmaking.h"
+#include "srcpy_matchmaking.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -232,9 +232,9 @@ BOOST_PYTHON_MODULE(matchmaking){
 
 #include "cbase.h"
 
-#include "src_python_matchmaking.h"
+#include "srcpy_matchmaking.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

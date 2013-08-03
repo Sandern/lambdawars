@@ -32,9 +32,9 @@
 
 #include "effect_dispatch_data.h"
 
-#include "src_python_te.h"
+#include "srcpy_te.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
@@ -1350,9 +1350,9 @@ BOOST_PYTHON_MODULE(_te){
 
 #include "effect_dispatch_data.h"
 
-#include "src_python_te.h"
+#include "srcpy_te.h"
 
-#include "src_python.h"
+#include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 

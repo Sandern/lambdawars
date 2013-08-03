@@ -42,7 +42,7 @@ class VGUIControls(GenerateModuleClient):
         'vgui_bitmapimage.h',
         'vgui_avatarimage.h',
         
-        'src_python_vgui.h',
+        'srcpy_vgui.h',
         'hl2wars/hl2wars_baseminimap.h',
         'hl2wars/vgui_video_general.h',
     ] )

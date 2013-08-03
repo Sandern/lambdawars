@@ -12,7 +12,7 @@ class SrcBase(GenerateModulePureShared):
         'tier0\dbg.h',
         
         'Color.h',
-        'src_python_base.h',
+        'srcpy_base.h',
         'globalvars_base.h',
         'edict.h',
         'igamemovement.h',
@@ -445,7 +445,7 @@ class SrcBase(GenerateModulePureShared):
     # Adds precompiled header + other default includes
     def AddAdditionalCode(self, mb):
         # Add includes
-        header = code_creators.include_t( 'src_python_converters.h' )
+        header = code_creators.include_t( 'srcpy_converters.h' )
         mb.code_creator.adopt_include(header)
         header = code_creators.include_t( 'coordsize.h' )
         mb.code_creator.adopt_include(header)
