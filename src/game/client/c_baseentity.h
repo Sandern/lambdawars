@@ -1910,6 +1910,7 @@ public:
 	virtual void					ClearPyInstance();
 	bp::object						GetPyHandle() const;
 	void							SetPyTouch( bp::object touch_method );
+	void							PyTouch( C_BaseEntity *pOther );
 	void							SetPyThink( bp::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
 	bp::object						GetPyThink();
 	void							PyThink();

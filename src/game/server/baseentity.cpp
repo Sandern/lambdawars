@@ -2735,16 +2735,6 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 	if ( m_pfnTouch ) {
 		(this->*m_pfnTouch)( pOther );
 	}
-#ifdef ENABLE_PYTHON
-	else if( m_pyTouchMethod.ptr() != Py_None ) {
-		try {
-			m_pyTouchMethod( *pOther );
-		} catch(bp::error_already_set &) {
-			PyErr_Print();
-			PyErr_Clear();
-		}
-	}
-#endif // ENABLE_PYTHON
 
 	// notify parent of touch
 	if ( m_pParent != NULL )

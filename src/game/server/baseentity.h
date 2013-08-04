@@ -1966,6 +1966,7 @@ public:
 	virtual void		ClearPyInstance();
 	bp::object			GetPyHandle() const;
 	void				SetPyTouch( bp::object touch_method );
+	void				PyTouch( CBaseEntity *pOther );
 	void				PySendEvent( IRecipientFilter &filter, int event, int data=0 );
 
 	virtual void		PySetModel( const char *szModelName );		// Python safe version		

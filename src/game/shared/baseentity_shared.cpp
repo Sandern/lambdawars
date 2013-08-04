@@ -2851,6 +2851,7 @@ void CBaseEntity::SetPyTouch( bp::object touch_method )
 	}
 
 	m_pyTouchMethod = touch_method;
+	SetTouch( &CBaseEntity::PyTouch );
 }
 
 //-----------------------------------------------------------------------------
@@ -2873,7 +2874,8 @@ void CBaseEntity::SetPyThink( bp::object func, float thinkTime, const char *szCo
 			SetThink(NULL);
 			m_pyThink = func;
 		}
-		else {
+		else 
+		{
 			SetThink( &CBaseEntity::PyThink );
 			m_pyThink = func;
 			int thinkTick = ( thinkTime == TICK_NEVER_THINK ) ? TICK_NEVER_THINK : TIME_TO_TICKS( thinkTime );
@@ -2908,18 +2910,32 @@ void CBaseEntity::SetPyThink( bp::object func, float thinkTime, const char *szCo
 //----------------------------------------------------------------------------
 void CBaseEntity::PyThink()
 {
-	try	{
+	try	
+	{
 		m_pyThink();
-	} catch(boost::python::error_already_set &) {
-#ifndef CLIENT_DLL
-		//if( !ValidatePyInstance() )
-		//	return;
-#endif // CLIENT_DLL
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//----------------------------------------------------------------------------
+void CBaseEntity::PyTouch( CBaseEntity *pOther )
+{
+	try	
+	{
+		m_pyTouchMethod( pOther ? pOther->GetPyHandle() : boost::python::object() );
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
+		PyErr_Print();
+		PyErr_Clear();
+	}
+}
 
 // Functions which return *IPhysicsObject need to be wrapped in python
 //-----------------------------------------------------------------------------

@@ -4523,15 +4523,6 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("iEntIndex"), bp::arg("iChannel"), bp::arg("pSample") ) );
         
         }
-        { //::C_BaseEntity::PyThink
-        
-            typedef void ( ::C_BaseEntity::*PyThink_function_type )(  ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "PyThink"
-                , PyThink_function_type( &::C_BaseEntity::PyThink ) );
-        
-        }
         { //::C_BaseEntity::PyUpdateNetworkVar
         
             typedef void ( ::C_BaseEntity::*PyUpdateNetworkVar_function_type )( char const *,::boost::python::object,bool ) ;

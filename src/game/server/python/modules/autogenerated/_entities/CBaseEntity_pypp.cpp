@@ -2376,15 +2376,6 @@ void register_CBaseEntity_class(){
                 , GetEntityName_function_type( &::CBaseEntity::GetEntityName ) );
         
         }
-        { //::CBaseEntity::GetEntityNameAsCStr
-        
-            typedef char const * ( ::CBaseEntity::*GetEntityNameAsCStr_function_type )(  ) ;
-            
-            CBaseEntity_exposer.def( 
-                "GetEntityNameAsCStr"
-                , GetEntityNameAsCStr_function_type( &::CBaseEntity::GetEntityNameAsCStr ) );
-        
-        }
         { //::CBaseEntity::GetEyeAngleOffset
         
             typedef ::QAngle const & ( ::CBaseEntity::*GetEyeAngleOffset_function_type )(  ) const;
@@ -4721,15 +4712,6 @@ void register_CBaseEntity_class(){
                 "StopSound"
                 , StopSound_function_type( &::CBaseEntity::PyStopSound )
                 , ( bp::arg("iEntIndex"), bp::arg("iChannel"), bp::arg("pSample") ) );
-        
-        }
-        { //::CBaseEntity::PyThink
-        
-            typedef void ( ::CBaseEntity::*PyThink_function_type )(  ) ;
-            
-            CBaseEntity_exposer.def( 
-                "PyThink"
-                , PyThink_function_type( &::CBaseEntity::PyThink ) );
         
         }
         { //::CBaseEntity::PyVPhysicsGetObject

@@ -495,6 +495,8 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('CreatePyHandle').exclude() # Use GetHandle instead.
         mb.mem_funs('GetPyHandle').rename('GetHandle')
         mb.mem_funs('GetPySelf').exclude()
+        mb.mem_funs('PyThink').exclude()
+        mb.mem_funs('PyTouch').exclude()
         
         # Don't give a shit about the following functions
         mb.mem_funs( lambda decl: HasArgType(decl, 'CEntityMapData') ).exclude()
@@ -764,6 +766,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('NotifySystemEvent').exclude()          # Don't care
             mb.mem_funs('Entity').exclude()          # Don't care
+            mb.mem_funs('GetEntityNameAsCStr').exclude() # Always use GetEntityName()
             
             mb.mem_funs('EmitSentenceByIndex').exclude()    # Don't care for now
             
