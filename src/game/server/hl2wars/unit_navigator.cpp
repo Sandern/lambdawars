@@ -76,7 +76,7 @@ ConVar unit_dens_all_nomove("unit_dens_all_nomove", "0.5");
 
 ConVar unit_cost_distweight("unit_cost_distweight", "1.0");
 ConVar unit_cost_timeweight("unit_cost_timeweight", "1.0");
-ConVar unit_cost_lastdirweight("unit_cost_lastdirweight", "25.0");
+ConVar unit_cost_lastdirweight("unit_cost_lastdirweight", "24.0");
 ConVar unit_cost_discomfortweight_start("unit_cost_discomfortweight_start", "1.0");
 ConVar unit_cost_discomfortweight_growthreshold("unit_cost_discomfortweight_growthreshold", "0.05");
 ConVar unit_cost_discomfortweight_growrate("unit_cost_discomfortweight_growrate", "500.0");
@@ -947,9 +947,12 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// 2. The disconform the unit feels due the density in the tested direction
 	// 3. The change in direction from the last direction we went. We slightly prefer to keep going in 
 	//	  the same direction as the last time (otherwise we might ping pong back and forth between two spots)
-	return ( ( unit_cost_distweight.GetFloat() * fDist ) + 
-			 ( m_fDiscomfortWeight * fDensity ) ) +
-			 ( (vFinalVelocity.Normalized() - m_vLastDirection).Length2D() * unit_cost_lastdirweight.GetFloat() );
+	//	  Only if blocked a little.
+	float cost = ( unit_cost_distweight.GetFloat() * fDist ) + 
+			 ( m_fDiscomfortWeight * fDensity );
+	if( GetBlockedStatus() >= BS_LITTLE )
+		cost += (vFinalVelocity.Normalized() - m_vLastDirection).Length2D() * unit_cost_lastdirweight.GetFloat();
+	return cost;
 }
 
 //-----------------------------------------------------------------------------
@@ -1971,6 +1974,7 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 	else
 	{
 		m_bLowVelocityDetectionActive = false;
+		m_fLowVelocityStartTime = gpGlobals->curtime;
 	}
 
 	// Check long distance if needed
