@@ -592,6 +592,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('GetRenderClipPlane').exclude()     # Don't care for now
             mb.mem_funs('GetIDString').exclude()            # Don't care for now
             mb.mem_funs('PhysicsAddHalfGravity').exclude()  # This one only seems to have a declaration on the client!!!
+            mb.mem_funs('PyUpdateNetworkVar').exclude()     # Internal for network vars
             
             mb.mem_funs('AllocateIntermediateData').exclude()            # Don't care
             mb.mem_funs('DestroyIntermediateData').exclude()            # Don't care

@@ -40,8 +40,10 @@
 
 #include "matchmaking/swarm/imatchext_swarm.h"
 
-#include "srcpy_boostpython.h"
-#include "hl2wars/vgui/vgui_news.h"
+//#include "hl2wars/vgui/vgui_news.h"
+#include "cbase.h"
+#include "python/srcpy.h"
+#include "src_cef.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -82,16 +84,42 @@ MainMenu::MainMenu( Panel *parent, const char *panelName ):
 
 	m_iQuickJoinHelpText = MMQJHT_NONE;
 
-	m_pNews = new WebNews( this );
-
+#ifdef ENABLE_PYTHON
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		try
+		{
+			boost::python::object mainmenu = SrcPySystem()->Get( "CefMainMenu", "vgui.mainmenu" );
+			m_refCefMainMenu = mainmenu( *((vgui::Panel *)this) );
+			m_pCefMainMenu = boost::python::extract<SrcCefBrowser *>( m_refCefMainMenu );
+			if( m_pCefMainMenu )
+			{
+				m_pCefMainMenu->GetPanel()->SetParent( this );
+			}
+		}
+		catch( boost::python::error_already_set & )
+		{
+			PyErr_Print();
+		}
+	}
+#endif // ENABLE_PYTHON
 	SetDeleteSelfOnClose( true );
 }
 
 //=============================================================================
 MainMenu::~MainMenu()
 {
-	delete m_pNews;
-
+#ifdef ENABLE_PYTHON
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		if( m_pCefMainMenu )
+		{
+			m_pCefMainMenu->Destroy();
+			m_refCefMainMenu = boost::python::object();
+			m_pCefMainMenu = NULL;
+		}
+	}
+#endif // ENABLE_PYTHON
 	RemoveFrameListener( this );
 
 }

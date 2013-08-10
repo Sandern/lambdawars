@@ -18,6 +18,7 @@
 #ifdef CLIENT_DLL
 	#include "networkstringtable_clientdll.h"
 	#include "srcpy_materials.h"
+	#include "hl2wars/gameui/wars/basemodpanel.h"
 #else
 	#include "networkstringtable_gamedll.h"
 #endif // CLIENT_DLL
@@ -319,6 +320,9 @@ void CSrcPython::ExtraShutdown( void )
 		return;
 
 #ifdef CLIENT_DLL
+	// Part of the main menu is in Python, so all windows must be closed when shutting down Python
+	BaseModUI::CBaseModPanel::GetSingleton().CloseAllWindows();
+
 	// Clear python panels
 	DestroyPyPanels();
 #endif // CLIENT_DLL

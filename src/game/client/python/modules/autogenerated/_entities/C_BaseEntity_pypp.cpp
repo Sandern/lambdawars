@@ -4523,16 +4523,6 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("iEntIndex"), bp::arg("iChannel"), bp::arg("pSample") ) );
         
         }
-        { //::C_BaseEntity::PyUpdateNetworkVar
-        
-            typedef void ( ::C_BaseEntity::*PyUpdateNetworkVar_function_type )( char const *,::boost::python::object,bool ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "PyUpdateNetworkVar"
-                , PyUpdateNetworkVar_function_type( &::C_BaseEntity::PyUpdateNetworkVar )
-                , ( bp::arg("pName"), bp::arg("data"), bp::arg("callchanged")=(bool)(false) ) );
-        
-        }
         { //::C_BaseEntity::PyVPhysicsGetObject
         
             typedef ::boost::python::object ( ::C_BaseEntity::*VPhysicsGetObject_function_type )(  ) ;
