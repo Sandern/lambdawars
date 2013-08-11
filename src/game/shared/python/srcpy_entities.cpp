@@ -15,7 +15,6 @@
 	#include "c_basetempentity.h"
 #else
 	#include "basetempentity.h"
-	#include "hl2wars_player.h"
 	#include "bone_setup.h"
 	#include "physics_prop_ragdoll.h"
 	#include "world.h"
@@ -24,7 +23,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-using namespace boost::python;
+namespace bp = boost::python;
 
 // -------------------------------------------------------------------------------
 PyHandle::PyHandle(bp::object ent)
@@ -53,9 +52,12 @@ void PyHandle::Set( bp::object ent )
 	}
 
 	CBaseEntity *pEnt = NULL;
-	try {
+	try 
+	{
 		pEnt = bp::extract<CBaseEntity *>(ent);
-	} catch(error_already_set &) {
+	} 
+	catch( bp::error_already_set & ) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -140,7 +142,7 @@ bp::object CreatePyHandle( int iEntry, int iSerialNumber )
 		clshandle = _entities.attr("PyHandle");
 		return clshandle(iEntry, iSerialNumber);
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Print();	
 	}
@@ -195,7 +197,7 @@ C_BaseEntity *PyEntityFactory::Create()
 		boost::python::object inst = m_PyClass();
 		pEnt = boost::python::extract<CBaseEntity *>(inst);
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		PyErr_Print();
 		return NULL;
@@ -311,7 +313,7 @@ IServerNetworkable *PyEntityFactory::Create( const char *pClassName )
 
 		return pEnt->NetworkProp();
 	}
-	catch(error_already_set &)
+	catch( bp::error_already_set & )
 	{
 		Warning("Failed to create entity %s:\n", pClassName );
 		PyErr_Print();
@@ -433,11 +435,14 @@ public:
 			return;
 		}
 
-		try {
+		try 
+		{
 			SrcPySystem()->Run<int, int>( 
 				SrcPySystem()->Get("ReceiveEvent", m_hEnt->GetPyInstance(), true), 
 				m_iEvent, m_nData );
-		} catch(error_already_set &) {
+		} 
+		catch( bp::error_already_set & ) 
+		{
 			PyErr_Print();
 		}
 	}
@@ -522,7 +527,7 @@ bp::object PyRespawnPlayer( CBasePlayer *pPlayer, const char *classname )
 	UTIL_RemoveImmediate( pPlayer );
 
 	// Create a new player using the provided player class
-	CHL2WarsPlayer *pPlayerNew = dynamic_cast<CHL2WarsPlayer *>(CHL2WarsPlayer::CreatePlayer( classname, pEdict ));
+	CBasePlayer *pPlayerNew = dynamic_cast<CBasePlayer *>(CBasePlayer::CreatePlayer( classname, pEdict ));
 	if( !pPlayerNew )
 	{
 		PyErr_SetString(PyExc_ValueError, "Invalid player entity class");

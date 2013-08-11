@@ -17,6 +17,7 @@
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
+	#include "srcpy_base.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

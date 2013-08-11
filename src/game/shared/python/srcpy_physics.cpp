@@ -12,6 +12,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+namespace bp = boost::python;
+
 //-----------------------------------------------------------------------------
 // Purpose: IPhysicsShadowController base wrapper for python.
 //-----------------------------------------------------------------------------
@@ -22,7 +24,7 @@ PyPhysicsShadowController::PyPhysicsShadowController( boost::python::object refP
 	if( refPyPhysObj.ptr() == Py_None )
 		return;
 
-	m_pPyPhysObj = boost::python::extract<PyPhysicsObjectBase *>(refPyPhysObj);
+	m_pPyPhysObj = boost::python::extract<PyPhysicsObject *>(refPyPhysObj);
 	m_pPyPhysObj->CheckValid();
 	m_pShadCont = m_pPyPhysObj->m_pPhysObj->GetShadowController();
 }
@@ -43,17 +45,18 @@ void PyPhysicsShadowController::CheckValid()
 // ? Is using memcmp on a PyObject correct ?
 bool PyPhysicsShadowController::Cmp( boost::python::object other )
 {
-	if( other.ptr() == Py_None ) {
+	if( other.ptr() == Py_None ) 
+	{
 		return m_pShadCont != NULL;
 	}
 
 	if( PyObject_IsInstance(other.ptr(), boost::python::object(_physics.attr("PyPhysicsShadowController")).ptr()) )
 	{
 		IPhysicsShadowController *other_ext = boost::python::extract<IPhysicsShadowController *>(other);
-		return memcmp(other_ext, m_pShadCont, sizeof(int));
+		return V_memcmp(other_ext, m_pShadCont, sizeof(IPhysicsShadowController *));
 	}
 
-	return memcmp(other.ptr(), m_pShadCont, sizeof(int));
+	return V_memcmp(other.ptr(), m_pShadCont, sizeof(IPhysicsShadowController *));
 }
 
 bool PyPhysicsShadowController::NonZero()
@@ -159,90 +162,158 @@ void PyPhysicsShadowController::GetMaxSpeed( float *pMaxSpeedOut, float *pMaxAng
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+PyPhysicsObject::PyPhysicsObject() :
+	 m_pPhysObj(NULL), m_hEnt(NULL), m_bOwnsPhysObject(false)
+{
+}
+
+PyPhysicsObject::PyPhysicsObject( IPhysicsObject *pPhysObj ) : m_hEnt(NULL), m_bOwnsPhysObject(false)
+{
+	if( !pPhysObj )
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid physics object" );
+		throw boost::python::error_already_set();
+		return;
+	}
+
+	InitFromPhysicsObject( pPhysObj );
+}
+
+PyPhysicsObject::PyPhysicsObject( CBaseEntity *pEnt ) : m_hEnt(NULL), m_bOwnsPhysObject(false)
+{
+	if( !pEnt || !pEnt->VPhysicsGetObject() )
+	{
+		m_hEnt = NULL;
+		PyErr_SetString(PyExc_ValueError, "Invalid Entity or physics object" );
+		throw boost::python::error_already_set();
+		return;
+	}
+
+	m_hEnt = pEnt;
+	m_pPhysObj = pEnt->VPhysicsGetObject();
+}
+
+PyPhysicsObject::~PyPhysicsObject()
+{
+	Destroy();
+}
+
+void PyPhysicsObject::InitFromPhysicsObject( IPhysicsObject *pPhysObj )
+{
+	m_pPhysObj = pPhysObj;
+
+	m_hEnt = reinterpret_cast<CBaseEntity *>( pPhysObj->GetGameData() );
+}
+
+void PyPhysicsObject::CheckValid() 
+{
+	if( !m_hEnt || m_hEnt->VPhysicsGetObject() != m_pPhysObj )
+	{
+		PyErr_SetString(PyExc_ValueError, "PhysicsObject invalid" );
+		throw boost::python::error_already_set();
+	}
+}
+
+void PyPhysicsObject::Destroy()
+{
+	CheckValid();
+
+	if( !m_bOwnsPhysObject )
+		return;
+
+	if( !g_EntityCollisionHash )
+		return;
+
+	PhysDestroyObject(m_pPhysObj, m_hEnt);
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: IPhysicsObject base wrapper for python.
 //-----------------------------------------------------------------------------
-// ? Is using memcmp on a PyObject correct ?
-bool PyPhysicsObjectBase::Cmp( boost::python::object other )
+bool PyPhysicsObject::Cmp( boost::python::object other )
 {
-	if( other.ptr() == Py_None ) {
+	if( other.ptr() == Py_None ) 
+	{
 		return m_pPhysObj != NULL;
 	}
 
-	if( PyObject_IsInstance(other.ptr(), boost::python::object(_physics.attr("PyPhysicsObjectBase")).ptr()) )
+	if( PyObject_IsInstance(other.ptr(), boost::python::object(_physics.attr("PyPhysicsObject")).ptr()) )
 	{
 		IPhysicsObject *other_ext = boost::python::extract<IPhysicsObject *>(other);
-		return memcmp(other_ext, m_pPhysObj, sizeof(int));
+		return V_memcmp(other_ext, m_pPhysObj, sizeof(IPhysicsObject *));
 	}
 
-	return memcmp(other.ptr(), m_pPhysObj, sizeof(int));
+	return V_memcmp(other.ptr(), m_pPhysObj, sizeof(IPhysicsObject *));
 }
 
-bool PyPhysicsObjectBase::NonZero()
+bool PyPhysicsObject::NonZero()
 {
 	return m_pPhysObj != NULL;
 }
 
-bool PyPhysicsObjectBase::IsStatic()
+bool PyPhysicsObject::IsStatic()
 {
 	CheckValid();
 	return m_pPhysObj->IsStatic();
 }
 
-bool PyPhysicsObjectBase::IsAsleep()
+bool PyPhysicsObject::IsAsleep()
 {
 	CheckValid();
 	return m_pPhysObj->IsAsleep();
 }
 
-bool PyPhysicsObjectBase::IsTrigger()
+bool PyPhysicsObject::IsTrigger()
 {
 	CheckValid();
 	return m_pPhysObj->IsTrigger();
 }
 
-bool PyPhysicsObjectBase::IsFluid()
+bool PyPhysicsObject::IsFluid()
 {
 	CheckValid();
 	return m_pPhysObj->IsFluid();
 }
 
-bool PyPhysicsObjectBase::IsHinged()
+bool PyPhysicsObject::IsHinged()
 {
 	CheckValid();
 	return m_pPhysObj->IsHinged();
 }
 
-bool PyPhysicsObjectBase::IsCollisionEnabled()
+bool PyPhysicsObject::IsCollisionEnabled()
 {
 	CheckValid();
 	return m_pPhysObj->IsCollisionEnabled();
 }
 
-bool PyPhysicsObjectBase::IsGravityEnabled()
+bool PyPhysicsObject::IsGravityEnabled()
 {
 	CheckValid();
 	return m_pPhysObj->IsGravityEnabled();
 }
 
-bool PyPhysicsObjectBase::IsDragEnabled()
+bool PyPhysicsObject::IsDragEnabled()
 {
 	CheckValid();
 	return m_pPhysObj->IsDragEnabled();
 }
 
-bool PyPhysicsObjectBase::IsMotionEnabled()
+bool PyPhysicsObject::IsMotionEnabled()
 {
 	CheckValid();
 	return m_pPhysObj->IsMotionEnabled();
 }
 
-bool PyPhysicsObjectBase::IsMoveable()
+bool PyPhysicsObject::IsMoveable()
 {
 	CheckValid();
 	return m_pPhysObj->IsMoveable();
 }
 
-bool PyPhysicsObjectBase::IsAttachedToConstraint(bool bExternalOnly)
+bool PyPhysicsObject::IsAttachedToConstraint(bool bExternalOnly)
 {
 	CheckValid();
 	return m_pPhysObj->IsAttachedToConstraint(bExternalOnly);
@@ -251,25 +322,25 @@ bool PyPhysicsObjectBase::IsAttachedToConstraint(bool bExternalOnly)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::EnableCollisions( bool enable )
+void PyPhysicsObject::EnableCollisions( bool enable )
 {
 	CheckValid();
 	m_pPhysObj->EnableCollisions(enable);
 }
 
-void PyPhysicsObjectBase::EnableGravity( bool enable )
+void PyPhysicsObject::EnableGravity( bool enable )
 {
 	CheckValid();
 	m_pPhysObj->EnableGravity(enable);
 }
 
-void PyPhysicsObjectBase::EnableDrag( bool enable )
+void PyPhysicsObject::EnableDrag( bool enable )
 {
 	CheckValid();
 	m_pPhysObj->EnableDrag(enable);
 }
 
-void PyPhysicsObjectBase::EnableMotion( bool enable )
+void PyPhysicsObject::EnableMotion( bool enable )
 {
 	CheckValid();
 	m_pPhysObj->EnableMotion(enable);
@@ -278,25 +349,25 @@ void PyPhysicsObjectBase::EnableMotion( bool enable )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::SetGameFlags( unsigned short userFlags )
+void PyPhysicsObject::SetGameFlags( unsigned short userFlags )
 {
 	CheckValid();
 	m_pPhysObj->SetGameFlags(userFlags);
 }
 
-unsigned short PyPhysicsObjectBase::GetGameFlags( void )
+unsigned short PyPhysicsObject::GetGameFlags( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetGameFlags();
 }
 
-void PyPhysicsObjectBase::SetGameIndex( unsigned short gameIndex )
+void PyPhysicsObject::SetGameIndex( unsigned short gameIndex )
 {
 	CheckValid();
 	m_pPhysObj->SetGameIndex(gameIndex);
 }
 
-unsigned short PyPhysicsObjectBase::GetGameIndex( void )
+unsigned short PyPhysicsObject::GetGameIndex( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetGameIndex();
@@ -305,13 +376,13 @@ unsigned short PyPhysicsObjectBase::GetGameIndex( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::SetCallbackFlags( unsigned short callbackflags )
+void PyPhysicsObject::SetCallbackFlags( unsigned short callbackflags )
 {
 	CheckValid();
 	m_pPhysObj->SetCallbackFlags(callbackflags);
 }
 
-unsigned short PyPhysicsObjectBase::GetCallbackFlags( void )
+unsigned short PyPhysicsObject::GetCallbackFlags( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetCallbackFlags();
@@ -320,25 +391,25 @@ unsigned short PyPhysicsObjectBase::GetCallbackFlags( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::Wake( void )
+void PyPhysicsObject::Wake( void )
 {
 	CheckValid();
 	m_pPhysObj->Wake();
 }
 
-void PyPhysicsObjectBase::Sleep( void )
+void PyPhysicsObject::Sleep( void )
 {
 	CheckValid();
 	m_pPhysObj->Sleep();
 }
 
-void PyPhysicsObjectBase::RecheckCollisionFilter()
+void PyPhysicsObject::RecheckCollisionFilter()
 {
 	CheckValid();
 	m_pPhysObj->RecheckCollisionFilter();
 }
 
-void PyPhysicsObjectBase::RecheckContactPoints()
+void PyPhysicsObject::RecheckContactPoints()
 {
 	CheckValid();
 	m_pPhysObj->RecheckContactPoints();
@@ -347,48 +418,48 @@ void PyPhysicsObjectBase::RecheckContactPoints()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::SetMass( float mass )
+void PyPhysicsObject::SetMass( float mass )
 {
 	CheckValid();
 	m_pPhysObj->SetMass(mass);
 }
 
-float PyPhysicsObjectBase::GetMass( void )
+float PyPhysicsObject::GetMass( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetMass();
 }
 
-float PyPhysicsObjectBase::GetInvMass( void )
+float PyPhysicsObject::GetInvMass( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetInvMass();
 }
 
-Vector PyPhysicsObjectBase::GetInertia( void )
+Vector PyPhysicsObject::GetInertia( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetInertia();
 }
 
-Vector PyPhysicsObjectBase::GetInvInertia( void )
+Vector PyPhysicsObject::GetInvInertia( void )
 {
 	CheckValid();
 	return m_pPhysObj->GetInvInertia();
 }
 
-void PyPhysicsObjectBase::SetInertia( const Vector &inertia )
+void PyPhysicsObject::SetInertia( const Vector &inertia )
 {
 	CheckValid();
 	m_pPhysObj->SetInertia(inertia);
 }
 
-void PyPhysicsObjectBase::SetDamping( float speed, float rot )
+void PyPhysicsObject::SetDamping( float speed, float rot )
 {
 	CheckValid();
 	m_pPhysObj->SetDamping(&speed, &rot);
 }
-bp::tuple PyPhysicsObjectBase::GetDamping()
+bp::tuple PyPhysicsObject::GetDamping()
 {
 	CheckValid();
     float speed;
@@ -397,181 +468,181 @@ bp::tuple PyPhysicsObjectBase::GetDamping()
 	return bp::make_tuple(speed, rot);
 }
 
-void PyPhysicsObjectBase::SetDragCoefficient( float *pDrag, float *pAngularDrag )
+void PyPhysicsObject::SetDragCoefficient( float *pDrag, float *pAngularDrag )
 {
 	CheckValid();
 	m_pPhysObj->SetDragCoefficient(pDrag, pAngularDrag);
 }
-void PyPhysicsObjectBase::SetBuoyancyRatio( float ratio )
+void PyPhysicsObject::SetBuoyancyRatio( float ratio )
 {
 	CheckValid();
 	m_pPhysObj->SetBuoyancyRatio(ratio);
 }
 
-int	PyPhysicsObjectBase::GetMaterialIndex()
+int	PyPhysicsObject::GetMaterialIndex()
 {
 	CheckValid();
 	return m_pPhysObj->GetMaterialIndex();
 }
 
-void PyPhysicsObjectBase::SetMaterialIndex( int materialIndex )
+void PyPhysicsObject::SetMaterialIndex( int materialIndex )
 {
 	CheckValid();
 	m_pPhysObj->SetMaterialIndex(materialIndex);
 }
 
 // contents bits
-unsigned int PyPhysicsObjectBase::GetContents()
+unsigned int PyPhysicsObject::GetContents()
 {
 	CheckValid();
 	return m_pPhysObj->GetContents();
 }
 
-void PyPhysicsObjectBase::SetContents( unsigned int contents )
+void PyPhysicsObject::SetContents( unsigned int contents )
 {
 	CheckValid();
 	m_pPhysObj->SetContents(contents);
 }
 
-float PyPhysicsObjectBase::GetSphereRadius()
+float PyPhysicsObject::GetSphereRadius()
 {
 	CheckValid();
 	return m_pPhysObj->GetSphereRadius();
 }
 
-float PyPhysicsObjectBase::GetEnergy()
+float PyPhysicsObject::GetEnergy()
 {
 	CheckValid();
 	return m_pPhysObj->GetEnergy();
 }
 
-Vector PyPhysicsObjectBase::GetMassCenterLocalSpace()
+Vector PyPhysicsObject::GetMassCenterLocalSpace()
 {
 	CheckValid();
 	return m_pPhysObj->GetMassCenterLocalSpace();
 }
 
-void PyPhysicsObjectBase::SetPosition( const Vector &worldPosition, const QAngle &angles, bool isTeleport )
+void PyPhysicsObject::SetPosition( const Vector &worldPosition, const QAngle &angles, bool isTeleport )
 {
 	CheckValid();
 	m_pPhysObj->SetPosition(worldPosition, angles, isTeleport);
 }
 
-void PyPhysicsObjectBase::SetPositionMatrix( const matrix3x4_t&matrix, bool isTeleport )
+void PyPhysicsObject::SetPositionMatrix( const matrix3x4_t&matrix, bool isTeleport )
 {
 	CheckValid();
 	m_pPhysObj->SetPositionMatrix(matrix, isTeleport);
 }
 
-void PyPhysicsObjectBase::GetPosition( Vector *worldPosition, QAngle *angles )
+void PyPhysicsObject::GetPosition( Vector *worldPosition, QAngle *angles )
 {
 	CheckValid();
 	m_pPhysObj->GetPosition(worldPosition, angles);
 }
 
-void PyPhysicsObjectBase::GetPositionMatrix( matrix3x4_t *positionMatrix )
+void PyPhysicsObject::GetPositionMatrix( matrix3x4_t *positionMatrix )
 {
 	CheckValid();
 	m_pPhysObj->GetPositionMatrix(positionMatrix);
 }
 
-void PyPhysicsObjectBase::SetVelocity( const Vector *velocity, const AngularImpulse *angularVelocity )
+void PyPhysicsObject::SetVelocity( const Vector *velocity, const AngularImpulse *angularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->SetVelocity( velocity, angularVelocity );
 }
 
-void PyPhysicsObjectBase::SetVelocityInstantaneous( const Vector *velocity, const AngularImpulse *angularVelocity )
+void PyPhysicsObject::SetVelocityInstantaneous( const Vector *velocity, const AngularImpulse *angularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->SetVelocityInstantaneous( velocity, angularVelocity );
 }
 
-void PyPhysicsObjectBase::GetVelocity( Vector *velocity, AngularImpulse *angularVelocity )
+void PyPhysicsObject::GetVelocity( Vector *velocity, AngularImpulse *angularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->GetVelocity( velocity, angularVelocity );
 }
 
-void PyPhysicsObjectBase::AddVelocity( const Vector *velocity, const AngularImpulse *angularVelocity )
+void PyPhysicsObject::AddVelocity( const Vector *velocity, const AngularImpulse *angularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->AddVelocity( velocity, angularVelocity );
 }
 
-void PyPhysicsObjectBase::GetVelocityAtPoint( const Vector &worldPosition, Vector *pVelocity )
+void PyPhysicsObject::GetVelocityAtPoint( const Vector &worldPosition, Vector *pVelocity )
 {
 	CheckValid();
 	m_pPhysObj->GetVelocityAtPoint( worldPosition, pVelocity );
 }
 
-void PyPhysicsObjectBase::GetImplicitVelocity( Vector *velocity, AngularImpulse *angularVelocity )
+void PyPhysicsObject::GetImplicitVelocity( Vector *velocity, AngularImpulse *angularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->GetImplicitVelocity( velocity, angularVelocity );
 }
 
-void PyPhysicsObjectBase::LocalToWorld( Vector *worldPosition, const Vector &localPosition )
+void PyPhysicsObject::LocalToWorld( Vector *worldPosition, const Vector &localPosition )
 {
 	CheckValid();
 	m_pPhysObj->LocalToWorld( worldPosition, localPosition );
 }
 
-void PyPhysicsObjectBase::WorldToLocal( Vector *localPosition, const Vector &worldPosition )
+void PyPhysicsObject::WorldToLocal( Vector *localPosition, const Vector &worldPosition )
 {
 	CheckValid();
 	m_pPhysObj->WorldToLocal( localPosition, worldPosition );
 }
 
-void PyPhysicsObjectBase::LocalToWorldVector( Vector *worldVector, const Vector &localVector )
+void PyPhysicsObject::LocalToWorldVector( Vector *worldVector, const Vector &localVector )
 {
 	CheckValid();
 	m_pPhysObj->LocalToWorldVector( worldVector, localVector );
 }
 
-void PyPhysicsObjectBase::WorldToLocalVector( Vector *localVector, const Vector &worldVector )
+void PyPhysicsObject::WorldToLocalVector( Vector *localVector, const Vector &worldVector )
 {
 	CheckValid();
 	m_pPhysObj->WorldToLocalVector( localVector, worldVector );
 }
 
-void PyPhysicsObjectBase::ApplyForceCenter( const Vector &forceVector )
+void PyPhysicsObject::ApplyForceCenter( const Vector &forceVector )
 {
 	CheckValid();
 	m_pPhysObj->ApplyForceCenter( forceVector );
 }
 
-void PyPhysicsObjectBase::ApplyForceOffset( const Vector &forceVector, const Vector &worldPosition )
+void PyPhysicsObject::ApplyForceOffset( const Vector &forceVector, const Vector &worldPosition )
 {
 	CheckValid();
 	m_pPhysObj->ApplyForceOffset( forceVector, worldPosition );
 }
 
-void PyPhysicsObjectBase::ApplyTorqueCenter( const AngularImpulse &torque )
+void PyPhysicsObject::ApplyTorqueCenter( const AngularImpulse &torque )
 {
 	CheckValid();
 	m_pPhysObj->ApplyTorqueCenter( torque );
 }
 
-void PyPhysicsObjectBase::CalculateForceOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerForce, AngularImpulse *centerTorque )
+void PyPhysicsObject::CalculateForceOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerForce, AngularImpulse *centerTorque )
 {
 	CheckValid();
 	m_pPhysObj->CalculateForceOffset( forceVector, worldPosition, centerForce, centerTorque );
 }
 
-void PyPhysicsObjectBase::CalculateVelocityOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerVelocity, AngularImpulse *centerAngularVelocity )
+void PyPhysicsObject::CalculateVelocityOffset( const Vector &forceVector, const Vector &worldPosition, Vector *centerVelocity, AngularImpulse *centerAngularVelocity )
 {
 	CheckValid();
 	m_pPhysObj->CalculateVelocityOffset( forceVector, worldPosition, centerVelocity, centerAngularVelocity );
 }
 
-float PyPhysicsObjectBase::CalculateLinearDrag( const Vector &unitDirection )
+float PyPhysicsObject::CalculateLinearDrag( const Vector &unitDirection )
 {
 	CheckValid();
 	return m_pPhysObj->CalculateLinearDrag( unitDirection );
 }
 
-float PyPhysicsObjectBase::CalculateAngularDrag( const Vector &objectSpaceRotationAxis )
+float PyPhysicsObject::CalculateAngularDrag( const Vector &objectSpaceRotationAxis )
 {
 	CheckValid();
 	return m_pPhysObj->CalculateAngularDrag( objectSpaceRotationAxis );
@@ -580,25 +651,25 @@ float PyPhysicsObjectBase::CalculateAngularDrag( const Vector &objectSpaceRotati
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyPhysicsObjectBase::SetShadow( float maxSpeed, float maxAngularSpeed, bool allowPhysicsMovement, bool allowPhysicsRotation )
+void PyPhysicsObject::SetShadow( float maxSpeed, float maxAngularSpeed, bool allowPhysicsMovement, bool allowPhysicsRotation )
 {
 	CheckValid();
 	m_pPhysObj->SetShadow( maxSpeed, maxAngularSpeed, allowPhysicsMovement, allowPhysicsRotation );
 }
 
-void PyPhysicsObjectBase::UpdateShadow( const Vector &targetPosition, const QAngle &targetAngles, bool tempDisableGravity, float timeOffset )
+void PyPhysicsObject::UpdateShadow( const Vector &targetPosition, const QAngle &targetAngles, bool tempDisableGravity, float timeOffset )
 {
 	CheckValid();
 	m_pPhysObj->UpdateShadow( targetPosition, targetAngles, tempDisableGravity, timeOffset );
 }
 
-int PyPhysicsObjectBase::GetShadowPosition( Vector *position, QAngle *angles )
+int PyPhysicsObject::GetShadowPosition( Vector *position, QAngle *angles )
 {
 	CheckValid();
 	return m_pPhysObj->GetShadowPosition( position, angles );
 }
 
-PyPhysicsShadowController PyPhysicsObjectBase::GetShadowController( void )
+PyPhysicsShadowController PyPhysicsObject::GetShadowController( void )
 {
 	CheckValid();
 
@@ -611,7 +682,7 @@ PyPhysicsShadowController PyPhysicsObjectBase::GetShadowController( void )
 	return PyPhysicsShadowController(ref);
 }
 
-void PyPhysicsObjectBase::RemoveShadowController()
+void PyPhysicsObject::RemoveShadowController()
 {
 	CheckValid();
 	m_pPhysObj->RemoveShadowController();
@@ -620,100 +691,40 @@ void PyPhysicsObjectBase::RemoveShadowController()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-const char *PyPhysicsObjectBase::GetName()
+const char *PyPhysicsObject::GetName()
 {
 	CheckValid();
 	return m_pPhysObj->GetName();
 }
 
-void PyPhysicsObjectBase::BecomeTrigger()
+void PyPhysicsObject::BecomeTrigger()
 {
 	CheckValid();
 	m_pPhysObj->BecomeTrigger();
 }
 
-void PyPhysicsObjectBase::RemoveTrigger()
+void PyPhysicsObject::RemoveTrigger()
 {
 	CheckValid();
 	m_pPhysObj->RemoveTrigger();
 }
 
-void PyPhysicsObjectBase::BecomeHinged( int localAxis )
+void PyPhysicsObject::BecomeHinged( int localAxis )
 {
 	CheckValid();
 	m_pPhysObj->BecomeHinged(localAxis);
 }
 
-void PyPhysicsObjectBase::RemoveHinged()
+void PyPhysicsObject::RemoveHinged()
 {
 	CheckValid();
 	m_pPhysObj->RemoveHinged();
 }
 
-void PyPhysicsObjectBase::OutputDebugInfo()
+void PyPhysicsObject::OutputDebugInfo()
 {
 	CheckValid();
 	m_pPhysObj->OutputDebugInfo();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-PyPhysicsObject::PyPhysicsObject() :
-	 m_hEnt(NULL), m_bValid(false), m_bOwnsPhysObject(false)
-{
-}
-
-#if 0
-PyPhysicsObject::PyPhysicsObject( IPhysicsObject *pPhysObj ) : m_hEnt(NULL), m_bOwnsPhysObject(true)
-{
-	if( !pPhysObj )
-	{
-		m_bValid = false;
-		return;
-	}
-
-	m_bValid = true;
-}
-#endif // 0
-
-PyPhysicsObject::PyPhysicsObject( CBaseEntity *pEnt ) : m_hEnt(NULL), m_bOwnsPhysObject(false)
-{
-	if( !pEnt || !pEnt->VPhysicsGetObject() )
-	{
-		m_hEnt = NULL;
-		m_bValid = false;
-		PyErr_SetString(PyExc_ValueError, "Invalid Entity or physics object" );
-		throw boost::python::error_already_set();
-		return;
-	}
-
-	m_hEnt = pEnt;
-	m_pPhysObj = pEnt->VPhysicsGetObject();
-	m_bValid = true;
-}
-
-PyPhysicsObject::~PyPhysicsObject()
-{
-	Destroy();
-}
-
-void PyPhysicsObject::InitFromPhysicsObject( IPhysicsObject *pPhysObj )
-{
-	m_pPhysObj = pPhysObj;
-	m_bValid = true;
-}
-
-void PyPhysicsObject::Destroy()
-{
-	if( !m_bOwnsPhysObject || !m_bValid || !m_pPhysObj )
-		return;
-
-	if( !g_EntityCollisionHash )
-		return;
-
-	PhysDestroyObject(m_pPhysObj, m_hEnt);
-	m_bValid = false;
 }
 
 bp::object PyCreatePhysicsObject( IPhysicsObject *pPhysObj )
@@ -737,7 +748,7 @@ bp::object PyCreatePhysicsObject( CBaseEntity *pEnt )
 
 void PyPhysDestroyObject( PyPhysicsObject *pPyPhysObj, CBaseEntity *pEntity )
 {
-	if( !pPyPhysObj || !pPyPhysObj->IsValid() )
+	if( !pPyPhysObj )
 		return;
 	pPyPhysObj->Destroy();
 }
@@ -761,11 +772,7 @@ boost::python::tuple PyPhysicsCollision::CollideGetAABB( PyPhysicsObject *pPhysO
 
 void PyPhysicsCollision::TraceBox( PyRay_t &ray, PyPhysicsObject &physObj, const Vector &collideOrigin, const QAngle &collideAngles, trace_t &ptr )
 {
-	if( !physObj.IsValid() )
-	{
-		PyErr_SetString(PyExc_ValueError, "Invalid Physic Object" );
-		throw boost::python::error_already_set();
-	}
+	physObj.CheckValid();
 	const CPhysCollide *pCollide = physObj.GetVPhysicsObject()->GetCollide();
 	physcollision->TraceBox( ray.ToRay(), pCollide, collideOrigin, collideAngles, &ptr );
 }

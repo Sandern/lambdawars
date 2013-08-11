@@ -42,7 +42,7 @@
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy_boostpython.h"
-	#include "srcpy_physics.h"
+
 	namespace bp = boost::python;
 #endif // ENABLE_PYTHON
 #include "srcpy_client_class.h" // Provides stubs
@@ -1923,13 +1923,6 @@ public:
 
 	void							PyUpdateNetworkVar( const char *pName, bp::object data, bool callchanged = false );
 
-	// Functions which return *IPhysicsObject need to be wrapped in python
-	void				PyVPhysicsSetObject( bp::object physref );
-	bp::object			PyVPhysicsGetObject( void );
-	bp::object			PyVPhysicsInitStatic( void );
-	bp::object			PyVPhysicsInitNormal( SolidType_t solidType, int nSolidFlags, bool createAsleep, solid_t *pSolid = NULL );
-	bp::object			PyVPhysicsInitShadow( bool allowPhysicsMovement, bool allowPhysicsRotation, solid_t *pSolid = NULL );
-
 	// EmitSound Wrappers
 	void PyEmitSound( const char *soundname ) { EmitSound(soundname); }
 	void PyEmitSound( const char *soundname, float soundtime ) { EmitSound(soundname, soundtime); }
@@ -2037,7 +2030,6 @@ protected:
 private:
 	bp::object m_pyTouchMethod;
 	bp::object m_pyThink;
-	bp::object m_pyPhysObj;			// Holds a ref to the physic object
 
 public:
 	// Holds a ref to the instance. Keeps the object always alive util Remove() is called.

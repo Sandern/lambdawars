@@ -25,7 +25,8 @@
 	#include "physics.h"
 #endif // CLIENT_DLL
 
-class PyPhysicsObjectBase;
+// Forward declarations
+class PyPhysicsObject;
 
 //-----------------------------------------------------------------------------
 // Purpose: IPhysicsShadowController wrapper for python.
@@ -73,7 +74,7 @@ public:
 
 private:
 	boost::python::object m_refPyPhysObj;
-	PyPhysicsObjectBase *m_pPyPhysObj;
+	PyPhysicsObject *m_pPyPhysObj;
 	IPhysicsShadowController *m_pShadCont;
 };
 
@@ -94,28 +95,37 @@ inline bool PyPhysicsShadowController::operator!=( const PyPhysicsShadowControll
 //-----------------------------------------------------------------------------
 // Purpose: IPhysicsObject base wrapper for python.
 //-----------------------------------------------------------------------------
-class PyPhysicsObjectBase 
+class PyPhysicsObject 
 {
 public:
 	friend class PyPhysicsShadowController;
 	friend class PyPhysicsCollision;
 
-	PyPhysicsObjectBase() : m_pPhysObj(NULL) {}
+	PyPhysicsObject();
+	PyPhysicsObject( CBaseEntity *pEnt );
+	PyPhysicsObject( IPhysicsObject *pPhysObj );
+
+	~PyPhysicsObject();
 
 	virtual PyObject *GetPySelf() const { return NULL; }
 
-	virtual void CheckValid()
-	{
-		PyErr_SetString(PyExc_ValueError, "PhysicsObject invalid" );
-		throw boost::python::error_already_set();
-	}
-
 	// Comparing
-	bool operator==(const PyPhysicsObjectBase& v) const;
-	bool operator!=(const PyPhysicsObjectBase& v) const;	
+	bool operator==(const PyPhysicsObject& v) const;
+	bool operator!=(const PyPhysicsObject& v) const;	
 
 	bool Cmp( boost::python::object other );
 	bool NonZero();
+
+	void CheckValid();
+
+	bool HasEntity() { return m_hEnt != NULL; }
+
+	// Functions for modifying. Not for python.
+	void SetEntity( CBaseEntity *pEnt ) { m_hEnt = pEnt; }
+	IPhysicsObject *GetVPhysicsObject() { return m_pPhysObj; }
+	void InitFromPhysicsObject( IPhysicsObject *pPhysObj );
+
+	void Destroy();
 
 public:
 	// IPhysicsObject methods
@@ -294,54 +304,20 @@ public:
 protected:
 	IPhysicsObject *m_pPhysObj;
 	bool			m_bOwnsObject;
+
+	EHANDLE m_hEnt;
+	bool m_bOwnsPhysObject;
 };
 
-inline bool PyPhysicsObjectBase::operator==( const PyPhysicsObjectBase& src ) const
+inline bool PyPhysicsObject::operator==( const PyPhysicsObject& src ) const
 {
 	return m_pPhysObj == src.m_pPhysObj;
 }
 
-inline bool PyPhysicsObjectBase::operator!=( const PyPhysicsObjectBase& src ) const 
+inline bool PyPhysicsObject::operator!=( const PyPhysicsObject& src ) const 
 {
 	return m_pPhysObj != src.m_pPhysObj;
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: IPhysicsObject python wrapper 
-//			TODO: Merge with base object, no longer needed.
-//-----------------------------------------------------------------------------
-class PyPhysicsObject : public PyPhysicsObjectBase
-{
-public:
-	PyPhysicsObject();
-	PyPhysicsObject( CBaseEntity *pEnt );
-
-	~PyPhysicsObject();
-
-	virtual void CheckValid() 
-	{
-		if( m_bValid == false ) {
-			PyErr_SetString(PyExc_ValueError, "PhysicsObject invalid" );
-			throw boost::python::error_already_set();
-		}
-	}
-
-	bool HasEntity() { return m_hEnt != NULL; }
-
-	// Functions for modifying. Not for python.
-	void SetEntity( CBaseEntity *pEnt ) { m_hEnt = pEnt; }
-	void SetInvalid() { m_bValid = false; m_hEnt = NULL; m_pPhysObj = NULL; }
-	bool IsValid() { return m_bValid; }
-	IPhysicsObject *GetVPhysicsObject() { return m_pPhysObj; }
-	void InitFromPhysicsObject( IPhysicsObject *pPhysObj );
-
-	void Destroy();
-
-private:
-	EHANDLE m_hEnt;
-	bool m_bValid;
-	bool m_bOwnsPhysObject;
-};
 
 boost::python::object PyCreateEmptyPhysicsObject();
 boost::python::object PyCreatePhysicsObject( IPhysicsObject *pPhysObj );

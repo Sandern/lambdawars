@@ -12,6 +12,7 @@
 #include "nav_area.h"
 #include "wars_mapboundary.h"
 #include "hl2wars_nav_pathfind.h"
+#include "collisionutils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -8,6 +8,7 @@ from pyplusplus.module_builder import call_policies
 from pyplusplus import messages
 from pygccxml.declarations import matchers
 from pyplusplus import code_creators
+from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 
 class Entities(GenerateModuleSemiShared):
     module_name = '_entities'
@@ -28,6 +29,7 @@ class Entities(GenerateModuleSemiShared):
         'beam_shared.h',
         'basecombatweapon_shared.h',
         'wars_mapboundary.h',
+        'srcpy_util.h', # for PyRay_t
     ]
     
     client_files = [
@@ -393,11 +395,6 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('SetRefEHandle').exclude()          # We already got an auto conversion to a safe handle
         mb.mem_funs('GetCollideable').exclude()         # Don't care for now
         mb.mem_funs('GetModel').exclude()               # Do we want this? 
-        mb.mem_funs('VPhysicsInitStatic').exclude()     # Replaced by wrapper
-        mb.mem_funs('VPhysicsInitNormal').exclude()     # Replaced by wrapper
-        mb.mem_funs('VPhysicsInitShadow').exclude()     # Replaced by wrapper
-        mb.mem_funs('VPhysicsGetObject').exclude()      # Replaced by wrapper
-        mb.mem_funs('VPhysicsSetObject').exclude()      # Replace by wrapper
         mb.mem_funs('VPhysicsGetObjectList').exclude()  # Don't care for now
         mb.mem_funs('Instance', function=lambda decl: not HasArgType(decl, 'int')).exclude()               # I don't think this is needed
         mb.mem_funs('PhysicsDispatchThink').exclude()   # Don't care
@@ -447,13 +444,6 @@ class Entities(GenerateModuleSemiShared):
             
         mb.mem_funs('PyAllocate').exclude()
         mb.mem_funs('PyDeallocate').exclude()
-        
-        # IPhysicsObject 
-        mb.mem_funs('PyVPhysicsInitStatic').rename('VPhysicsInitStatic')  
-        mb.mem_funs('PyVPhysicsInitNormal').rename('VPhysicsInitNormal') 
-        mb.mem_funs('PyVPhysicsInitShadow').rename('VPhysicsInitShadow')   
-        mb.mem_funs('PyVPhysicsGetObject').rename('VPhysicsGetObject')  
-        mb.mem_funs('PyVPhysicsSetObject').rename('VPhysicsSetObject')
         
         # Call policies
         mb.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference() 
@@ -531,6 +521,10 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
         #mb.mem_funs('TestCollision').virtuality = 'virtual'
         mb.mem_funs('OnRestore').virtuality = 'virtual'
+        
+        # Returning a physics object -> Convert by value, which results in the wrapper object being returned
+        physicsobject = mb.class_('IPhysicsObject')
+        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(physicsobject))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         if self.isClient:
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE

@@ -12,7 +12,7 @@
 #endif
 
 #ifndef ENABLE_PYTHON
-#error Python is disabled. Don't include this!
+#error "Python is disabled. Do not include this!"
 #endif // ENABLE_PYTHON
 
 #include "srcpy_boostpython.h"

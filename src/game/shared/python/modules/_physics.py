@@ -2,7 +2,7 @@ from generate_mods_helper import GenerateModuleSemiShared
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
-
+from pyplusplus import code_creators
 import settings
 
 class Physics(GenerateModuleSemiShared):
@@ -36,8 +36,8 @@ class Physics(GenerateModuleSemiShared):
 
     def ParsePhysicObjects(self, mb):
         # Base Wrapper
-        cls = mb.class_('PyPhysicsObjectBase')
-        cls.rename('PhysicsObjectBase')
+        cls = mb.class_('PyPhysicsObject')
+        cls.rename('PhysicsObject')
         cls.include()
         cls.calldefs().virtuality = 'not virtual'   
         cls.mem_funs('Cmp').rename('__cmp__')
@@ -47,24 +47,14 @@ class Physics(GenerateModuleSemiShared):
         cls.mem_funs('GetPySelf').exclude()  
         cls.add_wrapper_code('virtual PyObject *GetPySelf() const { return boost::python::detail::wrapper_base_::get_owner(*this); }')
         
-        # Bound to entity life time version
-        #cls = mb.class_('PyEntPhysicsObject')
-        #cls.include()
-        #cls.calldefs().virtuality = 'not virtual'   
-        #cls.add_wrapper_code('virtual PyObject *GetPySelf() const { return boost::python::detail::wrapper_base_::get_owner(*this); }')
-
-        # General version
-        cls = mb.class_('PyPhysicsObject')
-        cls.rename('PhysicsObject') # NOTE: Name must match PyCreateEmptyPhysicsObject in srcpy_physics.cpp!
-        cls.include()
-        cls.calldefs().virtuality = 'not virtual'  
         cls.mem_funs('SetEntity').exclude()
-        cls.mem_funs('SetInvalid').exclude()
-        cls.mem_funs('IsValid').exclude()
         cls.mem_funs('GetVPhysicsObject').exclude()
         cls.mem_funs('InitFromPhysicsObject').exclude()
-        cls.add_wrapper_code('virtual PyObject *GetPySelf() const { return boost::python::detail::wrapper_base_::get_owner(*this); }')
         
+        mb.add_registration_code( "ptr_IPhysicsObject_to_PyPhysicsObject();" )
+        mb.add_registration_code( "const_ptr_IPhysicsObject_to_PyPhysicsObject();" )
+        mb.add_registration_code( "PyPhysicsObject_to_IPhysicsObject();" )
+
         # Shadow controller
         cls = mb.class_('PyPhysicsShadowController')
         cls.rename('PhysicsShadowController')
@@ -165,3 +155,10 @@ class Physics(GenerateModuleSemiShared):
         
         if self.isServer:
             mb.free_function('Physics_RunThinkFunctions').include()
+            
+    def AddAdditionalCode(self, mb):
+        header = code_creators.include_t( 'srcpy_physics_converters.h' )
+        mb.code_creator.adopt_include(header)
+        super(Physics, self).AddAdditionalCode(mb)
+        
+            

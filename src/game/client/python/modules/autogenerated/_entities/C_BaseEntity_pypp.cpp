@@ -38,6 +38,7 @@
 #include "beam_shared.h"
 #include "basecombatweapon_shared.h"
 #include "wars_mapboundary.h"
+#include "srcpy_util.h"
 #include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
@@ -4523,54 +4524,6 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("iEntIndex"), bp::arg("iChannel"), bp::arg("pSample") ) );
         
         }
-        { //::C_BaseEntity::PyVPhysicsGetObject
-        
-            typedef ::boost::python::object ( ::C_BaseEntity::*VPhysicsGetObject_function_type )(  ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "VPhysicsGetObject"
-                , VPhysicsGetObject_function_type( &::C_BaseEntity::PyVPhysicsGetObject ) );
-        
-        }
-        { //::C_BaseEntity::PyVPhysicsInitNormal
-        
-            typedef ::boost::python::object ( ::C_BaseEntity::*VPhysicsInitNormal_function_type )( ::SolidType_t,int,bool,::solid_t * ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "VPhysicsInitNormal"
-                , VPhysicsInitNormal_function_type( &::C_BaseEntity::PyVPhysicsInitNormal )
-                , ( bp::arg("solidType"), bp::arg("nSolidFlags"), bp::arg("createAsleep"), bp::arg("pSolid")=bp::object() ) );
-        
-        }
-        { //::C_BaseEntity::PyVPhysicsInitShadow
-        
-            typedef ::boost::python::object ( ::C_BaseEntity::*VPhysicsInitShadow_function_type )( bool,bool,::solid_t * ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "VPhysicsInitShadow"
-                , VPhysicsInitShadow_function_type( &::C_BaseEntity::PyVPhysicsInitShadow )
-                , ( bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation"), bp::arg("pSolid")=bp::object() ) );
-        
-        }
-        { //::C_BaseEntity::PyVPhysicsInitStatic
-        
-            typedef ::boost::python::object ( ::C_BaseEntity::*VPhysicsInitStatic_function_type )(  ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "VPhysicsInitStatic"
-                , VPhysicsInitStatic_function_type( &::C_BaseEntity::PyVPhysicsInitStatic ) );
-        
-        }
-        { //::C_BaseEntity::PyVPhysicsSetObject
-        
-            typedef void ( ::C_BaseEntity::*VPhysicsSetObject_function_type )( ::boost::python::object ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "VPhysicsSetObject"
-                , VPhysicsSetObject_function_type( &::C_BaseEntity::PyVPhysicsSetObject )
-                , ( bp::arg("physref") ) );
-        
-        }
         { //::C_BaseEntity::RecordToolMessage
         
             typedef void ( ::C_BaseEntity::*RecordToolMessage_function_type )(  ) ;
@@ -6155,6 +6108,48 @@ void register_C_BaseEntity_class(){
                 , VPhysicsDestroyObject_function_type( &::C_BaseEntity::VPhysicsDestroyObject ) );
         
         }
+        { //::C_BaseEntity::VPhysicsGetObject
+        
+            typedef ::IPhysicsObject * ( ::C_BaseEntity::*VPhysicsGetObject_function_type )(  ) const;
+            
+            C_BaseEntity_exposer.def( 
+                "VPhysicsGetObject"
+                , VPhysicsGetObject_function_type( &::C_BaseEntity::VPhysicsGetObject )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BaseEntity::VPhysicsInitNormal
+        
+            typedef ::IPhysicsObject * ( ::C_BaseEntity::*VPhysicsInitNormal_function_type )( ::SolidType_t,int,bool,::solid_t * ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "VPhysicsInitNormal"
+                , VPhysicsInitNormal_function_type( &::C_BaseEntity::VPhysicsInitNormal )
+                , ( bp::arg("solidType"), bp::arg("nSolidFlags"), bp::arg("createAsleep"), bp::arg("pSolid")=bp::object() )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BaseEntity::VPhysicsInitShadow
+        
+            typedef ::IPhysicsObject * ( ::C_BaseEntity::*VPhysicsInitShadow_function_type )( bool,bool,::solid_t * ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "VPhysicsInitShadow"
+                , VPhysicsInitShadow_function_type( &::C_BaseEntity::VPhysicsInitShadow )
+                , ( bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation"), bp::arg("pSolid")=bp::object() )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BaseEntity::VPhysicsInitStatic
+        
+            typedef ::IPhysicsObject * ( ::C_BaseEntity::*VPhysicsInitStatic_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "VPhysicsInitStatic"
+                , VPhysicsInitStatic_function_type( &::C_BaseEntity::VPhysicsInitStatic )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::C_BaseEntity::VPhysicsIsFlesh
         
             typedef bool ( ::C_BaseEntity::*VPhysicsIsFlesh_function_type )(  ) ;
@@ -6162,6 +6157,16 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "VPhysicsIsFlesh"
                 , VPhysicsIsFlesh_function_type( &::C_BaseEntity::VPhysicsIsFlesh ) );
+        
+        }
+        { //::C_BaseEntity::VPhysicsSetObject
+        
+            typedef void ( ::C_BaseEntity::*VPhysicsSetObject_function_type )( ::IPhysicsObject * ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "VPhysicsSetObject"
+                , VPhysicsSetObject_function_type( &::C_BaseEntity::VPhysicsSetObject )
+                , ( bp::arg("pPhysics") ) );
         
         }
         { //::C_BaseEntity::VPhysicsUpdate

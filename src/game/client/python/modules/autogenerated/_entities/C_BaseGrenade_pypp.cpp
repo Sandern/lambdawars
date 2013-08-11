@@ -37,6 +37,7 @@
 #include "beam_shared.h"
 #include "basecombatweapon_shared.h"
 #include "wars_mapboundary.h"
+#include "srcpy_util.h"
 #include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"

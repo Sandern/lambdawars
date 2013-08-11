@@ -6,8 +6,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "srcpy_class_shared.h"
 #include "srcpy.h"
+#include "srcpy_class_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

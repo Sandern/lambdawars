@@ -99,6 +99,8 @@
 
 #include "wars_mapboundary.h"
 
+#include "srcpy_util.h"
+
 #include "srcpy_converters_ents.h"
 
 #include "srcpy.h"

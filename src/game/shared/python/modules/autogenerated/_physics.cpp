@@ -16,31 +16,13 @@
 
 #include "physics_shared.h"
 
+#include "srcpy_physics_converters.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
-
-struct PyPhysicsObjectBase_wrapper : PyPhysicsObjectBase, bp::wrapper< PyPhysicsObjectBase > {
-
-    PyPhysicsObjectBase_wrapper(PyPhysicsObjectBase const & arg )
-    : PyPhysicsObjectBase( arg )
-      , bp::wrapper< PyPhysicsObjectBase >(){
-        // copy constructor
-        
-    }
-
-    PyPhysicsObjectBase_wrapper( )
-    : PyPhysicsObjectBase( )
-      , bp::wrapper< PyPhysicsObjectBase >(){
-        // null constructor
-    
-    }
-
-    virtual PyObject *GetPySelf() const { return boost::python::detail::wrapper_base_::get_owner(*this); }
-
-};
 
 struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject > {
 
@@ -60,6 +42,13 @@ struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject >
 
     PyPhysicsObject_wrapper(::C_BaseEntity * pEnt )
     : PyPhysicsObject( boost::python::ptr(pEnt) )
+      , bp::wrapper< PyPhysicsObject >(){
+        // constructor
+    
+    }
+
+    PyPhysicsObject_wrapper(::IPhysicsObject * pPhysObj )
+    : PyPhysicsObject( boost::python::ptr(pPhysObj) )
       , bp::wrapper< PyPhysicsObject >(){
         // constructor
     
@@ -318,292 +307,121 @@ BOOST_PYTHON_MODULE(_physics){
             , (void ( ::PyPhysicsCollision::* )( ::PyRay_t &,::PyPhysicsObject &,::Vector const &,::QAngle const &,::trace_t & ) )( &::PyPhysicsCollision::TraceBox )
             , ( bp::arg("ray"), bp::arg("physObj"), bp::arg("collideOrigin"), bp::arg("collideAngles"), bp::arg("ptr") ) );
 
-    bp::class_< PyPhysicsObjectBase_wrapper >( "PhysicsObjectBase", bp::init< >() )    
-        .def( 
-            "AddVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::AddVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "ApplyForceCenter"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::ApplyForceCenter )
-            , ( bp::arg("forceVector") ) )    
-        .def( 
-            "ApplyForceOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const & ) )( &::PyPhysicsObjectBase::ApplyForceOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition") ) )    
-        .def( 
-            "ApplyTorqueCenter"
-            , (void ( ::PyPhysicsObjectBase::* )( ::AngularImpulse const & ) )( &::PyPhysicsObjectBase::ApplyTorqueCenter )
-            , ( bp::arg("torque") ) )    
-        .def( 
-            "BecomeHinged"
-            , (void ( ::PyPhysicsObjectBase::* )( int ) )( &::PyPhysicsObjectBase::BecomeHinged )
-            , ( bp::arg("localAxis") ) )    
-        .def( 
-            "BecomeTrigger"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::BecomeTrigger ) )    
-        .def( 
-            "CalculateAngularDrag"
-            , (float ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::CalculateAngularDrag )
-            , ( bp::arg("objectSpaceRotationAxis") ) )    
-        .def( 
-            "CalculateForceOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::CalculateForceOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerForce"), bp::arg("centerTorque") ) )    
-        .def( 
-            "CalculateLinearDrag"
-            , (float ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::CalculateLinearDrag )
-            , ( bp::arg("unitDirection") ) )    
-        .def( 
-            "CalculateVelocityOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::CalculateVelocityOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerVelocity"), bp::arg("centerAngularVelocity") ) )    
-        .def( 
-            "__cmp__"
-            , (bool ( ::PyPhysicsObjectBase::* )( ::boost::python::object ) )( &::PyPhysicsObjectBase::Cmp )
-            , ( bp::arg("other") ) )    
-        .def( 
-            "EnableCollisions"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableCollisions )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableDrag"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableDrag )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableGravity"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableGravity )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableMotion"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableMotion )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "GetCallbackFlags"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetCallbackFlags ) )    
-        .def( 
-            "GetContents"
-            , (unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetContents ) )    
-        .def( 
-            "GetDamping"
-            , (::boost::python::tuple ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetDamping ) )    
-        .def( 
-            "GetEnergy"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetEnergy ) )    
-        .def( 
-            "GetGameFlags"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetGameFlags ) )    
-        .def( 
-            "GetGameIndex"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetGameIndex ) )    
-        .def( 
-            "GetImplicitVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::GetImplicitVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "GetInertia"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInertia ) )    
-        .def( 
-            "GetInvInertia"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInvInertia ) )    
-        .def( 
-            "GetInvMass"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInvMass ) )    
-        .def( 
-            "GetMass"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMass ) )    
-        .def( 
-            "GetMassCenterLocalSpace"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMassCenterLocalSpace ) )    
-        .def( 
-            "GetMaterialIndex"
-            , (int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMaterialIndex ) )    
-        .def( 
-            "GetName"
-            , (char const * ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetName ) )    
-        .def( 
-            "GetPosition"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::QAngle * ) )( &::PyPhysicsObjectBase::GetPosition )
-            , ( bp::arg("worldPosition"), bp::arg("angles") ) )    
-        .def( 
-            "GetPositionMatrix"
-            , (void ( ::PyPhysicsObjectBase::* )( ::matrix3x4_t * ) )( &::PyPhysicsObjectBase::GetPositionMatrix )
-            , ( bp::arg("positionMatrix") ) )    
-        .def( 
-            "GetShadowController"
-            , (::PyPhysicsShadowController ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetShadowController ) )    
-        .def( 
-            "GetShadowPosition"
-            , (int ( ::PyPhysicsObjectBase::* )( ::Vector *,::QAngle * ) )( &::PyPhysicsObjectBase::GetShadowPosition )
-            , ( bp::arg("position"), bp::arg("angles") ) )    
-        .def( 
-            "GetSphereRadius"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetSphereRadius ) )    
-        .def( 
-            "GetVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::GetVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "GetVelocityAtPoint"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector * ) )( &::PyPhysicsObjectBase::GetVelocityAtPoint )
-            , ( bp::arg("worldPosition"), bp::arg("pVelocity") ) )    
-        .def( 
-            "IsAsleep"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsAsleep ) )    
-        .def( 
-            "IsAttachedToConstraint"
-            , (bool ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::IsAttachedToConstraint )
-            , ( bp::arg("bExternalOnly") ) )    
-        .def( 
-            "IsCollisionEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsCollisionEnabled ) )    
-        .def( 
-            "IsDragEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsDragEnabled ) )    
-        .def( 
-            "IsFluid"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsFluid ) )    
-        .def( 
-            "IsGravityEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsGravityEnabled ) )    
-        .def( 
-            "IsHinged"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsHinged ) )    
-        .def( 
-            "IsMotionEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsMotionEnabled ) )    
-        .def( 
-            "IsMoveable"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsMoveable ) )    
-        .def( 
-            "IsStatic"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsStatic ) )    
-        .def( 
-            "IsTrigger"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsTrigger ) )    
-        .def( 
-            "LocalToWorld"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::LocalToWorld )
-            , ( bp::arg("worldPosition"), bp::arg("localPosition") ) )    
-        .def( 
-            "LocalToWorldVector"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::LocalToWorldVector )
-            , ( bp::arg("worldVector"), bp::arg("localVector") ) )    
-        .def( 
-            "__nonzero__"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::NonZero ) )    
-        .def( 
-            "OutputDebugInfo"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::OutputDebugInfo ) )    
-        .def( 
-            "RecheckCollisionFilter"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RecheckCollisionFilter ) )    
-        .def( 
-            "RecheckContactPoints"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RecheckContactPoints ) )    
-        .def( 
-            "RemoveHinged"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveHinged ) )    
-        .def( 
-            "RemoveShadowController"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveShadowController ) )    
-        .def( 
-            "RemoveTrigger"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveTrigger ) )    
-        .def( 
-            "SetBuoyancyRatio"
-            , (void ( ::PyPhysicsObjectBase::* )( float ) )( &::PyPhysicsObjectBase::SetBuoyancyRatio )
-            , ( bp::arg("ratio") ) )    
-        .def( 
-            "SetCallbackFlags"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetCallbackFlags )
-            , ( bp::arg("callbackflags") ) )    
-        .def( 
-            "SetContents"
-            , (void ( ::PyPhysicsObjectBase::* )( unsigned int ) )( &::PyPhysicsObjectBase::SetContents )
-            , ( bp::arg("contents") ) )    
-        .def( 
-            "SetDamping"
-            , (void ( ::PyPhysicsObjectBase::* )( float,float ) )( &::PyPhysicsObjectBase::SetDamping )
-            , ( bp::arg("speed"), bp::arg("rot") ) )    
-        .def( 
-            "SetDragCoefficient"
-            , (void ( ::PyPhysicsObjectBase::* )( float *,float * ) )( &::PyPhysicsObjectBase::SetDragCoefficient )
-            , ( bp::arg("pDrag"), bp::arg("pAngularDrag") ) )    
-        .def( 
-            "SetGameFlags"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetGameFlags )
-            , ( bp::arg("userFlags") ) )    
-        .def( 
-            "SetGameIndex"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetGameIndex )
-            , ( bp::arg("gameIndex") ) )    
-        .def( 
-            "SetInertia"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::SetInertia )
-            , ( bp::arg("inertia") ) )    
-        .def( 
-            "SetMass"
-            , (void ( ::PyPhysicsObjectBase::* )( float ) )( &::PyPhysicsObjectBase::SetMass )
-            , ( bp::arg("mass") ) )    
-        .def( 
-            "SetMaterialIndex"
-            , (void ( ::PyPhysicsObjectBase::* )( int ) )( &::PyPhysicsObjectBase::SetMaterialIndex )
-            , ( bp::arg("materialIndex") ) )    
-        .def( 
-            "SetPosition"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::QAngle const &,bool ) )( &::PyPhysicsObjectBase::SetPosition )
-            , ( bp::arg("worldPosition"), bp::arg("angles"), bp::arg("isTeleport") ) )    
-        .def( 
-            "SetPositionMatrix"
-            , (void ( ::PyPhysicsObjectBase::* )( ::matrix3x4_t const &,bool ) )( &::PyPhysicsObjectBase::SetPositionMatrix )
-            , ( bp::arg("matrix"), bp::arg("isTeleport") ) )    
-        .def( 
-            "SetShadow"
-            , (void ( ::PyPhysicsObjectBase::* )( float,float,bool,bool ) )( &::PyPhysicsObjectBase::SetShadow )
-            , ( bp::arg("maxSpeed"), bp::arg("maxAngularSpeed"), bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation") ) )    
-        .def( 
-            "SetVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::SetVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "SetVelocityInstantaneous"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::SetVelocityInstantaneous )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "Sleep"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::Sleep ) )    
-        .def( 
-            "UpdateShadow"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::QAngle const &,bool,float ) )( &::PyPhysicsObjectBase::UpdateShadow )
-            , ( bp::arg("targetPosition"), bp::arg("targetAngles"), bp::arg("tempDisableGravity"), bp::arg("timeOffset") ) )    
-        .def( 
-            "Wake"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::Wake ) )    
-        .def( 
-            "WorldToLocal"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::WorldToLocal )
-            , ( bp::arg("localPosition"), bp::arg("worldPosition") ) )    
-        .def( 
-            "WorldToLocalVector"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::WorldToLocalVector )
-            , ( bp::arg("localVector"), bp::arg("worldVector") ) )    
-        .def( bp::self != bp::self )    
-        .def( bp::self == bp::self );
-
     { //::PyPhysicsObject
-        typedef bp::class_< PyPhysicsObject_wrapper, bp::bases< PyPhysicsObjectBase > > PhysicsObject_exposer_t;
+        typedef bp::class_< PyPhysicsObject_wrapper > PhysicsObject_exposer_t;
         PhysicsObject_exposer_t PhysicsObject_exposer = PhysicsObject_exposer_t( "PhysicsObject", bp::init< >() );
         bp::scope PhysicsObject_scope( PhysicsObject_exposer );
         PhysicsObject_exposer.def( bp::init< C_BaseEntity * >(( bp::arg("pEnt") )) );
         bp::implicitly_convertible< C_BaseEntity *, PyPhysicsObject >();
-        { //::PyPhysicsObject::CheckValid
+        PhysicsObject_exposer.def( bp::init< IPhysicsObject * >(( bp::arg("pPhysObj") )) );
+        bp::implicitly_convertible< IPhysicsObject *, PyPhysicsObject >();
+        { //::PyPhysicsObject::AddVelocity
         
-            typedef void ( ::PyPhysicsObject::*CheckValid_function_type )(  ) ;
+            typedef void ( ::PyPhysicsObject::*AddVelocity_function_type )( ::Vector const *,::AngularImpulse const * ) ;
             
             PhysicsObject_exposer.def( 
-                "CheckValid"
-                , CheckValid_function_type( &::PyPhysicsObject::CheckValid ) );
+                "AddVelocity"
+                , AddVelocity_function_type( &::PyPhysicsObject::AddVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyForceCenter
+        
+            typedef void ( ::PyPhysicsObject::*ApplyForceCenter_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyForceCenter"
+                , ApplyForceCenter_function_type( &::PyPhysicsObject::ApplyForceCenter )
+                , ( bp::arg("forceVector") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyForceOffset
+        
+            typedef void ( ::PyPhysicsObject::*ApplyForceOffset_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyForceOffset"
+                , ApplyForceOffset_function_type( &::PyPhysicsObject::ApplyForceOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyTorqueCenter
+        
+            typedef void ( ::PyPhysicsObject::*ApplyTorqueCenter_function_type )( ::AngularImpulse const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyTorqueCenter"
+                , ApplyTorqueCenter_function_type( &::PyPhysicsObject::ApplyTorqueCenter )
+                , ( bp::arg("torque") ) );
+        
+        }
+        { //::PyPhysicsObject::BecomeHinged
+        
+            typedef void ( ::PyPhysicsObject::*BecomeHinged_function_type )( int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "BecomeHinged"
+                , BecomeHinged_function_type( &::PyPhysicsObject::BecomeHinged )
+                , ( bp::arg("localAxis") ) );
+        
+        }
+        { //::PyPhysicsObject::BecomeTrigger
+        
+            typedef void ( ::PyPhysicsObject::*BecomeTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "BecomeTrigger"
+                , BecomeTrigger_function_type( &::PyPhysicsObject::BecomeTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateAngularDrag
+        
+            typedef float ( ::PyPhysicsObject::*CalculateAngularDrag_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateAngularDrag"
+                , CalculateAngularDrag_function_type( &::PyPhysicsObject::CalculateAngularDrag )
+                , ( bp::arg("objectSpaceRotationAxis") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateForceOffset
+        
+            typedef void ( ::PyPhysicsObject::*CalculateForceOffset_function_type )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateForceOffset"
+                , CalculateForceOffset_function_type( &::PyPhysicsObject::CalculateForceOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerForce"), bp::arg("centerTorque") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateLinearDrag
+        
+            typedef float ( ::PyPhysicsObject::*CalculateLinearDrag_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateLinearDrag"
+                , CalculateLinearDrag_function_type( &::PyPhysicsObject::CalculateLinearDrag )
+                , ( bp::arg("unitDirection") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateVelocityOffset
+        
+            typedef void ( ::PyPhysicsObject::*CalculateVelocityOffset_function_type )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateVelocityOffset"
+                , CalculateVelocityOffset_function_type( &::PyPhysicsObject::CalculateVelocityOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerVelocity"), bp::arg("centerAngularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::Cmp
+        
+            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::object ) ;
+            
+            PhysicsObject_exposer.def( 
+                "__cmp__"
+                , __cmp___function_type( &::PyPhysicsObject::Cmp )
+                , ( bp::arg("other") ) );
         
         }
         { //::PyPhysicsObject::Destroy
@@ -615,6 +433,241 @@ BOOST_PYTHON_MODULE(_physics){
                 , Destroy_function_type( &::PyPhysicsObject::Destroy ) );
         
         }
+        { //::PyPhysicsObject::EnableCollisions
+        
+            typedef void ( ::PyPhysicsObject::*EnableCollisions_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableCollisions"
+                , EnableCollisions_function_type( &::PyPhysicsObject::EnableCollisions )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableDrag
+        
+            typedef void ( ::PyPhysicsObject::*EnableDrag_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableDrag"
+                , EnableDrag_function_type( &::PyPhysicsObject::EnableDrag )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableGravity
+        
+            typedef void ( ::PyPhysicsObject::*EnableGravity_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableGravity"
+                , EnableGravity_function_type( &::PyPhysicsObject::EnableGravity )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableMotion
+        
+            typedef void ( ::PyPhysicsObject::*EnableMotion_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableMotion"
+                , EnableMotion_function_type( &::PyPhysicsObject::EnableMotion )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::GetCallbackFlags
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetCallbackFlags_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetCallbackFlags"
+                , GetCallbackFlags_function_type( &::PyPhysicsObject::GetCallbackFlags ) );
+        
+        }
+        { //::PyPhysicsObject::GetContents
+        
+            typedef unsigned int ( ::PyPhysicsObject::*GetContents_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetContents"
+                , GetContents_function_type( &::PyPhysicsObject::GetContents ) );
+        
+        }
+        { //::PyPhysicsObject::GetDamping
+        
+            typedef ::boost::python::tuple ( ::PyPhysicsObject::*GetDamping_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetDamping"
+                , GetDamping_function_type( &::PyPhysicsObject::GetDamping ) );
+        
+        }
+        { //::PyPhysicsObject::GetEnergy
+        
+            typedef float ( ::PyPhysicsObject::*GetEnergy_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetEnergy"
+                , GetEnergy_function_type( &::PyPhysicsObject::GetEnergy ) );
+        
+        }
+        { //::PyPhysicsObject::GetGameFlags
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetGameFlags_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetGameFlags"
+                , GetGameFlags_function_type( &::PyPhysicsObject::GetGameFlags ) );
+        
+        }
+        { //::PyPhysicsObject::GetGameIndex
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetGameIndex_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetGameIndex"
+                , GetGameIndex_function_type( &::PyPhysicsObject::GetGameIndex ) );
+        
+        }
+        { //::PyPhysicsObject::GetImplicitVelocity
+        
+            typedef void ( ::PyPhysicsObject::*GetImplicitVelocity_function_type )( ::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetImplicitVelocity"
+                , GetImplicitVelocity_function_type( &::PyPhysicsObject::GetImplicitVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::GetInertia
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetInertia_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInertia"
+                , GetInertia_function_type( &::PyPhysicsObject::GetInertia ) );
+        
+        }
+        { //::PyPhysicsObject::GetInvInertia
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetInvInertia_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInvInertia"
+                , GetInvInertia_function_type( &::PyPhysicsObject::GetInvInertia ) );
+        
+        }
+        { //::PyPhysicsObject::GetInvMass
+        
+            typedef float ( ::PyPhysicsObject::*GetInvMass_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInvMass"
+                , GetInvMass_function_type( &::PyPhysicsObject::GetInvMass ) );
+        
+        }
+        { //::PyPhysicsObject::GetMass
+        
+            typedef float ( ::PyPhysicsObject::*GetMass_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMass"
+                , GetMass_function_type( &::PyPhysicsObject::GetMass ) );
+        
+        }
+        { //::PyPhysicsObject::GetMassCenterLocalSpace
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetMassCenterLocalSpace_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMassCenterLocalSpace"
+                , GetMassCenterLocalSpace_function_type( &::PyPhysicsObject::GetMassCenterLocalSpace ) );
+        
+        }
+        { //::PyPhysicsObject::GetMaterialIndex
+        
+            typedef int ( ::PyPhysicsObject::*GetMaterialIndex_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMaterialIndex"
+                , GetMaterialIndex_function_type( &::PyPhysicsObject::GetMaterialIndex ) );
+        
+        }
+        { //::PyPhysicsObject::GetName
+        
+            typedef char const * ( ::PyPhysicsObject::*GetName_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetName"
+                , GetName_function_type( &::PyPhysicsObject::GetName ) );
+        
+        }
+        { //::PyPhysicsObject::GetPosition
+        
+            typedef void ( ::PyPhysicsObject::*GetPosition_function_type )( ::Vector *,::QAngle * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetPosition"
+                , GetPosition_function_type( &::PyPhysicsObject::GetPosition )
+                , ( bp::arg("worldPosition"), bp::arg("angles") ) );
+        
+        }
+        { //::PyPhysicsObject::GetPositionMatrix
+        
+            typedef void ( ::PyPhysicsObject::*GetPositionMatrix_function_type )( ::matrix3x4_t * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetPositionMatrix"
+                , GetPositionMatrix_function_type( &::PyPhysicsObject::GetPositionMatrix )
+                , ( bp::arg("positionMatrix") ) );
+        
+        }
+        { //::PyPhysicsObject::GetShadowController
+        
+            typedef ::PyPhysicsShadowController ( ::PyPhysicsObject::*GetShadowController_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetShadowController"
+                , GetShadowController_function_type( &::PyPhysicsObject::GetShadowController ) );
+        
+        }
+        { //::PyPhysicsObject::GetShadowPosition
+        
+            typedef int ( ::PyPhysicsObject::*GetShadowPosition_function_type )( ::Vector *,::QAngle * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetShadowPosition"
+                , GetShadowPosition_function_type( &::PyPhysicsObject::GetShadowPosition )
+                , ( bp::arg("position"), bp::arg("angles") ) );
+        
+        }
+        { //::PyPhysicsObject::GetSphereRadius
+        
+            typedef float ( ::PyPhysicsObject::*GetSphereRadius_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetSphereRadius"
+                , GetSphereRadius_function_type( &::PyPhysicsObject::GetSphereRadius ) );
+        
+        }
+        { //::PyPhysicsObject::GetVelocity
+        
+            typedef void ( ::PyPhysicsObject::*GetVelocity_function_type )( ::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetVelocity"
+                , GetVelocity_function_type( &::PyPhysicsObject::GetVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::GetVelocityAtPoint
+        
+            typedef void ( ::PyPhysicsObject::*GetVelocityAtPoint_function_type )( ::Vector const &,::Vector * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetVelocityAtPoint"
+                , GetVelocityAtPoint_function_type( &::PyPhysicsObject::GetVelocityAtPoint )
+                , ( bp::arg("worldPosition"), bp::arg("pVelocity") ) );
+        
+        }
         { //::PyPhysicsObject::HasEntity
         
             typedef bool ( ::PyPhysicsObject::*HasEntity_function_type )(  ) ;
@@ -624,6 +677,389 @@ BOOST_PYTHON_MODULE(_physics){
                 , HasEntity_function_type( &::PyPhysicsObject::HasEntity ) );
         
         }
+        { //::PyPhysicsObject::IsAsleep
+        
+            typedef bool ( ::PyPhysicsObject::*IsAsleep_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsAsleep"
+                , IsAsleep_function_type( &::PyPhysicsObject::IsAsleep ) );
+        
+        }
+        { //::PyPhysicsObject::IsAttachedToConstraint
+        
+            typedef bool ( ::PyPhysicsObject::*IsAttachedToConstraint_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsAttachedToConstraint"
+                , IsAttachedToConstraint_function_type( &::PyPhysicsObject::IsAttachedToConstraint )
+                , ( bp::arg("bExternalOnly") ) );
+        
+        }
+        { //::PyPhysicsObject::IsCollisionEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsCollisionEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsCollisionEnabled"
+                , IsCollisionEnabled_function_type( &::PyPhysicsObject::IsCollisionEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsDragEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsDragEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsDragEnabled"
+                , IsDragEnabled_function_type( &::PyPhysicsObject::IsDragEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsFluid
+        
+            typedef bool ( ::PyPhysicsObject::*IsFluid_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsFluid"
+                , IsFluid_function_type( &::PyPhysicsObject::IsFluid ) );
+        
+        }
+        { //::PyPhysicsObject::IsGravityEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsGravityEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsGravityEnabled"
+                , IsGravityEnabled_function_type( &::PyPhysicsObject::IsGravityEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsHinged
+        
+            typedef bool ( ::PyPhysicsObject::*IsHinged_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsHinged"
+                , IsHinged_function_type( &::PyPhysicsObject::IsHinged ) );
+        
+        }
+        { //::PyPhysicsObject::IsMotionEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsMotionEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsMotionEnabled"
+                , IsMotionEnabled_function_type( &::PyPhysicsObject::IsMotionEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsMoveable
+        
+            typedef bool ( ::PyPhysicsObject::*IsMoveable_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsMoveable"
+                , IsMoveable_function_type( &::PyPhysicsObject::IsMoveable ) );
+        
+        }
+        { //::PyPhysicsObject::IsStatic
+        
+            typedef bool ( ::PyPhysicsObject::*IsStatic_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsStatic"
+                , IsStatic_function_type( &::PyPhysicsObject::IsStatic ) );
+        
+        }
+        { //::PyPhysicsObject::IsTrigger
+        
+            typedef bool ( ::PyPhysicsObject::*IsTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsTrigger"
+                , IsTrigger_function_type( &::PyPhysicsObject::IsTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::LocalToWorld
+        
+            typedef void ( ::PyPhysicsObject::*LocalToWorld_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "LocalToWorld"
+                , LocalToWorld_function_type( &::PyPhysicsObject::LocalToWorld )
+                , ( bp::arg("worldPosition"), bp::arg("localPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::LocalToWorldVector
+        
+            typedef void ( ::PyPhysicsObject::*LocalToWorldVector_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "LocalToWorldVector"
+                , LocalToWorldVector_function_type( &::PyPhysicsObject::LocalToWorldVector )
+                , ( bp::arg("worldVector"), bp::arg("localVector") ) );
+        
+        }
+        { //::PyPhysicsObject::NonZero
+        
+            typedef bool ( ::PyPhysicsObject::*__nonzero___function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "__nonzero__"
+                , __nonzero___function_type( &::PyPhysicsObject::NonZero ) );
+        
+        }
+        { //::PyPhysicsObject::OutputDebugInfo
+        
+            typedef void ( ::PyPhysicsObject::*OutputDebugInfo_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "OutputDebugInfo"
+                , OutputDebugInfo_function_type( &::PyPhysicsObject::OutputDebugInfo ) );
+        
+        }
+        { //::PyPhysicsObject::RecheckCollisionFilter
+        
+            typedef void ( ::PyPhysicsObject::*RecheckCollisionFilter_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RecheckCollisionFilter"
+                , RecheckCollisionFilter_function_type( &::PyPhysicsObject::RecheckCollisionFilter ) );
+        
+        }
+        { //::PyPhysicsObject::RecheckContactPoints
+        
+            typedef void ( ::PyPhysicsObject::*RecheckContactPoints_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RecheckContactPoints"
+                , RecheckContactPoints_function_type( &::PyPhysicsObject::RecheckContactPoints ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveHinged
+        
+            typedef void ( ::PyPhysicsObject::*RemoveHinged_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveHinged"
+                , RemoveHinged_function_type( &::PyPhysicsObject::RemoveHinged ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveShadowController
+        
+            typedef void ( ::PyPhysicsObject::*RemoveShadowController_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveShadowController"
+                , RemoveShadowController_function_type( &::PyPhysicsObject::RemoveShadowController ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveTrigger
+        
+            typedef void ( ::PyPhysicsObject::*RemoveTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveTrigger"
+                , RemoveTrigger_function_type( &::PyPhysicsObject::RemoveTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::SetBuoyancyRatio
+        
+            typedef void ( ::PyPhysicsObject::*SetBuoyancyRatio_function_type )( float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetBuoyancyRatio"
+                , SetBuoyancyRatio_function_type( &::PyPhysicsObject::SetBuoyancyRatio )
+                , ( bp::arg("ratio") ) );
+        
+        }
+        { //::PyPhysicsObject::SetCallbackFlags
+        
+            typedef void ( ::PyPhysicsObject::*SetCallbackFlags_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetCallbackFlags"
+                , SetCallbackFlags_function_type( &::PyPhysicsObject::SetCallbackFlags )
+                , ( bp::arg("callbackflags") ) );
+        
+        }
+        { //::PyPhysicsObject::SetContents
+        
+            typedef void ( ::PyPhysicsObject::*SetContents_function_type )( unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetContents"
+                , SetContents_function_type( &::PyPhysicsObject::SetContents )
+                , ( bp::arg("contents") ) );
+        
+        }
+        { //::PyPhysicsObject::SetDamping
+        
+            typedef void ( ::PyPhysicsObject::*SetDamping_function_type )( float,float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetDamping"
+                , SetDamping_function_type( &::PyPhysicsObject::SetDamping )
+                , ( bp::arg("speed"), bp::arg("rot") ) );
+        
+        }
+        { //::PyPhysicsObject::SetDragCoefficient
+        
+            typedef void ( ::PyPhysicsObject::*SetDragCoefficient_function_type )( float *,float * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetDragCoefficient"
+                , SetDragCoefficient_function_type( &::PyPhysicsObject::SetDragCoefficient )
+                , ( bp::arg("pDrag"), bp::arg("pAngularDrag") ) );
+        
+        }
+        { //::PyPhysicsObject::SetGameFlags
+        
+            typedef void ( ::PyPhysicsObject::*SetGameFlags_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetGameFlags"
+                , SetGameFlags_function_type( &::PyPhysicsObject::SetGameFlags )
+                , ( bp::arg("userFlags") ) );
+        
+        }
+        { //::PyPhysicsObject::SetGameIndex
+        
+            typedef void ( ::PyPhysicsObject::*SetGameIndex_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetGameIndex"
+                , SetGameIndex_function_type( &::PyPhysicsObject::SetGameIndex )
+                , ( bp::arg("gameIndex") ) );
+        
+        }
+        { //::PyPhysicsObject::SetInertia
+        
+            typedef void ( ::PyPhysicsObject::*SetInertia_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetInertia"
+                , SetInertia_function_type( &::PyPhysicsObject::SetInertia )
+                , ( bp::arg("inertia") ) );
+        
+        }
+        { //::PyPhysicsObject::SetMass
+        
+            typedef void ( ::PyPhysicsObject::*SetMass_function_type )( float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetMass"
+                , SetMass_function_type( &::PyPhysicsObject::SetMass )
+                , ( bp::arg("mass") ) );
+        
+        }
+        { //::PyPhysicsObject::SetMaterialIndex
+        
+            typedef void ( ::PyPhysicsObject::*SetMaterialIndex_function_type )( int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetMaterialIndex"
+                , SetMaterialIndex_function_type( &::PyPhysicsObject::SetMaterialIndex )
+                , ( bp::arg("materialIndex") ) );
+        
+        }
+        { //::PyPhysicsObject::SetPosition
+        
+            typedef void ( ::PyPhysicsObject::*SetPosition_function_type )( ::Vector const &,::QAngle const &,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetPosition"
+                , SetPosition_function_type( &::PyPhysicsObject::SetPosition )
+                , ( bp::arg("worldPosition"), bp::arg("angles"), bp::arg("isTeleport") ) );
+        
+        }
+        { //::PyPhysicsObject::SetPositionMatrix
+        
+            typedef void ( ::PyPhysicsObject::*SetPositionMatrix_function_type )( ::matrix3x4_t const &,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetPositionMatrix"
+                , SetPositionMatrix_function_type( &::PyPhysicsObject::SetPositionMatrix )
+                , ( bp::arg("matrix"), bp::arg("isTeleport") ) );
+        
+        }
+        { //::PyPhysicsObject::SetShadow
+        
+            typedef void ( ::PyPhysicsObject::*SetShadow_function_type )( float,float,bool,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetShadow"
+                , SetShadow_function_type( &::PyPhysicsObject::SetShadow )
+                , ( bp::arg("maxSpeed"), bp::arg("maxAngularSpeed"), bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation") ) );
+        
+        }
+        { //::PyPhysicsObject::SetVelocity
+        
+            typedef void ( ::PyPhysicsObject::*SetVelocity_function_type )( ::Vector const *,::AngularImpulse const * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetVelocity"
+                , SetVelocity_function_type( &::PyPhysicsObject::SetVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::SetVelocityInstantaneous
+        
+            typedef void ( ::PyPhysicsObject::*SetVelocityInstantaneous_function_type )( ::Vector const *,::AngularImpulse const * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetVelocityInstantaneous"
+                , SetVelocityInstantaneous_function_type( &::PyPhysicsObject::SetVelocityInstantaneous )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::Sleep
+        
+            typedef void ( ::PyPhysicsObject::*Sleep_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "Sleep"
+                , Sleep_function_type( &::PyPhysicsObject::Sleep ) );
+        
+        }
+        { //::PyPhysicsObject::UpdateShadow
+        
+            typedef void ( ::PyPhysicsObject::*UpdateShadow_function_type )( ::Vector const &,::QAngle const &,bool,float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "UpdateShadow"
+                , UpdateShadow_function_type( &::PyPhysicsObject::UpdateShadow )
+                , ( bp::arg("targetPosition"), bp::arg("targetAngles"), bp::arg("tempDisableGravity"), bp::arg("timeOffset") ) );
+        
+        }
+        { //::PyPhysicsObject::Wake
+        
+            typedef void ( ::PyPhysicsObject::*Wake_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "Wake"
+                , Wake_function_type( &::PyPhysicsObject::Wake ) );
+        
+        }
+        { //::PyPhysicsObject::WorldToLocal
+        
+            typedef void ( ::PyPhysicsObject::*WorldToLocal_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "WorldToLocal"
+                , WorldToLocal_function_type( &::PyPhysicsObject::WorldToLocal )
+                , ( bp::arg("localPosition"), bp::arg("worldPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::WorldToLocalVector
+        
+            typedef void ( ::PyPhysicsObject::*WorldToLocalVector_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "WorldToLocalVector"
+                , WorldToLocalVector_function_type( &::PyPhysicsObject::WorldToLocalVector )
+                , ( bp::arg("localVector"), bp::arg("worldVector") ) );
+        
+        }
+        PhysicsObject_exposer.def( bp::self != bp::self );
+        PhysicsObject_exposer.def( bp::self == bp::self );
     }
 
     { //::PyPhysicsShadowController
@@ -919,6 +1355,12 @@ BOOST_PYTHON_MODULE(_physics){
     
     }
 
+    ptr_IPhysicsObject_to_PyPhysicsObject();
+
+    const_ptr_IPhysicsObject_to_PyPhysicsObject();
+
+    PyPhysicsObject_to_IPhysicsObject();
+
     bp::scope().attr( "physcollision" ) = boost::ref(pyphyscollision);
 
     bp::scope().attr( "physprops" ) = boost::ref(pyphysprops);
@@ -949,31 +1391,13 @@ BOOST_PYTHON_MODULE(_physics){
 
 #include "physics_impact_damage.h"
 
+#include "srcpy_physics_converters.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
-
-struct PyPhysicsObjectBase_wrapper : PyPhysicsObjectBase, bp::wrapper< PyPhysicsObjectBase > {
-
-    PyPhysicsObjectBase_wrapper(PyPhysicsObjectBase const & arg )
-    : PyPhysicsObjectBase( arg )
-      , bp::wrapper< PyPhysicsObjectBase >(){
-        // copy constructor
-        
-    }
-
-    PyPhysicsObjectBase_wrapper( )
-    : PyPhysicsObjectBase( )
-      , bp::wrapper< PyPhysicsObjectBase >(){
-        // null constructor
-    
-    }
-
-    virtual PyObject *GetPySelf() const { return boost::python::detail::wrapper_base_::get_owner(*this); }
-
-};
 
 struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject > {
 
@@ -993,6 +1417,13 @@ struct PyPhysicsObject_wrapper : PyPhysicsObject, bp::wrapper< PyPhysicsObject >
 
     PyPhysicsObject_wrapper(::CBaseEntity * pEnt )
     : PyPhysicsObject( boost::python::ptr(pEnt) )
+      , bp::wrapper< PyPhysicsObject >(){
+        // constructor
+    
+    }
+
+    PyPhysicsObject_wrapper(::IPhysicsObject * pPhysObj )
+    : PyPhysicsObject( boost::python::ptr(pPhysObj) )
       , bp::wrapper< PyPhysicsObject >(){
         // constructor
     
@@ -1251,292 +1682,121 @@ BOOST_PYTHON_MODULE(_physics){
             , (void ( ::PyPhysicsCollision::* )( ::PyRay_t &,::PyPhysicsObject &,::Vector const &,::QAngle const &,::trace_t & ) )( &::PyPhysicsCollision::TraceBox )
             , ( bp::arg("ray"), bp::arg("physObj"), bp::arg("collideOrigin"), bp::arg("collideAngles"), bp::arg("ptr") ) );
 
-    bp::class_< PyPhysicsObjectBase_wrapper >( "PhysicsObjectBase", bp::init< >() )    
-        .def( 
-            "AddVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::AddVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "ApplyForceCenter"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::ApplyForceCenter )
-            , ( bp::arg("forceVector") ) )    
-        .def( 
-            "ApplyForceOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const & ) )( &::PyPhysicsObjectBase::ApplyForceOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition") ) )    
-        .def( 
-            "ApplyTorqueCenter"
-            , (void ( ::PyPhysicsObjectBase::* )( ::AngularImpulse const & ) )( &::PyPhysicsObjectBase::ApplyTorqueCenter )
-            , ( bp::arg("torque") ) )    
-        .def( 
-            "BecomeHinged"
-            , (void ( ::PyPhysicsObjectBase::* )( int ) )( &::PyPhysicsObjectBase::BecomeHinged )
-            , ( bp::arg("localAxis") ) )    
-        .def( 
-            "BecomeTrigger"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::BecomeTrigger ) )    
-        .def( 
-            "CalculateAngularDrag"
-            , (float ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::CalculateAngularDrag )
-            , ( bp::arg("objectSpaceRotationAxis") ) )    
-        .def( 
-            "CalculateForceOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::CalculateForceOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerForce"), bp::arg("centerTorque") ) )    
-        .def( 
-            "CalculateLinearDrag"
-            , (float ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::CalculateLinearDrag )
-            , ( bp::arg("unitDirection") ) )    
-        .def( 
-            "CalculateVelocityOffset"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::CalculateVelocityOffset )
-            , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerVelocity"), bp::arg("centerAngularVelocity") ) )    
-        .def( 
-            "__cmp__"
-            , (bool ( ::PyPhysicsObjectBase::* )( ::boost::python::object ) )( &::PyPhysicsObjectBase::Cmp )
-            , ( bp::arg("other") ) )    
-        .def( 
-            "EnableCollisions"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableCollisions )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableDrag"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableDrag )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableGravity"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableGravity )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "EnableMotion"
-            , (void ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::EnableMotion )
-            , ( bp::arg("enable") ) )    
-        .def( 
-            "GetCallbackFlags"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetCallbackFlags ) )    
-        .def( 
-            "GetContents"
-            , (unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetContents ) )    
-        .def( 
-            "GetDamping"
-            , (::boost::python::tuple ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetDamping ) )    
-        .def( 
-            "GetEnergy"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetEnergy ) )    
-        .def( 
-            "GetGameFlags"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetGameFlags ) )    
-        .def( 
-            "GetGameIndex"
-            , (short unsigned int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetGameIndex ) )    
-        .def( 
-            "GetImplicitVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::GetImplicitVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "GetInertia"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInertia ) )    
-        .def( 
-            "GetInvInertia"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInvInertia ) )    
-        .def( 
-            "GetInvMass"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetInvMass ) )    
-        .def( 
-            "GetMass"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMass ) )    
-        .def( 
-            "GetMassCenterLocalSpace"
-            , (::Vector ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMassCenterLocalSpace ) )    
-        .def( 
-            "GetMaterialIndex"
-            , (int ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetMaterialIndex ) )    
-        .def( 
-            "GetName"
-            , (char const * ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetName ) )    
-        .def( 
-            "GetPosition"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::QAngle * ) )( &::PyPhysicsObjectBase::GetPosition )
-            , ( bp::arg("worldPosition"), bp::arg("angles") ) )    
-        .def( 
-            "GetPositionMatrix"
-            , (void ( ::PyPhysicsObjectBase::* )( ::matrix3x4_t * ) )( &::PyPhysicsObjectBase::GetPositionMatrix )
-            , ( bp::arg("positionMatrix") ) )    
-        .def( 
-            "GetShadowController"
-            , (::PyPhysicsShadowController ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetShadowController ) )    
-        .def( 
-            "GetShadowPosition"
-            , (int ( ::PyPhysicsObjectBase::* )( ::Vector *,::QAngle * ) )( &::PyPhysicsObjectBase::GetShadowPosition )
-            , ( bp::arg("position"), bp::arg("angles") ) )    
-        .def( 
-            "GetSphereRadius"
-            , (float ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::GetSphereRadius ) )    
-        .def( 
-            "GetVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::AngularImpulse * ) )( &::PyPhysicsObjectBase::GetVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "GetVelocityAtPoint"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::Vector * ) )( &::PyPhysicsObjectBase::GetVelocityAtPoint )
-            , ( bp::arg("worldPosition"), bp::arg("pVelocity") ) )    
-        .def( 
-            "IsAsleep"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsAsleep ) )    
-        .def( 
-            "IsAttachedToConstraint"
-            , (bool ( ::PyPhysicsObjectBase::* )( bool ) )( &::PyPhysicsObjectBase::IsAttachedToConstraint )
-            , ( bp::arg("bExternalOnly") ) )    
-        .def( 
-            "IsCollisionEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsCollisionEnabled ) )    
-        .def( 
-            "IsDragEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsDragEnabled ) )    
-        .def( 
-            "IsFluid"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsFluid ) )    
-        .def( 
-            "IsGravityEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsGravityEnabled ) )    
-        .def( 
-            "IsHinged"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsHinged ) )    
-        .def( 
-            "IsMotionEnabled"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsMotionEnabled ) )    
-        .def( 
-            "IsMoveable"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsMoveable ) )    
-        .def( 
-            "IsStatic"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsStatic ) )    
-        .def( 
-            "IsTrigger"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::IsTrigger ) )    
-        .def( 
-            "LocalToWorld"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::LocalToWorld )
-            , ( bp::arg("worldPosition"), bp::arg("localPosition") ) )    
-        .def( 
-            "LocalToWorldVector"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::LocalToWorldVector )
-            , ( bp::arg("worldVector"), bp::arg("localVector") ) )    
-        .def( 
-            "__nonzero__"
-            , (bool ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::NonZero ) )    
-        .def( 
-            "OutputDebugInfo"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::OutputDebugInfo ) )    
-        .def( 
-            "RecheckCollisionFilter"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RecheckCollisionFilter ) )    
-        .def( 
-            "RecheckContactPoints"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RecheckContactPoints ) )    
-        .def( 
-            "RemoveHinged"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveHinged ) )    
-        .def( 
-            "RemoveShadowController"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveShadowController ) )    
-        .def( 
-            "RemoveTrigger"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::RemoveTrigger ) )    
-        .def( 
-            "SetBuoyancyRatio"
-            , (void ( ::PyPhysicsObjectBase::* )( float ) )( &::PyPhysicsObjectBase::SetBuoyancyRatio )
-            , ( bp::arg("ratio") ) )    
-        .def( 
-            "SetCallbackFlags"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetCallbackFlags )
-            , ( bp::arg("callbackflags") ) )    
-        .def( 
-            "SetContents"
-            , (void ( ::PyPhysicsObjectBase::* )( unsigned int ) )( &::PyPhysicsObjectBase::SetContents )
-            , ( bp::arg("contents") ) )    
-        .def( 
-            "SetDamping"
-            , (void ( ::PyPhysicsObjectBase::* )( float,float ) )( &::PyPhysicsObjectBase::SetDamping )
-            , ( bp::arg("speed"), bp::arg("rot") ) )    
-        .def( 
-            "SetDragCoefficient"
-            , (void ( ::PyPhysicsObjectBase::* )( float *,float * ) )( &::PyPhysicsObjectBase::SetDragCoefficient )
-            , ( bp::arg("pDrag"), bp::arg("pAngularDrag") ) )    
-        .def( 
-            "SetGameFlags"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetGameFlags )
-            , ( bp::arg("userFlags") ) )    
-        .def( 
-            "SetGameIndex"
-            , (void ( ::PyPhysicsObjectBase::* )( short unsigned int ) )( &::PyPhysicsObjectBase::SetGameIndex )
-            , ( bp::arg("gameIndex") ) )    
-        .def( 
-            "SetInertia"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const & ) )( &::PyPhysicsObjectBase::SetInertia )
-            , ( bp::arg("inertia") ) )    
-        .def( 
-            "SetMass"
-            , (void ( ::PyPhysicsObjectBase::* )( float ) )( &::PyPhysicsObjectBase::SetMass )
-            , ( bp::arg("mass") ) )    
-        .def( 
-            "SetMaterialIndex"
-            , (void ( ::PyPhysicsObjectBase::* )( int ) )( &::PyPhysicsObjectBase::SetMaterialIndex )
-            , ( bp::arg("materialIndex") ) )    
-        .def( 
-            "SetPosition"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::QAngle const &,bool ) )( &::PyPhysicsObjectBase::SetPosition )
-            , ( bp::arg("worldPosition"), bp::arg("angles"), bp::arg("isTeleport") ) )    
-        .def( 
-            "SetPositionMatrix"
-            , (void ( ::PyPhysicsObjectBase::* )( ::matrix3x4_t const &,bool ) )( &::PyPhysicsObjectBase::SetPositionMatrix )
-            , ( bp::arg("matrix"), bp::arg("isTeleport") ) )    
-        .def( 
-            "SetShadow"
-            , (void ( ::PyPhysicsObjectBase::* )( float,float,bool,bool ) )( &::PyPhysicsObjectBase::SetShadow )
-            , ( bp::arg("maxSpeed"), bp::arg("maxAngularSpeed"), bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation") ) )    
-        .def( 
-            "SetVelocity"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::SetVelocity )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "SetVelocityInstantaneous"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const *,::AngularImpulse const * ) )( &::PyPhysicsObjectBase::SetVelocityInstantaneous )
-            , ( bp::arg("velocity"), bp::arg("angularVelocity") ) )    
-        .def( 
-            "Sleep"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::Sleep ) )    
-        .def( 
-            "UpdateShadow"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector const &,::QAngle const &,bool,float ) )( &::PyPhysicsObjectBase::UpdateShadow )
-            , ( bp::arg("targetPosition"), bp::arg("targetAngles"), bp::arg("tempDisableGravity"), bp::arg("timeOffset") ) )    
-        .def( 
-            "Wake"
-            , (void ( ::PyPhysicsObjectBase::* )(  ) )( &::PyPhysicsObjectBase::Wake ) )    
-        .def( 
-            "WorldToLocal"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::WorldToLocal )
-            , ( bp::arg("localPosition"), bp::arg("worldPosition") ) )    
-        .def( 
-            "WorldToLocalVector"
-            , (void ( ::PyPhysicsObjectBase::* )( ::Vector *,::Vector const & ) )( &::PyPhysicsObjectBase::WorldToLocalVector )
-            , ( bp::arg("localVector"), bp::arg("worldVector") ) )    
-        .def( bp::self != bp::self )    
-        .def( bp::self == bp::self );
-
     { //::PyPhysicsObject
-        typedef bp::class_< PyPhysicsObject_wrapper, bp::bases< PyPhysicsObjectBase > > PhysicsObject_exposer_t;
+        typedef bp::class_< PyPhysicsObject_wrapper > PhysicsObject_exposer_t;
         PhysicsObject_exposer_t PhysicsObject_exposer = PhysicsObject_exposer_t( "PhysicsObject", bp::init< >() );
         bp::scope PhysicsObject_scope( PhysicsObject_exposer );
         PhysicsObject_exposer.def( bp::init< CBaseEntity * >(( bp::arg("pEnt") )) );
         bp::implicitly_convertible< CBaseEntity *, PyPhysicsObject >();
-        { //::PyPhysicsObject::CheckValid
+        PhysicsObject_exposer.def( bp::init< IPhysicsObject * >(( bp::arg("pPhysObj") )) );
+        bp::implicitly_convertible< IPhysicsObject *, PyPhysicsObject >();
+        { //::PyPhysicsObject::AddVelocity
         
-            typedef void ( ::PyPhysicsObject::*CheckValid_function_type )(  ) ;
+            typedef void ( ::PyPhysicsObject::*AddVelocity_function_type )( ::Vector const *,::AngularImpulse const * ) ;
             
             PhysicsObject_exposer.def( 
-                "CheckValid"
-                , CheckValid_function_type( &::PyPhysicsObject::CheckValid ) );
+                "AddVelocity"
+                , AddVelocity_function_type( &::PyPhysicsObject::AddVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyForceCenter
+        
+            typedef void ( ::PyPhysicsObject::*ApplyForceCenter_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyForceCenter"
+                , ApplyForceCenter_function_type( &::PyPhysicsObject::ApplyForceCenter )
+                , ( bp::arg("forceVector") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyForceOffset
+        
+            typedef void ( ::PyPhysicsObject::*ApplyForceOffset_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyForceOffset"
+                , ApplyForceOffset_function_type( &::PyPhysicsObject::ApplyForceOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::ApplyTorqueCenter
+        
+            typedef void ( ::PyPhysicsObject::*ApplyTorqueCenter_function_type )( ::AngularImpulse const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "ApplyTorqueCenter"
+                , ApplyTorqueCenter_function_type( &::PyPhysicsObject::ApplyTorqueCenter )
+                , ( bp::arg("torque") ) );
+        
+        }
+        { //::PyPhysicsObject::BecomeHinged
+        
+            typedef void ( ::PyPhysicsObject::*BecomeHinged_function_type )( int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "BecomeHinged"
+                , BecomeHinged_function_type( &::PyPhysicsObject::BecomeHinged )
+                , ( bp::arg("localAxis") ) );
+        
+        }
+        { //::PyPhysicsObject::BecomeTrigger
+        
+            typedef void ( ::PyPhysicsObject::*BecomeTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "BecomeTrigger"
+                , BecomeTrigger_function_type( &::PyPhysicsObject::BecomeTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateAngularDrag
+        
+            typedef float ( ::PyPhysicsObject::*CalculateAngularDrag_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateAngularDrag"
+                , CalculateAngularDrag_function_type( &::PyPhysicsObject::CalculateAngularDrag )
+                , ( bp::arg("objectSpaceRotationAxis") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateForceOffset
+        
+            typedef void ( ::PyPhysicsObject::*CalculateForceOffset_function_type )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateForceOffset"
+                , CalculateForceOffset_function_type( &::PyPhysicsObject::CalculateForceOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerForce"), bp::arg("centerTorque") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateLinearDrag
+        
+            typedef float ( ::PyPhysicsObject::*CalculateLinearDrag_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateLinearDrag"
+                , CalculateLinearDrag_function_type( &::PyPhysicsObject::CalculateLinearDrag )
+                , ( bp::arg("unitDirection") ) );
+        
+        }
+        { //::PyPhysicsObject::CalculateVelocityOffset
+        
+            typedef void ( ::PyPhysicsObject::*CalculateVelocityOffset_function_type )( ::Vector const &,::Vector const &,::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "CalculateVelocityOffset"
+                , CalculateVelocityOffset_function_type( &::PyPhysicsObject::CalculateVelocityOffset )
+                , ( bp::arg("forceVector"), bp::arg("worldPosition"), bp::arg("centerVelocity"), bp::arg("centerAngularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::Cmp
+        
+            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::object ) ;
+            
+            PhysicsObject_exposer.def( 
+                "__cmp__"
+                , __cmp___function_type( &::PyPhysicsObject::Cmp )
+                , ( bp::arg("other") ) );
         
         }
         { //::PyPhysicsObject::Destroy
@@ -1548,6 +1808,241 @@ BOOST_PYTHON_MODULE(_physics){
                 , Destroy_function_type( &::PyPhysicsObject::Destroy ) );
         
         }
+        { //::PyPhysicsObject::EnableCollisions
+        
+            typedef void ( ::PyPhysicsObject::*EnableCollisions_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableCollisions"
+                , EnableCollisions_function_type( &::PyPhysicsObject::EnableCollisions )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableDrag
+        
+            typedef void ( ::PyPhysicsObject::*EnableDrag_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableDrag"
+                , EnableDrag_function_type( &::PyPhysicsObject::EnableDrag )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableGravity
+        
+            typedef void ( ::PyPhysicsObject::*EnableGravity_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableGravity"
+                , EnableGravity_function_type( &::PyPhysicsObject::EnableGravity )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::EnableMotion
+        
+            typedef void ( ::PyPhysicsObject::*EnableMotion_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "EnableMotion"
+                , EnableMotion_function_type( &::PyPhysicsObject::EnableMotion )
+                , ( bp::arg("enable") ) );
+        
+        }
+        { //::PyPhysicsObject::GetCallbackFlags
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetCallbackFlags_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetCallbackFlags"
+                , GetCallbackFlags_function_type( &::PyPhysicsObject::GetCallbackFlags ) );
+        
+        }
+        { //::PyPhysicsObject::GetContents
+        
+            typedef unsigned int ( ::PyPhysicsObject::*GetContents_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetContents"
+                , GetContents_function_type( &::PyPhysicsObject::GetContents ) );
+        
+        }
+        { //::PyPhysicsObject::GetDamping
+        
+            typedef ::boost::python::tuple ( ::PyPhysicsObject::*GetDamping_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetDamping"
+                , GetDamping_function_type( &::PyPhysicsObject::GetDamping ) );
+        
+        }
+        { //::PyPhysicsObject::GetEnergy
+        
+            typedef float ( ::PyPhysicsObject::*GetEnergy_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetEnergy"
+                , GetEnergy_function_type( &::PyPhysicsObject::GetEnergy ) );
+        
+        }
+        { //::PyPhysicsObject::GetGameFlags
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetGameFlags_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetGameFlags"
+                , GetGameFlags_function_type( &::PyPhysicsObject::GetGameFlags ) );
+        
+        }
+        { //::PyPhysicsObject::GetGameIndex
+        
+            typedef short unsigned int ( ::PyPhysicsObject::*GetGameIndex_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetGameIndex"
+                , GetGameIndex_function_type( &::PyPhysicsObject::GetGameIndex ) );
+        
+        }
+        { //::PyPhysicsObject::GetImplicitVelocity
+        
+            typedef void ( ::PyPhysicsObject::*GetImplicitVelocity_function_type )( ::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetImplicitVelocity"
+                , GetImplicitVelocity_function_type( &::PyPhysicsObject::GetImplicitVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::GetInertia
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetInertia_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInertia"
+                , GetInertia_function_type( &::PyPhysicsObject::GetInertia ) );
+        
+        }
+        { //::PyPhysicsObject::GetInvInertia
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetInvInertia_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInvInertia"
+                , GetInvInertia_function_type( &::PyPhysicsObject::GetInvInertia ) );
+        
+        }
+        { //::PyPhysicsObject::GetInvMass
+        
+            typedef float ( ::PyPhysicsObject::*GetInvMass_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetInvMass"
+                , GetInvMass_function_type( &::PyPhysicsObject::GetInvMass ) );
+        
+        }
+        { //::PyPhysicsObject::GetMass
+        
+            typedef float ( ::PyPhysicsObject::*GetMass_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMass"
+                , GetMass_function_type( &::PyPhysicsObject::GetMass ) );
+        
+        }
+        { //::PyPhysicsObject::GetMassCenterLocalSpace
+        
+            typedef ::Vector ( ::PyPhysicsObject::*GetMassCenterLocalSpace_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMassCenterLocalSpace"
+                , GetMassCenterLocalSpace_function_type( &::PyPhysicsObject::GetMassCenterLocalSpace ) );
+        
+        }
+        { //::PyPhysicsObject::GetMaterialIndex
+        
+            typedef int ( ::PyPhysicsObject::*GetMaterialIndex_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetMaterialIndex"
+                , GetMaterialIndex_function_type( &::PyPhysicsObject::GetMaterialIndex ) );
+        
+        }
+        { //::PyPhysicsObject::GetName
+        
+            typedef char const * ( ::PyPhysicsObject::*GetName_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetName"
+                , GetName_function_type( &::PyPhysicsObject::GetName ) );
+        
+        }
+        { //::PyPhysicsObject::GetPosition
+        
+            typedef void ( ::PyPhysicsObject::*GetPosition_function_type )( ::Vector *,::QAngle * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetPosition"
+                , GetPosition_function_type( &::PyPhysicsObject::GetPosition )
+                , ( bp::arg("worldPosition"), bp::arg("angles") ) );
+        
+        }
+        { //::PyPhysicsObject::GetPositionMatrix
+        
+            typedef void ( ::PyPhysicsObject::*GetPositionMatrix_function_type )( ::matrix3x4_t * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetPositionMatrix"
+                , GetPositionMatrix_function_type( &::PyPhysicsObject::GetPositionMatrix )
+                , ( bp::arg("positionMatrix") ) );
+        
+        }
+        { //::PyPhysicsObject::GetShadowController
+        
+            typedef ::PyPhysicsShadowController ( ::PyPhysicsObject::*GetShadowController_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetShadowController"
+                , GetShadowController_function_type( &::PyPhysicsObject::GetShadowController ) );
+        
+        }
+        { //::PyPhysicsObject::GetShadowPosition
+        
+            typedef int ( ::PyPhysicsObject::*GetShadowPosition_function_type )( ::Vector *,::QAngle * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetShadowPosition"
+                , GetShadowPosition_function_type( &::PyPhysicsObject::GetShadowPosition )
+                , ( bp::arg("position"), bp::arg("angles") ) );
+        
+        }
+        { //::PyPhysicsObject::GetSphereRadius
+        
+            typedef float ( ::PyPhysicsObject::*GetSphereRadius_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetSphereRadius"
+                , GetSphereRadius_function_type( &::PyPhysicsObject::GetSphereRadius ) );
+        
+        }
+        { //::PyPhysicsObject::GetVelocity
+        
+            typedef void ( ::PyPhysicsObject::*GetVelocity_function_type )( ::Vector *,::AngularImpulse * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetVelocity"
+                , GetVelocity_function_type( &::PyPhysicsObject::GetVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::GetVelocityAtPoint
+        
+            typedef void ( ::PyPhysicsObject::*GetVelocityAtPoint_function_type )( ::Vector const &,::Vector * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "GetVelocityAtPoint"
+                , GetVelocityAtPoint_function_type( &::PyPhysicsObject::GetVelocityAtPoint )
+                , ( bp::arg("worldPosition"), bp::arg("pVelocity") ) );
+        
+        }
         { //::PyPhysicsObject::HasEntity
         
             typedef bool ( ::PyPhysicsObject::*HasEntity_function_type )(  ) ;
@@ -1557,6 +2052,389 @@ BOOST_PYTHON_MODULE(_physics){
                 , HasEntity_function_type( &::PyPhysicsObject::HasEntity ) );
         
         }
+        { //::PyPhysicsObject::IsAsleep
+        
+            typedef bool ( ::PyPhysicsObject::*IsAsleep_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsAsleep"
+                , IsAsleep_function_type( &::PyPhysicsObject::IsAsleep ) );
+        
+        }
+        { //::PyPhysicsObject::IsAttachedToConstraint
+        
+            typedef bool ( ::PyPhysicsObject::*IsAttachedToConstraint_function_type )( bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsAttachedToConstraint"
+                , IsAttachedToConstraint_function_type( &::PyPhysicsObject::IsAttachedToConstraint )
+                , ( bp::arg("bExternalOnly") ) );
+        
+        }
+        { //::PyPhysicsObject::IsCollisionEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsCollisionEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsCollisionEnabled"
+                , IsCollisionEnabled_function_type( &::PyPhysicsObject::IsCollisionEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsDragEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsDragEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsDragEnabled"
+                , IsDragEnabled_function_type( &::PyPhysicsObject::IsDragEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsFluid
+        
+            typedef bool ( ::PyPhysicsObject::*IsFluid_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsFluid"
+                , IsFluid_function_type( &::PyPhysicsObject::IsFluid ) );
+        
+        }
+        { //::PyPhysicsObject::IsGravityEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsGravityEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsGravityEnabled"
+                , IsGravityEnabled_function_type( &::PyPhysicsObject::IsGravityEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsHinged
+        
+            typedef bool ( ::PyPhysicsObject::*IsHinged_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsHinged"
+                , IsHinged_function_type( &::PyPhysicsObject::IsHinged ) );
+        
+        }
+        { //::PyPhysicsObject::IsMotionEnabled
+        
+            typedef bool ( ::PyPhysicsObject::*IsMotionEnabled_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsMotionEnabled"
+                , IsMotionEnabled_function_type( &::PyPhysicsObject::IsMotionEnabled ) );
+        
+        }
+        { //::PyPhysicsObject::IsMoveable
+        
+            typedef bool ( ::PyPhysicsObject::*IsMoveable_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsMoveable"
+                , IsMoveable_function_type( &::PyPhysicsObject::IsMoveable ) );
+        
+        }
+        { //::PyPhysicsObject::IsStatic
+        
+            typedef bool ( ::PyPhysicsObject::*IsStatic_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsStatic"
+                , IsStatic_function_type( &::PyPhysicsObject::IsStatic ) );
+        
+        }
+        { //::PyPhysicsObject::IsTrigger
+        
+            typedef bool ( ::PyPhysicsObject::*IsTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "IsTrigger"
+                , IsTrigger_function_type( &::PyPhysicsObject::IsTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::LocalToWorld
+        
+            typedef void ( ::PyPhysicsObject::*LocalToWorld_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "LocalToWorld"
+                , LocalToWorld_function_type( &::PyPhysicsObject::LocalToWorld )
+                , ( bp::arg("worldPosition"), bp::arg("localPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::LocalToWorldVector
+        
+            typedef void ( ::PyPhysicsObject::*LocalToWorldVector_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "LocalToWorldVector"
+                , LocalToWorldVector_function_type( &::PyPhysicsObject::LocalToWorldVector )
+                , ( bp::arg("worldVector"), bp::arg("localVector") ) );
+        
+        }
+        { //::PyPhysicsObject::NonZero
+        
+            typedef bool ( ::PyPhysicsObject::*__nonzero___function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "__nonzero__"
+                , __nonzero___function_type( &::PyPhysicsObject::NonZero ) );
+        
+        }
+        { //::PyPhysicsObject::OutputDebugInfo
+        
+            typedef void ( ::PyPhysicsObject::*OutputDebugInfo_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "OutputDebugInfo"
+                , OutputDebugInfo_function_type( &::PyPhysicsObject::OutputDebugInfo ) );
+        
+        }
+        { //::PyPhysicsObject::RecheckCollisionFilter
+        
+            typedef void ( ::PyPhysicsObject::*RecheckCollisionFilter_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RecheckCollisionFilter"
+                , RecheckCollisionFilter_function_type( &::PyPhysicsObject::RecheckCollisionFilter ) );
+        
+        }
+        { //::PyPhysicsObject::RecheckContactPoints
+        
+            typedef void ( ::PyPhysicsObject::*RecheckContactPoints_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RecheckContactPoints"
+                , RecheckContactPoints_function_type( &::PyPhysicsObject::RecheckContactPoints ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveHinged
+        
+            typedef void ( ::PyPhysicsObject::*RemoveHinged_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveHinged"
+                , RemoveHinged_function_type( &::PyPhysicsObject::RemoveHinged ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveShadowController
+        
+            typedef void ( ::PyPhysicsObject::*RemoveShadowController_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveShadowController"
+                , RemoveShadowController_function_type( &::PyPhysicsObject::RemoveShadowController ) );
+        
+        }
+        { //::PyPhysicsObject::RemoveTrigger
+        
+            typedef void ( ::PyPhysicsObject::*RemoveTrigger_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "RemoveTrigger"
+                , RemoveTrigger_function_type( &::PyPhysicsObject::RemoveTrigger ) );
+        
+        }
+        { //::PyPhysicsObject::SetBuoyancyRatio
+        
+            typedef void ( ::PyPhysicsObject::*SetBuoyancyRatio_function_type )( float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetBuoyancyRatio"
+                , SetBuoyancyRatio_function_type( &::PyPhysicsObject::SetBuoyancyRatio )
+                , ( bp::arg("ratio") ) );
+        
+        }
+        { //::PyPhysicsObject::SetCallbackFlags
+        
+            typedef void ( ::PyPhysicsObject::*SetCallbackFlags_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetCallbackFlags"
+                , SetCallbackFlags_function_type( &::PyPhysicsObject::SetCallbackFlags )
+                , ( bp::arg("callbackflags") ) );
+        
+        }
+        { //::PyPhysicsObject::SetContents
+        
+            typedef void ( ::PyPhysicsObject::*SetContents_function_type )( unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetContents"
+                , SetContents_function_type( &::PyPhysicsObject::SetContents )
+                , ( bp::arg("contents") ) );
+        
+        }
+        { //::PyPhysicsObject::SetDamping
+        
+            typedef void ( ::PyPhysicsObject::*SetDamping_function_type )( float,float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetDamping"
+                , SetDamping_function_type( &::PyPhysicsObject::SetDamping )
+                , ( bp::arg("speed"), bp::arg("rot") ) );
+        
+        }
+        { //::PyPhysicsObject::SetDragCoefficient
+        
+            typedef void ( ::PyPhysicsObject::*SetDragCoefficient_function_type )( float *,float * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetDragCoefficient"
+                , SetDragCoefficient_function_type( &::PyPhysicsObject::SetDragCoefficient )
+                , ( bp::arg("pDrag"), bp::arg("pAngularDrag") ) );
+        
+        }
+        { //::PyPhysicsObject::SetGameFlags
+        
+            typedef void ( ::PyPhysicsObject::*SetGameFlags_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetGameFlags"
+                , SetGameFlags_function_type( &::PyPhysicsObject::SetGameFlags )
+                , ( bp::arg("userFlags") ) );
+        
+        }
+        { //::PyPhysicsObject::SetGameIndex
+        
+            typedef void ( ::PyPhysicsObject::*SetGameIndex_function_type )( short unsigned int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetGameIndex"
+                , SetGameIndex_function_type( &::PyPhysicsObject::SetGameIndex )
+                , ( bp::arg("gameIndex") ) );
+        
+        }
+        { //::PyPhysicsObject::SetInertia
+        
+            typedef void ( ::PyPhysicsObject::*SetInertia_function_type )( ::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetInertia"
+                , SetInertia_function_type( &::PyPhysicsObject::SetInertia )
+                , ( bp::arg("inertia") ) );
+        
+        }
+        { //::PyPhysicsObject::SetMass
+        
+            typedef void ( ::PyPhysicsObject::*SetMass_function_type )( float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetMass"
+                , SetMass_function_type( &::PyPhysicsObject::SetMass )
+                , ( bp::arg("mass") ) );
+        
+        }
+        { //::PyPhysicsObject::SetMaterialIndex
+        
+            typedef void ( ::PyPhysicsObject::*SetMaterialIndex_function_type )( int ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetMaterialIndex"
+                , SetMaterialIndex_function_type( &::PyPhysicsObject::SetMaterialIndex )
+                , ( bp::arg("materialIndex") ) );
+        
+        }
+        { //::PyPhysicsObject::SetPosition
+        
+            typedef void ( ::PyPhysicsObject::*SetPosition_function_type )( ::Vector const &,::QAngle const &,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetPosition"
+                , SetPosition_function_type( &::PyPhysicsObject::SetPosition )
+                , ( bp::arg("worldPosition"), bp::arg("angles"), bp::arg("isTeleport") ) );
+        
+        }
+        { //::PyPhysicsObject::SetPositionMatrix
+        
+            typedef void ( ::PyPhysicsObject::*SetPositionMatrix_function_type )( ::matrix3x4_t const &,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetPositionMatrix"
+                , SetPositionMatrix_function_type( &::PyPhysicsObject::SetPositionMatrix )
+                , ( bp::arg("matrix"), bp::arg("isTeleport") ) );
+        
+        }
+        { //::PyPhysicsObject::SetShadow
+        
+            typedef void ( ::PyPhysicsObject::*SetShadow_function_type )( float,float,bool,bool ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetShadow"
+                , SetShadow_function_type( &::PyPhysicsObject::SetShadow )
+                , ( bp::arg("maxSpeed"), bp::arg("maxAngularSpeed"), bp::arg("allowPhysicsMovement"), bp::arg("allowPhysicsRotation") ) );
+        
+        }
+        { //::PyPhysicsObject::SetVelocity
+        
+            typedef void ( ::PyPhysicsObject::*SetVelocity_function_type )( ::Vector const *,::AngularImpulse const * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetVelocity"
+                , SetVelocity_function_type( &::PyPhysicsObject::SetVelocity )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::SetVelocityInstantaneous
+        
+            typedef void ( ::PyPhysicsObject::*SetVelocityInstantaneous_function_type )( ::Vector const *,::AngularImpulse const * ) ;
+            
+            PhysicsObject_exposer.def( 
+                "SetVelocityInstantaneous"
+                , SetVelocityInstantaneous_function_type( &::PyPhysicsObject::SetVelocityInstantaneous )
+                , ( bp::arg("velocity"), bp::arg("angularVelocity") ) );
+        
+        }
+        { //::PyPhysicsObject::Sleep
+        
+            typedef void ( ::PyPhysicsObject::*Sleep_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "Sleep"
+                , Sleep_function_type( &::PyPhysicsObject::Sleep ) );
+        
+        }
+        { //::PyPhysicsObject::UpdateShadow
+        
+            typedef void ( ::PyPhysicsObject::*UpdateShadow_function_type )( ::Vector const &,::QAngle const &,bool,float ) ;
+            
+            PhysicsObject_exposer.def( 
+                "UpdateShadow"
+                , UpdateShadow_function_type( &::PyPhysicsObject::UpdateShadow )
+                , ( bp::arg("targetPosition"), bp::arg("targetAngles"), bp::arg("tempDisableGravity"), bp::arg("timeOffset") ) );
+        
+        }
+        { //::PyPhysicsObject::Wake
+        
+            typedef void ( ::PyPhysicsObject::*Wake_function_type )(  ) ;
+            
+            PhysicsObject_exposer.def( 
+                "Wake"
+                , Wake_function_type( &::PyPhysicsObject::Wake ) );
+        
+        }
+        { //::PyPhysicsObject::WorldToLocal
+        
+            typedef void ( ::PyPhysicsObject::*WorldToLocal_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "WorldToLocal"
+                , WorldToLocal_function_type( &::PyPhysicsObject::WorldToLocal )
+                , ( bp::arg("localPosition"), bp::arg("worldPosition") ) );
+        
+        }
+        { //::PyPhysicsObject::WorldToLocalVector
+        
+            typedef void ( ::PyPhysicsObject::*WorldToLocalVector_function_type )( ::Vector *,::Vector const & ) ;
+            
+            PhysicsObject_exposer.def( 
+                "WorldToLocalVector"
+                , WorldToLocalVector_function_type( &::PyPhysicsObject::WorldToLocalVector )
+                , ( bp::arg("localVector"), bp::arg("worldVector") ) );
+        
+        }
+        PhysicsObject_exposer.def( bp::self != bp::self );
+        PhysicsObject_exposer.def( bp::self == bp::self );
     }
 
     { //::PyPhysicsShadowController
@@ -1938,6 +2816,12 @@ BOOST_PYTHON_MODULE(_physics){
             , ( bp::arg("pEntity"), bp::arg("mins"), bp::arg("maxs"), bp::arg("origin"), bp::arg("angle"), bp::arg("isStatic") ) );
     
     }
+
+    ptr_IPhysicsObject_to_PyPhysicsObject();
+
+    const_ptr_IPhysicsObject_to_PyPhysicsObject();
+
+    PyPhysicsObject_to_IPhysicsObject();
 
     bp::scope().attr( "physcollision" ) = boost::ref(pyphyscollision);
 
