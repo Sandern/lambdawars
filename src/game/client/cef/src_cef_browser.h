@@ -118,7 +118,7 @@ public:
 
 	boost::python::object PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
 	void PySendCallback( boost::python::object callbackid, boost::python::list methodargs );
-	void PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs );
+	void PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs = boost::python::list() );
 	boost::python::object PyInvokeWithResult( PyJSObject *object, const char *methodname, boost::python::list methodargs );
 
 	virtual void PyOnMethodCall( int identifier, boost::python::object methodargs, boost::python::object callbackid ) {}

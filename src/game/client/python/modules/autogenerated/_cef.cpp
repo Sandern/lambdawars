@@ -1033,7 +1033,7 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "Invoke"
                 , Invoke_function_type( &::SrcCefBrowser::PyInvoke )
-                , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs") ) );
+                , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs")=boost::python::list() ) );
         
         }
         { //::SrcCefBrowser::PyInvokeWithResult
