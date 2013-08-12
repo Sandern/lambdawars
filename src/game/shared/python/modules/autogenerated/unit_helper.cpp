@@ -2419,6 +2419,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         .value("GF_REQUIREVISION", GF_REQUIREVISION)
         .value("GF_OWNERISTARGET", GF_OWNERISTARGET)
         .value("GF_DIRECTPATH", GF_DIRECTPATH)
+        .value("GF_ATGOAL_RELAX", GF_ATGOAL_RELAX)
         .export_values()
         ;
 
@@ -4255,6 +4256,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         UnitBasePath_exposer.def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies );
         UnitBasePath_exposer.def_readwrite( "success", &UnitBasePath::m_bSuccess );
+        UnitBasePath_exposer.def_readwrite( "m_fAtGoalTolerance", &UnitBasePath::m_fAtGoalTolerance );
         UnitBasePath_exposer.def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance );
         UnitBasePath_exposer.def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist );
         UnitBasePath_exposer.def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange );

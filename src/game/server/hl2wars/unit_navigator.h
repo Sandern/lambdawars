@@ -48,6 +48,7 @@ enum UnitGoalFlags
 	GF_REQUIREVISION = (1 << 4 ), // Fog of war
 	GF_OWNERISTARGET = (1 << 5 ), // Bumped into entity that is being owned by the target
 	GF_DIRECTPATH = (1 << 6), // Build direct path, don't do path finding. For special cases.
+	GF_ATGOAL_RELAX = (1 << 7) // For use with GF_NOCLEAR: 
 };
 
 
@@ -192,9 +193,8 @@ inline void UnitBaseWaypoint::SetNext( UnitBaseWaypoint *p )
 	}
 }
 
-// Path class
 //-----------------------------------------------------------------------------
-// Purpose: Path. Maintains the list of waypoints to a goal.
+// UnitBasePath: Maintains the list of waypoints to a goal and other related info
 //-----------------------------------------------------------------------------
 class UnitBasePath
 {
@@ -328,18 +328,19 @@ public:
 	CBaseEntity *GetTarget() { return m_hTarget; }
 
 public:
-	int m_iGoalType;
+	int m_iGoalType; // UnitGoalTypes
 	UnitBaseWaypoint *m_pWaypointHead;
 	Vector m_vGoalPos;
-	float m_waypointTolerance;
-	float m_fGoalTolerance;
-	int m_iGoalFlags;
+	float m_waypointTolerance; // Default minimum tolerance for waypoints
+	float m_fGoalTolerance; // Tolerance within it is OK to say we are at our goal
+	float m_fAtGoalTolerance; // Tolerance before starting to follow the target unit again (GF_NOCLEAR + GF_ATGOAL_RELAX)
+	int m_iGoalFlags; // UnitGoalFlags
 	float m_fMinRange, m_fMaxRange;
 	EHANDLE m_hTarget;
 	bool m_bAvoidEnemies;
-	Vector m_vStartPosition;
+	Vector m_vStartPosition; // The initial start position of the unit
 	float m_fMaxMoveDist;
-	bool m_bSuccess;
+	bool m_bSuccess; // Can be queried after path completion by other components
 };
 
 #define CONSIDER_SIZE 48
@@ -363,6 +364,8 @@ public:
 	virtual void		StopMoving();
 	void				DispatchOnNavComplete();
 	void				DispatchOnNavFailed();
+	void				DispatchOnNavAtGoal();
+	void				DispatchOnNavLostGoal();
 	virtual void		Update( UnitBaseMoveCommand &mv );
 	virtual void		UpdateFacingTargetState( bool bIsFacing );
 	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir=NULL );
@@ -396,7 +399,6 @@ public:
 	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
 
 	virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
-	//virtual bool		TestPosition( const Vector &vPosition );
 	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
@@ -526,7 +528,6 @@ private:
 	float m_fNextReactivePathUpdate;
 	float m_fNextAllowPathRecomputeTime;
 	bool m_bNoNavAreasNearby;
-	Vector m_vLastPosition;
 	float m_fIgnoreNavMeshTime;
 
 	CHandle<CUnitBase> m_hAtGoalDependencyEnt;

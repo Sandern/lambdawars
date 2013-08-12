@@ -244,6 +244,9 @@ void UnitBaseNavigator::StopMoving()
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::DispatchOnNavComplete()
 {
+	if( unit_navigator_debug.GetBool() )
+		DevMsg("#%d UnitNavigator: At goal. Dispatching success (OnNavComplete).\n", GetOuter()->entindex());
+
 	// Keep path around for querying the information about the last path
 	GetPath()->m_iGoalType = GOALTYPE_NONE;
 	GetPath()->m_bSuccess = true;
@@ -275,6 +278,48 @@ void UnitBaseNavigator::DispatchOnNavFailed()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::DispatchOnNavAtGoal()
+{
+	// Reset blocked status, otherwise we might get an instant fail if it changes back to has goal
+	ResetBlockedStatus();
+
+	if( GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX )
+		GetPath()->m_fAtGoalTolerance = m_fGoalDistance + 64.0f;
+
+ 	GetPath()->m_bSuccess = true;
+
+	if( unit_navigator_debug.GetBool() )
+		DevMsg("#%d UnitNavigator: At goal, but marked as \"no clear\". Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
+
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run<const char *>( 
+		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
+		"OnNavAtGoal"
+	);		
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::DispatchOnNavLostGoal()
+{
+	GetPath()->m_bSuccess = false;
+
+	if( unit_navigator_debug.GetBool() )
+		DevMsg("#%d UnitNavigator: Was at goal, but lost it. Dispatching lost (OnNavLostGoal).\n", GetOuter()->entindex());
+
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run<const char *>( 
+		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
+		"OnNavLostGoal"
+	);		
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Main routine. Update the movement variables.
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
@@ -302,8 +347,8 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		GoalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fWaypointDist );
 	}
 
-	// TODO/CHECK: If at goal we should probably not move. Otherwise the unit might move away when trying to bump into a target entity (like an enemy).
-	if( GoalStatus != CHS_ATGOAL )
+	// Compute velocity
+	if( GoalStatus != CHS_ATGOAL || (GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX) )
 	{
 		if( !m_bNoAvoid || GoalStatus == CHS_NOGOAL )
 		{
@@ -314,28 +359,16 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		{
 			float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
 
-			// TODO: If we are very close to the waypoint, should we always go to the waypoint?
+			// Desire full speed when not near the final goal
 			if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
 				m_vLastWishVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * vPathDir;
 			else
 				m_vLastWishVelocity = MoveCommand.maxspeed * vPathDir;
-			}
+		}
 	}
 	else
 	{
 		m_vLastWishVelocity.Zero();
-	}
-
-	// Update discomfort weight
-	if( m_fLastBestDensity > unit_cost_discomfortweight_growthreshold.GetFloat() )
-	{
-		m_fDiscomfortWeight = Min( m_fDiscomfortWeight+MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
-								   unit_cost_discomfortweight_max.GetFloat() );
-	}
-	else
-	{
-		m_fDiscomfortWeight = Max( m_fDiscomfortWeight-MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
-								   unit_cost_discomfortweight_start.GetFloat() );
 	}
 
 	// Finally update the move command
@@ -359,8 +392,6 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	}
 
 	UpdateGoalStatus( MoveCommand, GoalStatus );
-
-	m_vLastPosition = GetAbsOrigin();
 
 	if( unit_navigator_debug_show.GetBool() )
 	{
@@ -399,34 +430,23 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 
 #ifdef ENABLE_PYTHON
 	boost::python::object curPath = m_refPath;
-#endif // ENABLE_PYTHON
+#endif // ENABLE_PYTHO
+	
+	// Dispatch events to AI based on our new goal status if needed
 	if( GoalStatus == CHS_ATGOAL )
 	{
-		if( !(GetPath()->m_iGoalFlags & GF_NOCLEAR) )
+		if( GetPath()->m_iGoalFlags & GF_NOCLEAR )
 		{
-			if( unit_navigator_debug.GetBool() )
-				DevMsg("#%d UnitNavigator: At goal. Dispatching success (OnNavComplete).\n", GetOuter()->entindex());
-			DispatchOnNavComplete();
+			if( LastGoalStatus != CHS_ATGOAL )
+			{
+				// Notify AI we arrived at our goal
+				DispatchOnNavAtGoal();
+			}
 		}
 		else
 		{
-			// Notify AI we are at our goal
-			if( LastGoalStatus != CHS_ATGOAL )
-			{
-				// Reset blocked status, otherwise we might get an instant fail if it changes back to has goal
-				ResetBlockedStatus();
-
- 				GetPath()->m_bSuccess = true;
-
-				if( unit_navigator_debug.GetBool() )
-					DevMsg("#%d UnitNavigator: At goal, but marked as \"no clear\". Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
-#ifdef ENABLE_PYTHON
-				SrcPySystem()->Run<const char *>( 
-					SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
-					"OnNavAtGoal"
-				);		
-#endif // ENABLE_PYTHON
-			}
+			// Notify AI we are at our goal and completed the path
+			DispatchOnNavComplete();
 		}
 	}
 	else if( GoalStatus == CHS_HASGOAL )
@@ -436,16 +456,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 			// Notify AI we lost our goal
 			if( LastGoalStatus == CHS_ATGOAL )
 			{
-				GetPath()->m_bSuccess = false;
-
-				if( unit_navigator_debug.GetBool() )
-					DevMsg("#%d UnitNavigator: Was at goal, but lost it. Dispatching lost (OnNavLostGoal).\n", GetOuter()->entindex());
-#ifdef ENABLE_PYTHON
-				SrcPySystem()->Run<const char *>( 
-					SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
-					"OnNavLostGoal"
-				);		
-#endif // ENABLE_PYTHON
+				DispatchOnNavLostGoal();
 			}
 		}
 	}
@@ -458,6 +469,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 	}
 	else if( GoalStatus == CHS_CLIMB )
 	{
+		// Dispatch climb event to AI, so it can start the climb code
 		if( unit_navigator_debug.GetBool() )
 			DevMsg("#%d UnitNavigator: Encounter climb obstacle. Dispatching OnStartClimb.\n", GetOuter()->entindex());
 #ifdef ENABLE_PYTHON
@@ -619,8 +631,13 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 			pEnt->IsNavIgnored() || pEnt->GetOwnerEntity() == m_pOuter || (pEnt->GetFlags() & (FL_STATICPROP|FL_WORLDBRUSH)) )
 			continue;
 
-		if( pEnt == GetPath()->m_hTarget )
-			continue;
+		// RegenerateConsiderList only runs with CHS_ATGOAL with the GF_ATGOAL_RELAX flag
+		// In this case, we want to avoid the target, so it should not be filtered (used for following code)
+		if( GoalStatus != CHS_ATGOAL )
+		{
+			if( pEnt == GetPath()->m_hTarget )
+				continue;
+		}
 
 		if( !GetPath()->m_bAvoidEnemies )
 		{
@@ -634,7 +651,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 	}
 
 	// Compute densities
-	if( GoalStatus == CHS_NOGOAL )
+	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL )
 	{
 		m_pOuter->GetVectors(&m_vTestDirections[m_iUsedTestDirections], NULL, NULL); // Just use forward as start dir
 		m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
@@ -887,7 +904,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	Vector vFlowDir, vAvgVelocity, vPathVelocity, vFlowVelocity, vFinalVelocity, vPathDir;
 
 	// Dist to next waypoints + speed predicted position
-	if( GetPath()->m_iGoalType != GOALTYPE_NONE )
+	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GoalStatus != CHS_ATGOAL )
 		fDist = UnitComputePathDirection2(m_vTestPositions[iPos], GetPath()->m_pWaypointHead, vPathDir);
 	else if( m_vForceGoalVelocity != vec3_origin )
 		fDist = ( (m_vForceGoalVelocity * 2) - m_vTestPositions[iPos] ).Length2D();
@@ -898,6 +915,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 
 	// Compute path speed
 	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
+		// Desire full speed when not near the final goal
 		float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
 		if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
 			vPathVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * m_vTestDirections[iPos];
@@ -937,7 +955,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	*pFinalVelocity = vFinalVelocity;
 
 	// Velocity when having no goal is solely based on the density (i.e. just move away if something is getting close)
-	if( GoalStatus == CHS_NOGOAL || fSpeed == 0 ) 
+	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL || fSpeed == 0 ) 
 	{
 		return fDensity; 
 	}
@@ -984,15 +1002,14 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 	fBestCost = 999999999.0f;
 	vBestVel.Zero();
 
-	if( GoalStatus == CHS_NOGOAL )
+	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL )
 	{
 		// Don't have a goal, in this case we don't look at the flow speed
 		// Instead we try to find a position in which highest and lowest density surrounding us doesn't 
 		// differ too much.
-		// TODO: Cleanup. Remove ComputeUnitCost from this part and just calculate densities, since we don't use the other stuff.
 		float fHighestDensity = 0.0f;
 		int pos = -1;
-		for( i=0; i<m_iUsedTestDirections; i++ )	
+		for( i = 0; i < m_iUsedTestDirections; i++ )	
 		{
 			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fWaypointDist, fComputedDensity );
 			if( fComputedDensity > fHighestDensity )
@@ -1031,6 +1048,18 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			// NOTE: Stuck because there are no nav areas around (density higher than 90). Just try moving!
 			vBestVel = vPathDir * MoveCommand.maxspeed; 
 			m_bNoNavAreasNearby = true;
+		}
+
+		// Update discomfort weight
+		if( m_fLastBestDensity > unit_cost_discomfortweight_growthreshold.GetFloat() )
+		{
+			m_fDiscomfortWeight = Min( m_fDiscomfortWeight+MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
+									   unit_cost_discomfortweight_max.GetFloat() );
+		}
+		else
+		{
+			m_fDiscomfortWeight = Max( m_fDiscomfortWeight-MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
+									   unit_cost_discomfortweight_start.GetFloat() );
 		}
 	}
 
@@ -1129,8 +1158,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
 						GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
 
-				//UnitBaseWaypoint * pGoalWayPoint = GetPath()->m_pWaypointHead->GetLast();
-
 				// Update goal target position and recompute
 				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
@@ -1167,14 +1194,27 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	// Check if we bumped into our target goal. In that case we are done.
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT )
 	{
-		// Goal is satisfied if our blocker is the target or if we are REALLY close
-		if( MoveCommand.HasBlocker( GetPath()->m_hTarget ) || m_fGoalDistance < GetEntityBoundingRadius(m_pOuter)*2.0f || TestNearbyUnitsWithSameGoal( MoveCommand ) )
+		// If we are currently at our goal, we will simplify the check if GF_ATGOAL_RELAX is active
+		// We just need to be "near" the goal. m_fAtGoalTolerance is set at the time we first arrived at the goal.
+		if( m_LastGoalStatus == CHS_ATGOAL && ( GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX ) )
 		{
-			return CHS_ATGOAL;
+			if( m_fGoalDistance < GetPath()->m_fAtGoalTolerance )
+			{
+				RegenerateConsiderList( vPathDir, CHS_ATGOAL );
+				return CHS_ATGOAL;
+			}
 		}
-		else if( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && MoveCommand.HasBlockerWithOwnerEntity( GetPath()->m_hTarget ) )
+		else
 		{
-			return CHS_ATGOAL;
+			// Goal is satisfied if our blocker is the target or if we are REALLY close
+			if( MoveCommand.HasBlocker( GetPath()->m_hTarget ) || m_fGoalDistance < GetEntityBoundingRadius(m_pOuter)*2.0f || TestNearbyUnitsWithSameGoal( MoveCommand ) )
+			{
+				return CHS_ATGOAL;
+			}
+			else if( (GetPath()->m_iGoalFlags & GF_OWNERISTARGET) && MoveCommand.HasBlockerWithOwnerEntity( GetPath()->m_hTarget ) )
+			{
+				return CHS_ATGOAL;
+			}
 		}
 	}
 	// Check for any of the range goal types if we are in range. In that we are done.
@@ -1186,8 +1226,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		}
 	}
 
-	// Made it to here, so update our path
-	// Path updating
+	// Made it to here, so update our path if any
 	bool bPathBlocked = false;
 	CheckGoalStatus_t GoalStatus = CHS_NOGOAL;
 	vPathDir = vec3_origin;
@@ -1225,9 +1264,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				{
 					DevMsg("#%d UnitNavigator: path blocked, recomputing path...(reasons: ", GetOuter()->entindex());
 					if( bPathBlocked )
-						DevMsg("blocked");
-					if( (m_vLastPosition - GetAbsOrigin()).Length2D() < 1.0f )
-						DevMsg(", no movement");
+						DevMsg("blocked path detected");
+					if( GetBlockedStatus() > BS_NONE )
+						DevMsg(", blocked status higher than none");
 					for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
 					{
 						CBaseEntity *pBlocker = MoveCommand.blockers[i].blocker;
@@ -1268,7 +1307,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					Vector vHitPos = MoveCommand.blockers[i].blocker_hitpos + MoveCommand.blockers[i].blocker_dir * m_pOuter->CollisionProp()->BoundingRadius2D();
 					InsertSeed( vHitPos );
 				}
-				//InsertSeed( GetAbsOrigin() );
 			}
 		}
 	}
@@ -1718,21 +1756,6 @@ bool UnitBaseNavigator::IsCompleteInArea( CNavArea *pArea, const Vector &vPos )
 	return (vPos.x+vWorldMins.x) >= vMins.x && (vPos.x+vWorldMaxs.x) <= vMaxs.x &&
 		(vPos.y+vWorldMins.y) >= vMins.y && (vPos.y+vWorldMaxs.y) <= vMaxs.y;
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::TestPosition( const Vector &vPosition )
-{
-	trace_t tr;
-	UTIL_TraceHull(vPosition+Vector(0,0,8.0), vPosition+Vector(0,0,9.0), 
-		WorldAlignMins(), WorldAlignMaxs(), MASK_NPCSOLID, GetOuter(), COLLISION_GROUP_NPC, &tr);
-	if( tr.DidHit() )
-		return false;
-	return true;
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Test end waypoint
@@ -2746,7 +2769,8 @@ void UnitBaseNavigator::SetPath( boost::python::object path )
 
 #if 0
 //-----------------------------------------------------------------------------
-
+// Purpose:
+//-----------------------------------------------------------------------------
 void UnitBaseNavigator::CalculateDestinationInRange( Vector *pResult, const Vector &vGoalPos, float minrange, float maxrange)
 {
 	Vector dir;
@@ -2773,7 +2797,8 @@ void UnitBaseNavigator::CalculateDestinationInRange( Vector *pResult, const Vect
 #endif 
 
 //-----------------------------------------------------------------------------
-
+// Purpose:
+//-----------------------------------------------------------------------------
 bool UnitBaseNavigator::FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist )
 {
 	Vector testLoc = GetAbsOrigin() + ( dir * targetDist );
@@ -2791,9 +2816,9 @@ bool UnitBaseNavigator::FindVectorGoal( Vector *pResult, const Vector &dir, floa
 	return true;
 }
 
-
 //-----------------------------------------------------------------------------
-
+// Purpose:
+//-----------------------------------------------------------------------------
 void UnitBaseNavigator::CalculateDeflection( const Vector &start, const Vector &dir, const Vector &normal, Vector *pResult )
 {
 	Vector temp;
@@ -2801,8 +2826,6 @@ void UnitBaseNavigator::CalculateDeflection( const Vector &start, const Vector &
 	CrossProduct( normal, temp, *pResult );
 	VectorNormalize( *pResult );
 }
-
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Draw the list of waypoints for debugging
