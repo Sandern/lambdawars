@@ -1,6 +1,6 @@
 # ifndef BOOST_PYTHON_SYNOPSIS 
 
-#include "..\tuple.hpp"
+#include "../tuple.hpp"
 
 namespace boost { namespace python {
 /*
