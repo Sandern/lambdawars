@@ -213,6 +213,7 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastPathRecomputation = 0.0f;
 	m_fNextReactivePathUpdate = 0.0f;
+	m_iLastTargetArea = 0;
 	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
@@ -286,7 +287,7 @@ void UnitBaseNavigator::DispatchOnNavAtGoal()
 	ResetBlockedStatus();
 
 	if( GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX )
-		GetPath()->m_fAtGoalTolerance = m_fGoalDistance + 64.0f;
+		GetPath()->m_fAtGoalTolerance = m_fGoalDistance + GetEntityBoundingRadius(m_pOuter) * 4.5f;
 
  	GetPath()->m_bSuccess = true;
 
@@ -639,10 +640,23 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 				continue;
 		}
 
+		// If specified, don't avoid enemies
 		if( !GetPath()->m_bAvoidEnemies )
 		{
 			if( m_pOuter->IRelationType( pEnt ) == D_HT )
 				continue;
+		}
+
+		// Ignore units of who this unit is the follow target
+		// Otherwise we might move out of the way!
+		if( pEnt->MyUnitPointer() )
+		{
+			UnitBaseNavigator *pNavigator = pEnt->MyUnitPointer()->GetNavigator();
+			if( pNavigator )
+			{
+				if( pNavigator->GetPath()->m_iGoalType == GOALTYPE_TARGETENT && pNavigator->GetPath()->m_hTarget == m_pOuter )
+					continue;
+			}
 		}
 
 		// Store general info
@@ -1142,15 +1156,17 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			return CHS_FAILED;
 		}
 
-		// Check if the target ent moved into another area. In that case recalculate.
+		// Check if the target ent moved into another area. In that case recalculate the path.
 		// In the other case just update the goal pos (quick).
-		CNavArea *pTargetArea, *pGoalArea;
+		// Note that after a path recomputation, we won't try to recompute the path for a while anymore (performance)
 		const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition();
 
 		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 8.0f )
 		{
-			pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
-			pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos, true, 256.0f, false, false );
+			CNavArea *pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
+			CNavArea *pGoalArea = TheNavMesh->GetNavAreaByID( m_iLastTargetArea );
+			if( !pGoalArea )
+				pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos, true, 256.0f, false, false );
 
 			if( pTargetArea && pGoalArea && pTargetArea != pGoalArea )
 			{
@@ -1164,6 +1180,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					DoFindPathToPosInRange();
 				else
 					DoFindPathToPos();
+
+				// Store area id of the goal for the next time we check
+				m_iLastTargetArea = pGoalArea->GetID();
 			}
 			else
 			{
@@ -2341,6 +2360,9 @@ bool UnitBaseNavigator::DoFindPathToPos( UnitBasePath *pPath )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::DoFindPathToPos", VPROF_BUDGETGROUP_UNITS );
 
+	// Used for throttling too many path recomputations by this navigator
+	m_fLastPathRecomputation = gpGlobals->curtime;
+
 	m_iCurPathRecomputations++;
 
 	pPath->SetWaypoint(NULL);
@@ -2706,12 +2728,15 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 {
 	UnitBaseWaypoint *waypoints;
 
-	// Special case
+	// Special case: build a direct path
 	if( pPath->m_iGoalFlags & GF_DIRECTPATH )
 	{
 		return new UnitBaseWaypoint( pPath->m_vGoalPos );
 	}
 
+	// In some cases, units should arrive from a specific side
+	// In this case add an extra waypoint at the "entrance", which can't
+	// be skipped by the unit
 	IUnit *pUnit = pPath->m_hTarget ? pPath->m_hTarget->GetIUnit() : NULL;
 	if( pUnit && pUnit->HasEnterOffset() )
 	{
@@ -2756,7 +2781,7 @@ void UnitBaseNavigator::SetPath( boost::python::object path )
 	if( path.ptr() == Py_None )
 	{
 		// Install the default path object
-		m_refPath = SrcPySystem()->RunT<boost::python::object>( SrcPySystem()->Get("UnitBasePath", unit_helper), boost::python::object() );
+		m_refPath = unit_helper.attr("UnitBasePath")();
 		m_pPath = boost::python::extract<UnitBasePath *>(m_refPath);
 		m_pPath->m_vGoalPos = GetAbsOrigin();
 		return;
