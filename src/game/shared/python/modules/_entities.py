@@ -1,5 +1,5 @@
 # Module still needs a lot of cleaning up
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -10,7 +10,7 @@ from pygccxml.declarations import matchers
 from pyplusplus import code_creators
 from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 
-class Entities(GenerateModuleSemiShared):
+class Entities(SemiSharedModuleGenerator):
     module_name = '_entities'
     split = True
     
@@ -89,7 +89,7 @@ class Entities(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
         
@@ -359,7 +359,7 @@ class Entities(GenerateModuleSemiShared):
 
     
     def ParseBaseEntity(self, mb):
-        cls = mb.class_('C_BaseEntity') if self.isClient else mb.class_('CBaseEntity')
+        cls = mb.class_('C_BaseEntity') if self.isclient else mb.class_('CBaseEntity')
     
         # Free Send Properties
         count = 4
@@ -413,7 +413,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('PySetLifeState').exclude() # Use property
         mb.mem_funs('PyGetTakeDamage').exclude() # Use property
         mb.mem_funs('PySetTakeDamage').exclude() # Use property
-        if self.isServer:
+        if self.isserver:
             mb.mem_funs('SetMaxHealth').exclude() # Use property
         
         #mb.mem_funs('GetParametersForSound').exclude()  # Don't care for now
@@ -435,7 +435,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('SetTextureFrameIndex').exclude() # Don't care
         
         mb.mem_funs('GetParentToWorldTransform').exclude() # Problem with argument/return type
-        if self.isClient: mb.mem_funs('BuildJiggleTransformations').exclude() # No declaration
+        if self.isclient: mb.mem_funs('BuildJiggleTransformations').exclude() # No declaration
         
         # Use isclient/isserver globals/builtins
         mb.mem_funs('IsServer').exclude() 
@@ -526,7 +526,7 @@ class Entities(GenerateModuleSemiShared):
         physicsobject = mb.class_('IPhysicsObject')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(physicsobject))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
-        if self.isClient:
+        if self.isclient:
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE
             # Client Simulation functions
             mb.mem_funs('ClientThink').virtuality = 'virtual'
@@ -869,7 +869,7 @@ class Entities(GenerateModuleSemiShared):
             mb.vars( 'm_nForceBone' ).exclude()
 
     def ParseBaseAnimating(self, mb):
-        cls = mb.class_('C_BaseAnimating') if self.isClient else mb.class_('CBaseAnimating')
+        cls = mb.class_('C_BaseAnimating') if self.isclient else mb.class_('CBaseAnimating')
     
         # Transformations
         mb.mem_funs( 'GetPoseParameterRange' ).add_transformation( FT.output('minValue'), FT.output('maxValue') )
@@ -880,7 +880,7 @@ class Entities(GenerateModuleSemiShared):
         # C_BaseAnimatingOverlay    
         mb.mem_funs('GetAnimOverlay').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
     
-        if self.isClient:
+        if self.isclient:
             mb.vars('m_nSkin').rename('skin')
             mb.vars('m_nSkin').exclude() # Use property
             
@@ -959,7 +959,7 @@ class Entities(GenerateModuleSemiShared):
             mb.enums('LocalFlexController_t').include()
         
     def ParseBaseCombatCharacter(self, mb):
-        cls = mb.class_('C_BaseCombatCharacter') if self.isClient else mb.class_('CBaseCombatCharacter')
+        cls = mb.class_('C_BaseCombatCharacter') if self.isclient else mb.class_('CBaseCombatCharacter')
         
         # call policies    
         mb.mem_funs('Weapon_OwnsThisType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -979,7 +979,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('OnNavAreaChanged').exclude()
         mb.mem_funs('OnNavAreaRemoved').exclude()
         
-        if self.isClient:
+        if self.isclient:
             mb.mem_funs('GetWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.add_property( 'activeweapon'
                              , cls.member_function( 'GetActiveWeapon' ) )
@@ -1030,7 +1030,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('Event_KilledOther').virtuality = 'virtual'
             
     def ParseBasePlayer(self, mb):
-        cls = mb.class_('C_BasePlayer') if self.isClient else mb.class_('CBasePlayer')
+        cls = mb.class_('C_BasePlayer') if self.isclient else mb.class_('CBasePlayer')
         cls.calldefs().virtuality = 'not virtual'   
         mb.vars('m_nButtons').include()
         mb.vars('m_nButtons').rename('buttons')
@@ -1040,7 +1040,7 @@ class Entities(GenerateModuleSemiShared):
         mb.vars('m_afButtonPressed').rename('buttonspressed')
         mb.vars('m_afButtonReleased').include()
         mb.vars('m_afButtonReleased').rename('buttonsreleased')
-        if self.isClient:
+        if self.isclient:
             mb.mem_funs('GetRenderedWeaponModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetRepresentativeRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
@@ -1138,7 +1138,7 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_funs().virtuality = 'not virtual' 
 
     def ParseHL2WarsPlayer(self, mb):
-        cls = mb.class_('C_HL2WarsPlayer') if self.isClient else mb.class_('CHL2WarsPlayer')
+        cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
         #cls.calldefs().virtuality = 'not virtual'  
 
         cls.mem_funs('GetUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1153,7 +1153,7 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_funs('OnRightMouseButtonDoublePressed').virtuality = 'virtual'
         cls.mem_funs('OnRightMouseButtonReleased').virtuality = 'virtual'
     
-        if self.isClient:
+        if self.isclient:
             mb.mem_funs('GetLocalHL2WarsPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetSelectedUnitTypeRange').add_transformation( FT.output('iMin'), FT.output('iMax') )
             
@@ -1194,7 +1194,7 @@ class Entities(GenerateModuleSemiShared):
         AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnClick' in decl.name ), [CreateEntityArg('player')] )
         AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnCursor' in decl.name ), [CreateEntityArg('player')] )
         
-        if self.isClient:
+        if self.isclient:
             cls.mem_funs('OnInSelectionBox').virtuality = 'virtual'
             cls.mem_funs('OnOutSelectionBox').virtuality = 'virtual'
             
@@ -1210,7 +1210,7 @@ class Entities(GenerateModuleSemiShared):
         cls.mem_fun('GetAttackPriority').exclude()
         cls.mem_fun('SetAttackPriority').exclude()
         
-        if self.isClient:
+        if self.isclient:
             self.AddProperty(cls, 'energy', 'GetEnergy')
             self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
         else:
@@ -1219,7 +1219,7 @@ class Entities(GenerateModuleSemiShared):
         self.AddProperty(cls, 'kills', 'GetKills', 'SetKills')
         
     def ParseUnitBase(self, mb):
-        cls_name = 'C_UnitBase' if self.isClient else 'CUnitBase'
+        cls_name = 'C_UnitBase' if self.isclient else 'CUnitBase'
         cls = mb.class_(cls_name)
         #mb.vars('g_playerrelationships').include()
         mb.free_function('SetPlayerRelationShip').include()
@@ -1242,7 +1242,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('UserCmd').virtuality = 'virtual'
         mb.mem_funs('OnButtonsChanged').virtuality = 'virtual'
         mb.mem_funs('CustomCanBeSeen').virtuality = 'virtual'
-        if self.isClient:
+        if self.isclient:
             mb.mem_funs('OnHoverPaint').virtuality = 'virtual'
             mb.mem_funs('GetCursor').virtuality = 'virtual'
 
@@ -1279,7 +1279,7 @@ class Entities(GenerateModuleSemiShared):
         
         cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetEnemy').exclude() 
-        if self.isClient:
+        if self.isclient:
             mb.vars('m_iMaxHealth').rename('maxhealth')
             cls.add_property( 'enemy'
                              , cls.mem_fun('GetEnemy'))
@@ -1341,20 +1341,20 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('OnLostFullHealth').virtuality = 'virtual'
             
         # CFuncUnit
-        cls_name = 'CFuncUnit' if self.isServer else 'C_FuncUnit'
+        cls_name = 'CFuncUnit' if self.isserver else 'C_FuncUnit'
         cls = mb.class_(cls_name)
         cls.no_init = False
         self.ParseUnitBaseShared(mb, cls_name)
-        if self.isClient:
+        if self.isclient:
             cls.vars('m_iMaxHealth').rename('maxhealth')
             
     def ParseTriggers(self, mb):
         # CBaseTrigger
-        cls_name = 'C_BaseTrigger' if self.isClient else 'CBaseTrigger'
+        cls_name = 'C_BaseTrigger' if self.isclient else 'CBaseTrigger'
         cls = mb.class_(cls_name)
         cls.no_init = False
         
-        if self.isServer:
+        if self.isserver:
             cls.mem_funs('GetTouchingEntities').exclude()
             cls.mem_funs('GetClientSidePredicted').exclude() 
             cls.mem_funs('SetClientSidePredicted').exclude() 
@@ -1365,7 +1365,7 @@ class Entities(GenerateModuleSemiShared):
             cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
 
         # CTriggerMultiple
-        if self.isServer:
+        if self.isserver:
             cls = mb.class_('CTriggerMultiple')
             mb.class_('CTriggerMultiple').no_init = False
             mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1389,8 +1389,8 @@ class Entities(GenerateModuleSemiShared):
                 )
 
     def ParseBaseCombatWeapon(self, mb):
-        cls_name = 'C_BaseCombatWeapon' if self.isClient else 'CBaseCombatWeapon'
-        cls_name2 = 'C_WarsWeapon' if self.isClient else 'CWarsWeapon'
+        cls_name = 'C_BaseCombatWeapon' if self.isclient else 'CBaseCombatWeapon'
+        cls_name2 = 'C_WarsWeapon' if self.isclient else 'CWarsWeapon'
         all_cls = [cls_name, cls_name2]
         cls = mb.class_(cls_name)
         
@@ -1417,7 +1417,7 @@ class Entities(GenerateModuleSemiShared):
 
         mb.mem_funs('GetLastWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
-        if self.isServer:
+        if self.isserver:
             mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
             mb.mem_funs('IsInBadPosition').exclude() # Declaration only...
             if settings.ASW_CODE_BASE:
@@ -1460,14 +1460,14 @@ class Entities(GenerateModuleSemiShared):
         mb.vars('m_nViewModelIndex').rename('viewmodelindex')
         
         for cls_name3 in all_cls:
-            AddNetworkVarProperty( mb, 'nextprimaryattack', 'm_flNextPrimaryAttack', 'float', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'timeweaponidle', 'm_flTimeWeaponIdle', 'float', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'state', 'm_iState', 'int', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'primaryammotype', 'm_iPrimaryAmmoType', 'int', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'secondaryammotype', 'm_iSecondaryAmmoType', 'int', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'clip1', 'm_iClip1', 'int', cls_name3, self.isClient )
-            AddNetworkVarProperty( mb, 'clip2', 'm_iClip2', 'int', cls_name3, self.isClient )
+            AddNetworkVarProperty( mb, 'nextprimaryattack', 'm_flNextPrimaryAttack', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'timeweaponidle', 'm_flTimeWeaponIdle', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'state', 'm_iState', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'primaryammotype', 'm_iPrimaryAmmoType', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'secondaryammotype', 'm_iSecondaryAmmoType', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'clip1', 'm_iClip1', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'clip2', 'm_iClip2', 'int', cls_name3, self.isclient )
             
         cls.var('m_flNextPrimaryAttack').exclude()
         cls.var('m_flTimeWeaponIdle').exclude()
@@ -1485,7 +1485,7 @@ class Entities(GenerateModuleSemiShared):
         # Wars Weapon
         cls = mb.class_(cls_name2)
         cls.mem_funs('GetCommander').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        if self.isClient:
+        if self.isclient:
             cls.mem_funs('GetPredictionOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             cls.mem_funs('GetMuzzleAttachEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             
@@ -1507,7 +1507,7 @@ class Entities(GenerateModuleSemiShared):
         #cls.mem_fun('GetMinRestTime').exclude()
         #cls.mem_fun('GetMaxRestTime').exclude()
         
-        if self.isClient:
+        if self.isclient:
             cls.vars('m_vTracerColor').rename('tracercolor')
         
         cls.mem_funs('GetPrimaryAttackActivity').exclude()
@@ -1522,7 +1522,7 @@ class Entities(GenerateModuleSemiShared):
                          , cls.member_function( 'SetSecondaryAttackActivity' ) )
                          
     def ParseProps(self, mb):
-        if self.isServer:
+        if self.isserver:
             cls = mb.class_('CBreakableProp')
             cls.mem_funs('GetRootPhysicsObjectForBreak').exclude()
             
@@ -1537,7 +1537,7 @@ class Entities(GenerateModuleSemiShared):
     def ParseRemainingEntities(self, mb):
         # CBaseFlex
         mb.mem_funs( lambda decl: HasArgType(decl, 'CChoreoScene') ).exclude() 
-        if self.isServer:
+        if self.isserver:
             mb.mem_funs('FlexSettingLessFunc').exclude()
             mb.class_('CBaseFlex').class_('FS_LocalToGlobal_t').exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'AI_Response') ).exclude() 
@@ -1548,7 +1548,7 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('FindSceneFile').exclude() # Don't care
     
         # CBaseGrenade
-        cls_name = 'C_BaseGrenade' if self.isClient else 'CBaseGrenade'
+        cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
         cls = mb.class_(cls_name)
         
         # call policies
@@ -1580,7 +1580,7 @@ class Entities(GenerateModuleSemiShared):
         mb.mem_funs('GetStartEntityPtr').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('RandomTargetname').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
-        if self.isServer:
+        if self.isserver:
             # Not sure where to put this
             mb.free_function('DoSpark').include()
         
@@ -1735,13 +1735,13 @@ class Entities(GenerateModuleSemiShared):
             mb.mem_funs('GlowBlend').exclude()
             
         # Map boundary
-        cls_name = 'C_BaseFuncMapBoundary' if self.isClient else 'CBaseFuncMapBoundary'
+        cls_name = 'C_BaseFuncMapBoundary' if self.isclient else 'CBaseFuncMapBoundary'
         cls = mb.class_(cls_name)
         cls.vars('m_pNext').exclude()
         mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
     def ParseEntities(self, mb):
-        if self.isClient:
+        if self.isclient:
             self.ParseClientEntities(mb)
         else:
             self.ParseServerEntities(mb)
@@ -1802,7 +1802,7 @@ class Entities(GenerateModuleSemiShared):
         #mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
         # Protected functions we do want:
-        if self.isServer:
+        if self.isserver:
             mb.mem_funs('TraceAttack').include()
             mb.mem_funs('PassesFilterImpl').include()
             mb.mem_funs('PassesDamageFilterImpl').include()

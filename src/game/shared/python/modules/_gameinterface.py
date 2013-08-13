@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared, registered_modules
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -7,7 +7,7 @@ from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
 
-class GameInterface(GenerateModuleSemiShared):
+class GameInterface(SemiSharedModuleGenerator):
     module_name = '_gameinterface'
     
     if settings.ASW_CODE_BASE:
@@ -74,7 +74,7 @@ class GameInterface(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
@@ -102,7 +102,7 @@ class GameInterface(GenerateModuleSemiShared):
         mb.free_function('GetLevelName').include()    
         
         # Downloadables
-        if self.isServer:
+        if self.isserver:
             mb.free_function('AddToDownloadables').include()
         
         # Time
@@ -214,14 +214,14 @@ class GameInterface(GenerateModuleSemiShared):
         cls.mem_funs().virtuality = 'not virtual' 
         
         # Sending messages
-        if self.isServer:
+        if self.isserver:
             mb.free_functions('PySendUserMessage').include()
             mb.free_functions('PySendUserMessage').rename('SendUserMessage')
             
         # filters
         mb.class_('IRecipientFilter').include()
         mb.class_('IRecipientFilter').mem_funs().virtuality = 'not virtual' 
-        if self.isServer:
+        if self.isserver:
             mb.class_('CRecipientFilter').include()
             mb.class_('CRecipientFilter').mem_funs().virtuality = 'not virtual' 
         else:
@@ -251,7 +251,7 @@ class GameInterface(GenerateModuleSemiShared):
         mb.class_('PyGameEvent').mem_fun('Init').exclude()
         mb.class_('PyGameEvent').mem_fun('GetEvent').exclude()
         
-        if self.isServer:
+        if self.isserver:
             mb.free_function('PyFireGameEvent').include()
             mb.free_function('PyFireGameEvent').rename('FireGameEvent')
         else:
@@ -304,12 +304,12 @@ class GameInterface(GenerateModuleSemiShared):
         cls.mem_funs().virtuality = 'not virtual' 
         #cls.mem_funs('IsPerFrame').virtuality = 'virtual' 
         #cls.mem_funs('SafeRemoveIfDesired').virtuality = 'virtual' 
-        if self.isServer:
+        if self.isserver:
             cls.mem_funs('RunCommandPlayer').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
             cls.mem_funs('RunCommandUserCmd').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
             
         # Engine
-        if self.isServer:
+        if self.isserver:
             cls = mb.class_('PyVEngineServer')
             cls.rename('VEngineServer')
             cls.include()
@@ -320,7 +320,7 @@ class GameInterface(GenerateModuleSemiShared):
             cls.mem_funs('LoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.add_registration_code( "bp::scope().attr( \"engine\" ) = boost::ref(pyengine);" )   
 
-        if self.isServer:
+        if self.isserver:
             # CSteamID
             # On the client this is defined in a seperate module isteam, but server only needs this one
             mb.class_('CSteamID').include()
@@ -355,7 +355,7 @@ class GameInterface(GenerateModuleSemiShared):
         cls.mem_funs('FindOrLoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.add_registration_code( "bp::scope().attr( \"modelinfo\" ) = boost::ref(pymodelinfo);" )   
         
-        if self.isServer:
+        if self.isserver:
             mb.free_function('PyMapEntity_ParseAllEntities').include()
             mb.free_function('PyMapEntity_ParseAllEntities').rename('MapEntity_ParseAllEntities')
             
@@ -421,7 +421,7 @@ class GameInterface(GenerateModuleSemiShared):
         mb.add_registration_code( "bp::scope().attr( \"FCVAR_CLIENTCMD_CAN_EXECUTE\" ) = (int)FCVAR_CLIENTCMD_CAN_EXECUTE;" )
         
         # Excludes
-        if self.isServer:
+        if self.isserver:
             mb.mem_funs( lambda decl: HasArgType(decl, 'CTeam') ).exclude()
             
     def AddAdditionalCode(self, mb):

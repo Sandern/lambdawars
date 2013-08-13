@@ -1,0 +1,1 @@
+GCCXML_FLAGS=-iwrapper"../../srcpypp/Support/GCC/4.6" -include "../../srcpypp/Support/GCC/4.6/gccxml_builtins.h"

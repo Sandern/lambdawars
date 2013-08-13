@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
@@ -8,7 +8,7 @@ from src_helper import *
 
 import settings
 
-class GameRules(GenerateModuleSemiShared):
+class GameRules(SemiSharedModuleGenerator):
     module_name = '_gamerules'
     
     if settings.ASW_CODE_BASE:
@@ -38,7 +38,7 @@ class GameRules(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
@@ -46,7 +46,7 @@ class GameRules(GenerateModuleSemiShared):
         # Exclude everything by default
         mb.decls().exclude()
         
-        cls_name = 'CHL2WarsGameRules' if self.isServer else 'C_HL2WarsGameRules'
+        cls_name = 'CHL2WarsGameRules' if self.isserver else 'C_HL2WarsGameRules'
         cls = mb.class_(cls_name)
         cls.include()
         
@@ -54,7 +54,7 @@ class GameRules(GenerateModuleSemiShared):
         cls.mem_fun('GetAmmoDamage').virtuality = 'not virtual' # Just modify the ammo table when needed...
 
         # Gamerules class
-        if self.isServer:
+        if self.isserver:
             cls.mem_fun('GetIntermissionEndTime').exclude()
             cls.mem_fun('SetintermissionEndTime').exclude()
             cls.mem_fun('GetGameOver').exclude()

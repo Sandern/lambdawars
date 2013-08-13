@@ -1,11 +1,11 @@
-from generate_mods_helper import GenerateModuleClient
+from srcpy.module_generators import ClientModuleGenerator
 import settings
 
 from pyplusplus import function_transformers as FT
 from src_helper import DisableKnownWarnings, HasArgType
 from pyplusplus.module_builder import call_policies
 
-class ISteam(GenerateModuleClient):
+class ISteam(ClientModuleGenerator):
     module_name = 'isteam'
     
     files = [

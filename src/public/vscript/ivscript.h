@@ -189,7 +189,7 @@ DECLARE_DEDUCE_FIELDTYPE( FIELD_VARIANT,	ScriptVariant_t );
 template <typename T>
 inline const char * ScriptFieldTypeName() 
 {
-	T::using_unknown_script_type(); 
+	return T::using_unknown_script_type(); 
 }
 
 #define DECLARE_NAMED_FIELDTYPE( fieldType, strName ) template <> inline const char * ScriptFieldTypeName<fieldType>() { return strName; }

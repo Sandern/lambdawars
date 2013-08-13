@@ -1,9 +1,9 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 import settings
 #from src_helper import *
 
-class MatchMaking(GenerateModuleSemiShared):
+class MatchMaking(SemiSharedModuleGenerator):
     module_name = 'matchmaking'
     
     if settings.ASW_CODE_BASE:
@@ -24,7 +24,7 @@ class MatchMaking(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.files
         

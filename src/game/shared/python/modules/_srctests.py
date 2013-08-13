@@ -1,11 +1,11 @@
-from generate_mods_helper import GenerateModuleSemiShared, registered_modules
+from srcpy.module_generators import SemiSharedModuleGenerator
 
 from pyplusplus.module_builder import call_policies
 
 from src_helper import *
 import settings
 
-class _SrcTests(GenerateModuleSemiShared):
+class _SrcTests(SemiSharedModuleGenerator):
     module_name = '_srctests'
     
     if settings.ASW_CODE_BASE:
@@ -29,7 +29,7 @@ class _SrcTests(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files
         

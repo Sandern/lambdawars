@@ -1,8 +1,8 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 import settings
 
-class FOW(GenerateModuleSemiShared):
+class FOW(SemiSharedModuleGenerator):
     module_name = '_fow'
     
     if settings.ASW_CODE_BASE:
@@ -21,7 +21,7 @@ class FOW(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.files
         
@@ -46,9 +46,9 @@ class FOW(GenerateModuleSemiShared):
         cls.mem_fun('GetHeightAtTile').include()
         cls.mem_fun('GetHeightAtPoint').include()
         
-        if self.isServer:
+        if self.isserver:
             cls.mem_fun('PointInFOW').include()
-        if self.isClient:
+        if self.isclient:
             cls.mem_fun('ResetExplored').include()
                 
         mb.free_function('FogOfWarMgr').include()

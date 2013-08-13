@@ -1,10 +1,10 @@
-from generate_mods_helper import GenerateModuleSemiShared, registered_modules
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
 from pyplusplus.module_builder import call_policies
 
-class UnitHelper(GenerateModuleSemiShared):
+class UnitHelper(SemiSharedModuleGenerator):
     module_name = 'unit_helper'
     
     if settings.ASW_CODE_BASE:
@@ -44,7 +44,7 @@ class UnitHelper(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files
         
@@ -336,9 +336,9 @@ class UnitHelper(GenerateModuleSemiShared):
         cls.include()
         
     def AddMisc(self, mb):
-        if self.isServer:
+        if self.isserver:
             mb.free_function('VecCheckThrowTolerance').include()
-            #if self.isClient:
+            #if self.isclient:
             #    mb.free_function('DrawHealthBar').include()
         
         '''cls = mb.class_('GroupMoveOrder')
@@ -358,7 +358,7 @@ class UnitHelper(GenerateModuleSemiShared):
         self.AddUnitComponent(mb)
         self.AddLocomotion(mb)
         self.AddAnimState(mb)
-        if self.isServer:
+        if self.isserver:
             self.AddNavigator(mb)
             self.AddIntention(mb)
             self.AddSense(mb)

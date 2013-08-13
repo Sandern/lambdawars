@@ -1,8 +1,8 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 
 from pygccxml.declarations import matchers
 
-class VProf(GenerateModuleSemiShared):
+class VProf(SemiSharedModuleGenerator):
     module_name = 'vprof'
     
     files = [

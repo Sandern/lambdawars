@@ -1,10 +1,10 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 import settings
 
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 
-class Materials(GenerateModuleSemiShared):
+class Materials(SemiSharedModuleGenerator):
     module_name = 'materials'
     
     if settings.ASW_CODE_BASE:
@@ -28,7 +28,7 @@ class Materials(GenerateModuleSemiShared):
         #'avi/ibik.h',
     ]
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files  + ['glow_outline_effect.h']
         return self.server_files + self.files
         
@@ -46,7 +46,7 @@ class Materials(GenerateModuleSemiShared):
         mb.global_ns.mem_opers().exclude() # Fuck them for now
         mb.global_ns.casting_operators().exclude()
 
-        # if self.isClient:
+        # if self.isclient:
             # cls = mb.class_('IAppSystem')
             # cls.mem_funs().virtuality = 'not virtual'
             
@@ -61,7 +61,7 @@ class Materials(GenerateModuleSemiShared):
             # cls.add_registration_code( ";}\r\nbp::scope().attr( \"bik\" ) = boost::ref(bik);{", False )
             # #mb.add_registration_code( "bp::scope().attr( \"bik\" ) = boost::ref(bik);" )
             
-        if self.isClient:
+        if self.isclient:
             cls = mb.class_('CGlowObjectManager')
             cls.include()
             cls.mem_funs().virtuality = 'not virtual'

@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleClient
+from srcpy.module_generators import ClientModuleGenerator
 from src_helper import *
 import settings
 
@@ -7,7 +7,7 @@ from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
 from pygccxml.declarations import matchers
 
-class Input(GenerateModuleClient):
+class Input(ClientModuleGenerator):
     module_name = '_input'
 
     if settings.ASW_CODE_BASE:

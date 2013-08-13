@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModulePureShared
+from srcpy.module_generators import SharedModuleGenerator
 from src_helper import *
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
@@ -7,7 +7,7 @@ from pygccxml.declarations import matchers
 
 import settings
 
-class VMath(GenerateModulePureShared):
+class VMath(SharedModuleGenerator):
     module_name = '_vmath'
     
     files = [

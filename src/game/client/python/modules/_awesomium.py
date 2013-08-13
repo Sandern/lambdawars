@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleClient
+from srcpy.module_generators import ClientModuleGenerator
 from src_helper import *
 import settings
 
@@ -7,7 +7,7 @@ from pygccxml.declarations import matchers
 from pyplusplus.module_builder import call_policies
 from pyplusplus import code_creators
 
-class Awesomium(GenerateModuleClient):
+class Awesomium(ClientModuleGenerator):
     module_name = '_awesomium'
     
     if settings.ASW_CODE_BASE:

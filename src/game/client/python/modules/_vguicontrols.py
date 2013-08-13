@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleClient
+from srcpy.module_generators import ClientModuleGenerator
 from src_helper import *
 import settings
 
@@ -10,7 +10,7 @@ from pyplusplus.module_builder import call_policies
 #novguilib = False #settings.ASW_CODE_BASE 
 novguilib = settings.ASW_CODE_BASE 
 
-class VGUIControls(GenerateModuleClient):
+class VGUIControls(ClientModuleGenerator):
     module_name = '_vguicontrols'
     split = True
     

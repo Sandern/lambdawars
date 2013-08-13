@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import DisableKnownWarnings
 import settings
 
@@ -6,7 +6,7 @@ from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 from pyplusplus import messages
 
-class NDebugOverlay(GenerateModuleSemiShared):
+class NDebugOverlay(SemiSharedModuleGenerator):
     module_name = '_ndebugoverlay'
     
     if settings.ASW_CODE_BASE:
@@ -25,7 +25,7 @@ class NDebugOverlay(GenerateModuleSemiShared):
         'debugoverlay_shared.h'
     ]
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.files 
 

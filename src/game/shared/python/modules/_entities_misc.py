@@ -1,11 +1,11 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 from src_helper import *
 from pyplusplus import code_creators
 import settings
 
-class EntitiesMisc(GenerateModuleSemiShared):
+class EntitiesMisc(SemiSharedModuleGenerator):
     module_name = '_entities_misc'
     
     files = [
@@ -73,7 +73,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         server_files.append('ai_speech.h')
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
         
@@ -320,7 +320,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         
             
     def ParseMisc(self, mb):
-        if self.isServer:
+        if self.isserver:
             # Sky camera
             mb.free_function('GetCurrentSkyCamera').include()
             mb.free_function('GetCurrentSkyCamera').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -341,7 +341,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
                          , mb.class_('MouseTraceData_t').member_function( 'GetEnt' )
                          , mb.class_('MouseTraceData_t').member_function( 'SetEnt' ) )
                          
-        if self.isClient:
+        if self.isclient:
             mb.class_('MouseTraceData_t').vars('m_iX').rename('x')
             mb.class_('MouseTraceData_t').vars('m_iY').rename('y')  
             
@@ -389,7 +389,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         cls = mb.class_('CShotManipulator')
         cls.include()
         
-        if self.isServer:
+        if self.isserver:
             # //--------------------------------------------------------------------------------------------------------------------------------
             # Bone follower
             cls = mb.class_('pyphysfollower_t')
@@ -440,7 +440,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         mb.free_functions('PrecacheGibsForModel').include()
     
         # Enums
-        if self.isClient:
+        if self.isclient:
             mb.enums('ShadowType_t').include()
             mb.enums('RenderGroup_t').include()
             mb.enums('DataUpdateType_t').include()
@@ -472,7 +472,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         mb.classes('solid_t').include()
         
         # Types/Contants
-        if self.isServer:
+        if self.isserver:
             mb.add_registration_code( "bp::scope().attr( \"SOUND_NONE\" ) = (int)SOUND_NONE;" )
             mb.add_registration_code( "bp::scope().attr( \"SOUND_COMBAT\" ) = (int)SOUND_COMBAT;" )
             mb.add_registration_code( "bp::scope().attr( \"SOUND_WORLD\" ) = (int)SOUND_WORLD;" )
@@ -534,7 +534,7 @@ class EntitiesMisc(GenerateModuleSemiShared):
         # Exclude everything by default
         mb.decls().exclude()        
 
-        if self.isClient:
+        if self.isclient:
             self.ParseClientEntityRelated(mb)
         else:
             self.ParseServerEntityRelated(mb)

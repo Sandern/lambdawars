@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -6,7 +6,7 @@ from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
 
-class Particles(GenerateModuleSemiShared):
+class Particles(SemiSharedModuleGenerator):
     module_name = '_particles'
     
     if settings.ASW_CODE_BASE:
@@ -44,7 +44,7 @@ class Particles(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
@@ -204,12 +204,12 @@ class Particles(GenerateModuleSemiShared):
         mb.free_functions('PyReadParticleConfigFile').rename('ReadParticleConfigFile')
         mb.free_functions('PyDecommitTempMemory').include()
         mb.free_functions('PyDecommitTempMemory').rename('DecommitTempMemory')
-        if self.isClient:
+        if self.isclient:
             self.ParseClient(mb)
 
     #def AddAdditionalCode(self, mb):
         #super(Particles, self).AddAdditionalCode(mb)
-        #if self.isClient:
+        #if self.isclient:
             #header = code_creators.include_t( 'srcpy_particles_converters.h' )
             #mb.code_creator.adopt_include(header)   
     

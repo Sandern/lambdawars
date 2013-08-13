@@ -4,8 +4,6 @@
 
 
 
-#include "boost/python.hpp"
-
 #include "__array_1.pypp.hpp"
 
 #include "__convenience.pypp.hpp"

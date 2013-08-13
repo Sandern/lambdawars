@@ -4,8 +4,6 @@
 
 
 
-#include "boost/python.hpp"
-
 #include "videocfg/videocfg.h"
 
 #include "cbase.h"

@@ -1,10 +1,10 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 import settings
 #from src_helper import *
 
-class NavMesh(GenerateModuleSemiShared):
+class NavMesh(SemiSharedModuleGenerator):
     module_name = '_navmesh'
     
     if settings.ASW_CODE_BASE:
@@ -23,7 +23,7 @@ class NavMesh(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.files
         

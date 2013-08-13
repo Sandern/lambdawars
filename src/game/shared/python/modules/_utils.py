@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared, registered_modules
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -6,7 +6,7 @@ import pygccxml
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 
-class Utils(GenerateModuleSemiShared):
+class Utils(SemiSharedModuleGenerator):
     module_name = '_utils'
     
     if settings.ASW_CODE_BASE:
@@ -50,7 +50,7 @@ class Utils(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
@@ -94,7 +94,7 @@ class Utils(GenerateModuleSemiShared):
             mb.free_functions('UTIL_GetLocalPlayerOrListenServerHost').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
         
         # Helper for message stuff
-        if self.isServer:
+        if self.isserver:
             cls = mb.class_('hudtextparms_s')
             cls.include()
             cls.rename('hudtextparms')
@@ -192,7 +192,6 @@ class Utils(GenerateModuleSemiShared):
             return cls.mem_fun('ShouldHitEntity')
         except pygccxml.declarations.matcher.declaration_not_found_t:
             for b in cls.bases:
-                print b.__dict__
                 ret = self.RecursiveFindDecl(b.related_class, fnname)
                 if ret:
                     return ret
@@ -366,7 +365,7 @@ class Utils(GenerateModuleSemiShared):
         mb.free_function('GetSuppressHost').include()
         mb.free_function('GetSuppressHost').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
-        if self.isServer:
+        if self.isserver:
             self.ParseServer(mb)
         else:
             self.ParseClient(mb)

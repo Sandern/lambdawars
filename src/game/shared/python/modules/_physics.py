@@ -1,11 +1,11 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
 import settings
 
-class Physics(GenerateModuleSemiShared):
+class Physics(SemiSharedModuleGenerator):
     module_name = '_physics'
     
     if settings.ASW_CODE_BASE:
@@ -30,7 +30,7 @@ class Physics(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.files + self.server_files
 
@@ -94,7 +94,7 @@ class Physics(GenerateModuleSemiShared):
         mb.free_function('PyPhysDestroyObject').include()
         mb.free_function('PyPhysDestroyObject').rename('PhysDestroyObject')
         
-        if self.isServer:
+        if self.isserver:
             mb.free_function('PyPhysCallbackImpulse').include()
             mb.free_function('PyPhysCallbackImpulse').rename('PhysCallbackImpulse')
             mb.free_function('PyPhysCallbackSetVelocity').include()
@@ -119,7 +119,7 @@ class Physics(GenerateModuleSemiShared):
         mb.mem_funs('GetBaseMap').exclude()
         mb.mem_funs('GetDataDescMap').exclude()
         #mb.mem_funs('Init').exclude()
-        if self.isClient:
+        if self.isclient:
             mb.mem_funs('GetPredDescMap').exclude()
             mb.vars('m_PredMap').exclude()
             
@@ -142,7 +142,7 @@ class Physics(GenerateModuleSemiShared):
         cls.calldefs().virtuality = 'not virtual' 
         mb.add_registration_code( "bp::scope().attr( \"physprops\" ) = boost::ref(pyphysprops);" )
         
-        if self.isServer:
+        if self.isserver:
             mb.free_function('PyCalculateDefaultPhysicsDamage').include()
             mb.free_function('PyCalculateDefaultPhysicsDamage').rename('CalculateDefaultPhysicsDamage')
             
@@ -153,7 +153,7 @@ class Physics(GenerateModuleSemiShared):
         mb.free_function('PyForcePhysicsSimulate').include()
         mb.free_function('PyForcePhysicsSimulate').rename('ForcePhysicsSimulate')
         
-        if self.isServer:
+        if self.isserver:
             mb.free_function('Physics_RunThinkFunctions').include()
             
     def AddAdditionalCode(self, mb):

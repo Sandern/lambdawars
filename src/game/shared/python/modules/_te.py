@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared, registered_modules
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -6,7 +6,7 @@ from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers
 
-class TE(GenerateModuleSemiShared):
+class TE(SemiSharedModuleGenerator):
     module_name = '_te'
     
     client_files = [
@@ -36,7 +36,7 @@ class TE(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
@@ -244,7 +244,7 @@ class TE(GenerateModuleSemiShared):
 
         mb.add_registration_code( 'bp::scope().attr( "te" ) = boost::ref(te);' )
          
-        if self.isServer:
+        if self.isserver:
             self.ParseServer(mb)
         else:
             self.ParseClient(mb)

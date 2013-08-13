@@ -1,6 +1,6 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 
-class Animation(GenerateModuleSemiShared):
+class Animation(SemiSharedModuleGenerator):
     module_name = '_animation'
     
     files = [

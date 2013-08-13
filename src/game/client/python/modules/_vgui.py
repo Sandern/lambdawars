@@ -1,11 +1,11 @@
-from generate_mods_helper import GenerateModuleClient
+from srcpy.module_generators import ClientModuleGenerator
 import settings
 
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 
-class VGUI(GenerateModuleClient):
+class VGUI(ClientModuleGenerator):
     module_name = '_vgui'
     
     if settings.ASW_CODE_BASE:

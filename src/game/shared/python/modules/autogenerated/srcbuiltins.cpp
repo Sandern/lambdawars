@@ -4,8 +4,6 @@
 
 
 
-#include "boost/python.hpp"
-
 #include "srcpy_srcbuiltins.h"
 
 #include "srcpy.h"
@@ -31,33 +29,33 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyDevMsg
     
-        typedef void ( *SrcPyDevMsg_function_type )( int,char const * );
+        typedef void ( *DevMsg_function_type )( int,char const * );
         
         bp::def( 
-            "SrcPyDevMsg"
-            , SrcPyDevMsg_function_type( &::SrcPyDevMsg )
+            "DevMsg"
+            , DevMsg_function_type( &::SrcPyDevMsg )
             , ( bp::arg("level"), bp::arg("msg") ) );
     
     }
 
     { //::SrcPyMsg
     
-        typedef void ( *SrcPyMsg_function_type )( char const * );
+        typedef void ( *Msg_function_type )( char const * );
         
         bp::def( 
-            "SrcPyMsg"
-            , SrcPyMsg_function_type( &::SrcPyMsg )
+            "Msg"
+            , Msg_function_type( &::SrcPyMsg )
             , ( bp::arg("msg") ) );
     
     }
 
     { //::SrcPyWarning
     
-        typedef void ( *SrcPyWarning_function_type )( char const * );
+        typedef void ( *PrintWarning_function_type )( char const * );
         
         bp::def( 
-            "SrcPyWarning"
-            , SrcPyWarning_function_type( &::SrcPyWarning )
+            "PrintWarning"
+            , PrintWarning_function_type( &::SrcPyWarning )
             , ( bp::arg("msg") ) );
     
     }

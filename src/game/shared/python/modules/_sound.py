@@ -1,4 +1,4 @@
-from generate_mods_helper import GenerateModuleSemiShared
+from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
 import settings
 
@@ -7,7 +7,7 @@ from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
 from pygccxml.declarations import matchers
 
-class Sound(GenerateModuleSemiShared):
+class Sound(SemiSharedModuleGenerator):
     module_name = '_sound'
     
     if settings.ASW_CODE_BASE:
@@ -32,7 +32,7 @@ class Sound(GenerateModuleSemiShared):
     ]
     
     def GetFiles(self):
-        if self.isClient:
+        if self.isclient:
             return self.client_files + self.files 
         return self.server_files + self.files 
 
