@@ -60,6 +60,7 @@ bp::object gamemgr;
 bp::object weakref;
 bp::object srcbuiltins;
 bp::object srcbase;
+bp::object steam;
 bp::object _entities_misc;
 bp::object _entities;
 bp::object unit_helper;
@@ -261,6 +262,7 @@ bool CSrcPython::Init( )
 	Run( "from vmath import *" );
 	
 	types = Import("types");
+	steam = Import("steam");
 	Run( "import sound" ); // Import _sound before _entities_misc (register converters)
 	Run( "import _entities_misc" );
 	_entities_misc = Import("_entities_misc");
@@ -346,6 +348,7 @@ void CSrcPython::ExtraShutdown( void )
 	gamemgr = bp::object();
 	weakref = bp::object();
 	srcbase = bp::object();
+	steam = bp::object();
 	_entities_misc = bp::object();
 	_entities = bp::object();
 	unit_helper = bp::object();

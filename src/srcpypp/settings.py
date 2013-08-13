@@ -47,9 +47,9 @@ modules = [
     ('_animation', 'Animation'),
     ('_te', 'TE'),
     ('_fow', 'FOW'),
+    ('steam', 'Steam'),
     
     # # Client
-    ('isteam', 'ISteam'),
     ('_input', 'Input'),
     ('_vgui', 'VGUI'),
     ('_vguicontrols', 'VGUIControls'),

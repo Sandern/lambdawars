@@ -595,7 +595,7 @@ boost::python::object PyVEngineServer::GetClientSteamID( CBasePlayer *player )
 	const CSteamID *temp = engine->GetClientSteamID(player->edict());
 	if( !temp )
 		return boost::python::object();
-	return boost::python::import("_gameinterface").attr("CSteamID")(temp->ConvertToUint64());
+	return steam.attr("CSteamID")(temp->ConvertToUint64());
 }
 
 #endif // CLIENT_DLL

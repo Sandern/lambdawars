@@ -25,6 +25,7 @@ extern "C" __declspec(dllexport) void initmaterials();
 extern "C" __declspec(dllexport) void init_animation();
 extern "C" __declspec(dllexport) void init_te();
 extern "C" __declspec(dllexport) void init_fow();
+extern "C" __declspec(dllexport) void initsteam();
 extern "C" __declspec(dllexport) void init_gamerules();
 extern "C" __declspec(dllexport) void initunit_helper();
 extern "C" __declspec(dllexport) void init_navmesh();
@@ -47,6 +48,7 @@ extern "C"  void initmaterials();
 extern "C"  void init_animation();
 extern "C"  void init_te();
 extern "C"  void init_fow();
+extern "C"  void initsteam();
 extern "C"  void init_gamerules();
 extern "C"  void initunit_helper();
 extern "C"  void init_navmesh();
@@ -73,6 +75,7 @@ void AppendSharedModules()
 	APPEND_MODULE(_animation)
 	APPEND_MODULE(_te)
 	APPEND_MODULE(_fow)
+	APPEND_MODULE(steam)
 	APPEND_MODULE(_gamerules)
 	APPEND_MODULE(unit_helper)
 	APPEND_MODULE(_navmesh)

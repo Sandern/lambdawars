@@ -319,25 +319,6 @@ class GameInterface(SemiSharedModuleGenerator):
             cls.include()
             cls.mem_funs('LoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.add_registration_code( "bp::scope().attr( \"engine\" ) = boost::ref(pyengine);" )   
-
-        if self.isserver:
-            # CSteamID
-            # On the client this is defined in a seperate module isteam, but server only needs this one
-            mb.class_('CSteamID').include()
-            mb.class_('CSteamID').mem_funs('Render').exclude()
-            
-            mb.class_('CSteamID').calldefs( lambda decl: HasArgType(decl, 'char') ).exclude()
-            mb.class_('CSteamID').mem_funs('SetFromString').exclude()      # No definition...
-            mb.class_('CSteamID').mem_funs('SetFromSteam2String').exclude()      # No definition...
-            mb.class_('CSteamID').mem_funs('BValidExternalSteamID').exclude()      # No definition...
-            
-            mb.enum('EResult').include()
-            mb.enum('EDenyReason').include()
-            mb.enum('EUniverse').include()
-            mb.enum('EAccountType').include()
-            mb.enum('ESteamUserStatType').include()
-            mb.enum('EChatEntryType').include()
-            mb.enum('EChatRoomEnterResponse').include()
         
         # Command line
         if settings.ASW_CODE_BASE:
