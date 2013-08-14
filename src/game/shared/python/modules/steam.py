@@ -1,9 +1,8 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-import settings
 
 from pyplusplus import function_transformers as FT
-from src_helper import DisableKnownWarnings, HasArgType
 from pyplusplus.module_builder import call_policies
+from pygccxml.declarations import matchers, pointer_t, const_t, declarated_t, char_t
 
 class Steam(SemiSharedModuleGenerator):
     module_name = 'steam'
@@ -74,13 +73,15 @@ class Steam(SemiSharedModuleGenerator):
             self.ParseClient(mb)
 
         # CSteamID
-        mb.class_('CSteamID').include()
-        mb.class_('CSteamID').mem_funs('Render').exclude()
-        
-        mb.class_('CSteamID').calldefs( lambda decl: HasArgType(decl, 'char') ).exclude()
-        mb.class_('CSteamID').mem_funs('SetFromString').exclude()      # No definition...
-        mb.class_('CSteamID').mem_funs('SetFromSteam2String').exclude()      # No definition...
-        mb.class_('CSteamID').mem_funs('BValidExternalSteamID').exclude()      # No definition...
+        cls = mb.class_('CSteamID')
+        cls.include()
+        constpchararg = pointer_t(const_t(declarated_t(char_t())))
+        cls.constructors(matchers.calldef_matcher_t(arg_types=[constpchararg, None])).exclude()
+        cls.mem_funs('Render').exclude()
+        cls.mem_funs('SetFromStringStrict').exclude()
+        cls.mem_funs('SetFromString').exclude()      # No definition...
+        cls.mem_funs('SetFromSteam2String').exclude()      # No definition...
+        cls.mem_funs('BValidExternalSteamID').exclude()      # No definition...
         
         mb.enum('EResult').include()
         mb.enum('EDenyReason').include()
