@@ -150,7 +150,7 @@ void CefClientHandler::Destroy()
 {
 	if( GetBrowser() )
 	{
-		GetBrowser()->GetHost()->CloseBrowser( /*true*/ );
+		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
 
 	m_pSrcBrowser = NULL;
@@ -1034,6 +1034,9 @@ void SrcCefBrowser::PySendCallback( bp::object callbackid, bp::list pymethodargs
 }
 #endif // ENABLE_PYTHON
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::Ping()
 {
 	if( !IsValid() )
@@ -1045,4 +1048,34 @@ void SrcCefBrowser::Ping()
 	CefRefPtr<CefListValue> val = CefListValue::Create();
 	args->SetList(0, val);
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::ShowDevTools( ) 
+{
+	std::string devtools_url = GetBrowser()->GetHost()->GetDevToolsURL(true);
+	if (!devtools_url.empty()) 
+	{
+#if 0
+		if (m_bExternalDevTools) 
+		{
+			// Open DevTools in an external browser window.
+			LaunchExternalBrowser(devtools_url);
+		} 
+		else if (m_OpenDevToolsURLs.find(devtools_url) ==
+				m_OpenDevToolsURLs.end()) 
+#endif // 0
+		{
+		// Open DevTools in a popup window.
+		//m_OpenDevToolsURLs.insert(devtools_url);
+		GetBrowser()->GetMainFrame()->ExecuteJavaScript(
+			"window.open('" +  devtools_url + "');", "about:blank", 0);
+		}
+	}
+	else
+	{
+		Warning("SrcCefBrowser::ShowDevTools failed: No remote debugging port specified?\n");
+	}
 }

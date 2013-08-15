@@ -992,7 +992,7 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "CreateFunction"
                 , CreateFunction_function_type( &::SrcCefBrowser::PyCreateFunction )
-                , ( bp::arg("name"), bp::arg("pPyObject")=bp::object(), bp::arg("hascallback")=(bool)(false) ) );
+                , ( bp::arg("name"), bp::arg("object")=bp::object(), bp::arg("hascallback")=(bool)(false) ) );
         
         }
         { //::SrcCefBrowser::PyCreateGlobalObject
@@ -1230,6 +1230,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , SetZPos_function_type(&::SrcCefBrowser::SetZPos)
                 , default_SetZPos_function_type(&SrcCefBrowser_wrapper::default_SetZPos)
                 , ( bp::arg("z") ) );
+        
+        }
+        { //::SrcCefBrowser::ShowDevTools
+        
+            typedef void ( ::SrcCefBrowser::*ShowDevTools_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "ShowDevTools"
+                , ShowDevTools_function_type( &::SrcCefBrowser::ShowDevTools ) );
         
         }
         { //::SrcCefBrowser::StopLoad

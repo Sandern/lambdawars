@@ -79,6 +79,19 @@ class CefRenderHandler : public virtual CefBase {
                               int& screenY) { return false; }
 
   ///
+  // Called to allow the client to fill in the CefScreenInfo object with
+  // appropriate values. Return true if the |screen_info| structure has been
+  // modified.
+  //
+  // If the screen info rectangle is left empty the rectangle from GetViewRect
+  // will be used. If the rectangle is still empty or invalid popups may not be
+  // drawn correctly.
+  ///
+  /*--cef()--*/
+  virtual bool GetScreenInfo(CefRefPtr<CefBrowser> browser,
+                             CefScreenInfo& screen_info) { return false; }
+
+  ///
   // Called when the browser wants to show or hide the popup widget. The popup
   // should be shown if |show| is true and hidden if |show| is false.
   ///
@@ -114,6 +127,12 @@ class CefRenderHandler : public virtual CefBase {
   /*--cef()--*/
   virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
                               CefCursorHandle cursor) {}
+
+  ///
+  // Called when the scroll offset has changed.
+  ///
+  /*--cef()--*/
+  virtual void OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser) {}
 };
 
 #endif  // CEF_INCLUDE_CEF_RENDER_HANDLER_H_

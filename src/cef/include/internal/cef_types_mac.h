@@ -43,18 +43,22 @@
 @class NSCursor;
 @class NSEvent;
 @class NSView;
+@class NSTextInputContext;
 #else
 class NSCursor;
 class NSEvent;
 struct NSView;
+class NSTextInputContext;
 #endif
 #define cef_cursor_handle_t NSCursor*
 #define cef_event_handle_t NSEvent*
 #define cef_window_handle_t NSView*
+#define cef_text_input_context_t NSTextInputContext*
 #else
 #define cef_cursor_handle_t void*
 #define cef_event_handle_t void*
 #define cef_window_handle_t void*
+#define cef_text_input_context_t void*
 #endif
 
 #ifdef __cplusplus
@@ -82,6 +86,14 @@ typedef struct _cef_window_info_t {
 
   // NSView pointer for the parent view.
   cef_window_handle_t parent_view;
+
+  // If window rendering is disabled no browser window will be created. Set
+  // |parent_view| to the window that will act as the parent for popup menus,
+  // dialog boxes, etc.
+  bool window_rendering_disabled;
+
+  // Set to true to enable transparent painting.
+  bool transparent_painting;
 
   // NSView pointer for the new browser view.
   cef_window_handle_t view;

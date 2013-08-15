@@ -479,12 +479,6 @@ typedef struct _cef_browser_settings_t {
   cef_state_t text_area_resize;
 
   ///
-  // Controls whether the fastback (back/forward) page cache will be used. Also
-  // configurable using the "enable-fastback" command-line switch.
-  ///
-  cef_state_t page_cache;
-
-  ///
   // Controls whether the tab key can advance focus to links. Also configurable
   // using the "disable-tab-to-links" command-line switch.
   ///
@@ -528,12 +522,6 @@ typedef struct _cef_browser_settings_t {
   // "disable-accelerated-compositing" command-line switch.
   ///
   cef_state_t accelerated_compositing;
-
-  ///
-  // Controls whether developer tools (WebKit inspector) can be used. Also
-  // configurable using the "disable-developer-tools" command-line switch.
-  ///
-  cef_state_t developer_tools;
 } cef_browser_settings_t;
 
 ///
@@ -759,6 +747,22 @@ enum cef_errorcode_t {
 };
 
 ///
+// "Verb" of a drag-and-drop operation as negotiated between the source and
+// destination. These constants match their equivalents in WebCore's
+// DragActions.h and should not be renumbered.
+///
+enum cef_drag_operations_mask_t {
+    DRAG_OPERATION_NONE    = 0,
+    DRAG_OPERATION_COPY    = 1,
+    DRAG_OPERATION_LINK    = 2,
+    DRAG_OPERATION_GENERIC = 4,
+    DRAG_OPERATION_PRIVATE = 8,
+    DRAG_OPERATION_MOVE    = 16,
+    DRAG_OPERATION_DELETE  = 32,
+    DRAG_OPERATION_EVERY   = UINT_MAX
+};
+
+///
 // V8 access control values.
 ///
 enum cef_v8_accesscontrol_t {
@@ -971,6 +975,62 @@ enum cef_jsdialog_type_t {
   JSDIALOGTYPE_CONFIRM,
   JSDIALOGTYPE_PROMPT,
 };
+
+///
+// Screen information used when window rendering is disabled. This structure is
+// passed as a parameter to CefRenderHandler::GetScreenInfo and should be filled
+// in by the client.
+///
+typedef struct _cef_screen_info_t {
+  ///
+  // Device scale factor. Specifies the ratio between physical and logical
+  // pixels.
+  ///
+  float device_scale_factor;
+
+  ///
+  // The screen depth in bits per pixel.
+  ///
+  int depth;
+
+  ///
+  // The bits per color component. This assumes that the colors are balanced
+  // equally.
+  ///
+  int depth_per_component;
+
+  ///
+  // This can be true for black and white printers.
+  ///
+  bool is_monochrome;
+
+  ///
+  // This is set from the rcMonitor member of MONITORINFOEX, to whit:
+  //   "A RECT structure that specifies the display monitor rectangle,
+  //   expressed in virtual-screen coordinates. Note that if the monitor
+  //   is not the primary display monitor, some of the rectangle's
+  //   coordinates may be negative values."
+  //
+  // The |rect| and |available_rect| properties are used to determine the
+  // available surface for rendering popup views.
+  ///
+  cef_rect_t rect;
+
+  ///
+  // This is set from the rcWork member of MONITORINFOEX, to whit:
+  //   "A RECT structure that specifies the work area rectangle of the
+  //   display monitor that can be used by applications, expressed in
+  //   virtual-screen coordinates. Windows uses this rectangle to
+  //   maximize an application on the monitor. The rest of the area in
+  //   rcMonitor contains system windows such as the task bar and side
+  //   bars. Note that if the monitor is not the primary display monitor,
+  //   some of the rectangle's coordinates may be negative values".
+  //
+  // The |rect| and |available_rect| properties are used to determine the
+  // available surface for rendering popup views.
+  ///
+  cef_rect_t available_rect;
+} cef_screen_info_t;
 
 ///
 // Supported menu IDs. Non-English translations can be provided for the
@@ -1347,9 +1407,7 @@ enum cef_dom_event_category_t {
   DOM_EVENT_CATEGORY_POPSTATE = 0x2000,
   DOM_EVENT_CATEGORY_PROGRESS = 0x4000,
   DOM_EVENT_CATEGORY_XMLHTTPREQUEST_PROGRESS = 0x8000,
-  DOM_EVENT_CATEGORY_WEBKIT_ANIMATION = 0x10000,
-  DOM_EVENT_CATEGORY_WEBKIT_TRANSITION = 0x20000,
-  DOM_EVENT_CATEGORY_BEFORE_LOAD = 0x40000,
+  DOM_EVENT_CATEGORY_BEFORE_LOAD = 0x10000,
 };
 
 ///
@@ -1371,7 +1429,6 @@ enum cef_dom_node_type_t {
   DOM_NODE_TYPE_ATTRIBUTE,
   DOM_NODE_TYPE_TEXT,
   DOM_NODE_TYPE_CDATA_SECTION,
-  DOM_NODE_TYPE_ENTITY_REFERENCE,
   DOM_NODE_TYPE_ENTITY,
   DOM_NODE_TYPE_PROCESSING_INSTRUCTIONS,
   DOM_NODE_TYPE_COMMENT,

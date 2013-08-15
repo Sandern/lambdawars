@@ -74,6 +74,8 @@ public:
 
 	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
+	void ShowDevTools( );
+
 	// Load handler methods
 	virtual void OnLoadStart( CefRefPtr<CefFrame> frame );
 	virtual void OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode );
@@ -114,7 +116,7 @@ public:
 	boost::python::object PyGetMainFrame();
 
 	boost::python::object PyCreateGlobalObject( const char *name );
-	boost::python::object PyCreateFunction( const char *name, PyJSObject *pPyObject = NULL, bool hascallback = false );
+	boost::python::object PyCreateFunction( const char *name, PyJSObject *object = NULL, bool hascallback = false );
 
 	boost::python::object PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
 	void PySendCallback( boost::python::object callbackid, boost::python::list methodargs );

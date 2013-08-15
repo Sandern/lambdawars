@@ -116,10 +116,10 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
-	command_line->AppendSwitch( CefString( "disable-extensions" ) );
+	//command_line->AppendSwitch( CefString( "disable-extensions" ) );
 
-	command_line->AppendSwitch( CefString( "disable-application-cache" ) );
-	command_line->AppendSwitch( CefString( "disable-application-cache" ) );
+	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
+	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
 
 	DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
 }
@@ -144,8 +144,6 @@ bool CCefSystem::Init()
 		return true;
 	}
 
-	DevMsg("Initializing CEF\n");
-
 	// Get path to subprocess browser
 	char browser_subprocess_path[_MAX_PATH];
 	filesystem->RelativePathToFullPath( "bin/cef.exe", "MOD", browser_subprocess_path, _MAX_PATH );
@@ -160,18 +158,24 @@ bool CCefSystem::Init()
 	CefMainArgs main_args( hinst );
 	g_pClientApp = new ClientApp;
 
+	ConVarRef developer("developer");
+
 	// Settings
 	CefSettings settings;
 	settings.single_process = false;
 	settings.multi_threaded_message_loop = false;
-	settings.log_severity = LOGSEVERITY_ERROR_REPORT;
-	settings.command_line_args_disabled = true;
+	settings.log_severity = developer.GetBool() ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DEFAULT;
+	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
 	//settings.pack_loading_disabled = true;
+	settings.remote_debugging_port = 8088;
+	CefString(&settings.cache_path) = CefString( "cache" );
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
 	// Initialize CEF.
 	CefInitialize( main_args, settings, g_pClientApp.get() );
+
+	DevMsg("Initialized CEF\n");
 
 	m_bIsRunning = true;
 
@@ -189,10 +193,6 @@ void CCefSystem::Shutdown()
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 		m_CefBrowsers[i]->Destroy();
 	CefDoMessageLoopWork();
-
-	// Temp fix: Give cef threads some time to shutdown browsers
-	// Otherwise it might crash in case it's still processing an url...
-	//Sleep( 100 );
 
 	// Shut down CEF.
 	CefShutdown();

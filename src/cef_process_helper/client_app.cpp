@@ -130,7 +130,10 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
-	command_line->AppendSwitch( CefString( "disable-extensions" ) );
+	//command_line->AppendSwitch( CefString( "disable-extensions" ) );
+
+	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
+	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
 }
 
 //-----------------------------------------------------------------------------
