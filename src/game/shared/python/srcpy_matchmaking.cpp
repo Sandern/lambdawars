@@ -198,6 +198,11 @@ void PyMKCloseSession()
 	g_pMatchFramework->CloseSession();
 }
 
+bool PyMKIsSessionActive()
+{
+	return g_pMatchFramework->GetMatchSession() != NULL;
+}
+
 //=============================================================================
 // MatchEventsSubscription
 //=============================================================================

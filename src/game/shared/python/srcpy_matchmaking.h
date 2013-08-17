@@ -22,6 +22,7 @@ class IMatchSearchResult;
 void PyMKCreateSession( KeyValues *pSettings );
 void PyMKMatchSession( KeyValues *pSettings );
 void PyMKCloseSession();
+bool PyMKIsSessionActive();
 
 //=============================================================================
 // Search Result

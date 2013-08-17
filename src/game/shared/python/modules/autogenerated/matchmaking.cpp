@@ -210,6 +210,16 @@ BOOST_PYTHON_MODULE(matchmaking){
     
     }
 
+    { //::PyMKIsSessionActive
+    
+        typedef bool ( *IsSessionActive_function_type )(  );
+        
+        bp::def( 
+            "IsSessionActive"
+            , IsSessionActive_function_type( &::PyMKIsSessionActive ) );
+    
+    }
+
     { //::PyMKMatchSession
     
         typedef void ( *MatchSession_function_type )( ::KeyValues * );
@@ -425,6 +435,16 @@ BOOST_PYTHON_MODULE(matchmaking){
             "CreateSession"
             , CreateSession_function_type( &::PyMKCreateSession )
             , ( bp::arg("pSettings") ) );
+    
+    }
+
+    { //::PyMKIsSessionActive
+    
+        typedef bool ( *IsSessionActive_function_type )(  );
+        
+        bp::def( 
+            "IsSessionActive"
+            , IsSessionActive_function_type( &::PyMKIsSessionActive ) );
     
     }
 

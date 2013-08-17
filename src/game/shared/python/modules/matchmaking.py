@@ -39,6 +39,9 @@ class MatchMaking(SemiSharedModuleGenerator):
         mb.free_function('PyMKMatchSession').rename('MatchSession')
         mb.free_function('PyMKCloseSession').include()
         mb.free_function('PyMKCloseSession').rename('CloseSession')
+        mb.free_function('PyMKIsSessionActive').include()
+        mb.free_function('PyMKIsSessionActive').rename('IsSessionActive')
+        
 
         cls = mb.class_('PyMatchEventsSubscription')
         cls.include()
