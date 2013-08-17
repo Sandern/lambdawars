@@ -23,6 +23,10 @@
 	#include "networkstringtable_gamedll.h"
 #endif // CLIENT_DLL
 
+#ifdef WIN32
+#include <winlite.h>
+#endif // WIN32
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -90,13 +94,13 @@ extern void HookPyNetworkCls();
 
 //-----------------------------------------------------------------------------
 // Purpose: Required by boost to be user defined if BOOST_NO_EXCEPTIONS is defined
-//			http://www.boost.org/doc/libs/1_49_0/libs/utility/throw_exception.html
+//			http://www.boost.org/doc/libs/1_54_0/libs/exception/doc/throw_exception.html
 //-----------------------------------------------------------------------------
 namespace boost
 {
 	void throw_exception(std::exception const & e)
 	{
-		Msg("Exception\n");
+		Warning("Boost Python Exception\n");
 
 		FileHandle_t fh = filesystem->Open( "log.txt", "wb" );
 		if ( !fh )
@@ -146,12 +150,71 @@ CSrcPython::CSrcPython()
 
 bool CSrcPython::Init( )
 {
-	const bool bEnabled = !CommandLine() || CommandLine()->FindParm("-disablepython") == 0;
-	//const bool bToolsMode = !CommandLine() || CommandLine()->FindParm("-tools") != 0;
+	return InitInterpreter();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::Shutdown( void )
+{
+	if( !m_bPythonRunning )
+		return;
+
+#ifdef CLIENT_DLL
+	PyShutdownProceduralMaterials();
+#endif // CLIENT_DLL
+
+	PyErr_Clear(); // Make sure it does not hold any references...
+	GarbageCollect();
+}
+
+#ifdef WIN32
+extern "C" {
+	void PyImport_FreeDynLibraries( void );
+}
+#endif // WIN32
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::ExtraShutdown( void )
+{
+	ShutdownInterpreter();
+}
+
+static void VSPTCheckForParm( bp::list argv, const char *pParmToCheck )
+{
+	if( CommandLine()->FindParm( pParmToCheck ) == 0 )
+		return;
+
+	const char *value = CommandLine()->ParmValue( pParmToCheck, (const char *)0 );
+	Msg("VSPT argument %s: %s\n", pParmToCheck, value ? value : "<null>" );
+	argv.append( pParmToCheck );
+	if( value )
+		argv.append( value );
+}
+
+static void VSPTParmRemove( const char *pParmToCheck )
+{
+	if( CommandLine()->FindParm( pParmToCheck ) == 0 )
+		return;
+
+	CommandLine()->RemoveParm( pParmToCheck );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::InitInterpreter( void )
+{
+	const bool bEnabled = CommandLine() && CommandLine()->FindParm("-disablepython") == 0;
+	const bool bRunInterpreter = CommandLine() && CommandLine()->FindParm("-interpreter") != 0;
+	//const bool bToolsMode = CommandLine() && CommandLine()->FindParm("-tools") != 0;
 
 	/*const char *pGameDir = COM_GetModDirectory();
 	const char *pDevModDir = "hl2wars_asw_dev";
-	if( Q_strncmp( pGameDir, pDevModDir, Q_strlen( pDevModDir ) ) != 0 )*/
+	if( V_strncmp( pGameDir, pDevModDir, V_strlen( pDevModDir ) ) != 0 )*/
 	m_bPathProtected = CommandLine() ? CommandLine()->FindParm("-nopathprotection") == 0 : true;
 
 	bool bNoChangeWorkingDirectory = CommandLine() ? CommandLine()->FindParm("-testnochangeworkingdir") != 0 : false;
@@ -199,7 +262,7 @@ bool CSrcPython::Init( )
 #endif // CLIENT_DLL
 	ConColorMsg( g_PythonColor, "Initialized Python... (%f seconds)\n", Plat_FloatTime() - fStartTime );
 	fStartTime = Plat_FloatTime();
-	
+
 	// Save our thread ID
 #ifdef _WIN32
 	g_hPythonThreadID = GetCurrentThreadId();
@@ -288,38 +351,116 @@ bool CSrcPython::Init( )
 #endif // CLIENT_DLL
 	DevMsg( "Initialized Python default modules... (%f seconds)\n", Plat_FloatTime() - fStartTime );
 
+#ifdef WIN32
+	// Support for Visual Studio Python Tools
+	if( bRunInterpreter && CommandLine() )
+	{
+		bool bSuccess = false;
+
+#ifndef CLIENT_DLL
+		engine->ServerCommand("log on");
+		engine->ServerExecute();
+#endif // CLIENT_DLL
+
+		char interpreterFile[MAX_PATH];
+		interpreterFile[0] = 0;
+		const char *pParmInterpreterFile = CommandLine()->ParmValue( "-interpreter" );
+		if( pParmInterpreterFile )
+			V_strncpy( interpreterFile, pParmInterpreterFile, MAX_PATH );
+
+		if( interpreterFile[0] != 0 )
+		{
+			char vtptpath[MAX_PATH];
+			V_strncpy( vtptpath, interpreterFile, MAX_PATH );
+			V_StripFilename( vtptpath );
+			this->SysAppendPath( vtptpath );
+
+			VSPTParmRemove("-insecure");
+			/*VSPTParmRemove("-dev");
+			VSPTParmRemove("-textmode");
+			VSPTParmRemove("-game");
+			VSPTParmRemove("-interpreter");*/
+
+			//bp::list argv = bp::list();
+			//argv.append( interpreterFile );
+
+			/*
+			int n = CommandLine()->ParmCount();
+			for( int i = 1; i < n; i++ )
+			{
+				Msg("VSPT Parm #%d: %s\n", i, CommandLine()->GetParm( i ) );
+				argv.append( CommandLine()->GetParm( i ) );
+			}*/
+
+			// Check "visualstudio_py_repl.py" from visual studio python tools for all arguments
+			//VSPTCheckForParm( argv, "--port" );
+			//VSPTCheckForParm( argv, "--execution_mode" );
+			//VSPTCheckForParm( argv, "--enable-attach" );
+			//VSPTCheckForParm( argv, "--launch_file" );
+
+			bp::str args( CommandLine()->GetCmdLine() );
+
+			try
+			{
+				bp::str remainder( args.split( "-interpreter", 1 )[1] );
+
+				bp::exec( "import shlex", mainnamespace, mainnamespace );
+				bp::object shlex = Import("shlex");
+
+				bp::str newCmd( /*"\"" + bp::str(interpreterFile) + "\" " +*/ remainder );
+				newCmd = newCmd.replace( "\\\"", "\\\\\"" );
+
+				__builtin__.attr("print")( newCmd );
+
+				bp::list argv( shlex.attr("split")( newCmd ) );
+				bp::setattr( sys, bp::object("argv"), argv );
+			}
+			catch( bp::error_already_set & ) 
+			{
+				PyErr_Print();
+			}
+
+			DevMsg("New CommandLine: %s\n", CommandLine()->GetCmdLine() );
+
+			// Change working directory	
+			V_SetCurrentDirectory( vtptpath );
+
+			Msg("Running interpreter file: %s\n", interpreterFile );
+			Run("import encodings.idna");
+			bSuccess = this->ExecuteFile( interpreterFile );
+		}
+
+		// Make sure logs are saved
+#ifndef CLIENT_DLL
+		engine->ServerExecute();
+#endif // CLIENT_DLL
+		filesystem->AsyncFinishAllWrites();
+
+		if( bSuccess )
+		{
+			::TerminateProcess( ::GetCurrentProcess(), 0 );
+		}
+		else
+		{
+			Warning("PySource: Failed to execute interpreter file. Please check log.\n");
+		}
+		return true;
+	}
+#endif // WIN32
+
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CSrcPython::Shutdown( void )
+bool CSrcPython::ShutdownInterpreter( void )
 {
 	if( !m_bPythonRunning )
-		return;
-
-#ifdef CLIENT_DLL
-	PyShutdownProceduralMaterials();
-#endif // CLIENT_DLL
+		return false;
 
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
-}
-
-#ifdef WIN32
-extern "C" {
-	void PyImport_FreeDynLibraries( void );
-}
-#endif // WIN32
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CSrcPython::ExtraShutdown( void )
-{
-	if( !m_bPythonRunning )
-		return;
 
 #ifdef CLIENT_DLL
 	// Part of the main menu is in Python, so all windows must be closed when shutting down Python
@@ -337,11 +478,16 @@ void CSrcPython::ExtraShutdown( void )
 	m_methodTickList.Purge();
 	m_methodPerFrameList.Purge();
 
+	// Disconnect redirecting stdout/stderr
+	sys.attr("stdout") = bp::object();
+	sys.attr("stderr") = bp::object();
+
 	// Clear modules
 	mainmodule = bp::object();
 	mainnamespace = bp::object();
 
 	__builtin__ = bp::object();
+	srcbuiltins = bp::object();
 	sys = bp::object();
 	types = bp::object();
 	srcmgr = bp::object();
@@ -376,6 +522,8 @@ void CSrcPython::ExtraShutdown( void )
 	ConColorMsg( g_PythonColor, "SERVER: " );
 #endif // CLIENT_DLL
 	ConColorMsg( g_PythonColor, "Python is no longer running...\n" );
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1135,6 +1283,22 @@ CON_COMMAND_F( cpy, "Run a string on the python interpreter", FCVAR_CHEAT)
 		return;
 #endif // CLIENT_DLL
 	g_SrcPythonSystem.Run( args.ArgS(), "consolespace" );
+}
+
+#ifndef CLIENT_DLL
+CON_COMMAND( py_restart, "Restarts the Python interpreter on the Server")
+#else
+CON_COMMAND_F( cl_py_restart, "Restarts the Python interpreter on the Client", FCVAR_CHEAT)
+#endif // CLIENT_DLL
+{
+	if( !SrcPySystem()->IsPythonRunning() )
+		return;
+#ifndef CLIENT_DLL
+	if( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+	g_SrcPythonSystem.ShutdownInterpreter();
+	g_SrcPythonSystem.InitInterpreter();
 }
 
 //-----------------------------------------------------------------------------

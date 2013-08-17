@@ -197,6 +197,9 @@ public:
 	virtual void			LevelShutdownPreEntity();
 	virtual void			LevelShutdownPostEntity();
 
+	bool					InitInterpreter( void );
+	bool					ShutdownInterpreter( void );
+
 	bool					IsPythonRunning();
 	bool					IsPythonFinalizing(); // Special case
 	bool					IsPathProtected(); // For file writing
