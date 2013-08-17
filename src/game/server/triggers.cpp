@@ -39,7 +39,9 @@
 #include "hl2_player.h"
 #endif
 
-
+#ifdef HL2WARS_DLL
+#include "hl2wars_player.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -3194,6 +3196,9 @@ void CTriggerCamera::Enable( void )
 		SetAbsVelocity( vec3_origin );
 	}
 
+#ifdef HL2WARS_DLL
+	((CHL2WarsPlayer *)pPlayer)->SetStrategicMode( false );
+#endif // HL2WARS_DLL
 
 	pPlayer->SetViewEntity( this );
 
@@ -3274,6 +3279,10 @@ void CTriggerCamera::Disable( void )
 
 		//return the player to previous takedamage state
 		m_hPlayer->m_takedamage = m_nOldTakeDamage;
+
+#ifdef HL2WARS_DLL
+		((CHL2WarsPlayer *)pBasePlayer)->SetStrategicMode( true );
+#endif // HL2WARS_DLL
 	}
 
 	m_state = USE_OFF;
