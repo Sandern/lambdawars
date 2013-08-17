@@ -4749,6 +4749,17 @@ BOOST_PYTHON_MODULE(_vgui){
     
     }
 
+    { //::PyOpenGameUIWindow
+    
+        typedef void ( *OpenGameUIWindow_function_type )( int );
+        
+        bp::def( 
+            "OpenGameUIWindow"
+            , OpenGameUIWindow_function_type( &::PyOpenGameUIWindow )
+            , ( bp::arg("type") ) );
+    
+    }
+
     { //::vgui::input
     
         typedef ::vgui::IInput * ( *vgui_input_function_type )(  );

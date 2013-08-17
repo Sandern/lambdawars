@@ -16,6 +16,8 @@
 #include "hl2wars/vgui_video_general.h"
 #include "hl2wars/teamcolor_proxy.h"
 
+#include "hl2wars/gameui/wars/basemodpanel.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -720,4 +722,14 @@ VPANEL PyGetPanel( VGuiPanel_t type )
 CON_COMMAND(py_debug_panel_count, "Debug command for getting the number of python panels.")
 {
 	Msg("Python Panels: %d\n", g_PythonPanelCount );
+}
+
+
+//-----------------------------------------------------------------------------
+// Temporary function until everything is ported over to the new html based
+// menu.
+//-----------------------------------------------------------------------------
+void PyOpenGameUIWindow( int type )
+{
+	BaseModUI::CBaseModPanel::GetSingleton().OpenWindow( (BaseModUI::WINDOW_TYPE)type, 0 );
 }
