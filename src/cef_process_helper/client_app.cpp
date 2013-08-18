@@ -10,7 +10,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<RenderBrowser> renderBrowser = FindBrowser( browser );
 	if( !renderBrowser )
 	{
-		SendWarning(browser, "No render process found");
+		SendWarning(browser, "No render process found\n");
 		return false;
 	}
 
@@ -22,7 +22,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 			CefProcessMessage::Create("pong");
 		browser->SendProcessMessage(PID_BROWSER, retmessage);
 
-		SendMsg( browser, "Just send a pong message from browser %d", browser->GetIdentifier() );
+		SendMsg( browser, "Pong from render browser %d\n", browser->GetIdentifier() );
 		return true;
 	}
 	else if( msgname == "createglobalobject" ) 
@@ -32,7 +32,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefString objectName = args->GetString( 1 );
 
 		if( !renderBrowser->CreateGlobalObject( iIdentifier, objectName ) )
-			SendWarning(browser, "Failed to create global object %ls", objectName.c_str());
+			SendWarning(browser, "Failed to create global object %ls\n", objectName.c_str());
 
 		return true;
 	}
@@ -46,7 +46,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 			iParentIdentifier = args->GetInt( 2 );
 
 		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier ) )
-			SendWarning(browser, "Failed to create function object %ls", objectName.c_str());
+			SendWarning(browser, "Failed to create function object %ls\n", objectName.c_str());
 
 		return true;
 	}
@@ -60,7 +60,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 			iParentIdentifier = args->GetInt( 2 );
 
 		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier, true ) )
-			SendWarning(browser, "Failed to create function with callback object %ls", objectName.c_str());
+			SendWarning(browser, "Failed to create function with callback object %ls\n", objectName.c_str());
 
 		return true;
 	}
@@ -71,7 +71,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefListValue> methodargs = args->GetList( 1 );
 
 		if( !renderBrowser->DoCallback( iCallbackID, methodargs ) )
-			SendWarning(browser, "Failed to do callback for id %d", iCallbackID);
+			SendWarning(browser, "Failed to do callback for id %d\n", iCallbackID);
 
 		return true;
 	}
@@ -82,7 +82,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefString code = args->GetString( 1 );
 
 		if( !renderBrowser->ExecuteJavascriptWithResult( iIdentifier, code ) )
-			SendWarning(browser, "Failed to call javascript with result: %ls", code.c_str());
+			SendWarning(browser, "Failed to call javascript with result: %ls\n", code.c_str());
 
 		return true;
 	}
@@ -119,7 +119,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	}
 	else
 	{
-		SendWarning( browser, "Unknown proccess message %ls", msgname.c_str() );
+		SendWarning( browser, "Unknown proccess message %ls\n", msgname.c_str() );
 	}
 
 	return false;
@@ -234,7 +234,7 @@ bool ClientApp::OnBeforeNavigation(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<RenderBrowser> renderBrowser = FindBrowser( browser );
 	if( !renderBrowser )
 	{
-		SendWarning(browser, "OnBeforeNavigation: No render process found");
+		SendWarning(browser, "OnBeforeNavigation: No render process found\n");
 		return false;
 	}
 
