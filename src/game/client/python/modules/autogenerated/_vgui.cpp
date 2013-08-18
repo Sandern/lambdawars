@@ -4728,6 +4728,17 @@ BOOST_PYTHON_MODULE(_vgui){
     
     }
 
+    { //::PyGameUICommand
+    
+        typedef void ( *GameUICommand_function_type )( char const * );
+        
+        bp::def( 
+            "GameUICommand"
+            , GameUICommand_function_type( &::PyGameUICommand )
+            , ( bp::arg("command") ) );
+    
+    }
+
     { //::PyGetPanel
     
         typedef ::vgui::VPANEL ( *GetPanel_function_type )( ::VGuiPanel_t );
@@ -4746,17 +4757,6 @@ BOOST_PYTHON_MODULE(_vgui){
         bp::def( 
             "IsGameUIVisible"
             , IsGameUIVisible_function_type( &::PyIsGameUIVisible ) );
-    
-    }
-
-    { //::PyOpenGameUIWindow
-    
-        typedef void ( *OpenGameUIWindow_function_type )( int );
-        
-        bp::def( 
-            "OpenGameUIWindow"
-            , OpenGameUIWindow_function_type( &::PyOpenGameUIWindow )
-            , ( bp::arg("type") ) );
     
     }
 

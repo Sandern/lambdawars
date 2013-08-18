@@ -17,6 +17,7 @@
 #include "hl2wars/teamcolor_proxy.h"
 
 #include "hl2wars/gameui/wars/basemodpanel.h"
+#include "hl2wars/gameui/wars/basemodframe.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -729,7 +730,10 @@ CON_COMMAND(py_debug_panel_count, "Debug command for getting the number of pytho
 // Temporary function until everything is ported over to the new html based
 // menu.
 //-----------------------------------------------------------------------------
-void PyOpenGameUIWindow( int type )
+void PyGameUICommand( const char *command )
 {
-	BaseModUI::CBaseModPanel::GetSingleton().OpenWindow( (BaseModUI::WINDOW_TYPE)type, 0 );
+	BaseModUI::WINDOW_TYPE type = BaseModUI::CBaseModPanel::GetSingleton().GetActiveWindowType();
+	BaseModUI::CBaseModFrame *pActivePanel = BaseModUI::CBaseModPanel::GetSingleton().GetWindow( type );
+	if( pActivePanel )
+		pActivePanel->OnCommand( command );
 }
