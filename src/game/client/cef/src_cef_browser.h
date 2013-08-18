@@ -13,11 +13,6 @@
 #include <string>
 #include "include/internal/cef_ptr.h"
 
-
-//#ifdef WIN32
-	//#include <winlite.h>
-//#endif // WIN32
-
 // Forward declarations
 class CefClientHandler;
 class SrcCefVGUIPanel;
@@ -93,6 +88,16 @@ public:
 
 	virtual void LoadURL( const char *url );
 
+	// Navigation behavior
+	// Keep in sync with RenderBrowser!
+	enum NavigationType
+	{
+		NT_DEFAULT = 0, // All navigation is allowed
+		NT_PREVENTALL, // Prevent navigating away from the current page
+		NT_ONLYFILEPROT, // Only allow navigating to file protocol urls
+	};
+	virtual void SetNavigationBehavior( NavigationType behavior );
+
 	// Javascript methods
 	void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
 	CefRefPtr<JSObject>  ExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line = 0 );
@@ -152,6 +157,7 @@ private:
 	bool m_bGameInputEnabled;
 
 	bool m_bHasFocus;
+	NavigationType m_navigationBehavior;
 };
 
 inline void SrcCefBrowser::SetGameInputEnabled( bool state )

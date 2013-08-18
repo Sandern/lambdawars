@@ -14,7 +14,9 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		return false;
 	}
 
-	if( message->GetName() == "ping" ) 
+	CefString msgname = message->GetName();
+
+	if( msgname == "ping" ) 
 	{
 		CefRefPtr<CefProcessMessage> retmessage =
 			CefProcessMessage::Create("pong");
@@ -23,7 +25,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		SendMsg( browser, "Just send a pong message from browser %d", browser->GetIdentifier() );
 		return true;
 	}
-	else if( message->GetName() == "createglobalobject" ) 
+	else if( msgname == "createglobalobject" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iIdentifier = args->GetInt( 0 );
@@ -31,11 +33,10 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		if( !renderBrowser->CreateGlobalObject( iIdentifier, objectName ) )
 			SendWarning(browser, "Failed to create global object %ls", objectName.c_str());
-		//else
-		//	SendMsg(browser, "Created global object %ls", objectName.c_str());
+
 		return true;
 	}
-	else if( message->GetName() == "createfunction" ) 
+	else if( msgname == "createfunction" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iIdentifier = args->GetInt( 0 );
@@ -46,12 +47,10 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier ) )
 			SendWarning(browser, "Failed to create function object %ls", objectName.c_str());
-		//else
-		//	SendMsg( browser, "Created function %ls", objectName.c_str());
 
 		return true;
 	}
-	else if( message->GetName() == "createfunctionwithcallback" ) 
+	else if( msgname == "createfunctionwithcallback" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iIdentifier = args->GetInt( 0 );
@@ -62,12 +61,10 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier, true ) )
 			SendWarning(browser, "Failed to create function with callback object %ls", objectName.c_str());
-		//else
-		//	SendMsg( browser, "Created function with callback %ls", objectName.c_str());
 
 		return true;
 	}
-	else if( message->GetName() == "callbackmethod" )
+	else if( msgname == "callbackmethod" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iCallbackID = args->GetInt( 0 );
@@ -78,7 +75,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
-	else if( message->GetName() == "calljswithresult" ) 
+	else if( msgname == "calljswithresult" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iIdentifier = args->GetInt( 0 );
@@ -89,7 +86,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
-	else if( message->GetName() == "invoke" ) 
+	else if( msgname == "invoke" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iIdentifier = args->GetInt( 0 );
@@ -101,7 +98,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
-	else if( message->GetName() == "invokewithresult" ) 
+	else if( msgname == "invokewithresult" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		int iResultIdentifier = args->GetInt( 0 );
@@ -114,9 +111,15 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
+	else if( msgname == "navigationbehavior" )
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		renderBrowser->SetNavigationBehavior( (RenderBrowser::NavigationType)args->GetInt( 0 ) );
+		return true;
+	}
 	else
 	{
-		SendWarning( browser, "Unknown proccess message %ls", message->GetName().c_str() );
+		SendWarning( browser, "Unknown proccess message %ls", msgname.c_str() );
 	}
 
 	return false;
@@ -131,9 +134,6 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
 	//command_line->AppendSwitch( CefString( "disable-extensions" ) );
-
-	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
-	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -220,6 +220,54 @@ void ClientApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 		return;
 
 	renderBrowser->SetV8Context( NULL );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool ClientApp::OnBeforeNavigation(CefRefPtr<CefBrowser> browser,
+                                  CefRefPtr<CefFrame> frame,
+                                  CefRefPtr<CefRequest> request,
+								  NavigationType navigation_type,
+                                  bool is_redirect)
+{
+	CefRefPtr<RenderBrowser> renderBrowser = FindBrowser( browser );
+	if( !renderBrowser )
+	{
+		SendWarning(browser, "OnBeforeNavigation: No render process found");
+		return false;
+	}
+
+	// Default behavior: allow navigating away
+	bool bDenyNavigation = false;
+
+	if( renderBrowser->GetNavigationBehavior() == RenderBrowser::NT_PREVENTALL )
+	{
+		// This mode prevents from navigating away from the current page
+		if( browser->GetMainFrame()->GetURL() != request->GetURL() )
+			bDenyNavigation = true;
+	}
+	else if( renderBrowser->GetNavigationBehavior() == RenderBrowser::NT_ONLYFILEPROT )
+	{
+		// This mode only allows navigating to urls starting with the file protocol
+		std::string url = request->GetURL().ToString();
+		std::string filepro( "file://");
+		if( url.compare( 0, filepro.size(), filepro ) )
+			bDenyNavigation = true;
+	}
+
+	// If we don't allow navigation, open the url in a new window
+	if( bDenyNavigation )
+	{
+		CefRefPtr<CefProcessMessage> retmessage =
+			CefProcessMessage::Create("openurl");
+		CefRefPtr<CefListValue> args = retmessage->GetArgumentList();
+		args->SetString( 0, request->GetURL() );
+
+		browser->SendProcessMessage(PID_BROWSER, retmessage);
+	}
+	
+	return bDenyNavigation;
 }
 
 //-----------------------------------------------------------------------------

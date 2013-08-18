@@ -522,6 +522,36 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::ReloadIgnoreCache( );
     }
 
+    virtual void SetNavigationBehavior( ::SrcCefBrowser::NavigationType behavior ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "SetNavigationBehavior: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling SetNavigationBehavior( behavior ) of Class: SrcCefBrowser\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_SetNavigationBehavior = this->get_override( "SetNavigationBehavior" );
+        if( func_SetNavigationBehavior.ptr() != Py_None )
+            try {
+                func_SetNavigationBehavior( behavior );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::SetNavigationBehavior( behavior );
+            }
+        else
+            this->SrcCefBrowser::SetNavigationBehavior( behavior );
+    }
+    
+    void default_SetNavigationBehavior( ::SrcCefBrowser::NavigationType behavior ) {
+        SrcCefBrowser::SetNavigationBehavior( behavior );
+    }
+
     virtual void SetPos( int x, int y ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -752,6 +782,12 @@ BOOST_PYTHON_MODULE(_cef){
         typedef bp::class_< SrcCefBrowser_wrapper > SrcCefBrowser_exposer_t;
         SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const * > >(( bp::arg("name"), bp::arg("url")="" )) );
         bp::scope SrcCefBrowser_scope( SrcCefBrowser_exposer );
+        bp::enum_< SrcCefBrowser::NavigationType>("NavigationType")
+            .value("NT_DEFAULT", SrcCefBrowser::NT_DEFAULT)
+            .value("NT_PREVENTALL", SrcCefBrowser::NT_PREVENTALL)
+            .value("NT_ONLYFILEPROT", SrcCefBrowser::NT_ONLYFILEPROT)
+            .export_values()
+            ;
         bp::implicitly_convertible< char const *, SrcCefBrowser >();
         { //::SrcCefBrowser::Destroy
         
@@ -1162,6 +1198,18 @@ BOOST_PYTHON_MODULE(_cef){
                 "SetMouseInputEnabled"
                 , SetMouseInputEnabled_function_type( &::SrcCefBrowser::SetMouseInputEnabled )
                 , ( bp::arg("state") ) );
+        
+        }
+        { //::SrcCefBrowser::SetNavigationBehavior
+        
+            typedef void ( ::SrcCefBrowser::*SetNavigationBehavior_function_type )( ::SrcCefBrowser::NavigationType ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_SetNavigationBehavior_function_type )( ::SrcCefBrowser::NavigationType ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "SetNavigationBehavior"
+                , SetNavigationBehavior_function_type(&::SrcCefBrowser::SetNavigationBehavior)
+                , default_SetNavigationBehavior_function_type(&SrcCefBrowser_wrapper::default_SetNavigationBehavior)
+                , ( bp::arg("behavior") ) );
         
         }
         { //::SrcCefBrowser::SetPassMouseTruIfAlphaZero

@@ -18,6 +18,13 @@
 
 #include "inputsystem/iinputsystem.h"
 #include <vgui/IInput.h>
+#include "materialsystem/materialsystem_config.h"
+#include "steam/steam_api.h"
+
+#ifdef WIN32
+#include <winlite.h>
+#include <ShellAPI.h>
+#endif // WIN32
 
 // CEF
 #include "include/cef_app.h"
@@ -115,6 +122,13 @@ public:
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 							const CefString& errorText, const CefString& failedUrl);
 
+
+	// CefRequestHandler
+	virtual void OnResourceRedirect(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								const CefString& old_url,
+								CefString& new_url);
+
 	// CefRenderHandler
 	void SetOSRHandler(CefRefPtr<SrcCefOSRRenderer> handler) {
 		m_OSRHandler = handler;
@@ -192,6 +206,25 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "oncontextcreated" )
 	{
 		m_pSrcBrowser->OnContextCreated();
+	}
+	else if( message->GetName() == "openurl" )
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+
+		// Open url in steam browser if fullscreen
+		// If windowed, just do a shell execute so it executes in the default browser
+#ifdef WIN32
+		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+		if( config.Windowed() )
+		{
+			ShellExecute(NULL, "open", args->GetString( 0 ).ToString().c_str(),
+							NULL, NULL, SW_SHOWNORMAL);
+		}
+		else
+#endif // WIN32
+		{
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( args->GetString( 0 ).ToString().c_str() );
+		}
 	}
 	else if( message->GetName() == "msg" )
 	{
@@ -295,9 +328,19 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								const CefString& old_url,
+								CefString& new_url)
+{
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), 
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL)
 {
 	m_Name = name ? name : "";
@@ -432,6 +475,7 @@ void SrcCefBrowser::Think( void )
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::OnAfterCreated( void )
 {
+	Ping();
 }
 
 //-----------------------------------------------------------------------------
@@ -757,6 +801,26 @@ void SrcCefBrowser::LoadURL( const char *url )
 		return;
 
 	mainFrame->LoadURL( CefString( url ) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::SetNavigationBehavior( NavigationType behavior )
+{
+	if( !IsValid() )
+		return;
+
+	if( m_navigationBehavior == behavior )
+		return;
+
+	m_navigationBehavior = behavior; 
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("navigationbehavior");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetInt( 0, (int)m_navigationBehavior );
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
 }
 
 //-----------------------------------------------------------------------------

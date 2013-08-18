@@ -78,6 +78,17 @@ public:
 	bool Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 	bool InvokeWithResult( int iResultIdentifier, int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 	
+	// Navigation behavior
+	// Keep in sync with SrcCefBrowser!
+	enum NavigationType
+	{
+		NT_DEFAULT = 0, // All navigation is allowed
+		NT_PREVENTALL, // Prevent navigating away from the current page
+		NT_ONLYFILEPROT, // Only allow navigating to file protocol urls
+	};
+	virtual void SetNavigationBehavior( NavigationType behavior ) { m_navigationBehavior = behavior; }
+	NavigationType GetNavigationBehavior() { return m_navigationBehavior; }
+
 private:
 	CefRefPtr<CefBrowser> m_Browser;
 	CefRefPtr<ClientApp> m_ClientApp;
@@ -92,6 +103,8 @@ private:
 		CefRefPtr<CefV8Value> thisobject;
 	} jscallback_t;
 	std::vector< jscallback_t > m_Callbacks;
+
+	NavigationType m_navigationBehavior;
 
 	IMPLEMENT_REFCOUNTING( RenderBrowser );
 };
