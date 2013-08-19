@@ -16,18 +16,22 @@
 
 struct EntityObject
 {
-	EntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide = 1, int iHalfTall = 1 )
+	EntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide = 1, int iHalfTall = 1, bool bTestShowInFOW = true )
 	{
 		m_hEntity = pEnt;
 		m_pIcon = pIcon;
 		m_iHalfWide = iHalfWide;
 		m_iHalfTall = iHalfTall;
+		m_bTestShowInFOW = bTestShowInFOW;
+		m_fFlashTimeOut = 0;
 	}
 
 	EHANDLE m_hEntity;
 	CHudTexture *m_pIcon;
 	int m_iHalfWide;
 	int m_iHalfTall;
+	float m_fFlashTimeOut;
+	bool m_bTestShowInFOW;
 };
 
 class CBaseMinimap :  public vgui::Panel, public CGameEventListener
@@ -44,9 +48,10 @@ public:
 
 	// General
 	virtual void			SetMap(const char * map);
-	void					InsertEntityObject( CBaseEntity *ent, CHudTexture *icon=NULL, int iHalfWide = 1, int iHalfTall = 1 );
+	void					InsertEntityObject( CBaseEntity *ent, CHudTexture *icon=NULL, int iHalfWide = 1, int iHalfTall = 1, bool testshowinfow = true );
 	void					RemoveEntityObject( CBaseEntity *ent );
-	inline void				RemoveAllEntityObjects() { m_EntityObjects.RemoveAll(); }			
+	void					RemoveAllEntityObjects() { m_EntityObjects.RemoveAll(); }		
+	void					FlashEntity( CBaseEntity *ent, float duration );
 
 	// Draw
 	void					DrawEntityObjects();

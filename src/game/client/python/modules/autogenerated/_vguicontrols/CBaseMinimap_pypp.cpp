@@ -1578,6 +1578,16 @@ void register_CBaseMinimap_class(){
                 , ( bp::arg("event") ) );
         
         }
+        { //::CBaseMinimap::FlashEntity
+        
+            typedef void ( ::CBaseMinimap::*FlashEntity_function_type )( ::C_BaseEntity *,float ) ;
+            
+            CBaseMinimap_exposer.def( 
+                "FlashEntity"
+                , FlashEntity_function_type( &::CBaseMinimap::FlashEntity )
+                , ( bp::arg("ent"), bp::arg("duration") ) );
+        
+        }
         { //::CBaseMinimap::GetPanelBaseClassName
         
             typedef char const * ( *GetPanelBaseClassName_function_type )(  );
@@ -1607,12 +1617,12 @@ void register_CBaseMinimap_class(){
         }
         { //::CBaseMinimap::InsertEntityObject
         
-            typedef void ( ::CBaseMinimap::*InsertEntityObject_function_type )( ::C_BaseEntity *,::CHudTexture *,int,int ) ;
+            typedef void ( ::CBaseMinimap::*InsertEntityObject_function_type )( ::C_BaseEntity *,::CHudTexture *,int,int,bool ) ;
             
             CBaseMinimap_exposer.def( 
                 "InsertEntityObject"
                 , InsertEntityObject_function_type( &::CBaseMinimap::InsertEntityObject )
-                , ( bp::arg("ent"), bp::arg("icon")=bp::object(), bp::arg("iHalfWide")=(int)(1), bp::arg("iHalfTall")=(int)(1) ) );
+                , ( bp::arg("ent"), bp::arg("icon")=bp::object(), bp::arg("iHalfWide")=(int)(1), bp::arg("iHalfTall")=(int)(1), bp::arg("testshowinfow")=(bool)(true) ) );
         
         }
         { //::CBaseMinimap::MapToPanel

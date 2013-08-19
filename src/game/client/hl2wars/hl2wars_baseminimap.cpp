@@ -20,7 +20,7 @@ using namespace vgui;
 int CBaseMinimap::OVERVIEW_MAP_SIZE = 1024;
 
 ConVar minimap_outline_alpha("minimap_outline_alpha", "220");
-
+ConVar minimap_flash_scale("minimap_flash_scale", "16");
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ void CBaseMinimap::FireGameEvent( IGameEvent *event )
 {
 	const char * type = event->GetName();
 
-	if ( Q_strcmp(type, "game_newmap") == 0 )
+	if ( V_strcmp(type, "game_newmap") == 0 )
 	{
 		SetMap( event->GetString("mapname") );
 	}
@@ -74,13 +74,15 @@ void CBaseMinimap::SetMap(const char * levelname)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall )
+void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall, bool bTestShowInFOW )
 {
-	if( !pEnt ) {
-		Warning("CBaseMinimap::InsertEntityObject: Entity is None\n");
+	if( !pEnt ) 
+	{
+		Warning( "CBaseMinimap::InsertEntityObject: Entity is NULL\n" );
 		return;
 	}
-	m_EntityObjects.AddToTail( EntityObject(pEnt, pIcon, iHalfWide, iHalfTall) );
+
+	m_EntityObjects.AddToTail( EntityObject( pEnt, pIcon, iHalfWide, iHalfTall, bTestShowInFOW ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -88,19 +90,43 @@ void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, in
 //-----------------------------------------------------------------------------
 void CBaseMinimap::RemoveEntityObject( CBaseEntity *pEnt )
 {
-	int i;
-	for( i=0; i<m_EntityObjects.Count(); i++ )
+	if( !pEnt )
+		return;
+
+	for( int i = 0; i < m_EntityObjects.Count(); i++ )
 	{
 		if( m_EntityObjects.Element(i).m_hEntity == pEnt )
 		{
 			m_EntityObjects.Remove(i);
-			break;
+			return;
 		}
 	}
+
 #ifdef ENABLE_PYTHON
 	PyErr_SetString(PyExc_ValueError, "CBaseMinimap.RemoveEntityObject: x not in entity object list" );
 	throw boost::python::error_already_set(); 
+#else
+	Warning( "CBaseMinimap.RemoveEntityObject: entity #%d not in entity object list\n", pEnt->entindex() );
 #endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseMinimap::FlashEntity( CBaseEntity *pEnt, float duration )
+{
+	if( !pEnt )
+		return;
+
+	for( int i = 0; i < m_EntityObjects.Count(); i++ )
+	{
+		EntityObject &eo = m_EntityObjects.Element(i);
+		if( pEnt == eo.m_hEntity.Get() )
+		{
+			eo.m_fFlashTimeOut = gpGlobals->curtime + duration;
+			break;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -113,9 +139,11 @@ void CBaseMinimap::DrawEntityObjects()
 	CBaseEntity *pEnt;
 	Color color;
 
+	bool bFlashCycle = sin( gpGlobals->curtime * minimap_flash_scale.GetInt() ) > 0;
+
 	// Draw entity outlines on minimap
 	count = m_EntityObjects.Count();
-	for( i=count-1; i>=0; i-- )
+	for( i = count - 1; i >= 0; i-- )
 	{
 		EntityObject &eo = m_EntityObjects.Element(i);
 		pEnt = eo.m_hEntity.Get();
@@ -125,6 +153,9 @@ void CBaseMinimap::DrawEntityObjects()
 			m_EntityObjects.Remove(i);
 			continue;
 		}
+
+		if( eo.m_bTestShowInFOW && !pEnt->FOWShouldShow() )
+			continue;
 
 		surface()->DrawSetColor( 50, 50, 50, minimap_outline_alpha.GetInt() );
 		if( !eo.m_pIcon )
@@ -142,7 +173,7 @@ void CBaseMinimap::DrawEntityObjects()
 
 	// Draw entities on minimap
 	count = m_EntityObjects.Count();
-	for( i=count-1; i>=0; i-- )
+	for( i = count - 1; i >= 0; i-- )
 	{
 		EntityObject &eo = m_EntityObjects.Element(i);
 		pEnt = eo.m_hEntity.Get();
@@ -153,8 +184,17 @@ void CBaseMinimap::DrawEntityObjects()
 			continue;
 		}
 
+		if( eo.m_bTestShowInFOW && !pEnt->FOWShouldShow() )
+			continue;
+
+		bool flash = bFlashCycle && eo.m_fFlashTimeOut > gpGlobals->curtime;
+
+		if( flash )
+			color.SetColor( 255, 255, 255, minimap_outline_alpha.GetInt() );
+		else
+			color.SetColor(pEnt->GetTeamColor().x*255, pEnt->GetTeamColor().y*255, pEnt->GetTeamColor().z*255, 255);
+
 		// Draw
-		color.SetColor(pEnt->GetTeamColor().x*255, pEnt->GetTeamColor().y*255, pEnt->GetTeamColor().z*255, 255);
 		pos2d = MapToPanel( WorldToMap( pEnt->GetAbsOrigin() ) );
 		if( eo.m_pIcon )
 		{
