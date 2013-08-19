@@ -31,6 +31,9 @@ BOOST_PYTHON_MODULE(_fow){
             "DebugPrintEntities"
             , (void ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::DebugPrintEntities ) )    
         .def( 
+            "GetGridSize"
+            , (int ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::GetGridSize ) )    
+        .def( 
             "GetHeightAtPoint"
             , (float ( ::CFogOfWarMgr::* )( ::Vector const & ) )( &::CFogOfWarMgr::GetHeightAtPoint )
             , ( bp::arg("vPoint") ) )    
@@ -38,6 +41,9 @@ BOOST_PYTHON_MODULE(_fow){
             "GetHeightAtTile"
             , (float ( ::CFogOfWarMgr::* )( int,int ) )( &::CFogOfWarMgr::GetHeightAtTile )
             , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "GetTileSize"
+            , (int ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::GetTileSize ) )    
         .def( 
             "ModifyHeightAtExtent"
             , (void ( ::CFogOfWarMgr::* )( ::Vector const &,::Vector const &,float ) )( &::CFogOfWarMgr::ModifyHeightAtExtent )
@@ -93,6 +99,9 @@ BOOST_PYTHON_MODULE(_fow){
             "DebugPrintEntities"
             , (void ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::DebugPrintEntities ) )    
         .def( 
+            "GetGridSize"
+            , (int ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::GetGridSize ) )    
+        .def( 
             "GetHeightAtPoint"
             , (float ( ::CFogOfWarMgr::* )( ::Vector const & ) )( &::CFogOfWarMgr::GetHeightAtPoint )
             , ( bp::arg("vPoint") ) )    
@@ -100,6 +109,9 @@ BOOST_PYTHON_MODULE(_fow){
             "GetHeightAtTile"
             , (float ( ::CFogOfWarMgr::* )( int,int ) )( &::CFogOfWarMgr::GetHeightAtTile )
             , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "GetTileSize"
+            , (int ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::GetTileSize ) )    
         .def( 
             "ModifyHeightAtExtent"
             , (void ( ::CFogOfWarMgr::* )( ::Vector const &,::Vector const &,float ) )( &::CFogOfWarMgr::ModifyHeightAtExtent )

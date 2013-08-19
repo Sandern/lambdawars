@@ -79,6 +79,10 @@ public: // CBaseGameSystem overrides
 	virtual void LevelInitPostEntity();
 	virtual void LevelShutdownPostEntity();
 
+	// Grid/tile size
+	int					GetGridSize() { return m_nGridSize; }
+	int					GetTileSize() { return m_nTileSize; }
+
 	// Heightmap
 	bool				CanCalculateHeightMap();
 	void				CalculateHeightMap();
@@ -194,7 +198,8 @@ private:
 	bool		m_bWasFogofwarOn;
 	bool		m_bHeightMapLoaded;
 
-	int			m_nGridSize, m_nTileSize;
+	int			m_nGridSize;
+	int			m_nTileSize;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWar;
 	CUtlVector< int > m_TileHeights;
 	

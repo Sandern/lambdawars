@@ -37,6 +37,8 @@ class FOW(SemiSharedModuleGenerator):
         
         cls.mem_funs().exclude()
         
+        cls.mem_fun('GetGridSize').include()
+        cls.mem_fun('GetTileSize').include()
         cls.mem_fun('ComputeFOWPosition').include()
         cls.mem_fun('ComputeWorldPosition').include()
         cls.mem_fun('DebugPrintEntities').include()
