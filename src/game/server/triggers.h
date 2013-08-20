@@ -305,6 +305,7 @@ private:
 	float m_deceleration;
 	int	  m_state;
 	Vector m_vecMoveDir;
+	Vector m_vecLastPos;
 
 	float m_fov;
 	float m_fovSpeed;

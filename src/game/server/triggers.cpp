@@ -2881,6 +2881,8 @@ void CAI_ChangeHintGroup::InputActivate( inputdata_t &inputdata )
 #define SF_CAMERA_PLAYER_INTERRUPT		64
 #define SF_CAMERA_PLAYER_SETFOV			128
 
+#define SF_PATHCORNER_TELEPORT 2
+
 #if HL2_EPISODIC
 const float CTriggerCamera::kflPosInterpTime = 2.0f;
 #endif
@@ -2914,6 +2916,7 @@ BEGIN_DATADESC( CTriggerCamera )
 #endif
 	DEFINE_FIELD( m_nPlayerButtons, FIELD_INTEGER ),
 	DEFINE_FIELD( m_nOldTakeDamage, FIELD_INTEGER ),
+	DEFINE_FIELD( m_vecLastPos, FIELD_VECTOR),
 
 	DEFINE_KEYFIELD( m_fov, FIELD_FLOAT, "fov" ),
 	DEFINE_KEYFIELD( m_fovSpeed, FIELD_FLOAT, "fov_rate" ),
@@ -3164,8 +3167,15 @@ void CTriggerCamera::Enable( void )
 	{
 		if ( m_pPath->m_flSpeed != 0 )
 			m_targetSpeed = m_pPath->m_flSpeed;
-		
+	
 		m_flStopTime += m_pPath->GetDelay();
+		m_vecMoveDir = m_pPath->GetLocalOrigin() - GetLocalOrigin();
+		m_moveDistance = VectorNormalize( m_vecMoveDir );
+		m_flStopTime = gpGlobals->curtime + m_pPath->GetDelay();
+	}
+	else
+	{
+		m_moveDistance = 0;
 	}
 
 
@@ -3197,7 +3207,7 @@ void CTriggerCamera::Enable( void )
 	}
 
 #ifdef HL2WARS_DLL
-	((CHL2WarsPlayer *)pPlayer)->SetStrategicMode( false );
+	//((CHL2WarsPlayer *)pPlayer)->SetStrategicMode( false );
 #endif // HL2WARS_DLL
 
 	pPlayer->SetViewEntity( this );
@@ -3216,7 +3226,7 @@ void CTriggerCamera::Enable( void )
 		SetNextThink( gpGlobals->curtime );
 	}
 
-	m_moveDistance = 0;
+	m_vecLastPos = GetAbsOrigin();
 	Move();
 
 	DispatchUpdateTransmitState();
@@ -3281,7 +3291,7 @@ void CTriggerCamera::Disable( void )
 		m_hPlayer->m_takedamage = m_nOldTakeDamage;
 
 #ifdef HL2WARS_DLL
-		((CHL2WarsPlayer *)pBasePlayer)->SetStrategicMode( true );
+		//((CHL2WarsPlayer *)pBasePlayer)->SetStrategicMode( true );
 #endif // HL2WARS_DLL
 	}
 
@@ -3464,7 +3474,16 @@ void CTriggerCamera::Move()
 #endif
 	{
 		// Subtract movement from the previous frame
-		m_moveDistance -= m_flSpeed * gpGlobals->frametime;
+		if (m_pPath->GetSpawnFlags() & SF_PATHCORNER_TELEPORT)
+		{
+			SetAbsOrigin(m_pPath->GetAbsOrigin());
+			m_moveDistance = -1;  //Make sure we enter the conditional below and advance to the next corner.
+		}
+		else
+		{	
+			// Subtract movement from the previous frame
+			m_moveDistance -= VectorNormalize(GetAbsOrigin() - m_vecLastPos);
+		}
 
 		// Have we moved enough to reach the target?
 		if ( m_moveDistance <= 0 )
@@ -3522,6 +3541,8 @@ void CTriggerCamera::Move()
 		}
 	}
 #endif
+
+	m_vecLastPos = GetAbsOrigin();
 }
 
 
