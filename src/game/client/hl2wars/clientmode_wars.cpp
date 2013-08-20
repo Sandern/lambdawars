@@ -224,11 +224,13 @@ public:
 				pPanel->MakePopup( false );
 				pGameUI->SetLoadingBackgroundDialog( pPanel->GetVPanel() );
 
+#if 0
 				// add ASI logo to main menu
 				CSDK_Logo_Panel *pLogo = new CSDK_Logo_Panel( NULL, "ASILogo" );
 				vgui::VPANEL GameUIRoot = enginevgui->GetPanel( PANEL_GAMEUIDLL );
 				pLogo->SetParent( GameUIRoot );
 				g_hLogoPanel = pLogo;
+#endif // 0
 			}		
 		}
 

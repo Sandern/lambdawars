@@ -74,7 +74,7 @@ void CBaseMinimap::SetMap(const char * levelname)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall, bool bTestShowInFOW )
+void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall, bool bTestShowInFOW, bool bFlashOnAttacked )
 {
 	if( !pEnt ) 
 	{
@@ -82,7 +82,7 @@ void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, in
 		return;
 	}
 
-	m_EntityObjects.AddToTail( EntityObject( pEnt, pIcon, iHalfWide, iHalfTall, bTestShowInFOW ) );
+	m_EntityObjects.AddToTail( EntityObject( pEnt, pIcon, iHalfWide, iHalfTall, bTestShowInFOW, bFlashOnAttacked ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -187,7 +187,15 @@ void CBaseMinimap::DrawEntityObjects()
 		if( eo.m_bTestShowInFOW && !pEnt->FOWShouldShow() )
 			continue;
 
-		bool flash = bFlashCycle && eo.m_fFlashTimeOut > gpGlobals->curtime;
+		bool flash = false;
+		if( eo.m_bFlashOnAttacked && pEnt->MyUnitPointer() )
+		{
+			flash = bFlashCycle && ( gpGlobals->curtime - pEnt->MyUnitPointer()->GetLastTakeDamageTime() < 3.0f );
+		}
+		else
+		{
+			flash = bFlashCycle && eo.m_fFlashTimeOut > gpGlobals->curtime;
+		}
 
 		if( flash )
 			color.SetColor( 255, 255, 255, minimap_outline_alpha.GetInt() );

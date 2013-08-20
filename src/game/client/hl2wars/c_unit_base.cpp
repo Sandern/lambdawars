@@ -252,6 +252,14 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 			m_bForcedEnemyHate = true;
 		}
 	}
+
+	// Health changed?
+	if( m_iHealth != m_iOldHealth )
+	{
+		if( m_iOldHealth > m_iHealth )
+			m_fLastTakeDamageTime = gpGlobals->curtime;
+		m_iOldHealth = m_iHealth;
+	}
 }
 
 int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )

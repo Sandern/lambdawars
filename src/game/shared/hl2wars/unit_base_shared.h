@@ -275,6 +275,9 @@ public:
 #endif // ENABLE_PYTHON
 	UnitBaseAnimState*	GetAnimState();
 
+	// Note: on the client, this is based on the health variable decreasing
+	float				GetLastTakeDamageTime() { return m_fLastTakeDamageTime; }
+
 #ifndef CLIENT_DLL
 	virtual void		UpdateServerAnimation( void );
 	
@@ -308,7 +311,6 @@ public:
 	void				SetAttackLOSMask( int iMask ) { m_iAttackLOSMask = iMask; }
 	int					GetAttackLOSMask() { return m_iAttackLOSMask; }
 	bool				FastLOSCheck( const Vector &vTargetPos );
-	float				GetLastTakeDamageTime() { return m_fLastTakeDamageTime; }
 
 	// Navigator
 #ifdef ENABLE_PYTHON
@@ -469,6 +471,9 @@ private:
 	boost::python::object m_pyAnimState;
 #endif // ENABLE_PYTHON
 
+	// Last damage time
+	float m_fLastTakeDamageTime;
+
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
 	CNetworkString(	m_NetworkedUnitType, MAX_PATH );
@@ -481,7 +486,6 @@ private:
 	bool m_bHasRangeAttackLOS;
 	float m_fLastRangeAttackLOSTime;
 	int m_iAttackLOSMask;
-	float m_fLastTakeDamageTime;
 
 	// Navigator
 	UnitBaseNavigator *m_pNavigator;
@@ -518,8 +522,9 @@ private:
 	char m_NetworkedUnitType[MAX_PATH];
 	CHandle< CHL2WarsPlayer > m_hOldCommander;
 	CHandle< C_BaseCombatWeapon > m_hOldActiveWeapon;
+	int						m_iOldHealth;
 
-	CHandle< CBaseEntity > m_hOldEnemy;
+	CHandle< CBaseEntity >	m_hOldEnemy;
 	bool					m_bForcedEnemyHate;
 
 	// Target unit/produced new unit: blink
