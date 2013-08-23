@@ -127,12 +127,13 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+	//RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
 	//RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
-	RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
+	//RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
 
 	RecvPropString(  RECVINFO( m_NetworkedUnitType ) ),
 
@@ -152,6 +153,10 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	RecvPropInt		(RECVINFO(m_iEnergy)),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
+	//RecvPropInt		(RECVINFO(m_iKills)),
+END_RECV_TABLE()
+
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_SelectedOnlyTable )
 	RecvPropInt		(RECVINFO(m_iKills)),
 END_RECV_TABLE()
 
@@ -162,10 +167,11 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
 	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
+	RecvPropDataTable( "selecteddata", 0, 0, &REFERENCE_RECV_TABLE(DT_SelectedOnlyTable) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( CUnitBase )
-	//DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+	DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 
 	//DEFINE_PRED_FIELD( m_vecVelocity, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
@@ -262,6 +268,9 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )
 {
 	if( m_bIsBlinking )
@@ -274,6 +283,9 @@ int CUnitBase::DrawModel( int flags, const RenderableInstance_t &instance )
 	return BaseClass::DrawModel( flags, instance );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 const Vector& CUnitBase::GetRenderOrigin( void )
 {
 	//if( m_pAnimState )
@@ -285,6 +297,9 @@ const Vector& CUnitBase::GetRenderOrigin( void )
 }
 
 #if 0
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 {
 	// Skip if not in screen. SetupBones is really expensive and we shouldn't need it if not in screen.
@@ -301,12 +316,18 @@ bool CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int bo
 }
 #endif // 0
 
+//-----------------------------------------------------------------------------
+// Purpose: Makes the unit play the blink effect (highlights the unit)
+//-----------------------------------------------------------------------------
 void CUnitBase::Blink( float blink_time )
 {
 	m_bIsBlinking = true;
 	m_fBlinkTimeOut = blink_time != -1 ? gpGlobals->curtime + blink_time : -1;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::ShouldDraw( void )
 {
 	if( GetCommander() && GetCommander() == C_HL2WarsPlayer::GetLocalHL2WarsPlayer() )
@@ -317,30 +338,36 @@ bool CUnitBase::ShouldDraw( void )
 	return BaseClass::ShouldDraw();
 }
 
+ConVar cl_unit_interp_disable( "cl_unit_interp_disable", "0.1", FCVAR_NONE, "" );
+ConVar cl_unit_interp_rate( "cl_unit_interp_rate", "0.1", FCVAR_NONE, "Interpolation for units client side." );
+
+#define round(x) ((x)>=0)?(int)((x)+0.5):(int)((x)-0.5)
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::UpdateClientSideAnimation()
 {
-	if( m_bUpdateClientAnimations )
+#if 1
+	if( m_fNextSimulationUpdate < gpGlobals->curtime )
 	{
-#if 0
-		static ConVar cl_simulationtime_updaterate("cl_simulationtime_updaterate", "0.1");
-		static ConVar cl_simulationtime_offset("cl_simulationtime_offset", "0.05");
-		if( GetSimulationTime() < (gpGlobals->curtime - cl_simulationtime_updaterate.GetFloat()) )
-		{
-			//m_flOldSimulationTime = GetSimulationTime();
-			//PreDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
-			//SetSimulationTime( gpGlobals->curtime - cl_simulationtime_offset.GetFloat() );
-			//PostDataUpdate( DATA_UPDATE_DATATABLE_CHANGED );
-			/*float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
-			if ( flTimeDelta > 0 )
-			{
-				Vector newVelo = (GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
-				SetAbsVelocity( newVelo);
-			}
+		m_flOldSimulationTime = m_flSimulationTime;
+		m_flSimulationTime = gpGlobals->curtime;
+		OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
 
-			OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );*/
-		}
+		//float w = (m_fNextSimulationUpdate - m_fSimulationBaseClock) / cl_unit_interp_rate.GetFloat();
+		//float wnext = round( w );
+		//float nextw = (wnext - w);
+		//if( nextw < 0 )
+			m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat();
+		//else
+		//	m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat() * (wnext - w);
+		//Msg("Calculated next update: %f\n", cl_unit_interp_rate.GetFloat() * (wnext - w));
+	}
 #endif // 0
 
+	if( m_bUpdateClientAnimations )
+	{
 		// Yaw and Pitch are updated in UserCmd if the unit has a commander
 		if( !GetCommander() )
 		{
@@ -368,14 +395,31 @@ void CUnitBase::UpdateClientSideAnimation()
 		OnLatchInterpolatedVariables((1<<0));
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::InitPredictable( C_BasePlayer *pOwner )
 {
 	SetLocalVelocity(vec3_origin);
 	BaseClass::InitPredictable( pOwner );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::PostDataUpdate( DataUpdateType_t updateType )
 {
+	// Base simulation time on when the origin changed
+	bool originChanged = ( m_vecOldUnitOrigin != GetLocalOrigin() ) ? true : false;
+	if( originChanged )
+	{
+		m_flOldSimulationTime = m_flSimulationTime;
+		m_flSimulationTime = gpGlobals->curtime;
+		m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat();
+
+		m_vecOldUnitOrigin = GetLocalOrigin();
+	}
+
 	bool bPredict = ShouldPredict();
 	if ( bPredict )
 	{
@@ -416,6 +460,9 @@ void CUnitBase::PostDataUpdate( DataUpdateType_t updateType )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::NotePredictionError( const Vector &vDelta )
 {
 	Vector vOldDelta;
@@ -431,6 +478,9 @@ void CUnitBase::NotePredictionError( const Vector &vDelta )
 	ResetLatched(); 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::GetPredictionErrorSmoothingVector( Vector &vOffset )
 {
 	if ( engine->IsPlayingDemo() || !cl_wars_smooth.GetInt() || !cl_predict->GetBool() )
@@ -452,11 +502,17 @@ void CUnitBase::GetPredictionErrorSmoothingVector( Vector &vOffset )
 	vOffset = m_vecPredictionError * errorAmount;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 C_BasePlayer *CUnitBase::GetPredictionOwner()
 {
 	return GetCommander();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CUnitBase::ShouldPredict( void )
 {
 	if (C_BasePlayer::IsLocalPlayer(GetCommander()))
@@ -475,6 +531,9 @@ bool CUnitBase::ShouldPredict( void )
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::EstimateAbsVelocity( Vector& vel )
 {
 #if 1

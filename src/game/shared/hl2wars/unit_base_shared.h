@@ -349,11 +349,13 @@ public:
 	const Vector &		GetDefaultEyeOffset( void )			{ return m_vDefaultEyeOffset;	}
 
 #ifdef ENABLE_PYTHON
-	virtual bool IsSelectableByPlayer( CHL2WarsPlayer *pPlayer, boost::python::object target_selection = boost::python::object() ) { return true; }
+	virtual bool		IsSelectableByPlayer( CHL2WarsPlayer *pPlayer, boost::python::object target_selection = boost::python::object() ) { return true; }
 #endif // ENABLE_PYTHON
-	virtual void Select( CHL2WarsPlayer *pPlayer, bool bTriggerOnSel = true );
-	virtual void OnSelected( CHL2WarsPlayer *pPlayer );
-	virtual void OnDeSelected( CHL2WarsPlayer *pPlayer );
+	virtual void		Select( CHL2WarsPlayer *pPlayer, bool bTriggerOnSel = true );
+	virtual void		OnSelected( CHL2WarsPlayer *pPlayer );
+	virtual void		OnDeSelected( CHL2WarsPlayer *pPlayer );
+	bool				IsSelectedByPlayer( int entindex );
+	const CUtlVector< CHandle< CHL2WarsPlayer > > &GetSelectedByPlayers();
 #ifdef CLIENT_DLL
 	virtual void OnInSelectionBox( void ) {}
 	virtual void OnOutSelectionBox( void ) {}
@@ -541,6 +543,10 @@ private:
 
 	// Kills
 	int						m_iKills;
+
+	// Client simulation time
+	float					m_fNextSimulationUpdate;
+	Vector					m_vecOldUnitOrigin;
 #endif // CLIENT_DLL
 
 	CNetworkHandle( CBaseEntity, m_hSquadUnit );
@@ -579,6 +585,27 @@ inline int CUnitBase::GetSelectionPriority()
 inline void CUnitBase::SetSelectionPriority( int priority )
 {
 	m_iSelectionPriority = priority;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline bool CUnitBase::IsSelectedByPlayer( int entindex )
+{
+	for( int i = 0; i < m_SelectedByPlayers.Count(); i++ )
+	{
+		if( m_SelectedByPlayers[i].IsValid() && m_SelectedByPlayers[i].GetEntryIndex() == entindex )
+			return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline const CUtlVector< CHandle< CHL2WarsPlayer > > &CUnitBase::GetSelectedByPlayers()
+{
+	return m_SelectedByPlayers;
 }
 
 inline int CUnitBase::GetAttackPriority()

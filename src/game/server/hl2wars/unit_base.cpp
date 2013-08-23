@@ -376,6 +376,25 @@ void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, c
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendFullDataTable );
 
+void* SendProxy_SendSelectedOnlyDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+{
+	// Get the unit entity
+	CUnitBase *pUnit = (CUnitBase*)pVarData;
+	if ( pUnit )
+	{
+		pRecipients->ClearAllRecipients();
+		const CUtlVector< CHandle< CHL2WarsPlayer > > &selectedByPlayers = pUnit->GetSelectedByPlayers();
+		for( int i = 0; i < selectedByPlayers.Count(); i++ )
+		{
+			if( selectedByPlayers[i] && selectedByPlayers[i]->CountUnits() == 1 )
+				pRecipients->SetRecipient( selectedByPlayers[i].GetEntryIndex() - 1 );
+		}
+	}
+
+	return (void*)pVarData;
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendSelectedOnlyDataTable );
+
 extern void SendProxy_SimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID );
 
 //-----------------------------------------------------------------------------
@@ -421,8 +440,6 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
 END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
-	SendPropInt		(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime, SENDPROP_SIMULATION_TIME_PRIORITY ),
-
 	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
 
 	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
@@ -431,7 +448,7 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropInt		(SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
 
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
-	SendPropInt		(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
+	SendPropInt		(SENDINFO( m_fFlags ), PLAYER_FLAG_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
 
 	SendPropEHandle		( SENDINFO( m_hSquadUnit ) ),
 	SendPropEHandle		( SENDINFO( m_hCommander ) ),
@@ -441,10 +458,14 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),
 
-	SendPropInt		(SENDINFO(m_iEnergy), 15, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_iMaxEnergy), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED ),
 
-	SendPropInt		(SENDINFO(m_iKills), 9, SPROP_UNSIGNED ),
+	//SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
+END_SEND_TABLE()
+
+BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_SelectedOnlyTable )
+	SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
@@ -456,6 +477,8 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
 	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
 	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
+	// Data that gets sent when unit is the single selected unit of the player
+	SendPropDataTable( "selecteddata", 0, &REFERENCE_SEND_TABLE(DT_SelectedOnlyTable), SendProxy_SendSelectedOnlyDataTable ),
 
 	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
@@ -467,6 +490,9 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
 	SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),
 	SendPropExclude( "DT_BaseAnimatingOverlay", "overlay_vars" ),
+
+	SendPropExclude( "DT_BaseAnimating", "m_nNewSequenceParity" ),
+	SendPropExclude( "DT_BaseAnimating", "m_nResetEventsParity" ),
 	
 	// playeranimstate and clientside animation takes care of these on the client
 	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
@@ -524,7 +550,7 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 }
 
 // FIXME: Does not work properly
-#define USE_MINIMAL_SENDTABLE 0
+#define USE_MINIMAL_SENDTABLE 1
 
 //-----------------------------------------------------------------------------
 // Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
