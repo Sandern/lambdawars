@@ -688,7 +688,7 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 
 	// Update tick methods
 	int i;
-	for(i=m_methodTickList.Count()-1; i>=0; i--)
+	for( i = m_methodTickList.Count() - 1; i >= 0 ; i-- )
 	{
 		if( m_methodTickList[i].m_fNextTickTime < gpGlobals->curtime )
 		{
@@ -703,14 +703,14 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 				// Remove tick methods that are not looped (used to call back a function after a set time)
 				if( !m_methodTickList[i].m_bLooped )
 				{
-					m_methodTickList.Remove(i);
+					m_methodTickList.Remove( i );
 					continue;
 				}
 			} 
 			catch( bp::error_already_set & ) {
 				Warning("Unregistering tick method due the following exception (catch exception if you don't want this): \n");
 				PyErr_Print();
-				m_methodTickList.Remove(i);
+				m_methodTickList.Remove( i );
 				continue;
 			}
 			m_methodTickList[i].m_fNextTickTime = gpGlobals->curtime + m_methodTickList[i].m_fTickSignal;
@@ -718,7 +718,7 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 	}
 
 	// Update frame methods
-	for(i=m_methodPerFrameList.Count()-1; i>=0; i--)
+	for( i = m_methodPerFrameList.Count() - 1; i >= 0; i-- )
 	{
 		try 
 		{
@@ -727,7 +727,7 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 		catch( bp::error_already_set & ) {
 			Warning("Unregistering per frame method due the following exception (catch exception if you don't want this): \n");
 			PyErr_Print();
-			m_methodPerFrameList.Remove(i);
+			m_methodPerFrameList.Remove( i );
 			continue;
 		}
 	}
@@ -1115,15 +1115,13 @@ void CSrcPython::CleanupDelayedUpdateList()
 //-----------------------------------------------------------------------------
 void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool looped )
 {
-	int i;
-	for(i=0; i<m_methodTickList.Count(); i++)
+	if( IsTickMethodRegistered( method ) )
 	{
-		if( m_methodTickList[i].method == method )
-		{
-			PyErr_SetString(PyExc_Exception, "Method already registered" );
-			throw boost::python::error_already_set(); 
-		}
+		PyErr_SetString(PyExc_Exception, "Method already registered" );
+		throw boost::python::error_already_set(); 
 	}
+
+	Msg( "registering method: %#p\n", method.ptr() );
 	py_tick_methods tickmethod;
 	tickmethod.method = method;
 	tickmethod.m_fTickSignal = ticksignal;
@@ -1139,7 +1137,7 @@ void CSrcPython::UnregisterTickMethod( bp::object method )
 {
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
-		if( m_methodTickList[i].method == method )
+		if( m_methodTickList[i].method.ptr() == method.ptr() )
 		{
 			m_methodTickList.Remove(i);
 			return;
@@ -1167,7 +1165,7 @@ bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
-		if( m_methodTickList[i].method == method )
+		if( m_methodTickList[i].method.ptr() == method.ptr() )
 			return true;
 	}
 	return false;
@@ -1178,13 +1176,10 @@ bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 //-----------------------------------------------------------------------------
 void CSrcPython::RegisterPerFrameMethod( bp::object method )
 {
-	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
+	if( IsPerFrameMethodRegistered( method ) )
 	{
-		if( m_methodPerFrameList[i] == method )
-		{
-			PyErr_SetString(PyExc_Exception, "Method already registered" );
-			throw boost::python::error_already_set(); 
-		}
+		PyErr_SetString(PyExc_Exception, "Method already registered" );
+		throw boost::python::error_already_set(); 
 	}
 	m_methodPerFrameList.AddToTail(method);
 }
@@ -1196,7 +1191,7 @@ void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 {
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
-		if( m_methodPerFrameList[i] == method )
+		if( m_methodPerFrameList[i].ptr() == method.ptr() )
 		{
 			m_methodPerFrameList.Remove(i);
 			return;
@@ -1224,7 +1219,7 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
-		if( m_methodPerFrameList[i] == method )
+		if( m_methodPerFrameList[i].ptr() == method.ptr() )
 			return true;
 	}
 	return false;
