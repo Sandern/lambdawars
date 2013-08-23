@@ -1121,7 +1121,6 @@ void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool l
 		throw boost::python::error_already_set(); 
 	}
 
-	Msg( "registering method: %#p\n", method.ptr() );
 	py_tick_methods tickmethod;
 	tickmethod.method = method;
 	tickmethod.m_fTickSignal = ticksignal;
