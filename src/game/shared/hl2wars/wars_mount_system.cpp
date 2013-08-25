@@ -111,7 +111,7 @@ bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *
 	}
 	else
 	{
-		MountMsg("failed\n");
+		MountMsg("failed (not installed?)\n");
 	}
 	return false;
 }
