@@ -79,6 +79,7 @@ void CGlowObjectManager::RenderGlowModels( const CViewSetup *pSetup, int nSplitS
 	IMaterial *pMatGlowColor = NULL;
 
 	pMatGlowColor = materials->FindMaterial( "dev/glow_color", TEXTURE_GROUP_OTHER, true );
+	g_pStudioRender->ForcedMaterialOverride( pMatGlowColor );
 	
 	//==================//
 	// Draw the objects //
@@ -88,44 +89,6 @@ void CGlowObjectManager::RenderGlowModels( const CViewSetup *pSetup, int nSplitS
 		if ( m_GlowObjectDefinitions[i].IsUnused() || !m_GlowObjectDefinitions[i].ShouldDraw( nSplitScreenSlot ) )
 			continue;
 
-		g_pStudioRender->ForcedMaterialOverride( pMatGlowColor );
-
-		if ( m_GlowObjectDefinitions[i].m_bFullBloomRender )
-		{
-			
-			// Disabled because stencil test on off-screen buffers doesn't work with MSAA on.
-			// Also, the normal model render does not seem to work on the off-screen buffer
-
-			//g_pStudioRender->ForcedMaterialOverride( NULL );
-
-// 			ShaderStencilState_t stencilState;
-// 			stencilState.m_bEnable = true;
-// 			stencilState.m_nReferenceValue = m_GlowObjectDefinitions[i].m_nFullBloomStencilTestValue;
-// 			stencilState.m_nTestMask = 0xFF;
-// 			stencilState.m_CompareFunc = SHADER_STENCILFUNC_EQUAL;
-// 			stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
-// 			stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-// 			stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
-// 
-// 			pRenderContext->SetStencilState( stencilState );
-		}
-		else
-		{
-			
-			// Disabled because stencil test on off-screen buffers doesn't work with MSAA on
-			// Most features still work, but some (e.g. partial occlusion) don't
-// 			ShaderStencilState_t stencilState;
-// 			stencilState.m_bEnable = true;
-// 			stencilState.m_nReferenceValue = 1;
-// 			stencilState.m_nTestMask = 0x1;
-// 			stencilState.m_CompareFunc = SHADER_STENCILFUNC_EQUAL;
-// 			stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
-// 			stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-// 			stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
-// 
-// 			pRenderContext->SetStencilState( stencilState );
-		}
-		
 		render->SetBlend( m_GlowObjectDefinitions[i].m_flGlowAlpha );
 		Vector vGlowColor = m_GlowObjectDefinitions[i].m_vGlowColor * m_GlowObjectDefinitions[i].m_flGlowAlpha;
 		render->SetColorModulation( &vGlowColor[0] ); // This only sets rgb, not alpha
@@ -417,7 +380,7 @@ void CGlowObjectManager::ApplyEntityGlowEffects( const CViewSetup *pSetup, int n
 		ShaderStencilState_t stencilState;
 		stencilState.m_bEnable = true;
 		stencilState.m_nWriteMask = 0x0; // We're not changing stencil
-		stencilState.m_nTestMask = 0x3;
+		stencilState.m_nTestMask = 0xFF;
 		stencilState.m_nReferenceValue = 0x0;
 		stencilState.m_CompareFunc = SHADER_STENCILFUNC_EQUAL;
 		stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
