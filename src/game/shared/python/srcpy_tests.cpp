@@ -14,10 +14,8 @@
 //-----------------------------------------------------------------------------
 void SrcPyTest_EntityArg( CBaseEntity *pEntity )
 {
-	//Msg("SrcPyTest_EntityArg: %d\n", pEntity);
 	if( pEntity == NULL )
 		return;
-	//Msg("Entity pointer is not NULL\n");
 	if( dynamic_cast<CBaseEntity *>(pEntity) == NULL )
 	{
 		PyErr_SetString(PyExc_Exception, "Invalid entity pointer passed in as argument. Converter bug?" );
@@ -26,9 +24,41 @@ void SrcPyTest_EntityArg( CBaseEntity *pEntity )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Silly perf test
+//-----------------------------------------------------------------------------
 void SrcPyTest_NCrossProducts( int n, Vector &a, Vector &b )
 {
-	int i;
-	for( i=0; i<n; i++ )
-		Vector c = a.Cross(b);
+	Vector ret( 0, 0, 0 );
+	for( int i = 0; i < n; i++ )
+		ret += a.Cross(b);
+	Msg( "Result: %f %f %f\n", ret.x, ret.y, ret.z );
 }
+
+#ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CON_COMMAND_F( srctests_booloperator, "", FCVAR_CHEAT )
+{
+	// FIXME: There seems to be a problem with the bool operator
+	//		  On the client, this can result in a crash.
+	// See src\boost\boost\python\object_operators.hpp
+	try
+	{
+		boost::python::object testvalue = boost::python::object( boost::python::exec( "def testmethod(): pass" ) );
+		if( testvalue != bp::object() )
+		{
+			Msg("Tested value is not None\n");
+		}
+		else
+		{
+			Msg("Tested value is None\n");
+		}
+	}
+	catch( ... )
+	{
+		PyErr_Print();
+	}
+}
+#endif // CLIENT_DLL
