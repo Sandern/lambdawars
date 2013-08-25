@@ -205,14 +205,14 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 		try {
 			bSuccess = bp::extract<bool>(gamemgr.attr("_ApplyGameSettings")( PyKeyValuesToDict( pKV ) ));
 		} catch( boost::python::error_already_set & ) {
-			Warning("ApplyGameSettings: Error occurred while letting Python apply game settings\n");
+			Warning( "ApplyGameSettings: Error occurred while letting Python apply game settings for game mode \"%s\"\n", szMode );
 			PyErr_Print();
 		}
 #endif // ENABLE_PYTHON
 
 		if( !bSuccess )
 		{
-			Warning( "ApplyGameSettings: Unknown game mode! Falling back to gamelobby.\n" );
+			Warning( "ApplyGameSettings: Unknown game mode \"%s\"! Falling back to gamelobby.\n", szMode );
 			engine->ServerCommand( CFmtStr( "%s gamelobby reserved\n",
 				szMapCommand ) );
 		}
