@@ -239,103 +239,105 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 //-----------------------------------------------------------------------------
 bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 {
-#if 0
-	// PVS data must be up to date
-	Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
-	
-	int i;
-
-	// Early out if the areas are connected
-	if ( !m_PVSInfo.m_nAreaNum2 )
+	if( gpGlobals->maxClients == 1 )
 	{
-		for ( i=0; i< pInfo->m_AreasNetworked; i++ )
+		// PVS data must be up to date
+		Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
+	
+		int i;
+
+		// Early out if the areas are connected
+		if ( !m_PVSInfo.m_nAreaNum2 )
 		{
-			int clientArea = pInfo->m_Areas[i];
-			if ( clientArea == m_PVSInfo.m_nAreaNum || engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
-				break;
+			for ( i=0; i< pInfo->m_AreasNetworked; i++ )
+			{
+				int clientArea = pInfo->m_Areas[i];
+				if ( clientArea == m_PVSInfo.m_nAreaNum || engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
+					break;
+			}
 		}
+		else
+		{
+			// doors can legally straddle two areas, so
+			// we may need to check another one
+			for ( i=0; i< pInfo->m_AreasNetworked; i++ )
+			{
+				int clientArea = pInfo->m_Areas[i];
+				if ( clientArea == m_PVSInfo.m_nAreaNum || clientArea == m_PVSInfo.m_nAreaNum2 )
+					break;
+
+				if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
+					break;
+
+				if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum2 ) )
+					break;
+			}
+		}
+
+		if ( i == pInfo->m_AreasNetworked )
+		{
+			// areas not connected
+			return false;
+		}
+
+		// ignore if not touching a PV leaf
+		// negative leaf count is a node number
+		// If no pvs, add any entity
+
+		Assert( edict() != pInfo->m_pClientEnt );
+
+		unsigned char *pPVS = ( unsigned char * )pInfo->m_PVS;
+	
+		if ( m_PVSInfo.m_nClusterCount < 0 )   // too many clusters, use headnode
+		{
+			return (engine->CheckHeadnodeVisible( m_PVSInfo.m_nHeadNode, pPVS, pInfo->m_nPVSSize ) != 0);
+		}
+	
+		for ( i = m_PVSInfo.m_nClusterCount; --i >= 0; )
+		{
+			int nCluster = m_PVSInfo.m_pClusters[i];
+			if ( ((int)(pPVS[nCluster >> 3])) & BitVec_BitInByte( nCluster ) )
+				return true;
+		}
+
+		return false;		// not visible
 	}
 	else
 	{
-		// doors can legally straddle two areas, so
-		// we may need to check another one
-		for ( i=0; i< pInfo->m_AreasNetworked; i++ )
+		// Cull transmission based on the camera limits
+		// These limits are send in cl_strategic_cam_limits
+		CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+		Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
+		if ( !pRecipientEntity )
+			return false;
+	
+		CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
+
+		Vector vPlayerPos = pRecipientPlayer->Weapon_ShootPosition() + pRecipientPlayer->GetCameraOffset();
+
+		//NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), vPlayerPos, 255, 0, 0, false, 0.1f );
+
+		Vector vecToTarget = GetOuter()->WorldSpaceCenter() - vPlayerPos;
+		vecToTarget.NormalizeInPlace();
+
+		matrix3x4_t matAngles;
+		AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
+		VectorITransform( vecToTarget, matAngles, vecToTarget );
+
+		Vector vCamLimits;
+		UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
+
+		if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
+			vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
 		{
-			int clientArea = pInfo->m_Areas[i];
-			if ( clientArea == m_PVSInfo.m_nAreaNum || clientArea == m_PVSInfo.m_nAreaNum2 )
-				break;
-
-			if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
-				break;
-
-			if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum2 ) )
-				break;
-		}
-	}
-
-	if ( i == pInfo->m_AreasNetworked )
-	{
-		// areas not connected
-		return false;
-	}
-
-	// ignore if not touching a PV leaf
-	// negative leaf count is a node number
-	// If no pvs, add any entity
-
-	Assert( edict() != pInfo->m_pClientEnt );
-
-	unsigned char *pPVS = ( unsigned char * )pInfo->m_PVS;
-	
-	if ( m_PVSInfo.m_nClusterCount < 0 )   // too many clusters, use headnode
-	{
-		return (engine->CheckHeadnodeVisible( m_PVSInfo.m_nHeadNode, pPVS, pInfo->m_nPVSSize ) != 0);
-	}
-	
-	for ( i = m_PVSInfo.m_nClusterCount; --i >= 0; )
-	{
-		int nCluster = m_PVSInfo.m_pClusters[i];
-		if ( ((int)(pPVS[nCluster >> 3])) & BitVec_BitInByte( nCluster ) )
+			//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
 			return true;
-	}
+		}
 
-	return false;		// not visible
-#else
+		//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "not transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
 
-	// Cull transmission based on the camera limits
-	// These limits are send in cl_strategic_cam_limits
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
-	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
-	if ( !pRecipientEntity )
 		return false;
-	
-	CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
-
-	Vector vPlayerPos = pRecipientPlayer->Weapon_ShootPosition() + pRecipientPlayer->GetCameraOffset();
-
-	//NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), vPlayerPos, 255, 0, 0, false, 0.1f );
-
-	Vector vecToTarget = GetOuter()->WorldSpaceCenter() - vPlayerPos;
-	vecToTarget.NormalizeInPlace();
-
-	matrix3x4_t matAngles;
-	AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
-	VectorITransform( vecToTarget, matAngles, vecToTarget );
-
-	Vector vCamLimits;
-	UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
-
-	if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
-		vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
-	{
-		//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
-		return true;
 	}
-
-	//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "not transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
-
-	return false;
-#endif // 0
 }
 
 
