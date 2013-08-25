@@ -9,7 +9,6 @@
 #include "kbutton.h"
 #include "in_buttons.h"
 
-#include "c_hl2wars_player.h"
 #include "wars_mapboundary.h"
 #include "vgui/isurface.h"
 #include "vgui_controls/controls.h"
@@ -67,10 +66,12 @@ ConVar cl_strategic_cam_scrolldelta( "cl_strategic_cam_scrolldelta", "250", FCVA
 ConVar cl_strategic_height_tol( "cl_strategic_cam_height_tol", "48.0", FCVAR_ARCHIVE, "Height tolerance" );
 ConVar cl_strategic_height_adjustspeed( "cl_strategic_height_adjustspeed", "4000.0", FCVAR_ARCHIVE, "Speed at which the camera adjusts to the terrain height." );
 
-ConVar cl_debug_movement_hint( "cl_debug_movement_hint", "0" );
+ConVar cl_strategic_cam_limits( "cl_strategic_cam_limits", "", FCVAR_USERINFO|FCVAR_HIDDEN, "" );
 
 extern void OnActiveConfigChanged( IConVar *var, const char *pOldValue, float flOldValue );
 ConVar cl_active_config( "cl_active_config", "config_fps", FCVAR_ARCHIVE, "Active binding configuration file. Auto changes.", OnActiveConfigChanged );
+
+extern ConVar cl_strategic_cam_min_dist;
 
 extern ConVar cl_pitchdown;
 extern ConVar cl_pitchup;
@@ -98,12 +99,16 @@ static CHL2WarsInput g_Input;
 // Expose this interface
 ::IInput *input = ( ::IInput * )&g_Input;
 
-CHL2WarsInput::CHL2WarsInput()
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CHL2WarsInput::CHL2WarsInput() : m_bStrategicMode(false)
 {
-	m_bStrategicMode = false;
-	m_bResetDHNextSample = false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::Init_All( void )
 {
 	CInput::Init_All();
@@ -111,16 +116,22 @@ void CHL2WarsInput::Init_All( void )
 	BuildWindowList();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::Shutdown_All( void )
 {
 	CInput::Shutdown_All();
 
 	char config[MAX_PATH];
-	Q_snprintf( config, MAX_PATH, "%s.cfg", cl_active_config.GetString());
+	V_snprintf( config, MAX_PATH, "%s.cfg", cl_active_config.GetString());
 
 	SwitchConfig( config, NULL, NULL );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::LevelInit( void )
 {
 	CInput::LevelInit();
@@ -132,11 +143,9 @@ void CHL2WarsInput::LevelInit( void )
 	m_bScrolling = false;
 
 	// Get minimum camera distance
-	ConVarRef cl_strategic_cam_min_dist("cl_strategic_cam_min_dist");
-
 	char buf[MAX_PATH];
 	V_StripExtension( engine->GetLevelName(), buf, MAX_PATH );
-	Q_snprintf( buf, sizeof( buf ), "%s.res", buf );
+	V_snprintf( buf, sizeof( buf ), "%s.res", buf );
 
 	KeyValues *pMapData = new KeyValues("MapData");
 	if( pMapData->LoadFromFile( filesystem, buf ) )
@@ -165,7 +174,7 @@ void CHL2WarsInput::GetBindings(const char *config, CUtlBuffer &bufout)
 	int i;
 	do {
 		buf.GetLine(curline, LINE_BUF_SIZE);
-		if( !Q_strncmp(curline, "unbindall", 9) || !Q_strncmp(curline, "bind", 4) )
+		if( !V_strncmp(curline, "unbindall", 9) || !V_strncmp(curline, "bind", 4) )
 		{
 			for(i=0; i<LINE_BUF_SIZE; i++) 
 			{
@@ -191,26 +200,26 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 	{
 		filesystem->AsyncFinishAllWrites(); // Ensure we have the right config, because host_writeconfig uses async write
 		CUtlBuffer buf;
-		GetBindings("config.cfg", buf);
-		filesystem->WriteFile(VarArgs("cfg/%s", pSaveCurConfigTo), "MOD", buf);
+		GetBindings( "config.cfg", buf );
+		filesystem->WriteFile( VarArgs( "cfg/%s", pSaveCurConfigTo ), "MOD", buf );
 		filesystem->AsyncFinishAllWrites(); // Make sure the current config is written away
 	}
 
 	if( pSwitchToConfig )
 	{
-		if( !filesystem->FileExists(VarArgs("cfg/%s", pSwitchToConfig)) )
+		if( !filesystem->FileExists( VarArgs( "cfg/%s", pSwitchToConfig ) ) )
 		{
-			if( !pSwitchToConfigDefault || !filesystem->FileExists(VarArgs("cfg/%s", pSwitchToConfigDefault)) )
+			if( !pSwitchToConfigDefault || !filesystem->FileExists( VarArgs( "cfg/%s", pSwitchToConfigDefault ) ) )
 			{
-				Warning("SwitchConfig: No default config %s for config %s!\n", pSwitchToConfig, pSwitchToConfigDefault);
+				Warning( "SwitchConfig: No default config %s for config %s!\n", pSwitchToConfig, pSwitchToConfigDefault );
 				return;	
 			}
 
 			CUtlBuffer buf;
-			filesystem->ReadFile(VarArgs("cfg/%s", pSwitchToConfigDefault), "MOD", buf);
-			filesystem->WriteFile(VarArgs("cfg/%s", pSwitchToConfig), "MOD", buf);
+			filesystem->ReadFile( VarArgs( "cfg/%s", pSwitchToConfigDefault ), "MOD", buf );
+			filesystem->WriteFile( VarArgs( "cfg/%s", pSwitchToConfig ), "MOD", buf );
 		}
-		engine->ExecuteClientCmd( VarArgs("exec %s\n", pSwitchToConfig) );
+		engine->ExecuteClientCmd( VarArgs( "exec %s\n", pSwitchToConfig ) );
 		engine->ExecuteClientCmd( "host_writeconfig\n" ); // Writes it into config.cfg
 		
 	}
@@ -222,17 +231,17 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 void OnActiveConfigChanged( IConVar *var, const char *pOldValue, float flOldValue )
 {
 	char curconfig[MAX_PATH];
-	Q_snprintf( curconfig, MAX_PATH, "%s.cfg", pOldValue);
+	V_snprintf( curconfig, MAX_PATH, "%s.cfg", pOldValue);
 	char newconfig[MAX_PATH];
-	Q_snprintf( newconfig, MAX_PATH, "%s.cfg", cl_active_config.GetString());
+	V_snprintf( newconfig, MAX_PATH, "%s.cfg", cl_active_config.GetString());
 	char newconfigdefault[MAX_PATH];
-	Q_snprintf( newconfigdefault, MAX_PATH, "%s_default.cfg", cl_active_config.GetString());
+	V_snprintf( newconfigdefault, MAX_PATH, "%s_default.cfg", cl_active_config.GetString());
 
-	if( Q_stricmp( curconfig, newconfig ) == 0 )
+	if( V_stricmp( curconfig, newconfig ) == 0 )
 		return;
 
 	static bool bInitialConfig = true;
-	Msg("Config changed from %s to %s\n", bInitialConfig ? "none" : curconfig, newconfig);
+	Msg( "Config changed from %s to %s\n", bInitialConfig ? "none" : curconfig, newconfig );
 	g_Input.SwitchConfig( bInitialConfig ? NULL : curconfig, newconfig, newconfigdefault );
 	bInitialConfig = false;
 }
@@ -627,11 +636,10 @@ void CHL2WarsInput::GetFullscreenMousePos( int *mx, int *my, int *unclampedx, in
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Update the aim of the mouse pointer
+// Purpose: Calculate the aim of the mouse pointer at x,y
 //-----------------------------------------------------------------------------
-void CHL2WarsInput::UpdateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y )
+void CHL2WarsInput::CalculateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y, Vector &result )
 {
-	Vector forward;
 	// Remap x and y into -1 to 1 normalized space 
 	float xf, yf; 
 	xf = ( 2.0f * x / (float)(ScreenWidth()-1) ) - 1.0f; 
@@ -653,11 +661,13 @@ void CHL2WarsInput::UpdateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y )
 	// Transform the two points by the screen to world matrix 
 	screenToWorld.V3Mul( v1, pPlayer->Weapon_ShootPosition() + pPlayer->GetCameraOffset() ); // ray start origin 
 	screenToWorld.V3Mul( v2, o2 ); // ray end origin 
-	VectorSubtract( o2, pPlayer->Weapon_ShootPosition() + pPlayer->GetCameraOffset(), forward ); 
-	forward.NormalizeInPlace(); 
-	pPlayer->UpdateMouseData( forward );
+	VectorSubtract( o2, pPlayer->Weapon_ShootPosition() + pPlayer->GetCameraOffset(), result ); 
+	result.NormalizeInPlace();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsInput::ControllerMove ( int nSlot, float frametime, CUserCmd *cmd )
 {
 	// If the gameui is open, disable mouse input and do not update mouse aim
@@ -713,14 +723,27 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	}
 
 	// Normalize
-	nx = vgui::scheme()->GetProportionalNormalizedValue(x);
-	ny = vgui::scheme()->GetProportionalNormalizedValue(y);
-	nw = vgui::scheme()->GetProportionalNormalizedValue(ScreenWidth());
-	nh = vgui::scheme()->GetProportionalNormalizedValue(ScreenHeight());
+	nx = vgui::scheme()->GetProportionalNormalizedValue( x );
+	ny = vgui::scheme()->GetProportionalNormalizedValue( y);
+	nw = vgui::scheme()->GetProportionalNormalizedValue( ScreenWidth() );
+	nh = vgui::scheme()->GetProportionalNormalizedValue( ScreenHeight() );
 
 	// Update mouse aim (done in both fps & rts mode)
-	UpdateMouseAim( pPlayer, x, y);
-	//cmd->m_vMouseAim = pPlayer->GetMouseAim();
+	UpdateMouseAim( pPlayer, x, y );
+	
+	// Update player camera limits (if changed)
+	Vector vCamMin, vCamMax;
+	CalculateMouseAim( pPlayer, ScreenWidth() / 2, 0, vCamMax );
+	CalculateMouseAim( pPlayer, 0, ScreenHeight() / 2, vCamMin );
+
+	matrix3x4_t matAngles;
+	AngleMatrix( pPlayer->GetAbsAngles(), matAngles );
+	VectorITransform( vCamMin, matAngles, vCamMin );
+	VectorITransform( vCamMax, matAngles, vCamMax );
+
+	float fMaxY = fabs( vCamMin.y );
+	float fMaxZ = fabs( vCamMax.z );
+	cl_strategic_cam_limits.SetValue( VarArgs( "%f %f %f", 0.0f, fMaxY, fMaxZ ) );
 
 	// Call baseclass if not in strategic mouse
 	if( pPlayer->IsStrategicModeOn() == false ) {
@@ -745,7 +768,7 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	if( !pViewPort )
 		return;
 
-	if( m_bMouseRotationActive || pPlayer->GetFlags() & FL_FROZEN )
+	if( m_bMouseRotationActive /*|| pPlayer->GetFlags() & FL_FROZEN*/ )
 	{
 		if( pViewPort->IsMouseInputEnabled() )
 			pViewPort->SetMouseInputEnabled(false);
@@ -910,7 +933,7 @@ void CHL2WarsInput::ClampAngles( QAngle& viewangles )
 //-----------------------------------------------------------------------------
 void CHL2WarsInput::ActivateMouseClipping( void )
 {
-#if 1
+#ifndef USECUSTOMMOUSECLIPPING
 	engine->SetMouseWindowLock( true );
 #else
 	int x, y, w, h, offsetx, offsety;
@@ -936,7 +959,7 @@ void CHL2WarsInput::ActivateMouseClipping( void )
 
 void CHL2WarsInput::DeactivateMouseClipping( void )
 {
-#if 1
+#ifndef USECUSTOMMOUSECLIPPING
 	engine->SetMouseWindowLock( false );
 #else
 	ClipCursor( NULL );

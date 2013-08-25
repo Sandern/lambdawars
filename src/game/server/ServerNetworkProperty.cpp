@@ -10,6 +10,9 @@
 #include "tier0/dbg.h"
 #include "gameinterface.h"
 
+#include "hl2wars_player.h"
+#include "collisionutils.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -236,6 +239,7 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 //-----------------------------------------------------------------------------
 bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 {
+#if 0
 	// PVS data must be up to date
 	Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
 	
@@ -296,7 +300,42 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 	}
 
 	return false;		// not visible
+#else
 
+	// Cull transmission based on the camera limits
+	// These limits are send in cl_strategic_cam_limits
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
+	if ( !pRecipientEntity )
+		return false;
+	
+	CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
+
+	Vector vPlayerPos = pRecipientPlayer->Weapon_ShootPosition() + pRecipientPlayer->GetCameraOffset();
+
+	//NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), vPlayerPos, 255, 0, 0, false, 0.1f );
+
+	Vector vecToTarget = GetOuter()->WorldSpaceCenter() - vPlayerPos;
+	vecToTarget.NormalizeInPlace();
+
+	matrix3x4_t matAngles;
+	AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
+	VectorITransform( vecToTarget, matAngles, vecToTarget );
+
+	Vector vCamLimits;
+	UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
+
+	if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
+		vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
+	{
+		//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
+		return true;
+	}
+
+	//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "not transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
+
+	return false;
+#endif // 0
 }
 
 

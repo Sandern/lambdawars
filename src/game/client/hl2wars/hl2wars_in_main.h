@@ -11,12 +11,13 @@
 #endif
 
 #include "input.h"
+#include "c_hl2wars_player.h"
 
 #ifdef WIN32
 	#include <winlite.h>
 #endif // WIN32
 
-class C_HL2WarsPlayer;
+//#define USECUSTOMMOUSECLIPPING
 
 //-----------------------------------------------------------------------------
 // Purpose: HL2Wars Input interface
@@ -44,7 +45,8 @@ public:
 
 	virtual		void		GetFullscreenMousePos( int *mx, int *my, int *unclampedx = NULL, int *unclampedy = NULL );
 
-	void					UpdateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y );
+	virtual void			UpdateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y );
+	virtual void			CalculateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y, Vector &result );
 
 	virtual		void		ControllerMove( int nSlot, float frametime, CUserCmd *cmd );
 	virtual		void		MouseMove ( int nSlot, CUserCmd *cmd );
@@ -83,7 +85,7 @@ public:
 	void					BuildWindowList();
 	void					AddWindow( HWND hwnd ) { m_Windows.AddToTail( hwnd ); }
 	bool					HasWindowFocus();
-	HWND					GetWindow();
+	//HWND					GetWindow();
 
 private:
 	float					m_fCurrentSampleTime;
@@ -99,7 +101,6 @@ private:
 	bool				m_bScrollForward;
 	float				m_fScrollTimeOut;
 	bool				m_bScrolling;
-	bool				m_bResetDHNextSample;
 	float				m_flDesiredCameraDist;
 	float				m_flCurrentCameraDist;
 	Vector				m_vecCameraVelocity;
@@ -112,11 +113,26 @@ private:
 	CUtlVector< HWND > m_Windows;
 };
 
+#ifdef USECUSTOMMOUSECLIPPING
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 inline HWND CHL2WarsInput::GetWindow()
 {
 	if( m_Windows.Count() > 0 )
 		return m_Windows[0];
 	return 0;
+}
+#endif // USECUSTOMMOUSECLIPPING
+
+//-----------------------------------------------------------------------------
+// Purpose: Update the aim of the mouse pointer
+//-----------------------------------------------------------------------------
+inline void CHL2WarsInput::UpdateMouseAim( C_HL2WarsPlayer *pPlayer, int x, int y )
+{
+	Vector forward;
+	CalculateMouseAim( pPlayer, x, y, forward );
+	pPlayer->UpdateMouseData( forward );
 }
 
 #endif // WARS_IN_MAIN_H

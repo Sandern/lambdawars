@@ -57,6 +57,8 @@ END_DATADESC()
 	ConVar g_debug_mouse_noradiuscheck( "g_debug_mouse_noradiuscheck", "0" );
 
 	ConVar debug_snapcamerapos("debug_snapcamerapos", "0", FCVAR_CHEAT);
+
+	ConVar wars_debug_unit_mintable("wars_debug_unit_mintable", "0", FCVAR_CHEAT);
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -310,6 +312,28 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 		if( pEnt && pEnt->GetIMouse() )
 			pEnt->GetIMouse()->OnCursorEntered( this );
 	}
+
+#ifndef CLIENT_DLL
+	if( wars_debug_unit_mintable.GetBool() )
+	{
+		// Debug units using minimal table
+		int countMinTable = 0;
+		int countFullTable = 0;
+		CUnitBase **ppUnits = g_Unit_Manager.AccessUnits();
+		for ( int i = 0; i < g_Unit_Manager.NumUnits(); i++ )
+		{
+			CUnitBase *pOther = ppUnits[i];
+
+			if( pOther->UseMinimalSendTable() )
+				countMinTable++;
+			else
+				countFullTable++;
+		}
+
+		engine->Con_NPrintf( 1, "countMinTable: %d", countMinTable );
+		engine->Con_NPrintf( 2, "countFullTable: %d", countFullTable );
+	}
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
