@@ -2495,7 +2495,7 @@ inline void CServerNetworkProperty::CheckTransmit( CCheckTransmitInfo *pInfo )
 	}
 } */
 
-
+#if 0
 static void CheckTransmitRTS( CCheckTransmitInfo *pInfo, const unsigned short *pEdictIndices, int nEdicts )
 {
 	// NOTE: for speed's sake, this assumes that all networkables are CBaseEntities and that the edict list
@@ -2673,9 +2673,12 @@ static void CheckTransmitRTS( CCheckTransmitInfo *pInfo, const unsigned short *p
 		float fDot = fabs( DotProduct( vDir, vForward ) );
 		if( fDot >= fMaxDot || sv_force_transmit_ents.GetBool() )
 		{
+			NDebugOverlay::EntityText( pEnt->entindex(), 0, "not transmitting", 0.1f );
 			pEnt->SetTransmit( pInfo, false );
 			continue;
 		}
+
+		NDebugOverlay::EntityText( pEnt->entindex(), 0, "transmitting", 0.1f );
 
 		// If the entity is marked "check PVS" but it's in hierarchy, walk up the hierarchy looking for the
 		//  for any parent which is also in the PVS.  If none are found, then we don't need to worry about sending ourself
@@ -2734,6 +2737,7 @@ static void CheckTransmitRTS( CCheckTransmitInfo *pInfo, const unsigned short *p
 		}
 	}
 }
+#endif // 0
 
 void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned short *pEdictIndices, int nEdicts )
 {
