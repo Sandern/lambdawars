@@ -381,7 +381,7 @@ void CServerNetworkProperty::FireEvent()
 {
 	// Our timer went off. If our state has changed in the background, then 
 	// trigger a state change in the edict.
-	if ( m_bPendingStateChange )
+	if ( m_bPendingStateChange && m_pPev )
 	{
 		m_pPev->StateChanged();
 		m_bPendingStateChange = false;

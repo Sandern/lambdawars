@@ -564,20 +564,11 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 //-----------------------------------------------------------------------------
 int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-#ifdef USE_MINIMAL_SENDTABLE
-	if( g_unit_force_minimal_sendtable.GetInt() > 1 )
-	{
-		m_bUseMinimalSendTable = false;
-		return FL_EDICT_ALWAYS;
-	}
-#endif // USE_MINIMAL_SENDTABLE
-
-	m_bUseMinimalSendTable = false;
-
 	int fFlags = DispatchUpdateTransmitState();
 
 	if ( fFlags & FL_EDICT_ALWAYS )
 	{
+		m_bUseMinimalSendTable = false;
 		return FL_EDICT_ALWAYS;
 	}
 	else if ( fFlags & FL_EDICT_DONTSEND )
@@ -602,18 +593,26 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 
 	// by default do a PVS check
 	netProp->RecomputePVSInformation();
-	m_bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo );
-	if( m_bUseMinimalSendTable )
+	bool bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo );
+
+	if( m_bUseMinimalSendTable != bUseMinimalSendTable )
 	{
-		// Low update rate mode!
-		if( !netProp->TimerEventActive() )
+		m_bUseMinimalSendTable = bUseMinimalSendTable;
+
+		if( m_bUseMinimalSendTable )
+		{
+			// Low update rate mode!
 			netProp->SetUpdateInterval( g_unit_minimal_sendtable_updaterate.GetFloat() );
-	}
-	else
-	{
-		// Back to regular mode!
-		if( netProp->TimerEventActive() )
-			netProp->SetUpdateInterval( 0 );
+		}
+		else
+		{
+			// Back to regular mode!
+			if( netProp->TimerEventActive() )
+				netProp->SetUpdateInterval( 0 );
+
+			// State might have changed
+			netProp->NetworkStateChanged();
+		}
 	}
 
 	return FL_EDICT_ALWAYS;
