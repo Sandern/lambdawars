@@ -254,7 +254,10 @@ INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableExtraParticleFiles = NULL;
 
+#ifdef HL2WARS_DLL
 INetworkStringTable *g_pStringTablePyModules = NULL;
+INetworkStringTable *g_pStringTableGameDBNames = NULL;
+#endif // HL2WARS_DLL
 
 CStringTableSaveRestoreOps g_VguiScreenStringOps;
 
@@ -1549,7 +1552,10 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableInfoPanel = networkstringtable->CreateStringTable( "InfoPanel", MAX_INFOPANEL_STRINGS );
 	g_pStringTableClientSideChoreoScenes = networkstringtable->CreateStringTable( "Scenes", MAX_CHOREO_SCENES_STRINGS, 0, 0, NSF_DICTIONARY_ENABLED );
 
+#ifdef HL2WARS_DLL
 	g_pStringTablePyModules = networkstringtable->CreateStringTable( "PyModules", MAX_CHOREO_SCENES_STRINGS );
+	g_pStringTableGameDBNames = networkstringtable->CreateStringTable( "GameDBNames", MAX_CHOREO_SCENES_STRINGS );
+#endif // HL2WARS_DLL
 
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
@@ -1557,8 +1563,12 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 			g_pStringTableMaterials &&
 			g_pStringTableInfoPanel &&
 			g_pStringTableClientSideChoreoScenes &&
-			g_pStringTableExtraParticleFiles &&
-			g_pStringTablePyModules 
+			g_pStringTableExtraParticleFiles 
+#ifdef HL2WARS_DLL
+			&&
+			g_pStringTablePyModules &&
+			g_pStringTableGameDBNames
+#endif // HL2WARS_DLL
 			);
 
 	// Need this so we have the error material always handy

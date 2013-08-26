@@ -478,7 +478,7 @@ private:
 
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
-	CNetworkString(	m_NetworkedUnitType, MAX_PATH );
+	CNetworkVar(int, m_NetworkedUnitTypeSymbol );
 
 	bool m_bUseMinimalSendTable;
 
@@ -521,7 +521,9 @@ private:
 	CNetworkVar(int, m_iKills );
 #else
 	string_t m_UnitType;
-	char m_NetworkedUnitType[MAX_PATH];
+	int m_NetworkedUnitTypeSymbol;
+	int m_OldNetworkedUnitTypeSymbol;
+
 	CHandle< CHL2WarsPlayer > m_hOldCommander;
 	CHandle< C_BaseCombatWeapon > m_hOldActiveWeapon;
 	int						m_iOldHealth;

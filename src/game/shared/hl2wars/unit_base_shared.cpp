@@ -162,6 +162,9 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 
 	m_bFOWFilterFriendly = true;
 #else
+	m_OldNetworkedUnitTypeSymbol = -1;
+	m_NetworkedUnitTypeSymbol = -1;
+
 	SetPredictionEligible( true );
 
 	m_bUpdateClientAnimations = true;
@@ -180,6 +183,9 @@ CUnitBase::~CUnitBase()
 	RemoveFromUnitList();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::UpdateOnRemove( void )
 {
 	RemoveFromUnitList();
@@ -194,6 +200,9 @@ void CUnitBase::UpdateOnRemove( void )
 	BaseClass::UpdateOnRemove();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnRestore()
 {
 	BaseClass::OnRestore();
@@ -203,6 +212,9 @@ void CUnitBase::OnRestore()
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnChangeOwnerNumberInternal( int old_owner_number )
 {
 	BaseClass::OnChangeOwnerNumberInternal(old_owner_number);
@@ -215,6 +227,9 @@ void CUnitBase::OnChangeOwnerNumberInternal( int old_owner_number )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::AddToUnitList()
 {
 	if( IsMarkedForDeletion() )
@@ -252,6 +267,9 @@ void CUnitBase::AddToUnitList()
 	g_pUnitListHead = pUnitList;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::RemoveFromUnitList()
 {
 	g_Unit_Manager.RemoveUnit(this);
@@ -313,16 +331,25 @@ void CUnitBase::Select( CHL2WarsPlayer *pPlayer, bool bTriggerSel )
 	pPlayer->AddUnit(this, bTriggerSel);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnSelected( CHL2WarsPlayer *pPlayer )
 {
 	m_SelectedByPlayers.AddToTail( pPlayer );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnDeSelected( CHL2WarsPlayer *pPlayer )
 {
 	m_SelectedByPlayers.FindAndRemove( pPlayer );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CUnitBase::OnUnitTypeChanged( const char *old_unit_type )
 {
 	int i;
@@ -399,6 +426,9 @@ Disposition_t CUnitBase::IRelationType ( CBaseEntity *pTarget )
 	return D_ER;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CUnitBase::IRelationPriority( CBaseEntity *pTarget )
 {
 	return 0;

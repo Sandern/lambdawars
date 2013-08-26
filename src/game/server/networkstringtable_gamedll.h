@@ -36,7 +36,14 @@ extern INetworkStringTableContainer *networkstringtable;
 extern INetworkStringTable *g_pStringTableVguiScreen;
 extern INetworkStringTable *g_pStringTableClientSideChoreoScenes;
 
+#ifdef HL2WARS_DLL
+#define MAX_GAMEDBNAMES_STRING_BITS			10
+#define MAX_GAMEDBNAMES_STRINGS				( 1 << MAX_GAMEDBNAMES_STRING_BITS )
+#define GAMEDBNAMES_INVALID_STRING			( MAX_GAMEDBNAMES_STRINGS - 1 )
+
 extern INetworkStringTable *g_pStringTablePyModules;
+extern INetworkStringTable *g_pStringTableGameDBNames;
+#endif // HL2WARS_DLL
 
 #define MAX_INFOPANEL_STRINGS			128
 

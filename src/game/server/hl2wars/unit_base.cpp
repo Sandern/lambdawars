@@ -17,6 +17,7 @@
 #include "wars_weapon_shared.h"
 
 #include "sendprop_priorities.h"
+#include "networkstringtable_gamedll.h"
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
@@ -440,8 +441,8 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
 END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
-	SendPropString( SENDINFO( m_NetworkedUnitType ) ),
-
+	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
+	
 	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_takedamage ), 3, SPROP_UNSIGNED ),
@@ -480,7 +481,7 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that gets sent when unit is the single selected unit of the player
 	SendPropDataTable( "selecteddata", 0, &REFERENCE_SEND_TABLE(DT_SelectedOnlyTable), SendProxy_SendSelectedOnlyDataTable ),
 
-	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
+	//SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
@@ -511,7 +512,7 @@ BEGIN_DATADESC( CUnitBase )
 	DEFINE_FIELD( m_vEnterOffset, FIELD_VECTOR ),
 
 	DEFINE_FIELD( m_UnitType, FIELD_STRING ),
-	DEFINE_AUTO_ARRAY( m_NetworkedUnitType, FIELD_CHARACTER ),
+	DEFINE_FIELD( m_NetworkedUnitTypeSymbol, FIELD_INTEGER ),
 	DEFINE_FIELD( m_fLastTakeDamageTime, FIELD_FLOAT ),
 
 	DEFINE_FIELD( m_iEnergy, FIELD_INTEGER ),
@@ -618,7 +619,10 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 //-----------------------------------------------------------------------------
 void CUnitBase::SetUnitType( const char *unit_type )
 {
-	Q_strcpy( m_NetworkedUnitType.GetForModify(), unit_type );
+	m_NetworkedUnitTypeSymbol = g_pStringTableGameDBNames->FindStringIndex( unit_type );
+	if (m_NetworkedUnitTypeSymbol == INVALID_STRING_INDEX ) 
+		m_NetworkedUnitTypeSymbol = g_pStringTableGameDBNames->AddString( CBaseEntity::IsServer(), unit_type );
+
 	const char *pOldUnitType = STRING(m_UnitType);
 	m_UnitType = AllocPooledString(unit_type);
 	OnUnitTypeChanged(pOldUnitType);
@@ -916,9 +920,10 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 		}
 		else
 		{
-			Warning("CUnitBase::TargetDistance: Did not hit target!\n");
+			Warning( "CUnitBase::TargetDistance: Entity #%d:%s not hit target entity #%d:%s!\n", 
+						entindex(), GetClassname(), pTarget->entindex(), pTarget->GetClassname() );
 			if( g_debug_rangeattacklos.GetBool() )
-				NDebugOverlay::Line( pos, targetPos, 0, 255, 0, true, 1.0f );
+				NDebugOverlay::Line( pos, pTarget->EyePosition(), 255, 255, 0, true, 1.0f );
 		}
 	}
 

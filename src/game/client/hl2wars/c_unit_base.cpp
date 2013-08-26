@@ -18,6 +18,7 @@
 #include "c_hl2wars_player.h"
 #include "hl2wars_util_shared.h"
 #include "iinput.h"
+#include "networkstringtable_clientdll.h"
 
 #include "unit_baseanimstate.h"
 
@@ -127,21 +128,18 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
-	//RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
 	//RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
-	//RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
+	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
 
-	RecvPropString(  RECVINFO( m_NetworkedUnitType ) ),
-
-	RecvPropInt		(RECVINFO(m_iHealth)),
-	RecvPropInt		(RECVINFO(m_iMaxHealth)),
-	RecvPropInt		(RECVINFO(m_fFlags)),
-	RecvPropInt		(RECVINFO( m_takedamage)),
-	RecvPropInt		(RECVINFO( m_lifeState)),
+	RecvPropInt		(RECVINFO( m_iHealth )),
+	RecvPropInt		(RECVINFO( m_iMaxHealth )),
+	RecvPropInt		(RECVINFO( m_fFlags )),
+	RecvPropInt		(RECVINFO( m_takedamage )),
+	RecvPropInt		(RECVINFO( m_lifeState )),
 
 	RecvPropEHandle		( RECVINFO( m_hSquadUnit ) ),
 	RecvPropEHandle		( RECVINFO( m_hCommander ) ),
@@ -153,7 +151,6 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	RecvPropInt		(RECVINFO(m_iEnergy)),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
-	//RecvPropInt		(RECVINFO(m_iKills)),
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_SelectedOnlyTable )
@@ -171,7 +168,7 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( CUnitBase )
-	DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
+	//DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 
 	//DEFINE_PRED_FIELD( m_vecVelocity, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	DEFINE_PRED_FIELD( m_flCycle, FIELD_FLOAT, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
@@ -218,12 +215,34 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 			OnChangeOwnerNumber(0);
 	}
 
-	// Check if the player's faction changed ( Might want to add a string table )
-	if( m_UnitType == NULL_STRING || Q_strncmp( STRING(m_UnitType), m_NetworkedUnitType, MAX_PATH ) != 0 ) 
+	// Check if the unit type changed
+	if( m_NetworkedUnitTypeSymbol != m_OldNetworkedUnitTypeSymbol )
 	{
-		const char *pOldUnitType = STRING(m_UnitType);
-		m_UnitType = AllocPooledString(m_NetworkedUnitType);
-		OnUnitTypeChanged(pOldUnitType);
+		if ( m_NetworkedUnitTypeSymbol >= 0 && m_NetworkedUnitTypeSymbol < g_pStringTableGameDBNames->GetMaxStrings() )
+		{
+			char old_unittype[MAX_PATH];
+			old_unittype[0] = '\0';;
+			if( m_UnitType != NULL_STRING )
+				V_strncpy( old_unittype, m_UnitType, MAX_PATH );
+
+			const char *unittype = g_pStringTableGameDBNames->GetString( m_NetworkedUnitTypeSymbol );
+			if( unittype )
+			{
+				m_UnitType = AllocPooledString( unittype );
+			
+				OnUnitTypeChanged(old_unittype);
+			}
+			else
+			{
+				Warning("CUnitBase::OnDataChanged: invalid string in table\n");
+			}
+		}
+		else
+		{
+			Warning("CUnitBase::OnDataChanged: Unit received an invalid unit type\n");
+		}
+
+		m_OldNetworkedUnitTypeSymbol = m_NetworkedUnitTypeSymbol;
 	}
 
 	// Check change commander
@@ -338,31 +357,20 @@ bool CUnitBase::ShouldDraw( void )
 	return BaseClass::ShouldDraw();
 }
 
-ConVar cl_unit_interp_disable( "cl_unit_interp_disable", "0.1", FCVAR_NONE, "" );
 ConVar cl_unit_interp_rate( "cl_unit_interp_rate", "0.1", FCVAR_NONE, "Interpolation for units client side." );
-
-#define round(x) ((x)>=0)?(int)((x)+0.5):(int)((x)-0.5)
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CUnitBase::UpdateClientSideAnimation()
 {
-#if 1
+#if 0
 	if( m_fNextSimulationUpdate < gpGlobals->curtime )
 	{
 		m_flOldSimulationTime = m_flSimulationTime;
 		m_flSimulationTime = gpGlobals->curtime;
 		OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
-
-		//float w = (m_fNextSimulationUpdate - m_fSimulationBaseClock) / cl_unit_interp_rate.GetFloat();
-		//float wnext = round( w );
-		//float nextw = (wnext - w);
-		//if( nextw < 0 )
-			m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat();
-		//else
-		//	m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat() * (wnext - w);
-		//Msg("Calculated next update: %f\n", cl_unit_interp_rate.GetFloat() * (wnext - w));
+		m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat();
 	}
 #endif // 0
 
@@ -392,7 +400,7 @@ void CUnitBase::UpdateClientSideAnimation()
 	}
 
 	if( GetSequence() != -1 )
-		OnLatchInterpolatedVariables((1<<0));
+		OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 }
 
 //-----------------------------------------------------------------------------
