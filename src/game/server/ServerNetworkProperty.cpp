@@ -46,27 +46,41 @@ CServerNetworkProperty::CServerNetworkProperty()
 
 CServerNetworkProperty::~CServerNetworkProperty()
 {
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
 	if( !m_bDestroyed )
 	{
-		/* Free our transmit proxy.
-		if ( m_pTransmitProxy )
-		{
-			m_pTransmitProxy->Release();
-		}*/
-
-		engine->CleanUpEntityClusterList( &m_PVSInfo );
-
-		// remove the attached edict if it exists
-		DetachEdict();
+		DestroyNetworkProperty();
 	}
+#else
+	/* Free our transmit proxy.
+	if ( m_pTransmitProxy )
+	{
+		m_pTransmitProxy->Release();
+	}*/
+
+	engine->CleanUpEntityClusterList( &m_PVSInfo );
+
+	// remove the attached edict if it exists
+	DetachEdict();
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
 void CServerNetworkProperty::DestroyNetworkProperty()
 {
 	/* Free our transmit proxy.
 	if ( m_pTransmitProxy )
 	{
-	m_pTransmitProxy->Release();
+		m_pTransmitProxy->Release();
 	}*/
 
 	engine->CleanUpEntityClusterList( &m_PVSInfo );
@@ -76,6 +90,10 @@ void CServerNetworkProperty::DestroyNetworkProperty()
 
 	m_bDestroyed = true;
 }
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 //-----------------------------------------------------------------------------
 // Initialization

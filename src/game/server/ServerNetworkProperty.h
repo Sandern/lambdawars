@@ -28,7 +28,16 @@ public:
 public:
 	CServerNetworkProperty();
 	virtual	~CServerNetworkProperty();
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
 	void DestroyNetworkProperty();
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 public:
 // IServerNetworkable implementation.
@@ -101,6 +110,10 @@ public:
 
 	// Recomputes PVS information
 	void RecomputePVSInformation();
+
+#ifdef HL2WARS_DLL
+	bool TimerEventActive();
+#endif // HL2WARS_DLL
 
 private:
 	// Detaches the edict.. should only be called by CBaseNetworkable's destructor.
@@ -257,5 +270,11 @@ inline int CServerNetworkProperty::AreaNum() const
 	return m_PVSInfo.m_nAreaNum;
 }
 
+#ifdef HL2WARS_DLL
+inline bool CServerNetworkProperty::TimerEventActive()
+{
+	return m_TimerEvent.IsRegistered();
+}
+#endif // HL2WARS_DLL
 
 #endif // SERVERNETWORKPROPERTY_H

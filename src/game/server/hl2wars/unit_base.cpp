@@ -29,6 +29,7 @@
 static ConVar g_debug_rangeattacklos("g_debug_rangeattacklos", "0", FCVAR_CHEAT);
 static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
 static ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
+static ConVar g_unit_minimal_sendtable_updaterate("g_unit_minimal_sendtable_updaterate", "0.4", FCVAR_CHEAT);
 static ConVar unit_nextserveranimupdatetime("unit_nextserveranimupdatetime", "0.2", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
@@ -569,11 +570,9 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		m_bUseMinimalSendTable = false;
 		return FL_EDICT_ALWAYS;
 	}
-
-	m_bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool();
-#else
-	m_bUseMinimalSendTable = false;
 #endif // USE_MINIMAL_SENDTABLE
+
+	m_bUseMinimalSendTable = false;
 
 	int fFlags = DispatchUpdateTransmitState();
 
@@ -599,13 +598,24 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	}
 
 #if USE_MINIMAL_SENDTABLE
-	if( m_bUseMinimalSendTable )
-		return FL_EDICT_ALWAYS;
-	
-	// by default do a PVS check
 	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
+
+	// by default do a PVS check
 	netProp->RecomputePVSInformation();
-	m_bUseMinimalSendTable = !netProp->IsInPVS( pInfo );
+	m_bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo );
+	if( m_bUseMinimalSendTable )
+	{
+		// Low update rate mode!
+		if( !netProp->TimerEventActive() )
+			netProp->SetUpdateInterval( g_unit_minimal_sendtable_updaterate.GetFloat() );
+	}
+	else
+	{
+		// Back to regular mode!
+		if( netProp->TimerEventActive() )
+			netProp->SetUpdateInterval( 0 );
+	}
+
 	return FL_EDICT_ALWAYS;
 #else
 	return FL_EDICT_ALWAYS;

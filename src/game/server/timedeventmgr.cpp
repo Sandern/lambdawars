@@ -144,6 +144,9 @@ void CTimedEventMgr::RemoveEvent( CEventRegister *pEvent )
 			if ( m_Events.Element( i ) == pEvent )
 			{
 				m_Events.RemoveAt( i );
+#ifdef HL2WARS_DLL
+				pEvent->m_bRegistered = false;
+#endif // HL2WARS_DLL
 				break;
 			}
 		}
