@@ -30,6 +30,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifndef CLIENT_DLL
+#define VarArgs UTIL_VarArgs
+#endif // CLIENT_DLL
+
 // Shorter alias
 namespace bp = boost::python;
 
@@ -694,9 +698,11 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 		{
 			try 
 			{
-				m_methodTickList[i].method();
+				m_activeMethod = m_methodTickList[i].method;
 
-				// Method might have removed the method already
+				m_activeMethod();
+
+				// Method might have removed the entry already
 				if( !m_methodTickList.IsValidIndex(i) )
 					continue;
 
@@ -707,7 +713,8 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 					continue;
 				}
 			} 
-			catch( bp::error_already_set & ) {
+			catch( bp::error_already_set & ) 
+			{
 				Warning("Unregistering tick method due the following exception (catch exception if you don't want this): \n");
 				PyErr_Print();
 				m_methodTickList.Remove( i );
@@ -722,15 +729,20 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 	{
 		try 
 		{
-			m_methodPerFrameList[i]();
+			m_activeMethod = m_methodPerFrameList[i];
+
+			m_activeMethod();
 		}
-		catch( bp::error_already_set & ) {
+		catch( bp::error_already_set & ) 
+		{
 			Warning("Unregistering per frame method due the following exception (catch exception if you don't want this): \n");
 			PyErr_Print();
 			m_methodPerFrameList.Remove( i );
 			continue;
 		}
 	}
+
+	m_activeMethod = bp::object();
 
 #ifdef CLIENT_DLL
 	PyUpdateProceduralMaterials();
@@ -1134,15 +1146,22 @@ void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool l
 //-----------------------------------------------------------------------------
 void CSrcPython::UnregisterTickMethod( bp::object method )
 {
+	if( m_activeMethod.ptr() != Py_None && method != m_activeMethod )
+	{
+		PyErr_SetString(PyExc_Exception, "Cannot remove methods from a tick method (other than the active tick method itself)" );
+		throw boost::python::error_already_set(); 
+	}
+
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
-		if( m_methodTickList[i].method.ptr() == method.ptr() )
+		if( m_methodTickList[i].method == method )
 		{
 			m_methodTickList.Remove(i);
 			return;
 		}
 	}
-	PyErr_SetString(PyExc_Exception, "Method not found" );
+
+	PyErr_SetString(PyExc_Exception, VarArgs("Method %p not found", method.ptr()) );
 	throw boost::python::error_already_set(); 
 }
 
@@ -1164,7 +1183,7 @@ bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
-		if( m_methodTickList[i].method.ptr() == method.ptr() )
+		if( m_methodTickList[i].method == method )
 			return true;
 	}
 	return false;
@@ -1188,15 +1207,21 @@ void CSrcPython::RegisterPerFrameMethod( bp::object method )
 //-----------------------------------------------------------------------------
 void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 {
+	if( m_activeMethod.ptr() != Py_None && method != m_activeMethod )
+	{
+		PyErr_SetString(PyExc_Exception, "Cannot remove methods from a perframe method (other than the active perframe method itself)" );
+		throw boost::python::error_already_set(); 
+	}
+
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
-		if( m_methodPerFrameList[i].ptr() == method.ptr() )
+		if( m_methodPerFrameList[i] == method )
 		{
 			m_methodPerFrameList.Remove(i);
 			return;
 		}
 	}
-	PyErr_SetString(PyExc_Exception, "Method not found" );
+	PyErr_SetString(PyExc_Exception, VarArgs("Method %p not found", method.ptr()) );
 	throw boost::python::error_already_set(); 
 }
 
@@ -1218,7 +1243,7 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
-		if( m_methodPerFrameList[i].ptr() == method.ptr() )
+		if( m_methodPerFrameList[i] == method )
 			return true;
 	}
 	return false;
