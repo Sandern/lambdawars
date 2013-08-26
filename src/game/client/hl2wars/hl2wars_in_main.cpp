@@ -66,7 +66,21 @@ ConVar cl_strategic_cam_scrolldelta( "cl_strategic_cam_scrolldelta", "250", FCVA
 ConVar cl_strategic_height_tol( "cl_strategic_cam_height_tol", "48.0", FCVAR_ARCHIVE, "Height tolerance" );
 ConVar cl_strategic_height_adjustspeed( "cl_strategic_height_adjustspeed", "4000.0", FCVAR_ARCHIVE, "Speed at which the camera adjusts to the terrain height." );
 
-ConVar cl_strategic_cam_limits( "cl_strategic_cam_limits", "", FCVAR_USERINFO|FCVAR_HIDDEN, "" );
+ConVar cl_strategic_cam_limits_debug( "cl_strategic_cam_limits_debug", "", FCVAR_CHEAT, "" );
+
+void CameraLimitsChanged( IConVar *var, const char *pOldValue, float flOldValue )
+{
+	if( cl_strategic_cam_limits_debug.GetBool() )	
+		DevMsg("Camera Limits Changed to %s\n", ((ConVar *)var)->GetString());
+
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if( !pPlayer )
+		return;
+
+	engine->ClientCmd("player_camerasettings");
+}
+
+ConVar cl_strategic_cam_limits( "cl_strategic_cam_limits", "", FCVAR_USERINFO|FCVAR_HIDDEN, "", CameraLimitsChanged );
 
 extern void OnActiveConfigChanged( IConVar *var, const char *pOldValue, float flOldValue );
 ConVar cl_active_config( "cl_active_config", "config_fps", FCVAR_ARCHIVE, "Active binding configuration file. Auto changes.", OnActiveConfigChanged );
@@ -737,13 +751,19 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	CalculateMouseAim( pPlayer, 0, ScreenHeight() / 2, vCamMin );
 
 	matrix3x4_t matAngles;
-	AngleMatrix( pPlayer->GetAbsAngles(), matAngles );
+	//AngleMatrix( pPlayer->GetAbsAngles(), matAngles );
+	QAngle	viewangles;	
+	engine->GetViewAngles( viewangles );
+	AngleMatrix( viewangles, matAngles );
 	VectorITransform( vCamMin, matAngles, vCamMin );
 	VectorITransform( vCamMax, matAngles, vCamMax );
 
-	float fMaxY = fabs( vCamMin.y );
-	float fMaxZ = fabs( vCamMax.z );
-	cl_strategic_cam_limits.SetValue( VarArgs( "%f %f %f", 0.0f, fMaxY, fMaxZ ) );
+	Vector limits( 0.0f, fabs( vCamMin.y ), fabs( vCamMax.z ) );
+	if( !VectorsAreEqual( limits, pPlayer->GetCamLimits(), 0.017f ) ) // Tolerance of 1 degree
+	{
+		pPlayer->SetCamLimits( limits );
+		cl_strategic_cam_limits.SetValue( VarArgs( "%.2f %.2f %.2f", 0.0f, limits.y, limits.z ) );
+	}
 
 	// Call baseclass if not in strategic mouse
 	if( pPlayer->IsStrategicModeOn() == false ) {

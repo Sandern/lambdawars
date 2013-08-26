@@ -18,6 +18,7 @@
 
 extern CTimedEventMgr g_NetworkPropertyEventMgr;
 
+#define USE_NEW_ISINPVS
 
 //-----------------------------------------------------------------------------
 // Save/load
@@ -162,6 +163,10 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::RecomputePVSInformation()
 {
+#ifdef USE_NEW_ISINPVS
+	if( gpGlobals->maxClients != 1 )
+		return;
+#endif // USE_NEW_ISINPVS
 	if ( m_pPev && ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) != 0 ) )
 	{
 		m_pPev->m_fStateFlags &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
@@ -233,13 +238,14 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 	return false;		// not visible
 }
 
-
 //-----------------------------------------------------------------------------
 // PVS: this function is called a lot, so it avoids function calls
 //-----------------------------------------------------------------------------
 bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 {
+#ifdef USE_NEW_ISINPVS
 	if( gpGlobals->maxClients == 1 )
+#endif // USE_NEW_ISINPVS
 	{
 		// PVS data must be up to date
 		Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
@@ -302,6 +308,7 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 
 		return false;		// not visible
 	}
+#ifdef USE_NEW_ISINPVS
 	else
 	{
 		// Cull transmission based on the camera limits
@@ -324,8 +331,9 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 		AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
 		VectorITransform( vecToTarget, matAngles, vecToTarget );
 
-		Vector vCamLimits;
-		UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
+		const Vector &vCamLimits = pRecipientPlayer->GetCamLimits();
+		//Vector vCamLimits;
+		//UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
 
 		if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
 			vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
@@ -338,6 +346,7 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 
 		return false;
 	}
+#endif // 0
 }
 
 

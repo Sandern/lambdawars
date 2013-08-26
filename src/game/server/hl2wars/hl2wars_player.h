@@ -101,6 +101,8 @@ public:
 	float							GetCamAcceleration() { return m_fCamAcceleration; }
 	float							GetCamStopSpeed() { return m_fCamStopSpeed; }
 	float							GetCamFriction() { return m_fCamFriction; }
+	const Vector &					GetCamLimits() { return m_vCameraLimits; }
+	void							SetCamLimits( const Vector &limits ) { m_vCameraLimits = limits; }
 
 	virtual void					CalculateHeight( const Vector &vPosition );
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
@@ -214,6 +216,7 @@ private:
 	float m_fCamFriction;
 	float m_fMaxHeight;
 	Vector m_vCamGroundPos;
+	Vector m_vCameraLimits;
 
 	// Selection data
 	CUtlVector< EHANDLE >		m_hSelectedUnits;

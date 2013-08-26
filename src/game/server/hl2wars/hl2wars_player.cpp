@@ -181,6 +181,7 @@ void CHL2WarsPlayer::UpdateCameraSettings()
 	m_fCamAcceleration = atof( engine->GetClientConVarValue( entindex(), "cl_strategic_cam_accelerate" ) );
 	m_fCamStopSpeed = atof( engine->GetClientConVarValue( entindex(), "cl_strategic_cam_stopspeed" ) );
 	m_fCamFriction = atof( engine->GetClientConVarValue( entindex(), "cl_strategic_cam_friction" ) );
+	UTIL_StringToVector( m_vCameraLimits.Base(), engine->GetClientConVarValue( entindex(), "cl_strategic_cam_limits" ) );
 
 	SetMaxSpeed( m_fCamSpeed );
 

@@ -155,6 +155,8 @@ public:
 	float							GetCamAcceleration() { return cl_strategic_cam_accelerate.GetFloat(); }
 	float							GetCamStopSpeed() { return cl_strategic_cam_stopspeed.GetFloat(); }
 	float							GetCamFriction() { return cl_strategic_cam_friction.GetFloat(); }
+	const Vector &					GetCamLimits() { return m_vCameraLimits; }
+	void							SetCamLimits( const Vector &limits ) { m_vCameraLimits = limits; }
 
 	virtual void					CalculateHeight( const Vector &vPosition );
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
@@ -195,6 +197,7 @@ private:
 	Vector				m_vMouseAim;
 	MouseTraceData_t	m_MouseData;
 	Vector				m_vCameraOffset;
+	Vector				m_vCameraLimits;
 
 	MouseTraceData_t	m_MouseDataLeftPressed;
 	MouseTraceData_t	m_MouseDataLeftReleased;
