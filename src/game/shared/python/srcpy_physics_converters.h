@@ -57,8 +57,10 @@ struct PyPhysicsObject_to_IPhysicsObject
 			boost::python::borrowed(op)
 			)
 		);
-		PyPhysicsObject w = boost::python::extract<PyPhysicsObject>(handle);
-		return w.GetVPhysicsObject();
+		PyPhysicsObject *w = boost::python::extract<PyPhysicsObject *>(handle);
+		if( w )
+			return w->GetVPhysicsObject();
+		return NULL;
 	}
 };
 

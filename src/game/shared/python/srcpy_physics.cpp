@@ -209,19 +209,24 @@ void PyPhysicsObject::InitFromPhysicsObject( IPhysicsObject *pPhysObj )
 
 void PyPhysicsObject::CheckValid() 
 {
-	if( !m_hEnt || m_hEnt->VPhysicsGetObject() != m_pPhysObj )
+	// Fast check: physic object is owned by entity
+	if( m_hEnt )
 	{
-		PyErr_SetString(PyExc_ValueError, "PhysicsObject invalid" );
-		throw boost::python::error_already_set();
+		if( m_hEnt->VPhysicsGetObject() == m_pPhysObj )
+			return; // Valid
 	}
+
+	// None of the above checks worked, so invalid object
+	PyErr_SetString(PyExc_ValueError, "PhysicsObject invalid" );
+	throw boost::python::error_already_set();
 }
 
 void PyPhysicsObject::Destroy()
 {
-	CheckValid();
-
 	if( !m_bOwnsPhysObject )
 		return;
+
+	CheckValid();
 
 	if( !g_EntityCollisionHash )
 		return;
