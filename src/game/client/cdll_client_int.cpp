@@ -252,7 +252,10 @@ INetworkStringTable *g_pStringTableMaterials = NULL;
 INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 
+#ifdef HL2WARS_DLL
 INetworkStringTable *g_pStringTablePyModules = NULL;
+INetworkStringTable *g_pStringTableGameDBNames = NULL;
+#endif // HL2WARS_DLL
 
 static CGlobalVarsBase dummyvars( true );
 // So stuff that might reference gpGlobals during DLL initialization won't have a NULL pointer.
@@ -1971,7 +1974,10 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableInfoPanel = NULL;
 	g_pStringTableClientSideChoreoScenes = NULL;
 
+#ifdef HL2WARS_DLL
 	g_pStringTablePyModules = NULL;
+	g_pStringTableGameDBNames = NULL;
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -2247,10 +2253,16 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 		// When the particle system list changes, we need to know immediately
 		g_pStringTableExtraParticleFiles->SetStringChangedCallback( NULL, OnPrecacheParticleFile );
 	}
+#ifdef HL2WARS_DLL
 	else if ( !Q_strcasecmp( tableName, "PyModules" ) )
 	{
 		g_pStringTablePyModules = networkstringtable->FindTable( tableName );
 	}
+	else if ( !Q_strcasecmp( tableName, "GameDBNames" ) )
+	{
+		g_pStringTableGameDBNames = networkstringtable->FindTable( tableName );
+	}
+#endif // HL2WARS_DLL
 	else
 	{
 		// Pass tablename to gamerules last if all other checks fail
