@@ -3412,8 +3412,11 @@ void C_BaseEntity::MoveToLastReceivedPosition( bool force )
 
 bool C_BaseEntity::ShouldInterpolate()
 {
+#if defined(HL2WARS_DLL) || defined(SWARMKEEPER_DLL)
+	// Never bother interpolating client side entities
 	if( IsClientCreated() )
-		return false; // TODO: Is this correct? (Sander)
+		return false;
+#endif // HL2WARS_DLL || SWARMKEEPER_DLL
 
 	if ( IsViewEntity() )
 		return true;
