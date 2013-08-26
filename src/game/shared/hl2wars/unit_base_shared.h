@@ -26,6 +26,8 @@
 	#define CHL2WarsPlayer C_HL2WarsPlayer
 #endif
 
+#define SENDPROP_HEALTH_BITS_LOW 5 // Bits used for health when sending the minimal info
+
 class CHL2WarsPlayer;
 class CUnitBase;
 class UnitBaseLocomotion;
@@ -171,6 +173,9 @@ public:
 	virtual int ShouldTransmit( const CCheckTransmitInfo *pInfo );
 
 	bool UseMinimalSendTable(); // Only used by proxies
+	void SetAlwaysSendFullSelectionData( bool state ) { m_bAlwaysSendFullSelectionData = state; } // For buildings, see m_bAlwaysSendFullSelectionData
+	bool AlwaysSendFullSelectionData() { return m_bAlwaysSendFullSelectionData; }
+
 #endif // CLIENT_DLL
 
 	// IMouse implementation
@@ -207,6 +212,9 @@ public:
 #else
 	virtual void		OnDataChanged( DataUpdateType_t updateType );
 
+#ifdef CLIENT_DLL
+	virtual void		SetHealth(int iHealth) { m_iHealth = iHealth; }
+#endif // CLIENT_DLL
 	virtual int			GetHealth() const { return m_iHealth; }
 	virtual int			GetMaxHealth()  const	{ return m_iMaxHealth; }
 
@@ -247,10 +255,8 @@ public:
 	// Energy
 	int					GetEnergy() const { return m_iEnergy; }
 	int					GetMaxEnergy()  const	{ return m_iMaxEnergy; }
-#ifndef CLIENT_DLL
 	void				SetEnergy( int iEnergy ) { m_iEnergy = iEnergy; }
 	void				SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
-#endif // CLIENT_DLL
 
 	// Kills
 	int					GetKills() const { return m_iKills; }
@@ -481,6 +487,7 @@ private:
 	CNetworkVar(int, m_NetworkedUnitTypeSymbol );
 
 	bool m_bUseMinimalSendTable;
+	bool m_bAlwaysSendFullSelectionData; // Always send health/energy full resolution (for buildings)
 
 	bool m_bHasEnemy;
 	float m_fLastEnemyChangeTime;

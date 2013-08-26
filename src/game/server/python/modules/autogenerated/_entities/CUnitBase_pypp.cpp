@@ -1841,6 +1841,15 @@ void register_CUnitBase_class(){
                 , AimGun_function_type( &::CUnitBase::AimGun ) );
         
         }
+        { //::CUnitBase::AlwaysSendFullSelectionData
+        
+            typedef bool ( ::CUnitBase::*AlwaysSendFullSelectionData_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "AlwaysSendFullSelectionData"
+                , AlwaysSendFullSelectionData_function_type( &::CUnitBase::AlwaysSendFullSelectionData ) );
+        
+        }
         { //::CUnitBase::AreAttacksPassable
         
             typedef bool ( ::CUnitBase::*AreAttacksPassable_function_type )( ::CBaseEntity * ) ;
@@ -2070,6 +2079,16 @@ void register_CUnitBase_class(){
                 , GetPyNetworkType_function_type( &::CUnitBase::GetPyNetworkType ) );
         
         }
+        { //::CUnitBase::GetSelectedByPlayers
+        
+            typedef ::CUtlVector< CHandle< CHL2WarsPlayer >, CUtlMemory< CHandle< CHL2WarsPlayer >, int > > const & ( ::CUnitBase::*GetSelectedByPlayers_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "GetSelectedByPlayers"
+                , GetSelectedByPlayers_function_type( &::CUnitBase::GetSelectedByPlayers )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::CUnitBase::GetShootEnemyDir
         
             typedef ::Vector ( ::CUnitBase::*GetShootEnemyDir_function_type )( ::Vector &,bool ) ;
@@ -2185,6 +2204,16 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "IsCrouching"
                 , IsCrouching_function_type( &::CUnitBase::IsCrouching ) );
+        
+        }
+        { //::CUnitBase::IsSelectedByPlayer
+        
+            typedef bool ( ::CUnitBase::*IsSelectedByPlayer_function_type )( int ) ;
+            
+            CUnitBase_exposer.def( 
+                "IsSelectedByPlayer"
+                , IsSelectedByPlayer_function_type( &::CUnitBase::IsSelectedByPlayer )
+                , ( bp::arg("entindex") ) );
         
         }
         { //::CUnitBase::IsUnit
@@ -2358,6 +2387,16 @@ void register_CUnitBase_class(){
                 "SetAim"
                 , SetAim_function_type( &::CUnitBase::SetAim )
                 , ( bp::arg("vAimDir") ) );
+        
+        }
+        { //::CUnitBase::SetAlwaysSendFullSelectionData
+        
+            typedef void ( ::CUnitBase::*SetAlwaysSendFullSelectionData_function_type )( bool ) ;
+            
+            CUnitBase_exposer.def( 
+                "SetAlwaysSendFullSelectionData"
+                , SetAlwaysSendFullSelectionData_function_type( &::CUnitBase::SetAlwaysSendFullSelectionData )
+                , ( bp::arg("state") ) );
         
         }
         { //::CUnitBase::SetAnimEventMap

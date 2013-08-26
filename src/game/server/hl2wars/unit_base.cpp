@@ -294,7 +294,7 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 #endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
-// Purpose:  Send proxies
+// Purpose:  Send proxies for tables
 //-----------------------------------------------------------------------------
 void* SendProxy_SendCommanderDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
@@ -378,12 +378,15 @@ void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, c
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendFullDataTable );
 
-void* SendProxy_SendSelectedOnlyDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+void* SendProxy_SingleSelectionDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
 	// Get the unit entity
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
+		if( pUnit->AlwaysSendFullSelectionData() )
+			return (void*)pVarData; // Send full res to all players
+
 		pRecipients->ClearAllRecipients();
 		const CUtlVector< CHandle< CHL2WarsPlayer > > &selectedByPlayers = pUnit->GetSelectedByPlayers();
 		for( int i = 0; i < selectedByPlayers.Count(); i++ )
@@ -395,15 +398,59 @@ void* SendProxy_SendSelectedOnlyDataTable( const SendProp *pProp, const void *pS
 
 	return (void*)pVarData;
 }
-REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendSelectedOnlyDataTable );
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SingleSelectionDataTable );
+
+void* SendProxy_MultiOrNoneSelectionDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+{
+	// Get the unit entity
+	CUnitBase *pUnit = (CUnitBase*)pVarData;
+	if ( pUnit )
+	{
+		if( pUnit->AlwaysSendFullSelectionData() )
+		{
+			pRecipients->ClearAllRecipients(); // Never use this table
+			return (void*)pVarData; 
+		}
+
+		// Inverse of SendProxy_SingleSelectionDataTable: Clear all players that have this unit as single selection
+		const CUtlVector< CHandle< CHL2WarsPlayer > > &selectedByPlayers = pUnit->GetSelectedByPlayers();
+		for( int i = 0; i < selectedByPlayers.Count(); i++ )
+		{
+			if( selectedByPlayers[i] && selectedByPlayers[i]->CountUnits() == 1 )
+				pRecipients->ClearRecipient( selectedByPlayers[i].GetEntryIndex() - 1 );
+		}
+	}
+
+	return (void*)pVarData;
+}
+REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_MultiOrNoneSelectionDataTable );
 
 extern void SendProxy_SimulationTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID );
 
 //-----------------------------------------------------------------------------
-// Purpose:  Send tables
+// Purpose:  Send proxies for variables
 //-----------------------------------------------------------------------------
 void SendProxy_Origin( const SendProp *, const void *, const void *, DVariant *, int, int );
 
+void SendProxy_Health( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
+{
+	CUnitBase *unit = (CUnitBase*)pStruct;
+	Assert( unit );
+
+	pOut->m_Int = (int)floor( unit->HealthFraction() * ((1 << SENDPROP_HEALTH_BITS_LOW) - 1) );
+}
+
+void SendProxy_Energy( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
+{
+	CUnitBase *unit = (CUnitBase*)pStruct;
+	Assert( unit );
+
+	pOut->m_Int = (int)floor( (unit->GetEnergy() / (float)unit->GetMaxEnergy()) * ((1 << SENDPROP_HEALTH_BITS_LOW) - 1) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:  Send tables
+//-----------------------------------------------------------------------------
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	// Send high res version for the commander
 	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
@@ -435,17 +482,18 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 
 END_SEND_TABLE()
 
-// Table used when out of PVS (this is the only table being send then)
+// Table used when out of "PVS". This table is send when DT_FullTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
-	//SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 END_SEND_TABLE()
 
+// Table used when the unit is in "PVS". This table is send when DT_MinimalTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
 	
-	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED ),
+
 	SendPropInt		(SENDINFO( m_takedamage ), 3, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
 
@@ -459,17 +507,23 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),
-
-	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED ),
-
-	//SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
-BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_SelectedOnlyTable )
+// Single Unit Selection Table. Only send when the player has exactly one unit selected.
+// Used for displaying data in the hud
+BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_SingleSelectionTable )
+	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
+// Send when the unit is in a multi selection or is not selected at all
+BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MultiOrNoneSelectionTable )
+	SendPropInt		(SENDINFO( m_iHealth ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED, SendProxy_Health ),
+	SendPropInt		(SENDINFO( m_iEnergy ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED, SendProxy_Energy ),
+END_SEND_TABLE()
+
+// Main Unit Send Table. Always send
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
@@ -480,7 +534,9 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
 	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
 	// Data that gets sent when unit is the single selected unit of the player
-	SendPropDataTable( "selecteddata", 0, &REFERENCE_SEND_TABLE(DT_SelectedOnlyTable), SendProxy_SendSelectedOnlyDataTable ),
+	SendPropDataTable( "singleselectiondata", 0, &REFERENCE_SEND_TABLE(DT_SingleSelectionTable), SendProxy_SingleSelectionDataTable ),
+	// Data that gets sent when unit is in a multi selection of the player or is not selected at all
+	SendPropDataTable( "multiornoselectiondata", 0, &REFERENCE_SEND_TABLE(DT_MultiOrNoneSelectionTable), SendProxy_MultiOrNoneSelectionDataTable ),
 
 	//SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 

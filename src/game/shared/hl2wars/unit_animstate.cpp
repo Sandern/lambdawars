@@ -759,7 +759,7 @@ int UnitAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 	char szFullName[512];
 	va_list marker;
 	va_start( marker, pBaseName );
-	Q_vsnprintf( szFullName, sizeof( szFullName ), pBaseName, marker );
+	V_vsnprintf( szFullName, sizeof( szFullName ), pBaseName, marker );
 	va_end( marker );
 	int iSequence = GetOuter()->LookupSequence( szFullName );
 	
@@ -1555,7 +1555,7 @@ void UnitAnimState::AnimStateLog( const char *pMsg, ... )
 	char str[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( str, sizeof( str ), pMsg, marker );
+	V_vsnprintf( str, sizeof( str ), pMsg, marker );
 	va_end( marker );
 
 	// Log it?	
@@ -1585,7 +1585,7 @@ void UnitAnimState::AnimStatePrintf( int iLine, const char *pMsg, ... )
 	char str[4096];
 	va_list marker;
 	va_start( marker, pMsg );
-	Q_vsnprintf( str, sizeof( str ), pMsg, marker );
+	V_vsnprintf( str, sizeof( str ), pMsg, marker );
 	va_end( marker );
 
 	// Show it with Con_NPrintf.

@@ -1607,6 +1607,15 @@ void register_C_UnitBase_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::C_UnitBase::GetLastTakeDamageTime
+        
+            typedef float ( ::C_UnitBase::*GetLastTakeDamageTime_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "GetLastTakeDamageTime"
+                , GetLastTakeDamageTime_function_type( &::C_UnitBase::GetLastTakeDamageTime ) );
+        
+        }
         { //::C_UnitBase::GetNext
         
             typedef ::C_UnitBase * ( ::C_UnitBase::*GetNext_function_type )(  ) ;
@@ -1653,6 +1662,16 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.def( 
                 "GetRenderOrigin"
                 , GetRenderOrigin_function_type( &::C_UnitBase::GetRenderOrigin )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::C_UnitBase::GetSelectedByPlayers
+        
+            typedef ::CUtlVector< CHandle< C_HL2WarsPlayer >, CUtlMemory< CHandle< C_HL2WarsPlayer >, int > > const & ( ::C_UnitBase::*GetSelectedByPlayers_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "GetSelectedByPlayers"
+                , GetSelectedByPlayers_function_type( &::C_UnitBase::GetSelectedByPlayers )
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
@@ -1751,6 +1770,16 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.def( 
                 "IsCrouching"
                 , IsCrouching_function_type( &::C_UnitBase::IsCrouching ) );
+        
+        }
+        { //::C_UnitBase::IsSelectedByPlayer
+        
+            typedef bool ( ::C_UnitBase::*IsSelectedByPlayer_function_type )( int ) ;
+            
+            C_UnitBase_exposer.def( 
+                "IsSelectedByPlayer"
+                , IsSelectedByPlayer_function_type( &::C_UnitBase::IsSelectedByPlayer )
+                , ( bp::arg("entindex") ) );
         
         }
         { //::C_UnitBase::IsUnit
@@ -1962,6 +1991,16 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pCustomOfset")=bp::object() ) );
         
         }
+        { //::C_UnitBase::SetEnergy
+        
+            typedef void ( ::C_UnitBase::*SetEnergy_function_type )( int ) ;
+            
+            C_UnitBase_exposer.def( 
+                "SetEnergy"
+                , SetEnergy_function_type( &::C_UnitBase::SetEnergy )
+                , ( bp::arg("iEnergy") ) );
+        
+        }
         { //::C_UnitBase::SetEnterOffset
         
             typedef void ( ::C_UnitBase::*SetEnterOffset_function_type )( ::Vector const & ) ;
@@ -1970,6 +2009,16 @@ void register_C_UnitBase_class(){
                 "SetEnterOffset"
                 , SetEnterOffset_function_type( &::C_UnitBase::SetEnterOffset )
                 , ( bp::arg("enteroffset") ) );
+        
+        }
+        { //::C_UnitBase::SetMaxEnergy
+        
+            typedef void ( ::C_UnitBase::*SetMaxEnergy_function_type )( int ) ;
+            
+            C_UnitBase_exposer.def( 
+                "SetMaxEnergy"
+                , SetMaxEnergy_function_type( &::C_UnitBase::SetMaxEnergy )
+                , ( bp::arg("iMaxEnergy") ) );
         
         }
         { //::C_UnitBase::SetUseCustomCanBeSeenCheck

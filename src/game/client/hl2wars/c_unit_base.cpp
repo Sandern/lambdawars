@@ -93,6 +93,20 @@ void RecvProxy_Unit_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, 
 	}
 }
 
+void RecvProxy_Health( const CRecvProxyData *pData, void *pStruct, void *pOut )
+{
+	CUnitBase *unit = ( CUnitBase * )pStruct;
+
+	unit->SetHealth( (pData->m_Value.m_Int / (float)((1 << SENDPROP_HEALTH_BITS_LOW) - 1)) * unit->GetMaxHealth() );
+}
+
+void RecvProxy_Energy( const CRecvProxyData *pData, void *pStruct, void *pOut )
+{
+	CUnitBase *unit = ( CUnitBase * )pStruct;
+
+	unit->SetEnergy( (pData->m_Value.m_Int / (float)((1 << SENDPROP_HEALTH_BITS_LOW) - 1)) * unit->GetMaxEnergy() );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Recv tables
 //-----------------------------------------------------------------------------
@@ -135,8 +149,9 @@ END_RECV_TABLE()
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
 
-	RecvPropInt		(RECVINFO( m_iHealth )),
 	RecvPropInt		(RECVINFO( m_iMaxHealth )),
+	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
+
 	RecvPropInt		(RECVINFO( m_fFlags )),
 	RecvPropInt		(RECVINFO( m_takedamage )),
 	RecvPropInt		(RECVINFO( m_lifeState )),
@@ -148,13 +163,17 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	RecvPropBool( RECVINFO( m_bCrouching ) ),
 	RecvPropBool( RECVINFO( m_bClimbing ) ),
-
-	RecvPropInt		(RECVINFO(m_iEnergy)),
-	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
 END_RECV_TABLE()
 
-BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_SelectedOnlyTable )
-	RecvPropInt		(RECVINFO(m_iKills)),
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_SingleSelectionTable )
+	RecvPropInt		(RECVINFO( m_iHealth )),
+	RecvPropInt		(RECVINFO( m_iEnergy )),
+	RecvPropInt		(RECVINFO( m_iKills )),
+END_RECV_TABLE()
+
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MultiOrNoneSelectionTable )
+	RecvPropInt		(RECVINFO( m_iHealth ), 0, RecvProxy_Health ),
+	RecvPropInt		(RECVINFO( m_iEnergy ), 0, RecvProxy_Energy ),
 END_RECV_TABLE()
 
 IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
@@ -164,7 +183,8 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
 	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
-	RecvPropDataTable( "selecteddata", 0, 0, &REFERENCE_RECV_TABLE(DT_SelectedOnlyTable) ),
+	RecvPropDataTable( "singleselectiondata", 0, 0, &REFERENCE_RECV_TABLE(DT_SingleSelectionTable) ),
+	RecvPropDataTable( "multiornoselectiondata", 0, 0, &REFERENCE_RECV_TABLE(DT_MultiOrNoneSelectionTable) ),
 END_RECV_TABLE()
 
 BEGIN_PREDICTION_DATA( CUnitBase )

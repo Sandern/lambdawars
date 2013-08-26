@@ -1321,6 +1321,16 @@ void register_C_HL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::C_HL2WarsPlayer::GetCamLimits
+        
+            typedef ::Vector const & ( ::C_HL2WarsPlayer::*GetCamLimits_function_type )(  ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "GetCamLimits"
+                , GetCamLimits_function_type( &::C_HL2WarsPlayer::GetCamLimits )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::C_HL2WarsPlayer::GetCamMaxHeight
         
             typedef float ( ::C_HL2WarsPlayer::*GetCamMaxHeight_function_type )(  ) ;
@@ -1864,6 +1874,16 @@ void register_C_HL2WarsPlayer_class(){
                 "SelectGroup"
                 , SelectGroup_function_type( &::C_HL2WarsPlayer::SelectGroup )
                 , ( bp::arg("group") ) );
+        
+        }
+        { //::C_HL2WarsPlayer::SetCamLimits
+        
+            typedef void ( ::C_HL2WarsPlayer::*SetCamLimits_function_type )( ::Vector const & ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "SetCamLimits"
+                , SetCamLimits_function_type( &::C_HL2WarsPlayer::SetCamLimits )
+                , ( bp::arg("limits") ) );
         
         }
         { //::C_HL2WarsPlayer::SetCameraOffset
