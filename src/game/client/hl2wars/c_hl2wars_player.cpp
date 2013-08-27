@@ -181,6 +181,7 @@ bool C_HL2WarsPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	}
 	SetCameraOffset( pCmd->m_vCameraOffset );
 
+	// Direct move and following
 	if( IsStrategicModeOn() )
 	{
 		// If we pressed the movement keys and are following entities: release the cam

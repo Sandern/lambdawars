@@ -324,7 +324,7 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 		{
 			CUnitBase *pOther = ppUnits[i];
 
-			if( pOther->UseMinimalSendTable() )
+			if( pOther->UseMinimalSendTable( GetClientIndex() ) )
 				countMinTable++;
 			else
 				countFullTable++;

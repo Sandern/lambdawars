@@ -298,26 +298,19 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 //-----------------------------------------------------------------------------
 void* SendProxy_SendCommanderDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
-	// Get the weapon entity
+	// Get the unit entity
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		if( pUnit->UseMinimalSendTable() )
+		// Only send this chunk of data to the commander of the unit
+		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
+		if ( pPlayer )
 		{
-			pRecipients->ClearAllRecipients();
+			pRecipients->SetOnly( pPlayer->GetClientIndex() );
 		}
 		else
 		{
-			// Only send this chunk of data to the commander of the unit
-			CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-			if ( pPlayer )
-			{
-				pRecipients->SetOnly( pPlayer->GetClientIndex() );
-			}
-			else
-			{
-				pRecipients->ClearAllRecipients();
-			}
+			pRecipients->ClearAllRecipients();
 		}
 	}
 
@@ -331,19 +324,24 @@ void* SendProxy_SendNormalDataTable( const SendProp *pProp, const void *pStruct,
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		if( pUnit->UseMinimalSendTable() )
+		// Clear recipients who want the minimal table
+		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
 		{
-			pRecipients->ClearAllRecipients();
-		}
-		else
-		{
-			// Send this table to all players except the commander
-			CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-			if ( pPlayer )
+			if( pUnit->UseMinimalSendTable( i ) )
 			{
-				pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
+				pRecipients->ClearRecipient( i );
 			}
 		}
+
+		// Currently the commander uses the origin from the normal table, but a higher res version would be preferred
+#if 0
+		// Send this table to all players except the commander
+		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
+		if ( pPlayer )
+		{
+			pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
+		}
+#endif // 0
 	}
 
 	return (void*)pVarData;
@@ -356,8 +354,21 @@ void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		if( !pUnit->UseMinimalSendTable() )
-			pRecipients->ClearAllRecipients();
+		// Clear recipients who don't want the minimal table
+		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+		{
+			if( !pUnit->UseMinimalSendTable( i ) )
+			{
+				pRecipients->ClearRecipient( i );
+			}
+		}
+
+		// Commander uses own table
+		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
+		if ( pPlayer )
+		{
+			pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
+		}
 	}
 
 	return (void*)pVarData;
@@ -370,8 +381,11 @@ void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, c
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		if( pUnit->UseMinimalSendTable() )
-			pRecipients->ClearAllRecipients();
+		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+		{
+			if( pUnit->UseMinimalSendTable( i ) )
+				pRecipients->ClearRecipient( i );
+		}
 	}
 
 	return (void*)pVarData;
@@ -453,11 +467,13 @@ void SendProxy_Energy( const SendProp *pProp, const void *pStruct, const void *p
 //-----------------------------------------------------------------------------
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	// Send high res version for the commander
+#if 0
 	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
+#endif // 0
 
 	// This data is only send to the commander for prediction
 	//SendPropVector		( SENDINFO( m_vecBaseVelocity ), 20, 0, -1000, 1000 ),
@@ -473,18 +489,21 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
+#if 0
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+#endif // 0
 	SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-
 END_SEND_TABLE()
 
 // Table used when out of "PVS". This table is send when DT_FullTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+#if 0
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+#endif // 0
 END_SEND_TABLE()
 
 // Table used when the unit is in "PVS". This table is send when DT_MinimalTable is not send!
@@ -512,19 +531,21 @@ END_SEND_TABLE()
 // Single Unit Selection Table. Only send when the player has exactly one unit selected.
 // Used for displaying data in the hud
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_SingleSelectionTable )
-	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),
 	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
 END_SEND_TABLE()
 
 // Send when the unit is in a multi selection or is not selected at all
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MultiOrNoneSelectionTable )
-	SendPropInt		(SENDINFO( m_iHealth ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED, SendProxy_Health ),
+	SendPropInt		(SENDINFO( m_iHealth ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED/*|SPROP_CHANGES_OFTEN*/, SendProxy_Health ),
 	SendPropInt		(SENDINFO( m_iEnergy ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED, SendProxy_Energy ),
 END_SEND_TABLE()
 
 // Main Unit Send Table. Always send
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
+	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
 	// Data that gets sent to all other players
@@ -538,6 +559,11 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that gets sent when unit is in a multi selection of the player or is not selected at all
 	SendPropDataTable( "multiornoselectiondata", 0, &REFERENCE_SEND_TABLE(DT_MultiOrNoneSelectionTable), SendProxy_MultiOrNoneSelectionDataTable ),
 
+	//SendPropExclude( "DT_UnitBase", "singleselectiondata" ),
+	//SendPropExclude( "DT_UnitBase", "minimaldata" ),
+	//SendPropExclude( "DT_UnitBase", "commanderdata" ),
+
+	// Excludes
 	//SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
 	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
@@ -551,6 +577,7 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 
 	SendPropExclude( "DT_BaseAnimating", "m_nNewSequenceParity" ),
 	SendPropExclude( "DT_BaseAnimating", "m_nResetEventsParity" ),
+	SendPropExclude( "DT_BaseAnimating", "m_nMuzzleFlashParity" ),
 	
 	// playeranimstate and clientside animation takes care of these on the client
 	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
@@ -559,6 +586,11 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Something with the legs ?
 	SendPropExclude( "DT_BaseFlex" , "m_vecLean" ),
 	SendPropExclude( "DT_BaseFlex" , "m_vecShift" ),
+
+	// BaseCombatcharacter excludes
+	// Don't need weapons inventory synced
+	SendPropExclude( "DT_BCCLocalPlayerExclusive" , "m_hMyWeapons" ),
+	
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CUnitBase )
@@ -607,7 +639,6 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 	return BaseClass::KeyValue( szKeyName, szValue );
 }
 
-// FIXME: Does not work properly
 #define USE_MINIMAL_SENDTABLE 1
 
 //-----------------------------------------------------------------------------
@@ -622,19 +653,20 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
 	int fFlags = DispatchUpdateTransmitState();
 
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	Assert( pRecipientEntity->IsPlayer() );
+
+	int iClientIndex = pRecipientEntity->entindex() - 1;
+
 	if ( fFlags & FL_EDICT_ALWAYS )
 	{
-		m_bUseMinimalSendTable = false;
+		m_UseMinimalSendTable.Clear( iClientIndex );
 		return FL_EDICT_ALWAYS;
 	}
 	else if ( fFlags & FL_EDICT_DONTSEND )
 	{
 		return FL_EDICT_DONTSEND;
 	}
-
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
-
-	Assert( pRecipientEntity->IsPlayer() );
 	
 	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
 
@@ -651,11 +683,11 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	netProp->RecomputePVSInformation();
 	bool bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo );
 
-	if( m_bUseMinimalSendTable != bUseMinimalSendTable )
+	if( m_UseMinimalSendTable.IsBitSet( iClientIndex ) != bUseMinimalSendTable )
 	{
-		m_bUseMinimalSendTable = bUseMinimalSendTable;
+		m_UseMinimalSendTable.Set( iClientIndex, bUseMinimalSendTable );
 
-		if( m_bUseMinimalSendTable )
+		if( bUseMinimalSendTable )
 		{
 			// Low update rate mode!
 			netProp->SetUpdateInterval( g_unit_minimal_sendtable_updaterate.GetFloat() );
@@ -1220,3 +1252,29 @@ int CUnitBase::TakeHealth( float flHealth, int bitsDamageType )
 		OnFullHealth();
 	return rv;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Unit test code
+//-----------------------------------------------------------------------------
+class CUnitDummyTest : public CUnitBase
+{
+public:
+	DECLARE_CLASS( CUnitDummyTest, CUnitBase );
+
+	void Precache()
+	{
+		PrecacheModel("models/error.mdl");
+
+		BaseClass::Precache();
+	}
+
+	void Spawn( void )
+	{
+		Precache();
+
+		SetModel( "models/error.mdl" );
+
+		BaseClass::Spawn();
+	}
+};
+LINK_ENTITY_TO_CLASS( unit_dummy_test, CUnitDummyTest );

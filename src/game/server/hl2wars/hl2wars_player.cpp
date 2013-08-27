@@ -101,6 +101,7 @@ END_DATADESC()
 CHL2WarsPlayer::CHL2WarsPlayer() : m_nMouseButtonsPressed(0)
 {
 	SetViewDistance(1500.0f);
+	m_vCameraLimits.Init( 0, 2.0f, 2.0f );
 }
 
 
@@ -182,10 +183,10 @@ void CHL2WarsPlayer::UpdateCameraSettings()
 	m_fCamStopSpeed = atof( engine->GetClientConVarValue( entindex(), "cl_strategic_cam_stopspeed" ) );
 	m_fCamFriction = atof( engine->GetClientConVarValue( entindex(), "cl_strategic_cam_friction" ) );
 	UTIL_StringToVector( m_vCameraLimits.Base(), engine->GetClientConVarValue( entindex(), "cl_strategic_cam_limits" ) );
+	DevMsg( 2, "Server: Camera Limits Changed to %f %f %f for player #%d:%s\n", m_vCameraLimits.x, m_vCameraLimits.y, m_vCameraLimits.z, 
+		entindex(), GetPlayerName() );
 
 	SetMaxSpeed( m_fCamSpeed );
-
-	//Msg("Camera settings: %f %f %f %f\n", m_fCamSpeed, m_fCamAcceleration, m_fCamStopSpeed, m_fCamFriction );
 }
 
 //-----------------------------------------------------------------------------

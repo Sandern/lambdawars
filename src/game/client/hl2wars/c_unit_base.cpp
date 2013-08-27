@@ -116,11 +116,13 @@ extern void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct
 extern void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void *pOut );
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
+#if 0
 	// Hi res origin and angle
 	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
+#endif // 0
 
 	// Only received by the commander
 	RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
@@ -133,7 +135,9 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
+#if 0
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
+#endif // 0
 	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
@@ -142,8 +146,9 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+#if 0
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
-	//RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
+#endif // 0
 END_RECV_TABLE()
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
@@ -179,6 +184,8 @@ END_RECV_TABLE()
 IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
 
 BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
+	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
+
 	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
 	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
@@ -198,6 +205,12 @@ BEGIN_PREDICTION_DATA( CUnitBase )
 	DEFINE_PRED_FIELD( m_nResetEventsParity, FIELD_INTEGER, FTYPEDESC_OVERRIDE | FTYPEDESC_PRIVATE | FTYPEDESC_NOERRORCHECK ),
 	DEFINE_PRED_FIELD( m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD_TOL( m_vecBaseVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.05 ),
+
+	DEFINE_PRED_FIELD( m_iHealth, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK ),
+	DEFINE_PRED_FIELD( m_iMaxHealth, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	DEFINE_PRED_FIELD( m_iEnergy, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK ),
+	DEFINE_PRED_FIELD( m_iMaxEnergy, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	DEFINE_PRED_FIELD( m_iKills, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 END_PREDICTION_DATA()
 
 //-----------------------------------------------------------------------------

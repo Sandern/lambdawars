@@ -172,7 +172,7 @@ public:
 	
 	virtual int ShouldTransmit( const CCheckTransmitInfo *pInfo );
 
-	bool UseMinimalSendTable(); // Only used by proxies
+	bool UseMinimalSendTable( int iClientIndex ); // Only used by proxies
 	void SetAlwaysSendFullSelectionData( bool state ) { m_bAlwaysSendFullSelectionData = state; } // For buildings, see m_bAlwaysSendFullSelectionData
 	bool AlwaysSendFullSelectionData() { return m_bAlwaysSendFullSelectionData; }
 
@@ -486,7 +486,7 @@ private:
 	string_t						m_UnitType;
 	CNetworkVar(int, m_NetworkedUnitTypeSymbol );
 
-	bool m_bUseMinimalSendTable;
+	CBitVec<MAX_PLAYERS> m_UseMinimalSendTable;
 	bool m_bAlwaysSendFullSelectionData; // Always send health/energy full resolution (for buildings)
 
 	bool m_bHasEnemy;
@@ -673,9 +673,9 @@ inline bool CUnitBase::FastLOSCheck( const Vector &vTargetPos )
 	return !tr.DidHit();
 }
 
-inline bool CUnitBase::UseMinimalSendTable()
+inline bool CUnitBase::UseMinimalSendTable( int iClientIndex )
 {
-	return m_bUseMinimalSendTable;
+	return m_UseMinimalSendTable.IsBitSet( iClientIndex );
 }
 #endif // CLIENT_DLL
 

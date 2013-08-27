@@ -20,6 +20,8 @@ extern CTimedEventMgr g_NetworkPropertyEventMgr;
 
 #define USE_NEW_ISINPVS
 
+static ConVar wars_use_newpvs_code( "wars_use_newpvs_code", "1", FCVAR_CHEAT );
+
 //-----------------------------------------------------------------------------
 // Save/load
 //-----------------------------------------------------------------------------
@@ -175,14 +177,13 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 	return ( m_pOuter->GetEFlags() & EFL_KILLME ) != 0;
 }
 
-
 //-----------------------------------------------------------------------------
 // PVS information
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::RecomputePVSInformation()
 {
 #ifdef USE_NEW_ISINPVS
-	if( gpGlobals->maxClients != 1 )
+	if( gpGlobals->maxClients != 1 && wars_use_newpvs_code.GetBool() )
 		return;
 #endif // USE_NEW_ISINPVS
 	if ( m_pPev && ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) != 0 ) )
@@ -256,13 +257,31 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 	return false;		// not visible
 }
 
+static inline bool TestPointInCamera( const Vector &vPoint, const Vector &vCamLimits, const matrix3x4_t &matAngles, const Vector &vPlayerPos )
+{
+	// Get point direction
+	Vector vecToTarget = vPoint - vPlayerPos;
+	vecToTarget.NormalizeInPlace();
+
+	// Transform into player space
+	VectorITransform( vecToTarget, matAngles, vecToTarget );
+
+	// Test against camera angles of player
+	if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
+		vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
+	{
+		return true;
+	}
+	return false;
+}
+
 //-----------------------------------------------------------------------------
 // PVS: this function is called a lot, so it avoids function calls
 //-----------------------------------------------------------------------------
 bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 {
 #ifdef USE_NEW_ISINPVS
-	if( gpGlobals->maxClients == 1 )
+	if( gpGlobals->maxClients == 1 || !wars_use_newpvs_code.GetBool() )
 #endif // USE_NEW_ISINPVS
 	{
 		// PVS data must be up to date
@@ -338,29 +357,32 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 	
 		CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
 
+		// Get player camera position and limits
 		Vector vPlayerPos = pRecipientPlayer->Weapon_ShootPosition() + pRecipientPlayer->GetCameraOffset();
+		const Vector &vCamLimits = pRecipientPlayer->GetCamLimits();
 
-		//NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), vPlayerPos, 255, 0, 0, false, 0.1f );
-
-		Vector vecToTarget = GetOuter()->WorldSpaceCenter() - vPlayerPos;
-		vecToTarget.NormalizeInPlace();
-
+		// Get player angles
 		matrix3x4_t matAngles;
 		AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
-		VectorITransform( vecToTarget, matAngles, vecToTarget );
 
-		const Vector &vCamLimits = pRecipientPlayer->GetCamLimits();
-		//Vector vCamLimits;
-		//UTIL_StringToVector( vCamLimits.Base(), engine->GetClientConVarValue( pRecipientPlayer->entindex(), "cl_strategic_cam_limits" ) );
-
-		if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
-			vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
+		// Now check if the entity is within the camera limits
+		const Vector &center = GetOuter()->WorldSpaceCenter();
+		if( GetOuter()->IsPointSized() )
 		{
-			//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
-			return true;
+			if( TestPointInCamera( center, vCamLimits, matAngles, vPlayerPos ) )
+				return true;
 		}
+		else
+		{
+			// TODO: Do a better (and fast) check
+			const Vector &vOffset1 = GetOuter()->CollisionProp()->OBBMins();
+			Vector vOffset2 = GetOuter()->CollisionProp()->OBBMaxs();
+			vOffset2.z = vOffset1.z;
 
-		//NDebugOverlay::EntityText( GetOuter()->entindex(), 0, UTIL_VarArgs( "not transmitting vecToTarget %f %f %f", vecToTarget.x, vecToTarget.y, vecToTarget.z ), 0.1f );
+			if( TestPointInCamera( center + vOffset1, vCamLimits, matAngles, vPlayerPos ) ||
+				TestPointInCamera( center + vOffset2, vCamLimits, matAngles, vPlayerPos ) )
+				return true;
+		}
 
 		return false;
 	}

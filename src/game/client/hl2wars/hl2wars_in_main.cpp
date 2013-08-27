@@ -73,14 +73,18 @@ void CameraLimitsChanged( IConVar *var, const char *pOldValue, float flOldValue 
 	if( cl_strategic_cam_limits_debug.GetBool() )	
 		DevMsg("Camera Limits Changed to %s\n", ((ConVar *)var)->GetString());
 
+#if 0
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if( !pPlayer )
 		return;
 
-	engine->ClientCmd("player_camerasettings");
+	DevMsg("Camera Limits Changed to %s\n", ((ConVar *)var)->GetString());
+	engine->ExecuteClientCmd("player_camerasettings");
+#endif // 0
 }
 
 ConVar cl_strategic_cam_limits( "cl_strategic_cam_limits", "", FCVAR_USERINFO|FCVAR_HIDDEN, "", CameraLimitsChanged );
+ConVar cl_strategic_cam_limits_tol( "cl_strategic_cam_limits_tol", "0.052", FCVAR_ARCHIVE, "" );
 
 extern void OnActiveConfigChanged( IConVar *var, const char *pOldValue, float flOldValue );
 ConVar cl_active_config( "cl_active_config", "config_fps", FCVAR_ARCHIVE, "Active binding configuration file. Auto changes.", OnActiveConfigChanged );
@@ -758,11 +762,13 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	VectorITransform( vCamMin, matAngles, vCamMin );
 	VectorITransform( vCamMax, matAngles, vCamMax );
 
-	Vector limits( 0.0f, fabs( vCamMin.y ), fabs( vCamMax.z ) );
+	float fCamLimitTol = cl_strategic_cam_limits_tol.GetFloat();
+	Vector limits( 0.0f, fabs( vCamMin.y ) + fCamLimitTol, fabs( vCamMax.z ) + fCamLimitTol );
 	if( !VectorsAreEqual( limits, pPlayer->GetCamLimits(), 0.017f ) ) // Tolerance of 1 degree
 	{
 		pPlayer->SetCamLimits( limits );
 		cl_strategic_cam_limits.SetValue( VarArgs( "%.2f %.2f %.2f", 0.0f, limits.y, limits.z ) );
+		engine->ExecuteClientCmd("player_camerasettings");
 	}
 
 	// Call baseclass if not in strategic mouse
