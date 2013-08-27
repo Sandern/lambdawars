@@ -69,7 +69,7 @@
 
 #define SIGNED_GUID_LEN 32 // Hashed CD Key (32 hex alphabetic chars + 0 terminator )
 
-#define USE_INCREASED_NON_NETWORKED
+//#define USE_INCREASED_NON_NETWORKED
 #ifdef USE_INCREASED_NON_NETWORKED
 // Used for networking ehandles.
 #define NUM_ENT_ENTRY_BITS		(MAX_EDICT_BITS + 4) // 15
