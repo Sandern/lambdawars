@@ -486,7 +486,7 @@ private:
 	string_t						m_UnitType;
 	CNetworkVar(int, m_NetworkedUnitTypeSymbol );
 
-	CBitVec<MAX_PLAYERS> m_UseMinimalSendTable;
+	CPlayerBitVec m_UseMinimalSendTable;
 	bool m_bAlwaysSendFullSelectionData; // Always send health/energy full resolution (for buildings)
 
 	bool m_bHasEnemy;

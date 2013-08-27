@@ -325,7 +325,7 @@ void* SendProxy_SendNormalDataTable( const SendProp *pProp, const void *pStruct,
 	if ( pUnit )
 	{
 		// Clear recipients who want the minimal table
-		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+		for( int i = 0; i < gpGlobals->maxClients; i++ )
 		{
 			if( pUnit->UseMinimalSendTable( i ) )
 			{
@@ -355,7 +355,7 @@ void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct
 	if ( pUnit )
 	{
 		// Clear recipients who don't want the minimal table
-		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+		for( int i = 0; i < gpGlobals->maxClients; i++ )
 		{
 			if( !pUnit->UseMinimalSendTable( i ) )
 			{
@@ -381,7 +381,7 @@ void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, c
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		for( int i = 1; i < gpGlobals->maxClients + 1; i++ )
+		for( int i = 0; i < gpGlobals->maxClients; i++ )
 		{
 			if( pUnit->UseMinimalSendTable( i ) )
 				pRecipients->ClearRecipient( i );
