@@ -293,6 +293,14 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 }
 #endif // ENABLE_PYTHON
 
+//=============================================================================
+// Unit Send Tables
+//
+// Note1: Don't try to split vecOrigin and vecAngles over multiple tables.
+//		  The first few frames seem to send this data from all tables (Valve BUG?)
+//		  This ends up taking a big hit in Overrun due spawning many enemies at a high rate.
+//=============================================================================
+
 //-----------------------------------------------------------------------------
 // Purpose:  Send proxies for tables
 //-----------------------------------------------------------------------------
@@ -318,62 +326,23 @@ void* SendProxy_SendCommanderDataTable( const SendProp *pProp, const void *pStru
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendCommanderDataTable );
 
-void* SendProxy_SendNormalDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
-{
-	// Get the unit entity
-	CUnitBase *pUnit = (CUnitBase*)pVarData;
-	if ( pUnit )
-	{
-		// Clear recipients who want the minimal table
-		for( int i = 0; i < gpGlobals->maxClients; i++ )
-		{
-			if( pUnit->UseMinimalSendTable( i ) )
-			{
-				pRecipients->ClearRecipient( i );
-			}
-		}
-
-		// Currently the commander uses the origin from the normal table, but a higher res version would be preferred
 #if 0
-		// Send this table to all players except the commander
-		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-		if ( pPlayer )
-		{
-			pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
-		}
-#endif // 0
-	}
-
-	return (void*)pVarData;
-}
-REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendNormalDataTable );
-
 void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
-	// Get the unit entity
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
 	if ( pUnit )
 	{
-		// Clear recipients who don't want the minimal table
 		for( int i = 0; i < gpGlobals->maxClients; i++ )
 		{
 			if( !pUnit->UseMinimalSendTable( i ) )
-			{
 				pRecipients->ClearRecipient( i );
-			}
-		}
-
-		// Commander uses own table
-		CHL2WarsPlayer *pPlayer = pUnit->GetCommander();
-		if ( pPlayer )
-		{
-			pRecipients->ClearRecipient( pPlayer->GetClientIndex() );
 		}
 	}
 
 	return (void*)pVarData;
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendMinimalDataTable );
+#endif // 0
 
 void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
@@ -488,26 +457,19 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 
 END_SEND_TABLE()
 
-BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 #if 0
-	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
-#endif // 0
-	SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
-
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-END_SEND_TABLE()
-
 // Table used when out of "PVS". This table is send when DT_FullTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
-#if 0
-	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
-#endif // 0
 END_SEND_TABLE()
+#endif // 0
 
 // Table used when the unit is in "PVS". This table is send when DT_MinimalTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
+	SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
+
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
+
 	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
 	
 	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
@@ -522,7 +484,6 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropEHandle		( SENDINFO( m_hSquadUnit ) ),
 	SendPropEHandle		( SENDINFO( m_hCommander ) ),
 	SendPropEHandle		( SENDINFO( m_hEnemy ) ),
-	//SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),
@@ -545,23 +506,18 @@ END_SEND_TABLE()
 // Main Unit Send Table. Always send
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
 
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
-	// Data that gets sent to all other players
-	SendPropDataTable( "normaldata", 0, &REFERENCE_SEND_TABLE(DT_NormalExclusive), SendProxy_SendNormalDataTable ),
 	// Data that gets sent when unit is outside the pvs (and no other table is send)
-	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
-	// Data that gets sent when unit is inside the pvs (in addition to either DT_CommanderExclusive or DT_NormalExclusive)
+	//SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
+	// Data that gets sent when unit is inside the pvs
 	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
 	// Data that gets sent when unit is the single selected unit of the player
 	SendPropDataTable( "singleselectiondata", 0, &REFERENCE_SEND_TABLE(DT_SingleSelectionTable), SendProxy_SingleSelectionDataTable ),
 	// Data that gets sent when unit is in a multi selection of the player or is not selected at all
 	SendPropDataTable( "multiornoselectiondata", 0, &REFERENCE_SEND_TABLE(DT_MultiOrNoneSelectionTable), SendProxy_MultiOrNoneSelectionDataTable ),
-
-	//SendPropExclude( "DT_UnitBase", "singleselectiondata" ),
-	//SendPropExclude( "DT_UnitBase", "minimaldata" ),
-	//SendPropExclude( "DT_UnitBase", "commanderdata" ),
 
 	// Excludes
 	//SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
@@ -681,25 +637,16 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 
 	// by default do a PVS check
 	netProp->RecomputePVSInformation();
-	bool bUseMinimalSendTable = g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo );
+	bool bUseMinimalSendTable = GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
 
 	if( m_UseMinimalSendTable.IsBitSet( iClientIndex ) != bUseMinimalSendTable )
 	{
 		m_UseMinimalSendTable.Set( iClientIndex, bUseMinimalSendTable );
 
-		if( bUseMinimalSendTable )
+		if( !bUseMinimalSendTable )
 		{
-			// Low update rate mode!
-			netProp->SetUpdateInterval( g_unit_minimal_sendtable_updaterate.GetFloat() );
-		}
-		else
-		{
-			// Back to regular mode!
-			if( netProp->TimerEventActive() )
-				netProp->SetUpdateInterval( 0 );
-
 			// State might have changed
-			netProp->NetworkStateChanged();
+			NetworkStateChanged();
 		}
 	}
 

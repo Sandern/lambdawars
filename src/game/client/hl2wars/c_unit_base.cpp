@@ -134,24 +134,18 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	RecvPropFloat		( RECVINFO(m_vecViewOffset[2]) ),
 END_RECV_TABLE()
 
-BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_NormalExclusive )
 #if 0
-	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+END_RECV_TABLE()
 #endif // 0
+
+BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
+
 	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
-	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
-END_RECV_TABLE()
 
-BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
-#if 0
-	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
-#endif // 0
-END_RECV_TABLE()
-
-BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
 
 	RecvPropInt		(RECVINFO( m_iMaxHealth )),
@@ -164,7 +158,6 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropEHandle		( RECVINFO( m_hSquadUnit ) ),
 	RecvPropEHandle		( RECVINFO( m_hCommander ) ),
 	RecvPropEHandle		( RECVINFO( m_hEnemy ) ),
-	//RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
 	RecvPropBool( RECVINFO( m_bCrouching ) ),
 	RecvPropBool( RECVINFO( m_bClimbing ) ),
@@ -185,9 +178,9 @@ IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
 
 BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
+	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
 
-	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
-	RecvPropDataTable( "normaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_NormalExclusive) ),
+	//RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
 	RecvPropDataTable( "commanderdata", 0, 0, &REFERENCE_RECV_TABLE(DT_CommanderExclusive) ),
 	RecvPropDataTable( "singleselectiondata", 0, 0, &REFERENCE_RECV_TABLE(DT_SingleSelectionTable) ),

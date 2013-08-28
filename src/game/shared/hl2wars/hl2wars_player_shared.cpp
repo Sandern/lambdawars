@@ -330,8 +330,7 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 				countFullTable++;
 		}
 
-		engine->Con_NPrintf( 1, "countMinTable: %d", countMinTable );
-		engine->Con_NPrintf( 2, "countFullTable: %d", countFullTable );
+		engine->Con_NPrintf( 1 + GetClientIndex(), "#%d: countMinTable: %d, countFullTable: %d", GetClientIndex(), countMinTable, countFullTable );
 	}
 #endif // CLIENT_DLL
 }

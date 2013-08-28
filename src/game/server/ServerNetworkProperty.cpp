@@ -233,6 +233,7 @@ void CServerNetworkProperty::SetTransmitProxy( CBaseTransmitProxy *pProxy )
 //-----------------------------------------------------------------------------
 bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs, int pvssize )
 {
+#ifndef USE_NEW_ISINPVS
 	RecomputePVSInformation();
 
 	// ignore if not touching a PV leaf
@@ -253,6 +254,10 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 		if (pPVS[m_PVSInfo.m_pClusters[i] >> 3] & (1 << (m_PVSInfo.m_pClusters[i] & 7) ))
 			return true;
 	}
+#else
+	Assert( 0 );
+	Warning( "CServerNetworkProperty::IsInPVS: unimplemented\n");
+#endif // USE_NEW_ISINPVS
 
 	return false;		// not visible
 }
@@ -349,12 +354,11 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 	else
 	{
 		// Cull transmission based on the camera limits
-		// These limits are send in cl_strategic_cam_limits
+		// These limits are send in cl_strategic_cam_limits (basically just the fov angles)
 		CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
 		Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
 		if ( !pRecipientEntity )
 			return false;
-	
 		CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
 
 		// Get player camera position and limits

@@ -173,6 +173,8 @@ public:
 	virtual int ShouldTransmit( const CCheckTransmitInfo *pInfo );
 
 	bool UseMinimalSendTable( int iClientIndex ); // Only used by proxies
+	float GetNextSendThrottledDataTime( int iClientIndex );
+	void SetNextSendThrottledDataTime( int iClientIndex, float fNextTime );
 	void SetAlwaysSendFullSelectionData( bool state ) { m_bAlwaysSendFullSelectionData = state; } // For buildings, see m_bAlwaysSendFullSelectionData
 	bool AlwaysSendFullSelectionData() { return m_bAlwaysSendFullSelectionData; }
 
@@ -487,6 +489,7 @@ private:
 	CNetworkVar(int, m_NetworkedUnitTypeSymbol );
 
 	CPlayerBitVec m_UseMinimalSendTable;
+	float m_fNextSendThrottledDataTime[ABSOLUTE_PLAYER_LIMIT];
 	bool m_bAlwaysSendFullSelectionData; // Always send health/energy full resolution (for buildings)
 
 	bool m_bHasEnemy;
@@ -676,6 +679,16 @@ inline bool CUnitBase::FastLOSCheck( const Vector &vTargetPos )
 inline bool CUnitBase::UseMinimalSendTable( int iClientIndex )
 {
 	return m_UseMinimalSendTable.IsBitSet( iClientIndex );
+}
+
+inline float CUnitBase::GetNextSendThrottledDataTime( int iClientIndex )
+{
+	return m_fNextSendThrottledDataTime[iClientIndex];
+}
+
+inline void CUnitBase::SetNextSendThrottledDataTime( int iClientIndex, float fNextTime )
+{
+	m_fNextSendThrottledDataTime[iClientIndex] = fNextTime;
 }
 #endif // CLIENT_DLL
 
