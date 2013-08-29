@@ -397,7 +397,10 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 void CServerNetworkProperty::SetUpdateInterval( float val )
 {
 	if ( val == 0 )
+	{
 		m_TimerEvent.StopUpdates();
+		FireEvent(); // Fire event in case changed!
+	}
 	else
 		m_TimerEvent.SetUpdateInterval( val );
 }

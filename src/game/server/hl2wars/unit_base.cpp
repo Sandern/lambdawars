@@ -629,6 +629,7 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// Don't send when in the fow for the recv player.
 	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
+		m_UseMinimalSendTable.Set( iClientIndex, true ); // For determining low update rate
 		return FL_EDICT_DONTSEND;
 	}
 
@@ -647,6 +648,23 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		{
 			// State might have changed
 			NetworkStateChanged();
+
+			// This unit is no longer using the minmal table for this player, 
+			// so if low update rate is active, then we must clear it!
+			if( netProp->TimerEventActive() )
+			{
+				netProp->SetUpdateInterval( 0 );
+			}
+		}
+		else
+		{
+			// It might be the case that we can go into low update rate if not yet
+			// This is only possible if the unit is out of view of all players
+			// We only need some (slow) updates for the minimap!
+			if( !netProp->TimerEventActive() && m_UseMinimalSendTable.IsAllSet() )
+			{
+				netProp->SetUpdateInterval( 0.4f );
+			}
 		}
 	}
 

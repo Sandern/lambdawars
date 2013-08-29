@@ -161,6 +161,9 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 	SetUnitType("unit_unknown");
 
 	m_bFOWFilterFriendly = true;
+
+	m_UseMinimalSendTable.SetAll();
+	NetworkProp()->SetUpdateInterval( 0.4f );
 #else
 	m_OldNetworkedUnitTypeSymbol = -1;
 	m_NetworkedUnitTypeSymbol = -1;
