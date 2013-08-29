@@ -106,6 +106,13 @@ ClientApp::ClientApp()
 //-----------------------------------------------------------------------------
 void ClientApp::OnContextInitialized()
 {
+#if 0
+	char buf[MAX_PATH];
+	filesystem->RelativePathToFullPath( "bin/PepperFlash/pepflashplayer.dll", "MOD", buf, MAX_PATH );
+	V_FixSlashes( buf );
+	CefAddWebPluginPath( CefString( buf ) );
+	CefRefreshWebPlugins();
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------

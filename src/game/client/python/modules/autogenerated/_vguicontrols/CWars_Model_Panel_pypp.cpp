@@ -1531,6 +1531,16 @@ void register_CWars_Model_Panel_class(){
                 , GetPanelClassName_function_type( &::CWars_Model_Panel::GetPanelClassName ) );
         
         }
+        { //::CWars_Model_Panel::LookAtBounds
+        
+            typedef void ( ::CWars_Model_Panel::*LookAtBounds_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            CWars_Model_Panel_exposer.def( 
+                "LookAtBounds"
+                , LookAtBounds_function_type( &::CWars_Model_Panel::LookAtBounds )
+                , ( bp::arg("vecBoundsMin"), bp::arg("vecBoundsMax") ) );
+        
+        }
         { //::CWars_Model_Panel::SetAmbientCube
         
             typedef void ( ::CWars_Model_Panel::*SetAmbientCube_function_type )( ::Color & ) ;
@@ -1551,6 +1561,16 @@ void register_CWars_Model_Panel_class(){
                 , ( bp::arg("iGroup"), bp::arg("iValue") ) );
         
         }
+        { //::CWars_Model_Panel::SetModelAnglesAndPosition
+        
+            typedef void ( ::CWars_Model_Panel::*SetModelAnglesAndPosition_function_type )( ::QAngle const &,::Vector const & ) ;
+            
+            CWars_Model_Panel_exposer.def( 
+                "SetModelAnglesAndPosition"
+                , SetModelAnglesAndPosition_function_type( &::CWars_Model_Panel::SetModelAnglesAndPosition )
+                , ( bp::arg("angRot"), bp::arg("vecPos") ) );
+        
+        }
         { //::CWars_Model_Panel::SetupCustomLights
         
             typedef void ( ::CWars_Model_Panel::*SetupCustomLights_function_type )( ::Color,::Color,float,::Color,float ) ;
@@ -1561,7 +1581,6 @@ void register_CWars_Model_Panel_class(){
                 , ( bp::arg("cAmbient"), bp::arg("cKey"), bp::arg("fKeyBoost"), bp::arg("cRim"), bp::arg("fRimBoost") ) );
         
         }
-        CWars_Model_Panel_exposer.def_readwrite( "m_bShouldPaint", &CWars_Model_Panel::m_bShouldPaint );
         { //::CPotteryWheelPanel::AcceptManipulation
         
             typedef void ( CWars_Model_Panel_wrapper::*AcceptManipulation_function_type )( bool ) ;
