@@ -97,10 +97,10 @@ public:
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_iClip2 );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_iPrimaryAmmoType );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_iSecondaryAmmoType );
-	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flNextPrimaryAttack );
-	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flNextSecondaryAttack );
-	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nNextThinkTick );
-	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flTimeWeaponIdle );
+	//IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flNextPrimaryAttack );
+	//IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flNextSecondaryAttack );
+	//IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nNextThinkTick );
+	//IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_flTimeWeaponIdle );
 #else
 	Vector m_vTracerColor;
 #endif // CLIENT_DLL

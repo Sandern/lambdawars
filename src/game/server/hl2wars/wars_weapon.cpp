@@ -77,13 +77,15 @@ BEGIN_NETWORK_TABLE_NOBASE( CWarsWeapon, DT_WarsLocalWeaponData )
 END_NETWORK_TABLE()
 
 BEGIN_NETWORK_TABLE_NOBASE( CWarsWeapon, DT_WarsActiveLocalWeaponData )
-	SendPropTime( SENDINFO( m_flNextPrimaryAttack ) ),
-	SendPropTime( SENDINFO( m_flNextSecondaryAttack ) ),
-	SendPropInt( SENDINFO( m_nNextThinkTick ) ),
-	SendPropTime( SENDINFO( m_flTimeWeaponIdle ) ),
+	//SendPropTime( SENDINFO( m_flNextPrimaryAttack ) ),
+	//SendPropTime( SENDINFO( m_flNextSecondaryAttack ) ),
+	//SendPropInt( SENDINFO( m_nNextThinkTick ) ),
+	//SendPropTime( SENDINFO( m_flTimeWeaponIdle ) ),
 END_NETWORK_TABLE()
 
 IMPLEMENT_SERVERCLASS_ST(CWarsWeapon, DT_WarsWeapon)
+	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
+
 	SendPropExclude( "DT_BaseAnimating", "m_flPoseParameter" ),
 	SendPropExclude( "DT_BaseAnimating", "m_flPlaybackRate" ),	
 	SendPropExclude( "DT_BaseAnimating", "m_nSequence" ),	
@@ -91,8 +93,14 @@ IMPLEMENT_SERVERCLASS_ST(CWarsWeapon, DT_WarsWeapon)
 	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
 	SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
 
+	SendPropExclude( "DT_BaseAnimating", "m_nNewSequenceParity" ),
+	SendPropExclude( "DT_BaseAnimating", "m_nResetEventsParity" ),
+	SendPropExclude( "DT_BaseAnimating", "m_nMuzzleFlashParity" ),
+
 	SendPropExclude( "DT_BaseCombatWeapon", "LocalWeaponData" ),
 	SendPropExclude( "DT_BaseCombatWeapon", "LocalActiveWeaponData" ),
+	//SendPropExclude( "DT_BaseCombatWeapon", "m_hOwner" ),
+	SendPropExclude( "DT_BaseEntity", "m_hOwnerEntity" ),
 
 	SendPropDataTable("WarsLocalWeaponData", 0, &REFERENCE_SEND_TABLE(DT_WarsLocalWeaponData), SendProxy_SendWarsLocalWeaponDataTable ),
 	SendPropDataTable("WarsActiveLocalWeaponData", 0, &REFERENCE_SEND_TABLE(DT_WarsActiveLocalWeaponData), SendProxy_SendWarsActiveLocalWeaponDataTable ),
