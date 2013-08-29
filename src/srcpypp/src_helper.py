@@ -417,7 +417,56 @@ convert_to_py_name_template_novguilib = '''struct %(convert_to_py_name)s : bp::t
             return bp::incref( bp::object( %(handlename)s( &s ) ).ptr() );
     }
 };'''
-            
+
+# Converters when having the vgui lib
+ptr_convert_to_py_name_template = '''struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
+{
+    {
+        static PyObject* convert('+cls_name+' *s)
+        {
+            if( s )
+            {
+                if( s->GetPySelf() != NULL )
+                    return bp::incref( s->GetPySelf() ); 
+                else
+                    return bp::incref( bp::object( %(handlename)s( s ) ).ptr() );
+            }
+            else
+            {
+                return bp::incref(Py_None);
+            }
+        }
+    }
+};'''
+
+convert_to_py_name_template = '''struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s_to_handle>
+{
+    static PyObject* convert(const %(clsname)s &s)
+    {
+        if( s.GetPySelf() != NULL )
+            return bp::incref( s.GetPySelf() );
+        else
+            return bp::incref( bp::object( %(handlename)s( (%(clsname)s *)&s) ).ptr() );
+    }
+};'''
+
+convert_from_py_name_template = '''struct %(convert_from_py_name)s
+{
+    handle_to_%(clsname)s()
+    {
+        bp::converter::registry::insert(
+            &extract_%(clsname)s,
+            bp::type_id< %(clsname)s >()
+            );
+    }
+    
+    static void* extract_%(clsname)s(PyObject* op)
+    {
+        PyBaseVGUIHandle &h = bp::extract< PyBaseVGUIHandle & >(op);
+        return h.Get();
+    }
+};'''
+
 # Almost the same as above, maybe make a shared function?   
 def AddVGUIConverter(mb, cls_name, novguilib, containsabstract=False):
     cls = mb.class_(cls_name)
@@ -467,58 +516,14 @@ def AddVGUIConverter(mb, cls_name, novguilib, containsabstract=False):
         
         if not containsabstract:
             mb.add_declaration_code(convert_to_py_name_template_novguilib % strargs)
-
     else:
-        mb.add_declaration_code(
-        'struct '+ptr_convert_to_py_name+' : bp::to_python_converter<'+cls_name+' *, ptr_'+cls_name+'_to_handle>\r\n' + \
-        '{\r\n' + \
-        '    static PyObject* convert('+cls_name+' *s)\r\n' + \
-        '    {\r\n' + \
-        '        if( s ) {\r\n' + \
-        '            if(s->GetPySelf() != NULL)\r\n' + \
-        '                return bp::incref(s->GetPySelf());\r\n' + \
-        '            else\r\n' + \
-        '                return bp::incref(bp::object('+handlename+'(s)).ptr());\r\n' + \
-        '        }\r\n' + \
-        '        else {\r\n' + \
-        '            return bp::incref(Py_None);\r\n' + \
-        '        }\r\n' + \
-        '    }\r\n' + \
-        '};\r\n'
-        )
-
+        mb.add_declaration_code(ptr_convert_to_py_name_template % strargs)
+        
         if not containsabstract:
-            mb.add_declaration_code(
-            'struct '+convert_to_py_name+' : bp::to_python_converter<'+cls_name+', '+cls_name+'_to_handle>\r\n' + \
-            '{\r\n' + \
-            '    static PyObject* convert(const '+cls_name+' &s)\r\n' + \
-            '    {\r\n' + \
-            '        if(s.GetPySelf() != NULL)\r\n' + \
-            '            return bp::incref(s.GetPySelf());\r\n' + \
-            '        else\r\n' + \
-            '            return bp::incref(bp::object('+handlename+'(('+cls_name+' *)&s)).ptr());\r\n' + \
-            '    }\r\n' + \
-            '};\r\n'
-            )
+            mb.add_declaration_code(convert_to_py_name_template % strargs)
 
     # Add from python converter
-    mb.add_declaration_code(
-    'struct '+convert_from_py_name + '\r\n' + \
-    '{\r\n' + \
-    '    handle_to_'+cls_name+'()\r\n' + \
-    '    {\r\n' + \
-    '        bp::converter::registry::insert(\r\n' + \
-    '            &extract_'+cls_name+', \r\n' + \
-    '            bp::type_id<'+cls_name+'>()\r\n' + \
-    '            );\r\n' + \
-    '    }\r\n' + \
-    '\r\n' + \
-    '    static void* extract_'+cls_name+'(PyObject* op){\r\n' + \
-    '       PyBaseVGUIHandle h = bp::extract<PyBaseVGUIHandle>(op);\r\n' + \
-    '       return h.Get();\r\n' + \
-    '    }\r\n' + \
-    '};\r\n'
-    )
+    mb.add_declaration_code(convert_from_py_name_template % strargs)
     
     # Add registration code
     mb.add_registration_code( ptr_convert_to_py_name+"();" )

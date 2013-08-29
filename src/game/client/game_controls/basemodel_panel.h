@@ -165,7 +165,7 @@ public:
 	virtual void ApplySettings( KeyValues *inResourceData );
 	virtual void PerformLayout();
 
-	// Animaiton.
+	// Animations.
 	int FindDefaultAnim( void );
 	int FindAnimByName( const char *pszName );
 	void SetModelAnim( int iAnim );

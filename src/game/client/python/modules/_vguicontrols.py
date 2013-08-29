@@ -49,6 +49,8 @@ class VGUIControls(ClientModuleGenerator):
         'matsys_controls/mdlpanel.h',
         'matsys_controls/potterywheelpanel.h',
         'game_controls/basemodel_panel.h',
+        #'game_controls/basemodelpanel.h',
+        'hl2wars/vgui/wars_model_panel.h',
     ] )
     
     panel_cls_list = [  'AnimationController', 
@@ -64,6 +66,8 @@ class VGUIControls(ClientModuleGenerator):
                         'CPotteryWheelPanel',
                         'CMDLPanel',
                         'CBaseModelPanel',
+                        'CWars_Model_Panel',
+                        #'CModelPanel',
                      ]
     
     def ParseImageClasses(self, mb):

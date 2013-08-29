@@ -28,6 +28,7 @@
 #include "matsys_controls/mdlpanel.h"
 #include "matsys_controls/potterywheelpanel.h"
 #include "game_controls/basemodel_panel.h"
+#include "hl2wars/vgui/wars_model_panel.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "Image_pypp.hpp"

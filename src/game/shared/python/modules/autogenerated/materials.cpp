@@ -215,6 +215,167 @@ BOOST_PYTHON_MODULE(materials){
         }
     }
 
+    { //::LightDesc_t
+        typedef bp::class_< LightDesc_t > LightDesc_t_exposer_t;
+        LightDesc_t_exposer_t LightDesc_t_exposer = LightDesc_t_exposer_t( "LightDesc_t", bp::init< >() );
+        bp::scope LightDesc_t_scope( LightDesc_t_exposer );
+        LightDesc_t_exposer.def( bp::init< Vector const &, Vector const & >(( bp::arg("pos"), bp::arg("color") )) );
+        LightDesc_t_exposer.def( bp::init< Vector const &, Vector const &, Vector const &, float, float >(( bp::arg("pos"), bp::arg("color"), bp::arg("point_at"), bp::arg("inner_cone_boundary"), bp::arg("outer_cone_boundary") )) );
+        { //::LightDesc_t::ComputeLightAtPoints
+        
+            typedef void ( ::LightDesc_t::*ComputeLightAtPoints_function_type )( ::FourVectors const &,::FourVectors const &,::FourVectors &,bool ) const;
+            
+            LightDesc_t_exposer.def( 
+                "ComputeLightAtPoints"
+                , ComputeLightAtPoints_function_type( &::LightDesc_t::ComputeLightAtPoints )
+                , ( bp::arg("pos"), bp::arg("normal"), bp::arg("color"), bp::arg("DoHalfLambert")=(bool)(false) ) );
+        
+        }
+        { //::LightDesc_t::ComputeLightAtPointsForDirectional
+        
+            typedef void ( ::LightDesc_t::*ComputeLightAtPointsForDirectional_function_type )( ::FourVectors const &,::FourVectors const &,::FourVectors &,bool ) const;
+            
+            LightDesc_t_exposer.def( 
+                "ComputeLightAtPointsForDirectional"
+                , ComputeLightAtPointsForDirectional_function_type( &::LightDesc_t::ComputeLightAtPointsForDirectional )
+                , ( bp::arg("pos"), bp::arg("normal"), bp::arg("color"), bp::arg("DoHalfLambert")=(bool)(false) ) );
+        
+        }
+        { //::LightDesc_t::ComputeNonincidenceLightAtPoints
+        
+            typedef void ( ::LightDesc_t::*ComputeNonincidenceLightAtPoints_function_type )( ::FourVectors const &,::FourVectors & ) const;
+            
+            LightDesc_t_exposer.def( 
+                "ComputeNonincidenceLightAtPoints"
+                , ComputeNonincidenceLightAtPoints_function_type( &::LightDesc_t::ComputeNonincidenceLightAtPoints )
+                , ( bp::arg("pos"), bp::arg("color") ) );
+        
+        }
+        { //::LightDesc_t::DistanceAtWhichBrightnessIsLessThan
+        
+            typedef float ( ::LightDesc_t::*DistanceAtWhichBrightnessIsLessThan_function_type )( float ) const;
+            
+            LightDesc_t_exposer.def( 
+                "DistanceAtWhichBrightnessIsLessThan"
+                , DistanceAtWhichBrightnessIsLessThan_function_type( &::LightDesc_t::DistanceAtWhichBrightnessIsLessThan )
+                , ( bp::arg("flAmount") ) );
+        
+        }
+        { //::LightDesc_t::InitDirectional
+        
+            typedef void ( ::LightDesc_t::*InitDirectional_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            LightDesc_t_exposer.def( 
+                "InitDirectional"
+                , InitDirectional_function_type( &::LightDesc_t::InitDirectional )
+                , ( bp::arg("dir"), bp::arg("color") ) );
+        
+        }
+        { //::LightDesc_t::InitPoint
+        
+            typedef void ( ::LightDesc_t::*InitPoint_function_type )( ::Vector const &,::Vector const & ) ;
+            
+            LightDesc_t_exposer.def( 
+                "InitPoint"
+                , InitPoint_function_type( &::LightDesc_t::InitPoint )
+                , ( bp::arg("pos"), bp::arg("color") ) );
+        
+        }
+        { //::LightDesc_t::InitSpot
+        
+            typedef void ( ::LightDesc_t::*InitSpot_function_type )( ::Vector const &,::Vector const &,::Vector const &,float,float ) ;
+            
+            LightDesc_t_exposer.def( 
+                "InitSpot"
+                , InitSpot_function_type( &::LightDesc_t::InitSpot )
+                , ( bp::arg("pos"), bp::arg("color"), bp::arg("point_at"), bp::arg("inner_cone_boundary"), bp::arg("outer_cone_boundary") ) );
+        
+        }
+        { //::LightDesc_t::IsDirectionWithinLightCone
+        
+            typedef bool ( ::LightDesc_t::*IsDirectionWithinLightCone_function_type )( ::Vector const & ) const;
+            
+            LightDesc_t_exposer.def( 
+                "IsDirectionWithinLightCone"
+                , IsDirectionWithinLightCone_function_type( &::LightDesc_t::IsDirectionWithinLightCone )
+                , ( bp::arg("rdir") ) );
+        
+        }
+        { //::LightDesc_t::OneOverThetaDotMinusPhiDot
+        
+            typedef float ( ::LightDesc_t::*OneOverThetaDotMinusPhiDot_function_type )(  ) const;
+            
+            LightDesc_t_exposer.def( 
+                "OneOverThetaDotMinusPhiDot"
+                , OneOverThetaDotMinusPhiDot_function_type( &::LightDesc_t::OneOverThetaDotMinusPhiDot ) );
+        
+        }
+        { //::LightDesc_t::RecalculateDerivedValues
+        
+            typedef void ( ::LightDesc_t::*RecalculateDerivedValues_function_type )(  ) ;
+            
+            LightDesc_t_exposer.def( 
+                "RecalculateDerivedValues"
+                , RecalculateDerivedValues_function_type( &::LightDesc_t::RecalculateDerivedValues ) );
+        
+        }
+        { //::LightDesc_t::RecalculateOneOverThetaDotMinusPhiDot
+        
+            typedef void ( ::LightDesc_t::*RecalculateOneOverThetaDotMinusPhiDot_function_type )(  ) ;
+            
+            LightDesc_t_exposer.def( 
+                "RecalculateOneOverThetaDotMinusPhiDot"
+                , RecalculateOneOverThetaDotMinusPhiDot_function_type( &::LightDesc_t::RecalculateOneOverThetaDotMinusPhiDot ) );
+        
+        }
+        { //::LightDesc_t::SetupNewStyleAttenuation
+        
+            typedef void ( ::LightDesc_t::*SetupNewStyleAttenuation_function_type )( float,float ) ;
+            
+            LightDesc_t_exposer.def( 
+                "SetupNewStyleAttenuation"
+                , SetupNewStyleAttenuation_function_type( &::LightDesc_t::SetupNewStyleAttenuation )
+                , ( bp::arg("fFiftyPercentDistance"), bp::arg("fZeroPercentDistance") ) );
+        
+        }
+        { //::LightDesc_t::SetupOldStyleAttenuation
+        
+            typedef void ( ::LightDesc_t::*SetupOldStyleAttenuation_function_type )( float,float,float ) ;
+            
+            LightDesc_t_exposer.def( 
+                "SetupOldStyleAttenuation"
+                , SetupOldStyleAttenuation_function_type( &::LightDesc_t::SetupOldStyleAttenuation )
+                , ( bp::arg("fQuadatricAttn"), bp::arg("fLinearAttn"), bp::arg("fConstantAttn") ) );
+        
+        }
+        { //::LightDesc_t::operator=
+        
+            typedef ::LightDesc_t & ( ::LightDesc_t::*assign_function_type )( ::LightDesc_t const & ) ;
+            
+            LightDesc_t_exposer.def( 
+                "assign"
+                , assign_function_type( &::LightDesc_t::operator= )
+                , ( bp::arg("src") )
+                , bp::return_self< >() );
+        
+        }
+        LightDesc_t_exposer.def_readwrite( "m_Attenuation0", &LightDesc_t::m_Attenuation0 );
+        LightDesc_t_exposer.def_readwrite( "m_Attenuation1", &LightDesc_t::m_Attenuation1 );
+        LightDesc_t_exposer.def_readwrite( "m_Attenuation2", &LightDesc_t::m_Attenuation2 );
+        LightDesc_t_exposer.def_readwrite( "m_Color", &LightDesc_t::m_Color );
+        LightDesc_t_exposer.def_readwrite( "m_Direction", &LightDesc_t::m_Direction );
+        LightDesc_t_exposer.def_readwrite( "m_Falloff", &LightDesc_t::m_Falloff );
+        LightDesc_t_exposer.def_readwrite( "m_Flags", &LightDesc_t::m_Flags );
+        LightDesc_t_exposer.def_readwrite( "m_OneOverThetaDotMinusPhiDot", &LightDesc_t::m_OneOverThetaDotMinusPhiDot );
+        LightDesc_t_exposer.def_readwrite( "m_Phi", &LightDesc_t::m_Phi );
+        LightDesc_t_exposer.def_readwrite( "m_PhiDot", &LightDesc_t::m_PhiDot );
+        LightDesc_t_exposer.def_readwrite( "m_Position", &LightDesc_t::m_Position );
+        LightDesc_t_exposer.def_readwrite( "m_Range", &LightDesc_t::m_Range );
+        LightDesc_t_exposer.def_readwrite( "m_Theta", &LightDesc_t::m_Theta );
+        LightDesc_t_exposer.def_readwrite( "m_ThetaDot", &LightDesc_t::m_ThetaDot );
+        LightDesc_t_exposer.def_readwrite( "m_Type", &LightDesc_t::m_Type );
+    }
+
     bp::class_< PyProceduralTexture, boost::noncopyable >( "ProceduralTexture", bp::init< char const *, char const *, int, int, ImageFormat, int >(( bp::arg("pTextureName"), bp::arg("pTextureGroupName"), bp::arg("w"), bp::arg("h"), bp::arg("fmt"), bp::arg("nFlags") )) )    
         .def( 
             "Download"

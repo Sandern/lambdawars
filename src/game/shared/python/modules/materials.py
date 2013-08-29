@@ -76,6 +76,10 @@ class Materials(SemiSharedModuleGenerator):
             mb.enum('ImageFormat').include()
             
             mb.free_function('SetUITeamColor').include()
+            
+            # Material lights
+            cls = mb.class_('LightDesc_t')
+            cls.include()
 
         
         # Remove any protected function 
