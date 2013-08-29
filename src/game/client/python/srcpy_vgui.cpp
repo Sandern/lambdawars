@@ -15,6 +15,7 @@
 #include "hl2wars/hl2wars_baseminimap.h"
 #include "hl2wars/vgui_video_general.h"
 #include "hl2wars/teamcolor_proxy.h"
+#include "game_controls/basemodel_panel.h"
 
 #include "hl2wars/gameui/wars/basemodpanel.h"
 #include "hl2wars/gameui/wars/basemodframe.h"
@@ -228,13 +229,13 @@ const PyBaseVGUIHandle& PyBaseVGUIHandle::Set( IClientPanel *pPanel )
 
 #define TEST_PANEL( type, pPanel ) \
 	{							   \
-	bp::wrapper< type > *wrapper = dynamic_cast<bp::wrapper< type > *>( pPanel ); \
+	const bp::wrapper< type > *wrapper = dynamic_cast<const bp::wrapper< type > *>( pPanel ); \
 	pObject = wrapper ? bp::detail::wrapper_base_::get_owner(*wrapper) : NULL; \
 	if( pObject ) \
 		return pObject; \
 	}
 
-PyObject *GetPyPanel( Panel *pPanel )
+PyObject *GetPyPanel( const Panel *pPanel )
 {
 	PyObject *pObject;
 
@@ -248,6 +249,9 @@ PyObject *GetPyPanel( Panel *pPanel )
 	TEST_PANEL( RichText, pPanel );
 	TEST_PANEL( CBaseMinimap, pPanel );
 	TEST_PANEL( VideoGeneralPanel, pPanel );
+	TEST_PANEL( CPotteryWheelPanel, pPanel );
+	TEST_PANEL( CMDLPanel, pPanel );
+	TEST_PANEL( CBaseModelPanel, pPanel );
 
 	return NULL;
 }

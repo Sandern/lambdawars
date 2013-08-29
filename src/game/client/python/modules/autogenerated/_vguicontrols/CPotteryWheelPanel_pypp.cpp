@@ -28,24 +28,315 @@
 #include "game_controls/basemodel_panel.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "EditablePanel_pypp.hpp"
+#include "CPotteryWheelPanel_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::EditablePanel > {
+struct CPotteryWheelPanel_wrapper : PyPanel, CPotteryWheelPanel, bp::wrapper< CPotteryWheelPanel > {
 
-    EditablePanel_wrapper(::vgui::Panel * parent, char const * panelName )
-    : vgui::EditablePanel( boost::python::ptr(parent), panelName )
-      , bp::wrapper< vgui::EditablePanel >(){
+    CPotteryWheelPanel_wrapper(::vgui::Panel * pParent, char const * pName )
+    : CPotteryWheelPanel( boost::python::ptr(pParent), pName )
+      , bp::wrapper< CPotteryWheelPanel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
-    EditablePanel_wrapper(::vgui::Panel * parent, char const * panelName, ::vgui::HScheme hScheme )
-    : vgui::EditablePanel( boost::python::ptr(parent), panelName, hScheme )
-      , bp::wrapper< vgui::EditablePanel >(){
-        // constructor
-    	g_PythonPanelCount++;
+    void AcceptManipulation( bool bReleaseMouseCapture=true ){
+        CPotteryWheelPanel::AcceptManipulation( bReleaseMouseCapture );
+    }
+
+    void CancelManipulation(  ){
+        CPotteryWheelPanel::CancelManipulation(  );
+    }
+
+    void CreateDefaultLights(  ){
+        CPotteryWheelPanel::CreateDefaultLights(  );
+    }
+
+    void DrawGrid(  ){
+        CPotteryWheelPanel::DrawGrid(  );
+    }
+
+    void EnableMouseCapture( bool enable, ::vgui::MouseCode code=::BUTTON_CODE_INVALID ){
+        CPotteryWheelPanel::EnableMouseCapture( enable, code );
+    }
+
+    bool HasLightProbe(  ) const {
+        return CPotteryWheelPanel::HasLightProbe(  );
+    }
+
+    virtual void OnCursorMoved( int x, int y ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnCursorMoved: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnCursorMoved( x, y ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnCursorMoved = this->get_override( "OnCursorMoved" );
+        if( func_OnCursorMoved.ptr() != Py_None )
+            try {
+                func_OnCursorMoved( x, y );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnCursorMoved( x, y );
+            }
+        else
+            this->CPotteryWheelPanel::OnCursorMoved( x, y );
+    }
+    
+    void default_OnCursorMoved( int x, int y ) {
+        CPotteryWheelPanel::OnCursorMoved( x, y );
+    }
+
+    virtual void OnKeyCodePressed( ::vgui::KeyCode code ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnKeyCodePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnKeyCodePressed( code ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnKeyCodePressed = this->get_override( "OnKeyCodePressed" );
+        if( func_OnKeyCodePressed.ptr() != Py_None )
+            try {
+                func_OnKeyCodePressed( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnKeyCodePressed( code );
+            }
+        else
+            this->CPotteryWheelPanel::OnKeyCodePressed( code );
+    }
+    
+    void default_OnKeyCodePressed( ::vgui::KeyCode code ) {
+        CPotteryWheelPanel::OnKeyCodePressed( code );
+    }
+
+    virtual void OnKeyCodeReleased( ::vgui::KeyCode code ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnKeyCodeReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnKeyCodeReleased( code ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnKeyCodeReleased = this->get_override( "OnKeyCodeReleased" );
+        if( func_OnKeyCodeReleased.ptr() != Py_None )
+            try {
+                func_OnKeyCodeReleased( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnKeyCodeReleased( code );
+            }
+        else
+            this->CPotteryWheelPanel::OnKeyCodeReleased( code );
+    }
+    
+    void default_OnKeyCodeReleased( ::vgui::KeyCode code ) {
+        CPotteryWheelPanel::OnKeyCodeReleased( code );
+    }
+
+    virtual void OnMouseCaptureLost(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnMouseCaptureLost: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnMouseCaptureLost(  ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnMouseCaptureLost = this->get_override( "OnMouseCaptureLost" );
+        if( func_OnMouseCaptureLost.ptr() != Py_None )
+            try {
+                func_OnMouseCaptureLost(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnMouseCaptureLost(  );
+            }
+        else
+            this->CPotteryWheelPanel::OnMouseCaptureLost(  );
+    }
+    
+    void default_OnMouseCaptureLost(  ) {
+        CPotteryWheelPanel::OnMouseCaptureLost( );
+    }
+
+    virtual void OnMouseDoublePressed( ::vgui::MouseCode code ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnMouseDoublePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnMouseDoublePressed( code ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnMouseDoublePressed = this->get_override( "OnMouseDoublePressed" );
+        if( func_OnMouseDoublePressed.ptr() != Py_None )
+            try {
+                func_OnMouseDoublePressed( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnMouseDoublePressed( code );
+            }
+        else
+            this->CPotteryWheelPanel::OnMouseDoublePressed( code );
+    }
+    
+    void default_OnMouseDoublePressed( ::vgui::MouseCode code ) {
+        CPotteryWheelPanel::OnMouseDoublePressed( code );
+    }
+
+    virtual void OnMousePressed( ::vgui::MouseCode code ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnMousePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnMousePressed( code ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnMousePressed = this->get_override( "OnMousePressed" );
+        if( func_OnMousePressed.ptr() != Py_None )
+            try {
+                func_OnMousePressed( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnMousePressed( code );
+            }
+        else
+            this->CPotteryWheelPanel::OnMousePressed( code );
+    }
+    
+    void default_OnMousePressed( ::vgui::MouseCode code ) {
+        CPotteryWheelPanel::OnMousePressed( code );
+    }
+
+    virtual void OnMouseReleased( ::vgui::MouseCode code ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnMouseReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnMouseReleased( code ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnMouseReleased = this->get_override( "OnMouseReleased" );
+        if( func_OnMouseReleased.ptr() != Py_None )
+            try {
+                func_OnMouseReleased( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnMouseReleased( code );
+            }
+        else
+            this->CPotteryWheelPanel::OnMouseReleased( code );
+    }
+    
+    void default_OnMouseReleased( ::vgui::MouseCode code ) {
+        CPotteryWheelPanel::OnMouseReleased( code );
+    }
+
+    virtual void OnMouseWheeled( int delta ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnMouseWheeled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnMouseWheeled( delta ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnMouseWheeled = this->get_override( "OnMouseWheeled" );
+        if( func_OnMouseWheeled.ptr() != Py_None )
+            try {
+                func_OnMouseWheeled( delta );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnMouseWheeled( delta );
+            }
+        else
+            this->CPotteryWheelPanel::OnMouseWheeled( delta );
+    }
+    
+    void default_OnMouseWheeled( int delta ) {
+        CPotteryWheelPanel::OnMouseWheeled( delta );
+    }
+
+    virtual void OnTick(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "OnTick: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling OnTick(  ) of Class: CPotteryWheelPanel\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_OnTick = this->get_override( "OnTick" );
+        if( func_OnTick.ptr() != Py_None )
+            try {
+                func_OnTick(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPotteryWheelPanel::OnTick(  );
+            }
+        else
+            this->CPotteryWheelPanel::OnTick(  );
+    }
+    
+    void default_OnTick(  ) {
+        CPotteryWheelPanel::OnTick( );
+    }
+
+    bool WarpMouse( int & x, int & y ){
+        return CPotteryWheelPanel::WarpMouse( x, y );
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
@@ -208,98 +499,8 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
         vgui::Panel::OnCursorExited( );
     }
 
-    virtual void OnCursorMoved( int x, int y ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnCursorMoved: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnCursorMoved( x, y ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnCursorMoved = this->get_override( "OnCursorMoved" );
-        if( func_OnCursorMoved.ptr() != Py_None )
-            try {
-                func_OnCursorMoved( x, y );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnCursorMoved( x, y );
-            }
-        else
-            this->vgui::Panel::OnCursorMoved( x, y );
-    }
-    
-    void default_OnCursorMoved( int x, int y ) {
-        vgui::Panel::OnCursorMoved( x, y );
-    }
-
     void OnFinishDragging( bool mousereleased, ::vgui::MouseCode code, bool aborted=false ){
         vgui::Panel::OnFinishDragging( mousereleased, code, aborted );
-    }
-
-    virtual void OnKeyCodePressed( ::vgui::KeyCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyCodePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnKeyCodePressed = this->get_override( "OnKeyCodePressed" );
-        if( func_OnKeyCodePressed.ptr() != Py_None )
-            try {
-                func_OnKeyCodePressed( code );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnKeyCodePressed( code );
-            }
-        else
-            this->vgui::Panel::OnKeyCodePressed( code );
-    }
-    
-    void default_OnKeyCodePressed( ::vgui::KeyCode code ) {
-        vgui::Panel::OnKeyCodePressed( code );
-    }
-
-    virtual void OnKeyCodeReleased( ::vgui::KeyCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyCodeReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodeReleased( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnKeyCodeReleased = this->get_override( "OnKeyCodeReleased" );
-        if( func_OnKeyCodeReleased.ptr() != Py_None )
-            try {
-                func_OnKeyCodeReleased( code );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnKeyCodeReleased( code );
-            }
-        else
-            this->vgui::Panel::OnKeyCodeReleased( code );
-    }
-    
-    void default_OnKeyCodeReleased( ::vgui::KeyCode code ) {
-        vgui::Panel::OnKeyCodeReleased( code );
     }
 
     virtual void OnKeyFocusTicked(  ) {
@@ -362,66 +563,6 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
         vgui::Panel::OnKillFocus( );
     }
 
-    virtual void OnMouseCaptureLost(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseCaptureLost: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseCaptureLost(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnMouseCaptureLost = this->get_override( "OnMouseCaptureLost" );
-        if( func_OnMouseCaptureLost.ptr() != Py_None )
-            try {
-                func_OnMouseCaptureLost(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnMouseCaptureLost(  );
-            }
-        else
-            this->vgui::Panel::OnMouseCaptureLost(  );
-    }
-    
-    void default_OnMouseCaptureLost(  ) {
-        vgui::Panel::OnMouseCaptureLost( );
-    }
-
-    virtual void OnMouseDoublePressed( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseDoublePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseDoublePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnMouseDoublePressed = this->get_override( "OnMouseDoublePressed" );
-        if( func_OnMouseDoublePressed.ptr() != Py_None )
-            try {
-                func_OnMouseDoublePressed( code );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnMouseDoublePressed( code );
-            }
-        else
-            this->vgui::Panel::OnMouseDoublePressed( code );
-    }
-    
-    void default_OnMouseDoublePressed( ::vgui::MouseCode code ) {
-        vgui::Panel::OnMouseDoublePressed( code );
-    }
-
     virtual void OnMouseFocusTicked(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -452,66 +593,6 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
         vgui::Panel::OnMouseFocusTicked( );
     }
 
-    virtual void OnMousePressed( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMousePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMousePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnMousePressed = this->get_override( "OnMousePressed" );
-        if( func_OnMousePressed.ptr() != Py_None )
-            try {
-                func_OnMousePressed( code );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnMousePressed( code );
-            }
-        else
-            this->vgui::Panel::OnMousePressed( code );
-    }
-    
-    void default_OnMousePressed( ::vgui::MouseCode code ) {
-        vgui::Panel::OnMousePressed( code );
-    }
-
-    virtual void OnMouseReleased( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseReleased( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnMouseReleased = this->get_override( "OnMouseReleased" );
-        if( func_OnMouseReleased.ptr() != Py_None )
-            try {
-                func_OnMouseReleased( code );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnMouseReleased( code );
-            }
-        else
-            this->vgui::Panel::OnMouseReleased( code );
-    }
-    
-    void default_OnMouseReleased( ::vgui::MouseCode code ) {
-        vgui::Panel::OnMouseReleased( code );
-    }
-
     virtual void OnMouseTriplePressed( ::vgui::MouseCode code ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -540,36 +621,6 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     
     void default_OnMouseTriplePressed( ::vgui::MouseCode code ) {
         vgui::Panel::OnMouseTriplePressed( code );
-    }
-
-    virtual void OnMouseWheeled( int delta ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseWheeled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseWheeled( delta ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnMouseWheeled = this->get_override( "OnMouseWheeled" );
-        if( func_OnMouseWheeled.ptr() != Py_None )
-            try {
-                func_OnMouseWheeled( delta );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnMouseWheeled( delta );
-            }
-        else
-            this->vgui::Panel::OnMouseWheeled( delta );
-    }
-    
-    void default_OnMouseWheeled( int delta ) {
-        vgui::Panel::OnMouseWheeled( delta );
     }
 
     virtual void OnScreenSizeChanged( int oldwide, int oldtall ){
@@ -621,36 +672,6 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     
     void default_OnThink(  ) {
         vgui::Panel::OnThink( );
-    }
-
-    virtual void OnTick(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnTick: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnTick(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_OnTick = this->get_override( "OnTick" );
-        if( func_OnTick.ptr() != Py_None )
-            try {
-                func_OnTick(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::Panel::OnTick(  );
-            }
-        else
-            this->vgui::Panel::OnTick(  );
-    }
-    
-    void default_OnTick(  ) {
-        vgui::Panel::OnTick( );
     }
 
     virtual void PaintBuildOverlay(  ) {
@@ -1231,7 +1252,7 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
             #endif // _WIN32
             #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
             if( py_log_overrides.GetBool() )
-                Msg("Calling Paint(  ) of Class: vgui::vgui::Panel\n");
+                Msg("Calling Paint(  ) of Class: vgui::CPotteryWheelPanel\n");
             #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
             bp::override func_Paint = this->get_override( "Paint" );
             if( func_Paint.ptr() != Py_None )
@@ -1239,10 +1260,10 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
                     func_Paint(  );
                 } catch(bp::error_already_set &) {
                     PyErr_Print();
-                    this->vgui::Panel::Paint(  );
+                    this->CPotteryWheelPanel::Paint(  );
                 }
             else
-                this->vgui::Panel::Paint(  );
+                this->CPotteryWheelPanel::Paint(  );
                 
             FinishRecordSBuffer( m_PaintCallBuffer );
  
@@ -1254,7 +1275,7 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     }
     
     void default_Paint(  ) {
-        vgui::Panel::Paint( );
+        CPotteryWheelPanel::Paint( );
     }
 
     virtual void PaintBackground(  ) {
@@ -1333,7 +1354,7 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
 
     virtual bool IsPythonManaged() { return true; }
 
-    ~EditablePanel_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }
+    ~CPotteryWheelPanel_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }
 
     void DeletePanel( void ) { ::PyDeletePanel( this, this ); }
 
@@ -1385,503 +1406,726 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
         vgui::Panel::SetParent( boost::python::ptr(newParent) );
     }
 
+    private:
+virtual void OnPaint3D() {}
+
 };
 
-void register_EditablePanel_class(){
+void register_CPotteryWheelPanel_class(){
 
-    { //::vgui::EditablePanel
-        typedef bp::class_< EditablePanel_wrapper, bp::bases< vgui::Panel >, boost::noncopyable > EditablePanel_exposer_t;
-        EditablePanel_exposer_t EditablePanel_exposer = EditablePanel_exposer_t( "EditablePanel", bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("panelName") )) );
-        bp::scope EditablePanel_scope( EditablePanel_exposer );
-        EditablePanel_exposer.def( bp::init< vgui::Panel *, char const *, vgui::HScheme >(( bp::arg("parent"), bp::arg("panelName"), bp::arg("hScheme") )) );
-        { //::vgui::EditablePanel::ActivateBuildMode
+    { //::CPotteryWheelPanel
+        typedef bp::class_< CPotteryWheelPanel_wrapper, bp::bases< vgui::EditablePanel >, boost::noncopyable > CPotteryWheelPanel_exposer_t;
+        CPotteryWheelPanel_exposer_t CPotteryWheelPanel_exposer = CPotteryWheelPanel_exposer_t( "CPotteryWheelPanel", bp::init< vgui::Panel *, char const * >(( bp::arg("pParent"), bp::arg("pName") )) );
+        bp::scope CPotteryWheelPanel_scope( CPotteryWheelPanel_exposer );
+        { //::CPotteryWheelPanel::AcceptManipulation
         
-            typedef void ( ::vgui::EditablePanel::*ActivateBuildMode_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*AcceptManipulation_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
-                "ActivateBuildMode"
-                , ActivateBuildMode_function_type( &::vgui::EditablePanel::ActivateBuildMode ) );
+            CPotteryWheelPanel_exposer.def( 
+                "AcceptManipulation"
+                , AcceptManipulation_function_type( &CPotteryWheelPanel_wrapper::AcceptManipulation )
+                , ( bp::arg("bReleaseMouseCapture")=(bool)(true) ) );
         
         }
-        { //::vgui::EditablePanel::LoadControlSettings
+        { //::CPotteryWheelPanel::CancelManipulation
         
-            typedef void ( ::vgui::EditablePanel::*LoadControlSettings_function_type )( char const *,char const *,::KeyValues *,::KeyValues * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*CancelManipulation_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
-                "LoadControlSettings"
-                , LoadControlSettings_function_type( &::vgui::EditablePanel::LoadControlSettings )
-                , ( bp::arg("dialogResourceName"), bp::arg("pathID")=bp::object(), bp::arg("pPreloadedKeyValues")=bp::object(), bp::arg("pConditions")=bp::object() ) );
+            CPotteryWheelPanel_exposer.def( 
+                "CancelManipulation"
+                , CancelManipulation_function_type( &CPotteryWheelPanel_wrapper::CancelManipulation ) );
         
         }
-        { //::vgui::EditablePanel::SetControlEnabled
+        { //::CPotteryWheelPanel::ComputeCameraTransform
         
-            typedef void ( ::vgui::EditablePanel::*SetControlEnabled_function_type )( char const *,bool ) ;
+            typedef void ( ::CPotteryWheelPanel::*ComputeCameraTransform_function_type )( ::matrix3x4_t * ) ;
             
-            EditablePanel_exposer.def( 
-                "SetControlEnabled"
-                , SetControlEnabled_function_type( &::vgui::EditablePanel::SetControlEnabled )
-                , ( bp::arg("controlName"), bp::arg("enabled") ) );
+            CPotteryWheelPanel_exposer.def( 
+                "ComputeCameraTransform"
+                , ComputeCameraTransform_function_type( &::CPotteryWheelPanel::ComputeCameraTransform )
+                , ( bp::arg("pWorldToCamera") ) );
+        
+        }
+        { //::CPotteryWheelPanel::ComputePanelPosition
+        
+            typedef void ( ::CPotteryWheelPanel::*ComputePanelPosition_function_type )( ::Vector const &,::Vector2D * ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "ComputePanelPosition"
+                , ComputePanelPosition_function_type( &::CPotteryWheelPanel::ComputePanelPosition )
+                , ( bp::arg("vecPosition"), bp::arg("pPanelPos") ) );
+        
+        }
+        { //::CPotteryWheelPanel::CreateDefaultLights
+        
+            typedef void ( CPotteryWheelPanel_wrapper::*CreateDefaultLights_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "CreateDefaultLights"
+                , CreateDefaultLights_function_type( &CPotteryWheelPanel_wrapper::CreateDefaultLights ) );
+        
+        }
+        { //::CPotteryWheelPanel::DrawGrid
+        
+            typedef void ( CPotteryWheelPanel_wrapper::*DrawGrid_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "DrawGrid"
+                , DrawGrid_function_type( &CPotteryWheelPanel_wrapper::DrawGrid ) );
+        
+        }
+        { //::CPotteryWheelPanel::EnableMouseCapture
+        
+            typedef void ( CPotteryWheelPanel_wrapper::*EnableMouseCapture_function_type )( bool,::vgui::MouseCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "EnableMouseCapture"
+                , EnableMouseCapture_function_type( &CPotteryWheelPanel_wrapper::EnableMouseCapture )
+                , ( bp::arg("enable"), bp::arg("code")=::BUTTON_CODE_INVALID ) );
+        
+        }
+        { //::CPotteryWheelPanel::GetBackgroundColor
+        
+            typedef ::Color const & ( ::CPotteryWheelPanel::*GetBackgroundColor_function_type )(  ) const;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "GetBackgroundColor"
+                , GetBackgroundColor_function_type( &::CPotteryWheelPanel::GetBackgroundColor )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CPotteryWheelPanel::GetCameraFOV
+        
+            typedef int ( ::CPotteryWheelPanel::*GetCameraFOV_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "GetCameraFOV"
+                , GetCameraFOV_function_type( &::CPotteryWheelPanel::GetCameraFOV ) );
+        
+        }
+        { //::CPotteryWheelPanel::GetPanelBaseClassName
+        
+            typedef char const * ( *GetPanelBaseClassName_function_type )(  );
+            
+            CPotteryWheelPanel_exposer.def( 
+                "GetPanelBaseClassName"
+                , GetPanelBaseClassName_function_type( &::CPotteryWheelPanel::GetPanelBaseClassName ) );
+        
+        }
+        { //::CPotteryWheelPanel::GetPanelClassName
+        
+            typedef char const * ( *GetPanelClassName_function_type )(  );
+            
+            CPotteryWheelPanel_exposer.def( 
+                "GetPanelClassName"
+                , GetPanelClassName_function_type( &::CPotteryWheelPanel::GetPanelClassName ) );
+        
+        }
+        { //::CPotteryWheelPanel::HasLightProbe
+        
+            typedef bool ( CPotteryWheelPanel_wrapper::*HasLightProbe_function_type )(  ) const;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "HasLightProbe"
+                , HasLightProbe_function_type( &CPotteryWheelPanel_wrapper::HasLightProbe ) );
+        
+        }
+        { //::CPotteryWheelPanel::LookAt
+        
+            typedef void ( ::CPotteryWheelPanel::*LookAt_function_type )( ::Vector const &,float ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "LookAt"
+                , LookAt_function_type( &::CPotteryWheelPanel::LookAt )
+                , ( bp::arg("vecCenter"), bp::arg("flRadius") ) );
+        
+        }
+        { //::CPotteryWheelPanel::LookAt
+        
+            typedef void ( ::CPotteryWheelPanel::*LookAt_function_type )( float ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "LookAt"
+                , LookAt_function_type( &::CPotteryWheelPanel::LookAt )
+                , ( bp::arg("flRadius") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnCursorMoved
+        
+            typedef void ( ::CPotteryWheelPanel::*OnCursorMoved_function_type )( int,int ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnCursorMoved_function_type )( int,int ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnCursorMoved"
+                , OnCursorMoved_function_type(&::CPotteryWheelPanel::OnCursorMoved)
+                , default_OnCursorMoved_function_type(&CPotteryWheelPanel_wrapper::default_OnCursorMoved)
+                , ( bp::arg("x"), bp::arg("y") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnKeyCodePressed
+        
+            typedef void ( ::CPotteryWheelPanel::*OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnKeyCodePressed"
+                , OnKeyCodePressed_function_type(&::CPotteryWheelPanel::OnKeyCodePressed)
+                , default_OnKeyCodePressed_function_type(&CPotteryWheelPanel_wrapper::default_OnKeyCodePressed)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnKeyCodeReleased
+        
+            typedef void ( ::CPotteryWheelPanel::*OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnKeyCodeReleased"
+                , OnKeyCodeReleased_function_type(&::CPotteryWheelPanel::OnKeyCodeReleased)
+                , default_OnKeyCodeReleased_function_type(&CPotteryWheelPanel_wrapper::default_OnKeyCodeReleased)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnMouseCaptureLost
+        
+            typedef void ( ::CPotteryWheelPanel::*OnMouseCaptureLost_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseCaptureLost_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnMouseCaptureLost"
+                , OnMouseCaptureLost_function_type(&::CPotteryWheelPanel::OnMouseCaptureLost)
+                , default_OnMouseCaptureLost_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseCaptureLost) );
+        
+        }
+        { //::CPotteryWheelPanel::OnMouseDoublePressed
+        
+            typedef void ( ::CPotteryWheelPanel::*OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnMouseDoublePressed"
+                , OnMouseDoublePressed_function_type(&::CPotteryWheelPanel::OnMouseDoublePressed)
+                , default_OnMouseDoublePressed_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseDoublePressed)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnMousePressed
+        
+            typedef void ( ::CPotteryWheelPanel::*OnMousePressed_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMousePressed_function_type )( ::vgui::MouseCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnMousePressed"
+                , OnMousePressed_function_type(&::CPotteryWheelPanel::OnMousePressed)
+                , default_OnMousePressed_function_type(&CPotteryWheelPanel_wrapper::default_OnMousePressed)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnMouseReleased
+        
+            typedef void ( ::CPotteryWheelPanel::*OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnMouseReleased"
+                , OnMouseReleased_function_type(&::CPotteryWheelPanel::OnMouseReleased)
+                , default_OnMouseReleased_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseReleased)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnMouseWheeled
+        
+            typedef void ( ::CPotteryWheelPanel::*OnMouseWheeled_function_type )( int ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseWheeled_function_type )( int ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnMouseWheeled"
+                , OnMouseWheeled_function_type(&::CPotteryWheelPanel::OnMouseWheeled)
+                , default_OnMouseWheeled_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseWheeled)
+                , ( bp::arg("delta") ) );
+        
+        }
+        { //::CPotteryWheelPanel::OnTick
+        
+            typedef void ( ::CPotteryWheelPanel::*OnTick_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnTick_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "OnTick"
+                , OnTick_function_type(&::CPotteryWheelPanel::OnTick)
+                , default_OnTick_function_type(&CPotteryWheelPanel_wrapper::default_OnTick) );
+        
+        }
+        { //::CPotteryWheelPanel::ResetCameraPivot
+        
+            typedef void ( ::CPotteryWheelPanel::*ResetCameraPivot_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "ResetCameraPivot"
+                , ResetCameraPivot_function_type( &::CPotteryWheelPanel::ResetCameraPivot ) );
+        
+        }
+        { //::CPotteryWheelPanel::ResetView
+        
+            typedef void ( ::CPotteryWheelPanel::*ResetView_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "ResetView"
+                , ResetView_function_type( &::CPotteryWheelPanel::ResetView ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetBackgroundColor
+        
+            typedef void ( ::CPotteryWheelPanel::*SetBackgroundColor_function_type )( int,int,int ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetBackgroundColor"
+                , SetBackgroundColor_function_type( &::CPotteryWheelPanel::SetBackgroundColor )
+                , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetBackgroundColor
+        
+            typedef void ( ::CPotteryWheelPanel::*SetBackgroundColor_function_type )( ::Color const & ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetBackgroundColor"
+                , SetBackgroundColor_function_type( &::CPotteryWheelPanel::SetBackgroundColor )
+                , ( bp::arg("c") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetCameraFOV
+        
+            typedef void ( ::CPotteryWheelPanel::*SetCameraFOV_function_type )( float ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetCameraFOV"
+                , SetCameraFOV_function_type( &::CPotteryWheelPanel::SetCameraFOV )
+                , ( bp::arg("flFOV") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetCameraOffset
+        
+            typedef void ( ::CPotteryWheelPanel::*SetCameraOffset_function_type )( ::Vector const & ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetCameraOffset"
+                , SetCameraOffset_function_type( &::CPotteryWheelPanel::SetCameraOffset )
+                , ( bp::arg("vecOffset") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetCameraPositionAndAngles
+        
+            typedef void ( ::CPotteryWheelPanel::*SetCameraPositionAndAngles_function_type )( ::Vector const &,::QAngle const & ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetCameraPositionAndAngles"
+                , SetCameraPositionAndAngles_function_type( &::CPotteryWheelPanel::SetCameraPositionAndAngles )
+                , ( bp::arg("vecPos"), bp::arg("angDir") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetGridColor
+        
+            typedef void ( ::CPotteryWheelPanel::*SetGridColor_function_type )( int,int,int ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetGridColor"
+                , SetGridColor_function_type( &::CPotteryWheelPanel::SetGridColor )
+                , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetLightProbe
+        
+            typedef void ( ::CPotteryWheelPanel::*SetLightProbe_function_type )( ::CDmxElement * ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetLightProbe"
+                , SetLightProbe_function_type( &::CPotteryWheelPanel::SetLightProbe )
+                , ( bp::arg("pLightProbe") ) );
+        
+        }
+        { //::CPotteryWheelPanel::SetParentMouseNotify
+        
+            typedef void ( ::CPotteryWheelPanel::*SetParentMouseNotify_function_type )( bool ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "SetParentMouseNotify"
+                , SetParentMouseNotify_function_type( &::CPotteryWheelPanel::SetParentMouseNotify )
+                , ( bp::arg("bParentMouseNotify") ) );
+        
+        }
+        { //::CPotteryWheelPanel::UpdateCameraTransform
+        
+            typedef void ( ::CPotteryWheelPanel::*UpdateCameraTransform_function_type )(  ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "UpdateCameraTransform"
+                , UpdateCameraTransform_function_type( &::CPotteryWheelPanel::UpdateCameraTransform ) );
+        
+        }
+        { //::CPotteryWheelPanel::WarpMouse
+        
+            typedef bool ( CPotteryWheelPanel_wrapper::*WarpMouse_function_type )( int &,int & ) ;
+            
+            CPotteryWheelPanel_exposer.def( 
+                "WarpMouse"
+                , WarpMouse_function_type( &CPotteryWheelPanel_wrapper::WarpMouse )
+                , ( bp::arg("x"), bp::arg("y") ) );
         
         }
         { //::vgui::Panel::AddToOverridableColors
         
-            typedef void ( EditablePanel_wrapper::*AddToOverridableColors_function_type )( ::Color *,char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*AddToOverridableColors_function_type )( ::Color *,char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "AddToOverridableColors"
-                , AddToOverridableColors_function_type( &EditablePanel_wrapper::AddToOverridableColors )
+                , AddToOverridableColors_function_type( &CPotteryWheelPanel_wrapper::AddToOverridableColors )
                 , ( bp::arg("pColor"), bp::arg("scriptname") ) );
         
         }
         { //::vgui::Panel::ApplyOverridableColors
         
-            typedef void ( EditablePanel_wrapper::*ApplyOverridableColors_function_type )( ::vgui::IScheme * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*ApplyOverridableColors_function_type )( ::vgui::IScheme * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "ApplyOverridableColors"
-                , ApplyOverridableColors_function_type( &EditablePanel_wrapper::ApplyOverridableColors )
+                , ApplyOverridableColors_function_type( &CPotteryWheelPanel_wrapper::ApplyOverridableColors )
                 , ( bp::arg("pScheme") ) );
         
         }
         { //::vgui::Panel::ApplySchemeSettings
         
             typedef void ( ::vgui::Panel::*ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
-            typedef void ( EditablePanel_wrapper::*default_ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "ApplySchemeSettings"
                 , ApplySchemeSettings_function_type(&::vgui::Panel::ApplySchemeSettings)
-                , default_ApplySchemeSettings_function_type(&EditablePanel_wrapper::default_ApplySchemeSettings)
+                , default_ApplySchemeSettings_function_type(&CPotteryWheelPanel_wrapper::default_ApplySchemeSettings)
                 , ( bp::arg("pScheme") ) );
         
         }
         { //::vgui::Panel::CreateDragData
         
-            typedef void ( EditablePanel_wrapper::*CreateDragData_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*CreateDragData_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "CreateDragData"
-                , CreateDragData_function_type( &EditablePanel_wrapper::CreateDragData ) );
+                , CreateDragData_function_type( &CPotteryWheelPanel_wrapper::CreateDragData ) );
         
         }
         { //::vgui::Panel::DragDropStartDragging
         
-            typedef void ( EditablePanel_wrapper::*DragDropStartDragging_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*DragDropStartDragging_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "DragDropStartDragging"
-                , DragDropStartDragging_function_type( &EditablePanel_wrapper::DragDropStartDragging ) );
+                , DragDropStartDragging_function_type( &CPotteryWheelPanel_wrapper::DragDropStartDragging ) );
         
         }
         { //::vgui::Panel::GetNavDownPanel
         
-            typedef ::vgui::Panel * ( EditablePanel_wrapper::*GetNavDownPanel_function_type )(  ) ;
+            typedef ::vgui::Panel * ( CPotteryWheelPanel_wrapper::*GetNavDownPanel_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "GetNavDownPanel"
-                , GetNavDownPanel_function_type( &EditablePanel_wrapper::GetNavDownPanel )
+                , GetNavDownPanel_function_type( &CPotteryWheelPanel_wrapper::GetNavDownPanel )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::vgui::Panel::GetNavLeftPanel
         
-            typedef ::vgui::Panel * ( EditablePanel_wrapper::*GetNavLeftPanel_function_type )(  ) ;
+            typedef ::vgui::Panel * ( CPotteryWheelPanel_wrapper::*GetNavLeftPanel_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "GetNavLeftPanel"
-                , GetNavLeftPanel_function_type( &EditablePanel_wrapper::GetNavLeftPanel )
+                , GetNavLeftPanel_function_type( &CPotteryWheelPanel_wrapper::GetNavLeftPanel )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::vgui::Panel::GetNavRightPanel
         
-            typedef ::vgui::Panel * ( EditablePanel_wrapper::*GetNavRightPanel_function_type )(  ) ;
+            typedef ::vgui::Panel * ( CPotteryWheelPanel_wrapper::*GetNavRightPanel_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "GetNavRightPanel"
-                , GetNavRightPanel_function_type( &EditablePanel_wrapper::GetNavRightPanel )
+                , GetNavRightPanel_function_type( &CPotteryWheelPanel_wrapper::GetNavRightPanel )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::vgui::Panel::GetNavUpPanel
         
-            typedef ::vgui::Panel * ( EditablePanel_wrapper::*GetNavUpPanel_function_type )(  ) ;
+            typedef ::vgui::Panel * ( CPotteryWheelPanel_wrapper::*GetNavUpPanel_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "GetNavUpPanel"
-                , GetNavUpPanel_function_type( &EditablePanel_wrapper::GetNavUpPanel )
+                , GetNavUpPanel_function_type( &CPotteryWheelPanel_wrapper::GetNavUpPanel )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::vgui::Panel::InternalInitDefaultValues
         
-            typedef void ( EditablePanel_wrapper::*InternalInitDefaultValues_function_type )( ::PanelAnimationMap * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*InternalInitDefaultValues_function_type )( ::PanelAnimationMap * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "InternalInitDefaultValues"
-                , InternalInitDefaultValues_function_type( &EditablePanel_wrapper::InternalInitDefaultValues )
+                , InternalInitDefaultValues_function_type( &CPotteryWheelPanel_wrapper::InternalInitDefaultValues )
                 , ( bp::arg("map") ) );
         
         }
         { //::vgui::Panel::OnCommand
         
             typedef void ( ::vgui::Panel::*OnCommand_function_type )( char const * ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnCommand_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnCommand_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnCommand"
                 , OnCommand_function_type(&::vgui::Panel::OnCommand)
-                , default_OnCommand_function_type(&EditablePanel_wrapper::default_OnCommand)
+                , default_OnCommand_function_type(&CPotteryWheelPanel_wrapper::default_OnCommand)
                 , ( bp::arg("command") ) );
         
         }
         { //::vgui::Panel::OnContinueDragging
         
-            typedef void ( EditablePanel_wrapper::*OnContinueDragging_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*OnContinueDragging_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnContinueDragging"
-                , OnContinueDragging_function_type( &EditablePanel_wrapper::OnContinueDragging ) );
+                , OnContinueDragging_function_type( &CPotteryWheelPanel_wrapper::OnContinueDragging ) );
         
         }
         { //::vgui::Panel::OnCursorEntered
         
             typedef void ( ::vgui::Panel::*OnCursorEntered_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnCursorEntered_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnCursorEntered_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnCursorEntered"
                 , OnCursorEntered_function_type(&::vgui::Panel::OnCursorEntered)
-                , default_OnCursorEntered_function_type(&EditablePanel_wrapper::default_OnCursorEntered) );
+                , default_OnCursorEntered_function_type(&CPotteryWheelPanel_wrapper::default_OnCursorEntered) );
         
         }
         { //::vgui::Panel::OnCursorExited
         
             typedef void ( ::vgui::Panel::*OnCursorExited_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnCursorExited_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnCursorExited_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnCursorExited"
                 , OnCursorExited_function_type(&::vgui::Panel::OnCursorExited)
-                , default_OnCursorExited_function_type(&EditablePanel_wrapper::default_OnCursorExited) );
-        
-        }
-        { //::vgui::Panel::OnCursorMoved
-        
-            typedef void ( ::vgui::Panel::*OnCursorMoved_function_type )( int,int ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnCursorMoved_function_type )( int,int ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnCursorMoved"
-                , OnCursorMoved_function_type(&::vgui::Panel::OnCursorMoved)
-                , default_OnCursorMoved_function_type(&EditablePanel_wrapper::default_OnCursorMoved)
-                , ( bp::arg("x"), bp::arg("y") ) );
+                , default_OnCursorExited_function_type(&CPotteryWheelPanel_wrapper::default_OnCursorExited) );
         
         }
         { //::vgui::Panel::OnFinishDragging
         
-            typedef void ( EditablePanel_wrapper::*OnFinishDragging_function_type )( bool,::vgui::MouseCode,bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*OnFinishDragging_function_type )( bool,::vgui::MouseCode,bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnFinishDragging"
-                , OnFinishDragging_function_type( &EditablePanel_wrapper::OnFinishDragging )
+                , OnFinishDragging_function_type( &CPotteryWheelPanel_wrapper::OnFinishDragging )
                 , ( bp::arg("mousereleased"), bp::arg("code"), bp::arg("aborted")=(bool)(false) ) );
-        
-        }
-        { //::vgui::Panel::OnKeyCodePressed
-        
-            typedef void ( ::vgui::Panel::*OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnKeyCodePressed"
-                , OnKeyCodePressed_function_type(&::vgui::Panel::OnKeyCodePressed)
-                , default_OnKeyCodePressed_function_type(&EditablePanel_wrapper::default_OnKeyCodePressed)
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::Panel::OnKeyCodeReleased
-        
-            typedef void ( ::vgui::Panel::*OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnKeyCodeReleased"
-                , OnKeyCodeReleased_function_type(&::vgui::Panel::OnKeyCodeReleased)
-                , default_OnKeyCodeReleased_function_type(&EditablePanel_wrapper::default_OnKeyCodeReleased)
-                , ( bp::arg("code") ) );
         
         }
         { //::vgui::Panel::OnKeyFocusTicked
         
             typedef void ( ::vgui::Panel::*OnKeyFocusTicked_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnKeyFocusTicked_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnKeyFocusTicked_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnKeyFocusTicked"
                 , OnKeyFocusTicked_function_type(&::vgui::Panel::OnKeyFocusTicked)
-                , default_OnKeyFocusTicked_function_type(&EditablePanel_wrapper::default_OnKeyFocusTicked) );
+                , default_OnKeyFocusTicked_function_type(&CPotteryWheelPanel_wrapper::default_OnKeyFocusTicked) );
         
         }
         { //::vgui::Panel::OnKillFocus
         
             typedef void ( ::vgui::Panel::*OnKillFocus_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnKillFocus_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnKillFocus_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnKillFocus"
                 , OnKillFocus_function_type(&::vgui::Panel::OnKillFocus)
-                , default_OnKillFocus_function_type(&EditablePanel_wrapper::default_OnKillFocus) );
-        
-        }
-        { //::vgui::Panel::OnMouseCaptureLost
-        
-            typedef void ( ::vgui::Panel::*OnMouseCaptureLost_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseCaptureLost_function_type )(  ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnMouseCaptureLost"
-                , OnMouseCaptureLost_function_type(&::vgui::Panel::OnMouseCaptureLost)
-                , default_OnMouseCaptureLost_function_type(&EditablePanel_wrapper::default_OnMouseCaptureLost) );
-        
-        }
-        { //::vgui::Panel::OnMouseDoublePressed
-        
-            typedef void ( ::vgui::Panel::*OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnMouseDoublePressed"
-                , OnMouseDoublePressed_function_type(&::vgui::Panel::OnMouseDoublePressed)
-                , default_OnMouseDoublePressed_function_type(&EditablePanel_wrapper::default_OnMouseDoublePressed)
-                , ( bp::arg("code") ) );
+                , default_OnKillFocus_function_type(&CPotteryWheelPanel_wrapper::default_OnKillFocus) );
         
         }
         { //::vgui::Panel::OnMouseFocusTicked
         
             typedef void ( ::vgui::Panel::*OnMouseFocusTicked_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseFocusTicked_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseFocusTicked_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnMouseFocusTicked"
                 , OnMouseFocusTicked_function_type(&::vgui::Panel::OnMouseFocusTicked)
-                , default_OnMouseFocusTicked_function_type(&EditablePanel_wrapper::default_OnMouseFocusTicked) );
-        
-        }
-        { //::vgui::Panel::OnMousePressed
-        
-            typedef void ( ::vgui::Panel::*OnMousePressed_function_type )( ::vgui::MouseCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMousePressed_function_type )( ::vgui::MouseCode ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnMousePressed"
-                , OnMousePressed_function_type(&::vgui::Panel::OnMousePressed)
-                , default_OnMousePressed_function_type(&EditablePanel_wrapper::default_OnMousePressed)
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::Panel::OnMouseReleased
-        
-            typedef void ( ::vgui::Panel::*OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnMouseReleased"
-                , OnMouseReleased_function_type(&::vgui::Panel::OnMouseReleased)
-                , default_OnMouseReleased_function_type(&EditablePanel_wrapper::default_OnMouseReleased)
-                , ( bp::arg("code") ) );
+                , default_OnMouseFocusTicked_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseFocusTicked) );
         
         }
         { //::vgui::Panel::OnMouseTriplePressed
         
             typedef void ( ::vgui::Panel::*OnMouseTriplePressed_function_type )( ::vgui::MouseCode ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseTriplePressed_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnMouseTriplePressed_function_type )( ::vgui::MouseCode ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnMouseTriplePressed"
                 , OnMouseTriplePressed_function_type(&::vgui::Panel::OnMouseTriplePressed)
-                , default_OnMouseTriplePressed_function_type(&EditablePanel_wrapper::default_OnMouseTriplePressed)
+                , default_OnMouseTriplePressed_function_type(&CPotteryWheelPanel_wrapper::default_OnMouseTriplePressed)
                 , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::Panel::OnMouseWheeled
-        
-            typedef void ( ::vgui::Panel::*OnMouseWheeled_function_type )( int ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnMouseWheeled_function_type )( int ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnMouseWheeled"
-                , OnMouseWheeled_function_type(&::vgui::Panel::OnMouseWheeled)
-                , default_OnMouseWheeled_function_type(&EditablePanel_wrapper::default_OnMouseWheeled)
-                , ( bp::arg("delta") ) );
         
         }
         { //::vgui::Panel::OnScreenSizeChanged
         
-            typedef void ( EditablePanel_wrapper::*OnScreenSizeChanged_function_type )( int,int ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*OnScreenSizeChanged_function_type )( int,int ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnScreenSizeChanged"
-                , OnScreenSizeChanged_function_type( &EditablePanel_wrapper::default_OnScreenSizeChanged )
+                , OnScreenSizeChanged_function_type( &CPotteryWheelPanel_wrapper::default_OnScreenSizeChanged )
                 , ( bp::arg("oldwide"), bp::arg("oldtall") ) );
         
         }
         { //::vgui::Panel::OnStartDragging
         
-            typedef void ( EditablePanel_wrapper::*OnStartDragging_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*OnStartDragging_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnStartDragging"
-                , OnStartDragging_function_type( &EditablePanel_wrapper::OnStartDragging ) );
+                , OnStartDragging_function_type( &CPotteryWheelPanel_wrapper::OnStartDragging ) );
         
         }
         { //::vgui::Panel::OnThink
         
             typedef void ( ::vgui::Panel::*OnThink_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnThink_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_OnThink_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "OnThink"
                 , OnThink_function_type(&::vgui::Panel::OnThink)
-                , default_OnThink_function_type(&EditablePanel_wrapper::default_OnThink) );
-        
-        }
-        { //::vgui::Panel::OnTick
-        
-            typedef void ( ::vgui::Panel::*OnTick_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_OnTick_function_type )(  ) ;
-            
-            EditablePanel_exposer.def( 
-                "OnTick"
-                , OnTick_function_type(&::vgui::Panel::OnTick)
-                , default_OnTick_function_type(&EditablePanel_wrapper::default_OnTick) );
+                , default_OnThink_function_type(&CPotteryWheelPanel_wrapper::default_OnThink) );
         
         }
         { //::vgui::Panel::PaintBuildOverlay
         
             typedef void ( ::vgui::Panel::*PaintBuildOverlay_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_PaintBuildOverlay_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_PaintBuildOverlay_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "PaintBuildOverlay"
                 , PaintBuildOverlay_function_type(&::vgui::Panel::PaintBuildOverlay)
-                , default_PaintBuildOverlay_function_type(&EditablePanel_wrapper::default_PaintBuildOverlay) );
+                , default_PaintBuildOverlay_function_type(&CPotteryWheelPanel_wrapper::default_PaintBuildOverlay) );
         
         }
         { //::vgui::Panel::PaintTraverse
         
-            typedef void ( EditablePanel_wrapper::*PaintTraverse_function_type )( bool,bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*PaintTraverse_function_type )( bool,bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "PaintTraverse"
-                , PaintTraverse_function_type( &EditablePanel_wrapper::PaintTraverse )
+                , PaintTraverse_function_type( &CPotteryWheelPanel_wrapper::PaintTraverse )
                 , ( bp::arg("Repaint"), bp::arg("allowForce")=(bool)(true) ) );
         
         }
         { //::vgui::Panel::PostChildPaint
         
             typedef void ( ::vgui::Panel::*PostChildPaint_function_type )(  ) ;
-            typedef void ( EditablePanel_wrapper::*default_PostChildPaint_function_type )(  ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_PostChildPaint_function_type )(  ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "PostChildPaint"
                 , PostChildPaint_function_type(&::vgui::Panel::PostChildPaint)
-                , default_PostChildPaint_function_type(&EditablePanel_wrapper::default_PostChildPaint) );
+                , default_PostChildPaint_function_type(&CPotteryWheelPanel_wrapper::default_PostChildPaint) );
         
         }
         { //::vgui::Panel::SetBgColor
         
             typedef void ( ::vgui::Panel::*SetBgColor_function_type )( ::Color ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetBgColor_function_type )( ::Color ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetBgColor_function_type )( ::Color ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetBgColor"
                 , SetBgColor_function_type(&::vgui::Panel::SetBgColor)
-                , default_SetBgColor_function_type(&EditablePanel_wrapper::default_SetBgColor)
+                , default_SetBgColor_function_type(&CPotteryWheelPanel_wrapper::default_SetBgColor)
                 , ( bp::arg("color") ) );
         
         }
         { //::vgui::Panel::SetBorder
         
             typedef void ( ::vgui::Panel::*SetBorder_function_type )( ::vgui::IBorder * ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetBorder_function_type )( ::vgui::IBorder * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetBorder_function_type )( ::vgui::IBorder * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetBorder"
                 , SetBorder_function_type(&::vgui::Panel::SetBorder)
-                , default_SetBorder_function_type(&EditablePanel_wrapper::default_SetBorder)
+                , default_SetBorder_function_type(&CPotteryWheelPanel_wrapper::default_SetBorder)
                 , ( bp::arg("border") ) );
         
         }
         { //::vgui::Panel::SetCursor
         
             typedef void ( ::vgui::Panel::*SetCursor_function_type )( ::vgui::HCursor ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetCursor_function_type )( ::vgui::HCursor ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetCursor_function_type )( ::vgui::HCursor ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetCursor"
                 , SetCursor_function_type(&::vgui::Panel::SetCursor)
-                , default_SetCursor_function_type(&EditablePanel_wrapper::default_SetCursor)
+                , default_SetCursor_function_type(&CPotteryWheelPanel_wrapper::default_SetCursor)
                 , ( bp::arg("cursor") ) );
         
         }
         { //::vgui::Panel::SetDragEnabled
         
             typedef void ( ::vgui::Panel::*SetDragEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetDragEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetDragEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetDragEnabled"
                 , SetDragEnabled_function_type(&::vgui::Panel::SetDragEnabled)
-                , default_SetDragEnabled_function_type(&EditablePanel_wrapper::default_SetDragEnabled)
+                , default_SetDragEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetDragEnabled)
                 , ( bp::arg("enabled") ) );
         
         }
         { //::vgui::Panel::SetEnabled
         
             typedef void ( ::vgui::Panel::*SetEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetEnabled"
                 , SetEnabled_function_type(&::vgui::Panel::SetEnabled)
-                , default_SetEnabled_function_type(&EditablePanel_wrapper::default_SetEnabled)
+                , default_SetEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetEnabled)
                 , ( bp::arg("state") ) );
         
         }
         { //::vgui::Panel::SetFgColor
         
             typedef void ( ::vgui::Panel::*SetFgColor_function_type )( ::Color ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetFgColor_function_type )( ::Color ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetFgColor_function_type )( ::Color ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetFgColor"
                 , SetFgColor_function_type(&::vgui::Panel::SetFgColor)
-                , default_SetFgColor_function_type(&EditablePanel_wrapper::default_SetFgColor)
+                , default_SetFgColor_function_type(&CPotteryWheelPanel_wrapper::default_SetFgColor)
                 , ( bp::arg("color") ) );
         
         }
         { //::vgui::Panel::SetKeyBoardInputEnabled
         
             typedef void ( ::vgui::Panel::*SetKeyBoardInputEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetKeyBoardInputEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetKeyBoardInputEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetKeyBoardInputEnabled"
                 , SetKeyBoardInputEnabled_function_type(&::vgui::Panel::SetKeyBoardInputEnabled)
-                , default_SetKeyBoardInputEnabled_function_type(&EditablePanel_wrapper::default_SetKeyBoardInputEnabled)
+                , default_SetKeyBoardInputEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetKeyBoardInputEnabled)
                 , ( bp::arg("state") ) );
         
         }
         { //::vgui::Panel::SetMouseInputEnabled
         
             typedef void ( ::vgui::Panel::*SetMouseInputEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetMouseInputEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetMouseInputEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetMouseInputEnabled"
                 , SetMouseInputEnabled_function_type(&::vgui::Panel::SetMouseInputEnabled)
-                , default_SetMouseInputEnabled_function_type(&EditablePanel_wrapper::default_SetMouseInputEnabled)
+                , default_SetMouseInputEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetMouseInputEnabled)
                 , ( bp::arg("state") ) );
         
         }
@@ -1889,7 +2133,7 @@ void register_EditablePanel_class(){
         
             typedef ::vgui::Panel * ( ::vgui::Panel::*SetNavDown_function_type )( ::vgui::Panel * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavDown"
                 , SetNavDown_function_type( &::vgui::Panel::SetNavDown )
                 , ( bp::arg("navDown") )
@@ -1898,11 +2142,11 @@ void register_EditablePanel_class(){
         }
         { //::vgui::Panel::SetNavDown
         
-            typedef void ( EditablePanel_wrapper::*SetNavDown_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*SetNavDown_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavDown"
-                , SetNavDown_function_type( &EditablePanel_wrapper::SetNavDown )
+                , SetNavDown_function_type( &CPotteryWheelPanel_wrapper::SetNavDown )
                 , ( bp::arg("controlName") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
@@ -1911,7 +2155,7 @@ void register_EditablePanel_class(){
         
             typedef ::vgui::Panel * ( ::vgui::Panel::*SetNavLeft_function_type )( ::vgui::Panel * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavLeft"
                 , SetNavLeft_function_type( &::vgui::Panel::SetNavLeft )
                 , ( bp::arg("navLeft") )
@@ -1920,11 +2164,11 @@ void register_EditablePanel_class(){
         }
         { //::vgui::Panel::SetNavLeft
         
-            typedef void ( EditablePanel_wrapper::*SetNavLeft_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*SetNavLeft_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavLeft"
-                , SetNavLeft_function_type( &EditablePanel_wrapper::SetNavLeft )
+                , SetNavLeft_function_type( &CPotteryWheelPanel_wrapper::SetNavLeft )
                 , ( bp::arg("controlName") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
@@ -1933,7 +2177,7 @@ void register_EditablePanel_class(){
         
             typedef ::vgui::Panel * ( ::vgui::Panel::*SetNavRight_function_type )( ::vgui::Panel * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavRight"
                 , SetNavRight_function_type( &::vgui::Panel::SetNavRight )
                 , ( bp::arg("navRight") )
@@ -1942,11 +2186,11 @@ void register_EditablePanel_class(){
         }
         { //::vgui::Panel::SetNavRight
         
-            typedef void ( EditablePanel_wrapper::*SetNavRight_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*SetNavRight_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavRight"
-                , SetNavRight_function_type( &EditablePanel_wrapper::SetNavRight )
+                , SetNavRight_function_type( &CPotteryWheelPanel_wrapper::SetNavRight )
                 , ( bp::arg("controlName") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
@@ -1955,7 +2199,7 @@ void register_EditablePanel_class(){
         
             typedef ::vgui::Panel * ( ::vgui::Panel::*SetNavUp_function_type )( ::vgui::Panel * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavUp"
                 , SetNavUp_function_type( &::vgui::Panel::SetNavUp )
                 , ( bp::arg("navUp") )
@@ -1964,165 +2208,167 @@ void register_EditablePanel_class(){
         }
         { //::vgui::Panel::SetNavUp
         
-            typedef void ( EditablePanel_wrapper::*SetNavUp_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*SetNavUp_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetNavUp"
-                , SetNavUp_function_type( &EditablePanel_wrapper::SetNavUp )
+                , SetNavUp_function_type( &CPotteryWheelPanel_wrapper::SetNavUp )
                 , ( bp::arg("controlName") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::vgui::Panel::SetOverridableColor
         
-            typedef void ( EditablePanel_wrapper::*SetOverridableColor_function_type )( ::Color *,::Color const & ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*SetOverridableColor_function_type )( ::Color *,::Color const & ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetOverridableColor"
-                , SetOverridableColor_function_type( &EditablePanel_wrapper::SetOverridableColor )
+                , SetOverridableColor_function_type( &CPotteryWheelPanel_wrapper::SetOverridableColor )
                 , ( bp::arg("pColor"), bp::arg("newColor") ) );
         
         }
         { //::vgui::Panel::SetPaintBackgroundEnabled
         
             typedef void ( ::vgui::Panel::*SetPaintBackgroundEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetPaintBackgroundEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetPaintBackgroundEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetPaintBackgroundEnabled"
                 , SetPaintBackgroundEnabled_function_type(&::vgui::Panel::SetPaintBackgroundEnabled)
-                , default_SetPaintBackgroundEnabled_function_type(&EditablePanel_wrapper::default_SetPaintBackgroundEnabled)
+                , default_SetPaintBackgroundEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetPaintBackgroundEnabled)
                 , ( bp::arg("state") ) );
         
         }
         { //::vgui::Panel::SetPaintBackgroundType
         
             typedef void ( ::vgui::Panel::*SetPaintBackgroundType_function_type )( int ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetPaintBackgroundType_function_type )( int ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetPaintBackgroundType_function_type )( int ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetPaintBackgroundType"
                 , SetPaintBackgroundType_function_type(&::vgui::Panel::SetPaintBackgroundType)
-                , default_SetPaintBackgroundType_function_type(&EditablePanel_wrapper::default_SetPaintBackgroundType)
+                , default_SetPaintBackgroundType_function_type(&CPotteryWheelPanel_wrapper::default_SetPaintBackgroundType)
                 , ( bp::arg("type") ) );
         
         }
         { //::vgui::Panel::SetPaintBorderEnabled
         
             typedef void ( ::vgui::Panel::*SetPaintBorderEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetPaintBorderEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetPaintBorderEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetPaintBorderEnabled"
                 , SetPaintBorderEnabled_function_type(&::vgui::Panel::SetPaintBorderEnabled)
-                , default_SetPaintBorderEnabled_function_type(&EditablePanel_wrapper::default_SetPaintBorderEnabled)
+                , default_SetPaintBorderEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetPaintBorderEnabled)
                 , ( bp::arg("state") ) );
         
         }
         { //::vgui::Panel::SetPaintEnabled
         
             typedef void ( ::vgui::Panel::*SetPaintEnabled_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetPaintEnabled_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetPaintEnabled_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetPaintEnabled"
                 , SetPaintEnabled_function_type(&::vgui::Panel::SetPaintEnabled)
-                , default_SetPaintEnabled_function_type(&EditablePanel_wrapper::default_SetPaintEnabled)
+                , default_SetPaintEnabled_function_type(&CPotteryWheelPanel_wrapper::default_SetPaintEnabled)
                 , ( bp::arg("state") ) );
         
         }
         { //::vgui::Panel::SetParent
         
             typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::VPANEL ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetParent_function_type )( ::vgui::VPANEL ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetParent_function_type )( ::vgui::VPANEL ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetParent"
                 , SetParent_function_type(&::vgui::Panel::SetParent)
-                , default_SetParent_function_type(&EditablePanel_wrapper::default_SetParent)
+                , default_SetParent_function_type(&CPotteryWheelPanel_wrapper::default_SetParent)
                 , ( bp::arg("newParent") ) );
         
         }
         { //::vgui::Panel::SetScheme
         
             typedef void ( ::vgui::Panel::*SetScheme_function_type )( char const * ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetScheme_function_type )( char const * ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetScheme_function_type )( char const * ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetScheme"
                 , SetScheme_function_type(&::vgui::Panel::SetScheme)
-                , default_SetScheme_function_type(&EditablePanel_wrapper::default_SetScheme)
+                , default_SetScheme_function_type(&CPotteryWheelPanel_wrapper::default_SetScheme)
                 , ( bp::arg("tag") ) );
         
         }
         { //::vgui::Panel::SetScheme
         
             typedef void ( ::vgui::Panel::*SetScheme_function_type )( ::vgui::HScheme ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetScheme_function_type )( ::vgui::HScheme ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetScheme_function_type )( ::vgui::HScheme ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetScheme"
                 , SetScheme_function_type(&::vgui::Panel::SetScheme)
-                , default_SetScheme_function_type(&EditablePanel_wrapper::default_SetScheme)
+                , default_SetScheme_function_type(&CPotteryWheelPanel_wrapper::default_SetScheme)
                 , ( bp::arg("scheme") ) );
         
         }
         { //::vgui::Panel::SetVisible
         
             typedef void ( ::vgui::Panel::*SetVisible_function_type )( bool ) ;
-            typedef void ( EditablePanel_wrapper::*default_SetVisible_function_type )( bool ) ;
+            typedef void ( CPotteryWheelPanel_wrapper::*default_SetVisible_function_type )( bool ) ;
             
-            EditablePanel_exposer.def( 
+            CPotteryWheelPanel_exposer.def( 
                 "SetVisible"
                 , SetVisible_function_type(&::vgui::Panel::SetVisible)
-                , default_SetVisible_function_type(&EditablePanel_wrapper::default_SetVisible)
+                , default_SetVisible_function_type(&CPotteryWheelPanel_wrapper::default_SetVisible)
                 , ( bp::arg("state") ) );
         
         }
-        { //::vgui::EditablePanel::Paint
+        CPotteryWheelPanel_exposer.staticmethod( "GetPanelBaseClassName" );
+        CPotteryWheelPanel_exposer.staticmethod( "GetPanelClassName" );
+        { //::vgui::CPotteryWheelPanel::Paint
 
         typedef void ( ::vgui::Panel::*Paint_function_type )(  ) ;
-        typedef void ( EditablePanel_wrapper::*default_Paint_function_type )(  ) ;
+        typedef void ( CPotteryWheelPanel_wrapper::*default_Paint_function_type )(  ) ;
         
-        EditablePanel_exposer.def( 
+        CPotteryWheelPanel_exposer.def( 
             "Paint"
             , Paint_function_type(&::vgui::Panel::Paint)
-            , default_Paint_function_type(&EditablePanel_wrapper::default_Paint) );
+            , default_Paint_function_type(&CPotteryWheelPanel_wrapper::default_Paint) );
 
     }
-    { //::vgui::EditablePanel::PaintBackground
+    { //::vgui::CPotteryWheelPanel::PaintBackground
 
         typedef void ( ::vgui::Panel::*PaintBackground_function_type )(  ) ;
-        typedef void ( EditablePanel_wrapper::*default_PaintBackground_function_type )(  ) ;
+        typedef void ( CPotteryWheelPanel_wrapper::*default_PaintBackground_function_type )(  ) ;
         
-        EditablePanel_exposer.def( 
+        CPotteryWheelPanel_exposer.def( 
             "PaintBackground"
             , PaintBackground_function_type(&::vgui::Panel::PaintBackground)
-            , default_PaintBackground_function_type(&EditablePanel_wrapper::default_PaintBackground) );
+            , default_PaintBackground_function_type(&CPotteryWheelPanel_wrapper::default_PaintBackground) );
     
     }
-    { //::vgui::EditablePanel::InvalidateLayout
+    { //::vgui::CPotteryWheelPanel::InvalidateLayout
     
         typedef void ( ::vgui::Panel::*InvalidateLayout_function_type )( bool,bool ) ;
-        typedef void ( EditablePanel_wrapper::*default_InvalidateLayout_function_type )( bool,bool ) ;
+        typedef void ( CPotteryWheelPanel_wrapper::*default_InvalidateLayout_function_type )( bool,bool ) ;
         
-        EditablePanel_exposer.def( 
+        CPotteryWheelPanel_exposer.def( 
             "InvalidateLayout"
             , InvalidateLayout_function_type(&::vgui::Panel::InvalidateLayout)
-            , default_InvalidateLayout_function_type(&EditablePanel_wrapper::default_InvalidateLayout)
+            , default_InvalidateLayout_function_type(&CPotteryWheelPanel_wrapper::default_InvalidateLayout)
             , ( bp::arg("layoutNow")=(bool)(false), bp::arg("reloadScheme")=(bool)(false) ) );
     
     }
-        EditablePanel_exposer.def( "RegMessageMethod", &EditablePanel_wrapper::RegMessageMethod
+        CPotteryWheelPanel_exposer.def( "RegMessageMethod", &CPotteryWheelPanel_wrapper::RegMessageMethod
         , ( bp::arg("message"), bp::arg("method"), bp::arg("numParams")=(int)(0), bp::arg("nameFirstParam")="", bp::arg("typeFirstParam")=int(::vgui::DATATYPE_VOID), bp::arg("nameSecondParam")="", bp::arg("typeSecondParam")=int(::vgui::DATATYPE_VOID) ));
-        EditablePanel_exposer.def( "EnableSBuffer", &EditablePanel_wrapper::EnableSBuffer, bp::arg("bUseBuffer") );
-        EditablePanel_exposer.def( "IsSBufferEnabled", &EditablePanel_wrapper::IsSBufferEnabled );
-        EditablePanel_exposer.def( "FlushSBuffer", &EditablePanel_wrapper::FlushSBuffer );
-        EditablePanel_exposer.def( "SetFlushedByParent", &EditablePanel_wrapper::SetFlushedByParent, bp::arg("bEnabled") );
-        EditablePanel_exposer.def( 
+        CPotteryWheelPanel_exposer.def( "EnableSBuffer", &CPotteryWheelPanel_wrapper::EnableSBuffer, bp::arg("bUseBuffer") );
+        CPotteryWheelPanel_exposer.def( "IsSBufferEnabled", &CPotteryWheelPanel_wrapper::IsSBufferEnabled );
+        CPotteryWheelPanel_exposer.def( "FlushSBuffer", &CPotteryWheelPanel_wrapper::FlushSBuffer );
+        CPotteryWheelPanel_exposer.def( "SetFlushedByParent", &CPotteryWheelPanel_wrapper::SetFlushedByParent, bp::arg("bEnabled") );
+        CPotteryWheelPanel_exposer.def( 
             "SetParent"
             , (void ( ::vgui::Panel::* )( ::vgui::Panel * ) )(&::vgui::Panel::SetParent)
-            , (void ( EditablePanel_wrapper::* )( ::vgui::Panel * ) )(&EditablePanel_wrapper::default_SetParent)
+            , (void ( CPotteryWheelPanel_wrapper::* )( ::vgui::Panel * ) )(&CPotteryWheelPanel_wrapper::default_SetParent)
             , ( boost::python::arg("newParent") ) );
     }
 

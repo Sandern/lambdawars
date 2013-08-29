@@ -385,16 +385,57 @@ def AddEntityConverter( mb, cls_name ):
     mb.add_registration_code( ptr_convert_to_py_name+"();" )
     mb.add_registration_code( convert_to_py_name+"();" )
     mb.add_registration_code( convert_from_py_name+"();" )
-   
+    
+# Convert templates for without vgui lib
+ptr_convert_to_py_name_template_novguilib = '''struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
+{
+    static PyObject* convert( %(clsname)s *s )
+    {
+        if( s ) 
+        {
+            PyObject *pObject = GetPyPanel( s );
+            if( pObject )
+                return bp::incref( pObject );
+            else
+                return bp::incref( bp::object( %(handlename)s(s) ).ptr() );
+        }
+        else
+        {
+            return bp::incref( Py_None );
+        }
+    }
+};'''
+
+convert_to_py_name_template_novguilib = '''struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s_to_handle>
+{
+    static PyObject* convert( const %(clsname)s &s )
+    {
+        PyObject *pObject = GetPyPanel( &s );
+        if( pObject )
+            return bp::incref( pObject );
+        else
+            return bp::incref( bp::object( %(handlename)s( &s ) ).ptr() );
+    }
+};'''
+            
 # Almost the same as above, maybe make a shared function?   
-def AddVGUIConverter(mb, cls_name, novguilib):
+def AddVGUIConverter(mb, cls_name, novguilib, containsabstract=False):
     cls = mb.class_(cls_name)
     
     handlename = cls_name+'HANDLE'
     
-    ptr_convert_to_py_name = 'ptr_'+cls_name+'_to_handle'
-    convert_to_py_name = cls_name+'_to_handle'
-    convert_from_py_name = 'handle_to_'+cls_name
+    ptr_convert_to_py_name = 'ptr_%(clsname)s_to_handle' % {'clsname' : cls_name}
+    convert_to_py_name = '%(clsname)s_to_handle' % {'clsname' : cls_name}
+    convert_from_py_name = 'handle_to_%(clsname)s' % {'clsname' : cls_name}
+    
+    # Arguments for templates
+    strargs = {
+        'clsname' : cls_name,
+        'handlename' : handlename,
+        'ptr_convert_to_py_name' : ptr_convert_to_py_name,
+        'convert_to_py_name' : convert_to_py_name,
+        'convert_from_py_name' : convert_from_py_name,
+    }
     
     # Add GetPySelf method
     cls.add_wrapper_code(
@@ -407,7 +448,7 @@ def AddVGUIConverter(mb, cls_name, novguilib):
     constructors = cls.constructors(name=cls_name)
     constructors.body = '\tg_PythonPanelCount++;'  
         
-    cls.add_wrapper_code( '~'+cls_name+'_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }' ) 
+    cls.add_wrapper_code( '~%(clsname)s_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }' % strargs ) 
     
     if novguilib:
         cls.add_wrapper_code( 'void DeletePanel( void ) { ::PyDeletePanel( this, this ); }' )
@@ -415,74 +456,17 @@ def AddVGUIConverter(mb, cls_name, novguilib):
         cls.add_wrapper_code( 'void DeletePanel( void ) {}' )
     
     # Add handle typedef
-    mb.add_declaration_code( 'typedef PyVGUIHandle<'+cls_name+'> '+handlename+';\r\n' )
+    mb.add_declaration_code( 'typedef PyVGUIHandle<%(clsname)s> %(handlename)s;\r\n' % strargs )
     
     # Expose handle code
     mb.add_registration_code( GenerateVGUIHandleExposeCode(cls_name, handlename), True )
     
     # Add to python converters
     if novguilib:
-        # mb.add_declaration_code(
-        # 'struct '+ptr_convert_to_py_name+' : bp::to_python_converter<'+cls_name+' *, ptr_'+cls_name+'_to_handle>\r\n' + \
-        # '{\r\n' + \
-        # '    static PyObject* convert('+cls_name+' *s)\r\n' + \
-        # '    {\r\n' + \
-        # '        if( s ) {\r\n' + \
-        # '                return bp::incref(bp::object('+handlename+'(s)).ptr());\r\n' + \
-        # '        }\r\n' + \
-        # '        else {\r\n' + \
-        # '            return bp::incref(Py_None);\r\n' + \
-        # '        }\r\n' + \
-        # '    }\r\n' + \
-        # '};\r\n'
-        # )
-
-        # mb.add_declaration_code(
-        # 'struct '+convert_to_py_name+' : bp::to_python_converter<'+cls_name+', '+cls_name+'_to_handle>\r\n' + \
-        # '{\r\n' + \
-        # '    static PyObject* convert(const '+cls_name+' &s)\r\n' + \
-        # '    {\r\n' + \
-        # '            return bp::incref(bp::object('+handlename+'(('+cls_name+' *)&s)).ptr());\r\n' + \
-        # '    }\r\n' + \
-        # '};\r\n'
-        # )
+        mb.add_declaration_code(ptr_convert_to_py_name_template_novguilib % strargs)
         
-        mb.add_declaration_code(
-        'struct '+ptr_convert_to_py_name+' : bp::to_python_converter<'+cls_name+' *, ptr_'+cls_name+'_to_handle>\r\n' + \
-        '{\r\n' + \
-        '    static PyObject* convert('+cls_name+' *s)\r\n' + \
-        '    {\r\n' + \
-        '        if( s ) {\r\n' + \
-        #'            bp::wrapper< '+cls_name+' > *wrapper = dynamic_cast<bp::wrapper< ' + cls_name + ' > *>( s );\r\n' + \
-        #'            PyObject *pObject = wrapper ? bp::detail::wrapper_base_::get_owner(*wrapper) : NULL;\r\n' + \
-        '            PyObject *pObject = GetPyPanel(s);\r\n' + \
-        '            if( pObject )\r\n' + \
-        '                return bp::incref(pObject);\r\n' + \
-        '            else\r\n' + \
-        '                return bp::incref(bp::object('+handlename+'(s)).ptr());\r\n' + \
-        '        }\r\n' + \
-        '        else {\r\n' + \
-        '            return bp::incref(Py_None);\r\n' + \
-        '        }\r\n' + \
-        '    }\r\n' + \
-        '};\r\n'
-        )
-        
-        mb.add_declaration_code(
-        'struct '+convert_to_py_name+' : bp::to_python_converter<'+cls_name+', '+cls_name+'_to_handle>\r\n' + \
-        '{\r\n' + \
-        '    static PyObject* convert(const '+cls_name+' &s)\r\n' + \
-        '    {\r\n' + \
-        #'        bp::wrapper< '+cls_name+' > *wrapper = dynamic_cast<bp::wrapper< ' + cls_name + ' > *>(&('+cls_name+' &)s);\r\n' + \
-        #'        PyObject *pObject = wrapper ? bp::detail::wrapper_base_::get_owner(*wrapper) : NULL;\r\n' + \
-        '            PyObject *pObject = GetPyPanel(&('+cls_name+' &)s);\r\n' + \
-        '        if( pObject )\r\n' + \
-        '            return bp::incref(pObject);\r\n' + \
-        '        else\r\n' + \
-        '            return bp::incref(bp::object('+handlename+'(('+cls_name+' *)&s)).ptr());\r\n' + \
-        '    }\r\n' + \
-        '};\r\n'
-        )
+        if not containsabstract:
+            mb.add_declaration_code(convert_to_py_name_template_novguilib % strargs)
 
     else:
         mb.add_declaration_code(
@@ -503,18 +487,19 @@ def AddVGUIConverter(mb, cls_name, novguilib):
         '};\r\n'
         )
 
-        mb.add_declaration_code(
-        'struct '+convert_to_py_name+' : bp::to_python_converter<'+cls_name+', '+cls_name+'_to_handle>\r\n' + \
-        '{\r\n' + \
-        '    static PyObject* convert(const '+cls_name+' &s)\r\n' + \
-        '    {\r\n' + \
-        '        if(s.GetPySelf() != NULL)\r\n' + \
-        '            return bp::incref(s.GetPySelf());\r\n' + \
-        '        else\r\n' + \
-        '            return bp::incref(bp::object('+handlename+'(('+cls_name+' *)&s)).ptr());\r\n' + \
-        '    }\r\n' + \
-        '};\r\n'
-        )
+        if not containsabstract:
+            mb.add_declaration_code(
+            'struct '+convert_to_py_name+' : bp::to_python_converter<'+cls_name+', '+cls_name+'_to_handle>\r\n' + \
+            '{\r\n' + \
+            '    static PyObject* convert(const '+cls_name+' &s)\r\n' + \
+            '    {\r\n' + \
+            '        if(s.GetPySelf() != NULL)\r\n' + \
+            '            return bp::incref(s.GetPySelf());\r\n' + \
+            '        else\r\n' + \
+            '            return bp::incref(bp::object('+handlename+'(('+cls_name+' *)&s)).ptr());\r\n' + \
+            '    }\r\n' + \
+            '};\r\n'
+            )
 
     # Add from python converter
     mb.add_declaration_code(
@@ -537,7 +522,8 @@ def AddVGUIConverter(mb, cls_name, novguilib):
     
     # Add registration code
     mb.add_registration_code( ptr_convert_to_py_name+"();" )
-    mb.add_registration_code( convert_to_py_name+"();" )
+    if not containsabstract:
+        mb.add_registration_code( convert_to_py_name+"();" )
     mb.add_registration_code( convert_from_py_name+"();" )
     
 # ---------------------------------------------------------

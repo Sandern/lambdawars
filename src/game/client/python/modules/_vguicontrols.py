@@ -45,6 +45,10 @@ class VGUIControls(ClientModuleGenerator):
         'srcpy_vgui.h',
         'hl2wars/hl2wars_baseminimap.h',
         'hl2wars/vgui_video_general.h',
+        
+        'matsys_controls/mdlpanel.h',
+        'matsys_controls/potterywheelpanel.h',
+        'game_controls/basemodel_panel.h',
     ] )
     
     panel_cls_list = [  'AnimationController', 
@@ -57,6 +61,9 @@ class VGUIControls(ClientModuleGenerator):
                         'RichText',
                         'CBaseMinimap',
                         'VideoGeneralPanel',
+                        'CPotteryWheelPanel',
+                        'CMDLPanel',
+                        'CBaseModelPanel',
                      ]
     
     def ParseImageClasses(self, mb):
@@ -399,8 +406,8 @@ class VGUIControls(ClientModuleGenerator):
             else:
                 pass
                 #constructors = cls.constructors(name=cls_name)
-                #constructors.body = '\tSetAutoDelete(false);'    
-            AddVGUIConverter(mb, cls_name, novguilib)
+                #constructors.body = '\tSetAutoDelete(false);'
+            AddVGUIConverter(mb, cls_name, novguilib, containsabstract=(cls_name == 'CPotteryWheelPanel'))
             
             # # Add custom wrappers for functions who take keyvalues as input
             if not novguilib: # FIXME/TODO
@@ -799,7 +806,15 @@ class VGUIControls(ClientModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"BIK_LOOP\" ) = BIK_LOOP;" )
         mb.add_registration_code( "bp::scope().attr( \"BIK_PRELOAD\" ) = BIK_PRELOAD;" )
         mb.add_registration_code( "bp::scope().attr( \"BIK_NO_AUDIO\" ) = BIK_NO_AUDIO;" )
-
+        
+        # Model panels
+        cls = mb.class_('CPotteryWheelPanel')
+        cls.add_wrapper_code( 'private:\nvirtual void OnPaint3D() {}' )
+        cls = mb.class_('CMDLPanel')
+        cls = mb.class_('CBaseModelPanel')
+        mb.mem_funs('GetLightProbeCubemap').exclude()
+        mb.mem_funs('Select').exclude()
+        
     def Parse(self, mb):
         # Exclude everything by default
         mb.decls().exclude()  

@@ -162,28 +162,28 @@ class PyVGUIHandle : public PyBaseVGUIHandle
 public:
 	PyVGUIHandle() {}
 
-	PyVGUIHandle(T *panel)
+	PyVGUIHandle( const T *panel )
 	{
-		Set(panel);
+		Set( panel );
 	}
-	PyVGUIHandle(VPANEL handle)
+	PyVGUIHandle( VPANEL handle )
 	{
-		m_hPanelHandle = ivgui()->PanelToHandle(handle);
+		m_hPanelHandle = ivgui()->PanelToHandle( handle );
 	}
 
 	boost::python::object GetAttr( const char *name )
 	{
-		return boost::python::object(boost::python::ptr(Get())).attr(name);
+		return boost::python::object( boost::python::ptr( Get() ) ).attr( name );
 	}
 
 	T *Get();
-	void Set( T *pPanel );
+	void Set( const T *pPanel );
 
 	operator T *()							{ return Get(); }
 	T * operator ->()						{ return Get(); }
-	T * operator = (T *pPanel)				{ return Set(pPanel); }
+	T * operator = (T *pPanel)				{ return Set( pPanel ); }
 
-	bool operator == (T *pPanel)			{ return (Get() == pPanel); }
+	bool operator == (T *pPanel)			{ return Get() == pPanel; }
 	operator bool ()						{ return Get() != 0; }
 };
 
@@ -195,12 +195,12 @@ public:
 template< class T >
 T *PyVGUIHandle<T>::Get() 
 {
-	if (m_hPanelHandle != INVALID_PANEL)
+	if( m_hPanelHandle != INVALID_PANEL )
 	{
-		VPANEL panel = ivgui()->HandleToPanel(m_hPanelHandle);
-		if (panel)
+		VPANEL panel = ivgui()->HandleToPanel( m_hPanelHandle );
+		if( panel )
 		{
-			T *vguiPanel = dynamic_cast<T *>(ipanel()->GetPanel(panel, GetControlsModuleName()));
+			T *vguiPanel = dynamic_cast<T *>( ipanel()->GetPanel( panel, GetControlsModuleName() ) );
 			return vguiPanel;
 		}
 	}
@@ -211,11 +211,11 @@ T *PyVGUIHandle<T>::Get()
 // Purpose: sets the smart pointer
 //-----------------------------------------------------------------------------
 template< class T >
-void PyVGUIHandle<T>::Set(T *pent)
+void PyVGUIHandle<T>::Set( const T *pent )
 {
-	if (pent)
+	if( pent )
 	{
-		m_hPanelHandle = ivgui()->PanelToHandle(pent->GetVPanel());
+		m_hPanelHandle = pent->ToHandle();
 	}
 	else
 	{
@@ -232,7 +232,7 @@ public:
 	static bool NonZero() { return false; }
 };
 
-PyObject *GetPyPanel( Panel *pPanel );
+PyObject *GetPyPanel( const Panel *pPanel );
 void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx = -1 );
 
 //=============================================================================
