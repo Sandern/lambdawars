@@ -725,6 +725,9 @@ void C_BaseExplosionEffect::CreateMisc( void )
 {
 }
 
+static ConVar wars_explosion_light_radius( "wars_explosion_light_radius", "1024" );
+static ConVar wars_explosion_light_duration( "wars_explosion_light_duration", "0.3" );
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -748,17 +751,17 @@ void C_BaseExplosionEffect::CreateDynamicLight( void )
 			dl->die		= gpGlobals->curtime + 0.1f;
 		}
 #ifdef DEFERRED_ENABLED
-#if 0 // TODO
 		else
 		{
-			def_light_temp_t *l = new def_light_temp_t( false, 0.2f );
+			def_light_temp_t *l = new def_light_temp_t( false, wars_explosion_light_duration.GetFloat() );
 
 			l->ang = vec3_angle;
-			l->pos = m_vecOrigin + Vector(0, 0, 32.0f);
+			l->pos = m_vecOrigin;
+			l->pos.z += 64.0f;
 
 			l->col_diffuse = Vector( 0.964705882f, 0.82745098f, 0.403921569f ); //GetColor_Diffuse();
 
-			l->flRadius = m_flScale * 512.0f;
+			l->flRadius = m_flScale * wars_explosion_light_radius.GetFloat();
 			l->flFalloffPower = 1.0f;
 
 			l->iVisible_Dist = 1024.0f;
@@ -768,11 +771,10 @@ void C_BaseExplosionEffect::CreateDynamicLight( void )
 
 			l->iFlags >>= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
 			l->iFlags <<= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
-			//l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
+			l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
 
 			GetLightingManager()->AddTempLight( l );
 		}
-#endif // 0
 #endif // DEFERRED_ENABLED
 	}
 }

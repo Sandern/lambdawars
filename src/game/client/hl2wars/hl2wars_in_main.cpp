@@ -26,6 +26,10 @@
 #include "checksum_md5.h"
 #include "hltvcamera.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -690,7 +694,12 @@ void CHL2WarsInput::ControllerMove ( int nSlot, float frametime, CUserCmd *cmd )
 {
 	// If the gameui is open, disable mouse input and do not update mouse aim
 	// This way it will keep being at the last position (in case you type something in the console)
+#ifdef DEFERRED_ENABLED
+	CLightingEditor *pLightEditor = GetLightingEditor();
+	if( enginevgui->IsGameUIVisible() || pLightEditor->IsEditorActive() )
+#else
 	if( enginevgui->IsGameUIVisible() )
+#endif // HL2WARS_ASW_DLL
 	{
 		DeactivateMouseClipping();
 

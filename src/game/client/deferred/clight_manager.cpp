@@ -98,6 +98,9 @@ void CLightingManager::SetRenderConstants( const VMatrix &ScreenToWorld,
 
 void CLightingManager::LightSetup( const CViewSetup &setup )
 {
+	// Remove lights that have run out of time
+	UpdateTemplights();
+
 	PrepareLights();
 
 #if DEBUG
@@ -107,6 +110,13 @@ void CLightingManager::LightSetup( const CViewSetup &setup )
 	CullLights();
 
 #if DEFCFG_USE_SSE
+	if( m_bSortDataNeedsRealloc )
+	{
+		AllocateSortDataBuffer();
+
+		m_bSortDataNeedsRealloc = false;
+	}
+
 	BuildLightSortDataBuffer();
 #endif
 
@@ -155,7 +165,7 @@ void CLightingManager::AddLight( def_light_t *l )
 	m_hDeferredLights.AddToTail( l );
 
 #if DEFCFG_USE_SSE
-	AllocateSortDataBuffer();
+	m_bSortDataNeedsRealloc = true;
 #endif
 }
 
@@ -167,7 +177,8 @@ bool CLightingManager::RemoveLight( def_light_t *l )
 
 #if DEFCFG_USE_SSE
 	bool bSuccess = m_hDeferredLights.FindAndRemove( l );
-	AllocateSortDataBuffer();
+	if( bSuccess )
+		m_bSortDataNeedsRealloc = true;
 	return bSuccess;
 #else
 	return m_hDeferredLights.FindAndRemove( l );
@@ -181,6 +192,29 @@ bool CLightingManager::IsLightRendered( def_light_t *l )
 #endif
 
 	return m_hRenderLights.HasElement( l );
+}
+
+int CLightingManager::CountTempLights()
+{
+	return m_hDeferredTempLights.Count();
+}
+
+void CLightingManager::AddTempLight( def_light_temp_t *l )
+{
+	m_hDeferredTempLights.AddToTail( l );
+	AddLight( l );
+}
+
+void CLightingManager::UpdateTemplights()
+{
+	for( int i = m_hDeferredTempLights.Count() -1; i >= 0; i-- )
+	{
+		if( m_hDeferredTempLights[i]->fEndLifeTime < gpGlobals->curtime )
+		{
+			RemoveLight( m_hDeferredTempLights[i] );
+			m_hDeferredTempLights.Remove( i );
+		}
+	}
 }
 
 #if DEFCFG_USE_SSE
@@ -827,7 +861,7 @@ void CLightingManager::RenderLights( const CViewSetup &view, CDeferredViewRender
 	static CUtlVector<def_light_t*> lightsShadowed;
 	static CUtlVector<def_light_t*> lightsCookied;
 	static CUtlVector<def_light_t*> lightsSimple;
-
+	
 #if DEFCFG_EXTRA_SORT
 	struct Lightpass_t
 	{

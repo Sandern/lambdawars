@@ -12,15 +12,17 @@
 #include "util_shared.h"
 #include "unit_base_shared.h"
 
-//#include "deferred/cdeferred_manager_client.h"
-//#include "deferred/deferred_shared_common.h"
+#ifdef DEFERRED_ENABLED
+#include "deferred/cdeferred_manager_client.h"
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 ConVar max_muzzleflash_dlights( "max_muzzleflash_dlights", "15" );
 
-#if 0
+#ifdef DEFERRED_ENABLED
 void DoDeferredMuzzleFlash( const Vector &vOrigin )
 {
 	if( GetLightingManager()->CountTempLights() > max_muzzleflash_dlights.GetInt() )
@@ -44,7 +46,7 @@ void DoDeferredMuzzleFlash( const Vector &vOrigin )
 
 	l->iFlags >>= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
 	l->iFlags <<= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
-	//l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
+	l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
 
 	GetLightingManager()->AddTempLight( l );
 }
@@ -113,7 +115,7 @@ void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector 
 	if ( !pUnit || pUnit->IsDormant() )
 		return;
 
-	CBaseCombatWeapon *pWpn = pUnit->GetActiveWeapon();//dynamic_cast<C_BaseCombatWeapon *>( pEnt );	
+	CBaseCombatWeapon *pWpn = pUnit->GetActiveWeapon();	
 	if ( !pWpn || pWpn->IsDormant() )
 		return;
 
@@ -131,7 +133,10 @@ void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector 
 		return;
 	}
 
-	//DoDeferredMuzzleFlash( vecStart );
+#ifdef DEFERRED_ENABLED
+	if( GetDeferredManager()->IsDeferredRenderingEnabled() )
+		DoDeferredMuzzleFlash( vecStart );
+#endif // DEFERRED_ENABLED
 
 	asw_num_u_tracers++;
 	//ASWDoParticleTracer( pWpn, vecStart, vecEnd, pWpn->GetMuzzleFlashRed(), iAttributeEffects );

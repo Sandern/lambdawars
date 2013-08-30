@@ -38,6 +38,7 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		SHADER_PARAM( SCALE3, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
 		SHADER_PARAM( ROTATION4, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
 		SHADER_PARAM( SCALE4, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
+		SHADER_PARAM( MULTIBLEND, SHADER_PARAM_TYPE_BOOL, "1", "" )
 	END_SHADER_PARAMS
 
 	void SetupVars( Multiblend_DX9_Vars_t& info )
@@ -80,7 +81,9 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		if ( !bTranslucent || bIsDecal )
 		{
 			if( GetDeferredExt()->IsDeferredLightingEnabled() )
+			{
 				return "DEFERRED_BRUSH";
+			}
 		}
 #endif // DEFERRED_ENABLED
 		return 0;

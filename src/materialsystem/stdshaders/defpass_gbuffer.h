@@ -23,9 +23,11 @@ struct defParms_gBuffer
 	int iBumpmap3;
 	int iBumpmap4;
 	int iPhongmap;
+#if 0
 	int iBlendmodulate;
 	int iBlendmodulate2;
 	int iBlendmodulate3;
+#endif // 0
 
 	// control
 	int iAlphatestRef;
@@ -35,10 +37,25 @@ struct defParms_gBuffer
 	int iSSBump;
 
 	// blending
+#if 0
 	int iBlendmodulateTransform;
 	int iBlendmodulateTransform2;
 	int iBlendmodulateTransform3;
+#endif // 0
 	int iMultiblend;
+	int nSpecTexture;
+	int nSpecTexture2;
+	int nSpecTexture3;
+	int nSpecTexture4;
+
+	int nRotation;
+	int nRotation2;
+	int nRotation3;
+	int nRotation4;
+	int nScale;
+	int nScale2;
+	int nScale3;
+	int nScale4;
 
 	// config
 	bool bModel;

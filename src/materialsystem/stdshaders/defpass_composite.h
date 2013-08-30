@@ -20,9 +20,28 @@ struct defParms_composite
 	int iEnvmap;
 	int iEnvmapMask;
 	int iEnvmapMask2;
+#if 0
 	int iBlendmodulate;
 	int iBlendmodulate2;
 	int iBlendmodulate3;
+#endif // 0
+
+	// Multiblend
+	int iMultiblend;
+
+	int nSpecTexture;
+	int nSpecTexture2;
+	int nSpecTexture3;
+	int nSpecTexture4;
+
+	int nRotation;
+	int nRotation2;
+	int nRotation3;
+	int nRotation4;
+	int nScale;
+	int nScale2;
+	int nScale3;
+	int nScale4;
 
 	// envmapping
 	int iEnvmapTint;
@@ -50,16 +69,25 @@ struct defParms_composite
 	int iSelfIllumFresnelModulate;
 	int iSelfIllumMask;
 
+#if 0
 	// blendmod
 	int iBlendmodulateTransform;
 	int iBlendmodulateTransform2;
 	int iBlendmodulateTransform3;
-	int iMultiblend;
+#endif // 0
+	
 
 	int iFresnelRanges;
 
 	// config
 	bool bModel;
+
+	// Fog of war
+	int m_nFoW;
+
+	// Team color
+	int m_nTeamColorTexture;
+	int m_nTeamColor;
 };
 
 

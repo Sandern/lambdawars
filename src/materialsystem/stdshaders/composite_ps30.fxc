@@ -11,13 +11,14 @@
 // STATIC:		"RIMLIGHT"						"0..1"
 // STATIC:		"RIMLIGHTMODULATELIGHT"			"0..1"
 
-// STATIC:		"BASETEXTURE2"		"0..1"
-// STATIC:		"BLENDMODULATE"		"0..1"
 // STATIC:		"MULTIBLEND"		"0..1"
 
 // STATIC:		"SELFILLUM"					"0..1"
 // STATIC:		"SELFILLUM_MASK"			"0..1"
 // STATIC:		"SELFILLUM_ENVMAP_ALPHA"	"0..1"
+
+// STATIC:		"FOW"				"0..1"
+// STATIC:		"TEAMCOLORTEXTURE"	"0..1"
 
 // DYNAMIC:		"PIXELFOGTYPE"		"0..1"
 
@@ -49,6 +50,8 @@
 #include "common_deferred_fxc.h"
 #include "common_vertexlitgeneric_dx9.h"
 
+#include "fow_ps_fxc.h"
+#include "common_teamcolor.h"
 
 sampler sAlbedo							: register( s0 );
 
@@ -105,10 +108,12 @@ sampler sAlbedo2							: register( s5 );
 sampler sAlbedo3							: register( s7 );
 sampler sAlbedo4							: register( s8 );
 
-#if BLENDMODULATE
-sampler sBlendmodulate2						: register( s9 );
-sampler sBlendmodulate3						: register( s10 );
-#endif
+sampler SpecSampler1					: register( s9 );	// Spec map 1
+sampler SpecSampler2					: register( s10 );	// Spec map 2
+sampler SpecSampler3					: register( s13 );	// Spec map 3
+sampler SpecSampler4					: register( s14 );	// Spec map 4
+
+static const float3 cSpecularColor = float3( 1.0, 1.0, 1.0 );
 #endif
 
 #if SELFILLUM
@@ -118,10 +123,21 @@ sampler sSelfIllumMask						: register( s4 ); // override envmap mask
 #endif
 #endif
 
+#if FOW
+sampler FoWSampler				: register( s11 );	// Fog of War
+#endif
+
+#if TEAMCOLORTEXTURE
+sampler TeamColorSampler		: register( s12 );
+
+const float4 g_TeamColor				: register( c11 );
+#endif // TEAMCOLORTEXTURE
+
 struct PS_INPUT
 {
-#if BLENDMODULATE
-	float4 vTexCoord				: TEXCOORD0;
+#if MULTIBLEND
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
 	float2 vTexCoord				: TEXCOORD0;
 #endif
@@ -138,14 +154,15 @@ struct PS_INPUT
 #endif
 
 #if MULTIBLEND
-#if BLENDMODULATE
-	float4 vTexCoordBlendmod23			: TEXCOORD4;
-#endif
-	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vAlphaBlend					: TEXCOORD5;
 	float4 vColorBlend1					: COLOR0;
 	float4 vColorBlend2					: COLOR1;
 	float4 vColorBlend3					: TEXCOORD6;
 	float3 vColorBlend4					: TEXCOORD7;
+#endif
+
+#if ( FOW == 1 )
+	float4 vFowCoord				: TEXCOORD8;	// xy = fow, zw = blend4 coord
 #endif
 
 #if NOCULL
@@ -161,54 +178,73 @@ struct PS_OUTPUT
 	float4 vColor_0				:	COLOR0;
 };
 
-
 PS_OUTPUT main( const PS_INPUT In )
 {
 	PS_OUTPUT Out;
 
 	float4 flAlbedoSample = tex2D( sAlbedo, In.vTexCoord.xy );
 
-#if BASETEXTURE2
-	float4 flAlbedoSample2 = tex2D( sAlbedo2, In.vTexCoord.xy );
-	float flBlendfactor = In.vColor_0.w;
-#if BLENDMODULATE
-	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
-#endif
-	flAlbedoSample = lerp( flAlbedoSample, flAlbedoSample2, flBlendfactor );
-#endif
-
 #if MULTIBLEND
 	float remaining = 1;
 	float4 flBlendFactors;
-
-#if BLENDMODULATE
-	flBlendFactors.x = GetMultiBlendModulated( tex2D( sBlendmodulate, In.vTexCoord.zw ).rg, In.vColorBlend1.a, In.vAlphaBlend.x, remaining );
-	flBlendFactors.y = GetMultiBlendModulated( tex2D( sBlendmodulate2, In.vTexCoordBlendmod23.xy ).rg, In.vColorBlend2.a, In.vAlphaBlend.y, remaining );
-	flBlendFactors.z = GetMultiBlendModulated( tex2D( sBlendmodulate3, In.vTexCoordBlendmod23.zw ).rg, In.vColorBlend3.a, In.vAlphaBlend.z, remaining );
-#else
-	flBlendFactors.x = GetMultiBlend( In.vColorBlend1.a, remaining );
-	flBlendFactors.y = GetMultiBlend( In.vColorBlend2.a, remaining );
-	flBlendFactors.z = GetMultiBlend( In.vColorBlend3.a, remaining );
-#endif
+	
+	float4	color1 = tex2D( sAlbedo, In.vTexCoord.xy ) * float4( In.vColorBlend1.rgb, 1.0 );
+	float4	color2 = tex2D( sAlbedo2, In.vTexCoord.zw ) * float4( In.vColorBlend2.rgb, 1.0 );
+	float4	color3 = tex2D( sAlbedo3, In.vTexCoord2.xy ) * float4( In.vColorBlend3.rgb, 1.0 );
+	float4	color4 = tex2D( sAlbedo4, In.vTexCoord2.zw ) * float4( In.vColorBlend4.rgb, 1.0 );
+	
+	float4   spec1 = tex2D( SpecSampler1, In.vTexCoord.xy ); 
+	float4   spec2 = tex2D( SpecSampler2, In.vTexCoord.zw );
+	float4   spec3 = tex2D( SpecSampler3, In.vTexCoord2.xy );
+	float4   spec4 = tex2D( SpecSampler4, In.vTexCoord2.zw );
+	
+	flBlendFactors.x = ComputeMultiBlendFactor( spec1.a, color1.a, In.vColorBlend1.a, In.vAlphaBlend.r, remaining );
+	flBlendFactors.y = ComputeMultiBlendFactor( spec2.a, color2.a, In.vColorBlend2.a, In.vAlphaBlend.g, remaining );
+	flBlendFactors.z = ComputeMultiBlendFactor( spec3.a, color3.a, In.vColorBlend3.a, In.vAlphaBlend.b, remaining );
 	flBlendFactors.w = remaining;
+	
+	float4 vResult;
+	vResult.rgb = ( color1.rgb * flBlendFactors.x ) + ( color2.rgb * flBlendFactors.y ) + ( color3.rgb * flBlendFactors.z ) + ( color4.rgb * flBlendFactors.w );
+	
+	float3 fSpecular = In.vAlphaBlend.w * cSpecularColor;
+	float3 fSpecFinal = float3( 0.0, 0.0, 0.0 );
+	if ( flBlendFactors.x > 0.0 )
+	{
+		fSpecFinal += spec1.r * In.vColorBlend1.rgb * flBlendFactors.x;
+	}
+	if ( flBlendFactors.y > 0.0 )
+	{
+		fSpecFinal += spec2.r * In.vColorBlend2.rgb * flBlendFactors.y;
+	}
+	if ( flBlendFactors.z > 0.0 )
+	{
+		fSpecFinal += spec3.r * In.vColorBlend3.rgb * flBlendFactors.z;
+	}
+	if ( flBlendFactors.w > 0.0 )
+	{
+		fSpecFinal += spec4.r * In.vColorBlend4.rgb * flBlendFactors.w;
+	}
+	
+	vResult.rgb += fSpecFinal * fSpecular;
+	
+	vResult.a = 1.0;
+#else
+	float4 vResult = tex2D( sAlbedo, In.vTexCoord.xy );
+#endif
 
-	flAlbedoSample = flAlbedoSample * flBlendFactors.x
-		+ tex2D( sAlbedo2, In.vTexCoord.xy ) * flBlendFactors.y
-		+ tex2D( sAlbedo3, In.vTexCoord.xy ) * flBlendFactors.z
-		+ tex2D( sAlbedo4, In.vTexCoord.xy ) * flBlendFactors.w;
-
-	flAlbedoSample.rgb *= In.vColorBlend1.rgb * flBlendFactors.x
-		+ In.vColorBlend2.rgb * flBlendFactors.y
-		+ In.vColorBlend3.rgb * flBlendFactors.z
-		+ In.vColorBlend4.rgb * flBlendFactors.w;
+#if TEAMCOLORTEXTURE
+	if( g_TeamColor.a > 0.0 )
+	{
+		vResult = ApplyTeamColor( TeamColorSampler, GammaToLinear(g_TeamColor), In.vTexCoord.xy, vResult);
+	}
 #endif
 
 #if ALPHATEST
-	clip( flAlbedoSample.a - g_flAlphaRef );
+	clip( vResult.a - g_flAlphaRef );
 #endif
 
 #if TRANSLUCENT
-	Out.vColor_0.w = flAlbedoSample.a;
+	Out.vColor_0.w = vResult.a;
 #else
 	Out.vColor_0.w = 1;
 #endif
@@ -242,7 +278,7 @@ PS_OUTPUT main( const PS_INPUT In )
 	float dotEyeVec = 1.0f - saturate( dot( worldNormal, worldToEye ) );
 
 	float3 rimLighting = pow( dotEyeVec, g_flRimLight_Exponent_AlbedoScale.x );
-	rimLighting *= lerp( 1, flAlbedoSample.rgb, g_flRimLight_Exponent_AlbedoScale.y );
+	rimLighting *= lerp( 1, vResult.rgb, g_flRimLight_Exponent_AlbedoScale.y );
 	rimLighting *= g_flRimLight_Tint;
 #if RIMLIGHTMODULATELIGHT
 	rimLighting *= dot( flLighting.rgb, float3( 0.299f, 0.587f, 0.114f ) );
@@ -263,7 +299,7 @@ PS_OUTPUT main( const PS_INPUT In )
 #endif
 	flSpecularFactor = vecEnvmapmaskColor.r;
 #else
-	flSpecularFactor = flAlbedoSample.a;
+	flSpecularFactor = vResult.a;
 #endif
 
 #if RIMLIGHT
@@ -295,10 +331,10 @@ PS_OUTPUT main( const PS_INPUT In )
 #elif SELFILLUM_ENVMAP_ALPHA
 	flSelfIllumAmount = vecEnvmapmaskColor.a;
 #else
-	flSelfIllumAmount = flAlbedoSample.a;
+	flSelfIllumAmount = vResult.a;
 #endif
 	flLighting.rgb = max( flLighting.rgb,
-		flAlbedoSample.rgb * g_flSelfIllum_Tint * flSelfIllumAmount );
+		vResult.rgb * g_flSelfIllum_Tint * flSelfIllumAmount );
 #endif
 
 	float flLightScale =
@@ -308,8 +344,12 @@ PS_OUTPUT main( const PS_INPUT In )
 		GAMMA_LIGHT_SCALE;
 #endif
 
-	Out.vColor_0.xyz = ( ( flAlbedoSample + flLighting.w * g_flPhongScale ) * flLighting.xyz
+	Out.vColor_0.xyz = ( ( vResult + flLighting.w * g_flPhongScale ) * flLighting.xyz
 		+ flSpecularLighting ) * flLightScale;
+		
+#if ( FOW == 1 )
+	Out.vColor_0.rgb = CalcFoW( FoWSampler, In.vFowCoord, Out.vColor_0.rgb );
+#endif
 
 #if PIXELFOGTYPE == 0
 	float fogAmt = CalcPixelFogFactor( PIXELFOGTYPE, g_vecFogParams, g_vecOrigin, In.vWorldPos, 0 );

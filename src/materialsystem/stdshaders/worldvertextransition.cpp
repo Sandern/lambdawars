@@ -12,7 +12,9 @@
 #include "lightmappedgeneric_dx9_helper.h"
 #include "worldvertextransition_dx8_helper.h"
 
-//#include "fogofwar_blended_pass_helper.h"
+#ifdef DEFERRED_ENABLED
+#include "IDeferredExt.h"
+#endif // DEFERRED_ENABLED
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -131,14 +133,20 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 		info.m_nFoW = FOW;
 	}
 
-	/*void SetupVarsFogOfWarBlendedPass( FogOfWarBlendedPassVars_t &info )
-	{
-		info.m_nBaseTexture = BASETEXTURE;
-		info.m_nFogOfWarTexture = FOW;
-	}*/
-
 	SHADER_FALLBACK
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+
+		if ( !bTranslucent || bIsDecal )
+		{
+			if( GetDeferredExt()->IsDeferredLightingEnabled() )
+			{
+				return "DEFERRED_BRUSH";
+			}
+		}
+#endif // DEFERRED_ENABLED
 		return 0;
 	}
 
@@ -146,18 +154,12 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 	{
 		SetupVars( s_info );
 		InitParamsLightmappedGeneric_DX9( this, params, pMaterialName, s_info );
-
-		//SetupVarsFogOfWarBlendedPass( s_fowinfo );
-		//InitParamsFogOfWarBlendedPass( this, params, pMaterialName, s_fowinfo );
 	}
 
 	SHADER_INIT
 	{
 		SetupVars( s_info );
 		InitLightmappedGeneric_DX9( this, params, s_info );
-
-		//SetupVarsFogOfWarBlendedPass( s_fowinfo );
-		//InitFogOfWarBlendedPass( this, params, s_fowinfo );
 	}
 
 	SHADER_DRAW
@@ -171,8 +173,6 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 // 		}
 
 		DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
-
-		//DrawFogOfWarBlendedPass( this, params, pShaderAPI, pShaderShadow, s_fowinfo, vertexCompression );
 	}
 END_SHADER
 

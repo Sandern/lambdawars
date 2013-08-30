@@ -191,4 +191,48 @@ float GetMultiBlendModulated( in float2 modt, const float flBlendAmount, const f
 	return Result;
 }
 
+float2 ComputeTexCoord( const float2 vBaseCoord, const float flRotation, const float flScale )
+{
+	float2 	vAdjust = vBaseCoord - float2( 0.5, 0.5 );
+	float2 	vResult;
+	float 	c = cos( flRotation );
+	float 	s = sin( flRotation );
+	
+   	vResult.x = ( vAdjust.x * c ) + ( vAdjust.y * -s );
+   	vResult.y = ( vAdjust.x * s ) + ( vAdjust.y * c );
+   	
+   	return ( vResult / flScale ) + float2( 0.5, 0.5 );
+}
+
+float ComputeMultiBlendFactor( const float BlendStart, const float BlendEnd, const float BlendAmount, const float AlphaBlend, inout float Remaining )
+{
+	float Result = 0.0;
+   
+	if ( Remaining > 0.0 && BlendAmount > 0.0 )
+	{
+		float minb = max( 0.0, BlendEnd - BlendStart );
+		float maxb = min( 1.0, BlendEnd + BlendStart );
+
+		if ( minb != maxb )
+		{
+			Result = smoothstep( minb, maxb, BlendAmount );
+		}
+		else if ( BlendAmount >= minb )
+		{
+			Result = 1.0;
+		}
+
+	  	if ( BlendEnd < AlphaBlend )
+	  	{
+	  		float alpha = 2.0 - AlphaBlend - BlendEnd;
+	  		Result *= clamp( alpha, 0.0, 1.0 );
+   		}
+	}
+   
+	Result = clamp( Result, 0.0, Remaining );
+	Remaining -= Result;
+   
+	return Result;
+}
+
 #endif

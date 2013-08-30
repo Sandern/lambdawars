@@ -37,6 +37,10 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 		SHADER_PARAM( SELFILLUMFRESNEL, SHADER_PARAM_TYPE_BOOL, "0", "Self illum fresnel" )
 		SHADER_PARAM( SELFILLUMMASK, SHADER_PARAM_TYPE_TEXTURE, "shadertest/BaseTexture", "If we bind a texture here, it overrides base alpha (if any) for self illum" )
 
+		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
+
+		SHADER_PARAM( TEAMCOLOR, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "Team color" )
+		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
 	END_SHADER_PARAMS
 
 	void SetupParmsGBuffer( defParms_gBuffer &p )
@@ -88,6 +92,11 @@ BEGIN_VS_SHADER( DEFERRED_MODEL, "" )
 		p.iSelfIllumMask = SELFILLUMMASK;
 
 		p.iFresnelRanges = FRESNELRANGES;
+
+		p.m_nFoW = FOW;
+
+		p.m_nTeamColor = TEAMCOLOR;
+		p.m_nTeamColorTexture = TEAMCOLORMAP;
 	}
 
 	bool DrawToGBuffer( IMaterialVar **params )

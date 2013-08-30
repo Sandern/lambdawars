@@ -4,7 +4,6 @@
 // STATIC:		"NOCULL"			"0..1"
 // STATIC:		"PHONGMAP"			"0..1"
 // STATIC:		"BUMPMAP2"			"0..1"
-// STATIC:		"BLENDMODULATE"		"0..1"
 // STATIC:		"MULTIBLEND"		"0..1"
 
 // SKIP:		!$BUMPMAP2 && !$MULTIBLEND && $BLENDMODULATE
@@ -24,7 +23,7 @@
 #include "common_deferred_fxc.h"
 
 
-#if ALPHATEST
+#if ALPHATEST || MULTIBLEND
 sampler sAlbedo							: register( s0 );
 #endif
 
@@ -49,25 +48,27 @@ const float2 g_flHalflambert_Litface	: register( c1 );
 sampler sBumpmap2							: register( s3 );
 #endif
 
-#if BLENDMODULATE
-sampler sBlendmodulate						: register( s4 );
-#endif
-
 #if MULTIBLEND
 sampler sBumpmap2							: register( s3 );
 sampler sBumpmap3							: register( s5 );
 sampler sBumpmap4							: register( s6 );
-#if BLENDMODULATE
-sampler sBlendmodulate2						: register( s7 );
-sampler sBlendmodulate3						: register( s8 );
-#endif
+
+sampler sAlbedo2							: register( s7 );
+sampler sAlbedo3							: register( s8 );
+sampler sAlbedo4							: register( s9 );
+
+sampler SpecSampler1					: register( s10 );	// Spec map 1
+sampler SpecSampler2					: register( s11 );	// Spec map 2
+sampler SpecSampler3					: register( s12 );	// Spec map 3
+sampler SpecSampler4					: register( s13 );	// Spec map 4
 #endif
 
 
 struct PS_INPUT
 {
-#if BLENDMODULATE
-	float4 vTexCoord				: TEXCOORD0;
+#if MULTIBLEND
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
 	float2 vTexCoord				: TEXCOORD0;
 #endif
@@ -87,10 +88,7 @@ struct PS_INPUT
 #endif
 
 #if MULTIBLEND
-#if BLENDMODULATE
-	float4 vTexCoordBlendmod23			: TEXCOORD4;
-#endif
-	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vAlphaBlend					: TEXCOORD5;
 	float4 vColorBlend1					: COLOR0;
 	float4 vColorBlend2					: COLOR1;
 	float4 vColorBlend3					: TEXCOORD6;
@@ -135,25 +133,28 @@ PS_OUTPUT main( const PS_INPUT In )
 #if BUMPMAP2
 	float3 bumpNormal2 = tex2D( sBumpmap2, In.vTexCoord.xy ).rgb;
 	float flBlendfactor = In.vColor_0.w;
-#if BLENDMODULATE
-	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
-#endif
 	bumpNormal = lerp( bumpNormal, bumpNormal2, flBlendfactor );
 #endif
 
 #if MULTIBLEND
 	float remaining = 1;
 	float4 flBlendFactors;
-#if BLENDMODULATE
-	flBlendFactors.x = GetMultiBlendModulated( tex2D( sBlendmodulate, In.vTexCoord.zw ).rg, In.vColorBlend1.a, In.vAlphaBlend.x, remaining );
-	flBlendFactors.y = GetMultiBlendModulated( tex2D( sBlendmodulate2, In.vTexCoordBlendmod23.xy ).rg, In.vColorBlend2.a, In.vAlphaBlend.y, remaining );
-	flBlendFactors.z = GetMultiBlendModulated( tex2D( sBlendmodulate3, In.vTexCoordBlendmod23.zw ).rg, In.vColorBlend3.a, In.vAlphaBlend.z, remaining );
-#else
-	flBlendFactors.x = GetMultiBlend( In.vColorBlend1.a, remaining );
-	flBlendFactors.y = GetMultiBlend( In.vColorBlend2.a, remaining );
-	flBlendFactors.z = GetMultiBlend( In.vColorBlend3.a, remaining );
-#endif
+	
+	float4	color1 = tex2D( sAlbedo, In.vTexCoord.xy ) * float4( In.vColorBlend1.rgb, 1.0 );
+	float4	color2 = tex2D( sAlbedo2, In.vTexCoord.zw ) * float4( In.vColorBlend2.rgb, 1.0 );
+	float4	color3 = tex2D( sAlbedo3, In.vTexCoord2.xy ) * float4( In.vColorBlend3.rgb, 1.0 );
+	float4	color4 = tex2D( sAlbedo4, In.vTexCoord2.zw ) * float4( In.vColorBlend4.rgb, 1.0 );
+	
+	float4   spec1 = tex2D( SpecSampler1, In.vTexCoord.xy ); 
+	float4   spec2 = tex2D( SpecSampler2, In.vTexCoord.zw );
+	float4   spec3 = tex2D( SpecSampler3, In.vTexCoord2.xy );
+	float4   spec4 = tex2D( SpecSampler4, In.vTexCoord2.zw );
+	
+	flBlendFactors.x = ComputeMultiBlendFactor( spec1.a, color1.a, In.vColorBlend1.a, In.vAlphaBlend.r, remaining );
+	flBlendFactors.y = ComputeMultiBlendFactor( spec2.a, color2.a, In.vColorBlend2.a, In.vAlphaBlend.g, remaining );
+	flBlendFactors.z = ComputeMultiBlendFactor( spec3.a, color3.a, In.vColorBlend3.a, In.vAlphaBlend.b, remaining );
 	flBlendFactors.w = remaining;
+	
 	bumpNormal = bumpNormal * flBlendFactors.x
 		+ tex2D( sBumpmap2, In.vTexCoord.xy ) * flBlendFactors.y
 		+ tex2D( sBumpmap3, In.vTexCoord.xy ) * flBlendFactors.z

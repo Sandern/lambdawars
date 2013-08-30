@@ -989,6 +989,7 @@ static class CLightEditorHelper : public CAutoGameSystemPerFrame
 			return;
 		}
 
+#if 0
 		static bool bWasTabDown = false;
 		bool bIsTabDown = vgui::input()->IsKeyDown( KEY_TAB );
 
@@ -1003,5 +1004,6 @@ static class CLightEditorHelper : public CAutoGameSystemPerFrame
 
 			bWasTabDown = bIsTabDown;
 		}
+#endif // 0
 	};
 } __g_lightEditorHelper;

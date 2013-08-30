@@ -223,4 +223,14 @@ private:
 	float flLastRandomValue;
 };
 
+struct def_light_temp_t : def_light_t
+{
+	def_light_temp_t( bool bWorld = false, float fLifeTime = 1.0f ) : def_light_t( bWorld )
+	{
+		fEndLifeTime = gpGlobals->curtime + fLifeTime;
+	}
+
+	float fEndLifeTime;
+};
+
 #endif

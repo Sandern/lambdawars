@@ -48,6 +48,24 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( BLENDMASKTRANSFORM2, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 		SHADER_PARAM( BLENDMASKTRANSFORM3, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
+		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
+
+		SHADER_PARAM( TEAMCOLOR, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "Team color" )
+		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
+
+		// Multiblend specific
+		SHADER_PARAM( SPECTEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( SPECTEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( SPECTEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( SPECTEXTURE4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
+		SHADER_PARAM( ROTATION, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
+		SHADER_PARAM( SCALE, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
+		SHADER_PARAM( ROTATION2, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
+		SHADER_PARAM( SCALE2, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
+		SHADER_PARAM( ROTATION3, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
+		SHADER_PARAM( SCALE3, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
+		SHADER_PARAM( ROTATION4, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
+		SHADER_PARAM( SCALE4, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
 	END_SHADER_PARAMS
 
 	void SetupParmsGBuffer( defParms_gBuffer &p )
@@ -74,12 +92,26 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iSSBump = SSBUMP;
 
 		p.iMultiblend = MULTIBLEND;
+		p.nSpecTexture = SPECTEXTURE;
+		p.nSpecTexture2 = SPECTEXTURE2;
+		p.nSpecTexture3 = SPECTEXTURE3;
+		p.nSpecTexture4 = SPECTEXTURE4;
+		p.nRotation = ROTATION;
+		p.nRotation2 = ROTATION2;
+		p.nRotation3 = ROTATION3;
+		p.nRotation4 = ROTATION4;
+		p.nScale = SCALE;
+		p.nScale2 = SCALE2;
+		p.nScale3 = SCALE3;
+		p.nScale4 = SCALE4;
+#if 0
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
 		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
 		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
 		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
 		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
+#endif // 0
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )
@@ -119,15 +151,37 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iPhongScale = PHONG_SCALE;
 		p.iPhongFresnel = PHONG_FRESNEL;
 
+#if 0
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
 		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
 		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
 		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
 		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
+#endif // 0
+
+
+		p.nSpecTexture = SPECTEXTURE;
+		p.nSpecTexture2 = SPECTEXTURE2;
+		p.nSpecTexture3 = SPECTEXTURE3;
+		p.nSpecTexture4 = SPECTEXTURE4;
+		p.nRotation = ROTATION;
+		p.nRotation2 = ROTATION2;
+		p.nRotation3 = ROTATION3;
+		p.nRotation4 = ROTATION4;
+		p.nScale = SCALE;
+		p.nScale2 = SCALE2;
+		p.nScale3 = SCALE3;
+		p.nScale4 = SCALE4;
+
 		p.iMultiblend = MULTIBLEND;
 
 		p.iFresnelRanges = FRESNELRANGES;
+
+		p.m_nFoW = FOW;
+
+		p.m_nTeamColor = TEAMCOLOR;
+		p.m_nTeamColorTexture = TEAMCOLORMAP;
 	}
 
 	bool DrawToGBuffer( IMaterialVar **params )

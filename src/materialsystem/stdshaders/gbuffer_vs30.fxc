@@ -3,7 +3,6 @@
 // STATIC:		"TANGENTSPACE"			"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
 // STATIC:		"BUMPMAP2"				"0..1"
-// STATIC:		"BLENDMODULATE"			"0..1"
 // STATIC:		"MULTIBLEND"			"0..1"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
@@ -34,13 +33,10 @@ sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
 
 #endif
 
-#if BLENDMODULATE
-const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_3 ); // up to 4
 #if MULTIBLEND
-const float4 flBlendModTransform2[2]			: register( SHADER_SPECIFIC_CONST_5 ); // up to 6
-const float4 flBlendModTransform3[2]			: register( SHADER_SPECIFIC_CONST_7 ); // up to 8
-#endif
-#endif
+const float4 g_vRotations							: register( c27 );
+const float4 g_vScales								: register( c28 );
+#endif 
 
 struct VS_INPUT
 {
@@ -87,8 +83,9 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 vProjPos					: POSITION;
-#if BLENDMODULATE
-	float4 vTexCoord				: TEXCOORD0;
+#if MULTIBLEND
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
 	float2 vTexCoord				: TEXCOORD0;
 #endif
@@ -105,10 +102,7 @@ struct VS_OUTPUT
 #endif
 
 #if MULTIBLEND
-#if BLENDMODULATE
-	float4 vTexCoordBlendmod23			: TEXCOORD4;
-#endif
-	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vAlphaBlend					: TEXCOORD5;
 	float4 vColorBlend1					: COLOR0;
 	float4 vColorBlend2					: COLOR1;
 	float4 vColorBlend3					: TEXCOORD6;
@@ -197,14 +191,12 @@ VS_OUTPUT main( const VS_INPUT In )
 	Out.vColorBlend3 = In.vColorBlend3;
 	Out.vColorBlend4.xyz = In.vColorBlend4.xyz;
 	Out.vAlphaBlend.xyz = In.vAlphaBlend.xyz;
-#endif
-
-#if BLENDMODULATE
-	Out.vTexCoord.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform );
-#if MULTIBLEND
-	Out.vTexCoordBlendmod23.xy = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform2 );
-	Out.vTexCoordBlendmod23.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform3 );
-#endif
+	Out.vAlphaBlend.w = 0;
+	
+	Out.vTexCoord.xy = ComputeTexCoord( In.vTexCoord_0, g_vRotations.x, g_vScales.x );
+	Out.vTexCoord.zw = ComputeTexCoord( In.vTexCoord_0, g_vRotations.y, g_vScales.y );
+	Out.vTexCoord2.xy = ComputeTexCoord( In.vTexCoord_0, g_vRotations.z, g_vScales.z );
+	Out.vTexCoord2.zw = ComputeTexCoord( In.vTexCoord_0, g_vRotations.w, g_vScales.w );
 #endif
 
 #endif // NOT MODEL
