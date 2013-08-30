@@ -116,9 +116,11 @@ public:
 #endif
 
 public:
+#ifndef HL2WARS_DLL
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_vecVelocity );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_fFlags );
-	
+#endif // HL2WARS_DLL
+
 	bool				m_bHasWarnedAI;				// whether or not this grenade has issued its DANGER sound to the world sound list yet.
 	CNetworkVar( bool, m_bIsLive );					// Is this grenade live, or can it be picked up?
 	CNetworkVar( float, m_DmgRadius );				// How far do I do damage?

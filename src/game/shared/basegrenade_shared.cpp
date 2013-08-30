@@ -68,9 +68,24 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 //	SendPropTime( SENDINFO( m_flDetonateTime ) ),
 	SendPropEHandle( SENDINFO( m_hThrower ) ),
 
+#ifndef HL2WARS_DLL
 	SendPropVector( SENDINFO( m_vecVelocity ), 0, SPROP_NOSCALE ), 
 	// HACK: Use same flag bits as player for now
 	SendPropInt			( SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED, SendProxy_CropFlagsToPlayerFlagBitsLength ),
+#endif // HL2WARS_DLL
+	
+#ifdef HL2WARS_DLL
+	// Excludes
+	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+	SendPropExclude( "DT_BaseEntity", "m_hOwnerEntity" ), // Already got m_hThrower
+	SendPropExclude( "DT_ServerAnimationData" , "m_flCycle" ),	
+	SendPropExclude( "DT_AnimTimeMustBeFirst" , "m_flAnimTime" ),
+
+	// Resend smaller
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
+#endif // HL2WARS_DLL
 #else
 	RecvPropFloat( RECVINFO( m_flDamage ) ),
 	RecvPropFloat( RECVINFO( m_DmgRadius ) ),
@@ -78,10 +93,19 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 //	RecvPropTime( RECVINFO( m_flDetonateTime ) ),
 	RecvPropEHandle( RECVINFO( m_hThrower ) ),
 
+#ifndef HL2WARS_DLL
 	// Need velocity from grenades to make animation system work correctly when running
 	RecvPropVector( RECVINFO(m_vecVelocity), 0, RecvProxy_LocalVelocity ),
 
 	RecvPropInt( RECVINFO( m_fFlags ) ),
+#endif // HL2WARS_DLL
+
+#ifdef HL2WARS_DLL
+	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
+	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
+	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
+#endif // HL2WARS_DLL
+
 #endif
 END_NETWORK_TABLE()
 
