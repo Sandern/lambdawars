@@ -19,7 +19,9 @@
 #include "fx_line.h"
 #include "fx_water.h"
 
-//#include "deferred/deferred_shared_common.h"
+#ifdef DEFERRED_ENABLED
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -746,6 +748,7 @@ void C_BaseExplosionEffect::CreateDynamicLight( void )
 			dl->die		= gpGlobals->curtime + 0.1f;
 		}
 #ifdef DEFERRED_ENABLED
+#if 0 // TODO
 		else
 		{
 			def_light_temp_t *l = new def_light_temp_t( false, 0.2f );
@@ -769,6 +772,7 @@ void C_BaseExplosionEffect::CreateDynamicLight( void )
 
 			GetLightingManager()->AddTempLight( l );
 		}
+#endif // 0
 #endif // DEFERRED_ENABLED
 	}
 }

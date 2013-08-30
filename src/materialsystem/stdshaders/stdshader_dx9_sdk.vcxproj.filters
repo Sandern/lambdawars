@@ -25,6 +25,9 @@
     <Filter Include="Shader Source\psh">
       <UniqueIdentifier>{2f771bb4-558d-476b-9830-37d465094377}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\deferred">
+      <UniqueIdentifier>{53051c8e-2b49-4229-90fd-022fa8c2040c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\vpc_scripts\loadaddress.vpc">
@@ -359,6 +362,72 @@
     <ClCompile Include="lightmappedbrushgeneric_dx9_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IDeferredExt.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_lightingctrl.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_radiosity_grid.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="debug_shadow.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_brush.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_decalModulate.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_model.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="deferred_utility.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="defpass_composite.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="defpass_gbuffer.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="defpass_shadow.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting_global.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting_pass_basic.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting_pass_volum.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting_volume.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="lighting_world.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="volume_blend.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="volume_prepass.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="blur.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="radiosity_blend.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="radiosity_global.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
+    <ClCompile Include="radiosity_propagate.cpp">
+      <Filter>Source Files\deferred</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\dx9sdk\lib\d3dx9.lib">
@@ -488,6 +557,48 @@
     </ClInclude>
     <ClInclude Include="worldvertextransition_dx8_helper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDeferredExt.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="common_deferred_fxc.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="common_lighting_fxc.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="common_shadowmapping_fxc.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_context.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_global_common.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_includes.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="deferred_utility.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="defpass_composite.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="defpass_gbuffer.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="defpass_shadow.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="lighting_helper.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="lighting_pass_basic.h">
+      <Filter>Source Files\deferred</Filter>
+    </ClInclude>
+    <ClInclude Include="lighting_pass_volum.h">
+      <Filter>Source Files\deferred</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

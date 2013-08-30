@@ -156,6 +156,12 @@
 	#include "cef/src_cef.h"
 #endif // ENABLE_CEF
 
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+// For cookie string table
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1978,6 +1984,11 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTablePyModules = NULL;
 	g_pStringTableGameDBNames = NULL;
 #endif // HL2WARS_DLL
+
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+	g_pStringTable_LightCookies = NULL;
+#endif // DEFERRED_ENABLED
 }
 
 //-----------------------------------------------------------------------------
@@ -2263,6 +2274,15 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 		g_pStringTableGameDBNames = networkstringtable->FindTable( tableName );
 	}
 #endif // HL2WARS_DLL
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+	else if ( !Q_strcasecmp( tableName, COOKIE_STRINGTBL_NAME ) )
+	{
+		g_pStringTable_LightCookies = networkstringtable->FindTable( tableName );
+
+		g_pStringTable_LightCookies->SetStringChangedCallback( NULL, OnCookieTableChanged );
+	}
+#endif // DEFERRED_ENABLED
 	else
 	{
 		// Pass tablename to gamerules last if all other checks fail

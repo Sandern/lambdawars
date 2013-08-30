@@ -49,9 +49,15 @@
 #include "renderparm.h"
 #include "modelrendersystem.h"
 #include "vgui/ISurface.h"
+#ifdef DEFERRED_ENABLED
+#include "deferred/cdeferred_manager_client.h"
+#endif // DEFERRED_ENABLED
 
 #define PARTICLE_USAGE_DEMO									// uncomment to get particle bar thing
 
+#ifdef SHADER_EDITOR
+#include "shadereditor/shadereditorsystem.h"
+#endif // SHADER_EDITOR
 
 #if defined( HL2_CLIENT_DLL ) || defined( INFESTED_DLL )
 #define USE_MONITORS
@@ -68,8 +74,6 @@
 #include "c_asw_render_targets.h"
 #include "clientmode_asw.h"
 #endif
-
-#include "fowmgr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -90,6 +94,9 @@ extern ConVar mat_motion_blur_enabled;
 extern ConVar r_depthoverlay;
 extern ConVar r_shadow_deferred;
 
+// @Deferred - Biohazard
+// lots of stuff must not be file scope for the other IViewRender implementation to work
+
 //-----------------------------------------------------------------------------
 // Convars related to controlling rendering
 //-----------------------------------------------------------------------------
@@ -108,7 +115,7 @@ ConVar r_drawopaquerenderables( "r_drawopaquerenderables", "1", FCVAR_CHEAT );
 
 static ConVar r_flashlightdepth_drawtranslucents( "r_flashlightdepth_drawtranslucents", "0", FCVAR_NONE );
 
-ConVar r_flashlightvolumetrics( "r_flashlightvolumetrics", "1" );
+ConVar r_flashlightvolumetrics( "r_flashlightvolumetrics", "0" );
 
 
 // FIXME: This is not static because we needed to turn it off for TF2 playtests
@@ -404,6 +411,14 @@ private:
 };
 
 CWorldListCache g_WorldListCache;
+
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+void FlushWorldLists()
+{
+	g_WorldListCache.Flush();
+}
+#endif // DEFERRED_ENABLED
 
 //-----------------------------------------------------------------------------
 // Standard 3d skybox view
@@ -954,11 +969,16 @@ void CSimpleRenderExecutor::AddView( CRendering3dView *pView )
 	m_pMainView->SetActiveRenderer( pPrevRenderer );
 }
 
+// @Deferred - Biohazard
+// this is allocated differently now
+
+#if !defined( INFESTED_DLL ) && !defined( DEFERRED_ENABLED )
 static CViewRender g_ViewRender;
 IViewRender *GetViewRenderInstance()
 {
 	return &g_ViewRender;
 }
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -1328,6 +1348,7 @@ void CViewRender::GetScreenFadeDistances( float *pMin, float *pMax )
 			}
 		}
 	}
+
 }
 
 void CViewRender::OnScreenFadeMinSize( const CCommand &args )
@@ -2474,7 +2495,9 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		// Now actually draw the viewmodel
 		DrawViewModels( view, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
 
-		//g_ShaderEditorSystem->CustomPostRender();
+#ifdef SHADER_EDITOR
+		g_ShaderEditorSystem->CustomPostRender();
+#endif // SHADER_EDITOR
 
 		DrawUnderwaterOverlay();
 
@@ -2692,7 +2715,6 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		}
 
 		CDebugViewRender::Draw2DDebuggingInfo( hudViewSetup );
-		//FogOfWarMgr()->RenderFogOfWar();
 
 		Render2DEffectsPostHUD( hudViewSetup );
 
@@ -3636,8 +3658,14 @@ void CRendering3dView::BuildRenderableRenderLists( int viewID )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	const bool bUpdateLightmaps = viewID != VIEW_SHADOW_DEPTH_TEXTURE;
-
+// @Deferred - Biohazard
+// skip stuff
+	const bool bUpdateLightmaps = viewID != VIEW_SHADOW_DEPTH_TEXTURE 
+#ifdef DEFERRED_ENABLED
+		&& !GetDeferredManager()->IsDeferredRenderingEnabled()
+#endif // DEFERRED_ENABLED
+		;
+		
 	if ( bUpdateLightmaps )
 	{
 		render->BeginUpdateLightmaps();

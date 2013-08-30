@@ -153,7 +153,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;fxctmp9;vshtmp9;..\..\dx9sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;_DLL_EXT=.dll;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;USE_ACTUAL_DX;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;USE_ACTUAL_DX;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -1331,6 +1331,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="aftershock_helper.cpp" />
     <ClCompile Include="BaseVSShader.cpp" />
     <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="blur.cpp" />
     <ClCompile Include="BlurFilterX.cpp" />
     <ClCompile Include="BlurFilterY.cpp" />
     <ClCompile Include="BufferClearObeyStencil_dx9.cpp" />
@@ -1349,7 +1350,17 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="debugmorphaccumulator_dx9.cpp" />
     <ClCompile Include="debugmrttexture.cpp" />
     <ClCompile Include="DebugTextureView.cpp" />
+    <ClCompile Include="debug_lightingctrl.cpp" />
+    <ClCompile Include="debug_radiosity_grid.cpp" />
+    <ClCompile Include="debug_shadow.cpp" />
     <ClCompile Include="DecalModulate_dx9.cpp" />
+    <ClCompile Include="deferred_brush.cpp" />
+    <ClCompile Include="deferred_decalModulate.cpp" />
+    <ClCompile Include="deferred_model.cpp" />
+    <ClCompile Include="deferred_utility.cpp" />
+    <ClCompile Include="defpass_composite.cpp" />
+    <ClCompile Include="defpass_gbuffer.cpp" />
+    <ClCompile Include="defpass_shadow.cpp" />
     <ClCompile Include="DepthOfField_dx9.cpp" />
     <ClCompile Include="depthwrite.cpp" />
     <ClCompile Include="Downsample.cpp" />
@@ -1379,6 +1390,12 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="hsl_filmgrain_pass1.cpp" />
     <ClCompile Include="hsl_filmgrain_pass2.cpp" />
     <ClCompile Include="hsv.cpp" />
+    <ClCompile Include="IDeferredExt.cpp" />
+    <ClCompile Include="lighting_global.cpp" />
+    <ClCompile Include="lighting_pass_basic.cpp" />
+    <ClCompile Include="lighting_pass_volum.cpp" />
+    <ClCompile Include="lighting_volume.cpp" />
+    <ClCompile Include="lighting_world.cpp" />
     <ClCompile Include="lightmappedbrushgeneric.cpp" />
     <ClCompile Include="lightmappedbrushgeneric_dx9_helper.cpp" />
     <ClCompile Include="lightmappedgeneric_dx9.cpp" />
@@ -1411,6 +1428,9 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="projected_dx9_helper.cpp" />
     <ClCompile Include="prototype.cpp" />
     <ClCompile Include="prototype_helper.cpp" />
+    <ClCompile Include="radiosity_blend.cpp" />
+    <ClCompile Include="radiosity_global.cpp" />
+    <ClCompile Include="radiosity_propagate.cpp" />
     <ClCompile Include="refract.cpp" />
     <ClCompile Include="refract_dx9_helper.cpp" />
     <ClCompile Include="sample4x4.cpp" />
@@ -1431,8 +1451,10 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="unlittwotexture_dx9.cpp" />
     <ClCompile Include="vertexlitgeneric_dx9.cpp" />
     <ClCompile Include="vertexlitgeneric_dx9_helper.cpp" />
+    <ClCompile Include="volume_blend.cpp" />
     <ClCompile Include="volume_clouds.cpp" />
     <ClCompile Include="volume_clouds_helper.cpp" />
+    <ClCompile Include="volume_prepass.cpp" />
     <ClCompile Include="vortwarp_dx9.cpp" />
     <ClCompile Include="water.cpp" />
     <ClCompile Include="windowimposter_dx90.cpp" />
@@ -1455,6 +1477,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
   <ItemGroup>
     <ClInclude Include="BaseVSShader.h" />
     <ClInclude Include="cloak_dx9_helper.h" />
+    <ClInclude Include="common_deferred_fxc.h" />
     <ClInclude Include="common_flashlight_fxc.h" />
     <ClInclude Include="common_fog_ps_forcevertexfog_fxc.h" />
     <ClInclude Include="common_fog_ps_fxc.h" />
@@ -1464,15 +1487,28 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="common_fog_vs_supportsvertexfog_fxc.h" />
     <ClInclude Include="common_fxc.h" />
     <ClInclude Include="common_hlsl_cpp_consts.h" />
+    <ClInclude Include="common_lighting_fxc.h" />
     <ClInclude Include="common_lightmappedgeneric_fxc.h" />
     <ClInclude Include="common_ps_fxc.h" />
+    <ClInclude Include="common_shadowmapping_fxc.h" />
     <ClInclude Include="common_splinerope_fxc.h" />
     <ClInclude Include="common_spritecard_fxc.h" />
     <ClInclude Include="common_vertexlitgeneric_dx9.h" />
     <ClInclude Include="common_vs_fxc.h" />
+    <ClInclude Include="deferred_context.h" />
+    <ClInclude Include="deferred_global_common.h" />
+    <ClInclude Include="deferred_includes.h" />
+    <ClInclude Include="deferred_utility.h" />
+    <ClInclude Include="defpass_composite.h" />
+    <ClInclude Include="defpass_gbuffer.h" />
+    <ClInclude Include="defpass_shadow.h" />
     <ClInclude Include="flesh_helper.h" />
     <ClInclude Include="fow_ps_fxc.h" />
     <ClInclude Include="fow_vs_fxc.h" />
+    <ClInclude Include="IDeferredExt.h" />
+    <ClInclude Include="lighting_helper.h" />
+    <ClInclude Include="lighting_pass_basic.h" />
+    <ClInclude Include="lighting_pass_volum.h" />
     <ClInclude Include="lightmappedgeneric_dx9_helper.h" />
     <ClInclude Include="lightmappedgeneric_ps2_3_x.h" />
     <ClInclude Include="lightmappedpaint_dx9_helper.h" />

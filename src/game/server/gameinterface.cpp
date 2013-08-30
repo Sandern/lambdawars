@@ -126,6 +126,12 @@
 	#include "srcpy_networkvar.h"
 #endif // ENABLE_PYTHON
 
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+// for cookie string table
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
+
 #ifdef _WIN32
 #include "IGameUIFuncs.h"
 #endif
@@ -1557,6 +1563,11 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableGameDBNames = networkstringtable->CreateStringTable( "GameDBNames", MAX_CHOREO_SCENES_STRINGS );
 #endif // HL2WARS_DLL
 
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+	g_pStringTable_LightCookies = networkstringtable->CreateStringTable( COOKIE_STRINGTBL_NAME, MAX_COOKIE_TEXTURES, 0, 0, NSF_DICTIONARY_ENABLED );
+#endif // DEFERRED_ENABLED
+
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
 			g_pStringTableVguiScreen &&
@@ -1569,6 +1580,10 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 			g_pStringTablePyModules &&
 			g_pStringTableGameDBNames
 #endif // HL2WARS_DLL
+#ifdef DEFERRED_ENABLED
+// @Deferred - Biohazard
+			&& g_pStringTable_LightCookies
+#endif // DEFERRED_ENABLED
 			);
 
 	// Need this so we have the error material always handy
@@ -2505,255 +2520,8 @@ inline void CServerNetworkProperty::CheckTransmit( CCheckTransmitInfo *pInfo )
 	}
 } */
 
-#if 0
-static void CheckTransmitRTS( CCheckTransmitInfo *pInfo, const unsigned short *pEdictIndices, int nEdicts )
-{
-	// NOTE: for speed's sake, this assumes that all networkables are CBaseEntities and that the edict list
-	// is consecutive in memory. If either of these things change, then this routine needs to change, but
-	// ideally we won't be calling any virtual from this routine. This speedy routine was added as an
-	// optimization which would be nice to keep.
-	edict_t *pBaseEdict = gpGlobals->pEdicts;
-
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
-	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
-	if ( !pRecipientEntity )
-		return;
-	
-	MDLCACHE_CRITICAL_SECTION();
-	CHL2WarsPlayer *pRecipientPlayer = static_cast<CHL2WarsPlayer*>( pRecipientEntity );
-	const int skyBoxArea = pRecipientPlayer->m_Local.m_skybox3d.area;
-#ifndef _X360
-	const bool bIsHLTV = pRecipientPlayer->IsHLTV();
-#if defined( REPLAY_ENABLED )
-	const bool bIsReplay = pRecipientPlayer->IsReplay();
-#else
-	const bool bIsReplay = false;
-#endif
-
-	Vector vEyePosition = pRecipientPlayer->EyePosition() + pRecipientPlayer->GetCameraOffset();
-	Vector vForward;
-	int iFov = pRecipientPlayer->GetFOVForNetworking();
-	static ConVar transmit_test_override_fov("transmit_test_override_fov", "-1");
-	if( transmit_test_override_fov.GetInt() != -1 )
-		iFov = transmit_test_override_fov.GetInt();
-	float fMaxDot = cos( (iFov / 2) / 57.29578f );	// To radians;
-	pRecipientPlayer->GetVectors( &vForward, NULL, NULL );
-
-	NDebugOverlay::Line( vEyePosition, vEyePosition + vForward * 1000.0f, 255, 0, 0, true, 1.0f );
-
-	// m_pTransmitAlways must be set if HLTV client
-	Assert( bIsHLTV == ( pInfo->m_pTransmitAlways != NULL) ||
-		    bIsReplay == ( pInfo->m_pTransmitAlways != NULL) );
-#endif
-
-	for ( int i=0; i < nEdicts; i++ )
-	{
-		int iEdict = pEdictIndices[i];
-#if _X360
-		if ( i < nEdicts-1 )
-		{
-			PREFETCH360(&pBaseEdict[pEdictIndices[i+1]],0);
-		}
-#endif
-
-		edict_t *pEdict = &pBaseEdict[iEdict];
-		int nFlags = pEdict->m_fStateFlags & (FL_EDICT_DONTSEND|FL_EDICT_ALWAYS|FL_EDICT_PVSCHECK|FL_EDICT_FULLCHECK);
-
-		// entity needs no transmit
-		if ( nFlags & FL_EDICT_DONTSEND )
-			continue;
-		PREFETCH360(pEdict->GetUnknown(),0);
-
-		// entity is already marked for sending
-		if ( pInfo->m_pTransmitEdict->Get( iEdict ) )
-			continue;
-		
-		if ( nFlags & FL_EDICT_ALWAYS )
-		{
-			// FIXME: Hey! Shouldn't this be using SetTransmit so as 
-			// to also force network down dependent entities?
-			while ( true )
-			{
-				// mark entity for sending
-				pInfo->m_pTransmitEdict->Set( iEdict );
-	
-#ifndef _X360
-				if ( bIsHLTV || bIsReplay )
-				{
-					pInfo->m_pTransmitAlways->Set( iEdict );
-				}
-#endif	
-				CServerNetworkProperty *pEnt = static_cast<CServerNetworkProperty*>( pEdict->GetNetworkable() );
-				if ( !pEnt )
-					break;
-
-#ifdef ENABLE_PYTHON
-				// Python networkvars: mark player as transmit
-				CBaseEntity *pEntity = ( CBaseEntity * )pEdict->GetUnknown();
-				Assert( dynamic_cast< CBaseEntity* >( pEdict->GetUnknown() ) == pEntity );
-				pEntity->m_PyNetworkVarsPlayerTransmitBits.Set( ENTINDEX(pInfo->m_pClientEnt) );
-				PyNetworkVarsUpdateClient(pEntity, ENTINDEX(pInfo->m_pClientEnt) );
-#endif // ENABLE_PYTHON
-
-				CServerNetworkProperty *pParent = pEnt->GetNetworkParent();
-				if ( !pParent )
-					break;
-
-				pEdict = pParent->edict();
-				iEdict = pParent->entindex();
-			}
-			continue;
-		}
-
-		// FIXME: Would like to remove all dependencies
-		CBaseEntity *pEnt = ( CBaseEntity * )pEdict->GetUnknown();
-		Assert( dynamic_cast< CBaseEntity* >( pEdict->GetUnknown() ) == pEnt );
-
-			if ( nFlags == FL_EDICT_FULLCHECK )
-		{
-			// do a full ShouldTransmit() check, may return FL_EDICT_CHECKPVS
-			nFlags = pEnt->ShouldTransmit( pInfo );
-
-			Assert( !(nFlags & FL_EDICT_FULLCHECK) );
-
-			if ( nFlags & FL_EDICT_ALWAYS )
-			{
-				pEnt->SetTransmit( pInfo, true );
-				continue;
-			}	
-		}
-
-		// don't send this entity
-		if ( !( nFlags & FL_EDICT_PVSCHECK ) )
-			continue;
-
-		// Don't send entities in fow (if affected)
-		if( !pEnt->FOWShouldTransmit( pRecipientPlayer ) ) 
-		{
-			continue;
-		}
-
-		CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( pEdict->GetNetworkable() );
-
-#ifndef _X360
-		if ( bIsHLTV || bIsReplay )
-		{
-			// for the HLTV/Replay we don't cull against PVS
-			if ( netProp->AreaNum() == skyBoxArea )
-			{
-				pEnt->SetTransmit( pInfo, true );
-			}
-			else
-			{
-				pEnt->SetTransmit( pInfo, false );
-			}
-			continue;
-		}
-#endif
-
-		// Always send entities in the player's 3d skybox.
-		// Sidenote: call of AreaNum() ensures that PVS data is up to date for this entity
-		bool bSameAreaAsSky = netProp->AreaNum() == skyBoxArea;
-		if ( bSameAreaAsSky )
-		{
-			pEnt->SetTransmit( pInfo, true );
-			continue;
-		}
-
-		// Distance based:
-#if 0
-		CBaseEntity *pCheckEntity = pEnt->GetBaseEntity();
-		CHL2WarsPlayer *pl = (CHL2WarsPlayer *)ToHL2WarsPlayer( pRecipientEntity );
-		float fDist = pRecipientEntity->GetAbsOrigin().DistTo(pCheckEntity->GetAbsOrigin());
-		float fHeight = MAX(512.0f, pl->GetCamGroundPos().DistTo( pl->GetCamGroundPos() + pl->GetCameraOffset() ) );
-		static ConVar transmit_test_code("transmit_test_code", "1.5");
-		if( fDist < (fHeight * transmit_test_code.GetFloat()) )
-		{
-			pEnt->SetTransmit( pInfo, true );
-			continue;
-		}
-		else
-		{
-			continue;
-		}
-#endif // 0
-
-		Vector vDir = pEnt->GetAbsOrigin() - vEyePosition;
-		VectorNormalize( vDir );
-		float fDot = fabs( DotProduct( vDir, vForward ) );
-		if( fDot >= fMaxDot || sv_force_transmit_ents.GetBool() )
-		{
-			NDebugOverlay::EntityText( pEnt->entindex(), 0, "not transmitting", 0.1f );
-			pEnt->SetTransmit( pInfo, false );
-			continue;
-		}
-
-		NDebugOverlay::EntityText( pEnt->entindex(), 0, "transmitting", 0.1f );
-
-		// If the entity is marked "check PVS" but it's in hierarchy, walk up the hierarchy looking for the
-		//  for any parent which is also in the PVS.  If none are found, then we don't need to worry about sending ourself
-		CBaseEntity *orig = pEnt;
-		CServerNetworkProperty *check = netProp->GetNetworkParent();
-
-		// BUG BUG:  I think it might be better to build up a list of edict indices which "depend" on other answers and then
-		// resolve them in a second pass.  Not sure what happens if an entity has two parents who both request PVS check?
-        while ( check )
-		{
-			int checkIndex = check->entindex();
-
-			// Parent already being sent
-			if ( pInfo->m_pTransmitEdict->Get( checkIndex ) )
-			{
-				orig->SetTransmit( pInfo, true );
-				break;
-			}
-
-			edict_t *checkEdict = check->edict();
-			int checkFlags = checkEdict->m_fStateFlags & (FL_EDICT_DONTSEND|FL_EDICT_ALWAYS|FL_EDICT_PVSCHECK|FL_EDICT_FULLCHECK);
-			if ( checkFlags & FL_EDICT_DONTSEND )
-				break;
-
-			if ( checkFlags & FL_EDICT_ALWAYS )
-			{
-				orig->SetTransmit( pInfo, true );
-				break;
-			}
-
-			if ( checkFlags == FL_EDICT_FULLCHECK )
-			{
-				// do a full ShouldTransmit() check, may return FL_EDICT_CHECKPVS
-				CBaseEntity *pCheckEntity = check->GetBaseEntity();
-				nFlags = pCheckEntity->ShouldTransmit( pInfo );
-				Assert( !(nFlags & FL_EDICT_FULLCHECK) );
-				if ( nFlags & FL_EDICT_ALWAYS )
-				{
-					pCheckEntity->SetTransmit( pInfo, true );
-					orig->SetTransmit( pInfo, true );
-				}
-				break;
-			}
-
-			Vector vDir = check->GetBaseEntity()->GetAbsOrigin() - vEyePosition;
-			VectorNormalize( vDir );
-			float fDot = fabs( DotProduct( vDir, vForward ) );
-			if( fDot >= fMaxDot )
-			{
-				orig->SetTransmit( pInfo, true );
-				break;
-			}
-
-			// Continue up chain just in case the parent itself has a parent that's in the PVS...
-			check = check->GetNetworkParent();
-		}
-	}
-}
-#endif // 0
-
 void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned short *pEdictIndices, int nEdicts )
 {
-	//CheckTransmitRTS( pInfo, pEdictIndices, nEdicts );
-	//return;
-
 	// NOTE: for speed's sake, this assumes that all networkables are CBaseEntities and that the edict list
 	// is consecutive in memory. If either of these things change, then this routine needs to change, but
 	// ideally we won't be calling any virtual from this routine. This speedy routine was added as an

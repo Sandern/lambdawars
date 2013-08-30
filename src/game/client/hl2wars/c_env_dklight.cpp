@@ -9,8 +9,10 @@
 #include "c_baseplayer.h"
 #include "c_hl2wars_player.h"
 
-//#include "deferred/cdeferred_manager_client.h"
-//#include "deferred/deferred_shared_common.h"
+#ifdef DEFERRED_ENABLED
+#include "deferred/cdeferred_manager_client.h"
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

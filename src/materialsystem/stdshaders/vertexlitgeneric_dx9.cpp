@@ -12,6 +12,10 @@
 #include "cloak_blended_pass_helper.h"
 #include "flesh_interior_blended_pass_helper.h"
 
+#ifdef DEFERRED_ENABLED
+#include "IDeferredExt.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -406,6 +410,16 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 	SHADER_FALLBACK
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+
+		if ( !bTranslucent || bIsDecal )
+		{
+			if( GetDeferredExt()->IsDeferredLightingEnabled() )
+				return "DEFERRED_MODEL";
+		}
+#endif // DEFERRED_ENABLED
 		return 0;
 	}
 

@@ -369,11 +369,8 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 		}
 
 		bool bParallaxMapping = false;
-		// L4D: no parallax mapping
-		/*
 		if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
 			bParallaxMapping = ( info.m_nParallaxMap != -1 ) && ( params[info.m_nParallaxMap]->GetIntValue() != 0 );
-		*/
 
 		bool bHasFoW = true; //( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
 

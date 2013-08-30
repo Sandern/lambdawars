@@ -9,6 +9,10 @@
 #include "convar.h"
 #include "multiblend_dx9_helper.h"
 
+#ifdef DEFERRED_ENABLED
+#include "IDeferredExt.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -69,6 +73,16 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 
 	SHADER_FALLBACK
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+
+		if ( !bTranslucent || bIsDecal )
+		{
+			if( GetDeferredExt()->IsDeferredLightingEnabled() )
+				return "DEFERRED_BRUSH";
+		}
+#endif // DEFERRED_ENABLED
 		return 0;
 	}
 

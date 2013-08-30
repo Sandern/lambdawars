@@ -1,0 +1,198 @@
+
+// STATIC:		"MODEL"					"0..1"
+// STATIC:		"DECAL"					"0..1"
+// STATIC:		"MORPHING_VTEX"			"0..1"
+// STATIC:		"EYEVEC"				"0..1"
+// STATIC:		"BASETEXTURE2"			"0..1"
+// STATIC:		"BLENDMODULATE"			"0..1"
+// STATIC:		"MULTIBLEND"			"0..1"
+
+// DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
+// DYNAMIC:		"SKINNING"				"0..1"
+// DYNAMIC:		"MORPHING"				"0..1"
+
+// SKIP:		!$MODEL && $DECAL
+// SKIP:		!$BASETEXTURE2 && !$MULTIBLEND && $BLENDMODULATE
+// SKIP:		$MODEL && $BASETEXTURE2
+// SKIP:		$MODEL && $MULTIBLEND
+// SKIP:		$BASETEXTURE2 && $MULTIBLEND
+
+#include "common_vs_fxc.h"
+#include "common_deferred_fxc.h"
+
+static const bool g_bSkinning		= SKINNING ? true : false;
+
+#if MODEL
+
+const float3 cMorphTargetTextureDim			: register( SHADER_SPECIFIC_CONST_10 );
+const float4 cMorphSubrect					: register( SHADER_SPECIFIC_CONST_11 );
+sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
+
+#endif
+
+#if EYEVEC
+
+const float3 flEyepos						: register( SHADER_SPECIFIC_CONST_0 );
+
+#endif
+
+#if BLENDMODULATE
+const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_1 ); // up to 2
+#if MULTIBLEND
+const float4 flBlendModTransform2[2]			: register( SHADER_SPECIFIC_CONST_3 ); // up to 4
+const float4 flBlendModTransform3[2]			: register( SHADER_SPECIFIC_CONST_5 ); // up to 6
+#endif
+#endif
+
+struct VS_INPUT
+{
+#if MODEL
+	float4 vPos						: POSITION;
+	float4 vNormal					: NORMAL;
+#else
+	float3 vPos						: POSITION;
+
+#endif
+
+	float2 vTexCoord_0				: TEXCOORD0;
+
+#if MODEL
+
+	float4 vBoneWeights				: BLENDWEIGHT;
+	float4 vBoneIndices				: BLENDINDICES;
+	float4 vUserData				: TANGENT;
+
+	float4 vTexCoord2				: TEXCOORD2;
+	float4 vPosFlex					: POSITION1;
+	float4 vNormalFlex				: NORMAL1;
+	float vVertexID					: POSITION2;
+
+#else
+
+#if BASETEXTURE2
+	float4 vColor_0					: COLOR0;
+#endif
+
+#if MULTIBLEND
+	float4 vAlphaBlend					: TEXCOORD3;
+	float4 vColorBlend1					: TEXCOORD4;
+	float4 vColorBlend2					: TEXCOORD5;
+	float4 vColorBlend3					: TEXCOORD6;
+	float4 vColorBlend4					: TEXCOORD7;
+#endif
+
+#endif
+};
+
+struct VS_OUTPUT
+{
+	float4 vProjPos					: POSITION;
+#if BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0;
+#else
+	float2 vTexCoord				: TEXCOORD0;
+#endif
+
+	//float3 vProjPosXYW				: TEXCOORD1;
+	float3 worldPos					: TEXCOORD2;
+
+#if EYEVEC
+	float3 worldToEye				: TEXCOORD3;
+#endif
+
+#if BASETEXTURE2
+	float4 vColor_0					: COLOR0;
+#endif
+
+#if MULTIBLEND
+#if BLENDMODULATE
+	float4 vTexCoordBlendmod23			: TEXCOORD4;
+#endif
+	float3 vAlphaBlend					: TEXCOORD5;
+	float4 vColorBlend1					: COLOR0;
+	float4 vColorBlend2					: COLOR1;
+	float4 vColorBlend3					: TEXCOORD6;
+	float3 vColorBlend4					: TEXCOORD7;
+#endif
+};
+
+VS_OUTPUT main( const VS_INPUT In )
+{
+	VS_OUTPUT Out;
+
+	float3 worldPos;
+	float3 worldNormal;
+
+	// unpack stuff (model) &&
+	// morph (model) &&
+	// skin (model) ||
+	// xform to world (not model)
+
+#if MODEL
+	float4 vPos = In.vPos;
+	float3 vNormal = 0;
+
+	DecompressVertex_Normal( In.vNormal, vNormal );
+
+#if MORPHING
+#if !MORPHING_VTEX
+	ApplyMorph( In.vPosFlex, In.vNormalFlex, vPos.xyz, vNormal );
+#else
+	ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect,
+		In.vVertexID, In.vTexCoord2, vPos.xyz, vNormal );
+#endif
+#endif
+
+#if DECAL
+	SkinPositionAndNormal( g_bSkinning, vPos, vNormal,
+		In.vBoneWeights, In.vBoneIndices,
+		worldPos, worldNormal );
+#else
+	SkinPosition( g_bSkinning, vPos,
+		In.vBoneWeights, In.vBoneIndices,
+		worldPos );
+#endif
+
+#if DECAL
+	worldNormal = normalize( worldNormal );
+	worldPos += worldNormal * 0.05f * In.vTexCoord2.z;
+#endif
+
+#else // MODEL
+
+	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
+
+#if BASETEXTURE2
+	Out.vColor_0 = In.vColor_0;
+#endif
+
+#if MULTIBLEND
+	Out.vColorBlend1 = In.vColorBlend1;
+	Out.vColorBlend2 = In.vColorBlend2;
+	Out.vColorBlend3 = In.vColorBlend3;
+	Out.vColorBlend4.xyz = In.vColorBlend4.xyz;
+	Out.vAlphaBlend.xyz = In.vAlphaBlend.xyz;
+#endif
+
+#if BLENDMODULATE
+	Out.vTexCoord.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform );
+#if MULTIBLEND
+	Out.vTexCoordBlendmod23.xy = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform2 );
+	Out.vTexCoordBlendmod23.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform3 );
+#endif
+#endif
+
+#endif // NOT MODEL
+
+	Out.vProjPos = mul( float4( worldPos, 1 ), cViewProj );
+	Out.vTexCoord.xy = In.vTexCoord_0;
+	//Out.vProjPosXYW = Out.vProjPos.xyw;
+
+	Out.worldPos = worldPos;
+
+#if EYEVEC
+	Out.worldToEye = flEyepos - worldPos;
+#endif
+
+	return Out;
+}
