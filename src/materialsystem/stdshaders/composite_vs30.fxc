@@ -3,6 +3,8 @@
 // STATIC:		"DECAL"					"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
 // STATIC:		"EYEVEC"				"0..1"
+// STATIC:		"BASETEXTURE2"			"0..1"
+// STATIC:		"BLENDMODULATE"			"0..1"
 // STATIC:		"MULTIBLEND"			"0..1"
 // STATIC:		"FOW"					"0..1"
 
@@ -11,7 +13,8 @@
 // DYNAMIC:		"MORPHING"				"0..1"
 
 // SKIP:		!$MODEL && $DECAL
-// SKIP:		!$BASETEXTURE2 && !$MULTIBLEND && $BLENDMODULATE
+// SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
+// SKIP:		$MULTIBLEND && $BLENDMODULATE
 // SKIP:		$MODEL && $BASETEXTURE2
 // SKIP:		$MODEL && $MULTIBLEND
 // SKIP:		$BASETEXTURE2 && $MULTIBLEND
@@ -39,6 +42,10 @@ const float3 flEyepos						: register( SHADER_SPECIFIC_CONST_0 );
 
 #if FOW
 	const float4 g_vFoWWorldSize				: register( SHADER_SPECIFIC_CONST_7 );
+#endif
+
+#if BLENDMODULATE
+const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_1 ); // up to 2
 #endif
 
 #if MULTIBLEND
@@ -71,6 +78,10 @@ struct VS_INPUT
 
 #else
 
+#if BASETEXTURE2
+	float4 vColor_0					: COLOR0;
+#endif
+
 #if MULTIBLEND
 	float4 vAlphaBlend					: TEXCOORD3;
 	float4 vColorBlend1					: TEXCOORD4;
@@ -89,7 +100,11 @@ struct VS_OUTPUT
 	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
 	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
+#if BASETEXTURE2 && BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif 
 #endif
 
 	//float3 vProjPosXYW				: TEXCOORD1;
@@ -97,6 +112,10 @@ struct VS_OUTPUT
 
 #if EYEVEC
 	float3 worldToEye				: TEXCOORD3;
+#endif
+
+#if BASETEXTURE2
+	float4 vColor_0					: COLOR0;
 #endif
 
 #if MULTIBLEND
@@ -157,6 +176,10 @@ VS_OUTPUT main( const VS_INPUT In )
 #else // MODEL
 
 	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
+	
+#if BASETEXTURE2
+	Out.vColor_0 = In.vColor_0;
+#endif
 
 #if MULTIBLEND
 	Out.vColorBlend1 = In.vColorBlend1;
@@ -171,6 +194,10 @@ VS_OUTPUT main( const VS_INPUT In )
 	Out.vTexCoord2.xy = ComputeTexCoord( In.vTexCoord_0, g_vRotations.z, g_vScales.z );
 	Out.vTexCoord2.zw = ComputeTexCoord( In.vTexCoord_0, g_vRotations.w, g_vScales.w );
 #endif 
+
+#if BLENDMODULATE
+	Out.vTexCoord.zw = GetTransformedUVs( In.vTexCoord_0, flBlendModTransform );
+#endif
 
 #endif // NOT MODEL
 

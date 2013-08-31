@@ -58,10 +58,10 @@ void InitPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 	if ( PARM_DEFINED( info.iAlbedo4 ) )
 		pShader->LoadTexture( info.iAlbedo4 );
 
-#if 0
 	if ( PARM_DEFINED( info.iBlendmodulate ) )
 		pShader->LoadTexture( info.iBlendmodulate );
 
+#if 0
 	if ( PARM_DEFINED( info.iBlendmodulate2 ) )
 		pShader->LoadTexture( info.iBlendmodulate2 );
 
@@ -123,8 +123,9 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	const bool bRimLight = PARM_SET( info.iRimlightEnable );
 	const bool bRimLightModLight = bRimLight && PARM_SET( info.iRimlightModLight );
-#if 0
+
 	const bool bBlendmodulate = bAlbedo2 && PARM_TEX( info.iBlendmodulate );
+#if 0
 	const bool bBlendmodulate2 = bBlendmodulate && PARM_TEX( info.iBlendmodulate2 );
 	const bool bBlendmodulate3 = bBlendmodulate && PARM_TEX( info.iBlendmodulate3 );
 #endif // 0
@@ -140,7 +141,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 
 	//const bool bMultiBlend = PARM_SET( info.iMultiblend )
 	//	&& bAlbedo && bAlbedo2 && bAlbedo3 && !bEnvmapMask && !bSelfIllumMask;
-	const bool bMultiBlend = PARM_SET( info.iMultiblend ) || bAlbedo2 || bAlbedo3 || bAlbedo4;
+	const bool bMultiBlend = PARM_SET( info.iMultiblend )|| bAlbedo3 || bAlbedo4 || bHasSpec3 || bHasSpec4;
+	//const bool bWorldVertexTransition = !bMultiBlend && bAlbedo2;
 
 	const bool bNeedsFresnel = bPhongFresnel || bEnvmapFresnel;
 	const bool bGBufferNormal = bEnvmap || bRimLight || bNeedsFresnel;
@@ -242,10 +244,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER5, bUseSRGB );
 
-#if 0
 			if ( bBlendmodulate )
-				pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
-#endif // 0
+				pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
 		}
 
 		if ( bMultiBlend )
@@ -253,11 +253,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
 			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER7, bUseSRGB );
 
-			if ( bAlbedo4 )
-			{
-				pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
-				pShaderShadow->EnableSRGBRead( SHADER_SAMPLER8, bUseSRGB );
-			}
+			pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
+			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER8, bUseSRGB );
 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
@@ -288,8 +285,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_VERTEX_SHADER_COMBO( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO( DECAL, bModel && bIsDecal );
 		SET_STATIC_VERTEX_SHADER_COMBO( EYEVEC, bWorldEyeVec );
-		//SET_STATIC_VERTEX_SHADER_COMBO( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
-		//SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_VERTEX_SHADER_COMBO( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
+		SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_VERTEX_SHADER_COMBO( MULTIBLEND, bMultiBlend );
 		SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
 		SET_STATIC_VERTEX_SHADER( composite_vs30 );
@@ -305,8 +302,8 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 		SET_STATIC_PIXEL_SHADER_COMBO( PHONGFRESNEL, bPhongFresnel );
 		SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, bRimLight );
 		SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHTMODULATELIGHT, bRimLightModLight );
-		//SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
-		//SET_STATIC_PIXEL_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE2, bAlbedo2 && !bMultiBlend );
+		SET_STATIC_PIXEL_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_PIXEL_SHADER_COMBO( MULTIBLEND, bMultiBlend );
 		SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM, bSelfIllum );
 		SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM_MASK, bSelfIllumMask );
@@ -383,18 +380,19 @@ void DrawPassComposite( const defParms_composite &info, CBaseVSShader *pShader, 
 			{
 				tmpBuf.BindTexture( pShader, SHADER_SAMPLER5, info.iAlbedo2 );
 
-#if 0
 				if ( bBlendmodulate )
 				{
 					tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, info.iBlendmodulateTransform );
-					tmpBuf.BindTexture( pShader, SHADER_SAMPLER6, info.iBlendmodulate );
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER9, info.iBlendmodulate );
 				}
-#endif // 0
 			}
 
 			if ( bMultiBlend )
 			{
-				tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iAlbedo3 );
+				if( bAlbedo3 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iAlbedo3 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER7, TEXTURE_WHITE );
 
 				if ( bAlbedo4 )
 					tmpBuf.BindTexture( pShader, SHADER_SAMPLER8, info.iAlbedo4 );

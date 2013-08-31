@@ -38,15 +38,14 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( BLENDMODULATETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
 		SHADER_PARAM( BLENDMASKTRANSFORM, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
-		SHADER_PARAM( MULTIBLEND, SHADER_PARAM_TYPE_BOOL, "", "" )
 		SHADER_PARAM( BASETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BASETEXTURE4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BUMPMAP3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( BUMPMAP4, SHADER_PARAM_TYPE_TEXTURE, "", "" )
-		SHADER_PARAM( BLENDMODULATETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
-		SHADER_PARAM( BLENDMODULATETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
-		SHADER_PARAM( BLENDMASKTRANSFORM2, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
-		SHADER_PARAM( BLENDMASKTRANSFORM3, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
+		//SHADER_PARAM( BLENDMODULATETEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
+		//SHADER_PARAM( BLENDMODULATETEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "texture to use r/g channels for blend range for" )
+		//SHADER_PARAM( BLENDMASKTRANSFORM2, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
+		//SHADER_PARAM( BLENDMASKTRANSFORM3, SHADER_PARAM_TYPE_MATRIX, "center .5 .5 scale 1 1 rotate 0 translate 0 0", "$blendmodulatetexture texcoord transform" )
 
 		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
 
@@ -54,6 +53,7 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
 
 		// Multiblend specific
+		SHADER_PARAM( MULTIBLEND, SHADER_PARAM_TYPE_INTEGER, "", "" )
 		SHADER_PARAM( SPECTEXTURE, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( SPECTEXTURE2, SHADER_PARAM_TYPE_TEXTURE, "", "" )
 		SHADER_PARAM( SPECTEXTURE3, SHADER_PARAM_TYPE_TEXTURE, "", "" )
@@ -104,11 +104,14 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.nScale2 = SCALE2;
 		p.nScale3 = SCALE3;
 		p.nScale4 = SCALE4;
-#if 0
+
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
+#if 0
 		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
 		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
+#endif // 0
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
+#if 0
 		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
 		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
 #endif // 0
@@ -151,15 +154,17 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iPhongScale = PHONG_SCALE;
 		p.iPhongFresnel = PHONG_FRESNEL;
 
-#if 0
+
 		p.iBlendmodulate = BLENDMODULATETEXTURE;
+#if 0
 		p.iBlendmodulate2 = BLENDMODULATETEXTURE2;
 		p.iBlendmodulate3 = BLENDMODULATETEXTURE3;
+#endif // 0
 		p.iBlendmodulateTransform = BLENDMASKTRANSFORM;
+#if 0
 		p.iBlendmodulateTransform2 = BLENDMASKTRANSFORM2;
 		p.iBlendmodulateTransform3 = BLENDMASKTRANSFORM3;
 #endif // 0
-
 
 		p.nSpecTexture = SPECTEXTURE;
 		p.nSpecTexture2 = SPECTEXTURE2;

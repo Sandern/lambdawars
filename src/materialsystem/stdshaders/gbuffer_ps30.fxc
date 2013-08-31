@@ -4,6 +4,7 @@
 // STATIC:		"NOCULL"			"0..1"
 // STATIC:		"PHONGMAP"			"0..1"
 // STATIC:		"BUMPMAP2"			"0..1"
+// STATIC:		"BLENDMODULATE"		"0..1"
 // STATIC:		"MULTIBLEND"		"0..1"
 
 // SKIP:		!$BUMPMAP2 && !$MULTIBLEND && $BLENDMODULATE
@@ -63,6 +64,9 @@ sampler SpecSampler3					: register( s12 );	// Spec map 3
 sampler SpecSampler4					: register( s13 );	// Spec map 4
 #endif
 
+#if BLENDMODULATE
+sampler sBlendmodulate						: register( s10 );
+#endif
 
 struct PS_INPUT
 {
@@ -70,7 +74,11 @@ struct PS_INPUT
 	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
 	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
+#if BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif
 #endif
 	float4 worldNormal_Depth		: TEXCOORD1;
 
@@ -133,6 +141,9 @@ PS_OUTPUT main( const PS_INPUT In )
 #if BUMPMAP2
 	float3 bumpNormal2 = tex2D( sBumpmap2, In.vTexCoord.xy ).rgb;
 	float flBlendfactor = In.vColor_0.w;
+#if BLENDMODULATE
+	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
+#endif
 	bumpNormal = lerp( bumpNormal, bumpNormal2, flBlendfactor );
 #endif
 

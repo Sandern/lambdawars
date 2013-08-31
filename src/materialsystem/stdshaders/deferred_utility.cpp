@@ -13,8 +13,12 @@ void GetTexcoordSettings( const bool bDecal, const bool bMultiBlend,
 	};
 
 	static int iDimMultiBlend[] = {
-		2, 2, 0, 4,
-		4, 4, 4, 4,
+		2, 2, 0, 
+		4,			// alpha blend
+		4,			// vertex / blend color 0
+		4,			// vertex / blend color 1
+		4,			// vertex / blend color 2
+		4			// vertex / blend color 3
 	};
 
 	if ( bMultiBlend )

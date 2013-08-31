@@ -166,15 +166,6 @@ float GetModulatedBlend( in float flBlendAmount, in float2 modt )
 	return smoothstep( minb, maxb, flBlendAmount );
 }
 
-float GetMultiBlend( const float BlendAmount, inout float Remaining )
-{
-	float Result = smoothstep( 0.0, 1.0f, BlendAmount );
-	Result = min( Result, Remaining );
-	Remaining -= Result;
-
-	return Result;
-}
-
 float GetMultiBlendModulated( in float2 modt, const float flBlendAmount, const float AlphaBlend, inout float Remaining )
 {
 	//modt.r = lerp( modt.r, 1, AlphaBlend );

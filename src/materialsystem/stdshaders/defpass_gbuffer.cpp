@@ -33,19 +33,19 @@ void InitPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 	if ( PARM_DEFINED( info.iBumpmap4 ) )
 		pShader->LoadBumpMap( info.iBumpmap4 );
 
-#if 0
 	if ( PARM_DEFINED( info.iBlendmodulate ) )
 		pShader->LoadTexture( info.iBlendmodulate );
 
+#if 0
 	if ( PARM_DEFINED( info.iBlendmodulate2 ) )
 		pShader->LoadTexture( info.iBlendmodulate2 );
 
 	if ( PARM_DEFINED( info.iBlendmodulate3 ) )
 		pShader->LoadTexture( info.iBlendmodulate3 );
+#endif // 0
 
 	if ( PARM_DEFINED( info.iAlbedo ) )
 		pShader->LoadTexture( info.iAlbedo );
-#endif // 0
 
 	if ( PARM_DEFINED( info.iAlbedo2 ) )
 		pShader->LoadTexture( info.iAlbedo2 );
@@ -96,8 +96,9 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 	const bool bMultiBlend = PARM_SET( info.iMultiblend ) || bAlbedo2 || bAlbedo3 || bAlbedo4;
 	const bool bMultiBlendBump = bMultiBlend && bBumpmap;
 
+	const bool bHasBlendModulate = PARM_TEX( info.iBlendmodulate );
+	const bool bBlendmodulate = ( bAlbedo2 || bBumpmap2 ) && bHasBlendModulate;
 #if 0
-	const bool bBlendmodulate = ( bAlbedo2 || bBumpmap2 || bMultiBlendBump ) && PARM_TEX( info.iBlendmodulate );
 	const bool bBlendmodulate2 = bBlendmodulate && PARM_TEX( info.iBlendmodulate2 );
 	const bool bBlendmodulate3 = bBlendmodulate && PARM_TEX( info.iBlendmodulate3 );
 #endif // 0
@@ -197,16 +198,28 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 			}
 		}
 #else
+		if( bBlendmodulate )
+		{
+			pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
+
+			pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
+
+			pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
+		}
+
 		if ( bMultiBlendBump )
 		{
+			// Albedo
 			pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER5, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER6, true );
 
+			// Bumpmaps
 			pShaderShadow->EnableTexture( SHADER_SAMPLER7, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
 
+			// Spec
 			pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER11, true );
 			pShaderShadow->EnableTexture( SHADER_SAMPLER12, true );
@@ -229,7 +242,7 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		SET_STATIC_VERTEX_SHADER_COMBO( MORPHING_VTEX, bModel && bFastVTex );
 		SET_STATIC_VERTEX_SHADER_COMBO( TANGENTSPACE, bBumpmap );
 		SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP2, bBumpmap2 && !bMultiBlend );
-		//SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_VERTEX_SHADER_COMBO( MULTIBLEND, bMultiBlendBump );
 		SET_STATIC_VERTEX_SHADER( gbuffer_vs30 );
 
@@ -243,7 +256,7 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		SET_STATIC_PIXEL_SHADER_COMBO( BUMPMAP, bBumpmap ? bSSBump ? 2 : 1 : 0 );
 		SET_STATIC_PIXEL_SHADER_COMBO( NOCULL, bNoCull );
 		SET_STATIC_PIXEL_SHADER_COMBO( PHONGMAP, bPhongmap );
-		//SET_STATIC_PIXEL_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
+		SET_STATIC_PIXEL_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_PIXEL_SHADER_COMBO( MULTIBLEND, bMultiBlendBump );
 #if DEFCFG_DEFERRED_SHADING == 1
 		SET_STATIC_PIXEL_SHADER_COMBO( TWOTEXTURE, (bAlbedo2 || bBumpmap2) && !bMultiBlend );
@@ -359,6 +372,26 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 			}
 #endif // 0
 
+			if( bBlendmodulate )
+			{
+				if ( bBumpmap2 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER3, info.iBumpmap2 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER3, TEXTURE_NORMALMAP_FLAT );
+
+				if ( bAlbedo2 )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER7, info.iAlbedo2 );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER7, TEXTURE_GREY );
+
+				if ( bHasBlendModulate )
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER10, info.iBlendmodulate );
+				else
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER10, TEXTURE_BLACK );
+
+				tmpBuf.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, info.iBlendmodulateTransform );
+			}
+
 			if ( bMultiBlendBump )
 			{
 				// Bumpmaps
@@ -389,9 +422,9 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 					tmpBuf.BindStandardTexture( SHADER_SAMPLER8, TEXTURE_GREY );
 
 				if ( bAlbedo4 )
-					tmpBuf.BindTexture( pShader, SHADER_SAMPLER8, info.iAlbedo4 );
+					tmpBuf.BindTexture( pShader, SHADER_SAMPLER9, info.iAlbedo4 );
 				else
-					tmpBuf.BindStandardTexture( SHADER_SAMPLER8, TEXTURE_GREY );
+					tmpBuf.BindStandardTexture( SHADER_SAMPLER9, TEXTURE_GREY );
 
 				// Spec
 				if ( bHasSpec1 == true )

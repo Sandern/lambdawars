@@ -20,8 +20,9 @@ struct defParms_composite
 	int iEnvmap;
 	int iEnvmapMask;
 	int iEnvmapMask2;
-#if 0
+
 	int iBlendmodulate;
+#if 0
 	int iBlendmodulate2;
 	int iBlendmodulate3;
 #endif // 0
@@ -69,9 +70,9 @@ struct defParms_composite
 	int iSelfIllumFresnelModulate;
 	int iSelfIllumMask;
 
-#if 0
 	// blendmod
 	int iBlendmodulateTransform;
+#if 0
 	int iBlendmodulateTransform2;
 	int iBlendmodulateTransform3;
 #endif // 0

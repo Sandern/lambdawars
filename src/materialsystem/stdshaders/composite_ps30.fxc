@@ -11,6 +11,8 @@
 // STATIC:		"RIMLIGHT"						"0..1"
 // STATIC:		"RIMLIGHTMODULATELIGHT"			"0..1"
 
+// STATIC:		"BASETEXTURE2"		"0..1"
+// STATIC:		"BLENDMODULATE"		"0..1"
 // STATIC:		"MULTIBLEND"		"0..1"
 
 // STATIC:		"SELFILLUM"					"0..1"
@@ -33,7 +35,8 @@
 // SKIP:		$RIMLIGHT && !$READNORMAL
 // SKIP:		!$RIMLIGHT && $RIMLIGHTMODULATELIGHT
 
-// SKIP:		!$BASETEXTURE2 && !$MULTIBLEND && $BLENDMODULATE
+// SKIP:		!$BASETEXTURE2 && $BLENDMODULATE
+// SKIP:		$MULTIBLEND && $BLENDMODULATE
 // SKIP:		$MODEL && $BASETEXTURE2
 // SKIP:		$MODEL && $MULTIBLEND
 // SKIP:		$BASETEXTURE2 && $MULTIBLEND
@@ -86,10 +89,6 @@ sampler sEnvmapMask							: register( s4 );
 sampler sAlbedo2							: register( s5 );
 #endif
 
-#if BLENDMODULATE
-sampler sBlendmodulate						: register( s6 );
-#endif
-
 #if PHONGFRESNEL || ENVMAPFRESNEL
 const float3 g_flFresnelRanges				: register( c7 );
 #endif
@@ -101,6 +100,10 @@ const float2 g_flRimLight_Exponent_AlbedoScale		: register( c9 );
 
 #if ENVMAPMASK && BASETEXTURE2
 sampler sEnvmapMask2						: register( s7 );
+#endif
+
+#if BLENDMODULATE
+sampler sBlendmodulate						: register( s9 );
 #endif
 
 #if MULTIBLEND
@@ -139,7 +142,11 @@ struct PS_INPUT
 	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
 	float4 vTexCoord2				: TEXCOORD4; // xy = blend 3 coord, zw = blend 4 coord
 #else
+#if BASETEXTURE2 && BLENDMODULATE
+	float4 vTexCoord				: TEXCOORD0; // xy = blend 1 coord, zw = blend 2 coord
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif 
 #endif
 
 	//float3 vProjPosXYW				: TEXCOORD1;
@@ -181,8 +188,6 @@ struct PS_OUTPUT
 PS_OUTPUT main( const PS_INPUT In )
 {
 	PS_OUTPUT Out;
-
-	float4 flAlbedoSample = tex2D( sAlbedo, In.vTexCoord.xy );
 
 #if MULTIBLEND
 	float remaining = 1;
@@ -230,6 +235,16 @@ PS_OUTPUT main( const PS_INPUT In )
 	vResult.a = 1.0;
 #else
 	float4 vResult = tex2D( sAlbedo, In.vTexCoord.xy );
+	
+#if BASETEXTURE2
+	float4 flAlbedoSample2 = tex2D( sAlbedo2, In.vTexCoord.xy );
+	float flBlendfactor = In.vColor_0.w;
+#if BLENDMODULATE
+	flBlendfactor = GetModulatedBlend( flBlendfactor, tex2D( sBlendmodulate, In.vTexCoord.zw ).rg );
+#endif
+	vResult = lerp( vResult, flAlbedoSample2, flBlendfactor );
+#endif
+
 #endif
 
 #if TEAMCOLORTEXTURE
