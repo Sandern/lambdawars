@@ -84,6 +84,7 @@ MainMenu::MainMenu( Panel *parent, const char *panelName ):
 
 	m_iQuickJoinHelpText = MMQJHT_NONE;
 
+	m_pCefMainMenu = NULL;
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
