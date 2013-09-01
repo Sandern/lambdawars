@@ -63,8 +63,7 @@
       <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\python;..\..\..\..\..\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <BasicRuntimeChecks>
-      </BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeaderOutputFile>.\debug-obj/boost_python.pch</PrecompiledHeaderOutputFile>
@@ -73,7 +72,7 @@
       <ProgramDataBaseFileName>.\debug-obj/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MinimalRebuild>true</MinimalRebuild>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>

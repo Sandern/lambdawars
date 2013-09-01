@@ -70,7 +70,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;fxctmp9;vshtmp9;..\..\dx9sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;_DLL_EXT=.dll;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;USE_ACTUAL_DX;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;USE_ACTUAL_DX;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
