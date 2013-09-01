@@ -19,12 +19,14 @@ class SrcPyStdOut
 {
 public:
 	void write( boost::python::object msg );
+	void flush() {}
 };
 
 class SrcPyStdErr 
 {
 public:
 	void write( boost::python::object msg );
+	void flush() {}
 };
 
 // Wrappers for Msg, Warning and DevMsg (Python does not use VarArgs)
