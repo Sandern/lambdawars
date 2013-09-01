@@ -8,6 +8,9 @@
 
 #include "vgui_controls/messagebox.h"
 
+// Temporary
+static ConVar deferred_lighting( "deferred_lighting", "0", FCVAR_USERINFO );
+
 static CDeferredManagerClient __g_defmanager;
 CDeferredManagerClient *GetDeferredManager()
 {
@@ -56,6 +59,8 @@ bool CDeferredManagerClient::Init()
 		if ( bGotDefShaderDll )
 		{
 			m_bDefRenderingEnabled = true;
+			deferred_lighting.SetValue( 1 );
+
 			GetDeferredExt()->EnableDeferredLighting();
 
 			g_pCurrentViewRender = new CDeferredViewRender();
@@ -75,7 +80,8 @@ bool CDeferredManagerClient::Init()
 	{
 		Assert( g_pCurrentViewRender == NULL );
 
-		Warning( "Your hardware does not seem to support shader model 3.0. If you think that this is an error (hybrid GPUs), add -forcedeferred as start parameter.\n" );
+		if( bAllowDeferred )
+			Warning( "Your hardware does not seem to support shader model 3.0. If you think that this is an error (hybrid GPUs), add -forcedeferred as start parameter.\n" );
 		g_pCurrentViewRender = new CViewRender();
 	}
 	else
