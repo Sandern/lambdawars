@@ -50,6 +50,8 @@ void CWars_Model_Panel::Paint()
 	{
 		BaseClass::Paint();
 	}
+
+	pRenderContext.SafeRelease();
 }
 
 void CWars_Model_Panel::SetupCustomLights( Color cAmbient, Color cKey, float fKeyBoost, Color cRim, float fRimBoost )

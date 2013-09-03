@@ -699,7 +699,7 @@ void CHL2WarsInput::ControllerMove ( int nSlot, float frametime, CUserCmd *cmd )
 	if( enginevgui->IsGameUIVisible() || pLightEditor->IsEditorActive() )
 #else
 	if( enginevgui->IsGameUIVisible() )
-#endif // HL2WARS_ASW_DLL
+#endif 
 	{
 		DeactivateMouseClipping();
 
