@@ -598,47 +598,11 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 #define USE_MINIMAL_SENDTABLE 1
 
 //-----------------------------------------------------------------------------
-// Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
-//  objects ( prob. players ) that are not in the pvs.
-// Input  : **ppSendTable - 
-//			*recipient - 
-//			*pvs - 
-// Output : Returns true on success, false on failure.
+// Purpose: 
 //-----------------------------------------------------------------------------
-int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
+void CUnitBase::SetUseMinimalSendTable( int iClientIndex, bool bUseMinimalSendTable )
 {
-	int fFlags = DispatchUpdateTransmitState();
-
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
-	Assert( pRecipientEntity->IsPlayer() );
-
-	int iClientIndex = pRecipientEntity->entindex() - 1;
-
-	if ( fFlags & FL_EDICT_ALWAYS )
-	{
-		m_UseMinimalSendTable.Clear( iClientIndex );
-		return FL_EDICT_ALWAYS;
-	}
-	else if ( fFlags & FL_EDICT_DONTSEND )
-	{
-		return FL_EDICT_DONTSEND;
-	}
-	
-	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
-
-	// Don't send when in the fow for the recv player.
-	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
-	{
-		m_UseMinimalSendTable.Set( iClientIndex, true ); // For determining low update rate
-		return FL_EDICT_DONTSEND;
-	}
-
-#if USE_MINIMAL_SENDTABLE
 	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
-
-	// by default do a PVS check
-	netProp->RecomputePVSInformation();
-	bool bUseMinimalSendTable = GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
 
 	if( m_UseMinimalSendTable.IsBitSet( iClientIndex ) != bUseMinimalSendTable )
 	{
@@ -667,6 +631,53 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 			}
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
+//  objects ( prob. players ) that are not in the pvs.
+// Input  : **ppSendTable - 
+//			*recipient - 
+//			*pvs - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
+{
+#if 0 // Shouldn't be needed
+	int fFlags = DispatchUpdateTransmitState();
+
+	if ( fFlags & FL_EDICT_ALWAYS )
+	{
+		SetUseMinimalSendTable( iClientIndex, false ); // For determining low update rate
+		return FL_EDICT_ALWAYS;
+	}
+	else if ( fFlags & FL_EDICT_DONTSEND )
+	{
+		return FL_EDICT_DONTSEND;
+	}
+#endif // 0
+
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	Assert( pRecipientEntity->IsPlayer() );
+
+	int iClientIndex = pRecipientEntity->entindex() - 1;
+	
+	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
+
+	// Don't send when in the fow for the recv player.
+	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
+	{
+		SetUseMinimalSendTable( iClientIndex, true ); // For determining low update rate
+		return FL_EDICT_DONTSEND;
+	}
+
+#if USE_MINIMAL_SENDTABLE
+	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
+
+	// by default do a PVS check
+	netProp->RecomputePVSInformation();
+	bool bUseMinimalSendTable = GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
+	SetUseMinimalSendTable( iClientIndex, bUseMinimalSendTable );
 
 	return FL_EDICT_ALWAYS;
 #else
@@ -674,7 +685,14 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 #endif // 0
 }
 
-
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CUnitBase::UpdateTransmitState()
+{
+	// Should always use the full check
+	return SetTransmitState( FL_EDICT_FULLCHECK );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

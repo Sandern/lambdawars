@@ -325,9 +325,19 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 			CUnitBase *pOther = ppUnits[i];
 
 			if( pOther->UseMinimalSendTable( GetClientIndex() ) )
+			{
 				countMinTable++;
+				if( wars_debug_unit_mintable.GetInt() > 1 )
+					NDebugOverlay::EntityText( pOther->entindex(), GetClientIndex(), UTIL_VarArgs( "#%d:MinTable", GetClientIndex() ), 0.1f, 255, 0, 0, 255 );
+			}
 			else
+			{
 				countFullTable++;
+				if( wars_debug_unit_mintable.GetInt() > 1 )
+					NDebugOverlay::EntityText( pOther->entindex(), GetClientIndex(), UTIL_VarArgs( "#%d:FullTable", GetClientIndex() ), 0.1f, 0, 255, 0, 255 );
+			}
+
+			
 		}
 
 		engine->Con_NPrintf( 1 + GetClientIndex(), "#%d: countMinTable: %d, countFullTable: %d", GetClientIndex(), countMinTable, countFullTable );

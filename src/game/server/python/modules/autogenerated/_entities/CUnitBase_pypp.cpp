@@ -544,6 +544,36 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CUnitBase::UpdateOnRemove( );
     }
 
+    virtual int UpdateTransmitState(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateTransmitState: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateTransmitState(  ) of Class: CUnitBase\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateTransmitState = this->get_override( "UpdateTransmitState" );
+        if( func_UpdateTransmitState.ptr() != Py_None )
+            try {
+                return func_UpdateTransmitState(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::UpdateTransmitState(  );
+            }
+        else
+            return this->CUnitBase::UpdateTransmitState(  );
+    }
+    
+    int default_UpdateTransmitState(  ) {
+        return CUnitBase::UpdateTransmitState( );
+    }
+
     virtual void UserCmd( ::CUserCmd * pCmd ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1369,36 +1399,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     void default_StopLoopingSounds(  ) {
         CBaseEntity::StopLoopingSounds( );
-    }
-
-    virtual int UpdateTransmitState(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "UpdateTransmitState: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateTransmitState(  ) of Class: CBaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_UpdateTransmitState = this->get_override( "UpdateTransmitState" );
-        if( func_UpdateTransmitState.ptr() != Py_None )
-            try {
-                return func_UpdateTransmitState(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseEntity::UpdateTransmitState(  );
-            }
-        else
-            return this->CBaseEntity::UpdateTransmitState(  );
-    }
-    
-    int default_UpdateTransmitState(  ) {
-        return CBaseEntity::UpdateTransmitState( );
     }
 
     virtual void VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
@@ -2550,6 +2550,17 @@ void register_CUnitBase_class(){
                 , UpdateServerAnimation_function_type( &::CUnitBase::UpdateServerAnimation ) );
         
         }
+        { //::CUnitBase::UpdateTransmitState
+        
+            typedef int ( ::CUnitBase::*UpdateTransmitState_function_type )(  ) ;
+            typedef int ( CUnitBase_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "UpdateTransmitState"
+                , UpdateTransmitState_function_type(&::CUnitBase::UpdateTransmitState)
+                , default_UpdateTransmitState_function_type(&CUnitBase_wrapper::default_UpdateTransmitState) );
+        
+        }
         { //::CUnitBase::UseCustomCanBeSeenCheck
         
             typedef bool ( ::CUnitBase::*UseCustomCanBeSeenCheck_function_type )(  ) ;
@@ -2561,11 +2572,12 @@ void register_CUnitBase_class(){
         }
         { //::CUnitBase::UseMinimalSendTable
         
-            typedef bool ( ::CUnitBase::*UseMinimalSendTable_function_type )(  ) ;
+            typedef bool ( ::CUnitBase::*UseMinimalSendTable_function_type )( int ) ;
             
             CUnitBase_exposer.def( 
                 "UseMinimalSendTable"
-                , UseMinimalSendTable_function_type( &::CUnitBase::UseMinimalSendTable ) );
+                , UseMinimalSendTable_function_type( &::CUnitBase::UseMinimalSendTable )
+                , ( bp::arg("iClientIndex") ) );
         
         }
         { //::CUnitBase::UserCmd
@@ -2903,17 +2915,6 @@ void register_CUnitBase_class(){
                 "StopLoopingSounds"
                 , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
                 , default_StopLoopingSounds_function_type(&CUnitBase_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CUnitBase_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CUnitBase_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CUnitBase_wrapper::default_UpdateTransmitState) );
         
         }
         { //::CBaseEntity::VPhysicsCollision

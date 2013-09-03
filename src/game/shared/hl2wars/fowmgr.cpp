@@ -1923,11 +1923,7 @@ void CFogOfWarMgr::UpdateVisibility( void )
 		}
 #endif // 0
 
-#if 0
-		infow = m_FogOfWarTextureData[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)] < 10;
-#else
 		infow = m_FogOfWar[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)] < 10;
-#endif // 0
 		if( infow != pEnt->IsInFOW() )
 		{
 			pEnt->SetInFOW( infow );
