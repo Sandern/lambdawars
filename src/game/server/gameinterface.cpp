@@ -1575,16 +1575,18 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 			g_pStringTableInfoPanel &&
 			g_pStringTableClientSideChoreoScenes &&
 			g_pStringTableExtraParticleFiles 
+			);
+
 #ifdef HL2WARS_DLL
-			&&
-			g_pStringTablePyModules &&
-			g_pStringTableGameDBNames
+	Assert( g_pStringTablePyModules &&
+			g_pStringTableGameDBNames 
+			);
 #endif // HL2WARS_DLL
+
 #ifdef DEFERRED_ENABLED
 // @Deferred - Biohazard
-			&& g_pStringTable_LightCookies
+	Assert( g_pStringTable_LightCookies );
 #endif // DEFERRED_ENABLED
-			);
 
 	// Need this so we have the error material always handy
 	PrecacheMaterial( "debug/debugempty" );
