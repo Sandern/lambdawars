@@ -14,9 +14,10 @@
 #include "multiblend_vs30.inc"
 #include "multiblend_ps30.inc"
 
+#include "deferred_includes.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
-
 
 // FIXME: doesn't support fresnel!
 void InitParamsMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Multiblend_DX9_Vars_t &info )
@@ -105,7 +106,9 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 	bool bHasSpec4 = ( info.m_nSpecTexture4 != -1 && params[ info.m_nSpecTexture4 ]->IsDefined() );
 	bool bUsingEditor = pShader->CanUseEditorMaterials(); // pShader->UsingEditor( params );
 //	bool bSinglePassFlashlight = true;
-	bool bHasFlashlight = pShader->UsingFlashlight( params );
+	bool bHasFlashlight = false; //pShader->UsingFlashlight( params );
+
+	bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 
 #if 0
 	if ( pShader->IsSnapshotting() || ( !pContextData ) || ( pContextData->m_bMaterialVarsChanged ) )
@@ -145,6 +148,9 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 	{
 		pShader->SetInitialShadowState( );
 
+		pShaderShadow->EnableAlphaWrites( false );
+		pShaderShadow->EnableDepthWrites( true );
+
 		pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
 		pShaderShadow->EnableTexture( SHADER_SAMPLER2, true );
 		pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
@@ -177,6 +183,9 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 			pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
 		}
 
+		if( bDeferredActive )
+			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+
 		if( bHasFlashlight )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
@@ -186,7 +195,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		}
 
 		pShaderShadow->EnableSRGBWrite( true );
-		pShaderShadow->EnableAlphaWrites( true ); // writing water fog alpha always.
+		//pShaderShadow->EnableAlphaWrites( true ); // writing water fog alpha always.
 
 		unsigned int flags = VERTEX_POSITION | VERTEX_NORMAL;
 		int nTexCoordCount = 8;
@@ -222,6 +231,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
 		SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+		SET_STATIC_PIXEL_SHADER_COMBO( DEFERRED, bDeferredActive );
 		SET_STATIC_PIXEL_SHADER( multiblend_ps30 );
 
 		pShader->DefaultFog();
@@ -351,6 +361,16 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 #endif
 		}
 #endif
+
+		if( bDeferredActive )
+		{
+			pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
+			int x, y, w, t;
+			pShaderAPI->GetCurrentViewport( x, y, w, t );
+			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
+
+			pShaderAPI->SetPixelShaderConstant( 3, fl1 );
+		}
 
 		if ( bHasFoW )
 		{

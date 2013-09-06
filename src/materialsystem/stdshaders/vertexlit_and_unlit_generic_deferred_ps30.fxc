@@ -8,21 +8,21 @@
 // STATIC: "BASEALPHAENVMAPMASK"		"0..1"
 // STATIC: "SELFILLUM"					"0..1"
 // STATIC: "VERTEXCOLOR"				"0..1"
-// STATIC: "FLASHLIGHT"					"0..1"
+// DISABLED STATIC: "FLASHLIGHT"					"0..1"
 // STATIC: "SELFILLUM_ENVMAPMASK_ALPHA" "0..1"
-// STATIC: "DETAIL_BLEND_MODE"          "0..9"
-// STATIC: "SEAMLESS_BASE"              "0..1"
-// STATIC: "SEAMLESS_DETAIL"            "0..1"
-// STATIC: "DISTANCEALPHA"              "0..1"
-// STATIC: "DISTANCEALPHAFROMDETAIL"    "0..1"
-// STATIC: "SOFT_MASK"                  "0..1"
-// STATIC: "OUTLINE"                    "0..1"
-// STATIC: "OUTER_GLOW"                 "0..1"
-// STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps30]  [PC]
+// DISABLED STATIC: "DETAIL_BLEND_MODE"          "0..9"
+// DISABLED STATIC: "SEAMLESS_BASE"              "0..1"
+// DISABLED STATIC: "SEAMLESS_DETAIL"            "0..1"
+// DISABLED STATIC: "DISTANCEALPHA"              "0..1"
+// DISABLED STATIC: "DISTANCEALPHAFROMDETAIL"    "0..1"
+// DISABLED STATIC: "SOFT_MASK"                  "0..1"
+// DISABLED STATIC: "OUTLINE"                    "0..1"
+// DISABLED STATIC: "OUTER_GLOW"                 "0..1"
+// DISABLED STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps30]  [PC]
 // STATIC: "SHADER_SRGB_READ"			"0..1"	[XBOX]
 // STATIC: "SHADER_SRGB_READ"			"0..0"	[PC]
-// STATIC: "DESATURATEWITHBASEALPHA"	"0..1"
-// STATIC: "LIGHTING_PREVIEW"			"0..3"	[PC]
+// DISABLED STATIC: "DESATURATEWITHBASEALPHA"	"0..1"
+// STATIC: "LIGHTING_PREVIEW"			"0..0"	[PC]
 // STATIC: "LIGHTING_PREVIEW"			"0..0"	[XBOX]
 // STATIC: "ENVMAPFRESNEL"				"0..1"
 // STATIC: "FOW"						"0..1"
@@ -30,7 +30,7 @@
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps20b]
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps30]
 // DYNAMIC: "WRITEWATERFOGTODESTALPHA"	"0..1"
-// DYNAMIC: "UBERLIGHT"					"0..1"	[ps30] [PC]
+// DYNAMIC: "UBERLIGHT"					"0..0"	[ps30] [PC]
 
 // detail blend mode 6 = ps20b only
 // SKIP: $DETAIL_BLEND_MODE == 6				[ps20]
@@ -77,9 +77,13 @@
 
 // SKIP: $FLASHLIGHTSHADOWS && ($LIGHTING_PREVIEW == 3)
 
+// Temp
+#define FLASHLIGHT 0
+#define DETAIL_BLEND_MODE 0
+
 #define PC_FLASHLIGHT ((FLASHLIGHT == 1) && !defined( _X360))
 
-#define TEAMCOLORTEXTURE (defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0))
+#define TEAMCOLORTEXTURE 1
 
 #include "common_fog_ps_supportsvertexfog_fxc.h"
 #include "shader_constant_register_map.h"
@@ -88,6 +92,7 @@
 #include "fow_ps_fxc.h"
  
 #include "common_teamcolor.h"
+#include "common_deferred_fxc.h"
 
 const float4 g_EnvmapTint_SPF					: register( c0 ); //SPF=Single Pass Flashlight, stored in previously unused alpha.
 const float4 g_DiffuseModulation				: register( c1 );
@@ -189,6 +194,10 @@ sampler FoWSampler				: register( s9 );	// Fog of War
 
 #endif
 
+
+sampler sLightAccum		: register( s13 );
+const float2 g_vecFullScreenTexel		: register( PSREG_UBERLIGHT_SMOOTH_EDGE_0 );
+
 struct PS_INPUT
 {
 #if SEAMLESS_BASE
@@ -231,6 +240,8 @@ struct PS_INPUT
 #if ( FOW == 1 )
 	float2 vFowCoord				: TEXCOORD2;
 #endif
+
+	float2 vScreenPos				: VPOS;
 };
 
 #if LIGHTING_PREVIEW == 2
@@ -467,8 +478,13 @@ float4 main( PS_INPUT i ) : COLOR
 	#endif
 
 	alpha = lerp( alpha, alpha * i.color.a, g_fVertexAlpha );
-
-	float3 diffuseComponent = albedo * diffuseLighting;
+	
+	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
+	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+	
+	//float3 diffuseComponent = albedo * (diffuseLighting + flLighting); // Adding up
+	//float3 diffuseComponent = albedo * lerp( diffuseLighting, flLighting, 0.4 ); // Lerp result
+	float3 diffuseComponent = albedo * min( diffuseLighting, flLighting ); // Darken result
 
 	#if ( DETAILTEXTURE )
 	{

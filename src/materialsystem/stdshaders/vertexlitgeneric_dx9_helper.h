@@ -10,6 +10,7 @@
 
 #include <string.h>
 
+#include "deferred_includes.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -174,6 +175,12 @@ void InitVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, bo
 void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow,
 							   bool bVertexLitGeneric, VertexLitGeneric_DX9_Vars_t &info, VertexCompressionType_t vertexCompression,
 							   CBasePerMaterialContextData **pContextDataPtr );
+
+class CVertexLitGeneric_DX9_Context : public CDeferredPerMaterialContextData
+{
+public:
+	CCommandBufferBuilder< CFixedCommandStorageBuffer< 800 > > m_SemiStaticCmdsOut;
+};
 
 
 #endif // VERTEXLITGENERIC_DX9_HELPER_H

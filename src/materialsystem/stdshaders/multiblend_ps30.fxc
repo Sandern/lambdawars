@@ -7,15 +7,18 @@
 // STATIC: "FLASHLIGHT"					"0..1" [ps30]
 // STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps20b] [PC]
 // STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps30]  [PC]
+// STATIC: "DEFERRED"					"0..1"
 
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps20b]
 
 //  SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTSHADOWS == 1 )
+//  SKIP: ( $FLASHLIGHT == 1 ) && ( $DEFERRED == 1 )
 
 #include "shader_constant_register_map.h"
 #include "common_fog_ps_fxc.h"
 #include "fow_ps_fxc.h"
 #include "common_flashlight_fxc.h"
+#include "common_deferred_fxc.h"
 
 sampler BaseSampler1					: register( s1 );	// Base map 1
 sampler BaseSampler2					: register( s2 );	// Base map 2
@@ -46,7 +49,6 @@ sampler FoWSampler					: register( s10 );	// Fog of War
 
 #endif
 
-
 #if ( FLASHLIGHT == 1 )
 
 const float4 g_FlashlightAttenuationFactors	: register( c13 );
@@ -59,6 +61,10 @@ sampler RandRotSampler			: register( s15 );
 
 #endif
 
+#if ( DEFERRED == 1 )
+sampler sLightAccum		: register( s13 );
+const float2 g_vecFullScreenTexel		: register( c3 );
+#endif // DEFERRED
 
 // free floats: texcoord2 ( 4 xyzw ), texcoord7( 1 w ), vBaseTexCoord( 2 zw ) ( when we remove lightmaps )
 struct PS_INPUT
@@ -76,6 +82,8 @@ struct PS_INPUT
 	float4 vColorBlend2						: COLOR1;
 	float4 vColorBlend3						: TEXCOORD6;
 	float3 vColorBlend4						: TEXCOORD7;
+	
+	float2 vScreenPos				: VPOS;
 };
 
 
@@ -99,6 +107,7 @@ sampler SpecSampler2					: register( s7 );	// Spec map 2
 sampler SpecSampler3					: register( s8 );	// Spec map 3
 sampler SpecSampler4					: register( s9 );	// Spec map 4
 
+/*
 float ComputeMultiBlendFactor( const float BlendStart, const float BlendEnd, const float BlendAmount, const float AlphaBlend, inout float Remaining )
 {
 	float Result = 0.0;
@@ -129,15 +138,24 @@ float ComputeMultiBlendFactor( const float BlendStart, const float BlendEnd, con
    
 	return Result;
 }
+*/
 
 #endif
 
 #if LIGHTING_PREVIEW == 2
 LPREVIEW_PS_OUT main( PS_INPUT i ) : COLOR
 #else
-float4 main( PS_INPUT i ) : COLOR
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+};
+PS_OUTPUT main( PS_INPUT i )
 #endif
 {
+#if LIGHTING_PREVIEW != 2
+	PS_OUTPUT Out;
+#endif
+
 	float blendfactor1 = 0.0;
 	float blendfactor2 = 0.0;
 	float blendfactor3 = 0.0;
@@ -201,15 +219,28 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float3 worldSpaceNormal = float3( 0, 0, 1 );
 
+#if DEFERRED == 1
+	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
+	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+#endif // DEFERRED
+
 #if LIGHTING_PREVIEW == 0
 	float3 lightmapColor = tex2D( LightmapSampler, i.vBaseTexCoord.zw );
 	float3 diffuseLighting = lightmapColor * g_TintValuesTimesLightmapScale.rgb;
 	diffuseLighting += g_cAmbientColor;
 	
+#if DEFERRED == 1
+	//vResult.rgb *= (diffuseLighting + flLighting); // Adding up
+	//vResult.rgb *= lerp( diffuseLighting, flLighting, 0.4 ); // Lerp result
+	vResult.rgb *= min( diffuseLighting, flLighting ); // Darken result
+#else
 	vResult.rgb *= diffuseLighting;
+#endif // DEFERRED
+
 #elif ( LIGHTING_PREVIEW == 1 )
 	float dotprod = 0.7+0.25 * dot( worldSpaceNormal, normalize( float3( 1, 2, -.5 ) ) );
-	return FinalOutput( float4( dotprod*vResult.xyz, 1.0f ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+	Out.vColor_0 =  FinalOutput( float4( dotprod*vResult.xyz, 1.0f ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+	return Out;
 #elif ( LIGHTING_PREVIEW == 2 )
 	LPREVIEW_PS_OUT ret;
 	ret.color = float4( vResult.xyz, 1.0f );
@@ -247,6 +278,7 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.xyz, i.worldPos_projPosZ.xyz, i.worldPos_projPosZ.w );
 	
-	return FinalOutput( float4( vResult, fogFactor ), fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR );
+	Out.vColor_0 = FinalOutput( float4( vResult, fogFactor ), fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR );
+	return Out;
 #endif
 }

@@ -3662,7 +3662,7 @@ void CRendering3dView::BuildRenderableRenderLists( int viewID )
 // skip stuff
 	const bool bUpdateLightmaps = viewID != VIEW_SHADOW_DEPTH_TEXTURE 
 #ifdef DEFERRED_ENABLED
-		&& !GetDeferredManager()->IsDeferredRenderingEnabled()
+		//&& !GetDeferredManager()->IsDeferredRenderingEnabled()
 #endif // DEFERRED_ENABLED
 		;
 		

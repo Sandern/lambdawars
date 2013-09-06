@@ -14,7 +14,7 @@
 #include "fogofwar_blended_pass_helper.h"
 
 #ifdef DEFERRED_ENABLED
-#include "IDeferredExt.h"
+#include "deferred_includes.h"
 #endif // DEFERRED_ENABLED
 
 // NOTE: This has to be the last file included!
@@ -98,6 +98,10 @@ BEGIN_VS_SHADER( LightmappedGeneric,
 		SHADER_PARAM( PAINTSPLATNORMALMAP, SHADER_PARAM_TYPE_TEXTURE, "paint/splatnormal_default", "The paint splat normal map to use when paint is enabled on the surface" )
 		SHADER_PARAM( PAINTSPLATENVMAP, SHADER_PARAM_TYPE_TEXTURE, "env_cubemap", "The envmap to use on the paint pass. You're getting one whether you like it or not" )
 		
+		// Deferred:
+		SHADER_PARAM( PHONG_EXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
+		SHADER_PARAM( PHONG_EXP2, SHADER_PARAM_TYPE_FLOAT, "", "" )
+
 END_SHADER_PARAMS
 
 	void SetupVars( LightmappedGeneric_DX9_Vars_t& info )
@@ -172,15 +176,43 @@ END_SHADER_PARAMS
 		info.m_nPaintSplatEnvMap = PAINTSPLATENVMAP;
 	}
 
-	void SetupVarsFogOfWarBlendedPass( FogOfWarBlendedPassVars_t &info )
+	void SetupParmsGBuffer( defParms_gBuffer &p )
 	{
-		info.m_nBaseTexture = BASETEXTURE;
-		info.m_nFogOfWarTexture = FOW;
+		p.bModel = false;
+
+		p.iAlbedo = BASETEXTURE;
+		p.iAlbedo2 = BASETEXTURE2;
+		p.iBumpmap = BUMPMAP;
+		p.iBumpmap2 = BUMPMAP2;
+		p.iPhongExp = PHONG_EXP;
+		p.iPhongExp2 = PHONG_EXP2;
+
+		p.iAlphatestRef = ALPHATESTREFERENCE;
+	}
+
+	void SetupParmsShadow( defParms_shadow &p )
+	{
+		p.bModel = false;
+		p.iAlbedo = BASETEXTURE;
+
+		p.iAlphatestRef = ALPHATESTREFERENCE;
+	}
+
+	bool DrawToGBuffer( IMaterialVar **params )
+	{
+#if DEFCFG_DEFERRED_SHADING == 1
+		return true;
+#else
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+
+		return !bTranslucent && !bIsDecal;
+#endif
 	}
 
 	SHADER_FALLBACK
 	{
-#ifdef DEFERRED_ENABLED
+#if 0 // def DEFERRED_ENABLED
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
 
@@ -199,8 +231,17 @@ END_SHADER_PARAMS
 		SetupVars( s_info );
 		InitParamsLightmappedGeneric_DX9( this, params, pMaterialName, s_info );
 
-		//SetupVarsFogOfWarBlendedPass( s_fowinfo );
-		//InitParamsFogOfWarBlendedPass( this, params, pMaterialName, s_fowinfo );
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitParmsGBuffer( parms_gbuffer, this, params );
+		
+			defParms_shadow parms_shadow;
+			SetupParmsShadow( parms_shadow );
+			InitParmsShadowPass( parms_shadow, this, params );
+		}
 	}
 
 	SHADER_INIT
@@ -208,14 +249,84 @@ END_SHADER_PARAMS
 		SetupVars( s_info );
 		InitLightmappedGeneric_DX9( this, params, s_info );
 
-		//SetupVarsFogOfWarBlendedPass( s_fowinfo );
-		//InitFogOfWarBlendedPass( this, params, s_fowinfo );
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitPassGBuffer( parms_gbuffer, this, params );
+
+			defParms_shadow parms_shadow;
+			SetupParmsShadow( parms_shadow );
+			InitPassShadowPass( parms_shadow, this, params );
+		}
 	}
 
 	SHADER_DRAW
 	{
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			if ( pShaderAPI != NULL && *pContextDataPtr == NULL )
+			{
+				*pContextDataPtr = new CLightmappedGeneric_DX9_Context();
+			}
+
+			CLightmappedGeneric_DX9_Context *pDefContext = reinterpret_cast< CLightmappedGeneric_DX9_Context* >(*pContextDataPtr);
+
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			const bool bDrawToGBuffer = DrawToGBuffer( params );
+
+			Assert( pShaderAPI == NULL ||
+				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );
+
+			if ( bDrawToGBuffer )
+			{
+				if ( pShaderShadow != NULL ||
+					iDeferredRenderStage == DEFERRED_RENDER_STAGE_GBUFFER )
+				{
+					defParms_gBuffer parms_gbuffer;
+					SetupParmsGBuffer( parms_gbuffer );
+					DrawPassGBuffer( parms_gbuffer, this, params, pShaderShadow, pShaderAPI,
+						vertexCompression, pDefContext );
+				}
+				else
+					Draw( false );
+
+				if ( pShaderShadow != NULL ||
+					iDeferredRenderStage == DEFERRED_RENDER_STAGE_SHADOWPASS )
+				{
+					defParms_shadow parms_shadow;
+					SetupParmsShadow( parms_shadow );
+					DrawPassShadowPass( parms_shadow, this, params, pShaderShadow, pShaderAPI,
+						vertexCompression, pDefContext );
+				}
+				else
+					Draw( false );
+			}
+
+			if( ( pShaderShadow != NULL ||
+				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION ) )
+			{
+				DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
+				//DrawLightmappedGeneric_Deferred_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pDefContext );
+			}
+			else
+			{
+				Draw( false );
+			}
+
+			//if ( pShaderAPI != NULL && pDefContext->m_bMaterialVarsChanged )
+			//	pDefContext->m_bMaterialVarsChanged = false;
+
+			return;
+		}
+
 		DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
-		
+
 		// If the game/mod can potentially support the paint feature, then we need to always record snapshots 
 		// as though there may be a 2nd pass.  When in a map containing paint, you need to also draw the 2nd pass.
 		if ( g_pConfig->m_bPaintInGame )

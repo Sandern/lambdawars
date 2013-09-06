@@ -12,6 +12,7 @@
 #include "BaseVSShader.h"
 #include "shaderlib/commandbuilder.h"
 
+#include "deferred_includes.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -101,7 +102,7 @@ struct LightmappedGeneric_DX9_Vars_t
 	int m_nPaintSplatEnvMap;
 };
 
-class CLightmappedGeneric_DX9_Context : public CBasePerMaterialContextData
+class CLightmappedGeneric_DX9_Context : public CDeferredPerMaterialContextData
 {
 public:
 	uint8 *m_pStaticCmds;
@@ -112,6 +113,7 @@ public:
 	bool m_bPixelShaderForceFastPathBecauseOutline;
 	bool m_bFullyOpaque;
 	bool m_bFullyOpaqueWithoutAlphaTest;
+	bool m_bNeedsCmdRegen;
 
 	CLightmappedGeneric_DX9_Context *m_pPaintSubcontext; //passed off to the lightmapped paint shader if we're running that
 
@@ -128,6 +130,7 @@ public:
 	{
 		m_pStaticCmds = NULL;
 		m_pPaintSubcontext = NULL;
+		m_bNeedsCmdRegen = true;
 	}
 
 	~CLightmappedGeneric_DX9_Context( void )
@@ -147,6 +150,10 @@ void InitLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 								 IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, 
 								 LightmappedGeneric_DX9_Vars_t &info, CBasePerMaterialContextData **pContextDataPtr	 );
+void DrawLightmappedGeneric_Deferred_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
+								 IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, 
+								 LightmappedGeneric_DX9_Vars_t &info, CDeferredPerMaterialContextData *pDeferredContext	 );
+
 
 
 #endif // LIGHTMAPPEDGENERIC_DX9_HELPER_H

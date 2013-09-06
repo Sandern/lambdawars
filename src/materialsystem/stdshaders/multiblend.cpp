@@ -10,7 +10,7 @@
 #include "multiblend_dx9_helper.h"
 
 #ifdef DEFERRED_ENABLED
-#include "IDeferredExt.h"
+#include "deferred_includes.h"
 #endif // DEFERRED_ENABLED
 
 // NOTE: This has to be the last file included!
@@ -38,6 +38,10 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		SHADER_PARAM( SCALE3, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
 		SHADER_PARAM( ROTATION4, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )
 		SHADER_PARAM( SCALE4, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
+
+		// Deferred:
+		SHADER_PARAM( PHONG_EXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
+		SHADER_PARAM( PHONG_EXP2, SHADER_PARAM_TYPE_FLOAT, "", "" )
 	END_SHADER_PARAMS
 
 	void SetupVars( Multiblend_DX9_Vars_t& info )
@@ -64,16 +68,81 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		info.m_nFlashlightTextureFrame = FLASHLIGHTTEXTUREFRAME;
 	}
 
+	void SetupParmsGBuffer( defParms_gBuffer &p )
+	{
+		p.bModel = false;
+
+		p.iAlbedo = BASETEXTURE;
+#if DEFCFG_DEFERRED_SHADING == 1
+		p.iAlbedo2 = BASETEXTURE2;
+		p.iAlbedo3 = BASETEXTURE3;
+		p.iAlbedo4 = BASETEXTURE4;
+#endif
+
+		//p.iMultiblend = true;
+		p.nSpecTexture = SPECTEXTURE;
+		p.nSpecTexture2 = SPECTEXTURE2;
+		p.nSpecTexture3 = SPECTEXTURE3;
+		p.nSpecTexture4 = SPECTEXTURE4;
+		p.nRotation = ROTATION;
+		p.nRotation2 = ROTATION2;
+		p.nRotation3 = ROTATION3;
+		p.nRotation4 = ROTATION4;
+		p.nScale = SCALE;
+		p.nScale2 = SCALE2;
+		p.nScale3 = SCALE3;
+		p.nScale4 = SCALE4;
+
+		p.iPhongExp = PHONG_EXP;
+		p.iPhongExp2 = PHONG_EXP2;
+	}
+
+	void SetupParmsShadow( defParms_shadow &p )
+	{
+		p.bModel = false;
+		p.iAlbedo = BASETEXTURE;
+		p.iAlbedo2 = BASETEXTURE2;
+		p.iAlbedo3 = BASETEXTURE3;
+		p.iAlbedo4 = BASETEXTURE4;
+
+		//p.iAlphatestRef = ALPHATESTREFERENCE;
+		//p.iMultiblend = true;
+	}
+
+	bool DrawToGBuffer( IMaterialVar **params )
+	{
+#if DEFCFG_DEFERRED_SHADING == 1
+		return true;
+#else
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+
+		return !bTranslucent && !bIsDecal;
+#endif
+	}
+
 	SHADER_INIT_PARAMS()
 	{
 		Multiblend_DX9_Vars_t info;
 		SetupVars( info );
 		InitParamsMultiblend_DX9( this, params, pMaterialName, info );
+
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitParmsGBuffer( parms_gbuffer, this, params );
+		
+			defParms_shadow parms_shadow;
+			SetupParmsShadow( parms_shadow );
+			InitParmsShadowPass( parms_shadow, this, params );
+		}
 	}
 
 	SHADER_FALLBACK
 	{
-#ifdef DEFERRED_ENABLED
+#if 0 //def DEFERRED_ENABLED
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
 
@@ -93,13 +162,86 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		Multiblend_DX9_Vars_t info;
 		SetupVars( info );
 		InitMultiblend_DX9( this, params, info );
+
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitPassGBuffer( parms_gbuffer, this, params );
+
+			defParms_shadow parms_shadow;
+			SetupParmsShadow( parms_shadow );
+			InitPassShadowPass( parms_shadow, this, params );
+		}
 	}
 
 	SHADER_DRAW
 	{
-		Multiblend_DX9_Vars_t info;
-		SetupVars( info );
-		DrawMultiblend_DX9( this, params, pShaderAPI, pShaderShadow, info, vertexCompression, pContextDataPtr );
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+
+		if( !bDeferredActive )
+		{
+			Multiblend_DX9_Vars_t info;
+			SetupVars( info );
+			DrawMultiblend_DX9( this, params, pShaderAPI, pShaderShadow, info, vertexCompression, pContextDataPtr );
+		}
+		else
+		{
+			if ( pShaderAPI != NULL && *pContextDataPtr == NULL )
+				*pContextDataPtr = new CDeferredPerMaterialContextData();
+
+			CDeferredPerMaterialContextData *pDefContext = reinterpret_cast< CDeferredPerMaterialContextData* >(*pContextDataPtr);
+
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			const bool bDrawToGBuffer = DrawToGBuffer( params );
+
+			Assert( pShaderAPI == NULL ||
+				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );
+
+			if ( bDrawToGBuffer )
+			{
+				if ( pShaderShadow != NULL ||
+					iDeferredRenderStage == DEFERRED_RENDER_STAGE_GBUFFER )
+				{
+					defParms_gBuffer parms_gbuffer;
+					SetupParmsGBuffer( parms_gbuffer );
+					DrawPassGBuffer( parms_gbuffer, this, params, pShaderShadow, pShaderAPI,
+						vertexCompression, pDefContext );
+				}
+				else
+					Draw( false );
+
+				if ( pShaderShadow != NULL ||
+					iDeferredRenderStage == DEFERRED_RENDER_STAGE_SHADOWPASS )
+				{
+					defParms_shadow parms_shadow;
+					SetupParmsShadow( parms_shadow );
+					DrawPassShadowPass( parms_shadow, this, params, pShaderShadow, pShaderAPI,
+						vertexCompression, pDefContext );
+				}
+				else
+					Draw( false );
+			}
+
+	#if ( DEFCFG_DEFERRED_SHADING == 0 )
+			if ( pShaderShadow != NULL ||
+				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION )
+			{
+				Multiblend_DX9_Vars_t info;
+				SetupVars( info );
+				DrawMultiblend_DX9( this, params, pShaderAPI, pShaderShadow, info, vertexCompression, pContextDataPtr );
+			}
+			else
+				Draw( false );
+	#endif
+
+			if ( pShaderAPI != NULL && pDefContext->m_bMaterialVarsChanged )
+				pDefContext->m_bMaterialVarsChanged = false;
+		}
 	}
 END_SHADER
 

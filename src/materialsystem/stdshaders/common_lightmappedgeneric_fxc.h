@@ -256,6 +256,10 @@ struct VS_OUTPUT
 	float4 flashlightSpacePos		: TEXCOORD8;
 	float4 vProjPos					: TEXCOORD9;
 #endif
+
+#ifdef PIXELSHADER
+	float2 vScreenPos				: VPOS;
+#endif
 };
 
 #define DETAILCOORDS detailOrBumpAndEnvmapMaskTexCoord.xy

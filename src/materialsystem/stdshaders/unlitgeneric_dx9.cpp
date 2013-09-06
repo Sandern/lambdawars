@@ -9,6 +9,10 @@
 #include "BaseVSShader.h"
 #include "vertexlitgeneric_dx9_helper.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred_includes.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -205,6 +209,18 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 		info.m_nTeamColor = TEAMCOLOR;
 		info.m_nTeamColorTexture = TEAMCOLORMAP;
+	}
+
+	void SetupParmsShadow( defParms_shadow &p )
+	{
+		p.bModel = false;
+		p.iAlbedo = BASETEXTURE;
+		//p.iAlbedo2 = BASETEXTURE2;
+		//p.iAlbedo3 = BASETEXTURE3;
+		//p.iAlbedo4 = BASETEXTURE4;
+
+		p.iAlphatestRef = ALPHATESTREFERENCE;
+		//p.iMultiblend = MULTIBLEND;
 	}
 
 	SHADER_INIT_PARAMS()
