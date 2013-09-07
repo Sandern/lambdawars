@@ -324,6 +324,7 @@ class GameInterface(SemiSharedModuleGenerator):
         if settings.ASW_CODE_BASE:
             cls = mb.class_('ICommandLine')
             cls.include()
+            cls.mem_funs().virtuality = 'not virtual'
             
             mb.free_function('CommandLine').include()
             mb.free_function('CommandLine').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
