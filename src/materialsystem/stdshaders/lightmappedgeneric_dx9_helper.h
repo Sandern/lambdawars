@@ -149,7 +149,7 @@ void InitParamsLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** pa
 void InitLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, LightmappedGeneric_DX9_Vars_t &info );
 void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 								 IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, 
-								 LightmappedGeneric_DX9_Vars_t &info, CBasePerMaterialContextData **pContextDataPtr	 );
+								 LightmappedGeneric_DX9_Vars_t &info, CBasePerMaterialContextData **pContextDataPtr, bool bDeferredActive );
 void DrawLightmappedGeneric_Deferred_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 								 IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow, 
 								 LightmappedGeneric_DX9_Vars_t &info, CDeferredPerMaterialContextData *pDeferredContext	 );

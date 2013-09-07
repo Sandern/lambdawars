@@ -9,7 +9,7 @@
 // STATIC: "HALFLAMBERT"				"0..1"
 // STATIC: "FLASHLIGHT"					"0..1"
 // STATIC: "DETAILTEXTURE"				"0..1"
-// DISABLED STATIC: "DETAIL_BLEND_MODE"      	"0..6"
+// STATIC: "DETAIL_BLEND_MODE"      	"0..6"
 // DISABLED STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"						[ps30] [PC]
 // STATIC: "SHADER_SRGB_READ"			"0..1"						[XBOX]
 // STATIC: "SHADER_SRGB_READ"			"0..0"						[PC]
@@ -61,7 +61,7 @@
 // SKIP: ( $FOW && $STATICLIGHT3 )
 
 // Temp
-#define DETAIL_BLEND_MODE 0
+//#define DETAIL_BLEND_MODE 0
 #define FLASHLIGHTDEPTHFILTERMODE 0 // temp
 
 #include "common_fog_ps_supportsvertexfog_fxc.h"

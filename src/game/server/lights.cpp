@@ -9,6 +9,10 @@
 #include "lights.h"
 #include "world.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred/deferred_shared_common.h"
+#endif // DEFERRED_ENABLED
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -241,6 +245,15 @@ public:
 
 	bool	KeyValue( const char *szKeyName, const char *szValue ); 
 	void	Spawn( void );
+
+#ifdef DEFERRED_ENABLED
+	void	Activate( void );
+
+private:
+	string_t m_sLight;
+	string_t m_sAmbientLight;
+	float m_fLightPitch;
+#endif // DEFERRED_ENABLED
 };
 
 LINK_ENTITY_TO_CLASS( light_environment, CEnvLight );
@@ -250,9 +263,22 @@ bool CEnvLight::KeyValue( const char *szKeyName, const char *szValue )
 	if (FStrEq(szKeyName, "_light"))
 	{
 		// nothing
+#ifdef DEFERRED_ENABLED
+		m_sLight = AllocPooledString( szValue );
+#endif // DEFERRED_ENABLED
 	}
 	else
 	{
+#ifdef DEFERRED_ENABLED
+		if( FStrEq(szKeyName, "pitch") )
+		{
+			m_fLightPitch = atof( szValue );
+		}
+		else if( FStrEq(szKeyName, "_ambient") )
+		{
+			m_sAmbientLight = AllocPooledString( szValue );
+		}
+#endif // DEFERRED_ENABLED
 		return BaseClass::KeyValue( szKeyName, szValue );
 	}
 
@@ -262,5 +288,33 @@ bool CEnvLight::KeyValue( const char *szKeyName, const char *szValue )
 
 void CEnvLight::Spawn( void )
 {
+#ifdef DEFERRED_ENABLED
+	SetName( MAKE_STRING( "light_environment" ) );
+#endif // DEFERRED_ENABLED
 	BaseClass::Spawn( );
 }
+
+#ifdef DEFERRED_ENABLED
+void CEnvLight::Activate( void )
+{
+	BaseClass::Activate( );
+
+	if ( GetGlobalLight() == NULL )
+	{
+		CBaseEntity *pGlobalLight = CreateEntityByName( "light_deferred_global" );
+		if( pGlobalLight )
+		{
+			const QAngle &vecAngles = GetAbsAngles();
+			pGlobalLight->KeyValue( "diffuse", STRING( m_sLight ) );
+			pGlobalLight->KeyValue( "ambient_high", STRING( m_sAmbientLight ) );
+			pGlobalLight->KeyValue( "ambient_low", STRING( m_sAmbientLight ) );
+			pGlobalLight->KeyValue( "spawnflags", DEFLIGHTGLOBAL_ENABLED | DEFLIGHTGLOBAL_SHADOW_ENABLED );
+			pGlobalLight->KeyValue( "angles", UTIL_VarArgs("%f %f %f", -m_fLightPitch, vecAngles.y, vecAngles.z ) );
+			DispatchSpawn( pGlobalLight );
+			pGlobalLight->Activate();
+		}
+	}
+
+	UTIL_Remove( this );
+}
+#endif // DEFERRED_ENABLED

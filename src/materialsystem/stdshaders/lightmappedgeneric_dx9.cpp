@@ -311,7 +311,7 @@ END_SHADER_PARAMS
 			if( ( pShaderShadow != NULL ||
 				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION ) )
 			{
-				DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
+				DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr, bDrawToGBuffer );
 				//DrawLightmappedGeneric_Deferred_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pDefContext );
 			}
 			else
@@ -325,7 +325,7 @@ END_SHADER_PARAMS
 			return;
 		}
 
-		DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
+		DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr, false );
 
 		// If the game/mod can potentially support the paint feature, then we need to always record snapshots 
 		// as though there may be a 2nd pass.  When in a map containing paint, you need to also draw the 2nd pass.

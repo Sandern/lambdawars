@@ -18,6 +18,10 @@
 #include "water_ps20b.inc"
 #include "shaderlib/commandbuilder.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred_includes.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -766,6 +770,20 @@ BEGIN_VS_SHADER( Water_DX90,
 
 	SHADER_DRAW
 	{
+#ifdef DEFERRED_ENABLED
+		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			if( pShaderShadow == NULL &&
+							iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+				return;
+		}
+#endif // DEFERRED_ENABLED
+
 		bool bRefraction = params[REFRACTTEXTURE]->IsTexture();
 		bool bReflection = params[REFLECTTEXTURE]->IsTexture();
 		bool bForceCheap = ( params[FORCECHEAP]->GetIntValue() != 0 );

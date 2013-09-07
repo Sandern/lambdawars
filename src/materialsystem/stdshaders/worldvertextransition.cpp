@@ -280,10 +280,12 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 
 			bDrawComposite = ( pShaderShadow != NULL ||
 				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION );
+
+			bDeferredActive = bDrawToGBuffer;
 		}
 
 		if( pShaderShadow != NULL || bDrawComposite )
-			DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr );
+			DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr, bDeferredActive );
 		else
 			Draw( false );
 	}
