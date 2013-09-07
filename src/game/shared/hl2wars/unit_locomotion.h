@@ -76,7 +76,9 @@ public:
 
 	// Out list of blockers
 	CUtlVector< UnitBlocker_t > blockers;
+#ifdef ENABLE_PYTHON
 	boost::python::list pyblockers;
+#endif // ENABLE_PYTHON
 
 	// Settings
 	float maxspeed;

@@ -198,6 +198,7 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 	}*/
 #endif // CLIENT_DLL
 
+#ifdef ENABLE_PYTHON
 	// For Python: keep list of blockers
 	mv.pyblockers = bp::list();
 	for( int i = 0; i < mv.blockers.Count(); i++ )
@@ -206,6 +207,7 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 			continue;
  		mv.pyblockers.append( mv.blockers[i].blocker->GetPyHandle() );
 	}
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
