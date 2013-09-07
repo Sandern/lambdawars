@@ -250,8 +250,8 @@ public:
 	void	Activate( void );
 
 private:
-	string_t m_sLight;
-	string_t m_sAmbientLight;
+	float m_vecLight[4];
+	float m_vecAmbientLight[4];
 	float m_fLightPitch;
 #endif // DEFERRED_ENABLED
 };
@@ -264,7 +264,7 @@ bool CEnvLight::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		// nothing
 #ifdef DEFERRED_ENABLED
-		m_sLight = AllocPooledString( szValue );
+		UTIL_StringToFloatArray( m_vecLight, 4,  szValue );
 #endif // DEFERRED_ENABLED
 	}
 	else
@@ -276,7 +276,7 @@ bool CEnvLight::KeyValue( const char *szKeyName, const char *szValue )
 		}
 		else if( FStrEq(szKeyName, "_ambient") )
 		{
-			m_sAmbientLight = AllocPooledString( szValue );
+			UTIL_StringToFloatArray( m_vecAmbientLight, 4,  szValue );
 		}
 #endif // DEFERRED_ENABLED
 		return BaseClass::KeyValue( szKeyName, szValue );
@@ -295,6 +295,10 @@ void CEnvLight::Spawn( void )
 }
 
 #ifdef DEFERRED_ENABLED
+static ConVar deferred_autoenvlight_ambient_intensity_low("deferred_autoenvlight_ambient_intensity_low", "0.15");
+static ConVar deferred_autoenvlight_ambient_intensity_high("deferred_autoenvlight_ambient_intensity_high", "0.45");
+static ConVar deferred_autoenvlight_diffuse_intensity("deferred_autoenvlight_diffuse_intensity", "1.1");
+
 void CEnvLight::Activate( void )
 {
 	BaseClass::Activate( );
@@ -304,10 +308,14 @@ void CEnvLight::Activate( void )
 		CBaseEntity *pGlobalLight = CreateEntityByName( "light_deferred_global" );
 		if( pGlobalLight )
 		{
+			float ds = deferred_autoenvlight_diffuse_intensity.GetFloat();
+			float asl = deferred_autoenvlight_ambient_intensity_low.GetFloat();
+			float ash = deferred_autoenvlight_ambient_intensity_high.GetFloat();
+
 			const QAngle &vecAngles = GetAbsAngles();
-			pGlobalLight->KeyValue( "diffuse", STRING( m_sLight ) );
-			pGlobalLight->KeyValue( "ambient_high", STRING( m_sAmbientLight ) );
-			pGlobalLight->KeyValue( "ambient_low", STRING( m_sAmbientLight ) );
+			pGlobalLight->KeyValue( "diffuse", UTIL_VarArgs("%f %f %f %f", m_vecLight[0], m_vecLight[1], m_vecLight[2], m_vecLight[3] * ds ) );
+			pGlobalLight->KeyValue( "ambient_high", UTIL_VarArgs("%f %f %f %f", m_vecAmbientLight[0], m_vecAmbientLight[1], m_vecAmbientLight[2], m_vecAmbientLight[3] * ash ) );
+			pGlobalLight->KeyValue( "ambient_low", UTIL_VarArgs("%f %f %f %f", m_vecAmbientLight[0], m_vecAmbientLight[1], m_vecAmbientLight[2], m_vecAmbientLight[3] * asl ) );
 			pGlobalLight->KeyValue( "spawnflags", DEFLIGHTGLOBAL_ENABLED | DEFLIGHTGLOBAL_SHADOW_ENABLED );
 			pGlobalLight->KeyValue( "angles", UTIL_VarArgs("%f %f %f", -m_fLightPitch, vecAngles.y, vecAngles.z ) );
 			DispatchSpawn( pGlobalLight );

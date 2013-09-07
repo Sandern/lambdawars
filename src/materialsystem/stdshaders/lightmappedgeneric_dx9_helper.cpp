@@ -412,9 +412,9 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 		pContextData->m_bFullyOpaque = bFullyOpaque;
 		pContextData->m_bFullyOpaqueWithoutAlphaTest = bFullyOpaqueWithoutAlphaTest;
 
-		bool bHasOutline = IsBoolSet( info.m_nOutline, params ) && !bDeferredActive /* temp */;
+		bool bHasOutline = IsBoolSet( info.m_nOutline, params );
 		pContextData->m_bPixelShaderForceFastPathBecauseOutline = bHasOutline;
-		bool bHasSoftEdges = IsBoolSet( info.m_nSoftEdges, params ) && !bDeferredActive /* temp */;
+		bool bHasSoftEdges = IsBoolSet( info.m_nSoftEdges, params );
 		bool hasEnvmapMask = params[info.m_nEnvmapMask]->IsTexture() && !bHasFoW;
 		
 		
@@ -575,9 +575,6 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 				{
 					nDetailBlendMode = 9;
 				}
-
-				if( bDeferredActive )
-					nDetailBlendMode = 0; /* Temp */
 				
 				if( hasBump || hasNormalMapAlphaEnvmapMask )
 				{
@@ -685,9 +682,10 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 					SET_STATIC_PIXEL_SHADER_COMBO( FANCY_BLENDING, bHasBlendModulateTexture );
 					SET_STATIC_PIXEL_SHADER_COMBO( MASKEDBLENDING, bMaskedBlending);
 					SET_STATIC_PIXEL_SHADER_COMBO( SEAMLESS, bSeamlessMapping );
-					/*SET_STATIC_PIXEL_SHADER_COMBO( OUTLINE, bHasOutline );
+					SET_STATIC_PIXEL_SHADER_COMBO( OUTLINE, bHasOutline );
 					SET_STATIC_PIXEL_SHADER_COMBO( SOFTEDGES, bHasSoftEdges );
-					SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );*/
+					SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, hasDetailTexture );
+					SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 					SET_STATIC_PIXEL_SHADER_COMBO( PARALLAX_MAPPING, bParallaxMapping );
 					SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
 					SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
@@ -1153,14 +1151,13 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 
 		if( bDeferredActive )
 		{
-			//DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum(), -1 );
-			pShader->BindTexture( SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum()  );
+			DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum(), 0 );
+			//DynamicCmdsOut.BindStandardTexture( SHADER_SAMPLER14, TEXTURE_WHITE );
 			int x, y, w, t;
 			pShaderAPI->GetCurrentViewport( x, y, w, t );
 			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
 
-			//DynamicCmdsOut.SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
-			pShaderAPI->SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
+			DynamicCmdsOut.SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
 		}
 
 		bool bFlashlightShadows = false;
@@ -1196,9 +1193,9 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( FASTPATHENVMAPCONTRAST,  bPixelShaderFastPath && envmapContrast == 1.0f );
 
 			// Don't write fog to alpha if we're using translucency
-			//SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, bWriteDepthToAlpha );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, bWriteDepthToAlpha );
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA, bWriteWaterFogToAlpha );
-			//SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
 			SET_DYNAMIC_PIXEL_SHADER_CMD( DynamicCmdsOut, lightmappedgeneric_deferred_ps30 );
 		}
 		else

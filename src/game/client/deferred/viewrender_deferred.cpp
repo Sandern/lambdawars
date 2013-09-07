@@ -3099,7 +3099,7 @@ void CGBufferView::Setup( const CViewSetup &view, bool bDrewSkybox )
 	m_bDrewSkybox = bDrewSkybox;
 
 	BaseClass::Setup( view );
-	m_bDrawWorldNormal = false; //true;
+	m_bDrawWorldNormal = true;
 
 	m_ClearFlags = 0;
 	m_DrawFlags = DF_DRAW_ENTITITES;
@@ -3673,7 +3673,7 @@ void CBaseShadowView::Setup( const CViewSetup &view, ITexture *pDepthTexture, IT
 
 	BaseClass::Setup( view );
 
-	m_bDrawWorldNormal =  false; //true;
+	m_bDrawWorldNormal =  true;
 
 	m_DrawFlags = DF_DRAW_ENTITITES | DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER;
 	m_ClearFlags = 0;

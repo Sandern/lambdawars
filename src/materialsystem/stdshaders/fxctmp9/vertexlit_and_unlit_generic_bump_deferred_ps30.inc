@@ -188,7 +188,7 @@ private:
 public:
 	void SetFLASHLIGHT( int i )
 	{
-		Assert( i >= 0 && i <= 1 );
+		Assert( i >= 0 && i <= 0 );
 		m_nFLASHLIGHT = i;
 #ifdef _DEBUG
 		m_bFLASHLIGHT = true;
@@ -244,6 +244,27 @@ public:
 #endif
 	}
 private:
+	int m_nFLASHLIGHTDEPTHFILTERMODE;
+#ifdef _DEBUG
+	bool m_bFLASHLIGHTDEPTHFILTERMODE;
+#endif
+public:
+	void SetFLASHLIGHTDEPTHFILTERMODE( int i )
+	{
+		Assert( i >= 0 && i <= 2 );
+		m_nFLASHLIGHTDEPTHFILTERMODE = i;
+#ifdef _DEBUG
+		m_bFLASHLIGHTDEPTHFILTERMODE = true;
+#endif
+	}
+	void SetFLASHLIGHTDEPTHFILTERMODE( bool i )
+	{
+		m_nFLASHLIGHTDEPTHFILTERMODE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFLASHLIGHTDEPTHFILTERMODE = true;
+#endif
+	}
+private:
 	int m_nSHADER_SRGB_READ;
 #ifdef _DEBUG
 	bool m_bSHADER_SRGB_READ;
@@ -283,6 +304,27 @@ public:
 		m_nSTATICLIGHT3 = i ? 1 : 0;
 #ifdef _DEBUG
 		m_bSTATICLIGHT3 = true;
+#endif
+	}
+private:
+	int m_nWORLD_NORMAL;
+#ifdef _DEBUG
+	bool m_bWORLD_NORMAL;
+#endif
+public:
+	void SetWORLD_NORMAL( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nWORLD_NORMAL = i;
+#ifdef _DEBUG
+		m_bWORLD_NORMAL = true;
+#endif
+	}
+	void SetWORLD_NORMAL( bool i )
+	{
+		m_nWORLD_NORMAL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bWORLD_NORMAL = true;
 #endif
 	}
 private:
@@ -372,6 +414,10 @@ public:
 #endif // _DEBUG
 		m_nDETAIL_BLEND_MODE = 0;
 #ifdef _DEBUG
+		m_bFLASHLIGHTDEPTHFILTERMODE = false;
+#endif // _DEBUG
+		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
+#ifdef _DEBUG
 		m_bSHADER_SRGB_READ = false;
 #endif // _DEBUG
 		m_nSHADER_SRGB_READ = 0;
@@ -379,6 +425,10 @@ public:
 		m_bSTATICLIGHT3 = false;
 #endif // _DEBUG
 		m_nSTATICLIGHT3 = 0;
+#ifdef _DEBUG
+		m_bWORLD_NORMAL = false;
+#endif // _DEBUG
+		m_nWORLD_NORMAL = 0;
 #ifdef _DEBUG
 		m_bFOW = false;
 #endif // _DEBUG
@@ -393,13 +443,13 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bDIFFUSELIGHTING && m_bLIGHTWARPTEXTURE && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bNORMALMAPALPHAENVMAPMASK && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bDETAILTEXTURE && m_bDETAIL_BLEND_MODE && m_bSHADER_SRGB_READ && m_bSTATICLIGHT3 && m_bFOW && m_bDOPIXELFOG;
+		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bDIFFUSELIGHTING && m_bLIGHTWARPTEXTURE && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bNORMALMAPALPHAENVMAPMASK && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bDETAILTEXTURE && m_bDETAIL_BLEND_MODE && m_bFLASHLIGHTDEPTHFILTERMODE && m_bSHADER_SRGB_READ && m_bSTATICLIGHT3 && m_bWORLD_NORMAL && m_bFOW && m_bDOPIXELFOG;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 40 * m_nCUBEMAP ) + ( 80 * m_nDIFFUSELIGHTING ) + ( 160 * m_nLIGHTWARPTEXTURE ) + ( 320 * m_nSELFILLUM ) + ( 640 * m_nSELFILLUMFRESNEL ) + ( 1280 * m_nNORMALMAPALPHAENVMAPMASK ) + ( 2560 * m_nHALFLAMBERT ) + ( 5120 * m_nFLASHLIGHT ) + ( 10240 * m_nDETAILTEXTURE ) + ( 20480 * m_nDETAIL_BLEND_MODE ) + ( 143360 * m_nSHADER_SRGB_READ ) + ( 143360 * m_nSTATICLIGHT3 ) + ( 143360 * m_nFOW ) + ( 286720 * m_nDOPIXELFOG ) + 0;
+		return ( 80 * m_nCUBEMAP ) + ( 160 * m_nDIFFUSELIGHTING ) + ( 320 * m_nLIGHTWARPTEXTURE ) + ( 640 * m_nSELFILLUM ) + ( 1280 * m_nSELFILLUMFRESNEL ) + ( 2560 * m_nNORMALMAPALPHAENVMAPMASK ) + ( 5120 * m_nHALFLAMBERT ) + ( 10240 * m_nFLASHLIGHT ) + ( 10240 * m_nDETAILTEXTURE ) + ( 20480 * m_nDETAIL_BLEND_MODE ) + ( 143360 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 430080 * m_nSHADER_SRGB_READ ) + ( 430080 * m_nSTATICLIGHT3 ) + ( 430080 * m_nWORLD_NORMAL ) + ( 860160 * m_nFOW ) + ( 1720320 * m_nDOPIXELFOG ) + 0;
 	}
 };
-#define shaderStaticTest_vertexlit_and_unlit_generic_bump_deferred_ps30 psh_forgot_to_set_static_CUBEMAP + psh_forgot_to_set_static_DIFFUSELIGHTING + psh_forgot_to_set_static_LIGHTWARPTEXTURE + psh_forgot_to_set_static_SELFILLUM + psh_forgot_to_set_static_SELFILLUMFRESNEL + psh_forgot_to_set_static_NORMALMAPALPHAENVMAPMASK + psh_forgot_to_set_static_HALFLAMBERT + psh_forgot_to_set_static_FLASHLIGHT + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_SHADER_SRGB_READ + psh_forgot_to_set_static_STATICLIGHT3 + psh_forgot_to_set_static_FOW + 0
+#define shaderStaticTest_vertexlit_and_unlit_generic_bump_deferred_ps30 psh_forgot_to_set_static_CUBEMAP + psh_forgot_to_set_static_DIFFUSELIGHTING + psh_forgot_to_set_static_LIGHTWARPTEXTURE + psh_forgot_to_set_static_SELFILLUM + psh_forgot_to_set_static_SELFILLUMFRESNEL + psh_forgot_to_set_static_NORMALMAPALPHAENVMAPMASK + psh_forgot_to_set_static_HALFLAMBERT + psh_forgot_to_set_static_FLASHLIGHT + psh_forgot_to_set_static_DETAILTEXTURE + psh_forgot_to_set_static_DETAIL_BLEND_MODE + psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + psh_forgot_to_set_static_SHADER_SRGB_READ + psh_forgot_to_set_static_STATICLIGHT3 + psh_forgot_to_set_static_WORLD_NORMAL + psh_forgot_to_set_static_FOW + 0
 class vertexlit_and_unlit_generic_bump_deferred_ps30_Dynamic_Index
 {
 private:
@@ -466,6 +516,27 @@ public:
 #endif
 	}
 private:
+	int m_nFLASHLIGHTSHADOWS;
+#ifdef _DEBUG
+	bool m_bFLASHLIGHTSHADOWS;
+#endif
+public:
+	void SetFLASHLIGHTSHADOWS( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nFLASHLIGHTSHADOWS = i;
+#ifdef _DEBUG
+		m_bFLASHLIGHTSHADOWS = true;
+#endif
+	}
+	void SetFLASHLIGHTSHADOWS( bool i )
+	{
+		m_nFLASHLIGHTSHADOWS = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFLASHLIGHTSHADOWS = true;
+#endif
+	}
+private:
 	int m_nUBERLIGHT;
 #ifdef _DEBUG
 	bool m_bUBERLIGHT;
@@ -524,6 +595,10 @@ public:
 #endif // _DEBUG
 		m_nAMBIENT_LIGHT = 0;
 #ifdef _DEBUG
+		m_bFLASHLIGHTSHADOWS = false;
+#endif // _DEBUG
+		m_nFLASHLIGHTSHADOWS = 0;
+#ifdef _DEBUG
 		m_bUBERLIGHT = false;
 #endif // _DEBUG
 		m_nUBERLIGHT = 0;
@@ -537,10 +612,10 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bWRITEWATERFOGTODESTALPHA && m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bUBERLIGHT && m_bPIXELFOGTYPE;
+		bool bAllDynamicVarsDefined = m_bWRITEWATERFOGTODESTALPHA && m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bFLASHLIGHTSHADOWS && m_bUBERLIGHT && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nWRITEWATERFOGTODESTALPHA ) + ( 2 * m_nNUM_LIGHTS ) + ( 10 * m_nAMBIENT_LIGHT ) + ( 20 * m_nUBERLIGHT ) + ( 20 * m_nPIXELFOGTYPE ) + 0;
+		return ( 1 * m_nWRITEWATERFOGTODESTALPHA ) + ( 2 * m_nNUM_LIGHTS ) + ( 10 * m_nAMBIENT_LIGHT ) + ( 20 * m_nFLASHLIGHTSHADOWS ) + ( 40 * m_nUBERLIGHT ) + ( 40 * m_nPIXELFOGTYPE ) + 0;
 	}
 };
-#define shaderDynamicTest_vertexlit_and_unlit_generic_bump_deferred_ps30 psh_forgot_to_set_dynamic_WRITEWATERFOGTODESTALPHA + psh_forgot_to_set_dynamic_NUM_LIGHTS + psh_forgot_to_set_dynamic_AMBIENT_LIGHT + psh_forgot_to_set_dynamic_UBERLIGHT + 0
+#define shaderDynamicTest_vertexlit_and_unlit_generic_bump_deferred_ps30 psh_forgot_to_set_dynamic_WRITEWATERFOGTODESTALPHA + psh_forgot_to_set_dynamic_NUM_LIGHTS + psh_forgot_to_set_dynamic_AMBIENT_LIGHT + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS + psh_forgot_to_set_dynamic_UBERLIGHT + 0

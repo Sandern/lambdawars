@@ -30,11 +30,9 @@
 // Always run fow
 #define FOW 1
 
-// Temp defines
-#define DETAIL_BLEND_MODE 0
-#define WRITE_DEPTH_TO_DESTALPHA 0
-
 // NOTE: This has to be before inclusion of common_lightmappedgeneric_fxc.h to get the vertex format right!
+// NOTE2: DETAILTEXTURE is now also a static, so we can skip all the needless combos with DETAIL_BLEND_MODE!
+#undef DETAILTEXTURE
 #if ( DETAIL_BLEND_MODE == 12 )
 #define DETAILTEXTURE 0
 #else

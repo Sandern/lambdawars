@@ -3,14 +3,14 @@
 // STATIC: "CUBEMAP"					"0..1"
 // STATIC: "SELFILLUM"					"0..1"
 // STATIC: "SELFILLUMFRESNEL"			"0..1"
-// DISABLED STATIC: "FLASHLIGHT"					"0..1"
+// STATIC: "FLASHLIGHT"					"0..0"
 // STATIC: "LIGHTWARPTEXTURE"			"0..1"
 // STATIC: "PHONGWARPTEXTURE"			"0..1"
 // DISABLED FOREVER STATIC: "WRINKLEMAP"					"0..1"
-// DISABLED STATIC: "DETAIL_BLEND_MODE"          "0..6"
+// STATIC: "DETAIL_BLEND_MODE"          "0..6"
 // STATIC: "DETAILTEXTURE"				"0..1"
 // STATIC: "RIMLIGHT"					"0..1"
-// DISABLED STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps30]  [PC]
+// STATIC: "FLASHLIGHTDEPTHFILTERMODE"	"0..2"	[ps30]  [PC]
 // STATIC: "SHADER_SRGB_READ"			"0..1"	[XBOX]
 // STATIC: "SHADER_SRGB_READ"			"0..0"	[PC]
 // STATIC: "WORLD_NORMAL"				"0..0"	[ps20b] [PC]
@@ -36,6 +36,9 @@
 // We don't care about flashlight depth unless the flashlight is on
 // SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTSHADOWS == 1 )
 
+// Don't compile needless flashlight combos
+// SKIP: ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTDEPTHFILTERMODE != 0 )
+
 // We don't care about uberlight unless the flashlight is on
 // SKIP: ( $FLASHLIGHT == 0 ) && ( $UBERLIGHT == 1 )	[ps30]
 
@@ -56,7 +59,6 @@
 // SKIP: ( $FOW == 1 ) && ( $WRINKLEMAP == 1 )
 
 #define FOW 1
-#define DETAIL_BLEND_MODE 0 // temp
 
 #include "common_flashlight_fxc.h"
 #include "shader_constant_register_map.h"

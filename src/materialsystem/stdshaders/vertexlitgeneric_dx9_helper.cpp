@@ -794,10 +794,10 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
 					SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, bHasDetailTexture );
 					SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
-					//SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
+					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
 					SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
 					SET_STATIC_PIXEL_SHADER_COMBO( STATICLIGHT3, bStaticLight3Streams );
-					//SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, nLightingPreviewMode == 3 );
+					SET_STATIC_PIXEL_SHADER_COMBO( WORLD_NORMAL, nLightingPreviewMode == 3 );
 					SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 					//SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
 					SET_STATIC_PIXEL_SHADER( vertexlit_and_unlit_generic_bump_deferred_ps30 );
@@ -875,7 +875,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_STATIC_PIXEL_SHADER_COMBO( ENVMAPFRESNEL,  bHasEnvMapFresnel && bHasEnvmap );
 					SET_STATIC_PIXEL_SHADER_COMBO( SELFILLUM, bHasSelfIllum );
 					SET_STATIC_PIXEL_SHADER_COMBO( VERTEXCOLOR, bHasVertexColor );
-					/*SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
+					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, bHasFlashlight );
 					SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 					SET_STATIC_PIXEL_SHADER_COMBO( SEAMLESS_BASE, bSeamlessBase );
 					SET_STATIC_PIXEL_SHADER_COMBO( SEAMLESS_DETAIL, bSeamlessDetail );
@@ -884,9 +884,9 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_STATIC_PIXEL_SHADER_COMBO( SOFT_MASK, bSoftMask );
 					SET_STATIC_PIXEL_SHADER_COMBO( OUTLINE, bOutline );
 					SET_STATIC_PIXEL_SHADER_COMBO( OUTER_GLOW, bGlow );
-					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );*/
+					SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHTDEPTHFILTERMODE, nShadowFilterMode );
 					SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
-					//SET_STATIC_PIXEL_SHADER_COMBO( DESATURATEWITHBASEALPHA, bDesaturateWithBaseAlpha );
+					SET_STATIC_PIXEL_SHADER_COMBO( DESATURATEWITHBASEALPHA, bDesaturateWithBaseAlpha );
 					SET_STATIC_PIXEL_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
 					SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 					//SET_STATIC_PIXEL_SHADER_COMBO( TEAMCOLORTEXTURE,  bHasTeamColorTexture );
@@ -1473,7 +1473,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				DECLARE_DYNAMIC_PIXEL_SHADER( vertexlit_and_unlit_generic_bump_deferred_ps30 );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, bWorldNormal ? 0 : lightState.m_nNumLights );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( AMBIENT_LIGHT, bWorldNormal ? 0 : (lightState.m_bAmbientLight ? 1 : 0 ) );
-				//SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bWorldNormal ? 0 : bFlashlightShadows );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bWorldNormal ? 0 : bFlashlightShadows );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( UBERLIGHT, bUberlight );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA, bWriteWaterFogToAlpha );
 				SET_DYNAMIC_PIXEL_SHADER_CMD( DynamicCmdsOut, vertexlit_and_unlit_generic_bump_deferred_ps30 );
