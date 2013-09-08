@@ -1670,8 +1670,7 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	const Vector &boxMaxs = m_vecMaxs;
 
 	// bloat by traveling the max velocity in all directions, plus the stepsize up/down
-	Vector bloat;
-	bloat.Init(radius, radius, radius);
+	Vector bloat( radius, radius, radius );
 	bloat.z += Max<float>( stepsize, ( stepsize * ( mv.interval*mv.maxspeed/48.0 ) ) );
 	AddPointToBounds( start + boxMaxs + bloat, moveMins, moveMaxs );
 	AddPointToBounds( start + boxMins - bloat, moveMins, moveMaxs );
