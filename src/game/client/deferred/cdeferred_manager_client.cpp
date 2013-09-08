@@ -42,7 +42,7 @@ bool CDeferredManagerClient::Init()
 {
 	AssertMsg( g_pCurrentViewRender == NULL, "viewrender already allocated?!" );
 
-	const int iDeferredLevel = CommandLine() && CommandLine()->ParmValue("-deferred", 1) != 0;
+	const int iDeferredLevel = CommandLine() ? CommandLine()->ParmValue("-deferred", 1) : 1;
 	const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-deferred") != 0;
 	const bool bForceDeferred = CommandLine() && CommandLine()->FindParm("-forcedeferred") != 0;
 	bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
@@ -65,9 +65,9 @@ bool CDeferredManagerClient::Init()
 			GetDeferredExt()->EnableDeferredLighting();
 
 			if( iDeferredLevel > 1 )
-				g_pCurrentViewRender = new CViewRender();
-			else
 				g_pCurrentViewRender = new CDeferredViewRender();
+			else
+				g_pCurrentViewRender = new CViewRender();
 
 			ConVarRef r_shadows( "r_shadows" );
 			r_shadows.SetValue( "0" );

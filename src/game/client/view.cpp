@@ -338,6 +338,10 @@ void CViewRender::LevelInit( void )
 	g_pScreenSpaceEffects->InitScreenSpaceEffects( );
 
 	InitFadeData();
+
+#ifdef DEFERRED_ENABLED
+	ResetCascadeDelay();
+#endif // DEFERRED_ENABLED
 }
 
 //-----------------------------------------------------------------------------

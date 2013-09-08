@@ -16,6 +16,9 @@
 #include "iviewrender.h"
 #include "view_shared.h"
 
+#ifdef DEFERRED_ENABLED
+#include "../../materialsystem/stdshaders/deferred_global_common.h"
+#endif // DEFERRED_ENABLED
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -262,7 +265,10 @@ protected:
 	void			Begin360ZPass();
 	void			End360ZPass();
 
-
+#ifdef DEFERRED_ENABLED
+	void			PushComposite();
+	void			PopComposite();
+#endif // DEFERRED_ENABLED
 
 	void ReleaseLists();
 
@@ -486,6 +492,34 @@ protected:
 
 	void			GetLetterBoxRectangles( int nSlot, const CViewSetup &view, CUtlVector< vrect_t >& vecLetterBoxRectangles );
 	void			DrawLetterBoxRectangles( int nSlot, const CUtlVector< vrect_t >& vecLetterBoxRectangles );
+
+	// Deferred rendering
+#ifdef DEFERRED_ENABLED
+	void			ProcessDeferredGlobals( const CViewSetup &view );
+
+	void			ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible,
+									 bool bDrawViewModel );
+
+	void BeginRadiosity( const CViewSetup &view );
+	void UpdateRadiosityPosition();
+	void PerformRadiosityGlobal( const int iRadiosityCascade, const CViewSetup &view );
+	void EndRadiosity( const CViewSetup &view );
+	void DebugRadiosity( const CViewSetup &view );
+
+	IMesh *GetRadiosityScreenGrid( const int iCascade );
+	IMesh *CreateRadiosityScreenGrid( const Vector2D &vecViewportBase, const float flWorldStepSize );
+
+	void			PerformLighting( const CViewSetup &view );
+
+	void			ResetCascadeDelay();
+	void			RenderCascadedShadows( const CViewSetup &view, const bool bEnableRadiosity );
+
+	float m_flRenderDelay[SHADOW_NUM_CASCADES];
+
+	Vector m_vecRadiosityOrigin[2];
+	IMesh *m_pMesh_RadiosityScreenGrid[2];
+	CUtlVector< IMesh* > m_hRadiosityDebugMeshList[2];
+#endif // DEFERRED_ENABLED
 
 	// This stores the current view
  	CViewSetup		m_CurrentView;

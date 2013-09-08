@@ -20,7 +20,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar max_muzzleflash_dlights( "max_muzzleflash_dlights", "15" );
+ConVar max_muzzleflash_dlights( "max_muzzleflash_dlights", "5" );
 
 #ifdef DEFERRED_ENABLED
 void DoDeferredMuzzleFlash( const Vector &vOrigin )
