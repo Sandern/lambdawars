@@ -278,7 +278,7 @@ END_SHADER_PARAMS
 				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
 				: DEFERRED_RENDER_STAGE_INVALID;
 
-			const bool bDrawToGBuffer = DrawToGBuffer( params );
+			const bool bDrawToGBuffer = true; //DrawToGBuffer( params );
 
 			Assert( pShaderAPI == NULL ||
 				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );
