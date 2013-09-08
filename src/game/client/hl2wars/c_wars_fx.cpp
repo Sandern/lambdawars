@@ -134,8 +134,9 @@ void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector 
 	}
 
 #ifdef DEFERRED_ENABLED
-	if( GetDeferredManager()->IsDeferredRenderingEnabled() )
-		DoDeferredMuzzleFlash( vecStart );
+	// Disabled: does not look good right now and takes a perf hit with many units
+	//if( GetDeferredManager()->IsDeferredRenderingEnabled() )
+	//	DoDeferredMuzzleFlash( vecStart );
 #endif // DEFERRED_ENABLED
 
 	asw_num_u_tracers++;

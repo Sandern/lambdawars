@@ -816,6 +816,57 @@ public:
 private:
 	int iCascadeIndex;
 };
+
+class CDualParaboloidShadowBlendView : public CBaseShadowBlendView
+{
+	DECLARE_CLASS( CDualParaboloidShadowBlendView, CBaseShadowBlendView );
+public:
+	CDualParaboloidShadowBlendView(CViewRender *pMainView,
+		def_light_t *pLight,
+		const bool &bSecondary)
+		: CBaseShadowBlendView( pMainView )
+	{
+			m_pLight = pLight;
+			m_bSecondary = bSecondary;
+	}
+	virtual bool	AdjustView( float waterHeight );
+	virtual void	PushView( float waterHeight );
+	virtual void	PopView();
+
+	virtual void	CalcShadowView();
+
+	virtual int		GetShadowMode(){
+		return DEFERRED_SHADOW_MODE_DPSM;
+	};
+
+private:
+	bool m_bSecondary;
+	def_light_t *m_pLight;
+};
+
+class CSpotLightShadowBlendView : public CBaseShadowBlendView
+{
+	DECLARE_CLASS( CSpotLightShadowBlendView, CBaseShadowBlendView );
+public:
+	CSpotLightShadowBlendView(CViewRender *pMainView,
+		def_light_t *pLight, int index )
+		: CBaseShadowBlendView( pMainView )
+	{
+			m_pLight = pLight;
+			m_iIndex = index;
+	}
+
+	virtual void	CalcShadowView();
+	virtual void	CommitData();
+
+	virtual int		GetShadowMode(){
+		return DEFERRED_SHADOW_MODE_PROJECTED;
+	};
+
+private:
+	def_light_t *m_pLight;
+	int m_iIndex;
+};
 #endif // DEFERRED_ENABLED
 
 
@@ -2733,8 +2784,7 @@ void CViewRender::PerformLighting( const CViewSetup &view )
 
 	pRenderContext.SafeRelease();
 
-	// TODO
-	// GetLightingManager()->RenderLights( lightingView, this );
+	GetLightingManager()->RenderLights( lightingView, this );
 
 	if ( bRadiosityEnabled )
 		EndRadiosity( view );
@@ -2791,6 +2841,48 @@ void CViewRender::RenderCascadedShadows( const CViewSetup &view, const bool bEna
 
 		if ( bDoRadiosity )
 			PerformRadiosityGlobal( iRadTarget, view );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CViewRender::DrawLightShadowView( const CViewSetup &view, int iDesiredShadowmap, def_light_t *l )
+{
+	CViewSetup setup;
+	setup.origin = l->pos;
+	setup.angles = l->ang;
+	setup.m_bOrtho = false;
+	setup.m_flAspectRatio = 1;
+	setup.x = setup.y = 0;
+
+	Vector origins[2] = { view.origin, l->pos };
+	render->ViewSetupVis( false, 2, origins );
+
+	switch ( l->iLighttype )
+	{
+	default:
+		Assert( 0 );
+		break;
+	case DEFLIGHTTYPE_POINT:
+		{
+			CRefPtr<CDualParaboloidShadowBlendView> pDPView0 = new CDualParaboloidShadowBlendView( this, l, false );
+			pDPView0->Setup( setup, GetShadowDepthRT_DP( iDesiredShadowmap ), GetShadowColorRT_DP( iDesiredShadowmap ) );
+			AddViewToScene( pDPView0 );
+
+			CRefPtr<CDualParaboloidShadowBlendView> pDPView1 = new CDualParaboloidShadowBlendView( this, l, true );
+			pDPView1->Setup( setup, GetShadowDepthRT_DP( iDesiredShadowmap ), GetShadowColorRT_DP( iDesiredShadowmap ) );
+			AddViewToScene( pDPView1 );
+		}
+		break;
+	case DEFLIGHTTYPE_SPOT:
+		{
+			CRefPtr<CSpotLightShadowBlendView> pProjView = new CSpotLightShadowBlendView( this, l, iDesiredShadowmap );
+			
+			pProjView->Setup( setup, GetShadowDepthRT_Proj( iDesiredShadowmap ), GetShadowColorRT_Proj( iDesiredShadowmap ) );
+			AddViewToScene( pProjView );
+		}
+		break;
 	}
 }
 #endif // DEFERRED_ENABLED
@@ -2984,7 +3076,28 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 	ASSERT_LOCAL_PLAYER_RESOLVABLE();
 	int slot = GET_ACTIVE_SPLITSCREEN_SLOT();
 
+#ifdef DEFERRED_ENABLED
+	CViewSetup worldView = view;
+
+	if( bDeferredActive )
+	{
+		CLightingEditor *pLightEditor = GetLightingEditor();
+
+		if ( pLightEditor->IsEditorActive() && !building_cubemaps.GetBool() )
+			pLightEditor->GetEditorView( &worldView.origin, &worldView.angles );
+		else
+			pLightEditor->SetEditorView( &worldView.origin, &worldView.angles );
+
+		
+	}
+
+	m_CurrentView = worldView;
+#else
+	const CViewSetup &worldView = view;
 	m_CurrentView = view;
+#endif // DEFERRED_ENABLED
+
+	
 
 	C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 	VPROF( "CViewRender::RenderView" );
@@ -3031,7 +3144,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 	if ( !m_FreezeParams[ slot ].m_bTakeFreezeFrame && m_FreezeParams[ slot ].m_flFreezeFrameUntil > gpGlobals->curtime )
 	{
 		CRefPtr<CFreezeFrameView> pFreezeFrameView = new CFreezeFrameView( this );
-		pFreezeFrameView->Setup( view );
+		pFreezeFrameView->Setup( worldView );
 		AddViewToScene( pFreezeFrameView );
 
 		g_bRenderingView = true;
@@ -3053,7 +3166,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 
 		g_bRenderingView = true;
 
-		RenderPreScene( view );
+		RenderPreScene( worldView );
 
 		// Must be first 
 		render->SceneBegin();
@@ -3064,16 +3177,15 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		UpdateMaterialSystemTonemapScalar();
 
 		// clear happens here probably
-		SetupMain3DView( slot, view, hudViewSetup, nClearFlags, saveRenderTarget );
+		SetupMain3DView( slot, worldView, hudViewSetup, nClearFlags, saveRenderTarget );
 
 		g_pClientShadowMgr->UpdateSplitscreenLocalPlayerShadowSkip();
 
 #ifdef DEFERRED_ENABLED
 		if( bDeferredActive )
 		{
-			const CViewSetup &worldView = view; // TODO
 			ProcessDeferredGlobals( worldView );
-			//GetLightingManager()->LightSetup( worldView ); // TODO
+			GetLightingManager()->LightSetup( worldView );
 		}
 #endif // DEFERRED_ENABLED
 
@@ -3081,7 +3193,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
 
 		// Don't bother with the skybox if we're drawing an ND buffer for the SFM
-		if ( !view.m_bDrawWorldNormal )
+		if ( !worldView.m_bDrawWorldNormal )
 		{
 			// if the 3d skybox world is drawn, then don't draw the normal skybox
 			if ( true ) // For pix event
@@ -3094,7 +3206,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 				#endif
 
 				CSkyboxView *pSkyView = new CSkyboxView( this );
-				if ( ( bDrew3dSkybox = pSkyView->Setup( view, &nClearFlags, &nSkyboxVisible ) ) != false )
+				if ( ( bDrew3dSkybox = pSkyView->Setup( worldView, &nClearFlags, &nSkyboxVisible ) ) != false )
 				{
 					AddViewToScene( pSkyView );
 				}
@@ -3106,13 +3218,13 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		if ( ( nClearFlags & VIEW_CLEAR_COLOR ) == 0 )
 		{
 			MDLCACHE_CRITICAL_SECTION();
-			if ( enginetrace->GetPointContents( view.origin ) == CONTENTS_SOLID )
+			if ( enginetrace->GetPointContents( worldView.origin ) == CONTENTS_SOLID )
 			{
 				nClearFlags |= VIEW_CLEAR_COLOR;
 			}
 		}
 
-		PreViewDrawScene( view );
+		PreViewDrawScene( worldView );
 
 		// Render world and all entities, particles, etc.
 		if( !g_pIntroData )
@@ -3123,7 +3235,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 				PIXEVENT( pRenderContext, "ViewDrawScene()" );
 			}
 			#endif
-			ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, view, nClearFlags, VIEW_MAIN, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
+			ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, worldView, nClearFlags, VIEW_MAIN, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
 		}
 		else
 		{
@@ -3133,22 +3245,23 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 				PIXEVENT( pRenderContext, "ViewDrawScene_Intro()" );
 			}
 			#endif
-			ViewDrawScene_Intro( view, nClearFlags, *g_pIntroData );
+			ViewDrawScene_Intro( worldView, nClearFlags, *g_pIntroData );
 		}
 
 		// We can still use the 'current view' stuff set up in ViewDrawScene
 		AllowCurrentViewAccess( true );
 
 #ifdef DEFERRED_ENABLED
-		if( bDeferredActive ) // TODO
+		if( bDeferredActive )
 		{
 			// must happen before teardown
-			//pLightEditor->OnRender();
+			CLightingEditor *pLightEditor = GetLightingEditor();
+			pLightEditor->OnRender();
 
-			//GetLightingManager()->LightTearDown();
+			GetLightingManager()->LightTearDown();
 		}
 #endif // DEFERRED_ENABLED
-		PostViewDrawScene( view );
+		PostViewDrawScene( worldView );
 
 		engine->DrawPortals();
 
@@ -3178,17 +3291,17 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 				pRenderContext.GetFrom( materials );
 				{
 					PIXEVENT( pRenderContext, "DoDepthOfField()" );
-					DoDepthOfField( view );
+					DoDepthOfField( worldView );
 				}
 				pRenderContext.SafeRelease();
 			}
 
-			if ( ( view.m_nMotionBlurMode != MOTION_BLUR_DISABLE ) && ( mat_motion_blur_enabled.GetInt() ) )
+			if ( ( worldView.m_nMotionBlurMode != MOTION_BLUR_DISABLE ) && ( mat_motion_blur_enabled.GetInt() ) )
 			{
 				pRenderContext.GetFrom( materials );
 				{
 					PIXEVENT( pRenderContext, "DoImageSpaceMotionBlur()" );
-					DoImageSpaceMotionBlur( view );
+					DoImageSpaceMotionBlur( worldView );
 				}
 				pRenderContext.SafeRelease();
 			}
@@ -3203,7 +3316,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		#endif
 
 		// Now actually draw the viewmodel
-		DrawViewModels( view, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
+		DrawViewModels( worldView, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
 
 #ifdef SHADER_EDITOR
 		g_ShaderEditorSystem->CustomPostRender();
@@ -3233,7 +3346,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		DrawSmokeFogOverlay();
 
 		// Overlay screen fade on entire screen
-		PerformScreenOverlay( view.x, view.y, view.width, view.height );
+		PerformScreenOverlay( worldView.x, worldView.y, worldView.width, worldView.height );
 
 		// Prevent sound stutter if going slow
 		engine->Sound_ExtraUpdate();	
@@ -3245,7 +3358,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 			pRenderContext.SafeRelease();
 		}
 
-		if ( !building_cubemaps.GetBool() && view.m_bDoBloomAndToneMapping )
+		if ( !building_cubemaps.GetBool() && worldView.m_bDoBloomAndToneMapping )
 		{
 			pRenderContext.GetFrom( materials );
 			{
@@ -3268,7 +3381,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 				{
 					bFlashlightIsOn = pLocal->IsEffectActive( EF_DIMLIGHT );
 				}
-				DoEnginePostProcessing( view.x, view.y, view.width, view.height, bFlashlightIsOn );
+				DoEnginePostProcessing( worldView.x, worldView.y, worldView.width, worldView.height, bFlashlightIsOn );
 			}
 			pRenderContext.SafeRelease();
 		}
@@ -3278,10 +3391,10 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		if ( IsPC() )
 		{
 			// Grab the pre-color corrected frame for editing purposes
-			engine->GrabPreColorCorrectedFrame( view.x, view.y, view.width, view.height );
+			engine->GrabPreColorCorrectedFrame( worldView.x, worldView.y, worldView.width, worldView.height );
 		}
 
-		PerformScreenSpaceEffects( view.x, view.y, view.width, view.height );
+		PerformScreenSpaceEffects( worldView.x, worldView.y, worldView.width, worldView.height );
 
 
 		#if defined( _X360 )
@@ -3292,9 +3405,9 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		}
 		#endif
 
-		GetClientMode()->DoPostScreenSpaceEffects( &view );
+		GetClientMode()->DoPostScreenSpaceEffects( &worldView );
 
-		CleanupMain3DView( view );
+		CleanupMain3DView( worldView );
 
 		if ( m_FreezeParams[ slot ].m_bTakeFreezeFrame )
 		{
@@ -3343,30 +3456,30 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 		// NOTE: view.height is off by 1 on the PC in a release build, but debug is correct! I'm leaving this here to help track this down later.
 		// engine->Con_NPrintf( 25 + hh, "view( %d, %d, %d, %d ) GetBackBufferDimensions( %d, %d )\n", view.x, view.y, view.width, view.height, nScreenWidth, nScreenHeight );
 
-		if ( view.x != 0 ) // if left of viewport isn't at 0
+		if ( worldView.x != 0 ) // if left of viewport isn't at 0
 		{
-			pRenderContext->Viewport( view.x, view.y, 1, view.height );
+			pRenderContext->Viewport( worldView.x, worldView.y, 1, worldView.height );
 			pRenderContext->ClearColor3ub( 0, 0, 0 );
 			pRenderContext->ClearBuffers( true, false );
 		}
 
-		if ( ( view.x + view.width ) != nScreenWidth ) // if right of viewport isn't at edge of screen
+		if ( ( worldView.x + worldView.width ) != nScreenWidth ) // if right of viewport isn't at edge of screen
 		{
-			pRenderContext->Viewport( view.x + view.width - 1, view.y, 1, view.height );
+			pRenderContext->Viewport( worldView.x + worldView.width - 1, worldView.y, 1, worldView.height );
 			pRenderContext->ClearColor3ub( 0, 0, 0 );
 			pRenderContext->ClearBuffers( true, false );
 		}
 
-		if ( view.y != 0 ) // if top of viewport isn't at 0
+		if ( worldView.y != 0 ) // if top of viewport isn't at 0
 		{
 			pRenderContext->Viewport( view.x, view.y, view.width, 1 );
 			pRenderContext->ClearColor3ub( 0, 0, 0 );
 			pRenderContext->ClearBuffers( true, false );
 		}
 
-		if ( ( view.y + view.height ) != nScreenHeight ) // if bottom of viewport isn't at edge of screen
+		if ( ( worldView.y + worldView.height ) != nScreenHeight ) // if bottom of viewport isn't at edge of screen
 		{
-			pRenderContext->Viewport( view.x, view.y + view.height - 1, view.width, 1 );
+			pRenderContext->Viewport( worldView.x, worldView.y + worldView.height - 1, worldView.width, 1 );
 			pRenderContext->ClearColor3ub( 0, 0, 0 );
 			pRenderContext->ClearBuffers( true, false );
 		}
@@ -3444,7 +3557,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 
 	g_WorldListCache.Flush();
 
-	m_CurrentView = view;
+	m_CurrentView = worldView;
 
 #ifdef PARTICLE_USAGE_DEMO
 	ParticleUsageDemo();
@@ -7622,5 +7735,97 @@ void COrthoShadowBlendView::CommitData()
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_SHADOW_INDEX, iCascadeIndex );
+}
+
+
+bool CDualParaboloidShadowBlendView::AdjustView( float waterHeight )
+{
+	BaseClass::AdjustView( waterHeight );
+
+	// HACK: when pushing our actual view the renderer fails building the worldlist right!
+	// So we can't. Shit.
+	return false;
+}
+
+void CDualParaboloidShadowBlendView::PushView( float waterHeight )
+{
+	BaseClass::PushView( waterHeight );
+}
+
+void CDualParaboloidShadowBlendView::PopView()
+{
+	BaseClass::PopView();
+}
+
+void CDualParaboloidShadowBlendView::CalcShadowView()
+{
+	float flRadius = m_pLight->flRadius;
+
+	m_bOrtho = true;
+	m_OrthoTop = m_OrthoLeft = -flRadius;
+	m_OrthoBottom = m_OrthoRight = flRadius;
+
+	int dpsmRes = GetShadowResolution_Point();
+
+	width = dpsmRes;
+	height = dpsmRes;
+
+	zNear = zNearViewmodel = 0;
+	zFar = zFarViewmodel = flRadius;
+
+	if ( m_bSecondary )
+	{
+		y = dpsmRes;
+
+		Vector fwd, up;
+		AngleVectors( angles, &fwd, NULL, &up );
+		VectorAngles( -fwd, up, angles );
+	}
+}
+
+
+void CSpotLightShadowBlendView::CalcShadowView()
+{
+	float flRadius = m_pLight->flRadius;
+
+	int spotRes = GetShadowResolution_Spot();
+
+	width = spotRes;
+	height = spotRes;
+
+	zNear = zNearViewmodel = DEFLIGHT_SPOT_ZNEAR;
+	zFar = zFarViewmodel = flRadius;
+
+	fov = fovViewmodel = m_pLight->GetFOV();
+}
+
+void CSpotLightShadowBlendView::CommitData()
+{
+	struct sendShadowDataProj
+	{
+		shadowData_proj_t data;
+		int index;
+		static void Fire( sendShadowDataProj d )
+		{
+			IDeferredExtension *pDef = GetDeferredExt();
+			pDef->CommitShadowData_Proj( d.index, d.data );
+		};
+	};
+
+	Vector fwd;
+	AngleVectors( angles, &fwd );
+
+	sendShadowDataProj data;
+	data.index = m_iIndex;
+	data.data.vecForward.Init( fwd );
+	data.data.vecOrigin.Init( origin );
+	// slope min, slope max, normal max, depth
+	//data.data.vecSlopeSettings.Init( 0.005f, 0.02f, 3, zFar );
+	data.data.vecSlopeSettings.Init( 0.001f, 0.005f, 3, 0 );
+
+	QUEUE_FIRE( sendShadowDataProj, Fire, data );
+
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_SHADOW_INDEX, m_iIndex );
 }
 #endif // DEFERRED_ENABLED

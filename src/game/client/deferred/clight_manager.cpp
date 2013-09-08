@@ -855,7 +855,7 @@ FORCEINLINE void CLightingManager::DrawVolumePrepass( bool bDoModelTransform, co
 	pRenderContext->PopRenderTargetAndViewport();
 }
 
-void CLightingManager::RenderLights( const CViewSetup &view, CDeferredViewRender *pCaller )
+void CLightingManager::RenderLights( const CViewSetup &view, CViewRender *pCaller )
 {
 	static CUtlVector<def_light_t*> lightsShadowedCookied;
 	static CUtlVector<def_light_t*> lightsShadowed;

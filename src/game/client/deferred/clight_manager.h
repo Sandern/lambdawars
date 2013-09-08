@@ -4,6 +4,7 @@
 #include "cbase.h"
 
 class CViewSetup;
+class CViewRender;
 class CDeferredViewRender;
 #if DEFCFG_USE_SSE
 struct def_light_presortdatax4_t;
@@ -60,7 +61,7 @@ public:
 	void SortLights();
 
 	// draw all lights set up for rendering
-	void RenderLights( const CViewSetup &view, CDeferredViewRender *pCaller );
+	void RenderLights( const CViewSetup &view, CViewRender *pCaller );
 
 	// add volumes to scene after composition
 	void RenderVolumetrics( const CViewSetup &view );

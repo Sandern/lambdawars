@@ -38,6 +38,10 @@ class C_BaseEntity;
 	class CStunEffect;
 #endif // HL2_EPISODIC
 
+#ifdef DEFERRED_ENABLED
+	struct def_light_t;
+#endif // DEFERRED_ENABLED
+
 //-----------------------------------------------------------------------------
 // Data specific to intro mode to control rendering.
 //-----------------------------------------------------------------------------
@@ -514,6 +518,10 @@ protected:
 	void			ResetCascadeDelay();
 	void			RenderCascadedShadows( const CViewSetup &view, const bool bEnableRadiosity );
 
+public:
+	virtual void	DrawLightShadowView( const CViewSetup &view, int iDesiredShadowmap, def_light_t *l );
+
+protected:
 	float m_flRenderDelay[SHADOW_NUM_CASCADES];
 
 	Vector m_vecRadiosityOrigin[2];
