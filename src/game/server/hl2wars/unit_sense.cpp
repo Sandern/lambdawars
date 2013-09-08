@@ -119,7 +119,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	m_hNearestFriendly = NULL;
 	m_hNearestAttackedFriendly = NULL;
 
-	iBestAttackPriority = -666;
+	iBestAttackPriority = -1000;
 
 	m_SeenEnemies.RemoveAll();
 	m_SeenOther.RemoveAll();
@@ -248,11 +248,13 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				m_SeenEnemies.Tail().distancesqr = otherDist;
 
 				// Test if nearest enemy
-				if( otherDist < fBestEnemyDist )
+				iAttackPriority = GetOuter()->m_Relationship[i].priority;
+				if( iAttackPriority > iBestAttackPriority 
+					|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 				{
 					fBestEnemyDist = otherDist;
 					m_hNearestEnemy = pEntOther;
-					iBestAttackPriority = 666;//iAttackPriority;
+					iBestAttackPriority = iAttackPriority;
 				}
 			}
 			else
