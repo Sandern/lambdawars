@@ -209,8 +209,7 @@ class GameInterface(SemiSharedModuleGenerator):
         cls.mem_funs('Dispatch').exclude()               # Must be excluded, or else things get broken without errors/warnings!
         cls.mem_funs('AutoCompleteSuggest').exclude()
         
-        #mb.mem_funs('GetName').include()
-        # Virtuality fuxors ConCommand. 
+        # Virtuality screws up ConCommand. 
         cls.mem_funs().virtuality = 'not virtual' 
         
         # Sending messages
@@ -321,13 +320,12 @@ class GameInterface(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"engine\" ) = boost::ref(pyengine);" )   
         
         # Command line
-        if settings.ASW_CODE_BASE:
-            cls = mb.class_('ICommandLine')
-            cls.include()
-            cls.mem_funs().virtuality = 'not virtual'
+        cls = mb.class_('ICommandLine')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
             
-            mb.free_function('CommandLine').include()
-            mb.free_function('CommandLine').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
+        mb.free_function('CommandLine').include()
+        mb.free_function('CommandLine').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         
         # Accessing model info
         cls = mb.class_('PyVModelInfo')
