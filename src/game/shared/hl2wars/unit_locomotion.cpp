@@ -516,11 +516,15 @@ void UnitBaseLocomotion::UpdateBlockerNoMove()
 	CBaseEntity *pList[MAX_FIND_BLOCKERS];
 	Ray_t ray;
 	ray.Init( mv->origin, mv->origin + Vector(0,0,1), m_vecMins - Vector(fBloat, fBloat, 0.0f), m_vecMaxs + Vector(fBloat, fBloat, 0.0f) );
-	int n = UTIL_EntitiesAlongRay( pList, MAX_FIND_BLOCKERS, ray, 0 );
+	int n = UTIL_EntitiesAlongRay( pList, MAX_FIND_BLOCKERS, ray, FL_NPC|FL_OBJECT );
 
 	for( int i = 0; i < n; i++ )
 	{
-		AddBlocker( pList[i], pList[i]->GetAbsOrigin(), vec3_origin );
+		CBaseEntity *pEnt = pList[i];
+		if( !pEnt || pEnt == GetOuter() || !pEnt->IsSolid() )
+			continue;
+
+		AddBlocker( pEnt, pEnt->GetAbsOrigin(), vec3_origin );
 	}
 }
 
