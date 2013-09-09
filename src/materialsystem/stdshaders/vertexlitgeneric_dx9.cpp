@@ -529,7 +529,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 			Assert( pShaderAPI == NULL ||
 				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );
 
-			if ( bDrawToGBuffer )
+			//if ( bDrawToGBuffer )
 			{
 				if ( pShaderShadow != NULL ||
 					iDeferredRenderStage == DEFERRED_RENDER_STAGE_GBUFFER )
@@ -556,6 +556,8 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 			bDrawComposite = ( pShaderShadow != NULL ||
 				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION );
+
+			bDeferredActive = bDrawToGBuffer;
 		}
 
 		// Skip the standard rendering if cloak pass is fully opaque
@@ -575,7 +577,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		{
 			VertexLitGeneric_DX9_Vars_t vars;
 			SetupVars( vars );
-			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, true, vars, vertexCompression, pContextDataPtr );
+			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, true, vars, vertexCompression, pContextDataPtr, bDeferredActive );
 		}
 		else
 		{

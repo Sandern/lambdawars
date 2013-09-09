@@ -270,11 +270,9 @@ static void ComputePhongShaderInfo( CBaseVSShader *pShader, IMaterialVar** param
 }
 
 void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, IShaderShadow* pShaderShadow,
-	                         VertexLitGeneric_DX9_Vars_t &info, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContextDataPtr )
+	                         VertexLitGeneric_DX9_Vars_t &info, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData **pContextDataPtr, bool bDeferredActive )
 {
 	CPhong_DX9_Context *pContextData = reinterpret_cast< CPhong_DX9_Context *> ( *pContextDataPtr );
-
-	bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 
 	bool bHasFlashlight = pShader->UsingFlashlight( params );
 	bool bHasFlashlightOnly = bHasFlashlight && !IsX360();

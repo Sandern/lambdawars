@@ -50,7 +50,7 @@ BEGIN_VS_SHADER( Wireframe_DX9,
 		VertexLitGeneric_DX9_Vars_t vars;
 		vars.m_nDisplacementMap = DISPLACEMENTMAP;
 		vars.m_nDisplacementWrinkleMap = DISPLACEMENTWRINKLE;
-		DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr );
+		DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr, false );
 	}
 END_SHADER
 

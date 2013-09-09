@@ -398,12 +398,10 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 											   bool bVertexLitGeneric, bool bHasFlashlight, bool bSinglePassFlashlight, 
 											   VertexLitGeneric_DX9_Vars_t &info,
 											   VertexCompressionType_t vertexCompression,
-											   CBasePerMaterialContextData **pContextDataPtr ) 
+											   CBasePerMaterialContextData **pContextDataPtr, bool bDeferredActive ) 
 
 {
 	CVertexLitGeneric_DX9_Context *pContextData = reinterpret_cast< CVertexLitGeneric_DX9_Context *> ( *pContextDataPtr );
-
-	bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled() && bVertexLitGeneric;
 
 	bool bHasBump = IsTextureSet( info.m_nBumpmap, params );
 #if !defined( _X360 )
@@ -437,16 +435,12 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 		nDetailBlendMode = 5;								// skip fancy threshold blending if ps2.0
 	}
 
-	// Temp
-	if( bDeferredActive )
-		nDetailBlendMode = 0;
-
 	BlendType_t nBlendType;
 
 	int nDetailTranslucencyTexture = -1;
 
 	float fBlendFactor = GetFloatParam( info.m_nDetailTextureBlendFactor, params, 1.0 );
-	bool bHasDetailTexture = IsTextureSet( info.m_nDetail, params ) && !bDeferredActive /* temp */;
+	bool bHasDetailTexture = IsTextureSet( info.m_nDetail, params );
 	if ( bHasDetailTexture && ( fBlendFactor > 0.0 ) )
 	{
 		if ( ( nDetailBlendMode == 3 ) || ( nDetailBlendMode == 8 ) || ( nDetailBlendMode == 9 ) )
@@ -500,8 +494,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 	if ( pShader->IsSnapshotting() || (! pContextData ) || ( pContextData->m_bMaterialVarsChanged ) )
 	{
-		bool bSeamlessBase = IsBoolSet( info.m_nSeamlessBase, params ) && !bTreeSway && !bDeferredActive /* temp */;
-		bool bSeamlessDetail = IsBoolSet( info.m_nSeamlessDetail, params ) && !bTreeSway && !bDeferredActive /* temp */;
+		bool bSeamlessBase = IsBoolSet( info.m_nSeamlessBase, params ) && !bTreeSway;
+		bool bSeamlessDetail = IsBoolSet( info.m_nSeamlessDetail, params ) && !bTreeSway;
 		bool bDistanceAlpha = IsBoolSet( info.m_nDistanceAlpha, params );
 		bool bHasSelfIllum = (!bHasFlashlight || bSinglePassFlashlight) && IS_FLAG_SET( MATERIAL_VAR_SELFILLUM );
 
@@ -836,9 +830,9 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				if ( bDistanceAlpha )
 				{
 					bDistanceAlphaFromDetail = IsBoolSet( info.m_nDistanceAlphaFromDetail, params );
-					bSoftMask = IsBoolSet( info.m_nSoftEdges, params ) && !bDeferredActive /* temp */;
-					bGlow = IsBoolSet( info.m_nGlow, params ) && !bDeferredActive /* temp */;
-					bOutline = IsBoolSet( info.m_nOutline, params ) && !bDeferredActive /* temp */;
+					bSoftMask = IsBoolSet( info.m_nSoftEdges, params );
+					bGlow = IsBoolSet( info.m_nGlow, params );
+					bOutline = IsBoolSet( info.m_nOutline, params );
 				}
 
 				// The vertex shader uses the vertex id stream
@@ -1576,11 +1570,11 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynamicAPI *pShaderAPI,
 	IShaderShadow* pShaderShadow, bool bVertexLitGeneric, VertexLitGeneric_DX9_Vars_t &info, VertexCompressionType_t vertexCompression,
-								CBasePerMaterialContextData **pContextDataPtr )
+								CBasePerMaterialContextData **pContextDataPtr, bool bDeferredActive )
 {
 	if ( WantsPhongShader( params, info ) && g_pHardwareConfig->SupportsPixelShaders_2_b() /*&& mat_bumpmap.GetBool()*/ )
 	{
-		DrawPhong_DX9( pShader, params, pShaderAPI, pShaderShadow, info, vertexCompression, pContextDataPtr );
+		DrawPhong_DX9( pShader, params, pShaderAPI, pShaderShadow, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 		return;		
 	}
 	
@@ -1592,7 +1586,7 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 	{
 		//360 only supports single pass flashlight, so bHasFlashlight == bSinglePassFlashlight. And single pass flashlights are the same as multipass when there's no flashlight.
 		DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-			pShaderShadow, bVertexLitGeneric, bHasFlashlight, IsX360(), info, vertexCompression, pContextDataPtr );
+			pShaderShadow, bVertexLitGeneric, bHasFlashlight, IsX360(), info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 	}
 	else //single pass flashlight enabled material. Support both multipass and single pass flashlight
 	{
@@ -1600,9 +1594,9 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 		{
 			//snapshotting, grab a snapshot of both modes
 			DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-				pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr );
+				pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 			DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-				pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr );
+				pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 		}
 		else
 		{
@@ -1612,13 +1606,13 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 				//use only the second (singlepass flashlights) snapshot
 				pShader->Draw( false );
 				DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-					pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr );
+					pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 			}
 			else
 			{
 				//use only the first (multipass flashlights) snapshot
 				DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-					pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr );
+					pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
 				pShader->Draw( false );
 			}
 		}
