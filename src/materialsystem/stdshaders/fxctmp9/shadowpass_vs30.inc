@@ -70,6 +70,27 @@ public:
 		m_bMULTITEXTURE = true;
 #endif
 	}
+private:
+	int m_nTREESWAY;
+#ifdef _DEBUG
+	bool m_bTREESWAY;
+#endif
+public:
+	void SetTREESWAY( int i )
+	{
+		Assert( i >= 0 && i <= 2 );
+		m_nTREESWAY = i;
+#ifdef _DEBUG
+		m_bTREESWAY = true;
+#endif
+	}
+	void SetTREESWAY( bool i )
+	{
+		m_nTREESWAY = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bTREESWAY = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	shadowpass_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
@@ -86,19 +107,23 @@ public:
 		m_bMULTITEXTURE = false;
 #endif // _DEBUG
 		m_nMULTITEXTURE = 0;
+#ifdef _DEBUG
+		m_bTREESWAY = false;
+#endif // _DEBUG
+		m_nTREESWAY = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bMODEL && m_bMORPHING_VTEX && m_bMULTITEXTURE;
+		bool bAllStaticVarsDefined = m_bMODEL && m_bMORPHING_VTEX && m_bMULTITEXTURE && m_bTREESWAY;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 48 * m_nMODEL ) + ( 96 * m_nMORPHING_VTEX ) + ( 192 * m_nMULTITEXTURE ) + 0;
+		return ( 48 * m_nMODEL ) + ( 96 * m_nMORPHING_VTEX ) + ( 192 * m_nMULTITEXTURE ) + ( 576 * m_nTREESWAY ) + 0;
 	}
 };
-#define shaderStaticTest_shadowpass_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_MORPHING_VTEX + vsh_forgot_to_set_static_MULTITEXTURE + 0
+#define shaderStaticTest_shadowpass_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_MORPHING_VTEX + vsh_forgot_to_set_static_MULTITEXTURE + vsh_forgot_to_set_static_TREESWAY + 0
 class shadowpass_vs30_Dynamic_Index
 {
 private:

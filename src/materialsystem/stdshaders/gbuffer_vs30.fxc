@@ -5,6 +5,7 @@
 // STATIC:		"BUMPMAP2"				"0..1"
 // STATIC:		"BLENDMODULATE"			"0..1"
 // STATIC:		"MULTIBLEND"			"0..1"
+// STATIC:		"TREESWAY"				"0..2"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
@@ -41,6 +42,37 @@ const float4 g_vScales								: register( c28 );
 
 #if BLENDMODULATE
 const float4 flBlendModTransform[2]			: register( SHADER_SPECIFIC_CONST_3 ); // up to 4
+#endif
+
+#if ( TREESWAY )
+	const float4 flTreeSwayParams1			: register( SHADER_SPECIFIC_CONST_5 );
+	const float4 flTreeSwayParams2			: register( SHADER_SPECIFIC_CONST_6 );
+	const float4 flTreeSwayParams3			: register( SHADER_SPECIFIC_CONST_7 );
+	const float4 flTreeSwayParams4			: register( SHADER_SPECIFIC_CONST_8 );
+	const float4 flTreeSwayParams5			: register( SHADER_SPECIFIC_CONST_9 );
+	
+	#define g_flFastSwaySpeedScale flTreeSwayParams1.x
+	#define g_flScrumbleFalloffCurve flTreeSwayParams1.y
+	#define g_flSwayFalloffCurve flTreeSwayParams1.z
+	#define g_flScrumbleSpeed flTreeSwayParams1.w
+	
+	#define g_flTime flTreeSwayParams2.y
+	#define g_vWindDir flTreeSwayParams2.zw
+
+	#define g_flHeight flTreeSwayParams3.x
+	#define g_flStartHeight flTreeSwayParams3.y
+	#define g_flRadius flTreeSwayParams3.z
+	#define g_flStartRadius flTreeSwayParams3.w
+
+	#define g_flSwaySpeed flTreeSwayParams4.x
+	#define g_flSwayIntensity flTreeSwayParams4.y
+	#define g_flScrumbleWaveCount flTreeSwayParams4.z
+	#define g_flScrumbleIntensity flTreeSwayParams4.w
+
+	#define g_flWindSpeedLerpStart flTreeSwayParams5.x
+	#define g_flWindSpeedLerpEnd flTreeSwayParams5.y
+	
+	#include "tree_sway.h"
 #endif
 
 struct VS_INPUT
@@ -151,6 +183,12 @@ VS_OUTPUT main( const VS_INPUT In )
 #endif
 #endif
 
+	#if ( TREESWAY )
+	{
+		vPos.xyz = ComputeTreeSway( vPos.xyz, g_flTime );
+	}
+	#endif
+
 	SkinPositionNormalAndTangentSpace( g_bSkinning, vPos, vNormal, vTangentMixed,
 		In.vBoneWeights, In.vBoneIndices,
 		worldPos, worldNormal, worldTangentS, worldTangentT );
@@ -169,6 +207,12 @@ VS_OUTPUT main( const VS_INPUT In )
 		In.vVertexID, In.vTexCoord2, vPos.xyz, vNormal );
 #endif
 #endif
+
+	#if ( TREESWAY )
+	{
+		vPos.xyz = ComputeTreeSway( vPos.xyz, g_flTime );
+	}
+	#endif
 
 	SkinPositionAndNormal( g_bSkinning, vPos, vNormal,
 		In.vBoneWeights, In.vBoneIndices,

@@ -17,6 +17,22 @@ void InitParmsGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMa
 
 	PARM_INIT_FLOAT( info.iPhongExp, DEFAULT_PHONG_EXP );
 	PARM_INIT_FLOAT( info.iPhongExp2, DEFAULT_PHONG_EXP );
+
+	InitIntParam( info.m_nTreeSway, params, 0 );
+	InitFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
+	InitFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
+	InitFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
+	InitFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
+	InitFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedHighWindMultiplier, params, 2.0f );
+	InitFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 5.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
+	InitFloatParam( info.m_nTreeSwayFalloffExp, params, 1.5f );
+	InitFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
 }
 
 void InitPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMaterialVar **params )
@@ -107,6 +123,9 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 	const bool bHasSpec2 = ( info.nSpecTexture2 != -1 && params[ info.nSpecTexture2 ]->IsDefined() );
 	const bool bHasSpec3 = ( info.nSpecTexture3 != -1 && params[ info.nSpecTexture3 ]->IsDefined() );
 	const bool bHasSpec4 = ( info.nSpecTexture4 != -1 && params[ info.nSpecTexture4 ]->IsDefined() );
+
+	const bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 );
+	const int nTreeSwayMode = clamp( GetIntParam( info.m_nTreeSway, params, 0 ), 0, 2 );
 
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
 	const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT ) && bAlbedo && bIsDecal;
@@ -244,6 +263,7 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP2, bBumpmap2 && !bMultiBlend );
 		SET_STATIC_VERTEX_SHADER_COMBO( BLENDMODULATE, bBlendmodulate );
 		SET_STATIC_VERTEX_SHADER_COMBO( MULTIBLEND, bMultiBlendBump );
+		SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, bTreeSway ? nTreeSwayMode : 0 );
 		SET_STATIC_VERTEX_SHADER( gbuffer_vs30 );
 
 #if DEFCFG_DEFERRED_SHADING == 1
@@ -459,6 +479,32 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 				tmpBuf.SetVertexShaderConstant( 28, vScales.Base() );
 			}
 
+			if ( bTreeSway )
+			{
+				float flParams[4];
+				flParams[0] = GetFloatParam( info.m_nTreeSwaySpeedHighWindMultiplier, params, 2.0f );
+				flParams[1] = GetFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
+				flParams[2] = GetFloatParam( info.m_nTreeSwayFalloffExp, params, 1.0f );
+				flParams[3] = GetFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 3.0f );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, flParams );
+
+				flParams[0] = GetFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
+				flParams[1] = GetFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
+				flParams[2] = GetFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
+				flParams[3] = GetFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, flParams );
+
+				flParams[0] = GetFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
+				flParams[1] = GetFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
+				flParams[2] = GetFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
+				flParams[3] = GetFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, flParams );
+
+				flParams[0] = GetFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
+				flParams[1] = GetFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_9, flParams );
+			}
+
 			tmpBuf.SetPixelShaderConstant4( 1, 
 				IS_FLAG_SET( MATERIAL_VAR_HALFLAMBERT ) ? 1.0f : 0.0f,
 				PARM_SET( info.iLitface ) ? 1.0f : 0.0f, 
@@ -492,6 +538,17 @@ void DrawPassGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMat
 		{
 			bool bUnusedTexCoords[3] = { false, true, !pShaderAPI->IsHWMorphingEnabled() || !bIsDecal };
 			pShaderAPI->MarkUnusedVertexFields( 0, 3, bUnusedTexCoords );
+		}
+
+		if ( bTreeSway )
+		{
+			float fTempConst[4];
+			fTempConst[0] = 0; // unused
+			fTempConst[1] = pShaderAPI->CurrentTime();
+			Vector windDir = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_WIND_DIRECTION );
+			fTempConst[2] = windDir.x;
+			fTempConst[3] = windDir.y;
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, fTempConst );
 		}
 
 		float vPos[4] = {0,0,0,0};

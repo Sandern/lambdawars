@@ -137,6 +137,27 @@ public:
 		m_bMULTIBLEND = true;
 #endif
 	}
+private:
+	int m_nTREESWAY;
+#ifdef _DEBUG
+	bool m_bTREESWAY;
+#endif
+public:
+	void SetTREESWAY( int i )
+	{
+		Assert( i >= 0 && i <= 2 );
+		m_nTREESWAY = i;
+#ifdef _DEBUG
+		m_bTREESWAY = true;
+#endif
+	}
+	void SetTREESWAY( bool i )
+	{
+		m_nTREESWAY = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bTREESWAY = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	gbuffer_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
@@ -165,19 +186,23 @@ public:
 		m_bMULTIBLEND = false;
 #endif // _DEBUG
 		m_nMULTIBLEND = 0;
+#ifdef _DEBUG
+		m_bTREESWAY = false;
+#endif // _DEBUG
+		m_nTREESWAY = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bMODEL && m_bTANGENTSPACE && m_bMORPHING_VTEX && m_bBUMPMAP2 && m_bBLENDMODULATE && m_bMULTIBLEND;
+		bool bAllStaticVarsDefined = m_bMODEL && m_bTANGENTSPACE && m_bMORPHING_VTEX && m_bBUMPMAP2 && m_bBLENDMODULATE && m_bMULTIBLEND && m_bTREESWAY;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 8 * m_nMODEL ) + ( 16 * m_nTANGENTSPACE ) + ( 32 * m_nMORPHING_VTEX ) + ( 64 * m_nBUMPMAP2 ) + ( 128 * m_nBLENDMODULATE ) + ( 256 * m_nMULTIBLEND ) + 0;
+		return ( 8 * m_nMODEL ) + ( 16 * m_nTANGENTSPACE ) + ( 32 * m_nMORPHING_VTEX ) + ( 64 * m_nBUMPMAP2 ) + ( 128 * m_nBLENDMODULATE ) + ( 256 * m_nMULTIBLEND ) + ( 512 * m_nTREESWAY ) + 0;
 	}
 };
-#define shaderStaticTest_gbuffer_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_TANGENTSPACE + vsh_forgot_to_set_static_MORPHING_VTEX + vsh_forgot_to_set_static_BUMPMAP2 + vsh_forgot_to_set_static_BLENDMODULATE + vsh_forgot_to_set_static_MULTIBLEND + 0
+#define shaderStaticTest_gbuffer_vs30 vsh_forgot_to_set_static_MODEL + vsh_forgot_to_set_static_TANGENTSPACE + vsh_forgot_to_set_static_MORPHING_VTEX + vsh_forgot_to_set_static_BUMPMAP2 + vsh_forgot_to_set_static_BLENDMODULATE + vsh_forgot_to_set_static_MULTIBLEND + vsh_forgot_to_set_static_TREESWAY + 0
 class gbuffer_vs30_Dynamic_Index
 {
 private:

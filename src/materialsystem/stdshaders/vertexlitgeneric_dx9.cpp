@@ -374,6 +374,22 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		p.iPhongExp = PHONGEXPONENT;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
+
+		p.m_nTreeSway = TREESWAY;
+		p.m_nTreeSwayHeight = TREESWAYHEIGHT;
+		p.m_nTreeSwayStartHeight = TREESWAYSTARTHEIGHT;
+		p.m_nTreeSwayRadius = TREESWAYRADIUS;
+		p.m_nTreeSwayStartRadius = TREESWAYSTARTRADIUS;
+		p.m_nTreeSwaySpeed = TREESWAYSPEED;
+		p.m_nTreeSwaySpeedHighWindMultiplier = TREESWAYSPEEDHIGHWINDMULTIPLIER;
+		p.m_nTreeSwayStrength = TREESWAYSTRENGTH;
+		p.m_nTreeSwayScrumbleSpeed = TREESWAYSCRUMBLESPEED;
+		p.m_nTreeSwayScrumbleStrength = TREESWAYSCRUMBLESTRENGTH;
+		p.m_nTreeSwayScrumbleFrequency = TREESWAYSCRUMBLEFREQUENCY;
+		p.m_nTreeSwayFalloffExp = TREESWAYFALLOFFEXP;
+		p.m_nTreeSwayScrumbleFalloffExp = TREESWAYSCRUMBLEFALLOFFEXP;		
+		p.m_nTreeSwaySpeedLerpStart = TREESWAYSPEEDLERPSTART;
+		p.m_nTreeSwaySpeedLerpEnd = TREESWAYSPEEDLERPEND;
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )
@@ -382,6 +398,22 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		p.iAlbedo = BASETEXTURE;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
+
+		p.m_nTreeSway = TREESWAY;
+		p.m_nTreeSwayHeight = TREESWAYHEIGHT;
+		p.m_nTreeSwayStartHeight = TREESWAYSTARTHEIGHT;
+		p.m_nTreeSwayRadius = TREESWAYRADIUS;
+		p.m_nTreeSwayStartRadius = TREESWAYSTARTRADIUS;
+		p.m_nTreeSwaySpeed = TREESWAYSPEED;
+		p.m_nTreeSwaySpeedHighWindMultiplier = TREESWAYSPEEDHIGHWINDMULTIPLIER;
+		p.m_nTreeSwayStrength = TREESWAYSTRENGTH;
+		p.m_nTreeSwayScrumbleSpeed = TREESWAYSCRUMBLESPEED;
+		p.m_nTreeSwayScrumbleStrength = TREESWAYSCRUMBLESTRENGTH;
+		p.m_nTreeSwayScrumbleFrequency = TREESWAYSCRUMBLEFREQUENCY;
+		p.m_nTreeSwayFalloffExp = TREESWAYFALLOFFEXP;
+		p.m_nTreeSwayScrumbleFalloffExp = TREESWAYSCRUMBLEFALLOFFEXP;		
+		p.m_nTreeSwaySpeedLerpStart = TREESWAYSPEEDLERPSTART;
+		p.m_nTreeSwaySpeedLerpEnd = TREESWAYSPEEDLERPEND;
 	}
 
 	bool DrawToGBuffer( IMaterialVar **params )

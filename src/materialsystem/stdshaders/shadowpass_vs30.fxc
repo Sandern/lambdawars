@@ -2,6 +2,7 @@
 // STATIC:		"MODEL"					"0..1"
 // STATIC:		"MORPHING_VTEX"			"0..1"
 // STATIC:		"MULTITEXTURE"			"0..2"
+// STATIC:		"TREESWAY"				"0..2"
 
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 // DYNAMIC:		"SKINNING"				"0..1"
@@ -43,6 +44,44 @@ const float4x3 g_matView			: register( SHADER_SPECIFIC_CONST_7 );
 
 #endif
 
+#if MULTITEXTURE == 2
+
+const float4 g_vRotations							: register( SHADER_SPECIFIC_CONST_12 );
+const float4 g_vScales								: register( SHADER_SPECIFIC_CONST_13 );
+
+#endif // MULTITEXTURE
+
+#if ( TREESWAY )
+	const float4 flTreeSwayParams1			: register( SHADER_SPECIFIC_CONST_5 );
+	const float4 flTreeSwayParams2			: register( SHADER_SPECIFIC_CONST_6 );
+	const float4 flTreeSwayParams3			: register( SHADER_SPECIFIC_CONST_7 );
+	const float4 flTreeSwayParams4			: register( SHADER_SPECIFIC_CONST_8 );
+	const float4 flTreeSwayParams5			: register( SHADER_SPECIFIC_CONST_9 );
+	
+	#define g_flFastSwaySpeedScale flTreeSwayParams1.x
+	#define g_flScrumbleFalloffCurve flTreeSwayParams1.y
+	#define g_flSwayFalloffCurve flTreeSwayParams1.z
+	#define g_flScrumbleSpeed flTreeSwayParams1.w
+	
+	#define g_flTime flTreeSwayParams2.y
+	#define g_vWindDir flTreeSwayParams2.zw
+
+	#define g_flHeight flTreeSwayParams3.x
+	#define g_flStartHeight flTreeSwayParams3.y
+	#define g_flRadius flTreeSwayParams3.z
+	#define g_flStartRadius flTreeSwayParams3.w
+
+	#define g_flSwaySpeed flTreeSwayParams4.x
+	#define g_flSwayIntensity flTreeSwayParams4.y
+	#define g_flScrumbleWaveCount flTreeSwayParams4.z
+	#define g_flScrumbleIntensity flTreeSwayParams4.w
+
+	#define g_flWindSpeedLerpStart flTreeSwayParams5.x
+	#define g_flWindSpeedLerpEnd flTreeSwayParams5.y
+	
+	#include "tree_sway.h"
+#endif
+
 struct VS_INPUT
 {
 #if MODEL
@@ -82,7 +121,13 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 vProjPos					: POSITION;
+	
+#if MULTITEXTURE == 2
+	float4 vTexCoord				: TEXCOORD0;
+	float4 vTexCoord2				: TEXCOORD4;
+#else
 	float2 vTexCoord				: TEXCOORD0;
+#endif 
 
 #if SHADOWMAPPING_USE_COLOR
 #	if SHADOW_MODE == DEFERRED_SHADOW_MODE_PROJECTED
@@ -138,13 +183,26 @@ VS_OUTPUT main( const VS_INPUT In )
 #endif
 #endif
 
+	#if ( TREESWAY )
+	{
+		vPos.xyz = ComputeTreeSway( vPos.xyz, g_flTime );
+	}
+	#endif
+
 	SkinPositionAndNormal( g_bSkinning, vPos, vNormal,
 		In.vBoneWeights, In.vBoneIndices,
 		worldPos, worldNormal );
 
 #else // MODEL
+	float3 vPos = In.vPos;
+	
+	#if ( TREESWAY )
+	{
+		vPos.xyz = ComputeTreeSway( vPos.xyz, g_flTime );
+	}
+	#endif
 
-	worldPos = mul( float4( In.vPos, 1 ), cModel[0] );
+	worldPos = mul( float4( vPos, 1 ), cModel[0] );
 	worldNormal = mul( In.vNormal, ( float3x3 )cModel[0] );
 
 #endif // NOT MODEL
@@ -180,7 +238,14 @@ VS_OUTPUT main( const VS_INPUT In )
 
 #endif
 
+#if MULTITEXTURE == 2
+	Out.vTexCoord.xy = ComputeTexCoord( In.vTexCoord_0, g_vRotations.x, g_vScales.x );
+	Out.vTexCoord.zw = ComputeTexCoord( In.vTexCoord_0, g_vRotations.y, g_vScales.y );
+	Out.vTexCoord2.xy = ComputeTexCoord( In.vTexCoord_0, g_vRotations.z, g_vScales.z );
+	Out.vTexCoord2.zw = ComputeTexCoord( In.vTexCoord_0, g_vRotations.w, g_vScales.w );
+#else
 	Out.vTexCoord = In.vTexCoord_0;
+#endif // MULTITEXTURE
 
 #if RADIOSITY
 	Out.vecNormal = worldNormal;
