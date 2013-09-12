@@ -127,6 +127,54 @@ CWarsWeapon::CWarsWeapon()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CWarsWeapon::UpdateTransmitState()
+{
+	// Should always use the full check
+	return SetTransmitState( FL_EDICT_FULLCHECK );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Note, an entity can override the send table ( e.g., to send less data or to send minimal data for
+//  objects ( prob. players ) that are not in the pvs.
+// Input  : **ppSendTable - 
+//			*recipient - 
+//			*pvs - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+int CWarsWeapon::ShouldTransmit( const CCheckTransmitInfo *pInfo )
+{
+#if 0 // Shouldn't be needed
+	int fFlags = DispatchUpdateTransmitState();
+
+	if ( fFlags & FL_EDICT_ALWAYS )
+	{
+		SetUseMinimalSendTable( iClientIndex, false ); // For determining low update rate
+		return FL_EDICT_ALWAYS;
+	}
+	else if ( fFlags & FL_EDICT_DONTSEND )
+	{
+		return FL_EDICT_DONTSEND;
+	}
+#endif // 0
+
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	Assert( pRecipientEntity->IsPlayer() );
+
+	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
+
+	// Don't send when in the fow for the recv player.
+	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
+	{
+		return FL_EDICT_DONTSEND;
+	}
+
+	// Default to pvs check
+	return FL_EDICT_PVSCHECK;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Weapons ignore other weapons when LOS tracing
 //-----------------------------------------------------------------------------
 class CWarsWeaponLOSFilter : public CTraceFilterSkipTwoEntities
@@ -322,3 +370,14 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 
 	return false;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Weapon test code
+//-----------------------------------------------------------------------------
+class CWeaponDummyTest : public CWarsWeapon
+{
+public:
+	DECLARE_CLASS( CWeaponDummyTest, CWarsWeapon );
+
+};
+LINK_ENTITY_TO_CLASS( weapon_dummy_test, CWeaponDummyTest );

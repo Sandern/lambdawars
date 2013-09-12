@@ -114,12 +114,12 @@
 
 #ifdef HL2WARS_DLL
 #include "matchmaking/swarm/imatchext_swarm.h"
-#endif // HL2WARS_DLL
-
-#include "hl2wars_player.h"
+#include "hl2wars/unit_base_shared.h"
+#include "hl2wars/hl2wars_player.h"
 #include "hl2wars/fowmgr.h"
 #include "hl2wars/wars_plat_misc.h"
 #include "hl2wars/wars_mount_system.h"
+#endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
@@ -2592,11 +2592,17 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				if ( !pEnt )
 					break;
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 				// Python networkvars: mark player as transmit
 				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( ENTINDEX(pInfo->m_pClientEnt) );
 				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), ENTINDEX(pInfo->m_pClientEnt) );
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 				CServerNetworkProperty *pParent = pEnt->GetNetworkParent();
 				if ( !pParent )
@@ -2726,6 +2732,35 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	}
 
 //	Msg("A:%i, N:%i, F: %i, P: %i\n", always, dontSend, fullCheck, PVS );
+
+#ifdef HL2WARS_DLL
+	// Update usage of minimal tables for units
+	// This means sending less data and low update when the unit is "out of view"
+	// The unit is still being updated for the minimap and selection (hud)
+	// TODO: Maybe find a better place?
+	int i;
+	CUnitBase *pUnit;
+	CUnitBase **ppUnits = g_Unit_Manager.AccessUnits();
+	for ( i = 0; i < g_Unit_Manager.NumUnits(); i++ )
+	{
+		pUnit = ppUnits[i];
+
+		if( pUnit->GetTransmitState() & FL_EDICT_DONTSEND )
+		{
+			// When not sending, make sure it's marked as minimal table
+			// This is used for determing the low update rate mode
+			pUnit->SetUseMinimalSendTable( pRecipientPlayer->GetClientIndex(), true );
+			continue;
+		}
+
+		CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( pUnit->GetNetworkable() );
+
+		// The unit is being send, so determine if we should use the minimal table
+		netProp->RecomputePVSInformation();
+		bool bUseMinimalSendTable = pUnit->GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
+		pUnit->SetUseMinimalSendTable( pRecipientPlayer->GetClientIndex(), bUseMinimalSendTable );
+	}
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------

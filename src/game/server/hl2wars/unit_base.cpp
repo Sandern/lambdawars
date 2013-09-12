@@ -28,7 +28,7 @@
 
 static ConVar g_debug_rangeattacklos("g_debug_rangeattacklos", "0", FCVAR_CHEAT);
 static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
-static ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
+ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
 static ConVar g_unit_minimal_sendtable_updaterate("g_unit_minimal_sendtable_updaterate", "0.4", FCVAR_CHEAT);
 static ConVar unit_nextserveranimupdatetime("unit_nextserveranimupdatetime", "0.2", FCVAR_CHEAT);
 
@@ -595,8 +595,6 @@ bool CUnitBase::KeyValue( const char *szKeyName, const char *szValue )
 	return BaseClass::KeyValue( szKeyName, szValue );
 }
 
-#define USE_MINIMAL_SENDTABLE 1
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -660,29 +658,15 @@ int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
 	Assert( pRecipientEntity->IsPlayer() );
 
-	int iClientIndex = pRecipientEntity->entindex() - 1;
-	
 	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
 
 	// Don't send when in the fow for the recv player.
 	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
-		SetUseMinimalSendTable( iClientIndex, true ); // For determining low update rate
 		return FL_EDICT_DONTSEND;
 	}
 
-#if USE_MINIMAL_SENDTABLE
-	CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( GetNetworkable() );
-
-	// by default do a PVS check
-	netProp->RecomputePVSInformation();
-	bool bUseMinimalSendTable = GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
-	SetUseMinimalSendTable( iClientIndex, bUseMinimalSendTable );
-
 	return FL_EDICT_ALWAYS;
-#else
-	return FL_EDICT_ALWAYS;
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------

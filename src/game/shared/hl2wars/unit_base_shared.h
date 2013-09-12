@@ -13,11 +13,13 @@
 
 #include "iunit.h"
 #if defined( CLIENT_DLL )
-	#include "c_basecombatcharacter.h"
+#include "c_basecombatcharacter.h"
 #else
-	#include "basecombatcharacter.h"
-	#include "unit_base.h"
-	#include "ai_speech.h"
+#include "basecombatcharacter.h"
+#include "unit_base.h"
+#include "ai_speech.h"
+
+extern ConVar g_unit_force_minimal_sendtable;
 #endif
 
 #if defined( CLIENT_DLL )
@@ -174,6 +176,7 @@ public:
 	virtual int	UpdateTransmitState();
 
 	bool UseMinimalSendTable( int iClientIndex ); // Only used by proxies
+	void SetUseMinimalSendTable( int iClientIndex, bool state );
 	void SetAlwaysSendFullSelectionData( bool state ) { m_bAlwaysSendFullSelectionData = state; } // For buildings, see m_bAlwaysSendFullSelectionData
 	bool AlwaysSendFullSelectionData() { return m_bAlwaysSendFullSelectionData; }
 
@@ -411,10 +414,6 @@ public:
 private:
 	void AddToUnitList();
 	void RemoveFromUnitList();
-
-#ifndef CLIENT_DLL
-	void SetUseMinimalSendTable( int iClientIndex, bool state );
-#endif // CLIENT_DLL
 
 public:
 	// FOW Variables

@@ -57,6 +57,9 @@ public:
 	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );
 
 	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, CBaseEntity *pTarget = NULL );	
+
+	virtual int				UpdateTransmitState();
+	virtual int				ShouldTransmit( const CCheckTransmitInfo *pInfo );
 #endif // CLIENT_DLL
 
 	CHL2WarsPlayer*			GetCommander();
