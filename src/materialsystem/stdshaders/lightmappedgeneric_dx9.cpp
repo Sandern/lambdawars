@@ -184,6 +184,7 @@ END_SHADER_PARAMS
 		p.iAlbedo2 = BASETEXTURE2;
 		p.iBumpmap = BUMPMAP;
 		p.iBumpmap2 = BUMPMAP2;
+		p.iSSBump = SSBUMP;
 		p.iPhongExp = PHONG_EXP;
 		p.iPhongExp2 = PHONG_EXP2;
 
@@ -278,7 +279,7 @@ END_SHADER_PARAMS
 				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
 				: DEFERRED_RENDER_STAGE_INVALID;
 
-			const bool bDrawToGBuffer = true; //DrawToGBuffer( params );
+			const bool bDrawToGBuffer = DrawToGBuffer( params );
 
 			Assert( pShaderAPI == NULL ||
 				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );

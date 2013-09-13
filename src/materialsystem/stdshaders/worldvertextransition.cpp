@@ -22,8 +22,6 @@
 
 static LightmappedGeneric_DX9_Vars_t s_info;
 
-//static FogOfWarBlendedPassVars_t s_fowinfo;
-
 DEFINE_FALLBACK_SHADER( WorldVertexTransition, WorldVertexTransition_DX9 )
 
 BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
@@ -144,6 +142,7 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 
 		p.iAlbedo = BASETEXTURE;
 		p.iBumpmap = BUMPMAP;
+		p.iSSBump = SSBUMP;
 
 		p.iPhongExp = PHONG_EXP;
 		p.iPhongExp2 = PHONG_EXP2;
@@ -162,7 +161,7 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
-#if 1 || DEFCFG_DEFERRED_SHADING == 1
+#if DEFCFG_DEFERRED_SHADING == 1
 		return true;
 #else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
@@ -281,7 +280,7 @@ BEGIN_VS_SHADER( WorldVertexTransition_DX9, "Help for WorldVertexTransition" )
 			bDrawComposite = ( pShaderShadow != NULL ||
 				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION );
 
-			bDeferredActive = bDrawToGBuffer;
+			//bDeferredActive = bDrawToGBuffer;
 		}
 
 		if( pShaderShadow != NULL || bDrawComposite )

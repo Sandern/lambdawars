@@ -215,23 +215,23 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 				flParams[1] = GetFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
 				flParams[2] = GetFloatParam( info.m_nTreeSwayFalloffExp, params, 1.0f );
 				flParams[3] = GetFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 3.0f );
-				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, flParams );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, flParams );
 
 				flParams[0] = GetFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
 				flParams[1] = GetFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
 				flParams[2] = GetFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
 				flParams[3] = GetFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
-				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, flParams );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, flParams );
 
 				flParams[0] = GetFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
 				flParams[1] = GetFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
 				flParams[2] = GetFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
 				flParams[3] = GetFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
-				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, flParams );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, flParams );
 
 				flParams[0] = GetFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
 				flParams[1] = GetFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
-				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_9, flParams );
+				tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_14, flParams );
 			}
 
 			tmpBuf.End();
@@ -275,7 +275,7 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 			Vector windDir = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_WIND_DIRECTION );
 			fTempConst[2] = windDir.x;
 			fTempConst[3] = windDir.y;
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, fTempConst );
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, fTempConst );
 		}
 
 		pShaderAPI->ExecuteCommandBuffer( pDeferredContext->GetCommands( CDeferredPerMaterialContextData::DEFSTAGE_SHADOW ) );

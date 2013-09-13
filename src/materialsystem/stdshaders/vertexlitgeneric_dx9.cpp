@@ -374,7 +374,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		p.iPhongExp = PHONGEXPONENT;
 
 		p.iAlphatestRef = ALPHATESTREFERENCE;
-
+		
 		p.m_nTreeSway = TREESWAY;
 		p.m_nTreeSwayHeight = TREESWAYHEIGHT;
 		p.m_nTreeSwayStartHeight = TREESWAYSTARTHEIGHT;

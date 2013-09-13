@@ -274,7 +274,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 {
 	CPhong_DX9_Context *pContextData = reinterpret_cast< CPhong_DX9_Context *> ( *pContextDataPtr );
 
-	bool bHasFlashlight = pShader->UsingFlashlight( params );
+	bool bHasFlashlight = !bDeferredActive && pShader->UsingFlashlight( params );
 	bool bHasFlashlightOnly = bHasFlashlight && !IsX360();
 #ifndef _X360
 	bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );

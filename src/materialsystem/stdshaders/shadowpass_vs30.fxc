@@ -52,11 +52,11 @@ const float4 g_vScales								: register( SHADER_SPECIFIC_CONST_13 );
 #endif // MULTITEXTURE
 
 #if ( TREESWAY )
-	const float4 flTreeSwayParams1			: register( SHADER_SPECIFIC_CONST_5 );
-	const float4 flTreeSwayParams2			: register( SHADER_SPECIFIC_CONST_6 );
-	const float4 flTreeSwayParams3			: register( SHADER_SPECIFIC_CONST_7 );
-	const float4 flTreeSwayParams4			: register( SHADER_SPECIFIC_CONST_8 );
-	const float4 flTreeSwayParams5			: register( SHADER_SPECIFIC_CONST_9 );
+	const float4 flTreeSwayParams1			: register( SHADER_SPECIFIC_CONST_3 );
+	const float4 flTreeSwayParams2			: register( SHADER_SPECIFIC_CONST_4 );
+	const float4 flTreeSwayParams3			: register( SHADER_SPECIFIC_CONST_5 );
+	const float4 flTreeSwayParams4			: register( SHADER_SPECIFIC_CONST_6 );
+	const float4 flTreeSwayParams5			: register( SHADER_SPECIFIC_CONST_14 );
 	
 	#define g_flFastSwaySpeedScale flTreeSwayParams1.x
 	#define g_flScrumbleFalloffCurve flTreeSwayParams1.y

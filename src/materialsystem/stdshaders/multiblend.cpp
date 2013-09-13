@@ -79,7 +79,6 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		p.iAlbedo4 = BASETEXTURE4;
 #endif
 
-		//p.iMultiblend = true;
 		p.nSpecTexture = SPECTEXTURE;
 		p.nSpecTexture2 = SPECTEXTURE2;
 		p.nSpecTexture3 = SPECTEXTURE3;
@@ -119,7 +118,6 @@ BEGIN_VS_SHADER( Multiblend_DX90, "Help for Multiblend" )
 		p.nScale4 = SCALE4;
 
 		//p.iAlphatestRef = ALPHATESTREFERENCE;
-		//p.iMultiblend = true;
 	}
 
 	bool DrawToGBuffer( IMaterialVar **params )

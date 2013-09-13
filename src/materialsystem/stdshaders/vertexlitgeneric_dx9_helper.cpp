@@ -487,7 +487,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 		}
 	}
 
-	bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 ); //&& !bHasFoW;
+	bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 );
 	int nTreeSwayMode = GetIntParam( info.m_nTreeSway, params, 0 );
 	nTreeSwayMode = clamp( nTreeSwayMode, 0, 2 );
 
@@ -1579,7 +1579,7 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 	}
 	
 	bool bReceiveFlashlight = bVertexLitGeneric || ( GetIntParam( info.m_nReceiveFlashlight, params ) != 0 );
-	bool bHasFlashlight = bReceiveFlashlight && pShader->UsingFlashlight( params );
+	bool bHasFlashlight = !bDeferredActive && bReceiveFlashlight && pShader->UsingFlashlight( params );
 
 	//since single pass flashlights have a different snapshot than multipass. We need to get snapshots of both and only actually draw the enabled mode
 	if( IsX360() || !bHasFlashlight || (GetIntParam( info.m_nSinglePassFlashlight, params ) == 0) )
