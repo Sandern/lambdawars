@@ -6639,8 +6639,10 @@ void CBaseWaterView::CSoftwareIntersectionView::Setup( bool bAboveWater )
 //-----------------------------------------------------------------------------
 void CBaseWaterView::CSoftwareIntersectionView::Draw()
 {
+	PushComposite();
 	DrawSetup( GetOuter()->m_waterHeight, m_DrawFlags, GetOuter()->m_waterZAdjust );
 	DrawExecute( GetOuter()->m_waterHeight, CurrentViewID(), GetOuter()->m_waterZAdjust );
+	PopComposite();
 }
 
 //-----------------------------------------------------------------------------
@@ -6786,7 +6788,7 @@ void CAboveWaterView::CReflectionView::Setup( bool bReflectEntities )
 //-----------------------------------------------------------------------------
 void CAboveWaterView::CReflectionView::Draw()
 {
-
+	PushComposite();
 
 	// Store off view origin and angles and set the new view
 	int nSaveViewID = CurrentViewID();
@@ -6803,7 +6805,7 @@ void CAboveWaterView::CReflectionView::Draw()
 
 	r_visocclusion.SetValue( bVisOcclusion );
 	
-
+	PopComposite();
 
 	// finish off the view and restore the previous view.
 	SetupCurrentView( origin, angles, ( view_id_t )nSaveViewID );
@@ -7014,10 +7016,14 @@ void CUnderWaterView::CRefractionView::Draw()
 	pRenderContext->GetFogColor( ucFogColor );
 	pRenderContext->ClearColor4ub( ucFogColor[0], ucFogColor[1], ucFogColor[2], 255 );
 
+	PushComposite();
+
 	DrawSetup( GetOuter()->m_waterHeight, m_DrawFlags, GetOuter()->m_waterZAdjust );
 
 	EnableWorldFog();
 	DrawExecute( GetOuter()->m_waterHeight, VIEW_REFRACTION, GetOuter()->m_waterZAdjust );
+
+	PopComposite();
 
 	Rect_t srcRect;
 	srcRect.x = x;

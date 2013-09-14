@@ -5,16 +5,13 @@
 // STATIC: "REFLECT"						"0..1"
 // STATIC: "REFRACT"						"0..1"
 // STATIC: "ABOVEWATER"						"0..1"
-// STATIC: "FLOWMAP"						"0..1"  [ps20b]
-// STATIC: "FLOWMAP"						"0..0"  [ps20] [ = 0; ]
+// STATIC: "FLOWMAP"						"0..1"
 // STATIC: "FLOW_DEBUG"						"0..2"
-// STATIC: "FLASHLIGHT"                     "0..1"	[ps20b]
-// STATIC: "FLASHLIGHT"                     "0..0"  [ps20] [ = 0; ]
-// STATIC: "LIGHTMAPWATERFOG"               "0..1"  [ps20b]
-// STATIC: "LIGHTMAPWATERFOG"               "0..0"  [ps20] [ = 0; ]
+// STATIC: "FLASHLIGHT"						"0..1"
+// STATIC: "LIGHTMAPWATERFOG"				"0..1"
 // STATIC: "FORCEFRESNEL"					"0..1"
-// DYNAMIC: "FLASHLIGHTSHADOWS"             "0..1"  [ps20b]
-// DYNAMIC: "FLASHLIGHTSHADOWS"             "0..0"  [ps20] [ = 0; ]
+// STATIC: "FOW"					"0..1"
+// DYNAMIC: "FLASHLIGHTSHADOWS"             "0..1"
 
 // Multitexture and basetexture are mutually exclusive.
 // SKIP: $MULTITEXTURE && $BASETEXTURE
@@ -34,6 +31,7 @@
 
 #include "common_ps_fxc.h"
 #include "common_fog_ps_fxc.h"
+#include "fow_ps_fxc.h"
 
 #include "shader_constant_register_map.h"
 #include "common_flashlight_fxc.h"
@@ -58,6 +56,12 @@ sampler LightmapSampler				: register( s3 );
 	sampler FlashlightSampler		: register( s6 );
 	sampler ShadowDepthSampler      : register( s7 );
 	sampler RandRotSampler          : register( s8 );
+#endif
+
+#if ( FOW == 1 )
+
+sampler FoWSampler				: register( s9 );	// Fog of War
+
 #endif
 
 const float4 g_vRefractTint			: register( c1 );
@@ -151,6 +155,10 @@ struct PS_INPUT
 	#else
 		float2 lightmapTexCoord			: TEXCOORD7;
 	#endif
+#endif
+
+#if ( FOW == 1 )
+	float2 vFowCoord				: TEXCOORD8;
 #endif
 };
 
@@ -592,6 +600,10 @@ float4 main( PS_INPUT i ) : COLOR
 		vResult.xyz += g_flFlashlightTint * g_WaterFogColor.rgb * vFlashlightDiffuseLighting.xyz * LINEAR_LIGHT_SCALE;
 	}
   	#endif
+	
+#if ( FOW == 1 )
+	vResult.rgb = CalcFoW( FoWSampler, i.vFowCoord, vResult.rgb );
+#endif
 
 	#if ( PIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE )
 	{

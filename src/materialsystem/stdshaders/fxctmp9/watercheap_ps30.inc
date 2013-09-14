@@ -10,7 +10,7 @@
 // defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 // ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
 #include "shaderlib/cshader.h"
-class watercheap_ps20b_Static_Index
+class watercheap_ps30_Static_Index
 {
 private:
 	int m_nMULTITEXTURE;
@@ -161,7 +161,7 @@ public:
 	}
 public:
 	// CONSTRUCTOR
-	watercheap_ps20b_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
+	watercheap_ps30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bMULTITEXTURE = false;
@@ -203,8 +203,8 @@ public:
 		return ( 4 * m_nMULTITEXTURE ) + ( 8 * m_nFRESNEL ) + ( 16 * m_nBLEND ) + ( 32 * m_nREFRACTALPHA ) + ( 64 * m_nHDRTYPE ) + ( 192 * m_nFLOWMAP ) + ( 384 * m_nFLOW_DEBUG ) + 0;
 	}
 };
-#define shaderStaticTest_watercheap_ps20b psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_FRESNEL + psh_forgot_to_set_static_BLEND + psh_forgot_to_set_static_REFRACTALPHA + psh_forgot_to_set_static_HDRTYPE + psh_forgot_to_set_static_FLOWMAP + psh_forgot_to_set_static_FLOW_DEBUG + 0
-class watercheap_ps20b_Dynamic_Index
+#define shaderStaticTest_watercheap_ps30 psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_FRESNEL + psh_forgot_to_set_static_BLEND + psh_forgot_to_set_static_REFRACTALPHA + psh_forgot_to_set_static_HDRTYPE + psh_forgot_to_set_static_FLOWMAP + psh_forgot_to_set_static_FLOW_DEBUG + 0
+class watercheap_ps30_Dynamic_Index
 {
 private:
 	int m_nHDRENABLED;
@@ -250,7 +250,7 @@ public:
 	}
 public:
 	// CONSTRUCTOR
-	watercheap_ps20b_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
+	watercheap_ps30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 #ifdef _DEBUG
 		m_bHDRENABLED = false;
@@ -272,4 +272,4 @@ public:
 		return ( 1 * m_nHDRENABLED ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };
-#define shaderDynamicTest_watercheap_ps20b psh_forgot_to_set_dynamic_HDRENABLED + 0
+#define shaderDynamicTest_watercheap_ps30 psh_forgot_to_set_dynamic_HDRENABLED + 0

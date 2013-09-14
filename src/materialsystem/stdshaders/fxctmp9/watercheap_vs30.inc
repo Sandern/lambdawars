@@ -1,7 +1,7 @@
 // ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
 // defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 #include "shaderlib/cshader.h"
-class watercheap_vs20_Static_Index
+class watercheap_vs30_Static_Index
 {
 private:
 	int m_nBLEND;
@@ -26,7 +26,7 @@ public:
 	}
 public:
 	// CONSTRUCTOR
-	watercheap_vs20_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
+	watercheap_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
 	{
 #ifdef _DEBUG
 		m_bBLEND = false;
@@ -44,12 +44,12 @@ public:
 		return ( 1 * m_nBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_watercheap_vs20 vsh_forgot_to_set_static_BLEND + 0
-class watercheap_vs20_Dynamic_Index
+#define shaderStaticTest_watercheap_vs30 vsh_forgot_to_set_static_BLEND + 0
+class watercheap_vs30_Dynamic_Index
 {
 public:
 	// CONSTRUCTOR
-	watercheap_vs20_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
+	watercheap_vs30_Dynamic_Index( IShaderDynamicAPI *pShaderAPI )
 	{
 	}
 	int GetIndex()
@@ -61,4 +61,4 @@ public:
 		return 0;
 	}
 };
-#define shaderDynamicTest_watercheap_vs20 0
+#define shaderDynamicTest_watercheap_vs30 0

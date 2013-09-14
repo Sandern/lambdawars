@@ -3,8 +3,9 @@
 // STATIC: "BASETEXTURE"				"0..1"
 // STATIC: "MULTITEXTURE"				"0..1"
 // STATIC: "FLASHLIGHT"					"0..1"
-// STATIC: "LIGHTMAPWATERFOG"           "0..1"
+// STATIC: "LIGHTMAPWATERFOG"			"0..1"
 // STATIC: "FLOWMAP"					"0..1"
+// STATIC: "FOW"						"0..1"
 
 // Multitexture and basetexture are mutually exclusive.
 // SKIP: $MULTITEXTURE && $BASETEXTURE
@@ -19,13 +20,18 @@
 // SKIP: ( $FLASHLIGHT || $LIGHTMAPWATERFOG ) && ( ( $BASETEXTURE && !$FLOWMAP ) || $MULTITEXTURE )
 
 #include "common_vs_fxc.h"
+#include "fow_vs_fxc.h"
 
 const float4 cBumpTexCoordTransform[2]	:  register( SHADER_SPECIFIC_CONST_1 );
 const float4 TexOffsets	:  register( SHADER_SPECIFIC_CONST_3 );
 
 #if FLASHLIGHT
-	const float4x4 g_FlashlightWorldToTexture : register( SHADER_SPECIFIC_CONST_4 );
+	const float4x4 g_FlashlightWorldToTexture : register( SHADER_SPECIFIC_CONST_4 ); // up to 7
 #endif
+
+#if FOW
+	const float4 g_vFoWWorldSize				: register( SHADER_SPECIFIC_CONST_8 );
+#endif // FOW
 
 struct VS_INPUT
 {
@@ -62,6 +68,10 @@ struct VS_OUTPUT
 
 	#if LIGHTMAPWATERFOG
 		float2 lightmapTexCoord			: TEXCOORD7;
+	#endif
+	
+	#if ( FOW == 1 )
+		float2 vFowCoord				: TEXCOORD8;
 	#endif
 };
 
@@ -153,6 +163,10 @@ VS_OUTPUT main( const VS_INPUT v )
 		o.flashlightSpacePos = mul( float4( vWorldPos, 1.0f ), g_FlashlightWorldToTexture );
 	}
 	#endif
+	
+#if ( FOW == 1 )
+	o.vFowCoord = CalcFoWCoord( g_vFoWWorldSize, vWorldPos.xy );
+#endif
 
 	return o;
 }

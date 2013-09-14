@@ -10,12 +10,10 @@
 #include "common_hlsl_cpp_consts.h" // hack hack hack!
 #include "convar.h"
 
-#include "watercheap_vs20.inc"
-#include "watercheap_ps20.inc"
-#include "watercheap_ps20b.inc"
-#include "water_vs20.inc"
-#include "water_ps20.inc"
-#include "water_ps20b.inc"
+#include "watercheap_vs30.inc"
+#include "watercheap_ps30.inc"
+#include "water_vs30.inc"
+#include "water_ps30.inc"
 #include "shaderlib/commandbuilder.h"
 
 #ifdef DEFERRED_ENABLED
@@ -82,6 +80,9 @@ BEGIN_VS_SHADER( Water_DX90,
 		SHADER_PARAM( COLOR_FLOW_TIMEINTERVALINSECONDS, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( COLOR_FLOW_UVSCROLLDISTANCE, SHADER_PARAM_TYPE_FLOAT, "", "" )
 		SHADER_PARAM( COLOR_FLOW_LERPEXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
+
+		// Fog of war
+		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
 	END_SHADER_PARAMS
 
 	SHADER_INIT_PARAMS()
@@ -153,6 +154,8 @@ BEGIN_VS_SHADER( Water_DX90,
 		{
 			SET_FLAGS2( MATERIAL_VAR2_LIGHTING_BUMPED_LIGHTMAP );
 		}
+
+		SET_PARAM_STRING_IF_NOT_DEFINED( FOW, "_rt_fog_of_war" );
 	}
 
 	SHADER_FALLBACK
@@ -192,6 +195,10 @@ BEGIN_VS_SHADER( Water_DX90,
 		{
 			LoadTexture( FLOW_NOISE_TEXTURE );
 		}
+		if ( IS_PARAM_DEFINED( FOW ) )
+		{
+			LoadTexture( FOW );
+		}
 	}
 
 	inline void GetVecParam( int constantVar, float *val )
@@ -221,6 +228,16 @@ BEGIN_VS_SHADER( Water_DX90,
 		bool bLightmapWaterFog = ( params[LIGHTMAPWATERFOG]->GetIntValue() != 0 );
 
 		bool bForceFresnel = ( params[FORCEFRESNEL]->GetFloatValue() != -1.0f );
+
+		bool bHasFoW = ( params[FOW]->IsTexture() != 0 );
+		if ( bHasFoW == true )
+		{
+			ITexture *pTexture = params[FOW]->GetTextureValue();
+			if ( ( pTexture->GetFlags() & TEXTUREFLAGS_RENDERTARGET ) == 0 )
+			{
+				bHasFoW = false;
+			}
+		}
 
 		if ( bHasFlowmap )
 		{
@@ -289,6 +306,12 @@ BEGIN_VS_SHADER( Water_DX90,
 				pShaderShadow->EnableTexture( SHADER_SAMPLER8, true );
 			}
 
+			// Fog of war
+			if( bHasFoW )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER9, true );
+			}
+
 			int fmt = VERTEX_POSITION | VERTEX_NORMAL | VERTEX_TANGENT_S | VERTEX_TANGENT_T;
 
 			// texcoord0 : base texcoord
@@ -302,45 +325,31 @@ BEGIN_VS_SHADER( Water_DX90,
 			}
 			pShaderShadow->VertexShaderVertexFormat( fmt, numTexCoords, 0, 0 );
 			
-			DECLARE_STATIC_VERTEX_SHADER( water_vs20 );
+			DECLARE_STATIC_VERTEX_SHADER( water_vs30 );
 			SET_STATIC_VERTEX_SHADER_COMBO( MULTITEXTURE, bHasMultiTexture );
 			SET_STATIC_VERTEX_SHADER_COMBO( BASETEXTURE, bHasBaseTexture );
 			SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, hasFlashlight );
 			SET_STATIC_VERTEX_SHADER_COMBO( LIGHTMAPWATERFOG, bLightmapWaterFog );
 			SET_STATIC_VERTEX_SHADER_COMBO( FLOWMAP, bHasFlowmap );
-			SET_STATIC_VERTEX_SHADER( water_vs20 );
+			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
+			SET_STATIC_VERTEX_SHADER( water_vs30 );
 
 			// "REFLECT" "0..1"
 			// "REFRACT" "0..1"
 			
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( water_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFLECT,  bReflection );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFRACT,  bRefraction );
-				SET_STATIC_PIXEL_SHADER_COMBO( ABOVEWATER,  params[ABOVEWATER]->GetIntValue() );
-				SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE, bHasMultiTexture );
-				SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE, bHasBaseTexture );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, hasFlashlight );
-				SET_STATIC_PIXEL_SHADER_COMBO( LIGHTMAPWATERFOG, bLightmapWaterFog );
-				SET_STATIC_PIXEL_SHADER_COMBO( FORCEFRESNEL, bForceFresnel );
-				SET_STATIC_PIXEL_SHADER( water_ps20b );
-			}
-			else
-			{
-				DECLARE_STATIC_PIXEL_SHADER( water_ps20 );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFLECT,  bReflection );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFRACT,  bRefraction );
-				SET_STATIC_PIXEL_SHADER_COMBO( ABOVEWATER,  params[ABOVEWATER]->GetIntValue() );
-				SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE, bHasMultiTexture );
-				SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE, bHasBaseTexture );
-//				SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
-				SET_STATIC_PIXEL_SHADER_COMBO( FORCEFRESNEL, bForceFresnel );
-				SET_STATIC_PIXEL_SHADER( water_ps20 );
-			}
+			DECLARE_STATIC_PIXEL_SHADER( water_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( REFLECT,  bReflection );
+			SET_STATIC_PIXEL_SHADER_COMBO( REFRACT,  bRefraction );
+			SET_STATIC_PIXEL_SHADER_COMBO( ABOVEWATER,  params[ABOVEWATER]->GetIntValue() );
+			SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE, bHasMultiTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( BASETEXTURE, bHasBaseTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLASHLIGHT, hasFlashlight );
+			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTMAPWATERFOG, bLightmapWaterFog );
+			SET_STATIC_PIXEL_SHADER_COMBO( FORCEFRESNEL, bForceFresnel );
+			SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
+			SET_STATIC_PIXEL_SHADER( water_ps30 );
 
 			FogToFogColor();
 
@@ -520,8 +529,8 @@ BEGIN_VS_SHADER( Water_DX90,
 				SetPixelShaderConstant( 9, FLOWMAPSCROLLRATE );
 			}
 
-			DECLARE_DYNAMIC_VERTEX_SHADER( water_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER( water_vs20 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( water_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( water_vs30 );
 			
 			CCommandBufferBuilder< CFixedCommandStorageBuffer< 1000 > > DynamicCmdsOut;
 
@@ -550,6 +559,22 @@ BEGIN_VS_SHADER( Water_DX90,
 				DynamicCmdsOut.SetPixelShaderConstant( 10, FLASHLIGHTTINT );
 			}
 
+			// Fog of war
+			if( bHasFoW )
+			{
+				DynamicCmdsOut.BindTexture( this, SHADER_SAMPLER9, FOW, -1 );
+
+				float	vFoWSize[ 4 ];
+				Vector	vMins = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MINS );
+				Vector	vMaxs = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MAXS );
+				vFoWSize[ 0 ] = vMins.x;
+				vFoWSize[ 1 ] = vMins.y;
+				vFoWSize[ 2 ] = vMaxs.x - vMins.x;
+				vFoWSize[ 3 ] = vMaxs.y - vMins.y;
+
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, vFoWSize );
+			}
+
 			// Get viewport and render target dimensions and set shader constant to do a 2D mad
 			int nViewportX, nViewportY, nViewportWidth, nViewportHeight;
 			pShaderAPI->GetCurrentViewport( nViewportX, nViewportY, nViewportWidth, nViewportHeight );
@@ -566,17 +591,9 @@ BEGIN_VS_SHADER( Water_DX90,
 			vViewportMad[3] = ( float )nViewportY / ( float )nRtHeight;
 			DynamicCmdsOut.SetPixelShaderConstant( 24, vViewportMad, 1 );
 
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( water_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER( water_ps20b );
-			}
-			else
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( water_ps20 );
-				SET_DYNAMIC_PIXEL_SHADER( water_ps20 );
-			}
+			DECLARE_DYNAMIC_PIXEL_SHADER( water_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
+			SET_DYNAMIC_PIXEL_SHADER( water_ps30 );
 
 			DynamicCmdsOut.End();
 			pShaderAPI->ExecuteCommandBuffer( DynamicCmdsOut.Base() );
@@ -624,38 +641,21 @@ BEGIN_VS_SHADER( Water_DX90,
 			int fmt = VERTEX_POSITION | VERTEX_NORMAL | VERTEX_TANGENT_S | VERTEX_TANGENT_T;
 			pShaderShadow->VertexShaderVertexFormat( fmt, 1, 0, 0 );
 
-			DECLARE_STATIC_VERTEX_SHADER( watercheap_vs20 );
+			DECLARE_STATIC_VERTEX_SHADER( watercheap_vs30 );
 			SET_STATIC_VERTEX_SHADER_COMBO( BLEND,  bBlend && bRefraction );
-			SET_STATIC_VERTEX_SHADER( watercheap_vs20 );
+			SET_STATIC_VERTEX_SHADER( watercheap_vs30 );
 
-			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( watercheap_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( FRESNEL,  params[NOFRESNEL]->GetIntValue() == 0 );
-				SET_STATIC_PIXEL_SHADER_COMBO( BLEND,  bBlend );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFRACTALPHA,  bRefraction );
-				SET_STATIC_PIXEL_SHADER_COMBO( HDRTYPE,  g_pHardwareConfig->GetHDRType() );
-				Vector4D Scroll1;
-				params[SCROLL1]->GetVecValue( Scroll1.Base(), 4 );
-				SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE,fabs(Scroll1.x) > 0.0);
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
-				SET_STATIC_PIXEL_SHADER( watercheap_ps20b );
-			}
-			else
-			{
-				DECLARE_STATIC_PIXEL_SHADER( watercheap_ps20 );
-				SET_STATIC_PIXEL_SHADER_COMBO( FRESNEL,  params[NOFRESNEL]->GetIntValue() == 0 );
-				SET_STATIC_PIXEL_SHADER_COMBO( BLEND,  bBlend );
-				SET_STATIC_PIXEL_SHADER_COMBO( REFRACTALPHA,  bRefraction );
-				SET_STATIC_PIXEL_SHADER_COMBO( HDRTYPE,  g_pHardwareConfig->GetHDRType() );
-				Vector4D Scroll1;
-				params[SCROLL1]->GetVecValue( Scroll1.Base(), 4 );
-				SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE,fabs(Scroll1.x) > 0.0);
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
-				SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
-				SET_STATIC_PIXEL_SHADER( watercheap_ps20 );
-			}
+			DECLARE_STATIC_PIXEL_SHADER( watercheap_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( FRESNEL,  params[NOFRESNEL]->GetIntValue() == 0 );
+			SET_STATIC_PIXEL_SHADER_COMBO( BLEND,  bBlend );
+			SET_STATIC_PIXEL_SHADER_COMBO( REFRACTALPHA,  bRefraction );
+			SET_STATIC_PIXEL_SHADER_COMBO( HDRTYPE,  g_pHardwareConfig->GetHDRType() );
+			Vector4D Scroll1;
+			params[SCROLL1]->GetVecValue( Scroll1.Base(), 4 );
+			SET_STATIC_PIXEL_SHADER_COMBO( MULTITEXTURE,fabs(Scroll1.x) > 0.0);
+			SET_STATIC_PIXEL_SHADER_COMBO( FLOWMAP, bHasFlowmap );
+			SET_STATIC_PIXEL_SHADER_COMBO( FLOW_DEBUG, clamp( params[ FLOW_DEBUG ]->GetIntValue(), 0, 2 ) );
+			SET_STATIC_PIXEL_SHADER( watercheap_ps30 );
 
 			// HDRFIXME: test cheap water!
 			if( g_pHardwareConfig->GetHDRType() != HDR_TYPE_NONE )
@@ -749,21 +749,12 @@ BEGIN_VS_SHADER( Water_DX90,
 				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, vc0, 1 );
 			}
 
-			DECLARE_DYNAMIC_VERTEX_SHADER( watercheap_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER( watercheap_vs20 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( watercheap_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( watercheap_vs30 );
 
-			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( watercheap_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( HDRENABLED,  IsHDREnabled() );
-				SET_DYNAMIC_PIXEL_SHADER( watercheap_ps20b );
-			}
-			else
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( watercheap_ps20 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( HDRENABLED,  IsHDREnabled() );
-				SET_DYNAMIC_PIXEL_SHADER( watercheap_ps20 );
-			}
+			DECLARE_DYNAMIC_PIXEL_SHADER( watercheap_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( HDRENABLED,  IsHDREnabled() );
+			SET_DYNAMIC_PIXEL_SHADER( watercheap_ps30 );
 		}
 		Draw();
 	}
@@ -771,6 +762,7 @@ BEGIN_VS_SHADER( Water_DX90,
 	SHADER_DRAW
 	{
 #ifdef DEFERRED_ENABLED
+		// For now, don't draw the water if it's not in composition mode
 		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 		if( bDeferredActive )
 		{
