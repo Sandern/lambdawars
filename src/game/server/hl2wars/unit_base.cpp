@@ -326,7 +326,6 @@ void* SendProxy_SendCommanderDataTable( const SendProp *pProp, const void *pStru
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendCommanderDataTable );
 
-#if 0
 void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
 	CUnitBase *pUnit = (CUnitBase*)pVarData;
@@ -342,7 +341,6 @@ void* SendProxy_SendMinimalDataTable( const SendProp *pProp, const void *pStruct
 	return (void*)pVarData;
 }
 REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendMinimalDataTable );
-#endif // 0
 
 void* SendProxy_SendFullDataTable( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
 {
@@ -457,11 +455,11 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 
 END_SEND_TABLE()
 
-#if 0
 // Table used when out of "PVS". This table is send when DT_FullTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
+	// Send one bit, so that when we go back to the full table it will send a real update of the z component
+	SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), 1, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 END_SEND_TABLE()
-#endif // 0
 
 // Table used when the unit is in "PVS". This table is send when DT_MinimalTable is not send!
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
@@ -511,7 +509,7 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
 	// Data that gets sent when unit is outside the pvs (and no other table is send)
-	//SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
+	SendPropDataTable( "minimaldata", 0, &REFERENCE_SEND_TABLE(DT_MinimalTable), SendProxy_SendMinimalDataTable ),
 	// Data that gets sent when unit is inside the pvs
 	SendPropDataTable( "fulldata", 0, &REFERENCE_SEND_TABLE(DT_FullTable), SendProxy_SendFullDataTable ),
 	// Data that gets sent when unit is the single selected unit of the player
