@@ -77,6 +77,19 @@ ConVar sv_fogofwar_tilesize( "sv_fogofwar_tilesize", "64", FCVAR_CHEAT | FCVAR_R
 	#define FOW_UPDATERATE sv_fogofwar_updaterate.GetFloat()
 #endif
 
+#ifdef CLIENT_DLL
+// Precache materials on client
+PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheFogOfWar )
+	PRECACHE( MATERIAL, "fow/fow" )
+	PRECACHE( MATERIAL, "fow/fow_blur" )
+	PRECACHE( MATERIAL, "fow/fow_clear" )
+	PRECACHE( MATERIAL, "fow/fow_cpe" )
+	PRECACHE( MATERIAL, "fow/fow_debug" )
+	PRECACHE( MATERIAL, "fow/fow_im" )
+	PRECACHE( MATERIAL, "fow/fow_im_debug" )
+PRECACHE_REGISTER_END( )
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // FOW Entity list. Keeps track of fow entities per player/owner
 //-----------------------------------------------------------------------------
