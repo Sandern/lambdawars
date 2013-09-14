@@ -272,6 +272,9 @@ protected:
 #ifdef DEFERRED_ENABLED
 	void			PushComposite();
 	void			PopComposite();
+
+	static void PushGBuffer( bool bInitial, float zScale = 1.0f, bool bClearDepth = true );
+	static void PopGBuffer();
 #endif // DEFERRED_ENABLED
 
 	void ReleaseLists();

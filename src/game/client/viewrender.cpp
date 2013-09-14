@@ -434,7 +434,7 @@ public:
 	  {
 	  }
 
-	bool			Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibility_t *pSkyboxVisible );
+	bool			Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibility_t *pSkyboxVisible, bool bGBuffer = false );
 	void			Draw();
 
 protected:
@@ -451,6 +451,10 @@ protected:
 	sky3dparams_t *	PreRender3dSkyboxWorld( SkyboxVisibility_t nSkyboxVisible );
 
 	sky3dparams_t *m_pSky3dParams;
+
+#if DEFERRED_ENABLED
+	bool		m_bGBufferPass;
+#endif // DEFERRED_ENABLED
 };
 
 
@@ -749,8 +753,8 @@ public:
 	virtual void	PushView( float waterHeight );
 	virtual void	PopView();
 
-	static void PushGBuffer( bool bInitial, float zScale = 1.0f, bool bClearDepth = true );
-	static void PopGBuffer();
+	//static void PushGBuffer( bool bInitial, float zScale = 1.0f, bool bClearDepth = true );
+	//static void PopGBuffer();
 
 private: 
 	VisibleFogVolumeInfo_t m_fogInfo;
@@ -2397,7 +2401,7 @@ void CViewRender::ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, 
 
 	int nClearFlags = 0; // ?? TODO
 	CSkyboxView *pSkyView = new CSkyboxView( this );
-	if ( ( bDrew3dSkybox = pSkyView->Setup( view, &nClearFlags, &nSkyboxVisible ) ) != false )
+	if ( ( bDrew3dSkybox = pSkyView->Setup( view, &nClearFlags, &nSkyboxVisible, true ) ) != false )
 		AddViewToScene( pSkyView );
 
 	SafeRelease( pSkyView );
@@ -4585,6 +4589,66 @@ void CRendering3dView::PopComposite()
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
 		DEFERRED_RENDER_STAGE_INVALID );
 }
+
+void CRendering3dView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
+{
+	ITexture *pNormals = GetDefRT_Normals();
+	ITexture *pDepth = GetDefRT_Depth();
+
+	CMatRenderContextPtr pRenderContext( materials );
+
+	pRenderContext->ClearColor4ub( 0, 0, 0, 0 );
+
+	if ( bInitial )
+	{
+		pRenderContext->PushRenderTargetAndViewport( pDepth );
+		pRenderContext->ClearBuffers( true, false );
+		pRenderContext->PopRenderTargetAndViewport();
+	}
+
+#if DEFCFG_DEFERRED_SHADING == 1
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Albedo() );
+#else
+	pRenderContext->PushRenderTargetAndViewport( pNormals );
+#endif
+
+	if ( bClearDepth )
+		pRenderContext->ClearBuffers( false, true );
+
+	pRenderContext->SetRenderTargetEx( 1, pDepth );
+
+#if DEFCFG_DEFERRED_SHADING == 1
+	pRenderContext->SetRenderTargetEx( 2, pNormals );
+	pRenderContext->SetRenderTargetEx( 3, GetDefRT_Specular() );
+#endif
+
+	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
+		DEFERRED_RENDER_STAGE_GBUFFER );
+
+	struct defData_setZScale
+	{
+	public:
+		float zScale;
+
+		static void Fire( defData_setZScale d )
+		{
+			GetDeferredExt()->CommitZScale( d.zScale );
+		};
+	};
+
+	defData_setZScale data;
+	data.zScale = zScale;
+	QUEUE_FIRE( defData_setZScale, Fire, data );
+}
+
+void CRendering3dView::PopGBuffer()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
+		DEFERRED_RENDER_STAGE_INVALID );
+
+	pRenderContext->PopRenderTargetAndViewport();
+}
 #endif // DEFERRED_ENABLED
 
 CMaterialReference g_material_WriteZ; //init'ed on by CViewRender::Init()
@@ -5779,6 +5843,17 @@ sky3dparams_t *CSkyboxView::PreRender3dSkyboxWorld( SkyboxVisibility_t nSkyboxVi
 //-----------------------------------------------------------------------------
 void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostRender, ITexture *pRenderTarget )
 {
+#ifdef DEFERRED_ENABLED
+	if ( m_bGBufferPass )
+	{
+		m_DrawFlags |= DF_SKIP_WORLD_DECALS_AND_OVERLAYS;
+
+#if DEFCFG_DEFERRED_SHADING
+		m_DrawFlags |= DF_DRAWSKYBOX;
+#endif
+	}
+#endif // DEFERRED_ENABLED
+
 	unsigned char **areabits = render->GetAreaBits();
 	unsigned char *savebits;
 	unsigned char tmpbits[ 32 ];
@@ -5797,8 +5872,11 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 	zFar = MAX_TRACE_LENGTH;
 
 	// scale origin by sky scale and translate to sky origin
+	float skyScale = 1.0f;
 	{
-		float scale = (m_pSky3dParams->scale > 0) ? (1.0f / m_pSky3dParams->scale) : 1.0f;
+		skyScale = (m_pSky3dParams->scale > 0) ? m_pSky3dParams->scale : 1.0f;
+		float scale = 1.0f / skyScale;
+
 		Vector vSkyOrigin = m_pSky3dParams->origin;
 		VectorScale( origin, scale, origin );
 		VectorAdd( origin, vSkyOrigin, origin );
@@ -5824,10 +5902,12 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 	render->ViewSetupVis( false, 1, &m_pSky3dParams->origin.Get() );
 	render->Push3DView( (*this), m_ClearFlags, pRenderTarget, GetFrustum() );
 
-	//if ( m_bGBufferPass )
-	//	PushGBuffer( true, skyScale );
-	//else
+#ifdef DEFERRED_ENABLED
+	if ( m_bGBufferPass )
+		PushGBuffer( true, skyScale );
+	else
 		PushComposite();
+#endif // DEFERRED_ENABLED
 
 	// Store off view origin and angles
 	SetupCurrentView( origin, angles, iSkyBoxViewID );
@@ -5880,10 +5960,12 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 		FinishCurrentView();
 	}
 
-	//if ( m_bGBufferPass )
-	//	PopGBuffer();
-	//else
+#ifdef DEFERRED_ENABLED
+	if ( m_bGBufferPass )
+		PopGBuffer();
+	else
 		PopComposite();
+#endif // DEFERRED_ENABLED
 
 	// FIXME: Workaround to 3d skybox not depth-of-fielding properly. The real fix is for the 3d skybox dest alpha depth values
 	// to be biased. Currently all I do is clear alpha to 1 after the 3D skybox path. This avoids the skybox being unblurred.
@@ -5919,8 +6001,10 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-bool CSkyboxView::Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibility_t *pSkyboxVisible )
+bool CSkyboxView::Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibility_t *pSkyboxVisible, bool bGBuffer )
 {
+	m_bGBufferPass = bGBuffer;
+
 	BaseClass::Setup( view );
 
 	// The skybox might not be visible from here
@@ -5936,7 +6020,7 @@ bool CSkyboxView::Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibil
 	// The next path will need to clear depth, though.
 	m_ClearFlags = *pClearFlags;
 	*pClearFlags &= ~( VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL | VIEW_CLEAR_FULL_TARGET );
-	*pClearFlags |= VIEW_CLEAR_DEPTH; // Need to clear depth after rednering the skybox
+	*pClearFlags |= VIEW_CLEAR_DEPTH; // Need to clear depth after rendering the skybox
 
 	m_DrawFlags = DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER | DF_RENDER_WATER;
 	if( r_skybox.GetBool() )
@@ -7468,66 +7552,6 @@ void CGBufferBlendView::PushView( float waterHeight )
 void CGBufferBlendView::PopView()
 {
 	PopGBuffer();
-}
-
-void CGBufferBlendView::PushGBuffer( bool bInitial, float zScale, bool bClearDepth )
-{
-	ITexture *pNormals = GetDefRT_Normals();
-	ITexture *pDepth = GetDefRT_Depth();
-
-	CMatRenderContextPtr pRenderContext( materials );
-
-	pRenderContext->ClearColor4ub( 0, 0, 0, 0 );
-
-	if ( bInitial )
-	{
-		pRenderContext->PushRenderTargetAndViewport( pDepth );
-		pRenderContext->ClearBuffers( true, false );
-		pRenderContext->PopRenderTargetAndViewport();
-	}
-
-#if DEFCFG_DEFERRED_SHADING == 1
-	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Albedo() );
-#else
-	pRenderContext->PushRenderTargetAndViewport( pNormals );
-#endif
-
-	if ( bClearDepth )
-		pRenderContext->ClearBuffers( false, true );
-
-	pRenderContext->SetRenderTargetEx( 1, pDepth );
-
-#if DEFCFG_DEFERRED_SHADING == 1
-	pRenderContext->SetRenderTargetEx( 2, pNormals );
-	pRenderContext->SetRenderTargetEx( 3, GetDefRT_Specular() );
-#endif
-
-	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
-		DEFERRED_RENDER_STAGE_GBUFFER );
-
-	struct defData_setZScale
-	{
-	public:
-		float zScale;
-
-		static void Fire( defData_setZScale d )
-		{
-			GetDeferredExt()->CommitZScale( d.zScale );
-		};
-	};
-
-	defData_setZScale data;
-	data.zScale = zScale;
-	QUEUE_FIRE( defData_setZScale, Fire, data );
-}
-
-void CGBufferBlendView::PopGBuffer()
-{
-	CMatRenderContextPtr pRenderContext( materials );
-	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE,
-		DEFERRED_RENDER_STAGE_INVALID );
-
-	pRenderContext->PopRenderTargetAndViewport();
 }
 
 void CBaseShadowBlendView::Setup( const CViewSetup &view, ITexture *pDepthTexture, ITexture *pDummyTexture )
