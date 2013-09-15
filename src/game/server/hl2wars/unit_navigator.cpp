@@ -1319,13 +1319,13 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 				// Don't allow too many recomputations
 				if( GetBlockedStatus() >= BS_STUCK )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(15.0f, 20.0f);
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(7.0f, 12.0f);
 				else if( GetBlockedStatus() >= BS_MUCH )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(10.0f, 15.0f);
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(4.0f, 5.0f);
 				else if( GetBlockedStatus() >= BS_LITTLE )
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(5.0f, 7.0f);
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(2.0f, 3.0f);
 				else
-					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(3.0f, 5.0f);
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(1.0f, 2.0f);
 			}
 
 			if( GetBlockedStatus() > BS_LITTLE )
