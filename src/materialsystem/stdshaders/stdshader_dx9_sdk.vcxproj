@@ -1385,6 +1385,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="fogofwar_cpe.cpp" />
     <ClCompile Include="fogofwar_im.cpp" />
     <ClCompile Include="gamecontrols.cpp" />
+    <ClCompile Include="GlobalLitGeneric.cpp" />
     <ClCompile Include="HDRCombineTo16Bit.cpp" />
     <ClCompile Include="HDRSelectRange.cpp" />
     <ClCompile Include="hsl_filmgrain_pass1.cpp" />

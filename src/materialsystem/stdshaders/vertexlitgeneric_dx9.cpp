@@ -19,7 +19,7 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-DEFINE_FALLBACK_SHADER( GlobalLitSimple, VertexLitGeneric )
+//DEFINE_FALLBACK_SHADER( GlobalLitSimple, VertexLitGeneric )
 DEFINE_FALLBACK_SHADER( CustomHero, VertexLitGeneric )
 
 BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
