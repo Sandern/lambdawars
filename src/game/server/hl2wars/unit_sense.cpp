@@ -94,7 +94,7 @@ bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 bool UnitBaseSense::TestUnit( CUnitBase *pUnit )
 {
-	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->FOWShouldShow( m_pOuter->GetOwnerNumber() ) )
+	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->FOWShouldShow( m_pOuter->GetOwnerNumber() ) || !pUnit->IsSolid() )
 		return false;
 
 	return true;
