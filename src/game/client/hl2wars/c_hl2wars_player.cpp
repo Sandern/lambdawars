@@ -72,6 +72,7 @@ LINK_ENTITY_TO_CLASS( player, C_HL2WarsPlayer );
 C_HL2WarsPlayer::C_HL2WarsPlayer() : m_bOldIsStrategicModeOn(false)
 {
 	m_NetworkedFactionName[0] = 0;
+	m_bCamValid = false;
 }
 
 

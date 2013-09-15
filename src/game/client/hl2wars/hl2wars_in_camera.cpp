@@ -20,6 +20,7 @@ ConVar cl_strategic_cam_spring_vel_max( "cl_strategic_cam_spring_vel_max", "3000
 ConVar cl_strategic_cam_spring_const( "cl_strategic_cam_spring_const", "49", FCVAR_ARCHIVE, "Camera spring constant." );
 ConVar cl_strategic_cam_spring_dampening( "cl_strategic_cam_spring_dampening", "3.0", FCVAR_ARCHIVE, "Camera spring dampening." );
 extern ConVar cl_strategic_height_tol;
+ConVar cl_strategic_cam_delta_snap( "cl_strategic_cam_delta_snap", "4096.0", FCVAR_CHEAT, "Snaps camera directly to desired height if difference is larger than this" );
 
 ConVar cl_strategic_cam_min_dist( "cl_strategic_cam_min_dist", "240.0", FCVAR_CHEAT, "Camera minimum distance" );
 ConVar cl_strategic_cam_max_dist( "cl_strategic_cam_max_dist", "840.0", FCVAR_CHEAT, "Camera maximum distance" );
@@ -75,25 +76,27 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() );
 	}
 
+	float fMaxCamHeight = MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
+
 	// Reset if desired height or max height is not yet set
 	if( m_flDesiredCameraDist == -1 )
 	{
 		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() ); // Ensure we have a valid height
-		m_flDesiredCameraDist = m_flCurrentCameraDist = clamp( 800.0f, cl_strategic_cam_min_dist.GetFloat(), MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() ) );
-		m_flCurrentCameraDist = clamp( m_flCurrentCameraDist, cl_strategic_cam_min_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
+		m_flDesiredCameraDist = m_flCurrentCameraDist = clamp( 800.0f, cl_strategic_cam_min_dist.GetFloat(), fMaxCamHeight );
+		m_flCurrentCameraDist = clamp( m_flCurrentCameraDist, cl_strategic_cam_min_dist.GetFloat(), fMaxCamHeight );
 	}
 
 	// Clamp camera height within the valid range
-	if( pPlayer->GetCamMaxHeight() != -1 )
+	if( pPlayer->IsCamValid() )
 	{
-		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() ) );
+		m_flDesiredCameraDist = clamp( m_flDesiredCameraDist, cl_strategic_cam_min_dist.GetFloat(), fMaxCamHeight );
 	}
 
 	// Converge cam height
 	float flCameraDelta = fabs( m_flCurrentCameraDist - m_flDesiredCameraDist );
 
 	// Check against a tolerance so we don't oscillate forever.
-	if ( flCameraDelta > cl_strategic_height_tol.GetFloat() )
+	if ( flCameraDelta > cl_strategic_height_tol.GetFloat() && flCameraDelta < cl_strategic_cam_delta_snap.GetFloat() )
 	{
 		// Get frametime = delta time
 		float flFrameTime = gpGlobals->frametime;

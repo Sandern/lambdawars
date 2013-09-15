@@ -102,6 +102,7 @@ CHL2WarsPlayer::CHL2WarsPlayer() : m_nMouseButtonsPressed(0)
 {
 	SetViewDistance(1500.0f);
 	m_vCameraLimits.Init( 0, 2.0f, 2.0f );
+	m_bCamValid = false;
 }
 
 

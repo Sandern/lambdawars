@@ -106,6 +106,7 @@ public:
 
 	virtual void					CalculateHeight( const Vector &vPosition );
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
+	bool							IsCamValid() { return m_bCamValid; }
 	const Vector &					GetCamGroundPos() { return m_vCamGroundPos; }
 
 	// selection management
@@ -215,6 +216,7 @@ private:
 	float m_fCamStopSpeed;
 	float m_fCamFriction;
 	float m_fMaxHeight;
+	bool m_bCamValid;
 	Vector m_vCamGroundPos;
 	Vector m_vCameraLimits;
 

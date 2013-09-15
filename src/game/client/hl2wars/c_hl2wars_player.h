@@ -160,6 +160,7 @@ public:
 
 	virtual void					CalculateHeight( const Vector &vPosition );
 	float							GetCamMaxHeight() { return m_fMaxHeight; }
+	bool							IsCamValid() { return m_bCamValid; }
 	const Vector &					GetCamGroundPos() { return m_vCamGroundPos; }
 
 	// Direct move
@@ -224,6 +225,7 @@ private:
 	float				m_fDirectMoveTimeOut;
 
 	float				m_fMaxHeight;
+	bool				m_bCamValid;
 	Vector				m_vCamGroundPos;
 
 	EHANDLE				m_hCamFollowEntity;

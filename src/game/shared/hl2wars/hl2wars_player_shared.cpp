@@ -1404,10 +1404,19 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: This function is responsible for setting up the player camera.
+//			It determines a ground position and maximum height (which in turn is
+//			clamped in the camera code).
 //-----------------------------------------------------------------------------
 void CHL2WarsPlayer::CalculateHeight( const Vector &vPosition )
 {
+	if( !CBaseFuncMapBoundary::IsWithinAnyMapBoundary( vPosition ) )
+	{
+		m_bCamValid = false;
+		m_vCamGroundPos = vPosition;
+		return;
+	}
+
 	trace_t tr;
 	CTraceFilterWars traceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
 
@@ -1415,32 +1424,33 @@ void CHL2WarsPlayer::CalculateHeight( const Vector &vPosition )
 	vTestStartPos.z += 64.0f; // Should be placed at the ground, so raise a bit.
 
 	// Trace up
-	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, MAX_TRACE_LENGTH), 
+	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, COORD_EXTENT), 
 		GetPlayerMins(), GetPlayerMaxs(),
 		CONTENTS_PLAYERCLIP, &traceFilter, &tr );
-	if( !tr.DidHit() )
+	if( !tr.DidHit() || tr.allsolid || !CBaseFuncMapBoundary::DidHitMapBoundary( tr.m_pEnt ) )
 	{
-		m_fMaxHeight = -1;
-		m_vCamGroundPos = vTestStartPos;
+		m_bCamValid = false;
+		m_vCamGroundPos = vPosition;
 		return;
 	}
 
 	Vector vMaxPos = tr.endpos;
 
 	// Trace down
-	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, -MAX_TRACE_LENGTH), 
+	UTIL_TraceHull( vTestStartPos, vTestStartPos + Vector(0, 0, -COORD_EXTENT), 
 		GetPlayerMins(), GetPlayerMaxs(),
 		CONTENTS_PLAYERCLIP, &traceFilter, &tr );
-	if( !tr.DidHit() )
+	if( !tr.DidHit() || tr.allsolid || !CBaseFuncMapBoundary::DidHitMapBoundary( tr.m_pEnt ) )
 	{
-		m_fMaxHeight = -1;
-		m_vCamGroundPos = vTestStartPos;
+		m_bCamValid = false;
+		m_vCamGroundPos = vPosition;
 		return;
 	}
 
 	// Update height settings
 	m_vCamGroundPos = tr.endpos;
 	m_fMaxHeight = (vMaxPos - tr.endpos).Length() - 64.0f;
+	m_bCamValid = true;
 }
 
 //-----------------------------------------------------------------------------

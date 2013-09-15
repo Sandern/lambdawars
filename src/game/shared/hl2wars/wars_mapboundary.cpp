@@ -123,3 +123,17 @@ void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ 
 		}
 	}
 }
+
+bool CBaseFuncMapBoundary::DidHitMapBoundary( CBaseEntity *pHitEnt )
+{
+	if( !pHitEnt )
+		return false;
+
+	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
+	{
+		if( pEnt == pHitEnt )
+			return true;
+	}
+
+	return false;
+}
