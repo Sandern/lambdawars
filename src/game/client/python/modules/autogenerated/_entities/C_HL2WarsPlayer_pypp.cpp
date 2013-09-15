@@ -1598,6 +1598,15 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("ability") ) );
         
         }
+        { //::C_HL2WarsPlayer::IsCamValid
+        
+            typedef bool ( ::C_HL2WarsPlayer::*IsCamValid_function_type )(  ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "IsCamValid"
+                , IsCamValid_function_type( &::C_HL2WarsPlayer::IsCamValid ) );
+        
+        }
         { //::C_HL2WarsPlayer::IsLeftDoublePressed
         
             typedef bool ( ::C_HL2WarsPlayer::*IsLeftDoublePressed_function_type )(  ) ;

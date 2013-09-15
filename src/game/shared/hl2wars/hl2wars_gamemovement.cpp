@@ -28,6 +28,7 @@
 	ConVar cl_showmovementspeed( "cl_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (client) movement speed." );
 #else
 	ConVar sv_showmovementspeed( "sv_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (server) movement speed." );
+	ConVar sv_strategic_debug_movement( "sv_strategic_debug_movement", "-1", FCVAR_CHEAT, "" );
 #endif // CLIENT_DLL
 // ---------------------------------------------------------------------------------------- //
 // Settings
@@ -318,7 +319,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		wishvel[i] = up[i]*fmove + right[i]*smove;
 	wishvel[2] = 0.0f;
 
-	if( warsplayer->GetCamMaxHeight() != -1 && warsplayer->GetCamMaxHeight() > 2.0f )
+	if( warsplayer->IsCamValid() && warsplayer->GetCamMaxHeight() > 2.0f )
 		;//wishvel[2] = -warsplayer->GetCamHeight() * 4.0f; // Force player origin down
 	else
 		wishvel = wishvel + forward*umove*4.0;		// Zooming is forward
@@ -383,13 +384,22 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		engine->Con_NPrintf( 1, "CLIENT Movement speed: %6.1f | maxspeed: %6.1f | userspeed: %6.1f | pos:  %6.1f %6.1f %6.1f | mins: %6.1f %6.1f %6.1f | maxs: %6.1f %6.1f %6.1f", 
 			mv->m_vecVelocity.Length(), maxspeed, speed, mv->GetAbsOrigin().x, mv->GetAbsOrigin().y, mv->GetAbsOrigin().z,
 			GetPlayerMins().x, GetPlayerMins().y, GetPlayerMins().z, GetPlayerMaxs().x, GetPlayerMaxs().y, GetPlayerMaxs().z );
+		engine->Con_NPrintf( 2, "CLIENT Cam Max Height: %6.1f | ground pos: %6.1f %6.1f %6.1f", 
+			warsplayer->GetCamMaxHeight(), warsplayer->GetCamGroundPos().x, warsplayer->GetCamGroundPos().y, warsplayer->GetCamGroundPos().z );
 	}
 #else
 	if( sv_showmovementspeed.GetInt() == player->entindex() )
 	{
-		engine->Con_NPrintf( 3, "SERVER Movement speed: %6.1f | maxspeed: %6.1f | userspeed: %6.1f | pos:  %6.1f %6.1f %6.1f | mins: %6.1f %6.1f %6.1f | maxs: %6.1f %6.1f %6.1f", 
+		engine->Con_NPrintf( 4, "SERVER Movement speed: %6.1f | maxspeed: %6.1f | userspeed: %6.1f | pos:  %6.1f %6.1f %6.1f | mins: %6.1f %6.1f %6.1f | maxs: %6.1f %6.1f %6.1f", 
 			mv->m_vecVelocity.Length(), maxspeed, speed, mv->GetAbsOrigin().x, mv->GetAbsOrigin().y, mv->GetAbsOrigin().z,
 			GetPlayerMins().x, GetPlayerMins().y, GetPlayerMins().z, GetPlayerMaxs().x, GetPlayerMaxs().y, GetPlayerMaxs().z );
+		engine->Con_NPrintf( 5, "SERVER Cam Max Height: %6.1f | ground pos: %6.1f %6.1f %6.1f", 
+			warsplayer->GetCamMaxHeight(), warsplayer->GetCamGroundPos().x, warsplayer->GetCamGroundPos().y, warsplayer->GetCamGroundPos().z );
+	}
+
+	if( sv_strategic_debug_movement.GetInt() == player->entindex() )
+	{
+		NDebugOverlay::Box( mv->GetAbsOrigin(), -Vector(16, 16, 16), Vector(16, 16, 16), 0, 255, 0, 255, gpGlobals->frametime );
 	}
 #endif // CLIENT_DLL
 
@@ -398,7 +408,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	// Store current height
 	heightchange = mv->GetAbsOrigin().z;
 
-	if( warsplayer->GetCamMaxHeight() != -1 )
+	if( warsplayer->IsCamValid() )
 	{
 		//Vector vCamOffsetZ = Vector(0.0f, 0.0f, warsplayer->GetCameraOffset().z);
 		//TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos()+vCamOffsetZ, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
@@ -412,7 +422,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	VectorMA( mv->GetAbsOrigin(), gpGlobals->frametime, mv->m_vecVelocity, destination );
 
 	TracePlayerBBox( mv->GetAbsOrigin(), destination, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
-	if (pm.fraction == 1)
+	if( pm.fraction == 1 )
 	{
 
 		mv->SetAbsOrigin( pm.endpos );
@@ -426,7 +436,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	// Determine new height and return player to the ground
 	warsplayer->CalculateHeight( mv->GetAbsOrigin() );
 
-	if( warsplayer->GetCamMaxHeight() != -1 )
+	if( warsplayer->IsCamValid() )
 	{
 		TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos(), PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 		mv->SetAbsOrigin( pm.endpos );

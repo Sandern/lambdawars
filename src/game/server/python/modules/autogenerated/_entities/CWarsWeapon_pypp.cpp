@@ -133,6 +133,36 @@ struct CWarsWeapon_wrapper : CWarsWeapon, bp::wrapper< CWarsWeapon > {
         CWarsWeapon::PrimaryAttack( );
     }
 
+    virtual int UpdateTransmitState(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "UpdateTransmitState: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling UpdateTransmitState(  ) of Class: CWarsWeapon\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_UpdateTransmitState = this->get_override( "UpdateTransmitState" );
+        if( func_UpdateTransmitState.ptr() != Py_None )
+            try {
+                return func_UpdateTransmitState(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CWarsWeapon::UpdateTransmitState(  );
+            }
+        else
+            return this->CWarsWeapon::UpdateTransmitState(  );
+    }
+    
+    int default_UpdateTransmitState(  ) {
+        return CWarsWeapon::UpdateTransmitState( );
+    }
+
     virtual void Activate(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1084,36 +1114,6 @@ struct CWarsWeapon_wrapper : CWarsWeapon, bp::wrapper< CWarsWeapon > {
         CBaseEntity::UpdateOnRemove( );
     }
 
-    virtual int UpdateTransmitState(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "UpdateTransmitState: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateTransmitState(  ) of Class: CBaseCombatWeapon\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_UpdateTransmitState = this->get_override( "UpdateTransmitState" );
-        if( func_UpdateTransmitState.ptr() != Py_None )
-            try {
-                return func_UpdateTransmitState(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatWeapon::UpdateTransmitState(  );
-            }
-        else
-            return this->CBaseCombatWeapon::UpdateTransmitState(  );
-    }
-    
-    int default_UpdateTransmitState(  ) {
-        return CBaseCombatWeapon::UpdateTransmitState( );
-    }
-
     virtual void VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -1447,6 +1447,17 @@ void register_CWarsWeapon_class(){
                 "SetWeaponVisible"
                 , SetWeaponVisible_function_type( &::CWarsWeapon::SetWeaponVisible )
                 , ( bp::arg("visible") ) );
+        
+        }
+        { //::CWarsWeapon::UpdateTransmitState
+        
+            typedef int ( ::CWarsWeapon::*UpdateTransmitState_function_type )(  ) ;
+            typedef int ( CWarsWeapon_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "UpdateTransmitState"
+                , UpdateTransmitState_function_type(&::CWarsWeapon::UpdateTransmitState)
+                , default_UpdateTransmitState_function_type(&CWarsWeapon_wrapper::default_UpdateTransmitState) );
         
         }
         { //::CWarsWeapon::WeaponLOSCondition
@@ -1865,17 +1876,6 @@ void register_CWarsWeapon_class(){
                 "UpdateOnRemove"
                 , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
                 , default_UpdateOnRemove_function_type(&CWarsWeapon_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseCombatWeapon::UpdateTransmitState
-        
-            typedef int ( ::CBaseCombatWeapon::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CWarsWeapon_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CWarsWeapon_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseCombatWeapon::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CWarsWeapon_wrapper::default_UpdateTransmitState) );
         
         }
         { //::CBaseEntity::VPhysicsCollision

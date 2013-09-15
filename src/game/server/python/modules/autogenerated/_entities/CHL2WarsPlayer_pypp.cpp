@@ -2021,6 +2021,15 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("ability") ) );
         
         }
+        { //::CHL2WarsPlayer::IsCamValid
+        
+            typedef bool ( ::CHL2WarsPlayer::*IsCamValid_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "IsCamValid"
+                , IsCamValid_function_type( &::CHL2WarsPlayer::IsCamValid ) );
+        
+        }
         { //::CHL2WarsPlayer::IsLeftDoublePressed
         
             typedef bool ( ::CHL2WarsPlayer::*IsLeftDoublePressed_function_type )(  ) ;

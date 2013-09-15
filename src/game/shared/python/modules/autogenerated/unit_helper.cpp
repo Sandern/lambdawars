@@ -273,6 +273,10 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
     
     }
 
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
+    }
+
     virtual void HandleJump(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -319,6 +323,10 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
       , bp::wrapper< UnitBaseAirLocomotion >(){
         // constructor
     
+    }
+
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
     }
 
     virtual void HandleJump(  ) {
@@ -1336,6 +1344,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("args"), bp::arg("pResult") ) );
         
         }
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitBaseLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitBaseLocomotion_wrapper::CheckVelocity ) );
+        
+        }
         { //::UnitBaseLocomotion::ClearBlockers
         
             typedef void ( ::UnitBaseLocomotion::*ClearBlockers_function_type )(  ) ;
@@ -1612,6 +1629,15 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseAirLocomotion_exposer.def_readwrite( "desiredheight", &UnitBaseAirLocomotion::m_fDesiredHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoiserate", &UnitBaseAirLocomotion::m_fFlyNoiseRate );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoisez", &UnitBaseAirLocomotion::m_fFlyNoiseZ );
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitBaseAirLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitBaseAirLocomotion_wrapper::CheckVelocity ) );
+        
+        }
         { //::UnitBaseLocomotion::HandleJump
         
             typedef void ( ::UnitBaseLocomotion::*HandleJump_function_type )(  ) ;
@@ -2170,6 +2196,10 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
     
     }
 
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
+    }
+
     virtual void HandleJump(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -2216,6 +2246,10 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
       , bp::wrapper< UnitBaseAirLocomotion >(){
         // constructor
     
+    }
+
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
     }
 
     virtual void HandleJump(  ) {
@@ -3906,6 +3940,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("args"), bp::arg("pResult") ) );
         
         }
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitBaseLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitBaseLocomotion_wrapper::CheckVelocity ) );
+        
+        }
         { //::UnitBaseLocomotion::ClearBlockers
         
             typedef void ( ::UnitBaseLocomotion::*ClearBlockers_function_type )(  ) ;
@@ -4182,6 +4225,15 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseAirLocomotion_exposer.def_readwrite( "desiredheight", &UnitBaseAirLocomotion::m_fDesiredHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoiserate", &UnitBaseAirLocomotion::m_fFlyNoiseRate );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoisez", &UnitBaseAirLocomotion::m_fFlyNoiseZ );
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitBaseAirLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitBaseAirLocomotion_wrapper::CheckVelocity ) );
+        
+        }
         { //::UnitBaseLocomotion::HandleJump
         
             typedef void ( ::UnitBaseLocomotion::*HandleJump_function_type )(  ) ;

@@ -234,6 +234,9 @@ public:
 
 	void SetupMovementBounds( UnitBaseMoveCommand &mv );
 
+protected:
+	void CheckVelocity( void );
+
 public:
 	float stepsize;
 	int unitsolidmask;

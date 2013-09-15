@@ -1056,6 +1056,16 @@ void register_CBaseFuncMapBoundary_class(){
         typedef bp::class_< CBaseFuncMapBoundary_wrapper, bp::bases< CBaseEntity >, boost::noncopyable > CBaseFuncMapBoundary_exposer_t;
         CBaseFuncMapBoundary_exposer_t CBaseFuncMapBoundary_exposer = CBaseFuncMapBoundary_exposer_t( "CBaseFuncMapBoundary", bp::init< >() );
         bp::scope CBaseFuncMapBoundary_scope( CBaseFuncMapBoundary_exposer );
+        { //::CBaseFuncMapBoundary::DidHitMapBoundary
+        
+            typedef bool ( *DidHitMapBoundary_function_type )( ::CBaseEntity * );
+            
+            CBaseFuncMapBoundary_exposer.def( 
+                "DidHitMapBoundary"
+                , DidHitMapBoundary_function_type( &::CBaseFuncMapBoundary::DidHitMapBoundary )
+                , ( bp::arg("pHitEnt") ) );
+        
+        }
         { //::CBaseFuncMapBoundary::GetBloat
         
             typedef float ( ::CBaseFuncMapBoundary::*GetBloat_function_type )(  ) ;
@@ -1476,6 +1486,7 @@ void register_CBaseFuncMapBoundary_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
+        CBaseFuncMapBoundary_exposer.staticmethod( "DidHitMapBoundary" );
         CBaseFuncMapBoundary_exposer.staticmethod( "IsWithinAnyMapBoundary" );
         CBaseFuncMapBoundary_exposer.staticmethod( "SnapToNearestBoundary" );
         { //::CBaseFuncMapBoundary::TestCollision

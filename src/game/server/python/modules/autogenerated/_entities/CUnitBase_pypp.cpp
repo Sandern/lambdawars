@@ -2479,6 +2479,16 @@ void register_CUnitBase_class(){
                 , ( bp::arg("bUseCustomCanBeSeen") ) );
         
         }
+        { //::CUnitBase::SetUseMinimalSendTable
+        
+            typedef void ( ::CUnitBase::*SetUseMinimalSendTable_function_type )( int,bool ) ;
+            
+            CUnitBase_exposer.def( 
+                "SetUseMinimalSendTable"
+                , SetUseMinimalSendTable_function_type( &::CUnitBase::SetUseMinimalSendTable )
+                , ( bp::arg("iClientIndex"), bp::arg("state") ) );
+        
+        }
         { //::CUnitBase::Spawn
         
             typedef void ( ::CUnitBase::*Spawn_function_type )(  ) ;

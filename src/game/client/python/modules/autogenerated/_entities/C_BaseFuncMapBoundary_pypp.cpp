@@ -859,6 +859,16 @@ void register_C_BaseFuncMapBoundary_class(){
         typedef bp::class_< C_BaseFuncMapBoundary_wrapper, bp::bases< C_BaseEntity >, boost::noncopyable > C_BaseFuncMapBoundary_exposer_t;
         C_BaseFuncMapBoundary_exposer_t C_BaseFuncMapBoundary_exposer = C_BaseFuncMapBoundary_exposer_t( "C_BaseFuncMapBoundary", bp::init< >() );
         bp::scope C_BaseFuncMapBoundary_scope( C_BaseFuncMapBoundary_exposer );
+        { //::C_BaseFuncMapBoundary::DidHitMapBoundary
+        
+            typedef bool ( *DidHitMapBoundary_function_type )( ::C_BaseEntity * );
+            
+            C_BaseFuncMapBoundary_exposer.def( 
+                "DidHitMapBoundary"
+                , DidHitMapBoundary_function_type( &::C_BaseFuncMapBoundary::DidHitMapBoundary )
+                , ( bp::arg("pHitEnt") ) );
+        
+        }
         { //::C_BaseFuncMapBoundary::GetBloat
         
             typedef float ( ::C_BaseFuncMapBoundary::*GetBloat_function_type )(  ) ;
@@ -1218,6 +1228,7 @@ void register_C_BaseFuncMapBoundary_class(){
                 , default_UpdateOnRemove_function_type(&C_BaseFuncMapBoundary_wrapper::default_UpdateOnRemove) );
         
         }
+        C_BaseFuncMapBoundary_exposer.staticmethod( "DidHitMapBoundary" );
         C_BaseFuncMapBoundary_exposer.staticmethod( "IsWithinAnyMapBoundary" );
         C_BaseFuncMapBoundary_exposer.staticmethod( "SnapToNearestBoundary" );
         { //::C_BaseFuncMapBoundary::TestCollision

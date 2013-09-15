@@ -20,6 +20,7 @@
 #include "tier0/memdbgon.h"
 
 ConVar unit_nolocomotion("unit_nolocomotion", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+ConVar unit_locomotion_debug("unit_locomotion_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 #define	MAX_CLIP_PLANES	5
 
@@ -599,8 +600,12 @@ void UnitBaseLocomotion::AirMove( void )
 		// Apply hack
 		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
 		mv->origin = trace.endpos;
-		DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-			trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
+
+		if( unit_locomotion_debug.GetBool() )
+		{
+			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
+				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
+		}
 	}
 
 	trace_t pm;
@@ -708,6 +713,10 @@ void UnitBaseLocomotion::Move( float interval, UnitBaseMoveCommand &move_command
 	Friction();
 	FullWalkMove();
 	MoveFacing();
+
+	// Sometimes an unit spawns with an invalid velocity and can't move
+	// Validate velocity after each move
+	CheckVelocity();
 }
 
 //-----------------------------------------------------------------------------
@@ -752,6 +761,12 @@ void UnitBaseLocomotion::GroundMove()
 		// Apply hack
 		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
 		mv->origin = trace.endpos;
+
+		if( unit_locomotion_debug.GetBool() )
+		{
+			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
+				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
+		}
 	}
 
 #if !defined(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )
@@ -1032,8 +1047,6 @@ void UnitBaseLocomotion::StartGravity( void )
 	Vector temp = m_pOuter->GetBaseVelocity();
 	temp[ 2 ] = 0;
 	m_pOuter->SetBaseVelocity( temp );
-
-	//CheckVelocity();
 }
 
 //-----------------------------------------------------------------------------
@@ -1053,8 +1066,6 @@ void UnitBaseLocomotion::FinishGravity( void )
 
 	// Get the correct velocity for the end of the dt 
   	mv->velocity[2] -= (ent_gravity * sv_gravity.GetFloat() * mv->interval * 0.5);
-
-	//CheckVelocity();
 }
 
 //-----------------------------------------------------------------------------
@@ -1680,4 +1691,46 @@ void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 	AddPointToBounds( start + boxMins - bloat, moveMins, moveMaxs );
 	// now build an optimized trace within these bounds
 	enginetrace->SetupLeafAndEntityListBox( moveMins, moveMaxs, m_pTraceListData );
+}
+
+extern const char *DescribeAxis( int axis );
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitBaseLocomotion::CheckVelocity( void )
+{
+	int i;
+
+	//
+	// bound velocity
+	//
+
+	for( i=0; i < 3; i++ )
+	{
+		// See if it's bogus.
+		if (IS_NAN(mv->velocity[i]))
+		{
+			DevMsg( 1, "PM  Got a NaN velocity %s\n", DescribeAxis( i ) );
+			mv->velocity[i] = 0;
+		}
+
+		if (IS_NAN(mv->origin[i]))
+		{
+			DevMsg( 1, "PM  Got a NaN origin on %s\n", DescribeAxis( i ) );
+			mv->origin[ i ] = 0;
+		}
+
+		// Bound it.
+		if (mv->velocity[i] > sv_maxvelocity.GetFloat()) 
+		{
+			DevMsg( 1, "PM  Got a velocity too high on %s\n", DescribeAxis( i ) );
+			mv->velocity[i] = sv_maxvelocity.GetFloat();
+		}
+		else if (mv->velocity[i] < -sv_maxvelocity.GetFloat())
+		{
+			DevMsg( 1, "PM  Got a velocity too low on %s\n", DescribeAxis( i ) );
+			mv->velocity[i] = -sv_maxvelocity.GetFloat();
+		}
+	}
 }
