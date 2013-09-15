@@ -547,7 +547,7 @@ public:
 		m_fRadius = fRadius;
 
 		if( vPos.IsValid() )
-			m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, fRadius, false, true);
+			m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, 1250.0f + fRadius, false, true);
 		else
 			Warning( "HidingSpotCollector: Invalid input position %f %f %f\n", vPos.x, vPos.y, vPos.z );
 
@@ -674,9 +674,9 @@ static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotRe
 }
 
 #ifdef CLIENT_DLL
-	ConVar disable_hidingspots( "cl_disable_hidingspots", "0", FCVAR_CHEAT );
+	ConVar disable_hidingspots( "cl_disable_coverspots", "0", FCVAR_CHEAT );
 #else
-	ConVar disable_hidingspots( "sv_disable_hidingspots", "0", FCVAR_CHEAT );
+	ConVar disable_hidingspots( "sv_disable_coverspots", "0", FCVAR_CHEAT );
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
