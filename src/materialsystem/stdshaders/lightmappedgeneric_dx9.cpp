@@ -201,7 +201,7 @@ END_SHADER_PARAMS
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
-#if DEFCFG_DEFERRED_SHADING == 1
+#if 1 || DEFCFG_DEFERRED_SHADING == 1
 		return true;
 #else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );

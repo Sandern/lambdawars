@@ -10,6 +10,7 @@
 BEGIN_VS_SHADER( GlobalLitSimple, "" )
 	BEGIN_SHADER_PARAMS
 		SHADER_PARAM( FULLBRIGHT, SHADER_PARAM_TYPE_BOOL, "0", "Render full bright" )
+		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "0.5", "" )
 
 		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
 	END_SHADER_PARAMS
@@ -19,19 +20,15 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 		p.bModel = false;
 
 		p.iAlbedo = BASETEXTURE;
+		p.iAlphatestRef = ALPHATESTREFERENCE;
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )
 	{
 		p.bModel = false;
 		p.iAlbedo = BASETEXTURE;
+		p.iAlphatestRef = ALPHATESTREFERENCE;
 	}
-
-	/*void SetupParmsGlobalLitGeneric( defParms_composite &p )
-	{
-		p.bModel = false;
-		p.iAlbedo = BASETEXTURE;
-	}*/
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
@@ -42,11 +39,33 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 
 		return !bTranslucent && !bIsDecal;
+		//return !bTranslucent || bIsDecal;
 #endif
 	}
 
 	SHADER_INIT_PARAMS()
 	{
+		//const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )// && !bIsDecal )
+		{
+			const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+			const bool bAlphaTest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST );
+
+			if( bTranslucent ) 
+			{
+				CLEAR_FLAGS( MATERIAL_VAR_TRANSLUCENT );
+				SET_FLAGS( MATERIAL_VAR_ALPHATEST );
+
+				params[ALPHATESTREFERENCE]->SetFloatValue( 0.5f );
+			}
+			else if( bAlphaTest )
+			{
+				if( params[ALPHATESTREFERENCE]->GetFloatValue() == 0.0f )
+					params[ALPHATESTREFERENCE]->SetFloatValue( 0.5f );
+			}
+		}
+
 		const bool bDrawToGBuffer = DrawToGBuffer( params );
 
 		if ( bDrawToGBuffer )
@@ -88,8 +107,10 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 	SHADER_FALLBACK
 	{
-		Msg("%s fullbright? %d\n", params[BASETEXTURE]->GetStringValue(), params[FULLBRIGHT]->GetIntValue() );
-		if( params[FULLBRIGHT]->GetIntValue() == 0 )
+		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+		if( bIsDecal )
+			return "LightmappedGeneric";
+		if( params[FULLBRIGHT]->GetIntValue() == 0 && !bIsDecal )
 		{
 			return "VertexLitGeneric";
 		}
@@ -100,15 +121,40 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 	inline void DrawGlobalLitGeneric( IMaterialVar **params, IShaderShadow* pShaderShadow,
 		IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData *pContextDataPtr ) 
 	{
-		const bool bHasFoW = false;
+		bool bHasFoW = ( ( params[FOW]->IsTexture() != 0 ) );
+		if ( bHasFoW == true )
+		{
+			ITexture *pTexture = params[FOW]->GetTextureValue();
+			if ( ( pTexture->GetFlags() & TEXTUREFLAGS_RENDERTARGET ) == 0 )
+			{
+				bHasFoW = false;
+			}
+		}
+
+		const bool bIsFullbright = params[FULLBRIGHT]->GetIntValue() != 0;
+		const bool bIsAlphaTested = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) != 0;
 
 		SHADOW_STATE
 		{
 			SetInitialShadowState( );
 
+			// Alpha test: FIXME: shouldn't this be handled in Shader_t::SetInitialShadowState
+			pShaderShadow->EnableAlphaTest( bIsAlphaTested );
+			if ( params[ALPHATESTREFERENCE]->GetFloatValue() > 0.0f )
+			{
+				pShaderShadow->AlphaFunc( SHADER_ALPHAFUNC_GEQUAL, params[ALPHATESTREFERENCE]->GetFloatValue() );
+			}
+
 			DefaultFog();
 
 			pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
+
+			if ( bHasFoW )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
+			}
+
+			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
 
 			int iVFmtFlags = VERTEX_POSITION;
 			int iUserDataSize = 0;
@@ -134,6 +180,7 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 			SET_STATIC_VERTEX_SHADER( globallitgeneric_vs30 );
 
 			DECLARE_STATIC_PIXEL_SHADER( globallitgeneric_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( FULLBRIGHT, bIsFullbright );
 			SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
 			SET_STATIC_PIXEL_SHADER( globallitgeneric_ps30 );
 
@@ -143,6 +190,27 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 			pShaderAPI->SetDefaultState();
 
 			BindTexture( SHADER_SAMPLER1, BASETEXTURE );							// Base Map 1
+
+			if ( bHasFoW )
+			{
+				BindTexture( SHADER_SAMPLER10, FOW, -1 );
+
+				float	vFoWSize[ 4 ];
+				Vector	vMins = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MINS );
+				Vector	vMaxs = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_GLOBAL_FOW_MAXS );
+				vFoWSize[ 0 ] = vMins.x;
+				vFoWSize[ 1 ] = vMins.y;
+				vFoWSize[ 2 ] = vMaxs.x - vMins.x;
+				vFoWSize[ 3 ] = vMaxs.y - vMins.y;
+				pShaderAPI->SetVertexShaderConstant( 26, vFoWSize );
+			}
+
+			BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
+			int x, y, w, t;
+			pShaderAPI->GetCurrentViewport( x, y, w, t );
+			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
+
+			pShaderAPI->SetPixelShaderConstant( 3, fl1 );
 
 			DECLARE_DYNAMIC_VERTEX_SHADER( globallitgeneric_vs30 );
 			SET_DYNAMIC_VERTEX_SHADER( globallitgeneric_vs30 );

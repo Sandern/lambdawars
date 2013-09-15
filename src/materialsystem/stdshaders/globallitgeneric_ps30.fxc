@@ -1,4 +1,5 @@
 //========== Copyright (c) Valve Corporation, All rights reserved. ==========//
+// STATIC: "FULLBRIGHT"					"0..1"
 // STATIC: "FOW"						"0..1"
 
 #include "shader_constant_register_map.h"
@@ -13,6 +14,9 @@ sampler BaseSampler1					: register( s1 );	// Base map 1
 sampler FoWSampler					: register( s10 );	// Fog of War
 
 #endif
+
+sampler sLightAccum		: register( s13 );
+const float2 g_vecFullScreenTexel		: register( c3 );
 
 struct PS_INPUT
 {
@@ -30,5 +34,16 @@ struct PS_INPUT
 float4 main( PS_INPUT i ) : COLOR
 {
 	float4 result = tex2Dsrgb( BaseSampler1, i.vBaseTexCoord.xy );
-	return result;
+
+#if FULLBRIGHT == 0
+	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
+	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+	result.rgb *= flLighting;
+	
+#if FOW
+	result.rgb = CalcFoW( FoWSampler, i.vFowCoord.xy, result.rgb );
+#endif // FOW
+#endif // FULLBRIGHT
+	
+	return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
 }

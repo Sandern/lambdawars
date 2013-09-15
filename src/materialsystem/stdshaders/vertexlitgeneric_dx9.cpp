@@ -462,9 +462,17 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		}
 		else if ( params[CLOAKPASSENABLED]->GetIntValue() )
 		{
-			CloakBlendedPassVars_t info;
-			SetupVarsCloakBlendedPass( info );
-			InitParamsCloakBlendedPass( this, params, pMaterialName, info );
+			if( bDeferredActive )
+			{
+				// FIXME: Currently broken in deferred mode
+				params[CLOAKPASSENABLED]->SetIntValue( 0 );
+			}
+			else
+			{
+				CloakBlendedPassVars_t info;
+				SetupVarsCloakBlendedPass( info );
+				InitParamsCloakBlendedPass( this, params, pMaterialName, info );
+			}
 		}
 
 		// Emissive Scroll Pass
@@ -491,7 +499,6 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 			InitParamsFleshInteriorBlendedPass( this, params, pMaterialName, info );
 		}
 
-		//bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 		if( bDeferredActive )
 		{
 			defParms_gBuffer parms_gbuffer;
@@ -506,16 +513,6 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 	SHADER_FALLBACK
 	{
-#if 0 //def DEFERRED_ENABLED
-		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
-		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
-
-		if ( !bTranslucent || bIsDecal )
-		{
-			if( GetDeferredExt()->IsDeferredLightingEnabled() )
-				return "DEFERRED_MODEL";
-		}
-#endif // DEFERRED_ENABLED
 		return 0;
 	}
 
