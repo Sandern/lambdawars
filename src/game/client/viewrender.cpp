@@ -3476,7 +3476,7 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 
 		if ( worldView.y != 0 ) // if top of viewport isn't at 0
 		{
-			pRenderContext->Viewport( view.x, view.y, view.width, 1 );
+			pRenderContext->Viewport( worldView.x, worldView.y, worldView.width, 1 );
 			pRenderContext->ClearColor3ub( 0, 0, 0 );
 			pRenderContext->ClearBuffers( true, false );
 		}

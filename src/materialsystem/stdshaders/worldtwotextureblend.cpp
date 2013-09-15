@@ -10,14 +10,8 @@
 
 #include "ConVar.h"
 
-#ifndef _X360
 #include "lightmappedgeneric_vs30.inc"
 #include "worldtwotextureblend_ps30.inc"
-#endif
-
-#include "lightmappedgeneric_vs20.inc"
-#include "worldtwotextureblend_ps20.inc"
-#include "worldtwotextureblend_ps20b.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

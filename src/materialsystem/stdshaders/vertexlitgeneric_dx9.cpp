@@ -20,6 +20,7 @@
 #include "tier0/memdbgon.h"
 
 DEFINE_FALLBACK_SHADER( GlobalLitSimple, VertexLitGeneric )
+DEFINE_FALLBACK_SHADER( CustomHero, VertexLitGeneric )
 
 BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 	BEGIN_SHADER_PARAMS
@@ -47,7 +48,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		SHADER_PARAM( SELFILLUMFRESNEL, SHADER_PARAM_TYPE_BOOL, "0", "Self illum fresnel" )
 		SHADER_PARAM( SELFILLUMFRESNELMINMAXEXP, SHADER_PARAM_TYPE_VEC4, "0", "Self illum fresnel min, max, exp" )
 		SHADER_PARAM( SELFILLUMMASKSCALE, SHADER_PARAM_TYPE_FLOAT, "0", "Scale self illum effect strength" )
-		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "0.0", "" )	
+		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "0.5", "" )	
 		SHADER_PARAM( FLASHLIGHTNOLAMBERT, SHADER_PARAM_TYPE_BOOL, "0", "Flashlight pass sets N.L=1.0" )
 
 		// Debugging term for visualizing ambient data on its own
@@ -430,6 +431,26 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 	SHADER_INIT_PARAMS()
 	{
+		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
+			const bool bAlphaTest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST );
+
+			if( bTranslucent ) 
+			{
+				CLEAR_FLAGS( MATERIAL_VAR_TRANSLUCENT );
+				SET_FLAGS( MATERIAL_VAR_ALPHATEST );
+
+				params[ALPHATESTREFERENCE]->SetFloatValue( 0.5f );
+			}
+			else if( bAlphaTest )
+			{
+				if( params[ALPHATESTREFERENCE]->GetFloatValue() == 0.0f )
+					params[ALPHATESTREFERENCE]->SetFloatValue( 0.5f );
+			}
+		}
+
 		VertexLitGeneric_DX9_Vars_t vars;
 		SetupVars( vars );
 		InitParamsVertexLitGeneric_DX9( this, params, pMaterialName, true, vars, true );
@@ -470,7 +491,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 			InitParamsFleshInteriorBlendedPass( this, params, pMaterialName, info );
 		}
 
-		bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		//bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 		if( bDeferredActive )
 		{
 			defParms_gBuffer parms_gbuffer;
@@ -561,7 +582,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 			Assert( pShaderAPI == NULL ||
 				iDeferredRenderStage != DEFERRED_RENDER_STAGE_INVALID );
 
-			//if ( bDrawToGBuffer )
+			if ( bDrawToGBuffer )
 			{
 				if ( pShaderShadow != NULL ||
 					iDeferredRenderStage == DEFERRED_RENDER_STAGE_GBUFFER )
@@ -621,7 +642,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		if ( params[CLOAKPASSENABLED]->GetIntValue() )
 		{
 			// If ( snapshotting ) or ( we need to draw this frame )
- 			if ( bDrawComposite && ( ( pShaderShadow != NULL ) || ( ( params[CLOAKFACTOR]->GetFloatValue() > 0.0f ) && ( params[CLOAKFACTOR]->GetFloatValue() < 1.0f ) ) ) )
+ 			if ( ( pShaderShadow != NULL ) || ( bDrawComposite && ( params[CLOAKFACTOR]->GetFloatValue() > 0.0f ) && ( params[CLOAKFACTOR]->GetFloatValue() < 1.0f ) ) )
 			{
 				CloakBlendedPassVars_t info;
 				SetupVarsCloakBlendedPass( info );
@@ -638,7 +659,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		if ( params[EMISSIVEBLENDENABLED]->GetIntValue() )
 		{
 			// If ( snapshotting ) or ( we need to draw this frame )
-			if ( bDrawComposite && ( ( pShaderShadow != NULL ) || ( params[EMISSIVEBLENDSTRENGTH]->GetFloatValue() > 0.0f ) ) )
+			if ( ( pShaderShadow != NULL ) || ( bDrawComposite && ( params[EMISSIVEBLENDSTRENGTH]->GetFloatValue() > 0.0f ) ) )
 			{
 				EmissiveScrollBlendedPassVars_t info;
 				SetupVarsEmissiveScrollBlendedPass( info );

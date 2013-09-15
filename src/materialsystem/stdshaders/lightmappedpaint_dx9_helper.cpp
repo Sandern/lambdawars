@@ -10,7 +10,7 @@
 #include "BaseVSShader.h"
 #include "shaderlib/commandbuilder.h"
 #include "convar.h"
-#include "lightmappedgeneric_vs20.inc"
+#include "lightmappedgeneric_vs30.inc"
 #include "lightmappedpaint_ps20.inc"
 #include "lightmappedpaint_ps20b.inc"
 
@@ -217,7 +217,7 @@ void DrawLightmappedPaint_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 
 				int bumpmap_variant=(hasSSBump) ? 2 : hasBump;
 
-				DECLARE_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
+				DECLARE_STATIC_VERTEX_SHADER( lightmappedgeneric_vs30 );
 				SET_STATIC_VERTEX_SHADER_COMBO( ENVMAP_MASK,  hasEnvmapMask );
 				SET_STATIC_VERTEX_SHADER_COMBO( TANGENTSPACE, 1 ); //need tangent transpose matrix for lighting
 				SET_STATIC_VERTEX_SHADER_COMBO( BUMPMAP,  hasBump );
@@ -235,7 +235,7 @@ void DrawLightmappedPaint_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 				SET_STATIC_VERTEX_SHADER_COMBO( FLASHLIGHT, hasFlashlight);
 #endif
 				SET_STATIC_VERTEX_SHADER_COMBO( FOW, false );
-				SET_STATIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
+				SET_STATIC_VERTEX_SHADER( lightmappedgeneric_vs30 );
 
 #define TCOMBINE_NONE 12									// there is no detail texture
 
@@ -489,9 +489,9 @@ void DrawLightmappedPaint_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 		}
 
 		MaterialFogMode_t fogType = pShaderAPI->GetSceneFogMode();
-		DECLARE_DYNAMIC_VERTEX_SHADER( lightmappedgeneric_vs20 );
+		DECLARE_DYNAMIC_VERTEX_SHADER( lightmappedgeneric_vs30 );
 		SET_DYNAMIC_VERTEX_SHADER_COMBO( FASTPATH,  bVertexShaderFastPath );
-		SET_DYNAMIC_VERTEX_SHADER_CMD( DynamicCmdsOut, lightmappedgeneric_vs20 );
+		SET_DYNAMIC_VERTEX_SHADER_CMD( DynamicCmdsOut, lightmappedgeneric_vs30 );
 
 		bool bPixelShaderFastPath = pContextData->m_bPixelShaderFastPath;
 

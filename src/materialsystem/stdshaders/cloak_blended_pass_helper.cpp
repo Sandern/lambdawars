@@ -249,44 +249,18 @@ void DrawCloakBlendedPass( CBaseVSShader *pShader, IMaterialVar** params, IShade
 			pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, info.m_nBumpTransform );
 		}
 
-#ifndef _X360
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-		{
-			// Set Vertex Shader Combos
-			DECLARE_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
-			SET_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs20 );
-
-			// Set Pixel Shader Combos
-			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps20b );
-			}
-			else
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps20 );
-				SET_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps20 );
-			}
-		}
-#ifndef _X360
-		else
-		{
+		if( g_pHardwareConfig->HasFastVertexTextures() )
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
 
-			// Set Vertex Shader Combos
-			DECLARE_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
-			SET_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs30 );
+		// Set Vertex Shader Combos
+		DECLARE_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs30 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, pShaderAPI->GetCurrentNumBones() > 0 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
+		SET_DYNAMIC_VERTEX_SHADER( cloak_blended_pass_vs30 );
 
-			// Set Pixel Shader Combos
-			DECLARE_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps30 );
-		}
-#endif
+		// Set Pixel Shader Combos
+		DECLARE_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps30 );
+		SET_DYNAMIC_PIXEL_SHADER( cloak_blended_pass_ps30 );
 
 		// Bind textures
 		pShaderAPI->BindStandardTexture( SHADER_SAMPLER0, TEXTURE_FRAME_BUFFER_FULL_TEXTURE_0 ); // Refraction Map

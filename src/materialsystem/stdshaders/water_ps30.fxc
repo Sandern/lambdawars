@@ -473,7 +473,7 @@ float4 main( PS_INPUT i ) : COLOR
 			vRefractColor = lerp( vRefractColor, vRefractColor * g_vRefractTint, edgeFadeFactor );
 		#endif
 
-		#if ( REFLECT && !defined( SHADER_MODEL_PS_2_0 ) )
+		#if ( REFLECT /*&& !defined( SHADER_MODEL_PS_2_0 )*/ )
 		{
 			vReflectColor *= saturate( 2.0 * waterFogDepthValue );
 		}
@@ -602,7 +602,8 @@ float4 main( PS_INPUT i ) : COLOR
   	#endif
 	
 #if ( FOW == 1 )
-	vResult.rgb = CalcFoW( FoWSampler, i.vFowCoord, vResult.rgb );
+	float3 fowResult = CalcFoW( FoWSampler, i.vFowCoord, vResult.rgb );
+	vResult.rgb = lerp(fowResult, vResult.rgb, 0.8);
 #endif
 
 	#if ( PIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE )

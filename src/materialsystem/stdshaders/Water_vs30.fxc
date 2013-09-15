@@ -47,7 +47,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 vProjPos_POSITION		: POSITION;
-	#if !defined( _X360 ) && !defined( SHADER_MODEL_VS_3_0 )
+	#if !defined( _X360 ) /*&& !defined( SHADER_MODEL_VS_3_0 )*/
 		float  fog						: FOG;
 	#endif
 	float2 vBumpTexCoord			: TEXCOORD0;
@@ -107,7 +107,7 @@ VS_OUTPUT main( const VS_INPUT v )
 	float3 vWorldPos = mul( v.vPos, cModel[0] );
 	o.worldPos = vWorldPos;
 	
-	#if ( !defined( _X360 ) && !defined( SHADER_MODEL_VS_3_0 ) )
+	#if ( !defined( _X360 ) /*&& !defined( SHADER_MODEL_VS_3_0 )*/ )
 	{
 		o.fog = CalcFixedFunctionFog( vWorldPos, FOGTYPE_RANGE );
 	}

@@ -23,7 +23,6 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-
 DEFINE_FALLBACK_SHADER( Water, Water_DX9_HDR )
 
 BEGIN_VS_SHADER( Water_DX90, 
@@ -246,7 +245,7 @@ BEGIN_VS_SHADER( Water_DX90,
 
 		if ( bHasBaseTexture || bHasMultiTexture )
 		{
-			//hasFlashlight = false;
+			hasFlashlight = false;
 			//bLightmapWaterFog = false;
 		}
 
@@ -807,4 +806,3 @@ BEGIN_INHERITED_SHADER( Water_DX9_HDR, Water_DX90,
 		return 0;
 	}
 END_INHERITED_SHADER
-

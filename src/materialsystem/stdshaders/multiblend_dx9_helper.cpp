@@ -89,6 +89,8 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 {
 //	CMultiblend_DX9_Context *pContextData = reinterpret_cast< CMultiblend_DX9_Context * > ( *pContextDataPtr );
 
+	const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+
 	bool bIsModel = IS_FLAG_SET( MATERIAL_VAR_MODEL );
 	bool bHasFoW = ( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
 	if ( bHasFoW == true )
@@ -106,9 +108,9 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 	bool bHasSpec4 = ( info.m_nSpecTexture4 != -1 && params[ info.m_nSpecTexture4 ]->IsDefined() );
 	bool bUsingEditor = pShader->CanUseEditorMaterials(); // pShader->UsingEditor( params );
 //	bool bSinglePassFlashlight = true;
-	bool bHasFlashlight = false; //pShader->UsingFlashlight( params );
+	bool bHasFlashlight = !bDeferredActive && pShader->UsingFlashlight( params );
 
-	bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+	
 
 #if 0
 	if ( pShader->IsSnapshotting() || ( !pContextData ) || ( pContextData->m_bMaterialVarsChanged ) )
@@ -148,8 +150,8 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 	{
 		pShader->SetInitialShadowState( );
 
-		pShaderShadow->EnableAlphaWrites( false );
-		pShaderShadow->EnableDepthWrites( true );
+		//pShaderShadow->EnableAlphaWrites( false );
+	//	pShaderShadow->EnableDepthWrites( true );
 
 		pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
 		pShaderShadow->EnableTexture( SHADER_SAMPLER2, true );
@@ -195,7 +197,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		}
 
 		pShaderShadow->EnableSRGBWrite( true );
-		//pShaderShadow->EnableAlphaWrites( true ); // writing water fog alpha always.
+		pShaderShadow->EnableAlphaWrites( true ); // writing water fog alpha always.
 
 		unsigned int flags = VERTEX_POSITION | VERTEX_NORMAL;
 		int nTexCoordCount = 8;
@@ -414,7 +416,7 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, info.m_nBaseTextureTransform );
 
-		//pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
+		pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );
 
 		// Pack phong exponent in with the eye position
 		float vEyePos_SpecExponent[4];
