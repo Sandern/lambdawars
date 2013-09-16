@@ -451,10 +451,19 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 {
 	// Invalidate Layout of all browsers. This will make it call PerformLayout next think.
+	int dirtyx, dirtyy, dirtyw, dirtyh;
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 	{
 		if( m_CefBrowsers[i]->IsValid() )
 			m_CefBrowsers[i]->InvalidateLayout();
+
+		// Full dirty
+		dirtyx = 0;
+		dirtyy = 0;
+		dirtyw = m_CefBrowsers[i]->GetOSRHandler()->GetWidth();
+		dirtyh = m_CefBrowsers[i]->GetOSRHandler()->GetHeight();
+
+		m_CefBrowsers[i]->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
 	}
 }
 

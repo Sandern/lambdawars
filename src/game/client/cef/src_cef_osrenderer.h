@@ -45,6 +45,8 @@ public:
 	virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
 								CefCursorHandle cursor);
 
+	virtual void OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser);
+
 	virtual void SetCursor( vgui::CursorCode cursor );
 
 	// For texture generation
@@ -52,8 +54,8 @@ public:
 	int GetWidth() { return m_iWidth; }
 	int GetHeight() { return m_iHeight; }
 
-	void LockTextureBuffer() { s_BufferMutex.Lock(); }
-	void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
+	//void LockTextureBuffer() { s_BufferMutex.Lock(); }
+	//void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
 
 	int GetAlphaAt( int x, int y );
 
@@ -74,7 +76,7 @@ private:
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;
 
-	CThreadFastMutex s_BufferMutex;
+	//CThreadFastMutex s_BufferMutex;
 
 	SrcCefBrowser *m_pBrowser;
 

@@ -42,6 +42,7 @@ SrcCefOSRRenderer::~SrcCefOSRRenderer()
 	if( m_pTextureBuffer != NULL )
 	{
 		free( m_pTextureBuffer );
+		m_pTextureBuffer = NULL;
 	}
 }
 
@@ -117,13 +118,16 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 					int height)
 {
 	if( !m_pBrowser || !m_pBrowser->GetPanel() )
+	{
+		Warning("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet\n");
 		return;
+	}
 
 	int channels = 4;
 
 	if( type != PET_VIEW )
 	{
-		Msg("Unsupported paint type\n");
+		Warning("SrcCefOSRRenderer::OnPaint: Unsupported paint type\n");
 		return;
 	}
 
@@ -135,7 +139,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 	dirtyxend = 0;
 	dirtyyend = 0;
 
-	s_BufferMutex.Lock();
+	//AUTO_LOCK( s_BufferMutex );
 
 	// Update image buffer size if needed
 	if( m_iWidth != width || m_iHeight != height )
@@ -143,8 +147,9 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		if( m_pTextureBuffer != NULL )
 		{
 			free( m_pTextureBuffer );
+			m_pTextureBuffer = NULL;
 		}
-		Msg("Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
+		DevMsg("Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
 		m_iWidth = width;
 		m_iHeight = height;
 		m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
@@ -173,15 +178,13 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		}
 
 		// Update max dirty area
-		dirtyx = MIN( rect.x, dirtyx );
-		dirtyy = MIN( rect.y, dirtyy );
-		dirtyxend = MAX( rect.x + rect.width, dirtyxend );
-		dirtyyend = MAX( rect.y + rect.height, dirtyyend );
+		dirtyx = Min( rect.x, dirtyx );
+		dirtyy = Min( rect.y, dirtyy );
+		dirtyxend = Max( rect.x + rect.width, dirtyxend );
+		dirtyyend = Max( rect.y + rect.height, dirtyyend );
 	}
 
 	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
-
-	s_BufferMutex.Unlock();
 }
 
 //-----------------------------------------------------------------------------
@@ -259,9 +262,13 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 
 	int channels = 4;
 
-	s_BufferMutex.Lock();
+	//AUTO_LOCK( s_BufferMutex );
 	unsigned char *pImageData = m_pTextureBuffer;
 	unsigned char alpha = pImageData ? pImageData[(y * m_iWidth * channels) + (x * channels) + 3] : 0;
-	s_BufferMutex.Unlock();
 	return alpha;
+}
+
+void SrcCefOSRRenderer::OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser)
+{
+	DevMsg( "SrcCefOSRRenderer OnScrollOffsetChanged called\n" );
 }

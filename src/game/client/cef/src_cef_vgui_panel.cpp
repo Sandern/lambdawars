@@ -60,7 +60,7 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 	m_bCalledLeftPressedParent = m_bCalledRightPressedParent = m_bCalledMiddlePressedParent = false;
 
 	static int staticMatWebViewID = 0;
-	Q_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
+	V_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
 }
 
 //-----------------------------------------------------------------------------
@@ -136,13 +136,13 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	}
 
 	static int staticTextureID = 0;
-	Q_snprintf( m_TextureWebViewName, _MAX_PATH, "_rt_test%d", staticTextureID++ );
+	V_snprintf( m_TextureWebViewName, _MAX_PATH, "_rt_test%d", staticTextureID++ );
 
 	if( g_debug_cef.GetBool() )
 		DevMsg("Cef: initializing texture %s\n", m_TextureWebViewName);
 
 	// IMPORTANT: Use TEXTUREFLAGS_POINTSAMPLE. Otherwise mat_filtertextures will make it really blurred and ugly.
-	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specifiy
+	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specify
 	//				a sub rect when calling ->Download()).
 	m_RenderBuffer.InitProceduralTexture( m_TextureWebViewName, TEXTURE_GROUP_VGUI, m_iTexWide, m_iTexTall, IMAGE_FORMAT_BGRA8888, 
 		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY|
@@ -172,7 +172,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 
 	// Create a material
 	char MatBufName[_MAX_PATH];
-	Q_snprintf( MatBufName, _MAX_PATH, "materials/%s.vmt", m_MatWebViewName );
+	V_snprintf( MatBufName, _MAX_PATH, "materials/%s.vmt", m_MatWebViewName );
 	KeyValues *pVMT = new KeyValues("UnlitGeneric");
 	pVMT->SetString("$basetexture", m_TextureWebViewName);
 	pVMT->SetString("$translucent", "1");
@@ -227,7 +227,7 @@ void SrcCefVGUIPanel::Paint()
 	if( !m_pTextureRegen )
 		return;
 
-	m_pBrowser->GetOSRHandler()->LockTextureBuffer();
+	//m_pBrowser->GetOSRHandler()->LockTextureBuffer();
 
 	// Draw
 	if( m_pTextureRegen->IsDirty() )
@@ -258,8 +258,6 @@ void SrcCefVGUIPanel::Paint()
 		//	materials->ReloadMaterials(m_MatWebViewName); // FIXME
 	}
 
-	//DevMsg("Paint. Thread ID: %d\n", GetCurrentThreadId());
-
 	// Must have a valid texture and the texture regenerator should be valid
 	if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
 	{
@@ -282,7 +280,7 @@ void SrcCefVGUIPanel::Paint()
 		}
 	}
 
-	m_pBrowser->GetOSRHandler()->UnlockTextureBuffer();
+	//m_pBrowser->GetOSRHandler()->UnlockTextureBuffer();
 }
 
 //-----------------------------------------------------------------------------
@@ -290,10 +288,10 @@ void SrcCefVGUIPanel::Paint()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend )
 {
-	m_iDirtyX = MIN( m_iDirtyX, dirtyx );
-	m_iDirtyY = MIN( m_iDirtyY, dirtyy );
-	m_iDirtyXEnd = MAX( m_iDirtyXEnd, dirtyxend );
-	m_iDirtyYEnd = MAX( m_iDirtyYEnd, dirtyyend );
+	m_iDirtyX = Min( m_iDirtyX, dirtyx );
+	m_iDirtyY = Min( m_iDirtyY, dirtyy );
+	m_iDirtyXEnd = Max( m_iDirtyXEnd, dirtyxend );
+	m_iDirtyYEnd = Max( m_iDirtyYEnd, dirtyyend );
 
 	if( !m_pTextureRegen )
 		return;
