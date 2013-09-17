@@ -1105,8 +1105,6 @@ void CDeferredViewRender::DrawWorldComposite( const CViewSetup &view, int nClear
 		AddViewToScene( pNoWaterView );
 	}
 
-	Assert( !pCustomVisibility );
-
 	// Blat out the visible fog leaf if we're not going to use it
 	if ( !r_ForceWaterLeaf.GetBool() )
 	{
