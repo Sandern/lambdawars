@@ -34,6 +34,11 @@
 
 extern ConVar g_debug_cef;
 
+// Debug
+#define CefDbgMsg( lvl, fmt, ... )				\
+	if( g_debug_cef.GetBool() )	\
+		DevMsg( lvl, fmt, ##__VA_ARGS__ );		\
+
 //-----------------------------------------------------------------------------
 // Purpose: SrcCEF system
 //-----------------------------------------------------------------------------

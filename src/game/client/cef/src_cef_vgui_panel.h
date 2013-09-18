@@ -27,7 +27,7 @@ public:
 	SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pParent );
 	~SrcCefVGUIPanel();
 
-	virtual void ResizeTexture( int width, int height );
+	virtual bool ResizeTexture( int width, int height );
 	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend );
 
 	virtual void Paint();
@@ -52,6 +52,9 @@ public:
 	//virtual void InternalFocusChanged(bool lost);
 
 	virtual vgui::HCursor GetCursor();
+
+protected:
+	int	GetBrowserID();
 
 private:
 	virtual void UpdatePressedParent( vgui::MouseCode code, bool state );

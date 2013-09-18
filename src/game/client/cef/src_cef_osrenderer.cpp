@@ -5,6 +5,7 @@
 //=============================================================================
 
 #include "cbase.h"
+#include "src_cef.h"
 #include "src_cef_osrenderer.h"
 #include "src_cef_browser.h"
 #include "src_cef_vgui_panel.h"
@@ -244,8 +245,7 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
 {
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg( "CEF: OnCursorChange -> %d\n", cursor );
+	CefDbgMsg( 2, "#%dCef: OnCursorChange -> %d\n", m_pBrowser->GetBrowser()->GetIdentifier(), cursor );
 	m_pBrowser->GetPanel()->SetCursor( cursor );
 }
 
@@ -268,7 +268,10 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 	return alpha;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser)
 {
-	DevMsg( "SrcCefOSRRenderer OnScrollOffsetChanged called\n" );
+	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer OnScrollOffsetChanged called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
 }

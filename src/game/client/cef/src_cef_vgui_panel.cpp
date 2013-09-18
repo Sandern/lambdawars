@@ -94,7 +94,7 @@ SrcCefVGUIPanel::~SrcCefVGUIPanel()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::ResizeTexture( int width, int height )
+bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 {
 	m_iWVWide = width;
 	m_iWVTall = height;
@@ -102,8 +102,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	int po2wide = nexthigher(m_iWVWide);
 	int po2tall = nexthigher(m_iWVTall);
 
-	if( g_debug_cef.GetBool() )
-		DevMsg("Cef: Resizing texture to %d %d (wish size: %d %d)\n", po2wide, po2tall, m_iWVWide, m_iWVTall );
+	CefDbgMsg( 1, "Cef#%d: Resizing texture from %d %d to %d %d (wish size: %d %d)\n", GetBrowserID(), m_iTexWide, m_iTexTall, po2wide, po2tall, m_iWVWide, m_iWVTall );
 
 	// Only rebuild when the actual size change and don't bother if the size
 	// is larger than needed.
@@ -112,7 +111,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	{
 		m_fTexS1 = 1.0 - (m_iTexWide - m_iWVWide) / (float)m_iTexWide;
 		m_fTexT1 = 1.0 - (m_iTexTall - m_iWVTall) / (float)m_iTexTall;
-		return;
+		return true;
 	}
 
 	m_iTexWide = po2wide;
@@ -150,7 +149,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	if( !m_RenderBuffer.IsValid() )
 	{
 		Warning("Cef: Failed to initialize render buffer texture\n");
-		return;
+		return false;
 	}
 
 	m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
@@ -162,7 +161,7 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	//	m_MatRef.Shutdown();
 
 	if( g_debug_cef.GetBool() )
-		DevMsg("Cef: initializing material %s...", m_MatWebViewName);
+		DevMsg("Cef: initializing material %s...\n", m_MatWebViewName);
 
 	// Make sure the directory exists
 	if( filesystem->FileExists("materials/vgui/webview", "MOD") == false )
@@ -181,10 +180,10 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 
 #if 1
 	// Save to file
-	pVMT->SaveToFile(filesystem, MatBufName, "MOD");
+	pVMT->SaveToFile( filesystem, MatBufName, "MOD" );
 
-	m_MatRef.Init(m_MatWebViewName, TEXTURE_GROUP_VGUI, true);
-	materials->ReloadMaterials(m_MatWebViewName);
+	m_MatRef.Init( m_MatWebViewName, TEXTURE_GROUP_VGUI, true );
+	materials->ReloadMaterials( m_MatWebViewName );
 #else
 	// TODO: Figure out how to use the following instead of writing to file:
 	//		 This should init it as a procedural material, but it doesn't seems to work...
@@ -193,8 +192,8 @@ void SrcCefVGUIPanel::ResizeTexture( int width, int height )
 
 	pVMT->deleteThis();
 
-	if( g_debug_cef.GetBool() )
-		DevMsg("done.\n");
+	CefDbgMsg( 1, "Cef#%d: Finished initializing web material.\n", GetBrowserID() );
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -205,23 +204,27 @@ void SrcCefVGUIPanel::Paint()
 	int iWide, iTall;
 	GetSize( iWide, iTall );
 
+	//Msg("SrcCefVGUIPanel::Paint\n");
+
 	// Update texture if needed
 	if( m_bSizeChanged )
 	{
+		// Update texture
+		if( !ResizeTexture( iWide, iTall ) )
+			return;
+
 		m_bSizeChanged = false;
 
-		// Update texture
-		ResizeTexture( iWide, iTall );
-
 		// Update texture ID
-		if( g_cef_debug_texture.GetBool() )
-			DevMsg("CEF: initializing texture id...");
+		CefDbgMsg( 1, "Cef#%d: initializing texture id...\n", GetBrowserID() );
+
+		if( m_iTextureID != -1 )
+		{
+			vgui::surface()->DestroyTextureID( m_iTextureID );
+		}
 
 		m_iTextureID = vgui::surface()->CreateNewTextureID( true );
 		vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
-
-		if( g_cef_debug_texture.GetBool() )
-			DevMsg("done.\n");
 	}
 
 	if( !m_pTextureRegen )
@@ -235,7 +238,6 @@ void SrcCefVGUIPanel::Paint()
 		//if( g_cef_debug_texture.GetBool() )
 		//	DevMsg("CEF: texture requires full regeneration\n");
 		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-
 		{
 			VPROF_BUDGET( "Download", "CefDownloadTexture" );
 			Rect_t dirtyArea;
@@ -305,7 +307,19 @@ void SrcCefVGUIPanel::OnSizeChanged(int newWide, int newTall)
 {
 	BaseClass::OnSizeChanged( newWide, newTall );
 
-	m_bSizeChanged = true;
+	//if( m_pTextureRegen )
+	{
+		int iWide, iTall;
+		GetSize( iWide, iTall );
+
+		m_bSizeChanged = true;
+		if( !ResizeTexture( iWide, iTall ) )
+			m_bSizeChanged = false;
+	}
+	/*else
+	{
+		m_bSizeChanged = true;
+	}*/
 }
 
 //-----------------------------------------------------------------------------
@@ -314,7 +328,6 @@ void SrcCefVGUIPanel::OnSizeChanged(int newWide, int newTall)
 void SrcCefVGUIPanel::PerformLayout()
 {
 	BaseClass::PerformLayout();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -338,8 +351,7 @@ void SrcCefVGUIPanel::OnCursorEntered()
 	me.modifiers = GetEventFlags();
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, false );
 
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected cursor entered %d %d\n", m_iMouseX, m_iMouseY);
+	CefDbgMsg( 2, "Cef#%d: injected cursor entered %d %d\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 }
 
 //-----------------------------------------------------------------------------
@@ -353,8 +365,7 @@ void SrcCefVGUIPanel::OnCursorExited()
 	me.modifiers = GetEventFlags();
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, true );
 
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected cursor exited %d %d\n", m_iMouseX, m_iMouseY);
+	CefDbgMsg( 2, "Cef#%d: injected cursor exited %d %d\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 }
 
 //-----------------------------------------------------------------------------
@@ -367,8 +378,7 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( x, y ) )
 	{
-		if( g_debug_cef.GetInt() > 2 )
-			DevMsg("CEF: passed cursor move %d %d to parent (alpha zero)\n", x, y);
+		CefDbgMsg( 3, "Cef#%d: passed cursor move %d %d to parent (alpha zero)\n", GetBrowserID(), x, y );
 
 		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
 		//return;
@@ -380,8 +390,7 @@ void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
 	me.modifiers = GetEventFlags();
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseMoveEvent( me, false );
 
-	if( g_debug_cef.GetInt() > 2 )
-		DevMsg("CEF: injected cursor move %d %d\n", x, y);
+	CefDbgMsg( 3, "Cef#%d: injected cursor move %d %d\n", GetBrowserID(), x, y );
 }
 
 //-----------------------------------------------------------------------------
@@ -429,8 +438,7 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 	// Store if we pressed on the parent
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
-		if( g_debug_cef.GetInt() > 0 )
-			DevMsg("CEF: passed mouse pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
+		CefDbgMsg( 1, "Cef#%d: passed mouse pressed %d %d to parent\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 
 		CallParentFunction(new KeyValues("MousePressed", "code", code));
 
@@ -475,8 +483,7 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
 
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected mouse pressed %d %d (mouse capture: %d)\n", m_iMouseX, m_iMouseY, m_pBrowser->GetUseMouseCapture());
+	CefDbgMsg( 1, "Cef#%d: injected mouse pressed %d %d (mouse capture: %d)\n", GetBrowserID(), m_iMouseX, m_iMouseY, m_pBrowser->GetUseMouseCapture() );
 }
 
 //-----------------------------------------------------------------------------
@@ -487,8 +494,7 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 	// Do click on parent if needed
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
-		if( g_debug_cef.GetInt() > 0 )
-			DevMsg("CEF: passed mouse double pressed %d %d to parent\n", m_iMouseX, m_iMouseY);
+		CefDbgMsg( 1, "Cef#%d: passed mouse double pressed %d %d to parent\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 
 		CallParentFunction(new KeyValues("MouseDoublePressed", "code", code));
 	}
@@ -520,8 +526,7 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
 
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected mouse double pressed %d %d\n", m_iMouseX, m_iMouseY);
+	CefDbgMsg( 1, "Cef#%d: injected mouse double pressed %d %d\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 }
 
 //-----------------------------------------------------------------------------
@@ -539,8 +544,7 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 	// Check if we should pass input to parent (only if we don't have mouse capture active)
 	if( (m_pBrowser->GetUseMouseCapture() && IsPressedParent( code )) || ( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) ) )
 	{
-		if( g_debug_cef.GetInt() > 0 )
-			DevMsg("CEF: passed mouse released %d %d to parent\n", m_iMouseX, m_iMouseY);
+		CefDbgMsg( 1, "Cef#%d: passed mouse released %d %d to parent\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 
 		CallParentFunction(new KeyValues("MouseReleased", "code", code));
 	}
@@ -575,8 +579,7 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, true, 1 );
 
-	if( g_debug_cef.GetInt() > 0 )
-		DevMsg("CEF: injected mouse released %d %d\n", m_iMouseX, m_iMouseY);
+	CefDbgMsg( 1, "Cef#%d: injected mouse released %d %d\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 }
 
 //-----------------------------------------------------------------------------
@@ -590,8 +593,7 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 		return;
 	}
 
-	if( g_debug_cef.GetInt() > 2 )
-		DevMsg("CEF: injected mouse wheeled %d\n", delta);
+	CefDbgMsg( 1, "Cef#%d: injected mouse wheeled %d\n", GetBrowserID(), delta );
 
 	CefMouseEvent me;
 	me.x = m_iMouseX;
@@ -663,3 +665,11 @@ void SrcCefVGUIPanel::InternalFocusChanged(bool lost)
 		m_pBrowser->Focus();
 }
 #endif // 0
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int	SrcCefVGUIPanel::GetBrowserID()
+{
+	return m_pBrowser->GetBrowser()->GetIdentifier();
+}

@@ -13,6 +13,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+static ConVar g_debug_cef_test("g_debug_cef_test", "0" );
+
 CCefTextureGenerator::CCefTextureGenerator( SrcCefBrowser *pBrowser ) : m_pBrowser(pBrowser), m_bIsDirty(true)
 {
 
@@ -23,6 +25,9 @@ CCefTextureGenerator::CCefTextureGenerator( SrcCefBrowser *pBrowser ) : m_pBrows
 //-----------------------------------------------------------------------------
 void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
 {
+	if( g_debug_cef_test.GetBool() )
+		return;
+
 	// Don't regenerate while loading
 	if( engine->IsDrawingLoadingImage() )
 	{
@@ -57,6 +62,10 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 
 	srcwidth = m_pBrowser->GetOSRHandler()->GetWidth();
 	srcheight = m_pBrowser->GetOSRHandler()->GetHeight();
+
+	// Shouldn't happen, but can happen
+	if( srcwidth > width || srcheight > height )
+		return;
 
 	const unsigned char *srcbuffer = m_pBrowser->GetOSRHandler()->GetTextureBuffer();
 
