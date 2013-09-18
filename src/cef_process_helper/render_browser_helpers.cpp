@@ -29,6 +29,14 @@ void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListV
 		{
 			args->SetString( idx, value->GetStringValue() );
 		}
+		else if( value->IsObject() )
+		{
+			args->SetString( idx, value->GetStringValue() );
+		}
+		else
+		{
+			args->SetNull( idx );
+		}
 
 		idx++;
 	}

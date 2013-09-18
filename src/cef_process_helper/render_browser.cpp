@@ -207,15 +207,20 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 			CefRefPtr<CefListValue> methodargs = CefListValue::Create();
 			V8ValueListToListValue( arguments, methodargs );
 
+			if( callback )
+			{
+				// Remove last, this is the callback method
+				// Do this before the SetList call
+				// SetList will invalidate methodargs and take ownership
+				methodargs->Remove( methodargs->GetSize() - 1 );
+			}
+
 			args->SetInt( 0, i->first );
 			args->SetList( 1, methodargs );
 
 			// Store callback
 			if( callback )
 			{
-				// Remove last, this is the callback method
-				methodargs->Remove( methodargs->GetSize() - 1 );
-
 				m_Callbacks.push_back( jscallback_t() );
 				m_Callbacks.back().callback = callback;
 				m_Callbacks.back().callbackid = s_NextCallbackID++;
