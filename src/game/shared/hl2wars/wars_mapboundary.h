@@ -28,9 +28,9 @@ public:
 
 	void GetMapBoundary( Vector &mins, Vector &maxs );
 
-	bool IsWithinMapBoundary( const Vector &vPoint, bool bIgnoreZ = false );
-	static CBaseFuncMapBoundary *IsWithinAnyMapBoundary( const Vector &vPoint, bool bIgnoreZ = false );
-	static void SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ=false );
+	bool IsWithinMapBoundary( const Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bIgnoreZ = false );
+	static CBaseFuncMapBoundary *IsWithinAnyMapBoundary( const Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bIgnoreZ = false );
+	static void SnapToNearestBoundary( Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bUseMaxZ=false );
 	static bool	DidHitMapBoundary( CBaseEntity *pHitEnt );
 
 	float GetBloat() { return m_fBloat; }

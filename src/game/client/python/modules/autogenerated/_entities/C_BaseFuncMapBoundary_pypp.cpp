@@ -890,33 +890,33 @@ void register_C_BaseFuncMapBoundary_class(){
         }
         { //::C_BaseFuncMapBoundary::IsWithinAnyMapBoundary
         
-            typedef ::C_BaseFuncMapBoundary * ( *IsWithinAnyMapBoundary_function_type )( ::Vector const &,bool );
+            typedef ::C_BaseFuncMapBoundary * ( *IsWithinAnyMapBoundary_function_type )( ::Vector const &,::Vector const &,::Vector const &,bool );
             
             C_BaseFuncMapBoundary_exposer.def( 
                 "IsWithinAnyMapBoundary"
                 , IsWithinAnyMapBoundary_function_type( &::C_BaseFuncMapBoundary::IsWithinAnyMapBoundary )
-                , ( bp::arg("vPoint"), bp::arg("bIgnoreZ")=(bool)(false) )
+                , ( bp::arg("vPoint"), bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("bIgnoreZ")=(bool)(false) )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::C_BaseFuncMapBoundary::IsWithinMapBoundary
         
-            typedef bool ( ::C_BaseFuncMapBoundary::*IsWithinMapBoundary_function_type )( ::Vector const &,bool ) ;
+            typedef bool ( ::C_BaseFuncMapBoundary::*IsWithinMapBoundary_function_type )( ::Vector const &,::Vector const &,::Vector const &,bool ) ;
             
             C_BaseFuncMapBoundary_exposer.def( 
                 "IsWithinMapBoundary"
                 , IsWithinMapBoundary_function_type( &::C_BaseFuncMapBoundary::IsWithinMapBoundary )
-                , ( bp::arg("vPoint"), bp::arg("bIgnoreZ")=(bool)(false) ) );
+                , ( bp::arg("vPoint"), bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("bIgnoreZ")=(bool)(false) ) );
         
         }
         { //::C_BaseFuncMapBoundary::SnapToNearestBoundary
         
-            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector &,bool );
+            typedef void ( *SnapToNearestBoundary_function_type )( ::Vector &,::Vector const &,::Vector const &,bool );
             
             C_BaseFuncMapBoundary_exposer.def( 
                 "SnapToNearestBoundary"
                 , SnapToNearestBoundary_function_type( &::C_BaseFuncMapBoundary::SnapToNearestBoundary )
-                , ( bp::arg("vPoint"), bp::arg("bUseMaxZ")=(bool)(false) ) );
+                , ( bp::arg("vPoint"), bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("bUseMaxZ")=(bool)(false) ) );
         
         }
         { //::C_BaseEntity::Activate

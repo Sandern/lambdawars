@@ -1410,7 +1410,7 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 //-----------------------------------------------------------------------------
 void CHL2WarsPlayer::CalculateHeight( const Vector &vPosition )
 {
-	if( !CBaseFuncMapBoundary::IsWithinAnyMapBoundary( vPosition ) )
+	if( !CBaseFuncMapBoundary::IsWithinAnyMapBoundary( vPosition, GetPlayerMins(), GetPlayerMaxs() ) )
 	{
 		m_bCamValid = false;
 		m_vCamGroundPos = vPosition;
@@ -1469,27 +1469,20 @@ void CHL2WarsPlayer::SnapCameraTo( const Vector &vPos )
 		return;
 	}
 
-	CBaseFuncMapBoundary *pBoundary = CBaseFuncMapBoundary::IsWithinAnyMapBoundary( vPos, true );
-	if( !pBoundary )
-		return;
-
-	Vector vAbsMins, vAbsMaxs;
-	pBoundary->GetMapBoundary( vAbsMins, vAbsMaxs );
+	Vector vPosClamped = vPos;
+	CBaseFuncMapBoundary::SnapToNearestBoundary( vPosClamped, GetPlayerMins(), GetPlayerMaxs(), false );
 
 	QAngle vAngles = GetAbsAngles();
-	Vector vForward, vDir, vTest, vCamLookAt;
+	Vector vForward, vDir, vCamLookAt;
 	AngleVectors(vAngles, &vForward, NULL, NULL);
-
-	vTest.x = vPos.x; vTest.y = vPos.y;
-	vTest.z = vAbsMaxs.z - 8.0f - GetPlayerMaxs().z;
 
 	// Figure out position at which we are looking
 	trace_t tr;
 	CTraceFilterWars traceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
-	UTIL_TraceHull( vTest, vTest + Vector(0, 0, -MAX_TRACE_LENGTH), GetPlayerMins(), GetPlayerMaxs(), CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	UTIL_TraceHull( vPosClamped, vPosClamped + Vector(0, 0, -MAX_TRACE_LENGTH), GetPlayerMins(), GetPlayerMaxs(), CONTENTS_PLAYERCLIP, &traceFilter, &tr );
 	if( !tr.DidHit() || tr.startsolid )
 	{
-		Warning("SnapCameraTo: Failed. Increase bloat (%f) setting of func_map_boundary.\n", pBoundary->GetBloat());
+		DevMsg("SnapCameraTo: Failed. Did hit %d? Start solid? %d\n", tr.DidHit(), tr.startsolid );
 		return;
 	}
 	vCamLookAt = tr.endpos;
@@ -1499,39 +1492,11 @@ void CHL2WarsPlayer::SnapCameraTo( const Vector &vPos )
 		NDebugOverlay::Box( vCamLookAt, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, 2.0f );
 	}
 
-#if 0
-	vDir = -vForward;
-	vDir.z = 0.0f;
-	VectorNormalize(vDir);
-
-	float fDist;
-	float fAngle = acos( DotProduct( -vForward, vDir ) );
-	fAngle = sin( fAngle );
-	if( fAngle != 0 )
-		fDist = m_fCurHeight / fAngle;
-	else
-		fDist = m_fCurHeight;
-	//Msg("Cur: %f, travel: %f, angle: %f\n", m_fCurHeight, fDist, fAngle);
-
-	// Figure out cam position
-	//NDebugOverlay::Box( vCamLookAt, -Vector(32, 32, 32), Vector(32, 32, 32), 255, 0, 0, 255, 5 );
-	//NDebugOverlay::SweptBox(vCamLookAt,  vCamLookAt + (-vForward *  m_fCurHeight), 
-	//	-Vector(32, 32, 32), Vector(32, 32, 32), QAngle(), 0, 255, 0, 200, 5.0);
-	UTIL_TraceHull( vCamLookAt, vCamLookAt + -vForward * fDist, GetPlayerMins(), GetPlayerMaxs(), CONTENTS_PLAYERCLIP, &traceFilter, &tr );
-	if( tr.startsolid )
-	{
-		Warning("SnapCameraTo: Failed. Check your map boundary brush!\n");
-		return;
-	}
-
-	SetDirectMove( tr.endpos );
-#else
 #ifdef CLIENT_DLL
 	SetDirectMove( vCamLookAt );
 #else
 	SetAbsOrigin( vCamLookAt );
 #endif // CLIENT_DLL
-#endif // 0
 }
 
 #if 0

@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "wars_mapboundary.h"
 #include "collisionutils.h"
+#include "hl2wars_util_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -36,11 +37,17 @@ template< class CBaseFuncMapBoundary >
 CBaseFuncMapBoundary *C_EntityClassList< CBaseFuncMapBoundary >::m_pClassList = NULL;
 #endif
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseFuncMapBoundary *GetMapBoundaryList()
 {
 	return g_FuncMapBounderiesList.m_pClassList;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseFuncMapBoundary::CBaseFuncMapBoundary()
 {
 	SetBlocksLOS( false );
@@ -48,12 +55,17 @@ CBaseFuncMapBoundary::CBaseFuncMapBoundary()
 	g_FuncMapBounderiesList.Insert( this );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseFuncMapBoundary::~CBaseFuncMapBoundary()
 {
 	g_FuncMapBounderiesList.Remove( this );
 }
 
-
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CBaseFuncMapBoundary::GetMapBoundary( Vector &mins, Vector &maxs )
 {
 	CollisionProp()->WorldSpaceAABB( &mins, &maxs );
@@ -67,63 +79,68 @@ void CBaseFuncMapBoundary::GetMapBoundary( Vector &mins, Vector &maxs )
 	maxs.z += m_fBloat;
 }
 
-bool CBaseFuncMapBoundary::IsWithinMapBoundary( const Vector &vPoint, bool bIgnoreZ )
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CBaseFuncMapBoundary::IsWithinMapBoundary( const Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bIgnoreZ )
 {
-	Vector vAbsMins, vAbsMaxs;
-	GetMapBoundary( vAbsMins, vAbsMaxs );
-	if( bIgnoreZ )
-	{
-		vAbsMins.z = MIN_COORD_FLOAT;
-		vAbsMaxs.z = MAX_COORD_FLOAT;
-	}
-
-	if( IsPointInBox( vPoint, vAbsMins, vAbsMaxs ) )
-		return true;
-	return false;
+	trace_t tr;
+	CTraceFilterWars traceFilter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT );
+	UTIL_TraceHull( vPoint, GetAbsOrigin(), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	return tr.fraction == 1.0f;
 }
 
-CBaseFuncMapBoundary *CBaseFuncMapBoundary::IsWithinAnyMapBoundary( const Vector &vPoint, bool bIgnoreZ )
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CBaseFuncMapBoundary *CBaseFuncMapBoundary::IsWithinAnyMapBoundary( const Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bIgnoreZ )
 {
 	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
 	{
-		if( pEnt && pEnt->IsWithinMapBoundary( vPoint, bIgnoreZ ) )
+		if( pEnt && pEnt->IsWithinMapBoundary( vPoint, vMins, vMaxs, bIgnoreZ ) )
 			return pEnt;
 	}
 	return NULL;
 }
 
-void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, bool bUseMaxZ )
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, const Vector &vMins, const Vector &vMaxs, bool bUseMaxZ )
 {
+	trace_t tr;
+	CTraceFilterWars traceFilter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT );
+
 	Vector mins, maxs;
-	float fNearestZ = MAX_COORD_FLOAT;
-	vPoint.z = MAX( MIN_COORD_FLOAT, MIN( MAX_COORD_FLOAT, vPoint.z ) ); // Clamp within valid bounds
+	vPoint.z = Max( MIN_COORD_FLOAT, Min( MAX_COORD_FLOAT, vPoint.z ) ); // Clamp within valid bounds
+
+	float fBestDist = MAX_COORD_FLOAT * MAX_COORD_FLOAT;
 
 	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
 	{
 		if( !pEnt )
 			continue;
 
-		if( pEnt->IsWithinMapBoundary( vPoint ) )
+		UTIL_TraceHull( pEnt->GetAbsOrigin(), vPoint, vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+
+		float fDist = ( pEnt->GetAbsOrigin() - tr.endpos ).Length2DSqr();
+		if( fDist < fBestDist )
 		{
-			pEnt->GetMapBoundary(mins, maxs);
-			vPoint.z = bUseMaxZ ? maxs.z : mins.z;
-			//DevMsg("SnapToNearestBoundary: Modifying point z to %f\n", vPoint.z);
-			break;
-		}
-		else if( pEnt->IsWithinMapBoundary( vPoint, true ) )
-		{
-			pEnt->GetMapBoundary(mins, maxs);
-			float zdist = abs( mins.z - vPoint.z );
-			if( zdist < fNearestZ )
-			{
-				fNearestZ = zdist;
-				vPoint.z = bUseMaxZ ? maxs.z : mins.z;
-				//DevMsg("SnapToNearestBoundary: Modifying point z to %f\n", vPoint.z);
-			}
+			vPoint = tr.endpos;
+			fBestDist = fDist;
 		}
 	}
+
+	if( bUseMaxZ )
+		UTIL_TraceHull( vPoint, vPoint + Vector(0, 0, COORD_EXTENT), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	else
+		UTIL_TraceHull( vPoint, vPoint - Vector(0, 0, COORD_EXTENT), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	vPoint = tr.endpos;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CBaseFuncMapBoundary::DidHitMapBoundary( CBaseEntity *pHitEnt )
 {
 	if( !pHitEnt )
