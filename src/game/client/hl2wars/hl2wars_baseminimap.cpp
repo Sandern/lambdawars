@@ -232,6 +232,14 @@ void CBaseMinimap::DrawEntityObjects()
 	}
 }
 
+static Vector ComputePlayerViewPoint( const Vector &vStart, const Vector &vEnd )
+{
+	trace_t tr;
+	CTraceFilterWorldOnly traceFilter;
+	UTIL_TraceLine(vStart, vEnd, MASK_SOLID_BRUSHONLY, &traceFilter, &tr);
+	return (tr.surface.flags & SURF_HITBOX) != 0 ? vEnd : tr.endpos;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -244,38 +252,20 @@ void CBaseMinimap::DrawPlayerView()
 	Vector start, forward1, forward2, point1, point2;
 	Vector2D point2D1, point2D2, point2D3, point2D4;
 
-	int mask = MASK_SOLID_BRUSHONLY; //CONTENTS_PLAYERCLIP;
+	float fMaxTraceDist = pPlayer->GetCamMaxHeight() * 1.5f;
+	if( fMaxTraceDist < 0 )
+		fMaxTraceDist = COORD_EXTENT;
 
 	trace_t tr;
-	//CTraceFilterWars traceFilter( pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT );
 	CTraceFilterWorldOnly traceFilter;
 
 	start = pPlayer->Weapon_ShootPosition() + pPlayer->GetCameraOffset();
 	forward1 = UTIL_GetMouseAim(pPlayer, 0, 0);
 	forward2 = UTIL_GetMouseAim(pPlayer, ScreenWidth(), 0);
 
-	
-
-#if 0
-	UTIL_TraceLine(start, pPlayer->Weapon_ShootPosition(), mask, &traceFilter, &tr);
-	if( tr.fraction != 1.0f )
-	{
-		float fHeight = abs( start.z - pPlayer->Weapon_ShootPosition().z );
-
-		point1 = start + forward1 * fHeight;
-		point2 = start + forward2 * fHeight;
-		Msg("Using default view box %f\n", fHeight);
-	}
-	else
-#endif // 0
-	{
-		// Find the two lowest points
-		UTIL_TraceLine(start, start + (forward1 *  8192), mask, &traceFilter, &tr);
-		point1 = tr.endpos;
-
-		UTIL_TraceLine(start, start + (forward2 *  8192), mask, &traceFilter, &tr);
-		point2 = tr.endpos;
-	}
+	// Find the two lowest points
+	point1 = ComputePlayerViewPoint( start, start + (forward1 *  fMaxTraceDist) );
+	point2 = ComputePlayerViewPoint( start, start + (forward2 *  fMaxTraceDist) );
 
     if( (start - point1).Length() > (start - point2).Length() )
 	{
@@ -290,13 +280,11 @@ void CBaseMinimap::DrawPlayerView()
 	}
 
 	// Find the two highest points
-    forward1 = UTIL_GetMouseAim(pPlayer, ScreenWidth(), ScreenHeight() );
-    UTIL_TraceLine(start, start + (forward1 *  8192), mask, &traceFilter, &tr);
-    point1 = tr.endpos;
+	forward1 = UTIL_GetMouseAim(pPlayer, ScreenWidth(), ScreenHeight() );
+	forward2 = UTIL_GetMouseAim(pPlayer, 0, ScreenHeight()  );
 
-    forward2 = UTIL_GetMouseAim(pPlayer, 0, ScreenHeight()  );
-    UTIL_TraceLine(start, start + (forward2 *  8192), mask, &traceFilter, &tr);
-    point2 = tr.endpos;
+	point1 = ComputePlayerViewPoint( start, start + (forward1 *  fMaxTraceDist) );
+	point2 = ComputePlayerViewPoint( start, start + (forward2 *  fMaxTraceDist) );
 
     if( (start - point1).Length() > (start - point2).Length() )
 	{
