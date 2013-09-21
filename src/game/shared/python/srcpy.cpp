@@ -1181,6 +1181,12 @@ boost::python::list CSrcPython::GetRegisteredTickMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
+#if defined( _DEBUG ) && defined( CLIENT_DLL )
+	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
+	// of bp::object. Disabled for now...
+	return false;
+#endif // 0 
+
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
 		if( m_methodTickList[i].method == method )
@@ -1241,6 +1247,11 @@ boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
+#if defined( _DEBUG ) && defined( CLIENT_DLL )
+	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
+	// of bp::object. Disabled for now...
+	return false;
+#endif // 0 
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )
