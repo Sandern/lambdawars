@@ -354,24 +354,25 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		if (spd < 1.0f)
 		{
 			mv->m_vecVelocity.Init();
-			return;
 		}
+		else
+		{
+			// Bleed off some speed, but if we have less than the bleed
+			//  threshhold, bleed the theshold amount.
+			float control = (spd < stopspeed) ? stopspeed : spd;
 
-		// Bleed off some speed, but if we have less than the bleed
-		//  threshhold, bleed the theshold amount.
-		float control = (spd < stopspeed) ? stopspeed : spd;
+			// Add the amount to the drop amount.
+			float drop = control * friction * gpGlobals->frametime;
 
-		// Add the amount to the drop amount.
-		float drop = control * friction * gpGlobals->frametime;
+			// scale the velocity
+			float newspeed = spd - drop;
+			if (newspeed < 0)
+				newspeed = 0;
 
-		// scale the velocity
-		float newspeed = spd - drop;
-		if (newspeed < 0)
-			newspeed = 0;
-
-		// Determine proportion of old speed we are using.
-		newspeed /= spd;
-		VectorScale( mv->m_vecVelocity, newspeed, mv->m_vecVelocity );
+			// Determine proportion of old speed we are using.
+			newspeed /= spd;
+			VectorScale( mv->m_vecVelocity, newspeed, mv->m_vecVelocity );
+		}
 	}
 	else
 	{
@@ -402,8 +403,6 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		NDebugOverlay::Box( mv->GetAbsOrigin(), -Vector(16, 16, 16), Vector(16, 16, 16), 0, 255, 0, 255, gpGlobals->frametime );
 	}
 #endif // CLIENT_DLL
-
-	//CheckVelocity();
 
 	// Store current height
 	heightchange = mv->GetAbsOrigin().z;
@@ -446,7 +445,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		warsplayer->CalculateHeight( mv->GetAbsOrigin() );
 	}
 
-	//CheckVelocity();
+	CheckVelocity();
 
 	// Zero out velocity if in noaccel mode
 	if ( maxacceleration < 0.0f )
