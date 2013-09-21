@@ -804,6 +804,7 @@ void CFogOfWarMgr::OnResolutionChanged()
 	ShutdownRenderTargets();
 	InitRenderTargets();
 	materials->EndRenderTargetAllocation();
+	materials->FinishRenderTargetAllocation();
 #endif // FOW_USE_PROCTEX
 }
 
