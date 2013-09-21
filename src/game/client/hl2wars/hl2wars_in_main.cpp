@@ -647,11 +647,11 @@ void CHL2WarsInput::GetFullscreenMousePos( int *mx, int *my, int *unclampedx, in
 	}
 
 	// Clamp
-	current_posx = MAX( -1, current_posx );
-	current_posx = MIN( ScreenWidth()+1, current_posx );
+	current_posx = Max( -1, current_posx );
+	current_posx = Min( ScreenWidth()+1, current_posx );
 
-	current_posy = MAX( -1, current_posy );
-	current_posy = MIN( ScreenHeight()+1, current_posy );
+	current_posy = Max( -1, current_posy );
+	current_posy = Min( ScreenHeight()+1, current_posy );
 
 	*mx = current_posx;
 	*my = current_posy;
@@ -836,18 +836,18 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 			// Add to movement if our mouse goes along the edges
 			if( x < cl_mouse_edgethreshold.GetInt() ) {
 				cmd ->sidemove -= cl_mouse_edgespeed.GetFloat() *
-				 MAX( MIN( 1.0-(nx/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
+									 Max( Min( 1.0-(nx/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
 			} else if( x > nw - cl_mouse_edgethreshold.GetInt() ) {
 				cmd ->sidemove += cl_mouse_edgespeed.GetFloat() *
-				MAX( MIN( 1.0-((nw-nx-1)/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
+									Max( Min( 1.0-((nw-nx-1)/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
 			}
 
 			if( y < cl_mouse_edgethreshold.GetInt() ) {
 				cmd ->forwardmove += cl_mouse_edgespeed.GetFloat() * 
-				MAX( MIN( 1.0-(ny/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
+									Max( Min( 1.0-(ny/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
 			} else if( y > nh - cl_mouse_edgethreshold.GetInt() ) {
 				cmd ->forwardmove -= cl_mouse_edgespeed.GetFloat() * 
-				MAX( MIN( 1.0-((nh-ny-1)/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
+									Max( Min( 1.0-((nh-ny-1)/(cl_mouse_edgethreshold.GetInt()/2.0) ),1.0 ),0.0 );
 			}
 
 			m_iLastPosX = x;
