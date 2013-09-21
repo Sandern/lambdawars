@@ -25,10 +25,11 @@
 #include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
-	ConVar cl_showmovementspeed( "cl_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (client) movement speed." );
+	ConVar showmovementspeed( "cl_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (client) movement speed." );
+	ConVar strategic_debug_movement( "cl_strategic_debug_movement", "-1", FCVAR_CHEAT, "" );
 #else
-	ConVar sv_showmovementspeed( "sv_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (server) movement speed." );
-	ConVar sv_strategic_debug_movement( "sv_strategic_debug_movement", "-1", FCVAR_CHEAT, "" );
+	ConVar showmovementspeed( "sv_showmovementspeed", "-1", FCVAR_CHEAT, "Show the (server) movement speed." );
+	ConVar strategic_debug_movement( "sv_strategic_debug_movement", "-1", FCVAR_CHEAT, "" );
 #endif // CLIENT_DLL
 // ---------------------------------------------------------------------------------------- //
 // Settings
@@ -380,7 +381,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 	}
 
 #ifdef CLIENT_DLL
-	if( cl_showmovementspeed.GetInt() == player->entindex() )
+	if( showmovementspeed.GetInt() == player->entindex() )
 	{
 		engine->Con_NPrintf( 1, "CLIENT Movement speed: %6.1f | maxspeed: %6.1f | userspeed: %6.1f | pos:  %6.1f %6.1f %6.1f | mins: %6.1f %6.1f %6.1f | maxs: %6.1f %6.1f %6.1f", 
 			mv->m_vecVelocity.Length(), maxspeed, speed, mv->GetAbsOrigin().x, mv->GetAbsOrigin().y, mv->GetAbsOrigin().z,
@@ -389,7 +390,7 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 			warsplayer->GetCamMaxHeight(), warsplayer->GetCamGroundPos().x, warsplayer->GetCamGroundPos().y, warsplayer->GetCamGroundPos().z );
 	}
 #else
-	if( sv_showmovementspeed.GetInt() == player->entindex() )
+	if( showmovementspeed.GetInt() == player->entindex() )
 	{
 		engine->Con_NPrintf( 4, "SERVER Movement speed: %6.1f | maxspeed: %6.1f | userspeed: %6.1f | pos:  %6.1f %6.1f %6.1f | mins: %6.1f %6.1f %6.1f | maxs: %6.1f %6.1f %6.1f", 
 			mv->m_vecVelocity.Length(), maxspeed, speed, mv->GetAbsOrigin().x, mv->GetAbsOrigin().y, mv->GetAbsOrigin().z,
@@ -397,12 +398,12 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		engine->Con_NPrintf( 5, "SERVER Cam Max Height: %6.1f | ground pos: %6.1f %6.1f %6.1f", 
 			warsplayer->GetCamMaxHeight(), warsplayer->GetCamGroundPos().x, warsplayer->GetCamGroundPos().y, warsplayer->GetCamGroundPos().z );
 	}
+#endif // CLIENT_DLL
 
-	if( sv_strategic_debug_movement.GetInt() == player->entindex() )
+	if( strategic_debug_movement.GetInt() == player->entindex() )
 	{
 		NDebugOverlay::Box( mv->GetAbsOrigin(), -Vector(16, 16, 16), Vector(16, 16, 16), 0, 255, 0, 255, gpGlobals->frametime );
 	}
-#endif // CLIENT_DLL
 
 	// Store current height
 	heightchange = mv->GetAbsOrigin().z;
@@ -413,7 +414,10 @@ void CHL2WarsGameMovement::StrategicPlayerMove()
 		//TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos()+vCamOffsetZ, PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 		TracePlayerBBox( mv->GetAbsOrigin(), warsplayer->GetCamGroundPos()+Vector(0, 0, warsplayer->GetCamMaxHeight()-48.0f), PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 		mv->SetAbsOrigin( pm.endpos );
-		//NDebugOverlay::Box( warsplayer->GetCamGroundPos()+vCamOffsetZ, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, gpGlobals->frametime );
+
+		if( strategic_debug_movement.GetInt() == player->entindex() )
+			NDebugOverlay::SweptBox( warsplayer->GetCamGroundPos(), warsplayer->GetCamGroundPos()+Vector(0, 0, warsplayer->GetCamMaxHeight()-48.0f), 
+				GetPlayerMins(), GetPlayerMaxs(), warsplayer->GetAbsAngles(), 255, 255, 0, 100, gpGlobals->frametime );
 	}
 
 	// Try moving, only obstructed by the map boundaries.

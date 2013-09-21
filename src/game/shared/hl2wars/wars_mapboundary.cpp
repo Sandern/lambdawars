@@ -86,7 +86,11 @@ bool CBaseFuncMapBoundary::IsWithinMapBoundary( const Vector &vPoint, const Vect
 {
 	trace_t tr;
 	CTraceFilterWars traceFilter( NULL, COLLISION_GROUP_PLAYER_MOVEMENT );
-	UTIL_TraceHull( vPoint, GetAbsOrigin(), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+
+	UTIL_TraceHull( vPoint, vPoint + Vector(0, 0, COORD_EXTENT), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+	Vector adjustedPoint = tr.endpos;
+
+	UTIL_TraceHull( adjustedPoint, GetAbsOrigin(), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
 	return tr.fraction == 1.0f;
 }
 
@@ -116,12 +120,19 @@ void CBaseFuncMapBoundary::SnapToNearestBoundary( Vector &vPoint, const Vector &
 
 	float fBestDist = MAX_COORD_FLOAT * MAX_COORD_FLOAT;
 
+	Vector adjustedPoint = vPoint;
+	if( IsWithinAnyMapBoundary( vPoint, vMins, vMaxs ) )
+	{
+		UTIL_TraceHull( vPoint, vPoint + Vector(0, 0, COORD_EXTENT), vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+		adjustedPoint = tr.endpos;
+	}
+
 	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
 	{
 		if( !pEnt )
 			continue;
 
-		UTIL_TraceHull( pEnt->GetAbsOrigin(), vPoint, vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
+		UTIL_TraceHull( pEnt->GetAbsOrigin(), adjustedPoint, vMins, vMaxs, CONTENTS_PLAYERCLIP, &traceFilter, &tr );
 
 		float fDist = ( pEnt->GetAbsOrigin() - tr.endpos ).Length2DSqr();
 		if( fDist < fBestDist )
