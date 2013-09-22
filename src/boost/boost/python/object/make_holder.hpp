@@ -87,7 +87,7 @@ struct make_holder<N>
 #  define BOOST_PP_LOCAL_LIMITS (0, N-1)
 #  include BOOST_PP_LOCAL_ITERATE()
 # endif 
-   
+        
         static void execute(
 #if !defined( BOOST_PYTHON_NO_PY_SIGNATURES) && defined( BOOST_PYTHON_PY_SIGNATURES_PROPER_INIT_SELF_TYPE)
             boost::python::detail::python_class<BOOST_DEDUCED_TYPENAME Holder::value_type> *p
@@ -96,18 +96,18 @@ struct make_holder<N>
 #endif
             BOOST_PP_ENUM_TRAILING_BINARY_PARAMS_Z(1, N, t, a))
         {
-			typedef is_base_of<IClientEntity, Holder::value_type> is_IClientEntity;
-			typedef is_base_of<IServerEntity, Holder::value_type> is_IServerEntity;
+			typedef is_base_of<IClientEntity, typename Holder::value_type> is_IClientEntity;
+			typedef is_base_of<IServerEntity, typename Holder::value_type> is_IServerEntity;
 
 			typedef typename mpl::if_<
 				is_IClientEntity
-				, value_holder_custom<Holder::value_type>
+				, value_holder_custom<typename Holder::value_type>
 				, Holder
 			>::type NewHolder;
 
 			typedef typename mpl::if_<
 				is_IServerEntity
-				, value_holder_custom<Holder::value_type>
+				, value_holder_custom<typename Holder::value_type>
 				, NewHolder
 			>::type NewHolder2;
 

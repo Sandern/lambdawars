@@ -240,5 +240,4 @@ value_holder_custom(
 # undef N
 
 #endif // BOOST_PP_ITERATION_DEPTH()
-
 #endif
