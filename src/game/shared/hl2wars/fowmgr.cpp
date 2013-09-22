@@ -2055,6 +2055,9 @@ bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, CBasePlayer *pPlayer )
 	
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifdef CLIENT_DLL
 bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt )
 #else
@@ -2084,61 +2087,18 @@ bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, int owner )
 #endif // CLIENT_DLL
 }
 
-#if 0
+#ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
-// Purpose:
+// Purpose: Tests if point can be seen by client index.
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::AddSpecialUpdater(  Vector origin, float radius, float delay, float lifetime, int owner )
+bool CFogOfWarMgr::PointInFOWByPlayerIndex( const Vector &vPoint, int iEntIndex )
 {
-	fogofwar_t data;
-	data.m_iX = (origin.x + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize;
-	data.m_iY = (origin.y + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize;
-	data.m_iRadius = radius / m_nTileSize;
-	data.m_iOwnerNumber = owner;
-	data.m_fDelay = gpGlobals->curtime + delay;
-	data.m_fLifeTime = gpGlobals->curtime + lifetime;
-	AddSpecialUpdater(data);
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iEntIndex );
+	if( !pPlayer )
+		return false;
+	return PointInFOW( vPoint, pPlayer->GetOwnerNumber() );
 }
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void CFogOfWarMgr::AddSpecialUpdater( fogofwar_t data )
-{
-	m_SpecialUpdateList.AddToTail(data);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void CFogOfWarMgr::UpdateSpecialUpdateList()
-{
-	int i;
-	for(i=0; i < m_SpecialUpdateList.Count(); i++ )
-	{
-		if( m_SpecialUpdateList.Element(i).m_fDelay > gpGlobals->curtime )
-			continue;
-
-		if( m_SpecialUpdateList.Element(i).m_fLifeTime >= 0.0 && m_SpecialUpdateList.Element(i).m_fLifeTime < gpGlobals->curtime )
-		{
-			if( m_SpecialUpdateList.Element(i).m_iOwnerNumber >= 0 &&
-					m_SpecialUpdateList.Element(i).m_iOwnerNumber < MAX_PLAYERS )
-			{
-				UpdateFOWAt( m_SpecialUpdateList.Element(i).m_iOwnerNumber, m_SpecialUpdateList.Element(i).m_iX, 
-					m_SpecialUpdateList.Element(i).m_iY, m_SpecialUpdateList.Element(i).m_iRadius, true );
-			}
-			m_SpecialUpdateList.Remove(i);
-			continue;
-		}
-		if( m_SpecialUpdateList.Element(i).m_iOwnerNumber >= 0 &&
-			m_SpecialUpdateList.Element(i).m_iOwnerNumber < MAX_PLAYERS )
-		{
-			UpdateFOWAt( m_SpecialUpdateList.Element(i).m_iOwnerNumber, m_SpecialUpdateList.Element(i).m_iX, 
-			m_SpecialUpdateList.Element(i).m_iY, m_SpecialUpdateList.Element(i).m_iRadius, false );
-		}
-	}
-}
-#endif // 0
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Lists all entities updating the/or being affected by the fog of war.

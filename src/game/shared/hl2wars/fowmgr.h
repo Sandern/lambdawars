@@ -171,6 +171,7 @@ public:
 #ifndef CLIENT_DLL
 	// Querying
 	bool				PointInFOW( const Vector &vPoint, int iOwner );
+	bool				PointInFOWByPlayerIndex( const Vector &vPoint, int iEntIndex );
 
 	// For entities that are not hidden in the fog of war, but not updated (FOWFLAG_NOTRANSMIT, but not FOWFLAG_HIDDEN)
 	// These entities should be transmitted at least once.
@@ -180,13 +181,6 @@ public:
 	void				ResetToUnknown( int iPlayerIndex );
 	void				ResetToKnown( int iPlayerIndex );
 #endif // CLIENT_DLL
-
-#if 0
-	// Marker
-	virtual void		AddSpecialUpdater(  Vector origin, float radius, float delay, float lifetime, int owner );
-	virtual void		AddSpecialUpdater( fogofwar_t data );
-	virtual void		UpdateSpecialUpdateList();
-#endif // 0
 
 	// Debug
 	void				DebugPrintEntities();
@@ -206,10 +200,6 @@ private:
 	FOWListInfo *m_pFogUpdaterListHead;
 	CUtlVector<CBaseEntity *> m_FogEntities;
 	
-#if 0
-	CUtlVector< fogofwar_t > m_SpecialUpdateList;
-#endif // 0
-
 	// FOWFLAG_NOTRANSMIT related
 #ifndef CLIENT_DLL
 	CBitVec<MAX_EDICTS> m_KnownEntities[MAX_PLAYERS]; // Used for known functions

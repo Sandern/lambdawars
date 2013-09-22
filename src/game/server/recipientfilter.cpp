@@ -10,6 +10,10 @@
 #include "team.h"
 #include "ipredictionsystem.h"
 
+#ifdef HL2WARS_DLL
+#include "hl2wars/fowmgr.h"
+#endif // HL2WARS_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -249,6 +253,16 @@ void CRecipientFilter::AddRecipientsByPVS( const Vector& origin )
 		engine->Message_DetermineMulticastRecipients( false, origin, playerbits );
 		AddPlayersFromBitMask( playerbits );
 	}
+
+#ifdef HL2WARS_DLL
+	// Filter when in the fog of war
+	for( int i = 0; i < GetRecipientCount(); i++ )
+	{
+		int iIdx = GetRecipientIndex( i );
+		if( FogOfWarMgr()->PointInFOWByPlayerIndex( origin, iIdx ) )
+			this->RemoveRecipientByPlayerIndex( iIdx );
+	}
+#endif // HL2WARS_DLL
 }
 
 void CRecipientFilter::RemoveRecipientsByPVS( const Vector& origin )
@@ -279,6 +293,16 @@ void CRecipientFilter::AddRecipientsByPAS( const Vector& origin )
 		engine->Message_DetermineMulticastRecipients( true, origin, playerbits );
 		AddPlayersFromBitMask( playerbits );
 	}
+
+#ifdef HL2WARS_DLL
+	// Filter when in the fog of war
+	for( int i = 0; i < GetRecipientCount(); i++ )
+	{
+		int iIdx = GetRecipientIndex( i );
+		if( FogOfWarMgr()->PointInFOWByPlayerIndex( origin, iIdx ) )
+			this->RemoveRecipientByPlayerIndex( iIdx );
+	}
+#endif // HL2WARS_DLL
 }
 
 bool CRecipientFilter::IsInitMessage( void ) const
