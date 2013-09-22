@@ -43,7 +43,8 @@ bool CDeferredManagerClient::Init()
 	AssertMsg( g_pCurrentViewRender == NULL, "viewrender already allocated?!" );
 
 	const int iDeferredLevel = CommandLine() ? CommandLine()->ParmValue("-deferred", 1) : 1;
-	const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-deferred") != 0;
+	//const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-deferred") != 0;
+	const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-disabledeferred") == 0;
 	const bool bForceDeferred = CommandLine() && CommandLine()->FindParm("-forcedeferred") != 0;
 	bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
 
@@ -77,6 +78,10 @@ bool CDeferredManagerClient::Init()
 			materials->AddModeChangeCallBack( &DefRTsOnModeChanged );
 
 			InitializeDeferredMaterials();
+
+			// Temporary
+			if( CommandLine() )
+				CommandLine()->AppendParm( "-deferred", "" );
 		}
 	}
 
