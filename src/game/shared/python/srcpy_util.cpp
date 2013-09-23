@@ -1,6 +1,6 @@
 //====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
-// Purpose: Utility code. Merge with srcpy_wrappers_util.h?
+// Purpose: Utility code
 //
 // $NoKeywords: $
 //=============================================================================//

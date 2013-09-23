@@ -41,6 +41,20 @@ namespace bp = boost::python;
 	extern void DestroyPyPanels();
 #endif // CLIENT_DLL
 
+#if 0
+// Stubs for Python
+const char *Py_GetBuildInfo(void) { return ""; }
+const char *_Py_hgversion(void) { return ""; }
+const char *_Py_hgidentifier(void) { return ""; }
+#endif // 0
+
+extern "C" 
+{
+	char dllVersionBuffer[16] = ""; // a private buffer
+	HMODULE PyWin_DLLhModule = NULL;
+	const char *PyWin_DLLVersionString = dllVersionBuffer;
+}
+
 // For debugging
 ConVar g_debug_python( "g_debug_python", "0", FCVAR_REPLICATED );
 
@@ -256,7 +270,25 @@ bool CSrcPython::InitInterpreter( void )
 	m_bPythonRunning = true;
 
 	double fStartTime = Plat_FloatTime();
-	
+
+	char buf[MAX_PATH];
+	char pythonpath[MAX_PATH];
+	pythonpath[0] = '\0';
+
+	filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, _MAX_PATH);
+	V_FixupPathName(buf, MAX_PATH, buf);
+	V_strcat( pythonpath, buf, MAX_PATH );
+	V_strcat( pythonpath, ";", MAX_PATH );
+	filesystem->RelativePathToFullPath("python/Lib/DLLs", "MOD", buf, _MAX_PATH);
+	V_FixupPathName(buf, MAX_PATH, buf);
+	V_strcat( pythonpath, buf, MAX_PATH );
+
+#ifdef WIN32
+	::SetEnvironmentVariable( "PYTHONPATH", pythonpath );
+#else
+    ::setenv( "PYTHONPATH", pythonpath, 1 );
+#endif // WIN32
+    
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
 #ifdef CLIENT_DLL

@@ -87,26 +87,26 @@ void CheckEntities(PyClientClassBase *pCC, boost::python::object pyClass );
 		static boost::python::object m_PyClass;														\
 		static int m_iType;																			\
 	};																								\
-	boost::python::object name##::m_PyClass;														\
-	int name##::m_iType;																			\
-	IClientNetworkable* name##::PyClientClass_CreateObject( int entnum, int serialNum )				\
+	boost::python::object name::m_PyClass;														\
+	int name::m_iType;																			\
+	IClientNetworkable* name::PyClientClass_CreateObject( int entnum, int serialNum )				\
 	{																								\
 		return ClientClassFactory(m_iType, m_PyClass, entnum, serialNum);							\
 	}																								\
-	void name##::SetPyClass( boost::python::object cls_type )										\
+	void name::SetPyClass( boost::python::object cls_type )										\
 	{																								\
 		m_PyClass = cls_type;																		\
 		if( g_bDoNotInitPythonClasses == false)														\
 			InitPyClass();																			\
 		CheckEntities(this, m_PyClass);																\
 	}																								\
-	void name##::SetType( int iType )																\
+	void name::SetType( int iType )																\
 	{																								\
 		m_iType = iType;																			\
 	}																								\
-	void name##::InitPyClass()																		\
+	void name::InitPyClass()																		\
 	{																								\
-		bp::object meth = SrcPySystem()->Get("InitEntityClass", m_PyClass, false);					\
+		boost::python::object meth = SrcPySystem()->Get("InitEntityClass", m_PyClass, false);		\
 		if( meth.ptr() == Py_None )																	\
 			return;																					\
 		SrcPySystem()->Run( meth );																	\

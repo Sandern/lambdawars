@@ -18,7 +18,6 @@
 #include "vcollide_parse.h"
 #include "vphysics_interface.h"
 #include "physics_shared.h"
-//#include "srcpy_wrappers_base.h"
 #include "srcpy_util.h"
 
 #ifndef CLIENT_DLL

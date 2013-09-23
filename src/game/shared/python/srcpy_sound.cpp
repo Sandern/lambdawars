@@ -1,14 +1,5 @@
 //====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
-// Purpose: Client DLL VGUI2 Viewport
-//
-// $Workfile:     $
-// $Date:         $
-//
-//-----------------------------------------------------------------------------
-// $Log: $
-//
-// $NoKeywords: $
 //=============================================================================//
 
 #include "cbase.h"

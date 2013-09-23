@@ -124,6 +124,58 @@ void PyHandle::SetAttr( const char *name, bp::object v )
 	PyGet().attr("__setattr__")(name, v);
 }
 
+int PyHandle::Cmp( bp::object other )
+{
+	// The thing to which we compare is NULL
+	PyObject *pPyObject = other.ptr();
+	if( pPyObject == Py_None ) {
+		return Get() != NULL;
+	}
+
+	// We are NULL
+	if( Get() == NULL )
+	{
+		return pPyObject != NULL;
+	}
+
+	// Check if it is directly a pointer to an entity
+#ifdef CLIENT_DLL
+	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("C_BaseEntity")).ptr()) )
+#else
+	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("CBaseEntity")).ptr()) )
+#endif // CLIENT_DLL
+	{
+		CBaseEntity *pSelf = Get();
+		CBaseEntity *pOther = boost::python::extract< CBaseEntity * >(other);
+		if( pOther == pSelf )
+		{
+			return 0;
+		}
+		else if( pOther->entindex() > pSelf->entindex() )
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+
+	// Must be a handle
+	CBaseHandle *pHandle = bp::extract< CBaseHandle * >( other );
+	if( pHandle )
+	{
+		if( pHandle->ToInt() == ToInt() )
+			return 0;
+		else if( pHandle->GetEntryIndex() > GetEntryIndex() )
+			return 1;
+		else
+			return -1;
+	}
+
+	return -1;
+}
+
 boost::python::object PyHandle::Str()
 {
 	if( Get() )
@@ -236,7 +288,7 @@ PyEntityFactory::PyEntityFactory( const char *pClassName, boost::python::object 
 	m_PyClass = PyClass;
 
 	// Remove old factory if any
-	if( EntityFactoryDictionary()->HasFactory( NULL, m_ClassName ) )
+	if( EntityFactoryDictionary()->FindFactory( m_ClassName ) )
 		EntityFactoryDictionary()->RemoveFactory( m_ClassName );
 
 	// Install new factory
@@ -260,7 +312,7 @@ PyEntityFactory::~PyEntityFactory()
 	// Another new factory might already be installed. When a python module gets reloaded
 	// the new factory might be created first. Afterwards the old one is dereferenced and 
 	// destroyed.
-	if( EntityFactoryDictionary()->HasFactory( this, m_ClassName ) )
+	if( EntityFactoryDictionary()->FindFactory( m_ClassName ) == this )
 		EntityFactoryDictionary()->RemoveFactory( m_ClassName );
 
 	// Unlink
@@ -392,7 +444,7 @@ bp::list PyGetAllClassnames()
 	while( p )
 	{
 		// Filter non linked factories (undestroyed python instances)
-		if( EntityFactoryDictionary()->HasFactory( p, p->GetClassname() ) )
+		if( EntityFactoryDictionary()->FindFactory( p->GetClassname() ) == p )
 		{
 			l.append( bp::object( p->GetClassname() ) );
 		}

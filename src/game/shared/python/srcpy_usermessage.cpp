@@ -17,6 +17,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+namespace bp = boost::python;
+
 // In python we don't want to specify the types, so we need to send the type data
 // with the message. Additionally we need to ensure begin and end function is called
 // This is why the message is done in one list, so we can hide everything in one function
@@ -244,7 +246,7 @@ void PyPrintElement( pywrite &w )
 ConVar g_debug_pyusermessage("g_debug_pyusermessage", "0", FCVAR_CHEAT|FCVAR_GAMEDLL);
 
 //-----------------------------------------------------------------------------
-// Purpose: New message function. Remove the old one once done converting
+// Purpose: Sends a user message
 //-----------------------------------------------------------------------------
 void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg )
 {
@@ -297,7 +299,7 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 }
 #else
 
-bp::object PyReadElement( bf_read &msg )
+boost::python::object PyReadElement( bf_read &msg )
 {
 	int type = msg.ReadByte();
 	char buf[255];	// User message is max 255 bytes, so if a string it is likely smaller

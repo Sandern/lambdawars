@@ -38,43 +38,42 @@ public:
 	CEPyHandle( T *pVal ) : CHandle<T>(pVal) {}
 	CEPyHandle( int iEntry, int iSerialNumber ) : CHandle<T>(iEntry, iSerialNumber) {}
 
-	bp::object GetAttr( const char *name );
+	boost::python::object GetAttr( const char *name );
 
-	int Cmp( bp::object other );
+	int Cmp( boost::python::object other );
 	bool NonZero();
 };
 
 template< class T >
-inline bp::object CEPyHandle<T>::GetAttr( const char *name )
+inline boost::python::object CEPyHandle<T>::GetAttr( const char *name )
 {
-	return bp::object(bp::ptr(Get())).attr(name);
+	return boost::python::object(boost::python::ptr(this->Get())).attr(name);
 }
 
-// ? Is using memcmp on a PyObject correct ?
 template< class T >
-int CEPyHandle<T>::Cmp( bp::object other )
+int CEPyHandle<T>::Cmp( boost::python::object other )
 {
 	// The thing to which we compare is NULL
 	PyObject *pPyObject = other.ptr();
 	if( pPyObject == Py_None ) {
-		return Get() != NULL;
+		return this->Get() != NULL;
 	}
 
 	// We are NULL
-	if( Get() == NULL )
+	if( this->Get() == NULL )
 	{
 		return pPyObject != NULL;
 	}
 
 	// Check if it is directly a pointer to an entity
 #ifdef CLIENT_DLL
-	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("C_BaseEntity")).ptr()) )
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("C_BaseEntity")).ptr()) )
 #else
-	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("CBaseEntity")).ptr()) )
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseEntity")).ptr()) )
 #endif // CLIENT_DLL
 	{
-		CBaseEntity *pSelf = Get();
-		CBaseEntity *pOther = bp::extract<CBaseEntity *>(other);
+		CBaseEntity *pSelf = this->Get();
+		CBaseEntity *pOther = boost::python::extract<CBaseEntity *>(other);
 		if( pOther == pSelf )
 		{
 			return 0;
@@ -90,12 +89,12 @@ int CEPyHandle<T>::Cmp( bp::object other )
 	}
 
 	// Must be a handle
-	CBaseHandle *pHandle = bp::extract<CBaseHandle *>( other );
+	CBaseHandle *pHandle = boost::python::extract<CBaseHandle *>( other );
 	if( pHandle )
 	{
-		if( pHandle->ToInt() == ToInt() )
+		if( pHandle->ToInt() == this->ToInt() )
 			return 0;
-		else if( pHandle->GetEntryIndex() > GetEntryIndex() )
+		else if( pHandle->GetEntryIndex() > this->GetEntryIndex() )
 			return 1;
 		else
 			return -1;
@@ -107,36 +106,34 @@ int CEPyHandle<T>::Cmp( bp::object other )
 template< class T >
 inline bool CEPyHandle<T>::NonZero()
 {
-	return Get() != NULL;
+	return this->Get() != NULL;
 }
 
 //----------------------------------------------------------------------------
-// Purpose: Python entity handle 2, python entities only
-//			This is a bit annoying, since CHandle template assumes T is a pointer 
-//			to the entity, so we can't fill in "bp::object"
+// Purpose: Python entity handle, for python entities only
 //-----------------------------------------------------------------------------
 class PyHandle : public CBaseHandle
 {
 public:
-	PyHandle(bp::object ent);
+	PyHandle(boost::python::object ent);
 	PyHandle( int iEntry, int iSerialNumber ) : CBaseHandle(iEntry, iSerialNumber) {}
 
 public:
 	CBaseEntity *Get() const;
-	bp::object PyGet() const;
-	void Set( bp::object ent );
+	boost::python::object PyGet() const;
+	void Set( boost::python::object ent );
 
-	bool	operator==( bp::object val ) const;
-	bool	operator!=( bp::object val ) const;
+	bool	operator==( boost::python::object val ) const;
+	bool	operator!=( boost::python::object val ) const;
 	bool	operator==( const PyHandle &val ) const;
 	bool	operator!=( const PyHandle &val ) const;
-	const PyHandle& operator=( bp::object val );
+	const PyHandle& operator=( boost::python::object val );
 
-	bp::object GetAttr( const char *name );
-	bp::object GetAttribute( const char *name );
-	void SetAttr( const char *name, bp::object v );
+	boost::python::object GetAttr( const char *name );
+	boost::python::object GetAttribute( const char *name );
+	void SetAttr( const char *name, boost::python::object v );
 
-	int Cmp( bp::object other );
+	int Cmp( boost::python::object other );
 	bool NonZero() { return PyGet().ptr() != Py_None; }
 
 	virtual PyObject *GetPySelf() { return NULL; }
@@ -144,78 +141,16 @@ public:
 	boost::python::object Str();
 };
 
-inline int PyHandle::Cmp( bp::object other )
-{
-	// The thing to which we compare is NULL
-	PyObject *pPyObject = other.ptr();
-	if( pPyObject == Py_None ) {
-		return Get() != NULL;
-	}
-
-	// We are NULL
-	if( Get() == NULL )
-	{
-		return pPyObject != NULL;
-	}
-
-	// Check if it is directly a pointer to an entity
-#ifdef CLIENT_DLL
-	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("C_BaseEntity")).ptr()) )
-#else
-	if( PyObject_IsInstance(pPyObject, bp::object(_entities.attr("CBaseEntity")).ptr()) )
-#endif // CLIENT_DLL
-	{
-		CBaseEntity *pSelf = Get();
-#ifdef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
-		CBaseEntity *pOther = NULL;
-#else
-		CBaseEntity *pOther = boost::python::extract< CBaseEntity * >(other);
-#endif // PYPP_GENERATION
-		if( pOther == pSelf )
-		{
-			return 0;
-		}
-		else if( pOther->entindex() > pSelf->entindex() )
-		{
-			return 1;
-		}
-		else
-		{
-			return -1;
-		}
-	}
-
-	// Must be a handle
-#ifdef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
-	CBaseHandle *pHandle = NULL;
-#else
-	CBaseHandle *pHandle = bp::extract< CBaseHandle * >( other );
-#endif // PYPP_GENERATION
-	if( pHandle )
-	{
-		if( pHandle->ToInt() == ToInt() )
-			return 0;
-		else if( pHandle->GetEntryIndex() > GetEntryIndex() )
-			return 1;
-		else
-			return -1;
-	}
-
-	return -1;
-
-	return 0;
-}
-
-bp::object CreatePyHandle( int iEntry, int iSerialNumber );
+boost::python::object CreatePyHandle( int iEntry, int iSerialNumber );
 
 #ifndef CLIENT_DLL
-bp::object PyGetWorldEntity();
+boost::python::object PyGetWorldEntity();
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Dead python entity. The __class__ object of a removed entity gets 
-//			rebinded to this. This way you can't accidently access (potential)
-//			dangerous methods.
+//			rebinded to this. This way you can't accidently access most of the
+//			(potential) dangerous methods.
 //-----------------------------------------------------------------------------
 class DeadEntity 
 {
@@ -228,16 +163,16 @@ public:
 class PyEntityFactory 
 {
 public:
-	PyEntityFactory( const char *pClassName, bp::object PyClass );
+	PyEntityFactory( const char *pClassName, boost::python::object PyClass );
 	~PyEntityFactory();
 
 	C_BaseEntity *Create();
 
-	bp::object GetClass() { return m_PyClass; }
+	boost::python::object GetClass() { return m_PyClass; }
 
 private:
 	char m_ClassName[128];
-	bp::object m_PyClass;
+	boost::python::object m_PyClass;
 };
 
 #else
@@ -245,7 +180,7 @@ private:
 class PyEntityFactory : public IEntityFactory
 {
 public:
-	PyEntityFactory( const char *pClassName, bp::object PyClass );
+	PyEntityFactory( const char *pClassName, boost::python::object PyClass );
 	~PyEntityFactory();
 
 	IServerNetworkable *Create( const char *pClassName );
@@ -257,7 +192,7 @@ public:
 	void InitPyClass();
 	virtual bool IsPyFactory() { return true; }
 
-	bp::object GetClass() { return m_PyClass; }
+	boost::python::object GetClass() { return m_PyClass; }
 	const char *GetClassname() { return m_ClassName; }
 
 private:
@@ -268,45 +203,47 @@ public:
 
 private:
 	char m_ClassName[128];
-	bp::object m_PyClass;
+	boost::python::object m_PyClass;
 };
 void InitAllPythonEntities();
 #endif
 
-bp::object PyGetClassByClassname( const char *class_name );
-bp::list PyGetAllClassnames();
+boost::python::object PyGetClassByClassname( const char *class_name );
+boost::python::list PyGetAllClassnames();
 
-// ----------- Sending events to client
 #ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: Sending events to client
+//-----------------------------------------------------------------------------
 void PySendEvent( IRecipientFilter &filter, EHANDLE ent, int event, int data);
 #endif // CLIENT_DLL
 
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
-// Purpose: Spawn a player
+// Purpose: (Re)spawn a player using the specified class
 //-----------------------------------------------------------------------------
-bp::object PyRespawnPlayer( CBasePlayer *pPlayer, const char *classname );
+boost::python::object PyRespawnPlayer( CBasePlayer *pPlayer, const char *classname );
 #endif // CLIENT_DLL
 
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
-// Purpose: Bone follow stuff (mainly for the strider)
+// Purpose: Bone followers
 //-----------------------------------------------------------------------------
 Vector GetAttachmentPositionInSpaceOfBone( CStudioHdr *pStudioHdr, const char *pAttachmentName, int outputBoneIndex );
 
 typedef struct pyphysfollower_t
 {
 	int boneindex;
-	bp::object follower;
+	boost::python::object follower;
 } pyphysfollower_t;
 
 class PyBoneFollowerManager : public CBoneFollowerManager
 {
 public:
 	// Use either of these to create the bone followers in your entity's CreateVPhysics()
-	void InitBoneFollowers( CBaseAnimating *pParentEntity, bp::list followerbonenames );
+	void InitBoneFollowers( CBaseAnimating *pParentEntity, boost::python::list followerbonenames );
 	void AddBoneFollower( CBaseAnimating *pParentEntity, const char *pFollowerBoneName, solid_t *pSolid = NULL );	// Adds a single bone follower
 
 	// Call this after you move your bones

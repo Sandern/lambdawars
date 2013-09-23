@@ -4,8 +4,8 @@
 //
 //=============================================================================//
 
-#ifndef SRCPY_TEMPENTS_CONVERTERS_H
-#define SRCPY_TEMPENTS_CONVERTERS_H
+#ifndef SRCPY_GAMEINTERFACE_CONVERTERS_H
+#define SRCPY_GAMEINTERFACE_CONVERTERS_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -63,4 +63,4 @@ struct wrap_model_t_to_model_t
 	}
 };
 
-#endif // SRCPY_TEMPENTS_CONVERTERS_H
+#endif // SRCPY_GAMEINTERFACE_CONVERTERS_H
