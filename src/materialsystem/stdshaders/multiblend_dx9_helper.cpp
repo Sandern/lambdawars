@@ -19,6 +19,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+static ConVar mat_deferred_blendlightmap( "mat_deferred_blendlightmap", "0.5" );
+
 // FIXME: doesn't support fresnel!
 void InitParamsMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Multiblend_DX9_Vars_t &info )
 {
@@ -186,7 +188,10 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		}
 
 		if( bDeferredActive )
+		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+			pShaderShadow->EnableTexture( SHADER_SAMPLER14, true );
+		}
 
 		if( bHasFlashlight )
 		{
@@ -367,11 +372,16 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		if( bDeferredActive )
 		{
 			pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
+			pShader->BindTexture( SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum2()  );
+
 			int x, y, w, t;
 			pShaderAPI->GetCurrentViewport( x, y, w, t );
 			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
 
 			pShaderAPI->SetPixelShaderConstant( 3, fl1 );
+
+			float fl2[4] = { mat_deferred_blendlightmap.GetFloat(), 0, 0, 0 };
+			pShaderAPI->SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl2 );
 		}
 
 		if ( bHasFoW )

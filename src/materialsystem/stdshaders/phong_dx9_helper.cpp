@@ -428,9 +428,10 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		if( bDeferredActive )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
+			pShaderShadow->EnableTexture( SHADER_SAMPLER11, true );
 		}
 
-		if ( phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture )
+		if ( phongInfo.m_bHasDetailTexture )
 		{
 			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
 			if ( nDetailBlendMode != 0 ) //Not Mod2X
@@ -457,8 +458,8 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		if( bHasTeamColorTexture )
 		{
-			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
-			//pShaderShadow->EnableSRGBRead( SHADER_SAMPLER12, true );
+			//pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER12, true );
 		}
 
 		if ( bHasDisplacement && IsPC() && g_pHardwareConfig->HasFastVertexTextures() )
@@ -516,7 +517,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
 			//SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, !bHasFoW && phongInfo.m_bHasBaseTextureWrinkle );
-			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
 			SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
@@ -537,7 +538,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			SET_STATIC_PIXEL_SHADER_COMBO( LIGHTWARPTEXTURE, phongInfo.m_bHasDiffuseWarp && phongInfo.m_bHasPhong );
 			SET_STATIC_PIXEL_SHADER_COMBO( PHONGWARPTEXTURE, phongInfo.m_bHasPhongWarp && phongInfo.m_bHasPhong );
 			//SET_STATIC_PIXEL_SHADER_COMBO( WRINKLEMAP, !bHasFoW && phongInfo.m_bHasBaseTextureWrinkle );
-			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture );
+			SET_STATIC_PIXEL_SHADER_COMBO( DETAILTEXTURE, phongInfo.m_bHasDetailTexture );
 			SET_STATIC_PIXEL_SHADER_COMBO( DETAIL_BLEND_MODE, nDetailBlendMode );
 			SET_STATIC_PIXEL_SHADER_COMBO( RIMLIGHT, phongInfo.m_bHasRimLight );
 			SET_STATIC_PIXEL_SHADER_COMBO( CUBEMAP, bHasEnvmap );
@@ -678,7 +679,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				}
 			}
 
-			if ( phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture )
+			if ( phongInfo.m_bHasDetailTexture )
 			{
 				pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER13, info.m_nDetail, info.m_nDetailFrame );
 			}
@@ -710,7 +711,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				pContextData->m_SemiStaticCmdsOut.SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, info.m_nBumpTransform );
 			}
 
-			if ( phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture )
+			if ( phongInfo.m_bHasDetailTexture )
 			{
 				if ( IS_PARAM_DEFINED( info.m_nDetailTextureTransform ) )
 				{
@@ -865,7 +866,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				}
 
 				// DETAILTEXTURE
-				if ( phongInfo.m_bHasDetailTexture && !bHasTeamColorTexture )
+				if ( phongInfo.m_bHasDetailTexture )
 				{
 					pContextData->m_SemiStaticCmdsOut.BindStandardTexture( SHADER_SAMPLER13, TEXTURE_GREY );
 				}
@@ -951,7 +952,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 				const float *vecTeamColor = IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor;
 				//pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 0, IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor, 1 );
 				pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( PSREG_RIMPARAMS, vecTeamColor, 1 );
-				pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER13, info.m_nTeamColorTexture, -1 );
+				pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER12, info.m_nTeamColorTexture, -1 );
 			}
 
 			pContextData->m_SemiStaticCmdsOut.End();
@@ -1027,7 +1028,9 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		if( bDeferredActive )
 		{
-			pShader->BindTexture( SHADER_SAMPLER10, GetDeferredExt()->GetTexture_LightAccum()  );
+			pShader->BindTexture( SHADER_SAMPLER10, GetDeferredExt()->GetTexture_LightAccum() );
+			pShader->BindTexture( SHADER_SAMPLER11, GetDeferredExt()->GetTexture_LightAccum2() );
+
 			int x, y, w, t;
 			pShaderAPI->GetCurrentViewport( x, y, w, t );
 			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };

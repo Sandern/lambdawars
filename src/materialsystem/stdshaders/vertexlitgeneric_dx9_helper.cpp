@@ -721,6 +721,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			if( bDeferredActive )
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+				pShaderShadow->EnableTexture( SHADER_SAMPLER14, true );
 			}
 
 			pShaderShadow->EnableSRGBWrite( bSRGBWrite );
@@ -1438,7 +1439,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 		if( bDeferredActive )
 		{
-			pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
+			pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum() );
+			pShader->BindTexture( SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum2() ) ;
 
 			//DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum(), 0 );
 			int x, y, w, t;

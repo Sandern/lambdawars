@@ -141,7 +141,8 @@ public:
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
-		ITexture *pTexLightAccum ) = 0;
+		ITexture *pTexLightAccum,
+		ITexture *pTexLightAccum2 ) = 0;
 	virtual void CommitTexture_CascadedDepth( const int &index, ITexture *pTexShadowDepth ) = 0;
 	virtual void CommitTexture_DualParaboloidDepth( const int &index, ITexture *pTexShadowDepth ) = 0;
 	virtual void CommitTexture_ProjectedDepth( const int &index, ITexture *pTexShadowDepth ) = 0;
@@ -194,7 +195,8 @@ public:
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
-		ITexture *pTexLightAccum );
+		ITexture *pTexLightAccum,
+		ITexture *pTexLightAccum2 );
 	virtual void CommitTexture_CascadedDepth( const int &index, ITexture *pTexShadowDepth );
 	virtual void CommitTexture_DualParaboloidDepth( const int &index, ITexture *pTexShadowDepth );
 	virtual void CommitTexture_ProjectedDepth( const int &index, ITexture *pTexShadowDepth );
@@ -233,6 +235,7 @@ public:
 	inline ITexture *GetTexture_Normals();
 	inline ITexture *GetTexture_Depth();
 	inline ITexture *GetTexture_LightAccum();
+	inline ITexture *GetTexture_LightAccum2();
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	inline ITexture *GetTexture_LightCtrl();
 #elif DEFCFG_DEFERRED_SHADING == 1
@@ -278,6 +281,7 @@ private:
 	ITexture *m_pTexNormals;
 	ITexture *m_pTexDepth;
 	ITexture *m_pTexLightAccum;
+	ITexture *m_pTexLightAccum2;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	ITexture *m_pTexLightCtrl;
 #elif DEFCFG_DEFERRED_SHADING == 1
@@ -390,6 +394,10 @@ ITexture *CDeferredExtension::GetTexture_Depth()
 ITexture *CDeferredExtension::GetTexture_LightAccum()
 {
 	return m_pTexLightAccum;
+}
+ITexture *CDeferredExtension::GetTexture_LightAccum2()
+{
+	return m_pTexLightAccum2;
 }
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 ITexture *CDeferredExtension::GetTexture_LightCtrl()

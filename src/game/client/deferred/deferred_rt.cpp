@@ -10,6 +10,7 @@ static CTextureReference g_tex_Depth;
 static CTextureReference g_tex_LightCtrl;
 #endif
 static CTextureReference g_tex_Lightaccum;
+static CTextureReference g_tex_Lightaccum2;
 static CTextureReference g_tex_Albedo;
 static CTextureReference g_tex_Specular;
 
@@ -163,6 +164,13 @@ const ImageFormat fmt_gbuffer0 =
 #endif
 
 		g_tex_Lightaccum.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_LIGHTACCUM,
+			dummy, dummy,
+			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
+			fmt_lightAccum,
+			MATERIAL_RT_DEPTH_NONE,
+			lightAccumFlags, 0 ) );
+
+		g_tex_Lightaccum2.Init( materials->CreateNamedRenderTargetTextureEx2( DEFRTNAME_LIGHTACCUM2,
 			dummy, dummy,
 			RT_SIZE_FULL_FRAME_BUFFER_ROUNDED_UP,
 			fmt_lightAccum,
@@ -415,7 +423,8 @@ const ImageFormat fmt_gbuffer0 =
 		g_tex_Albedo,
 		g_tex_Specular,
 #endif
-		g_tex_Lightaccum );
+		g_tex_Lightaccum,
+		g_tex_Lightaccum2 );
 
 	for ( int i = 0; i < MAX_SHADOW_ORTHO; i++ )
 		GetDeferredExt()->CommitTexture_CascadedDepth( i,
@@ -514,6 +523,12 @@ ITexture *GetDefRT_Lightaccum()
 {
 	Assert( g_tex_Lightaccum.IsValid() );
 	return g_tex_Lightaccum;
+}
+
+ITexture *GetDefRT_Lightaccum2()
+{
+	Assert( g_tex_Lightaccum2.IsValid() );
+	return g_tex_Lightaccum2;
 }
 
 ITexture *GetDefRT_VolumePrepass()

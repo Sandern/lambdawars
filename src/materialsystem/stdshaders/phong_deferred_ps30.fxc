@@ -52,9 +52,6 @@
 // Only do world normals in constrained case
 // SKIP: ( $WORLD_NORMAL == 1 ) && ( $FLASHLIGHTSHADOWS == 1 ) && ( $NUM_LIGHTS != 0 ) && ( $WRITEWATERFOGTODESTALPHA == 1 )
 
-// Use detail sampler for team color sampler
-// SKIP: ( $TEAMCOLORTEXTURE == 1 ) && ( $DETAILTEXTURE == 1 )
-
 // FOW skip combinations
 // SKIP: ( $FOW == 1 ) && ( $WRINKLEMAP == 1 )
 
@@ -178,10 +175,11 @@ sampler AmbientOcclusionSampler	: register( s15 );	// screen space ambient occlu
 #endif
 
 #if ( TEAMCOLORTEXTURE == 1 ) && defined( SHADER_MODEL_PS_3_0 )
-sampler TeamColorSampler		: register( s13 );
+sampler TeamColorSampler		: register( s12 );
 #endif // TEAMCOLORTEXTURE
 
 sampler sLightAccum		: register( s10 );
+sampler sLightAccum2	: register( s11 );
 const float2 g_vecFullScreenTexel		: register( PSREG_UBERLIGHT_SMOOTH_EDGE_0 );
 
 #define FLASHLIGHT_ONLY ( FLASHLIGHT && !SINGLE_PASS_FLASHLIGHT )
@@ -415,10 +413,18 @@ float4 main( PS_INPUT i ) : COLOR
 	
 	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
 	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+	float4 flLighting2 = ReadLighting( tex2D( sLightAccum2, screenPos ) );
 	
 	//float3 diffuseComponent = albedo * (diffuseLighting + flLighting); // Adding up
 	//float3 diffuseComponent = albedo * lerp( diffuseLighting, flLighting, 0.4 ); // Lerp result
-	float3 diffuseComponent = albedo * min( diffuseLighting, flLighting ); // Darken result
+	//float3 diffuseComponent = albedo * min( diffuseLighting, flLighting ); // Darken result
+	
+	float3 diffuseComponent;
+	float defint = length( flLighting );
+	if( defint > 0 )
+		diffuseComponent = albedo * (min( diffuseLighting, flLighting ) + flLighting2); // Darken 
+	else
+		diffuseComponent = albedo * (diffuseLighting + flLighting2);
 	
 	#if ( SELFILLUM && !FLASHLIGHT_ONLY )
 	{

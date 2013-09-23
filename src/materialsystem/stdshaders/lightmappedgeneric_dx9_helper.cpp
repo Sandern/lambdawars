@@ -601,6 +601,7 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 				if( bDeferredActive )
 				{
 					pShaderShadow->EnableTexture( SHADER_SAMPLER14, true );
+					pShaderShadow->EnableTexture( SHADER_SAMPLER15, true );
 				}
 
 				if( hasFlashlight && IsX360() )
@@ -1152,6 +1153,7 @@ void DrawLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 		if( bDeferredActive )
 		{
 			DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum(), 0 );
+			DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER15, GetDeferredExt()->GetTexture_LightAccum2(), 0 );
 			//DynamicCmdsOut.BindStandardTexture( SHADER_SAMPLER14, TEXTURE_WHITE );
 			int x, y, w, t;
 			pShaderAPI->GetCurrentViewport( x, y, w, t );

@@ -176,6 +176,7 @@ sampler FoWSampler				: register( s13 );	// Fog of War
 #endif
 
 sampler sLightAccum		: register( s14 );
+sampler sLightAccum2		: register( s15 );
 const float2 g_vecFullScreenTexel		: register( PSREG_UBERLIGHT_SMOOTH_EDGE_0 );
 
 #if defined( _X360 )
@@ -536,10 +537,18 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
 	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+	float4 flLighting2 = ReadLighting( tex2D( sLightAccum2, screenPos ) );
 	
 	//float3 diffuseComponent = albedo * (diffuseLighting + flLighting); // Adding up
 	//float3 diffuseComponent = albedo * lerp( diffuseLighting, flLighting, 0.4 ); // Lerp result
-	float3 diffuseComponent = albedo * min( diffuseLighting, flLighting ); // Darken result
+	//float3 diffuseComponent = albedo * min( diffuseLighting, flLighting ); // Darken result
+	
+	float3 diffuseComponent;
+	float defint = length( flLighting );
+	if( defint > 0 )
+		diffuseComponent = albedo * (min( diffuseLighting, flLighting ) + flLighting2); // Darken 
+	else
+		diffuseComponent = albedo * (diffuseLighting + flLighting2);
 	
 #if defined( _X360 ) && FLASHLIGHT
 

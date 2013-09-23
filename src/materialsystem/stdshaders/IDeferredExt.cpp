@@ -16,6 +16,7 @@ CDeferredExtension::CDeferredExtension()
 	m_pTexNormals = NULL;
 	m_pTexDepth = NULL;
 	m_pTexLightAccum = NULL;
+	m_pTexLightAccum2 = NULL;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = NULL;
 #elif DEFCFG_DEFERRED_SHADING == 1
@@ -144,11 +145,13 @@ void CDeferredExtension::CommitTexture_General( ITexture *pTexNormals, ITexture 
 		ITexture *pTexAlbedo,
 		ITexture *pTexSpecular,
 #endif
-		ITexture *pTexLightAccum )
+		ITexture *pTexLightAccum,
+		ITexture *pTexLightAccum2 )
 {
 	m_pTexNormals = pTexNormals;
 	m_pTexDepth = pTexDepth;
 	m_pTexLightAccum = pTexLightAccum;
+	m_pTexLightAccum2 = pTexLightAccum2;
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
 	m_pTexLightCtrl = pTexLightingCtrl;
 #elif DEFCFG_DEFERRED_SHADING == 1

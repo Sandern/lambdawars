@@ -63,7 +63,9 @@ sampler RandRotSampler			: register( s15 );
 
 #if ( DEFERRED == 1 )
 sampler sLightAccum		: register( s13 );
+sampler sLightAccum2		: register( s14 );
 const float2 g_vecFullScreenTexel		: register( c3 );
+const float4 g_deferredControls			: register( c33 );
 #endif // DEFERRED
 
 // free floats: texcoord2 ( 4 xyzw ), texcoord7( 1 w ), vBaseTexCoord( 2 zw ) ( when we remove lightmaps )
@@ -222,6 +224,7 @@ PS_OUTPUT main( PS_INPUT i )
 #if DEFERRED == 1
 	float2 screenPos = ( i.vScreenPos + 0.5f ) * g_vecFullScreenTexel;
 	float4 flLighting = ReadLighting( tex2D( sLightAccum, screenPos ) );
+	float4 flLighting2 = ReadLighting( tex2D( sLightAccum2, screenPos ) );
 #endif // DEFERRED
 
 #if LIGHTING_PREVIEW == 0
@@ -232,7 +235,13 @@ PS_OUTPUT main( PS_INPUT i )
 #if DEFERRED == 1
 	//vResult.rgb *= (diffuseLighting + flLighting); // Adding up
 	//vResult.rgb *= lerp( diffuseLighting, flLighting, 0.4 ); // Lerp result
-	vResult.rgb *= min( diffuseLighting, flLighting ); // Darken result
+	//vResult.rgb *= min( diffuseLighting, flLighting ) + flLighting2; // Darken result
+	
+	float defint = length( flLighting );
+	if( defint > 0 )
+		vResult.rgb *= min( diffuseLighting, flLighting ) + flLighting2; // Darken 
+	else
+		vResult.rgb *= (diffuseLighting + flLighting2);
 #else
 	vResult.rgb *= diffuseLighting;
 #endif // DEFERRED

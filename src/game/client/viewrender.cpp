@@ -2786,6 +2786,12 @@ void CViewRender::PerformLighting( const CViewSetup &view )
 	else
 		DrawLightPassFullscreen( GetDeferredManager()->GetDeferredMaterial( DEF_MAT_LIGHT_GLOBAL ), lightingView.width, lightingView.height );
 
+	pRenderContext->PopRenderTargetAndViewport();
+	pRenderContext->PushRenderTargetAndViewport( GetDefRT_Lightaccum2() );
+
+	pRenderContext->ClearColor4ub( 0, 0, 0, 0 );
+	pRenderContext->ClearBuffers( true, false );
+
 	pRenderContext.SafeRelease();
 
 	GetLightingManager()->RenderLights( lightingView, this );

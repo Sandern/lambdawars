@@ -51,9 +51,6 @@
 // Only do world normals in constrained case
 // SKIP: ( $WORLD_NORMAL == 1 ) && ( $FLASHLIGHTSHADOWS == 1 ) && ( $NUM_LIGHTS != 0 ) && ( $WRITEWATERFOGTODESTALPHA == 1 )
 
-// Use detail sampler for team color sampler
-// SKIP: ( $TEAMCOLORTEXTURE == 1 ) && ( $DETAILTEXTURE == 1 )
-
 // FOW skip combinations
 // SKIP: ( $FOW == 1 ) && ( $WRINKLEMAP == 1 )
 
@@ -176,7 +173,7 @@ sampler AmbientOcclusionSampler	: register( s15 );	// screen space ambient occlu
 #endif
 
 #if ( TEAMCOLORTEXTURE == 1 ) && defined( SHADER_MODEL_PS_3_0 )
-sampler TeamColorSampler		: register( s13 );
+sampler TeamColorSampler		: register( s12 );
 #endif // TEAMCOLORTEXTURE
 
 #define FLASHLIGHT_ONLY ( FLASHLIGHT && !SINGLE_PASS_FLASHLIGHT )
