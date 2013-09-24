@@ -172,7 +172,7 @@ sampler SelfIllumMaskSampler	: register( s14 );	// selfillummask
 sampler AmbientOcclusionSampler	: register( s15 );	// screen space ambient occlusion sampler on PC
 #endif
 
-#if ( TEAMCOLORTEXTURE == 1 ) && defined( SHADER_MODEL_PS_3_0 )
+#if ( TEAMCOLORTEXTURE == 1 )
 sampler TeamColorSampler		: register( s12 );
 #endif // TEAMCOLORTEXTURE
 
@@ -218,7 +218,7 @@ float4 main( PS_INPUT i ) : COLOR
 	
 	float4 baseColor = tex2Dsrgb( BaseTextureSampler, i.baseTexCoordDetailTexCoord.xy );
 
-#if TEAMCOLORTEXTURE && defined(SHADER_MODEL_PS_3_0)
+#if TEAMCOLORTEXTURE
 	baseColor = ApplyTeamColor( TeamColorSampler, GammaToLinear(g_TeamColor), i.baseTexCoordDetailTexCoord.xy, baseColor);
 #endif
 

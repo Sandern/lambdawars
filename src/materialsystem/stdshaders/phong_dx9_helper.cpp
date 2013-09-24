@@ -287,7 +287,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 	bool bHasDisplacementWrinkles = (info.m_nDisplacementWrinkleMap != -1) && params[info.m_nDisplacementWrinkleMap]->GetIntValue();
 #endif
 
-	bool bHasTeamColorTexture = ( info.m_nTeamColorTexture != -1 ) && params[info.m_nTeamColorTexture]->IsTexture() && g_pHardwareConfig->HasFastVertexTextures();
+	bool bHasTeamColorTexture = ( info.m_nTeamColorTexture != -1 ) && params[info.m_nTeamColorTexture]->IsTexture();
 
 	bool bHasFoW = ( ( info.m_nFoW != -1 ) && ( params[ info.m_nFoW ]->IsTexture() != 0 ) );
 	bool bFOWValidTexture = true;
@@ -458,8 +458,7 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		if( bHasTeamColorTexture )
 		{
-			//pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
-			pShaderShadow->EnableSRGBRead( SHADER_SAMPLER12, true );
+			pShaderShadow->EnableTexture( SHADER_SAMPLER12, true );
 		}
 
 		if ( bHasDisplacement && IsPC() && g_pHardwareConfig->HasFastVertexTextures() )
@@ -950,7 +949,6 @@ void DrawPhong_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			{
 				static const float kDefaultTeamColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 				const float *vecTeamColor = IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor;
-				//pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 0, IS_PARAM_DEFINED( info.m_nTeamColor ) ? params[info.m_nTeamColor]->GetVecValue() : kDefaultTeamColor, 1 );
 				pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( PSREG_RIMPARAMS, vecTeamColor, 1 );
 				pContextData->m_SemiStaticCmdsOut.BindTexture( pShader, SHADER_SAMPLER12, info.m_nTeamColorTexture, -1 );
 			}
