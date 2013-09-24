@@ -20,7 +20,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar max_muzzleflash_dlights( "max_muzzleflash_dlights", "5" );
+ConVar max_muzzleflash_dlights( "wars_muzzleflash_max_lights", "5" );
+ConVar wars_muzzleflash_radius( "wars_muzzleflash_radius", "320" );
+ConVar wars_muzzleflash_intensity( "wars_muzzleflash_intensity", "0.8" );
 
 #ifdef DEFERRED_ENABLED
 void DoDeferredMuzzleFlash( const Vector &vOrigin )
@@ -33,16 +35,16 @@ void DoDeferredMuzzleFlash( const Vector &vOrigin )
 	l->ang = vec3_angle;
 	l->pos = vOrigin;
 
-	l->col_diffuse = Vector( 0.964705882f, 0.82745098f, 0.403921569f ); //GetColor_Diffuse();
+	l->col_diffuse = Vector( 0.964705882f, 0.82745098f, 0.403921569f ) * wars_muzzleflash_intensity.GetFloat();
 	//l->col_ambient = Vector(20, 20, 20); //GetColor_Ambient();
 
-	l->flRadius = 512.0f;
+	l->flRadius = wars_muzzleflash_radius.GetFloat();
 	l->flFalloffPower = 1.0f;
 
-	l->iVisible_Dist = 1024.0f;
-	l->iVisible_Range = 1024.0f;
-	l->iShadow_Dist = 512.0f;
-	l->iShadow_Range = 512.0f;
+	l->iVisible_Dist = l->flRadius * 2;
+	l->iVisible_Range = l->flRadius * 2;
+	l->iShadow_Dist = l->flRadius;
+	l->iShadow_Range = l->flRadius;
 
 	l->iFlags >>= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
 	l->iFlags <<= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
