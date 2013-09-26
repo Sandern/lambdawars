@@ -547,7 +547,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	GarbageCollect();
 	Py_Finalize();
 #ifdef WIN32
-	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash.
+	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash if c extension modules are used.
 #endif // WIN32
 	m_bPythonIsFinalizing = false;
 	m_bPythonRunning = false;
