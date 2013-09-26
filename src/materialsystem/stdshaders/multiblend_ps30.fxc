@@ -29,11 +29,7 @@ sampler LightmapSampler					: register( s5 );
 const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
 const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );
 
-#if ((defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)))
-
-static const float3 cSpecularColor = float3( 1.0, 1.0, 1.0 );
-
-#endif
+const float4 cSpecularColor				: register( PSREG_CONSTANT_22 );
 
 #if LIGHTING_PREVIEW == 0
 
@@ -196,7 +192,7 @@ PS_OUTPUT main( PS_INPUT i )
 
 #if ( ( defined( SHADER_MODEL_PS_2_B ) || defined( SHADER_MODEL_PS_3_0 ) ) )
 
-	float3 fSpecular = i.vAlphaBlend.w * cSpecularColor;
+	float3 fSpecular = i.vAlphaBlend.w * cSpecularColor.rgb * cSpecularColor.a;
 	float3 fSpecFinal = float3( 0.0, 0.0, 0.0 );
 	if ( blendfactor1 > 0.0 )
 	{

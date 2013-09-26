@@ -20,6 +20,10 @@
 #include "tier0/memdbgon.h"
 
 static ConVar mat_deferred_blendlightmap( "mat_deferred_blendlightmap", "0.5" );
+static ConVar mat_multiblend_spec_color_r( "mat_multiblend_spec_color_r", "1" );
+static ConVar mat_multiblend_spec_color_g( "mat_multiblend_spec_color_g", "1" );
+static ConVar mat_multiblend_spec_color_b( "mat_multiblend_spec_color_b", "1" );
+static ConVar mat_multiblend_spec_color_a( "mat_multiblend_spec_color_a", "0.2" );
 
 // FIXME: doesn't support fresnel!
 void InitParamsMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, Multiblend_DX9_Vars_t &info )
@@ -430,7 +434,12 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 
 		// Pack phong exponent in with the eye position
 		float vEyePos_SpecExponent[4];
-		float vSpecularTint[4] = {1, 1, 1, 1};
+		float vSpecularTint[4] = {
+			mat_multiblend_spec_color_r.GetFloat(),
+			mat_multiblend_spec_color_g.GetFloat(),
+			mat_multiblend_spec_color_b.GetFloat(),
+			mat_multiblend_spec_color_a.GetFloat()
+		};
 		pShaderAPI->GetWorldSpaceCameraPosition( vEyePos_SpecExponent );
 
 //		if ( (info.m_nPhongExponent != -1) && params[info.m_nPhongExponent]->IsDefined() )
@@ -447,6 +456,10 @@ void DrawMultiblend_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderD
 		}
 
 		pShaderAPI->SetPixelShaderConstant( PSREG_EYEPOS_SPEC_EXPONENT, vEyePos_SpecExponent, 1 );
+
+
+		pShaderAPI->SetPixelShaderConstant( PSREG_CONSTANT_22, vSpecularTint, 1 );
+		//mat_multiblend_spec_color_r
 
 		// Set c0 and c1 to contain first two rows of ViewProj matrix
 		VMatrix matView, matProj, matViewProj;
