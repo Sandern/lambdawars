@@ -941,7 +941,7 @@ void CLightingEditor::ParseVmfFile( KeyValues *pKeyValues )
 		if ( Q_strcmp( pKey->GetName(), "entity" ) )
 			continue;
 
-		const bool bLightEntity = !Q_stricmp( pKey->GetString( "classname" ), "light_deferred" );
+		const bool bLightEntity = !Q_stricmp( pKey->GetString( "classname" ), "light_deferred" ) || !Q_stricmp( pKey->GetString( "classname" ), "env_deferred_light" );
 		const bool bGlobalLightEntity = !Q_stricmp( pKey->GetString( "classname" ), "light_deferred_global" );
 
 		if ( bGlobalLightEntity )
@@ -1010,7 +1010,7 @@ void CLightingEditor::ApplyLightsToCurrentVmfFile()
 			break;
 		}
 
-		bool bIsDeferredLight = !Q_stricmp( pKey->GetString( "classname" ), "light_deferred" );
+		bool bIsDeferredLight = !Q_stricmp( pKey->GetString( "classname" ), "light_deferred" ) || !Q_stricmp( pKey->GetString( "classname" ), "env_deferred_light" );
 
 		const char *pszDefault = "";
 		const char *pszTarget = pKey->GetString( "targetname", pszDefault );
