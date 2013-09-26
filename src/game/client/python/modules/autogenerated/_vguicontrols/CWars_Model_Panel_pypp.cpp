@@ -23,9 +23,6 @@
 #include "srcpy_vgui.h"
 #include "hl2wars/hl2wars_baseminimap.h"
 #include "hl2wars/vgui_video_general.h"
-#include "matsys_controls/mdlpanel.h"
-#include "matsys_controls/potterywheelpanel.h"
-#include "game_controls/basemodel_panel.h"
 #include "hl2wars/vgui/wars_model_panel.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
@@ -40,10 +37,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
       , bp::wrapper< CWars_Model_Panel >(){
         // constructor
     	g_PythonPanelCount++;
-    }
-
-    void AcceptManipulation( bool bReleaseMouseCapture=true ){
-        CPotteryWheelPanel::AcceptManipulation( bReleaseMouseCapture );
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
@@ -66,7 +59,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling ApplySchemeSettings( boost::python::ptr(pScheme) ) of Class: CMDLPanel\n");
+            Msg("Calling ApplySchemeSettings( boost::python::ptr(pScheme) ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_ApplySchemeSettings = this->get_override( "ApplySchemeSettings" );
         if( func_ApplySchemeSettings.ptr() != Py_None )
@@ -74,22 +67,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_ApplySchemeSettings( boost::python::ptr(pScheme) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CMDLPanel::ApplySchemeSettings( boost::python::ptr(pScheme) );
+                this->vgui::Panel::ApplySchemeSettings( boost::python::ptr(pScheme) );
             }
         else
-            this->CMDLPanel::ApplySchemeSettings( boost::python::ptr(pScheme) );
+            this->vgui::Panel::ApplySchemeSettings( boost::python::ptr(pScheme) );
     }
     
     void default_ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
-        CMDLPanel::ApplySchemeSettings( boost::python::ptr(pScheme) );
-    }
-
-    void CancelManipulation(  ){
-        CPotteryWheelPanel::CancelManipulation(  );
-    }
-
-    void CreateDefaultLights(  ){
-        CPotteryWheelPanel::CreateDefaultLights(  );
+        vgui::Panel::ApplySchemeSettings( boost::python::ptr(pScheme) );
     }
 
     void CreateDragData(  ){
@@ -98,14 +83,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
 
     void DragDropStartDragging(  ){
         vgui::Panel::DragDropStartDragging(  );
-    }
-
-    void DrawGrid(  ){
-        CPotteryWheelPanel::DrawGrid(  );
-    }
-
-    void EnableMouseCapture( bool enable, ::vgui::MouseCode code=::BUTTON_CODE_INVALID ){
-        CPotteryWheelPanel::EnableMouseCapture( enable, code );
     }
 
     ::vgui::Panel * GetNavDownPanel(  ){
@@ -122,10 +99,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
 
     ::vgui::Panel * GetNavUpPanel(  ){
         return vgui::Panel::GetNavUpPanel(  );
-    }
-
-    bool HasLightProbe(  ) const {
-        return CPotteryWheelPanel::HasLightProbe(  );
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
@@ -238,7 +211,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnCursorMoved( x, y ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnCursorMoved( x, y ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnCursorMoved = this->get_override( "OnCursorMoved" );
         if( func_OnCursorMoved.ptr() != Py_None )
@@ -246,14 +219,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnCursorMoved( x, y );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnCursorMoved( x, y );
+                this->vgui::Panel::OnCursorMoved( x, y );
             }
         else
-            this->CBaseModelPanel::OnCursorMoved( x, y );
+            this->vgui::Panel::OnCursorMoved( x, y );
     }
     
     void default_OnCursorMoved( int x, int y ) {
-        CBaseModelPanel::OnCursorMoved( x, y );
+        vgui::Panel::OnCursorMoved( x, y );
     }
 
     void OnFinishDragging( bool mousereleased, ::vgui::MouseCode code, bool aborted=false ){
@@ -272,7 +245,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodePressed( code ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnKeyCodePressed( code ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnKeyCodePressed = this->get_override( "OnKeyCodePressed" );
         if( func_OnKeyCodePressed.ptr() != Py_None )
@@ -280,14 +253,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnKeyCodePressed( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnKeyCodePressed( code );
+                this->vgui::Panel::OnKeyCodePressed( code );
             }
         else
-            this->CBaseModelPanel::OnKeyCodePressed( code );
+            this->vgui::Panel::OnKeyCodePressed( code );
     }
     
     void default_OnKeyCodePressed( ::vgui::KeyCode code ) {
-        CBaseModelPanel::OnKeyCodePressed( code );
+        vgui::Panel::OnKeyCodePressed( code );
     }
 
     virtual void OnKeyCodeReleased( ::vgui::KeyCode code ) {
@@ -302,7 +275,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodeReleased( code ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnKeyCodeReleased( code ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnKeyCodeReleased = this->get_override( "OnKeyCodeReleased" );
         if( func_OnKeyCodeReleased.ptr() != Py_None )
@@ -310,14 +283,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnKeyCodeReleased( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnKeyCodeReleased( code );
+                this->vgui::Panel::OnKeyCodeReleased( code );
             }
         else
-            this->CBaseModelPanel::OnKeyCodeReleased( code );
+            this->vgui::Panel::OnKeyCodeReleased( code );
     }
     
     void default_OnKeyCodeReleased( ::vgui::KeyCode code ) {
-        CBaseModelPanel::OnKeyCodeReleased( code );
+        vgui::Panel::OnKeyCodeReleased( code );
     }
 
     virtual void OnKeyFocusTicked(  ) {
@@ -392,7 +365,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseCaptureLost(  ) of Class: CPotteryWheelPanel\n");
+            Msg("Calling OnMouseCaptureLost(  ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMouseCaptureLost = this->get_override( "OnMouseCaptureLost" );
         if( func_OnMouseCaptureLost.ptr() != Py_None )
@@ -400,14 +373,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnMouseCaptureLost(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CPotteryWheelPanel::OnMouseCaptureLost(  );
+                this->vgui::Panel::OnMouseCaptureLost(  );
             }
         else
-            this->CPotteryWheelPanel::OnMouseCaptureLost(  );
+            this->vgui::Panel::OnMouseCaptureLost(  );
     }
     
     void default_OnMouseCaptureLost(  ) {
-        CPotteryWheelPanel::OnMouseCaptureLost( );
+        vgui::Panel::OnMouseCaptureLost( );
     }
 
     virtual void OnMouseDoublePressed( ::vgui::MouseCode code ) {
@@ -422,7 +395,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseDoublePressed( code ) of Class: CPotteryWheelPanel\n");
+            Msg("Calling OnMouseDoublePressed( code ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMouseDoublePressed = this->get_override( "OnMouseDoublePressed" );
         if( func_OnMouseDoublePressed.ptr() != Py_None )
@@ -430,14 +403,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnMouseDoublePressed( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CPotteryWheelPanel::OnMouseDoublePressed( code );
+                this->vgui::Panel::OnMouseDoublePressed( code );
             }
         else
-            this->CPotteryWheelPanel::OnMouseDoublePressed( code );
+            this->vgui::Panel::OnMouseDoublePressed( code );
     }
     
     void default_OnMouseDoublePressed( ::vgui::MouseCode code ) {
-        CPotteryWheelPanel::OnMouseDoublePressed( code );
+        vgui::Panel::OnMouseDoublePressed( code );
     }
 
     virtual void OnMouseFocusTicked(  ) {
@@ -482,7 +455,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnMousePressed( code ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnMousePressed( code ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMousePressed = this->get_override( "OnMousePressed" );
         if( func_OnMousePressed.ptr() != Py_None )
@@ -490,14 +463,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnMousePressed( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnMousePressed( code );
+                this->vgui::Panel::OnMousePressed( code );
             }
         else
-            this->CBaseModelPanel::OnMousePressed( code );
+            this->vgui::Panel::OnMousePressed( code );
     }
     
     void default_OnMousePressed( ::vgui::MouseCode code ) {
-        CBaseModelPanel::OnMousePressed( code );
+        vgui::Panel::OnMousePressed( code );
     }
 
     virtual void OnMouseReleased( ::vgui::MouseCode code ) {
@@ -512,7 +485,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseReleased( code ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnMouseReleased( code ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMouseReleased = this->get_override( "OnMouseReleased" );
         if( func_OnMouseReleased.ptr() != Py_None )
@@ -520,14 +493,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnMouseReleased( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnMouseReleased( code );
+                this->vgui::Panel::OnMouseReleased( code );
             }
         else
-            this->CBaseModelPanel::OnMouseReleased( code );
+            this->vgui::Panel::OnMouseReleased( code );
     }
     
     void default_OnMouseReleased( ::vgui::MouseCode code ) {
-        CBaseModelPanel::OnMouseReleased( code );
+        vgui::Panel::OnMouseReleased( code );
     }
 
     virtual void OnMouseTriplePressed( ::vgui::MouseCode code ) {
@@ -572,7 +545,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseWheeled( delta ) of Class: CBaseModelPanel\n");
+            Msg("Calling OnMouseWheeled( delta ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnMouseWheeled = this->get_override( "OnMouseWheeled" );
         if( func_OnMouseWheeled.ptr() != Py_None )
@@ -580,14 +553,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnMouseWheeled( delta );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseModelPanel::OnMouseWheeled( delta );
+                this->vgui::Panel::OnMouseWheeled( delta );
             }
         else
-            this->CBaseModelPanel::OnMouseWheeled( delta );
+            this->vgui::Panel::OnMouseWheeled( delta );
     }
     
     void default_OnMouseWheeled( int delta ) {
-        CBaseModelPanel::OnMouseWheeled( delta );
+        vgui::Panel::OnMouseWheeled( delta );
     }
 
     virtual void OnScreenSizeChanged( int oldwide, int oldtall ){
@@ -653,7 +626,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnTick(  ) of Class: CMDLPanel\n");
+            Msg("Calling OnTick(  ) of Class: vgui::Panel\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnTick = this->get_override( "OnTick" );
         if( func_OnTick.ptr() != Py_None )
@@ -661,14 +634,14 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
                 func_OnTick(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CMDLPanel::OnTick(  );
+                this->vgui::Panel::OnTick(  );
             }
         else
-            this->CMDLPanel::OnTick(  );
+            this->vgui::Panel::OnTick(  );
     }
     
     void default_OnTick(  ) {
-        CMDLPanel::OnTick( );
+        vgui::Panel::OnTick( );
     }
 
     virtual void PaintBuildOverlay(  ) {
@@ -703,36 +676,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
 
     void PaintTraverse( bool Repaint, bool allowForce=true ){
         vgui::Panel::PaintTraverse( Repaint, allowForce );
-    }
-
-    virtual void PerformLayout(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PerformLayout: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PerformLayout(  ) of Class: CBaseModelPanel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_PerformLayout = this->get_override( "PerformLayout" );
-        if( func_PerformLayout.ptr() != Py_None )
-            try {
-                func_PerformLayout(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseModelPanel::PerformLayout(  );
-            }
-        else
-            this->CBaseModelPanel::PerformLayout(  );
-    }
-    
-    void default_PerformLayout(  ) {
-        CBaseModelPanel::PerformLayout( );
     }
 
     virtual void PostChildPaint(  ) {
@@ -1265,10 +1208,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         vgui::Panel::SetVisible( state );
     }
 
-    bool WarpMouse( int & x, int & y ){
-        return CPotteryWheelPanel::WarpMouse( x, y );
-    }
-
     virtual void Paint(  ) {
         if( !IsSBufferEnabled() || ShouldRecordSBuffer( m_PaintCallBuffer ) )
         {
@@ -1442,77 +1381,9 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
 void register_CWars_Model_Panel_class(){
 
     { //::CWars_Model_Panel
-        typedef bp::class_< CWars_Model_Panel_wrapper, bp::bases< CBaseModelPanel >, boost::noncopyable > CWars_Model_Panel_exposer_t;
+        typedef bp::class_< CWars_Model_Panel_wrapper, bp::bases< vgui::EditablePanel >, boost::noncopyable > CWars_Model_Panel_exposer_t;
         CWars_Model_Panel_exposer_t CWars_Model_Panel_exposer = CWars_Model_Panel_exposer_t( "CWars_Model_Panel", bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("name") )) );
         bp::scope CWars_Model_Panel_scope( CWars_Model_Panel_exposer );
-        { //::CWars_Model_Panel::AddLight
-        
-            typedef void ( ::CWars_Model_Panel::*AddLight_function_type )( ::LightDesc_t &,char const * ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "AddLight"
-                , AddLight_function_type( &::CWars_Model_Panel::AddLight )
-                , ( bp::arg("newlight"), bp::arg("attachlight") ) );
-        
-        }
-        { //::CWars_Model_Panel::AddLight
-        
-            typedef void ( ::CWars_Model_Panel::*AddLight_function_type )( ::LightDesc_t &,::matrix3x4_t & ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "AddLight"
-                , AddLight_function_type( &::CWars_Model_Panel::AddLight )
-                , ( bp::arg("newlight"), bp::arg("lightToWorld") ) );
-        
-        }
-        { //::CWars_Model_Panel::ClearLights
-        
-            typedef void ( ::CWars_Model_Panel::*ClearLights_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "ClearLights"
-                , ClearLights_function_type( &::CWars_Model_Panel::ClearLights ) );
-        
-        }
-        { //::CWars_Model_Panel::FindBodygroupByName
-        
-            typedef int ( ::CWars_Model_Panel::*FindBodygroupByName_function_type )( char const * ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "FindBodygroupByName"
-                , FindBodygroupByName_function_type( &::CWars_Model_Panel::FindBodygroupByName )
-                , ( bp::arg("name") ) );
-        
-        }
-        { //::CWars_Model_Panel::GetLight
-        
-            typedef ::LightDesc_t ( ::CWars_Model_Panel::*GetLight_function_type )( int ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "GetLight"
-                , GetLight_function_type( &::CWars_Model_Panel::GetLight )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::CWars_Model_Panel::GetLightToWorld
-        
-            typedef ::matrix3x4_t ( ::CWars_Model_Panel::*GetLightToWorld_function_type )( int ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "GetLightToWorld"
-                , GetLightToWorld_function_type( &::CWars_Model_Panel::GetLightToWorld )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::CWars_Model_Panel::GetNumBodyGroups
-        
-            typedef int ( ::CWars_Model_Panel::*GetNumBodyGroups_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "GetNumBodyGroups"
-                , GetNumBodyGroups_function_type( &::CWars_Model_Panel::GetNumBodyGroups ) );
-        
-        }
         { //::CWars_Model_Panel::GetPanelBaseClassName
         
             typedef char const * ( *GetPanelBaseClassName_function_type )(  );
@@ -1529,66 +1400,6 @@ void register_CWars_Model_Panel_class(){
             CWars_Model_Panel_exposer.def( 
                 "GetPanelClassName"
                 , GetPanelClassName_function_type( &::CWars_Model_Panel::GetPanelClassName ) );
-        
-        }
-        { //::CWars_Model_Panel::LookAtBounds
-        
-            typedef void ( ::CWars_Model_Panel::*LookAtBounds_function_type )( ::Vector const &,::Vector const & ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "LookAtBounds"
-                , LookAtBounds_function_type( &::CWars_Model_Panel::LookAtBounds )
-                , ( bp::arg("vecBoundsMin"), bp::arg("vecBoundsMax") ) );
-        
-        }
-        { //::CWars_Model_Panel::SetAmbientCube
-        
-            typedef void ( ::CWars_Model_Panel::*SetAmbientCube_function_type )( ::Color & ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "SetAmbientCube"
-                , SetAmbientCube_function_type( &::CWars_Model_Panel::SetAmbientCube )
-                , ( bp::arg("cAmbient") ) );
-        
-        }
-        { //::CWars_Model_Panel::SetBodygroup
-        
-            typedef void ( ::CWars_Model_Panel::*SetBodygroup_function_type )( int,int ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "SetBodygroup"
-                , SetBodygroup_function_type( &::CWars_Model_Panel::SetBodygroup )
-                , ( bp::arg("iGroup"), bp::arg("iValue") ) );
-        
-        }
-        { //::CWars_Model_Panel::SetModelAnglesAndPosition
-        
-            typedef void ( ::CWars_Model_Panel::*SetModelAnglesAndPosition_function_type )( ::QAngle const &,::Vector const & ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "SetModelAnglesAndPosition"
-                , SetModelAnglesAndPosition_function_type( &::CWars_Model_Panel::SetModelAnglesAndPosition )
-                , ( bp::arg("angRot"), bp::arg("vecPos") ) );
-        
-        }
-        { //::CWars_Model_Panel::SetupCustomLights
-        
-            typedef void ( ::CWars_Model_Panel::*SetupCustomLights_function_type )( ::Color,::Color,float,::Color,float ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "SetupCustomLights"
-                , SetupCustomLights_function_type( &::CWars_Model_Panel::SetupCustomLights )
-                , ( bp::arg("cAmbient"), bp::arg("cKey"), bp::arg("fKeyBoost"), bp::arg("cRim"), bp::arg("fRimBoost") ) );
-        
-        }
-        { //::CPotteryWheelPanel::AcceptManipulation
-        
-            typedef void ( CWars_Model_Panel_wrapper::*AcceptManipulation_function_type )( bool ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "AcceptManipulation"
-                , AcceptManipulation_function_type( &CWars_Model_Panel_wrapper::AcceptManipulation )
-                , ( bp::arg("bReleaseMouseCapture")=(bool)(true) ) );
         
         }
         { //::vgui::Panel::AddToOverridableColors
@@ -1611,34 +1422,16 @@ void register_CWars_Model_Panel_class(){
                 , ( bp::arg("pScheme") ) );
         
         }
-        { //::CMDLPanel::ApplySchemeSettings
+        { //::vgui::Panel::ApplySchemeSettings
         
-            typedef void ( ::CMDLPanel::*ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
+            typedef void ( ::vgui::Panel::*ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_ApplySchemeSettings_function_type )( ::vgui::IScheme * ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "ApplySchemeSettings"
-                , ApplySchemeSettings_function_type(&::CMDLPanel::ApplySchemeSettings)
+                , ApplySchemeSettings_function_type(&::vgui::Panel::ApplySchemeSettings)
                 , default_ApplySchemeSettings_function_type(&CWars_Model_Panel_wrapper::default_ApplySchemeSettings)
                 , ( bp::arg("pScheme") ) );
-        
-        }
-        { //::CPotteryWheelPanel::CancelManipulation
-        
-            typedef void ( CWars_Model_Panel_wrapper::*CancelManipulation_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "CancelManipulation"
-                , CancelManipulation_function_type( &CWars_Model_Panel_wrapper::CancelManipulation ) );
-        
-        }
-        { //::CPotteryWheelPanel::CreateDefaultLights
-        
-            typedef void ( CWars_Model_Panel_wrapper::*CreateDefaultLights_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "CreateDefaultLights"
-                , CreateDefaultLights_function_type( &CWars_Model_Panel_wrapper::CreateDefaultLights ) );
         
         }
         { //::vgui::Panel::CreateDragData
@@ -1657,25 +1450,6 @@ void register_CWars_Model_Panel_class(){
             CWars_Model_Panel_exposer.def( 
                 "DragDropStartDragging"
                 , DragDropStartDragging_function_type( &CWars_Model_Panel_wrapper::DragDropStartDragging ) );
-        
-        }
-        { //::CPotteryWheelPanel::DrawGrid
-        
-            typedef void ( CWars_Model_Panel_wrapper::*DrawGrid_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "DrawGrid"
-                , DrawGrid_function_type( &CWars_Model_Panel_wrapper::DrawGrid ) );
-        
-        }
-        { //::CPotteryWheelPanel::EnableMouseCapture
-        
-            typedef void ( CWars_Model_Panel_wrapper::*EnableMouseCapture_function_type )( bool,::vgui::MouseCode ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "EnableMouseCapture"
-                , EnableMouseCapture_function_type( &CWars_Model_Panel_wrapper::EnableMouseCapture )
-                , ( bp::arg("enable"), bp::arg("code")=::BUTTON_CODE_INVALID ) );
         
         }
         { //::vgui::Panel::GetNavDownPanel
@@ -1716,15 +1490,6 @@ void register_CWars_Model_Panel_class(){
                 "GetNavUpPanel"
                 , GetNavUpPanel_function_type( &CWars_Model_Panel_wrapper::GetNavUpPanel )
                 , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CPotteryWheelPanel::HasLightProbe
-        
-            typedef bool ( CWars_Model_Panel_wrapper::*HasLightProbe_function_type )(  ) const;
-            
-            CWars_Model_Panel_exposer.def( 
-                "HasLightProbe"
-                , HasLightProbe_function_type( &CWars_Model_Panel_wrapper::HasLightProbe ) );
         
         }
         { //::vgui::Panel::InternalInitDefaultValues
@@ -1780,14 +1545,14 @@ void register_CWars_Model_Panel_class(){
                 , default_OnCursorExited_function_type(&CWars_Model_Panel_wrapper::default_OnCursorExited) );
         
         }
-        { //::CBaseModelPanel::OnCursorMoved
+        { //::vgui::Panel::OnCursorMoved
         
-            typedef void ( ::CBaseModelPanel::*OnCursorMoved_function_type )( int,int ) ;
+            typedef void ( ::vgui::Panel::*OnCursorMoved_function_type )( int,int ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnCursorMoved_function_type )( int,int ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnCursorMoved"
-                , OnCursorMoved_function_type(&::CBaseModelPanel::OnCursorMoved)
+                , OnCursorMoved_function_type(&::vgui::Panel::OnCursorMoved)
                 , default_OnCursorMoved_function_type(&CWars_Model_Panel_wrapper::default_OnCursorMoved)
                 , ( bp::arg("x"), bp::arg("y") ) );
         
@@ -1802,26 +1567,26 @@ void register_CWars_Model_Panel_class(){
                 , ( bp::arg("mousereleased"), bp::arg("code"), bp::arg("aborted")=(bool)(false) ) );
         
         }
-        { //::CBaseModelPanel::OnKeyCodePressed
+        { //::vgui::Panel::OnKeyCodePressed
         
-            typedef void ( ::CBaseModelPanel::*OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( ::vgui::Panel::*OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnKeyCodePressed_function_type )( ::vgui::KeyCode ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnKeyCodePressed"
-                , OnKeyCodePressed_function_type(&::CBaseModelPanel::OnKeyCodePressed)
+                , OnKeyCodePressed_function_type(&::vgui::Panel::OnKeyCodePressed)
                 , default_OnKeyCodePressed_function_type(&CWars_Model_Panel_wrapper::default_OnKeyCodePressed)
                 , ( bp::arg("code") ) );
         
         }
-        { //::CBaseModelPanel::OnKeyCodeReleased
+        { //::vgui::Panel::OnKeyCodeReleased
         
-            typedef void ( ::CBaseModelPanel::*OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( ::vgui::Panel::*OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnKeyCodeReleased_function_type )( ::vgui::KeyCode ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnKeyCodeReleased"
-                , OnKeyCodeReleased_function_type(&::CBaseModelPanel::OnKeyCodeReleased)
+                , OnKeyCodeReleased_function_type(&::vgui::Panel::OnKeyCodeReleased)
                 , default_OnKeyCodeReleased_function_type(&CWars_Model_Panel_wrapper::default_OnKeyCodeReleased)
                 , ( bp::arg("code") ) );
         
@@ -1848,25 +1613,25 @@ void register_CWars_Model_Panel_class(){
                 , default_OnKillFocus_function_type(&CWars_Model_Panel_wrapper::default_OnKillFocus) );
         
         }
-        { //::CPotteryWheelPanel::OnMouseCaptureLost
+        { //::vgui::Panel::OnMouseCaptureLost
         
-            typedef void ( ::CPotteryWheelPanel::*OnMouseCaptureLost_function_type )(  ) ;
+            typedef void ( ::vgui::Panel::*OnMouseCaptureLost_function_type )(  ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnMouseCaptureLost_function_type )(  ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnMouseCaptureLost"
-                , OnMouseCaptureLost_function_type(&::CPotteryWheelPanel::OnMouseCaptureLost)
+                , OnMouseCaptureLost_function_type(&::vgui::Panel::OnMouseCaptureLost)
                 , default_OnMouseCaptureLost_function_type(&CWars_Model_Panel_wrapper::default_OnMouseCaptureLost) );
         
         }
-        { //::CPotteryWheelPanel::OnMouseDoublePressed
+        { //::vgui::Panel::OnMouseDoublePressed
         
-            typedef void ( ::CPotteryWheelPanel::*OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( ::vgui::Panel::*OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnMouseDoublePressed"
-                , OnMouseDoublePressed_function_type(&::CPotteryWheelPanel::OnMouseDoublePressed)
+                , OnMouseDoublePressed_function_type(&::vgui::Panel::OnMouseDoublePressed)
                 , default_OnMouseDoublePressed_function_type(&CWars_Model_Panel_wrapper::default_OnMouseDoublePressed)
                 , ( bp::arg("code") ) );
         
@@ -1882,26 +1647,26 @@ void register_CWars_Model_Panel_class(){
                 , default_OnMouseFocusTicked_function_type(&CWars_Model_Panel_wrapper::default_OnMouseFocusTicked) );
         
         }
-        { //::CBaseModelPanel::OnMousePressed
+        { //::vgui::Panel::OnMousePressed
         
-            typedef void ( ::CBaseModelPanel::*OnMousePressed_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( ::vgui::Panel::*OnMousePressed_function_type )( ::vgui::MouseCode ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnMousePressed_function_type )( ::vgui::MouseCode ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnMousePressed"
-                , OnMousePressed_function_type(&::CBaseModelPanel::OnMousePressed)
+                , OnMousePressed_function_type(&::vgui::Panel::OnMousePressed)
                 , default_OnMousePressed_function_type(&CWars_Model_Panel_wrapper::default_OnMousePressed)
                 , ( bp::arg("code") ) );
         
         }
-        { //::CBaseModelPanel::OnMouseReleased
+        { //::vgui::Panel::OnMouseReleased
         
-            typedef void ( ::CBaseModelPanel::*OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
+            typedef void ( ::vgui::Panel::*OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnMouseReleased"
-                , OnMouseReleased_function_type(&::CBaseModelPanel::OnMouseReleased)
+                , OnMouseReleased_function_type(&::vgui::Panel::OnMouseReleased)
                 , default_OnMouseReleased_function_type(&CWars_Model_Panel_wrapper::default_OnMouseReleased)
                 , ( bp::arg("code") ) );
         
@@ -1918,14 +1683,14 @@ void register_CWars_Model_Panel_class(){
                 , ( bp::arg("code") ) );
         
         }
-        { //::CBaseModelPanel::OnMouseWheeled
+        { //::vgui::Panel::OnMouseWheeled
         
-            typedef void ( ::CBaseModelPanel::*OnMouseWheeled_function_type )( int ) ;
+            typedef void ( ::vgui::Panel::*OnMouseWheeled_function_type )( int ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnMouseWheeled_function_type )( int ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnMouseWheeled"
-                , OnMouseWheeled_function_type(&::CBaseModelPanel::OnMouseWheeled)
+                , OnMouseWheeled_function_type(&::vgui::Panel::OnMouseWheeled)
                 , default_OnMouseWheeled_function_type(&CWars_Model_Panel_wrapper::default_OnMouseWheeled)
                 , ( bp::arg("delta") ) );
         
@@ -1960,14 +1725,14 @@ void register_CWars_Model_Panel_class(){
                 , default_OnThink_function_type(&CWars_Model_Panel_wrapper::default_OnThink) );
         
         }
-        { //::CMDLPanel::OnTick
+        { //::vgui::Panel::OnTick
         
-            typedef void ( ::CMDLPanel::*OnTick_function_type )(  ) ;
+            typedef void ( ::vgui::Panel::*OnTick_function_type )(  ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_OnTick_function_type )(  ) ;
             
             CWars_Model_Panel_exposer.def( 
                 "OnTick"
-                , OnTick_function_type(&::CMDLPanel::OnTick)
+                , OnTick_function_type(&::vgui::Panel::OnTick)
                 , default_OnTick_function_type(&CWars_Model_Panel_wrapper::default_OnTick) );
         
         }
@@ -1990,17 +1755,6 @@ void register_CWars_Model_Panel_class(){
                 "PaintTraverse"
                 , PaintTraverse_function_type( &CWars_Model_Panel_wrapper::PaintTraverse )
                 , ( bp::arg("Repaint"), bp::arg("allowForce")=(bool)(true) ) );
-        
-        }
-        { //::CBaseModelPanel::PerformLayout
-        
-            typedef void ( ::CBaseModelPanel::*PerformLayout_function_type )(  ) ;
-            typedef void ( CWars_Model_Panel_wrapper::*default_PerformLayout_function_type )(  ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "PerformLayout"
-                , PerformLayout_function_type(&::CBaseModelPanel::PerformLayout)
-                , default_PerformLayout_function_type(&CWars_Model_Panel_wrapper::default_PerformLayout) );
         
         }
         { //::vgui::Panel::PostChildPaint
@@ -2302,16 +2056,6 @@ void register_CWars_Model_Panel_class(){
                 , SetVisible_function_type(&::vgui::Panel::SetVisible)
                 , default_SetVisible_function_type(&CWars_Model_Panel_wrapper::default_SetVisible)
                 , ( bp::arg("state") ) );
-        
-        }
-        { //::CPotteryWheelPanel::WarpMouse
-        
-            typedef bool ( CWars_Model_Panel_wrapper::*WarpMouse_function_type )( int &,int & ) ;
-            
-            CWars_Model_Panel_exposer.def( 
-                "WarpMouse"
-                , WarpMouse_function_type( &CWars_Model_Panel_wrapper::WarpMouse )
-                , ( bp::arg("x"), bp::arg("y") ) );
         
         }
         CWars_Model_Panel_exposer.staticmethod( "GetPanelBaseClassName" );

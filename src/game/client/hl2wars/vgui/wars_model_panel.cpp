@@ -23,10 +23,10 @@ ConVar asw_rim_outerCone( "asw_rim_outerCone" , "30.0" , FCVAR_NONE );
 ConVar asw_key_range( "asw_key_range" , "0" , FCVAR_NONE );
 ConVar asw_rim_range( "asw_rim_range" , "0" , FCVAR_NONE );
 
-CWars_Model_Panel::CWars_Model_Panel( vgui::Panel *parent, const char *name ) : CBaseModelPanel( parent, name )
+CWars_Model_Panel::CWars_Model_Panel( vgui::Panel *parent, const char *name ) : BaseClass( parent, name )
 {
-	m_bShouldPaint = true;
-	m_pStudioHdr = NULL;
+	//m_bShouldPaint = true;
+	//m_pStudioHdr = NULL;
 }
 
 CWars_Model_Panel::~CWars_Model_Panel()
@@ -39,6 +39,7 @@ void CWars_Model_Panel::Paint()
 {
 	CMatRenderContextPtr pRenderContext( materials );
 
+#if 0
 	// Turn off depth-write to dest alpha so that we get white there instead.  The code that uses
 	// the render target needs a mask of where stuff was rendered.
 	pRenderContext->SetIntRenderingParameter( INT_RENDERPARM_WRITE_DEPTH_TO_DESTALPHA, false );
@@ -50,10 +51,12 @@ void CWars_Model_Panel::Paint()
 	{
 		BaseClass::Paint();
 	}
+#endif // 0
 
 	pRenderContext.SafeRelease();
 }
 
+#if 0
 void CWars_Model_Panel::SetupCustomLights( Color cAmbient, Color cKey, float fKeyBoost, Color cRim, float fRimBoost )
 {
 	memset( &m_LightingState, 0, sizeof(MaterialLightingState_t) );
@@ -391,3 +394,4 @@ void CWars_Model_Panel::LookAtBounds( const Vector &vecBoundsMin, const Vector &
 	SetCameraOffset( Vector( 0.0f, -vecCameraOffset.x, -vecCameraOffset.y ) );
 	UpdateCameraTransform();
 }
+#endif // 0

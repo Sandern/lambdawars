@@ -12,15 +12,16 @@ class CStudioHdr;
 //-----------------------------------------------------------------------------
 // Base class for all Alien Swarm model panels
 //-----------------------------------------------------------------------------
-class CWars_Model_Panel : public CBaseModelPanel
+class CWars_Model_Panel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CWars_Model_Panel, CBaseModelPanel );
+	DECLARE_CLASS_SIMPLE( CWars_Model_Panel, vgui::EditablePanel );
 public:
 	CWars_Model_Panel( vgui::Panel *parent, const char *name );
 	virtual ~CWars_Model_Panel();
 
 	virtual void Paint();
 
+#if 0
 	// function to set up scene sets
 	void SetupCustomLights( Color cAmbient, Color cKey, float fKeyBoost, Color cRim, float fRimBoost );
 
@@ -50,6 +51,7 @@ protected:
 
 private:
 	CStudioHdr* m_pStudioHdr;
+#endif // 0
 };
 
 

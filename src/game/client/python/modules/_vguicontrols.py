@@ -46,9 +46,9 @@ class VGUIControls(ClientModuleGenerator):
         'hl2wars/hl2wars_baseminimap.h',
         'hl2wars/vgui_video_general.h',
         
-        'matsys_controls/mdlpanel.h',
-        'matsys_controls/potterywheelpanel.h',
-        'game_controls/basemodel_panel.h',
+        #'matsys_controls/mdlpanel.h',
+        #'matsys_controls/potterywheelpanel.h',
+        #'game_controls/basemodel_panel.h',
         #'game_controls/basemodelpanel.h',
         'hl2wars/vgui/wars_model_panel.h',
     ] )
@@ -63,9 +63,9 @@ class VGUIControls(ClientModuleGenerator):
                         'RichText',
                         'CBaseMinimap',
                         'VideoGeneralPanel',
-                        'CPotteryWheelPanel',
-                        'CMDLPanel',
-                        'CBaseModelPanel',
+                        #'CPotteryWheelPanel',
+                        #'CMDLPanel',
+                        #'CBaseModelPanel',
                         'CWars_Model_Panel',
                         #'CModelPanel',
                      ]
@@ -812,12 +812,12 @@ class VGUIControls(ClientModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"BIK_NO_AUDIO\" ) = BIK_NO_AUDIO;" )
         
         # Model panels
-        cls = mb.class_('CPotteryWheelPanel')
-        cls.add_wrapper_code( 'private:\nvirtual void OnPaint3D() {}' )
-        cls = mb.class_('CMDLPanel')
-        cls = mb.class_('CBaseModelPanel')
-        mb.mem_funs('GetLightProbeCubemap').exclude()
-        mb.mem_funs('Select').exclude()
+        #cls = mb.class_('CPotteryWheelPanel')
+        #cls.add_wrapper_code( 'private:\nvirtual void OnPaint3D() {}' )
+        #cls = mb.class_('CMDLPanel')
+        #cls = mb.class_('CBaseModelPanel')
+        #mb.mem_funs('GetLightProbeCubemap').exclude()
+        #mb.mem_funs('Select').exclude()
         
     def Parse(self, mb):
         # Exclude everything by default
