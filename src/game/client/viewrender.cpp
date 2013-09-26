@@ -1593,6 +1593,10 @@ void CViewRender::ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxV
 		ViewDrawGBuffer( view, bDrew3dSkybox, nSkyboxVisible, bDrawViewModel );
 
 		PerformLighting( view );
+
+#ifdef SHADER_EDITOR
+		g_ShaderEditorSystem->UpdateSkymask( bDrew3dSkybox );
+#endif // SHADER_EDITOR
 	}
 #endif // DEFERRED_ENABLED
 
@@ -1633,6 +1637,13 @@ void CViewRender::ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxV
 	ParticleMgr()->IncrementFrameCode();
 
 	DrawWorldAndEntities( drawSkybox, view, nClearFlags, pCustomVisibility );
+
+#ifdef DEFERRED_ENABLED
+	if( bDeferredActive )
+	{
+		GetLightingManager()->RenderVolumetrics( view );
+	}
+#endif // DEFERRED_ENABLED
 
 	// Disable fog for the rest of the stuff
 	DisableFog();

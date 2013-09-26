@@ -1867,6 +1867,9 @@
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp">
       <Filter>Source Files\deferred\shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\dota.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
