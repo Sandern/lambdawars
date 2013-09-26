@@ -20,14 +20,15 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar max_muzzleflash_dlights( "wars_muzzleflash_max_lights", "5" );
+ConVar max_muzzleflash_dlights( "wars_muzzleflash_max_lights", "0" );
 ConVar wars_muzzleflash_radius( "wars_muzzleflash_radius", "320" );
 ConVar wars_muzzleflash_intensity( "wars_muzzleflash_intensity", "0.8" );
+ConVar wars_muzzleflash_shadow( "wars_muzzleflash_shadow", "1" );
 
 #ifdef DEFERRED_ENABLED
 void DoDeferredMuzzleFlash( const Vector &vOrigin )
 {
-	if( GetLightingManager()->CountTempLights() > max_muzzleflash_dlights.GetInt() )
+	if( GetLightingManager()->CountTempLights() >= max_muzzleflash_dlights.GetInt() )
 		return;
 
 	def_light_temp_t *l = new def_light_temp_t( false, 0.1f );
@@ -48,7 +49,8 @@ void DoDeferredMuzzleFlash( const Vector &vOrigin )
 
 	l->iFlags >>= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
 	l->iFlags <<= DEFLIGHTGLOBAL_FLAGS_MAX_SHARED_BITS;
-	l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
+	if( wars_muzzleflash_shadow.GetBool() )
+		l->iFlags |= DEFLIGHT_SHADOW_ENABLED;
 
 	GetLightingManager()->AddTempLight( l );
 }
