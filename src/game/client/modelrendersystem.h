@@ -17,6 +17,7 @@
 
 #include "clientleafsystem.h"
 
+#define USE_RENDERDATA_CACHE
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -60,6 +61,10 @@ public:
 	virtual void CleanupTranslucentTempData( TranslucentTempData_t *pTempData ) = 0;
 
 	virtual IMaterial *GetFastPathColorMaterial() = 0;
+
+#ifdef USE_RENDERDATA_CACHE
+	virtual void CleanupRenderData() = 0;
+#endif //USE_RENDERDATA_CACHE
 };
 
 

@@ -3584,7 +3584,9 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 	ParticleUsageDemo();
 #endif
 
-
+#ifdef USE_RENDERDATA_CACHE
+	g_pModelRenderSystem->CleanupRenderData();
+#endif // USE_RENDERDATA_CACHE
 }
 
 //-----------------------------------------------------------------------------
