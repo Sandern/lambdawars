@@ -638,7 +638,7 @@ void CFogOfWarMgr::AllocateFogOfWar()
 	if( sv_fogofwar_tilesize.GetInt() == m_nTileSize )
 		return;
 
-	Msg("Allocating Fog of War with tilesize %d\n", sv_fogofwar_tilesize.GetInt());
+	DevMsg ("Allocating Fog of War with tilesize %d\n", sv_fogofwar_tilesize.GetInt() );
 
 	DeallocateFogOfWar();
 
