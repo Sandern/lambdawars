@@ -292,7 +292,8 @@ void PostProcessDota2( const char *pPath )
 }
 #endif // 0
 
-#if 1
+#ifndef CLIENT_DLL
+#if 0
 CON_COMMAND_F( test_open_file, "", FCVAR_CHEAT)
 {
 	char path[_MAX_PATH];
@@ -308,6 +309,7 @@ CON_COMMAND_F( test_open_file, "", FCVAR_CHEAT)
 	filesystem->Close(f);
 }
 #endif // 0
+#endif // CLIENT_DLL
 
 #if 0
 #ifdef CLIENT_DLL
