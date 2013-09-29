@@ -17,7 +17,10 @@
 
 #include "clientleafsystem.h"
 
-#define USE_RENDERDATA_CACHE
+// Experimental: caches the mat render data and reuses when possible
+// Useful for deferred mode, where we end up rendering the same thing over and over again
+// Can also prevent a crash with "out of render data memory"
+//#define USE_RENDERDATA_CACHE
 
 //-----------------------------------------------------------------------------
 // Forward declarations
