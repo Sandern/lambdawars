@@ -38,6 +38,9 @@ struct wrap_model_t
     model_t *pModel;
 };
 
+// For event queue
+extern void ServiceEventQueue( void );
+
 //-----------------------------------------------------------------------------
 // Purpose: Python function for deleting a directory
 //-----------------------------------------------------------------------------

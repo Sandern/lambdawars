@@ -6749,6 +6749,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PyShutdownConVar
+    
+        typedef bool ( *PyShutdownConVar_function_type )( char const * );
+        
+        bp::def( 
+            "PyShutdownConVar"
+            , PyShutdownConVar_function_type( &::PyShutdownConVar )
+            , ( bp::arg("pName") ) );
+    
+    }
+
     bp::scope().attr( "engine" ) = boost::ref(pyengine);
 
     bp::scope().attr( "modelinfo" ) = boost::ref(pymodelinfo);
@@ -6807,14 +6818,13 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
     bp::scope().attr( "FCVAR_CLIENTCMD_CAN_EXECUTE" ) = (int)FCVAR_CLIENTCMD_CAN_EXECUTE;
 
-    { //::PyShutdownConVar
+    { //::ServiceEventQueue
     
-        typedef bool ( *PyShutdownConVar_function_type )( char const * );
+        typedef void ( *ServiceEventQueue_function_type )(  );
         
         bp::def( 
-            "PyShutdownConVar"
-            , PyShutdownConVar_function_type( &::PyShutdownConVar )
-            , ( bp::arg("pName") ) );
+            "ServiceEventQueue"
+            , ServiceEventQueue_function_type( &::ServiceEventQueue ) );
     
     }
 }

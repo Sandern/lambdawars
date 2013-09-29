@@ -356,6 +356,9 @@ class GameInterface(SemiSharedModuleGenerator):
             cls.include()
             cls.mem_fun('GetCollideable').exclude()
             
+            # Event queue
+            mb.free_function('ServiceEventQueue').include()
+            
         # model_t
         cls = mb.class_('wrap_model_t')
         cls.include()
