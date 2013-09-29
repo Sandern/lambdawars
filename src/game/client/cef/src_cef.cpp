@@ -155,6 +155,13 @@ bool CCefSystem::Init()
 	char browser_subprocess_path[_MAX_PATH];
 	filesystem->RelativePathToFullPath( "bin/cef.exe", "MOD", browser_subprocess_path, _MAX_PATH );
 
+	// The process sub process file should exist. Error out, because otherwise we can't display the main menu
+	if( filesystem->FileExists( browser_subprocess_path ) == false )
+	{
+		Error( "Could not locate %s\n", browser_subprocess_path );
+		return false;
+	}
+
 	// Find and set the main window
 	EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
 

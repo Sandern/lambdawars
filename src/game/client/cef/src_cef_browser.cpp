@@ -373,8 +373,11 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
     // Creat the new child browser window
 	if( g_debug_cef.GetBool() )
 		DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
-	CefBrowserHost::CreateBrowser(info, m_CefClientHandler,
-		m_URL, settings);
+	
+	if( !CefBrowserHost::CreateBrowser(info, m_CefClientHandler, m_URL, settings) )
+	{
+		Warning(" Failed to create CEF browser %s\n", name );
+	}
 }
 
 //-----------------------------------------------------------------------------
