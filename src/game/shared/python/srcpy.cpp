@@ -279,9 +279,16 @@ bool CSrcPython::InitInterpreter( void )
 	V_FixupPathName(buf, MAX_PATH, buf);
 	V_strcat( pythonpath, buf, MAX_PATH );
 	V_strcat( pythonpath, ";", MAX_PATH );
+
+#ifdef CLIENT_DLL
+	filesystem->RelativePathToFullPath("python/Lib/ClientDLLs", "MOD", buf, _MAX_PATH);
+	V_FixupPathName(buf, MAX_PATH, buf);
+	V_strcat( pythonpath, buf, MAX_PATH );
+#else
 	filesystem->RelativePathToFullPath("python/Lib/DLLs", "MOD", buf, _MAX_PATH);
 	V_FixupPathName(buf, MAX_PATH, buf);
 	V_strcat( pythonpath, buf, MAX_PATH );
+#endif // CLIENT_DLL
 
 #ifdef WIN32
 	::SetEnvironmentVariable( "PYTHONPATH", pythonpath );
