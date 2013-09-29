@@ -1870,6 +1870,9 @@
     <ClCompile Include="..\shared\hl2wars\dota.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\wars_flora.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3659,6 +3662,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\deferred\ssemath_ext.h">
       <Filter>Source Files\deferred\shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\hl2wars\wars_flora.h">
+      <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

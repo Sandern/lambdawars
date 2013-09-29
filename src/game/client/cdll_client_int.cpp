@@ -148,8 +148,12 @@
 	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
+#ifdef HL2WARS_DLL
 #include "hl2wars/fowmgr.h"
-#include "wars_mount_system.h"
+#include "hl2wars/wars_mount_system.h"
+#include "hl2wars/wars_flora.h"
+#endif // HL2WARS_DLL
+
 #include "nav_mesh.h"
 
 #ifdef ENABLE_CEF
@@ -991,7 +995,9 @@ bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 	IGameSystem::Add( GetPredictionCopyTester() );
 #endif
 
+#ifdef HL2WARS_DLL
 	IGameSystem::Add( FogOfWarMgr() );
+#endif // HL2WARS_DLL
 #ifdef ENABLE_PYTHON
 	IGameSystem::Add( SrcPySystem() );
 #endif // ENABLE_PYTHON
@@ -1966,6 +1972,10 @@ void CHLClient::LevelInitPostEntity( )
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( hh );
 		GetCenterPrint()->Clear();
 	}
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::SpawnMapFlora();
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -2988,7 +2998,9 @@ void CHLClient::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 	// Tell split screen system
 	VGui_OnScreenSizeChanged();
 
+#ifdef HL2WARS_DLL
 	FogOfWarMgr()->OnResolutionChanged();
+#endif // HL2WARS_DLL
 
 #ifdef ENABLE_CEF
 	CEFSystem().OnScreenSizeChanged( nOldWidth, nOldHeight );
