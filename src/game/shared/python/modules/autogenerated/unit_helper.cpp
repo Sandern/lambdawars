@@ -4721,6 +4721,24 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , CountSeenOther_function_type( &::UnitBaseSense::CountSeenOther ) );
         
         }
+        { //::UnitBaseSense::Disable
+        
+            typedef void ( ::UnitBaseSense::*Disable_function_type )(  ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "Disable"
+                , Disable_function_type( &::UnitBaseSense::Disable ) );
+        
+        }
+        { //::UnitBaseSense::Enable
+        
+            typedef void ( ::UnitBaseSense::*Enable_function_type )(  ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "Enable"
+                , Enable_function_type( &::UnitBaseSense::Enable ) );
+        
+        }
         { //::UnitBaseSense::ForcePerformSensing
         
             typedef void ( ::UnitBaseSense::*ForcePerformSensing_function_type )(  ) ;
@@ -4768,6 +4786,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "GetNearestOther"
                 , GetNearestOther_function_type( &::UnitBaseSense::GetNearestOther )
                 , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::UnitBaseSense::IsEnabled
+        
+            typedef bool ( ::UnitBaseSense::*IsEnabled_function_type )(  ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "IsEnabled"
+                , IsEnabled_function_type( &::UnitBaseSense::IsEnabled ) );
         
         }
         { //::UnitBaseSense::Look

@@ -23,6 +23,10 @@ public:
 	UnitBaseSense( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
+	void Enable();
+	void Disable();
+	bool IsEnabled();
+
 	void PerformSensing();
 	void ForcePerformSensing();
 	void Look( int iDistance );
@@ -69,6 +73,8 @@ public:
 	float m_fSenseRate;
 
 private:
+	bool m_bEnabled;
+
 	struct SeenObject_t {
 		EHANDLE entity;
 		float distancesqr;
@@ -98,6 +104,21 @@ private:
 };
 
 // Inlines
+inline void UnitBaseSense::Enable()
+{
+	m_bEnabled = true;
+}
+
+inline void UnitBaseSense::Disable()
+{
+	m_bEnabled = false;
+}
+
+inline bool UnitBaseSense::IsEnabled()
+{
+	return m_bEnabled;
+}
+
 inline void UnitBaseSense::SetUseLimitedViewCone( bool bUseCone )
 {
 	m_bUseLimitedViewCone = bUseCone;

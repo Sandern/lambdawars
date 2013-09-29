@@ -18,7 +18,7 @@
 #ifdef ENABLE_PYTHON
 UnitBaseSense::UnitBaseSense( boost::python::object outer ) : 
 	UnitComponent(outer), m_fSenseDistance(-1), m_bUseLimitedViewCone(false), 
-	m_fSenseRate(0.4f), m_fNextSenseTime(0.0f), m_bTestLOS(false)
+	m_fSenseRate(0.4f), m_fNextSenseTime(0.0f), m_bTestLOS(false), m_bEnabled(true)
 {
 	m_SeenEnemies.EnsureCapacity(512);
 	m_SeenOther.EnsureCapacity(512);
@@ -123,6 +123,10 @@ int UnitBaseSense::LookForUnits( int iDistance )
 
 	m_SeenEnemies.RemoveAll();
 	m_SeenOther.RemoveAll();
+
+	// Don't do any sensing if we are disabled; just empty the lists
+	if( !m_bEnabled )
+		return CountSeen();
 
 	const Vector &origin = GetOuter()->GetAbsOrigin();
 	distSqr = iDistance * iDistance;
