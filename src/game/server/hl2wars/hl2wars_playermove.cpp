@@ -136,14 +136,6 @@ void CHL2WarsPlayerMove::RunCommand( CBasePlayer *player, CUserCmd *ucmd, IMoveH
 
 	//CommentarySystem_PePlayerRunCommand( player, ucmd );
 
-	// Do weapon selection
-	/*if ( ucmd->weaponselect != 0 )
-	{
-		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >( CBaseEntity::Instance( ucmd->weaponselect ) );
-		if (weapon)
-			pWarsPlayer->ASWSelectWeapon(weapon, 0); // ucmd->weaponsubtype);  // infested - subtype var used for sending marine profile index instead
-	}*/
-
 	IServerVehicle *pVehicle = player->GetVehicle();
 
 	// Latch in impulse.
@@ -220,7 +212,6 @@ void CHL2WarsPlayerMove::RunCommand( CBasePlayer *player, CUserCmd *ucmd, IMoveH
 	//lagcompensation->FinishLagCompensation( player );
 
 	// let the player drive marine movement here
-	//pWarsPlayer->DriveMarineMovement( ucmd, moveHelper );
 	if( pWarsPlayer->GetControlledUnit() )
 		pWarsPlayer->GetControlledUnit()->GetIUnit()->UserCmd( ucmd );
 

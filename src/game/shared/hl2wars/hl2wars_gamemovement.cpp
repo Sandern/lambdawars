@@ -168,6 +168,12 @@ const Vector& CHL2WarsGameMovement::GetPlayerMaxs( void ) const
 //-----------------------------------------------------------------------------
 bool CHL2WarsGameMovement::CanAccelerate()
 {
+	// Observers are dead, but should still be able to accelerate
+	if ( player->IsObserver() )
+	{
+		return true;
+	}
+
 	if( player->GetMoveType() != MOVETYPE_STRATEGIC )
 	{
 		return CGameMovement::CanAccelerate();
@@ -213,6 +219,9 @@ void CHL2WarsGameMovement::PlayerMove()
 	StrategicPlayerMove();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsGameMovement::CheckParameters( void )
 {
 	// Other movetype than strategic? use base class
@@ -489,6 +498,9 @@ inline void CHL2WarsGameMovement::TracePlayerBBox( const Vector& start, const Ve
 	enginetrace->TraceRay( ray, fMask, &traceFilter, &pm );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CBaseHandle CHL2WarsGameMovement::TestPlayerPosition( const Vector& pos, int collisionGroup, trace_t& pm )
 {
 	if( player->GetMoveType() != MOVETYPE_STRATEGIC )

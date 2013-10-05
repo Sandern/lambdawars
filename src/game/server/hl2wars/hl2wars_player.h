@@ -55,6 +55,7 @@ public:
 	inline void						RemoveHudHiddenBits( int bits ) { m_Local.m_iHideHUD &= ~bits; } 
 
 	void							SetStrategicMode( bool state );
+	virtual void					NoClipStateChanged( void );
 
 	virtual const char *			GetDefaultFaction( void ) { return "rebels"; }
 

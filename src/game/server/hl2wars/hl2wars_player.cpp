@@ -484,7 +484,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 
 		ChangeTeam( TEAM_SPECTATOR );
 		SetOwnerNumber( 0 );
-		//SetObserverMode( OBS_MODE_ROAMING );
+		SetObserverMode( OBS_MODE_ROAMING );
 		//m_afPhysicsFlags |= PFLAG_OBSERVER;
 		//SetMoveType( MOVETYPE_STRATEGIC );
 
@@ -567,6 +567,7 @@ void CHL2WarsPlayer::SetStrategicMode( bool state )
 
 	if( state )
 	{
+		RemoveEFlags( EFL_NOCLIP_ACTIVE ); // Might come from noclip mode
 		SetMoveType( MOVETYPE_STRATEGIC );
 		AddEffects( EF_NODRAW );
 		m_Local.m_iHideHUD &= ~HIDEHUD_STRATEGIC;
@@ -582,11 +583,12 @@ void CHL2WarsPlayer::SetStrategicMode( bool state )
 		//m_afPhysicsFlags |= PFLAG_OBSERVER;
 		RemoveFlag( FL_DUCKING );
 		AddSolidFlags( FSOLID_NOT_SOLID );
-		RemoveFOWFlags(FOWFLAG_ALL_MASK);
+		//RemoveFOWFlags(FOWFLAG_ALL_MASK);
 	}
 	else
 	{
-		SetMoveType( MOVETYPE_WALK );
+		if( GetMoveType() == MOVETYPE_STRATEGIC )
+			SetMoveType( MOVETYPE_WALK );
 		RemoveEffects( EF_NODRAW );
 		m_Local.m_iHideHUD &= ~HIDEHUD_CROSSHAIR;
 		m_Local.m_iHideHUD |= HIDEHUD_STRATEGIC;
@@ -595,8 +597,19 @@ void CHL2WarsPlayer::SetStrategicMode( bool state )
 		SetCollisionGroup( COLLISION_GROUP_PLAYER );// normal collision for player
 		RemoveSolidFlags( FSOLID_NOT_SOLID );
 		//m_afPhysicsFlags &= ~PFLAG_OBSERVER;
-		AddFOWFlags(FOWFLAG_UNITS_MASK);
+		//AddFOWFlags(FOWFLAG_UNITS_MASK);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CHL2WarsPlayer::NoClipStateChanged( void )
+{
+	BaseClass::NoClipStateChanged();
+
+	if( GetMoveType() != MOVETYPE_STRATEGIC )
+		SetStrategicMode( false );
 }
 
 //-----------------------------------------------------------------------------
