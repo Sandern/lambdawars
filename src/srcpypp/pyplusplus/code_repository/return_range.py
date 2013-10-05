@@ -54,12 +54,20 @@ struct return_raw_data_ref
                     typedef typename boost::remove_pointer< T >::type value_type;
                     typedef typename boost::remove_const< value_type >::type non_const_value_type;
                     non_const_value_type* data = const_cast<non_const_value_type*>( return_value );
+#ifdef Py_CAPSULE_H
+                    return PyCapsule_New((void*)data, "pypp._C_API_", NULL);
+#else
                     return PyCObject_FromVoidPtr( data, NULL );
+#endif
                 }
             }
 
             static PyTypeObject const * get_pytype(){
+#ifdef Py_CAPSULE_H
+                return &PyCapsule_Type;
+#else
                 return &PyCObject_Type;
+#endif
             }
         };
     };
@@ -87,10 +95,17 @@ public:
         if( result == bpl::detail::none() ){
             return result;
         }
+#ifdef Py_CAPSULE_H
+        if( !PyCapsule_CheckExact( result ) ){
+            throw std::runtime_error( "Internal error: expected to get PyCapsule" );
+        }
+        value_type* raw_data = reinterpret_cast<value_type*>( PyCapsule_GetPointer( result, "pypp._C_API_" ) );
+#else
         if( !PyCObject_Check( result ) ){
             throw std::runtime_error( "Internal error: expected to get PyCObject" );
         }
         value_type* raw_data = reinterpret_cast<value_type*>( PyCObject_AsVoidPtr( result ) );
+#endif
         Py_DECREF(result);//we don't need result anymore
 
         bpl::tuple args_w( bpl::handle<>( bpl::borrowed( args ) ) );

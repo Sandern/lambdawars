@@ -30,6 +30,10 @@ def remove_ref_or_ptr( type_ ):
     else:
         raise TypeError( 'Type should be reference or pointer, got %s.' % type_ )
 
+def add_refop_if_ptr( type_, var ):
+    if declarations.is_pointer( type_ ):
+        return '&%s' % ( var )
+    return var
 
 # output_t
 class output_t( transformer.transformer_t ):
@@ -70,7 +74,7 @@ class output_t( transformer.transformer_t ):
         #declaring new variable, which will keep result
         var_name = controller.declare_variable( remove_ref_or_ptr( self.arg.type ), self.arg.name )
         #adding just declared variable to the original function call expression
-        controller.modify_arg_expression( self.arg_index, var_name )
+        controller.modify_arg_expression( self.arg_index, add_refop_if_ptr( self.arg.type, var_name ) )
         #adding the variable to return variables list
         controller.return_variable( var_name )
 

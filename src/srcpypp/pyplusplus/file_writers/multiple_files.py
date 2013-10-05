@@ -180,7 +180,7 @@ class multiple_files_t(writer.writer_t):
             else:# user header file - always include
                 answer.append( include_cc.create() )
 
-        for used_header in self.get_user_headers( creators ):
+        for user_header in self.get_user_headers( creators ):
             answer.append( '#include "%s"' % user_header )
 
         for creator in creators:
