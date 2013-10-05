@@ -163,47 +163,31 @@ class SemiSharedModuleGenerator(SourceModuleGenerator):
     client_huge_classes = None
     server_huge_classes = None
     
-    clientfiles = []
-    serverfiles = []
-    
-    def GetFiles(self):
-        # TODO: Remove
-        if self.isclient:
-            allfiles = self.clientfiles + self.files
-        else:
-            allfiles = self.serverfiles + self.files 
-        
-        files = []
-        for filename in allfiles:
-            if not filename:
-                continue
-            if filename.startswith('#'):
-                if self.isserver:
-                    files.append(filename[1:])
-            elif filename.startswith('$'):
-                if self.isclient:
-                    files.append(filename[1:])
-            else:
-                files.append(filename)
-        return files
-    
     # Main method
     def Run(self):
+        # Parse client side of module
         self.isclient = True
         self.isserver = False
-        mb_client = self.CreateBuilder(self.GetFiles())
+        mb_client = self.CreateBuilder(*self.GetFiles())
         self.Parse(mb_client)
+        
+        # Parse server side of module
         self.isclient = False
         self.isserver = True
-        mb_server = self.CreateBuilder(self.GetFiles())
+        mb_server = self.CreateBuilder(*self.GetFiles())
         self.Parse(mb_server)
+        
+        # Output files
         self.FinalOutput(mb_client, mb_server)
         
     # Create builder
-    def CreateBuilder(self, files):
+    def CreateBuilder(self, files, parseonlyfiles):
         if self.isclient:
-            return src_module_builder_t(files, is_client=True)   
-        return src_module_builder_t(files, is_client=False)   
+            mb = src_module_builder_t(files, is_client=True)
+        else:
+            mb = src_module_builder_t(files, is_client=False)
+        mb.parseonlyfiles = parseonlyfiles
+        return mb
         
     def GenerateContent(self, mb):
         return mb.get_module()

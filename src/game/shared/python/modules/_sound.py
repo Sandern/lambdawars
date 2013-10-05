@@ -1,7 +1,4 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
-import settings
-
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
@@ -10,34 +7,15 @@ from pygccxml.declarations import matchers
 class Sound(SemiSharedModuleGenerator):
     module_name = '_sound'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-    
-    server_files = []
-    
     files = [
-        'wchar.h'
-        , 'string_t.h'
-        , 'cbase.h'
-        , 'shareddefs.h'
-        , 'srcpy_sound.h'
-        , 'soundflags.h'
+		'$%videocfg/videocfg.h',
+        'wchar.h',
+        'string_t.h',
+        'cbase.h',
+        'shareddefs.h',
+        'srcpy_sound.h',
+        'soundflags.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
-
-    def ParseClient(self, mb):
-        pass
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -47,7 +25,7 @@ class Sound(SemiSharedModuleGenerator):
         mb.class_('PyEngineSound').include()
         mb.class_('PyEngineSound').rename('EngineSound')
         
-        # HAX: Stupid hax to make py++ generate it in the order I WANT. soundengine should follow after PyEngineSound!
+        # soundengine should follow after PyEngineSound!
         mb.class_('PyEngineSound').add_registration_code( "}bp::scope().attr( \"soundengine\" ) = boost::ref(pysoundengine);{", False )   
         
         # EmitSound_t
@@ -95,8 +73,6 @@ class Sound(SemiSharedModuleGenerator):
         # Remove any protected function 
         mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
-        # Disable shared warnings
-        DisableKnownWarnings(mb)
         
     def AddAdditionalCode(self, mb):
         super(Sound, self).AddAdditionalCode(mb)

@@ -8,13 +8,13 @@ class Steam(SemiSharedModuleGenerator):
     module_name = 'steam'
     
     files = [
-        'videocfg/videocfg.h',
+        '$%videocfg/videocfg.h',
 
         'cbase.h',
-        'steam\steam_api.h',
-        'steam\isteamfriends.h',
-        'steam\isteamutils.h',
-        'steam\steamclientpublic.h',
+        'steam/steam_api.h',
+        'steam/isteamfriends.h',
+        'steam/isteamutils.h',
+        'steam/steamclientpublic.h',
         
         '$vgui_avatarimage.h',
     ]

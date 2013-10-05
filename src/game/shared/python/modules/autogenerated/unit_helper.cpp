@@ -2,13 +2,7 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
-
-#include "c_baseplayer.h"
-
-#include "c_unit_base.h"
 
 #include "unit_base_shared.h"
 
@@ -19,6 +13,10 @@
 #include "unit_airlocomotion.h"
 
 #include "unit_animstate.h"
+
+#include "c_baseplayer.h"
+
+#include "c_unit_base.h"
 
 #include "srcpy.h"
 
@@ -1706,6 +1704,16 @@ BOOST_PYTHON_MODULE(unit_helper){
 #else
 #include "cbase.h"
 
+#include "unit_base_shared.h"
+
+#include "unit_component.h"
+
+#include "unit_locomotion.h"
+
+#include "unit_airlocomotion.h"
+
+#include "unit_animstate.h"
+
 #include "player.h"
 
 #include "unit_expresser.h"
@@ -1719,16 +1727,6 @@ BOOST_PYTHON_MODULE(unit_helper){
 #include "unit_sense.h"
 
 #include "unit_base.h"
-
-#include "unit_base_shared.h"
-
-#include "unit_component.h"
-
-#include "unit_locomotion.h"
-
-#include "unit_airlocomotion.h"
-
-#include "unit_animstate.h"
 
 #include "srcpy.h"
 

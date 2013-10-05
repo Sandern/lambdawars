@@ -7,19 +7,14 @@ from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers
 from pyplusplus.module_builder import call_policies
 
-#novguilib = False #settings.ASW_CODE_BASE 
 novguilib = settings.ASW_CODE_BASE 
 
 class VGUIControls(ClientModuleGenerator):
     module_name = '_vguicontrols'
     split = True
     
-    if settings.ASW_CODE_BASE:
-        files = ['videocfg/videocfg.h']
-    else:
-        files = ['wchartypes.h', 'shake.h']
-        
-    files.extend( [
+    files = [
+        'videocfg/videocfg.h',
         'cbase.h',
         
         'vgui_controls/Panel.h',
@@ -46,12 +41,8 @@ class VGUIControls(ClientModuleGenerator):
         'hl2wars/hl2wars_baseminimap.h',
         'hl2wars/vgui_video_general.h',
         
-        #'matsys_controls/mdlpanel.h',
-        #'matsys_controls/potterywheelpanel.h',
-        #'game_controls/basemodel_panel.h',
-        #'game_controls/basemodelpanel.h',
         'hl2wars/vgui/wars_model_panel.h',
-    ] )
+    ]
     
     panel_cls_list = [  'AnimationController', 
                         'Panel', 
@@ -63,12 +54,8 @@ class VGUIControls(ClientModuleGenerator):
                         'RichText',
                         'CBaseMinimap',
                         'VideoGeneralPanel',
-                        #'CPotteryWheelPanel',
-                        #'CMDLPanel',
-                        #'CBaseModelPanel',
                         'CWars_Model_Panel',
-                        #'CModelPanel',
-                     ]
+    ]
     
     def ParseImageClasses(self, mb):
         # IBorder
@@ -668,7 +655,7 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs( 'FindPanelAnimationEntry' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs( 'FindDropTargetPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.mem_funs( 'GetNavDown' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
             mb.mem_funs( 'GetNavDownPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
             mb.mem_funs( 'GetNavLeft' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
@@ -793,7 +780,7 @@ class VGUIControls(ClientModuleGenerator):
         )
 
         # RichText
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.mem_funs('GetScrollBar').exclude()
             
     def ParseMisc(self, mb):

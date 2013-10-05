@@ -4,8 +4,6 @@
 #ifdef CLIENT_DLL
 #include "__array_1.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "gamerules.h"
@@ -13,8 +11,6 @@
 #include "multiplay_gamerules.h"
 
 #include "teamplay_gamerules.h"
-
-#include "hl2wars_gamerules.h"
 
 #include "srcpy_gamerules.h"
 
@@ -2261,10 +2257,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , (void ( ::C_RecipientFilter::* )( ::Vector const & ) )( &::C_RecipientFilter::AddRecipientsByPVS )
             , ( bp::arg("origin") ) )    
         .def( 
-            "AddRecipientsByTeam"
-            , (void ( ::C_RecipientFilter::* )( ::C_Team * ) )( &::C_RecipientFilter::AddRecipientsByTeam )
-            , ( bp::arg("team") ) )    
-        .def( 
             "CopyFrom"
             , (void ( ::C_RecipientFilter::* )( ::C_RecipientFilter const & ) )( &::C_RecipientFilter::CopyFrom )
             , ( bp::arg("src") ) )    
@@ -2294,10 +2286,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "RemoveRecipient"
             , (void ( ::C_RecipientFilter::* )( ::C_BasePlayer * ) )( &::C_RecipientFilter::RemoveRecipient )
             , ( bp::arg("player") ) )    
-        .def( 
-            "RemoveRecipientsByTeam"
-            , (void ( ::C_RecipientFilter::* )( ::C_Team * ) )( &::C_RecipientFilter::RemoveRecipientsByTeam )
-            , ( bp::arg("team") ) )    
         .def( 
             "RemoveSplitScreenPlayers"
             , (void ( ::C_RecipientFilter::* )(  ) )( &::C_RecipientFilter::RemoveSplitScreenPlayers ) )    
@@ -3424,8 +3412,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
 #include "srcpy_usermessage.h"
 
-#include "hl2wars_gameinterface.h"
-
 #include "mapentities.h"
 
 #include "tier0/icommandline.h"
@@ -3439,6 +3425,8 @@ BOOST_PYTHON_MODULE(_gameinterface){
 #include "srcpy_gameinterface.h"
 
 #include "cdll_int.h"
+
+#include "hl2wars_gameinterface.h"
 
 #include "wars_mount_system.h"
 

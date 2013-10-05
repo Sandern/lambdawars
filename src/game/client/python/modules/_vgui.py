@@ -1,5 +1,4 @@
 from srcpy.module_generators import ClientModuleGenerator
-import settings
 
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
@@ -8,17 +7,8 @@ from pygccxml.declarations import matchers
 class VGUI(ClientModuleGenerator):
     module_name = '_vgui'
     
-    if settings.ASW_CODE_BASE:
-        files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-        
-    files.extend( [
+    files = [
+        'videocfg/videocfg.h',
         'cbase.h',
         
         'vgui_controls/Controls.h',
@@ -43,7 +33,7 @@ class VGUI(ClientModuleGenerator):
         'srcpy_hud.h',
         'hud.h',
         'hudelement.h',
-    ] )
+    ]
     
     def ParseInterfaces(self, mb):
         # ISchemeManager
@@ -57,7 +47,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs( 'GetIScheme' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )    
         #cls.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('GetSurface').exclude()
         
         # IScheme
@@ -66,7 +56,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual' 
         cls.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
 
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.class_('fontalias_t').exclude()
         
         # ILocalize
@@ -132,7 +122,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs( 'AdjustEngineViewport' ).add_transformation( FT.output('x'), FT.output('y'), FT.output('width'), FT.output('height') )
         cls.mem_funs( 'ActivateInGameVGuiContext' ).include()  # Not safe, but IClientMode should not be overridden.
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs( 'GetPanelFromViewport' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         
     def ParseISurface(self, mb):
@@ -145,7 +135,7 @@ class VGUI(ClientModuleGenerator):
         
         mb.enum('CursorCode').include()
         mb.enum('FontDrawType_t').include()
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.class_('FontVertex_t').include()
         else:
             mb.class_('Vertex_t').include()
@@ -173,7 +163,7 @@ class VGUI(ClientModuleGenerator):
         mb.free_function('GetHud').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
         
         cls.mem_funs( 'FindElement' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        if not settings.ASW_CODE_BASE: # ASW should use HudIcons() / CHudIcons
+        if not self.settings.ASW_CODE_BASE: # ASW should use HudIcons() / CHudIcons
             #cls.mem_funs( 'GetIcon' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object )
             #cls.mem_funs( 'AddUnsearchableHudIconToList' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object ) 
             #cls.mem_funs( 'AddSearchableHudIconToList' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object )
@@ -183,7 +173,7 @@ class VGUI(ClientModuleGenerator):
             cls.mem_funs( 'AddSearchableHudIconToList' ).call_policies = call_policies.return_internal_reference()
         cls.vars('m_HudList').exclude()
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('GetHudList').exclude()
             cls.mem_funs('GetHudPanelList').exclude()
             
@@ -202,7 +192,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs('GetNext').exclude()
 
         # HudIcons
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls = mb.class_('CHudIcons')
             cls.include()
             # FIXME

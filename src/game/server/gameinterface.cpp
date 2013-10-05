@@ -772,12 +772,18 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	MountExtraContent();
 
 #ifndef SWARMKEEPER_DLL
-	if ( !CommandLine()->CheckParm( "-noep2check") )
+	if ( !CommandLine()->CheckParm( "-noep2check" ) )
 	{
-		if( !steamapicontext || !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp(420) == false )
+		if( !steamapicontext || !steamapicontext->SteamApps() )
 		{
-			SrcShellExecute("steam://store/420");
-			Error("This mod requires Half-Life 2: Episode Two.");
+			Error( "Could not get steam api. Is Steam running?" );
+			return false;
+		}
+
+		if( !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp( 420 ) == false )
+		{
+			SrcShellExecute( "steam://store/420" );
+			Error( "This mod requires Half-Life 2: Episode Two." );
 			return false;
 		}
 	}

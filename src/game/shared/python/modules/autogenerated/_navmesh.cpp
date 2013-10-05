@@ -6,8 +6,6 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "srcpy_navmesh.h"

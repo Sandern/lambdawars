@@ -1,7 +1,5 @@
 # Module still needs a lot of cleaning up
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
-import settings
 
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
@@ -10,90 +8,208 @@ from pygccxml.declarations import matchers
 from pyplusplus import code_creators
 from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 
+from src_helper import HasArgType, AddWrapReg, AddWrapRegs, CreateEntityArg, AddNetworkVarProperty, DisableKnownWarnings
+
+# Templates for client and server class
+tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
+#if defined(_WIN32) // POSIX: TODO
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            return %(clsname)s::GetClientClass();
+#endif // _WIN32
+        ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
+        if( pClientClass )
+            return pClientClass;
+        return %(clsname)s::GetClientClass();
+    }
+'''
+
+tmpl_serverclass = '''virtual ServerClass* GetServerClass() {
+#if defined(_WIN32)
+#if defined(_DEBUG)
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+#elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetServerClass: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+#endif // _DEBUG/PY_CHECKTHREADID
+#endif // _WIN32
+#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetServerClass(  ) of Class: %(clsname)s\\n");
+#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
+        if( pServerClass )
+            return pServerClass;
+        return %(clsname)s::GetServerClass();
+    }
+'''
+
+# Templates for entities handles and converters
+tmpl_enthandle = '''{ //::%(handlename)s
+        typedef bp::class_< %(handlename)s, bp::bases< CBaseHandle > > %(handlename)s_exposer_t;
+        %(handlename)s_exposer_t %(handlename)s_exposer = %(handlename)s_exposer_t( "%(handlename)s", bp::init< >() );
+        %(handlename)s_exposer.def( bp::init< %(clsname)s * >(( bp::arg("pVal") )) );
+        %(handlename)s_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::%(handlename)s::GetAttr
+        
+            typedef bp::object ( ::%(handlename)s::*GetAttr_function_type )( const char * ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::%(handlename)s::GetAttr )
+            );
+        
+        }
+        { //::%(handlename)s::Cmp
+        
+            typedef bool ( ::%(handlename)s::*Cmp_function_type )( bp::object ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__cmp__"
+                , Cmp_function_type( &::%(handlename)s::Cmp )
+            );
+        
+        }
+        { //::%(handlename)s::NonZero
+        
+            typedef bool ( ::%(handlename)s::*NonZero_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__nonzero__"
+                , NonZero_function_type( &::%(handlename)s::NonZero )
+            );
+        
+        }
+        { //::%(handlename)s::Set
+        
+            typedef void ( ::%(handlename)s::*Set_function_type )( %(clsname)s * ) const;
+            
+            %(handlename)s_exposer.def( 
+                "Set"
+                , Set_function_type( &::%(handlename)s::Set )
+            );
+        
+        }
+        { //::%(handlename)s::GetSerialNumber
+        
+            typedef int ( ::%(handlename)s::*GetSerialNumber_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "GetSerialNumber"
+                , GetSerialNumber_function_type( &::%(handlename)s::GetSerialNumber )
+            );
+        
+        }
+        { //::%(handlename)s::GetEntryIndex
+        
+            typedef int ( ::%(handlename)s::*GetEntryIndex_function_type )(  ) const;
+            
+            %(handlename)s_exposer.def( 
+                "GetEntryIndex"
+                , GetEntryIndex_function_type( &::%(handlename)s::GetEntryIndex )
+            );
+        
+        }
+        %(handlename)s_exposer.def( bp::self != bp::self );
+        %(handlename)s_exposer.def( bp::self == bp::self );
+    }
+'''
+
+tmpl_ent_converters = '''
+struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
+{
+    static PyObject* convert(%(clsname)s *s)
+    {
+        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
+    }
+};
+
+struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s_to_handle>
+{
+    static PyObject* convert(const %(clsname)s &s)
+    {
+        return bp::incref(s.GetPyHandle().ptr());
+    }
+};
+
+struct %(convert_from_py_name)s
+{
+    handle_to_%(clsname)s()
+    {
+        bp::converter::registry::insert(
+            &extract_%(clsname)s, 
+            bp::type_id<%(clsname)s>()
+            );
+    }
+
+    static void* extract_%(clsname)s(PyObject* op){
+       CBaseHandle h = bp::extract<CBaseHandle>(op);
+       if( h.Get() == NULL )
+           return Py_None;
+       return h.Get();
+    }
+};
+'''
+
 class Entities(SemiSharedModuleGenerator):
     module_name = '_entities'
     split = True
     
+    # Includes
     files = [
-        'shared_classnames.h',
+        '$%videocfg/videocfg.h',
+        'cbase.h',
         'npcevent.h',
-        'studio.h',
         'srcpy_entities.h',
-        'isaverestore.h',
-        'saverestore.h',
-        'mapentities_shared.h',
-        'vcollide_parse.h',
-        'hl2wars_player_shared.h',
-        'imouse.h',
-        'props_shared.h',
-        'beam_shared.h',
-        'basecombatweapon_shared.h',
-        'wars_mapboundary.h',
-        'srcpy_util.h', # for PyRay_t
-    ]
-    
-    client_files = [
-            'videocfg/videocfg.h',
-            'cbase.h',
-            'takedamageinfo.h',
-            'c_baseanimating.h',
-            'c_baseanimatingoverlay.h',
-            'c_baseflex.h',
-            'c_basecombatcharacter.h',
-            'basegrenade_shared.h',
-            'c_baseplayer.h',
-            'c_hl2wars_player.h',
-            'unit_base_shared.h',
-            'wars_func_unit.h',
-            'c_playerresource.h',
-            'sprite.h',
-            'SpriteTrail.h',
-            'c_smoke_trail.h',
-            'c_wars_weapon.h',
-            'c_basetoggle.h',
-            'c_triggers.h',
-    ]
-
-    server_files = [
-        'cbase.h', 
-        'mathlib/vmatrix.h', 
-        'utlvector.h', 
-        'shareddefs.h', 
-        'util.h',
-
-        'takedamageinfo.h',
-        'baseanimating.h',
-        'BaseAnimatingOverlay.h',
-        'baseflex.h',
-        'basecombatcharacter.h',
+        'bone_setup.h',
         'basegrenade_shared.h',
-        'player.h',
-        'hl2wars_player.h',
-        'unit_base_shared.h',
-        'unit_sense.h',
-        'wars_func_unit.h',
-        'soundent.h',
-        'gib.h',
+        '$takedamageinfo.h',
+        '$c_ai_basenpc.h',
+        '#SkyCamera.h',
+        '#ai_basenpc.h',
+        '#modelentities.h',
+        '$c_basetoggle.h',
+        '#basetoggle.h',
+        '$c_triggers.h',
+        '#triggers.h',
+        '$soundinfo.h',
+        '#nav_area.h',
+        '#AI_Criteria.h',
+        'saverestore.h',
+        'vcollide_parse.h', # solid_t
+        '#iservervehicle.h',
+        '$iclientvehicle.h',
+        '%choreoscene.h',
+        '%choreoactor.h',
+        '$steam/steamclientpublic.h', # CSteamID
+        '$view_shared.h', # CViewSetup
+        '#spark.h',
+        '#physics_prop_ragdoll.h',
+        '#filters.h',
+        '#EntityFlame.h',
+        '#gib.h',
+        '$c_playerresource.h',
+        '#props.h',
+        
         'Sprite.h',
         'SpriteTrail.h',
-        'smoke_trail.h',
-        'entityoutput.h',
-        'props.h',
-        'modelentities.h',    
-        'triggers.h',
-        'wars_weapon.h',
-        'spark.h',
-        'physics_prop_ragdoll.h',
-        'filters.h',
-        'EntityFlame.h',
-    ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
+        '$c_smoke_trail.h',
+        '#smoke_trail.h',
+        'beam_shared.h',
         
-    client_entities = [ 
+        # HL2Wars
+        '$c_hl2wars_player.h',
+        '#hl2wars_player.h',
+        'unit_base_shared.h',
+        'wars_func_unit.h',
+        'hl2wars_player_shared.h',
+        'wars_mapboundary.h',
+        'srcpy_util.h', # for PyRay_t
+        '$c_wars_weapon.h',
+        '#wars_weapon.h',
+    ]
+        
+    # List of entity classes want to have exposed
+    cliententities = [ 
         'C_BaseEntity', 
         'C_BaseAnimating', 
         'C_BaseAnimatingOverlay',  
@@ -119,7 +235,7 @@ class Entities(SemiSharedModuleGenerator):
         'C_BaseFuncMapBoundary',
     ]
     
-    server_entities = [ 
+    serverentities = [ 
         'CBaseEntity', 
         'CBaseAnimating', 
         'CBaseAnimatingOverlay', 
@@ -133,7 +249,7 @@ class Entities(SemiSharedModuleGenerator):
         'CGib',
         'CSprite',
         'CSpriteTrail',
-        'CBaseParticleEntity',
+        'CBaseParticleEntity', # Baseclass for SmokeTrail
         'SmokeTrail',
         'RocketTrail',
         'CBeam',
@@ -156,43 +272,79 @@ class Entities(SemiSharedModuleGenerator):
         'CEntityFlame',
     ]
     
-    def SetupProperty(self, mb, cls, pyname, gettername, settername):
-        mb.mem_funs(gettername).exclude()
-        mb.mem_funs(settername).exclude()
+    def AddEntityConverter(self, mb, clsname):
+        ''' Creates entities converters/handles for Python. '''
+        cls = mb.class_(clsname)
         
-        cls.add_property(pyname
-                         , cls.member_function(gettername)
-                         , cls.member_function(settername))
+        handlename = '%sHANDLE' % (clsname)
         
-    def SetupClassShared(self, mb, cls_name):
-        cls = mb.class_(cls_name)
+        ptr_convert_to_py_name = 'ptr_%s_to_handle' % (clsname)
+        convert_to_py_name = '%s_to_handle' % (clsname)
+        convert_from_py_name = 'handle_to_%s' % (clsname)
         
-        #IncludeEmptyClass(mb, cls_name)
+        # Add handle typedef
+        mb.add_declaration_code( 'typedef CEPyHandle< %s > %s;\r\n'% (clsname, handlename) )
+        
+        # Expose handle code
+        mb.add_registration_code( tmpl_enthandle % {'clsname' : clsname, 'handlename' : handlename}, True )
+        
+        # Add declaration code for converters
+        mb.add_declaration_code( tmpl_ent_converters % {
+            'clsname' : clsname,
+            'ptr_convert_to_py_name' : ptr_convert_to_py_name,
+            'convert_to_py_name' : convert_to_py_name,
+            'convert_from_py_name' : convert_from_py_name,
+        })
+        
+        # Add registration code
+        mb.add_registration_code( "%s();" % (ptr_convert_to_py_name) )
+        mb.add_registration_code( "%s();" % (convert_to_py_name) )
+        mb.add_registration_code( "%s();" % (convert_from_py_name) )
+        
+    # Parse methods
+    def SetupEntityClass(self, mb, clsname):
+        ''' This function is called for both exposed client and server entities and 
+            applies shared functionality. '''
+        cls = mb.class_(clsname)
+        
         cls.include()
-        cls.calldefs( matchers.access_type_matcher_t( 'protected' ), allow_empty=True ).exclude()
+        cls.calldefs(matchers.access_type_matcher_t('protected'), allow_empty=True).exclude()
         
-        # Be selective about we need to override
-        # DO NOT REMOVE. Some functions are not thread safe, which will cause runtime errors because we didn't setup python threadsafe (slower)
-        cls.mem_funs().virtuality = 'not virtual' 
+        # Be selective about what we need to override
+        # DO NOT REMOVE. Some functions are not thread safe, which will cause runtime errors because we did not setup python threadsafe (slower)
+        cls.mem_funs(allow_empty=True).virtuality = 'not virtual' 
 
         # Add converters + a python handle class
-        AddEntityConverter(mb, cls_name)    
-    
-    # Need to place this in GetClientClass, but this situation is difficult to fix. The particle system calls it from a different thread.
-    """
-                                    '    #if defined(_WIN32)\r\n' + \
-                                    '    #if defined(_DEBUG)\r\n' + \
-                                    '    Assert( GetCurrentThreadId() == g_hPythonThreadID );\r\n' + \
-                                    '    #elif defined(PY_CHECKTHREADID)\r\n' + \
-                                    '    if( GetCurrentThreadId() != g_hPythonThreadID )\r\n' + \
-                                    '        Error( "GetClientClass: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );\r\n' + \
-                                    '    #endif // _DEBUG/PY_CHECKTHREADID\r\n' + \
-                                    '    #endif // _WIN32\r\n' + \
-                                    '    #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)\r\n' + \
-                                    '    if( py_log_overrides.GetBool() )\r\n' + \
-                                    '        Msg("Calling GetClientClass(  ) of Class: %s\\n");\r\n' % (cls_name) + \
-                                    '    #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES\r\n' + \
-    """
+        self.AddEntityConverter(mb, clsname)  
+        
+        # Use by converters to check if a Python Object is attached
+        cls.add_wrapper_code(
+            'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
+        )
+        
+        # Test if the Entity class is setup right
+        try:
+            cls.mem_funs('CreatePyHandle').exclude() # Use GetHandle instead.
+        except (matcher.declaration_not_found_t, RuntimeError):
+            raise Exception('Class %s has no CreatePyHandle function. Did you forgot to declare the entity as a Python class?' % (clsname))
+        
+        # Apply common rules to the entity class
+        # Don't care about the following:
+        cls.vars(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()        # Don't care or needs a better look
+        cls.classes(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()        # Don't care or needs a better look
+        cls.mem_funs(lambda decl: 'YouForgotToImplement' in decl.name, allow_empty=True).exclude()   # Don't care
+        cls.mem_funs('ClearPyInstance', allow_empty=True).exclude()        # Not needed, used for cleaning up python entities
+        cls.mem_funs('GetBaseMap', allow_empty=True).exclude()             # Not needed
+        cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
+        cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
+
+        matrix3x4 = mb.class_('matrix3x4_t')
+        cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(declarated_t(matrix3x4))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        
+        # TODO: Default exlude, only include the variables we want
+        #cls.vars(allow_empty=True).exclude()
+        
+        return cls
     
     def AddTestCollisionMethod(self, cls, cls_name):
         # Test collision
@@ -245,9 +397,9 @@ class Entities(SemiSharedModuleGenerator):
             ''' % { 'cls_name' : cls_name}
         , False )
     
-    def ParseClientEntities(self, mb):
+    '''def ParseClientEntities(self, mb):
         for cls_name in self.client_entities:
-            self.SetupClassShared(mb, cls_name)
+            self.SetupEntityClass(mb, cls_name)
 
             # Check if the python class is networkable. Return the right client class.
             cls = mb.class_(cls_name)
@@ -263,9 +415,9 @@ class Entities(SemiSharedModuleGenerator):
             
             self.AddTestCollisionMethod(cls, cls_name)
             
-            cls.add_wrapper_code(
-                'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
-            )
+            #cls.add_wrapper_code(
+            #    'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
+            #)
     
         mb.vars( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
         mb.classes( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
@@ -276,11 +428,64 @@ class Entities(SemiSharedModuleGenerator):
                          , mb.class_('C_BaseEntity').member_function( 'PySetLifeState' ) )
         mb.class_('C_BaseEntity').add_property( 'takedamage'
                          , mb.class_('C_BaseEntity').member_function( 'PyGetTakeDamage' )
-                         , mb.class_('C_BaseEntity').member_function( 'PySetTakeDamage' ) )
+                         , mb.class_('C_BaseEntity').member_function( 'PySetTakeDamage' ) )'''
                          
+    def ParseClientEntities(self, mb):
+        # Made not virtual so no wrapper code is generated in IClientUnknown and IClientEntity
+        mb.class_('IClientRenderable').mem_funs().virtuality = 'not virtual' 
+        mb.class_('IClientNetworkable').mem_funs().virtuality = 'not virtual' 
+        mb.class_('IClientThinkable').mem_funs().virtuality = 'not virtual'
+
+        self.IncludeEmptyClass(mb, 'IClientUnknown')
+        self.IncludeEmptyClass(mb, 'IClientEntity')
+        
+        for clsname in self.cliententities:
+            cls = self.SetupEntityClass(mb, clsname)
+
+            # Check if the python class is networkable. Add code for getting the "ClientClass" if that's the case.
+            decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
+            if decl:
+                decl.include()
+                cls.add_wrapper_code( tmpl_clientclass % {'clsname' : clsname})
+                
+            # Apply common rules
+            # Excludes
+            cls.mem_funs('GetPredDescMap', allow_empty=True).exclude()
+            cls.mem_funs('OnNewModel', allow_empty=True).exclude() # Don't care for now
+            cls.mem_funs('GetClientClass', allow_empty=True).exclude()
+            cls.mem_funs('GetMouth', allow_empty=True).exclude()
+            
+            self.AddTestCollisionMethod(cls, clsname)
+
+        mb.mem_funs('SetThinkHandle').exclude()
+        mb.mem_funs('GetThinkHandle').exclude()
+        
     def ParseServerEntities(self, mb):
-        for cls_name in self.server_entities:
-            self.SetupClassShared(mb, cls_name)
+        self.IncludeEmptyClass(mb, 'IServerUnknown')
+        self.IncludeEmptyClass(mb, 'IServerEntity')
+        
+        for clsname in self.serverentities:
+            cls = self.SetupEntityClass(mb, clsname)
+            
+            # Check if the python class is networkable. Add code for getting the "ServerClass" if that's the case.
+            decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
+            if decl:
+                decl.include()
+                cls.add_wrapper_code(tmpl_serverclass % {'clsname' : clsname})
+                
+            # Apply common rules
+            # Excludes
+            cls.mem_funs('GetServerClass', allow_empty=True).exclude()         # Don't care about this one
+            
+            self.AddTestCollisionMethod(cls, clsname)
+            
+        # Creation and spawning
+        mb.free_functions('CreateEntityByName').include()
+        mb.free_functions('DispatchSpawn').include()
+                         
+    '''def ParseServerEntities(self, mb):
+        for cls_name in self.serverentities:
+            self.SetupEntityClass(mb, cls_name)
 
             # Check if the python class is networkable. Return the right serverclass.
             cls = mb.class_(cls_name)
@@ -305,17 +510,17 @@ class Entities(SemiSharedModuleGenerator):
                                         '}\r\n'
                 )
                 
-                cls.add_wrapper_code(
-                    'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
-                )
+                #cls.add_wrapper_code(
+                #    'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
+                #)
             
             #AddWrapReg( mb, cls_name, mb.member_function('CanBeSeenBy', lambda decl: HasArgType(decl, 'CBaseEntity')), [CreateEntityArg('pEnt')] )  
             
             self.AddTestCollisionMethod(cls, cls_name)
             
-        mb.vars( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
-        mb.classes( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
-        mb.mem_funs( lambda decl: 'YouForgotToImplement' in decl.name ).exclude()   # Don't care
+        #mb.vars( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
+        #mb.classes( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
+        #mb.mem_funs( lambda decl: 'YouForgotToImplement' in decl.name ).exclude()   # Don't care
         
         # Network var accessors
         # TODO: clrender, renderfx
@@ -355,7 +560,7 @@ class Entities(SemiSharedModuleGenerator):
         #mb.free_functions('CreateNetworkableByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         #mb.free_functions('SpawnEntityByName').include()           # <-- LOL, declaration only.
         #mb.free_functions('SpawnEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.free_functions('DispatchSpawn').include()
+        mb.free_functions('DispatchSpawn').include()'''
 
     
     def ParseBaseEntity(self, mb):
@@ -381,7 +586,7 @@ class Entities(SemiSharedModuleGenerator):
         mb.vars('m_pfnTouch').exclude()
         mb.vars('m_pPredictionPlayer').exclude()
         mb.vars('m_DataMap').exclude()
-        if not settings.ASW_CODE_BASE: # TODO: Maybe check symbol USE_PREDICTABLEID ?
+        if not self.settings.ASW_CODE_BASE: # TODO: Maybe check symbol USE_PREDICTABLEID ?
             mb.vars('m_PredictableID').exclude()
         mb.vars('m_lifeState').exclude()
         mb.vars('m_takedamage').exclude()
@@ -482,7 +687,7 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('SetPyTouch').rename('SetTouch')
         mb.mem_funs('SetPyThink').rename('SetThink')
         mb.mem_funs('GetPyThink').rename('GetThink')
-        mb.mem_funs('CreatePyHandle').exclude() # Use GetHandle instead.
+        #mb.mem_funs('CreatePyHandle').exclude() # Use GetHandle instead.
         mb.mem_funs('GetPyHandle').rename('GetHandle')
         mb.mem_funs('GetPySelf').exclude()
         mb.mem_funs('PyThink').exclude()
@@ -564,7 +769,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_nModelIndex').exclude()
             mb.vars('m_iTeamNum').exclude()
             mb.vars('m_hRender').exclude()
-            if not settings.ASW_CODE_BASE: # TODO: Maybe check symbol USE_PREDICTABLEID ?
+            if not self.settings.ASW_CODE_BASE: # TODO: Maybe check symbol USE_PREDICTABLEID ?
                 mb.vars('m_pPredictionContext').exclude()
             
             mb.mem_funs('GetClientClass').exclude()         # Don't care about this one
@@ -597,7 +802,7 @@ class Entities(SemiSharedModuleGenerator):
             
             mb.mem_funs('MyCombatWeaponPointer').exclude()
             
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetClientAlphaProperty').exclude()
                 mb.mem_funs('GetClientModelRenderable').exclude()
                 mb.mem_funs('GetResponseSystem').exclude()
@@ -619,7 +824,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_iHealth').rename('health')
             mb.vars('m_lifeState').rename('lifestate')
             mb.vars('m_nRenderFX').rename('renderfx')
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.vars('m_nRenderFXBlend').rename('renderfxblend')
             mb.vars('m_nRenderMode').rename('rendermode')
             mb.vars('m_clrRender').rename('clrender')
@@ -633,9 +838,9 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_iClassname').rename('classname')    
             mb.vars('m_flSpeed').rename('speed')
             
-            mb.mem_funs('GetViewDistance').exclude()
-            mb.class_('C_BaseEntity').add_property( 'viewdistance'
-                             , mb.class_('C_BaseEntity').member_function( 'GetViewDistance' ) )
+            self.SetupProperty(mb, cls, 'viewdistance', 'GetViewDistance')
+            self.SetupProperty(mb, cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
+            self.SetupProperty(mb, cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
 
             # Don't give a shit about the following functions
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_AI_BaseNPC') != -1 ).exclude()
@@ -664,10 +869,10 @@ class Entities(SemiSharedModuleGenerator):
             mb.add_registration_code( "bp::scope().attr( \"CLIENT_THINK_NEVER\" ) = CLIENT_THINK_NEVER;" )
             
             # Exclude
-            mb.mem_funs( function=lambda decl: 'NetworkStateChanged_' in decl.name ).exclude()
-            mb.vars( function=lambda decl: 'NetworkVar_' in decl.name ).exclude()
-            mb.classes( function=lambda decl: 'NetworkVar_' in decl.name ).exclude()
-            mb.classes( function=lambda decl: 'CNetworkVarBase' in decl.name ).exclude()
+            #mb.mem_funs( function=lambda decl: 'NetworkStateChanged_' in decl.name ).exclude()
+            #mb.vars( function=lambda decl: 'NetworkVar_' in decl.name ).exclude()
+            #mb.classes( function=lambda decl: 'NetworkVar_' in decl.name ).exclude()
+            #mb.classes( function=lambda decl: 'CNetworkVarBase' in decl.name ).exclude()
             
             # Include protected
             mb.mem_funs('AddToEntityList').include()
@@ -693,12 +898,17 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_target').rename('target')
             mb.vars('m_iszDamageFilterName').rename('damagefiltername')
             
-            mb.mem_funs('GetViewDistance').exclude()
-            mb.mem_funs('SetViewDistance').exclude()
-            mb.class_('CBaseEntity').add_property( 'viewdistance'
-                             , mb.class_('CBaseEntity').member_function( 'GetViewDistance' )
-                             , mb.class_('CBaseEntity').member_function( 'SetViewDistance' ) )
 
+            # Properties
+            self.SetupProperty(mb, cls, 'viewdistance', 'GetViewDistance', 'SetViewDistance')
+            
+            self.SetupProperty(mb, cls, 'health', 'GetHealth', 'SetHealth')
+            self.SetupProperty(mb, cls, 'maxhealth', 'GetMaxHealth', 'SetMaxHealth')
+            self.SetupProperty(mb, cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
+            self.SetupProperty(mb, cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
+            self.SetupProperty(mb, cls, 'animtime', 'GetAnimTime', 'SetAnimTime')
+            self.SetupProperty(mb, cls, 'simulationtime', 'GetSimulationTime', 'SetSimulationTime')
+            self.SetupProperty(mb, cls, 'rendermode', 'GetRenderMode', 'SetRenderMode', excludesetget=False)
             
             # Replace and rename
             mb.mem_funs('SetModel').exclude()
@@ -781,7 +991,7 @@ class Entities(SemiSharedModuleGenerator):
             
             mb.mem_funs('MyCombatWeaponPointer').exclude()
             
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('FindNamedOutput').exclude()
                 mb.mem_funs('GetBaseAnimatingOverlay').exclude()
                 mb.mem_funs('GetContextData').exclude()
@@ -836,7 +1046,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: HasArgType(decl, 'CCheckTransmitInfo') ).exclude()
             
             # Exclude the following for now until we decide if we want them ( need fixes/exposed classes )
-            #if not settings.ASW_CODE_BASE:
+            #if not self.settings.ASW_CODE_BASE:
             #    mb.mem_funs( lambda decl: HasArgType(decl, 'AI_CriteriaSet') ).exclude()
 
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IResponseSystem') != -1 ).exclude()
@@ -859,7 +1069,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars( 'm_nHitboxSet' ).exclude()
             mb.vars( 'm_nSkin' ).exclude()
             mb.vars( 'm_flPlaybackRate' ).exclude()
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.vars( 'm_flModelWidthScale' ).exclude()
             mb.vars( 'm_nBody' ).exclude()
             mb.vars( 'm_bIsLive' ).exclude()
@@ -909,7 +1119,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             
             # Exclude
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBoneCache') != -1 ).exclude()
             else:
                 mb.mem_funs('GetBoneArrayForWrite').exclude()
@@ -927,13 +1137,15 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
             
+            self.SetupProperty(mb, cls, 'skin', 'GetSkin', 'SetSkin')
+            
             # excludes
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBoneCache') != -1 ).exclude()
             mb.mem_funs('GetPoseParameterArray').exclude()
             mb.mem_funs('GetEncodedControllerArray').exclude()
 
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetBoneCache').exclude()
                 mb.mem_funs('InputIgniteNumHitboxFires').exclude()
                 mb.mem_funs('InputIgniteHitboxFireScale').exclude()
@@ -1002,7 +1214,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('OnPursuedBy').exclude()
             mb.vars('m_DefaultRelationship').exclude()
 
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetEntitiesInFaction').exclude()
             mb.mem_funs('GetFogTrigger').exclude()
             mb.mem_funs('PlayFootstepSound').exclude()
@@ -1064,7 +1276,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('ShouldGoSouth').exclude() # <-- Declaration only :)
             mb.mem_funs('GetFootstepSurface').exclude()
             
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('ActivePlayerCombatCharacter').exclude()
                 mb.mem_funs('GetActiveColorCorrection').exclude()
                 mb.mem_funs('GetActivePostProcessController').exclude()
@@ -1088,7 +1300,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetViewModel').exclude()
             mb.mem_funs('PlayerData').exclude()
             mb.mem_funs('GetLadderSurface').exclude()
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetCurrentCommand').exclude()
             mb.mem_funs('GetLastKnownArea').exclude()
             mb.mem_funs('GetPhysicsController').exclude()
@@ -1104,7 +1316,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetAudioParams').exclude()
             mb.mem_funs('SetupVPhysicsShadow').exclude()
             
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('ActivePlayerCombatCharacter').exclude()
                 mb.mem_funs('FindPickerAILink').exclude()
                 mb.mem_funs('GetPlayerProxy').exclude()
@@ -1127,7 +1339,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GiveNamedItem').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('FindUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('DoubleCheckUseNPC').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            if not settings.ASW_CODE_BASE:
+            if not self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetHeldObject').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('GetViewEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('GetFOVOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1420,10 +1632,10 @@ class Entities(SemiSharedModuleGenerator):
         if self.isserver:
             mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
             mb.mem_funs('IsInBadPosition').exclude() # Declaration only...
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('IsCarrierAlive').exclude()
         else:
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('GetWeaponList').exclude()
 
         mb.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
@@ -1527,7 +1739,7 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('GetRootPhysicsObjectForBreak').exclude()
             
             cls = mb.class_('CPhysicsProp')
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 cls.mem_funs('GetObstructingEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
                 
             cls = mb.class_('CRagdollProp')
@@ -1541,7 +1753,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('FlexSettingLessFunc').exclude()
             mb.class_('CBaseFlex').class_('FS_LocalToGlobal_t').exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'AI_Response') ).exclude() 
-            if settings.ASW_CODE_BASE:
+            if self.settings.ASW_CODE_BASE:
                 mb.mem_funs('ScriptGetOldestScene').exclude()
                 mb.mem_funs('ScriptGetSceneByIndex').exclude()
         else:
@@ -1585,7 +1797,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.free_function('DoSpark').include()
         
             # CSoundEnt
-            IncludeEmptyClass(mb, 'CSoundEnt')
+            self.IncludeEmptyClass(mb, 'CSoundEnt')
             mb.mem_funs('InsertSound').include()
             
             # CGib
@@ -1815,6 +2027,9 @@ class Entities(SemiSharedModuleGenerator):
         
         # Disable shared warnings
         DisableKnownWarnings(mb)
+        
+        # Finally apply common rules to all includes functions and classes, etc.
+        self.ApplyCommonRules(mb)
         
     def AddAdditionalCode(self, mb):
         header = code_creators.include_t( 'srcpy_converters_ents.h' )

@@ -2,8 +2,6 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "steam/steam_api.h"
@@ -856,8 +854,6 @@ BOOST_PYTHON_MODULE(steam){
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 }
 #else
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "steam/steam_api.h"

@@ -1,53 +1,34 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
-import settings
+from src_helper import AddWrapReg, CreateEntityArg
 
 from pyplusplus.module_builder import call_policies
 
 class UnitHelper(SemiSharedModuleGenerator):
     module_name = 'unit_helper'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-            'cbase.h',
-            'c_baseplayer.h',
-            'c_unit_base.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-            'c_baseplayer.h',
-            'c_unit_base.h',
-        ]
-    
-    server_files = [
-        'cbase.h',
-        'player.h',
-        'unit_expresser.h',
-        'unit_navigator.h',
-        'unit_airnavigator.h',
-        'unit_intention.h',
-        'unit_sense.h',
-        'unit_base.h',
-    ]
-    
+
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
+        
         'unit_base_shared.h',
         'unit_component.h',
         'unit_locomotion.h',
         'unit_airlocomotion.h',
         'unit_animstate.h',
         #'wars_orders.h'
+        
+        '$c_baseplayer.h',
+        '$c_unit_base.h',
+        
+        '#player.h',
+        '#unit_expresser.h',
+        '#unit_navigator.h',
+        '#unit_airnavigator.h',
+        '#unit_intention.h',
+        '#unit_sense.h',
+        '#unit_base.h',
     ]
     
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files
-        
     def AddUnitComponent(self, mb):
         cls = mb.class_('UnitComponent')
         cls.include()
@@ -317,7 +298,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         AddWrapReg( mb, cls, cls.mem_fun('HandleEvent'), [CreateEntityArg('pUnit'), 'event'] )
         
     def AddExpresser(self, mb):
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls = mb.class_('CriteriaSet')
         else:
             cls = mb.class_('AI_CriteriaSet')
@@ -329,7 +310,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.mem_fun('GetMySpeechSemaphore').exclude()
         cls.mem_funs('GetOuter').exclude()
         cls.mem_fun('GetSink').exclude()
-        if not settings.ASW_CODE_BASE:
+        if not self.settings.ASW_CODE_BASE:
             cls.mem_fun('SpeakFindResponse').exclude()
         
         cls = mb.class_('UnitExpresser')

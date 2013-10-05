@@ -5,50 +5,37 @@
 
 #include "__array_1.pypp.hpp"
 #include "cbase.h"
-#include "mathlib/vmatrix.h"
-#include "utlvector.h"
-#include "shareddefs.h"
-#include "util.h"
-#include "takedamageinfo.h"
-#include "baseanimating.h"
-#include "BaseAnimatingOverlay.h"
-#include "baseflex.h"
-#include "basecombatcharacter.h"
+#include "npcevent.h"
+#include "srcpy_entities.h"
+#include "bone_setup.h"
 #include "basegrenade_shared.h"
-#include "player.h"
-#include "hl2wars_player.h"
-#include "unit_base_shared.h"
-#include "unit_sense.h"
-#include "wars_func_unit.h"
-#include "soundent.h"
-#include "gib.h"
-#include "Sprite.h"
-#include "SpriteTrail.h"
-#include "smoke_trail.h"
-#include "entityoutput.h"
-#include "props.h"
+#include "SkyCamera.h"
+#include "ai_basenpc.h"
 #include "modelentities.h"
+#include "basetoggle.h"
 #include "triggers.h"
-#include "wars_weapon.h"
+#include "nav_area.h"
+#include "AI_Criteria.h"
+#include "saverestore.h"
+#include "vcollide_parse.h"
+#include "iservervehicle.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
-#include "shared_classnames.h"
-#include "npcevent.h"
-#include "studio.h"
-#include "srcpy_entities.h"
-#include "isaverestore.h"
-#include "saverestore.h"
-#include "mapentities_shared.h"
-#include "vcollide_parse.h"
-#include "hl2wars_player_shared.h"
-#include "imouse.h"
-#include "props_shared.h"
+#include "gib.h"
+#include "props.h"
+#include "Sprite.h"
+#include "SpriteTrail.h"
+#include "smoke_trail.h"
 #include "beam_shared.h"
-#include "basecombatweapon_shared.h"
+#include "hl2wars_player.h"
+#include "unit_base_shared.h"
+#include "wars_func_unit.h"
+#include "hl2wars_player_shared.h"
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
+#include "wars_weapon.h"
 #include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
@@ -777,26 +764,26 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
         CBaseEntity::StopLoopingSounds( );
     }
 
+    virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
+
     virtual ServerClass* GetServerClass() {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
+#if defined(_WIN32)
+#if defined(_DEBUG)
         Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
+#elif defined(PY_CHECKTHREADID)
         if( GetCurrentThreadId() != g_hPythonThreadID )
             Error( "GetServerClass: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+#endif // _DEBUG/PY_CHECKTHREADID
+#endif // _WIN32
+#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
             Msg("Calling GetServerClass(  ) of Class: CBasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>("pyServerClass", GetPyInstance(), NULL, true);
+#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
         return CBasePlayer::GetServerClass();
     }
-
-    virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
                 #if defined(_WIN32)

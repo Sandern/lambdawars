@@ -29,7 +29,8 @@ class C_SmokeTrail : public C_BaseParticleEntity, public IPrototypeAppEffect
 public:
 	DECLARE_CLASS( C_SmokeTrail, C_BaseParticleEntity );
 	DECLARE_CLIENTCLASS();
-	
+	DECLARE_PYCLASS( C_SmokeTrail ); // TODO: Remove from Python, particle system is sufficient!
+
 					C_SmokeTrail();
 	virtual			~C_SmokeTrail();
 
@@ -109,7 +110,8 @@ class C_RocketTrail : public C_BaseParticleEntity, public IPrototypeAppEffect
 public:
 	DECLARE_CLASS( C_RocketTrail, C_BaseParticleEntity );
 	DECLARE_CLIENTCLASS();
-	
+	DECLARE_PYCLASS( C_RocketTrail ); // TODO: Remove from Python, particle system is sufficient!
+
 					C_RocketTrail();
 	virtual			~C_RocketTrail();
 

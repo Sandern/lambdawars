@@ -157,6 +157,8 @@ class src_module_builder_t(module_builder.module_builder_t):
         else:
             ds = dsymbols+dsymbols_server
             incl = incl_paths_server+incl_paths  
+            
+        self.definedsymbols = ds
         
         module_builder.module_builder_t.__init__(
                     self

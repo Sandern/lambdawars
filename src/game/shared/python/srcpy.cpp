@@ -83,7 +83,7 @@ bp::object weakref;
 bp::object srcbuiltins;
 bp::object srcbase;
 bp::object steam;
-bp::object _entities_misc;
+bp::object _entitiesmisc;
 bp::object _entities;
 bp::object unit_helper;
 bp::object _particles;
@@ -369,9 +369,9 @@ bool CSrcPython::InitInterpreter( void )
 	
 	types = Import("types");
 	steam = Import("steam");
-	Run( "import sound" ); // Import _sound before _entities_misc (register converters)
-	Run( "import _entities_misc" );
-	_entities_misc = Import("_entities_misc");
+	Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
+	Run( "import _entitiesmisc" );
+	_entitiesmisc = Import("_entitiesmisc");
 	Run( "import _entities" );
 	_entities = Import("_entities");
 	unit_helper = Import("unit_helper");
@@ -538,7 +538,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	weakref = bp::object();
 	srcbase = bp::object();
 	steam = bp::object();
-	_entities_misc = bp::object();
+	_entitiesmisc = bp::object();
 	_entities = bp::object();
 	unit_helper = bp::object();
 	_particles = bp::object();

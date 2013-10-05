@@ -6,27 +6,25 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
-#include "cdll_util.h"
+#include "srcpy_util.h"
 
 #include "util_shared.h"
-
-#include "iclientshadowmgr.h"
-
-#include "projected_texture_unlit.h"
 
 #include "gametrace.h"
 
 #include "engine/IEngineTrace.h"
 
+#include "cdll_util.h"
+
+#include "iclientshadowmgr.h"
+
 #include "viewrender.h"
 
 #include "view.h"
 
-#include "srcpy_util.h"
+#include "projected_texture_unlit.h"
 
 #include "hl2wars_util_shared.h"
 
@@ -2762,6 +2760,16 @@ BOOST_PYTHON_MODULE(_utils){
     }
 }
 #else
+#include "cbase.h"
+
+#include "srcpy_util.h"
+
+#include "util_shared.h"
+
+#include "gametrace.h"
+
+#include "engine/IEngineTrace.h"
+
 #include "mathlib/vmatrix.h"
 
 #include "utlvector.h"
@@ -2770,15 +2778,7 @@ BOOST_PYTHON_MODULE(_utils){
 
 #include "util.h"
 
-#include "cbase.h"
-
 #include "explode.h"
-
-#include "gametrace.h"
-
-#include "engine/IEngineTrace.h"
-
-#include "srcpy_util.h"
 
 #include "hl2wars_util_shared.h"
 

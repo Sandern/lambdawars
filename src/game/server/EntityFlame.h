@@ -30,6 +30,7 @@ class CEntityFlame : public CBaseEntity
 	DECLARE_SERVERCLASS();
 	DECLARE_CLASS( CEntityFlame, CBaseEntity );
 	DECLARE_DATADESC();
+	DECLARE_PYCLASS( CEntityFlame ); 
 
 public:
 	static CEntityFlame	*Create( CBaseEntity *pTarget, float flLifetime, float flSize = 0.0f, bool bUseHitboxes = true );

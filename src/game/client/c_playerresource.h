@@ -22,6 +22,7 @@ class C_PlayerResource : public C_BaseEntity, public IGameResources
 public:
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
+	DECLARE_PYCLIENTCLASS( C_PlayerResource, PN_PLAYERRESOURCE );
 
 					C_PlayerResource();
 	virtual			~C_PlayerResource();

@@ -19,6 +19,7 @@ class CPlayerResource : public CBaseEntity
 public:
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
+	DECLARE_PYSERVERCLASS( CPlayerResource, PN_PLAYERRESOURCE );
 
 	virtual void Spawn( void );
 	virtual	int	 ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_DONT_SAVE; }

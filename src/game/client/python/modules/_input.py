@@ -1,6 +1,5 @@
 from srcpy.module_generators import ClientModuleGenerator
 from src_helper import *
-import settings
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
@@ -10,34 +9,22 @@ from pygccxml.declarations import matchers
 class Input(ClientModuleGenerator):
     module_name = '_input'
 
-    if settings.ASW_CODE_BASE:
-        files = [
-            'videocfg/videocfg.h',
+    files = [
+        'videocfg/videocfg.h',
 
-            'vgui/Cursor.h',
-            'inputsystem/ButtonCode.h',
-            'kbutton.h',
-            'cbase.h',
-            'input.h',
-        ]
-    else:
-        files = [
-            'wchartypes.h',
-            'shake.h',
-        
-            'vgui/Cursor.h',
-            'inputsystem/ButtonCode.h',
-            'kbutton.h',
-            'cbase.h',
-            'input.h',
-        ]
+        'vgui/Cursor.h',
+        'inputsystem/ButtonCode.h',
+        'kbutton.h',
+        'cbase.h',
+        'input.h',
+    ]
 
     def Parse(self, mb):
         # Exclude everything by default
         mb.decls().exclude()
         
         mb.class_('kbutton_t').include()
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.class_('kbutton_t').mem_funs('GetPerUser').exclude()
         
         # //--------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +32,7 @@ class Input(ClientModuleGenerator):
         cls = mb.class_('CInput')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual'
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             #mb.mem_funs('FindKey').exclude() # FIXME
             mb.mem_funs('FindKey').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
         else:

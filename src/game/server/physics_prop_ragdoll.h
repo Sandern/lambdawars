@@ -23,6 +23,7 @@ namespace ResponseRules { class IResponseSystem; };
 class CRagdollProp : public CBaseAnimating, public CDefaultPlayerPickupVPhysics
 {
 	DECLARE_CLASS( CRagdollProp, CBaseAnimating );
+	DECLARE_PYCLASS( CRagdollProp );
 
 public:
 	CRagdollProp( void );

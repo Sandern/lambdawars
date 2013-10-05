@@ -1,29 +1,14 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
-import settings
 
 class FOW(SemiSharedModuleGenerator):
     module_name = '_fow'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-        
     files = [
+        '$%videocfg/videocfg.h',
         'cbase.h',
         'hl2wars/fowmgr.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.files
         
     def Parse(self, mb):
         # Exclude everything, then add what we need

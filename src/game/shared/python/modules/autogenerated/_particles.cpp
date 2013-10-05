@@ -4,11 +4,9 @@
 #ifdef CLIENT_DLL
 #include "__array_1.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "tier1/utlvector.h"
 
-#include "tier1/utlsortvector.h"
+#include "tier1/UtlSortVector.h"
 
 #include "tier1/utlobjectreference.h"
 

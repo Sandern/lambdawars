@@ -16,82 +16,31 @@ PyServerClass *g_pPyServerClassHead = NULL;
 
 bool g_SetupNetworkTablesOnHold = false;
 
-namespace DT_BaseEntity
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BaseAnimating
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BaseAnimatingOverlay
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BaseFlex
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BaseCombatCharacter
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BasePlayer
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_HL2WarsPlayer
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_BaseGrenade
-{
-	extern SendTable g_SendTable;
-}
-namespace DT_UnitBase
-{
-	extern SendTable g_SendTable;
-}
+#define EXTERN_SENDTABLE( DT_ClassName ) namespace DT_ClassName { extern SendTable g_SendTable; }
 
-namespace DT_Sprite
-{
-	extern SendTable g_SendTable;
-}
+EXTERN_SENDTABLE( DT_BaseEntity );
+EXTERN_SENDTABLE( DT_BaseAnimating );
+EXTERN_SENDTABLE( DT_BaseAnimatingOverlay );
+EXTERN_SENDTABLE( DT_BaseFlex );
+EXTERN_SENDTABLE( DT_BaseCombatWeapon );
+EXTERN_SENDTABLE( DT_BaseCombatCharacter );
+EXTERN_SENDTABLE( DT_BasePlayer );
+EXTERN_SENDTABLE( DT_BaseGrenade );
+EXTERN_SENDTABLE( DT_Beam );
+EXTERN_SENDTABLE( DT_Sprite );
+EXTERN_SENDTABLE( DT_SmokeTrail );
+EXTERN_SENDTABLE( DT_BaseToggle );
+EXTERN_SENDTABLE( DT_BaseTrigger );
+EXTERN_SENDTABLE( DT_PlayerResource );
 
-namespace DT_SmokeTrail
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_Beam
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_BaseCombatWeapon
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_WarsWeapon
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_FuncUnit
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_BaseToggle
-{
-	extern SendTable g_SendTable;
-}
-
-namespace DT_BaseTrigger
-{
-	extern SendTable g_SendTable;
-}
+#ifdef HL2WARS_DLL
+EXTERN_SENDTABLE( DT_HL2WarsPlayer );
+EXTERN_SENDTABLE( DT_UnitBase );
+EXTERN_SENDTABLE( DT_WarsWeapon );
+EXTERN_SENDTABLE( DT_FuncUnit );
+EXTERN_SENDTABLE( DT_HL2WarsPlayer );
+EXTERN_SENDTABLE( DT_BaseFuncMapBoundary );
+#endif // HL2WARS_DLL
 
 namespace bp = boost::python;
 
@@ -132,14 +81,8 @@ void PyServerClass::SetupServerClass( int iType )
 	case PN_BASEPLAYER:
 		m_pTable = &(DT_BasePlayer::g_SendTable);
 		break;
-	case PN_HL2WARSPLAYER:
-		m_pTable = &(DT_HL2WarsPlayer::g_SendTable);
-		break;
 	case PN_BASEGRENADE:
 		m_pTable = &(DT_BaseGrenade::g_SendTable);
-		break;
-	case PN_UNITBASE:
-		m_pTable = &(DT_UnitBase::g_SendTable);
 		break;
 	case PN_SPRITE:
 		m_pTable = &(DT_Sprite::g_SendTable);
@@ -153,18 +96,32 @@ void PyServerClass::SetupServerClass( int iType )
 	case PN_BASECOMBATWEAPON:
 		m_pTable = &(DT_BaseCombatWeapon::g_SendTable);
 		break;
-	case PN_WARSWEAPON:
-		m_pTable = &(DT_WarsWeapon::g_SendTable);
-		break;
-	case PN_FUNCUNIT:
-		m_pTable = &(DT_FuncUnit::g_SendTable);
-		break;
 	case PN_BASETOGGLE:
 		m_pTable = &(DT_BaseToggle::g_SendTable);
 		break;
 	case PN_BASETRIGGER:
 		m_pTable = &(DT_BaseTrigger::g_SendTable);
 		break;
+	case PN_PLAYERRESOURCE:
+		m_pTable = &(DT_PlayerResource::g_SendTable);
+		break;
+#ifdef HL2WARS_DLL
+	case PN_HL2WARSPLAYER:
+		m_pTable = &(DT_HL2WarsPlayer::g_SendTable);
+		break;
+	case PN_UNITBASE:
+		m_pTable = &(DT_UnitBase::g_SendTable);
+		break;
+	case PN_WARSWEAPON:
+		m_pTable = &(DT_WarsWeapon::g_SendTable);
+		break;
+	case PN_FUNCUNIT:
+		m_pTable = &(DT_FuncUnit::g_SendTable);
+		break;
+	case PN_BASEFUNCMAPBOUNDARY:
+		m_pTable = &(DT_BaseFuncMapBoundary::g_SendTable);
+		break;
+#endif // HL2WARS_DLL
 	default:
 		m_pTable = &(DT_BaseEntity::g_SendTable);
 		break;

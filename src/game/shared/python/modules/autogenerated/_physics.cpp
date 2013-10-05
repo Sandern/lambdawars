@@ -2,11 +2,13 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "srcpy_physics.h"
+
+#include "vphysics/friction.h"
+
+#include "physics.h"
 
 #include "vphysics_interface.h"
 
@@ -1377,11 +1379,15 @@ BOOST_PYTHON_MODULE(_physics){
 
 #include "srcpy_physics.h"
 
+#include "vphysics/friction.h"
+
+#include "physics.h"
+
+#include "physics_impact_damage.h"
+
 #include "vphysics_interface.h"
 
 #include "physics_shared.h"
-
-#include "physics_impact_damage.h"
 
 #include "srcpy_physics_converters.h"
 

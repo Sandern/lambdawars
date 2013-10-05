@@ -20,6 +20,7 @@ class SmokeTrail : public CBaseParticleEntity
 public:
 	DECLARE_CLASS( SmokeTrail, CBaseParticleEntity );
 	DECLARE_SERVERCLASS();
+	DECLARE_PYCLASS( SmokeTrail ); // TODO: Remove from Python, particle system is sufficient!
 
 	SmokeTrail();
 	virtual bool KeyValue( const char *szKeyName, const char *szValue ); 
@@ -58,6 +59,7 @@ class RocketTrail : public CBaseParticleEntity
 public:
 	DECLARE_CLASS( RocketTrail, CBaseParticleEntity );
 	DECLARE_SERVERCLASS();
+	DECLARE_PYCLASS( RocketTrail ); // TODO: Remove from Python, particle system is sufficient!
 
 	RocketTrail();
 	void					SetEmit(bool bVal);

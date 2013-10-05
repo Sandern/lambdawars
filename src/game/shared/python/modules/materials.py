@@ -1,37 +1,24 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-import settings
 
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 
 class Materials(SemiSharedModuleGenerator):
     module_name = 'materials'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = ['videocfg/videocfg.h']
-    else:
-        client_files = ['wchartypes.h','shake.h']
-        
-    client_files.extend( [
-        'cdll_client_int.h',
-        'viewpostprocess.h',
-        'hl2wars/teamcolor_proxy.h',
-    ] )
-        
-    server_files = []
-    
+
     files = [
+        '$%videocfg/videocfg.h',
         'cbase.h',
         'materialsystem\imaterial.h',
         'materialsystem\MaterialSystemUtil.h',
         'python\srcpy_materials.h',
-        #'avi/ibik.h',
-    ]
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files  + ['glow_outline_effect.h']
-        return self.server_files + self.files
+        '$cdll_client_int.h',
+        '$viewpostprocess.h',
+        '$glow_outline_effect.h',
         
+        '$hl2wars/teamcolor_proxy.h',
+    ]
+
     def Parse(self, mb):
         # Exclude everything, then add what we need
         # Otherwise we get very big source code and dll's
@@ -46,21 +33,6 @@ class Materials(SemiSharedModuleGenerator):
         mb.global_ns.mem_opers().exclude() # Fuck them for now
         mb.global_ns.casting_operators().exclude()
 
-        # if self.isclient:
-            # cls = mb.class_('IAppSystem')
-            # cls.mem_funs().virtuality = 'not virtual'
-            
-            # # bik interface        
-            # cls = mb.class_('IBik')
-            # cls.include()
-            # cls.mem_funs().virtuality = 'not virtual'
-            
-            # cls.mem_fun('GetMaterial').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
-            # # Lame fix, don't know how to change the order of the registrations...
-            # cls.add_registration_code( ";}\r\nbp::scope().attr( \"bik\" ) = boost::ref(bik);{", False )
-            # #mb.add_registration_code( "bp::scope().attr( \"bik\" ) = boost::ref(bik);" )
-            
         if self.isclient:
             cls = mb.class_('CGlowObjectManager')
             cls.include()

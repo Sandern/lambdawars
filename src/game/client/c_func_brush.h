@@ -14,6 +14,7 @@ class C_FuncBrush : public C_BaseEntity
 public:
 	DECLARE_CLASS( C_FuncBrush, C_BaseEntity );
 	DECLARE_CLIENTCLASS();
+	DECLARE_PYCLASS( C_FuncBrush );
 
 	void OnDataChanged( DataUpdateType_t type );
 

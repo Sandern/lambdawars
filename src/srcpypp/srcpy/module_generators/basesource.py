@@ -18,41 +18,61 @@ class SourceModuleGenerator(ModuleGenerator):
     isserver = False
     
     def GetFiles(self):
+        parseonlyfiles = []
         files = []
         for filename in self.files:
             if not filename:
                 continue
-            if filename.startswith('#'):
-                if self.isserver:
-                    files.append(filename[1:])
-            elif filename.startswith('$'):
-                if self.isclient:
-                    files.append(filename[1:])
-            else:
+                
+            addtoserver = False
+            addtoclient = False
+            parseonly = False
+            while filename[0] in ['#', '$', '%']:
+                c = filename[0]
+                if c == '#':
+                    addtoserver = True 
+                elif c == '$':
+                    addtoclient = True
+                elif c == '%':
+                    parseonly = True
+                filename = filename[1:]
+                
+            if not addtoserver and not addtoclient:
                 files.append(filename)
-        return files
+            if self.isserver and addtoserver:
+                files.append(filename)
+            if self.isclient and addtoclient:
+                files.append(filename)
+                
+            if parseonly and filename in files:
+                parseonlyfiles.append(filename)
+                
+        return files, parseonlyfiles
         
     def PostCodeCreation(self, mb):
         ''' Allows modifying mb.code_creator just after the code creation. '''
+        parseonlyfiles = list(mb.parseonlyfiles)
+        
         # Remove boost\python.hpp header. This is already included by srcpy.h
         # and directly including can break debug mode (because it redefines _DEBUG)
-        # TODO: Maybe do this in a nicer way, but it's not too important.
-        header = code_creators.include_t(os.path.normpath(r'boost/python.hpp'))
-        originaltestpath = os.path.normpath(header.header)
-        found = False
-        for creator in mb.code_creator.creators:
-            try:
-                testpath = os.path.normpath(creator.header)
-                if originaltestpath == testpath:
-                    found = True
-                    mb.code_creator.remove_creator(creator)
-                    break
-            except:
-                pass
-        
-        if not found:
-            raise Exception('Could not find boost/python.hpp header''')
- 
+        parseonlyfiles.append(r'boost/python.hpp')
+
+        # Remove files which where added for parsing only
+        for filename in parseonlyfiles:
+            found = False
+            testfilenamepath = os.path.normpath(filename)
+            for creator in mb.code_creator.creators:
+                try:
+                    testpath = os.path.normpath(creator.header)
+                    if testfilenamepath == testpath:
+                        found = True
+                        mb.code_creator.remove_creator(creator)
+                        break
+                except:
+                    pass
+            if not found:
+                raise Exception('Could not find %s header''' % (filename))
+            
     # Applies common rules to code
     def ApplyCommonRules(self, mb):
         # Common function added for getting the "PyObject" of an entity

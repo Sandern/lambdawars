@@ -22,6 +22,11 @@ class CBaseFuncMapBoundary : public CBaseEntity
 public:
 	DECLARE_NETWORKCLASS();
 	DECLARE_DATADESC();
+#ifdef CLIENT_DLL
+	DECLARE_PYCLIENTCLASS( CBaseFuncMapBoundary, PN_BASEFUNCMAPBOUNDARY );
+#else
+	DECLARE_PYSERVERCLASS( CBaseFuncMapBoundary, PN_BASEFUNCMAPBOUNDARY );
+#endif // CLIENT_DLL
 
 	CBaseFuncMapBoundary();
 	~CBaseFuncMapBoundary();

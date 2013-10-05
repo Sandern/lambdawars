@@ -12,8 +12,10 @@ class ClientModuleGenerator(SourceModuleGenerator):
         return os.path.join(self.settings.srcpath, self.settings.client_path)
     
     # Create builder
-    def CreateBuilder(self, files):
-        return src_module_builder_t(files, is_client=True)    
+    def CreateBuilder(self, files, parseonlyfiles):
+        mb = src_module_builder_t(files, is_client=True)
+        mb.parseonlyfiles = parseonlyfiles
+        return mb
     
 
     

@@ -1,6 +1,5 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
-import settings
 
 import pygccxml
 from pyplusplus.module_builder import call_policies
@@ -8,51 +7,29 @@ from pyplusplus import function_transformers as FT
 
 class Utils(SemiSharedModuleGenerator):
     module_name = '_utils'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-        
-    client_files.extend( [
-        'cbase.h',
-        'cdll_util.h',
-        'util_shared.h',
-        #'srcpy_util.h',
-        'iclientshadowmgr.h',
-        'projected_texture_unlit.h',
-        'gametrace.h',
-        'engine\IEngineTrace.h',
-        'viewrender.h',
-        'view.h',
-    ] )
-    
-    server_files = [
-        'mathlib/vmatrix.h', 
-        'utlvector.h', 
-        'shareddefs.h',
-        'util.h',
-        
-        'cbase.h',
-        'explode.h',
-        'gametrace.h',
-        'engine\IEngineTrace.h'
-    ]
-    
+
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
         'srcpy_util.h',
+        'util_shared.h',
+        'gametrace.h',
+        'engine/IEngineTrace.h',
+        
+        '#mathlib/vmatrix.h', 
+        '#utlvector.h', 
+        '#shareddefs.h',
+        '#util.h',
+        '#explode.h',
+        
+        '$cdll_util.h',
+        '$iclientshadowmgr.h',
+        '$viewrender.h',
+        '$view.h',
+        
+        '$projected_texture_unlit.h',
         'hl2wars_util_shared.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
 
     def ParseServer(self, mb):
         # Entity index functions
@@ -89,7 +66,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('UTIL_EntitiesInPVS').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.free_functions('UTIL_FindClientInPVS').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.free_functions('UTIL_FindClientInPVSGuts').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.free_functions('UTIL_GetLocalPlayerOrListenServerHost').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
         
@@ -151,7 +128,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_function('MainWorldToViewMatrix').include()
         
         # Call policies and excludes
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.free_function('UTIL_GetLocalizedKeyString').exclude()
             mb.free_function('UTIL_MessageText').exclude()
             mb.free_functions('UTIL_EntityFromUserMessageEHandle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
@@ -334,7 +311,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('IntersectRayWithBox').include()
         mb.free_functions('IntersectRayWithOBB').include()
         mb.free_functions('IsSphereIntersectingSphere').include()
-        if not settings.ASW_CODE_BASE: # IsBoxIntersectingSphere gives a problem
+        if not self.settings.ASW_CODE_BASE: # IsBoxIntersectingSphere gives a problem
             mb.free_functions('IsBoxIntersectingSphere').include()
         mb.free_functions('IsBoxIntersectingSphereExtents').include()
         mb.free_functions('IsRayIntersectingSphere').include()

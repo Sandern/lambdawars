@@ -4,43 +4,22 @@ from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers
 
-from src_helper import *
-
-import settings
+from src_helper import AddWrapReg, GetTopDeclaration
 
 class GameRules(SemiSharedModuleGenerator):
     module_name = '_gamerules'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-            'cbase.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-        ]
-    
-    server_files = [
-        'cbase.h',
-        'items.h',
-    ]
-    
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
         'gamerules.h',
         'multiplay_gamerules.h',
         'teamplay_gamerules.h',
         'hl2wars_gamerules.h',
         'srcpy_gamerules.h',
         'ammodef.h',
+        '#items.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
 
     def Parse(self, mb):
         # Exclude everything by default

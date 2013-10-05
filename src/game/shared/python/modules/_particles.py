@@ -1,7 +1,4 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
-import settings
-
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
@@ -9,45 +6,22 @@ from pyplusplus import code_creators
 class Particles(SemiSharedModuleGenerator):
     module_name = '_particles'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-            'tier1/utlvector.h',
-            'tier1/utlsortvector.h',
-            'tier1/utlobjectreference.h',
-
-            'cbase.h',
-            'particles_ez.h',
-            'icliententityinternal.h',
-            'convar.h',
-            'fx.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-            'particles_ez.h',
-            'icliententityinternal.h',
-            'convar.h',
-            'fx.h',
-        ]
-    
-    server_files = [
-        'cbase.h',
-        'gameinterface.h'
-    ]
-    
     files = [
+		'$%videocfg/videocfg.h',
+        '$tier1/utlvector.h',
+        '$tier1/UtlSortVector.h',
+        '$tier1/utlobjectreference.h',
+        
+        'cbase.h',
+        '#gameinterface.h',
+        '$particles_ez.h',
+        '$icliententityinternal.h',
+        '$convar.h',
+        '$fx.h',
         'particle_parse.h',
         'srcpy_particles.h',
     ]
     
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
-
     def ParseClient(self, mb):
         # Dynamic lights
         mb.class_('PyDLight').include()
@@ -129,7 +103,7 @@ class Particles(SemiSharedModuleGenerator):
 
         cls.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('Create').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregate').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregatePrecached').call_policies = call_policies.return_internal_reference()
@@ -148,7 +122,7 @@ class Particles(SemiSharedModuleGenerator):
         cls.mem_funs('GetModelView').exclude()
         cls.mem_funs('PMaterialToIMaterial').exclude()
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('CreateNonDrawingEffect').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('FirstNewEffect').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('NextNewEffect').call_policies = call_policies.return_internal_reference()
@@ -169,7 +143,7 @@ class Particles(SemiSharedModuleGenerator):
         mb.mem_funs('GetBaseMap').exclude()
         mb.mem_funs('GetDataDescMap').exclude()
         mb.mem_funs('GetPredDescMap').exclude()
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             mb.mem_funs('CreatePrecached').exclude()
         
         # Frequently used materials with particles

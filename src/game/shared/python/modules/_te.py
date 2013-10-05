@@ -1,6 +1,5 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from src_helper import *
-import settings
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
@@ -9,37 +8,27 @@ from pygccxml.declarations import matchers
 class TE(SemiSharedModuleGenerator):
     module_name = '_te'
     
-    client_files = [
-        'videocfg/videocfg.h',
-
-        'cbase.h',
-        'tempent.h',
-        'c_te_legacytempents.h',
-        'c_te_effect_dispatch.h',
-        'fx.h',
-        'fx_quad.h',
-        'fx_line.h',
-        'clientsideeffects.h',
-        'wars_mesh_builder.h',
-        'fx_envelope.h',
-        'c_strider_fx.h',
-    ]
-    
-    server_files = [
-        'cbase.h',
-        'te_effect_dispatch.h',
-    ]
-    
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
         'effect_dispatch_data.h',
         'srcpy_te.h',
+        
+        '$tempent.h',
+        '$c_te_legacytempents.h',
+        '$c_te_effect_dispatch.h',
+        '$fx.h',
+        '$fx_quad.h',
+        '$fx_line.h',
+        '$clientsideeffects.h',
+        '$fx_envelope.h',
+        '$c_strider_fx.h',
+        
+        '#te_effect_dispatch.h',
+        
+        '$wars_mesh_builder.h',
     ]
     
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
-
     def ParseServer(self, mb):
         mb.class_('CEffectData').vars('m_nEntIndex').exclude()
         

@@ -37,7 +37,7 @@ modules = [
     ('srcbase', 'SrcBase'),
     ('_vmath', 'VMath'),
     ('_entities', 'Entities'),
-    ('_entities_misc', 'EntitiesMisc'),
+    ('_entitiesmisc', 'EntitiesMisc'),
     ('_gameinterface', 'GameInterface'),
     ('_utils', 'Utils'),
     ('_physics', 'Physics'),

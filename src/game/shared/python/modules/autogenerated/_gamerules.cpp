@@ -2,8 +2,6 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "gamerules.h"
@@ -246,8 +244,6 @@ BOOST_PYTHON_MODULE(_gamerules){
 #else
 #include "cbase.h"
 
-#include "items.h"
-
 #include "gamerules.h"
 
 #include "multiplay_gamerules.h"
@@ -259,6 +255,8 @@ BOOST_PYTHON_MODULE(_gamerules){
 #include "srcpy_gamerules.h"
 
 #include "ammodef.h"
+
+#include "items.h"
 
 #include "srcpy.h"
 

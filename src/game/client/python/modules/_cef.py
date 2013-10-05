@@ -1,6 +1,4 @@
 from srcpy.module_generators import ClientModuleGenerator
-from src_helper import *
-import settings
 
 from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers

@@ -35,6 +35,7 @@ class CSpriteTrail : public CSprite
 	DECLARE_CLASS( CSpriteTrail, CSprite );
 	DECLARE_DATADESC();
 	DECLARE_PREDICTABLE();
+	DECLARE_PYCLASS( CSpriteTrail ); // TODO: Remove from Python, particle system is sufficient!
 
 public:
 	DECLARE_NETWORKCLASS();

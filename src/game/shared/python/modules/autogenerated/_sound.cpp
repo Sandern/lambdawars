@@ -4,8 +4,6 @@
 #ifdef CLIENT_DLL
 #include "__array_1.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "wchar.h"
 
 #include "string_t.h"

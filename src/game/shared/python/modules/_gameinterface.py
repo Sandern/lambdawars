@@ -1,82 +1,47 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
-import settings
+from srcpy.matchers import calldef_withtypes
 
 from pygccxml import declarations 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
+from pygccxml.declarations import matchers, pointer_t, reference_t, declarated_t
 
 class GameInterface(SemiSharedModuleGenerator):
     module_name = '_gameinterface'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-
-            'cbase.h',
-            'gamerules.h',
-            'multiplay_gamerules.h',
-            'teamplay_gamerules.h',
-            'hl2wars_gamerules.h',
-            'srcpy_gamerules.h',
-            'c_recipientfilter.h',
-            'tier0/icommandline.h',
-        ]
-        
-        server_files = [
-            'cbase.h',
-            'mathlib/vmatrix.h', 
-            'utlvector.h', 
-            'shareddefs.h',
-            'util.h',
-            'iservernetworkable.h',
-            #'enginecallback.h',
-            'recipientfilter.h',
-            'srcpy_usermessage.h',
-            'hl2wars_gameinterface.h',
-            'mapentities.h',
-            'tier0/icommandline.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-            'gamerules.h',
-            'multiplay_gamerules.h',
-            'teamplay_gamerules.h',
-            'hl2wars_gamerules.h',
-            'srcpy_gamerules.h',
-            'c_recipientfilter.h',
-        ]
-    
-        server_files = [
-            'cbase.h',
-            'mathlib/vmatrix.h', 
-            'utlvector.h', 
-            'shareddefs.h',
-            'util.h',
-            'iservernetworkable.h',
-            'recipientfilter.h',
-            'srcpy_usermessage.h',
-            'hl2wars_gameinterface.h',
-            'mapentities.h',
-        ]
-    
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
+        
+        '#mathlib/vmatrix.h', 
+        '#utlvector.h', 
+        '#shareddefs.h',
+        '#util.h',
+        '#iservernetworkable.h',
+        #'#enginecallback.h',
+        '#recipientfilter.h',
+        '#srcpy_usermessage.h',
+        '#mapentities.h',
+        
+        '$gamerules.h',
+        '$multiplay_gamerules.h',
+        '$teamplay_gamerules.h',
+        '$srcpy_gamerules.h',
+        '$c_recipientfilter.h',
+        
+        'tier0/icommandline.h',
         'convar.h',
         'igameevents.h',
         'irecipientfilter.h',
         'srcpy_gameinterface.h',
         'cdll_int.h',
+        '#%team.h',
+        '$%c_team.h',
+        
+        '#hl2wars_gameinterface.h',
         'wars_mount_system.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -319,7 +284,7 @@ class GameInterface(SemiSharedModuleGenerator):
             cls.mem_funs('LoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.add_registration_code( "bp::scope().attr( \"engine\" ) = boost::ref(pyengine);" )   
         
-        # Command line
+        # Command line access
         cls = mb.class_('ICommandLine')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual'
@@ -405,8 +370,15 @@ class GameInterface(SemiSharedModuleGenerator):
         
         # Excludes
         if self.isserver:
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CTeam') ).exclude()
-            
+            excludetypes = [
+                        pointer_t(declarated_t(mb.class_('CTeam'))),
+            ]
+        else:
+            excludetypes = [
+                        pointer_t(declarated_t(mb.class_('C_Team'))),
+            ]
+        mb.calldefs( calldef_withtypes( excludetypes ) ).exclude()
+    
     def AddAdditionalCode(self, mb):
         header = code_creators.include_t( 'srcpy_gameinterface_converters.h' )
         mb.code_creator.adopt_include(header)

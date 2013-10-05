@@ -2,9 +2,11 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
+
+#include "effect_dispatch_data.h"
+
+#include "srcpy_te.h"
 
 #include "tempent.h"
 
@@ -20,15 +22,11 @@
 
 #include "clientsideeffects.h"
 
-#include "wars_mesh_builder.h"
-
 #include "fx_envelope.h"
 
 #include "c_strider_fx.h"
 
-#include "effect_dispatch_data.h"
-
-#include "srcpy_te.h"
+#include "wars_mesh_builder.h"
 
 #include "srcpy.h"
 
@@ -1338,11 +1336,11 @@ BOOST_PYTHON_MODULE(_te){
 #else
 #include "cbase.h"
 
-#include "te_effect_dispatch.h"
-
 #include "effect_dispatch_data.h"
 
 #include "srcpy_te.h"
+
+#include "te_effect_dispatch.h"
 
 #include "srcpy.h"
 

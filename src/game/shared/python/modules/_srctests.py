@@ -1,38 +1,15 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-
 from pyplusplus.module_builder import call_policies
-
-from src_helper import *
-import settings
 
 class _SrcTests(SemiSharedModuleGenerator):
     module_name = '_srctests'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-            'cbase.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            'cbase.h',
-        ]
-    
-    server_files = [
-        'cbase.h'
-    ]
-    
+
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
         'srcpy_tests.h'
     ]
     
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files
-        
     def Parse(self, mb):
         # Exclude everything by default
         mb.decls().exclude() 

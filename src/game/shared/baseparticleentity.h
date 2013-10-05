@@ -31,6 +31,7 @@ public:
 	DECLARE_CLASS( CBaseParticleEntity, CBaseEntity );
 	DECLARE_PREDICTABLE();
 	DECLARE_NETWORKCLASS();
+	DECLARE_PYCLASS( CBaseParticleEntity ); // TODO: Remove from Python, particle system is sufficient!
 
 	CBaseParticleEntity();
 	virtual ~CBaseParticleEntity();

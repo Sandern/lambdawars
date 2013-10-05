@@ -34,6 +34,7 @@
 class CBaseFilter : public CLogicalEntity
 {
 	DECLARE_CLASS( CBaseFilter, CLogicalEntity );
+	DECLARE_PYCLASS( CBaseFilter );
 
 public:
 

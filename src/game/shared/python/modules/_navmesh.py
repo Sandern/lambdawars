@@ -1,32 +1,16 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
-import settings
-#from src_helper import *
 
 class NavMesh(SemiSharedModuleGenerator):
     module_name = '_navmesh'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-        
+
     files = [
+        '$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_navmesh.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.files
-        
+ 
     def Parse(self, mb):
         # Exclude everything, then add what we need
         # Otherwise we get very big source code and dll's

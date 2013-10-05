@@ -16,18 +16,22 @@
 #include "srcpy_client_class.h"
 #include "srcpy.h"
 #include "usermessages.h"
-
-#include "c_hl2wars_player.h"
 #include "basegrenade_shared.h"
-#include "unit_base_shared.h"
 #include "sprite.h"
 #include "c_smoke_trail.h"
 #include "beam_shared.h"
 #include "basecombatweapon_shared.h"
-#include "c_wars_weapon.h"
-#include "wars_func_unit.h"
 #include "c_basetoggle.h"
 #include "c_triggers.h"
+#include "c_playerresource.h"
+
+#ifdef HL2WARS_DLL
+#include "c_hl2wars_player.h"
+#include "unit_base_shared.h"
+#include "c_wars_weapon.h"
+#include "wars_func_unit.h"
+#include "wars_mapboundary.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -36,79 +40,32 @@ PyClientClassBase *g_pPyClientClassHead = NULL;
 
 namespace bp = boost::python;
 
+#define EXTERN_RECVTABLE( DT_ClassName ) namespace DT_ClassName { extern RecvTable g_RecvTable; }
+
 // Recv tables
-namespace DT_BaseAnimating
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_BaseAnimatingOverlay
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_BaseFlex
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_BaseCombatCharacter
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_BasePlayer
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_HL2WarsPlayer
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_BaseGrenade
-{
-	extern RecvTable g_RecvTable;
-}
-namespace DT_UnitBase
-{
-	extern RecvTable g_RecvTable;
-}
+EXTERN_RECVTABLE( DT_BaseAnimating );
+EXTERN_RECVTABLE( DT_BaseAnimatingOverlay );
+EXTERN_RECVTABLE( DT_BaseFlex );
+EXTERN_RECVTABLE( DT_BaseCombatCharacter );
+EXTERN_RECVTABLE( DT_BasePlayer );
+EXTERN_RECVTABLE( DT_BaseGrenade );
+EXTERN_RECVTABLE( DT_Sprite );
+EXTERN_RECVTABLE( DT_SmokeTrail );
+EXTERN_RECVTABLE( DT_Beam );
+EXTERN_RECVTABLE( DT_BaseCombatWeapon );
+EXTERN_RECVTABLE( DT_Sprite );
+EXTERN_RECVTABLE( DT_BaseToggle );
+EXTERN_RECVTABLE( DT_BaseTrigger );
+EXTERN_RECVTABLE( DT_PlayerResource );
 
-namespace DT_Sprite
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_SmokeTrail
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_Beam
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_BaseCombatWeapon
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_WarsWeapon
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_FuncUnit 
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_BaseToggle 
-{
-	extern RecvTable g_RecvTable;
-}
-
-namespace DT_BaseTrigger 
-{
-	extern RecvTable g_RecvTable;
-}
+#ifdef HL2WARS_DLL
+EXTERN_RECVTABLE( DT_HL2WarsPlayer );
+EXTERN_RECVTABLE( DT_UnitBase );
+EXTERN_RECVTABLE( DT_WarsWeapon );
+EXTERN_RECVTABLE( DT_FuncUnit );
+EXTERN_RECVTABLE( DT_HL2WarsPlayer );
+EXTERN_RECVTABLE( DT_BaseFuncMapBoundary );
+#endif // HL2WARS_DLL
 
 // A lot of factories
 #define IMPLEMENT_FALLBACK_FACTORY( clientClassName ) \
@@ -130,17 +87,22 @@ IMPLEMENT_FALLBACK_FACTORY(C_BaseAnimatingOverlay)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseFlex)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatCharacter)
 IMPLEMENT_FALLBACK_FACTORY(C_BasePlayer)
-IMPLEMENT_FALLBACK_FACTORY(C_HL2WarsPlayer)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseGrenade)
-IMPLEMENT_FALLBACK_FACTORY(C_UnitBase)
 IMPLEMENT_FALLBACK_FACTORY(C_Sprite)
 IMPLEMENT_FALLBACK_FACTORY(C_SmokeTrail)
 IMPLEMENT_FALLBACK_FACTORY(C_Beam)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatWeapon)
-IMPLEMENT_FALLBACK_FACTORY(C_WarsWeapon)
-IMPLEMENT_FALLBACK_FACTORY(C_FuncUnit)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseToggle)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseTrigger)
+IMPLEMENT_FALLBACK_FACTORY(C_PlayerResource)
+
+#ifdef HL2WARS_DLL
+IMPLEMENT_FALLBACK_FACTORY(C_HL2WarsPlayer)
+IMPLEMENT_FALLBACK_FACTORY(C_UnitBase)
+IMPLEMENT_FALLBACK_FACTORY(C_WarsWeapon)
+IMPLEMENT_FALLBACK_FACTORY(C_FuncUnit)
+IMPLEMENT_FALLBACK_FACTORY(CBaseFuncMapBoundary)
+#endif // HL2WARS_DLL
 
 // Set the right recv table
 void SetupClientClassRecv( PyClientClassBase *p, int iType  )
@@ -165,14 +127,8 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 	case PN_BASEPLAYER:
 		p->m_pRecvTable = &(DT_BasePlayer::g_RecvTable);
 		break;
-	case PN_HL2WARSPLAYER:
-		p->m_pRecvTable = &(DT_HL2WarsPlayer::g_RecvTable);
-		break;
 	case PN_BASEGRENADE:
 		p->m_pRecvTable = &(DT_BaseGrenade::g_RecvTable);
-		break;
-	case PN_UNITBASE:
-		p->m_pRecvTable = &(DT_UnitBase::g_RecvTable);
 		break;
 	case PN_SPRITE:
 		p->m_pRecvTable = &(DT_Sprite::g_RecvTable);
@@ -186,18 +142,32 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 	case PN_BASECOMBATWEAPON:
 		p->m_pRecvTable = &(DT_BaseCombatWeapon::g_RecvTable);
 		break;
-	case PN_WARSWEAPON:
-		p->m_pRecvTable = &(DT_WarsWeapon::g_RecvTable);
-		break;
-	case PN_FUNCUNIT:
-		p->m_pRecvTable = &(DT_FuncUnit::g_RecvTable);
-		break;
 	case PN_BASETOGGLE:
 		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
 		break;
 	case PN_BASETRIGGER:
 		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
 		break;
+	case PN_PLAYERRESOURCE:
+		p->m_pRecvTable = &(DT_PlayerResource::g_RecvTable);
+		break;
+#ifdef HL2WARS_DLL
+	case PN_HL2WARSPLAYER:
+		p->m_pRecvTable = &(DT_HL2WarsPlayer::g_RecvTable);
+		break;
+	case PN_UNITBASE:
+		p->m_pRecvTable = &(DT_UnitBase::g_RecvTable);
+		break;
+	case PN_WARSWEAPON:
+		p->m_pRecvTable = &(DT_WarsWeapon::g_RecvTable);
+		break;
+	case PN_FUNCUNIT:
+		p->m_pRecvTable = &(DT_FuncUnit::g_RecvTable);
+		break;
+	case PN_BASEFUNCMAPBOUNDARY:
+		p->m_pRecvTable = &(DT_BaseFuncMapBoundary::g_RecvTable);
+		break;
+#endif // HL2WARS_DLL
 	default:
 		p->m_pRecvTable = &(DT_BaseEntity::g_RecvTable);
 		break;

@@ -52,7 +52,7 @@ extern boost::python::object __builtin__;
 extern boost::python::object types;
 extern boost::python::object sys;
 extern boost::python::object steam;
-extern boost::python::object _entities_misc;
+extern boost::python::object _entitiesmisc;
 extern boost::python::object _entities;
 extern boost::python::object unit_helper;
 extern boost::python::object _particles;

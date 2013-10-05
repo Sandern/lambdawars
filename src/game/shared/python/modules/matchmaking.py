@@ -1,37 +1,20 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
-import settings
-#from src_helper import *
 
 class MatchMaking(SemiSharedModuleGenerator):
     module_name = 'matchmaking'
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
         
     files = [
+        '#$videocfg/videocfg.h',
         'cbase.h',
         'srcpy_matchmaking.h',
         #'steam/isteammatchmaking.h',
         #'matchmaking/imatchframework.h',
     ]
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.files
         
     def Parse(self, mb):
         # Exclude everything, then add what we need
         mb.decls().exclude() 
-        
         
         mb.free_function('PyMKCreateSession').include()
         mb.free_function('PyMKCreateSession').rename('CreateSession')
@@ -41,7 +24,6 @@ class MatchMaking(SemiSharedModuleGenerator):
         mb.free_function('PyMKCloseSession').rename('CloseSession')
         mb.free_function('PyMKIsSessionActive').include()
         mb.free_function('PyMKIsSessionActive').rename('IsSessionActive')
-        
 
         cls = mb.class_('PyMatchEventsSubscription')
         cls.include()

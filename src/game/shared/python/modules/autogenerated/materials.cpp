@@ -2,14 +2,6 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
-#include "cdll_client_int.h"
-
-#include "viewpostprocess.h"
-
-#include "hl2wars/teamcolor_proxy.h"
-
 #include "cbase.h"
 
 #include "materialsystem/imaterial.h"
@@ -18,7 +10,13 @@
 
 #include "python/srcpy_materials.h"
 
+#include "cdll_client_int.h"
+
+#include "viewpostprocess.h"
+
 #include "glow_outline_effect.h"
+
+#include "hl2wars/teamcolor_proxy.h"
 
 #include "srcpy.h"
 

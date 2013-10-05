@@ -3,12 +3,36 @@ from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
 from src_helper import *
 from pyplusplus import code_creators
-import settings
 
 class EntitiesMisc(SemiSharedModuleGenerator):
-    module_name = '_entities_misc'
+    module_name = '_entitiesmisc'
     
     files = [
+        '$%videocfg/videocfg.h',
+        'cbase.h',
+        'takedamageinfo.h',
+        '$cliententitylist.h',
+        '$soundinfo.h',
+        
+        '#mathlib/vmatrix.h', 
+        '#utlvector.h', 
+        '#shareddefs.h', 
+        '#util.h',
+        
+        '#networkvar.h',
+        '#eventqueue.h',
+        '#entitylist.h',
+        '#takedamageinfo.h',
+        '#srcpy_networkvar.h',
+        '#soundent.h',
+        '#entityoutput.h',
+        '#SkyCamera.h',
+        '#world.h',
+        '#globals.h',
+        '#physics_prop_ragdoll.h',
+
+        '#srcpy_srcbuiltins.h',
+        
         'shared_classnames.h',
         'npcevent.h',
         'studio.h',
@@ -17,72 +41,22 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         'saverestore.h',
         'mapentities_shared.h',
         'vcollide_parse.h',
-        'hl2wars_player_shared.h',
-        'imouse.h',
         'props_shared.h',
         'beam_shared.h',
         'shot_manipulator.h',
-    ]
-    
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-
-            'cbase.h',
-            'takedamageinfo.h',
-            'cliententitylist.h',
-
-            'c_hl2wars_player.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-            
-            'cbase.h',
-            'takedamageinfo.h',
-            'cliententitylist.h',
-
-            'c_hl2wars_player.h',
-        ]
-
-    server_files = [
-        'cbase.h', 
-        'mathlib/vmatrix.h', 
-        'utlvector.h', 
-        'shareddefs.h', 
-        'util.h',
         
-        'networkvar.h',
-        'eventqueue.h',
-        'entitylist.h',
-        'takedamageinfo.h',
-        'srcpy_networkvar.h',
-        'soundent.h',
-        'entityoutput.h',
-        'SkyCamera.h',
-        'world.h',
-        'globals.h',
-        'physics_prop_ragdoll.h',
-        
-        'hl2wars_player.h',
-        'srcpy_base.h',
+        'imouse.h',
+        '$c_hl2wars_player.h',
+        '#hl2wars_player.h',
+        '#srcpy_base.h',
     ]
-    
-    if not settings.ASW_CODE_BASE:
-        server_files.append('ai_speech.h')
-    
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.server_files + self.files 
         
     def ParseClientEntityRelated(self, mb):    
         # Creating a client class
         cls =  mb.class_('NetworkedClass')
         cls.include()
         cls.vars('m_pClientClass').exclude()
-        IncludeEmptyClass(mb, 'ClientClass')
+        self.IncludeEmptyClass(mb, 'ClientClass')
         mb.class_('ClientClass').no_init = True
         mb.class_('ClientClass').calldefs('ClientClass').exclude()
         
@@ -112,7 +86,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_function('ClientEntityList').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         
         # PyEntityFactory    
-        IncludeEmptyClass(mb, 'PyEntityFactory')
+        self.IncludeEmptyClass(mb, 'PyEntityFactory')
         mb.class_('PyEntityFactory').rename('EntityFactory')
         mb.free_function('PyGetClassByClassname').include()
         mb.free_function('PyGetClassByClassname').rename('GetClassByClassname')
@@ -121,7 +95,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         
     def ParseServerEntityRelated(self, mb):
         # PyEntityFactory    
-        IncludeEmptyClass(mb, 'PyEntityFactory')
+        self.IncludeEmptyClass(mb, 'PyEntityFactory')
         mb.class_('PyEntityFactory').rename('EntityFactory')
         mb.free_function('PyGetClassByClassname').include()
         mb.free_function('PyGetClassByClassname').rename('GetClassByClassname')
@@ -132,7 +106,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls = mb.class_('NetworkedClass')
         cls.include()
         cls.vars('m_pServerClass').exclude()
-        IncludeEmptyClass(mb, 'ServerClass')
+        self.IncludeEmptyClass(mb, 'ServerClass')
         mb.class_('ServerClass').no_init = True
         mb.class_('ServerClass').calldefs('ServerClass').exclude()
 
@@ -226,7 +200,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('FindEntityByNetname').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         cls.mem_funs('FindEntityProcedural').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
 
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('FindEntityByClassnameFast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.mem_funs('FindEntityByClassnameNearest2D').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.mem_funs('FindEntityByClassnameNearestFast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -250,7 +224,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('Save').exclude()
         cls.mem_funs('Restore').exclude()
         
-        if settings.ASW_CODE_BASE:
+        if self.settings.ASW_CODE_BASE:
             cls.mem_funs('GetActionForTarget').exclude()
             cls.mem_funs('GetFirstAction').exclude()
             
@@ -309,7 +283,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.add_registration_code( 'def("GetEnt", &::gamevcollisionevent_t_wrapper::GetEnt)')
 
         # Speech
-        if not settings.ASW_CODE_BASE:
+        if not self.settings.ASW_CODE_BASE:
             cls = mb.class_('CAI_Expresser')
             cls.include()
             cls.calldefs().virtuality = 'not virtual'  

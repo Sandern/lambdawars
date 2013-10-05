@@ -19,11 +19,11 @@ class ModuleGenerator(object):
     path = 'specify a valid path'
     
     def GetFiles(self):
-        return self.files
+        return self.files, []
     
     # Main method
     def Run(self):
-        mb = self.CreateBuilder(self.GetFiles())
+        mb = self.CreateBuilder(*self.GetFiles())
         self.Parse(mb)
         self.FinalOutput(mb)
         
@@ -32,8 +32,10 @@ class ModuleGenerator(object):
         assert(0)
         
     # Create builder
-    def CreateBuilder(self, files):
-        return src_module_builder_t(files, is_client=False)
+    def CreateBuilder(self, files, parseonlyfiles):
+        mb = src_module_builder_t(files, is_client=False)
+        mb.parseonlyfiles = parseonlyfiles
+        return mb
             
     def FinalOutput(self, mb):
         ''' Finalizes the output after generation of the bindings.
@@ -90,4 +92,17 @@ class ModuleGenerator(object):
         if c.enums(allow_empty=True):
             c.enums(allow_empty=True).exclude()  
         
+    def SetupProperty(self, mb, cls, pyname, gettername, settername=None, excludesetget=True):
+        ''' Shortcut for adding a property and exluding the getter/setter functions. '''
+        cls = mb.class_(cls) if type(cls) == str else cls
+        
+        getter = cls.mem_fun(gettername)
+        setter = cls.mem_fun(settername) if settername != None else None
+        
+        if excludesetget:
+            getter.exclude()
+            if setter:
+                setter.exclude()
+        
+        cls.add_property(pyname, getter, setter)
             

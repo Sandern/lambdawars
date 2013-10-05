@@ -15,7 +15,7 @@ extern "C" __declspec(dllexport) void initsrcbuiltins();
 extern "C" __declspec(dllexport) void initsrcbase();
 extern "C" __declspec(dllexport) void init_vmath();
 extern "C" __declspec(dllexport) void init_entities();
-extern "C" __declspec(dllexport) void init_entities_misc();
+extern "C" __declspec(dllexport) void init_entitiesmisc();
 extern "C" __declspec(dllexport) void init_gameinterface();
 extern "C" __declspec(dllexport) void init_utils();
 extern "C" __declspec(dllexport) void init_physics();
@@ -38,7 +38,7 @@ extern "C"  void initsrcbuiltins();
 extern "C"  void initsrcbase();
 extern "C"  void init_vmath();
 extern "C"  void init_entities();
-extern "C"  void init_entities_misc();
+extern "C"  void init_entitiesmisc();
 extern "C"  void init_gameinterface();
 extern "C"  void init_utils();
 extern "C"  void init_physics();
@@ -65,7 +65,7 @@ void AppendSharedModules()
 	APPEND_MODULE(srcbase)
 	APPEND_MODULE(_vmath)
 	APPEND_MODULE(_entities)
-	APPEND_MODULE(_entities_misc)
+	APPEND_MODULE(_entitiesmisc)
 	APPEND_MODULE(_gameinterface)
 	APPEND_MODULE(_utils)
 	APPEND_MODULE(_physics)

@@ -11,7 +11,6 @@ class VProf(SemiSharedModuleGenerator):
 
     def Parse(self, mb):
         # Exclude everything, then add what we need
-        # Otherwise we get very big source code and dll's
         mb.decls().exclude() 
         
         mb.class_('CVProfile').include()

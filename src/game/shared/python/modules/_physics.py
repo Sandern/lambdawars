@@ -3,37 +3,22 @@ from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
 from pyplusplus import code_creators
-import settings
+from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 
 class Physics(SemiSharedModuleGenerator):
     module_name = '_physics'
     
-    if settings.ASW_CODE_BASE:
-        client_files = [
-            'videocfg/videocfg.h',
-        ]
-    else:
-        client_files = [
-            'wchartypes.h',
-            'shake.h',
-        ]
-    
-    server_files = [
-        'physics_impact_damage.h',
-    ]
-    
     files = [
+		'$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_physics.h',
+        'vphysics/friction.h',
+        'physics.h',
+        '#physics_impact_damage.h',
         'vphysics_interface.h',
         'physics_shared.h',
     ]
     
-    def GetFiles(self):
-        if self.isclient:
-            return self.client_files + self.files 
-        return self.files + self.server_files
-
     def ParsePhysicObjects(self, mb):
         # Base Wrapper
         cls = mb.class_('PyPhysicsObject')
