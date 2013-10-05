@@ -38,13 +38,13 @@
 #include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "IServerUnknown_pypp.hpp"
+#include "IHandleEntity_pypp.hpp"
 
 namespace bp = boost::python;
 
-void register_IServerUnknown_class(){
+void register_IHandleEntity_class(){
 
-    bp::class_< IServerUnknown, bp::bases< IHandleEntity >, boost::noncopyable >( "IServerUnknown", bp::no_init );
+    bp::class_< IHandleEntity, boost::noncopyable >( "IHandleEntity", bp::no_init );
 
 }
 

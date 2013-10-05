@@ -2082,6 +2082,15 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("iMode") ) );
         
         }
+        { //::CHL2WarsPlayer::NoClipStateChanged
+        
+            typedef void ( ::CHL2WarsPlayer::*NoClipStateChanged_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "NoClipStateChanged"
+                , NoClipStateChanged_function_type( &::CHL2WarsPlayer::NoClipStateChanged ) );
+        
+        }
         { //::CHL2WarsPlayer::OnChangeOwnerNumber
         
             typedef void ( ::CHL2WarsPlayer::*OnChangeOwnerNumber_function_type )( int ) ;

@@ -8,43 +8,38 @@
 #include "srcpy_entities.h"
 #include "bone_setup.h"
 #include "basegrenade_shared.h"
-#include "SkyCamera.h"
-#include "ai_basenpc.h"
-#include "modelentities.h"
-#include "basetoggle.h"
-#include "triggers.h"
-#include "nav_area.h"
-#include "AI_Criteria.h"
+#include "takedamageinfo.h"
+#include "c_ai_basenpc.h"
+#include "c_basetoggle.h"
+#include "c_triggers.h"
+#include "soundinfo.h"
 #include "saverestore.h"
 #include "vcollide_parse.h"
-#include "iservervehicle.h"
-#include "spark.h"
-#include "physics_prop_ragdoll.h"
-#include "filters.h"
-#include "EntityFlame.h"
-#include "gib.h"
-#include "props.h"
+#include "iclientvehicle.h"
+#include "steam/steamclientpublic.h"
+#include "view_shared.h"
+#include "c_playerresource.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
-#include "smoke_trail.h"
+#include "c_smoke_trail.h"
 #include "beam_shared.h"
-#include "hl2wars_player.h"
+#include "c_hl2wars_player.h"
 #include "unit_base_shared.h"
 #include "wars_func_unit.h"
 #include "hl2wars_player_shared.h"
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
-#include "wars_weapon.h"
+#include "c_wars_weapon.h"
 #include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "IServerUnknown_pypp.hpp"
+#include "IHandleEntity_pypp.hpp"
 
 namespace bp = boost::python;
 
-void register_IServerUnknown_class(){
+void register_IHandleEntity_class(){
 
-    bp::class_< IServerUnknown, bp::bases< IHandleEntity >, boost::noncopyable >( "IServerUnknown", bp::no_init );
+    bp::class_< IHandleEntity, boost::noncopyable >( "IHandleEntity", bp::no_init );
 
 }
 

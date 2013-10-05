@@ -482,86 +482,37 @@ class Entities(SemiSharedModuleGenerator):
         # Creation and spawning
         mb.free_functions('CreateEntityByName').include()
         mb.free_functions('DispatchSpawn').include()
-                         
-    '''def ParseServerEntities(self, mb):
-        for cls_name in self.serverentities:
-            self.SetupEntityClass(mb, cls_name)
 
-            # Check if the python class is networkable. Return the right serverclass.
-            cls = mb.class_(cls_name)
-            if cls_name not in ['CPointEntity','CServerOnlyEntity', 'CServerOnlyPointEntity', 'CLogicalEntity', 'CFuncBrush', 'CBaseFilter', 'CEntityFlame']:
-                cls.add_wrapper_code(   'virtual ServerClass* GetServerClass() {\r\n' + \
-                                        '    #if defined(_WIN32)\r\n' + \
-                                        '    #if defined(_DEBUG)\r\n' + \
-                                        '    Assert( GetCurrentThreadId() == g_hPythonThreadID );\r\n' + \
-                                        '    #elif defined(PY_CHECKTHREADID)\r\n' + \
-                                        '    if( GetCurrentThreadId() != g_hPythonThreadID )\r\n' + \
-                                        '        Error( "GetServerClass: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );\r\n' + \
-                                        '    #endif // _DEBUG/PY_CHECKTHREADID\r\n' + \
-                                        '    #endif // _WIN32\r\n' + \
-                                        '    #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)\r\n' + \
-                                        '    if( py_log_overrides.GetBool() )\r\n' + \
-                                        '        Msg("Calling GetServerClass(  ) of Class: %s\\n");\r\n' % (cls_name) + \
-                                        '    #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES\r\n' + \
-                                        '    ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>("pyServerClass", GetPyInstance(), NULL, true);\r\n' + \
-                                        '    if( pServerClass )\r\n' + \
-                                        '        return pServerClass;\r\n' + \
-                                        '    return '+cls_name+'::GetServerClass();\r\n' + \
-                                        '}\r\n'
-                )
-                
-                #cls.add_wrapper_code(
-                #    'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
-                #)
-            
-            #AddWrapReg( mb, cls_name, mb.member_function('CanBeSeenBy', lambda decl: HasArgType(decl, 'CBaseEntity')), [CreateEntityArg('pEnt')] )  
-            
-            self.AddTestCollisionMethod(cls, cls_name)
-            
-        #mb.vars( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
-        #mb.classes( lambda decl: 'NetworkVar' in decl.name ).exclude()        # Don't care or needs a better look
-        #mb.mem_funs( lambda decl: 'YouForgotToImplement' in decl.name ).exclude()   # Don't care
+    def ParseBaseEntityHandles(self, mb):
+        # Dead entity
+        cls = mb.class_('DeadEntity')
+        cls.include()
+        cls.mem_fun('NonZero').rename('__nonzero__')
         
-        # Network var accessors
-        # TODO: clrender, renderfx
-        mb.class_('CBaseEntity').add_property( 'health'
-                         , mb.class_('CBaseEntity').member_function( 'GetHealth' )
-                         , mb.class_('CBaseEntity').member_function( 'SetHealth' ) )
-        mb.class_('CBaseEntity').add_property( 'maxhealth'
-                         , mb.class_('CBaseEntity').member_function( 'GetMaxHealth' )
-                         , mb.class_('CBaseEntity').member_function( 'SetMaxHealth' ) )
-        mb.class_('CBaseEntity').add_property( 'lifestate'
-                         , mb.class_('CBaseEntity').member_function( 'PyGetLifeState' )
-                         , mb.class_('CBaseEntity').member_function( 'PySetLifeState' ) )
-        mb.class_('CBaseEntity').add_property( 'takedamage'
-                         , mb.class_('CBaseEntity').member_function( 'PyGetTakeDamage' )
-                         , mb.class_('CBaseEntity').member_function( 'PySetTakeDamage' ) )
-        mb.class_('CBaseEntity').add_property( 'animtime'
-                         , mb.class_('CBaseEntity').member_function( 'GetAnimTime' )
-                         , mb.class_('CBaseEntity').member_function( 'SetAnimTime' ) )
-        mb.class_('CBaseEntity').add_property( 'simulationtime'
-                         , mb.class_('CBaseEntity').member_function( 'GetSimulationTime' )
-                         , mb.class_('CBaseEntity').member_function( 'SetSimulationTime' ) )
-        mb.class_('CBaseEntity').add_property( 'rendermode'
-                         , mb.class_('CBaseEntity').member_function( 'GetRenderMode' )
-                         , mb.class_('CBaseEntity').member_function( 'SetRenderMode' ) )
-
-        mb.class_('CBaseAnimating').add_property( 'skin'
-                         , mb.class_('CBaseAnimating').member_function( 'GetSkin' )
-                         , mb.class_('CBaseAnimating').member_function( 'SetSkin' ) )
-        mb.mem_funs('GetSkin').exclude()
-        mb.mem_funs('SetSkin').exclude()
-            
-        # //--------------------------------------------------------------------------------------------------------------------------------
-        # Useful free functions
-        mb.free_functions('CreateEntityByName').include()
-        mb.free_functions('CreateEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.free_functions('CreateNetworkableByName').include()     # Gives problems on linux and I can't find the definition. Don't think we need it anyway.
-        #mb.free_functions('CreateNetworkableByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        #mb.free_functions('SpawnEntityByName').include()           # <-- LOL, declaration only.
-        #mb.free_functions('SpawnEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.free_functions('DispatchSpawn').include()'''
-
+        # Entity Handles
+        cls = mb.class_('CBaseHandle')
+        cls.include()
+        cls.mem_funs().exclude()
+        cls.mem_funs('GetEntryIndex').include()
+        cls.mem_funs('GetSerialNumber').include()
+        cls.mem_funs('ToInt').include()
+        cls.mem_funs('IsValid').include()
+        
+        cls = mb.class_('PyHandle')
+        cls.include()
+        cls.mem_fun('Get').exclude()
+        cls.mem_fun('PyGet').rename('Get')
+        cls.mem_fun('GetAttr').rename('__getattr__')
+        cls.mem_fun('GetAttribute').rename('__getattribute__')
+        cls.mem_fun('SetAttr').rename('__setattr__')
+        cls.mem_fun('Cmp').rename('__cmp__')
+        cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_fun('Str').rename('__str__')
+        cls.mem_funs('GetPySelf').exclude()
+        
+        cls.add_wrapper_code(
+            'virtual PyObject *GetPySelf() { return boost::python::detail::wrapper_base_::get_owner(*this); }'
+        )
     
     def ParseBaseEntity(self, mb):
         cls = mb.class_('C_BaseEntity') if self.isclient else mb.class_('CBaseEntity')
@@ -1953,41 +1904,14 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
     def ParseEntities(self, mb):
+        self.ParseBaseEntityHandles(mb)
+        
+        self.IncludeEmptyClass(mb, 'IHandleEntity')
+    
         if self.isclient:
             self.ParseClientEntities(mb)
         else:
             self.ParseServerEntities(mb)
-        mb.mem_funs('GetPyNetworkType').include()
-
-        # Dead entity
-        cls = mb.class_('DeadEntity')
-        cls.include()
-        cls.mem_fun('NonZero').rename('__nonzero__')
-        
-        # Entity Handles
-        cls = mb.class_('CBaseHandle')
-        cls.include()
-        cls.mem_funs().exclude()
-        cls.mem_funs('GetEntryIndex').include()
-        cls.mem_funs('GetSerialNumber').include()
-        cls.mem_funs('ToInt').include()
-        cls.mem_funs('IsValid').include()
-        
-        cls = mb.class_('PyHandle')
-        cls.include()
-        cls.mem_fun('Get').exclude()
-        cls.mem_fun('PyGet').rename('Get')
-        cls.mem_fun('GetAttr').rename('__getattr__')
-        cls.mem_fun('GetAttribute').rename('__getattribute__')
-        cls.mem_fun('SetAttr').rename('__setattr__')
-        cls.mem_fun('Cmp').rename('__cmp__')
-        cls.mem_fun('NonZero').rename('__nonzero__')
-        cls.mem_fun('Str').rename('__str__')
-        cls.mem_funs('GetPySelf').exclude()
-        
-        cls.add_wrapper_code(
-            'virtual PyObject *GetPySelf() { return boost::python::detail::wrapper_base_::get_owner(*this); }'
-        )
         
         self.ParseBaseEntity(mb)
         self.ParseBaseAnimating(mb)

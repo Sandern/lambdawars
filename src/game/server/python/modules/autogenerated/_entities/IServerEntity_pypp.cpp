@@ -42,41 +42,9 @@
 
 namespace bp = boost::python;
 
-struct IServerEntity_wrapper : IServerEntity, bp::wrapper< IServerEntity > {
-
-    IServerEntity_wrapper()
-    : IServerEntity()
-      , bp::wrapper< IServerEntity >(){
-        // null constructor
-        
-    }
-
-    virtual ::CBaseHandle const & GetRefEHandle(  ) const {
-        throw std::logic_error("warning W1049: This method could not be overriden in Python - method returns reference to local variable!");
-    }
-
-    virtual void SetRefEHandle( ::CBaseHandle const & handle ){
-        bp::override func_SetRefEHandle = this->get_override( "SetRefEHandle" );
-        try {
-            func_SetRefEHandle( boost::ref(handle) );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-};
-
 void register_IServerEntity_class(){
 
-    bp::class_< IServerEntity_wrapper, bp::bases< IServerUnknown >, boost::noncopyable >( "IServerEntity", bp::no_init )    
-        .def( 
-            "GetRefEHandle"
-            , bp::pure_virtual( (::CBaseHandle const & ( ::IHandleEntity::* )(  ) const)(&::IHandleEntity::GetRefEHandle) )
-            , bp::return_value_policy< bp::copy_const_reference >() )    
-        .def( 
-            "SetRefEHandle"
-            , bp::pure_virtual( (void ( ::IHandleEntity::* )( ::CBaseHandle const & ) )(&::IHandleEntity::SetRefEHandle) )
-            , ( bp::arg("handle") ) );
+    bp::class_< IServerEntity, bp::bases< IServerUnknown >, boost::noncopyable >( "IServerEntity", bp::no_init );
 
 }
 
