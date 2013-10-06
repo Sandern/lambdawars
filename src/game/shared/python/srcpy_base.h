@@ -316,22 +316,4 @@ public:
 	inline bool IsAnyFlagSet() const { return CUtlFlags<unsigned short>::IsAnyFlagSet(); }
 };
 
-#ifndef CLIENT_DLL
-//-----------------------------------------------------------------------------
-// Purpose: PyOutputEvent
-//-----------------------------------------------------------------------------
-class PyOutputEvent : public CBaseEntityOutput
-{
-public:
-	PyOutputEvent();
-
-	void Set( variant_t value );
-
-	// void Firing, no parameter
-	void FireOutput( CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 );
-	void FireOutput( variant_t Value, CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 ) 
-	{ CBaseEntityOutput::FireOutput( Value, pActivator, pCaller, fDelay ); }
-};
-#endif // CLIENT_DLL
-
 #endif // SRCPY_BASE_H

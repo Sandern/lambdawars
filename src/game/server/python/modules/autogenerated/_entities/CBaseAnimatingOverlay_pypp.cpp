@@ -35,7 +35,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "CBaseAnimatingOverlay_pypp.hpp"

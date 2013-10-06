@@ -43,7 +43,7 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	bp::object issubclass;
 	bp::object cgamerules;
 	try {
-		issubclass = __builtin__.attr("issubclass");
+		issubclass = builtins.attr("issubclass");
 		cgamerules = bp::import("_gamerules").attr("CHL2WarsGameRules");
 
 		bool bIsSubclass = bp::extract<bool>( issubclass(gamerules, cgamerules) );

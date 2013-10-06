@@ -47,7 +47,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         'imouse.h',
         '$c_hl2wars_player.h',
         '#hl2wars_player.h',
-        '#srcpy_base.h',
     ]
         
     def ParseClientEntityRelated(self, mb):    
@@ -91,6 +90,13 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_function('PyGetClassByClassname').rename('GetClassByClassname')
         mb.free_function('PyGetAllClassnames').include()
         mb.free_function('PyGetAllClassnames').rename('GetAllClassnames')
+        
+        # Client only structs
+        cls = mb.class_('SpatializationInfo_t')
+        cls.include()
+        cls.var('pOrigin').exclude()
+        cls.var('pAngles').exclude()
+        cls.var('pflRadius').exclude()
         
     def ParseServerEntityRelated(self, mb):
         # PyEntityFactory    
@@ -240,7 +246,13 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         #mb.class_('COutputColor32').include()        
         
         # Inputdata_t and variant_t
-        mb.class_('inputdata_t').include()
+        cls = mb.class_('inputdata_t')
+        cls.include()
+        if self.settings.branch == 'source2013':
+            cls.var('nOutputID').rename('outputid')
+            cls.var('pActivator').rename('activator')
+            cls.var('pCaller').rename('caller')
+        
         mb.class_('variant_t').include()
         mb.class_('variant_t').vars( lambda decl: 'm_Save' in decl.name ).exclude()
         mb.class_('variant_t').vars('vecVal').exclude()
@@ -400,11 +412,13 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.add_registration_code( "ptr_imouse_to_py_imouse();" )
         
         # Model
-        IncludeEmptyClass(mb, 'CStudioHdr')
-        mb.class_('CStudioHdr').calldefs('CStudioHdr').exclude()
-        mb.class_('CStudioHdr').no_init = True
-        mb.class_('CStudioHdr').mem_funs('pszName').include()
-
+        cls = mb.class_('CStudioHdr')
+        self.IncludeEmptyClass(mb, 'CStudioHdr')
+        cls.calldefs('CStudioHdr').exclude()
+        cls.no_init = True
+        cls.mem_funs('pszName').include()
+        cls.mem_funs('pszName').rename('name')
+        
         # Shared Props
         mb.class_('breakablepropparams_t').include()
         mb.free_functions('GetMassEquivalent').include()
@@ -512,9 +526,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         else:
             self.ParseServerEntityRelated(mb)
         self.ParseMisc(mb)
-        
-        # Disable shared warnings
-        DisableKnownWarnings(mb)
         
     def AddAdditionalCode(self, mb):
         header = code_creators.include_t( 'srcpy_converters_ents.h' )

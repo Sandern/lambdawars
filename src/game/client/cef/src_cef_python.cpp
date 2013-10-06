@@ -58,7 +58,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
-	bp::object type = __builtin__.attr("type");
+	bp::object type = builtins.attr("type");
 
 	for( int i = 0; i < n; i++ )
 	{
@@ -165,7 +165,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 {
 	CefRefPtr<CefDictionaryValue> result = CefDictionaryValue::Create();
 
-	bp::object type = __builtin__.attr("type");
+	bp::object type = builtins.attr("type");
 
 	bp::object key, value;
 	const bp::object objectKeys = d.iterkeys();

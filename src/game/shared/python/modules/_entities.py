@@ -4,9 +4,8 @@ from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
 from pyplusplus import messages
-from pygccxml.declarations import matchers
-from pyplusplus import code_creators
 from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
+from pyplusplus import code_creators
 
 from src_helper import HasArgType, AddWrapReg, AddWrapRegs, CreateEntityArg, AddNetworkVarProperty, DisableKnownWarnings
 
@@ -114,7 +113,7 @@ tmpl_enthandle = '''{ //::%(handlename)s
     }
 '''
 
-tmpl_ent_converters = '''
+tmpl_ent_converters_to = '''
 struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
 {
     static PyObject* convert(%(clsname)s *s)
@@ -130,7 +129,9 @@ struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s
         return bp::incref(s.GetPyHandle().ptr());
     }
 };
+'''
 
+tmpl_ent_converters_from = '''
 struct %(convert_from_py_name)s
 {
     handle_to_%(clsname)s()
@@ -188,6 +189,7 @@ class Entities(SemiSharedModuleGenerator):
         '#gib.h',
         '$c_playerresource.h',
         '#props.h',
+        '$%baseviewmodel_shared.h',
         
         'Sprite.h',
         'SpriteTrail.h',
@@ -271,7 +273,7 @@ class Entities(SemiSharedModuleGenerator):
         'CEntityFlame',
     ]
     
-    def AddEntityConverter(self, mb, clsname):
+    def AddEntityConverter(self, mb, clsname, pyhandletoptronly=False):
         ''' Creates entities converters/handles for Python. '''
         cls = mb.class_(clsname)
         
@@ -281,14 +283,21 @@ class Entities(SemiSharedModuleGenerator):
         convert_to_py_name = '%s_to_handle' % (clsname)
         convert_from_py_name = 'handle_to_%s' % (clsname)
         
-        # Add handle typedef
-        mb.add_declaration_code( 'typedef CEPyHandle< %s > %s;\r\n'% (clsname, handlename) )
-        
-        # Expose handle code
-        mb.add_registration_code( tmpl_enthandle % {'clsname' : clsname, 'handlename' : handlename}, True )
+        if not pyhandletoptronly:
+            # Add handle
+            mb.add_declaration_code( 'typedef CEPyHandle< %s > %s;\r\n'% (clsname, handlename) )
+            mb.add_registration_code( tmpl_enthandle % {'clsname' : clsname, 'handlename' : handlename}, True )
         
         # Add declaration code for converters
-        mb.add_declaration_code( tmpl_ent_converters % {
+        if not pyhandletoptronly:
+            mb.add_declaration_code( tmpl_ent_converters_to % {
+                'clsname' : clsname,
+                'ptr_convert_to_py_name' : ptr_convert_to_py_name,
+                'convert_to_py_name' : convert_to_py_name,
+                'convert_from_py_name' : convert_from_py_name,
+            })
+        
+        mb.add_declaration_code( tmpl_ent_converters_from % {
             'clsname' : clsname,
             'ptr_convert_to_py_name' : ptr_convert_to_py_name,
             'convert_to_py_name' : convert_to_py_name,
@@ -296,8 +305,9 @@ class Entities(SemiSharedModuleGenerator):
         })
         
         # Add registration code
-        mb.add_registration_code( "%s();" % (ptr_convert_to_py_name) )
-        mb.add_registration_code( "%s();" % (convert_to_py_name) )
+        if not pyhandletoptronly:
+            mb.add_registration_code( "%s();" % (ptr_convert_to_py_name) )
+            mb.add_registration_code( "%s();" % (convert_to_py_name) )
         mb.add_registration_code( "%s();" % (convert_from_py_name) )
         
     # Parse methods
@@ -338,8 +348,10 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
         cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
 
+        # matrix3x4_t is always returned by value
         matrix3x4 = mb.class_('matrix3x4_t')
         cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(declarated_t(matrix3x4))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(const_t(declarated_t(matrix3x4)))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         # TODO: Default exlude, only include the variables we want
         #cls.vars(allow_empty=True).exclude()
@@ -475,7 +487,6 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('Cmp').rename('__cmp__')
         cls.mem_fun('NonZero').rename('__nonzero__')
         cls.mem_fun('Str').rename('__str__')
-        cls.mem_funs('GetPySelf').exclude()
         
         cls.add_wrapper_code(
             'virtual PyObject *GetPySelf() { return boost::python::detail::wrapper_base_::get_owner(*this); }'
@@ -511,6 +522,7 @@ class Entities(SemiSharedModuleGenerator):
         
         mb.mem_funs('Release').exclude()                # Don't care
         mb.mem_funs('GetPyInstance').exclude()          # Not needed, used when converting entities to python
+        mb.mem_funs('SetPyInstance').exclude()          # Not needed, used when converting entities to python
         mb.mem_funs('ClearPyInstance').exclude()        # Not needed, used for cleaning up python entities
         mb.mem_funs('GetBaseMap').exclude()             # Not needed
         mb.mem_funs('GetDataDescMap').exclude()         # Not needed
@@ -528,16 +540,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetBaseAnimating').exclude() # Automatically done by converter
         mb.mem_funs('MyUnitPointer').exclude() # Automatically done by converter
         mb.mem_funs('GetIUnit').exclude()
-        
-        '''mb.mem_funs('GetHealth').exclude() # Use property
-        mb.mem_funs('SetHealth').exclude() # Use property
-        mb.mem_funs('GetMaxHealth').exclude() # Use property
-        mb.mem_funs('PyGetLifeState').exclude() # Use property
-        mb.mem_funs('PySetLifeState').exclude() # Use property
-        mb.mem_funs('PyGetTakeDamage').exclude() # Use property
-        mb.mem_funs('PySetTakeDamage').exclude() # Use property
-        if self.isserver:
-            mb.mem_funs('SetMaxHealth').exclude() # Use property'''
         
         #mb.mem_funs('GetParametersForSound').exclude()  # Don't care for now
         #mb.mem_funs('LookupSoundLevel').exclude()       # Don't care for now
@@ -569,25 +571,25 @@ class Entities(SemiSharedModuleGenerator):
         
         # Call policies
         mb.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference() 
-        mb.mem_funs('CreatePredictedEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetBaseAnimating').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetOwnerEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetEffectEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('CreatePredictedEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetBaseAnimating').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetOwnerEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetEffectEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('GetTeam').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetRootMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('FirstMoveChild').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('NextMovePeer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('MyNPCPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )      # Remove?
-        mb.mem_funs('MyCombatCharacterPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  # Remove?
-        mb.mem_funs('GetFollowedEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetSimulatingPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetGroundEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetPredictionPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        #mb.mem_funs('GetMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetRootMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('FirstMoveChild').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('NextMovePeer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('MyNPCPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )      # Remove?
+        #mb.mem_funs('MyCombatCharacterPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  # Remove?
+        #mb.mem_funs('GetFollowedEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetSimulatingPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        #mb.mem_funs('GetGroundEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        #mb.mem_funs('GetPredictionPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetBeamTraceFilter').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('Instance').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetMousePassEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('Instance').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetMousePassEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
         # Transformations
         #mb.mem_funs( name='EmitSound', function=lambda decl: HasArgType(decl, 'HSOUNDSCRIPTHANDLE') ).add_transformation( FT.input("handle") )
@@ -605,7 +607,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('SetPyThink').rename('SetThink')
         mb.mem_funs('GetPyThink').rename('GetThink')
         mb.mem_funs('GetPyHandle').rename('GetHandle')
-        mb.mem_funs('GetPySelf').exclude()
         mb.mem_funs('PyThink').exclude()
         mb.mem_funs('PyTouch').exclude()
         
@@ -616,8 +617,7 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude with certain arguments
         mb.mem_funs( lambda decl: HasArgType(decl, 'groundlink_t') ).exclude()
         mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('groundlink_t') != -1 ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'touchlink_t') ).exclude()    
-        #mb.mem_funs( lambda decl: HasArgType(decl, 'matrix3x4_t') ).exclude()
+        mb.mem_funs( lambda decl: HasArgType(decl, 'touchlink_t') ).exclude()
         mb.mem_funs( lambda decl: HasArgType(decl, 'bf_read') ).exclude()
         
         # Exclude trace stuff for now
@@ -633,14 +633,15 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetTracerType').virtuality = 'virtual'
         mb.mem_funs('MakeTracer').virtuality = 'virtual'
         mb.mem_funs('DoImpactEffect').virtuality = 'virtual'
-        mb.mem_funs('GetIMouse').virtuality = 'virtual'
-        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
         mb.mem_funs('StartTouch').virtuality = 'virtual'
         mb.mem_funs('EndTouch').virtuality = 'virtual'
         mb.mem_funs('UpdateTransmitState').virtuality = 'virtual'
         mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
         #mb.mem_funs('TestCollision').virtuality = 'virtual'
         mb.mem_funs('OnRestore').virtuality = 'virtual'
+        
+        mb.mem_funs('GetIMouse').virtuality = 'virtual'
+        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
         
         # Returning a physics object -> Convert by value, which results in the wrapper object being returned
         physicsobject = mb.class_('IPhysicsObject')
@@ -721,10 +722,7 @@ class Entities(SemiSharedModuleGenerator):
             #mb.mem_funs( 'GetShadowCastDistance' ).add_transformation( FT.output('pDist') )
                 
             # Call policies
-            mb.mem_funs('GetShadowUseOtherEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('EntityToWorldTransform').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetPredictionOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             
             # Rename public variables
             mb.vars('m_iHealth').rename('health')
@@ -765,7 +763,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: HasArgType(decl, 'CNewParticleEffect') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'IClientEntity') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseHandle') != -1 ).exclude()
-            #mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('matrix3x4_t') != -1 ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CDamageModifier') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'Quaternion') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'SpatializationInfo_t') ).exclude()
@@ -858,7 +855,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_flAnimTime').exclude()
             mb.vars('m_iTeamNum').exclude()
 
-            mb.mem_funs('GetServerClass').exclude()         # Don't care about this one
             mb.mem_funs('GetNetworkable').exclude()         # Don't care for now
             mb.mem_funs('NetworkProp').exclude()            # Don't care
             mb.mem_funs('edict').exclude()                  # Not needed
@@ -915,27 +911,12 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('CanBeSeenBy').exclude()      
             mb.mem_funs('DensityMap').exclude() # Don't care for now.
             
-            # Call policies 
-            mb.mem_funs('GetServerClass').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetEntitySkybox').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            # Call policies
             mb.mem_funs('GetResponseSystem').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetServerVehicle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetNextTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Respawn').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Create').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('CreateNoSpawn').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('PhysicsPushMove').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('PhysicsPushRotate').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('PhysicsCheckRotateMove').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('PhysicsCheckPushMove').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('AddEntityToGroundList').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('HasPhysicsAttacker').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('EntityToWorldTransform').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetParentToWorldTransform').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             
-            mb.mem_funs('GetTouchTrace').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  # Temp fix
+            mb.mem_funs('GetTouchTrace').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  # Temp fix
             
             # Don't give a shit about the following functions
            # mb.mem_funs( lambda decl: HasArgType(decl, 'CAI_BaseNPC') ).exclude()
@@ -973,35 +954,24 @@ class Entities(SemiSharedModuleGenerator):
         cls = mb.class_('C_BaseAnimating') if self.isclient else mb.class_('CBaseAnimating')
     
         # Transformations
-        mb.mem_funs( 'GetPoseParameterRange' ).add_transformation( FT.output('minValue'), FT.output('maxValue') )
+        mb.mem_funs('GetPoseParameterRange').add_transformation(FT.output('minValue'), FT.output('maxValue'))
 
         # Call policies   
         mb.mem_funs('GetModelPtr').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
         
         # C_BaseAnimatingOverlay    
         mb.mem_funs('GetAnimOverlay').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        
+        # Properties
+        self.SetupProperty(mb, cls, 'skin', 'GetSkin', 'SetSkin')
     
         if self.isclient:
-            mb.vars('m_nSkin').rename('skin')
             mb.vars('m_nSkin').exclude() # Use property
-            
-            cls.add_property( 'skin'
-                             , cls.member_function( 'GetSkin' )
-                             , cls.member_function( 'SetSkin' ) )
-            cls.mem_funs('GetSkin').exclude()
-            cls.mem_funs('SetSkin').exclude()
             
             cls.vars('m_SequenceTransitioner').exclude()
             cls.vars('m_nHitboxSet').exclude()
             cls.vars('m_pClientsideRagdoll').exclude()
             cls.vars('m_pRagdoll').exclude()
-            
-            # Call policies
-            mb.mem_funs('BecomeRagdollOnClient').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('CreateRagdollCopy').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('FindFollowedEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('BecomeRagdollOnClient').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('BecomeRagdollOnClient').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             
             #mb.mem_funs('OnNewModel').call_policies = call_policies.return_internal_reference() #call_policies.return_value_policy( call_policies.reference_existing_object ) 
             mb.mem_funs('ParticleProp').call_policies = call_policies.return_internal_reference() 
@@ -1028,8 +998,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
             
-            self.SetupProperty(mb, cls, 'skin', 'GetSkin', 'SetSkin')
-            
             # excludes
             if self.settings.branch != 'swarm':
                 mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBoneCache') != -1 ).exclude()
@@ -1047,26 +1015,16 @@ class Entities(SemiSharedModuleGenerator):
             mb.vars('m_flGroundSpeed').rename('groundspeed')
             mb.vars('m_flLastEventCheck').rename('lastevencheck')
             
-            # Call policies
-            mb.mem_funs('GetSequenceKeyValues').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetLightingOriginRelative').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetLightingOrigin').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
             # Transformations
-            
-            mb.mem_funs( 'GotoSequence' ).add_transformation( FT.output('iNextSequence'), FT.output('flCycle'), FT.output('iDir') )
-            mb.mem_funs( 'LookupHitbox' ).add_transformation( FT.output('outSet'), FT.output('outBox') )
-            mb.mem_funs( 'GetIntervalMovement' ).add_transformation( FT.output('bMoveSeqFinished') )
+            mb.mem_funs('GotoSequence').add_transformation(FT.output('iNextSequence'), FT.output('flCycle'), FT.output('iDir'))
+            mb.mem_funs('LookupHitbox').add_transformation(FT.output('outSet'), FT.output('outBox'))
+            mb.mem_funs('GetIntervalMovement').add_transformation(FT.output('bMoveSeqFinished'))
             
             # Enums
             mb.enums('LocalFlexController_t').include()
         
     def ParseBaseCombatCharacter(self, mb):
         cls = mb.class_('C_BaseCombatCharacter') if self.isclient else mb.class_('CBaseCombatCharacter')
-        
-        # call policies    
-        mb.mem_funs('Weapon_OwnsThisType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetActiveWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
         # enums
         mb.enum('Disposition_t').include()
@@ -1083,18 +1041,14 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('OnNavAreaRemoved').exclude()
         
         if self.isclient:
-            mb.mem_funs('GetWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            cls.add_property( 'activeweapon'
-                             , cls.member_function( 'GetActiveWeapon' ) )
+            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', excludesetget=False)
                              
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE
             mb.mem_funs('OnActiveWeaponChanged').virtuality = 'virtual'
             
         else:
             cls.member_function('SetActiveWeapon').exclude()
-            cls.add_property( 'activeweapon'
-                             , cls.member_function( 'GetActiveWeapon' )
-                             , cls.member_function('SetActiveWeapon') )        
+            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon', excludesetget=False)
         
             # Exclude
             #mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseCombatWeapon') != -1 ).exclude()
@@ -1109,17 +1063,6 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetEntitiesInFaction').exclude()
             mb.mem_funs('GetFogTrigger').exclude()
             mb.mem_funs('PlayFootstepSound').exclude()
-
-            # call policies
-            mb.mem_funs('FindMissTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Weapon_Create').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Weapon_FindUsable').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Weapon_GetSlot').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Weapon_GetWpnForAmmo').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('FindHealthItem').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('CheckTraceHullAttack').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetVehicleEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             
             mb.free_function('RadiusDamage').include()
 
@@ -1144,19 +1087,12 @@ class Entities(SemiSharedModuleGenerator):
         mb.vars('m_afButtonReleased').include()
         mb.vars('m_afButtonReleased').rename('buttonsreleased')
         if self.isclient:
-            mb.mem_funs('GetRenderedWeaponModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetRepresentativeRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetViewModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('FindUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+            mb.mem_funs('GetViewModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('GetFogParams').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetFootstepSurface').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetLadderSurface').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetLocalPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetObserverTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetActiveWeaponForSelection').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetLastWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            mb.mem_funs('GetLadderSurface').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             
             # Exclude for now
             mb.mem_funs('Hints').exclude()
@@ -1177,7 +1113,7 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetViewEntity').exclude()
                 mb.mem_funs('IsReplay').exclude()
 
-            mb.mem_funs('CalcView').add_transformation( FT.output('zNear'), FT.output('zFar'), FT.output('fov') )
+            mb.mem_funs('CalcView').add_transformation(FT.output('zNear'), FT.output('zFar'), FT.output('fov'))
         else:
             # NO DECLARATION
             mb.mem_funs('SetWeaponAnimType').exclude()
@@ -1276,9 +1212,6 @@ class Entities(SemiSharedModuleGenerator):
                              , cls.mem_fun('SetControlledUnit')) 
                              
         mb.add_registration_code( "bp::scope().attr( \"PLAYER_MAX_GROUPS\" ) = PLAYER_MAX_GROUPS;" )
-            
-        # Player cls functions are never overriden for now
-        #cls.mem_funs().virtuality = 'not virtual' 
         
     def ParseUnitBaseShared(self, mb, cls_name):
         cls = mb.class_(cls_name)
@@ -1365,10 +1298,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('OnUserLeftControl').exclude()
         mb.mem_funs('CanUserControl').exclude() 
         
-        mb.mem_funs('GetSquad').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetNext').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetCommander').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
         mb.free_function('MapUnits').include()
         
         self.ParseUnitBaseShared(mb, cls_name)
@@ -1380,7 +1309,7 @@ class Entities(SemiSharedModuleGenerator):
                          , cls.mem_fun('PyGetAnimState')
                          , cls.mem_fun('SetAnimState') )
         
-        cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetEnemy').exclude() 
         if self.isclient:
             mb.vars('m_iMaxHealth').rename('maxhealth')
@@ -1393,8 +1322,6 @@ class Entities(SemiSharedModuleGenerator):
                              , cls.mem_fun('IsClimbing'))    
             cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
         else:
-            #cls.mem_funs('EnemyDistance').exclude() 
-            #AddWrapReg( mb, 'CUnitBase', cls.mem_fun('EnemyDistance'), [CreateEntityArg('pEnemy')] )
             cls.mem_funs('GetLastTakeDamageTime').exclude()
                  
             cls.vars('m_fDeathDrop').rename('deathdrop')
@@ -1518,7 +1445,7 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetControlPanelClassName').exclude()
         mb.mem_funs('GetControlPanelInfo').exclude()
 
-        mb.mem_funs('GetLastWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetLastWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
         if self.isserver:
             mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
@@ -1529,7 +1456,7 @@ class Entities(SemiSharedModuleGenerator):
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetWeaponList').exclude()
 
-        mb.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        #mb.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
         # Rename variables
         mb.var('m_iViewModelIndex').exclude()
@@ -1587,11 +1514,6 @@ class Entities(SemiSharedModuleGenerator):
         
         # Wars Weapon
         cls = mb.class_(cls_name2)
-        cls.mem_funs('GetCommander').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        if self.isclient:
-            cls.mem_funs('GetPredictionOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            cls.mem_funs('GetMuzzleAttachEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            
         cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
         cls.var('m_fFireRate').rename('firerate')
         cls.var('m_vBulletSpread').rename('bulletspread')
@@ -1624,11 +1546,8 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('GetRootPhysicsObjectForBreak').exclude()
             
             cls = mb.class_('CPhysicsProp')
-            if self.settings.branch == 'swarm':
-                cls.mem_funs('GetObstructingEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
                 
             cls = mb.class_('CRagdollProp')
-            cls.mem_funs('GetKiller').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
     def ParseRemainingEntities(self, mb):
@@ -1648,10 +1567,6 @@ class Entities(SemiSharedModuleGenerator):
         cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
         cls = mb.class_(cls_name)
         
-        # call policies
-        cls.mem_funs('GetThrower').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetOriginalThrower').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
         cls.add_property( 'damage'
                          , cls.member_function( 'GetDamage' )
                          , cls.member_function( 'SetDamage' ) )
@@ -1663,19 +1578,7 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('SetDamage').exclude()
         cls.mem_fun('GetDamageRadius').exclude()
         cls.mem_fun('SetDamageRadius').exclude()
-                         
-        # //--------------------------------------------------------------------------------------------------------------------------------
-        # CSprite
-        mb.mem_funs('SpriteCreatePredictable').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
-        # //--------------------------------------------------------------------------------------------------------------------------------
-        # CBeam
-        mb.mem_funs('BeamCreate').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('BeamCreatePredictable').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetEndEntityPtr').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetStartEntityPtr').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('RandomTargetname').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
+
         if self.isserver:
             # Not sure where to put this
             mb.free_function('DoSpark').include()
@@ -1689,13 +1592,8 @@ class Entities(SemiSharedModuleGenerator):
             mb.enum('GibType_e').include()
             
             # CSprite
-            mb.mem_funs('SpriteCreate').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('SpriteTrailCreate').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.free_functions('SpawnBlood').include()
-            
-            # SmokeTrail
-            mb.mem_funs('CreateSmokeTrail').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
+
             cls = mb.class_('SmokeTrail')
             cls.var('m_EndColor').exclude()#rename('endcolor')
             cls.var('m_EndSize').rename('endsize')
@@ -1744,9 +1642,6 @@ class Entities(SemiSharedModuleGenerator):
             cls.add_wrapper_code('Vector GetStartColor() { return m_StartColor.Get(); }')
             cls.add_wrapper_code('void SetStartColor(Vector &startcolor) { m_StartColor = startcolor; }')
             
-            # RocketTrail (looks like smoketrail..)
-            mb.mem_funs('CreateRocketTrail').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
             cls = mb.class_('RocketTrail')
             cls.var('m_EndColor').exclude()#rename('endcolor')
             cls.var('m_EndSize').rename('endsize')
@@ -1807,11 +1702,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.add_registration_code( "bp::scope().attr( \"SF_WALL_START_OFF\" ) = (int)SF_WALL_START_OFF;" )
             mb.add_registration_code( "bp::scope().attr( \"SF_IGNORE_PLAYERUSE\" ) = (int)SF_IGNORE_PLAYERUSE;" )
             
-            # Call poilicies
-            mb.free_functions('CreateRagGib').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-            mb.mem_funs('GetSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value)    
-            mb.mem_funs('GetFlame').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
-        
             # Base filter
             cls = mb.class_('CBaseFilter')
             cls.no_init = False
@@ -1820,8 +1710,6 @@ class Entities(SemiSharedModuleGenerator):
             
             # CEntityFlame
             cls = mb.class_('CEntityFlame')
-            cls.mem_fun('Create').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-            cls.mem_fun('GetAttacker').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         else:
             # C_PlayerResource
             mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
@@ -1840,7 +1728,8 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseBaseEntityHandles(mb)
         
         self.IncludeEmptyClass(mb, 'IHandleEntity')
-    
+        self.AddEntityConverter(mb, 'IHandleEntity', True)
+        
         if self.isclient:
             self.ParseClientEntities(mb)
         else:
@@ -1856,10 +1745,6 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseBaseCombatWeapon(mb)
         self.ParseProps(mb)
         self.ParseRemainingEntities(mb)
-        
-        # Add converters
-        #mb.add_registration_code( "ptr_ihandleentity_to_pyhandle();" )
-        #mb.add_registration_code( "py_ent_to_ihandleentity();" )
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -1875,10 +1760,5 @@ class Entities(SemiSharedModuleGenerator):
         
         # Finally apply common rules to all includes functions and classes, etc.
         self.ApplyCommonRules(mb)
-        
-    '''def AddAdditionalCode(self, mb):
-        header = code_creators.include_t( 'srcpy_converters_ents.h' )
-        mb.code_creator.adopt_include(header)
-        super(Entities, self).AddAdditionalCode(mb)'''
 
     

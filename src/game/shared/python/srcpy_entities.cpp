@@ -103,7 +103,7 @@ bp::object PyHandle::GetAttr( const char *name )
 		)
 		);
 	Assert( self.ptr() != NULL );
-	return __builtin__.attr("object").attr("__getattr__")(self, name);	
+	return builtins.attr("object").attr("__getattr__")(self, name);	
 }
 
 bp::object PyHandle::GetAttribute( const char *name )
@@ -116,7 +116,7 @@ bp::object PyHandle::GetAttribute( const char *name )
 		)
 	);
 	Assert( self.ptr() != NULL );
-	return __builtin__.attr("object").attr("__getattribute__")(self, name);	
+	return builtins.attr("object").attr("__getattribute__")(self, name);	
 }
 
 void PyHandle::SetAttr( const char *name, bp::object v )
@@ -352,8 +352,8 @@ IServerNetworkable *PyEntityFactory::Create( const char *pClassName )
 			pEnt->AddEFlags( EFL_NO_AUTO_EDICT_ATTACH );
 		}
 
-		pEnt->m_pyInstance = inst;
-		pEnt->PostConstructor(pClassName);
+		pEnt->SetPyInstance( inst );
+		pEnt->PostConstructor( pClassName );
 		
 		if( !bServerOnly && g_SetupNetworkTablesOnHold )
 		{
@@ -382,7 +382,7 @@ void PyEntityFactory::Destroy( IServerNetworkable *pNetworkable )
 		CBaseEntity *pEnt = pNetworkable->GetBaseEntity();
 		if( pEnt )
 		{
-			pEnt->m_pyInstance = boost::python::object();
+			pEnt->SetPyInstance( boost::python::object() );
 		}
 		pNetworkable->Release();
 	}
@@ -410,9 +410,9 @@ void PyEntityFactory::CheckEntities()
 	pEnt = gEntList.FindEntityByClassname( NULL, m_ClassName );
 	while( pEnt )
 	{
-		if( pEnt->m_pyInstance.ptr() != Py_None )
+		if( pEnt->GetPyInstance().ptr() != Py_None )
 		{
-			pEnt->m_pyInstance.attr("__setattr__")("__class__", m_PyClass);
+			pEnt->GetPyInstance().attr("__setattr__")("__class__", m_PyClass);
 		}
 		pEnt = gEntList.FindEntityByClassname( pEnt, m_ClassName);
 	}
@@ -598,6 +598,33 @@ bp::object PyRespawnPlayer( CBasePlayer *pPlayer, const char *classname )
 #endif // CLIENT_DLL
 
 #ifndef CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Purpose: PyOutputEvent
+//-----------------------------------------------------------------------------
+PyOutputEvent::PyOutputEvent()
+{
+	// Set to NULL! Normally it depends on the the memory allocation function of CBaseEntity
+	m_ActionList = NULL; 
+
+	// Default
+	m_Value.Set( FIELD_VOID, NULL );
+}
+
+void PyOutputEvent::Set( variant_t value )
+{
+	m_Value = value;
+}
+
+// void Firing, no parameter
+void PyOutputEvent::FireOutput( CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay )
+{
+	CBaseEntityOutput::FireOutput(m_Value, pActivator, pCaller, fDelay);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Bone followers
+//-----------------------------------------------------------------------------
 void PyBoneFollowerManager::InitBoneFollowers( CBaseAnimating *pParentEntity, boost::python::list followerbonenames )
 {
 	if( !pParentEntity )

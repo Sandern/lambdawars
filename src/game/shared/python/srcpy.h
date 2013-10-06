@@ -48,7 +48,7 @@ extern unsigned int g_hPythonThreadID;
 extern boost::python::object mainmodule;
 extern boost::python::object mainnamespace;
 
-extern boost::python::object __builtin__;
+extern boost::python::object builtins;
 extern boost::python::object types;
 extern boost::python::object sys;
 extern boost::python::object steam;
@@ -72,7 +72,11 @@ extern boost::python::object fntype;
 //-----------------------------------------------------------------------------
 #define STRINGIZE(x) #x 
 #define XSTR(x) STRINGIZE(x)
+#if PY_VERSION_HEX < 0x03000000
 #define PYINIT(x) init##x
+#else
+#define PYINIT(x) PyInit_##x
+#endif // 0x03000000
 
 #define APPEND_MODULE( x )											\
 	if (PyImport_AppendInittab(STRINGIZE(x), PYINIT(x)) == -1)		\

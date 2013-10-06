@@ -80,7 +80,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( datatype == __builtin__.attr("set") )
+	else if( datatype == builtins.attr("set") )
 	{
 		w.type = PYTYPE_SET;
 
@@ -368,7 +368,7 @@ boost::python::object PyReadElement( bf_read &msg )
 		length = msg.ReadShort();
 		for( int i = 0; i < length; i++ )
 			embeddedlist.append( PyReadElement(msg) );
-		return __builtin__.attr("set")(embeddedlist);
+		return builtins.attr("set")(embeddedlist);
 	case PYTYPE_DICT:
 		length = msg.ReadShort();
 		for( int i = 0; i < length; i++ )

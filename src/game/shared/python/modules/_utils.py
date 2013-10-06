@@ -1,9 +1,10 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
 
 import pygccxml
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
+from pygccxml.declarations import reference_t, declarated_t, const_t
+from srcpy.matchers import calldef_withtypes
 
 class Utils(SemiSharedModuleGenerator):
     module_name = '_utils'
@@ -40,7 +41,8 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('UTIL_VarArgs').exclude()
         mb.free_functions('UTIL_LogPrintf').exclude()
         mb.free_functions('UTIL_FunctionToName').exclude()
-        mb.free_functions('UTIL_FunctionFromName').exclude()
+        if self.settings.branch == 'swarm':
+            mb.free_functions('UTIL_FunctionFromName').exclude()
         
         # Exclude for now
         mb.free_functions('UTIL_GetDebugColorForRelationship').exclude()
@@ -130,38 +132,12 @@ class Utils(SemiSharedModuleGenerator):
             mb.free_function('UTIL_GetLocalizedKeyString').exclude()
             mb.free_function('UTIL_MessageText').exclude()
             mb.free_functions('UTIL_EntityFromUserMessageEHandle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
-            mb.free_functions('UTIL_PlayerByUserId').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
+        mb.free_functions('UTIL_PlayerByUserId').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
             
         # Transformations
         mb.free_functions( 'GetVectorInScreenSpace' ).add_transformation( FT.output('iX'), FT.output('iY') )
         mb.free_functions( 'GetTargetInScreenSpace' ).add_transformation( FT.output('iX'), FT.output('iY') )
 
-    def SetupTraceFilterWithNoBase(self, mb, clsname):
-        cls = mb.class_(clsname)
-        cls.include()
-        cls.mem_funs(allow_empty=True).virtuality = 'not virtual'
-        
-        cls.add_wrapper_code('''
-            virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ) {
-                boost::python::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
-                if( func_ShouldHitEntity.ptr() != Py_None )
-                {
-                    try {
-                        return func_ShouldHitEntity( ConvertIHandleEntity( pEntity ), contentsMask );
-                    } catch(...) {
-                        PyErr_Print();
-                    }
-                }
-                return false;
-            }
-        ''')
-        
-        cls.add_registration_code( '''
-        def( 
-            "ShouldHitEntity"
-            , (bool ( ::%s_wrapper::* )( ::IHandleEntity *,int ) )(&::%s_wrapper::ShouldHitEntity)
-            , ( boost::python::arg("pEntity"), boost::python::arg("contentsMask") ) )''' % (clsname, clsname))
-            
     def RecursiveFindDecl(self, cls, fnname):
         try:
             return cls.mem_fun('ShouldHitEntity')
@@ -176,13 +152,7 @@ class Utils(SemiSharedModuleGenerator):
         cls = mb.class_(clsname)
         cls.include()
         cls.mem_funs(allow_empty=True).virtuality = 'not virtual'
-        
-        try:
-            shouldhitentdecl = self.RecursiveFindDecl(cls, 'ShouldHitEntity')#cls.mem_fun('ShouldHitEntity')
-            argname = shouldhitentdecl.arguments[0].name
-            AddWrapReg(mb, clsname, shouldhitentdecl, [CreateIHandleEntityArg(argname), 'contentsMask'])
-        except pygccxml.declarations.matcher.declaration_not_found_t:
-            raise Exception('Must implement ShouldHitEntity for overriding..')
+        cls.mem_funs('ShouldHitEntity', allow_empty=True).virtuality = 'virtual'
             
     def Parse(self, mb):
         # Exclude everything by default
@@ -192,12 +162,9 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions( lambda decl: 'UTIL_' in decl.name ).include()
 
         # Exclude and replace
-        mb.free_functions(name='UTIL_TraceLine', function=lambda decl: HasArgType(decl, 'IHandleEntity') ).exclude()
-        mb.free_functions('UTIL_PyTraceLine').rename('UTIL_TraceLine') 
-        mb.free_functions('UTIL_TraceHull', function=lambda decl: HasArgType(decl, 'IHandleEntity')).exclude()
-        mb.free_functions('UTIL_PyTraceHull').rename('UTIL_TraceHull') 
-        mb.free_functions('UTIL_TraceEntity', function=lambda decl: HasArgType(decl, 'IHandleEntity')).exclude()
-        mb.free_functions('UTIL_PyTraceEntity').rename('UTIL_TraceEntity') 
+        mb.free_functions('UTIL_TraceLine').include()
+        mb.free_functions('UTIL_TraceHull').include()
+        mb.free_functions('UTIL_TraceEntity').include()
         mb.free_functions('UTIL_TraceRay').exclude()
         mb.free_functions('UTIL_PyTraceRay').rename('UTIL_TraceRay')     
         mb.free_functions('UTIL_PyEntitiesInSphere').rename('UTIL_EntitiesInSphere')
@@ -252,14 +219,9 @@ class Utils(SemiSharedModuleGenerator):
         cls.calldefs().exclude()
         cls.mem_fun('ShouldHitEntity').virtuality = 'not virtual'
         
-        tracefiltersnobase = [
+        tracefilters = [
             'CTraceFilter',
             'CTraceFilterEntitiesOnly',
-        ]
-        for clsname in tracefiltersnobase:
-            self.SetupTraceFilterWithNoBase(mb, clsname)
-        
-        tracefilters = [
             'CTraceFilterWorldOnly',
             'CTraceFilterWorldAndPropsOnly',
             'CTraceFilterHitAll',
@@ -273,13 +235,14 @@ class Utils(SemiSharedModuleGenerator):
             'CTraceFilterSkipTwoClassnames',
             'CTraceFilterSimpleClassnameList',
             'CTraceFilterChain',
+            'CPyTraceFilterSimple',
+			
             'CTraceFilterOnlyUnitsAndPlayer',
             'CTraceFilterNoUnitsOrPlayer',
             'CTraceFilterIgnoreTeam',
             'CTraceFilterSkipFriendly',
             'CTraceFilterSkipEnemies',
             'CTraceFilterWars',
-            'CPyTraceFilterSimple',
         ]
         for clsname in tracefilters:
             self.SetupTraceFilter(mb, clsname)
@@ -314,11 +277,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('IsBoxIntersectingSphereExtents').include()
         mb.free_functions('IsRayIntersectingSphere').include()
         mb.free_functions('IsCircleIntersectingRectangle').include()
-        mb.free_functions('IsBoxIntersectingBox').include()
-        mb.free_functions('IsBoxIntersectingBoxExtents').include()
         mb.free_functions('IsOBBIntersectingOBB').include()
-        mb.free_functions('IsBoxIntersectingRay', function=lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('IsPointInBox', function=lambda decl: HasArgType(decl, 'Vector') ).include()
         mb.free_functions('IsPointInCone').include()
         mb.free_functions('IntersectTriangleWithPlaneBarycentric').include()
         mb.enum('QuadBarycentricRetval_t').include()
@@ -333,8 +292,17 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('OBBHasFullyContainedIntersectionWithQuad').include()
         mb.free_functions('RayHasFullyContainedIntersectionWithQuad').include()
         
-        mb.free_functions(function=lambda decl: HasArgType(decl, '__m128')).exclude()
-        mb.free_functions(function=lambda decl: HasArgType(decl, 'fltx4')).exclude()    
+        vectorcls = mb.class_('Vector')
+        excludetypes = [
+            declarated_t(vectorcls),
+            reference_t(declarated_t(vectorcls)),
+            reference_t(const_t(declarated_t(vectorcls))),
+        ]
+        vectormatcher =  calldef_withtypes( excludetypes )
+        mb.free_functions('IsBoxIntersectingBox', vectormatcher).include() 
+        mb.free_functions('IsBoxIntersectingBoxExtents', vectormatcher).include()   
+        mb.free_functions('IsBoxIntersectingRay', vectormatcher).include()
+        mb.free_functions('IsPointInBox', vectormatcher).include()
         
         # Prediction functions
         mb.free_function('GetSuppressHost').include()
@@ -344,7 +312,5 @@ class Utils(SemiSharedModuleGenerator):
             self.ParseServer(mb)
         else:
             self.ParseClient(mb)
-            
-        # Disable shared warnings
-        DisableKnownWarnings(mb)          
+      
         

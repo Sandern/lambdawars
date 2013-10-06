@@ -33,7 +33,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_BasePlayer_pypp.hpp"
@@ -1160,6 +1159,15 @@ void register_C_BasePlayer_class(){
                 "GetFogParams"
                 , GetFogParams_function_type( &::C_BasePlayer::GetFogParams )
                 , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BasePlayer::GetHealth
+        
+            typedef int ( ::C_BasePlayer::*GetHealth_function_type )(  ) const;
+            
+            C_BasePlayer_exposer.def( 
+                "GetHealth"
+                , GetHealth_function_type( &::C_BasePlayer::GetHealth ) );
         
         }
         { //::C_BasePlayer::GetImpulse

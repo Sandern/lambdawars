@@ -53,10 +53,6 @@ class GameInterface(SemiSharedModuleGenerator):
                            )
                            
         # Filesystem functions
-        mb.free_function('PyRemoveFile').include()
-        mb.free_function('PyRemoveFile').rename('RemoveFile')
-        mb.free_function('PyRemoveDirectory').include()
-        mb.free_function('PyRemoveDirectory').rename('RemoveDirectory')
         mb.free_function('PyGetModPath').include()
         mb.free_function('PyGetModPath').rename('GetModPath')
         mb.free_function('PyAsyncFinishAllWrites').include()

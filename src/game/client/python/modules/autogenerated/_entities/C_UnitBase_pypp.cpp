@@ -30,7 +30,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_UnitBase_pypp.hpp"
@@ -1590,6 +1589,15 @@ void register_C_UnitBase_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::C_UnitBase::GetHealth
+        
+            typedef int ( ::C_UnitBase::*GetHealth_function_type )(  ) const;
+            
+            C_UnitBase_exposer.def( 
+                "GetHealth"
+                , GetHealth_function_type( &::C_UnitBase::GetHealth ) );
+        
+        }
         { //::C_UnitBase::GetIMouse
         
             typedef ::IMouse * ( ::C_UnitBase::*GetIMouse_function_type )(  ) ;
@@ -1609,6 +1617,15 @@ void register_C_UnitBase_class(){
             C_UnitBase_exposer.def( 
                 "GetLastTakeDamageTime"
                 , GetLastTakeDamageTime_function_type( &::C_UnitBase::GetLastTakeDamageTime ) );
+        
+        }
+        { //::C_UnitBase::GetMaxHealth
+        
+            typedef int ( ::C_UnitBase::*GetMaxHealth_function_type )(  ) const;
+            
+            C_UnitBase_exposer.def( 
+                "GetMaxHealth"
+                , GetMaxHealth_function_type( &::C_UnitBase::GetMaxHealth ) );
         
         }
         { //::C_UnitBase::GetNext
@@ -2004,6 +2021,16 @@ void register_C_UnitBase_class(){
                 "SetEnterOffset"
                 , SetEnterOffset_function_type( &::C_UnitBase::SetEnterOffset )
                 , ( bp::arg("enteroffset") ) );
+        
+        }
+        { //::C_UnitBase::SetHealth
+        
+            typedef void ( ::C_UnitBase::*SetHealth_function_type )( int ) ;
+            
+            C_UnitBase_exposer.def( 
+                "SetHealth"
+                , SetHealth_function_type( &::C_UnitBase::SetHealth )
+                , ( bp::arg("iHealth") ) );
         
         }
         { //::C_UnitBase::SetMaxEnergy

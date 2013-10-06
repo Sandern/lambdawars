@@ -9,6 +9,7 @@
 #include "srcpy_util.h"
 #include "srcpy.h"
 #include "ipredictionsystem.h"
+#include <filesystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -189,22 +190,6 @@ boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, 
 
 	free(pList);
 	return pylist;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-boost::python::object ConvertIHandleEntity( IHandleEntity *pHandleEntity )
-{
-	boost::python::object ret;
-
-	CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
-	if( pEntity )
-	{
-		ret = pEntity->GetPyHandle();
-	}
-
-	return ret;
 }
 
 //-----------------------------------------------------------------------------

@@ -30,7 +30,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_FuncUnit_pypp.hpp"
@@ -1407,6 +1406,15 @@ void register_C_FuncUnit_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::C_FuncUnit::GetHealth
+        
+            typedef int ( ::C_FuncUnit::*GetHealth_function_type )(  ) const;
+            
+            C_FuncUnit_exposer.def( 
+                "GetHealth"
+                , GetHealth_function_type( &::C_FuncUnit::GetHealth ) );
+        
+        }
         { //::C_FuncUnit::GetIMouse
         
             typedef ::IMouse * ( ::C_FuncUnit::*GetIMouse_function_type )(  ) ;
@@ -1417,6 +1425,15 @@ void register_C_FuncUnit_class(){
                 , GetIMouse_function_type(&::C_FuncUnit::GetIMouse)
                 , default_GetIMouse_function_type(&C_FuncUnit_wrapper::default_GetIMouse)
                 , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_FuncUnit::GetMaxHealth
+        
+            typedef int ( ::C_FuncUnit::*GetMaxHealth_function_type )(  ) const;
+            
+            C_FuncUnit_exposer.def( 
+                "GetMaxHealth"
+                , GetMaxHealth_function_type( &::C_FuncUnit::GetMaxHealth ) );
         
         }
         { //::C_FuncUnit::GetPyNetworkType

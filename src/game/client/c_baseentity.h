@@ -1906,7 +1906,10 @@ public:
 
 	virtual PyObject *				GetPySelf() const { return NULL; }
 
-	bp::object						GetPyInstance() const;
+	// This function returns the reference to the Python instance (if any)
+	boost::python::object			GetPyInstance() const;
+	void							SetPyInstance( boost::python::object inst );
+
 	virtual void					ClearPyInstance();
 	bp::object						GetPyHandle() const;
 	void							SetPyTouch( bp::object touch_method );
@@ -2626,6 +2629,12 @@ inline ShouldTransmitState_t CBaseEntity::GetLastShouldTransmitState()
 inline bp::object CBaseEntity::GetPyInstance() const 
 { 
 	return m_pyInstance; 
+}
+
+inline void CBaseEntity::SetPyInstance( boost::python::object inst )
+{
+	Assert( GetRefEHandle() == NULL );
+	m_pyInstance = inst;
 }
 
 inline bp::object CBaseEntity::GetPyHandle() const 

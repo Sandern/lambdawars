@@ -106,7 +106,9 @@ class Particles(SemiSharedModuleGenerator):
             cls.mem_funs('Create').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregate').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregatePrecached').call_policies = call_policies.return_internal_reference()
-
+        else:
+            cls.mem_funs('Create').exclude() # TODO/FIXME
+			
         #mb.class_('CNewParticleEffectHandle').include()
         #mb.class_('CNewParticleEffectHandle').mem_funs('GetParticleEffect').exclude()
         
@@ -137,7 +139,8 @@ class Particles(SemiSharedModuleGenerator):
 
         cls = mb.class_('CParticleProperty')
         cls.include()
-        cls.mem_funs('Create').call_policies = call_policies.return_internal_reference() #call_policies.return_value_policy( call_policies.return_by_value ) 
+        cls.mem_funs('Create').call_policies = call_policies.return_internal_reference() 
+        cls.mem_funs('GetParticleEffectFromIdx').call_policies = call_policies.return_internal_reference()
         mb.mem_funs('GetOuter').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('GetBaseMap').exclude()
         mb.mem_funs('GetDataDescMap').exclude()
@@ -169,7 +172,8 @@ class Particles(SemiSharedModuleGenerator):
         mb.free_functions('PrecacheParticleSystem').include()
         mb.free_functions('DispatchParticleEffect').include()
         mb.free_functions('StopParticleEffects').include()
-        mb.free_functions('StopParticleEffect').include()
+        if self.settings.branch == 'swarm':
+                mb.free_functions('StopParticleEffect').include()
         
         mb.free_functions('PyShouldLoadSheets').include()
         mb.free_functions('PyShouldLoadSheets').rename('ShouldLoadSheets')

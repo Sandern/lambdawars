@@ -31,7 +31,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_BaseEntity_pypp.hpp"
@@ -2029,6 +2028,15 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("vecGroundVel") ) );
         
         }
+        { //::C_BaseEntity::GetHealth
+        
+            typedef int ( ::C_BaseEntity::*GetHealth_function_type )(  ) const;
+            
+            C_BaseEntity_exposer.def( 
+                "GetHealth"
+                , GetHealth_function_type( &::C_BaseEntity::GetHealth ) );
+        
+        }
         { //::C_BaseEntity::GetIMouse
         
             typedef ::IMouse * ( ::C_BaseEntity::*GetIMouse_function_type )(  ) ;
@@ -2185,6 +2193,15 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "GetMaxGPULevel"
                 , GetMaxGPULevel_function_type( &::C_BaseEntity::GetMaxGPULevel ) );
+        
+        }
+        { //::C_BaseEntity::GetMaxHealth
+        
+            typedef int ( ::C_BaseEntity::*GetMaxHealth_function_type )(  ) const;
+            
+            C_BaseEntity_exposer.def( 
+                "GetMaxHealth"
+                , GetMaxHealth_function_type( &::C_BaseEntity::GetMaxHealth ) );
         
         }
         { //::C_BaseEntity::GetMinCPULevel
@@ -4720,7 +4737,7 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "RenderableToWorldTransform"
                 , RenderableToWorldTransform_function_type( &::C_BaseEntity::RenderableToWorldTransform )
-                , bp::return_value_policy< bp::copy_const_reference >() );
+                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::C_BaseEntity::ResetLatched
@@ -5187,6 +5204,16 @@ void register_C_BaseEntity_class(){
                 "SetGroundEntity"
                 , SetGroundEntity_function_type( &::C_BaseEntity::SetGroundEntity )
                 , ( bp::arg("ground") ) );
+        
+        }
+        { //::C_BaseEntity::SetHealth
+        
+            typedef void ( ::C_BaseEntity::*SetHealth_function_type )( int ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetHealth"
+                , SetHealth_function_type( &::C_BaseEntity::SetHealth )
+                , ( bp::arg("iHealth") ) );
         
         }
         { //::C_BaseEntity::SetInFOW

@@ -4,7 +4,7 @@ from . basegenerator import ModuleGenerator
 from .. src_module_builder import src_module_builder_t
 from pyplusplus import code_creators
 from pyplusplus.module_builder import call_policies
-from pygccxml.declarations import matchers, pointer_t, reference_t, declarated_t, void_t
+from pygccxml.declarations import matchers, pointer_t, reference_t, declarated_t, void_t, compound_t
 
 class SourceModuleGenerator(ModuleGenerator):
     # Choices: client, server, semi_shared and pure_shared
@@ -78,25 +78,46 @@ class SourceModuleGenerator(ModuleGenerator):
                     pass
             if not found:
                 raise Exception('Could not find %s header''' % (filename))
+    
+    def TestInheritIHandleEntity(self, decl):
+        ihandlecls = self.ihandlecls
+        
+        # Only consider declarated and compound types
+        return_type = decl.return_type
+        if type(return_type) != declarated_t and not isinstance(return_type, compound_t):
+            return False
+            
+        # Traverse bases of return type
+        declaration = None
+        while return_type:
+            if type(return_type) == declarated_t:
+                declaration = return_type.declaration
+                break
+            if not isinstance(return_type, compound_t):
+                break
+            return_type = return_type.base
+            
+        if not declaration or not hasattr(declaration, 'recursive_bases'):
+            return False
+            
+        # Look through all bases of the class we are testing
+        recursive_bases = declaration.recursive_bases
+        for testcls in recursive_bases:
+            if ihandlecls == testcls.related_class:
+                return True
+            
+        return False
             
     # Applies common rules to code
     def ApplyCommonRules(self, mb):
         # Common function added for getting the "PyObject" of an entity
         mb.mem_funs('GetPySelf').exclude()
         
-        # All return values derived from IHandleEntity entity will be returned by value, 
-        # so the converter is called
-        ihandlecls = mb.class_('IHandleEntity')
-        def testInherits(memfun):
-            try:
-                othercls = memfun.return_type.base.declaration
-                for testcls in othercls.recursive_bases:
-                    if ihandlecls == testcls.related_class:
-                        return True
-            except AttributeError:
-                pass
-            return False
-        mb.calldefs(matchers.custom_matcher_t(testInherits)).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        # All return values derived from IHandleEntity entity will be returned by value.
+        # This ensures the converter is called
+        self.ihandlecls = mb.class_('IHandleEntity')
+        decls = mb.calldefs(matchers.custom_matcher_t(self.TestInheritIHandleEntity))
+        decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # Anything returning KeyValues should be returned by value so it calls the converter
         keyvalues = mb.class_('KeyValues')

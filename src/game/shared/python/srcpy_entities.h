@@ -23,8 +23,6 @@
 
 #include "srcpy_boostpython.h"
 
-namespace bp = boost::python;
-
 extern boost::python::object _entities;
 
 //-----------------------------------------------------------------------------
@@ -216,18 +214,30 @@ boost::python::list PyGetAllClassnames();
 // Purpose: Sending events to client
 //-----------------------------------------------------------------------------
 void PySendEvent( IRecipientFilter &filter, EHANDLE ent, int event, int data);
-#endif // CLIENT_DLL
 
-
-#ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: (Re)spawn a player using the specified class
 //-----------------------------------------------------------------------------
 boost::python::object PyRespawnPlayer( CBasePlayer *pPlayer, const char *classname );
-#endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: PyOutputEvent
+//-----------------------------------------------------------------------------
+class PyOutputEvent : public CBaseEntityOutput
+{
+public:
+	PyOutputEvent();
 
-#ifndef CLIENT_DLL
+	void Set( variant_t value );
+
+	// void Firing, no parameter
+	void FireOutput( CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 );
+	void FireOutput( variant_t Value, CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay = 0 ) 
+	{ 
+		CBaseEntityOutput::FireOutput( Value, pActivator, pCaller, fDelay ); 
+	}
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: Bone followers
 //-----------------------------------------------------------------------------

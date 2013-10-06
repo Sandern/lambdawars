@@ -49,7 +49,7 @@ bp::dict PyKeyValuesToDict( const KeyValues *pKV )
 
 KeyValues *PyDictToKeyValues( bp::dict d )
 {
-	bp::object type = __builtin__.attr("type");
+	bp::object type = builtins.attr("type");
 	bp::object dicttype = types.attr("DictType");
 
 	KeyValues *pKV = new KeyValues("Data");
@@ -85,7 +85,7 @@ KeyValues *PyDictToKeyValues( bp::dict d )
 #if 0
 bp::dict PyKeyValues( bp::object name, bp::object firstKey, bp::object firstValue, bp::object secondKey, bp::object secondValue )
 {
-	bp::object type = __builtin__.attr("type");
+	bp::object type = builtins.attr("type");
 	bp::object dicttype = types.attr("DictType");
 	if( type(name) == dicttype )
 	{
@@ -509,28 +509,3 @@ int PyUtlRBTree::InsertIfNotFound( boost::python::object insert )
 	//CopyConstruct( &Element( newNode ), insert );
 	return newNode;
 }
-
-#ifndef CLIENT_DLL
-//-----------------------------------------------------------------------------
-// Purpose: PyOutputEvent
-//-----------------------------------------------------------------------------
-PyOutputEvent::PyOutputEvent()
-{
-	// Set to NULL! Normally it depends on the the memory allocation function of CBaseEntity
-	m_ActionList = NULL; 
-
-	// Default
-	m_Value.Set( FIELD_VOID, NULL );
-}
-
-void PyOutputEvent::Set( variant_t value )
-{
-	m_Value = value;
-}
-
-// void Firing, no parameter
-void PyOutputEvent::FireOutput( CBaseEntity *pActivator, CBaseEntity *pCaller, float fDelay )
-{
-	CBaseEntityOutput::FireOutput(m_Value, pActivator, pCaller, fDelay);
-}
-#endif // CLIENT_DLL

@@ -8,7 +8,6 @@
 #include "cbase.h"
 #include "srcpy_gameinterface.h"
 #include "srcpy.h"
-#include "srcpy_base.h"
 
 #include "utldict.h"
 
@@ -19,47 +18,6 @@
 #include "tier0/memdbgon.h"
 
 using namespace boost::python;
-
-//-----------------------------------------------------------------------------
-// Purpose: Python function for deleting a file
-//-----------------------------------------------------------------------------
-void PyRemoveFile( char const* pRelativePath, const char *pathID )
-{
-	if( !SrcPyPathIsInGameFolder(pRelativePath) )
-	{
-		char buf[512];
-		V_snprintf(buf, 512, "File must be in the mod folder! (%s)", pRelativePath);
-		PyErr_SetString(PyExc_ValueError, buf);
-		throw boost::python::error_already_set(); 
-		return;
-	}
-	filesystem->RemoveFile( pRelativePath, pathID );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Python function for deleting a directory
-//			TODO: Remove this function?
-//-----------------------------------------------------------------------------
-void PyRemoveDirectory( char const* pPath, const char *pathID )
-{
-	char buf[512];
-
-#ifdef WIN32
-	if( !SrcPyPathIsInGameFolder(pPath) )
-	{
-		V_snprintf(buf, sizeof(buf), "File must be in the mod folder! (%s)", pPath);
-		PyErr_SetString(PyExc_ValueError, buf);
-		throw boost::python::error_already_set(); 
-		return;
-	}
-
-	V_snprintf(buf, sizeof(buf), "rmdir /S /Q \"%s\"\n", pPath);
-	_popen(buf, "r");
-#else
-	PyErr_SetString(PyExc_ValueError, "RemoveDir is not support.");
-	throw boost::python::error_already_set(); 
-#endif // WIN32
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Python function for getting the mod path
@@ -141,12 +99,15 @@ void PyConCommand::Dispatch( const CCommand &command )
 {
 	ConCommand::Dispatch(command);
 
-	try {
+	try 
+	{
 		if( m_bUsesWeakRef )
 			m_pyCommandCallback()( command );
 		else
 			m_pyCommandCallback( command );
-	} catch( error_already_set & ) {
+	} 
+	catch( error_already_set & ) 
+	{
 		PyErr_Print();
 	}
 }

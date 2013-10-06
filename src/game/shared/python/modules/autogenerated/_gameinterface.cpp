@@ -3280,28 +3280,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
-    { //::PyRemoveDirectory
-    
-        typedef void ( *RemoveDirectory_function_type )( char const *,char const * );
-        
-        bp::def( 
-            "RemoveDirectory"
-            , RemoveDirectory_function_type( &::PyRemoveDirectory )
-            , ( bp::arg("pPath"), bp::arg("pathID")=bp::object() ) );
-    
-    }
-
-    { //::PyRemoveFile
-    
-        typedef void ( *RemoveFile_function_type )( char const *,char const * );
-        
-        bp::def( 
-            "RemoveFile"
-            , RemoveFile_function_type( &::PyRemoveFile )
-            , ( bp::arg("pRelativePath"), bp::arg("pathID")=bp::object() ) );
-    
-    }
-
     { //::PyRemoveSearchPath
     
         typedef bool ( *RemoveSearchPath_function_type )( char const *,char const * );
@@ -6679,28 +6657,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "MountSteamContent"
             , MountSteamContent_function_type( &::PyMountSteamContent )
             , ( bp::arg("nExtraAppId")=(int)(-0x000000001) ) );
-    
-    }
-
-    { //::PyRemoveDirectory
-    
-        typedef void ( *RemoveDirectory_function_type )( char const *,char const * );
-        
-        bp::def( 
-            "RemoveDirectory"
-            , RemoveDirectory_function_type( &::PyRemoveDirectory )
-            , ( bp::arg("pPath"), bp::arg("pathID")=bp::object() ) );
-    
-    }
-
-    { //::PyRemoveFile
-    
-        typedef void ( *RemoveFile_function_type )( char const *,char const * );
-        
-        bp::def( 
-            "RemoveFile"
-            , RemoveFile_function_type( &::PyRemoveFile )
-            , ( bp::arg("pRelativePath"), bp::arg("pathID")=bp::object() ) );
     
     }
 

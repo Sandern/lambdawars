@@ -42,10 +42,8 @@ struct wrap_model_t
 extern void ServiceEventQueue( void );
 
 //-----------------------------------------------------------------------------
-// Purpose: Python function for deleting a directory
+// Purpose: 
 //-----------------------------------------------------------------------------
-void PyRemoveFile( char const* pRelativePath, const char *pathID = 0 );
-void PyRemoveDirectory( char const* pPath, const char *pathID = 0 );
 boost::python::object PyGetModPath();
 
 // Special use case

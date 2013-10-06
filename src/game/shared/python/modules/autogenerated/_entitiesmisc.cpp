@@ -1966,7 +1966,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
         .def( 
-            "pszName"
+            "name"
             , (char const * ( ::CStudioHdr::* )(  ) const)( &::CStudioHdr::pszName ) );
 
     bp::class_< ClientClass >( "ClientClass", bp::no_init );
@@ -2128,6 +2128,19 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnCursorExited)
             , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorExited)
             , ( boost::python::arg("player") ) );
+
+    { //::SpatializationInfo_t
+        typedef bp::class_< SpatializationInfo_t > SpatializationInfo_t_exposer_t;
+        SpatializationInfo_t_exposer_t SpatializationInfo_t_exposer = SpatializationInfo_t_exposer_t( "SpatializationInfo_t" );
+        bp::scope SpatializationInfo_t_scope( SpatializationInfo_t_exposer );
+        bp::enum_< SpatializationInfo_t::SPATIALIZATIONTYPE>("SPATIALIZATIONTYPE")
+            .value("SI_INCREATION", SpatializationInfo_t::SI_INCREATION)
+            .value("SI_INSPATIALIZATION", SpatializationInfo_t::SI_INSPATIALIZATION)
+            .export_values()
+            ;
+        SpatializationInfo_t_exposer.def_readwrite( "info", &SpatializationInfo_t::info );
+        SpatializationInfo_t_exposer.def_readwrite( "type", &SpatializationInfo_t::type );
+    }
 
     bp::class_< animevent_t_wrapper >( "animevent_t" )    
         .def_readwrite( "_event_highword", &animevent_t::_event_highword )    
@@ -2452,8 +2465,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 #include "imouse.h"
 
 #include "hl2wars_player.h"
-
-#include "srcpy_base.h"
 
 #include "srcpy_converters_ents.h"
 
@@ -4709,7 +4720,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
         .def( 
-            "pszName"
+            "name"
             , (char const * ( ::CStudioHdr::* )(  ) const)( &::CStudioHdr::pszName ) );
 
     bp::class_< FireBulletsInfo_t_wrapper >( "FireBulletsInfo_t", bp::init< >() )    

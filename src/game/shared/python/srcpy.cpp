@@ -74,7 +74,7 @@ boost::python::object mainmodule;
 boost::python::object mainnamespace;
 
 // Global module references.
-bp::object __builtin__;
+bp::object builtins;
 bp::object types;
 bp::object sys;
 bp::object srcmgr;
@@ -336,24 +336,29 @@ bool CSrcPython::InitInterpreter( void )
 
 	weakref = Import("weakref");
 	srcbase = Import("srcbase");
-	__builtin__ = Import("__builtin__");
+	
+#if PY_VERSION_HEX < 0x03000000
+	builtins = Import("__builtin__");
+#else
+	builtins = Import("builtins");
+#endif 
 
 	// Set isclient and isserver globals to the right values
 	try 
 	{
 #ifdef CLIENT_DLL
-		__builtin__.attr("isclient") = true;
+		builtins.attr("isclient") = true;
 #else
-		__builtin__.attr("isserver") = true;
+		builtins.attr("isserver") = true;
 #endif // CLIENT_DLL
-		__builtin__.attr("gpGlobals") = srcbase.attr("gpGlobals");
+		builtins.attr("gpGlobals") = boost::ref( gpGlobals );
 	} 
 	catch( bp::error_already_set & ) 
 	{
 		PyErr_Print();
 	}
 
-	fntype = __builtin__.attr("type");
+	fntype = builtins.attr("type");
 
 	// Add the maps directory to the modulse path
 	SysAppendPath("maps");
@@ -453,7 +458,7 @@ bool CSrcPython::InitInterpreter( void )
 				bp::str newCmd( /*"\"" + bp::str(interpreterFile) + "\" " +*/ remainder );
 				newCmd = newCmd.replace( "\\\"", "\\\\\"" );
 
-				__builtin__.attr("print")( newCmd );
+				builtins.attr("print")( newCmd );
 
 				bp::list argv( shlex.attr("split")( newCmd ) );
 				bp::setattr( sys, bp::object("argv"), argv );
@@ -529,7 +534,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	mainmodule = bp::object();
 	mainnamespace = bp::object();
 
-	__builtin__ = bp::object();
+	builtins = bp::object();
 	srcbuiltins = bp::object();
 	sys = bp::object();
 	types = bp::object();

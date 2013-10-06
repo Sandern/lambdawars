@@ -35,7 +35,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "CBaseCombatCharacter_pypp.hpp"
@@ -2788,8 +2787,7 @@ void register_CBaseCombatCharacter_class(){
             CBaseCombatCharacter_exposer.def( 
                 "Weapon_GetSlot"
                 , Weapon_GetSlot_function_type( &::CBaseCombatCharacter::Weapon_GetSlot )
-                , ( bp::arg("pszWeapon"), bp::arg("iSubType")=(int)(0) )
-                , bp::return_value_policy< bp::return_by_value >() );
+                , ( bp::arg("pszWeapon"), bp::arg("iSubType")=(int)(0) ) );
         
         }
         { //::CBaseCombatCharacter::Weapon_GetSlot

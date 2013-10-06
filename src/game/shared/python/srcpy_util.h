@@ -13,7 +13,6 @@
 
 #include "srcpy_boostpython.h"
 
-#include "srcpy_base.h"
 #include "collisionutils.h"
 #include "util_shared.h"
 
@@ -129,10 +128,6 @@ boost::python::object UTIL_PyEntitiesInBox( int listMax, const Vector &mins, con
 boost::python::object UTIL_PyEntitiesInSphere( int listMax, const Vector &center, float radius, int flagMask, int partitionmask = DEFAULT_PARTITION_MASK );
 boost::python::object UTIL_PyEntitiesAlongRay( int listMax, const PyRay_t &ray, int flagMask, int partitionmask = DEFAULT_PARTITION_MASK );
 
-
-// Converter IHandleEntity
-boost::python::object ConvertIHandleEntity( IHandleEntity *entity );
-
 // Simple trace filter for python
 class CPyTraceFilterSimple : public CTraceFilterSimple
 {
@@ -188,45 +183,6 @@ inline float PyIntersectRayWithTriangle( const PyRay_t& ray,
 {
 	//return IntersectRayWithTriangle( *(ray.ray), v1, v2, v3, oneSided );
 	return IntersectRayWithTriangle( ray.ToRay(), v1, v2, v3, oneSided );
-}
-
-
-// Trace stuff
-inline void UTIL_PyTraceLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, unsigned int mask, 
-						   const CBaseEntity *ignore, int collisionGroup, trace_t *ptr )
-{
-	Ray_t ray;
-	ray.Init( vecAbsStart, vecAbsEnd );
-	CTraceFilterSimple traceFilter( (const IHandleEntity *)ignore, collisionGroup );
-
-	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
-
-	if( r_visualizetraces.GetBool() )
-	{
-		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 0, 0, true, -1.0f );
-	}
-}
-
-inline void UTIL_PyTraceHull( const Vector &vecAbsStart, const Vector &vecAbsEnd, const Vector &hullMin, 
-						   const Vector &hullMax, unsigned int mask, const CBaseEntity *ignore, 
-						   int collisionGroup, trace_t *ptr )
-{
-	Ray_t ray;
-	ray.Init( vecAbsStart, vecAbsEnd, hullMin, hullMax );
-	CTraceFilterSimple traceFilter( (const IHandleEntity *)ignore, collisionGroup );
-
-	enginetrace->TraceRay( ray, mask, &traceFilter, ptr );
-
-	if( r_visualizetraces.GetBool() )
-	{
-		DebugDrawLine( ptr->startpos, ptr->endpos, 255, 255, 0, true, -1.0f );
-	}
-}
-
-inline void UTIL_PyTraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, const Vector &vecAbsEnd, 
-					  unsigned int mask, const CBaseEntity *ignore, int collisionGroup, trace_t *ptr )
-{
-	UTIL_TraceEntity( pEntity, vecAbsStart, vecAbsEnd, mask, (const IHandleEntity *)ignore, collisionGroup, ptr );
 }
 
 inline void UTIL_PyTraceRay( const PyRay_t &ray, unsigned int mask, 

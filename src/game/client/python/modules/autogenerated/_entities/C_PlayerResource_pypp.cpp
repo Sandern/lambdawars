@@ -30,7 +30,6 @@
 #include "wars_mapboundary.h"
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
-#include "srcpy_converters_ents.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_PlayerResource_pypp.hpp"
@@ -882,6 +881,16 @@ void register_C_PlayerResource_class(){
             C_PlayerResource_exposer.def( 
                 "GetFrags"
                 , GetFrags_function_type( &::C_PlayerResource::GetFrags )
+                , ( bp::arg("index") ) );
+        
+        }
+        { //::C_PlayerResource::GetHealth
+        
+            typedef int ( ::C_PlayerResource::*GetHealth_function_type )( int ) ;
+            
+            C_PlayerResource_exposer.def( 
+                "GetHealth"
+                , GetHealth_function_type( &::C_PlayerResource::GetHealth )
                 , ( bp::arg("index") ) );
         
         }
