@@ -1,5 +1,6 @@
 # Module still needs a lot of cleaning up
 from srcpy.module_generators import SemiSharedModuleGenerator
+from srcpy.matchers import calldef_withtypes
 
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
@@ -212,48 +213,42 @@ class Entities(SemiSharedModuleGenerator):
     # List of entity classes want to have exposed
     cliententities = [ 
         'C_BaseEntity', 
-        'C_BaseAnimating', 
-        'C_BaseAnimatingOverlay',  
-        'C_BaseFlex', 
+        'C_BaseAnimating',
+        'C_BaseAnimatingOverlay',
+        'C_BaseFlex',
         'C_BaseCombatCharacter',
         'C_BaseGrenade',
         'C_BasePlayer',
-        'C_HL2WarsPlayer',
-        'C_UnitBase',
-        'C_FuncUnit',
+        'C_BaseCombatWeapon',
         'C_PlayerResource',
+        'C_BaseToggle',
+        'C_BaseTrigger',
+        'C_FuncBrush',
+        
         'C_Sprite',
         'C_SpriteTrail',
         'C_BaseParticleEntity',
         'C_SmokeTrail',
         'C_RocketTrail',
         'C_Beam',
-        'C_BaseCombatWeapon',
+        
+        'C_HL2WarsPlayer',
+        'C_UnitBase',
+        'C_FuncUnit',
         'C_WarsWeapon',
-        'C_FuncBrush',
-        'C_BaseToggle',
-        'C_BaseTrigger',
         'C_BaseFuncMapBoundary',
     ]
     
     serverentities = [ 
         'CBaseEntity', 
-        'CBaseAnimating', 
-        'CBaseAnimatingOverlay', 
-        'CBaseFlex', 
+        'CBaseAnimating',
+        'CBaseAnimatingOverlay',
+        'CBaseFlex',
         'CBaseCombatCharacter',
         'CBaseGrenade',
         'CBasePlayer',
-        'CHL2WarsPlayer',
-        'CUnitBase',
-        'CFuncUnit',
+        'CBaseCombatWeapon',
         'CGib',
-        'CSprite',
-        'CSpriteTrail',
-        'CBaseParticleEntity', # Baseclass for SmokeTrail
-        'SmokeTrail',
-        'RocketTrail',
-        'CBeam',
         'CPointEntity',
         'CServerOnlyEntity',
         'CServerOnlyPointEntity',
@@ -262,15 +257,25 @@ class Entities(SemiSharedModuleGenerator):
         'CBaseToggle',
         'CBaseTrigger',
         'CTriggerMultiple',
-        'CBaseCombatWeapon',
-        'CWarsWeapon',
-        'CBaseFuncMapBoundary',
         'CBaseProp',
         'CBreakableProp',
         'CPhysicsProp',
         'CRagdollProp',
         'CBaseFilter',
         'CEntityFlame',
+        
+        'CSprite',
+        'CSpriteTrail',
+        'CBaseParticleEntity', # Baseclass for SmokeTrail
+        'SmokeTrail',
+        'RocketTrail',
+        'CBeam',
+        
+        'CHL2WarsPlayer',
+        'CUnitBase',
+        'CFuncUnit',
+        'CWarsWeapon',
+        'CBaseFuncMapBoundary',
     ]
     
     def AddEntityConverter(self, mb, clsname, pyhandletoptronly=False):
@@ -571,25 +576,9 @@ class Entities(SemiSharedModuleGenerator):
         
         # Call policies
         mb.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference() 
-        #mb.mem_funs('CreatePredictedEntityByName').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetBaseAnimating').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetOwnerEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetEffectEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs('GetTeam').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        #mb.mem_funs('GetMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetRootMoveParent').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('FirstMoveChild').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('NextMovePeer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('MyNPCPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )      # Remove?
-        #mb.mem_funs('MyCombatCharacterPointer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  # Remove?
-        #mb.mem_funs('GetFollowedEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetSimulatingPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        #mb.mem_funs('GetGroundEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        #mb.mem_funs('GetPredictionPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetBeamTraceFilter').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('Instance').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        #mb.mem_funs('GetMousePassEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
         # Transformations
         #mb.mem_funs( name='EmitSound', function=lambda decl: HasArgType(decl, 'HSOUNDSCRIPTHANDLE') ).add_transformation( FT.input("handle") )
@@ -649,20 +638,18 @@ class Entities(SemiSharedModuleGenerator):
         
         if self.isclient:
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE
-            # Client Simulation functions
+            # List of client functions overridable in Python
+            mb.mem_funs('ShouldDraw').virtuality = 'virtual' # Called when visibility is updated, doesn't happens a lot.
+            mb.mem_funs('GetCollideType').virtuality = 'virtual'
             mb.mem_funs('ClientThink').virtuality = 'virtual'
             mb.mem_funs('OnDataChanged').virtuality = 'virtual'
             mb.mem_funs('Simulate').virtuality = 'virtual'
-            
-            mb.mem_funs('ShouldDraw').virtuality = 'virtual' # Called when visibility is updated, doesn't happens a lot.
-            
             mb.mem_funs('NotifyShouldTransmit').exclude()
             mb.mem_funs('PyNotifyShouldTransmit').rename('NotifyShouldTransmit')
             mb.mem_funs('PyNotifyShouldTransmit').virtuality = 'virtual'
             
             mb.mem_funs('PyReceiveMessage').virtuality = 'virtual'
             mb.mem_funs('PyReceiveMessage').rename('ReceiveMessage')
-            mb.mem_funs('GetCollideType').virtuality = 'virtual'
 
             # Excludes
             mb.mem_funs('GetDataTableBasePtr').exclude()
@@ -859,8 +846,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('NetworkProp').exclude()            # Don't care
             mb.mem_funs('edict').exclude()                  # Not needed
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
-            #mb.mem_funs('EntityToWorldTransform').exclude() # Don't care for now
-            #mb.mem_funs('GetParentToWorldTransform').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
@@ -959,9 +944,6 @@ class Entities(SemiSharedModuleGenerator):
         # Call policies   
         mb.mem_funs('GetModelPtr').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
         
-        # C_BaseAnimatingOverlay    
-        mb.mem_funs('GetAnimOverlay').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
         # Properties
         self.SetupProperty(mb, cls, 'skin', 'GetSkin', 'SetSkin')
     
@@ -1023,13 +1005,153 @@ class Entities(SemiSharedModuleGenerator):
             # Enums
             mb.enums('LocalFlexController_t').include()
         
+    def ParseBaseAnimatingOverlay(self, mb):
+        cls = mb.class_('C_BaseAnimatingOverlay') if self.isclient else mb.class_('CBaseAnimatingOverlay')
+    
+        cls.mem_funs('GetAnimOverlay').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        
+    def ParseBaseFlex(self, mb):
+        cls = mb.class_('C_BaseFlex') if self.isclient else mb.class_('CBaseFlex')
+
+        excludetypes = [
+            pointer_t(declarated_t(mb.class_('CChoreoScene'))),
+            pointer_t(declarated_t(mb.class_('CChoreoActor'))),
+        ]
+        mb.calldefs( calldef_withtypes( excludetypes ) ).exclude()
+        
+        if self.isserver:
+            mb.mem_funs('FlexSettingLessFunc').exclude()
+            cls.class_('FS_LocalToGlobal_t').exclude()
+            mb.mem_funs( lambda decl: HasArgType(decl, 'AI_Response') ).exclude() 
+            if self.settings.branch == 'swarm':
+                mb.mem_funs('ScriptGetOldestScene').exclude()
+                mb.mem_funs('ScriptGetSceneByIndex').exclude()
+        else:
+            mb.mem_funs('FindSceneFile').exclude() # Don't care
+            
+    def ParseBaseCombatWeapon(self, mb):
+        cls_name = 'C_BaseCombatWeapon' if self.isclient else 'CBaseCombatWeapon'
+        cls_name2 = 'C_WarsWeapon' if self.isclient else 'CWarsWeapon'
+        all_cls = [cls_name, cls_name2]
+        cls = mb.class_(cls_name)
+        
+        # Overridable
+        mb.mem_funs('PrimaryAttack').virtuality = 'virtual'
+        mb.mem_funs('SecondaryAttack').virtuality = 'virtual'
+        
+        # Shared Excludes
+        mb.mem_funs('ActivityList').exclude()
+        mb.mem_funs('GetConstraint').exclude()
+        mb.mem_funs('GetDeathNoticeName').exclude()
+        mb.mem_funs('GetEncryptionKey').exclude()
+        mb.mem_funs('GetProficiencyValues').exclude()
+        mb.mem_funs('GetSpriteActive').exclude()
+        mb.mem_funs('GetSpriteAmmo').exclude()
+        mb.mem_funs('GetSpriteAmmo2').exclude()
+        mb.mem_funs('GetSpriteAutoaim').exclude()
+        mb.mem_funs('GetSpriteCrosshair').exclude()
+        mb.mem_funs('GetSpriteInactive').exclude()
+        mb.mem_funs('GetSpriteZoomedAutoaim').exclude()
+        mb.mem_funs('GetSpriteZoomedCrosshair').exclude()
+        mb.mem_funs('GetControlPanelClassName').exclude()
+        mb.mem_funs('GetControlPanelInfo').exclude()
+
+        if self.isserver:
+            mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
+            mb.mem_funs('IsInBadPosition').exclude() # Declaration only...
+            if self.settings.branch == 'swarm':
+                mb.mem_funs('IsCarrierAlive').exclude()
+        else:
+            if self.settings.branch == 'swarm':
+                mb.mem_funs('GetWeaponList').exclude()
+
+        # Rename variables
+        mb.var('m_iViewModelIndex').exclude()
+        mb.var('m_iWorldModelIndex').exclude()
+
+        mb.var('m_bAltFiresUnderwater').rename('altfiresunderwater')
+        mb.var('m_bFireOnEmpty').rename('fireonempty')
+        mb.var('m_bFiresUnderwater').rename('firesunderwater')
+        mb.var('m_bInReload').rename('inreload')
+        mb.var('m_bReloadsSingly').rename('reloadssingly')
+        mb.var('m_fFireDuration').rename('fireduration')
+        mb.var('m_fMaxRange1').rename('maxrange1')
+        mb.var('m_fMaxRange2').rename('maxrange2')
+        mb.var('m_fMinRange1').rename('minrange1')
+        mb.var('m_fMinRange2').rename('minrange2')
+        mb.var('m_flNextEmptySoundTime').rename('nextemptysoundtime')
+        mb.var('m_flNextPrimaryAttack').rename('nextprimaryattack')
+        mb.var('m_flNextSecondaryAttack').rename('nextsecondaryattack')
+        mb.vars('m_flTimeWeaponIdle').rename('timeweaponidle')
+        mb.var('m_flUnlockTime').rename('unlocktime')
+        mb.var('m_hLocker').rename('locker')
+        mb.var('m_iClip1').rename('clip1')
+        mb.var('m_iClip2').rename('clip2')
+        mb.var('m_iPrimaryAmmoType').rename('primaryammotype')
+        mb.var('m_iSecondaryAmmoType').rename('secondaryammotype')
+        mb.var('m_iState').rename('state')
+        mb.var('m_iSubType').rename('subtype')
+        mb.var('m_iViewModelIndex').rename('viewmodelindex')
+        mb.var('m_iWorldModelIndex').rename('worldmodelindex')
+        mb.vars('m_iszName').rename('name')
+        mb.vars('m_nViewModelIndex').rename('viewmodelindex')
+        
+        for cls_name3 in all_cls:
+            AddNetworkVarProperty( mb, 'nextprimaryattack', 'm_flNextPrimaryAttack', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'timeweaponidle', 'm_flTimeWeaponIdle', 'float', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'state', 'm_iState', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'primaryammotype', 'm_iPrimaryAmmoType', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'secondaryammotype', 'm_iSecondaryAmmoType', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'clip1', 'm_iClip1', 'int', cls_name3, self.isclient )
+            AddNetworkVarProperty( mb, 'clip2', 'm_iClip2', 'int', cls_name3, self.isclient )
+            
+        cls.var('m_flNextPrimaryAttack').exclude()
+        cls.var('m_flTimeWeaponIdle').exclude()
+        cls.var('m_flNextSecondaryAttack').exclude()
+        cls.var('m_iState').exclude()
+        cls.var('m_iPrimaryAmmoType').exclude()
+        cls.var('m_iSecondaryAmmoType').exclude()
+        cls.var('m_iClip1').exclude()
+        cls.var('m_iClip2').exclude()
+            
+        # Misc
+        mb.enum('WeaponSound_t').include()
+        mb.enum('WeaponSound_t').rename('WeaponSound')
+        
+        # Wars Weapon
+        cls = mb.class_(cls_name2)
+        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
+        cls.var('m_fFireRate').rename('firerate')
+        cls.var('m_vBulletSpread').rename('bulletspread')
+        cls.var('m_fOverrideAmmoDamage').rename('overrideammodamage')
+        cls.var('m_fMaxBulletRange').rename('maxbulletrange')
+        cls.var('m_iMinBurst').rename('minburst')
+        cls.var('m_iMaxBurst').rename('maxburst')
+        cls.var('m_fMinRestTime').rename('minresttime')
+        cls.var('m_fMaxRestTime').rename('maxresttime')
+        cls.var('m_bEnableBurst').rename('enableburst')
+        cls.var('m_nBurstShotsRemaining').rename('burstshotsremaining')
+        
+        if self.isclient:
+            cls.vars('m_vTracerColor').rename('tracercolor')
+        
+        cls.mem_funs('GetPrimaryAttackActivity').exclude()
+        cls.mem_funs('SetPrimaryAttackActivity').exclude()
+        cls.mem_funs('GetSecondaryAttackActivity').exclude()
+        cls.mem_funs('SetSecondaryAttackActivity').exclude()
+        cls.add_property( 'primaryattackactivity'
+                         , cls.member_function( 'GetPrimaryAttackActivity' )
+                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
+        cls.add_property( 'secondaryattackactivity'
+                         , cls.member_function( 'GetSecondaryAttackActivity' )
+                         , cls.member_function( 'SetSecondaryAttackActivity' ) )
+                         
     def ParseBaseCombatCharacter(self, mb):
-        cls = mb.class_('C_BaseCombatCharacter') if self.isclient else mb.class_('CBaseCombatCharacter')
+        cls = mb.class_('C_BaseCombatCharacter' if self.isclient else 'CBaseCombatCharacter')
         
         # enums
         mb.enum('Disposition_t').include()
-        
-        cls.member_function( 'GetActiveWeapon' ).exclude()
         
         mb.vars('m_HackedGunPos').rename('hackedgunpos')
         
@@ -1041,14 +1163,13 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('OnNavAreaRemoved').exclude()
         
         if self.isclient:
-            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', excludesetget=False)
+            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon')
                              
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE
             mb.mem_funs('OnActiveWeaponChanged').virtuality = 'virtual'
-            
         else:
             cls.member_function('SetActiveWeapon').exclude()
-            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon', excludesetget=False)
+            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon')
         
             # Exclude
             #mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseCombatWeapon') != -1 ).exclude()
@@ -1172,13 +1293,61 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetFOVOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('GetUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('Weapon_GetLast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
-        # Player cls functions are never overriden for now
-        cls.mem_funs().virtuality = 'not virtual' 
 
+    def ParseTriggers(self, mb):
+        # CBaseTrigger
+        cls_name = 'C_BaseTrigger' if self.isclient else 'CBaseTrigger'
+        cls = mb.class_(cls_name)
+        cls.no_init = False
+        
+        if self.isserver:
+            cls.mem_funs('GetTouchingEntities').exclude()
+            cls.mem_funs('GetClientSidePredicted').exclude() 
+            cls.mem_funs('SetClientSidePredicted').exclude() 
+            cls.add_property( 'clientsidepredicted'
+                             , cls.mem_fun('GetClientSidePredicted')
+                             , cls.mem_fun('SetClientSidePredicted') )
+        else:
+            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
+
+        # CTriggerMultiple
+        if self.isserver:
+            cls = mb.class_('CTriggerMultiple')
+            mb.class_('CTriggerMultiple').no_init = False
+            mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+            mb.vars('m_bDisabled').rename('disabled')
+            mb.vars('m_hFilter').rename('filter')
+            mb.vars('m_hFilter').exclude()
+            mb.vars('m_iFilterName').rename('filtername')
+            
+            for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
+                triggers = mb.class_(clsname)
+                triggers.add_wrapper_code(    
+                'virtual boost::python::list GetTouchingEntities( void ) {\r\n' + \
+                '    return UtlVectorToListByValue<EHANDLE>(m_hTouchingEntities);\r\n' + \
+                '}\r\n'        
+                )
+                triggers.add_registration_code(
+                    'def( \r\n'
+                    '    "GetTouchingEntities"\r\n'
+                    '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
+                    ') \r\n' % (clsname, clsname)
+                )
+                         
+    def ParseProps(self, mb):
+        if self.isserver:
+            cls = mb.class_('CBreakableProp')
+            cls.mem_funs('GetRootPhysicsObjectForBreak').exclude()
+            
+            cls = mb.class_('CPhysicsProp')
+                
+            cls = mb.class_('CRagdollProp')
+            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        
+
+	# Wars Entity Parsing
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
-        #cls.calldefs().virtuality = 'not virtual'  
 
         cls.mem_funs('GetUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         cls.mem_funs('GetGroupUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1257,7 +1426,6 @@ class Entities(SemiSharedModuleGenerator):
     def ParseUnitBase(self, mb):
         cls_name = 'C_UnitBase' if self.isclient else 'CUnitBase'
         cls = mb.class_(cls_name)
-        #mb.vars('g_playerrelationships').include()
         mb.free_function('SetPlayerRelationShip').include()
         mb.free_function('GetPlayerRelationShip').include()
         
@@ -1377,192 +1545,8 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseUnitBaseShared(mb, cls_name)
         if self.isclient:
             cls.vars('m_iMaxHealth').rename('maxhealth')
-            
-    def ParseTriggers(self, mb):
-        # CBaseTrigger
-        cls_name = 'C_BaseTrigger' if self.isclient else 'CBaseTrigger'
-        cls = mb.class_(cls_name)
-        cls.no_init = False
-        
-        if self.isserver:
-            cls.mem_funs('GetTouchingEntities').exclude()
-            cls.mem_funs('GetClientSidePredicted').exclude() 
-            cls.mem_funs('SetClientSidePredicted').exclude() 
-            cls.add_property( 'clientsidepredicted'
-                             , cls.mem_fun('GetClientSidePredicted')
-                             , cls.mem_fun('SetClientSidePredicted') )
-        else:
-            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
 
-        # CTriggerMultiple
-        if self.isserver:
-            cls = mb.class_('CTriggerMultiple')
-            mb.class_('CTriggerMultiple').no_init = False
-            mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.vars('m_bDisabled').rename('disabled')
-            mb.vars('m_hFilter').rename('filter')
-            mb.vars('m_hFilter').exclude()
-            mb.vars('m_iFilterName').rename('filtername')
-            
-            for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
-                triggers = mb.class_(clsname)
-                triggers.add_wrapper_code(    
-                'virtual boost::python::list GetTouchingEntities( void ) {\r\n' + \
-                '    return UtlVectorToListByValue<EHANDLE>(m_hTouchingEntities);\r\n' + \
-                '}\r\n'        
-                )
-                triggers.add_registration_code(
-                    'def( \r\n'
-                    '    "GetTouchingEntities"\r\n'
-                    '    , (boost::python::list ( ::%s_wrapper::* )( void ) )(&::%s_wrapper::GetTouchingEntities)\r\n'
-                    ') \r\n' % (clsname, clsname)
-                )
-
-    def ParseBaseCombatWeapon(self, mb):
-        cls_name = 'C_BaseCombatWeapon' if self.isclient else 'CBaseCombatWeapon'
-        cls_name2 = 'C_WarsWeapon' if self.isclient else 'CWarsWeapon'
-        all_cls = [cls_name, cls_name2]
-        cls = mb.class_(cls_name)
-        
-        # Overridable
-        mb.mem_funs('PrimaryAttack').virtuality = 'virtual'
-        mb.mem_funs('SecondaryAttack').virtuality = 'virtual'
-        
-        # Basecombatweapon
-        mb.mem_funs('ActivityList').exclude()
-        mb.mem_funs('GetConstraint').exclude()
-        mb.mem_funs('GetDeathNoticeName').exclude()
-        mb.mem_funs('GetEncryptionKey').exclude()
-        mb.mem_funs('GetProficiencyValues').exclude()
-        mb.mem_funs('GetSpriteActive').exclude()
-        mb.mem_funs('GetSpriteAmmo').exclude()
-        mb.mem_funs('GetSpriteAmmo2').exclude()
-        mb.mem_funs('GetSpriteAutoaim').exclude()
-        mb.mem_funs('GetSpriteCrosshair').exclude()
-        mb.mem_funs('GetSpriteInactive').exclude()
-        mb.mem_funs('GetSpriteZoomedAutoaim').exclude()
-        mb.mem_funs('GetSpriteZoomedCrosshair').exclude()
-        mb.mem_funs('GetControlPanelClassName').exclude()
-        mb.mem_funs('GetControlPanelInfo').exclude()
-
-        #mb.mem_funs('GetLastWeapon').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
-        if self.isserver:
-            mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
-            mb.mem_funs('IsInBadPosition').exclude() # Declaration only...
-            if self.settings.branch == 'swarm':
-                mb.mem_funs('IsCarrierAlive').exclude()
-        else:
-            if self.settings.branch == 'swarm':
-                mb.mem_funs('GetWeaponList').exclude()
-
-        #mb.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        
-        # Rename variables
-        mb.var('m_iViewModelIndex').exclude()
-        mb.var('m_iWorldModelIndex').exclude()
-
-        mb.var('m_bAltFiresUnderwater').rename('altfiresunderwater')
-        mb.var('m_bFireOnEmpty').rename('fireonempty')
-        mb.var('m_bFiresUnderwater').rename('firesunderwater')
-        mb.var('m_bInReload').rename('inreload')
-        mb.var('m_bReloadsSingly').rename('reloadssingly')
-        mb.var('m_fFireDuration').rename('fireduration')
-        mb.var('m_fMaxRange1').rename('maxrange1')
-        mb.var('m_fMaxRange2').rename('maxrange2')
-        mb.var('m_fMinRange1').rename('minrange1')
-        mb.var('m_fMinRange2').rename('minrange2')
-        mb.var('m_flNextEmptySoundTime').rename('nextemptysoundtime')
-        mb.var('m_flNextPrimaryAttack').rename('nextprimaryattack')
-        mb.var('m_flNextSecondaryAttack').rename('nextsecondaryattack')
-        mb.vars('m_flTimeWeaponIdle').rename('timeweaponidle')
-        mb.var('m_flUnlockTime').rename('unlocktime')
-        mb.var('m_hLocker').rename('locker')
-        mb.var('m_iClip1').rename('clip1')
-        mb.var('m_iClip2').rename('clip2')
-        mb.var('m_iPrimaryAmmoType').rename('primaryammotype')
-        mb.var('m_iSecondaryAmmoType').rename('secondaryammotype')
-        mb.var('m_iState').rename('state')
-        mb.var('m_iSubType').rename('subtype')
-        mb.var('m_iViewModelIndex').rename('viewmodelindex')
-        mb.var('m_iWorldModelIndex').rename('worldmodelindex')
-        mb.vars('m_iszName').rename('name')
-        mb.vars('m_nViewModelIndex').rename('viewmodelindex')
-        
-        for cls_name3 in all_cls:
-            AddNetworkVarProperty( mb, 'nextprimaryattack', 'm_flNextPrimaryAttack', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'timeweaponidle', 'm_flTimeWeaponIdle', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'state', 'm_iState', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'primaryammotype', 'm_iPrimaryAmmoType', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'secondaryammotype', 'm_iSecondaryAmmoType', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'clip1', 'm_iClip1', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'clip2', 'm_iClip2', 'int', cls_name3, self.isclient )
-            
-        cls.var('m_flNextPrimaryAttack').exclude()
-        cls.var('m_flTimeWeaponIdle').exclude()
-        cls.var('m_flNextSecondaryAttack').exclude()
-        cls.var('m_iState').exclude()
-        cls.var('m_iPrimaryAmmoType').exclude()
-        cls.var('m_iSecondaryAmmoType').exclude()
-        cls.var('m_iClip1').exclude()
-        cls.var('m_iClip2').exclude()
-            
-        # Misc
-        mb.enum('WeaponSound_t').include()
-        mb.enum('WeaponSound_t').rename('WeaponSound')
-        
-        # Wars Weapon
-        cls = mb.class_(cls_name2)
-        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
-        cls.var('m_fFireRate').rename('firerate')
-        cls.var('m_vBulletSpread').rename('bulletspread')
-        cls.var('m_fOverrideAmmoDamage').rename('overrideammodamage')
-        cls.var('m_fMaxBulletRange').rename('maxbulletrange')
-        cls.var('m_iMinBurst').rename('minburst')
-        cls.var('m_iMaxBurst').rename('maxburst')
-        cls.var('m_fMinRestTime').rename('minresttime')
-        cls.var('m_fMaxRestTime').rename('maxresttime')
-        cls.var('m_bEnableBurst').rename('enableburst')
-        cls.var('m_nBurstShotsRemaining').rename('burstshotsremaining')
-        
-        if self.isclient:
-            cls.vars('m_vTracerColor').rename('tracercolor')
-        
-        cls.mem_funs('GetPrimaryAttackActivity').exclude()
-        cls.mem_funs('SetPrimaryAttackActivity').exclude()
-        cls.mem_funs('GetSecondaryAttackActivity').exclude()
-        cls.mem_funs('SetSecondaryAttackActivity').exclude()
-        cls.add_property( 'primaryattackactivity'
-                         , cls.member_function( 'GetPrimaryAttackActivity' )
-                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
-        cls.add_property( 'secondaryattackactivity'
-                         , cls.member_function( 'GetSecondaryAttackActivity' )
-                         , cls.member_function( 'SetSecondaryAttackActivity' ) )
-                         
-    def ParseProps(self, mb):
-        if self.isserver:
-            cls = mb.class_('CBreakableProp')
-            cls.mem_funs('GetRootPhysicsObjectForBreak').exclude()
-            
-            cls = mb.class_('CPhysicsProp')
-                
-            cls = mb.class_('CRagdollProp')
-            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
     def ParseRemainingEntities(self, mb):
-        # CBaseFlex
-        mb.mem_funs( lambda decl: HasArgType(decl, 'CChoreoScene') ).exclude() 
-        if self.isserver:
-            mb.mem_funs('FlexSettingLessFunc').exclude()
-            mb.class_('CBaseFlex').class_('FS_LocalToGlobal_t').exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'AI_Response') ).exclude() 
-            if self.settings.branch == 'swarm':
-                mb.mem_funs('ScriptGetOldestScene').exclude()
-                mb.mem_funs('ScriptGetSceneByIndex').exclude()
-        else:
-            mb.mem_funs('FindSceneFile').exclude() # Don't care
-    
         # CBaseGrenade
         cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
         cls = mb.class_(cls_name)
@@ -1737,14 +1721,17 @@ class Entities(SemiSharedModuleGenerator):
         
         self.ParseBaseEntity(mb)
         self.ParseBaseAnimating(mb)
+        self.ParseBaseAnimatingOverlay(mb)
+        self.ParseBaseFlex(mb)
+        self.ParseBaseCombatWeapon(mb)
         self.ParseBaseCombatCharacter(mb)
         self.ParseBasePlayer(mb)
-        self.ParseHL2WarsPlayer(mb)
-        self.ParseUnitBase(mb)
         self.ParseTriggers(mb)
-        self.ParseBaseCombatWeapon(mb)
         self.ParseProps(mb)
         self.ParseRemainingEntities(mb)
+        
+        self.ParseHL2WarsPlayer(mb)
+        self.ParseUnitBase(mb)
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -1760,5 +1747,4 @@ class Entities(SemiSharedModuleGenerator):
         
         # Finally apply common rules to all includes functions and classes, etc.
         self.ApplyCommonRules(mb)
-
-    
+        

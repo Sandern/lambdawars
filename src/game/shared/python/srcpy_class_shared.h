@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "srcpy_boostpython.h"
+
 //-----------------------------------------------------------------------------
 // Shared between server and client class
 // When you add a new type:

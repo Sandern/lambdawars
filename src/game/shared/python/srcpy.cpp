@@ -77,15 +77,13 @@ boost::python::object mainnamespace;
 bp::object builtins;
 bp::object types;
 bp::object sys;
-bp::object srcmgr;
-bp::object gamemgr;
+
 bp::object weakref;
 bp::object srcbuiltins;
 bp::object srcbase;
 bp::object steam;
 bp::object _entitiesmisc;
 bp::object _entities;
-bp::object unit_helper;
 bp::object _particles;
 bp::object _physics;
 bp::object matchmaking;
@@ -93,6 +91,10 @@ bp::object matchmaking;
 #ifdef CLIENT_DLL
 	boost::python::object _vguicontrols;
 #endif // CLIENT_DLL
+
+bp::object unit_helper;
+bp::object srcmgr;
+bp::object gamemgr;
 
 boost::python::object fntype;
 
