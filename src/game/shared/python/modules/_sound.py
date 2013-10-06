@@ -8,7 +8,6 @@ class Sound(SemiSharedModuleGenerator):
     module_name = '_sound'
     
     files = [
-		'$%videocfg/videocfg.h',
         'wchar.h',
         'string_t.h',
         'cbase.h',

@@ -148,12 +148,6 @@ def ParseModules(settings, specificmodule=None, appendfileonly=False):
     serverappendfile = GenerateAppendFile(os.path.join(srcpath, settings.server_path), server_modules, 'server')
     sharedappendfile = GenerateAppendFile(os.path.join(srcpath, settings.shared_path), shared_modules, 'shared')
     
-    # Add python files for autoupdatevxproj setting if specified
-    #if settings.addpythonfiles:
-    #    client_filenames.extend(map(os.path.normpath, settings.pythonfiles_client))
-    #    server_filenames.extend(map(os.path.normpath, settings.pythonfiles_server))
-    #    shared_filenames.extend(map(os.path.normpath, settings.pythonfiles_shared))
-    
     # Add append files for autoupdatevxproj setting if specified
     if client_filenames: 
         client_filenames.append(clientappendfile.split(rm.settings.srcpath)[1][1:])

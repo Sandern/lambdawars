@@ -6,7 +6,6 @@ class NavMesh(SemiSharedModuleGenerator):
     module_name = '_navmesh'
 
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_navmesh.h',
     ]

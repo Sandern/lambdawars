@@ -18,9 +18,15 @@ class SourceModuleGenerator(ModuleGenerator):
     isserver = False
     
     def GetFiles(self):
+        parsefiles = list(self.files)
+        
+        # Only for parsing, seems required for some reason (or some error somewhere in the gccxml setup?)
+        if self.settings.branch == 'swarm':
+            parsefiles.insert(0, '$%videocfg/videocfg.h')
+    
         parseonlyfiles = []
         files = []
-        for filename in self.files:
+        for filename in parsefiles:
             if not filename:
                 continue
                 

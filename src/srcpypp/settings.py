@@ -18,8 +18,8 @@ client_path = os.path.normpath('game/client/python/modules/%s/' % (autogenfolder
 server_path = os.path.normpath('game/server/python/modules/%s/' % (autogenfoldername))
 shared_path = os.path.normpath('game/shared/python/modules/%s/' % (autogenfoldername))
 
-# Alien Swarm code base? 
-ASW_CODE_BASE = True
+# Branch (currently either "swarm" or "source2013")
+branch = "swarm"
 
 # Project project paths (see vxprojinfo.py for the available info)
 vcxprojserver = '../game/server/wars_server.vcxproj'
@@ -36,6 +36,9 @@ modules = [
     ('srcbuiltins', 'SrcBuiltins'),
     ('srcbase', 'SrcBase'),
     ('_vmath', 'VMath'),
+    
+    # Game
+    ('_animation', 'Animation'),
     ('_entities', 'Entities'),
     ('_entitiesmisc', 'EntitiesMisc'),
     ('_gameinterface', 'GameInterface'),
@@ -44,88 +47,26 @@ modules = [
     ('_sound', 'Sound'),
     ('_particles', 'Particles'),
     ('materials', 'Materials'),
-    ('_animation', 'Animation'),
+	('_gamerules', 'GameRules'),
+	
     ('_te', 'TE'),
     ('_fow', 'FOW'),
     ('steam', 'Steam'),
     
-    # # Client
+    # Client
     ('_input', 'Input'),
     ('_vgui', 'VGUI'),
     ('_vguicontrols', 'VGUIControls'),
     ('_cef', 'CEF'),
     
-    # # Game
-    ('_gamerules', 'GameRules'),
+    # Wars
     ('unit_helper', 'UnitHelper'),
     
-    # # Misc
+    # Misc
     ('_navmesh', 'NavMesh'),
     ('_ndebugoverlay', 'NDebugOverlay'),
     ('vprof', 'VProf'),
     ('_srctests', '_SrcTests'),
     ('matchmaking', 'MatchMaking'),
-]
-
-# Base files (in case you want to make use automatically updating the vcxproj)
-pythonfiles_shared = [
-    '../shared/python/srcpy.cpp',
-    '../shared/python/srcpy.h',
-    '../shared/python/srcpy_animation.cpp',
-    '../shared/python/srcpy_animation.h',
-    '../shared/python/srcpy_base.cpp',
-    '../shared/python/srcpy_base.h',
-    '../shared/python/srcpy_class_shared.cpp',
-    '../shared/python/srcpy_class_shared.h',
-    '../shared/python/srcpy_converters.h',
-    '../shared/python/srcpy_converters_ents.h',
-    '../shared/python/srcpy_entities.cpp',
-    '../shared/python/srcpy_entities.h',
-    '../shared/python/srcpy_gameinterface.cpp',
-    '../shared/python/srcpy_gameinterface.h',
-    '../shared/python/srcpy_gameinterface_converters.h',
-    '../shared/python/srcpy_gamerules.cpp',
-    '../shared/python/srcpy_gamerules.h',
-    '../shared/python/srcpy_matchmaking.cpp',
-    '../shared/python/srcpy_matchmaking.h',
-    '../shared/python/srcpy_materials.cpp',
-    '../shared/python/srcpy_materials.h',
-    '../shared/python/srcpy_navmesh.cpp',
-    '../shared/python/srcpy_navmesh.h',
-    '../shared/python/srcpy_networkvar.cpp',
-    '../shared/python/srcpy_networkvar.h',
-    '../shared/python/srcpy_particles.cpp',
-    '../shared/python/srcpy_particles.h',
-    '../shared/python/srcpy_physics.cpp',
-    '../shared/python/srcpy_physics.h',
-    '../shared/python/srcpy_scclasses.cpp',
-    '../shared/python/srcpy_sound.cpp',
-    '../shared/python/srcpy_sound.h',
-    '../shared/python/srcpy_te.cpp',
-    '../shared/python/srcpy_te.h',
-    '../shared/python/srcpy_tests.cpp',
-    '../shared/python/srcpy_tests.h',
-    '../shared/python/srcpy_usermessage.cpp',
-    '../shared/python/srcpy_usermessage.h',
-    '../shared/python/srcpy_util.cpp',
-    '../shared/python/srcpy_util.h',
-    '../shared/python/srcpy_srcbuiltins.cpp',
-    '../shared/python/srcpy_srcbuiltins.h',
-]
-
-pythonfiles_client = [
-    'python/srcpy_client_class.cpp',
-    'python/srcpy_client_class.h',
-    'python/srcpy_hud.cpp',
-    'python/srcpy_hud.h',
-    'python/srcpy_vgui.cpp',
-    'python/srcpy_vgui.h',
-    'python/SurfaceBuffer.cpp',
-    'python/SurfaceBuffer.h',
-]
-
-pythonfiles_server = [
-    'python/srcpy_server_class.cpp',
-    'python/srcpy_server_class.h',
 ]
 

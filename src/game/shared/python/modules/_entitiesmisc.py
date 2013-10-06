@@ -8,7 +8,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
     module_name = '_entitiesmisc'
     
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'takedamageinfo.h',
         '$cliententitylist.h',
@@ -200,7 +199,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('FindEntityByNetname').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         cls.mem_funs('FindEntityProcedural').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
 
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('FindEntityByClassnameFast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.mem_funs('FindEntityByClassnameNearest2D').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             cls.mem_funs('FindEntityByClassnameNearestFast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -224,7 +223,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('Save').exclude()
         cls.mem_funs('Restore').exclude()
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('GetActionForTarget').exclude()
             cls.mem_funs('GetFirstAction').exclude()
             
@@ -283,7 +282,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.add_registration_code( 'def("GetEnt", &::gamevcollisionevent_t_wrapper::GetEnt)')
 
         # Speech
-        if not self.settings.ASW_CODE_BASE:
+        if self.settings.branch != 'swarm':
             cls = mb.class_('CAI_Expresser')
             cls.include()
             cls.calldefs().virtuality = 'not virtual'  

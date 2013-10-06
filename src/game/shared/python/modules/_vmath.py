@@ -433,7 +433,7 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('MatrixToAngles').include()
 
         # Exclude
-        if not settings.ASW_CODE_BASE:
+        if self.settings.branch != 'swarm':
             mb.vars('pfVectorNormalizeFast').exclude()
             mb.vars('pfVectorNormalize').exclude()
             mb.vars('pfInvRSquared').exclude()

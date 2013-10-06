@@ -10,8 +10,6 @@
 
 #include "__array_1.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "vgui/Cursor.h"
 
 #include "inputsystem/ButtonCode.h"

@@ -9,7 +9,6 @@ class Utils(SemiSharedModuleGenerator):
     module_name = '_utils'
 
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_util.h',
         'util_shared.h',
@@ -66,15 +65,14 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('UTIL_EntitiesInPVS').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.free_functions('UTIL_FindClientInPVS').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.free_functions('UTIL_FindClientInPVSGuts').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.free_functions('UTIL_GetLocalPlayerOrListenServerHost').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
         
         # Helper for message stuff
-        if self.isserver:
-            cls = mb.class_('hudtextparms_s')
-            cls.include()
-            cls.rename('hudtextparms')
+        cls = mb.class_('hudtextparms_s')
+        cls.include()
+        cls.rename('hudtextparms')
         
         # Tracefilters
         mb.class_('CTraceFilterMelee').include()
@@ -128,7 +126,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_function('MainWorldToViewMatrix').include()
         
         # Call policies and excludes
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.free_function('UTIL_GetLocalizedKeyString').exclude()
             mb.free_function('UTIL_MessageText').exclude()
             mb.free_functions('UTIL_EntityFromUserMessageEHandle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )   
@@ -311,7 +309,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('IntersectRayWithBox').include()
         mb.free_functions('IntersectRayWithOBB').include()
         mb.free_functions('IsSphereIntersectingSphere').include()
-        if not self.settings.ASW_CODE_BASE: # IsBoxIntersectingSphere gives a problem
+        if self.settings.branch != 'swarm': # IsBoxIntersectingSphere gives a problem
             mb.free_functions('IsBoxIntersectingSphere').include()
         mb.free_functions('IsBoxIntersectingSphereExtents').include()
         mb.free_functions('IsRayIntersectingSphere').include()

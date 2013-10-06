@@ -2105,25 +2105,6 @@ void register_C_BaseCombatWeapon_class(){
                 , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
         
         }
-        { //::C_BaseCombatWeapon::NetworkStateChanged_m_nNextThinkTick
-        
-            typedef void ( ::C_BaseCombatWeapon::*NetworkStateChanged_m_nNextThinkTick_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "NetworkStateChanged_m_nNextThinkTick"
-                , NetworkStateChanged_m_nNextThinkTick_function_type( &::C_BaseCombatWeapon::NetworkStateChanged_m_nNextThinkTick ) );
-        
-        }
-        { //::C_BaseCombatWeapon::NetworkStateChanged_m_nNextThinkTick
-        
-            typedef void ( ::C_BaseCombatWeapon::*NetworkStateChanged_m_nNextThinkTick_function_type )( void * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "NetworkStateChanged_m_nNextThinkTick"
-                , NetworkStateChanged_m_nNextThinkTick_function_type( &::C_BaseCombatWeapon::NetworkStateChanged_m_nNextThinkTick )
-                , ( bp::arg("pVar") ) );
-        
-        }
         { //::C_BaseCombatWeapon::OnDataChanged
         
             typedef void ( ::C_BaseCombatWeapon::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;

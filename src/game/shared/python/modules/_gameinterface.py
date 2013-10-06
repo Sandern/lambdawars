@@ -11,7 +11,6 @@ class GameInterface(SemiSharedModuleGenerator):
     module_name = '_gameinterface'
     
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         
         '#mathlib/vmatrix.h', 

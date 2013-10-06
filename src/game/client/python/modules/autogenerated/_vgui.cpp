@@ -10,8 +10,6 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "vgui_controls/Controls.h"

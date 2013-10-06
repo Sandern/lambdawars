@@ -2,8 +2,6 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "srcpy_matchmaking.h"
@@ -232,8 +230,6 @@ BOOST_PYTHON_MODULE(matchmaking){
     }
 }
 #else
-#include "videocfg/videocfg.h"
-
 #include "cbase.h"
 
 #include "srcpy_matchmaking.h"

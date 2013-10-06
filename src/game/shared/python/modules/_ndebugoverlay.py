@@ -6,7 +6,6 @@ class NDebugOverlay(SemiSharedModuleGenerator):
     module_name = '_ndebugoverlay'
     
     files = [
-		'$%videocfg/videocfg.h',
         'cbase.h',
         'debugoverlay_shared.h'
     ]

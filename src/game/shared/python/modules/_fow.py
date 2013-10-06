@@ -5,7 +5,6 @@ class FOW(SemiSharedModuleGenerator):
     module_name = '_fow'
     
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'hl2wars/fowmgr.h',
     ]

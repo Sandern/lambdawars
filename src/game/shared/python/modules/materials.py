@@ -7,7 +7,6 @@ class Materials(SemiSharedModuleGenerator):
     module_name = 'materials'
 
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'materialsystem\imaterial.h',
         'materialsystem\MaterialSystemUtil.h',

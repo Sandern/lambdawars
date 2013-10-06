@@ -6,6 +6,8 @@ from .. src_module_builder import src_module_builder_t
 class ClientModuleGenerator(SourceModuleGenerator):
     module_type = 'client'
     dll_name = 'Client'
+    isclient = True
+    isserver = False
     
     @property
     def path(self):

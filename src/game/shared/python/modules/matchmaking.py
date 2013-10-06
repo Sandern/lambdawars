@@ -5,7 +5,6 @@ class MatchMaking(SemiSharedModuleGenerator):
     module_name = 'matchmaking'
         
     files = [
-        '#$videocfg/videocfg.h',
         'cbase.h',
         'srcpy_matchmaking.h',
         #'steam/isteammatchmaking.h',

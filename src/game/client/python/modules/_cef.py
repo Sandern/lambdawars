@@ -9,8 +9,6 @@ class CEF(ClientModuleGenerator):
     module_name = '_cef'
 
     files = [
-        'videocfg/videocfg.h',
-        
         'cbase.h',
         
         'src_cef.h',

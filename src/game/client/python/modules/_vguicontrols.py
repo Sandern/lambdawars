@@ -7,14 +7,11 @@ from pyplusplus import function_transformers as FT
 from pygccxml.declarations import matchers
 from pyplusplus.module_builder import call_policies
 
-novguilib = settings.ASW_CODE_BASE 
-
 class VGUIControls(ClientModuleGenerator):
     module_name = '_vguicontrols'
     split = True
     
     files = [
-        'videocfg/videocfg.h',
         'cbase.h',
         
         'vgui_controls/Panel.h',
@@ -390,7 +387,7 @@ class VGUIControls(ClientModuleGenerator):
                 cls.classes().exclude()
         
             # SetPythonManaged(true) prevents deletes of panels in the c++ side. Otherwise crash.
-            if not novguilib: # FIXME/TODO
+            if not self.novguilib: # FIXME/TODO
                 pass
             #    constructors = cls.constructors(name=cls_name)
             #    constructors.body = '\tPyInit();'    
@@ -398,10 +395,10 @@ class VGUIControls(ClientModuleGenerator):
                 pass
                 #constructors = cls.constructors(name=cls_name)
                 #constructors.body = '\tSetAutoDelete(false);'
-            AddVGUIConverter(mb, cls_name, novguilib, containsabstract=(cls_name == 'CPotteryWheelPanel'))
+            AddVGUIConverter(mb, cls_name, self.novguilib, containsabstract=(cls_name == 'CPotteryWheelPanel'))
             
             # # Add custom wrappers for functions who take keyvalues as input
-            if not novguilib: # FIXME/TODO
+            if not self.novguilib: # FIXME/TODO
                 AddWrapReg( mb, cls_name, mb.mem_fun('PyOnMessage'), ['*params', 'fromPanel'] )
             #AddWrapReg( mb, cls_name, mb.mem_fun('CallParentFunction'), ['*message'] )
             #AddWrapReg( mb, cls_name, mb.mem_fun('PostActionSignal'), ['*message'] )
@@ -478,7 +475,7 @@ class VGUIControls(ClientModuleGenerator):
         # Tweak Panels
         # Used by converters + special method added in the wrapper
         # Don't include here
-        if not novguilib: # FIXME/TODO
+        if not self.novguilib: # FIXME/TODO
             mb.mem_funs('GetPySelf').exclude()  
             #mb.mem_funs('PyInit').exclude()  
             #mb.mem_funs('SetPythonManaged').exclude()
@@ -520,7 +517,7 @@ class VGUIControls(ClientModuleGenerator):
     def ParsePanel(self, mb):
         #all_classes = mb.classes(self.panel_cls_list)
     
-        if not novguilib: # FIXME/TODO
+        if not self.novguilib: # FIXME/TODO
             mb.mem_funs('PyDeletePanel').rename('DeletePanel')
             mb.mem_fun('PyOnMessage').rename( 'OnMessage' )
 
@@ -600,7 +597,7 @@ class VGUIControls(ClientModuleGenerator):
         
         # Exclude list
         mb.mem_funs('SetParent', lambda decl: HasArgType(decl, 'Panel')).exclude() # Custom wrapper
-        if not novguilib: # FIXME/TODO
+        if not self.novguilib: # FIXME/TODO
             mb.mem_funs('PyOnMessage').exclude() # Custom wrapper
             
         mb.mem_funs('QueryInterface').exclude()
@@ -619,7 +616,7 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs('IsBuildModeActive').exclude()
         #mb.mem_funs('SetAutoDelete').exclude()
         #mb.mem_funs('IsAutoDeleteSet').exclude()
-        if not novguilib: # Overriden in ASW_CODE_BASE to prevent delete. Instead a friendly Python cleanup is done.
+        if not self.novguilib: # Overriden in alien swarm to prevent delete. Instead a friendly Python cleanup is done.
             mb.mem_funs('DeletePanel').exclude()
         mb.mem_funs('OnDelete').exclude()
         mb.mem_funs('MarkForDeletion').exclude()
@@ -655,7 +652,7 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs( 'FindPanelAnimationEntry' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         mb.mem_funs( 'FindDropTargetPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.mem_funs( 'GetNavDown' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
             mb.mem_funs( 'GetNavDownPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
             mb.mem_funs( 'GetNavLeft' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
@@ -780,7 +777,7 @@ class VGUIControls(ClientModuleGenerator):
         )
 
         # RichText
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.mem_funs('GetScrollBar').exclude()
             
     def ParseMisc(self, mb):
@@ -807,6 +804,8 @@ class VGUIControls(ClientModuleGenerator):
         #mb.mem_funs('Select').exclude()
         
     def Parse(self, mb):
+        self.novguilib = (self.settings.branch == 'swarm')
+        
         # Exclude everything by default
         mb.decls().exclude()  
 

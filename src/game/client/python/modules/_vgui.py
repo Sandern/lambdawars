@@ -8,7 +8,6 @@ class VGUI(ClientModuleGenerator):
     module_name = '_vgui'
     
     files = [
-        'videocfg/videocfg.h',
         'cbase.h',
         
         'vgui_controls/Controls.h',
@@ -47,7 +46,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs( 'GetIScheme' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )    
         #cls.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('GetSurface').exclude()
         
         # IScheme
@@ -56,7 +55,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual' 
         cls.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
 
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.class_('fontalias_t').exclude()
         
         # ILocalize
@@ -122,7 +121,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs( 'AdjustEngineViewport' ).add_transformation( FT.output('x'), FT.output('y'), FT.output('width'), FT.output('height') )
         cls.mem_funs( 'ActivateInGameVGuiContext' ).include()  # Not safe, but IClientMode should not be overridden.
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs( 'GetPanelFromViewport' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         
     def ParseISurface(self, mb):
@@ -135,7 +134,7 @@ class VGUI(ClientModuleGenerator):
         
         mb.enum('CursorCode').include()
         mb.enum('FontDrawType_t').include()
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.class_('FontVertex_t').include()
         else:
             mb.class_('Vertex_t').include()
@@ -163,7 +162,7 @@ class VGUI(ClientModuleGenerator):
         mb.free_function('GetHud').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
         
         cls.mem_funs( 'FindElement' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        if not self.settings.ASW_CODE_BASE: # ASW should use HudIcons() / CHudIcons
+        if self.settings.branch != 'swarm': # ASW should use HudIcons() / CHudIcons
             #cls.mem_funs( 'GetIcon' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object )
             #cls.mem_funs( 'AddUnsearchableHudIconToList' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object ) 
             #cls.mem_funs( 'AddSearchableHudIconToList' ).call_policies = call_policies.return_value_policy( call_policies.manage_new_object )
@@ -173,7 +172,7 @@ class VGUI(ClientModuleGenerator):
             cls.mem_funs( 'AddSearchableHudIconToList' ).call_policies = call_policies.return_internal_reference()
         cls.vars('m_HudList').exclude()
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('GetHudList').exclude()
             cls.mem_funs('GetHudPanelList').exclude()
             
@@ -192,7 +191,7 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs('GetNext').exclude()
 
         # HudIcons
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls = mb.class_('CHudIcons')
             cls.include()
             # FIXME

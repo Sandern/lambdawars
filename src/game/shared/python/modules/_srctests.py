@@ -5,7 +5,6 @@ class _SrcTests(SemiSharedModuleGenerator):
     module_name = '_srctests'
 
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_tests.h'
     ]

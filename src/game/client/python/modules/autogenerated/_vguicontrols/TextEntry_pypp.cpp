@@ -3,7 +3,6 @@
 #include "cbase.h"
 #include "__convenience.pypp.hpp"
 #include "__call_policies.pypp.hpp"
-#include "videocfg/videocfg.h"
 #include "cbase.h"
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/AnimationController.h"

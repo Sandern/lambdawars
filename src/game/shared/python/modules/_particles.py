@@ -7,7 +7,6 @@ class Particles(SemiSharedModuleGenerator):
     module_name = '_particles'
     
     files = [
-		'$%videocfg/videocfg.h',
         '$tier1/utlvector.h',
         '$tier1/UtlSortVector.h',
         '$tier1/utlobjectreference.h',
@@ -103,7 +102,7 @@ class Particles(SemiSharedModuleGenerator):
 
         cls.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('Create').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregate').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('CreateOrAggregatePrecached').call_policies = call_policies.return_internal_reference()
@@ -122,7 +121,7 @@ class Particles(SemiSharedModuleGenerator):
         cls.mem_funs('GetModelView').exclude()
         cls.mem_funs('PMaterialToIMaterial').exclude()
         
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls.mem_funs('CreateNonDrawingEffect').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('FirstNewEffect').call_policies = call_policies.return_internal_reference()
             cls.mem_funs('NextNewEffect').call_policies = call_policies.return_internal_reference()
@@ -143,7 +142,7 @@ class Particles(SemiSharedModuleGenerator):
         mb.mem_funs('GetBaseMap').exclude()
         mb.mem_funs('GetDataDescMap').exclude()
         mb.mem_funs('GetPredDescMap').exclude()
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.mem_funs('CreatePrecached').exclude()
         
         # Frequently used materials with particles

@@ -10,7 +10,6 @@ class GameRules(SemiSharedModuleGenerator):
     module_name = '_gamerules'
     
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'gamerules.h',
         'multiplay_gamerules.h',

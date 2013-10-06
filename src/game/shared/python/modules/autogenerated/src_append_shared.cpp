@@ -14,6 +14,7 @@ using namespace boost::python;
 extern "C" __declspec(dllexport) void initsrcbuiltins();
 extern "C" __declspec(dllexport) void initsrcbase();
 extern "C" __declspec(dllexport) void init_vmath();
+extern "C" __declspec(dllexport) void init_animation();
 extern "C" __declspec(dllexport) void init_entities();
 extern "C" __declspec(dllexport) void init_entitiesmisc();
 extern "C" __declspec(dllexport) void init_gameinterface();
@@ -22,11 +23,10 @@ extern "C" __declspec(dllexport) void init_physics();
 extern "C" __declspec(dllexport) void init_sound();
 extern "C" __declspec(dllexport) void init_particles();
 extern "C" __declspec(dllexport) void initmaterials();
-extern "C" __declspec(dllexport) void init_animation();
+extern "C" __declspec(dllexport) void init_gamerules();
 extern "C" __declspec(dllexport) void init_te();
 extern "C" __declspec(dllexport) void init_fow();
 extern "C" __declspec(dllexport) void initsteam();
-extern "C" __declspec(dllexport) void init_gamerules();
 extern "C" __declspec(dllexport) void initunit_helper();
 extern "C" __declspec(dllexport) void init_navmesh();
 extern "C" __declspec(dllexport) void init_ndebugoverlay();
@@ -37,6 +37,7 @@ extern "C" __declspec(dllexport) void initmatchmaking();
 extern "C"  void initsrcbuiltins();
 extern "C"  void initsrcbase();
 extern "C"  void init_vmath();
+extern "C"  void init_animation();
 extern "C"  void init_entities();
 extern "C"  void init_entitiesmisc();
 extern "C"  void init_gameinterface();
@@ -45,11 +46,10 @@ extern "C"  void init_physics();
 extern "C"  void init_sound();
 extern "C"  void init_particles();
 extern "C"  void initmaterials();
-extern "C"  void init_animation();
+extern "C"  void init_gamerules();
 extern "C"  void init_te();
 extern "C"  void init_fow();
 extern "C"  void initsteam();
-extern "C"  void init_gamerules();
 extern "C"  void initunit_helper();
 extern "C"  void init_navmesh();
 extern "C"  void init_ndebugoverlay();
@@ -64,6 +64,7 @@ void AppendSharedModules()
 	APPEND_MODULE(srcbuiltins)
 	APPEND_MODULE(srcbase)
 	APPEND_MODULE(_vmath)
+	APPEND_MODULE(_animation)
 	APPEND_MODULE(_entities)
 	APPEND_MODULE(_entitiesmisc)
 	APPEND_MODULE(_gameinterface)
@@ -72,11 +73,10 @@ void AppendSharedModules()
 	APPEND_MODULE(_sound)
 	APPEND_MODULE(_particles)
 	APPEND_MODULE(materials)
-	APPEND_MODULE(_animation)
+	APPEND_MODULE(_gamerules)
 	APPEND_MODULE(_te)
 	APPEND_MODULE(_fow)
 	APPEND_MODULE(steam)
-	APPEND_MODULE(_gamerules)
 	APPEND_MODULE(unit_helper)
 	APPEND_MODULE(_navmesh)
 	APPEND_MODULE(_ndebugoverlay)

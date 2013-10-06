@@ -9,7 +9,6 @@ class Physics(SemiSharedModuleGenerator):
     module_name = '_physics'
     
     files = [
-		'$%videocfg/videocfg.h',
         'cbase.h',
         'srcpy_physics.h',
         'vphysics/friction.h',

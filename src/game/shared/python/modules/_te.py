@@ -9,7 +9,6 @@ class TE(SemiSharedModuleGenerator):
     module_name = '_te'
     
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         'effect_dispatch_data.h',
         'srcpy_te.h',

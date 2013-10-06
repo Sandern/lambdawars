@@ -5,6 +5,8 @@ from . basesource import SourceModuleGenerator
 class ServerModuleGenerator(SourceModuleGenerator):
     module_type = 'server'
     dll_name = 'Server'
+    isclient = False
+    isserver = True
     
     @property
     def path(self):

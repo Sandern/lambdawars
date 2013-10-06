@@ -195,7 +195,13 @@ class SemiSharedModuleGenerator(SourceModuleGenerator):
     # Default includes
     def AddAdditionalCode(self, mb):
         mb.code_creator.user_defined_directories.append( os.path.abspath('.') )
+        if self.settings.branch == 'source2013':
+            header = code_creators.include_t( 'tier0/valve_minmax_off.h' )
+            mb.code_creator.adopt_include( header )
         header = code_creators.include_t( 'srcpy.h' )
+        if self.settings.branch == 'source2013':
+            mb.code_creator.adopt_include( header )
+            header = code_creators.include_t( 'tier0/valve_minmax_on.h' )
         mb.code_creator.adopt_include( header )
         header = code_creators.include_t( 'tier0/memdbgon.h' )
         mb.code_creator.adopt_include(header)

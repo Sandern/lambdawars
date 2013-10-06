@@ -10,8 +10,6 @@ class Input(ClientModuleGenerator):
     module_name = '_input'
 
     files = [
-        'videocfg/videocfg.h',
-
         'vgui/Cursor.h',
         'inputsystem/ButtonCode.h',
         'kbutton.h',
@@ -24,7 +22,7 @@ class Input(ClientModuleGenerator):
         mb.decls().exclude()
         
         mb.class_('kbutton_t').include()
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             mb.class_('kbutton_t').mem_funs('GetPerUser').exclude()
         
         # //--------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +30,7 @@ class Input(ClientModuleGenerator):
         cls = mb.class_('CInput')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual'
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             #mb.mem_funs('FindKey').exclude() # FIXME
             mb.mem_funs('FindKey').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object ) 
         else:

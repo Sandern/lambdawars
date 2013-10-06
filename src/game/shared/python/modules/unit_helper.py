@@ -7,7 +7,6 @@ class UnitHelper(SemiSharedModuleGenerator):
     module_name = 'unit_helper'
 
     files = [
-        '$%videocfg/videocfg.h',
         'cbase.h',
         
         'unit_base_shared.h',
@@ -298,7 +297,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         AddWrapReg( mb, cls, cls.mem_fun('HandleEvent'), [CreateEntityArg('pUnit'), 'event'] )
         
     def AddExpresser(self, mb):
-        if self.settings.ASW_CODE_BASE:
+        if self.settings.branch == 'swarm':
             cls = mb.class_('CriteriaSet')
         else:
             cls = mb.class_('AI_CriteriaSet')
@@ -310,7 +309,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.mem_fun('GetMySpeechSemaphore').exclude()
         cls.mem_funs('GetOuter').exclude()
         cls.mem_fun('GetSink').exclude()
-        if not self.settings.ASW_CODE_BASE:
+        if self.settings.branch != 'swarm':
             cls.mem_fun('SpeakFindResponse').exclude()
         
         cls = mb.class_('UnitExpresser')
