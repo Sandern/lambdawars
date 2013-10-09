@@ -46,10 +46,10 @@ void CTeamColorProxy::OnBind( void *pRenderable )
 
 	IClientRenderable *pRend = ( IClientRenderable* )pRenderable;
 	C_BaseEntity *pEnt = pRend->GetIClientUnknown()->GetBaseEntity();
-	if ( !pEnt )
+	if( !pEnt )
 		return;
 
-	Vector &teamcolor = pEnt->GetTeamColor(false);
+	Vector &teamcolor = pEnt->GetTeamColor( false );
 
 	m_pColorTextureVar->SetVecValue(teamcolor[0], teamcolor[1], teamcolor[2], 1);
 }

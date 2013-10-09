@@ -23,9 +23,11 @@ extern ConVar g_unit_force_minimal_sendtable;
 #endif
 
 #if defined( CLIENT_DLL )
-	#define CUnitBase C_UnitBase
-	#define CBaseCombatCharacter C_BaseCombatCharacter
-	#define CHL2WarsPlayer C_HL2WarsPlayer
+#define CUnitBase C_UnitBase
+#define CBaseCombatCharacter C_BaseCombatCharacter
+#define CHL2WarsPlayer C_HL2WarsPlayer
+
+class CGlowObject;
 #endif
 
 #define SENDPROP_HEALTH_BITS_LOW 5 // Bits used for health when sending the minimal info
@@ -203,6 +205,10 @@ public:
 	void					Blink( float blink_time = 3.0f );
 
 	virtual const Vector&			GetRenderOrigin( void );
+
+	virtual bool		OnInternalDrawModel( ClientModelRenderInfo_t *pInfo );
+	void				EnableTeamColorGlow( );
+	void				DisableTeamColorGlow( );
 
 #endif // CLIENT_DLL
 	virtual void		DoMuzzleFlash();
@@ -560,6 +566,9 @@ private:
 	// Client simulation time
 	float					m_fNextSimulationUpdate;
 	Vector					m_vecOldUnitOrigin;
+
+	// Glow
+	CGlowObject *m_pTeamColorGlowEffect;
 #endif // CLIENT_DLL
 
 	CNetworkHandle( CBaseEntity, m_hSquadUnit );

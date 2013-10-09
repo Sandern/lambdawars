@@ -171,6 +171,8 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 	SetPredictionEligible( true );
 
 	m_bUpdateClientAnimations = true;
+
+	m_pTeamColorGlowEffect = NULL;
 #endif // CLIENT_DLL
 
 	AddToUnitList();
@@ -184,6 +186,10 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 CUnitBase::~CUnitBase()
 {
 	RemoveFromUnitList();
+
+#ifdef CLIENT_DLL
+	DisableTeamColorGlow();
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------

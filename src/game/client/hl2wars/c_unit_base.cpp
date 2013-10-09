@@ -10,6 +10,7 @@
 #include "gamestringpool.h"
 #include "model_types.h"
 #include "cdll_bounded_cvars.h"
+#include "glow_outline_effect.h"
 
 #include <vgui_controls/Controls.h>
 #include <vgui/ISurface.h>
@@ -428,6 +429,41 @@ void CUnitBase::UpdateClientSideAnimation()
 
 	if( GetSequence() != -1 )
 		OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+bool CUnitBase::OnInternalDrawModel( ClientModelRenderInfo_t *pInfo )
+{
+	if( m_pTeamColorGlowEffect )
+	{
+		m_pTeamColorGlowEffect->SetColor( GetTeamColor( false ) );
+	}
+	return BaseClass::OnInternalDrawModel( pInfo );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::EnableTeamColorGlow( )
+{
+	if( m_pTeamColorGlowEffect )
+		return;
+
+	m_pTeamColorGlowEffect = new CGlowObject( this, GetTeamColor(), 1.0, true );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::DisableTeamColorGlow( )
+{
+	if( !m_pTeamColorGlowEffect )
+		return;
+	
+	delete m_pTeamColorGlowEffect;
+	m_pTeamColorGlowEffect = NULL;
 }
 
 //-----------------------------------------------------------------------------
