@@ -266,16 +266,17 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 
 	if( g_debug_mouse_aim.GetBool() )
 	{
-		NDebugOverlay::SweptBox(vStartPos,  vStartPos + (m_vMouseAim *  8192), 
-				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, QAngle(), 255, 0, 0, 200, 0.05f);
+		NDebugOverlay::SweptBox( vStartPos,  vStartPos + (m_vMouseAim *  8192), 
+				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, QAngle(), 255, 0, 0, 200, 0.05f );
 		if( mousedata.GetEnt() )
 		{
+			CBaseEntity *pEnt = mousedata.GetEnt();
 #ifndef CLIENT_DLL
-			NDebugOverlay::BoxAngles(mousedata.GetEnt()->GetAbsOrigin(), mousedata.GetEnt()->WorldAlignMins(),
-				mousedata.GetEnt()->WorldAlignMaxs(), mousedata.GetEnt()->GetAbsAngles(), 0, 0, 255, 255, 0.05f);
+			NDebugOverlay::BoxAngles( pEnt->GetAbsOrigin(), pEnt->WorldAlignMins(),
+				pEnt->WorldAlignMaxs(), pEnt->GetAbsAngles(), 0, !pEnt->IsSolid() * 255, 255, 255, 0.05f );
 #else
-			NDebugOverlay::BoxAngles(mousedata.GetEnt()->GetAbsOrigin(), mousedata.GetEnt()->WorldAlignMins(),
-				mousedata.GetEnt()->WorldAlignMaxs(), mousedata.GetEnt()->GetAbsAngles(), 0, 255, 0, 255, 0.05f);
+			NDebugOverlay::BoxAngles( pEnt->GetAbsOrigin(), pEnt->WorldAlignMins(),
+				pEnt->WorldAlignMaxs(), pEnt->GetAbsAngles(), !pEnt->IsSolid() * 255, 255, 0, 255, 0.05f );
 #endif // CLIENT_DLL
 		}
 	}
