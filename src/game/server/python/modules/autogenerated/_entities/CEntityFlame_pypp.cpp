@@ -986,536 +986,202 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CEntityFlame\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CEntityFlame::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CEntityFlame::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CEntityFlame::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CEntityFlame_class(){
 
-    { //::CEntityFlame
-        typedef bp::class_< CEntityFlame_wrapper, bp::bases< CBaseEntity >, boost::noncopyable > CEntityFlame_exposer_t;
-        CEntityFlame_exposer_t CEntityFlame_exposer = CEntityFlame_exposer_t( "CEntityFlame", bp::no_init );
-        bp::scope CEntityFlame_scope( CEntityFlame_exposer );
-        CEntityFlame_exposer.def( bp::init< >() );
-        { //::CEntityFlame::Activate
-        
-            typedef void ( ::CEntityFlame::*Activate_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CEntityFlame::Activate)
-                , default_Activate_function_type(&CEntityFlame_wrapper::default_Activate) );
-        
-        }
-        { //::CEntityFlame::AttachToEntity
-        
-            typedef void ( ::CEntityFlame::*AttachToEntity_function_type )( ::CBaseEntity * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "AttachToEntity"
-                , AttachToEntity_function_type( &::CEntityFlame::AttachToEntity )
-                , ( bp::arg("pTarget") ) );
-        
-        }
-        { //::CEntityFlame::Create
-        
-            typedef ::CEntityFlame * ( *Create_function_type )( ::CBaseEntity *,float,float,bool );
-            
-            CEntityFlame_exposer.def( 
-                "Create"
-                , Create_function_type( &::CEntityFlame::Create )
-                , ( bp::arg("pTarget"), bp::arg("flLifetime"), bp::arg("flSize")=0.0f, bp::arg("bUseHitboxes")=(bool)(true) )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CEntityFlame::GetAttacker
-        
-            typedef ::CBaseEntity * ( ::CEntityFlame::*GetAttacker_function_type )(  ) const;
-            
-            CEntityFlame_exposer.def( 
-                "GetAttacker"
-                , GetAttacker_function_type( &::CEntityFlame::GetAttacker )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CEntityFlame::GetFlameDamagePerSecond
-        
-            typedef float ( ::CEntityFlame::*GetFlameDamagePerSecond_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "GetFlameDamagePerSecond"
-                , GetFlameDamagePerSecond_function_type( &::CEntityFlame::GetFlameDamagePerSecond ) );
-        
-        }
-        { //::CEntityFlame::GetFlameRadiusDamagePerSecond
-        
-            typedef float ( ::CEntityFlame::*GetFlameRadiusDamagePerSecond_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "GetFlameRadiusDamagePerSecond"
-                , GetFlameRadiusDamagePerSecond_function_type( &::CEntityFlame::GetFlameRadiusDamagePerSecond ) );
-        
-        }
-        { //::CEntityFlame::GetRemainingLife
-        
-            typedef float ( ::CEntityFlame::*GetRemainingLife_function_type )(  ) const;
-            
-            CEntityFlame_exposer.def( 
-                "GetRemainingLife"
-                , GetRemainingLife_function_type( &::CEntityFlame::GetRemainingLife ) );
-        
-        }
-        { //::CEntityFlame::Precache
-        
-            typedef void ( ::CEntityFlame::*Precache_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CEntityFlame::Precache)
-                , default_Precache_function_type(&CEntityFlame_wrapper::default_Precache) );
-        
-        }
-        { //::CEntityFlame::SetAttacker
-        
-            typedef void ( ::CEntityFlame::*SetAttacker_function_type )( ::CBaseEntity * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "SetAttacker"
-                , SetAttacker_function_type( &::CEntityFlame::SetAttacker )
-                , ( bp::arg("pAttacker") ) );
-        
-        }
-        { //::CEntityFlame::SetFlameDamagePerSecond
-        
-            typedef void ( ::CEntityFlame::*SetFlameDamagePerSecond_function_type )( float ) ;
-            
-            CEntityFlame_exposer.def( 
-                "SetFlameDamagePerSecond"
-                , SetFlameDamagePerSecond_function_type( &::CEntityFlame::SetFlameDamagePerSecond )
-                , ( bp::arg("fDamage") ) );
-        
-        }
-        { //::CEntityFlame::SetFlameRadiusDamagePerSecond
-        
-            typedef void ( ::CEntityFlame::*SetFlameRadiusDamagePerSecond_function_type )( float ) ;
-            
-            CEntityFlame_exposer.def( 
-                "SetFlameRadiusDamagePerSecond"
-                , SetFlameRadiusDamagePerSecond_function_type( &::CEntityFlame::SetFlameRadiusDamagePerSecond )
-                , ( bp::arg("fDamage") ) );
-        
-        }
-        { //::CEntityFlame::SetLifetime
-        
-            typedef void ( ::CEntityFlame::*SetLifetime_function_type )( float ) ;
-            
-            CEntityFlame_exposer.def( 
-                "SetLifetime"
-                , SetLifetime_function_type( &::CEntityFlame::SetLifetime )
-                , ( bp::arg("lifetime") ) );
-        
-        }
-        { //::CEntityFlame::Spawn
-        
-            typedef void ( ::CEntityFlame::*Spawn_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CEntityFlame::Spawn)
-                , default_Spawn_function_type(&CEntityFlame_wrapper::default_Spawn) );
-        
-        }
-        { //::CEntityFlame::UpdateOnRemove
-        
-            typedef void ( ::CEntityFlame::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CEntityFlame::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CEntityFlame_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CEntityFlame::UseCheapEffect
-        
-            typedef void ( ::CEntityFlame::*UseCheapEffect_function_type )( bool ) ;
-            
-            CEntityFlame_exposer.def( 
-                "UseCheapEffect"
-                , UseCheapEffect_function_type( &::CEntityFlame::UseCheapEffect )
-                , ( bp::arg("bCheap") ) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CEntityFlame_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CEntityFlame_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CEntityFlame_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CEntityFlame_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CEntityFlame_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CEntityFlame_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CEntityFlame_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseEntity::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CEntityFlame_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CEntityFlame_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CEntityFlame_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CEntityFlame_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CEntityFlame_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CEntityFlame_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CEntityFlame_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CEntityFlame_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CEntityFlame_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CEntityFlame_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CEntityFlame_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CEntityFlame_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CEntityFlame_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CEntityFlame_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CEntityFlame_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CEntityFlame_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CEntityFlame_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CEntityFlame_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CEntityFlame_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CEntityFlame_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CEntityFlame_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CEntityFlame_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CEntityFlame_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CEntityFlame_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CEntityFlame_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseEntity::OnRestore
-        
-            typedef void ( ::CBaseEntity::*OnRestore_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseEntity::OnRestore)
-                , default_OnRestore_function_type(&CEntityFlame_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CEntityFlame_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CEntityFlame_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CEntityFlame_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CEntityFlame_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CEntityFlame_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CEntityFlame_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CEntityFlame_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CEntityFlame_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CEntityFlame_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CEntityFlame_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CEntityFlame_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CEntityFlame_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CEntityFlame_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CEntityFlame_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CEntityFlame_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CEntityFlame_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CEntityFlame_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CEntityFlame_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CEntityFlame_exposer.staticmethod( "Create" );
-        { //::CEntityFlame::TestCollision
-            
-                typedef bool ( ::CEntityFlame::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CEntityFlame_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CEntityFlame_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CEntityFlame::TestCollision)
-                    , default_TestCollision_function_type(&CEntityFlame_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CEntityFlame_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CEntityFlame", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "Activate"
+            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Activate)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Activate) )    
+        .def( 
+            "AttachToEntity"
+            , (void ( ::CEntityFlame::* )( ::CBaseEntity * ) )( &::CEntityFlame::AttachToEntity )
+            , ( bp::arg("pTarget") ) )    
+        .def( 
+            "Create"
+            , (::CEntityFlame * (*)( ::CBaseEntity *,float,float,bool ))( &::CEntityFlame::Create )
+            , ( bp::arg("pTarget"), bp::arg("flLifetime"), bp::arg("flSize")=0.0f, bp::arg("bUseHitboxes")=(bool)(true) )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetAttacker"
+            , (::CBaseEntity * ( ::CEntityFlame::* )(  ) const)( &::CEntityFlame::GetAttacker )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetFlameDamagePerSecond"
+            , (float ( ::CEntityFlame::* )(  ) )( &::CEntityFlame::GetFlameDamagePerSecond ) )    
+        .def( 
+            "GetFlameRadiusDamagePerSecond"
+            , (float ( ::CEntityFlame::* )(  ) )( &::CEntityFlame::GetFlameRadiusDamagePerSecond ) )    
+        .def( 
+            "GetRemainingLife"
+            , (float ( ::CEntityFlame::* )(  ) const)( &::CEntityFlame::GetRemainingLife ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Precache)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Precache) )    
+        .def( 
+            "SetAttacker"
+            , (void ( ::CEntityFlame::* )( ::CBaseEntity * ) )( &::CEntityFlame::SetAttacker )
+            , ( bp::arg("pAttacker") ) )    
+        .def( 
+            "SetFlameDamagePerSecond"
+            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetFlameDamagePerSecond )
+            , ( bp::arg("fDamage") ) )    
+        .def( 
+            "SetFlameRadiusDamagePerSecond"
+            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetFlameRadiusDamagePerSecond )
+            , ( bp::arg("fDamage") ) )    
+        .def( 
+            "SetLifetime"
+            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetLifetime )
+            , ( bp::arg("lifetime") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Spawn)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Spawn) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::UpdateOnRemove)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UseCheapEffect"
+            , (void ( ::CEntityFlame::* )( bool ) )( &::CEntityFlame::UseCheapEffect )
+            , ( bp::arg("bCheap") ) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CEntityFlame_wrapper::* )( ::Vector *,::Vector * ) )(&CEntityFlame_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CEntityFlame_wrapper::* )( ::trace_t &,int ) )(&CEntityFlame_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
+            , (int ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CEntityFlame_wrapper::* )( char const *,char const * ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CEntityFlame_wrapper::* )( char const *,float ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CEntityFlame_wrapper::* )( char const *,int ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CEntityFlame_wrapper::* )( char const *,::Vector const & ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CEntityFlame_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CEntityFlame_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
+            , (void ( CEntityFlame_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CEntityFlame_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CEntityFlame_wrapper::* )( int ) )(&CEntityFlame_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::OnRestore)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_OnRestore) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CEntityFlame_wrapper::* )( char const * ) )(&CEntityFlame_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CEntityFlame_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CEntityFlame_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CEntityFlame_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "Create" );
 
 }
 

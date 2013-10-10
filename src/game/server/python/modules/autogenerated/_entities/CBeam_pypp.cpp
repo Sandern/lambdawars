@@ -1005,35 +1005,6 @@ struct CBeam_wrapper : CBeam, bp::wrapper< CBeam > {
         return CBeam::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBeam\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBeam::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBeam::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBeam::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CBeam_class(){
@@ -2063,18 +2034,6 @@ void register_CBeam_class(){
         CBeam_exposer.staticmethod( "BeamCreate" );
         CBeam_exposer.staticmethod( "BeamCreatePredictable" );
         CBeam_exposer.staticmethod( "GetPyNetworkType" );
-        { //::CBeam::TestCollision
-            
-                typedef bool ( ::CBeam::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBeam_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBeam_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBeam::TestCollision)
-                    , default_TestCollision_function_type(&CBeam_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
     }
 
 }

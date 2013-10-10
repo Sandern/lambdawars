@@ -986,426 +986,158 @@ struct CLogicalEntity_wrapper : CLogicalEntity, bp::wrapper< CLogicalEntity > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CLogicalEntity\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CLogicalEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CLogicalEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CLogicalEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CLogicalEntity_class(){
 
-    { //::CLogicalEntity
-        typedef bp::class_< CLogicalEntity_wrapper, bp::bases< CServerOnlyEntity >, boost::noncopyable > CLogicalEntity_exposer_t;
-        CLogicalEntity_exposer_t CLogicalEntity_exposer = CLogicalEntity_exposer_t( "CLogicalEntity" );
-        bp::scope CLogicalEntity_scope( CLogicalEntity_exposer );
-        { //::CLogicalEntity::KeyValue
-        
-            typedef bool ( ::CLogicalEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CLogicalEntity::KeyValue)
-                , default_KeyValue_function_type(&CLogicalEntity_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::Activate
-        
-            typedef void ( ::CBaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseEntity::Activate)
-                , default_Activate_function_type(&CLogicalEntity_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CLogicalEntity_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CLogicalEntity_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CLogicalEntity_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CLogicalEntity_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CLogicalEntity_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseEntity::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CLogicalEntity_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CLogicalEntity_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CLogicalEntity_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CLogicalEntity_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CLogicalEntity_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CLogicalEntity_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CLogicalEntity_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CLogicalEntity_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CLogicalEntity_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CLogicalEntity_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CLogicalEntity_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CLogicalEntity_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CLogicalEntity_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CLogicalEntity_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CLogicalEntity_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseEntity::OnRestore
-        
-            typedef void ( ::CBaseEntity::*OnRestore_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseEntity::OnRestore)
-                , default_OnRestore_function_type(&CLogicalEntity_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CLogicalEntity_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CLogicalEntity_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CLogicalEntity_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CLogicalEntity_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CLogicalEntity_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CLogicalEntity_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseEntity::Precache
-        
-            typedef void ( ::CBaseEntity::*Precache_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBaseEntity::Precache)
-                , default_Precache_function_type(&CLogicalEntity_wrapper::default_Precache) );
-        
-        }
-        { //::CBaseEntity::Spawn
-        
-            typedef void ( ::CBaseEntity::*Spawn_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseEntity::Spawn)
-                , default_Spawn_function_type(&CLogicalEntity_wrapper::default_Spawn) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CLogicalEntity_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CLogicalEntity_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CLogicalEntity_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CLogicalEntity_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CLogicalEntity_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CLogicalEntity_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CLogicalEntity_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CLogicalEntity_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CLogicalEntity_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CLogicalEntity_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CLogicalEntity::TestCollision
-            
-                typedef bool ( ::CLogicalEntity::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CLogicalEntity_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CLogicalEntity_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CLogicalEntity::TestCollision)
-                    , default_TestCollision_function_type(&CLogicalEntity_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CLogicalEntity_wrapper, bp::bases< CServerOnlyEntity >, boost::noncopyable >( "CLogicalEntity" )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CLogicalEntity::* )( char const *,char const * ) )(&::CLogicalEntity::KeyValue)
+            , (bool ( CLogicalEntity_wrapper::* )( char const *,char const * ) )(&CLogicalEntity_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Activate)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_Activate) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CLogicalEntity_wrapper::* )( ::Vector *,::Vector * ) )(&CLogicalEntity_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CLogicalEntity_wrapper::* )( ::CBaseEntity * ) )(&CLogicalEntity_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CLogicalEntity_wrapper::* )( ::trace_t &,int ) )(&CLogicalEntity_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
+            , (int ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CLogicalEntity_wrapper::* )( ::CBaseEntity * ) )(&CLogicalEntity_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CLogicalEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CLogicalEntity_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CLogicalEntity_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CLogicalEntity_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CLogicalEntity_wrapper::* )( char const *,float ) )(&CLogicalEntity_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CLogicalEntity_wrapper::* )( char const *,int ) )(&CLogicalEntity_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CLogicalEntity_wrapper::* )( char const *,::Vector const & ) )(&CLogicalEntity_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CLogicalEntity_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CLogicalEntity_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
+            , (void ( CLogicalEntity_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CLogicalEntity_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CLogicalEntity_wrapper::* )( int ) )(&CLogicalEntity_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::OnRestore)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_OnRestore) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CLogicalEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CLogicalEntity_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CLogicalEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CLogicalEntity_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CLogicalEntity_wrapper::* )( char const * ) )(&CLogicalEntity_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Precache)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_Precache) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Spawn)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_Spawn) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CLogicalEntity_wrapper::* )( ::CBaseEntity * ) )(&CLogicalEntity_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CLogicalEntity_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CLogicalEntity_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CLogicalEntity_wrapper::* )(  ) )(&CLogicalEntity_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CLogicalEntity_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CLogicalEntity_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) );
 
 }
 

@@ -906,2022 +906,753 @@ struct C_BaseCombatWeapon_wrapper : C_BaseCombatWeapon, bp::wrapper< C_BaseComba
         return C_BaseCombatWeapon::GetClientClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_BaseCombatWeapon\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_BaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_BaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_BaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
+    float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack; }
 
-    float m_flNextPrimaryAttack_Get() {
-       return m_flNextPrimaryAttack;
-    }
+    void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack = val; }
 
-    void m_flNextPrimaryAttack_Set(float val) {
-       m_flNextPrimaryAttack = val;
-    }
+    float m_flNextSecondaryAttack_Get() { return m_flNextSecondaryAttack; }
 
-    float m_flNextSecondaryAttack_Get() {
-       return m_flNextSecondaryAttack;
-    }
+    void m_flNextSecondaryAttack_Set( float val ) { m_flNextSecondaryAttack = val; }
 
-    void m_flNextSecondaryAttack_Set(float val) {
-       m_flNextSecondaryAttack = val;
-    }
+    float m_flTimeWeaponIdle_Get() { return m_flTimeWeaponIdle; }
 
-    float m_flTimeWeaponIdle_Get() {
-       return m_flTimeWeaponIdle;
-    }
+    void m_flTimeWeaponIdle_Set( float val ) { m_flTimeWeaponIdle = val; }
 
-    void m_flTimeWeaponIdle_Set(float val) {
-       m_flTimeWeaponIdle = val;
-    }
+    int m_iState_Get() { return m_iState; }
 
-    int m_iState_Get() {
-       return m_iState;
-    }
+    void m_iState_Set( int val ) { m_iState = val; }
 
-    void m_iState_Set(int val) {
-       m_iState = val;
-    }
+    int m_iPrimaryAmmoType_Get() { return m_iPrimaryAmmoType; }
 
-    int m_iPrimaryAmmoType_Get() {
-       return m_iPrimaryAmmoType;
-    }
+    void m_iPrimaryAmmoType_Set( int val ) { m_iPrimaryAmmoType = val; }
 
-    void m_iPrimaryAmmoType_Set(int val) {
-       m_iPrimaryAmmoType = val;
-    }
+    int m_iSecondaryAmmoType_Get() { return m_iSecondaryAmmoType; }
 
-    int m_iSecondaryAmmoType_Get() {
-       return m_iSecondaryAmmoType;
-    }
+    void m_iSecondaryAmmoType_Set( int val ) { m_iSecondaryAmmoType = val; }
 
-    void m_iSecondaryAmmoType_Set(int val) {
-       m_iSecondaryAmmoType = val;
-    }
+    int m_iClip1_Get() { return m_iClip1; }
 
-    int m_iClip1_Get() {
-       return m_iClip1;
-    }
+    void m_iClip1_Set( int val ) { m_iClip1 = val; }
 
-    void m_iClip1_Set(int val) {
-       m_iClip1 = val;
-    }
+    int m_iClip2_Get() { return m_iClip2; }
 
-    int m_iClip2_Get() {
-       return m_iClip2;
-    }
-
-    void m_iClip2_Set(int val) {
-       m_iClip2 = val;
-    }
+    void m_iClip2_Set( int val ) { m_iClip2 = val; }
 
 };
 
 void register_C_BaseCombatWeapon_class(){
 
-    { //::C_BaseCombatWeapon
-        typedef bp::class_< C_BaseCombatWeapon_wrapper, bp::bases< C_BaseAnimating >, boost::noncopyable > C_BaseCombatWeapon_exposer_t;
-        C_BaseCombatWeapon_exposer_t C_BaseCombatWeapon_exposer = C_BaseCombatWeapon_exposer_t( "C_BaseCombatWeapon", bp::init< >() );
-        bp::scope C_BaseCombatWeapon_scope( C_BaseCombatWeapon_exposer );
-        { //::C_BaseCombatWeapon::AbortReload
-        
-            typedef void ( ::C_BaseCombatWeapon::*AbortReload_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AbortReload"
-                , AbortReload_function_type( &::C_BaseCombatWeapon::AbortReload ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Activate
-        
-            typedef void ( ::C_BaseCombatWeapon::*Activate_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_Activate_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::C_BaseCombatWeapon::Activate)
-                , default_Activate_function_type(&C_BaseCombatWeapon_wrapper::default_Activate) );
-        
-        }
-        { //::C_BaseCombatWeapon::ActivityListCount
-        
-            typedef int ( ::C_BaseCombatWeapon::*ActivityListCount_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ActivityListCount"
-                , ActivityListCount_function_type( &::C_BaseCombatWeapon::ActivityListCount ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ActivityOverride
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*ActivityOverride_function_type )( ::Activity,bool * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ActivityOverride"
-                , ActivityOverride_function_type( &::C_BaseCombatWeapon::ActivityOverride )
-                , ( bp::arg("baseAct"), bp::arg("pRequired") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::AddLookShift
-        
-            typedef bool ( ::C_BaseCombatWeapon::*AddLookShift_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AddLookShift"
-                , AddLookShift_function_type( &::C_BaseCombatWeapon::AddLookShift ) );
-        
-        }
-        { //::C_BaseCombatWeapon::AddViewKick
-        
-            typedef void ( ::C_BaseCombatWeapon::*AddViewKick_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AddViewKick"
-                , AddViewKick_function_type( &::C_BaseCombatWeapon::AddViewKick ) );
-        
-        }
-        { //::C_BaseCombatWeapon::AddViewmodelBob
-        
-            typedef void ( ::C_BaseCombatWeapon::*AddViewmodelBob_function_type )( ::C_BaseViewModel *,::Vector &,::QAngle & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AddViewmodelBob"
-                , AddViewmodelBob_function_type( &::C_BaseCombatWeapon::AddViewmodelBob )
-                , ( bp::arg("viewmodel"), bp::arg("origin"), bp::arg("angles") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::AllowsAutoSwitchFrom
-        
-            typedef bool ( ::C_BaseCombatWeapon::*AllowsAutoSwitchFrom_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AllowsAutoSwitchFrom"
-                , AllowsAutoSwitchFrom_function_type( &::C_BaseCombatWeapon::AllowsAutoSwitchFrom ) );
-        
-        }
-        { //::C_BaseCombatWeapon::AllowsAutoSwitchTo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*AllowsAutoSwitchTo_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AllowsAutoSwitchTo"
-                , AllowsAutoSwitchTo_function_type( &::C_BaseCombatWeapon::AllowsAutoSwitchTo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::BaseForceFire
-        
-            typedef void ( ::C_BaseCombatWeapon::*BaseForceFire_function_type )( ::C_BaseCombatCharacter *,::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "BaseForceFire"
-                , BaseForceFire_function_type( &::C_BaseCombatWeapon::BaseForceFire )
-                , ( bp::arg("pOperator"), bp::arg("pTarget")=bp::object() ) );
-        
-        }
-        { //::C_BaseCombatWeapon::BoneMergeFastCullBloat
-        
-            typedef void ( ::C_BaseCombatWeapon::*BoneMergeFastCullBloat_function_type )( ::Vector &,::Vector &,::Vector const &,::Vector const & ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "BoneMergeFastCullBloat"
-                , BoneMergeFastCullBloat_function_type( &::C_BaseCombatWeapon::BoneMergeFastCullBloat )
-                , ( bp::arg("localMins"), bp::arg("localMaxs"), bp::arg("thisEntityMins"), bp::arg("thisEntityMaxs") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CalcViewmodelBob
-        
-            typedef float ( ::C_BaseCombatWeapon::*CalcViewmodelBob_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CalcViewmodelBob"
-                , CalcViewmodelBob_function_type( &::C_BaseCombatWeapon::CalcViewmodelBob ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CanBePickedUpByNPCs
-        
-            typedef bool ( ::C_BaseCombatWeapon::*CanBePickedUpByNPCs_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CanBePickedUpByNPCs"
-                , CanBePickedUpByNPCs_function_type( &::C_BaseCombatWeapon::CanBePickedUpByNPCs ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CanBeSelected
-        
-            typedef bool ( ::C_BaseCombatWeapon::*CanBeSelected_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CanBeSelected"
-                , CanBeSelected_function_type( &::C_BaseCombatWeapon::CanBeSelected ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CanDeploy
-        
-            typedef bool ( ::C_BaseCombatWeapon::*CanDeploy_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CanDeploy"
-                , CanDeploy_function_type( &::C_BaseCombatWeapon::CanDeploy ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CanHolster
-        
-            typedef bool ( ::C_BaseCombatWeapon::*CanHolster_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CanHolster"
-                , CanHolster_function_type( &::C_BaseCombatWeapon::CanHolster ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CanLower
-        
-            typedef bool ( ::C_BaseCombatWeapon::*CanLower_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CanLower"
-                , CanLower_function_type( &::C_BaseCombatWeapon::CanLower ) );
-        
-        }
-        { //::C_BaseCombatWeapon::CheckReload
-        
-            typedef void ( ::C_BaseCombatWeapon::*CheckReload_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CheckReload"
-                , CheckReload_function_type( &::C_BaseCombatWeapon::CheckReload ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Clip1
-        
-            typedef int ( ::C_BaseCombatWeapon::*Clip1_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Clip1"
-                , Clip1_function_type( &::C_BaseCombatWeapon::Clip1 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Clip2
-        
-            typedef int ( ::C_BaseCombatWeapon::*Clip2_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Clip2"
-                , Clip2_function_type( &::C_BaseCombatWeapon::Clip2 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DefaultDeploy
-        
-            typedef bool ( ::C_BaseCombatWeapon::*DefaultDeploy_function_type )( char *,char *,int,char * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DefaultDeploy"
-                , DefaultDeploy_function_type( &::C_BaseCombatWeapon::DefaultDeploy )
-                , ( bp::arg("szViewModel"), bp::arg("szWeaponModel"), bp::arg("iActivity"), bp::arg("szAnimExt") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DefaultReload
-        
-            typedef bool ( ::C_BaseCombatWeapon::*DefaultReload_function_type )( int,int,int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DefaultReload"
-                , DefaultReload_function_type( &::C_BaseCombatWeapon::DefaultReload )
-                , ( bp::arg("iClipSize1"), bp::arg("iClipSize2"), bp::arg("iActivity") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DefaultTouch
-        
-            typedef void ( ::C_BaseCombatWeapon::*DefaultTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DefaultTouch"
-                , DefaultTouch_function_type( &::C_BaseCombatWeapon::DefaultTouch )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Deploy
-        
-            typedef bool ( ::C_BaseCombatWeapon::*Deploy_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Deploy"
-                , Deploy_function_type( &::C_BaseCombatWeapon::Deploy ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DisplayAltFireHudHint
-        
-            typedef void ( ::C_BaseCombatWeapon::*DisplayAltFireHudHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DisplayAltFireHudHint"
-                , DisplayAltFireHudHint_function_type( &::C_BaseCombatWeapon::DisplayAltFireHudHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DisplayReloadHudHint
-        
-            typedef void ( ::C_BaseCombatWeapon::*DisplayReloadHudHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DisplayReloadHudHint"
-                , DisplayReloadHudHint_function_type( &::C_BaseCombatWeapon::DisplayReloadHudHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DrawCrosshair
-        
-            typedef void ( ::C_BaseCombatWeapon::*DrawCrosshair_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DrawCrosshair"
-                , DrawCrosshair_function_type( &::C_BaseCombatWeapon::DrawCrosshair ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DrawModel
-        
-            typedef int ( ::C_BaseCombatWeapon::*DrawModel_function_type )( int,::RenderableInstance_t const & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DrawModel"
-                , DrawModel_function_type( &::C_BaseCombatWeapon::DrawModel )
-                , ( bp::arg("flags"), bp::arg("instance") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::DrawOverriddenViewmodel
-        
-            typedef int ( ::C_BaseCombatWeapon::*DrawOverriddenViewmodel_function_type )( ::C_BaseViewModel *,int,::RenderableInstance_t const & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DrawOverriddenViewmodel"
-                , DrawOverriddenViewmodel_function_type( &::C_BaseCombatWeapon::DrawOverriddenViewmodel )
-                , ( bp::arg("pViewmodel"), bp::arg("flags"), bp::arg("instance") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Drop
-        
-            typedef void ( ::C_BaseCombatWeapon::*Drop_function_type )( ::Vector const & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Drop"
-                , Drop_function_type( &::C_BaseCombatWeapon::Drop )
-                , ( bp::arg("vecVelocity") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::EnsureCorrectRenderingModel
-        
-            typedef void ( ::C_BaseCombatWeapon::*EnsureCorrectRenderingModel_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "EnsureCorrectRenderingModel"
-                , EnsureCorrectRenderingModel_function_type( &::C_BaseCombatWeapon::EnsureCorrectRenderingModel ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Equip
-        
-            typedef void ( ::C_BaseCombatWeapon::*Equip_function_type )( ::C_BaseCombatCharacter * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Equip"
-                , Equip_function_type( &::C_BaseCombatWeapon::Equip )
-                , ( bp::arg("pOwner") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::FinishReload
-        
-            typedef void ( ::C_BaseCombatWeapon::*FinishReload_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "FinishReload"
-                , FinishReload_function_type( &::C_BaseCombatWeapon::FinishReload ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetActivity
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*GetActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetActivity"
-                , GetActivity_function_type( &::C_BaseCombatWeapon::GetActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetAnimPrefix
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetAnimPrefix_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetAnimPrefix"
-                , GetAnimPrefix_function_type( &::C_BaseCombatWeapon::GetAnimPrefix ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetBulletSpread
-        
-            typedef ::Vector const & ( ::C_BaseCombatWeapon::*GetBulletSpread_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetBulletSpread"
-                , GetBulletSpread_function_type( &::C_BaseCombatWeapon::GetBulletSpread )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::C_BaseCombatWeapon::GetBulletSpread
-        
-            typedef ::Vector ( ::C_BaseCombatWeapon::*GetBulletSpread_function_type )( ::WeaponProficiency_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetBulletSpread"
-                , GetBulletSpread_function_type( &::C_BaseCombatWeapon::GetBulletSpread )
-                , ( bp::arg("proficiency") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetBulletType
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetBulletType_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetBulletType"
-                , GetBulletType_function_type( &::C_BaseCombatWeapon::GetBulletType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetDamage
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetDamage_function_type )( float,int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetDamage"
-                , GetDamage_function_type( &::C_BaseCombatWeapon::GetDamage )
-                , ( bp::arg("flDistance"), bp::arg("iLocation") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetDefaultAnimSpeed
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetDefaultAnimSpeed_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetDefaultAnimSpeed"
-                , GetDefaultAnimSpeed_function_type( &::C_BaseCombatWeapon::GetDefaultAnimSpeed ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetDefaultClip1
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetDefaultClip1_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetDefaultClip1"
-                , GetDefaultClip1_function_type( &::C_BaseCombatWeapon::GetDefaultClip1 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetDefaultClip2
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetDefaultClip2_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetDefaultClip2"
-                , GetDefaultClip2_function_type( &::C_BaseCombatWeapon::GetDefaultClip2 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetDrawActivity
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*GetDrawActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetDrawActivity"
-                , GetDrawActivity_function_type( &::C_BaseCombatWeapon::GetDrawActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetFireRate
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetFireRate_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetFireRate"
-                , GetFireRate_function_type( &::C_BaseCombatWeapon::GetFireRate ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetIdealActivity
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*GetIdealActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetIdealActivity"
-                , GetIdealActivity_function_type( &::C_BaseCombatWeapon::GetIdealActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetIdealSequence
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetIdealSequence_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetIdealSequence"
-                , GetIdealSequence_function_type( &::C_BaseCombatWeapon::GetIdealSequence ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetLastWeapon
-        
-            typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatWeapon::*GetLastWeapon_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetLastWeapon"
-                , GetLastWeapon_function_type( &::C_BaseCombatWeapon::GetLastWeapon )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMaxAutoAimDeflection
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetMaxAutoAimDeflection_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMaxAutoAimDeflection"
-                , GetMaxAutoAimDeflection_function_type( &::C_BaseCombatWeapon::GetMaxAutoAimDeflection ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMaxBurst
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetMaxBurst_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMaxBurst"
-                , GetMaxBurst_function_type( &::C_BaseCombatWeapon::GetMaxBurst ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMaxClip1
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetMaxClip1_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMaxClip1"
-                , GetMaxClip1_function_type( &::C_BaseCombatWeapon::GetMaxClip1 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMaxClip2
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetMaxClip2_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMaxClip2"
-                , GetMaxClip2_function_type( &::C_BaseCombatWeapon::GetMaxClip2 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMaxRestTime
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetMaxRestTime_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMaxRestTime"
-                , GetMaxRestTime_function_type( &::C_BaseCombatWeapon::GetMaxRestTime ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMinBurst
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetMinBurst_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMinBurst"
-                , GetMinBurst_function_type( &::C_BaseCombatWeapon::GetMinBurst ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetMinRestTime
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetMinRestTime_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetMinRestTime"
-                , GetMinRestTime_function_type( &::C_BaseCombatWeapon::GetMinRestTime ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetName
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetName_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetName"
-                , GetName_function_type( &::C_BaseCombatWeapon::GetName ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetOwner
-        
-            typedef ::C_BaseCombatCharacter * ( ::C_BaseCombatWeapon::*GetOwner_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetOwner"
-                , GetOwner_function_type( &::C_BaseCombatWeapon::GetOwner )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPosition
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetPosition_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPosition"
-                , GetPosition_function_type( &::C_BaseCombatWeapon::GetPosition ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPrimaryAmmoCount
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetPrimaryAmmoCount_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPrimaryAmmoCount"
-                , GetPrimaryAmmoCount_function_type( &::C_BaseCombatWeapon::GetPrimaryAmmoCount ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPrimaryAmmoType
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetPrimaryAmmoType_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPrimaryAmmoType"
-                , GetPrimaryAmmoType_function_type( &::C_BaseCombatWeapon::GetPrimaryAmmoType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPrimaryAttackActivity
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*GetPrimaryAttackActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPrimaryAttackActivity"
-                , GetPrimaryAttackActivity_function_type( &::C_BaseCombatWeapon::GetPrimaryAttackActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPrintName
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetPrintName_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPrintName"
-                , GetPrintName_function_type( &::C_BaseCombatWeapon::GetPrintName ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseCombatWeapon::GetPyNetworkType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetRandomBurst
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetRandomBurst_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetRandomBurst"
-                , GetRandomBurst_function_type( &::C_BaseCombatWeapon::GetRandomBurst ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetRumbleEffect
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetRumbleEffect_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetRumbleEffect"
-                , GetRumbleEffect_function_type( &::C_BaseCombatWeapon::GetRumbleEffect ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSecondaryAmmoCount
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetSecondaryAmmoCount_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSecondaryAmmoCount"
-                , GetSecondaryAmmoCount_function_type( &::C_BaseCombatWeapon::GetSecondaryAmmoCount ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSecondaryAmmoType
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetSecondaryAmmoType_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSecondaryAmmoType"
-                , GetSecondaryAmmoType_function_type( &::C_BaseCombatWeapon::GetSecondaryAmmoType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSecondaryAttackActivity
-        
-            typedef ::Activity ( ::C_BaseCombatWeapon::*GetSecondaryAttackActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSecondaryAttackActivity"
-                , GetSecondaryAttackActivity_function_type( &::C_BaseCombatWeapon::GetSecondaryAttackActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetShootPosition
-        
-            typedef bool ( ::C_BaseCombatWeapon::*GetShootPosition_function_type )( ::Vector &,::QAngle & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetShootPosition"
-                , GetShootPosition_function_type( &::C_BaseCombatWeapon::GetShootPosition )
-                , ( bp::arg("vOrigin"), bp::arg("vAngles") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetShootSound
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetShootSound_function_type )( int ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetShootSound"
-                , GetShootSound_function_type( &::C_BaseCombatWeapon::GetShootSound )
-                , ( bp::arg("iIndex") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSlot
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetSlot_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSlot"
-                , GetSlot_function_type( &::C_BaseCombatWeapon::GetSlot ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSpreadBias
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetSpreadBias_function_type )( ::WeaponProficiency_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSpreadBias"
-                , GetSpreadBias_function_type( &::C_BaseCombatWeapon::GetSpreadBias )
-                , ( bp::arg("proficiency") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetSubType
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetSubType_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetSubType"
-                , GetSubType_function_type( &::C_BaseCombatWeapon::GetSubType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetToolRecordingState
-        
-            typedef void ( ::C_BaseCombatWeapon::*GetToolRecordingState_function_type )( ::KeyValues * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetToolRecordingState"
-                , GetToolRecordingState_function_type( &::C_BaseCombatWeapon::GetToolRecordingState )
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetToolViewModelState
-        
-            typedef void ( ::C_BaseCombatWeapon::*GetToolViewModelState_function_type )( ::KeyValues * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetToolViewModelState"
-                , GetToolViewModelState_function_type( &::C_BaseCombatWeapon::GetToolViewModelState )
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetViewModel
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetViewModel_function_type )( int ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetViewModel"
-                , GetViewModel_function_type( &::C_BaseCombatWeapon::GetViewModel )
-                , ( bp::arg("viewmodelindex")=(int)(0) )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseCombatWeapon::GetViewModelSequenceDuration
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetViewModelSequenceDuration_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetViewModelSequenceDuration"
-                , GetViewModelSequenceDuration_function_type( &::C_BaseCombatWeapon::GetViewModelSequenceDuration ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetViewmodelBoneControllers
-        
-            typedef void ( ::C_BaseCombatWeapon::*GetViewmodelBoneControllers_function_type )( ::C_BaseViewModel *,float * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetViewmodelBoneControllers"
-                , GetViewmodelBoneControllers_function_type( &::C_BaseCombatWeapon::GetViewmodelBoneControllers )
-                , ( bp::arg("pViewModel"), bp::arg("controllers") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWeaponFileInfoHandle
-        
-            typedef ::WEAPON_FILE_INFO_HANDLE ( ::C_BaseCombatWeapon::*GetWeaponFileInfoHandle_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWeaponFileInfoHandle"
-                , GetWeaponFileInfoHandle_function_type( &::C_BaseCombatWeapon::GetWeaponFileInfoHandle ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWeaponFlags
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetWeaponFlags_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWeaponFlags"
-                , GetWeaponFlags_function_type( &::C_BaseCombatWeapon::GetWeaponFlags ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWeaponID
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetWeaponID_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWeaponID"
-                , GetWeaponID_function_type( &::C_BaseCombatWeapon::GetWeaponID ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWeaponIdleTime
-        
-            typedef float ( ::C_BaseCombatWeapon::*GetWeaponIdleTime_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWeaponIdleTime"
-                , GetWeaponIdleTime_function_type( &::C_BaseCombatWeapon::GetWeaponIdleTime ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWeight
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetWeight_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWeight"
-                , GetWeight_function_type( &::C_BaseCombatWeapon::GetWeight ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWorldModel
-        
-            typedef char const * ( ::C_BaseCombatWeapon::*GetWorldModel_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWorldModel"
-                , GetWorldModel_function_type( &::C_BaseCombatWeapon::GetWorldModel ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWorldModelIndex
-        
-            typedef int ( ::C_BaseCombatWeapon::*GetWorldModelIndex_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWorldModelIndex"
-                , GetWorldModelIndex_function_type( &::C_BaseCombatWeapon::GetWorldModelIndex ) );
-        
-        }
-        { //::C_BaseCombatWeapon::GetWpnData
-        
-            typedef ::FileWeaponInfo_t const & ( ::C_BaseCombatWeapon::*GetWpnData_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetWpnData"
-                , GetWpnData_function_type( &::C_BaseCombatWeapon::GetWpnData )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::C_BaseCombatWeapon::GiveDefaultAmmo
-        
-            typedef void ( ::C_BaseCombatWeapon::*GiveDefaultAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GiveDefaultAmmo"
-                , GiveDefaultAmmo_function_type( &::C_BaseCombatWeapon::GiveDefaultAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HandleFireOnEmpty
-        
-            typedef void ( ::C_BaseCombatWeapon::*HandleFireOnEmpty_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HandleFireOnEmpty"
-                , HandleFireOnEmpty_function_type( &::C_BaseCombatWeapon::HandleFireOnEmpty ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HandleInput
-        
-            typedef void ( ::C_BaseCombatWeapon::*HandleInput_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HandleInput"
-                , HandleInput_function_type( &::C_BaseCombatWeapon::HandleInput ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HasAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*HasAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HasAmmo"
-                , HasAmmo_function_type( &::C_BaseCombatWeapon::HasAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HasAnyAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*HasAnyAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HasAnyAmmo"
-                , HasAnyAmmo_function_type( &::C_BaseCombatWeapon::HasAnyAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HasPrimaryAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*HasPrimaryAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HasPrimaryAmmo"
-                , HasPrimaryAmmo_function_type( &::C_BaseCombatWeapon::HasPrimaryAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HasSecondaryAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*HasSecondaryAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HasSecondaryAmmo"
-                , HasSecondaryAmmo_function_type( &::C_BaseCombatWeapon::HasSecondaryAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HasWeaponIdleTimeElapsed
-        
-            typedef bool ( ::C_BaseCombatWeapon::*HasWeaponIdleTimeElapsed_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HasWeaponIdleTimeElapsed"
-                , HasWeaponIdleTimeElapsed_function_type( &::C_BaseCombatWeapon::HasWeaponIdleTimeElapsed ) );
-        
-        }
-        { //::C_BaseCombatWeapon::HideThink
-        
-            typedef void ( ::C_BaseCombatWeapon::*HideThink_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "HideThink"
-                , HideThink_function_type( &::C_BaseCombatWeapon::HideThink ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Holster
-        
-            typedef bool ( ::C_BaseCombatWeapon::*Holster_function_type )( ::C_BaseCombatWeapon * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Holster"
-                , Holster_function_type( &::C_BaseCombatWeapon::Holster )
-                , ( bp::arg("pSwitchingTo")=bp::object() ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsActiveByLocalPlayer
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsActiveByLocalPlayer_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsActiveByLocalPlayer"
-                , IsActiveByLocalPlayer_function_type( &::C_BaseCombatWeapon::IsActiveByLocalPlayer ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsAllowedToSwitch
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsAllowedToSwitch_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsAllowedToSwitch"
-                , IsAllowedToSwitch_function_type( &::C_BaseCombatWeapon::IsAllowedToSwitch ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsBaseCombatWeapon
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsBaseCombatWeapon_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsBaseCombatWeapon"
-                , IsBaseCombatWeapon_function_type( &::C_BaseCombatWeapon::IsBaseCombatWeapon ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsBeingCarried
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsBeingCarried_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsBeingCarried"
-                , IsBeingCarried_function_type( &::C_BaseCombatWeapon::IsBeingCarried ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsCarriedByLocalPlayer
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsCarriedByLocalPlayer_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsCarriedByLocalPlayer"
-                , IsCarriedByLocalPlayer_function_type( &::C_BaseCombatWeapon::IsCarriedByLocalPlayer ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsCarrierAlive
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsCarrierAlive_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsCarrierAlive"
-                , IsCarrierAlive_function_type( &::C_BaseCombatWeapon::IsCarrierAlive ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsLocked
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsLocked_function_type )( ::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsLocked"
-                , IsLocked_function_type( &::C_BaseCombatWeapon::IsLocked )
-                , ( bp::arg("pAsker") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsMeleeWeapon
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsMeleeWeapon_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsMeleeWeapon"
-                , IsMeleeWeapon_function_type( &::C_BaseCombatWeapon::IsMeleeWeapon ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsOverridingViewmodel
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsOverridingViewmodel_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsOverridingViewmodel"
-                , IsOverridingViewmodel_function_type( &::C_BaseCombatWeapon::IsOverridingViewmodel ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsPredicted
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsPredicted_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsPredicted"
-                , IsPredicted_function_type( &::C_BaseCombatWeapon::IsPredicted ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsViewModelSequenceFinished
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsViewModelSequenceFinished_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsViewModelSequenceFinished"
-                , IsViewModelSequenceFinished_function_type( &::C_BaseCombatWeapon::IsViewModelSequenceFinished ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsWeaponVisible
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsWeaponVisible_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsWeaponVisible"
-                , IsWeaponVisible_function_type( &::C_BaseCombatWeapon::IsWeaponVisible ) );
-        
-        }
-        { //::C_BaseCombatWeapon::IsWeaponZoomed
-        
-            typedef bool ( ::C_BaseCombatWeapon::*IsWeaponZoomed_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "IsWeaponZoomed"
-                , IsWeaponZoomed_function_type( &::C_BaseCombatWeapon::IsWeaponZoomed ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ItemBusyFrame
-        
-            typedef void ( ::C_BaseCombatWeapon::*ItemBusyFrame_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ItemBusyFrame"
-                , ItemBusyFrame_function_type( &::C_BaseCombatWeapon::ItemBusyFrame ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ItemHolsterFrame
-        
-            typedef void ( ::C_BaseCombatWeapon::*ItemHolsterFrame_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ItemHolsterFrame"
-                , ItemHolsterFrame_function_type( &::C_BaseCombatWeapon::ItemHolsterFrame ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ItemPostFrame
-        
-            typedef void ( ::C_BaseCombatWeapon::*ItemPostFrame_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ItemPostFrame"
-                , ItemPostFrame_function_type( &::C_BaseCombatWeapon::ItemPostFrame ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ItemPreFrame
-        
-            typedef void ( ::C_BaseCombatWeapon::*ItemPreFrame_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ItemPreFrame"
-                , ItemPreFrame_function_type( &::C_BaseCombatWeapon::ItemPreFrame ) );
-        
-        }
-        { //::C_BaseCombatWeapon::KeyInput
-        
-            typedef int ( ::C_BaseCombatWeapon::*KeyInput_function_type )( int,::ButtonCode_t,char const * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "KeyInput"
-                , KeyInput_function_type( &::C_BaseCombatWeapon::KeyInput )
-                , ( bp::arg("down"), bp::arg("keynum"), bp::arg("pszCurrentBinding") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Lock
-        
-            typedef void ( ::C_BaseCombatWeapon::*Lock_function_type )( float,::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Lock"
-                , Lock_function_type( &::C_BaseCombatWeapon::Lock )
-                , ( bp::arg("lockTime"), bp::arg("pLocker") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::LookupAttachment
-        
-            typedef int ( ::C_BaseCombatWeapon::*LookupAttachment_function_type )( char const * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "LookupAttachment"
-                , LookupAttachment_function_type( &::C_BaseCombatWeapon::LookupAttachment )
-                , ( bp::arg("pAttachmentName") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Lower
-        
-            typedef bool ( ::C_BaseCombatWeapon::*Lower_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Lower"
-                , Lower_function_type( &::C_BaseCombatWeapon::Lower ) );
-        
-        }
-        { //::C_BaseCombatWeapon::MaintainIdealActivity
-        
-            typedef void ( ::C_BaseCombatWeapon::*MaintainIdealActivity_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "MaintainIdealActivity"
-                , MaintainIdealActivity_function_type( &::C_BaseCombatWeapon::MaintainIdealActivity ) );
-        
-        }
-        { //::C_BaseCombatWeapon::MakeTracer
-        
-            typedef void ( ::C_BaseCombatWeapon::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::C_BaseCombatWeapon::MakeTracer)
-                , default_MakeTracer_function_type(&C_BaseCombatWeapon_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OnDataChanged
-        
-            typedef void ( ::C_BaseCombatWeapon::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnDataChanged"
-                , OnDataChanged_function_type(&::C_BaseCombatWeapon::OnDataChanged)
-                , default_OnDataChanged_function_type(&C_BaseCombatWeapon_wrapper::default_OnDataChanged)
-                , ( bp::arg("updateType") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OnFireEvent
-        
-            typedef bool ( ::C_BaseCombatWeapon::*OnFireEvent_function_type )( ::C_BaseViewModel *,::Vector const &,::QAngle const &,int,char const * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnFireEvent"
-                , OnFireEvent_function_type( &::C_BaseCombatWeapon::OnFireEvent )
-                , ( bp::arg("pViewModel"), bp::arg("origin"), bp::arg("angles"), bp::arg("event"), bp::arg("options") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OnMouseWheel
-        
-            typedef void ( ::C_BaseCombatWeapon::*OnMouseWheel_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnMouseWheel"
-                , OnMouseWheel_function_type( &::C_BaseCombatWeapon::OnMouseWheel )
-                , ( bp::arg("nDirection") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OnPickedUp
-        
-            typedef void ( ::C_BaseCombatWeapon::*OnPickedUp_function_type )( ::C_BaseCombatCharacter * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnPickedUp"
-                , OnPickedUp_function_type( &::C_BaseCombatWeapon::OnPickedUp )
-                , ( bp::arg("pNewOwner") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OnRestore
-        
-            typedef void ( ::C_BaseCombatWeapon::*OnRestore_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::C_BaseCombatWeapon::OnRestore)
-                , default_OnRestore_function_type(&C_BaseCombatWeapon_wrapper::default_OnRestore) );
-        
-        }
-        { //::C_BaseCombatWeapon::Operator_FrameUpdate
-        
-            typedef void ( ::C_BaseCombatWeapon::*Operator_FrameUpdate_function_type )( ::C_BaseCombatCharacter * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Operator_FrameUpdate"
-                , Operator_FrameUpdate_function_type( &::C_BaseCombatWeapon::Operator_FrameUpdate )
-                , ( bp::arg("pOperator") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::OverrideMouseInput
-        
-            typedef void ( ::C_BaseCombatWeapon::*OverrideMouseInput_function_type )( float *,float * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OverrideMouseInput"
-                , OverrideMouseInput_function_type( &::C_BaseCombatWeapon::OverrideMouseInput )
-                , ( bp::arg("x"), bp::arg("y") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Precache
-        
-            typedef void ( ::C_BaseCombatWeapon::*Precache_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_Precache_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::C_BaseCombatWeapon::Precache)
-                , default_Precache_function_type(&C_BaseCombatWeapon_wrapper::default_Precache) );
-        
-        }
-        { //::C_BaseCombatWeapon::PrimaryAttack
-        
-            typedef void ( ::C_BaseCombatWeapon::*PrimaryAttack_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_PrimaryAttack_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "PrimaryAttack"
-                , PrimaryAttack_function_type(&::C_BaseCombatWeapon::PrimaryAttack)
-                , default_PrimaryAttack_function_type(&C_BaseCombatWeapon_wrapper::default_PrimaryAttack) );
-        
-        }
-        { //::C_BaseCombatWeapon::Ready
-        
-            typedef bool ( ::C_BaseCombatWeapon::*Ready_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Ready"
-                , Ready_function_type( &::C_BaseCombatWeapon::Ready ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Redraw
-        
-            typedef void ( ::C_BaseCombatWeapon::*Redraw_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Redraw"
-                , Redraw_function_type( &::C_BaseCombatWeapon::Redraw ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Reload
-        
-            typedef bool ( ::C_BaseCombatWeapon::*Reload_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Reload"
-                , Reload_function_type( &::C_BaseCombatWeapon::Reload ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ReloadOrSwitchWeapons
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ReloadOrSwitchWeapons_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ReloadOrSwitchWeapons"
-                , ReloadOrSwitchWeapons_function_type( &::C_BaseCombatWeapon::ReloadOrSwitchWeapons ) );
-        
-        }
-        { //::C_BaseCombatWeapon::RescindAltFireHudHint
-        
-            typedef void ( ::C_BaseCombatWeapon::*RescindAltFireHudHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "RescindAltFireHudHint"
-                , RescindAltFireHudHint_function_type( &::C_BaseCombatWeapon::RescindAltFireHudHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::RescindReloadHudHint
-        
-            typedef void ( ::C_BaseCombatWeapon::*RescindReloadHudHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "RescindReloadHudHint"
-                , RescindReloadHudHint_function_type( &::C_BaseCombatWeapon::RescindReloadHudHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SecondaryAttack
-        
-            typedef void ( ::C_BaseCombatWeapon::*SecondaryAttack_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_SecondaryAttack_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SecondaryAttack"
-                , SecondaryAttack_function_type(&::C_BaseCombatWeapon::SecondaryAttack)
-                , default_SecondaryAttack_function_type(&C_BaseCombatWeapon_wrapper::default_SecondaryAttack) );
-        
-        }
-        { //::C_BaseCombatWeapon::SendViewModelAnim
-        
-            typedef void ( ::C_BaseCombatWeapon::*SendViewModelAnim_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SendViewModelAnim"
-                , SendViewModelAnim_function_type( &::C_BaseCombatWeapon::SendViewModelAnim )
-                , ( bp::arg("nSequence") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SendWeaponAnim
-        
-            typedef bool ( ::C_BaseCombatWeapon::*SendWeaponAnim_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SendWeaponAnim"
-                , SendWeaponAnim_function_type( &::C_BaseCombatWeapon::SendWeaponAnim )
-                , ( bp::arg("iActivity") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetActivity
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetActivity_function_type )( ::Activity,float ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetActivity"
-                , SetActivity_function_type( &::C_BaseCombatWeapon::SetActivity )
-                , ( bp::arg("act"), bp::arg("duration") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetActivity
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetActivity_function_type )( ::Activity ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetActivity"
-                , SetActivity_function_type( &::C_BaseCombatWeapon::SetActivity )
-                , ( bp::arg("eActivity") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetDormant
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetDormant_function_type )( bool ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetDormant"
-                , SetDormant_function_type( &::C_BaseCombatWeapon::SetDormant )
-                , ( bp::arg("bDormant") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetIdealActivity
-        
-            typedef bool ( ::C_BaseCombatWeapon::*SetIdealActivity_function_type )( ::Activity ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetIdealActivity"
-                , SetIdealActivity_function_type( &::C_BaseCombatWeapon::SetIdealActivity )
-                , ( bp::arg("ideal") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetOwner
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetOwner_function_type )( ::C_BaseCombatCharacter * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetOwner"
-                , SetOwner_function_type( &::C_BaseCombatWeapon::SetOwner )
-                , ( bp::arg("owner") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetPickupTouch
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetPickupTouch_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetPickupTouch"
-                , SetPickupTouch_function_type( &::C_BaseCombatWeapon::SetPickupTouch ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetPrimaryAmmoCount
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetPrimaryAmmoCount_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetPrimaryAmmoCount"
-                , SetPrimaryAmmoCount_function_type( &::C_BaseCombatWeapon::SetPrimaryAmmoCount )
-                , ( bp::arg("count") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetSecondaryAmmoCount
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetSecondaryAmmoCount_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetSecondaryAmmoCount"
-                , SetSecondaryAmmoCount_function_type( &::C_BaseCombatWeapon::SetSecondaryAmmoCount )
-                , ( bp::arg("count") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetSubType
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetSubType_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetSubType"
-                , SetSubType_function_type( &::C_BaseCombatWeapon::SetSubType )
-                , ( bp::arg("iType") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetViewModel
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetViewModel_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetViewModel"
-                , SetViewModel_function_type( &::C_BaseCombatWeapon::SetViewModel ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetViewModelIndex
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetViewModelIndex_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetViewModelIndex"
-                , SetViewModelIndex_function_type( &::C_BaseCombatWeapon::SetViewModelIndex )
-                , ( bp::arg("index")=(int)(0) ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetWeaponIdleTime
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetWeaponIdleTime_function_type )( float ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetWeaponIdleTime"
-                , SetWeaponIdleTime_function_type( &::C_BaseCombatWeapon::SetWeaponIdleTime )
-                , ( bp::arg("time") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::SetWeaponVisible
-        
-            typedef void ( ::C_BaseCombatWeapon::*SetWeaponVisible_function_type )( bool ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "SetWeaponVisible"
-                , SetWeaponVisible_function_type( &::C_BaseCombatWeapon::SetWeaponVisible )
-                , ( bp::arg("visible") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShadowCastType
-        
-            typedef ::ShadowType_t ( ::C_BaseCombatWeapon::*ShadowCastType_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShadowCastType"
-                , ShadowCastType_function_type( &::C_BaseCombatWeapon::ShadowCastType ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldDisplayAltFireHUDHint
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldDisplayAltFireHUDHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldDisplayAltFireHUDHint"
-                , ShouldDisplayAltFireHUDHint_function_type( &::C_BaseCombatWeapon::ShouldDisplayAltFireHUDHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldDisplayReloadHUDHint
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldDisplayReloadHUDHint_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldDisplayReloadHUDHint"
-                , ShouldDisplayReloadHUDHint_function_type( &::C_BaseCombatWeapon::ShouldDisplayReloadHUDHint ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldDraw
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldDraw_function_type )(  ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_ShouldDraw_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldDraw"
-                , ShouldDraw_function_type(&::C_BaseCombatWeapon::ShouldDraw)
-                , default_ShouldDraw_function_type(&C_BaseCombatWeapon_wrapper::default_ShouldDraw) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldDrawCrosshair
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldDrawCrosshair_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldDrawCrosshair"
-                , ShouldDrawCrosshair_function_type( &::C_BaseCombatWeapon::ShouldDrawCrosshair ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldDrawPickup
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldDrawPickup_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldDrawPickup"
-                , ShouldDrawPickup_function_type( &::C_BaseCombatWeapon::ShouldDrawPickup ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ShouldShowControlPanels
-        
-            typedef bool ( ::C_BaseCombatWeapon::*ShouldShowControlPanels_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ShouldShowControlPanels"
-                , ShouldShowControlPanels_function_type( &::C_BaseCombatWeapon::ShouldShowControlPanels ) );
-        
-        }
-        { //::C_BaseCombatWeapon::Spawn
-        
-            typedef void ( ::C_BaseCombatWeapon::*Spawn_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::C_BaseCombatWeapon::Spawn)
-                , default_Spawn_function_type(&C_BaseCombatWeapon_wrapper::default_Spawn) );
-        
-        }
-        { //::C_BaseCombatWeapon::StartSprinting
-        
-            typedef bool ( ::C_BaseCombatWeapon::*StartSprinting_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "StartSprinting"
-                , StartSprinting_function_type( &::C_BaseCombatWeapon::StartSprinting ) );
-        
-        }
-        { //::C_BaseCombatWeapon::StopSprinting
-        
-            typedef bool ( ::C_BaseCombatWeapon::*StopSprinting_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "StopSprinting"
-                , StopSprinting_function_type( &::C_BaseCombatWeapon::StopSprinting ) );
-        
-        }
-        { //::C_BaseCombatWeapon::StopWeaponSound
-        
-            typedef void ( ::C_BaseCombatWeapon::*StopWeaponSound_function_type )( ::WeaponSound_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "StopWeaponSound"
-                , StopWeaponSound_function_type( &::C_BaseCombatWeapon::StopWeaponSound )
-                , ( bp::arg("sound_type") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::UpdateClientData
-        
-            typedef int ( ::C_BaseCombatWeapon::*UpdateClientData_function_type )( ::C_BasePlayer * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UpdateClientData"
-                , UpdateClientData_function_type( &::C_BaseCombatWeapon::UpdateClientData )
-                , ( bp::arg("pPlayer") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::UsesClipsForAmmo1
-        
-            typedef bool ( ::C_BaseCombatWeapon::*UsesClipsForAmmo1_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UsesClipsForAmmo1"
-                , UsesClipsForAmmo1_function_type( &::C_BaseCombatWeapon::UsesClipsForAmmo1 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::UsesClipsForAmmo2
-        
-            typedef bool ( ::C_BaseCombatWeapon::*UsesClipsForAmmo2_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UsesClipsForAmmo2"
-                , UsesClipsForAmmo2_function_type( &::C_BaseCombatWeapon::UsesClipsForAmmo2 ) );
-        
-        }
-        { //::C_BaseCombatWeapon::UsesPrimaryAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*UsesPrimaryAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UsesPrimaryAmmo"
-                , UsesPrimaryAmmo_function_type( &::C_BaseCombatWeapon::UsesPrimaryAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::UsesSecondaryAmmo
-        
-            typedef bool ( ::C_BaseCombatWeapon::*UsesSecondaryAmmo_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UsesSecondaryAmmo"
-                , UsesSecondaryAmmo_function_type( &::C_BaseCombatWeapon::UsesSecondaryAmmo ) );
-        
-        }
-        { //::C_BaseCombatWeapon::ViewModelDrawn
-        
-            typedef void ( ::C_BaseCombatWeapon::*ViewModelDrawn_function_type )( ::C_BaseViewModel * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ViewModelDrawn"
-                , ViewModelDrawn_function_type( &::C_BaseCombatWeapon::ViewModelDrawn )
-                , ( bp::arg("pViewModel") ) );
-        
-        }
-        { //::C_BaseCombatWeapon::VisibleInWeaponSelection
-        
-            typedef bool ( ::C_BaseCombatWeapon::*VisibleInWeaponSelection_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "VisibleInWeaponSelection"
-                , VisibleInWeaponSelection_function_type( &::C_BaseCombatWeapon::VisibleInWeaponSelection ) );
-        
-        }
-        { //::C_BaseCombatWeapon::WantsToOverrideViewmodelAttachments
-        
-            typedef bool ( ::C_BaseCombatWeapon::*WantsToOverrideViewmodelAttachments_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "WantsToOverrideViewmodelAttachments"
-                , WantsToOverrideViewmodelAttachments_function_type( &::C_BaseCombatWeapon::WantsToOverrideViewmodelAttachments ) );
-        
-        }
-        { //::C_BaseCombatWeapon::WeaponAutoAimScale
-        
-            typedef float ( ::C_BaseCombatWeapon::*WeaponAutoAimScale_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "WeaponAutoAimScale"
-                , WeaponAutoAimScale_function_type( &::C_BaseCombatWeapon::WeaponAutoAimScale ) );
-        
-        }
-        { //::C_BaseCombatWeapon::WeaponIdle
-        
-            typedef void ( ::C_BaseCombatWeapon::*WeaponIdle_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "WeaponIdle"
-                , WeaponIdle_function_type( &::C_BaseCombatWeapon::WeaponIdle ) );
-        
-        }
-        { //::C_BaseCombatWeapon::WeaponSound
-        
-            typedef void ( ::C_BaseCombatWeapon::*WeaponSound_function_type )( ::WeaponSound_t,float ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "WeaponSound"
-                , WeaponSound_function_type( &::C_BaseCombatWeapon::WeaponSound )
-                , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
-        
-        }
-        { //::C_BaseCombatWeapon::WeaponState
-        
-            typedef int ( ::C_BaseCombatWeapon::*WeaponState_function_type )(  ) const;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "WeaponState"
-                , WeaponState_function_type( &::C_BaseCombatWeapon::WeaponState ) );
-        
-        }
-        C_BaseCombatWeapon_exposer.def_readwrite( "altfiresunderwater", &C_BaseCombatWeapon::m_bAltFiresUnderwater );
-        C_BaseCombatWeapon_exposer.def_readwrite( "fireonempty", &C_BaseCombatWeapon::m_bFireOnEmpty );
-        C_BaseCombatWeapon_exposer.def_readwrite( "firesunderwater", &C_BaseCombatWeapon::m_bFiresUnderwater );
-        C_BaseCombatWeapon_exposer.def_readwrite( "inreload", &C_BaseCombatWeapon::m_bInReload );
-        C_BaseCombatWeapon_exposer.def_readwrite( "reloadssingly", &C_BaseCombatWeapon::m_bReloadsSingly );
-        C_BaseCombatWeapon_exposer.def_readwrite( "fireduration", &C_BaseCombatWeapon::m_fFireDuration );
-        C_BaseCombatWeapon_exposer.def_readwrite( "maxrange1", &C_BaseCombatWeapon::m_fMaxRange1 );
-        C_BaseCombatWeapon_exposer.def_readwrite( "maxrange2", &C_BaseCombatWeapon::m_fMaxRange2 );
-        C_BaseCombatWeapon_exposer.def_readwrite( "minrange1", &C_BaseCombatWeapon::m_fMinRange1 );
-        C_BaseCombatWeapon_exposer.def_readwrite( "minrange2", &C_BaseCombatWeapon::m_fMinRange2 );
-        C_BaseCombatWeapon_exposer.def_readwrite( "nextemptysoundtime", &C_BaseCombatWeapon::m_flNextEmptySoundTime );
-        C_BaseCombatWeapon_exposer.def_readwrite( "unlocktime", &C_BaseCombatWeapon::m_flUnlockTime );
-        C_BaseCombatWeapon_exposer.def_readwrite( "locker", &C_BaseCombatWeapon::m_hLocker );
-        C_BaseCombatWeapon_exposer.def_readwrite( "subtype", &C_BaseCombatWeapon::m_iSubType );
-        C_BaseCombatWeapon_exposer.def_readwrite( "name", &C_BaseCombatWeapon::m_iszName );
-        C_BaseCombatWeapon_exposer.def_readwrite( "viewmodelindex", &C_BaseCombatWeapon::m_nViewModelIndex );
-        { //::C_BaseEntity::AddToEntityList
-        
-            typedef void ( C_BaseCombatWeapon_wrapper::*AddToEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "AddToEntityList"
-                , AddToEntityList_function_type( &C_BaseCombatWeapon_wrapper::AddToEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseEntity::ClientThink
-        
-            typedef void ( ::C_BaseEntity::*ClientThink_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_ClientThink_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ClientThink"
-                , ClientThink_function_type(&::C_BaseEntity::ClientThink)
-                , default_ClientThink_function_type(&C_BaseCombatWeapon_wrapper::default_ClientThink) );
-        
-        }
-        { //::C_BaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::C_BaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&C_BaseCombatWeapon_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
-        
-        }
-        { //::C_BaseEntity::CreateVPhysics
-        
-            typedef bool ( ::C_BaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::C_BaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&C_BaseCombatWeapon_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::C_BaseEntity::DoImpactEffect
-        
-            typedef void ( ::C_BaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::C_BaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&C_BaseCombatWeapon_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::C_BaseEntity::EndTouch
-        
-            typedef void ( ::C_BaseEntity::*EndTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_EndTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::C_BaseEntity::EndTouch)
-                , default_EndTouch_function_type(&C_BaseCombatWeapon_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseAnimating::GetCollideType
-        
-            typedef ::CollideType_t ( ::C_BaseAnimating::*GetCollideType_function_type )(  ) ;
-            typedef ::CollideType_t ( C_BaseCombatWeapon_wrapper::*default_GetCollideType_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetCollideType"
-                , GetCollideType_function_type(&::C_BaseAnimating::GetCollideType)
-                , default_GetCollideType_function_type(&C_BaseCombatWeapon_wrapper::default_GetCollideType) );
-        
-        }
-        { //::C_BaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::C_BaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( C_BaseCombatWeapon_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::C_BaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&C_BaseCombatWeapon_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseEntity::GetTracerType
-        
-            typedef char const * ( ::C_BaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( C_BaseCombatWeapon_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::C_BaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&C_BaseCombatWeapon_wrapper::default_GetTracerType) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_BaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::C_BaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::C_BaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::C_BaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&C_BaseCombatWeapon_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::C_BaseEntity::PyNotifyShouldTransmit
-        
-            typedef void ( ::C_BaseEntity::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "NotifyShouldTransmit"
-                , NotifyShouldTransmit_function_type(&::C_BaseEntity::PyNotifyShouldTransmit)
-                , default_NotifyShouldTransmit_function_type(&C_BaseCombatWeapon_wrapper::default_NotifyShouldTransmit)
-                , ( bp::arg("state") ) );
-        
-        }
-        { //::C_BaseAnimating::PyOnNewModel
-        
-            typedef void ( ::C_BaseAnimating::*OnNewModel_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_OnNewModel_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type(&::C_BaseAnimating::PyOnNewModel)
-                , default_OnNewModel_function_type(&C_BaseCombatWeapon_wrapper::default_OnNewModel) );
-        
-        }
-        { //::C_BaseEntity::PyReceiveMessage
-        
-            typedef void ( ::C_BaseEntity::*ReceiveMessage_function_type )( ::boost::python::list ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_ReceiveMessage_function_type )( ::boost::python::list ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "ReceiveMessage"
-                , ReceiveMessage_function_type(&::C_BaseEntity::PyReceiveMessage)
-                , default_ReceiveMessage_function_type(&C_BaseCombatWeapon_wrapper::default_ReceiveMessage)
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_BaseEntity::RemoveFromEntityList
-        
-            typedef void ( C_BaseCombatWeapon_wrapper::*RemoveFromEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "RemoveFromEntityList"
-                , RemoveFromEntityList_function_type( &C_BaseCombatWeapon_wrapper::RemoveFromEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseAnimating::Simulate
-        
-            typedef bool ( ::C_BaseAnimating::*Simulate_function_type )(  ) ;
-            typedef bool ( C_BaseCombatWeapon_wrapper::*default_Simulate_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "Simulate"
-                , Simulate_function_type(&::C_BaseAnimating::Simulate)
-                , default_Simulate_function_type(&C_BaseCombatWeapon_wrapper::default_Simulate) );
-        
-        }
-        { //::C_BaseEntity::StartTouch
-        
-            typedef void ( ::C_BaseEntity::*StartTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_StartTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::C_BaseEntity::StartTouch)
-                , default_StartTouch_function_type(&C_BaseCombatWeapon_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseEntity::UpdateOnRemove
-        
-            typedef void ( ::C_BaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( C_BaseCombatWeapon_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            C_BaseCombatWeapon_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::C_BaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&C_BaseCombatWeapon_wrapper::default_UpdateOnRemove) );
-        
-        }
-        C_BaseCombatWeapon_exposer.staticmethod( "GetPyNetworkType" );
-        { //::C_BaseCombatWeapon::TestCollision
-            
-                typedef bool ( ::C_BaseCombatWeapon::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_BaseCombatWeapon_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_BaseCombatWeapon_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_BaseCombatWeapon::TestCollision)
-                    , default_TestCollision_function_type(&C_BaseCombatWeapon_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-        C_BaseCombatWeapon_exposer.add_property("nextprimaryattack", 
-           &C_BaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get,
-           &C_BaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set );
-        C_BaseCombatWeapon_exposer.add_property("nextsecondaryattack", 
-           &C_BaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get,
-           &C_BaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set );
-        C_BaseCombatWeapon_exposer.add_property("timeweaponidle", 
-           &C_BaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get,
-           &C_BaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set );
-        C_BaseCombatWeapon_exposer.add_property("state", 
-           &C_BaseCombatWeapon_wrapper::m_iState_Get,
-           &C_BaseCombatWeapon_wrapper::m_iState_Set );
-        C_BaseCombatWeapon_exposer.add_property("primaryammotype", 
-           &C_BaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Get,
-           &C_BaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Set );
-        C_BaseCombatWeapon_exposer.add_property("secondaryammotype", 
-           &C_BaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Get,
-           &C_BaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Set );
-        C_BaseCombatWeapon_exposer.add_property("clip1", 
-           &C_BaseCombatWeapon_wrapper::m_iClip1_Get,
-           &C_BaseCombatWeapon_wrapper::m_iClip1_Set );
-        C_BaseCombatWeapon_exposer.add_property("clip2", 
-           &C_BaseCombatWeapon_wrapper::m_iClip2_Get,
-           &C_BaseCombatWeapon_wrapper::m_iClip2_Set );
-    }
+    bp::class_< C_BaseCombatWeapon_wrapper, bp::bases< C_BaseAnimating >, boost::noncopyable >( "C_BaseCombatWeapon", bp::init< >() )    
+        .def( 
+            "AbortReload"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::AbortReload ) )    
+        .def( 
+            "Activate"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::Activate)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_Activate) )    
+        .def( 
+            "ActivityListCount"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ActivityListCount ) )    
+        .def( 
+            "ActivityOverride"
+            , (::Activity ( ::C_BaseCombatWeapon::* )( ::Activity,bool * ) )( &::C_BaseCombatWeapon::ActivityOverride )
+            , ( bp::arg("baseAct"), bp::arg("pRequired") ) )    
+        .def( 
+            "AddLookShift"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::AddLookShift ) )    
+        .def( 
+            "AddViewKick"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::AddViewKick ) )    
+        .def( 
+            "AddViewmodelBob"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseViewModel *,::Vector &,::QAngle & ) )( &::C_BaseCombatWeapon::AddViewmodelBob )
+            , ( bp::arg("viewmodel"), bp::arg("origin"), bp::arg("angles") ) )    
+        .def( 
+            "AllowsAutoSwitchFrom"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::AllowsAutoSwitchFrom ) )    
+        .def( 
+            "AllowsAutoSwitchTo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::AllowsAutoSwitchTo ) )    
+        .def( 
+            "BaseForceFire"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatCharacter *,::C_BaseEntity * ) )( &::C_BaseCombatWeapon::BaseForceFire )
+            , ( bp::arg("pOperator"), bp::arg("pTarget")=bp::object() ) )    
+        .def( 
+            "BoneMergeFastCullBloat"
+            , (void ( ::C_BaseCombatWeapon::* )( ::Vector &,::Vector &,::Vector const &,::Vector const & ) const)( &::C_BaseCombatWeapon::BoneMergeFastCullBloat )
+            , ( bp::arg("localMins"), bp::arg("localMaxs"), bp::arg("thisEntityMins"), bp::arg("thisEntityMaxs") ) )    
+        .def( 
+            "CalcViewmodelBob"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CalcViewmodelBob ) )    
+        .def( 
+            "CanBePickedUpByNPCs"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CanBePickedUpByNPCs ) )    
+        .def( 
+            "CanBeSelected"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CanBeSelected ) )    
+        .def( 
+            "CanDeploy"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CanDeploy ) )    
+        .def( 
+            "CanHolster"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CanHolster ) )    
+        .def( 
+            "CanLower"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CanLower ) )    
+        .def( 
+            "CheckReload"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::CheckReload ) )    
+        .def( 
+            "Clip1"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::Clip1 ) )    
+        .def( 
+            "Clip2"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::Clip2 ) )    
+        .def( 
+            "DefaultDeploy"
+            , (bool ( ::C_BaseCombatWeapon::* )( char *,char *,int,char * ) )( &::C_BaseCombatWeapon::DefaultDeploy )
+            , ( bp::arg("szViewModel"), bp::arg("szWeaponModel"), bp::arg("iActivity"), bp::arg("szAnimExt") ) )    
+        .def( 
+            "DefaultReload"
+            , (bool ( ::C_BaseCombatWeapon::* )( int,int,int ) )( &::C_BaseCombatWeapon::DefaultReload )
+            , ( bp::arg("iClipSize1"), bp::arg("iClipSize2"), bp::arg("iActivity") ) )    
+        .def( 
+            "DefaultTouch"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseEntity * ) )( &::C_BaseCombatWeapon::DefaultTouch )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Deploy"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::Deploy ) )    
+        .def( 
+            "DisplayAltFireHudHint"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::DisplayAltFireHudHint ) )    
+        .def( 
+            "DisplayReloadHudHint"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::DisplayReloadHudHint ) )    
+        .def( 
+            "DrawCrosshair"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::DrawCrosshair ) )    
+        .def( 
+            "DrawModel"
+            , (int ( ::C_BaseCombatWeapon::* )( int,::RenderableInstance_t const & ) )( &::C_BaseCombatWeapon::DrawModel )
+            , ( bp::arg("flags"), bp::arg("instance") ) )    
+        .def( 
+            "DrawOverriddenViewmodel"
+            , (int ( ::C_BaseCombatWeapon::* )( ::C_BaseViewModel *,int,::RenderableInstance_t const & ) )( &::C_BaseCombatWeapon::DrawOverriddenViewmodel )
+            , ( bp::arg("pViewmodel"), bp::arg("flags"), bp::arg("instance") ) )    
+        .def( 
+            "Drop"
+            , (void ( ::C_BaseCombatWeapon::* )( ::Vector const & ) )( &::C_BaseCombatWeapon::Drop )
+            , ( bp::arg("vecVelocity") ) )    
+        .def( 
+            "EnsureCorrectRenderingModel"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::EnsureCorrectRenderingModel ) )    
+        .def( 
+            "Equip"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatCharacter * ) )( &::C_BaseCombatWeapon::Equip )
+            , ( bp::arg("pOwner") ) )    
+        .def( 
+            "FinishReload"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::FinishReload ) )    
+        .def( 
+            "GetActivity"
+            , (::Activity ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetActivity ) )    
+        .def( 
+            "GetAnimPrefix"
+            , (char const * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetAnimPrefix ) )    
+        .def( 
+            "GetBulletSpread"
+            , (::Vector const & ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetBulletSpread )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GetBulletSpread"
+            , (::Vector ( ::C_BaseCombatWeapon::* )( ::WeaponProficiency_t ) )( &::C_BaseCombatWeapon::GetBulletSpread )
+            , ( bp::arg("proficiency") ) )    
+        .def( 
+            "GetBulletType"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetBulletType ) )    
+        .def( 
+            "GetDamage"
+            , (float ( ::C_BaseCombatWeapon::* )( float,int ) )( &::C_BaseCombatWeapon::GetDamage )
+            , ( bp::arg("flDistance"), bp::arg("iLocation") ) )    
+        .def( 
+            "GetDefaultAnimSpeed"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetDefaultAnimSpeed ) )    
+        .def( 
+            "GetDefaultClip1"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetDefaultClip1 ) )    
+        .def( 
+            "GetDefaultClip2"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetDefaultClip2 ) )    
+        .def( 
+            "GetDrawActivity"
+            , (::Activity ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetDrawActivity ) )    
+        .def( 
+            "GetFireRate"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetFireRate ) )    
+        .def( 
+            "GetIdealActivity"
+            , (::Activity ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetIdealActivity ) )    
+        .def( 
+            "GetIdealSequence"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetIdealSequence ) )    
+        .def( 
+            "GetLastWeapon"
+            , (::C_BaseCombatWeapon * ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetLastWeapon )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetMaxAutoAimDeflection"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetMaxAutoAimDeflection ) )    
+        .def( 
+            "GetMaxBurst"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetMaxBurst ) )    
+        .def( 
+            "GetMaxClip1"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetMaxClip1 ) )    
+        .def( 
+            "GetMaxClip2"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetMaxClip2 ) )    
+        .def( 
+            "GetMaxRestTime"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetMaxRestTime ) )    
+        .def( 
+            "GetMinBurst"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetMinBurst ) )    
+        .def( 
+            "GetMinRestTime"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetMinRestTime ) )    
+        .def( 
+            "GetName"
+            , (char const * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetName ) )    
+        .def( 
+            "GetOwner"
+            , (::C_BaseCombatCharacter * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetOwner )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetPosition"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetPosition ) )    
+        .def( 
+            "GetPrimaryAmmoCount"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetPrimaryAmmoCount ) )    
+        .def( 
+            "GetPrimaryAmmoType"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetPrimaryAmmoType ) )    
+        .def( 
+            "GetPrimaryAttackActivity"
+            , (::Activity ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetPrimaryAttackActivity ) )    
+        .def( 
+            "GetPrintName"
+            , (char const * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetPrintName ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::C_BaseCombatWeapon::GetPyNetworkType ) )    
+        .def( 
+            "GetRandomBurst"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetRandomBurst ) )    
+        .def( 
+            "GetRumbleEffect"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetRumbleEffect ) )    
+        .def( 
+            "GetSecondaryAmmoCount"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetSecondaryAmmoCount ) )    
+        .def( 
+            "GetSecondaryAmmoType"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetSecondaryAmmoType ) )    
+        .def( 
+            "GetSecondaryAttackActivity"
+            , (::Activity ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetSecondaryAttackActivity ) )    
+        .def( 
+            "GetShootPosition"
+            , (bool ( ::C_BaseCombatWeapon::* )( ::Vector &,::QAngle & ) )( &::C_BaseCombatWeapon::GetShootPosition )
+            , ( bp::arg("vOrigin"), bp::arg("vAngles") ) )    
+        .def( 
+            "GetShootSound"
+            , (char const * ( ::C_BaseCombatWeapon::* )( int ) const)( &::C_BaseCombatWeapon::GetShootSound )
+            , ( bp::arg("iIndex") ) )    
+        .def( 
+            "GetSlot"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetSlot ) )    
+        .def( 
+            "GetSpreadBias"
+            , (float ( ::C_BaseCombatWeapon::* )( ::WeaponProficiency_t ) )( &::C_BaseCombatWeapon::GetSpreadBias )
+            , ( bp::arg("proficiency") ) )    
+        .def( 
+            "GetSubType"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetSubType ) )    
+        .def( 
+            "GetToolRecordingState"
+            , (void ( ::C_BaseCombatWeapon::* )( ::KeyValues * ) )( &::C_BaseCombatWeapon::GetToolRecordingState )
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "GetToolViewModelState"
+            , (void ( ::C_BaseCombatWeapon::* )( ::KeyValues * ) )( &::C_BaseCombatWeapon::GetToolViewModelState )
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "GetViewModel"
+            , (char const * ( ::C_BaseCombatWeapon::* )( int ) const)( &::C_BaseCombatWeapon::GetViewModel )
+            , ( bp::arg("viewmodelindex")=(int)(0) )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetViewModelSequenceDuration"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetViewModelSequenceDuration ) )    
+        .def( 
+            "GetViewmodelBoneControllers"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseViewModel *,float * ) )( &::C_BaseCombatWeapon::GetViewmodelBoneControllers )
+            , ( bp::arg("pViewModel"), bp::arg("controllers") ) )    
+        .def( 
+            "GetWeaponFileInfoHandle"
+            , (::WEAPON_FILE_INFO_HANDLE ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetWeaponFileInfoHandle ) )    
+        .def( 
+            "GetWeaponFlags"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetWeaponFlags ) )    
+        .def( 
+            "GetWeaponID"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetWeaponID ) )    
+        .def( 
+            "GetWeaponIdleTime"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetWeaponIdleTime ) )    
+        .def( 
+            "GetWeight"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetWeight ) )    
+        .def( 
+            "GetWorldModel"
+            , (char const * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetWorldModel ) )    
+        .def( 
+            "GetWorldModelIndex"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetWorldModelIndex ) )    
+        .def( 
+            "GetWpnData"
+            , (::FileWeaponInfo_t const & ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetWpnData )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GiveDefaultAmmo"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GiveDefaultAmmo ) )    
+        .def( 
+            "HandleFireOnEmpty"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HandleFireOnEmpty ) )    
+        .def( 
+            "HandleInput"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HandleInput ) )    
+        .def( 
+            "HasAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HasAmmo ) )    
+        .def( 
+            "HasAnyAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HasAnyAmmo ) )    
+        .def( 
+            "HasPrimaryAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HasPrimaryAmmo ) )    
+        .def( 
+            "HasSecondaryAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HasSecondaryAmmo ) )    
+        .def( 
+            "HasWeaponIdleTimeElapsed"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HasWeaponIdleTimeElapsed ) )    
+        .def( 
+            "HideThink"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::HideThink ) )    
+        .def( 
+            "Holster"
+            , (bool ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatWeapon * ) )( &::C_BaseCombatWeapon::Holster )
+            , ( bp::arg("pSwitchingTo")=bp::object() ) )    
+        .def( 
+            "IsActiveByLocalPlayer"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsActiveByLocalPlayer ) )    
+        .def( 
+            "IsAllowedToSwitch"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsAllowedToSwitch ) )    
+        .def( 
+            "IsBaseCombatWeapon"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::IsBaseCombatWeapon ) )    
+        .def( 
+            "IsBeingCarried"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::IsBeingCarried ) )    
+        .def( 
+            "IsCarriedByLocalPlayer"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsCarriedByLocalPlayer ) )    
+        .def( 
+            "IsCarrierAlive"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::IsCarrierAlive ) )    
+        .def( 
+            "IsLocked"
+            , (bool ( ::C_BaseCombatWeapon::* )( ::C_BaseEntity * ) )( &::C_BaseCombatWeapon::IsLocked )
+            , ( bp::arg("pAsker") ) )    
+        .def( 
+            "IsMeleeWeapon"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::IsMeleeWeapon ) )    
+        .def( 
+            "IsOverridingViewmodel"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsOverridingViewmodel ) )    
+        .def( 
+            "IsPredicted"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::IsPredicted ) )    
+        .def( 
+            "IsViewModelSequenceFinished"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsViewModelSequenceFinished ) )    
+        .def( 
+            "IsWeaponVisible"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsWeaponVisible ) )    
+        .def( 
+            "IsWeaponZoomed"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::IsWeaponZoomed ) )    
+        .def( 
+            "ItemBusyFrame"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ItemBusyFrame ) )    
+        .def( 
+            "ItemHolsterFrame"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ItemHolsterFrame ) )    
+        .def( 
+            "ItemPostFrame"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ItemPostFrame ) )    
+        .def( 
+            "ItemPreFrame"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ItemPreFrame ) )    
+        .def( 
+            "KeyInput"
+            , (int ( ::C_BaseCombatWeapon::* )( int,::ButtonCode_t,char const * ) )( &::C_BaseCombatWeapon::KeyInput )
+            , ( bp::arg("down"), bp::arg("keynum"), bp::arg("pszCurrentBinding") ) )    
+        .def( 
+            "Lock"
+            , (void ( ::C_BaseCombatWeapon::* )( float,::C_BaseEntity * ) )( &::C_BaseCombatWeapon::Lock )
+            , ( bp::arg("lockTime"), bp::arg("pLocker") ) )    
+        .def( 
+            "LookupAttachment"
+            , (int ( ::C_BaseCombatWeapon::* )( char const * ) )( &::C_BaseCombatWeapon::LookupAttachment )
+            , ( bp::arg("pAttachmentName") ) )    
+        .def( 
+            "Lower"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::Lower ) )    
+        .def( 
+            "MaintainIdealActivity"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::MaintainIdealActivity ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::C_BaseCombatWeapon::* )( ::Vector const &,::trace_t const &,int ) )(&::C_BaseCombatWeapon::MakeTracer)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_BaseCombatWeapon_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "OnDataChanged"
+            , (void ( ::C_BaseCombatWeapon::* )( ::DataUpdateType_t ) )(&::C_BaseCombatWeapon::OnDataChanged)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::DataUpdateType_t ) )(&C_BaseCombatWeapon_wrapper::default_OnDataChanged)
+            , ( bp::arg("updateType") ) )    
+        .def( 
+            "OnFireEvent"
+            , (bool ( ::C_BaseCombatWeapon::* )( ::C_BaseViewModel *,::Vector const &,::QAngle const &,int,char const * ) )( &::C_BaseCombatWeapon::OnFireEvent )
+            , ( bp::arg("pViewModel"), bp::arg("origin"), bp::arg("angles"), bp::arg("event"), bp::arg("options") ) )    
+        .def( 
+            "OnMouseWheel"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::OnMouseWheel )
+            , ( bp::arg("nDirection") ) )    
+        .def( 
+            "OnPickedUp"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatCharacter * ) )( &::C_BaseCombatWeapon::OnPickedUp )
+            , ( bp::arg("pNewOwner") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::OnRestore)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_OnRestore) )    
+        .def( 
+            "Operator_FrameUpdate"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatCharacter * ) )( &::C_BaseCombatWeapon::Operator_FrameUpdate )
+            , ( bp::arg("pOperator") ) )    
+        .def( 
+            "OverrideMouseInput"
+            , (void ( ::C_BaseCombatWeapon::* )( float *,float * ) )( &::C_BaseCombatWeapon::OverrideMouseInput )
+            , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::Precache)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_Precache) )    
+        .def( 
+            "PrimaryAttack"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::PrimaryAttack)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_PrimaryAttack) )    
+        .def( 
+            "Ready"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::Ready ) )    
+        .def( 
+            "Redraw"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::Redraw ) )    
+        .def( 
+            "Reload"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::Reload ) )    
+        .def( 
+            "ReloadOrSwitchWeapons"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ReloadOrSwitchWeapons ) )    
+        .def( 
+            "RescindAltFireHudHint"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::RescindAltFireHudHint ) )    
+        .def( 
+            "RescindReloadHudHint"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::RescindReloadHudHint ) )    
+        .def( 
+            "SecondaryAttack"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::SecondaryAttack)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_SecondaryAttack) )    
+        .def( 
+            "SendViewModelAnim"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SendViewModelAnim )
+            , ( bp::arg("nSequence") ) )    
+        .def( 
+            "SendWeaponAnim"
+            , (bool ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SendWeaponAnim )
+            , ( bp::arg("iActivity") ) )    
+        .def( 
+            "SetActivity"
+            , (void ( ::C_BaseCombatWeapon::* )( ::Activity,float ) )( &::C_BaseCombatWeapon::SetActivity )
+            , ( bp::arg("act"), bp::arg("duration") ) )    
+        .def( 
+            "SetActivity"
+            , (void ( ::C_BaseCombatWeapon::* )( ::Activity ) )( &::C_BaseCombatWeapon::SetActivity )
+            , ( bp::arg("eActivity") ) )    
+        .def( 
+            "SetDormant"
+            , (void ( ::C_BaseCombatWeapon::* )( bool ) )( &::C_BaseCombatWeapon::SetDormant )
+            , ( bp::arg("bDormant") ) )    
+        .def( 
+            "SetIdealActivity"
+            , (bool ( ::C_BaseCombatWeapon::* )( ::Activity ) )( &::C_BaseCombatWeapon::SetIdealActivity )
+            , ( bp::arg("ideal") ) )    
+        .def( 
+            "SetOwner"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseCombatCharacter * ) )( &::C_BaseCombatWeapon::SetOwner )
+            , ( bp::arg("owner") ) )    
+        .def( 
+            "SetPickupTouch"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::SetPickupTouch ) )    
+        .def( 
+            "SetPrimaryAmmoCount"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SetPrimaryAmmoCount )
+            , ( bp::arg("count") ) )    
+        .def( 
+            "SetSecondaryAmmoCount"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SetSecondaryAmmoCount )
+            , ( bp::arg("count") ) )    
+        .def( 
+            "SetSubType"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SetSubType )
+            , ( bp::arg("iType") ) )    
+        .def( 
+            "SetViewModel"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::SetViewModel ) )    
+        .def( 
+            "SetViewModelIndex"
+            , (void ( ::C_BaseCombatWeapon::* )( int ) )( &::C_BaseCombatWeapon::SetViewModelIndex )
+            , ( bp::arg("index")=(int)(0) ) )    
+        .def( 
+            "SetWeaponIdleTime"
+            , (void ( ::C_BaseCombatWeapon::* )( float ) )( &::C_BaseCombatWeapon::SetWeaponIdleTime )
+            , ( bp::arg("time") ) )    
+        .def( 
+            "SetWeaponVisible"
+            , (void ( ::C_BaseCombatWeapon::* )( bool ) )( &::C_BaseCombatWeapon::SetWeaponVisible )
+            , ( bp::arg("visible") ) )    
+        .def( 
+            "ShadowCastType"
+            , (::ShadowType_t ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShadowCastType ) )    
+        .def( 
+            "ShouldDisplayAltFireHUDHint"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShouldDisplayAltFireHUDHint ) )    
+        .def( 
+            "ShouldDisplayReloadHUDHint"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShouldDisplayReloadHUDHint ) )    
+        .def( 
+            "ShouldDraw"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::ShouldDraw)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_ShouldDraw) )    
+        .def( 
+            "ShouldDrawCrosshair"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShouldDrawCrosshair ) )    
+        .def( 
+            "ShouldDrawPickup"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShouldDrawPickup ) )    
+        .def( 
+            "ShouldShowControlPanels"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::ShouldShowControlPanels ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )(&::C_BaseCombatWeapon::Spawn)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_Spawn) )    
+        .def( 
+            "StartSprinting"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::StartSprinting ) )    
+        .def( 
+            "StopSprinting"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::StopSprinting ) )    
+        .def( 
+            "StopWeaponSound"
+            , (void ( ::C_BaseCombatWeapon::* )( ::WeaponSound_t ) )( &::C_BaseCombatWeapon::StopWeaponSound )
+            , ( bp::arg("sound_type") ) )    
+        .def( 
+            "UpdateClientData"
+            , (int ( ::C_BaseCombatWeapon::* )( ::C_BasePlayer * ) )( &::C_BaseCombatWeapon::UpdateClientData )
+            , ( bp::arg("pPlayer") ) )    
+        .def( 
+            "UsesClipsForAmmo1"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::UsesClipsForAmmo1 ) )    
+        .def( 
+            "UsesClipsForAmmo2"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::UsesClipsForAmmo2 ) )    
+        .def( 
+            "UsesPrimaryAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::UsesPrimaryAmmo ) )    
+        .def( 
+            "UsesSecondaryAmmo"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::UsesSecondaryAmmo ) )    
+        .def( 
+            "ViewModelDrawn"
+            , (void ( ::C_BaseCombatWeapon::* )( ::C_BaseViewModel * ) )( &::C_BaseCombatWeapon::ViewModelDrawn )
+            , ( bp::arg("pViewModel") ) )    
+        .def( 
+            "VisibleInWeaponSelection"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::VisibleInWeaponSelection ) )    
+        .def( 
+            "WantsToOverrideViewmodelAttachments"
+            , (bool ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::WantsToOverrideViewmodelAttachments ) )    
+        .def( 
+            "WeaponAutoAimScale"
+            , (float ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::WeaponAutoAimScale ) )    
+        .def( 
+            "WeaponIdle"
+            , (void ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::WeaponIdle ) )    
+        .def( 
+            "WeaponSound"
+            , (void ( ::C_BaseCombatWeapon::* )( ::WeaponSound_t,float ) )( &::C_BaseCombatWeapon::WeaponSound )
+            , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) )    
+        .def( 
+            "WeaponState"
+            , (int ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::WeaponState ) )    
+        .def_readwrite( "altfiresunderwater", &C_BaseCombatWeapon::m_bAltFiresUnderwater )    
+        .def_readwrite( "fireonempty", &C_BaseCombatWeapon::m_bFireOnEmpty )    
+        .def_readwrite( "firesunderwater", &C_BaseCombatWeapon::m_bFiresUnderwater )    
+        .def_readwrite( "inreload", &C_BaseCombatWeapon::m_bInReload )    
+        .def_readwrite( "reloadssingly", &C_BaseCombatWeapon::m_bReloadsSingly )    
+        .def_readwrite( "fireduration", &C_BaseCombatWeapon::m_fFireDuration )    
+        .def_readwrite( "maxrange1", &C_BaseCombatWeapon::m_fMaxRange1 )    
+        .def_readwrite( "maxrange2", &C_BaseCombatWeapon::m_fMaxRange2 )    
+        .def_readwrite( "minrange1", &C_BaseCombatWeapon::m_fMinRange1 )    
+        .def_readwrite( "minrange2", &C_BaseCombatWeapon::m_fMinRange2 )    
+        .def_readwrite( "nextemptysoundtime", &C_BaseCombatWeapon::m_flNextEmptySoundTime )    
+        .def_readwrite( "nextprimaryattack", &C_BaseCombatWeapon::m_flNextPrimaryAttack )    
+        .def_readwrite( "nextsecondaryattack", &C_BaseCombatWeapon::m_flNextSecondaryAttack )    
+        .def_readwrite( "timeweaponidle", &C_BaseCombatWeapon::m_flTimeWeaponIdle )    
+        .def_readwrite( "unlocktime", &C_BaseCombatWeapon::m_flUnlockTime )    
+        .def_readwrite( "locker", &C_BaseCombatWeapon::m_hLocker )    
+        .def_readwrite( "clip1", &C_BaseCombatWeapon::m_iClip1 )    
+        .def_readwrite( "clip2", &C_BaseCombatWeapon::m_iClip2 )    
+        .def_readwrite( "primaryammotype", &C_BaseCombatWeapon::m_iPrimaryAmmoType )    
+        .def_readwrite( "secondaryammotype", &C_BaseCombatWeapon::m_iSecondaryAmmoType )    
+        .def_readwrite( "state", &C_BaseCombatWeapon::m_iState )    
+        .def_readwrite( "subtype", &C_BaseCombatWeapon::m_iSubType )    
+        .def_readwrite( "viewmodelindex", &C_BaseCombatWeapon::m_iViewModelIndex )    
+        .def_readwrite( "worldmodelindex", &C_BaseCombatWeapon::m_iWorldModelIndex )    
+        .def_readwrite( "name", &C_BaseCombatWeapon::m_iszName )    
+        .def_readwrite( "viewmodelindex", &C_BaseCombatWeapon::m_nViewModelIndex )    
+        .def( 
+            "AddToEntityList"
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseCombatWeapon_wrapper::AddToEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "ClientThink"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ClientThink)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_ClientThink) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::C_BaseEntity::* )( ::Vector *,::Vector * ) )(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::Vector *,::Vector * ) )(&C_BaseCombatWeapon_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::CreateVPhysics)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::C_BaseEntity::* )( ::trace_t &,int ) )(&::C_BaseEntity::DoImpactEffect)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::trace_t &,int ) )(&C_BaseCombatWeapon_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::EndTouch)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseCombatWeapon_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "GetCollideType"
+            , (::CollideType_t ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::GetCollideType)
+            , (::CollideType_t ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_GetCollideType) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetIMouse)
+            , (::IMouse * ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetTracerType)
+            , (char const * ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,char const * ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )( char const *,char const * ) )(&C_BaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,float ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )( char const *,float ) )(&C_BaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,int ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )( char const *,int ) )(&C_BaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,::Vector const & ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )( char const *,::Vector const & ) )(&C_BaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( int ) )(&C_BaseCombatWeapon_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "NotifyShouldTransmit"
+            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::PyNotifyShouldTransmit)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::ShouldTransmitState_t ) )(&C_BaseCombatWeapon_wrapper::default_NotifyShouldTransmit)
+            , ( bp::arg("state") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::PyOnNewModel)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_OnNewModel) )    
+        .def( 
+            "ReceiveMessage"
+            , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::boost::python::list ) )(&C_BaseCombatWeapon_wrapper::default_ReceiveMessage)
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "RemoveFromEntityList"
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseCombatWeapon_wrapper::RemoveFromEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "Simulate"
+            , (bool ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::Simulate)
+            , (bool ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_Simulate) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::StartTouch)
+            , (void ( C_BaseCombatWeapon_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseCombatWeapon_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
+            , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_UpdateOnRemove) )    
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "nextprimaryattack", &C_BaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get, &C_BaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set )    
+        .add_property( "nextsecondaryattack", &C_BaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get, &C_BaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set )    
+        .add_property( "timeweaponidle", &C_BaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get, &C_BaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set )    
+        .add_property( "state", &C_BaseCombatWeapon_wrapper::m_iState_Get, &C_BaseCombatWeapon_wrapper::m_iState_Set )    
+        .add_property( "primaryammotype", &C_BaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Get, &C_BaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Set )    
+        .add_property( "secondaryammotype", &C_BaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Get, &C_BaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Set )    
+        .add_property( "clip1", &C_BaseCombatWeapon_wrapper::m_iClip1_Get, &C_BaseCombatWeapon_wrapper::m_iClip1_Set )    
+        .add_property( "clip2", &C_BaseCombatWeapon_wrapper::m_iClip2_Get, &C_BaseCombatWeapon_wrapper::m_iClip2_Set );
 
 }
 

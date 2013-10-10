@@ -24,6 +24,7 @@ class ModuleGenerator(object):
     # Main method
     def Run(self):
         mb = self.CreateBuilder(*self.GetFiles())
+        self.mb = mb
         self.Parse(mb)
         self.FinalOutput(mb)
         
@@ -68,6 +69,11 @@ class ModuleGenerator(object):
         header = code_creators.include_t( 'tier0/memdbgon.h' )
         mb.code_creator.adopt_include(header)
         
+    def IncludeVarAndRename(self, varname, newvarname):
+        v = self.mb.vars(varname)
+        v.include()
+        v.rename(newvarname)
+        
     def AddProperty(self, cls, propertyname, getter, setter=''):
         cls.mem_funs(getter).exclude()
         if setter: 
@@ -92,9 +98,9 @@ class ModuleGenerator(object):
         if c.enums(allow_empty=True):
             c.enums(allow_empty=True).exclude()  
         
-    def SetupProperty(self, mb, cls, pyname, gettername, settername=None, excludesetget=True):
+    def SetupProperty(self, cls, pyname, gettername, settername=None, excludesetget=True):
         ''' Shortcut for adding a property and exluding the getter/setter functions. '''
-        cls = mb.class_(cls) if type(cls) == str else cls
+        cls = self.mb.class_(cls) if type(cls) == str else cls
         
         getter = cls.mem_fun(gettername)
         setter = cls.mem_fun(settername) if settername != None else None

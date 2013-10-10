@@ -1095,35 +1095,6 @@ struct CFuncUnit_wrapper : CFuncUnit, bp::wrapper< CFuncUnit > {
         return CFuncUnit::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CFuncUnit\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CFuncUnit::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CFuncUnit::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CFuncUnit::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
     virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
         if( func_IsSelectableByPlayer.ptr() != Py_None )
@@ -2032,18 +2003,6 @@ void register_CFuncUnit_class(){
                 , fset( &::CFuncUnit::SetKills ) );
         
         }
-        { //::CFuncUnit::TestCollision
-            
-                typedef bool ( ::CFuncUnit::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CFuncUnit_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CFuncUnit_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CFuncUnit::TestCollision)
-                    , default_TestCollision_function_type(&CFuncUnit_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
         CFuncUnit_exposer.def( 
             "IsSelectableByPlayer"
             , (bool ( ::CFuncUnit::* )( ::CHL2WarsPlayer *,::boost::python::object ) )(&::CFuncUnit::IsSelectableByPlayer)

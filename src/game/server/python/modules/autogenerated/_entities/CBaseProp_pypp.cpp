@@ -1063,494 +1063,182 @@ struct CBaseProp_wrapper : CBaseProp, bp::wrapper< CBaseProp > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBaseProp\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBaseProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBaseProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBaseProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CBaseProp_class(){
 
-    { //::CBaseProp
-        typedef bp::class_< CBaseProp_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable > CBaseProp_exposer_t;
-        CBaseProp_exposer_t CBaseProp_exposer = CBaseProp_exposer_t( "CBaseProp" );
-        bp::scope CBaseProp_scope( CBaseProp_exposer );
-        { //::CBaseProp::Activate
-        
-            typedef void ( ::CBaseProp::*Activate_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseProp::Activate)
-                , default_Activate_function_type(&CBaseProp_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseProp::CalculateBlockLOS
-        
-            typedef void ( ::CBaseProp::*CalculateBlockLOS_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "CalculateBlockLOS"
-                , CalculateBlockLOS_function_type( &::CBaseProp::CalculateBlockLOS ) );
-        
-        }
-        { //::CBaseProp::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseProp::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseProp::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CBaseProp_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseProp::IsAlive
-        
-            typedef bool ( ::CBaseProp::*IsAlive_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "IsAlive"
-                , IsAlive_function_type( &::CBaseProp::IsAlive ) );
-        
-        }
-        { //::CBaseProp::KeyValue
-        
-            typedef bool ( ::CBaseProp::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CBaseProp_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CBaseProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseProp::KeyValue)
-                , default_KeyValue_function_type(&CBaseProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseProp::OverridePropdata
-        
-            typedef bool ( ::CBaseProp::*OverridePropdata_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "OverridePropdata"
-                , OverridePropdata_function_type( &::CBaseProp::OverridePropdata ) );
-        
-        }
-        { //::CBaseProp::ParsePropData
-        
-            typedef int ( ::CBaseProp::*ParsePropData_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "ParsePropData"
-                , ParsePropData_function_type( &::CBaseProp::ParsePropData ) );
-        
-        }
-        { //::CBaseProp::Precache
-        
-            typedef void ( ::CBaseProp::*Precache_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBaseProp::Precache)
-                , default_Precache_function_type(&CBaseProp_wrapper::default_Precache) );
-        
-        }
-        { //::CBaseProp::Spawn
-        
-            typedef void ( ::CBaseProp::*Spawn_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseProp::Spawn)
-                , default_Spawn_function_type(&CBaseProp_wrapper::default_Spawn) );
-        
-        }
-        { //::CBaseAnimating::CanBecomeRagdoll
-        
-            typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
-            typedef bool ( CBaseProp_wrapper::*default_CanBecomeRagdoll_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "CanBecomeRagdoll"
-                , CanBecomeRagdoll_function_type(&::CBaseAnimating::CanBecomeRagdoll)
-                , default_CanBecomeRagdoll_function_type(&CBaseProp_wrapper::default_CanBecomeRagdoll) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CBaseProp_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CBaseProp_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CBaseProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CBaseProp_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CBaseProp_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseProp_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseProp_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CBaseProp_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CBaseProp_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CBaseProp_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CBaseProp_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseAnimating::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseAnimating::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CBaseProp_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseAnimating::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CBaseProp_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseProp_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseProp_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CBaseProp_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseProp_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseProp_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CBaseProp_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseProp_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CBaseProp_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CBaseProp_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CBaseProp_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CBaseProp_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CBaseProp_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CBaseProp_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CBaseProp_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CBaseProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CBaseProp_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CBaseProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CBaseProp_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CBaseProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CBaseProp_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CBaseProp_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CBaseProp_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseAnimating::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseAnimating::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CBaseProp_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CBaseProp_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseAnimating::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CBaseProp_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CBaseProp_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CBaseProp_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CBaseProp_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseAnimating::OnRestore
-        
-            typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
-                , default_OnRestore_function_type(&CBaseProp_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseAnimating::OnSequenceSet
-        
-            typedef void ( ::CBaseAnimating::*OnSequenceSet_function_type )( int ) ;
-            typedef void ( CBaseProp_wrapper::*default_OnSequenceSet_function_type )( int ) ;
-            
-            CBaseProp_exposer.def( 
-                "OnSequenceSet"
-                , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
-                , default_OnSequenceSet_function_type(&CBaseProp_wrapper::default_OnSequenceSet)
-                , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CBaseProp_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseProp_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CBaseProp_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseProp_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseProp_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CBaseProp_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CBaseProp_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CBaseProp_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CBaseProp_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CBaseProp_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseAnimating::PyOnNewModel
-        
-            typedef void ( CBaseProp_wrapper::*OnNewModel_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type( &CBaseProp_wrapper::default_OnNewModel ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseProp_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseProp_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CBaseProp_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CBaseProp_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CBaseProp_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CBaseProp_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CBaseProp_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CBaseProp_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CBaseProp_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CBaseProp_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CBaseProp_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CBaseProp_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CBaseProp_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBaseProp_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CBaseProp_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CBaseProp::TestCollision
-            
-                typedef bool ( ::CBaseProp::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBaseProp_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBaseProp_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBaseProp::TestCollision)
-                    , default_TestCollision_function_type(&CBaseProp_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CBaseProp_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CBaseProp" )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Activate)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_Activate) )    
+        .def( 
+            "CalculateBlockLOS"
+            , (void ( ::CBaseProp::* )(  ) )( &::CBaseProp::CalculateBlockLOS ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::DrawDebugGeometryOverlays)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "IsAlive"
+            , (bool ( ::CBaseProp::* )(  ) )( &::CBaseProp::IsAlive ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseProp::* )( char const *,char const * ) )(&::CBaseProp::KeyValue)
+            , (bool ( CBaseProp_wrapper::* )( char const *,char const * ) )(&CBaseProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "OverridePropdata"
+            , (bool ( ::CBaseProp::* )(  ) )( &::CBaseProp::OverridePropdata ) )    
+        .def( 
+            "ParsePropData"
+            , (int ( ::CBaseProp::* )(  ) )( &::CBaseProp::ParsePropData ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Precache)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_Precache) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Spawn)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_Spawn) )    
+        .def( 
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_CanBecomeRagdoll) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CBaseProp_wrapper::* )( ::Vector *,::Vector * ) )(&CBaseProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CBaseProp_wrapper::* )( ::CBaseEntity * ) )(&CBaseProp_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CBaseProp_wrapper::* )( ::trace_t &,int ) )(&CBaseProp_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CBaseProp_wrapper::* )( ::CBaseEntity * ) )(&CBaseProp_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CBaseProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProp_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CBaseProp_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBaseProp_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseProp_wrapper::* )( char const *,float ) )(&CBaseProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseProp_wrapper::* )( char const *,int ) )(&CBaseProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseProp_wrapper::* )( char const *,::Vector const & ) )(&CBaseProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CBaseProp_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBaseProp_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
+            , (void ( CBaseProp_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBaseProp_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CBaseProp_wrapper::* )( int ) )(&CBaseProp_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_OnRestore) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CBaseProp_wrapper::* )( int ) )(&CBaseProp_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CBaseProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProp_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CBaseProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProp_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CBaseProp_wrapper::* )( char const * ) )(&CBaseProp_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_OnNewModel) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CBaseProp_wrapper::* )( ::CBaseEntity * ) )(&CBaseProp_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CBaseProp_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseProp_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CBaseProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseProp_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) );
 
 }
 

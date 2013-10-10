@@ -1116,35 +1116,6 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
         return C_UnitBase::GetClientClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_UnitBase\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_UnitBase::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_UnitBase::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_UnitBase::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
     virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
         if( func_IsSelectableByPlayer.ptr() != Py_None )
@@ -1497,6 +1468,15 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pUnit")=bp::object() ) );
         
         }
+        { //::C_UnitBase::DisableTeamColorGlow
+        
+            typedef void ( ::C_UnitBase::*DisableTeamColorGlow_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "DisableTeamColorGlow"
+                , DisableTeamColorGlow_function_type( &::C_UnitBase::DisableTeamColorGlow ) );
+        
+        }
         { //::C_UnitBase::DoImpactEffect
         
             typedef void ( ::C_UnitBase::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
@@ -1526,6 +1506,15 @@ void register_C_UnitBase_class(){
                 "DrawModel"
                 , DrawModel_function_type( &::C_UnitBase::DrawModel )
                 , ( bp::arg("flags"), bp::arg("instance") ) );
+        
+        }
+        { //::C_UnitBase::EnableTeamColorGlow
+        
+            typedef void ( ::C_UnitBase::*EnableTeamColorGlow_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "EnableTeamColorGlow"
+                , EnableTeamColorGlow_function_type( &::C_UnitBase::EnableTeamColorGlow ) );
         
         }
         { //::C_UnitBase::EstimateAbsVelocity
@@ -1882,6 +1871,16 @@ void register_C_UnitBase_class(){
                 , default_OnInSelectionBox_function_type(&C_UnitBase_wrapper::default_OnInSelectionBox) );
         
         }
+        { //::C_UnitBase::OnInternalDrawModel
+        
+            typedef bool ( ::C_UnitBase::*OnInternalDrawModel_function_type )( ::ClientModelRenderInfo_t * ) ;
+            
+            C_UnitBase_exposer.def( 
+                "OnInternalDrawModel"
+                , OnInternalDrawModel_function_type( &::C_UnitBase::OnInternalDrawModel )
+                , ( bp::arg("pInfo") ) );
+        
+        }
         { //::C_UnitBase::OnOutSelectionBox
         
             typedef void ( ::C_UnitBase::*OnOutSelectionBox_function_type )(  ) ;
@@ -2142,9 +2141,7 @@ void register_C_UnitBase_class(){
         C_UnitBase_exposer.def_readwrite( "accuracy", &C_UnitBase::m_fAccuracy );
         C_UnitBase_exposer.def_readwrite( "eyepitch", &C_UnitBase::m_fEyePitch );
         C_UnitBase_exposer.def_readwrite( "eyeyaw", &C_UnitBase::m_fEyeYaw );
-        C_UnitBase_exposer.def_readwrite( "m_flPredictionErrorTime", &C_UnitBase::m_flPredictionErrorTime );
         C_UnitBase_exposer.def_readwrite( "maxhealth", &C_UnitBase::m_iMaxHealth );
-        C_UnitBase_exposer.def_readwrite( "m_vecPredictionError", &C_UnitBase::m_vecPredictionError );
         { //::C_BaseEntity::Activate
         
             typedef void ( ::C_BaseEntity::*Activate_function_type )(  ) ;
@@ -2454,18 +2451,6 @@ void register_C_UnitBase_class(){
                 , fget( &::C_UnitBase::IsClimbing ) );
         
         }
-        { //::C_UnitBase::TestCollision
-            
-                typedef bool ( ::C_UnitBase::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_UnitBase_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_UnitBase_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_UnitBase::TestCollision)
-                    , default_TestCollision_function_type(&C_UnitBase_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
         C_UnitBase_exposer.def( 
             "IsSelectableByPlayer"
             , (bool ( ::C_UnitBase::* )( ::C_HL2WarsPlayer *,::boost::python::object ) )(&::C_UnitBase::IsSelectableByPlayer)

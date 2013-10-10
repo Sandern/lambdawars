@@ -392,7 +392,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Activate(  ) of Class: CBaseAnimating\n");
+            Msg("Calling Activate(  ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Activate = this->get_override( "Activate" );
         if( func_Activate.ptr() != Py_None )
@@ -400,14 +400,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_Activate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseAnimating::Activate(  );
+                this->CBasePlayer::Activate(  );
             }
         else
-            this->CBaseAnimating::Activate(  );
+            this->CBasePlayer::Activate(  );
     }
     
     void default_Activate(  ) {
-        CBaseAnimating::Activate( );
+        CBasePlayer::Activate( );
     }
 
     virtual bool BecomeRagdoll( ::CTakeDamageInfo const & info, ::Vector const & forceVector ) {
@@ -602,7 +602,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling DoImpactEffect( boost::ref(tr), nDamageType ) of Class: CBaseEntity\n");
+            Msg("Calling DoImpactEffect( boost::ref(tr), nDamageType ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_DoImpactEffect = this->get_override( "DoImpactEffect" );
         if( func_DoImpactEffect.ptr() != Py_None )
@@ -610,14 +610,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_DoImpactEffect( boost::ref(tr), nDamageType );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+                this->CBasePlayer::DoImpactEffect( boost::ref(tr), nDamageType );
             }
         else
-            this->CBaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+            this->CBasePlayer::DoImpactEffect( boost::ref(tr), nDamageType );
     }
     
     void default_DoImpactEffect( ::trace_t & tr, int nDamageType ) {
-        CBaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+        CBasePlayer::DoImpactEffect( boost::ref(tr), nDamageType );
     }
 
     virtual void DrawDebugGeometryOverlays(  ) {
@@ -632,7 +632,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling DrawDebugGeometryOverlays(  ) of Class: CBaseEntity\n");
+            Msg("Calling DrawDebugGeometryOverlays(  ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_DrawDebugGeometryOverlays = this->get_override( "DrawDebugGeometryOverlays" );
         if( func_DrawDebugGeometryOverlays.ptr() != Py_None )
@@ -640,14 +640,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_DrawDebugGeometryOverlays(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::DrawDebugGeometryOverlays(  );
+                this->CBasePlayer::DrawDebugGeometryOverlays(  );
             }
         else
-            this->CBaseEntity::DrawDebugGeometryOverlays(  );
+            this->CBasePlayer::DrawDebugGeometryOverlays(  );
     }
     
     void default_DrawDebugGeometryOverlays(  ) {
-        CBaseEntity::DrawDebugGeometryOverlays( );
+        CBasePlayer::DrawDebugGeometryOverlays( );
     }
 
     virtual int DrawDebugTextOverlays(  ) {
@@ -752,7 +752,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Event_Killed( boost::ref(info) ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling Event_Killed( boost::ref(info) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Event_Killed = this->get_override( "Event_Killed" );
         if( func_Event_Killed.ptr() != Py_None )
@@ -760,14 +760,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_Event_Killed( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseCombatCharacter::Event_Killed( boost::ref(info) );
+                this->CBasePlayer::Event_Killed( boost::ref(info) );
             }
         else
-            this->CBaseCombatCharacter::Event_Killed( boost::ref(info) );
+            this->CBasePlayer::Event_Killed( boost::ref(info) );
     }
     
     void default_Event_Killed( ::CTakeDamageInfo const & info ) {
-        CBaseCombatCharacter::Event_Killed( boost::ref(info) );
+        CBasePlayer::Event_Killed( boost::ref(info) );
     }
 
     virtual void Event_KilledOther( ::CBaseEntity * pVictim, ::CTakeDamageInfo const & info ) {
@@ -782,7 +782,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) ) of Class: CBaseEntity\n");
+            Msg("Calling Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Event_KilledOther = this->get_override( "Event_KilledOther" );
         if( func_Event_KilledOther.ptr() != Py_None )
@@ -790,14 +790,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
+                this->CBasePlayer::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
             }
         else
-            this->CBaseEntity::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
+            this->CBasePlayer::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
     }
     
     void default_Event_KilledOther( ::CBaseEntity * pVictim, ::CTakeDamageInfo const & info ) {
-        CBaseEntity::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
+        CBasePlayer::Event_KilledOther( boost::python::ptr(pVictim), boost::ref(info) );
     }
 
     virtual ::IMouse * GetIMouse(  ) {
@@ -842,7 +842,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling GetTracerType(  ) of Class: CBaseEntity\n");
+            Msg("Calling GetTracerType(  ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_GetTracerType = this->get_override( "GetTracerType" );
         if( func_GetTracerType.ptr() != Py_None )
@@ -850,14 +850,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 return func_GetTracerType(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseEntity::GetTracerType(  );
+                return this->CBasePlayer::GetTracerType(  );
             }
         else
-            return this->CBaseEntity::GetTracerType(  );
+            return this->CBasePlayer::GetTracerType(  );
     }
     
     char const * default_GetTracerType(  ) {
-        return CBaseEntity::GetTracerType( );
+        return CBasePlayer::GetTracerType( );
     }
 
     virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
@@ -992,7 +992,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType ) of Class: CBaseEntity\n");
+            Msg("Calling MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_MakeTracer = this->get_override( "MakeTracer" );
         if( func_MakeTracer.ptr() != Py_None )
@@ -1000,14 +1000,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+                this->CBasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
             }
         else
-            this->CBaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+            this->CBasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
     }
     
     void default_MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
-        CBaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+        CBasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
     }
 
     virtual void ModifyOrAppendCriteria( ::ResponseRules::CriteriaSet & set ) {
@@ -1052,7 +1052,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnRestore(  ) of Class: CBaseAnimatingOverlay\n");
+            Msg("Calling OnRestore(  ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnRestore = this->get_override( "OnRestore" );
         if( func_OnRestore.ptr() != Py_None )
@@ -1060,14 +1060,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_OnRestore(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseAnimatingOverlay::OnRestore(  );
+                this->CBasePlayer::OnRestore(  );
             }
         else
-            this->CBaseAnimatingOverlay::OnRestore(  );
+            this->CBasePlayer::OnRestore(  );
     }
     
     void default_OnRestore(  ) {
-        CBaseAnimatingOverlay::OnRestore( );
+        CBasePlayer::OnRestore( );
     }
 
     virtual void OnSequenceSet( int nOldSequence ) {
@@ -1112,7 +1112,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnTakeDamage( boost::ref(info) ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling OnTakeDamage( boost::ref(info) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnTakeDamage = this->get_override( "OnTakeDamage" );
         if( func_OnTakeDamage.ptr() != Py_None )
@@ -1120,14 +1120,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 return func_OnTakeDamage( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseCombatCharacter::OnTakeDamage( boost::ref(info) );
+                return this->CBasePlayer::OnTakeDamage( boost::ref(info) );
             }
         else
-            return this->CBaseCombatCharacter::OnTakeDamage( boost::ref(info) );
+            return this->CBasePlayer::OnTakeDamage( boost::ref(info) );
     }
     
     int default_OnTakeDamage( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::OnTakeDamage( boost::ref(info) );
+        return CBasePlayer::OnTakeDamage( boost::ref(info) );
     }
 
     virtual int OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
@@ -1142,7 +1142,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnTakeDamage_Alive( boost::ref(info) ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling OnTakeDamage_Alive( boost::ref(info) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnTakeDamage_Alive = this->get_override( "OnTakeDamage_Alive" );
         if( func_OnTakeDamage_Alive.ptr() != Py_None )
@@ -1150,14 +1150,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 return func_OnTakeDamage_Alive( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
+                return this->CBasePlayer::OnTakeDamage_Alive( boost::ref(info) );
             }
         else
-            return this->CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
+            return this->CBasePlayer::OnTakeDamage_Alive( boost::ref(info) );
     }
     
     int default_OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::OnTakeDamage_Alive( boost::ref(info) );
+        return CBasePlayer::OnTakeDamage_Alive( boost::ref(info) );
     }
 
     virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
@@ -1373,7 +1373,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling VPhysicsCollision( index, boost::python::ptr(pEvent) ) of Class: CBaseEntity\n");
+            Msg("Calling VPhysicsCollision( index, boost::python::ptr(pEvent) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_VPhysicsCollision = this->get_override( "VPhysicsCollision" );
         if( func_VPhysicsCollision.ptr() != Py_None )
@@ -1381,17 +1381,17 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_VPhysicsCollision( index, boost::python::ptr(pEvent) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::VPhysicsCollision( index, boost::python::ptr(pEvent) );
+                this->CBasePlayer::VPhysicsCollision( index, boost::python::ptr(pEvent) );
             }
         else
-            this->CBaseEntity::VPhysicsCollision( index, boost::python::ptr(pEvent) );
+            this->CBasePlayer::VPhysicsCollision( index, boost::python::ptr(pEvent) );
     }
     
     void default_VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
-        CBaseEntity::VPhysicsCollision( index, boost::python::ptr(pEvent) );
+        CBasePlayer::VPhysicsCollision( index, boost::python::ptr(pEvent) );
     }
 
-    virtual void Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget=0, ::Vector const * pVelocity=0 ) {
+    virtual void Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget, ::Vector const * pVelocity ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
@@ -1403,7 +1403,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Weapon_Drop = this->get_override( "Weapon_Drop" );
         if( func_Weapon_Drop.ptr() != Py_None )
@@ -1411,14 +1411,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseCombatCharacter::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
+                this->CBasePlayer::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
             }
         else
-            this->CBaseCombatCharacter::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
+            this->CBasePlayer::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
     }
     
-    void default_Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget=0, ::Vector const * pVelocity=0 ) {
-        CBaseCombatCharacter::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
+    void default_Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget, ::Vector const * pVelocity ) {
+        CBasePlayer::Weapon_Drop( boost::python::ptr(pWeapon), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
     }
 
     virtual void Weapon_Equip( ::CBaseCombatWeapon * pWeapon ) {
@@ -1433,7 +1433,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Weapon_Equip( boost::python::ptr(pWeapon) ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling Weapon_Equip( boost::python::ptr(pWeapon) ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Weapon_Equip = this->get_override( "Weapon_Equip" );
         if( func_Weapon_Equip.ptr() != Py_None )
@@ -1441,14 +1441,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 func_Weapon_Equip( boost::python::ptr(pWeapon) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseCombatCharacter::Weapon_Equip( boost::python::ptr(pWeapon) );
+                this->CBasePlayer::Weapon_Equip( boost::python::ptr(pWeapon) );
             }
         else
-            this->CBaseCombatCharacter::Weapon_Equip( boost::python::ptr(pWeapon) );
+            this->CBasePlayer::Weapon_Equip( boost::python::ptr(pWeapon) );
     }
     
     void default_Weapon_Equip( ::CBaseCombatWeapon * pWeapon ) {
-        CBaseCombatCharacter::Weapon_Equip( boost::python::ptr(pWeapon) );
+        CBasePlayer::Weapon_Equip( boost::python::ptr(pWeapon) );
     }
 
     virtual bool Weapon_Switch( ::CBaseCombatWeapon * pWeapon, int viewmodelindex=0 ) {
@@ -1463,7 +1463,7 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex ) of Class: CBaseCombatCharacter\n");
+            Msg("Calling Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex ) of Class: CBasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Weapon_Switch = this->get_override( "Weapon_Switch" );
         if( func_Weapon_Switch.ptr() != Py_None )
@@ -1471,14 +1471,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
                 return func_Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseCombatCharacter::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
+                return this->CBasePlayer::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
             }
         else
-            return this->CBaseCombatCharacter::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
+            return this->CBasePlayer::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
     }
     
     bool default_Weapon_Switch( ::CBaseCombatWeapon * pWeapon, int viewmodelindex=0 ) {
-        return CBaseCombatCharacter::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
+        return CBasePlayer::Weapon_Switch( boost::python::ptr(pWeapon), viewmodelindex );
     }
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
@@ -1501,35 +1501,6 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
             return pServerClass;
         return CHL2WarsPlayer::GetServerClass();
     }
-
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CHL2WarsPlayer\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CHL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CHL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CHL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
 
 };
 
@@ -2469,14 +2440,14 @@ void register_CHL2WarsPlayer_class(){
                 , WasRightDoublePressed_function_type( &::CHL2WarsPlayer::WasRightDoublePressed ) );
         
         }
-        { //::CBaseAnimating::Activate
+        { //::CBasePlayer::Activate
         
-            typedef void ( ::CBaseAnimating::*Activate_function_type )(  ) ;
+            typedef void ( ::CBasePlayer::*Activate_function_type )(  ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_Activate_function_type )(  ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Activate"
-                , Activate_function_type(&::CBaseAnimating::Activate)
+                , Activate_function_type(&::CBasePlayer::Activate)
                 , default_Activate_function_type(&CHL2WarsPlayer_wrapper::default_Activate) );
         
         }
@@ -2550,26 +2521,26 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("pVictim") ) );
         
         }
-        { //::CBaseEntity::DoImpactEffect
+        { //::CBasePlayer::DoImpactEffect
         
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
+            typedef void ( ::CBasePlayer::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
+                , DoImpactEffect_function_type(&::CBasePlayer::DoImpactEffect)
                 , default_DoImpactEffect_function_type(&CHL2WarsPlayer_wrapper::default_DoImpactEffect)
                 , ( bp::arg("tr"), bp::arg("nDamageType") ) );
         
         }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
+        { //::CBasePlayer::DrawDebugGeometryOverlays
         
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
+            typedef void ( ::CBasePlayer::*DrawDebugGeometryOverlays_function_type )(  ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
+                , DrawDebugGeometryOverlays_function_type(&::CBasePlayer::DrawDebugGeometryOverlays)
                 , default_DrawDebugGeometryOverlays_function_type(&CHL2WarsPlayer_wrapper::default_DrawDebugGeometryOverlays) );
         
         }
@@ -2608,26 +2579,26 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("info") ) );
         
         }
-        { //::CBaseCombatCharacter::Event_Killed
+        { //::CBasePlayer::Event_Killed
         
-            typedef void ( ::CBaseCombatCharacter::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef void ( ::CBasePlayer::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Event_Killed"
-                , Event_Killed_function_type(&::CBaseCombatCharacter::Event_Killed)
+                , Event_Killed_function_type(&::CBasePlayer::Event_Killed)
                 , default_Event_Killed_function_type(&CHL2WarsPlayer_wrapper::default_Event_Killed)
                 , ( bp::arg("info") ) );
         
         }
-        { //::CBaseEntity::Event_KilledOther
+        { //::CBasePlayer::Event_KilledOther
         
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
+            typedef void ( ::CBasePlayer::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
+                , Event_KilledOther_function_type(&::CBasePlayer::Event_KilledOther)
                 , default_Event_KilledOther_function_type(&CHL2WarsPlayer_wrapper::default_Event_KilledOther)
                 , ( bp::arg("pVictim"), bp::arg("info") ) );
         
@@ -2644,14 +2615,14 @@ void register_CHL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CBaseEntity::GetTracerType
+        { //::CBasePlayer::GetTracerType
         
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
+            typedef char const * ( ::CBasePlayer::*GetTracerType_function_type )(  ) ;
             typedef char const * ( CHL2WarsPlayer_wrapper::*default_GetTracerType_function_type )(  ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
+                , GetTracerType_function_type(&::CBasePlayer::GetTracerType)
                 , default_GetTracerType_function_type(&CHL2WarsPlayer_wrapper::default_GetTracerType) );
         
         }
@@ -2703,14 +2674,14 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
         
         }
-        { //::CBaseEntity::MakeTracer
+        { //::CBasePlayer::MakeTracer
         
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
+            typedef void ( ::CBasePlayer::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
+                , MakeTracer_function_type(&::CBasePlayer::MakeTracer)
                 , default_MakeTracer_function_type(&CHL2WarsPlayer_wrapper::default_MakeTracer)
                 , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
         
@@ -2727,14 +2698,14 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("set") ) );
         
         }
-        { //::CBaseAnimatingOverlay::OnRestore
+        { //::CBasePlayer::OnRestore
         
-            typedef void ( ::CBaseAnimatingOverlay::*OnRestore_function_type )(  ) ;
+            typedef void ( ::CBasePlayer::*OnRestore_function_type )(  ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_OnRestore_function_type )(  ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimatingOverlay::OnRestore)
+                , OnRestore_function_type(&::CBasePlayer::OnRestore)
                 , default_OnRestore_function_type(&CHL2WarsPlayer_wrapper::default_OnRestore) );
         
         }
@@ -2750,26 +2721,26 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("nOldSequence") ) );
         
         }
-        { //::CBaseCombatCharacter::OnTakeDamage
+        { //::CBasePlayer::OnTakeDamage
         
-            typedef int ( ::CBaseCombatCharacter::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef int ( ::CBasePlayer::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
             typedef int ( CHL2WarsPlayer_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseCombatCharacter::OnTakeDamage)
+                , OnTakeDamage_function_type(&::CBasePlayer::OnTakeDamage)
                 , default_OnTakeDamage_function_type(&CHL2WarsPlayer_wrapper::default_OnTakeDamage)
                 , ( bp::arg("info") ) );
         
         }
-        { //::CBaseCombatCharacter::OnTakeDamage_Alive
+        { //::CBasePlayer::OnTakeDamage_Alive
         
-            typedef int ( ::CBaseCombatCharacter::*OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef int ( ::CBasePlayer::*OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
             typedef int ( CHL2WarsPlayer_wrapper::*default_OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "OnTakeDamage_Alive"
-                , OnTakeDamage_Alive_function_type(&::CBaseCombatCharacter::OnTakeDamage_Alive)
+                , OnTakeDamage_Alive_function_type(&::CBasePlayer::OnTakeDamage_Alive)
                 , default_OnTakeDamage_Alive_function_type(&CHL2WarsPlayer_wrapper::default_OnTakeDamage_Alive)
                 , ( bp::arg("info") ) );
         
@@ -2863,50 +2834,50 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
         
         }
-        { //::CBaseEntity::VPhysicsCollision
+        { //::CBasePlayer::VPhysicsCollision
         
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
+            typedef void ( ::CBasePlayer::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
+                , VPhysicsCollision_function_type(&::CBasePlayer::VPhysicsCollision)
                 , default_VPhysicsCollision_function_type(&CHL2WarsPlayer_wrapper::default_VPhysicsCollision)
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        { //::CBaseCombatCharacter::Weapon_Drop
+        { //::CBasePlayer::Weapon_Drop
         
-            typedef void ( ::CBaseCombatCharacter::*Weapon_Drop_function_type )( ::CBaseCombatWeapon *,::Vector const *,::Vector const * ) ;
+            typedef void ( ::CBasePlayer::*Weapon_Drop_function_type )( ::CBaseCombatWeapon *,::Vector const *,::Vector const * ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_Weapon_Drop_function_type )( ::CBaseCombatWeapon *,::Vector const *,::Vector const * ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Weapon_Drop"
-                , Weapon_Drop_function_type(&::CBaseCombatCharacter::Weapon_Drop)
+                , Weapon_Drop_function_type(&::CBasePlayer::Weapon_Drop)
                 , default_Weapon_Drop_function_type(&CHL2WarsPlayer_wrapper::default_Weapon_Drop)
-                , ( bp::arg("pWeapon"), bp::arg("pvecTarget")=bp::object(), bp::arg("pVelocity")=bp::object() ) );
+                , ( bp::arg("pWeapon"), bp::arg("pvecTarget"), bp::arg("pVelocity") ) );
         
         }
-        { //::CBaseCombatCharacter::Weapon_Equip
+        { //::CBasePlayer::Weapon_Equip
         
-            typedef void ( ::CBaseCombatCharacter::*Weapon_Equip_function_type )( ::CBaseCombatWeapon * ) ;
+            typedef void ( ::CBasePlayer::*Weapon_Equip_function_type )( ::CBaseCombatWeapon * ) ;
             typedef void ( CHL2WarsPlayer_wrapper::*default_Weapon_Equip_function_type )( ::CBaseCombatWeapon * ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Weapon_Equip"
-                , Weapon_Equip_function_type(&::CBaseCombatCharacter::Weapon_Equip)
+                , Weapon_Equip_function_type(&::CBasePlayer::Weapon_Equip)
                 , default_Weapon_Equip_function_type(&CHL2WarsPlayer_wrapper::default_Weapon_Equip)
                 , ( bp::arg("pWeapon") ) );
         
         }
-        { //::CBaseCombatCharacter::Weapon_Switch
+        { //::CBasePlayer::Weapon_Switch
         
-            typedef bool ( ::CBaseCombatCharacter::*Weapon_Switch_function_type )( ::CBaseCombatWeapon *,int ) ;
+            typedef bool ( ::CBasePlayer::*Weapon_Switch_function_type )( ::CBaseCombatWeapon *,int ) ;
             typedef bool ( CHL2WarsPlayer_wrapper::*default_Weapon_Switch_function_type )( ::CBaseCombatWeapon *,int ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "Weapon_Switch"
-                , Weapon_Switch_function_type(&::CBaseCombatCharacter::Weapon_Switch)
+                , Weapon_Switch_function_type(&::CBasePlayer::Weapon_Switch)
                 , default_Weapon_Switch_function_type(&CHL2WarsPlayer_wrapper::default_Weapon_Switch)
                 , ( bp::arg("pWeapon"), bp::arg("viewmodelindex")=(int)(0) ) );
         
@@ -2925,18 +2896,6 @@ void register_CHL2WarsPlayer_class(){
                 , fset( &::CHL2WarsPlayer::SetControlledUnit ) );
         
         }
-        { //::CHL2WarsPlayer::TestCollision
-            
-                typedef bool ( ::CHL2WarsPlayer::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CHL2WarsPlayer_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CHL2WarsPlayer_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CHL2WarsPlayer::TestCollision)
-                    , default_TestCollision_function_type(&CHL2WarsPlayer_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
     }
 
 }

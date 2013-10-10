@@ -805,451 +805,161 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_SmokeTrail\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_SmokeTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_SmokeTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_SmokeTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_C_SmokeTrail_class(){
 
-    { //::C_SmokeTrail
-        typedef bp::class_< C_SmokeTrail_wrapper, bp::bases< C_BaseParticleEntity >, boost::noncopyable > C_SmokeTrail_exposer_t;
-        C_SmokeTrail_exposer_t C_SmokeTrail_exposer = C_SmokeTrail_exposer_t( "C_SmokeTrail", bp::init< >() );
-        bp::scope C_SmokeTrail_scope( C_SmokeTrail_exposer );
-        { //::C_SmokeTrail::CleanupToolRecordingState
-        
-            typedef void ( ::C_SmokeTrail::*CleanupToolRecordingState_function_type )( ::KeyValues * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "CleanupToolRecordingState"
-                , CleanupToolRecordingState_function_type( &::C_SmokeTrail::CleanupToolRecordingState )
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_SmokeTrail::OnDataChanged
-        
-            typedef void ( ::C_SmokeTrail::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "OnDataChanged"
-                , OnDataChanged_function_type(&::C_SmokeTrail::OnDataChanged)
-                , default_OnDataChanged_function_type(&C_SmokeTrail_wrapper::default_OnDataChanged)
-                , ( bp::arg("updateType") ) );
-        
-        }
-        { //::C_SmokeTrail::RenderParticles
-        
-            typedef void ( ::C_SmokeTrail::*RenderParticles_function_type )( ::CParticleRenderIterator * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "RenderParticles"
-                , RenderParticles_function_type( &::C_SmokeTrail::RenderParticles )
-                , ( bp::arg("pIterator") ) );
-        
-        }
-        { //::C_SmokeTrail::SetEmit
-        
-            typedef void ( ::C_SmokeTrail::*SetEmit_function_type )( bool ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "SetEmit"
-                , SetEmit_function_type( &::C_SmokeTrail::SetEmit )
-                , ( bp::arg("bEmit") ) );
-        
-        }
-        { //::C_SmokeTrail::SetSpawnRate
-        
-            typedef void ( ::C_SmokeTrail::*SetSpawnRate_function_type )( float ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "SetSpawnRate"
-                , SetSpawnRate_function_type( &::C_SmokeTrail::SetSpawnRate )
-                , ( bp::arg("rate") ) );
-        
-        }
-        { //::C_SmokeTrail::SimulateParticles
-        
-            typedef void ( ::C_SmokeTrail::*SimulateParticles_function_type )( ::CParticleSimulateIterator * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "SimulateParticles"
-                , SimulateParticles_function_type( &::C_SmokeTrail::SimulateParticles )
-                , ( bp::arg("pIterator") ) );
-        
-        }
-        { //::C_SmokeTrail::Start
-        
-            typedef void ( ::C_SmokeTrail::*Start_function_type )( ::CParticleMgr *,::IPrototypeArgAccess * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Start"
-                , Start_function_type( &::C_SmokeTrail::Start )
-                , ( bp::arg("pParticleMgr"), bp::arg("pArgs") ) );
-        
-        }
-        { //::C_SmokeTrail::Update
-        
-            typedef void ( ::C_SmokeTrail::*Update_function_type )( float ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Update"
-                , Update_function_type( &::C_SmokeTrail::Update )
-                , ( bp::arg("fTimeDelta") ) );
-        
-        }
-        C_SmokeTrail_exposer.def_readwrite( "m_EndColor", &C_SmokeTrail::m_EndColor );
-        C_SmokeTrail_exposer.def_readwrite( "m_EndSize", &C_SmokeTrail::m_EndSize );
-        C_SmokeTrail_exposer.def_readwrite( "m_MaxDirectedSpeed", &C_SmokeTrail::m_MaxDirectedSpeed );
-        C_SmokeTrail_exposer.def_readwrite( "m_MaxSpeed", &C_SmokeTrail::m_MaxSpeed );
-        C_SmokeTrail_exposer.def_readwrite( "m_MinDirectedSpeed", &C_SmokeTrail::m_MinDirectedSpeed );
-        C_SmokeTrail_exposer.def_readwrite( "m_MinSpeed", &C_SmokeTrail::m_MinSpeed );
-        C_SmokeTrail_exposer.def_readwrite( "m_Opacity", &C_SmokeTrail::m_Opacity );
-        C_SmokeTrail_exposer.def_readwrite( "m_ParticleLifetime", &C_SmokeTrail::m_ParticleLifetime );
-        C_SmokeTrail_exposer.def_readwrite( "m_SpawnRadius", &C_SmokeTrail::m_SpawnRadius );
-        C_SmokeTrail_exposer.def_readwrite( "m_SpawnRate", &C_SmokeTrail::m_SpawnRate );
-        C_SmokeTrail_exposer.def_readwrite( "m_StartColor", &C_SmokeTrail::m_StartColor );
-        C_SmokeTrail_exposer.def_readwrite( "m_StartSize", &C_SmokeTrail::m_StartSize );
-        C_SmokeTrail_exposer.def_readwrite( "m_StopEmitTime", &C_SmokeTrail::m_StopEmitTime );
-        C_SmokeTrail_exposer.def_readwrite( "m_VelocityOffset", &C_SmokeTrail::m_VelocityOffset );
-        C_SmokeTrail_exposer.def_readwrite( "m_bEmit", &C_SmokeTrail::m_bEmit );
-        C_SmokeTrail_exposer.def_readwrite( "m_nAttachment", &C_SmokeTrail::m_nAttachment );
-        { //::C_BaseParticleEntity::Activate
-        
-            typedef void ( ::C_BaseParticleEntity::*Activate_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_Activate_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::C_BaseParticleEntity::Activate)
-                , default_Activate_function_type(&C_SmokeTrail_wrapper::default_Activate) );
-        
-        }
-        { //::C_BaseEntity::AddToEntityList
-        
-            typedef void ( C_SmokeTrail_wrapper::*AddToEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "AddToEntityList"
-                , AddToEntityList_function_type( &C_SmokeTrail_wrapper::AddToEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseEntity::ClientThink
-        
-            typedef void ( ::C_BaseEntity::*ClientThink_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_ClientThink_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "ClientThink"
-                , ClientThink_function_type(&::C_BaseEntity::ClientThink)
-                , default_ClientThink_function_type(&C_SmokeTrail_wrapper::default_ClientThink) );
-        
-        }
-        { //::C_BaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::C_BaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&C_SmokeTrail_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
-        
-        }
-        { //::C_BaseEntity::CreateVPhysics
-        
-            typedef bool ( ::C_BaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::C_BaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&C_SmokeTrail_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::C_BaseEntity::DoImpactEffect
-        
-            typedef void ( ::C_BaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::C_BaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&C_SmokeTrail_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::C_BaseEntity::EndTouch
-        
-            typedef void ( ::C_BaseEntity::*EndTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_EndTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::C_BaseEntity::EndTouch)
-                , default_EndTouch_function_type(&C_SmokeTrail_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseEntity::GetCollideType
-        
-            typedef ::CollideType_t ( ::C_BaseEntity::*GetCollideType_function_type )(  ) ;
-            typedef ::CollideType_t ( C_SmokeTrail_wrapper::*default_GetCollideType_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "GetCollideType"
-                , GetCollideType_function_type(&::C_BaseEntity::GetCollideType)
-                , default_GetCollideType_function_type(&C_SmokeTrail_wrapper::default_GetCollideType) );
-        
-        }
-        { //::C_BaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::C_BaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( C_SmokeTrail_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::C_BaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&C_SmokeTrail_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseEntity::GetTracerType
-        
-            typedef char const * ( ::C_BaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( C_SmokeTrail_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::C_BaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&C_SmokeTrail_wrapper::default_GetTracerType) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_SmokeTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_SmokeTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_SmokeTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_SmokeTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::C_BaseEntity::MakeTracer
-        
-            typedef void ( ::C_BaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::C_BaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&C_SmokeTrail_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::C_BaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::C_BaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::C_BaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&C_SmokeTrail_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::C_BaseEntity::OnRestore
-        
-            typedef void ( ::C_BaseEntity::*OnRestore_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::C_BaseEntity::OnRestore)
-                , default_OnRestore_function_type(&C_SmokeTrail_wrapper::default_OnRestore) );
-        
-        }
-        { //::C_BaseEntity::Precache
-        
-            typedef void ( ::C_BaseEntity::*Precache_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_Precache_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::C_BaseEntity::Precache)
-                , default_Precache_function_type(&C_SmokeTrail_wrapper::default_Precache) );
-        
-        }
-        { //::C_BaseEntity::PyNotifyShouldTransmit
-        
-            typedef void ( ::C_BaseEntity::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "NotifyShouldTransmit"
-                , NotifyShouldTransmit_function_type(&::C_BaseEntity::PyNotifyShouldTransmit)
-                , default_NotifyShouldTransmit_function_type(&C_SmokeTrail_wrapper::default_NotifyShouldTransmit)
-                , ( bp::arg("state") ) );
-        
-        }
-        { //::C_BaseEntity::PyReceiveMessage
-        
-            typedef void ( ::C_BaseEntity::*ReceiveMessage_function_type )( ::boost::python::list ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_ReceiveMessage_function_type )( ::boost::python::list ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "ReceiveMessage"
-                , ReceiveMessage_function_type(&::C_BaseEntity::PyReceiveMessage)
-                , default_ReceiveMessage_function_type(&C_SmokeTrail_wrapper::default_ReceiveMessage)
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_BaseEntity::RemoveFromEntityList
-        
-            typedef void ( C_SmokeTrail_wrapper::*RemoveFromEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "RemoveFromEntityList"
-                , RemoveFromEntityList_function_type( &C_SmokeTrail_wrapper::RemoveFromEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseParticleEntity::ShouldDraw
-        
-            typedef bool ( ::C_BaseParticleEntity::*ShouldDraw_function_type )(  ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_ShouldDraw_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "ShouldDraw"
-                , ShouldDraw_function_type(&::C_BaseParticleEntity::ShouldDraw)
-                , default_ShouldDraw_function_type(&C_SmokeTrail_wrapper::default_ShouldDraw) );
-        
-        }
-        { //::C_BaseEntity::Simulate
-        
-            typedef bool ( ::C_BaseEntity::*Simulate_function_type )(  ) ;
-            typedef bool ( C_SmokeTrail_wrapper::*default_Simulate_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Simulate"
-                , Simulate_function_type(&::C_BaseEntity::Simulate)
-                , default_Simulate_function_type(&C_SmokeTrail_wrapper::default_Simulate) );
-        
-        }
-        { //::C_BaseEntity::Spawn
-        
-            typedef void ( ::C_BaseEntity::*Spawn_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::C_BaseEntity::Spawn)
-                , default_Spawn_function_type(&C_SmokeTrail_wrapper::default_Spawn) );
-        
-        }
-        { //::C_BaseEntity::StartTouch
-        
-            typedef void ( ::C_BaseEntity::*StartTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_StartTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::C_BaseEntity::StartTouch)
-                , default_StartTouch_function_type(&C_SmokeTrail_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseEntity::UpdateOnRemove
-        
-            typedef void ( ::C_BaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( C_SmokeTrail_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            C_SmokeTrail_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::C_BaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&C_SmokeTrail_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::C_SmokeTrail::TestCollision
-            
-                typedef bool ( ::C_SmokeTrail::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_SmokeTrail_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_SmokeTrail_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_SmokeTrail::TestCollision)
-                    , default_TestCollision_function_type(&C_SmokeTrail_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< C_SmokeTrail_wrapper, bp::bases< C_BaseParticleEntity >, boost::noncopyable >( "C_SmokeTrail", bp::init< >() )    
+        .def( 
+            "CleanupToolRecordingState"
+            , (void ( ::C_SmokeTrail::* )( ::KeyValues * ) )( &::C_SmokeTrail::CleanupToolRecordingState )
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "OnDataChanged"
+            , (void ( ::C_SmokeTrail::* )( ::DataUpdateType_t ) )(&::C_SmokeTrail::OnDataChanged)
+            , (void ( C_SmokeTrail_wrapper::* )( ::DataUpdateType_t ) )(&C_SmokeTrail_wrapper::default_OnDataChanged)
+            , ( bp::arg("updateType") ) )    
+        .def( 
+            "RenderParticles"
+            , (void ( ::C_SmokeTrail::* )( ::CParticleRenderIterator * ) )( &::C_SmokeTrail::RenderParticles )
+            , ( bp::arg("pIterator") ) )    
+        .def( 
+            "SetEmit"
+            , (void ( ::C_SmokeTrail::* )( bool ) )( &::C_SmokeTrail::SetEmit )
+            , ( bp::arg("bEmit") ) )    
+        .def( 
+            "SetSpawnRate"
+            , (void ( ::C_SmokeTrail::* )( float ) )( &::C_SmokeTrail::SetSpawnRate )
+            , ( bp::arg("rate") ) )    
+        .def( 
+            "SimulateParticles"
+            , (void ( ::C_SmokeTrail::* )( ::CParticleSimulateIterator * ) )( &::C_SmokeTrail::SimulateParticles )
+            , ( bp::arg("pIterator") ) )    
+        .def( 
+            "Start"
+            , (void ( ::C_SmokeTrail::* )( ::CParticleMgr *,::IPrototypeArgAccess * ) )( &::C_SmokeTrail::Start )
+            , ( bp::arg("pParticleMgr"), bp::arg("pArgs") ) )    
+        .def( 
+            "Update"
+            , (void ( ::C_SmokeTrail::* )( float ) )( &::C_SmokeTrail::Update )
+            , ( bp::arg("fTimeDelta") ) )    
+        .def( 
+            "Activate"
+            , (void ( ::C_BaseParticleEntity::* )(  ) )(&::C_BaseParticleEntity::Activate)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Activate) )    
+        .def( 
+            "AddToEntityList"
+            , (void ( C_SmokeTrail_wrapper::* )( ::entity_list_ids_t ) )(&C_SmokeTrail_wrapper::AddToEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "ClientThink"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ClientThink)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_ClientThink) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::C_BaseEntity::* )( ::Vector *,::Vector * ) )(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( C_SmokeTrail_wrapper::* )( ::Vector *,::Vector * ) )(&C_SmokeTrail_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::CreateVPhysics)
+            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::C_BaseEntity::* )( ::trace_t &,int ) )(&::C_BaseEntity::DoImpactEffect)
+            , (void ( C_SmokeTrail_wrapper::* )( ::trace_t &,int ) )(&C_SmokeTrail_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::EndTouch)
+            , (void ( C_SmokeTrail_wrapper::* )( ::C_BaseEntity * ) )(&C_SmokeTrail_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "GetCollideType"
+            , (::CollideType_t ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetCollideType)
+            , (::CollideType_t ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetCollideType) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetIMouse)
+            , (::IMouse * ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetTracerType)
+            , (char const * ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,char const * ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_SmokeTrail_wrapper::* )( char const *,char const * ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,float ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_SmokeTrail_wrapper::* )( char const *,float ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,int ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_SmokeTrail_wrapper::* )( char const *,int ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,::Vector const & ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_SmokeTrail_wrapper::* )( char const *,::Vector const & ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::C_BaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::C_BaseEntity::MakeTracer)
+            , (void ( C_SmokeTrail_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_SmokeTrail_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
+            , (void ( C_SmokeTrail_wrapper::* )( int ) )(&C_SmokeTrail_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::OnRestore)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_OnRestore) )    
+        .def( 
+            "Precache"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Precache)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Precache) )    
+        .def( 
+            "NotifyShouldTransmit"
+            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::PyNotifyShouldTransmit)
+            , (void ( C_SmokeTrail_wrapper::* )( ::ShouldTransmitState_t ) )(&C_SmokeTrail_wrapper::default_NotifyShouldTransmit)
+            , ( bp::arg("state") ) )    
+        .def( 
+            "ReceiveMessage"
+            , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)
+            , (void ( C_SmokeTrail_wrapper::* )( ::boost::python::list ) )(&C_SmokeTrail_wrapper::default_ReceiveMessage)
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "RemoveFromEntityList"
+            , (void ( C_SmokeTrail_wrapper::* )( ::entity_list_ids_t ) )(&C_SmokeTrail_wrapper::RemoveFromEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "ShouldDraw"
+            , (bool ( ::C_BaseParticleEntity::* )(  ) )(&::C_BaseParticleEntity::ShouldDraw)
+            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_ShouldDraw) )    
+        .def( 
+            "Simulate"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Simulate)
+            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Simulate) )    
+        .def( 
+            "Spawn"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Spawn)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Spawn) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::StartTouch)
+            , (void ( C_SmokeTrail_wrapper::* )( ::C_BaseEntity * ) )(&C_SmokeTrail_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
+            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_UpdateOnRemove) );
 
 }
 

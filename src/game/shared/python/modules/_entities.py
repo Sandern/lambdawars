@@ -321,6 +321,8 @@ class Entities(SemiSharedModuleGenerator):
             applies shared functionality. '''
         cls = mb.class_(clsname)
         
+        self.entclasses.append(cls)
+        
         cls.include()
         cls.calldefs(matchers.access_type_matcher_t('protected'), allow_empty=True).exclude()
         
@@ -358,62 +360,11 @@ class Entities(SemiSharedModuleGenerator):
         cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(declarated_t(matrix3x4))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(const_t(declarated_t(matrix3x4)))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
-        # TODO: Default exlude, only include the variables we want
-        #cls.vars(allow_empty=True).exclude()
+        # All public variables are excluded by default
+        cls.vars(allow_empty=True).exclude()
         
         return cls
-    
-    def AddTestCollisionMethod(self, cls, cls_name):
-        # Test collision
-        cls.add_wrapper_code(
-        '''
-            virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: %(cls_name)s\\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->%(cls_name)s::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->%(cls_name)s::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
             
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return %(cls_name)s::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-        ''' % { 'cls_name' : cls_name} )
-        
-        cls.add_registration_code(
-            '''
-            { //::%(cls_name)s::TestCollision
-            
-                typedef bool ( ::%(cls_name)s::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( %(cls_name)s_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                %(cls_name)s_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::%(cls_name)s::TestCollision)
-                    , default_TestCollision_function_type(&%(cls_name)s_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-            ''' % { 'cls_name' : cls_name}
-        , False )
-                         
     def ParseClientEntities(self, mb):
         # Made not virtual so no wrapper code is generated in IClientUnknown and IClientEntity
         mb.class_('IClientRenderable').mem_funs().virtuality = 'not virtual' 
@@ -438,12 +389,10 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('OnNewModel', allow_empty=True).exclude() # Don't care for now
             cls.mem_funs('GetClientClass', allow_empty=True).exclude()
             cls.mem_funs('GetMouth', allow_empty=True).exclude()
-            
-            self.AddTestCollisionMethod(cls, clsname)
 
         mb.mem_funs('SetThinkHandle').exclude()
         mb.mem_funs('GetThinkHandle').exclude()
-        
+            
     def ParseServerEntities(self, mb):
         self.IncludeEmptyClass(mb, 'IServerUnknown')
         self.IncludeEmptyClass(mb, 'IServerEntity')
@@ -460,11 +409,8 @@ class Entities(SemiSharedModuleGenerator):
             # Apply common rules
             # Excludes
             cls.mem_funs('GetServerClass', allow_empty=True).exclude()         # Don't care about this one
-            
-            self.AddTestCollisionMethod(cls, clsname)
-            
-        # Creation and spawning
-        mb.free_functions('CreateEntityByName').include()
+
+        # Spawning helper
         mb.free_functions('DispatchSpawn').include()
 
     def ParseBaseEntityHandles(self, mb):
@@ -509,22 +455,13 @@ class Entities(SemiSharedModuleGenerator):
         
         for d in datatypes:
             for i in range(1, count+1):
-                self.SetupProperty(mb, cls, 'prop%s%d' % (d['type'], i), 'PyGetProp%s%d' % (d['name'], i), 'PySetProp%s%d' % (d['name'], i))
+                self.SetupProperty(cls, 'prop%s%d' % (d['type'], i), 'PyGetProp%s%d' % (d['name'], i), 'PySetProp%s%d' % (d['name'], i))
         
         # Exclude operators
         mb.global_ns.mem_opers('new').exclude()
         mb.global_ns.mem_opers('delete').exclude()
         
         # Excludes
-        mb.vars('m_pfnThink').exclude()
-        mb.vars('m_pfnTouch').exclude()
-        mb.vars('m_pPredictionPlayer').exclude()
-        mb.vars('m_DataMap').exclude()
-        if self.settings.branch == 'source2013':
-            mb.vars('m_PredictableID').exclude()
-        mb.vars('m_lifeState').exclude()
-        mb.vars('m_takedamage').exclude()
-        
         mb.mem_funs('Release').exclude()                # Don't care
         mb.mem_funs('GetPyInstance').exclude()          # Not needed, used when converting entities to python
         mb.mem_funs('SetPyInstance').exclude()          # Not needed, used when converting entities to python
@@ -655,20 +592,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetDataTableBasePtr').exclude()
             mb.mem_funs('OnNewModel').exclude()  
 
-            # Excludes
-            mb.vars('m_pClassRecvTable').exclude()
-            mb.vars('m_PredDesc').exclude()
-            mb.vars('m_PredMap').exclude()
-            mb.vars('m_pOriginalData').exclude()
-            mb.vars('m_VarMap').exclude()
-            mb.vars('m_clrRender').exclude()
-            mb.vars('m_pyInstance').exclude()
-            mb.vars('m_nModelIndex').exclude()
-            mb.vars('m_iTeamNum').exclude()
-            mb.vars('m_hRender').exclude()
-            if self.settings.branch == 'source2013':
-                mb.vars('m_pPredictionContext').exclude()
-            
+            # Excludes  
             mb.mem_funs('GetPredDescMap').exclude()         # Don't care about this one
             mb.mem_funs('GetIClientUnknown').exclude()      # Don't care about this one
             mb.mem_funs('GetClientNetworkable').exclude()   # Don't care about this one
@@ -712,26 +636,26 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             
             # Rename public variables
-            mb.vars('m_iHealth').rename('health')
-            mb.vars('m_lifeState').rename('lifestate')
-            mb.vars('m_nRenderFX').rename('renderfx')
+            self.IncludeVarAndRename('m_iHealth', 'health')
+            self.IncludeVarAndRename('m_lifeState', 'lifestate')
+            self.IncludeVarAndRename('m_nRenderFX', 'renderfx')
             if self.settings.branch == 'source2013':
-                mb.vars('m_nRenderFXBlend').rename('renderfxblend')
-            mb.vars('m_nRenderMode').rename('rendermode')
-            mb.vars('m_clrRender').rename('clrender')
-            mb.vars('m_takedamage').rename('takedamage')
-            mb.vars('m_flAnimTime').rename('animtime')
-            mb.vars('m_flOldAnimTime').rename('oldanimtime')
-            mb.vars('m_flSimulationTime').rename('simulationtime')
-            mb.vars('m_flOldSimulationTime').rename('oldsimulationtime')
-            mb.vars('m_nNextThinkTick').rename('nextthinktick')
-            mb.vars('m_nLastThinkTick').rename('lastthinktick')  
-            mb.vars('m_iClassname').rename('classname')    
-            mb.vars('m_flSpeed').rename('speed')
+                self.IncludeVarAndRename('m_nRenderFXBlend', 'renderfxblend')
+            self.IncludeVarAndRename('m_nRenderMode', 'rendermode')
+            self.IncludeVarAndRename('m_clrRender', 'clrender')
+            self.IncludeVarAndRename('m_takedamage', 'takedamage')
+            self.IncludeVarAndRename('m_flAnimTime', 'animtime')
+            self.IncludeVarAndRename('m_flOldAnimTime', 'oldanimtime')
+            self.IncludeVarAndRename('m_flSimulationTime', 'simulationtime')
+            self.IncludeVarAndRename('m_flOldSimulationTime', 'oldsimulationtime')
+            self.IncludeVarAndRename('m_nNextThinkTick', 'nextthinktick')
+            self.IncludeVarAndRename('m_nLastThinkTick', 'lastthinktick')  
+            self.IncludeVarAndRename('m_iClassname', 'classname')    
+            self.IncludeVarAndRename('m_flSpeed', 'speed')
             
-            self.SetupProperty(mb, cls, 'viewdistance', 'GetViewDistance')
-            self.SetupProperty(mb, cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
-            self.SetupProperty(mb, cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
+            self.SetupProperty(cls, 'viewdistance', 'GetViewDistance')
+            self.SetupProperty(cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
+            self.SetupProperty(cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
 
             # Don't give a shit about the following functions
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_AI_BaseNPC') != -1 ).exclude()
@@ -767,32 +691,32 @@ class Entities(SemiSharedModuleGenerator):
         else:
             mb.mem_funs('PySendEvent').include()
             mb.mem_funs('PySendEvent').rename('SendEvent')
-            mb.vars('m_flPrevAnimTime').rename('prevanimtime')
-            mb.vars('m_nNextThinkTick').rename('nextthinktick')
-            mb.vars('m_nLastThinkTick').rename('lastthinktick')
-            mb.vars('m_iClassname').rename('classname')
-            mb.vars('m_iGlobalname').rename('globalname')
-            mb.vars('m_iParent').rename('parent')
-            mb.vars('m_iHammerID').rename('hammerid')
-            mb.vars('m_flSpeed').rename('speed')
-            mb.vars('m_debugOverlays').rename('debugoverlays')
-            mb.vars('m_bAllowPrecache').rename('allowprecache')
-            mb.vars('m_bInDebugSelect').rename('indebugselect')
-            mb.vars('m_nDebugPlayer').rename('debugplayer')
-            mb.vars('m_target').rename('target')
-            mb.vars('m_iszDamageFilterName').rename('damagefiltername')
+            self.IncludeVarAndRename('m_flPrevAnimTime', 'prevanimtime')
+            self.IncludeVarAndRename('m_nNextThinkTick', 'nextthinktick')
+            self.IncludeVarAndRename('m_nLastThinkTick', 'lastthinktick')
+            self.IncludeVarAndRename('m_iClassname', 'classname')
+            self.IncludeVarAndRename('m_iGlobalname', 'globalname')
+            self.IncludeVarAndRename('m_iParent', 'parent')
+            self.IncludeVarAndRename('m_iHammerID', 'hammerid')
+            self.IncludeVarAndRename('m_flSpeed', 'speed')
+            self.IncludeVarAndRename('m_debugOverlays', 'debugoverlays')
+            self.IncludeVarAndRename('m_bAllowPrecache', 'allowprecache')
+            self.IncludeVarAndRename('m_bInDebugSelect', 'indebugselect')
+            self.IncludeVarAndRename('m_nDebugPlayer', 'debugplayer')
+            self.IncludeVarAndRename('m_target', 'target')
+            self.IncludeVarAndRename('m_iszDamageFilterName', 'damagefiltername')
             
 
             # Properties
-            self.SetupProperty(mb, cls, 'viewdistance', 'GetViewDistance', 'SetViewDistance')
+            self.SetupProperty(cls, 'viewdistance', 'GetViewDistance', 'SetViewDistance')
             
-            self.SetupProperty(mb, cls, 'health', 'GetHealth', 'SetHealth')
-            self.SetupProperty(mb, cls, 'maxhealth', 'GetMaxHealth', 'SetMaxHealth')
-            self.SetupProperty(mb, cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
-            self.SetupProperty(mb, cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
-            self.SetupProperty(mb, cls, 'animtime', 'GetAnimTime', 'SetAnimTime')
-            self.SetupProperty(mb, cls, 'simulationtime', 'GetSimulationTime', 'SetSimulationTime')
-            self.SetupProperty(mb, cls, 'rendermode', 'GetRenderMode', 'SetRenderMode', excludesetget=False)
+            self.SetupProperty(cls, 'health', 'GetHealth', 'SetHealth')
+            self.SetupProperty(cls, 'maxhealth', 'GetMaxHealth', 'SetMaxHealth')
+            self.SetupProperty(cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
+            self.SetupProperty(cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
+            self.SetupProperty(cls, 'animtime', 'GetAnimTime', 'SetAnimTime')
+            self.SetupProperty(cls, 'simulationtime', 'GetSimulationTime', 'SetSimulationTime')
+            self.SetupProperty(cls, 'rendermode', 'GetRenderMode', 'SetRenderMode', excludesetget=False)
             
             # Replace and rename
             mb.mem_funs('SetModel').exclude()
@@ -824,24 +748,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('DeathNotice').virtuality = 'virtual'
         
             # Excludes
-            mb.vars('m_pTimedOverlay').exclude()
-            mb.vars('m_pClassSendTable').exclude()
-            mb.vars('m_pfnUse').exclude()
-            mb.vars('m_pfnBlocked').exclude()
-            mb.vars('m_hDamageFilter').exclude()            # Don't think we need this one
-            mb.vars('s_bAbsQueriesValid').exclude()
-            mb.vars('sm_bAccurateTriggerBboxChecks').exclude()
-            mb.vars('m_nRenderMode').exclude()
-            mb.vars('m_nRenderFX').exclude()
-            mb.vars('m_nModelIndex').exclude()
-            mb.vars('m_iHealth').exclude()
-            mb.vars('m_flSimulationTime').exclude()
-            mb.vars('m_iMaxHealth').exclude()
-            mb.vars('m_clrRender').exclude()
-            mb.vars('m_pfnMoveDone').exclude()
-            mb.vars('m_flAnimTime').exclude()
-            mb.vars('m_iTeamNum').exclude()
-
             mb.mem_funs('GetNetworkable').exclude()         # Don't care for now
             mb.mem_funs('NetworkProp').exclude()            # Don't care
             mb.mem_funs('edict').exclude()                  # Not needed
@@ -887,11 +793,7 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('ScriptGetRootMoveParent').exclude()
                 mb.mem_funs('ScriptNextMovePeer').exclude()
                 mb.mem_funs('InputDispatchEffect').exclude() # No def?
-                
-                mb.vars('m_pEvent').exclude()
-                mb.vars('m_pScriptModelKeyValues').exclude()
-                mb.vars('m_hScriptInstance').exclude()
-                
+          
             # Replaced
             mb.mem_funs('CanBeSeenBy').exclude()      
             mb.mem_funs('DensityMap').exclude() # Don't care for now.
@@ -945,10 +847,9 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetModelPtr').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
         
         # Properties
-        self.SetupProperty(mb, cls, 'skin', 'GetSkin', 'SetSkin')
+        self.SetupProperty(cls, 'skin', 'GetSkin', 'SetSkin')
     
         if self.isclient:
-            mb.vars('m_nSkin').exclude() # Use property
             
             cls.vars('m_SequenceTransitioner').exclude()
             cls.vars('m_nHitboxSet').exclude()
@@ -993,9 +894,9 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs( name='GetBonePosition', function=lambda decl: HasArgType(decl, 'char') ).exclude() 
                 
             # Rename vars
-            mb.vars('m_OnIgnite').rename('onignite')
-            mb.vars('m_flGroundSpeed').rename('groundspeed')
-            mb.vars('m_flLastEventCheck').rename('lastevencheck')
+            self.IncludeVarAndRename('m_OnIgnite', 'onignite')
+            self.IncludeVarAndRename('m_flGroundSpeed', 'groundspeed')
+            self.IncludeVarAndRename('m_flLastEventCheck', 'lastevencheck')
             
             # Transformations
             mb.mem_funs('GotoSequence').add_transformation(FT.output('iNextSequence'), FT.output('flCycle'), FT.output('iDir'))
@@ -1031,8 +932,6 @@ class Entities(SemiSharedModuleGenerator):
             
     def ParseBaseCombatWeapon(self, mb):
         cls_name = 'C_BaseCombatWeapon' if self.isclient else 'CBaseCombatWeapon'
-        cls_name2 = 'C_WarsWeapon' if self.isclient else 'CWarsWeapon'
-        all_cls = [cls_name, cls_name2]
         cls = mb.class_(cls_name)
         
         # Overridable
@@ -1066,86 +965,48 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetWeaponList').exclude()
 
         # Rename variables
-        mb.var('m_iViewModelIndex').exclude()
-        mb.var('m_iWorldModelIndex').exclude()
-
-        mb.var('m_bAltFiresUnderwater').rename('altfiresunderwater')
-        mb.var('m_bFireOnEmpty').rename('fireonempty')
-        mb.var('m_bFiresUnderwater').rename('firesunderwater')
-        mb.var('m_bInReload').rename('inreload')
-        mb.var('m_bReloadsSingly').rename('reloadssingly')
-        mb.var('m_fFireDuration').rename('fireduration')
-        mb.var('m_fMaxRange1').rename('maxrange1')
-        mb.var('m_fMaxRange2').rename('maxrange2')
-        mb.var('m_fMinRange1').rename('minrange1')
-        mb.var('m_fMinRange2').rename('minrange2')
-        mb.var('m_flNextEmptySoundTime').rename('nextemptysoundtime')
-        mb.var('m_flNextPrimaryAttack').rename('nextprimaryattack')
-        mb.var('m_flNextSecondaryAttack').rename('nextsecondaryattack')
-        mb.vars('m_flTimeWeaponIdle').rename('timeweaponidle')
-        mb.var('m_flUnlockTime').rename('unlocktime')
-        mb.var('m_hLocker').rename('locker')
-        mb.var('m_iClip1').rename('clip1')
-        mb.var('m_iClip2').rename('clip2')
-        mb.var('m_iPrimaryAmmoType').rename('primaryammotype')
-        mb.var('m_iSecondaryAmmoType').rename('secondaryammotype')
-        mb.var('m_iState').rename('state')
-        mb.var('m_iSubType').rename('subtype')
-        mb.var('m_iViewModelIndex').rename('viewmodelindex')
-        mb.var('m_iWorldModelIndex').rename('worldmodelindex')
-        mb.vars('m_iszName').rename('name')
-        mb.vars('m_nViewModelIndex').rename('viewmodelindex')
+        self.IncludeVarAndRename('m_bAltFiresUnderwater', 'altfiresunderwater')
+        self.IncludeVarAndRename('m_bFireOnEmpty', 'fireonempty')
+        self.IncludeVarAndRename('m_bFiresUnderwater', 'firesunderwater')
+        self.IncludeVarAndRename('m_bInReload', 'inreload')
+        self.IncludeVarAndRename('m_bReloadsSingly', 'reloadssingly')
+        self.IncludeVarAndRename('m_fFireDuration', 'fireduration')
+        self.IncludeVarAndRename('m_fMaxRange1', 'maxrange1')
+        self.IncludeVarAndRename('m_fMaxRange2', 'maxrange2')
+        self.IncludeVarAndRename('m_fMinRange1', 'minrange1')
+        self.IncludeVarAndRename('m_fMinRange2', 'minrange2')
+        self.IncludeVarAndRename('m_flNextEmptySoundTime', 'nextemptysoundtime')
+        self.IncludeVarAndRename('m_flNextPrimaryAttack', 'nextprimaryattack')
+        self.IncludeVarAndRename('m_flNextSecondaryAttack', 'nextsecondaryattack')
+        self.IncludeVarAndRename('m_flTimeWeaponIdle', 'timeweaponidle')
+        self.IncludeVarAndRename('m_flUnlockTime', 'unlocktime')
+        self.IncludeVarAndRename('m_hLocker', 'locker')
+        self.IncludeVarAndRename('m_iClip1', 'clip1')
+        self.IncludeVarAndRename('m_iClip2', 'clip2')
+        self.IncludeVarAndRename('m_iPrimaryAmmoType', 'primaryammotype')
+        self.IncludeVarAndRename('m_iSecondaryAmmoType', 'secondaryammotype')
+        self.IncludeVarAndRename('m_iState', 'state')
+        self.IncludeVarAndRename('m_iSubType', 'subtype')
+        self.IncludeVarAndRename('m_iViewModelIndex', 'viewmodelindex')
+        self.IncludeVarAndRename('m_iWorldModelIndex', 'worldmodelindex')
+        self.IncludeVarAndRename('m_iszName', 'name')
+        self.IncludeVarAndRename('m_nViewModelIndex', 'viewmodelindex')
         
-        for cls_name3 in all_cls:
-            AddNetworkVarProperty( mb, 'nextprimaryattack', 'm_flNextPrimaryAttack', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'timeweaponidle', 'm_flTimeWeaponIdle', 'float', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'state', 'm_iState', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'primaryammotype', 'm_iPrimaryAmmoType', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'secondaryammotype', 'm_iSecondaryAmmoType', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'clip1', 'm_iClip1', 'int', cls_name3, self.isclient )
-            AddNetworkVarProperty( mb, 'clip2', 'm_iClip2', 'int', cls_name3, self.isclient )
+        for entcls in self.entclasses:
+            if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                self.AddNetworkVarProperty('nextprimaryattack', 'm_flNextPrimaryAttack', 'float', entcls)
+                self.AddNetworkVarProperty('nextsecondaryattack', 'm_flNextSecondaryAttack', 'float', entcls)
+                self.AddNetworkVarProperty('timeweaponidle', 'm_flTimeWeaponIdle', 'float', entcls)
+                self.AddNetworkVarProperty('state', 'm_iState', 'int', entcls)
+                self.AddNetworkVarProperty('primaryammotype', 'm_iPrimaryAmmoType', 'int', entcls)
+                self.AddNetworkVarProperty('secondaryammotype', 'm_iSecondaryAmmoType', 'int', entcls)
+                self.AddNetworkVarProperty('clip1', 'm_iClip1', 'int', entcls)
+                self.AddNetworkVarProperty('clip2', 'm_iClip2', 'int', entcls)
             
-        cls.var('m_flNextPrimaryAttack').exclude()
-        cls.var('m_flTimeWeaponIdle').exclude()
-        cls.var('m_flNextSecondaryAttack').exclude()
-        cls.var('m_iState').exclude()
-        cls.var('m_iPrimaryAmmoType').exclude()
-        cls.var('m_iSecondaryAmmoType').exclude()
-        cls.var('m_iClip1').exclude()
-        cls.var('m_iClip2').exclude()
             
         # Misc
         mb.enum('WeaponSound_t').include()
         mb.enum('WeaponSound_t').rename('WeaponSound')
-        
-        # Wars Weapon
-        cls = mb.class_(cls_name2)
-        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
-        cls.var('m_fFireRate').rename('firerate')
-        cls.var('m_vBulletSpread').rename('bulletspread')
-        cls.var('m_fOverrideAmmoDamage').rename('overrideammodamage')
-        cls.var('m_fMaxBulletRange').rename('maxbulletrange')
-        cls.var('m_iMinBurst').rename('minburst')
-        cls.var('m_iMaxBurst').rename('maxburst')
-        cls.var('m_fMinRestTime').rename('minresttime')
-        cls.var('m_fMaxRestTime').rename('maxresttime')
-        cls.var('m_bEnableBurst').rename('enableburst')
-        cls.var('m_nBurstShotsRemaining').rename('burstshotsremaining')
-        
-        if self.isclient:
-            cls.vars('m_vTracerColor').rename('tracercolor')
-        
-        cls.mem_funs('GetPrimaryAttackActivity').exclude()
-        cls.mem_funs('SetPrimaryAttackActivity').exclude()
-        cls.mem_funs('GetSecondaryAttackActivity').exclude()
-        cls.mem_funs('SetSecondaryAttackActivity').exclude()
-        cls.add_property( 'primaryattackactivity'
-                         , cls.member_function( 'GetPrimaryAttackActivity' )
-                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
-        cls.add_property( 'secondaryattackactivity'
-                         , cls.member_function( 'GetSecondaryAttackActivity' )
-                         , cls.member_function( 'SetSecondaryAttackActivity' ) )
                          
     def ParseBaseCombatCharacter(self, mb):
         cls = mb.class_('C_BaseCombatCharacter' if self.isclient else 'CBaseCombatCharacter')
@@ -1153,7 +1014,7 @@ class Entities(SemiSharedModuleGenerator):
         # enums
         mb.enum('Disposition_t').include()
         
-        mb.vars('m_HackedGunPos').rename('hackedgunpos')
+        self.IncludeVarAndRename('m_HackedGunPos', 'hackedgunpos')
         
         mb.mem_funs('GetLastKnownArea').exclude()
         mb.mem_funs('IsAreaTraversable').exclude()
@@ -1163,13 +1024,13 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('OnNavAreaRemoved').exclude()
         
         if self.isclient:
-            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon')
+            self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon')
                              
             # LIST OF CLIENT FUNCTIONS TO OVERRIDE
             mb.mem_funs('OnActiveWeaponChanged').virtuality = 'virtual'
         else:
             cls.member_function('SetActiveWeapon').exclude()
-            self.SetupProperty(mb, cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon')
+            self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon')
         
             # Exclude
             #mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseCombatWeapon') != -1 ).exclude()
@@ -1178,7 +1039,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('CauseDeath').exclude()
             #mb.mem_funs('FInViewCone').exclude()
             mb.mem_funs('OnPursuedBy').exclude()
-            mb.vars('m_DefaultRelationship').exclude()
 
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetEntitiesInFaction').exclude()
@@ -1187,8 +1047,8 @@ class Entities(SemiSharedModuleGenerator):
             
             mb.free_function('RadiusDamage').include()
 
-            mb.vars('m_bForceServerRagdoll').rename('forceserverragdoll')
-            mb.vars('m_bPreventWeaponPickup').rename('preventweaponpickup')
+            self.IncludeVarAndRename('m_bForceServerRagdoll', 'forceserverragdoll')
+            self.IncludeVarAndRename('m_bPreventWeaponPickup', 'preventweaponpickup')
             
             # LIST OF SERVER FUNCTIONS TO OVERRIDE
             mb.mem_funs('Weapon_Equip').virtuality = 'virtual'
@@ -1198,15 +1058,10 @@ class Entities(SemiSharedModuleGenerator):
             
     def ParseBasePlayer(self, mb):
         cls = mb.class_('C_BasePlayer') if self.isclient else mb.class_('CBasePlayer')
-        cls.calldefs().virtuality = 'not virtual'   
-        mb.vars('m_nButtons').include()
-        mb.vars('m_nButtons').rename('buttons')
-        mb.vars('m_afButtonLast').include()
-        mb.vars('m_afButtonLast').rename('buttonslast')
-        mb.vars('m_afButtonPressed').include()
-        mb.vars('m_afButtonPressed').rename('buttonspressed')
-        mb.vars('m_afButtonReleased').include()
-        mb.vars('m_afButtonReleased').rename('buttonsreleased')
+        self.IncludeVarAndRename('m_nButtons', 'buttons')
+        self.IncludeVarAndRename('m_afButtonLast', 'buttonslast')
+        self.IncludeVarAndRename('m_afButtonPressed', 'buttonspressed')
+        self.IncludeVarAndRename('m_afButtonReleased', 'buttonsreleased')
         if self.isclient:
             mb.mem_funs('GetRepresentativeRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1308,17 +1163,16 @@ class Entities(SemiSharedModuleGenerator):
                              , cls.mem_fun('GetClientSidePredicted')
                              , cls.mem_fun('SetClientSidePredicted') )
         else:
-            cls.var('m_bClientSidePredicted').rename('clientsidepredicted')
+            self.IncludeVarAndRename('m_bClientSidePredicted', 'clientsidepredicted')
 
         # CTriggerMultiple
         if self.isserver:
             cls = mb.class_('CTriggerMultiple')
             mb.class_('CTriggerMultiple').no_init = False
             mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.vars('m_bDisabled').rename('disabled')
-            mb.vars('m_hFilter').rename('filter')
-            mb.vars('m_hFilter').exclude()
-            mb.vars('m_iFilterName').rename('filtername')
+            self.IncludeVarAndRename('m_bDisabled', 'disabled')
+            self.IncludeVarAndRename('m_hFilter', 'filter')
+            self.IncludeVarAndRename('m_iFilterName', 'filtername')
             
             for clsname in ['CBaseTrigger', 'CTriggerMultiple']:
                 triggers = mb.class_(clsname)
@@ -1345,7 +1199,7 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
 
-	# Wars Entity Parsing
+    # Wars Entity Parsing
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
 
@@ -1429,17 +1283,15 @@ class Entities(SemiSharedModuleGenerator):
         mb.free_function('SetPlayerRelationShip').include()
         mb.free_function('GetPlayerRelationShip').include()
         
-        mb.vars('m_bFOWFilterFriendly').rename('fowfilterfriendly')
-        mb.vars('m_iFOWPosX').exclude()
-        mb.vars('m_iFOWPosY').exclude()
+        self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
         
-        mb.vars('m_fEyePitch').rename('eyepitch')
-        mb.vars('m_fEyeYaw').rename('eyeyaw')
+        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
+        self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
         
-        mb.vars('m_bNeverIgnoreAttacks').rename('neverignoreattacks')
-        mb.vars('m_bBodyTargetOriginBased').rename('bodytargetoriginbased')
+        self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
+        self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         
-        mb.vars('m_fAccuracy').rename('accuracy')
+        self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         
         # List of overridables
         mb.mem_funs('OnUnitTypeChanged').virtuality = 'virtual'
@@ -1480,7 +1332,7 @@ class Entities(SemiSharedModuleGenerator):
         #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         mb.mem_funs('GetEnemy').exclude() 
         if self.isclient:
-            mb.vars('m_iMaxHealth').rename('maxhealth')
+            self.IncludeVarAndRename('m_iMaxHealth', 'maxhealth')
             cls.add_property( 'enemy'
                              , cls.mem_fun('GetEnemy'))
                              
@@ -1488,7 +1340,7 @@ class Entities(SemiSharedModuleGenerator):
                              , cls.mem_fun('IsCrouching')) 
             cls.add_property( 'climbing'
                              , cls.mem_fun('IsClimbing'))    
-            cls.var('m_bUpdateClientAnimations').rename('updateclientanimations')
+            self.IncludeVarAndRename('m_bUpdateClientAnimations', 'updateclientanimations')
         else:
             cls.mem_funs('GetLastTakeDamageTime').exclude()
                  
@@ -1545,6 +1397,34 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseUnitBaseShared(mb, cls_name)
         if self.isclient:
             cls.vars('m_iMaxHealth').rename('maxhealth')
+            
+    def ParseWarsWeapon(self, mb):
+        cls = mb.class_('C_WarsWeapon' if self.isclient else 'CWarsWeapon')
+        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
+        self.IncludeVarAndRename('m_fFireRate', 'firerate')
+        self.IncludeVarAndRename('m_vBulletSpread', 'bulletspread')
+        self.IncludeVarAndRename('m_fOverrideAmmoDamage', 'overrideammodamage')
+        self.IncludeVarAndRename('m_fMaxBulletRange', 'maxbulletrange')
+        self.IncludeVarAndRename('m_iMinBurst', 'minburst')
+        self.IncludeVarAndRename('m_iMaxBurst', 'maxburst')
+        self.IncludeVarAndRename('m_fMinRestTime', 'minresttime')
+        self.IncludeVarAndRename('m_fMaxRestTime', 'maxresttime')
+        self.IncludeVarAndRename('m_bEnableBurst', 'enableburst')
+        self.IncludeVarAndRename('m_nBurstShotsRemaining', 'burstshotsremaining')
+        
+        if self.isclient:
+            cls.vars('m_vTracerColor').rename('tracercolor')
+        
+        cls.mem_funs('GetPrimaryAttackActivity').exclude()
+        cls.mem_funs('SetPrimaryAttackActivity').exclude()
+        cls.mem_funs('GetSecondaryAttackActivity').exclude()
+        cls.mem_funs('SetSecondaryAttackActivity').exclude()
+        cls.add_property( 'primaryattackactivity'
+                         , cls.member_function( 'GetPrimaryAttackActivity' )
+                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
+        cls.add_property( 'secondaryattackactivity'
+                         , cls.member_function( 'GetSecondaryAttackActivity' )
+                         , cls.member_function( 'SetSecondaryAttackActivity' ) )
 
     def ParseRemainingEntities(self, mb):
         # CBaseGrenade
@@ -1579,21 +1459,19 @@ class Entities(SemiSharedModuleGenerator):
             mb.free_functions('SpawnBlood').include()
 
             cls = mb.class_('SmokeTrail')
-            cls.var('m_EndColor').exclude()#rename('endcolor')
-            cls.var('m_EndSize').rename('endsize')
-            cls.var('m_MaxSpeed').rename('maxspeed')
-            cls.var('m_MinSpeed').rename('minspeed')
-            cls.var('m_MaxDirectedSpeed').rename('maxdirectedspeed')
-            cls.var('m_MinDirectedSpeed').rename('mindirectedspeed')
-            cls.var('m_Opacity').rename('opacity')
-            cls.var('m_ParticleLifetime').rename('particlelifetime')
-            cls.var('m_SpawnRadius').rename('spawnradius')
-            cls.var('m_SpawnRate').rename('spawnrate')
-            cls.var('m_StartColor').exclude()#rename('startcolor')
-            cls.var('m_StartSize').rename('startsize')
-            cls.var('m_StopEmitTime').rename('stopemittime')
-            cls.var('m_bEmit').rename('emit')
-            cls.var('m_nAttachment').rename('attachment')
+            self.IncludeVarAndRename('m_EndSize', 'endsize')
+            self.IncludeVarAndRename('m_MaxSpeed', 'maxspeed')
+            self.IncludeVarAndRename('m_MinSpeed', 'minspeed')
+            self.IncludeVarAndRename('m_MaxDirectedSpeed', 'maxdirectedspeed')
+            self.IncludeVarAndRename('m_MinDirectedSpeed', 'mindirectedspeed')
+            self.IncludeVarAndRename('m_Opacity', 'opacity')
+            self.IncludeVarAndRename('m_ParticleLifetime', 'particlelifetime')
+            self.IncludeVarAndRename('m_SpawnRadius', 'spawnradius')
+            self.IncludeVarAndRename('m_SpawnRate', 'spawnrate')
+            self.IncludeVarAndRename('m_StartSize', 'startsize')
+            self.IncludeVarAndRename('m_StopEmitTime', 'stopemittime')
+            self.IncludeVarAndRename('m_bEmit', 'emit')
+            self.IncludeVarAndRename('m_nAttachment', 'attachment')
 
 
             cls.add_registration_code('''
@@ -1627,21 +1505,19 @@ class Entities(SemiSharedModuleGenerator):
             cls.add_wrapper_code('void SetStartColor(Vector &startcolor) { m_StartColor = startcolor; }')
             
             cls = mb.class_('RocketTrail')
-            cls.var('m_EndColor').exclude()#rename('endcolor')
-            cls.var('m_EndSize').rename('endsize')
-            cls.var('m_MaxSpeed').rename('maxspeed')
-            cls.var('m_MinSpeed').rename('minspeed')
-            cls.var('m_Opacity').rename('opacity')
-            cls.var('m_ParticleLifetime').rename('particlelifetime')
-            cls.var('m_SpawnRadius').rename('spawnradius')
-            cls.var('m_SpawnRate').rename('spawnrate')
-            cls.var('m_StartColor').exclude()#rename('startcolor')
-            cls.var('m_StartSize').rename('startsize')
-            cls.var('m_StopEmitTime').rename('stopemittime')
-            cls.var('m_bEmit').rename('emit')
-            cls.var('m_nAttachment').rename('attachment')
-            cls.var('m_bDamaged').rename('damaged')
-            cls.var('m_flFlareScale').rename('flarescale')
+            self.IncludeVarAndRename('m_EndSize', 'endsize')
+            self.IncludeVarAndRename('m_MaxSpeed', 'maxspeed')
+            self.IncludeVarAndRename('m_MinSpeed', 'minspeed')
+            self.IncludeVarAndRename('m_Opacity', 'opacity')
+            self.IncludeVarAndRename('m_ParticleLifetime', 'particlelifetime')
+            self.IncludeVarAndRename('m_SpawnRadius', 'spawnradius')
+            self.IncludeVarAndRename('m_SpawnRate', 'spawnrate')
+            self.IncludeVarAndRename('m_StartSize', 'startsize')
+            self.IncludeVarAndRename('m_StopEmitTime', 'stopemittime')
+            self.IncludeVarAndRename('m_bEmit', 'emit')
+            self.IncludeVarAndRename('m_nAttachment', 'attachment')
+            self.IncludeVarAndRename('m_bDamaged', 'damaged')
+            self.IncludeVarAndRename('m_flFlareScale', 'flarescale')
             
             cls.add_registration_code('''
             { //property "endcolor"[fget=::RocketTrail_wrapper::GetEndColor, fset=::RocketTrail_wrapper::SetEndColor]
@@ -1714,6 +1590,9 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeEmptyClass(mb, 'IHandleEntity')
         self.AddEntityConverter(mb, 'IHandleEntity', True)
         
+        mb.free_functions('CreateEntityByName').include()
+        
+        self.entclasses = []
         if self.isclient:
             self.ParseClientEntities(mb)
         else:
@@ -1732,6 +1611,7 @@ class Entities(SemiSharedModuleGenerator):
         
         self.ParseHL2WarsPlayer(mb)
         self.ParseUnitBase(mb)
+        self.ParseWarsWeapon(mb)
 
     def Parse(self, mb):
         # Exclude everything by default

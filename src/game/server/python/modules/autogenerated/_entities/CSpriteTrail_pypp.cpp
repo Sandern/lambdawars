@@ -986,517 +986,195 @@ struct CSpriteTrail_wrapper : CSpriteTrail, bp::wrapper< CSpriteTrail > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CSpriteTrail\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CSpriteTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CSpriteTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CSpriteTrail::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CSpriteTrail_class(){
 
-    { //::CSpriteTrail
-        typedef bp::class_< CSpriteTrail_wrapper, bp::bases< CSprite >, boost::noncopyable > CSpriteTrail_exposer_t;
-        CSpriteTrail_exposer_t CSpriteTrail_exposer = CSpriteTrail_exposer_t( "CSpriteTrail", bp::init< >() );
-        bp::scope CSpriteTrail_scope( CSpriteTrail_exposer );
-        { //::CSpriteTrail::IsInSkybox
-        
-            typedef bool ( ::CSpriteTrail::*IsInSkybox_function_type )(  ) const;
-            
-            CSpriteTrail_exposer.def( 
-                "IsInSkybox"
-                , IsInSkybox_function_type( &::CSpriteTrail::IsInSkybox ) );
-        
-        }
-        { //::CSpriteTrail::Precache
-        
-            typedef void ( ::CSpriteTrail::*Precache_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CSpriteTrail::Precache)
-                , default_Precache_function_type(&CSpriteTrail_wrapper::default_Precache) );
-        
-        }
-        { //::CSpriteTrail::SetEndWidth
-        
-            typedef void ( ::CSpriteTrail::*SetEndWidth_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetEndWidth"
-                , SetEndWidth_function_type( &::CSpriteTrail::SetEndWidth )
-                , ( bp::arg("flEndWidth") ) );
-        
-        }
-        { //::CSpriteTrail::SetLifeTime
-        
-            typedef void ( ::CSpriteTrail::*SetLifeTime_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetLifeTime"
-                , SetLifeTime_function_type( &::CSpriteTrail::SetLifeTime )
-                , ( bp::arg("time") ) );
-        
-        }
-        { //::CSpriteTrail::SetMinFadeLength
-        
-            typedef void ( ::CSpriteTrail::*SetMinFadeLength_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetMinFadeLength"
-                , SetMinFadeLength_function_type( &::CSpriteTrail::SetMinFadeLength )
-                , ( bp::arg("flMinFadeLength") ) );
-        
-        }
-        { //::CSpriteTrail::SetSkybox
-        
-            typedef void ( ::CSpriteTrail::*SetSkybox_function_type )( ::Vector const &,float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetSkybox"
-                , SetSkybox_function_type( &::CSpriteTrail::SetSkybox )
-                , ( bp::arg("vecSkyboxOrigin"), bp::arg("flSkyboxScale") ) );
-        
-        }
-        { //::CSpriteTrail::SetStartWidth
-        
-            typedef void ( ::CSpriteTrail::*SetStartWidth_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetStartWidth"
-                , SetStartWidth_function_type( &::CSpriteTrail::SetStartWidth )
-                , ( bp::arg("flStartWidth") ) );
-        
-        }
-        { //::CSpriteTrail::SetStartWidthVariance
-        
-            typedef void ( ::CSpriteTrail::*SetStartWidthVariance_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetStartWidthVariance"
-                , SetStartWidthVariance_function_type( &::CSpriteTrail::SetStartWidthVariance )
-                , ( bp::arg("flStartWidthVariance") ) );
-        
-        }
-        { //::CSpriteTrail::SetTextureResolution
-        
-            typedef void ( ::CSpriteTrail::*SetTextureResolution_function_type )( float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "SetTextureResolution"
-                , SetTextureResolution_function_type( &::CSpriteTrail::SetTextureResolution )
-                , ( bp::arg("flTexelsPerInch") ) );
-        
-        }
-        { //::CSpriteTrail::Spawn
-        
-            typedef void ( ::CSpriteTrail::*Spawn_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CSpriteTrail::Spawn)
-                , default_Spawn_function_type(&CSpriteTrail_wrapper::default_Spawn) );
-        
-        }
-        { //::CSpriteTrail::SpriteTrailCreate
-        
-            typedef ::CSpriteTrail * ( *SpriteTrailCreate_function_type )( char const *,::Vector const &,bool );
-            
-            CSpriteTrail_exposer.def( 
-                "SpriteTrailCreate"
-                , SpriteTrailCreate_function_type( &::CSpriteTrail::SpriteTrailCreate )
-                , ( bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::Activate
-        
-            typedef void ( ::CBaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseEntity::Activate)
-                , default_Activate_function_type(&CSpriteTrail_wrapper::default_Activate) );
-        
-        }
-        { //::CSprite::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CSprite::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CSprite::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CSpriteTrail_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CSpriteTrail_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CSpriteTrail_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CSpriteTrail_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CSpriteTrail_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseEntity::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CSpriteTrail_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CSpriteTrail_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CSpriteTrail_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CSpriteTrail_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CSpriteTrail_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CSpriteTrail_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CSpriteTrail_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CSpriteTrail_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CSpriteTrail_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSpriteTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSpriteTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSpriteTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSpriteTrail_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CSpriteTrail_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CSpriteTrail_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CSpriteTrail_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CSprite::OnRestore
-        
-            typedef void ( ::CSprite::*OnRestore_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CSprite::OnRestore)
-                , default_OnRestore_function_type(&CSpriteTrail_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CSpriteTrail_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CSpriteTrail_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CSpriteTrail_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CSpriteTrail_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CSpriteTrail_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CSpriteTrail_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CSpriteTrail_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CSpriteTrail_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CSpriteTrail_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CSpriteTrail_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CSpriteTrail_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CSprite::UpdateTransmitState
-        
-            typedef int ( ::CSprite::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CSpriteTrail_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CSprite::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CSpriteTrail_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CSpriteTrail_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CSpriteTrail_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CSpriteTrail_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CSpriteTrail_exposer.staticmethod( "SpriteTrailCreate" );
-        { //::CSpriteTrail::TestCollision
-            
-                typedef bool ( ::CSpriteTrail::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CSpriteTrail_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CSpriteTrail_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CSpriteTrail::TestCollision)
-                    , default_TestCollision_function_type(&CSpriteTrail_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CSpriteTrail_wrapper, bp::bases< CSprite >, boost::noncopyable >( "CSpriteTrail", bp::init< >() )    
+        .def( 
+            "IsInSkybox"
+            , (bool ( ::CSpriteTrail::* )(  ) const)( &::CSpriteTrail::IsInSkybox ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CSpriteTrail::* )(  ) )(&::CSpriteTrail::Precache)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_Precache) )    
+        .def( 
+            "SetEndWidth"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetEndWidth )
+            , ( bp::arg("flEndWidth") ) )    
+        .def( 
+            "SetLifeTime"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetLifeTime )
+            , ( bp::arg("time") ) )    
+        .def( 
+            "SetMinFadeLength"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetMinFadeLength )
+            , ( bp::arg("flMinFadeLength") ) )    
+        .def( 
+            "SetSkybox"
+            , (void ( ::CSpriteTrail::* )( ::Vector const &,float ) )( &::CSpriteTrail::SetSkybox )
+            , ( bp::arg("vecSkyboxOrigin"), bp::arg("flSkyboxScale") ) )    
+        .def( 
+            "SetStartWidth"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetStartWidth )
+            , ( bp::arg("flStartWidth") ) )    
+        .def( 
+            "SetStartWidthVariance"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetStartWidthVariance )
+            , ( bp::arg("flStartWidthVariance") ) )    
+        .def( 
+            "SetTextureResolution"
+            , (void ( ::CSpriteTrail::* )( float ) )( &::CSpriteTrail::SetTextureResolution )
+            , ( bp::arg("flTexelsPerInch") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CSpriteTrail::* )(  ) )(&::CSpriteTrail::Spawn)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_Spawn) )    
+        .def( 
+            "SpriteTrailCreate"
+            , (::CSpriteTrail * (*)( char const *,::Vector const &,bool ))( &::CSpriteTrail::SpriteTrailCreate )
+            , ( bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Activate)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_Activate) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CSprite::* )( ::Vector *,::Vector * ) )(&::CSprite::ComputeWorldSpaceSurroundingBox)
+            , (void ( CSpriteTrail_wrapper::* )( ::Vector *,::Vector * ) )(&CSpriteTrail_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CSpriteTrail_wrapper::* )( ::CBaseEntity * ) )(&CSpriteTrail_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CSpriteTrail_wrapper::* )( ::trace_t &,int ) )(&CSpriteTrail_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
+            , (int ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CSpriteTrail_wrapper::* )( ::CBaseEntity * ) )(&CSpriteTrail_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CSpriteTrail_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSpriteTrail_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CSpriteTrail_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CSpriteTrail_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSpriteTrail_wrapper::* )( char const *,char const * ) )(&CSpriteTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSpriteTrail_wrapper::* )( char const *,float ) )(&CSpriteTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSpriteTrail_wrapper::* )( char const *,int ) )(&CSpriteTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSpriteTrail_wrapper::* )( char const *,::Vector const & ) )(&CSpriteTrail_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CSpriteTrail_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CSpriteTrail_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
+            , (void ( CSpriteTrail_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CSpriteTrail_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CSpriteTrail_wrapper::* )( int ) )(&CSpriteTrail_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CSprite::* )(  ) )(&::CSprite::OnRestore)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_OnRestore) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CSpriteTrail_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSpriteTrail_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CSpriteTrail_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSpriteTrail_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CSpriteTrail_wrapper::* )( char const * ) )(&CSpriteTrail_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CSpriteTrail_wrapper::* )( ::CBaseEntity * ) )(&CSpriteTrail_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CSpriteTrail_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CSpriteTrail_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CSprite::* )(  ) )(&::CSprite::UpdateTransmitState)
+            , (int ( CSpriteTrail_wrapper::* )(  ) )(&CSpriteTrail_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CSpriteTrail_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CSpriteTrail_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "SpriteTrailCreate" );
 
 }
 

@@ -1005,820 +1005,308 @@ struct CSprite_wrapper : CSprite, bp::wrapper< CSprite > {
         return CSprite::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CSprite\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CSprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CSprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CSprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CSprite_class(){
 
-    { //::CSprite
-        typedef bp::class_< CSprite_wrapper, bp::bases< CBaseEntity >, boost::noncopyable > CSprite_exposer_t;
-        CSprite_exposer_t CSprite_exposer = CSprite_exposer_t( "CSprite", bp::init< >() );
-        bp::scope CSprite_scope( CSprite_exposer );
-        { //::CSprite::Animate
-        
-            typedef void ( ::CSprite::*Animate_function_type )( float ) ;
-            
-            CSprite_exposer.def( 
-                "Animate"
-                , Animate_function_type( &::CSprite::Animate )
-                , ( bp::arg("frames") ) );
-        
-        }
-        { //::CSprite::AnimateAndDie
-        
-            typedef void ( ::CSprite::*AnimateAndDie_function_type )( float ) ;
-            
-            CSprite_exposer.def( 
-                "AnimateAndDie"
-                , AnimateAndDie_function_type( &::CSprite::AnimateAndDie )
-                , ( bp::arg("framerate") ) );
-        
-        }
-        { //::CSprite::AnimateForTime
-        
-            typedef void ( ::CSprite::*AnimateForTime_function_type )( float,float ) ;
-            
-            CSprite_exposer.def( 
-                "AnimateForTime"
-                , AnimateForTime_function_type( &::CSprite::AnimateForTime )
-                , ( bp::arg("framerate"), bp::arg("time") ) );
-        
-        }
-        { //::CSprite::AnimateThink
-        
-            typedef void ( ::CSprite::*AnimateThink_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "AnimateThink"
-                , AnimateThink_function_type( &::CSprite::AnimateThink ) );
-        
-        }
-        { //::CSprite::AnimateUntilDead
-        
-            typedef void ( ::CSprite::*AnimateUntilDead_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "AnimateUntilDead"
-                , AnimateUntilDead_function_type( &::CSprite::AnimateUntilDead ) );
-        
-        }
-        { //::CSprite::BeginFadeOutThink
-        
-            typedef void ( ::CSprite::*BeginFadeOutThink_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "BeginFadeOutThink"
-                , BeginFadeOutThink_function_type( &::CSprite::BeginFadeOutThink ) );
-        
-        }
-        { //::CSprite::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CSprite::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CSprite_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CSprite_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CSprite::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CSprite_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
-        
-        }
-        { //::CSprite::EnableWorldSpaceScale
-        
-            typedef void ( ::CSprite::*EnableWorldSpaceScale_function_type )( bool ) ;
-            
-            CSprite_exposer.def( 
-                "EnableWorldSpaceScale"
-                , EnableWorldSpaceScale_function_type( &::CSprite::EnableWorldSpaceScale )
-                , ( bp::arg("bEnable") ) );
-        
-        }
-        { //::CSprite::Expand
-        
-            typedef void ( ::CSprite::*Expand_function_type )( float,float ) ;
-            
-            CSprite_exposer.def( 
-                "Expand"
-                , Expand_function_type( &::CSprite::Expand )
-                , ( bp::arg("scaleSpeed"), bp::arg("fadeSpeed") ) );
-        
-        }
-        { //::CSprite::ExpandThink
-        
-            typedef void ( ::CSprite::*ExpandThink_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "ExpandThink"
-                , ExpandThink_function_type( &::CSprite::ExpandThink ) );
-        
-        }
-        { //::CSprite::FadeAndDie
-        
-            typedef void ( ::CSprite::*FadeAndDie_function_type )( float ) ;
-            
-            CSprite_exposer.def( 
-                "FadeAndDie"
-                , FadeAndDie_function_type( &::CSprite::FadeAndDie )
-                , ( bp::arg("duration") ) );
-        
-        }
-        { //::CSprite::FadeOutFromSpawn
-        
-            typedef void ( ::CSprite::*FadeOutFromSpawn_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "FadeOutFromSpawn"
-                , FadeOutFromSpawn_function_type( &::CSprite::FadeOutFromSpawn ) );
-        
-        }
-        { //::CSprite::Frames
-        
-            typedef float ( ::CSprite::*Frames_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "Frames"
-                , Frames_function_type( &::CSprite::Frames ) );
-        
-        }
-        { //::CSprite::GetBrightness
-        
-            typedef int ( ::CSprite::*GetBrightness_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "GetBrightness"
-                , GetBrightness_function_type( &::CSprite::GetBrightness ) );
-        
-        }
-        { //::CSprite::GetHDRColorScale
-        
-            typedef float ( ::CSprite::*GetHDRColorScale_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "GetHDRColorScale"
-                , GetHDRColorScale_function_type( &::CSprite::GetHDRColorScale ) );
-        
-        }
-        { //::CSprite::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CSprite_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CSprite::GetPyNetworkType ) );
-        
-        }
-        { //::CSprite::GetScale
-        
-            typedef float ( ::CSprite::*GetScale_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "GetScale"
-                , GetScale_function_type( &::CSprite::GetScale ) );
-        
-        }
-        { //::CSprite::InputColorBlueValue
-        
-            typedef void ( ::CSprite::*InputColorBlueValue_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputColorBlueValue"
-                , InputColorBlueValue_function_type( &::CSprite::InputColorBlueValue )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::InputColorGreenValue
-        
-            typedef void ( ::CSprite::*InputColorGreenValue_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputColorGreenValue"
-                , InputColorGreenValue_function_type( &::CSprite::InputColorGreenValue )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::InputColorRedValue
-        
-            typedef void ( ::CSprite::*InputColorRedValue_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputColorRedValue"
-                , InputColorRedValue_function_type( &::CSprite::InputColorRedValue )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::InputHideSprite
-        
-            typedef void ( ::CSprite::*InputHideSprite_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputHideSprite"
-                , InputHideSprite_function_type( &::CSprite::InputHideSprite )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::InputShowSprite
-        
-            typedef void ( ::CSprite::*InputShowSprite_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputShowSprite"
-                , InputShowSprite_function_type( &::CSprite::InputShowSprite )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::InputToggleSprite
-        
-            typedef void ( ::CSprite::*InputToggleSprite_function_type )( ::inputdata_t & ) ;
-            
-            CSprite_exposer.def( 
-                "InputToggleSprite"
-                , InputToggleSprite_function_type( &::CSprite::InputToggleSprite )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CSprite::IsOn
-        
-            typedef bool ( ::CSprite::*IsOn_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "IsOn"
-                , IsOn_function_type( &::CSprite::IsOn ) );
-        
-        }
-        { //::CSprite::IsTemporary
-        
-            typedef bool ( ::CSprite::*IsTemporary_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "IsTemporary"
-                , IsTemporary_function_type( &::CSprite::IsTemporary ) );
-        
-        }
-        { //::CSprite::ObjectCaps
-        
-            typedef int ( ::CSprite::*ObjectCaps_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "ObjectCaps"
-                , ObjectCaps_function_type( &::CSprite::ObjectCaps ) );
-        
-        }
-        { //::CSprite::OnRestore
-        
-            typedef void ( ::CSprite::*OnRestore_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CSprite::OnRestore)
-                , default_OnRestore_function_type(&CSprite_wrapper::default_OnRestore) );
-        
-        }
-        { //::CSprite::Precache
-        
-            typedef void ( ::CSprite::*Precache_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CSprite::Precache)
-                , default_Precache_function_type(&CSprite_wrapper::default_Precache) );
-        
-        }
-        { //::CSprite::SetAsTemporary
-        
-            typedef void ( ::CSprite::*SetAsTemporary_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "SetAsTemporary"
-                , SetAsTemporary_function_type( &::CSprite::SetAsTemporary ) );
-        
-        }
-        { //::CSprite::SetAttachment
-        
-            typedef void ( ::CSprite::*SetAttachment_function_type )( ::CBaseEntity *,int ) ;
-            
-            CSprite_exposer.def( 
-                "SetAttachment"
-                , SetAttachment_function_type( &::CSprite::SetAttachment )
-                , ( bp::arg("pEntity"), bp::arg("attachment") ) );
-        
-        }
-        { //::CSprite::SetBrightness
-        
-            typedef void ( ::CSprite::*SetBrightness_function_type )( int,float ) ;
-            
-            CSprite_exposer.def( 
-                "SetBrightness"
-                , SetBrightness_function_type( &::CSprite::SetBrightness )
-                , ( bp::arg("brightness"), bp::arg("duration")=0.0f ) );
-        
-        }
-        { //::CSprite::SetColor
-        
-            typedef void ( ::CSprite::*SetColor_function_type )( int,int,int ) ;
-            
-            CSprite_exposer.def( 
-                "SetColor"
-                , SetColor_function_type( &::CSprite::SetColor )
-                , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) );
-        
-        }
-        { //::CSprite::SetGlowProxySize
-        
-            typedef void ( ::CSprite::*SetGlowProxySize_function_type )( float ) ;
-            
-            CSprite_exposer.def( 
-                "SetGlowProxySize"
-                , SetGlowProxySize_function_type( &::CSprite::SetGlowProxySize )
-                , ( bp::arg("flSize") ) );
-        
-        }
-        { //::CSprite::SetScale
-        
-            typedef void ( ::CSprite::*SetScale_function_type )( float,float ) ;
-            
-            CSprite_exposer.def( 
-                "SetScale"
-                , SetScale_function_type( &::CSprite::SetScale )
-                , ( bp::arg("scale"), bp::arg("duration")=0.0f ) );
-        
-        }
-        { //::CSprite::SetSpriteScale
-        
-            typedef void ( ::CSprite::*SetSpriteScale_function_type )( float ) ;
-            
-            CSprite_exposer.def( 
-                "SetSpriteScale"
-                , SetSpriteScale_function_type( &::CSprite::SetSpriteScale )
-                , ( bp::arg("scale") ) );
-        
-        }
-        { //::CSprite::SetTexture
-        
-            typedef void ( ::CSprite::*SetTexture_function_type )( int ) ;
-            
-            CSprite_exposer.def( 
-                "SetTexture"
-                , SetTexture_function_type( &::CSprite::SetTexture )
-                , ( bp::arg("spriteIndex") ) );
-        
-        }
-        { //::CSprite::SetTransparency
-        
-            typedef void ( ::CSprite::*SetTransparency_function_type )( int,int,int,int,int,int ) ;
-            
-            CSprite_exposer.def( 
-                "SetTransparency"
-                , SetTransparency_function_type( &::CSprite::SetTransparency )
-                , ( bp::arg("rendermode"), bp::arg("r"), bp::arg("g"), bp::arg("b"), bp::arg("a"), bp::arg("fx") ) );
-        
-        }
-        { //::CSprite::Spawn
-        
-            typedef void ( ::CSprite::*Spawn_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CSprite::Spawn)
-                , default_Spawn_function_type(&CSprite_wrapper::default_Spawn) );
-        
-        }
-        { //::CSprite::SpriteCreate
-        
-            typedef ::CSprite * ( *SpriteCreate_function_type )( char const *,::Vector const &,bool );
-            
-            CSprite_exposer.def( 
-                "SpriteCreate"
-                , SpriteCreate_function_type( &::CSprite::SpriteCreate )
-                , ( bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CSprite::SpriteCreatePredictable
-        
-            typedef ::CSprite * ( *SpriteCreatePredictable_function_type )( char const *,int,char const *,::Vector const &,bool );
-            
-            CSprite_exposer.def( 
-                "SpriteCreatePredictable"
-                , SpriteCreatePredictable_function_type( &::CSprite::SpriteCreatePredictable )
-                , ( bp::arg("module"), bp::arg("line"), bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CSprite::SpriteInit
-        
-            typedef void ( ::CSprite::*SpriteInit_function_type )( char const *,::Vector const & ) ;
-            
-            CSprite_exposer.def( 
-                "SpriteInit"
-                , SpriteInit_function_type( &::CSprite::SpriteInit )
-                , ( bp::arg("pSpriteName"), bp::arg("origin") ) );
-        
-        }
-        { //::CSprite::TurnOff
-        
-            typedef void ( ::CSprite::*TurnOff_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "TurnOff"
-                , TurnOff_function_type( &::CSprite::TurnOff ) );
-        
-        }
-        { //::CSprite::TurnOn
-        
-            typedef void ( ::CSprite::*TurnOn_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "TurnOn"
-                , TurnOn_function_type( &::CSprite::TurnOn ) );
-        
-        }
-        { //::CSprite::UpdateTransmitState
-        
-            typedef int ( ::CSprite::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CSprite_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CSprite::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CSprite_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CSprite::Use
-        
-            typedef void ( ::CSprite::*Use_function_type )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) ;
-            
-            CSprite_exposer.def( 
-                "Use"
-                , Use_function_type( &::CSprite::Use )
-                , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) );
-        
-        }
-        CSprite_exposer.def_readwrite( "m_flDieTime", &CSprite::m_flDieTime );
-        CSprite_exposer.def_readwrite( "m_flFrame", &CSprite::m_flFrame );
-        CSprite_exposer.def_readwrite( "m_flSpriteFramerate", &CSprite::m_flSpriteFramerate );
-        CSprite_exposer.def_readwrite( "m_hAttachedToEntity", &CSprite::m_hAttachedToEntity );
-        CSprite_exposer.def_readwrite( "m_nAttachment", &CSprite::m_nAttachment );
-        { //::CBaseEntity::Activate
-        
-            typedef void ( ::CBaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseEntity::Activate)
-                , default_Activate_function_type(&CSprite_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CSprite_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CSprite_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSprite_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CSprite_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CSprite_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CSprite_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CSprite_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CSprite_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CSprite_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseEntity::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CSprite_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CSprite_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSprite_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CSprite_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CSprite_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CSprite_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSprite_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CSprite_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CSprite_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CSprite_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CSprite_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CSprite_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CSprite_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CSprite_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CSprite_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CSprite_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CSprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CSprite_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CSprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CSprite_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CSprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CSprite_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CSprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CSprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CSprite_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CSprite_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CSprite_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CSprite_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CSprite_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CSprite_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CSprite_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CSprite_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CSprite_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CSprite_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSprite_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CSprite_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CSprite_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CSprite_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CSprite_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CSprite_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CSprite_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CSprite_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CSprite_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CSprite_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CSprite_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CSprite_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CSprite_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CSprite_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CSprite_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CSprite_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CSprite_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CSprite_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CSprite_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CSprite_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CSprite_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CSprite_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CSprite_exposer.staticmethod( "GetPyNetworkType" );
-        CSprite_exposer.staticmethod( "SpriteCreate" );
-        CSprite_exposer.staticmethod( "SpriteCreatePredictable" );
-        { //::CSprite::TestCollision
-            
-                typedef bool ( ::CSprite::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CSprite_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CSprite_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CSprite::TestCollision)
-                    , default_TestCollision_function_type(&CSprite_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CSprite_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CSprite", bp::init< >() )    
+        .def( 
+            "Animate"
+            , (void ( ::CSprite::* )( float ) )( &::CSprite::Animate )
+            , ( bp::arg("frames") ) )    
+        .def( 
+            "AnimateAndDie"
+            , (void ( ::CSprite::* )( float ) )( &::CSprite::AnimateAndDie )
+            , ( bp::arg("framerate") ) )    
+        .def( 
+            "AnimateForTime"
+            , (void ( ::CSprite::* )( float,float ) )( &::CSprite::AnimateForTime )
+            , ( bp::arg("framerate"), bp::arg("time") ) )    
+        .def( 
+            "AnimateThink"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::AnimateThink ) )    
+        .def( 
+            "AnimateUntilDead"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::AnimateUntilDead ) )    
+        .def( 
+            "BeginFadeOutThink"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::BeginFadeOutThink ) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CSprite::* )( ::Vector *,::Vector * ) )(&::CSprite::ComputeWorldSpaceSurroundingBox)
+            , (void ( CSprite_wrapper::* )( ::Vector *,::Vector * ) )(&CSprite_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
+        .def( 
+            "EnableWorldSpaceScale"
+            , (void ( ::CSprite::* )( bool ) )( &::CSprite::EnableWorldSpaceScale )
+            , ( bp::arg("bEnable") ) )    
+        .def( 
+            "Expand"
+            , (void ( ::CSprite::* )( float,float ) )( &::CSprite::Expand )
+            , ( bp::arg("scaleSpeed"), bp::arg("fadeSpeed") ) )    
+        .def( 
+            "ExpandThink"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::ExpandThink ) )    
+        .def( 
+            "FadeAndDie"
+            , (void ( ::CSprite::* )( float ) )( &::CSprite::FadeAndDie )
+            , ( bp::arg("duration") ) )    
+        .def( 
+            "FadeOutFromSpawn"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::FadeOutFromSpawn ) )    
+        .def( 
+            "Frames"
+            , (float ( ::CSprite::* )(  ) )( &::CSprite::Frames ) )    
+        .def( 
+            "GetBrightness"
+            , (int ( ::CSprite::* )(  ) )( &::CSprite::GetBrightness ) )    
+        .def( 
+            "GetHDRColorScale"
+            , (float ( ::CSprite::* )(  ) )( &::CSprite::GetHDRColorScale ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CSprite::GetPyNetworkType ) )    
+        .def( 
+            "GetScale"
+            , (float ( ::CSprite::* )(  ) )( &::CSprite::GetScale ) )    
+        .def( 
+            "InputColorBlueValue"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputColorBlueValue )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputColorGreenValue"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputColorGreenValue )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputColorRedValue"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputColorRedValue )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputHideSprite"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputHideSprite )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputShowSprite"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputShowSprite )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputToggleSprite"
+            , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputToggleSprite )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "IsOn"
+            , (bool ( ::CSprite::* )(  ) )( &::CSprite::IsOn ) )    
+        .def( 
+            "IsTemporary"
+            , (bool ( ::CSprite::* )(  ) )( &::CSprite::IsTemporary ) )    
+        .def( 
+            "ObjectCaps"
+            , (int ( ::CSprite::* )(  ) )( &::CSprite::ObjectCaps ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CSprite::* )(  ) )(&::CSprite::OnRestore)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_OnRestore) )    
+        .def( 
+            "Precache"
+            , (void ( ::CSprite::* )(  ) )(&::CSprite::Precache)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_Precache) )    
+        .def( 
+            "SetAsTemporary"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::SetAsTemporary ) )    
+        .def( 
+            "SetAttachment"
+            , (void ( ::CSprite::* )( ::CBaseEntity *,int ) )( &::CSprite::SetAttachment )
+            , ( bp::arg("pEntity"), bp::arg("attachment") ) )    
+        .def( 
+            "SetBrightness"
+            , (void ( ::CSprite::* )( int,float ) )( &::CSprite::SetBrightness )
+            , ( bp::arg("brightness"), bp::arg("duration")=0.0f ) )    
+        .def( 
+            "SetColor"
+            , (void ( ::CSprite::* )( int,int,int ) )( &::CSprite::SetColor )
+            , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) )    
+        .def( 
+            "SetGlowProxySize"
+            , (void ( ::CSprite::* )( float ) )( &::CSprite::SetGlowProxySize )
+            , ( bp::arg("flSize") ) )    
+        .def( 
+            "SetScale"
+            , (void ( ::CSprite::* )( float,float ) )( &::CSprite::SetScale )
+            , ( bp::arg("scale"), bp::arg("duration")=0.0f ) )    
+        .def( 
+            "SetSpriteScale"
+            , (void ( ::CSprite::* )( float ) )( &::CSprite::SetSpriteScale )
+            , ( bp::arg("scale") ) )    
+        .def( 
+            "SetTexture"
+            , (void ( ::CSprite::* )( int ) )( &::CSprite::SetTexture )
+            , ( bp::arg("spriteIndex") ) )    
+        .def( 
+            "SetTransparency"
+            , (void ( ::CSprite::* )( int,int,int,int,int,int ) )( &::CSprite::SetTransparency )
+            , ( bp::arg("rendermode"), bp::arg("r"), bp::arg("g"), bp::arg("b"), bp::arg("a"), bp::arg("fx") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CSprite::* )(  ) )(&::CSprite::Spawn)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_Spawn) )    
+        .def( 
+            "SpriteCreate"
+            , (::CSprite * (*)( char const *,::Vector const &,bool ))( &::CSprite::SpriteCreate )
+            , ( bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "SpriteCreatePredictable"
+            , (::CSprite * (*)( char const *,int,char const *,::Vector const &,bool ))( &::CSprite::SpriteCreatePredictable )
+            , ( bp::arg("module"), bp::arg("line"), bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "SpriteInit"
+            , (void ( ::CSprite::* )( char const *,::Vector const & ) )( &::CSprite::SpriteInit )
+            , ( bp::arg("pSpriteName"), bp::arg("origin") ) )    
+        .def( 
+            "TurnOff"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::TurnOff ) )    
+        .def( 
+            "TurnOn"
+            , (void ( ::CSprite::* )(  ) )( &::CSprite::TurnOn ) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CSprite::* )(  ) )(&::CSprite::UpdateTransmitState)
+            , (int ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "Use"
+            , (void ( ::CSprite::* )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) )( &::CSprite::Use )
+            , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) )    
+        .def_readwrite( "attachment", &CSprite::m_nAttachment )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Activate)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_Activate) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CSprite_wrapper::* )( ::CBaseEntity * ) )(&CSprite_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CSprite_wrapper::* )( ::trace_t &,int ) )(&CSprite_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
+            , (int ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CSprite_wrapper::* )( ::CBaseEntity * ) )(&CSprite_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CSprite_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSprite_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CSprite_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CSprite_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSprite_wrapper::* )( char const *,char const * ) )(&CSprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSprite_wrapper::* )( char const *,float ) )(&CSprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSprite_wrapper::* )( char const *,int ) )(&CSprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CSprite_wrapper::* )( char const *,::Vector const & ) )(&CSprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CSprite_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CSprite_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
+            , (void ( CSprite_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CSprite_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CSprite_wrapper::* )( int ) )(&CSprite_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CSprite_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSprite_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CSprite_wrapper::* )( ::CTakeDamageInfo const & ) )(&CSprite_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CSprite_wrapper::* )( char const * ) )(&CSprite_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CSprite_wrapper::* )( ::CBaseEntity * ) )(&CSprite_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CSprite_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CSprite_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CSprite_wrapper::* )(  ) )(&CSprite_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CSprite_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CSprite_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "SpriteCreate" )    
+        .staticmethod( "SpriteCreatePredictable" );
 
 }
 

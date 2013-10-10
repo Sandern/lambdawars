@@ -846,35 +846,6 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         return C_BaseGrenade::GetClientClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_BaseGrenade\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_BaseGrenade::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_BaseGrenade::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_BaseGrenade::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_C_BaseGrenade_class(){
@@ -1093,11 +1064,6 @@ void register_C_BaseGrenade_class(){
                 , TumbleThink_function_type( &::C_BaseGrenade::TumbleThink ) );
         
         }
-        C_BaseGrenade_exposer.def_readwrite( "m_DmgRadius", &C_BaseGrenade::m_DmgRadius );
-        C_BaseGrenade_exposer.def_readwrite( "m_bHasWarnedAI", &C_BaseGrenade::m_bHasWarnedAI );
-        C_BaseGrenade_exposer.def_readwrite( "m_bIsLive", &C_BaseGrenade::m_bIsLive );
-        C_BaseGrenade_exposer.def_readwrite( "m_flDetonateTime", &C_BaseGrenade::m_flDetonateTime );
-        C_BaseGrenade_exposer.def_readwrite( "m_flWarnAITime", &C_BaseGrenade::m_flWarnAITime );
         { //::C_BaseEntity::Activate
         
             typedef void ( ::C_BaseEntity::*Activate_function_type )(  ) ;
@@ -1430,18 +1396,6 @@ void register_C_BaseGrenade_class(){
                 , fset( &::C_BaseGrenade::SetDamageRadius ) );
         
         }
-        { //::C_BaseGrenade::TestCollision
-            
-                typedef bool ( ::C_BaseGrenade::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_BaseGrenade_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_BaseGrenade_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_BaseGrenade::TestCollision)
-                    , default_TestCollision_function_type(&C_BaseGrenade_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
     }
 
 }

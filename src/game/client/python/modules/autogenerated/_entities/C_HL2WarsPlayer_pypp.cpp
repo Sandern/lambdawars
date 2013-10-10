@@ -610,7 +610,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling GetTracerType(  ) of Class: C_BaseEntity\n");
+            Msg("Calling GetTracerType(  ) of Class: C_BasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_GetTracerType = this->get_override( "GetTracerType" );
         if( func_GetTracerType.ptr() != Py_None )
@@ -618,14 +618,14 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
                 return func_GetTracerType(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseEntity::GetTracerType(  );
+                return this->C_BasePlayer::GetTracerType(  );
             }
         else
-            return this->C_BaseEntity::GetTracerType(  );
+            return this->C_BasePlayer::GetTracerType(  );
     }
     
     char const * default_GetTracerType(  ) {
-        return C_BaseEntity::GetTracerType( );
+        return C_BasePlayer::GetTracerType( );
     }
 
     virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
@@ -760,7 +760,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType ) of Class: C_BaseEntity\n");
+            Msg("Calling MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType ) of Class: C_BasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_MakeTracer = this->get_override( "MakeTracer" );
         if( func_MakeTracer.ptr() != Py_None )
@@ -768,14 +768,14 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
                 func_MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+                this->C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
             }
         else
-            this->C_BaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+            this->C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
     }
     
     void default_MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
-        C_BaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+        C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
     }
 
     virtual void OnRestore(  ) {
@@ -790,7 +790,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling OnRestore(  ) of Class: C_BaseEntity\n");
+            Msg("Calling OnRestore(  ) of Class: C_BasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_OnRestore = this->get_override( "OnRestore" );
         if( func_OnRestore.ptr() != Py_None )
@@ -798,14 +798,14 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
                 func_OnRestore(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::OnRestore(  );
+                this->C_BasePlayer::OnRestore(  );
             }
         else
-            this->C_BaseEntity::OnRestore(  );
+            this->C_BasePlayer::OnRestore(  );
     }
     
     void default_OnRestore(  ) {
-        C_BaseEntity::OnRestore( );
+        C_BasePlayer::OnRestore( );
     }
 
     virtual void Precache(  ) {
@@ -944,7 +944,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldDraw(  ) of Class: C_BaseEntity\n");
+            Msg("Calling ShouldDraw(  ) of Class: C_BasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_ShouldDraw = this->get_override( "ShouldDraw" );
         if( func_ShouldDraw.ptr() != Py_None )
@@ -952,14 +952,14 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
                 return func_ShouldDraw(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseEntity::ShouldDraw(  );
+                return this->C_BasePlayer::ShouldDraw(  );
             }
         else
-            return this->C_BaseEntity::ShouldDraw(  );
+            return this->C_BasePlayer::ShouldDraw(  );
     }
     
     bool default_ShouldDraw(  ) {
-        return C_BaseEntity::ShouldDraw( );
+        return C_BasePlayer::ShouldDraw( );
     }
 
     virtual bool Simulate(  ) {
@@ -974,7 +974,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Simulate(  ) of Class: C_BaseAnimating\n");
+            Msg("Calling Simulate(  ) of Class: C_BasePlayer\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_Simulate = this->get_override( "Simulate" );
         if( func_Simulate.ptr() != Py_None )
@@ -982,14 +982,14 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
                 return func_Simulate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseAnimating::Simulate(  );
+                return this->C_BasePlayer::Simulate(  );
             }
         else
-            return this->C_BaseAnimating::Simulate(  );
+            return this->C_BasePlayer::Simulate(  );
     }
     
     bool default_Simulate(  ) {
-        return C_BaseAnimating::Simulate( );
+        return C_BasePlayer::Simulate( );
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
@@ -1034,35 +1034,6 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
             return pClientClass;
         return C_HL2WarsPlayer::GetClientClass();
     }
-
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_HL2WarsPlayer\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_HL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_HL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_HL2WarsPlayer::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
 
 };
 
@@ -2185,14 +2156,14 @@ void register_C_HL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::C_BaseEntity::GetTracerType
+        { //::C_BasePlayer::GetTracerType
         
-            typedef char const * ( ::C_BaseEntity::*GetTracerType_function_type )(  ) ;
+            typedef char const * ( ::C_BasePlayer::*GetTracerType_function_type )(  ) ;
             typedef char const * ( C_HL2WarsPlayer_wrapper::*default_GetTracerType_function_type )(  ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "GetTracerType"
-                , GetTracerType_function_type(&::C_BaseEntity::GetTracerType)
+                , GetTracerType_function_type(&::C_BasePlayer::GetTracerType)
                 , default_GetTracerType_function_type(&C_HL2WarsPlayer_wrapper::default_GetTracerType) );
         
         }
@@ -2244,26 +2215,26 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
         
         }
-        { //::C_BaseEntity::MakeTracer
+        { //::C_BasePlayer::MakeTracer
         
-            typedef void ( ::C_BaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
+            typedef void ( ::C_BasePlayer::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             typedef void ( C_HL2WarsPlayer_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "MakeTracer"
-                , MakeTracer_function_type(&::C_BaseEntity::MakeTracer)
+                , MakeTracer_function_type(&::C_BasePlayer::MakeTracer)
                 , default_MakeTracer_function_type(&C_HL2WarsPlayer_wrapper::default_MakeTracer)
                 , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
         
         }
-        { //::C_BaseEntity::OnRestore
+        { //::C_BasePlayer::OnRestore
         
-            typedef void ( ::C_BaseEntity::*OnRestore_function_type )(  ) ;
+            typedef void ( ::C_BasePlayer::*OnRestore_function_type )(  ) ;
             typedef void ( C_HL2WarsPlayer_wrapper::*default_OnRestore_function_type )(  ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type(&::C_BaseEntity::OnRestore)
+                , OnRestore_function_type(&::C_BasePlayer::OnRestore)
                 , default_OnRestore_function_type(&C_HL2WarsPlayer_wrapper::default_OnRestore) );
         
         }
@@ -2323,25 +2294,25 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("listId") ) );
         
         }
-        { //::C_BaseEntity::ShouldDraw
+        { //::C_BasePlayer::ShouldDraw
         
-            typedef bool ( ::C_BaseEntity::*ShouldDraw_function_type )(  ) ;
+            typedef bool ( ::C_BasePlayer::*ShouldDraw_function_type )(  ) ;
             typedef bool ( C_HL2WarsPlayer_wrapper::*default_ShouldDraw_function_type )(  ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "ShouldDraw"
-                , ShouldDraw_function_type(&::C_BaseEntity::ShouldDraw)
+                , ShouldDraw_function_type(&::C_BasePlayer::ShouldDraw)
                 , default_ShouldDraw_function_type(&C_HL2WarsPlayer_wrapper::default_ShouldDraw) );
         
         }
-        { //::C_BaseAnimating::Simulate
+        { //::C_BasePlayer::Simulate
         
-            typedef bool ( ::C_BaseAnimating::*Simulate_function_type )(  ) ;
+            typedef bool ( ::C_BasePlayer::*Simulate_function_type )(  ) ;
             typedef bool ( C_HL2WarsPlayer_wrapper::*default_Simulate_function_type )(  ) ;
             
             C_HL2WarsPlayer_exposer.def( 
                 "Simulate"
-                , Simulate_function_type(&::C_BaseAnimating::Simulate)
+                , Simulate_function_type(&::C_BasePlayer::Simulate)
                 , default_Simulate_function_type(&C_HL2WarsPlayer_wrapper::default_Simulate) );
         
         }
@@ -2370,18 +2341,6 @@ void register_C_HL2WarsPlayer_class(){
                     , bp::return_value_policy< bp::return_by_value >() )  );
         
         }
-        { //::C_HL2WarsPlayer::TestCollision
-            
-                typedef bool ( ::C_HL2WarsPlayer::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_HL2WarsPlayer_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_HL2WarsPlayer_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_HL2WarsPlayer::TestCollision)
-                    , default_TestCollision_function_type(&C_HL2WarsPlayer_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
     }
 
 }

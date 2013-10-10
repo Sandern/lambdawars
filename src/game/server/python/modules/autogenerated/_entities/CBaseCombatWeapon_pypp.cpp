@@ -1142,2069 +1142,775 @@ struct CBaseCombatWeapon_wrapper : CBaseCombatWeapon, bp::wrapper< CBaseCombatWe
         return CBaseCombatWeapon::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBaseCombatWeapon\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBaseCombatWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
+    float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack.Get(); }
 
-    float m_flNextPrimaryAttack_Get() {
-       return m_flNextPrimaryAttack.Get();
-    }
+    void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack.Set( val ); }
 
-    void m_flNextPrimaryAttack_Set(float val) {
-       m_flNextPrimaryAttack.Set(val);
-    }
+    float m_flNextSecondaryAttack_Get() { return m_flNextSecondaryAttack.Get(); }
 
-    float m_flNextSecondaryAttack_Get() {
-       return m_flNextSecondaryAttack.Get();
-    }
+    void m_flNextSecondaryAttack_Set( float val ) { m_flNextSecondaryAttack.Set( val ); }
 
-    void m_flNextSecondaryAttack_Set(float val) {
-       m_flNextSecondaryAttack.Set(val);
-    }
+    float m_flTimeWeaponIdle_Get() { return m_flTimeWeaponIdle.Get(); }
 
-    float m_flTimeWeaponIdle_Get() {
-       return m_flTimeWeaponIdle.Get();
-    }
+    void m_flTimeWeaponIdle_Set( float val ) { m_flTimeWeaponIdle.Set( val ); }
 
-    void m_flTimeWeaponIdle_Set(float val) {
-       m_flTimeWeaponIdle.Set(val);
-    }
+    int m_iState_Get() { return m_iState.Get(); }
 
-    int m_iState_Get() {
-       return m_iState.Get();
-    }
+    void m_iState_Set( int val ) { m_iState.Set( val ); }
 
-    void m_iState_Set(int val) {
-       m_iState.Set(val);
-    }
+    int m_iPrimaryAmmoType_Get() { return m_iPrimaryAmmoType.Get(); }
 
-    int m_iPrimaryAmmoType_Get() {
-       return m_iPrimaryAmmoType.Get();
-    }
+    void m_iPrimaryAmmoType_Set( int val ) { m_iPrimaryAmmoType.Set( val ); }
 
-    void m_iPrimaryAmmoType_Set(int val) {
-       m_iPrimaryAmmoType.Set(val);
-    }
+    int m_iSecondaryAmmoType_Get() { return m_iSecondaryAmmoType.Get(); }
 
-    int m_iSecondaryAmmoType_Get() {
-       return m_iSecondaryAmmoType.Get();
-    }
+    void m_iSecondaryAmmoType_Set( int val ) { m_iSecondaryAmmoType.Set( val ); }
 
-    void m_iSecondaryAmmoType_Set(int val) {
-       m_iSecondaryAmmoType.Set(val);
-    }
+    int m_iClip1_Get() { return m_iClip1.Get(); }
 
-    int m_iClip1_Get() {
-       return m_iClip1.Get();
-    }
+    void m_iClip1_Set( int val ) { m_iClip1.Set( val ); }
 
-    void m_iClip1_Set(int val) {
-       m_iClip1.Set(val);
-    }
+    int m_iClip2_Get() { return m_iClip2.Get(); }
 
-    int m_iClip2_Get() {
-       return m_iClip2.Get();
-    }
-
-    void m_iClip2_Set(int val) {
-       m_iClip2.Set(val);
-    }
+    void m_iClip2_Set( int val ) { m_iClip2.Set( val ); }
 
 };
 
 void register_CBaseCombatWeapon_class(){
 
-    { //::CBaseCombatWeapon
-        typedef bp::class_< CBaseCombatWeapon_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable > CBaseCombatWeapon_exposer_t;
-        CBaseCombatWeapon_exposer_t CBaseCombatWeapon_exposer = CBaseCombatWeapon_exposer_t( "CBaseCombatWeapon", bp::no_init );
-        bp::scope CBaseCombatWeapon_scope( CBaseCombatWeapon_exposer );
-        CBaseCombatWeapon_exposer.def( bp::init< >() );
-        { //::CBaseCombatWeapon::AbortReload
-        
-            typedef void ( ::CBaseCombatWeapon::*AbortReload_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AbortReload"
-                , AbortReload_function_type( &::CBaseCombatWeapon::AbortReload ) );
-        
-        }
-        { //::CBaseCombatWeapon::Activate
-        
-            typedef void ( ::CBaseCombatWeapon::*Activate_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseCombatWeapon::Activate)
-                , default_Activate_function_type(&CBaseCombatWeapon_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseCombatWeapon::ActivityListCount
-        
-            typedef int ( ::CBaseCombatWeapon::*ActivityListCount_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ActivityListCount"
-                , ActivityListCount_function_type( &::CBaseCombatWeapon::ActivityListCount ) );
-        
-        }
-        { //::CBaseCombatWeapon::ActivityOverride
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*ActivityOverride_function_type )( ::Activity,bool * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ActivityOverride"
-                , ActivityOverride_function_type( &::CBaseCombatWeapon::ActivityOverride )
-                , ( bp::arg("baseAct"), bp::arg("pRequired") ) );
-        
-        }
-        { //::CBaseCombatWeapon::AddViewKick
-        
-            typedef void ( ::CBaseCombatWeapon::*AddViewKick_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AddViewKick"
-                , AddViewKick_function_type( &::CBaseCombatWeapon::AddViewKick ) );
-        
-        }
-        { //::CBaseCombatWeapon::AddViewmodelBob
-        
-            typedef void ( ::CBaseCombatWeapon::*AddViewmodelBob_function_type )( ::CBaseViewModel *,::Vector &,::QAngle & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AddViewmodelBob"
-                , AddViewmodelBob_function_type( &::CBaseCombatWeapon::AddViewmodelBob )
-                , ( bp::arg("viewmodel"), bp::arg("origin"), bp::arg("angles") ) );
-        
-        }
-        { //::CBaseCombatWeapon::AllowsAutoSwitchFrom
-        
-            typedef bool ( ::CBaseCombatWeapon::*AllowsAutoSwitchFrom_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AllowsAutoSwitchFrom"
-                , AllowsAutoSwitchFrom_function_type( &::CBaseCombatWeapon::AllowsAutoSwitchFrom ) );
-        
-        }
-        { //::CBaseCombatWeapon::AllowsAutoSwitchTo
-        
-            typedef bool ( ::CBaseCombatWeapon::*AllowsAutoSwitchTo_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AllowsAutoSwitchTo"
-                , AllowsAutoSwitchTo_function_type( &::CBaseCombatWeapon::AllowsAutoSwitchTo ) );
-        
-        }
-        { //::CBaseCombatWeapon::AttemptToMaterialize
-        
-            typedef void ( ::CBaseCombatWeapon::*AttemptToMaterialize_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "AttemptToMaterialize"
-                , AttemptToMaterialize_function_type( &::CBaseCombatWeapon::AttemptToMaterialize ) );
-        
-        }
-        { //::CBaseCombatWeapon::BaseForceFire
-        
-            typedef void ( ::CBaseCombatWeapon::*BaseForceFire_function_type )( ::CBaseCombatCharacter *,::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "BaseForceFire"
-                , BaseForceFire_function_type( &::CBaseCombatWeapon::BaseForceFire )
-                , ( bp::arg("pOperator"), bp::arg("pTarget")=bp::object() ) );
-        
-        }
-        { //::CBaseCombatWeapon::CalcViewmodelBob
-        
-            typedef float ( ::CBaseCombatWeapon::*CalcViewmodelBob_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CalcViewmodelBob"
-                , CalcViewmodelBob_function_type( &::CBaseCombatWeapon::CalcViewmodelBob ) );
-        
-        }
-        { //::CBaseCombatWeapon::CanBePickedUpByNPCs
-        
-            typedef bool ( ::CBaseCombatWeapon::*CanBePickedUpByNPCs_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanBePickedUpByNPCs"
-                , CanBePickedUpByNPCs_function_type( &::CBaseCombatWeapon::CanBePickedUpByNPCs ) );
-        
-        }
-        { //::CBaseCombatWeapon::CanBeSelected
-        
-            typedef bool ( ::CBaseCombatWeapon::*CanBeSelected_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanBeSelected"
-                , CanBeSelected_function_type( &::CBaseCombatWeapon::CanBeSelected ) );
-        
-        }
-        { //::CBaseCombatWeapon::CanDeploy
-        
-            typedef bool ( ::CBaseCombatWeapon::*CanDeploy_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanDeploy"
-                , CanDeploy_function_type( &::CBaseCombatWeapon::CanDeploy ) );
-        
-        }
-        { //::CBaseCombatWeapon::CanHolster
-        
-            typedef bool ( ::CBaseCombatWeapon::*CanHolster_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanHolster"
-                , CanHolster_function_type( &::CBaseCombatWeapon::CanHolster ) );
-        
-        }
-        { //::CBaseCombatWeapon::CanLower
-        
-            typedef bool ( ::CBaseCombatWeapon::*CanLower_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanLower"
-                , CanLower_function_type( &::CBaseCombatWeapon::CanLower ) );
-        
-        }
-        { //::CBaseCombatWeapon::CapabilitiesGet
-        
-            typedef int ( ::CBaseCombatWeapon::*CapabilitiesGet_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CapabilitiesGet"
-                , CapabilitiesGet_function_type( &::CBaseCombatWeapon::CapabilitiesGet ) );
-        
-        }
-        { //::CBaseCombatWeapon::CheckReload
-        
-            typedef void ( ::CBaseCombatWeapon::*CheckReload_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CheckReload"
-                , CheckReload_function_type( &::CBaseCombatWeapon::CheckReload ) );
-        
-        }
-        { //::CBaseCombatWeapon::CheckRespawn
-        
-            typedef void ( ::CBaseCombatWeapon::*CheckRespawn_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CheckRespawn"
-                , CheckRespawn_function_type( &::CBaseCombatWeapon::CheckRespawn ) );
-        
-        }
-        { //::CBaseCombatWeapon::Clip1
-        
-            typedef int ( ::CBaseCombatWeapon::*Clip1_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Clip1"
-                , Clip1_function_type( &::CBaseCombatWeapon::Clip1 ) );
-        
-        }
-        { //::CBaseCombatWeapon::Clip2
-        
-            typedef int ( ::CBaseCombatWeapon::*Clip2_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Clip2"
-                , Clip2_function_type( &::CBaseCombatWeapon::Clip2 ) );
-        
-        }
-        { //::CBaseCombatWeapon::DefaultDeploy
-        
-            typedef bool ( ::CBaseCombatWeapon::*DefaultDeploy_function_type )( char *,char *,int,char * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DefaultDeploy"
-                , DefaultDeploy_function_type( &::CBaseCombatWeapon::DefaultDeploy )
-                , ( bp::arg("szViewModel"), bp::arg("szWeaponModel"), bp::arg("iActivity"), bp::arg("szAnimExt") ) );
-        
-        }
-        { //::CBaseCombatWeapon::DefaultReload
-        
-            typedef bool ( ::CBaseCombatWeapon::*DefaultReload_function_type )( int,int,int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DefaultReload"
-                , DefaultReload_function_type( &::CBaseCombatWeapon::DefaultReload )
-                , ( bp::arg("iClipSize1"), bp::arg("iClipSize2"), bp::arg("iActivity") ) );
-        
-        }
-        { //::CBaseCombatWeapon::DefaultTouch
-        
-            typedef void ( ::CBaseCombatWeapon::*DefaultTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DefaultTouch"
-                , DefaultTouch_function_type( &::CBaseCombatWeapon::DefaultTouch )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Delete
-        
-            typedef void ( ::CBaseCombatWeapon::*Delete_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Delete"
-                , Delete_function_type( &::CBaseCombatWeapon::Delete ) );
-        
-        }
-        { //::CBaseCombatWeapon::Deploy
-        
-            typedef bool ( ::CBaseCombatWeapon::*Deploy_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Deploy"
-                , Deploy_function_type( &::CBaseCombatWeapon::Deploy ) );
-        
-        }
-        { //::CBaseCombatWeapon::DestroyItem
-        
-            typedef void ( ::CBaseCombatWeapon::*DestroyItem_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DestroyItem"
-                , DestroyItem_function_type( &::CBaseCombatWeapon::DestroyItem ) );
-        
-        }
-        { //::CBaseCombatWeapon::DisplayAltFireHudHint
-        
-            typedef void ( ::CBaseCombatWeapon::*DisplayAltFireHudHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DisplayAltFireHudHint"
-                , DisplayAltFireHudHint_function_type( &::CBaseCombatWeapon::DisplayAltFireHudHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::DisplayReloadHudHint
-        
-            typedef void ( ::CBaseCombatWeapon::*DisplayReloadHudHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DisplayReloadHudHint"
-                , DisplayReloadHudHint_function_type( &::CBaseCombatWeapon::DisplayReloadHudHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::Drop
-        
-            typedef void ( ::CBaseCombatWeapon::*Drop_function_type )( ::Vector const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Drop"
-                , Drop_function_type( &::CBaseCombatWeapon::Drop )
-                , ( bp::arg("vecVelocity") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Equip
-        
-            typedef void ( ::CBaseCombatWeapon::*Equip_function_type )( ::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Equip"
-                , Equip_function_type( &::CBaseCombatWeapon::Equip )
-                , ( bp::arg("pOwner") ) );
-        
-        }
-        { //::CBaseCombatWeapon::FallInit
-        
-            typedef void ( ::CBaseCombatWeapon::*FallInit_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "FallInit"
-                , FallInit_function_type( &::CBaseCombatWeapon::FallInit ) );
-        
-        }
-        { //::CBaseCombatWeapon::FallThink
-        
-            typedef void ( ::CBaseCombatWeapon::*FallThink_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "FallThink"
-                , FallThink_function_type( &::CBaseCombatWeapon::FallThink ) );
-        
-        }
-        { //::CBaseCombatWeapon::FinishReload
-        
-            typedef void ( ::CBaseCombatWeapon::*FinishReload_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "FinishReload"
-                , FinishReload_function_type( &::CBaseCombatWeapon::FinishReload ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetActivity
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*GetActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetActivity"
-                , GetActivity_function_type( &::CBaseCombatWeapon::GetActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetAnimPrefix
-        
-            typedef char const * ( ::CBaseCombatWeapon::*GetAnimPrefix_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetAnimPrefix"
-                , GetAnimPrefix_function_type( &::CBaseCombatWeapon::GetAnimPrefix ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetAvailableWeaponsInBox
-        
-            typedef int ( *GetAvailableWeaponsInBox_function_type )( ::CBaseCombatWeapon * *,int,::Vector const &,::Vector const & );
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetAvailableWeaponsInBox"
-                , GetAvailableWeaponsInBox_function_type( &::CBaseCombatWeapon::GetAvailableWeaponsInBox )
-                , ( bp::arg("pList"), bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs") ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetBulletSpread
-        
-            typedef ::Vector const & ( ::CBaseCombatWeapon::*GetBulletSpread_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetBulletSpread"
-                , GetBulletSpread_function_type( &::CBaseCombatWeapon::GetBulletSpread )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::CBaseCombatWeapon::GetBulletSpread
-        
-            typedef ::Vector ( ::CBaseCombatWeapon::*GetBulletSpread_function_type )( ::WeaponProficiency_t ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetBulletSpread"
-                , GetBulletSpread_function_type( &::CBaseCombatWeapon::GetBulletSpread )
-                , ( bp::arg("proficiency") ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetBulletType
-        
-            typedef int ( ::CBaseCombatWeapon::*GetBulletType_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetBulletType"
-                , GetBulletType_function_type( &::CBaseCombatWeapon::GetBulletType ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetDamage
-        
-            typedef float ( ::CBaseCombatWeapon::*GetDamage_function_type )( float,int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetDamage"
-                , GetDamage_function_type( &::CBaseCombatWeapon::GetDamage )
-                , ( bp::arg("flDistance"), bp::arg("iLocation") ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetDefaultAnimSpeed
-        
-            typedef float ( ::CBaseCombatWeapon::*GetDefaultAnimSpeed_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetDefaultAnimSpeed"
-                , GetDefaultAnimSpeed_function_type( &::CBaseCombatWeapon::GetDefaultAnimSpeed ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetDefaultClip1
-        
-            typedef int ( ::CBaseCombatWeapon::*GetDefaultClip1_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetDefaultClip1"
-                , GetDefaultClip1_function_type( &::CBaseCombatWeapon::GetDefaultClip1 ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetDefaultClip2
-        
-            typedef int ( ::CBaseCombatWeapon::*GetDefaultClip2_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetDefaultClip2"
-                , GetDefaultClip2_function_type( &::CBaseCombatWeapon::GetDefaultClip2 ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetDrawActivity
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*GetDrawActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetDrawActivity"
-                , GetDrawActivity_function_type( &::CBaseCombatWeapon::GetDrawActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetFireRate
-        
-            typedef float ( ::CBaseCombatWeapon::*GetFireRate_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetFireRate"
-                , GetFireRate_function_type( &::CBaseCombatWeapon::GetFireRate ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetIdealActivity
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*GetIdealActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetIdealActivity"
-                , GetIdealActivity_function_type( &::CBaseCombatWeapon::GetIdealActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetIdealSequence
-        
-            typedef int ( ::CBaseCombatWeapon::*GetIdealSequence_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetIdealSequence"
-                , GetIdealSequence_function_type( &::CBaseCombatWeapon::GetIdealSequence ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetLastWeapon
-        
-            typedef ::CBaseCombatWeapon * ( ::CBaseCombatWeapon::*GetLastWeapon_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetLastWeapon"
-                , GetLastWeapon_function_type( &::CBaseCombatWeapon::GetLastWeapon )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseCombatWeapon::GetMaxAutoAimDeflection
-        
-            typedef float ( ::CBaseCombatWeapon::*GetMaxAutoAimDeflection_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMaxAutoAimDeflection"
-                , GetMaxAutoAimDeflection_function_type( &::CBaseCombatWeapon::GetMaxAutoAimDeflection ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMaxBurst
-        
-            typedef int ( ::CBaseCombatWeapon::*GetMaxBurst_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMaxBurst"
-                , GetMaxBurst_function_type( &::CBaseCombatWeapon::GetMaxBurst ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMaxClip1
-        
-            typedef int ( ::CBaseCombatWeapon::*GetMaxClip1_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMaxClip1"
-                , GetMaxClip1_function_type( &::CBaseCombatWeapon::GetMaxClip1 ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMaxClip2
-        
-            typedef int ( ::CBaseCombatWeapon::*GetMaxClip2_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMaxClip2"
-                , GetMaxClip2_function_type( &::CBaseCombatWeapon::GetMaxClip2 ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMaxRestTime
-        
-            typedef float ( ::CBaseCombatWeapon::*GetMaxRestTime_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMaxRestTime"
-                , GetMaxRestTime_function_type( &::CBaseCombatWeapon::GetMaxRestTime ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMinBurst
-        
-            typedef int ( ::CBaseCombatWeapon::*GetMinBurst_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMinBurst"
-                , GetMinBurst_function_type( &::CBaseCombatWeapon::GetMinBurst ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetMinRestTime
-        
-            typedef float ( ::CBaseCombatWeapon::*GetMinRestTime_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetMinRestTime"
-                , GetMinRestTime_function_type( &::CBaseCombatWeapon::GetMinRestTime ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetName
-        
-            typedef char const * ( ::CBaseCombatWeapon::*GetName_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetName"
-                , GetName_function_type( &::CBaseCombatWeapon::GetName ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetOwner
-        
-            typedef ::CBaseCombatCharacter * ( ::CBaseCombatWeapon::*GetOwner_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetOwner"
-                , GetOwner_function_type( &::CBaseCombatWeapon::GetOwner )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseCombatWeapon::GetPosition
-        
-            typedef int ( ::CBaseCombatWeapon::*GetPosition_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPosition"
-                , GetPosition_function_type( &::CBaseCombatWeapon::GetPosition ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetPrimaryAmmoCount
-        
-            typedef int ( ::CBaseCombatWeapon::*GetPrimaryAmmoCount_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPrimaryAmmoCount"
-                , GetPrimaryAmmoCount_function_type( &::CBaseCombatWeapon::GetPrimaryAmmoCount ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetPrimaryAmmoType
-        
-            typedef int ( ::CBaseCombatWeapon::*GetPrimaryAmmoType_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPrimaryAmmoType"
-                , GetPrimaryAmmoType_function_type( &::CBaseCombatWeapon::GetPrimaryAmmoType ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetPrimaryAttackActivity
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*GetPrimaryAttackActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPrimaryAttackActivity"
-                , GetPrimaryAttackActivity_function_type( &::CBaseCombatWeapon::GetPrimaryAttackActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetPrintName
-        
-            typedef char const * ( ::CBaseCombatWeapon::*GetPrintName_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPrintName"
-                , GetPrintName_function_type( &::CBaseCombatWeapon::GetPrintName ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseCombatWeapon::GetPyNetworkType ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetRandomBurst
-        
-            typedef int ( ::CBaseCombatWeapon::*GetRandomBurst_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetRandomBurst"
-                , GetRandomBurst_function_type( &::CBaseCombatWeapon::GetRandomBurst ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetRumbleEffect
-        
-            typedef int ( ::CBaseCombatWeapon::*GetRumbleEffect_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetRumbleEffect"
-                , GetRumbleEffect_function_type( &::CBaseCombatWeapon::GetRumbleEffect ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSecondaryAmmoCount
-        
-            typedef int ( ::CBaseCombatWeapon::*GetSecondaryAmmoCount_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSecondaryAmmoCount"
-                , GetSecondaryAmmoCount_function_type( &::CBaseCombatWeapon::GetSecondaryAmmoCount ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSecondaryAmmoType
-        
-            typedef int ( ::CBaseCombatWeapon::*GetSecondaryAmmoType_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSecondaryAmmoType"
-                , GetSecondaryAmmoType_function_type( &::CBaseCombatWeapon::GetSecondaryAmmoType ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSecondaryAttackActivity
-        
-            typedef ::Activity ( ::CBaseCombatWeapon::*GetSecondaryAttackActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSecondaryAttackActivity"
-                , GetSecondaryAttackActivity_function_type( &::CBaseCombatWeapon::GetSecondaryAttackActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetShootSound
-        
-            typedef char const * ( ::CBaseCombatWeapon::*GetShootSound_function_type )( int ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetShootSound"
-                , GetShootSound_function_type( &::CBaseCombatWeapon::GetShootSound )
-                , ( bp::arg("iIndex") ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSlot
-        
-            typedef int ( ::CBaseCombatWeapon::*GetSlot_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSlot"
-                , GetSlot_function_type( &::CBaseCombatWeapon::GetSlot ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSpreadBias
-        
-            typedef float ( ::CBaseCombatWeapon::*GetSpreadBias_function_type )( ::WeaponProficiency_t ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSpreadBias"
-                , GetSpreadBias_function_type( &::CBaseCombatWeapon::GetSpreadBias )
-                , ( bp::arg("proficiency") ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetSubType
-        
-            typedef int ( ::CBaseCombatWeapon::*GetSubType_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetSubType"
-                , GetSubType_function_type( &::CBaseCombatWeapon::GetSubType ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetViewModelSequenceDuration
-        
-            typedef float ( ::CBaseCombatWeapon::*GetViewModelSequenceDuration_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetViewModelSequenceDuration"
-                , GetViewModelSequenceDuration_function_type( &::CBaseCombatWeapon::GetViewModelSequenceDuration ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWeaponFlags
-        
-            typedef int ( ::CBaseCombatWeapon::*GetWeaponFlags_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWeaponFlags"
-                , GetWeaponFlags_function_type( &::CBaseCombatWeapon::GetWeaponFlags ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWeaponID
-        
-            typedef int ( ::CBaseCombatWeapon::*GetWeaponID_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWeaponID"
-                , GetWeaponID_function_type( &::CBaseCombatWeapon::GetWeaponID ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWeaponIdleTime
-        
-            typedef float ( ::CBaseCombatWeapon::*GetWeaponIdleTime_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWeaponIdleTime"
-                , GetWeaponIdleTime_function_type( &::CBaseCombatWeapon::GetWeaponIdleTime ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWeight
-        
-            typedef int ( ::CBaseCombatWeapon::*GetWeight_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWeight"
-                , GetWeight_function_type( &::CBaseCombatWeapon::GetWeight ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWorldModel
-        
-            typedef char const * ( ::CBaseCombatWeapon::*GetWorldModel_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWorldModel"
-                , GetWorldModel_function_type( &::CBaseCombatWeapon::GetWorldModel ) );
-        
-        }
-        { //::CBaseCombatWeapon::GetWpnData
-        
-            typedef ::FileWeaponInfo_t const & ( ::CBaseCombatWeapon::*GetWpnData_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetWpnData"
-                , GetWpnData_function_type( &::CBaseCombatWeapon::GetWpnData )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::CBaseCombatWeapon::GiveDefaultAmmo
-        
-            typedef void ( ::CBaseCombatWeapon::*GiveDefaultAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GiveDefaultAmmo"
-                , GiveDefaultAmmo_function_type( &::CBaseCombatWeapon::GiveDefaultAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::HandleAnimEvent
-        
-            typedef void ( ::CBaseCombatWeapon::*HandleAnimEvent_function_type )( ::animevent_t * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HandleAnimEvent"
-                , HandleAnimEvent_function_type( &::CBaseCombatWeapon::HandleAnimEvent )
-                , ( bp::arg("pEvent") ) );
-        
-        }
-        { //::CBaseCombatWeapon::HandleFireOnEmpty
-        
-            typedef void ( ::CBaseCombatWeapon::*HandleFireOnEmpty_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HandleFireOnEmpty"
-                , HandleFireOnEmpty_function_type( &::CBaseCombatWeapon::HandleFireOnEmpty ) );
-        
-        }
-        { //::CBaseCombatWeapon::HasAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*HasAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HasAmmo"
-                , HasAmmo_function_type( &::CBaseCombatWeapon::HasAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::HasAnyAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*HasAnyAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HasAnyAmmo"
-                , HasAnyAmmo_function_type( &::CBaseCombatWeapon::HasAnyAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::HasPrimaryAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*HasPrimaryAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HasPrimaryAmmo"
-                , HasPrimaryAmmo_function_type( &::CBaseCombatWeapon::HasPrimaryAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::HasSecondaryAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*HasSecondaryAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HasSecondaryAmmo"
-                , HasSecondaryAmmo_function_type( &::CBaseCombatWeapon::HasSecondaryAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::HasWeaponIdleTimeElapsed
-        
-            typedef bool ( ::CBaseCombatWeapon::*HasWeaponIdleTimeElapsed_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HasWeaponIdleTimeElapsed"
-                , HasWeaponIdleTimeElapsed_function_type( &::CBaseCombatWeapon::HasWeaponIdleTimeElapsed ) );
-        
-        }
-        { //::CBaseCombatWeapon::HideThink
-        
-            typedef void ( ::CBaseCombatWeapon::*HideThink_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "HideThink"
-                , HideThink_function_type( &::CBaseCombatWeapon::HideThink ) );
-        
-        }
-        { //::CBaseCombatWeapon::Holster
-        
-            typedef bool ( ::CBaseCombatWeapon::*Holster_function_type )( ::CBaseCombatWeapon * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Holster"
-                , Holster_function_type( &::CBaseCombatWeapon::Holster )
-                , ( bp::arg("pSwitchingTo")=bp::object() ) );
-        
-        }
-        { //::CBaseCombatWeapon::InputHideWeapon
-        
-            typedef void ( ::CBaseCombatWeapon::*InputHideWeapon_function_type )( ::inputdata_t & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "InputHideWeapon"
-                , InputHideWeapon_function_type( &::CBaseCombatWeapon::InputHideWeapon )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsAllowedToSwitch
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsAllowedToSwitch_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsAllowedToSwitch"
-                , IsAllowedToSwitch_function_type( &::CBaseCombatWeapon::IsAllowedToSwitch ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsBaseCombatWeapon
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsBaseCombatWeapon_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsBaseCombatWeapon"
-                , IsBaseCombatWeapon_function_type( &::CBaseCombatWeapon::IsBaseCombatWeapon ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsConstrained
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsConstrained_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsConstrained"
-                , IsConstrained_function_type( &::CBaseCombatWeapon::IsConstrained ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsLocked
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsLocked_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsLocked"
-                , IsLocked_function_type( &::CBaseCombatWeapon::IsLocked )
-                , ( bp::arg("pAsker") ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsMeleeWeapon
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsMeleeWeapon_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsMeleeWeapon"
-                , IsMeleeWeapon_function_type( &::CBaseCombatWeapon::IsMeleeWeapon ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsPredicted
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsPredicted_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsPredicted"
-                , IsPredicted_function_type( &::CBaseCombatWeapon::IsPredicted ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsRemoveable
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsRemoveable_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsRemoveable"
-                , IsRemoveable_function_type( &::CBaseCombatWeapon::IsRemoveable ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsViewModelSequenceFinished
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsViewModelSequenceFinished_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsViewModelSequenceFinished"
-                , IsViewModelSequenceFinished_function_type( &::CBaseCombatWeapon::IsViewModelSequenceFinished ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsWeaponVisible
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsWeaponVisible_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsWeaponVisible"
-                , IsWeaponVisible_function_type( &::CBaseCombatWeapon::IsWeaponVisible ) );
-        
-        }
-        { //::CBaseCombatWeapon::IsWeaponZoomed
-        
-            typedef bool ( ::CBaseCombatWeapon::*IsWeaponZoomed_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "IsWeaponZoomed"
-                , IsWeaponZoomed_function_type( &::CBaseCombatWeapon::IsWeaponZoomed ) );
-        
-        }
-        { //::CBaseCombatWeapon::ItemBusyFrame
-        
-            typedef void ( ::CBaseCombatWeapon::*ItemBusyFrame_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ItemBusyFrame"
-                , ItemBusyFrame_function_type( &::CBaseCombatWeapon::ItemBusyFrame ) );
-        
-        }
-        { //::CBaseCombatWeapon::ItemHolsterFrame
-        
-            typedef void ( ::CBaseCombatWeapon::*ItemHolsterFrame_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ItemHolsterFrame"
-                , ItemHolsterFrame_function_type( &::CBaseCombatWeapon::ItemHolsterFrame ) );
-        
-        }
-        { //::CBaseCombatWeapon::ItemPostFrame
-        
-            typedef void ( ::CBaseCombatWeapon::*ItemPostFrame_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ItemPostFrame"
-                , ItemPostFrame_function_type( &::CBaseCombatWeapon::ItemPostFrame ) );
-        
-        }
-        { //::CBaseCombatWeapon::ItemPreFrame
-        
-            typedef void ( ::CBaseCombatWeapon::*ItemPreFrame_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ItemPreFrame"
-                , ItemPreFrame_function_type( &::CBaseCombatWeapon::ItemPreFrame ) );
-        
-        }
-        { //::CBaseCombatWeapon::Kill
-        
-            typedef void ( ::CBaseCombatWeapon::*Kill_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Kill"
-                , Kill_function_type( &::CBaseCombatWeapon::Kill ) );
-        
-        }
-        { //::CBaseCombatWeapon::Lock
-        
-            typedef void ( ::CBaseCombatWeapon::*Lock_function_type )( float,::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Lock"
-                , Lock_function_type( &::CBaseCombatWeapon::Lock )
-                , ( bp::arg("lockTime"), bp::arg("pLocker") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Lower
-        
-            typedef bool ( ::CBaseCombatWeapon::*Lower_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Lower"
-                , Lower_function_type( &::CBaseCombatWeapon::Lower ) );
-        
-        }
-        { //::CBaseCombatWeapon::MaintainIdealActivity
-        
-            typedef void ( ::CBaseCombatWeapon::*MaintainIdealActivity_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "MaintainIdealActivity"
-                , MaintainIdealActivity_function_type( &::CBaseCombatWeapon::MaintainIdealActivity ) );
-        
-        }
-        { //::CBaseCombatWeapon::MakeTracer
-        
-            typedef void ( ::CBaseCombatWeapon::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseCombatWeapon::MakeTracer)
-                , default_MakeTracer_function_type(&CBaseCombatWeapon_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseCombatWeapon::MakeWeaponNameFromEntity
-        
-            typedef void ( ::CBaseCombatWeapon::*MakeWeaponNameFromEntity_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "MakeWeaponNameFromEntity"
-                , MakeWeaponNameFromEntity_function_type( &::CBaseCombatWeapon::MakeWeaponNameFromEntity )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Materialize
-        
-            typedef void ( ::CBaseCombatWeapon::*Materialize_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Materialize"
-                , Materialize_function_type( &::CBaseCombatWeapon::Materialize ) );
-        
-        }
-        { //::CBaseCombatWeapon::ObjectCaps
-        
-            typedef int ( ::CBaseCombatWeapon::*ObjectCaps_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ObjectCaps"
-                , ObjectCaps_function_type( &::CBaseCombatWeapon::ObjectCaps ) );
-        
-        }
-        { //::CBaseCombatWeapon::OnMouseWheel
-        
-            typedef void ( ::CBaseCombatWeapon::*OnMouseWheel_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnMouseWheel"
-                , OnMouseWheel_function_type( &::CBaseCombatWeapon::OnMouseWheel )
-                , ( bp::arg("nDirection") ) );
-        
-        }
-        { //::CBaseCombatWeapon::OnPickedUp
-        
-            typedef void ( ::CBaseCombatWeapon::*OnPickedUp_function_type )( ::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnPickedUp"
-                , OnPickedUp_function_type( &::CBaseCombatWeapon::OnPickedUp )
-                , ( bp::arg("pNewOwner") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Operator_ForceNPCFire
-        
-            typedef void ( ::CBaseCombatWeapon::*Operator_ForceNPCFire_function_type )( ::CBaseCombatCharacter *,bool,::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Operator_ForceNPCFire"
-                , Operator_ForceNPCFire_function_type( &::CBaseCombatWeapon::Operator_ForceNPCFire )
-                , ( bp::arg("pOperator"), bp::arg("bSecondary"), bp::arg("pTarget")=bp::object() ) );
-        
-        }
-        { //::CBaseCombatWeapon::Operator_FrameUpdate
-        
-            typedef void ( ::CBaseCombatWeapon::*Operator_FrameUpdate_function_type )( ::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Operator_FrameUpdate"
-                , Operator_FrameUpdate_function_type( &::CBaseCombatWeapon::Operator_FrameUpdate )
-                , ( bp::arg("pOperator") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Operator_HandleAnimEvent
-        
-            typedef void ( ::CBaseCombatWeapon::*Operator_HandleAnimEvent_function_type )( ::animevent_t *,::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Operator_HandleAnimEvent"
-                , Operator_HandleAnimEvent_function_type( &::CBaseCombatWeapon::Operator_HandleAnimEvent )
-                , ( bp::arg("pEvent"), bp::arg("pOperator") ) );
-        
-        }
-        { //::CBaseCombatWeapon::Precache
-        
-            typedef void ( ::CBaseCombatWeapon::*Precache_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBaseCombatWeapon::Precache)
-                , default_Precache_function_type(&CBaseCombatWeapon_wrapper::default_Precache) );
-        
-        }
-        { //::CBaseCombatWeapon::PrimaryAttack
-        
-            typedef void ( ::CBaseCombatWeapon::*PrimaryAttack_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_PrimaryAttack_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "PrimaryAttack"
-                , PrimaryAttack_function_type(&::CBaseCombatWeapon::PrimaryAttack)
-                , default_PrimaryAttack_function_type(&CBaseCombatWeapon_wrapper::default_PrimaryAttack) );
-        
-        }
-        { //::CBaseCombatWeapon::Ready
-        
-            typedef bool ( ::CBaseCombatWeapon::*Ready_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Ready"
-                , Ready_function_type( &::CBaseCombatWeapon::Ready ) );
-        
-        }
-        { //::CBaseCombatWeapon::Reload
-        
-            typedef bool ( ::CBaseCombatWeapon::*Reload_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Reload"
-                , Reload_function_type( &::CBaseCombatWeapon::Reload ) );
-        
-        }
-        { //::CBaseCombatWeapon::ReloadOrSwitchWeapons
-        
-            typedef bool ( ::CBaseCombatWeapon::*ReloadOrSwitchWeapons_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ReloadOrSwitchWeapons"
-                , ReloadOrSwitchWeapons_function_type( &::CBaseCombatWeapon::ReloadOrSwitchWeapons ) );
-        
-        }
-        { //::CBaseCombatWeapon::RescindAltFireHudHint
-        
-            typedef void ( ::CBaseCombatWeapon::*RescindAltFireHudHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "RescindAltFireHudHint"
-                , RescindAltFireHudHint_function_type( &::CBaseCombatWeapon::RescindAltFireHudHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::RescindReloadHudHint
-        
-            typedef void ( ::CBaseCombatWeapon::*RescindReloadHudHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "RescindReloadHudHint"
-                , RescindReloadHudHint_function_type( &::CBaseCombatWeapon::RescindReloadHudHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::Respawn
-        
-            typedef ::CBaseEntity * ( ::CBaseCombatWeapon::*Respawn_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Respawn"
-                , Respawn_function_type( &::CBaseCombatWeapon::Respawn )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseCombatWeapon::SecondaryAttack
-        
-            typedef void ( ::CBaseCombatWeapon::*SecondaryAttack_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_SecondaryAttack_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SecondaryAttack"
-                , SecondaryAttack_function_type(&::CBaseCombatWeapon::SecondaryAttack)
-                , default_SecondaryAttack_function_type(&CBaseCombatWeapon_wrapper::default_SecondaryAttack) );
-        
-        }
-        { //::CBaseCombatWeapon::SendViewModelAnim
-        
-            typedef void ( ::CBaseCombatWeapon::*SendViewModelAnim_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SendViewModelAnim"
-                , SendViewModelAnim_function_type( &::CBaseCombatWeapon::SendViewModelAnim )
-                , ( bp::arg("nSequence") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SendWeaponAnim
-        
-            typedef bool ( ::CBaseCombatWeapon::*SendWeaponAnim_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SendWeaponAnim"
-                , SendWeaponAnim_function_type( &::CBaseCombatWeapon::SendWeaponAnim )
-                , ( bp::arg("iActivity") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetActivity
-        
-            typedef void ( ::CBaseCombatWeapon::*SetActivity_function_type )( ::Activity,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetActivity"
-                , SetActivity_function_type( &::CBaseCombatWeapon::SetActivity )
-                , ( bp::arg("act"), bp::arg("duration") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetActivity
-        
-            typedef void ( ::CBaseCombatWeapon::*SetActivity_function_type )( ::Activity ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetActivity"
-                , SetActivity_function_type( &::CBaseCombatWeapon::SetActivity )
-                , ( bp::arg("eActivity") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetIdealActivity
-        
-            typedef bool ( ::CBaseCombatWeapon::*SetIdealActivity_function_type )( ::Activity ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetIdealActivity"
-                , SetIdealActivity_function_type( &::CBaseCombatWeapon::SetIdealActivity )
-                , ( bp::arg("ideal") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetOwner
-        
-            typedef void ( ::CBaseCombatWeapon::*SetOwner_function_type )( ::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetOwner"
-                , SetOwner_function_type( &::CBaseCombatWeapon::SetOwner )
-                , ( bp::arg("owner") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetPickupTouch
-        
-            typedef void ( ::CBaseCombatWeapon::*SetPickupTouch_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetPickupTouch"
-                , SetPickupTouch_function_type( &::CBaseCombatWeapon::SetPickupTouch ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetPrimaryAmmoCount
-        
-            typedef void ( ::CBaseCombatWeapon::*SetPrimaryAmmoCount_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetPrimaryAmmoCount"
-                , SetPrimaryAmmoCount_function_type( &::CBaseCombatWeapon::SetPrimaryAmmoCount )
-                , ( bp::arg("count") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetRemoveable
-        
-            typedef void ( ::CBaseCombatWeapon::*SetRemoveable_function_type )( bool ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetRemoveable"
-                , SetRemoveable_function_type( &::CBaseCombatWeapon::SetRemoveable )
-                , ( bp::arg("bRemoveable") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetSecondaryAmmoCount
-        
-            typedef void ( ::CBaseCombatWeapon::*SetSecondaryAmmoCount_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetSecondaryAmmoCount"
-                , SetSecondaryAmmoCount_function_type( &::CBaseCombatWeapon::SetSecondaryAmmoCount )
-                , ( bp::arg("count") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetSubType
-        
-            typedef void ( ::CBaseCombatWeapon::*SetSubType_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetSubType"
-                , SetSubType_function_type( &::CBaseCombatWeapon::SetSubType )
-                , ( bp::arg("iType") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetViewModel
-        
-            typedef void ( ::CBaseCombatWeapon::*SetViewModel_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetViewModel"
-                , SetViewModel_function_type( &::CBaseCombatWeapon::SetViewModel ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetViewModelIndex
-        
-            typedef void ( ::CBaseCombatWeapon::*SetViewModelIndex_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetViewModelIndex"
-                , SetViewModelIndex_function_type( &::CBaseCombatWeapon::SetViewModelIndex )
-                , ( bp::arg("index")=(int)(0) ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetWeaponIdleTime
-        
-            typedef void ( ::CBaseCombatWeapon::*SetWeaponIdleTime_function_type )( float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetWeaponIdleTime"
-                , SetWeaponIdleTime_function_type( &::CBaseCombatWeapon::SetWeaponIdleTime )
-                , ( bp::arg("time") ) );
-        
-        }
-        { //::CBaseCombatWeapon::SetWeaponVisible
-        
-            typedef void ( ::CBaseCombatWeapon::*SetWeaponVisible_function_type )( bool ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "SetWeaponVisible"
-                , SetWeaponVisible_function_type( &::CBaseCombatWeapon::SetWeaponVisible )
-                , ( bp::arg("visible") ) );
-        
-        }
-        { //::CBaseCombatWeapon::ShouldDisplayAltFireHUDHint
-        
-            typedef bool ( ::CBaseCombatWeapon::*ShouldDisplayAltFireHUDHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ShouldDisplayAltFireHUDHint"
-                , ShouldDisplayAltFireHUDHint_function_type( &::CBaseCombatWeapon::ShouldDisplayAltFireHUDHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::ShouldDisplayReloadHUDHint
-        
-            typedef bool ( ::CBaseCombatWeapon::*ShouldDisplayReloadHUDHint_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ShouldDisplayReloadHUDHint"
-                , ShouldDisplayReloadHUDHint_function_type( &::CBaseCombatWeapon::ShouldDisplayReloadHUDHint ) );
-        
-        }
-        { //::CBaseCombatWeapon::ShouldShowControlPanels
-        
-            typedef bool ( ::CBaseCombatWeapon::*ShouldShowControlPanels_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ShouldShowControlPanels"
-                , ShouldShowControlPanels_function_type( &::CBaseCombatWeapon::ShouldShowControlPanels ) );
-        
-        }
-        { //::CBaseCombatWeapon::Spawn
-        
-            typedef void ( ::CBaseCombatWeapon::*Spawn_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseCombatWeapon::Spawn)
-                , default_Spawn_function_type(&CBaseCombatWeapon_wrapper::default_Spawn) );
-        
-        }
-        { //::CBaseCombatWeapon::StartSprinting
-        
-            typedef bool ( ::CBaseCombatWeapon::*StartSprinting_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "StartSprinting"
-                , StartSprinting_function_type( &::CBaseCombatWeapon::StartSprinting ) );
-        
-        }
-        { //::CBaseCombatWeapon::StopSprinting
-        
-            typedef bool ( ::CBaseCombatWeapon::*StopSprinting_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "StopSprinting"
-                , StopSprinting_function_type( &::CBaseCombatWeapon::StopSprinting ) );
-        
-        }
-        { //::CBaseCombatWeapon::StopWeaponSound
-        
-            typedef void ( ::CBaseCombatWeapon::*StopWeaponSound_function_type )( ::WeaponSound_t ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "StopWeaponSound"
-                , StopWeaponSound_function_type( &::CBaseCombatWeapon::StopWeaponSound )
-                , ( bp::arg("sound_type") ) );
-        
-        }
-        { //::CBaseCombatWeapon::UpdateClientData
-        
-            typedef int ( ::CBaseCombatWeapon::*UpdateClientData_function_type )( ::CBasePlayer * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UpdateClientData"
-                , UpdateClientData_function_type( &::CBaseCombatWeapon::UpdateClientData )
-                , ( bp::arg("pPlayer") ) );
-        
-        }
-        { //::CBaseCombatWeapon::UpdateTransmitState
-        
-            typedef int ( ::CBaseCombatWeapon::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CBaseCombatWeapon_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseCombatWeapon::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CBaseCombatWeapon_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseCombatWeapon::Use
-        
-            typedef void ( ::CBaseCombatWeapon::*Use_function_type )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Use"
-                , Use_function_type( &::CBaseCombatWeapon::Use )
-                , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) );
-        
-        }
-        { //::CBaseCombatWeapon::UsesClipsForAmmo1
-        
-            typedef bool ( ::CBaseCombatWeapon::*UsesClipsForAmmo1_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UsesClipsForAmmo1"
-                , UsesClipsForAmmo1_function_type( &::CBaseCombatWeapon::UsesClipsForAmmo1 ) );
-        
-        }
-        { //::CBaseCombatWeapon::UsesClipsForAmmo2
-        
-            typedef bool ( ::CBaseCombatWeapon::*UsesClipsForAmmo2_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UsesClipsForAmmo2"
-                , UsesClipsForAmmo2_function_type( &::CBaseCombatWeapon::UsesClipsForAmmo2 ) );
-        
-        }
-        { //::CBaseCombatWeapon::UsesPrimaryAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*UsesPrimaryAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UsesPrimaryAmmo"
-                , UsesPrimaryAmmo_function_type( &::CBaseCombatWeapon::UsesPrimaryAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::UsesSecondaryAmmo
-        
-            typedef bool ( ::CBaseCombatWeapon::*UsesSecondaryAmmo_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UsesSecondaryAmmo"
-                , UsesSecondaryAmmo_function_type( &::CBaseCombatWeapon::UsesSecondaryAmmo ) );
-        
-        }
-        { //::CBaseCombatWeapon::VisibleInWeaponSelection
-        
-            typedef bool ( ::CBaseCombatWeapon::*VisibleInWeaponSelection_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "VisibleInWeaponSelection"
-                , VisibleInWeaponSelection_function_type( &::CBaseCombatWeapon::VisibleInWeaponSelection ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponAutoAimScale
-        
-            typedef float ( ::CBaseCombatWeapon::*WeaponAutoAimScale_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponAutoAimScale"
-                , WeaponAutoAimScale_function_type( &::CBaseCombatWeapon::WeaponAutoAimScale ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponIdle
-        
-            typedef void ( ::CBaseCombatWeapon::*WeaponIdle_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponIdle"
-                , WeaponIdle_function_type( &::CBaseCombatWeapon::WeaponIdle ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponLOSCondition
-        
-            typedef bool ( ::CBaseCombatWeapon::*WeaponLOSCondition_function_type )( ::Vector const &,::Vector const &,bool ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponLOSCondition"
-                , WeaponLOSCondition_function_type( &::CBaseCombatWeapon::WeaponLOSCondition )
-                , ( bp::arg("ownerPos"), bp::arg("targetPos"), bp::arg("bSetConditions") ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponMeleeAttack1Condition
-        
-            typedef int ( ::CBaseCombatWeapon::*WeaponMeleeAttack1Condition_function_type )( float,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponMeleeAttack1Condition"
-                , WeaponMeleeAttack1Condition_function_type( &::CBaseCombatWeapon::WeaponMeleeAttack1Condition )
-                , ( bp::arg("flDot"), bp::arg("flDist") ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponMeleeAttack2Condition
-        
-            typedef int ( ::CBaseCombatWeapon::*WeaponMeleeAttack2Condition_function_type )( float,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponMeleeAttack2Condition"
-                , WeaponMeleeAttack2Condition_function_type( &::CBaseCombatWeapon::WeaponMeleeAttack2Condition )
-                , ( bp::arg("flDot"), bp::arg("flDist") ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponRangeAttack1Condition
-        
-            typedef int ( ::CBaseCombatWeapon::*WeaponRangeAttack1Condition_function_type )( float,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponRangeAttack1Condition"
-                , WeaponRangeAttack1Condition_function_type( &::CBaseCombatWeapon::WeaponRangeAttack1Condition )
-                , ( bp::arg("flDot"), bp::arg("flDist") ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponRangeAttack2Condition
-        
-            typedef int ( ::CBaseCombatWeapon::*WeaponRangeAttack2Condition_function_type )( float,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponRangeAttack2Condition"
-                , WeaponRangeAttack2Condition_function_type( &::CBaseCombatWeapon::WeaponRangeAttack2Condition )
-                , ( bp::arg("flDot"), bp::arg("flDist") ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponSound
-        
-            typedef void ( ::CBaseCombatWeapon::*WeaponSound_function_type )( ::WeaponSound_t,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponSound"
-                , WeaponSound_function_type( &::CBaseCombatWeapon::WeaponSound )
-                , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
-        
-        }
-        { //::CBaseCombatWeapon::WeaponState
-        
-            typedef int ( ::CBaseCombatWeapon::*WeaponState_function_type )(  ) const;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "WeaponState"
-                , WeaponState_function_type( &::CBaseCombatWeapon::WeaponState ) );
-        
-        }
-        CBaseCombatWeapon_exposer.def_readwrite( "altfiresunderwater", &CBaseCombatWeapon::m_bAltFiresUnderwater );
-        CBaseCombatWeapon_exposer.def_readwrite( "fireonempty", &CBaseCombatWeapon::m_bFireOnEmpty );
-        CBaseCombatWeapon_exposer.def_readwrite( "firesunderwater", &CBaseCombatWeapon::m_bFiresUnderwater );
-        CBaseCombatWeapon_exposer.def_readwrite( "inreload", &CBaseCombatWeapon::m_bInReload );
-        CBaseCombatWeapon_exposer.def_readwrite( "reloadssingly", &CBaseCombatWeapon::m_bReloadsSingly );
-        CBaseCombatWeapon_exposer.def_readwrite( "fireduration", &CBaseCombatWeapon::m_fFireDuration );
-        CBaseCombatWeapon_exposer.def_readwrite( "maxrange1", &CBaseCombatWeapon::m_fMaxRange1 );
-        CBaseCombatWeapon_exposer.def_readwrite( "maxrange2", &CBaseCombatWeapon::m_fMaxRange2 );
-        CBaseCombatWeapon_exposer.def_readwrite( "minrange1", &CBaseCombatWeapon::m_fMinRange1 );
-        CBaseCombatWeapon_exposer.def_readwrite( "minrange2", &CBaseCombatWeapon::m_fMinRange2 );
-        CBaseCombatWeapon_exposer.def_readwrite( "nextemptysoundtime", &CBaseCombatWeapon::m_flNextEmptySoundTime );
-        CBaseCombatWeapon_exposer.def_readwrite( "unlocktime", &CBaseCombatWeapon::m_flUnlockTime );
-        CBaseCombatWeapon_exposer.def_readwrite( "locker", &CBaseCombatWeapon::m_hLocker );
-        CBaseCombatWeapon_exposer.def_readwrite( "subtype", &CBaseCombatWeapon::m_iSubType );
-        CBaseCombatWeapon_exposer.def_readwrite( "name", &CBaseCombatWeapon::m_iszName );
-        CBaseCombatWeapon_exposer.def_readwrite( "viewmodelindex", &CBaseCombatWeapon::m_nViewModelIndex );
-        { //::CBaseAnimating::CanBecomeRagdoll
-        
-            typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_CanBecomeRagdoll_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CanBecomeRagdoll"
-                , CanBecomeRagdoll_function_type(&::CBaseAnimating::CanBecomeRagdoll)
-                , default_CanBecomeRagdoll_function_type(&CBaseCombatWeapon_wrapper::default_CanBecomeRagdoll) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CBaseCombatWeapon_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CBaseCombatWeapon_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CBaseCombatWeapon_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CBaseCombatWeapon_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CBaseCombatWeapon_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseAnimating::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseAnimating::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CBaseCombatWeapon_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseAnimating::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CBaseCombatWeapon_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CBaseCombatWeapon_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CBaseCombatWeapon_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CBaseCombatWeapon_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CBaseCombatWeapon_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CBaseCombatWeapon_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CBaseCombatWeapon_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CBaseCombatWeapon_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseCombatWeapon_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseAnimating::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseAnimating::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseAnimating::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CBaseCombatWeapon_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CBaseCombatWeapon_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseAnimating::OnRestore
-        
-            typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
-                , default_OnRestore_function_type(&CBaseCombatWeapon_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseAnimating::OnSequenceSet
-        
-            typedef void ( ::CBaseAnimating::*OnSequenceSet_function_type )( int ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_OnSequenceSet_function_type )( int ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnSequenceSet"
-                , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
-                , default_OnSequenceSet_function_type(&CBaseCombatWeapon_wrapper::default_OnSequenceSet)
-                , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CBaseCombatWeapon_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CBaseCombatWeapon_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseCombatWeapon_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CBaseCombatWeapon_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CBaseCombatWeapon_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CBaseCombatWeapon_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseAnimating::PyOnNewModel
-        
-            typedef void ( CBaseCombatWeapon_wrapper::*OnNewModel_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type( &CBaseCombatWeapon_wrapper::default_OnNewModel ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CBaseCombatWeapon_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CBaseCombatWeapon_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CBaseCombatWeapon_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CBaseCombatWeapon_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CBaseCombatWeapon_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CBaseCombatWeapon_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBaseCombatWeapon_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CBaseCombatWeapon_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CBaseCombatWeapon_exposer.staticmethod( "GetAvailableWeaponsInBox" );
-        CBaseCombatWeapon_exposer.staticmethod( "GetPyNetworkType" );
-        { //::CBaseCombatWeapon::TestCollision
-            
-                typedef bool ( ::CBaseCombatWeapon::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBaseCombatWeapon_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBaseCombatWeapon_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBaseCombatWeapon::TestCollision)
-                    , default_TestCollision_function_type(&CBaseCombatWeapon_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-        CBaseCombatWeapon_exposer.add_property("nextprimaryattack", 
-           &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get,
-           &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set );
-        CBaseCombatWeapon_exposer.add_property("nextsecondaryattack", 
-           &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get,
-           &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set );
-        CBaseCombatWeapon_exposer.add_property("timeweaponidle", 
-           &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get,
-           &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set );
-        CBaseCombatWeapon_exposer.add_property("state", 
-           &CBaseCombatWeapon_wrapper::m_iState_Get,
-           &CBaseCombatWeapon_wrapper::m_iState_Set );
-        CBaseCombatWeapon_exposer.add_property("primaryammotype", 
-           &CBaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Get,
-           &CBaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Set );
-        CBaseCombatWeapon_exposer.add_property("secondaryammotype", 
-           &CBaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Get,
-           &CBaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Set );
-        CBaseCombatWeapon_exposer.add_property("clip1", 
-           &CBaseCombatWeapon_wrapper::m_iClip1_Get,
-           &CBaseCombatWeapon_wrapper::m_iClip1_Set );
-        CBaseCombatWeapon_exposer.add_property("clip2", 
-           &CBaseCombatWeapon_wrapper::m_iClip2_Get,
-           &CBaseCombatWeapon_wrapper::m_iClip2_Set );
-    }
+    bp::class_< CBaseCombatWeapon_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CBaseCombatWeapon", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "AbortReload"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::AbortReload ) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::Activate)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_Activate) )    
+        .def( 
+            "ActivityListCount"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ActivityListCount ) )    
+        .def( 
+            "ActivityOverride"
+            , (::Activity ( ::CBaseCombatWeapon::* )( ::Activity,bool * ) )( &::CBaseCombatWeapon::ActivityOverride )
+            , ( bp::arg("baseAct"), bp::arg("pRequired") ) )    
+        .def( 
+            "AddViewKick"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::AddViewKick ) )    
+        .def( 
+            "AddViewmodelBob"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseViewModel *,::Vector &,::QAngle & ) )( &::CBaseCombatWeapon::AddViewmodelBob )
+            , ( bp::arg("viewmodel"), bp::arg("origin"), bp::arg("angles") ) )    
+        .def( 
+            "AllowsAutoSwitchFrom"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::AllowsAutoSwitchFrom ) )    
+        .def( 
+            "AllowsAutoSwitchTo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::AllowsAutoSwitchTo ) )    
+        .def( 
+            "AttemptToMaterialize"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::AttemptToMaterialize ) )    
+        .def( 
+            "BaseForceFire"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter *,::CBaseEntity * ) )( &::CBaseCombatWeapon::BaseForceFire )
+            , ( bp::arg("pOperator"), bp::arg("pTarget")=bp::object() ) )    
+        .def( 
+            "CalcViewmodelBob"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CalcViewmodelBob ) )    
+        .def( 
+            "CanBePickedUpByNPCs"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CanBePickedUpByNPCs ) )    
+        .def( 
+            "CanBeSelected"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CanBeSelected ) )    
+        .def( 
+            "CanDeploy"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CanDeploy ) )    
+        .def( 
+            "CanHolster"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CanHolster ) )    
+        .def( 
+            "CanLower"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CanLower ) )    
+        .def( 
+            "CapabilitiesGet"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CapabilitiesGet ) )    
+        .def( 
+            "CheckReload"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CheckReload ) )    
+        .def( 
+            "CheckRespawn"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::CheckRespawn ) )    
+        .def( 
+            "Clip1"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::Clip1 ) )    
+        .def( 
+            "Clip2"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::Clip2 ) )    
+        .def( 
+            "DefaultDeploy"
+            , (bool ( ::CBaseCombatWeapon::* )( char *,char *,int,char * ) )( &::CBaseCombatWeapon::DefaultDeploy )
+            , ( bp::arg("szViewModel"), bp::arg("szWeaponModel"), bp::arg("iActivity"), bp::arg("szAnimExt") ) )    
+        .def( 
+            "DefaultReload"
+            , (bool ( ::CBaseCombatWeapon::* )( int,int,int ) )( &::CBaseCombatWeapon::DefaultReload )
+            , ( bp::arg("iClipSize1"), bp::arg("iClipSize2"), bp::arg("iActivity") ) )    
+        .def( 
+            "DefaultTouch"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseEntity * ) )( &::CBaseCombatWeapon::DefaultTouch )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Delete"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Delete ) )    
+        .def( 
+            "Deploy"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Deploy ) )    
+        .def( 
+            "DestroyItem"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::DestroyItem ) )    
+        .def( 
+            "DisplayAltFireHudHint"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::DisplayAltFireHudHint ) )    
+        .def( 
+            "DisplayReloadHudHint"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::DisplayReloadHudHint ) )    
+        .def( 
+            "Drop"
+            , (void ( ::CBaseCombatWeapon::* )( ::Vector const & ) )( &::CBaseCombatWeapon::Drop )
+            , ( bp::arg("vecVelocity") ) )    
+        .def( 
+            "Equip"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter * ) )( &::CBaseCombatWeapon::Equip )
+            , ( bp::arg("pOwner") ) )    
+        .def( 
+            "FallInit"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::FallInit ) )    
+        .def( 
+            "FallThink"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::FallThink ) )    
+        .def( 
+            "FinishReload"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::FinishReload ) )    
+        .def( 
+            "GetActivity"
+            , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetActivity ) )    
+        .def( 
+            "GetAnimPrefix"
+            , (char const * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetAnimPrefix ) )    
+        .def( 
+            "GetAvailableWeaponsInBox"
+            , (int (*)( ::CBaseCombatWeapon * *,int,::Vector const &,::Vector const & ))( &::CBaseCombatWeapon::GetAvailableWeaponsInBox )
+            , ( bp::arg("pList"), bp::arg("listMax"), bp::arg("mins"), bp::arg("maxs") ) )    
+        .def( 
+            "GetBulletSpread"
+            , (::Vector const & ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetBulletSpread )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GetBulletSpread"
+            , (::Vector ( ::CBaseCombatWeapon::* )( ::WeaponProficiency_t ) )( &::CBaseCombatWeapon::GetBulletSpread )
+            , ( bp::arg("proficiency") ) )    
+        .def( 
+            "GetBulletType"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetBulletType ) )    
+        .def( 
+            "GetDamage"
+            , (float ( ::CBaseCombatWeapon::* )( float,int ) )( &::CBaseCombatWeapon::GetDamage )
+            , ( bp::arg("flDistance"), bp::arg("iLocation") ) )    
+        .def( 
+            "GetDefaultAnimSpeed"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetDefaultAnimSpeed ) )    
+        .def( 
+            "GetDefaultClip1"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetDefaultClip1 ) )    
+        .def( 
+            "GetDefaultClip2"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetDefaultClip2 ) )    
+        .def( 
+            "GetDrawActivity"
+            , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetDrawActivity ) )    
+        .def( 
+            "GetFireRate"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetFireRate ) )    
+        .def( 
+            "GetIdealActivity"
+            , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetIdealActivity ) )    
+        .def( 
+            "GetIdealSequence"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetIdealSequence ) )    
+        .def( 
+            "GetLastWeapon"
+            , (::CBaseCombatWeapon * ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetLastWeapon )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetMaxAutoAimDeflection"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetMaxAutoAimDeflection ) )    
+        .def( 
+            "GetMaxBurst"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetMaxBurst ) )    
+        .def( 
+            "GetMaxClip1"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetMaxClip1 ) )    
+        .def( 
+            "GetMaxClip2"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetMaxClip2 ) )    
+        .def( 
+            "GetMaxRestTime"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetMaxRestTime ) )    
+        .def( 
+            "GetMinBurst"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetMinBurst ) )    
+        .def( 
+            "GetMinRestTime"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetMinRestTime ) )    
+        .def( 
+            "GetName"
+            , (char const * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetName ) )    
+        .def( 
+            "GetOwner"
+            , (::CBaseCombatCharacter * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetOwner )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetPosition"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetPosition ) )    
+        .def( 
+            "GetPrimaryAmmoCount"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetPrimaryAmmoCount ) )    
+        .def( 
+            "GetPrimaryAmmoType"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetPrimaryAmmoType ) )    
+        .def( 
+            "GetPrimaryAttackActivity"
+            , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetPrimaryAttackActivity ) )    
+        .def( 
+            "GetPrintName"
+            , (char const * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetPrintName ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CBaseCombatWeapon::GetPyNetworkType ) )    
+        .def( 
+            "GetRandomBurst"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetRandomBurst ) )    
+        .def( 
+            "GetRumbleEffect"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetRumbleEffect ) )    
+        .def( 
+            "GetSecondaryAmmoCount"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetSecondaryAmmoCount ) )    
+        .def( 
+            "GetSecondaryAmmoType"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetSecondaryAmmoType ) )    
+        .def( 
+            "GetSecondaryAttackActivity"
+            , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetSecondaryAttackActivity ) )    
+        .def( 
+            "GetShootSound"
+            , (char const * ( ::CBaseCombatWeapon::* )( int ) const)( &::CBaseCombatWeapon::GetShootSound )
+            , ( bp::arg("iIndex") ) )    
+        .def( 
+            "GetSlot"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetSlot ) )    
+        .def( 
+            "GetSpreadBias"
+            , (float ( ::CBaseCombatWeapon::* )( ::WeaponProficiency_t ) )( &::CBaseCombatWeapon::GetSpreadBias )
+            , ( bp::arg("proficiency") ) )    
+        .def( 
+            "GetSubType"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetSubType ) )    
+        .def( 
+            "GetViewModelSequenceDuration"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetViewModelSequenceDuration ) )    
+        .def( 
+            "GetWeaponFlags"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetWeaponFlags ) )    
+        .def( 
+            "GetWeaponID"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetWeaponID ) )    
+        .def( 
+            "GetWeaponIdleTime"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetWeaponIdleTime ) )    
+        .def( 
+            "GetWeight"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetWeight ) )    
+        .def( 
+            "GetWorldModel"
+            , (char const * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetWorldModel ) )    
+        .def( 
+            "GetWpnData"
+            , (::FileWeaponInfo_t const & ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetWpnData )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GiveDefaultAmmo"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GiveDefaultAmmo ) )    
+        .def( 
+            "HandleAnimEvent"
+            , (void ( ::CBaseCombatWeapon::* )( ::animevent_t * ) )( &::CBaseCombatWeapon::HandleAnimEvent )
+            , ( bp::arg("pEvent") ) )    
+        .def( 
+            "HandleFireOnEmpty"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HandleFireOnEmpty ) )    
+        .def( 
+            "HasAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HasAmmo ) )    
+        .def( 
+            "HasAnyAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HasAnyAmmo ) )    
+        .def( 
+            "HasPrimaryAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HasPrimaryAmmo ) )    
+        .def( 
+            "HasSecondaryAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HasSecondaryAmmo ) )    
+        .def( 
+            "HasWeaponIdleTimeElapsed"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HasWeaponIdleTimeElapsed ) )    
+        .def( 
+            "HideThink"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::HideThink ) )    
+        .def( 
+            "Holster"
+            , (bool ( ::CBaseCombatWeapon::* )( ::CBaseCombatWeapon * ) )( &::CBaseCombatWeapon::Holster )
+            , ( bp::arg("pSwitchingTo")=bp::object() ) )    
+        .def( 
+            "InputHideWeapon"
+            , (void ( ::CBaseCombatWeapon::* )( ::inputdata_t & ) )( &::CBaseCombatWeapon::InputHideWeapon )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "IsAllowedToSwitch"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsAllowedToSwitch ) )    
+        .def( 
+            "IsBaseCombatWeapon"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::IsBaseCombatWeapon ) )    
+        .def( 
+            "IsConstrained"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsConstrained ) )    
+        .def( 
+            "IsLocked"
+            , (bool ( ::CBaseCombatWeapon::* )( ::CBaseEntity * ) )( &::CBaseCombatWeapon::IsLocked )
+            , ( bp::arg("pAsker") ) )    
+        .def( 
+            "IsMeleeWeapon"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::IsMeleeWeapon ) )    
+        .def( 
+            "IsPredicted"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::IsPredicted ) )    
+        .def( 
+            "IsRemoveable"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsRemoveable ) )    
+        .def( 
+            "IsViewModelSequenceFinished"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsViewModelSequenceFinished ) )    
+        .def( 
+            "IsWeaponVisible"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsWeaponVisible ) )    
+        .def( 
+            "IsWeaponZoomed"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::IsWeaponZoomed ) )    
+        .def( 
+            "ItemBusyFrame"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ItemBusyFrame ) )    
+        .def( 
+            "ItemHolsterFrame"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ItemHolsterFrame ) )    
+        .def( 
+            "ItemPostFrame"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ItemPostFrame ) )    
+        .def( 
+            "ItemPreFrame"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ItemPreFrame ) )    
+        .def( 
+            "Kill"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Kill ) )    
+        .def( 
+            "Lock"
+            , (void ( ::CBaseCombatWeapon::* )( float,::CBaseEntity * ) )( &::CBaseCombatWeapon::Lock )
+            , ( bp::arg("lockTime"), bp::arg("pLocker") ) )    
+        .def( 
+            "Lower"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Lower ) )    
+        .def( 
+            "MaintainIdealActivity"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::MaintainIdealActivity ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseCombatWeapon::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseCombatWeapon::MakeTracer)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBaseCombatWeapon_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "MakeWeaponNameFromEntity"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseEntity * ) )( &::CBaseCombatWeapon::MakeWeaponNameFromEntity )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Materialize"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Materialize ) )    
+        .def( 
+            "ObjectCaps"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ObjectCaps ) )    
+        .def( 
+            "OnMouseWheel"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::OnMouseWheel )
+            , ( bp::arg("nDirection") ) )    
+        .def( 
+            "OnPickedUp"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter * ) )( &::CBaseCombatWeapon::OnPickedUp )
+            , ( bp::arg("pNewOwner") ) )    
+        .def( 
+            "Operator_ForceNPCFire"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter *,bool,::CBaseEntity * ) )( &::CBaseCombatWeapon::Operator_ForceNPCFire )
+            , ( bp::arg("pOperator"), bp::arg("bSecondary"), bp::arg("pTarget")=bp::object() ) )    
+        .def( 
+            "Operator_FrameUpdate"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter * ) )( &::CBaseCombatWeapon::Operator_FrameUpdate )
+            , ( bp::arg("pOperator") ) )    
+        .def( 
+            "Operator_HandleAnimEvent"
+            , (void ( ::CBaseCombatWeapon::* )( ::animevent_t *,::CBaseCombatCharacter * ) )( &::CBaseCombatWeapon::Operator_HandleAnimEvent )
+            , ( bp::arg("pEvent"), bp::arg("pOperator") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::Precache)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_Precache) )    
+        .def( 
+            "PrimaryAttack"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::PrimaryAttack)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_PrimaryAttack) )    
+        .def( 
+            "Ready"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Ready ) )    
+        .def( 
+            "Reload"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Reload ) )    
+        .def( 
+            "ReloadOrSwitchWeapons"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ReloadOrSwitchWeapons ) )    
+        .def( 
+            "RescindAltFireHudHint"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::RescindAltFireHudHint ) )    
+        .def( 
+            "RescindReloadHudHint"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::RescindReloadHudHint ) )    
+        .def( 
+            "Respawn"
+            , (::CBaseEntity * ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::Respawn )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "SecondaryAttack"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::SecondaryAttack)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_SecondaryAttack) )    
+        .def( 
+            "SendViewModelAnim"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SendViewModelAnim )
+            , ( bp::arg("nSequence") ) )    
+        .def( 
+            "SendWeaponAnim"
+            , (bool ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SendWeaponAnim )
+            , ( bp::arg("iActivity") ) )    
+        .def( 
+            "SetActivity"
+            , (void ( ::CBaseCombatWeapon::* )( ::Activity,float ) )( &::CBaseCombatWeapon::SetActivity )
+            , ( bp::arg("act"), bp::arg("duration") ) )    
+        .def( 
+            "SetActivity"
+            , (void ( ::CBaseCombatWeapon::* )( ::Activity ) )( &::CBaseCombatWeapon::SetActivity )
+            , ( bp::arg("eActivity") ) )    
+        .def( 
+            "SetIdealActivity"
+            , (bool ( ::CBaseCombatWeapon::* )( ::Activity ) )( &::CBaseCombatWeapon::SetIdealActivity )
+            , ( bp::arg("ideal") ) )    
+        .def( 
+            "SetOwner"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseCombatCharacter * ) )( &::CBaseCombatWeapon::SetOwner )
+            , ( bp::arg("owner") ) )    
+        .def( 
+            "SetPickupTouch"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::SetPickupTouch ) )    
+        .def( 
+            "SetPrimaryAmmoCount"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SetPrimaryAmmoCount )
+            , ( bp::arg("count") ) )    
+        .def( 
+            "SetRemoveable"
+            , (void ( ::CBaseCombatWeapon::* )( bool ) )( &::CBaseCombatWeapon::SetRemoveable )
+            , ( bp::arg("bRemoveable") ) )    
+        .def( 
+            "SetSecondaryAmmoCount"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SetSecondaryAmmoCount )
+            , ( bp::arg("count") ) )    
+        .def( 
+            "SetSubType"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SetSubType )
+            , ( bp::arg("iType") ) )    
+        .def( 
+            "SetViewModel"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::SetViewModel ) )    
+        .def( 
+            "SetViewModelIndex"
+            , (void ( ::CBaseCombatWeapon::* )( int ) )( &::CBaseCombatWeapon::SetViewModelIndex )
+            , ( bp::arg("index")=(int)(0) ) )    
+        .def( 
+            "SetWeaponIdleTime"
+            , (void ( ::CBaseCombatWeapon::* )( float ) )( &::CBaseCombatWeapon::SetWeaponIdleTime )
+            , ( bp::arg("time") ) )    
+        .def( 
+            "SetWeaponVisible"
+            , (void ( ::CBaseCombatWeapon::* )( bool ) )( &::CBaseCombatWeapon::SetWeaponVisible )
+            , ( bp::arg("visible") ) )    
+        .def( 
+            "ShouldDisplayAltFireHUDHint"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ShouldDisplayAltFireHUDHint ) )    
+        .def( 
+            "ShouldDisplayReloadHUDHint"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ShouldDisplayReloadHUDHint ) )    
+        .def( 
+            "ShouldShowControlPanels"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::ShouldShowControlPanels ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::Spawn)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_Spawn) )    
+        .def( 
+            "StartSprinting"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::StartSprinting ) )    
+        .def( 
+            "StopSprinting"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::StopSprinting ) )    
+        .def( 
+            "StopWeaponSound"
+            , (void ( ::CBaseCombatWeapon::* )( ::WeaponSound_t ) )( &::CBaseCombatWeapon::StopWeaponSound )
+            , ( bp::arg("sound_type") ) )    
+        .def( 
+            "UpdateClientData"
+            , (int ( ::CBaseCombatWeapon::* )( ::CBasePlayer * ) )( &::CBaseCombatWeapon::UpdateClientData )
+            , ( bp::arg("pPlayer") ) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseCombatWeapon::* )(  ) )(&::CBaseCombatWeapon::UpdateTransmitState)
+            , (int ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "Use"
+            , (void ( ::CBaseCombatWeapon::* )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) )( &::CBaseCombatWeapon::Use )
+            , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) )    
+        .def( 
+            "UsesClipsForAmmo1"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::UsesClipsForAmmo1 ) )    
+        .def( 
+            "UsesClipsForAmmo2"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::UsesClipsForAmmo2 ) )    
+        .def( 
+            "UsesPrimaryAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::UsesPrimaryAmmo ) )    
+        .def( 
+            "UsesSecondaryAmmo"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::UsesSecondaryAmmo ) )    
+        .def( 
+            "VisibleInWeaponSelection"
+            , (bool ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::VisibleInWeaponSelection ) )    
+        .def( 
+            "WeaponAutoAimScale"
+            , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::WeaponAutoAimScale ) )    
+        .def( 
+            "WeaponIdle"
+            , (void ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::WeaponIdle ) )    
+        .def( 
+            "WeaponLOSCondition"
+            , (bool ( ::CBaseCombatWeapon::* )( ::Vector const &,::Vector const &,bool ) )( &::CBaseCombatWeapon::WeaponLOSCondition )
+            , ( bp::arg("ownerPos"), bp::arg("targetPos"), bp::arg("bSetConditions") ) )    
+        .def( 
+            "WeaponMeleeAttack1Condition"
+            , (int ( ::CBaseCombatWeapon::* )( float,float ) )( &::CBaseCombatWeapon::WeaponMeleeAttack1Condition )
+            , ( bp::arg("flDot"), bp::arg("flDist") ) )    
+        .def( 
+            "WeaponMeleeAttack2Condition"
+            , (int ( ::CBaseCombatWeapon::* )( float,float ) )( &::CBaseCombatWeapon::WeaponMeleeAttack2Condition )
+            , ( bp::arg("flDot"), bp::arg("flDist") ) )    
+        .def( 
+            "WeaponRangeAttack1Condition"
+            , (int ( ::CBaseCombatWeapon::* )( float,float ) )( &::CBaseCombatWeapon::WeaponRangeAttack1Condition )
+            , ( bp::arg("flDot"), bp::arg("flDist") ) )    
+        .def( 
+            "WeaponRangeAttack2Condition"
+            , (int ( ::CBaseCombatWeapon::* )( float,float ) )( &::CBaseCombatWeapon::WeaponRangeAttack2Condition )
+            , ( bp::arg("flDot"), bp::arg("flDist") ) )    
+        .def( 
+            "WeaponSound"
+            , (void ( ::CBaseCombatWeapon::* )( ::WeaponSound_t,float ) )( &::CBaseCombatWeapon::WeaponSound )
+            , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) )    
+        .def( 
+            "WeaponState"
+            , (int ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::WeaponState ) )    
+        .def_readwrite( "altfiresunderwater", &CBaseCombatWeapon::m_bAltFiresUnderwater )    
+        .def_readwrite( "fireonempty", &CBaseCombatWeapon::m_bFireOnEmpty )    
+        .def_readwrite( "firesunderwater", &CBaseCombatWeapon::m_bFiresUnderwater )    
+        .def_readwrite( "inreload", &CBaseCombatWeapon::m_bInReload )    
+        .def_readwrite( "reloadssingly", &CBaseCombatWeapon::m_bReloadsSingly )    
+        .def_readwrite( "fireduration", &CBaseCombatWeapon::m_fFireDuration )    
+        .def_readwrite( "maxrange1", &CBaseCombatWeapon::m_fMaxRange1 )    
+        .def_readwrite( "maxrange2", &CBaseCombatWeapon::m_fMaxRange2 )    
+        .def_readwrite( "minrange1", &CBaseCombatWeapon::m_fMinRange1 )    
+        .def_readwrite( "minrange2", &CBaseCombatWeapon::m_fMinRange2 )    
+        .def_readwrite( "nextemptysoundtime", &CBaseCombatWeapon::m_flNextEmptySoundTime )    
+        .def_readwrite( "nextprimaryattack", &CBaseCombatWeapon::m_flNextPrimaryAttack )    
+        .def_readwrite( "nextsecondaryattack", &CBaseCombatWeapon::m_flNextSecondaryAttack )    
+        .def_readwrite( "timeweaponidle", &CBaseCombatWeapon::m_flTimeWeaponIdle )    
+        .def_readwrite( "unlocktime", &CBaseCombatWeapon::m_flUnlockTime )    
+        .def_readwrite( "locker", &CBaseCombatWeapon::m_hLocker )    
+        .def_readwrite( "clip1", &CBaseCombatWeapon::m_iClip1 )    
+        .def_readwrite( "clip2", &CBaseCombatWeapon::m_iClip2 )    
+        .def_readwrite( "primaryammotype", &CBaseCombatWeapon::m_iPrimaryAmmoType )    
+        .def_readwrite( "secondaryammotype", &CBaseCombatWeapon::m_iSecondaryAmmoType )    
+        .def_readwrite( "state", &CBaseCombatWeapon::m_iState )    
+        .def_readwrite( "subtype", &CBaseCombatWeapon::m_iSubType )    
+        .def_readwrite( "viewmodelindex", &CBaseCombatWeapon::m_iViewModelIndex )    
+        .def_readwrite( "worldmodelindex", &CBaseCombatWeapon::m_iWorldModelIndex )    
+        .def_readwrite( "name", &CBaseCombatWeapon::m_iszName )    
+        .def_readwrite( "viewmodelindex", &CBaseCombatWeapon::m_nViewModelIndex )    
+        .def( 
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_CanBecomeRagdoll) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::Vector *,::Vector * ) )(&CBaseCombatWeapon_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CBaseEntity * ) )(&CBaseCombatWeapon_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::trace_t &,int ) )(&CBaseCombatWeapon_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CBaseEntity * ) )(&CBaseCombatWeapon_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseCombatWeapon_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBaseCombatWeapon_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseCombatWeapon_wrapper::* )( char const *,char const * ) )(&CBaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseCombatWeapon_wrapper::* )( char const *,float ) )(&CBaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseCombatWeapon_wrapper::* )( char const *,int ) )(&CBaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseCombatWeapon_wrapper::* )( char const *,::Vector const & ) )(&CBaseCombatWeapon_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBaseCombatWeapon_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CBaseCombatWeapon_wrapper::* )( int ) )(&CBaseCombatWeapon_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_OnRestore) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CBaseCombatWeapon_wrapper::* )( int ) )(&CBaseCombatWeapon_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CBaseCombatWeapon_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseCombatWeapon_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CBaseCombatWeapon_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseCombatWeapon_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CBaseCombatWeapon_wrapper::* )( char const * ) )(&CBaseCombatWeapon_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_OnNewModel) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CBaseEntity * ) )(&CBaseCombatWeapon_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CBaseCombatWeapon_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseCombatWeapon_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CBaseCombatWeapon_wrapper::* )(  ) )(&CBaseCombatWeapon_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CBaseCombatWeapon_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseCombatWeapon_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "GetAvailableWeaponsInBox" )    
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "nextprimaryattack", &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set )    
+        .add_property( "nextsecondaryattack", &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set )    
+        .add_property( "timeweaponidle", &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get, &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set )    
+        .add_property( "state", &CBaseCombatWeapon_wrapper::m_iState_Get, &CBaseCombatWeapon_wrapper::m_iState_Set )    
+        .add_property( "primaryammotype", &CBaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Get, &CBaseCombatWeapon_wrapper::m_iPrimaryAmmoType_Set )    
+        .add_property( "secondaryammotype", &CBaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Get, &CBaseCombatWeapon_wrapper::m_iSecondaryAmmoType_Set )    
+        .add_property( "clip1", &CBaseCombatWeapon_wrapper::m_iClip1_Get, &CBaseCombatWeapon_wrapper::m_iClip1_Set )    
+        .add_property( "clip2", &CBaseCombatWeapon_wrapper::m_iClip2_Get, &CBaseCombatWeapon_wrapper::m_iClip2_Set );
 
 }
 

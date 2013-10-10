@@ -816,727 +816,268 @@ struct C_Sprite_wrapper : C_Sprite, bp::wrapper< C_Sprite > {
         return C_Sprite::GetClientClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_Sprite\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_Sprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_Sprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_Sprite::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_C_Sprite_class(){
 
-    { //::C_Sprite
-        typedef bp::class_< C_Sprite_wrapper, bp::bases< C_BaseEntity >, boost::noncopyable > C_Sprite_exposer_t;
-        C_Sprite_exposer_t C_Sprite_exposer = C_Sprite_exposer_t( "C_Sprite", bp::init< >() );
-        bp::scope C_Sprite_scope( C_Sprite_exposer );
-        { //::C_Sprite::Animate
-        
-            typedef void ( ::C_Sprite::*Animate_function_type )( float ) ;
-            
-            C_Sprite_exposer.def( 
-                "Animate"
-                , Animate_function_type( &::C_Sprite::Animate )
-                , ( bp::arg("frames") ) );
-        
-        }
-        { //::C_Sprite::AnimateAndDie
-        
-            typedef void ( ::C_Sprite::*AnimateAndDie_function_type )( float ) ;
-            
-            C_Sprite_exposer.def( 
-                "AnimateAndDie"
-                , AnimateAndDie_function_type( &::C_Sprite::AnimateAndDie )
-                , ( bp::arg("framerate") ) );
-        
-        }
-        { //::C_Sprite::AnimateForTime
-        
-            typedef void ( ::C_Sprite::*AnimateForTime_function_type )( float,float ) ;
-            
-            C_Sprite_exposer.def( 
-                "AnimateForTime"
-                , AnimateForTime_function_type( &::C_Sprite::AnimateForTime )
-                , ( bp::arg("framerate"), bp::arg("time") ) );
-        
-        }
-        { //::C_Sprite::AnimateThink
-        
-            typedef void ( ::C_Sprite::*AnimateThink_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "AnimateThink"
-                , AnimateThink_function_type( &::C_Sprite::AnimateThink ) );
-        
-        }
-        { //::C_Sprite::AnimateUntilDead
-        
-            typedef void ( ::C_Sprite::*AnimateUntilDead_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "AnimateUntilDead"
-                , AnimateUntilDead_function_type( &::C_Sprite::AnimateUntilDead ) );
-        
-        }
-        { //::C_Sprite::BeginFadeOutThink
-        
-            typedef void ( ::C_Sprite::*BeginFadeOutThink_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "BeginFadeOutThink"
-                , BeginFadeOutThink_function_type( &::C_Sprite::BeginFadeOutThink ) );
-        
-        }
-        { //::C_Sprite::ClientThink
-        
-            typedef void ( ::C_Sprite::*ClientThink_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_ClientThink_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "ClientThink"
-                , ClientThink_function_type(&::C_Sprite::ClientThink)
-                , default_ClientThink_function_type(&C_Sprite_wrapper::default_ClientThink) );
-        
-        }
-        { //::C_Sprite::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::C_Sprite::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( C_Sprite_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            C_Sprite_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::C_Sprite::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&C_Sprite_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
-        
-        }
-        { //::C_Sprite::DrawModel
-        
-            typedef int ( ::C_Sprite::*DrawModel_function_type )( int,::RenderableInstance_t const & ) ;
-            
-            C_Sprite_exposer.def( 
-                "DrawModel"
-                , DrawModel_function_type( &::C_Sprite::DrawModel )
-                , ( bp::arg("flags"), bp::arg("instance") ) );
-        
-        }
-        { //::C_Sprite::EnableWorldSpaceScale
-        
-            typedef void ( ::C_Sprite::*EnableWorldSpaceScale_function_type )( bool ) ;
-            
-            C_Sprite_exposer.def( 
-                "EnableWorldSpaceScale"
-                , EnableWorldSpaceScale_function_type( &::C_Sprite::EnableWorldSpaceScale )
-                , ( bp::arg("bEnable") ) );
-        
-        }
-        { //::C_Sprite::Expand
-        
-            typedef void ( ::C_Sprite::*Expand_function_type )( float,float ) ;
-            
-            C_Sprite_exposer.def( 
-                "Expand"
-                , Expand_function_type( &::C_Sprite::Expand )
-                , ( bp::arg("scaleSpeed"), bp::arg("fadeSpeed") ) );
-        
-        }
-        { //::C_Sprite::ExpandThink
-        
-            typedef void ( ::C_Sprite::*ExpandThink_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "ExpandThink"
-                , ExpandThink_function_type( &::C_Sprite::ExpandThink ) );
-        
-        }
-        { //::C_Sprite::FadeAndDie
-        
-            typedef void ( ::C_Sprite::*FadeAndDie_function_type )( float ) ;
-            
-            C_Sprite_exposer.def( 
-                "FadeAndDie"
-                , FadeAndDie_function_type( &::C_Sprite::FadeAndDie )
-                , ( bp::arg("duration") ) );
-        
-        }
-        { //::C_Sprite::FadeOutFromSpawn
-        
-            typedef void ( ::C_Sprite::*FadeOutFromSpawn_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "FadeOutFromSpawn"
-                , FadeOutFromSpawn_function_type( &::C_Sprite::FadeOutFromSpawn ) );
-        
-        }
-        { //::C_Sprite::Frames
-        
-            typedef float ( ::C_Sprite::*Frames_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "Frames"
-                , Frames_function_type( &::C_Sprite::Frames ) );
-        
-        }
-        { //::C_Sprite::GetBrightness
-        
-            typedef int ( ::C_Sprite::*GetBrightness_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetBrightness"
-                , GetBrightness_function_type( &::C_Sprite::GetBrightness ) );
-        
-        }
-        { //::C_Sprite::GetHDRColorScale
-        
-            typedef float ( ::C_Sprite::*GetHDRColorScale_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetHDRColorScale"
-                , GetHDRColorScale_function_type( &::C_Sprite::GetHDRColorScale ) );
-        
-        }
-        { //::C_Sprite::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_Sprite_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_Sprite::GetPyNetworkType ) );
-        
-        }
-        { //::C_Sprite::GetRenderBounds
-        
-            typedef void ( ::C_Sprite::*GetRenderBounds_function_type )( ::Vector &,::Vector & ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetRenderBounds"
-                , GetRenderBounds_function_type( &::C_Sprite::GetRenderBounds )
-                , ( bp::arg("vecMins"), bp::arg("vecMaxs") ) );
-        
-        }
-        { //::C_Sprite::GetRenderBrightness
-        
-            typedef int ( ::C_Sprite::*GetRenderBrightness_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetRenderBrightness"
-                , GetRenderBrightness_function_type( &::C_Sprite::GetRenderBrightness ) );
-        
-        }
-        { //::C_Sprite::GetRenderOrigin
-        
-            typedef ::Vector const & ( ::C_Sprite::*GetRenderOrigin_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetRenderOrigin"
-                , GetRenderOrigin_function_type( &::C_Sprite::GetRenderOrigin )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::C_Sprite::GetRenderScale
-        
-            typedef float ( ::C_Sprite::*GetRenderScale_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetRenderScale"
-                , GetRenderScale_function_type( &::C_Sprite::GetRenderScale ) );
-        
-        }
-        { //::C_Sprite::GetScale
-        
-            typedef float ( ::C_Sprite::*GetScale_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetScale"
-                , GetScale_function_type( &::C_Sprite::GetScale ) );
-        
-        }
-        { //::C_Sprite::GetToolRecordingState
-        
-            typedef void ( ::C_Sprite::*GetToolRecordingState_function_type )( ::KeyValues * ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetToolRecordingState"
-                , GetToolRecordingState_function_type( &::C_Sprite::GetToolRecordingState )
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_Sprite::IsOn
-        
-            typedef bool ( ::C_Sprite::*IsOn_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "IsOn"
-                , IsOn_function_type( &::C_Sprite::IsOn ) );
-        
-        }
-        { //::C_Sprite::IsSprite
-        
-            typedef bool ( ::C_Sprite::*IsSprite_function_type )(  ) const;
-            
-            C_Sprite_exposer.def( 
-                "IsSprite"
-                , IsSprite_function_type( &::C_Sprite::IsSprite ) );
-        
-        }
-        { //::C_Sprite::OnDataChanged
-        
-            typedef void ( ::C_Sprite::*OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            typedef void ( C_Sprite_wrapper::*default_OnDataChanged_function_type )( ::DataUpdateType_t ) ;
-            
-            C_Sprite_exposer.def( 
-                "OnDataChanged"
-                , OnDataChanged_function_type(&::C_Sprite::OnDataChanged)
-                , default_OnDataChanged_function_type(&C_Sprite_wrapper::default_OnDataChanged)
-                , ( bp::arg("updateType") ) );
-        
-        }
-        { //::C_Sprite::Precache
-        
-            typedef void ( ::C_Sprite::*Precache_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_Precache_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::C_Sprite::Precache)
-                , default_Precache_function_type(&C_Sprite_wrapper::default_Precache) );
-        
-        }
-        { //::C_Sprite::SetAttachment
-        
-            typedef void ( ::C_Sprite::*SetAttachment_function_type )( ::C_BaseEntity *,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetAttachment"
-                , SetAttachment_function_type( &::C_Sprite::SetAttachment )
-                , ( bp::arg("pEntity"), bp::arg("attachment") ) );
-        
-        }
-        { //::C_Sprite::SetBrightness
-        
-            typedef void ( ::C_Sprite::*SetBrightness_function_type )( int,float ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetBrightness"
-                , SetBrightness_function_type( &::C_Sprite::SetBrightness )
-                , ( bp::arg("brightness"), bp::arg("duration")=0.0f ) );
-        
-        }
-        { //::C_Sprite::SetColor
-        
-            typedef void ( ::C_Sprite::*SetColor_function_type )( int,int,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetColor"
-                , SetColor_function_type( &::C_Sprite::SetColor )
-                , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) );
-        
-        }
-        { //::C_Sprite::SetGlowProxySize
-        
-            typedef void ( ::C_Sprite::*SetGlowProxySize_function_type )( float ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetGlowProxySize"
-                , SetGlowProxySize_function_type( &::C_Sprite::SetGlowProxySize )
-                , ( bp::arg("flSize") ) );
-        
-        }
-        { //::C_Sprite::SetModel
-        
-            typedef void ( ::C_Sprite::*SetModel_function_type )( char const * ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetModel"
-                , SetModel_function_type( &::C_Sprite::SetModel )
-                , ( bp::arg("szModelName") ) );
-        
-        }
-        { //::C_Sprite::SetScale
-        
-            typedef void ( ::C_Sprite::*SetScale_function_type )( float,float ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetScale"
-                , SetScale_function_type( &::C_Sprite::SetScale )
-                , ( bp::arg("scale"), bp::arg("duration")=0.0f ) );
-        
-        }
-        { //::C_Sprite::SetSpriteScale
-        
-            typedef void ( ::C_Sprite::*SetSpriteScale_function_type )( float ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetSpriteScale"
-                , SetSpriteScale_function_type( &::C_Sprite::SetSpriteScale )
-                , ( bp::arg("scale") ) );
-        
-        }
-        { //::C_Sprite::SetTexture
-        
-            typedef void ( ::C_Sprite::*SetTexture_function_type )( int ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetTexture"
-                , SetTexture_function_type( &::C_Sprite::SetTexture )
-                , ( bp::arg("spriteIndex") ) );
-        
-        }
-        { //::C_Sprite::SetTransparency
-        
-            typedef void ( ::C_Sprite::*SetTransparency_function_type )( int,int,int,int,int,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "SetTransparency"
-                , SetTransparency_function_type( &::C_Sprite::SetTransparency )
-                , ( bp::arg("rendermode"), bp::arg("r"), bp::arg("g"), bp::arg("b"), bp::arg("a"), bp::arg("fx") ) );
-        
-        }
-        { //::C_Sprite::Spawn
-        
-            typedef void ( ::C_Sprite::*Spawn_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::C_Sprite::Spawn)
-                , default_Spawn_function_type(&C_Sprite_wrapper::default_Spawn) );
-        
-        }
-        { //::C_Sprite::SpriteCreatePredictable
-        
-            typedef ::C_Sprite * ( *SpriteCreatePredictable_function_type )( char const *,int,char const *,::Vector const &,bool );
-            
-            C_Sprite_exposer.def( 
-                "SpriteCreatePredictable"
-                , SpriteCreatePredictable_function_type( &::C_Sprite::SpriteCreatePredictable )
-                , ( bp::arg("module"), bp::arg("line"), bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_Sprite::SpriteInit
-        
-            typedef void ( ::C_Sprite::*SpriteInit_function_type )( char const *,::Vector const & ) ;
-            
-            C_Sprite_exposer.def( 
-                "SpriteInit"
-                , SpriteInit_function_type( &::C_Sprite::SpriteInit )
-                , ( bp::arg("pSpriteName"), bp::arg("origin") ) );
-        
-        }
-        { //::C_Sprite::TurnOff
-        
-            typedef void ( ::C_Sprite::*TurnOff_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "TurnOff"
-                , TurnOff_function_type( &::C_Sprite::TurnOff ) );
-        
-        }
-        { //::C_Sprite::TurnOn
-        
-            typedef void ( ::C_Sprite::*TurnOn_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "TurnOn"
-                , TurnOn_function_type( &::C_Sprite::TurnOn ) );
-        
-        }
-        C_Sprite_exposer.def_readwrite( "m_flDieTime", &C_Sprite::m_flDieTime );
-        C_Sprite_exposer.def_readwrite( "m_flFrame", &C_Sprite::m_flFrame );
-        C_Sprite_exposer.def_readwrite( "m_flSpriteFramerate", &C_Sprite::m_flSpriteFramerate );
-        C_Sprite_exposer.def_readwrite( "m_hAttachedToEntity", &C_Sprite::m_hAttachedToEntity );
-        C_Sprite_exposer.def_readwrite( "m_nAttachment", &C_Sprite::m_nAttachment );
-        { //::C_BaseEntity::Activate
-        
-            typedef void ( ::C_BaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_Activate_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::C_BaseEntity::Activate)
-                , default_Activate_function_type(&C_Sprite_wrapper::default_Activate) );
-        
-        }
-        { //::C_BaseEntity::AddToEntityList
-        
-            typedef void ( C_Sprite_wrapper::*AddToEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_Sprite_exposer.def( 
-                "AddToEntityList"
-                , AddToEntityList_function_type( &C_Sprite_wrapper::AddToEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseEntity::CreateVPhysics
-        
-            typedef bool ( ::C_BaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( C_Sprite_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::C_BaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&C_Sprite_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::C_BaseEntity::DoImpactEffect
-        
-            typedef void ( ::C_BaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( C_Sprite_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::C_BaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&C_Sprite_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::C_BaseEntity::EndTouch
-        
-            typedef void ( ::C_BaseEntity::*EndTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_Sprite_wrapper::*default_EndTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_Sprite_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::C_BaseEntity::EndTouch)
-                , default_EndTouch_function_type(&C_Sprite_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseEntity::GetCollideType
-        
-            typedef ::CollideType_t ( ::C_BaseEntity::*GetCollideType_function_type )(  ) ;
-            typedef ::CollideType_t ( C_Sprite_wrapper::*default_GetCollideType_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetCollideType"
-                , GetCollideType_function_type(&::C_BaseEntity::GetCollideType)
-                , default_GetCollideType_function_type(&C_Sprite_wrapper::default_GetCollideType) );
-        
-        }
-        { //::C_BaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::C_BaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( C_Sprite_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::C_BaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&C_Sprite_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::C_BaseEntity::GetTracerType
-        
-            typedef char const * ( ::C_BaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( C_Sprite_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::C_BaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&C_Sprite_wrapper::default_GetTracerType) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( C_Sprite_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            C_Sprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_Sprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( C_Sprite_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            C_Sprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_Sprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( C_Sprite_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_Sprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::C_BaseEntity::KeyValue
-        
-            typedef bool ( ::C_BaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( C_Sprite_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            C_Sprite_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::C_BaseEntity::KeyValue)
-                , default_KeyValue_function_type(&C_Sprite_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::C_BaseEntity::MakeTracer
-        
-            typedef void ( ::C_BaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( C_Sprite_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            C_Sprite_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::C_BaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&C_Sprite_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::C_BaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::C_BaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( C_Sprite_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            C_Sprite_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::C_BaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&C_Sprite_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::C_BaseEntity::OnRestore
-        
-            typedef void ( ::C_BaseEntity::*OnRestore_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::C_BaseEntity::OnRestore)
-                , default_OnRestore_function_type(&C_Sprite_wrapper::default_OnRestore) );
-        
-        }
-        { //::C_BaseEntity::PyNotifyShouldTransmit
-        
-            typedef void ( ::C_BaseEntity::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            typedef void ( C_Sprite_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            
-            C_Sprite_exposer.def( 
-                "NotifyShouldTransmit"
-                , NotifyShouldTransmit_function_type(&::C_BaseEntity::PyNotifyShouldTransmit)
-                , default_NotifyShouldTransmit_function_type(&C_Sprite_wrapper::default_NotifyShouldTransmit)
-                , ( bp::arg("state") ) );
-        
-        }
-        { //::C_BaseEntity::PyReceiveMessage
-        
-            typedef void ( ::C_BaseEntity::*ReceiveMessage_function_type )( ::boost::python::list ) ;
-            typedef void ( C_Sprite_wrapper::*default_ReceiveMessage_function_type )( ::boost::python::list ) ;
-            
-            C_Sprite_exposer.def( 
-                "ReceiveMessage"
-                , ReceiveMessage_function_type(&::C_BaseEntity::PyReceiveMessage)
-                , default_ReceiveMessage_function_type(&C_Sprite_wrapper::default_ReceiveMessage)
-                , ( bp::arg("msg") ) );
-        
-        }
-        { //::C_BaseEntity::RemoveFromEntityList
-        
-            typedef void ( C_Sprite_wrapper::*RemoveFromEntityList_function_type )( ::entity_list_ids_t ) ;
-            
-            C_Sprite_exposer.def( 
-                "RemoveFromEntityList"
-                , RemoveFromEntityList_function_type( &C_Sprite_wrapper::RemoveFromEntityList )
-                , ( bp::arg("listId") ) );
-        
-        }
-        { //::C_BaseEntity::ShouldDraw
-        
-            typedef bool ( ::C_BaseEntity::*ShouldDraw_function_type )(  ) ;
-            typedef bool ( C_Sprite_wrapper::*default_ShouldDraw_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "ShouldDraw"
-                , ShouldDraw_function_type(&::C_BaseEntity::ShouldDraw)
-                , default_ShouldDraw_function_type(&C_Sprite_wrapper::default_ShouldDraw) );
-        
-        }
-        { //::C_BaseEntity::Simulate
-        
-            typedef bool ( ::C_BaseEntity::*Simulate_function_type )(  ) ;
-            typedef bool ( C_Sprite_wrapper::*default_Simulate_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "Simulate"
-                , Simulate_function_type(&::C_BaseEntity::Simulate)
-                , default_Simulate_function_type(&C_Sprite_wrapper::default_Simulate) );
-        
-        }
-        { //::C_BaseEntity::StartTouch
-        
-            typedef void ( ::C_BaseEntity::*StartTouch_function_type )( ::C_BaseEntity * ) ;
-            typedef void ( C_Sprite_wrapper::*default_StartTouch_function_type )( ::C_BaseEntity * ) ;
-            
-            C_Sprite_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::C_BaseEntity::StartTouch)
-                , default_StartTouch_function_type(&C_Sprite_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::C_BaseEntity::UpdateOnRemove
-        
-            typedef void ( ::C_BaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( C_Sprite_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            C_Sprite_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::C_BaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&C_Sprite_wrapper::default_UpdateOnRemove) );
-        
-        }
-        C_Sprite_exposer.staticmethod( "GetPyNetworkType" );
-        C_Sprite_exposer.staticmethod( "SpriteCreatePredictable" );
-        { //::C_Sprite::TestCollision
-            
-                typedef bool ( ::C_Sprite::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_Sprite_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_Sprite_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_Sprite::TestCollision)
-                    , default_TestCollision_function_type(&C_Sprite_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< C_Sprite_wrapper, bp::bases< C_BaseEntity >, boost::noncopyable >( "C_Sprite", bp::init< >() )    
+        .def( 
+            "Animate"
+            , (void ( ::C_Sprite::* )( float ) )( &::C_Sprite::Animate )
+            , ( bp::arg("frames") ) )    
+        .def( 
+            "AnimateAndDie"
+            , (void ( ::C_Sprite::* )( float ) )( &::C_Sprite::AnimateAndDie )
+            , ( bp::arg("framerate") ) )    
+        .def( 
+            "AnimateForTime"
+            , (void ( ::C_Sprite::* )( float,float ) )( &::C_Sprite::AnimateForTime )
+            , ( bp::arg("framerate"), bp::arg("time") ) )    
+        .def( 
+            "AnimateThink"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::AnimateThink ) )    
+        .def( 
+            "AnimateUntilDead"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::AnimateUntilDead ) )    
+        .def( 
+            "BeginFadeOutThink"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::BeginFadeOutThink ) )    
+        .def( 
+            "ClientThink"
+            , (void ( ::C_Sprite::* )(  ) )(&::C_Sprite::ClientThink)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_ClientThink) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::C_Sprite::* )( ::Vector *,::Vector * ) )(&::C_Sprite::ComputeWorldSpaceSurroundingBox)
+            , (void ( C_Sprite_wrapper::* )( ::Vector *,::Vector * ) )(&C_Sprite_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
+        .def( 
+            "DrawModel"
+            , (int ( ::C_Sprite::* )( int,::RenderableInstance_t const & ) )( &::C_Sprite::DrawModel )
+            , ( bp::arg("flags"), bp::arg("instance") ) )    
+        .def( 
+            "EnableWorldSpaceScale"
+            , (void ( ::C_Sprite::* )( bool ) )( &::C_Sprite::EnableWorldSpaceScale )
+            , ( bp::arg("bEnable") ) )    
+        .def( 
+            "Expand"
+            , (void ( ::C_Sprite::* )( float,float ) )( &::C_Sprite::Expand )
+            , ( bp::arg("scaleSpeed"), bp::arg("fadeSpeed") ) )    
+        .def( 
+            "ExpandThink"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::ExpandThink ) )    
+        .def( 
+            "FadeAndDie"
+            , (void ( ::C_Sprite::* )( float ) )( &::C_Sprite::FadeAndDie )
+            , ( bp::arg("duration") ) )    
+        .def( 
+            "FadeOutFromSpawn"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::FadeOutFromSpawn ) )    
+        .def( 
+            "Frames"
+            , (float ( ::C_Sprite::* )(  ) )( &::C_Sprite::Frames ) )    
+        .def( 
+            "GetBrightness"
+            , (int ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetBrightness ) )    
+        .def( 
+            "GetHDRColorScale"
+            , (float ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetHDRColorScale ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::C_Sprite::GetPyNetworkType ) )    
+        .def( 
+            "GetRenderBounds"
+            , (void ( ::C_Sprite::* )( ::Vector &,::Vector & ) )( &::C_Sprite::GetRenderBounds )
+            , ( bp::arg("vecMins"), bp::arg("vecMaxs") ) )    
+        .def( 
+            "GetRenderBrightness"
+            , (int ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetRenderBrightness ) )    
+        .def( 
+            "GetRenderOrigin"
+            , (::Vector const & ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetRenderOrigin )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "GetRenderScale"
+            , (float ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetRenderScale ) )    
+        .def( 
+            "GetScale"
+            , (float ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetScale ) )    
+        .def( 
+            "GetToolRecordingState"
+            , (void ( ::C_Sprite::* )( ::KeyValues * ) )( &::C_Sprite::GetToolRecordingState )
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "IsOn"
+            , (bool ( ::C_Sprite::* )(  ) )( &::C_Sprite::IsOn ) )    
+        .def( 
+            "IsSprite"
+            , (bool ( ::C_Sprite::* )(  ) const)( &::C_Sprite::IsSprite ) )    
+        .def( 
+            "OnDataChanged"
+            , (void ( ::C_Sprite::* )( ::DataUpdateType_t ) )(&::C_Sprite::OnDataChanged)
+            , (void ( C_Sprite_wrapper::* )( ::DataUpdateType_t ) )(&C_Sprite_wrapper::default_OnDataChanged)
+            , ( bp::arg("updateType") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::C_Sprite::* )(  ) )(&::C_Sprite::Precache)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_Precache) )    
+        .def( 
+            "SetAttachment"
+            , (void ( ::C_Sprite::* )( ::C_BaseEntity *,int ) )( &::C_Sprite::SetAttachment )
+            , ( bp::arg("pEntity"), bp::arg("attachment") ) )    
+        .def( 
+            "SetBrightness"
+            , (void ( ::C_Sprite::* )( int,float ) )( &::C_Sprite::SetBrightness )
+            , ( bp::arg("brightness"), bp::arg("duration")=0.0f ) )    
+        .def( 
+            "SetColor"
+            , (void ( ::C_Sprite::* )( int,int,int ) )( &::C_Sprite::SetColor )
+            , ( bp::arg("r"), bp::arg("g"), bp::arg("b") ) )    
+        .def( 
+            "SetGlowProxySize"
+            , (void ( ::C_Sprite::* )( float ) )( &::C_Sprite::SetGlowProxySize )
+            , ( bp::arg("flSize") ) )    
+        .def( 
+            "SetModel"
+            , (void ( ::C_Sprite::* )( char const * ) )( &::C_Sprite::SetModel )
+            , ( bp::arg("szModelName") ) )    
+        .def( 
+            "SetScale"
+            , (void ( ::C_Sprite::* )( float,float ) )( &::C_Sprite::SetScale )
+            , ( bp::arg("scale"), bp::arg("duration")=0.0f ) )    
+        .def( 
+            "SetSpriteScale"
+            , (void ( ::C_Sprite::* )( float ) )( &::C_Sprite::SetSpriteScale )
+            , ( bp::arg("scale") ) )    
+        .def( 
+            "SetTexture"
+            , (void ( ::C_Sprite::* )( int ) )( &::C_Sprite::SetTexture )
+            , ( bp::arg("spriteIndex") ) )    
+        .def( 
+            "SetTransparency"
+            , (void ( ::C_Sprite::* )( int,int,int,int,int,int ) )( &::C_Sprite::SetTransparency )
+            , ( bp::arg("rendermode"), bp::arg("r"), bp::arg("g"), bp::arg("b"), bp::arg("a"), bp::arg("fx") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::C_Sprite::* )(  ) )(&::C_Sprite::Spawn)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_Spawn) )    
+        .def( 
+            "SpriteCreatePredictable"
+            , (::C_Sprite * (*)( char const *,int,char const *,::Vector const &,bool ))( &::C_Sprite::SpriteCreatePredictable )
+            , ( bp::arg("module"), bp::arg("line"), bp::arg("pSpriteName"), bp::arg("origin"), bp::arg("animate") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "SpriteInit"
+            , (void ( ::C_Sprite::* )( char const *,::Vector const & ) )( &::C_Sprite::SpriteInit )
+            , ( bp::arg("pSpriteName"), bp::arg("origin") ) )    
+        .def( 
+            "TurnOff"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::TurnOff ) )    
+        .def( 
+            "TurnOn"
+            , (void ( ::C_Sprite::* )(  ) )( &::C_Sprite::TurnOn ) )    
+        .def( 
+            "Activate"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Activate)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_Activate) )    
+        .def( 
+            "AddToEntityList"
+            , (void ( C_Sprite_wrapper::* )( ::entity_list_ids_t ) )(&C_Sprite_wrapper::AddToEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::CreateVPhysics)
+            , (bool ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::C_BaseEntity::* )( ::trace_t &,int ) )(&::C_BaseEntity::DoImpactEffect)
+            , (void ( C_Sprite_wrapper::* )( ::trace_t &,int ) )(&C_Sprite_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::EndTouch)
+            , (void ( C_Sprite_wrapper::* )( ::C_BaseEntity * ) )(&C_Sprite_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "GetCollideType"
+            , (::CollideType_t ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetCollideType)
+            , (::CollideType_t ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_GetCollideType) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetIMouse)
+            , (::IMouse * ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetTracerType)
+            , (char const * ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,char const * ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_Sprite_wrapper::* )( char const *,char const * ) )(&C_Sprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,float ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_Sprite_wrapper::* )( char const *,float ) )(&C_Sprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,int ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_Sprite_wrapper::* )( char const *,int ) )(&C_Sprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::C_BaseEntity::* )( char const *,::Vector const & ) )(&::C_BaseEntity::KeyValue)
+            , (bool ( C_Sprite_wrapper::* )( char const *,::Vector const & ) )(&C_Sprite_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::C_BaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::C_BaseEntity::MakeTracer)
+            , (void ( C_Sprite_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_Sprite_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
+            , (void ( C_Sprite_wrapper::* )( int ) )(&C_Sprite_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::OnRestore)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_OnRestore) )    
+        .def( 
+            "NotifyShouldTransmit"
+            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::PyNotifyShouldTransmit)
+            , (void ( C_Sprite_wrapper::* )( ::ShouldTransmitState_t ) )(&C_Sprite_wrapper::default_NotifyShouldTransmit)
+            , ( bp::arg("state") ) )    
+        .def( 
+            "ReceiveMessage"
+            , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)
+            , (void ( C_Sprite_wrapper::* )( ::boost::python::list ) )(&C_Sprite_wrapper::default_ReceiveMessage)
+            , ( bp::arg("msg") ) )    
+        .def( 
+            "RemoveFromEntityList"
+            , (void ( C_Sprite_wrapper::* )( ::entity_list_ids_t ) )(&C_Sprite_wrapper::RemoveFromEntityList)
+            , ( bp::arg("listId") ) )    
+        .def( 
+            "ShouldDraw"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ShouldDraw)
+            , (bool ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_ShouldDraw) )    
+        .def( 
+            "Simulate"
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Simulate)
+            , (bool ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_Simulate) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::StartTouch)
+            , (void ( C_Sprite_wrapper::* )( ::C_BaseEntity * ) )(&C_Sprite_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
+            , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_UpdateOnRemove) )    
+        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "SpriteCreatePredictable" );
 
 }
 

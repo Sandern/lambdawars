@@ -169,12 +169,14 @@ class SemiSharedModuleGenerator(SourceModuleGenerator):
         self.isclient = True
         self.isserver = False
         mb_client = self.CreateBuilder(*self.GetFiles())
+        self.mb = mb_client
         self.Parse(mb_client)
         
         # Parse server side of module
         self.isclient = False
         self.isserver = True
         mb_server = self.CreateBuilder(*self.GetFiles())
+        self.mb = mb_server
         self.Parse(mb_server)
         
         # Output files

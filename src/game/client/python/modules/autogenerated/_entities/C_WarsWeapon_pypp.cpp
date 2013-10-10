@@ -915,98 +915,37 @@ struct C_WarsWeapon_wrapper : C_WarsWeapon, bp::wrapper< C_WarsWeapon > {
         return C_WarsWeapon::GetClientClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: C_WarsWeapon\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->C_WarsWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->C_WarsWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return C_WarsWeapon::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
+    float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack; }
 
-    float m_flNextPrimaryAttack_Get() {
-       return m_flNextPrimaryAttack;
-    }
+    void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack = val; }
 
-    void m_flNextPrimaryAttack_Set(float val) {
-       m_flNextPrimaryAttack = val;
-    }
+    float m_flNextSecondaryAttack_Get() { return m_flNextSecondaryAttack; }
 
-    float m_flNextSecondaryAttack_Get() {
-       return m_flNextSecondaryAttack;
-    }
+    void m_flNextSecondaryAttack_Set( float val ) { m_flNextSecondaryAttack = val; }
 
-    void m_flNextSecondaryAttack_Set(float val) {
-       m_flNextSecondaryAttack = val;
-    }
+    float m_flTimeWeaponIdle_Get() { return m_flTimeWeaponIdle; }
 
-    float m_flTimeWeaponIdle_Get() {
-       return m_flTimeWeaponIdle;
-    }
+    void m_flTimeWeaponIdle_Set( float val ) { m_flTimeWeaponIdle = val; }
 
-    void m_flTimeWeaponIdle_Set(float val) {
-       m_flTimeWeaponIdle = val;
-    }
+    int m_iState_Get() { return m_iState; }
 
-    int m_iState_Get() {
-       return m_iState;
-    }
+    void m_iState_Set( int val ) { m_iState = val; }
 
-    void m_iState_Set(int val) {
-       m_iState = val;
-    }
+    int m_iPrimaryAmmoType_Get() { return m_iPrimaryAmmoType; }
 
-    int m_iPrimaryAmmoType_Get() {
-       return m_iPrimaryAmmoType;
-    }
+    void m_iPrimaryAmmoType_Set( int val ) { m_iPrimaryAmmoType = val; }
 
-    void m_iPrimaryAmmoType_Set(int val) {
-       m_iPrimaryAmmoType = val;
-    }
+    int m_iSecondaryAmmoType_Get() { return m_iSecondaryAmmoType; }
 
-    int m_iSecondaryAmmoType_Get() {
-       return m_iSecondaryAmmoType;
-    }
+    void m_iSecondaryAmmoType_Set( int val ) { m_iSecondaryAmmoType = val; }
 
-    void m_iSecondaryAmmoType_Set(int val) {
-       m_iSecondaryAmmoType = val;
-    }
+    int m_iClip1_Get() { return m_iClip1; }
 
-    int m_iClip1_Get() {
-       return m_iClip1;
-    }
+    void m_iClip1_Set( int val ) { m_iClip1 = val; }
 
-    void m_iClip1_Set(int val) {
-       m_iClip1 = val;
-    }
+    int m_iClip2_Get() { return m_iClip2; }
 
-    int m_iClip2_Get() {
-       return m_iClip2;
-    }
-
-    void m_iClip2_Set(int val) {
-       m_iClip2 = val;
-    }
+    void m_iClip2_Set( int val ) { m_iClip2 = val; }
 
 };
 
@@ -1318,7 +1257,6 @@ void register_C_WarsWeapon_class(){
         C_WarsWeapon_exposer.def_readwrite( "minburst", &C_WarsWeapon::m_iMinBurst );
         C_WarsWeapon_exposer.def_readwrite( "burstshotsremaining", &C_WarsWeapon::m_nBurstShotsRemaining );
         C_WarsWeapon_exposer.def_readwrite( "bulletspread", &C_WarsWeapon::m_vBulletSpread );
-        C_WarsWeapon_exposer.def_readwrite( "tracercolor", &C_WarsWeapon::m_vTracerColor );
         { //::C_BaseCombatWeapon::Activate
         
             typedef void ( ::C_BaseCombatWeapon::*Activate_function_type )(  ) ;
@@ -1638,42 +1576,14 @@ void register_C_WarsWeapon_class(){
                 , fset( &::C_WarsWeapon::SetSecondaryAttackActivity ) );
         
         }
-        { //::C_WarsWeapon::TestCollision
-            
-                typedef bool ( ::C_WarsWeapon::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( C_WarsWeapon_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                C_WarsWeapon_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::C_WarsWeapon::TestCollision)
-                    , default_TestCollision_function_type(&C_WarsWeapon_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-        C_WarsWeapon_exposer.add_property("nextprimaryattack", 
-           &C_WarsWeapon_wrapper::m_flNextPrimaryAttack_Get,
-           &C_WarsWeapon_wrapper::m_flNextPrimaryAttack_Set );
-        C_WarsWeapon_exposer.add_property("nextsecondaryattack", 
-           &C_WarsWeapon_wrapper::m_flNextSecondaryAttack_Get,
-           &C_WarsWeapon_wrapper::m_flNextSecondaryAttack_Set );
-        C_WarsWeapon_exposer.add_property("timeweaponidle", 
-           &C_WarsWeapon_wrapper::m_flTimeWeaponIdle_Get,
-           &C_WarsWeapon_wrapper::m_flTimeWeaponIdle_Set );
-        C_WarsWeapon_exposer.add_property("state", 
-           &C_WarsWeapon_wrapper::m_iState_Get,
-           &C_WarsWeapon_wrapper::m_iState_Set );
-        C_WarsWeapon_exposer.add_property("primaryammotype", 
-           &C_WarsWeapon_wrapper::m_iPrimaryAmmoType_Get,
-           &C_WarsWeapon_wrapper::m_iPrimaryAmmoType_Set );
-        C_WarsWeapon_exposer.add_property("secondaryammotype", 
-           &C_WarsWeapon_wrapper::m_iSecondaryAmmoType_Get,
-           &C_WarsWeapon_wrapper::m_iSecondaryAmmoType_Set );
-        C_WarsWeapon_exposer.add_property("clip1", 
-           &C_WarsWeapon_wrapper::m_iClip1_Get,
-           &C_WarsWeapon_wrapper::m_iClip1_Set );
-        C_WarsWeapon_exposer.add_property("clip2", 
-           &C_WarsWeapon_wrapper::m_iClip2_Get,
-           &C_WarsWeapon_wrapper::m_iClip2_Set );
+        C_WarsWeapon_exposer.add_property( "nextprimaryattack", &C_WarsWeapon_wrapper::m_flNextPrimaryAttack_Get, &C_WarsWeapon_wrapper::m_flNextPrimaryAttack_Set );
+        C_WarsWeapon_exposer.add_property( "nextsecondaryattack", &C_WarsWeapon_wrapper::m_flNextSecondaryAttack_Get, &C_WarsWeapon_wrapper::m_flNextSecondaryAttack_Set );
+        C_WarsWeapon_exposer.add_property( "timeweaponidle", &C_WarsWeapon_wrapper::m_flTimeWeaponIdle_Get, &C_WarsWeapon_wrapper::m_flTimeWeaponIdle_Set );
+        C_WarsWeapon_exposer.add_property( "state", &C_WarsWeapon_wrapper::m_iState_Get, &C_WarsWeapon_wrapper::m_iState_Set );
+        C_WarsWeapon_exposer.add_property( "primaryammotype", &C_WarsWeapon_wrapper::m_iPrimaryAmmoType_Get, &C_WarsWeapon_wrapper::m_iPrimaryAmmoType_Set );
+        C_WarsWeapon_exposer.add_property( "secondaryammotype", &C_WarsWeapon_wrapper::m_iSecondaryAmmoType_Get, &C_WarsWeapon_wrapper::m_iSecondaryAmmoType_Set );
+        C_WarsWeapon_exposer.add_property( "clip1", &C_WarsWeapon_wrapper::m_iClip1_Get, &C_WarsWeapon_wrapper::m_iClip1_Set );
+        C_WarsWeapon_exposer.add_property( "clip2", &C_WarsWeapon_wrapper::m_iClip2_Get, &C_WarsWeapon_wrapper::m_iClip2_Set );
     }
 
 }

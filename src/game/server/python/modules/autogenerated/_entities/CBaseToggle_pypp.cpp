@@ -1035,559 +1035,203 @@ struct CBaseToggle_wrapper : CBaseToggle, bp::wrapper< CBaseToggle > {
         return CBaseToggle::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBaseToggle\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBaseToggle::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBaseToggle::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBaseToggle::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CBaseToggle_class(){
 
-    { //::CBaseToggle
-        typedef bp::class_< CBaseToggle_wrapper, bp::bases< CBaseEntity >, boost::noncopyable > CBaseToggle_exposer_t;
-        CBaseToggle_exposer_t CBaseToggle_exposer = CBaseToggle_exposer_t( "CBaseToggle", bp::init< >() );
-        bp::scope CBaseToggle_scope( CBaseToggle_exposer );
-        { //::CBaseToggle::AngularMove
-        
-            typedef void ( ::CBaseToggle::*AngularMove_function_type )( ::QAngle const &,float ) ;
-            
-            CBaseToggle_exposer.def( 
-                "AngularMove"
-                , AngularMove_function_type( &::CBaseToggle::AngularMove )
-                , ( bp::arg("vecDestAngle"), bp::arg("flSpeed") ) );
-        
-        }
-        { //::CBaseToggle::AngularMoveDone
-        
-            typedef void ( ::CBaseToggle::*AngularMoveDone_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "AngularMoveDone"
-                , AngularMoveDone_function_type( &::CBaseToggle::AngularMoveDone ) );
-        
-        }
-        { //::CBaseToggle::AxisDelta
-        
-            typedef float ( *AxisDelta_function_type )( int,::QAngle const &,::QAngle const & );
-            
-            CBaseToggle_exposer.def( 
-                "AxisDelta"
-                , AxisDelta_function_type( &::CBaseToggle::AxisDelta )
-                , ( bp::arg("flags"), bp::arg("angle1"), bp::arg("angle2") ) );
-        
-        }
-        { //::CBaseToggle::AxisDir
-        
-            typedef void ( ::CBaseToggle::*AxisDir_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "AxisDir"
-                , AxisDir_function_type( &::CBaseToggle::AxisDir ) );
-        
-        }
-        { //::CBaseToggle::AxisValue
-        
-            typedef float ( *AxisValue_function_type )( int,::QAngle const & );
-            
-            CBaseToggle_exposer.def( 
-                "AxisValue"
-                , AxisValue_function_type( &::CBaseToggle::AxisValue )
-                , ( bp::arg("flags"), bp::arg("angles") ) );
-        
-        }
-        { //::CBaseToggle::GetDelay
-        
-            typedef float ( ::CBaseToggle::*GetDelay_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "GetDelay"
-                , GetDelay_function_type( &::CBaseToggle::GetDelay ) );
-        
-        }
-        { //::CBaseToggle::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CBaseToggle_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseToggle::GetPyNetworkType ) );
-        
-        }
-        { //::CBaseToggle::IsLockedByMaster
-        
-            typedef bool ( ::CBaseToggle::*IsLockedByMaster_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "IsLockedByMaster"
-                , IsLockedByMaster_function_type( &::CBaseToggle::IsLockedByMaster ) );
-        
-        }
-        { //::CBaseToggle::KeyValue
-        
-            typedef bool ( ::CBaseToggle::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseToggle::KeyValue)
-                , default_KeyValue_function_type(&CBaseToggle_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseToggle::KeyValue
-        
-            typedef bool ( ::CBaseToggle::*KeyValue_function_type )( char const *,::Vector ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_KeyValue_function_type )( char const *,::Vector ) ;
-            
-            CBaseToggle_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseToggle::KeyValue)
-                , default_KeyValue_function_type(&CBaseToggle_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vec") ) );
-        
-        }
-        { //::CBaseToggle::KeyValue
-        
-            typedef bool ( ::CBaseToggle::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CBaseToggle_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseToggle::KeyValue)
-                , default_KeyValue_function_type(&CBaseToggle_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseToggle::LinearMove
-        
-            typedef void ( ::CBaseToggle::*LinearMove_function_type )( ::Vector const &,float ) ;
-            
-            CBaseToggle_exposer.def( 
-                "LinearMove"
-                , LinearMove_function_type( &::CBaseToggle::LinearMove )
-                , ( bp::arg("vecDest"), bp::arg("flSpeed") ) );
-        
-        }
-        { //::CBaseToggle::LinearMoveDone
-        
-            typedef void ( ::CBaseToggle::*LinearMoveDone_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "LinearMoveDone"
-                , LinearMoveDone_function_type( &::CBaseToggle::LinearMoveDone ) );
-        
-        }
-        { //::CBaseToggle::MoveDone
-        
-            typedef void ( ::CBaseToggle::*MoveDone_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "MoveDone"
-                , MoveDone_function_type( &::CBaseToggle::MoveDone ) );
-        
-        }
-        CBaseToggle_exposer.def_readwrite( "m_flHeight", &CBaseToggle::m_flHeight );
-        CBaseToggle_exposer.def_readwrite( "m_flLip", &CBaseToggle::m_flLip );
-        CBaseToggle_exposer.def_readwrite( "m_flMoveDistance", &CBaseToggle::m_flMoveDistance );
-        CBaseToggle_exposer.def_readwrite( "m_flWait", &CBaseToggle::m_flWait );
-        CBaseToggle_exposer.def_readwrite( "m_hActivator", &CBaseToggle::m_hActivator );
-        CBaseToggle_exposer.def_readwrite( "m_movementType", &CBaseToggle::m_movementType );
-        CBaseToggle_exposer.def_readwrite( "m_sMaster", &CBaseToggle::m_sMaster );
-        CBaseToggle_exposer.def_readwrite( "m_toggle_state", &CBaseToggle::m_toggle_state );
-        CBaseToggle_exposer.def_readwrite( "m_vecAngle1", &CBaseToggle::m_vecAngle1 );
-        CBaseToggle_exposer.def_readwrite( "m_vecAngle2", &CBaseToggle::m_vecAngle2 );
-        CBaseToggle_exposer.def_readwrite( "m_vecFinalAngle", &CBaseToggle::m_vecFinalAngle );
-        CBaseToggle_exposer.def_readwrite( "m_vecFinalDest", &CBaseToggle::m_vecFinalDest );
-        CBaseToggle_exposer.def_readwrite( "m_vecMoveAng", &CBaseToggle::m_vecMoveAng );
-        CBaseToggle_exposer.def_readwrite( "m_vecPosition1", &CBaseToggle::m_vecPosition1 );
-        CBaseToggle_exposer.def_readwrite( "m_vecPosition2", &CBaseToggle::m_vecPosition2 );
-        { //::CBaseEntity::Activate
-        
-            typedef void ( ::CBaseEntity::*Activate_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseEntity::Activate)
-                , default_Activate_function_type(&CBaseToggle_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CBaseToggle_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CBaseToggle_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CBaseToggle_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CBaseToggle_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CBaseToggle_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CBaseToggle_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CBaseToggle_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseEntity::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseEntity::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CBaseToggle_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseEntity::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CBaseToggle_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CBaseToggle_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseToggle_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CBaseToggle_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CBaseToggle_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CBaseToggle_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CBaseToggle_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CBaseToggle_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CBaseToggle_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CBaseToggle_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CBaseToggle_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseToggle_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBaseToggle_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CBaseToggle_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CBaseToggle_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CBaseToggle_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseEntity::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CBaseToggle_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseEntity::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CBaseToggle_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CBaseToggle_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CBaseToggle_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CBaseToggle_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseEntity::OnRestore
-        
-            typedef void ( ::CBaseEntity::*OnRestore_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseEntity::OnRestore)
-                , default_OnRestore_function_type(&CBaseToggle_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CBaseToggle_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CBaseToggle_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseToggle_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseToggle_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CBaseToggle_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CBaseToggle_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CBaseToggle_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseEntity::Precache
-        
-            typedef void ( ::CBaseEntity::*Precache_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBaseEntity::Precache)
-                , default_Precache_function_type(&CBaseToggle_wrapper::default_Precache) );
-        
-        }
-        { //::CBaseEntity::Spawn
-        
-            typedef void ( ::CBaseEntity::*Spawn_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseEntity::Spawn)
-                , default_Spawn_function_type(&CBaseToggle_wrapper::default_Spawn) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CBaseToggle_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CBaseToggle_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CBaseToggle_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CBaseToggle_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CBaseToggle_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CBaseToggle_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CBaseToggle_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CBaseToggle_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CBaseToggle_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CBaseToggle_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBaseToggle_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CBaseToggle_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CBaseToggle_exposer.staticmethod( "AxisDelta" );
-        CBaseToggle_exposer.staticmethod( "AxisValue" );
-        CBaseToggle_exposer.staticmethod( "GetPyNetworkType" );
-        { //::CBaseToggle::TestCollision
-            
-                typedef bool ( ::CBaseToggle::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBaseToggle_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBaseToggle_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBaseToggle::TestCollision)
-                    , default_TestCollision_function_type(&CBaseToggle_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CBaseToggle_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CBaseToggle", bp::init< >() )    
+        .def( 
+            "AngularMove"
+            , (void ( ::CBaseToggle::* )( ::QAngle const &,float ) )( &::CBaseToggle::AngularMove )
+            , ( bp::arg("vecDestAngle"), bp::arg("flSpeed") ) )    
+        .def( 
+            "AngularMoveDone"
+            , (void ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::AngularMoveDone ) )    
+        .def( 
+            "AxisDelta"
+            , (float (*)( int,::QAngle const &,::QAngle const & ))( &::CBaseToggle::AxisDelta )
+            , ( bp::arg("flags"), bp::arg("angle1"), bp::arg("angle2") ) )    
+        .def( 
+            "AxisDir"
+            , (void ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::AxisDir ) )    
+        .def( 
+            "AxisValue"
+            , (float (*)( int,::QAngle const & ))( &::CBaseToggle::AxisValue )
+            , ( bp::arg("flags"), bp::arg("angles") ) )    
+        .def( 
+            "GetDelay"
+            , (float ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::GetDelay ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CBaseToggle::GetPyNetworkType ) )    
+        .def( 
+            "IsLockedByMaster"
+            , (bool ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::IsLockedByMaster ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseToggle::* )( char const *,char const * ) )(&::CBaseToggle::KeyValue)
+            , (bool ( CBaseToggle_wrapper::* )( char const *,char const * ) )(&CBaseToggle_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseToggle::* )( char const *,::Vector ) )(&::CBaseToggle::KeyValue)
+            , (bool ( CBaseToggle_wrapper::* )( char const *,::Vector ) )(&CBaseToggle_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vec") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseToggle::* )( char const *,float ) )(&::CBaseToggle::KeyValue)
+            , (bool ( CBaseToggle_wrapper::* )( char const *,float ) )(&CBaseToggle_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "LinearMove"
+            , (void ( ::CBaseToggle::* )( ::Vector const &,float ) )( &::CBaseToggle::LinearMove )
+            , ( bp::arg("vecDest"), bp::arg("flSpeed") ) )    
+        .def( 
+            "LinearMoveDone"
+            , (void ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::LinearMoveDone ) )    
+        .def( 
+            "MoveDone"
+            , (void ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::MoveDone ) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Activate)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_Activate) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CBaseToggle_wrapper::* )( ::Vector *,::Vector * ) )(&CBaseToggle_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CBaseToggle_wrapper::* )( ::CBaseEntity * ) )(&CBaseToggle_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CBaseToggle_wrapper::* )( ::trace_t &,int ) )(&CBaseToggle_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
+            , (int ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CBaseToggle_wrapper::* )( ::CBaseEntity * ) )(&CBaseToggle_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CBaseToggle_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseToggle_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CBaseToggle_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBaseToggle_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseToggle_wrapper::* )( char const *,int ) )(&CBaseToggle_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBaseToggle_wrapper::* )( char const *,::Vector const & ) )(&CBaseToggle_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CBaseToggle_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBaseToggle_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
+            , (void ( CBaseToggle_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBaseToggle_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CBaseToggle_wrapper::* )( int ) )(&CBaseToggle_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::OnRestore)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_OnRestore) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CBaseToggle_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseToggle_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CBaseToggle_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseToggle_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CBaseToggle_wrapper::* )( char const * ) )(&CBaseToggle_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Precache)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_Precache) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Spawn)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_Spawn) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CBaseToggle_wrapper::* )( ::CBaseEntity * ) )(&CBaseToggle_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CBaseToggle_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseToggle_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CBaseToggle_wrapper::* )(  ) )(&CBaseToggle_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CBaseToggle_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseToggle_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "AxisDelta" )    
+        .staticmethod( "AxisValue" )    
+        .staticmethod( "GetPyNetworkType" );
 
 }
 

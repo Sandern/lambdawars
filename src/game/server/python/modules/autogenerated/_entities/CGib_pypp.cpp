@@ -1123,708 +1123,268 @@ struct CGib_wrapper : CGib, bp::wrapper< CGib > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CGib\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CGib::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CGib::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CGib::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CGib_class(){
 
-    { //::CGib
-        typedef bp::class_< CGib_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable > CGib_exposer_t;
-        CGib_exposer_t CGib_exposer = CGib_exposer_t( "CGib" );
-        bp::scope CGib_scope( CGib_exposer );
-        { //::CGib::BounceGibTouch
-        
-            typedef void ( ::CGib::*BounceGibTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "BounceGibTouch"
-                , BounceGibTouch_function_type( &::CGib::BounceGibTouch )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CGib::DieThink
-        
-            typedef void ( ::CGib::*DieThink_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "DieThink"
-                , DieThink_function_type( &::CGib::DieThink ) );
-        
-        }
-        { //::CGib::GetFlame
-        
-            typedef ::CBaseEntity * ( ::CGib::*GetFlame_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "GetFlame"
-                , GetFlame_function_type( &::CGib::GetFlame )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CGib::GetSprite
-        
-            typedef ::CBaseEntity * ( ::CGib::*GetSprite_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "GetSprite"
-                , GetSprite_function_type( &::CGib::GetSprite )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CGib::HasPhysicsAttacker
-        
-            typedef ::CBasePlayer * ( ::CGib::*HasPhysicsAttacker_function_type )( float ) ;
-            
-            CGib_exposer.def( 
-                "HasPhysicsAttacker"
-                , HasPhysicsAttacker_function_type( &::CGib::HasPhysicsAttacker )
-                , ( bp::arg("dt") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CGib::InitGib
-        
-            typedef void ( ::CGib::*InitGib_function_type )( ::CBaseEntity *,float,float ) ;
-            
-            CGib_exposer.def( 
-                "InitGib"
-                , InitGib_function_type( &::CGib::InitGib )
-                , ( bp::arg("pVictim"), bp::arg("fMaxVelocity"), bp::arg("fMinVelocity") ) );
-        
-        }
-        { //::CGib::LimitVelocity
-        
-            typedef void ( ::CGib::*LimitVelocity_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "LimitVelocity"
-                , LimitVelocity_function_type( &::CGib::LimitVelocity ) );
-        
-        }
-        { //::CGib::ObjectCaps
-        
-            typedef int ( ::CGib::*ObjectCaps_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "ObjectCaps"
-                , ObjectCaps_function_type( &::CGib::ObjectCaps ) );
-        
-        }
-        { //::CGib::OnPhysGunDrop
-        
-            typedef void ( ::CGib::*OnPhysGunDrop_function_type )( ::CBasePlayer *,::PhysGunDrop_t ) ;
-            
-            CGib_exposer.def( 
-                "OnPhysGunDrop"
-                , OnPhysGunDrop_function_type( &::CGib::OnPhysGunDrop )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CGib::OnPhysGunPickup
-        
-            typedef void ( ::CGib::*OnPhysGunPickup_function_type )( ::CBasePlayer *,::PhysGunPickup_t ) ;
-            
-            CGib_exposer.def( 
-                "OnPhysGunPickup"
-                , OnPhysGunPickup_function_type( &::CGib::OnPhysGunPickup )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CGib::SUB_AllowedToFade
-        
-            typedef bool ( ::CGib::*SUB_AllowedToFade_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "SUB_AllowedToFade"
-                , SUB_AllowedToFade_function_type( &::CGib::SUB_AllowedToFade ) );
-        
-        }
-        { //::CGib::SetBloodColor
-        
-            typedef void ( ::CGib::*SetBloodColor_function_type )( int ) ;
-            
-            CGib_exposer.def( 
-                "SetBloodColor"
-                , SetBloodColor_function_type( &::CGib::SetBloodColor )
-                , ( bp::arg("nBloodColor") ) );
-        
-        }
-        { //::CGib::SetFlame
-        
-            typedef void ( ::CGib::*SetFlame_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "SetFlame"
-                , SetFlame_function_type( &::CGib::SetFlame )
-                , ( bp::arg("pFlame") ) );
-        
-        }
-        { //::CGib::SetPhysicsAttacker
-        
-            typedef void ( ::CGib::*SetPhysicsAttacker_function_type )( ::CBasePlayer *,float ) ;
-            
-            CGib_exposer.def( 
-                "SetPhysicsAttacker"
-                , SetPhysicsAttacker_function_type( &::CGib::SetPhysicsAttacker )
-                , ( bp::arg("pEntity"), bp::arg("flTime") ) );
-        
-        }
-        { //::CGib::SetSprite
-        
-            typedef void ( ::CGib::*SetSprite_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "SetSprite"
-                , SetSprite_function_type( &::CGib::SetSprite )
-                , ( bp::arg("pSprite") ) );
-        
-        }
-        { //::CGib::Spawn
-        
-            typedef void ( ::CGib::*Spawn_function_type )( char const * ) ;
-            typedef void ( CGib_wrapper::*default_Spawn_function_type )( char const * ) ;
-            
-            CGib_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CGib::Spawn)
-                , default_Spawn_function_type(&CGib_wrapper::default_Spawn)
-                , ( bp::arg("szGibModel") ) );
-        
-        }
-        { //::CGib::Spawn
-        
-            typedef void ( ::CGib::*Spawn_function_type )( char const *,float ) ;
-            typedef void ( CGib_wrapper::*default_Spawn_function_type )( char const *,float ) ;
-            
-            CGib_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CGib::Spawn)
-                , default_Spawn_function_type(&CGib_wrapper::default_Spawn)
-                , ( bp::arg("szGibModel"), bp::arg("flLifetime") ) );
-        
-        }
-        { //::CGib::SpawnHeadGib
-        
-            typedef void ( *SpawnHeadGib_function_type )( ::CBaseEntity * );
-            
-            CGib_exposer.def( 
-                "SpawnHeadGib"
-                , SpawnHeadGib_function_type( &::CGib::SpawnHeadGib )
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CGib::SpawnRandomGibs
-        
-            typedef void ( *SpawnRandomGibs_function_type )( ::CBaseEntity *,int,::GibType_e );
-            
-            CGib_exposer.def( 
-                "SpawnRandomGibs"
-                , SpawnRandomGibs_function_type( &::CGib::SpawnRandomGibs )
-                , ( bp::arg("pVictim"), bp::arg("cGibs"), bp::arg("eGibType") ) );
-        
-        }
-        { //::CGib::SpawnSpecificGibs
-        
-            typedef void ( *SpawnSpecificGibs_function_type )( ::CBaseEntity *,int,float,float,char const *,float );
-            
-            CGib_exposer.def( 
-                "SpawnSpecificGibs"
-                , SpawnSpecificGibs_function_type( &::CGib::SpawnSpecificGibs )
-                , ( bp::arg("pVictim"), bp::arg("nNumGibs"), bp::arg("fMaxVelocity"), bp::arg("fMinVelocity"), bp::arg("cModelName"), bp::arg("flLifetime")=25 ) );
-        
-        }
-        { //::CGib::SpawnStickyGibs
-        
-            typedef void ( *SpawnStickyGibs_function_type )( ::CBaseEntity *,::Vector,int );
-            
-            CGib_exposer.def( 
-                "SpawnStickyGibs"
-                , SpawnStickyGibs_function_type( &::CGib::SpawnStickyGibs )
-                , ( bp::arg("pVictim"), bp::arg("vecOrigin"), bp::arg("cGibs") ) );
-        
-        }
-        { //::CGib::StickyGibTouch
-        
-            typedef void ( ::CGib::*StickyGibTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "StickyGibTouch"
-                , StickyGibTouch_function_type( &::CGib::StickyGibTouch )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CGib::Use
-        
-            typedef void ( ::CGib::*Use_function_type )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) ;
-            
-            CGib_exposer.def( 
-                "Use"
-                , Use_function_type( &::CGib::Use )
-                , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) );
-        
-        }
-        { //::CGib::WaitTillLand
-        
-            typedef void ( ::CGib::*WaitTillLand_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "WaitTillLand"
-                , WaitTillLand_function_type( &::CGib::WaitTillLand ) );
-        
-        }
-        CGib_exposer.def_readwrite( "m_bForceRemove", &CGib::m_bForceRemove );
-        CGib_exposer.def_readwrite( "m_cBloodDecals", &CGib::m_cBloodDecals );
-        CGib_exposer.def_readwrite( "m_flLastPhysicsInfluenceTime", &CGib::m_flLastPhysicsInfluenceTime );
-        CGib_exposer.def_readwrite( "m_hPhysicsAttacker", &CGib::m_hPhysicsAttacker );
-        CGib_exposer.def_readwrite( "m_lifeTime", &CGib::m_lifeTime );
-        CGib_exposer.def_readwrite( "m_material", &CGib::m_material );
-        { //::CBaseAnimating::Activate
-        
-            typedef void ( ::CBaseAnimating::*Activate_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseAnimating::Activate)
-                , default_Activate_function_type(&CGib_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseAnimating::CanBecomeRagdoll
-        
-            typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
-            typedef bool ( CGib_wrapper::*default_CanBecomeRagdoll_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "CanBecomeRagdoll"
-                , CanBecomeRagdoll_function_type(&::CBaseAnimating::CanBecomeRagdoll)
-                , default_CanBecomeRagdoll_function_type(&CGib_wrapper::default_CanBecomeRagdoll) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CGib_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CGib_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CGib_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CGib_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CGib_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CGib_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CGib_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CGib_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CGib_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CGib_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseEntity::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseEntity::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CGib_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseAnimating::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseAnimating::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CGib_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseAnimating::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CGib_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CGib_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CGib_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CGib_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CGib_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CGib_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CGib_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CGib_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CGib_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CGib_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CGib_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CGib_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CGib_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CGib_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CGib_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CGib_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CGib_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CGib_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CGib_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CGib_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CGib_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CGib_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CGib_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CGib_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CGib_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CGib_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CGib_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CGib_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseAnimating::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseAnimating::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CGib_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CGib_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseAnimating::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CGib_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CGib_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CGib_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CGib_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseAnimating::OnRestore
-        
-            typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
-                , default_OnRestore_function_type(&CGib_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseAnimating::OnSequenceSet
-        
-            typedef void ( ::CBaseAnimating::*OnSequenceSet_function_type )( int ) ;
-            typedef void ( CGib_wrapper::*default_OnSequenceSet_function_type )( int ) ;
-            
-            CGib_exposer.def( 
-                "OnSequenceSet"
-                , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
-                , default_OnSequenceSet_function_type(&CGib_wrapper::default_OnSequenceSet)
-                , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseEntity::OnTakeDamage
-        
-            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CGib_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CGib_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CGib_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CGib_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CGib_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CGib_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CGib_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CGib_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CGib_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CGib_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseAnimating::Precache
-        
-            typedef void ( ::CBaseAnimating::*Precache_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBaseAnimating::Precache)
-                , default_Precache_function_type(&CGib_wrapper::default_Precache) );
-        
-        }
-        { //::CBaseAnimating::PyOnNewModel
-        
-            typedef void ( CGib_wrapper::*OnNewModel_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type( &CGib_wrapper::default_OnNewModel ) );
-        
-        }
-        { //::CBaseAnimating::Spawn
-        
-            typedef void ( ::CBaseAnimating::*Spawn_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBaseAnimating::Spawn)
-                , default_Spawn_function_type(&CGib_wrapper::default_Spawn) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CGib_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CGib_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CGib_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CGib_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CGib_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CGib_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CGib_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateOnRemove
-        
-            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CGib_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CGib_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CGib_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CGib_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CGib_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CGib_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CGib_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CGib_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        CGib_exposer.staticmethod( "SpawnHeadGib" );
-        CGib_exposer.staticmethod( "SpawnRandomGibs" );
-        CGib_exposer.staticmethod( "SpawnSpecificGibs" );
-        CGib_exposer.staticmethod( "SpawnStickyGibs" );
-        { //::CGib::TestCollision
-            
-                typedef bool ( ::CGib::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CGib_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CGib_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CGib::TestCollision)
-                    , default_TestCollision_function_type(&CGib_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CGib_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CGib" )    
+        .def( 
+            "BounceGibTouch"
+            , (void ( ::CGib::* )( ::CBaseEntity * ) )( &::CGib::BounceGibTouch )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "DieThink"
+            , (void ( ::CGib::* )(  ) )( &::CGib::DieThink ) )    
+        .def( 
+            "GetFlame"
+            , (::CBaseEntity * ( ::CGib::* )(  ) )( &::CGib::GetFlame )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetSprite"
+            , (::CBaseEntity * ( ::CGib::* )(  ) )( &::CGib::GetSprite )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "HasPhysicsAttacker"
+            , (::CBasePlayer * ( ::CGib::* )( float ) )( &::CGib::HasPhysicsAttacker )
+            , ( bp::arg("dt") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "InitGib"
+            , (void ( ::CGib::* )( ::CBaseEntity *,float,float ) )( &::CGib::InitGib )
+            , ( bp::arg("pVictim"), bp::arg("fMaxVelocity"), bp::arg("fMinVelocity") ) )    
+        .def( 
+            "LimitVelocity"
+            , (void ( ::CGib::* )(  ) )( &::CGib::LimitVelocity ) )    
+        .def( 
+            "ObjectCaps"
+            , (int ( ::CGib::* )(  ) )( &::CGib::ObjectCaps ) )    
+        .def( 
+            "OnPhysGunDrop"
+            , (void ( ::CGib::* )( ::CBasePlayer *,::PhysGunDrop_t ) )( &::CGib::OnPhysGunDrop )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "OnPhysGunPickup"
+            , (void ( ::CGib::* )( ::CBasePlayer *,::PhysGunPickup_t ) )( &::CGib::OnPhysGunPickup )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "SUB_AllowedToFade"
+            , (bool ( ::CGib::* )(  ) )( &::CGib::SUB_AllowedToFade ) )    
+        .def( 
+            "SetBloodColor"
+            , (void ( ::CGib::* )( int ) )( &::CGib::SetBloodColor )
+            , ( bp::arg("nBloodColor") ) )    
+        .def( 
+            "SetFlame"
+            , (void ( ::CGib::* )( ::CBaseEntity * ) )( &::CGib::SetFlame )
+            , ( bp::arg("pFlame") ) )    
+        .def( 
+            "SetPhysicsAttacker"
+            , (void ( ::CGib::* )( ::CBasePlayer *,float ) )( &::CGib::SetPhysicsAttacker )
+            , ( bp::arg("pEntity"), bp::arg("flTime") ) )    
+        .def( 
+            "SetSprite"
+            , (void ( ::CGib::* )( ::CBaseEntity * ) )( &::CGib::SetSprite )
+            , ( bp::arg("pSprite") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CGib::* )( char const * ) )(&::CGib::Spawn)
+            , (void ( CGib_wrapper::* )( char const * ) )(&CGib_wrapper::default_Spawn)
+            , ( bp::arg("szGibModel") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CGib::* )( char const *,float ) )(&::CGib::Spawn)
+            , (void ( CGib_wrapper::* )( char const *,float ) )(&CGib_wrapper::default_Spawn)
+            , ( bp::arg("szGibModel"), bp::arg("flLifetime") ) )    
+        .def( 
+            "SpawnHeadGib"
+            , (void (*)( ::CBaseEntity * ))( &::CGib::SpawnHeadGib )
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "SpawnRandomGibs"
+            , (void (*)( ::CBaseEntity *,int,::GibType_e ))( &::CGib::SpawnRandomGibs )
+            , ( bp::arg("pVictim"), bp::arg("cGibs"), bp::arg("eGibType") ) )    
+        .def( 
+            "SpawnSpecificGibs"
+            , (void (*)( ::CBaseEntity *,int,float,float,char const *,float ))( &::CGib::SpawnSpecificGibs )
+            , ( bp::arg("pVictim"), bp::arg("nNumGibs"), bp::arg("fMaxVelocity"), bp::arg("fMinVelocity"), bp::arg("cModelName"), bp::arg("flLifetime")=25 ) )    
+        .def( 
+            "SpawnStickyGibs"
+            , (void (*)( ::CBaseEntity *,::Vector,int ))( &::CGib::SpawnStickyGibs )
+            , ( bp::arg("pVictim"), bp::arg("vecOrigin"), bp::arg("cGibs") ) )    
+        .def( 
+            "StickyGibTouch"
+            , (void ( ::CGib::* )( ::CBaseEntity * ) )( &::CGib::StickyGibTouch )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Use"
+            , (void ( ::CGib::* )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) )( &::CGib::Use )
+            , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) )    
+        .def( 
+            "WaitTillLand"
+            , (void ( ::CGib::* )(  ) )( &::CGib::WaitTillLand ) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_Activate) )    
+        .def( 
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_CanBecomeRagdoll) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CGib_wrapper::* )( ::Vector *,::Vector * ) )(&CGib_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CGib_wrapper::* )( ::CBaseEntity * ) )(&CGib_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CGib_wrapper::* )( ::trace_t &,int ) )(&CGib_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CGib_wrapper::* )( ::CBaseEntity * ) )(&CGib_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CGib_wrapper::* )( ::CTakeDamageInfo const & ) )(&CGib_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CGib_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CGib_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CGib_wrapper::* )( char const *,char const * ) )(&CGib_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CGib_wrapper::* )( char const *,float ) )(&CGib_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CGib_wrapper::* )( char const *,int ) )(&CGib_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CGib_wrapper::* )( char const *,::Vector const & ) )(&CGib_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CGib_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CGib_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
+            , (void ( CGib_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CGib_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CGib_wrapper::* )( int ) )(&CGib_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_OnRestore) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CGib_wrapper::* )( int ) )(&CGib_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CGib_wrapper::* )( ::CTakeDamageInfo const & ) )(&CGib_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CGib_wrapper::* )( ::CTakeDamageInfo const & ) )(&CGib_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CGib_wrapper::* )( char const * ) )(&CGib_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Precache)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_Precache) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_OnNewModel) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Spawn)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_Spawn) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CGib_wrapper::* )( ::CBaseEntity * ) )(&CGib_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CGib_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CGib_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CGib_wrapper::* )(  ) )(&CGib_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CGib_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CGib_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "SpawnHeadGib" )    
+        .staticmethod( "SpawnRandomGibs" )    
+        .staticmethod( "SpawnSpecificGibs" )    
+        .staticmethod( "SpawnStickyGibs" );
 
 }
 

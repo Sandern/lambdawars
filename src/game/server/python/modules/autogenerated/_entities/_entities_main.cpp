@@ -7,8 +7,6 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "__array_1.pypp.hpp"
-
 #include "cbase.h"
 
 #include "npcevent.h"

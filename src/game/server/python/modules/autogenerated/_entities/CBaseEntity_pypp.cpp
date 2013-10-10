@@ -1005,35 +1005,6 @@ struct CBaseEntity_wrapper : CBaseEntity, bp::wrapper< CBaseEntity > {
         return CBaseEntity::GetServerClass();
     }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBaseEntity\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBaseEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBaseEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBaseEntity::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CBaseEntity_class(){
@@ -6583,12 +6554,9 @@ void register_CBaseEntity_class(){
                 , entindex_function_type( &::CBaseEntity::entindex ) );
         
         }
-        CBaseEntity_exposer.def_readwrite( "m_ScriptScope", &CBaseEntity::m_ScriptScope );
         CBaseEntity_exposer.def_readwrite( "allowprecache", CBaseEntity::m_bAllowPrecache );
-        CBaseEntity_exposer.def_readwrite( "m_bClientSideRagdoll", &CBaseEntity::m_bClientSideRagdoll );
         CBaseEntity_exposer.def_readwrite( "indebugselect", CBaseEntity::m_bInDebugSelect );
         CBaseEntity_exposer.def_readwrite( "debugoverlays", &CBaseEntity::m_debugOverlays );
-        CBaseEntity_exposer.def_readwrite( "m_flCreateTime", &CBaseEntity::m_flCreateTime );
         CBaseEntity_exposer.def_readwrite( "prevanimtime", &CBaseEntity::m_flPrevAnimTime );
         CBaseEntity_exposer.def_readwrite( "speed", &CBaseEntity::m_flSpeed );
         CBaseEntity_exposer.def_readwrite( "classname", &CBaseEntity::m_iClassname );
@@ -6596,13 +6564,9 @@ void register_CBaseEntity_class(){
         CBaseEntity_exposer.def_readwrite( "hammerid", &CBaseEntity::m_iHammerID );
         CBaseEntity_exposer.def_readwrite( "parent", &CBaseEntity::m_iParent );
         CBaseEntity_exposer.def_readwrite( "damagefiltername", &CBaseEntity::m_iszDamageFilterName );
-        CBaseEntity_exposer.def_readwrite( "m_iszScriptId", &CBaseEntity::m_iszScriptId );
-        CBaseEntity_exposer.def_readwrite( "m_iszScriptThinkFunction", &CBaseEntity::m_iszScriptThinkFunction );
-        CBaseEntity_exposer.def_readwrite( "m_iszVScripts", &CBaseEntity::m_iszVScripts );
         CBaseEntity_exposer.def_readwrite( "debugplayer", CBaseEntity::m_nDebugPlayer );
         CBaseEntity_exposer.def_readwrite( "lastthinktick", &CBaseEntity::m_nLastThinkTick );
         CBaseEntity_exposer.def_readwrite( "target", &CBaseEntity::m_target );
-        CBaseEntity_exposer.def_readwrite( "touchStamp", &CBaseEntity::touchStamp );
         CBaseEntity_exposer.staticmethod( "Create" );
         CBaseEntity_exposer.staticmethod( "CreateNoSpawn" );
         CBaseEntity_exposer.staticmethod( "CreatePredictedEntityByName" );
@@ -6820,18 +6784,6 @@ void register_CBaseEntity_class(){
                 , fset( &::CBaseEntity::SetRenderMode ) );
         
         }
-        { //::CBaseEntity::TestCollision
-            
-                typedef bool ( ::CBaseEntity::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBaseEntity_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBaseEntity_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBaseEntity::TestCollision)
-                    , default_TestCollision_function_type(&CBaseEntity_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
     }
 
 }

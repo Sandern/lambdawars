@@ -1063,1051 +1063,391 @@ struct CBreakableProp_wrapper : CBreakableProp, bp::wrapper< CBreakableProp > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CBreakableProp\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CBreakableProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CBreakableProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CBreakableProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CBreakableProp_class(){
 
-    { //::CBreakableProp
-        typedef bp::class_< CBreakableProp_wrapper, bp::bases< CBaseProp >, boost::noncopyable > CBreakableProp_exposer_t;
-        CBreakableProp_exposer_t CBreakableProp_exposer = CBreakableProp_exposer_t( "CBreakableProp", bp::no_init );
-        bp::scope CBreakableProp_scope( CBreakableProp_exposer );
-        CBreakableProp_exposer.def( bp::init< >() );
-        { //::CBreakableProp::AnimateThink
-        
-            typedef void ( ::CBreakableProp::*AnimateThink_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "AnimateThink"
-                , AnimateThink_function_type( &::CBreakableProp::AnimateThink ) );
-        
-        }
-        { //::CBreakableProp::Break
-        
-            typedef void ( ::CBreakableProp::*Break_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Break"
-                , Break_function_type( &::CBreakableProp::Break )
-                , ( bp::arg("pBreaker"), bp::arg("info") ) );
-        
-        }
-        { //::CBreakableProp::BreakThink
-        
-            typedef void ( ::CBreakableProp::*BreakThink_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "BreakThink"
-                , BreakThink_function_type( &::CBreakableProp::BreakThink ) );
-        
-        }
-        { //::CBreakableProp::BreakablePropTouch
-        
-            typedef void ( ::CBreakableProp::*BreakablePropTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "BreakablePropTouch"
-                , BreakablePropTouch_function_type( &::CBreakableProp::BreakablePropTouch )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBreakableProp::CopyFadeFrom
-        
-            typedef void ( ::CBreakableProp::*CopyFadeFrom_function_type )( ::CBreakableProp * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "CopyFadeFrom"
-                , CopyFadeFrom_function_type( &::CBreakableProp::CopyFadeFrom )
-                , ( bp::arg("pSource") ) );
-        
-        }
-        { //::CBreakableProp::DisableAutoFade
-        
-            typedef void ( ::CBreakableProp::*DisableAutoFade_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "DisableAutoFade"
-                , DisableAutoFade_function_type( &::CBreakableProp::DisableAutoFade ) );
-        
-        }
-        { //::CBreakableProp::Event_Killed
-        
-            typedef void ( ::CBreakableProp::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CBreakableProp_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBreakableProp::Event_Killed)
-                , default_Event_Killed_function_type(&CBreakableProp_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBreakableProp::GetAutoAimRadius
-        
-            typedef float ( ::CBreakableProp::*GetAutoAimRadius_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetAutoAimRadius"
-                , GetAutoAimRadius_function_type( &::CBreakableProp::GetAutoAimRadius ) );
-        
-        }
-        { //::CBreakableProp::GetBasePropData
-        
-            typedef ::string_t ( ::CBreakableProp::*GetBasePropData_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetBasePropData"
-                , GetBasePropData_function_type( &::CBreakableProp::GetBasePropData ) );
-        
-        }
-        { //::CBreakableProp::GetBreakableCount
-        
-            typedef int ( ::CBreakableProp::*GetBreakableCount_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetBreakableCount"
-                , GetBreakableCount_function_type( &::CBreakableProp::GetBreakableCount ) );
-        
-        }
-        { //::CBreakableProp::GetBreakableModel
-        
-            typedef ::string_t ( ::CBreakableProp::*GetBreakableModel_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetBreakableModel"
-                , GetBreakableModel_function_type( &::CBreakableProp::GetBreakableModel ) );
-        
-        }
-        { //::CBreakableProp::GetBreakableSkin
-        
-            typedef int ( ::CBreakableProp::*GetBreakableSkin_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetBreakableSkin"
-                , GetBreakableSkin_function_type( &::CBreakableProp::GetBreakableSkin ) );
-        
-        }
-        { //::CBreakableProp::GetDmgModBullet
-        
-            typedef float ( ::CBreakableProp::*GetDmgModBullet_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetDmgModBullet"
-                , GetDmgModBullet_function_type( &::CBreakableProp::GetDmgModBullet ) );
-        
-        }
-        { //::CBreakableProp::GetDmgModClub
-        
-            typedef float ( ::CBreakableProp::*GetDmgModClub_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetDmgModClub"
-                , GetDmgModClub_function_type( &::CBreakableProp::GetDmgModClub ) );
-        
-        }
-        { //::CBreakableProp::GetDmgModExplosive
-        
-            typedef float ( ::CBreakableProp::*GetDmgModExplosive_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetDmgModExplosive"
-                , GetDmgModExplosive_function_type( &::CBreakableProp::GetDmgModExplosive ) );
-        
-        }
-        { //::CBreakableProp::GetDmgModFire
-        
-            typedef float ( ::CBreakableProp::*GetDmgModFire_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetDmgModFire"
-                , GetDmgModFire_function_type( &::CBreakableProp::GetDmgModFire ) );
-        
-        }
-        { //::CBreakableProp::GetExplosiveDamage
-        
-            typedef float ( ::CBreakableProp::*GetExplosiveDamage_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetExplosiveDamage"
-                , GetExplosiveDamage_function_type( &::CBreakableProp::GetExplosiveDamage ) );
-        
-        }
-        { //::CBreakableProp::GetExplosiveRadius
-        
-            typedef float ( ::CBreakableProp::*GetExplosiveRadius_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetExplosiveRadius"
-                , GetExplosiveRadius_function_type( &::CBreakableProp::GetExplosiveRadius ) );
-        
-        }
-        { //::CBreakableProp::GetMaxBreakableSize
-        
-            typedef int ( ::CBreakableProp::*GetMaxBreakableSize_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetMaxBreakableSize"
-                , GetMaxBreakableSize_function_type( &::CBreakableProp::GetMaxBreakableSize ) );
-        
-        }
-        { //::CBreakableProp::GetMultiplayerBreakMode
-        
-            typedef ::mp_break_t ( ::CBreakableProp::*GetMultiplayerBreakMode_function_type )(  ) const;
-            
-            CBreakableProp_exposer.def( 
-                "GetMultiplayerBreakMode"
-                , GetMultiplayerBreakMode_function_type( &::CBreakableProp::GetMultiplayerBreakMode ) );
-        
-        }
-        { //::CBreakableProp::GetNumBreakableChunks
-        
-            typedef int ( ::CBreakableProp::*GetNumBreakableChunks_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetNumBreakableChunks"
-                , GetNumBreakableChunks_function_type( &::CBreakableProp::GetNumBreakableChunks ) );
-        
-        }
-        { //::CBreakableProp::GetPhysicsDamageTable
-        
-            typedef ::string_t ( ::CBreakableProp::*GetPhysicsDamageTable_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetPhysicsDamageTable"
-                , GetPhysicsDamageTable_function_type( &::CBreakableProp::GetPhysicsDamageTable ) );
-        
-        }
-        { //::CBreakableProp::GetPhysicsMode
-        
-            typedef int ( ::CBreakableProp::*GetPhysicsMode_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetPhysicsMode"
-                , GetPhysicsMode_function_type( &::CBreakableProp::GetPhysicsMode ) );
-        
-        }
-        { //::CBreakableProp::HandleFirstCollisionInteractions
-        
-            typedef void ( ::CBreakableProp::*HandleFirstCollisionInteractions_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "HandleFirstCollisionInteractions"
-                , HandleFirstCollisionInteractions_function_type( &::CBreakableProp::HandleFirstCollisionInteractions )
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CBreakableProp::HandleInteractionStick
-        
-            typedef void ( ::CBreakableProp::*HandleInteractionStick_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "HandleInteractionStick"
-                , HandleInteractionStick_function_type( &::CBreakableProp::HandleInteractionStick )
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CBreakableProp::HasInteraction
-        
-            typedef bool ( ::CBreakableProp::*HasInteraction_function_type )( ::propdata_interactions_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "HasInteraction"
-                , HasInteraction_function_type( &::CBreakableProp::HasInteraction )
-                , ( bp::arg("Interaction") ) );
-        
-        }
-        { //::CBreakableProp::HasPhysicsAttacker
-        
-            typedef ::CBasePlayer * ( ::CBreakableProp::*HasPhysicsAttacker_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "HasPhysicsAttacker"
-                , HasPhysicsAttacker_function_type( &::CBreakableProp::HasPhysicsAttacker )
-                , ( bp::arg("dt") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBreakableProp::HasPreferredCarryAnglesForPlayer
-        
-            typedef bool ( ::CBreakableProp::*HasPreferredCarryAnglesForPlayer_function_type )( ::CBasePlayer * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "HasPreferredCarryAnglesForPlayer"
-                , HasPreferredCarryAnglesForPlayer_function_type( &::CBreakableProp::HasPreferredCarryAnglesForPlayer )
-                , ( bp::arg("pPlayer") ) );
-        
-        }
-        { //::CBreakableProp::Ignite
-        
-            typedef void ( ::CBreakableProp::*Ignite_function_type )( float,bool,float,bool ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Ignite"
-                , Ignite_function_type( &::CBreakableProp::Ignite )
-                , ( bp::arg("flFlameLifetime"), bp::arg("bNPCOnly"), bp::arg("flSize")=0.0f, bp::arg("bCalledByLevelDesigner")=(bool)(false) ) );
-        
-        }
-        { //::CBreakableProp::InputAddHealth
-        
-            typedef void ( ::CBreakableProp::*InputAddHealth_function_type )( ::inputdata_t & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "InputAddHealth"
-                , InputAddHealth_function_type( &::CBreakableProp::InputAddHealth )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CBreakableProp::InputBreak
-        
-            typedef void ( ::CBreakableProp::*InputBreak_function_type )( ::inputdata_t & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "InputBreak"
-                , InputBreak_function_type( &::CBreakableProp::InputBreak )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CBreakableProp::InputRemoveHealth
-        
-            typedef void ( ::CBreakableProp::*InputRemoveHealth_function_type )( ::inputdata_t & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "InputRemoveHealth"
-                , InputRemoveHealth_function_type( &::CBreakableProp::InputRemoveHealth )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CBreakableProp::InputSetHealth
-        
-            typedef void ( ::CBreakableProp::*InputSetHealth_function_type )( ::inputdata_t & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "InputSetHealth"
-                , InputSetHealth_function_type( &::CBreakableProp::InputSetHealth )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CBreakableProp::OnAttemptPhysGunPickup
-        
-            typedef bool ( ::CBreakableProp::*OnAttemptPhysGunPickup_function_type )( ::CBasePlayer *,::PhysGunPickup_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnAttemptPhysGunPickup"
-                , OnAttemptPhysGunPickup_function_type( &::CBreakableProp::OnAttemptPhysGunPickup )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CBreakableProp::OnPhysGunDrop
-        
-            typedef void ( ::CBreakableProp::*OnPhysGunDrop_function_type )( ::CBasePlayer *,::PhysGunDrop_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnPhysGunDrop"
-                , OnPhysGunDrop_function_type( &::CBreakableProp::OnPhysGunDrop )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CBreakableProp::OnPhysGunPickup
-        
-            typedef void ( ::CBreakableProp::*OnPhysGunPickup_function_type )( ::CBasePlayer *,::PhysGunPickup_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnPhysGunPickup"
-                , OnPhysGunPickup_function_type( &::CBreakableProp::OnPhysGunPickup )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CBreakableProp::OnTakeDamage
-        
-            typedef int ( ::CBreakableProp::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CBreakableProp_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBreakableProp::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CBreakableProp_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBreakableProp::OverridePropdata
-        
-            typedef bool ( ::CBreakableProp::*OverridePropdata_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OverridePropdata"
-                , OverridePropdata_function_type( &::CBreakableProp::OverridePropdata ) );
-        
-        }
-        { //::CBreakableProp::PhysGunLaunchAngularImpulse
-        
-            typedef ::AngularImpulse ( ::CBreakableProp::*PhysGunLaunchAngularImpulse_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PhysGunLaunchAngularImpulse"
-                , PhysGunLaunchAngularImpulse_function_type( &::CBreakableProp::PhysGunLaunchAngularImpulse ) );
-        
-        }
-        { //::CBreakableProp::PlayPuntSound
-        
-            typedef void ( ::CBreakableProp::*PlayPuntSound_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PlayPuntSound"
-                , PlayPuntSound_function_type( &::CBreakableProp::PlayPuntSound ) );
-        
-        }
-        { //::CBreakableProp::Precache
-        
-            typedef void ( ::CBreakableProp::*Precache_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CBreakableProp::Precache)
-                , default_Precache_function_type(&CBreakableProp_wrapper::default_Precache) );
-        
-        }
-        { //::CBreakableProp::PreferredCarryAngles
-        
-            typedef ::QAngle ( ::CBreakableProp::*PreferredCarryAngles_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PreferredCarryAngles"
-                , PreferredCarryAngles_function_type( &::CBreakableProp::PreferredCarryAngles ) );
-        
-        }
-        { //::CBreakableProp::PropDataOverrodeAIWalkable
-        
-            typedef bool ( ::CBreakableProp::*PropDataOverrodeAIWalkable_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PropDataOverrodeAIWalkable"
-                , PropDataOverrodeAIWalkable_function_type( &::CBreakableProp::PropDataOverrodeAIWalkable ) );
-        
-        }
-        { //::CBreakableProp::PropDataOverrodeBlockLOS
-        
-            typedef bool ( ::CBreakableProp::*PropDataOverrodeBlockLOS_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PropDataOverrodeBlockLOS"
-                , PropDataOverrodeBlockLOS_function_type( &::CBreakableProp::PropDataOverrodeBlockLOS ) );
-        
-        }
-        { //::CBreakableProp::RemoveInteraction
-        
-            typedef void ( ::CBreakableProp::*RemoveInteraction_function_type )( ::propdata_interactions_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "RemoveInteraction"
-                , RemoveInteraction_function_type( &::CBreakableProp::RemoveInteraction )
-                , ( bp::arg("Interaction") ) );
-        
-        }
-        { //::CBreakableProp::SetBasePropData
-        
-            typedef void ( ::CBreakableProp::*SetBasePropData_function_type )( ::string_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetBasePropData"
-                , SetBasePropData_function_type( &::CBreakableProp::SetBasePropData )
-                , ( bp::arg("iszBase") ) );
-        
-        }
-        { //::CBreakableProp::SetBreakableCount
-        
-            typedef void ( ::CBreakableProp::*SetBreakableCount_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetBreakableCount"
-                , SetBreakableCount_function_type( &::CBreakableProp::SetBreakableCount )
-                , ( bp::arg("iCount") ) );
-        
-        }
-        { //::CBreakableProp::SetBreakableModel
-        
-            typedef void ( ::CBreakableProp::*SetBreakableModel_function_type )( ::string_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetBreakableModel"
-                , SetBreakableModel_function_type( &::CBreakableProp::SetBreakableModel )
-                , ( bp::arg("iszModel") ) );
-        
-        }
-        { //::CBreakableProp::SetBreakableSkin
-        
-            typedef void ( ::CBreakableProp::*SetBreakableSkin_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetBreakableSkin"
-                , SetBreakableSkin_function_type( &::CBreakableProp::SetBreakableSkin )
-                , ( bp::arg("iSkin") ) );
-        
-        }
-        { //::CBreakableProp::SetDmgModBullet
-        
-            typedef void ( ::CBreakableProp::*SetDmgModBullet_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetDmgModBullet"
-                , SetDmgModBullet_function_type( &::CBreakableProp::SetDmgModBullet )
-                , ( bp::arg("flDmgMod") ) );
-        
-        }
-        { //::CBreakableProp::SetDmgModClub
-        
-            typedef void ( ::CBreakableProp::*SetDmgModClub_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetDmgModClub"
-                , SetDmgModClub_function_type( &::CBreakableProp::SetDmgModClub )
-                , ( bp::arg("flDmgMod") ) );
-        
-        }
-        { //::CBreakableProp::SetDmgModExplosive
-        
-            typedef void ( ::CBreakableProp::*SetDmgModExplosive_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetDmgModExplosive"
-                , SetDmgModExplosive_function_type( &::CBreakableProp::SetDmgModExplosive )
-                , ( bp::arg("flDmgMod") ) );
-        
-        }
-        { //::CBreakableProp::SetDmgModFire
-        
-            typedef void ( ::CBreakableProp::*SetDmgModFire_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetDmgModFire"
-                , SetDmgModFire_function_type( &::CBreakableProp::SetDmgModFire )
-                , ( bp::arg("flDmgMod") ) );
-        
-        }
-        { //::CBreakableProp::SetExplosiveDamage
-        
-            typedef void ( ::CBreakableProp::*SetExplosiveDamage_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetExplosiveDamage"
-                , SetExplosiveDamage_function_type( &::CBreakableProp::SetExplosiveDamage )
-                , ( bp::arg("flDamage") ) );
-        
-        }
-        { //::CBreakableProp::SetExplosiveRadius
-        
-            typedef void ( ::CBreakableProp::*SetExplosiveRadius_function_type )( float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetExplosiveRadius"
-                , SetExplosiveRadius_function_type( &::CBreakableProp::SetExplosiveRadius )
-                , ( bp::arg("flRadius") ) );
-        
-        }
-        { //::CBreakableProp::SetInteraction
-        
-            typedef void ( ::CBreakableProp::*SetInteraction_function_type )( ::propdata_interactions_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetInteraction"
-                , SetInteraction_function_type( &::CBreakableProp::SetInteraction )
-                , ( bp::arg("Interaction") ) );
-        
-        }
-        { //::CBreakableProp::SetMaxBreakableSize
-        
-            typedef void ( ::CBreakableProp::*SetMaxBreakableSize_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetMaxBreakableSize"
-                , SetMaxBreakableSize_function_type( &::CBreakableProp::SetMaxBreakableSize )
-                , ( bp::arg("iSize") ) );
-        
-        }
-        { //::CBreakableProp::SetMultiplayerBreakMode
-        
-            typedef void ( ::CBreakableProp::*SetMultiplayerBreakMode_function_type )( ::mp_break_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetMultiplayerBreakMode"
-                , SetMultiplayerBreakMode_function_type( &::CBreakableProp::SetMultiplayerBreakMode )
-                , ( bp::arg("mode") ) );
-        
-        }
-        { //::CBreakableProp::SetPhysicsAttacker
-        
-            typedef void ( ::CBreakableProp::*SetPhysicsAttacker_function_type )( ::CBasePlayer *,float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetPhysicsAttacker"
-                , SetPhysicsAttacker_function_type( &::CBreakableProp::SetPhysicsAttacker )
-                , ( bp::arg("pEntity"), bp::arg("flTime") ) );
-        
-        }
-        { //::CBreakableProp::SetPhysicsDamageTable
-        
-            typedef void ( ::CBreakableProp::*SetPhysicsDamageTable_function_type )( ::string_t ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetPhysicsDamageTable"
-                , SetPhysicsDamageTable_function_type( &::CBreakableProp::SetPhysicsDamageTable )
-                , ( bp::arg("iszTableName") ) );
-        
-        }
-        { //::CBreakableProp::SetPhysicsMode
-        
-            typedef void ( ::CBreakableProp::*SetPhysicsMode_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetPhysicsMode"
-                , SetPhysicsMode_function_type( &::CBreakableProp::SetPhysicsMode )
-                , ( bp::arg("iMode") ) );
-        
-        }
-        { //::CBreakableProp::SetPropDataBlocksLOS
-        
-            typedef void ( ::CBreakableProp::*SetPropDataBlocksLOS_function_type )( bool ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetPropDataBlocksLOS"
-                , SetPropDataBlocksLOS_function_type( &::CBreakableProp::SetPropDataBlocksLOS )
-                , ( bp::arg("bBlocksLOS") ) );
-        
-        }
-        { //::CBreakableProp::SetPropDataIsAIWalkable
-        
-            typedef void ( ::CBreakableProp::*SetPropDataIsAIWalkable_function_type )( bool ) ;
-            
-            CBreakableProp_exposer.def( 
-                "SetPropDataIsAIWalkable"
-                , SetPropDataIsAIWalkable_function_type( &::CBreakableProp::SetPropDataIsAIWalkable )
-                , ( bp::arg("b") ) );
-        
-        }
-        { //::CBreakableProp::Spawn
-        
-            typedef void ( ::CBreakableProp::*Spawn_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CBreakableProp::Spawn)
-                , default_Spawn_function_type(&CBreakableProp_wrapper::default_Spawn) );
-        
-        }
-        { //::CBreakableProp::StickAtPosition
-        
-            typedef void ( ::CBreakableProp::*StickAtPosition_function_type )( ::Vector const &,::Vector const &,::QAngle const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "StickAtPosition"
-                , StickAtPosition_function_type( &::CBreakableProp::StickAtPosition )
-                , ( bp::arg("stickPosition"), bp::arg("savePosition"), bp::arg("saveAngles") ) );
-        
-        }
-        { //::CBreakableProp::UpdateOnRemove
-        
-            typedef void ( ::CBreakableProp::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBreakableProp::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CBreakableProp_wrapper::default_UpdateOnRemove) );
-        
-        }
-        CBreakableProp_exposer.def_readwrite( "m_OnBreak", &CBreakableProp::m_OnBreak );
-        CBreakableProp_exposer.def_readwrite( "m_OnHealthChanged", &CBreakableProp::m_OnHealthChanged );
-        CBreakableProp_exposer.def_readwrite( "m_OnTakeDamage", &CBreakableProp::m_OnTakeDamage );
-        CBreakableProp_exposer.def_readwrite( "m_iMinHealthDmg", &CBreakableProp::m_iMinHealthDmg );
-        CBreakableProp_exposer.def_readwrite( "m_impactEnergyScale", &CBreakableProp::m_impactEnergyScale );
-        CBreakableProp_exposer.def_readwrite( "m_preferredCarryAngles", &CBreakableProp::m_preferredCarryAngles );
-        { //::CBaseProp::Activate
-        
-            typedef void ( ::CBaseProp::*Activate_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseProp::Activate)
-                , default_Activate_function_type(&CBreakableProp_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseAnimating::CanBecomeRagdoll
-        
-            typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_CanBecomeRagdoll_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "CanBecomeRagdoll"
-                , CanBecomeRagdoll_function_type(&::CBaseAnimating::CanBecomeRagdoll)
-                , default_CanBecomeRagdoll_function_type(&CBreakableProp_wrapper::default_CanBecomeRagdoll) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CBreakableProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CBreakableProp_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CBreakableProp_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CBreakableProp_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CBreakableProp_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseProp::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CBaseProp::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CBaseProp::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CBreakableProp_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CBaseAnimating::DrawDebugTextOverlays
-        
-            typedef int ( ::CBaseAnimating::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CBreakableProp_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CBaseAnimating::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CBreakableProp_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CBreakableProp_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CBreakableProp_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CBreakableProp_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CBreakableProp_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CBreakableProp_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CBreakableProp_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CBreakableProp_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CBreakableProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBreakableProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBreakableProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CBreakableProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseProp::KeyValue
-        
-            typedef bool ( ::CBaseProp::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseProp::KeyValue)
-                , default_KeyValue_function_type(&CBreakableProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CBreakableProp_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CBreakableProp_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseAnimating::ModifyOrAppendCriteria
-        
-            typedef void ( ::CBaseAnimating::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CBreakableProp_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CBaseAnimating::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CBreakableProp_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CBreakableProp_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CBreakableProp_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseAnimating::OnRestore
-        
-            typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
-                , default_OnRestore_function_type(&CBreakableProp_wrapper::default_OnRestore) );
-        
-        }
-        { //::CBaseAnimating::OnSequenceSet
-        
-            typedef void ( ::CBaseAnimating::*OnSequenceSet_function_type )( int ) ;
-            typedef void ( CBreakableProp_wrapper::*default_OnSequenceSet_function_type )( int ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnSequenceSet"
-                , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
-                , default_OnSequenceSet_function_type(&CBreakableProp_wrapper::default_OnSequenceSet)
-                , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBreakableProp_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CBreakableProp_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CBreakableProp_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CBreakableProp_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseAnimating::PyOnNewModel
-        
-            typedef void ( CBreakableProp_wrapper::*OnNewModel_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type( &CBreakableProp_wrapper::default_OnNewModel ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CBreakableProp_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CBreakableProp_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CBreakableProp_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::TraceAttack
-        
-            typedef void ( CBreakableProp_wrapper::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &CBreakableProp_wrapper::TraceAttack )
-                , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CBreakableProp_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CBreakableProp_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CBreakableProp_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CBaseEntity::VPhysicsCollision
-        
-            typedef void ( ::CBaseEntity::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CBreakableProp_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CBreakableProp_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CBreakableProp_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CBreakableProp::TestCollision
-            
-                typedef bool ( ::CBreakableProp::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CBreakableProp_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CBreakableProp_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CBreakableProp::TestCollision)
-                    , default_TestCollision_function_type(&CBreakableProp_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CBreakableProp_wrapper, bp::bases< CBaseProp >, boost::noncopyable >( "CBreakableProp", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "AnimateThink"
+            , (void ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::AnimateThink ) )    
+        .def( 
+            "Break"
+            , (void ( ::CBreakableProp::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )( &::CBreakableProp::Break )
+            , ( bp::arg("pBreaker"), bp::arg("info") ) )    
+        .def( 
+            "BreakThink"
+            , (void ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::BreakThink ) )    
+        .def( 
+            "BreakablePropTouch"
+            , (void ( ::CBreakableProp::* )( ::CBaseEntity * ) )( &::CBreakableProp::BreakablePropTouch )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "CopyFadeFrom"
+            , (void ( ::CBreakableProp::* )( ::CBreakableProp * ) )( &::CBreakableProp::CopyFadeFrom )
+            , ( bp::arg("pSource") ) )    
+        .def( 
+            "DisableAutoFade"
+            , (void ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::DisableAutoFade ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBreakableProp::* )( ::CTakeDamageInfo const & ) )(&::CBreakableProp::Event_Killed)
+            , (void ( CBreakableProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBreakableProp_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "GetAutoAimRadius"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetAutoAimRadius ) )    
+        .def( 
+            "GetBasePropData"
+            , (::string_t ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetBasePropData ) )    
+        .def( 
+            "GetBreakableCount"
+            , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetBreakableCount ) )    
+        .def( 
+            "GetBreakableModel"
+            , (::string_t ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetBreakableModel ) )    
+        .def( 
+            "GetBreakableSkin"
+            , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetBreakableSkin ) )    
+        .def( 
+            "GetDmgModBullet"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetDmgModBullet ) )    
+        .def( 
+            "GetDmgModClub"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetDmgModClub ) )    
+        .def( 
+            "GetDmgModExplosive"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetDmgModExplosive ) )    
+        .def( 
+            "GetDmgModFire"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetDmgModFire ) )    
+        .def( 
+            "GetExplosiveDamage"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetExplosiveDamage ) )    
+        .def( 
+            "GetExplosiveRadius"
+            , (float ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetExplosiveRadius ) )    
+        .def( 
+            "GetMaxBreakableSize"
+            , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetMaxBreakableSize ) )    
+        .def( 
+            "GetMultiplayerBreakMode"
+            , (::mp_break_t ( ::CBreakableProp::* )(  ) const)( &::CBreakableProp::GetMultiplayerBreakMode ) )    
+        .def( 
+            "GetNumBreakableChunks"
+            , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetNumBreakableChunks ) )    
+        .def( 
+            "GetPhysicsDamageTable"
+            , (::string_t ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetPhysicsDamageTable ) )    
+        .def( 
+            "GetPhysicsMode"
+            , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetPhysicsMode ) )    
+        .def( 
+            "HandleFirstCollisionInteractions"
+            , (void ( ::CBreakableProp::* )( int,::gamevcollisionevent_t * ) )( &::CBreakableProp::HandleFirstCollisionInteractions )
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .def( 
+            "HandleInteractionStick"
+            , (void ( ::CBreakableProp::* )( int,::gamevcollisionevent_t * ) )( &::CBreakableProp::HandleInteractionStick )
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .def( 
+            "HasInteraction"
+            , (bool ( ::CBreakableProp::* )( ::propdata_interactions_t ) )( &::CBreakableProp::HasInteraction )
+            , ( bp::arg("Interaction") ) )    
+        .def( 
+            "HasPhysicsAttacker"
+            , (::CBasePlayer * ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::HasPhysicsAttacker )
+            , ( bp::arg("dt") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "HasPreferredCarryAnglesForPlayer"
+            , (bool ( ::CBreakableProp::* )( ::CBasePlayer * ) )( &::CBreakableProp::HasPreferredCarryAnglesForPlayer )
+            , ( bp::arg("pPlayer") ) )    
+        .def( 
+            "Ignite"
+            , (void ( ::CBreakableProp::* )( float,bool,float,bool ) )( &::CBreakableProp::Ignite )
+            , ( bp::arg("flFlameLifetime"), bp::arg("bNPCOnly"), bp::arg("flSize")=0.0f, bp::arg("bCalledByLevelDesigner")=(bool)(false) ) )    
+        .def( 
+            "InputAddHealth"
+            , (void ( ::CBreakableProp::* )( ::inputdata_t & ) )( &::CBreakableProp::InputAddHealth )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputBreak"
+            , (void ( ::CBreakableProp::* )( ::inputdata_t & ) )( &::CBreakableProp::InputBreak )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputRemoveHealth"
+            , (void ( ::CBreakableProp::* )( ::inputdata_t & ) )( &::CBreakableProp::InputRemoveHealth )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputSetHealth"
+            , (void ( ::CBreakableProp::* )( ::inputdata_t & ) )( &::CBreakableProp::InputSetHealth )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "OnAttemptPhysGunPickup"
+            , (bool ( ::CBreakableProp::* )( ::CBasePlayer *,::PhysGunPickup_t ) )( &::CBreakableProp::OnAttemptPhysGunPickup )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "OnPhysGunDrop"
+            , (void ( ::CBreakableProp::* )( ::CBasePlayer *,::PhysGunDrop_t ) )( &::CBreakableProp::OnPhysGunDrop )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "OnPhysGunPickup"
+            , (void ( ::CBreakableProp::* )( ::CBasePlayer *,::PhysGunPickup_t ) )( &::CBreakableProp::OnPhysGunPickup )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBreakableProp::* )( ::CTakeDamageInfo const & ) )(&::CBreakableProp::OnTakeDamage)
+            , (int ( CBreakableProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBreakableProp_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "OverridePropdata"
+            , (bool ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::OverridePropdata ) )    
+        .def( 
+            "PhysGunLaunchAngularImpulse"
+            , (::AngularImpulse ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::PhysGunLaunchAngularImpulse ) )    
+        .def( 
+            "PlayPuntSound"
+            , (void ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::PlayPuntSound ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBreakableProp::* )(  ) )(&::CBreakableProp::Precache)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_Precache) )    
+        .def( 
+            "PreferredCarryAngles"
+            , (::QAngle ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::PreferredCarryAngles ) )    
+        .def( 
+            "PropDataOverrodeAIWalkable"
+            , (bool ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::PropDataOverrodeAIWalkable ) )    
+        .def( 
+            "PropDataOverrodeBlockLOS"
+            , (bool ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::PropDataOverrodeBlockLOS ) )    
+        .def( 
+            "RemoveInteraction"
+            , (void ( ::CBreakableProp::* )( ::propdata_interactions_t ) )( &::CBreakableProp::RemoveInteraction )
+            , ( bp::arg("Interaction") ) )    
+        .def( 
+            "SetBasePropData"
+            , (void ( ::CBreakableProp::* )( ::string_t ) )( &::CBreakableProp::SetBasePropData )
+            , ( bp::arg("iszBase") ) )    
+        .def( 
+            "SetBreakableCount"
+            , (void ( ::CBreakableProp::* )( int ) )( &::CBreakableProp::SetBreakableCount )
+            , ( bp::arg("iCount") ) )    
+        .def( 
+            "SetBreakableModel"
+            , (void ( ::CBreakableProp::* )( ::string_t ) )( &::CBreakableProp::SetBreakableModel )
+            , ( bp::arg("iszModel") ) )    
+        .def( 
+            "SetBreakableSkin"
+            , (void ( ::CBreakableProp::* )( int ) )( &::CBreakableProp::SetBreakableSkin )
+            , ( bp::arg("iSkin") ) )    
+        .def( 
+            "SetDmgModBullet"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetDmgModBullet )
+            , ( bp::arg("flDmgMod") ) )    
+        .def( 
+            "SetDmgModClub"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetDmgModClub )
+            , ( bp::arg("flDmgMod") ) )    
+        .def( 
+            "SetDmgModExplosive"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetDmgModExplosive )
+            , ( bp::arg("flDmgMod") ) )    
+        .def( 
+            "SetDmgModFire"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetDmgModFire )
+            , ( bp::arg("flDmgMod") ) )    
+        .def( 
+            "SetExplosiveDamage"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetExplosiveDamage )
+            , ( bp::arg("flDamage") ) )    
+        .def( 
+            "SetExplosiveRadius"
+            , (void ( ::CBreakableProp::* )( float ) )( &::CBreakableProp::SetExplosiveRadius )
+            , ( bp::arg("flRadius") ) )    
+        .def( 
+            "SetInteraction"
+            , (void ( ::CBreakableProp::* )( ::propdata_interactions_t ) )( &::CBreakableProp::SetInteraction )
+            , ( bp::arg("Interaction") ) )    
+        .def( 
+            "SetMaxBreakableSize"
+            , (void ( ::CBreakableProp::* )( int ) )( &::CBreakableProp::SetMaxBreakableSize )
+            , ( bp::arg("iSize") ) )    
+        .def( 
+            "SetMultiplayerBreakMode"
+            , (void ( ::CBreakableProp::* )( ::mp_break_t ) )( &::CBreakableProp::SetMultiplayerBreakMode )
+            , ( bp::arg("mode") ) )    
+        .def( 
+            "SetPhysicsAttacker"
+            , (void ( ::CBreakableProp::* )( ::CBasePlayer *,float ) )( &::CBreakableProp::SetPhysicsAttacker )
+            , ( bp::arg("pEntity"), bp::arg("flTime") ) )    
+        .def( 
+            "SetPhysicsDamageTable"
+            , (void ( ::CBreakableProp::* )( ::string_t ) )( &::CBreakableProp::SetPhysicsDamageTable )
+            , ( bp::arg("iszTableName") ) )    
+        .def( 
+            "SetPhysicsMode"
+            , (void ( ::CBreakableProp::* )( int ) )( &::CBreakableProp::SetPhysicsMode )
+            , ( bp::arg("iMode") ) )    
+        .def( 
+            "SetPropDataBlocksLOS"
+            , (void ( ::CBreakableProp::* )( bool ) )( &::CBreakableProp::SetPropDataBlocksLOS )
+            , ( bp::arg("bBlocksLOS") ) )    
+        .def( 
+            "SetPropDataIsAIWalkable"
+            , (void ( ::CBreakableProp::* )( bool ) )( &::CBreakableProp::SetPropDataIsAIWalkable )
+            , ( bp::arg("b") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBreakableProp::* )(  ) )(&::CBreakableProp::Spawn)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_Spawn) )    
+        .def( 
+            "StickAtPosition"
+            , (void ( ::CBreakableProp::* )( ::Vector const &,::Vector const &,::QAngle const & ) )( &::CBreakableProp::StickAtPosition )
+            , ( bp::arg("stickPosition"), bp::arg("savePosition"), bp::arg("saveAngles") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBreakableProp::* )(  ) )(&::CBreakableProp::UpdateOnRemove)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Activate)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_Activate) )    
+        .def( 
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_CanBecomeRagdoll) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CBreakableProp_wrapper::* )( ::Vector *,::Vector * ) )(&CBreakableProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CBreakableProp_wrapper::* )( ::CBaseEntity * ) )(&CBreakableProp_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CBreakableProp_wrapper::* )( ::trace_t &,int ) )(&CBreakableProp_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::DrawDebugGeometryOverlays)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CBreakableProp_wrapper::* )( ::CBaseEntity * ) )(&CBreakableProp_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CBreakableProp_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBreakableProp_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBreakableProp_wrapper::* )( char const *,float ) )(&CBreakableProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBreakableProp_wrapper::* )( char const *,int ) )(&CBreakableProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CBreakableProp_wrapper::* )( char const *,::Vector const & ) )(&CBreakableProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseProp::* )( char const *,char const * ) )(&::CBaseProp::KeyValue)
+            , (bool ( CBreakableProp_wrapper::* )( char const *,char const * ) )(&CBreakableProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CBreakableProp_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBreakableProp_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
+            , (void ( CBreakableProp_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBreakableProp_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CBreakableProp_wrapper::* )( int ) )(&CBreakableProp_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_OnRestore) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CBreakableProp_wrapper::* )( int ) )(&CBreakableProp_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CBreakableProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBreakableProp_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CBreakableProp_wrapper::* )( char const * ) )(&CBreakableProp_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_OnNewModel) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CBreakableProp_wrapper::* )( ::CBaseEntity * ) )(&CBreakableProp_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "TraceAttack"
+            , (void ( CBreakableProp_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBreakableProp_wrapper::TraceAttack)
+            , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CBreakableProp_wrapper::* )(  ) )(&CBreakableProp_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CBreakableProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBreakableProp_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) );
 
 }
 

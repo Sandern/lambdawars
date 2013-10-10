@@ -1059,808 +1059,304 @@ struct CRagdollProp_wrapper : CRagdollProp, bp::wrapper< CRagdollProp > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    virtual bool TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                #if defined(_WIN32)
-                #if defined(_DEBUG)
-                Assert( GetCurrentThreadId() == g_hPythonThreadID );
-                #elif defined(PY_CHECKTHREADID)
-                if( GetCurrentThreadId() != g_hPythonThreadID )
-                    Error( "TestCollision: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-                #endif // _DEBUG/PY_CHECKTHREADID
-                #endif // _WIN32
-                #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-                if( py_log_overrides.GetBool() )
-                    Msg("Calling TestCollision( boost::ref(ray), mask, boost::ref(trace) ) of Class: CRagdollProp\n");
-                #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-                bp::override func_TestCollision = this->get_override( "TestCollision" );
-                if( func_TestCollision.ptr() != Py_None )
-                    try {
-                        return func_TestCollision( PyRay_t(ray), mask, boost::ref(trace) );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        return this->CRagdollProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-                    }
-                else
-                    return this->CRagdollProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-            
-            bool default_TestCollision( ::Ray_t const & ray, unsigned int mask, ::trace_t & trace ) {
-                return CRagdollProp::TestCollision( boost::ref(ray), mask, boost::ref(trace) );
-            }
-
 };
 
 void register_CRagdollProp_class(){
 
-    { //::CRagdollProp
-        typedef bp::class_< CRagdollProp_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable > CRagdollProp_exposer_t;
-        CRagdollProp_exposer_t CRagdollProp_exposer = CRagdollProp_exposer_t( "CRagdollProp", bp::init< >() );
-        bp::scope CRagdollProp_scope( CRagdollProp_exposer );
-        { //::CRagdollProp::ClearFlagsThink
-        
-            typedef void ( ::CRagdollProp::*ClearFlagsThink_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "ClearFlagsThink"
-                , ClearFlagsThink_function_type( &::CRagdollProp::ClearFlagsThink ) );
-        
-        }
-        { //::CRagdollProp::DisableAutoFade
-        
-            typedef void ( ::CRagdollProp::*DisableAutoFade_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DisableAutoFade"
-                , DisableAutoFade_function_type( &::CRagdollProp::DisableAutoFade ) );
-        
-        }
-        { //::CRagdollProp::DisableMotion
-        
-            typedef void ( ::CRagdollProp::*DisableMotion_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DisableMotion"
-                , DisableMotion_function_type( &::CRagdollProp::DisableMotion ) );
-        
-        }
-        { //::CRagdollProp::DrawDebugGeometryOverlays
-        
-            typedef void ( ::CRagdollProp::*DrawDebugGeometryOverlays_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_DrawDebugGeometryOverlays_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DrawDebugGeometryOverlays"
-                , DrawDebugGeometryOverlays_function_type(&::CRagdollProp::DrawDebugGeometryOverlays)
-                , default_DrawDebugGeometryOverlays_function_type(&CRagdollProp_wrapper::default_DrawDebugGeometryOverlays) );
-        
-        }
-        { //::CRagdollProp::DrawDebugTextOverlays
-        
-            typedef int ( ::CRagdollProp::*DrawDebugTextOverlays_function_type )(  ) ;
-            typedef int ( CRagdollProp_wrapper::*default_DrawDebugTextOverlays_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DrawDebugTextOverlays"
-                , DrawDebugTextOverlays_function_type(&::CRagdollProp::DrawDebugTextOverlays)
-                , default_DrawDebugTextOverlays_function_type(&CRagdollProp_wrapper::default_DrawDebugTextOverlays) );
-        
-        }
-        { //::CRagdollProp::FadeOut
-        
-            typedef void ( ::CRagdollProp::*FadeOut_function_type )( float,float ) ;
-            
-            CRagdollProp_exposer.def( 
-                "FadeOut"
-                , FadeOut_function_type( &::CRagdollProp::FadeOut )
-                , ( bp::arg("flDelay")=0, bp::arg("fadeTime")=-0x000000001 ) );
-        
-        }
-        { //::CRagdollProp::GetAngleOverrideFromCurrentState
-        
-            typedef void ( ::CRagdollProp::*GetAngleOverrideFromCurrentState_function_type )( char *,int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "GetAngleOverrideFromCurrentState"
-                , GetAngleOverrideFromCurrentState_function_type( &::CRagdollProp::GetAngleOverrideFromCurrentState )
-                , ( bp::arg("pOut"), bp::arg("size") ) );
-        
-        }
-        { //::CRagdollProp::GetKiller
-        
-            typedef ::CBaseEntity * ( ::CRagdollProp::*GetKiller_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "GetKiller"
-                , GetKiller_function_type( &::CRagdollProp::GetKiller )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CRagdollProp::GetRagdoll
-        
-            typedef ::ragdoll_t * ( ::CRagdollProp::*GetRagdoll_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "GetRagdoll"
-                , GetRagdoll_function_type( &::CRagdollProp::GetRagdoll )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CRagdollProp::HandleFirstCollisionInteractions
-        
-            typedef void ( ::CRagdollProp::*HandleFirstCollisionInteractions_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "HandleFirstCollisionInteractions"
-                , HandleFirstCollisionInteractions_function_type( &::CRagdollProp::HandleFirstCollisionInteractions )
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CRagdollProp::HasPhysgunInteraction
-        
-            typedef bool ( ::CRagdollProp::*HasPhysgunInteraction_function_type )( char const *,char const * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "HasPhysgunInteraction"
-                , HasPhysgunInteraction_function_type( &::CRagdollProp::HasPhysgunInteraction )
-                , ( bp::arg("pszKeyName"), bp::arg("pszValue") ) );
-        
-        }
-        { //::CRagdollProp::HasPhysicsAttacker
-        
-            typedef ::CBasePlayer * ( ::CRagdollProp::*HasPhysicsAttacker_function_type )( float ) ;
-            
-            CRagdollProp_exposer.def( 
-                "HasPhysicsAttacker"
-                , HasPhysicsAttacker_function_type( &::CRagdollProp::HasPhysicsAttacker )
-                , ( bp::arg("dt") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CRagdollProp::InitRagdoll
-        
-            typedef void ( ::CRagdollProp::*InitRagdoll_function_type )( ::Vector const &,int,::Vector const &,::matrix3x4_t *,::matrix3x4_t *,float,int,bool,bool ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InitRagdoll"
-                , InitRagdoll_function_type( &::CRagdollProp::InitRagdoll )
-                , ( bp::arg("forceVector"), bp::arg("forceBone"), bp::arg("forcePos"), bp::arg("pPrevBones"), bp::arg("pBoneToWorld"), bp::arg("dt"), bp::arg("collisionGroup"), bp::arg("activateRagdoll"), bp::arg("bWakeRagdoll")=(bool)(true) ) );
-        
-        }
-        { //::CRagdollProp::InitRagdollAnimation
-        
-            typedef void ( ::CRagdollProp::*InitRagdollAnimation_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InitRagdollAnimation"
-                , InitRagdollAnimation_function_type( &::CRagdollProp::InitRagdollAnimation ) );
-        
-        }
-        { //::CRagdollProp::InputDisableMotion
-        
-            typedef void ( ::CRagdollProp::*InputDisableMotion_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputDisableMotion"
-                , InputDisableMotion_function_type( &::CRagdollProp::InputDisableMotion )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::InputEnableMotion
-        
-            typedef void ( ::CRagdollProp::*InputEnableMotion_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputEnableMotion"
-                , InputEnableMotion_function_type( &::CRagdollProp::InputEnableMotion )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::InputFadeAndRemove
-        
-            typedef void ( ::CRagdollProp::*InputFadeAndRemove_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputFadeAndRemove"
-                , InputFadeAndRemove_function_type( &::CRagdollProp::InputFadeAndRemove )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::InputStartRadgollBoogie
-        
-            typedef void ( ::CRagdollProp::*InputStartRadgollBoogie_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputStartRadgollBoogie"
-                , InputStartRadgollBoogie_function_type( &::CRagdollProp::InputStartRadgollBoogie )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::InputTurnOff
-        
-            typedef void ( ::CRagdollProp::*InputTurnOff_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputTurnOff"
-                , InputTurnOff_function_type( &::CRagdollProp::InputTurnOff )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::InputTurnOn
-        
-            typedef void ( ::CRagdollProp::*InputTurnOn_function_type )( ::inputdata_t & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "InputTurnOn"
-                , InputTurnOn_function_type( &::CRagdollProp::InputTurnOn )
-                , ( bp::arg("inputdata") ) );
-        
-        }
-        { //::CRagdollProp::IsAlive
-        
-            typedef bool ( ::CRagdollProp::*IsAlive_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "IsAlive"
-                , IsAlive_function_type( &::CRagdollProp::IsAlive ) );
-        
-        }
-        { //::CRagdollProp::IsFading
-        
-            typedef bool ( ::CRagdollProp::*IsFading_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "IsFading"
-                , IsFading_function_type( &::CRagdollProp::IsFading ) );
-        
-        }
-        { //::CRagdollProp::IsRagdoll
-        
-            typedef bool ( ::CRagdollProp::*IsRagdoll_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "IsRagdoll"
-                , IsRagdoll_function_type( &::CRagdollProp::IsRagdoll ) );
-        
-        }
-        { //::CRagdollProp::ModifyOrAppendCriteria
-        
-            typedef void ( ::CRagdollProp::*ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            typedef void ( CRagdollProp_wrapper::*default_ModifyOrAppendCriteria_function_type )( ::ResponseRules::CriteriaSet & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "ModifyOrAppendCriteria"
-                , ModifyOrAppendCriteria_function_type(&::CRagdollProp::ModifyOrAppendCriteria)
-                , default_ModifyOrAppendCriteria_function_type(&CRagdollProp_wrapper::default_ModifyOrAppendCriteria)
-                , ( bp::arg("set") ) );
-        
-        }
-        { //::CRagdollProp::ObjectCaps
-        
-            typedef int ( ::CRagdollProp::*ObjectCaps_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "ObjectCaps"
-                , ObjectCaps_function_type( &::CRagdollProp::ObjectCaps ) );
-        
-        }
-        { //::CRagdollProp::OnPhysGunDrop
-        
-            typedef void ( ::CRagdollProp::*OnPhysGunDrop_function_type )( ::CBasePlayer *,::PhysGunDrop_t ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnPhysGunDrop"
-                , OnPhysGunDrop_function_type( &::CRagdollProp::OnPhysGunDrop )
-                , ( bp::arg("pPhysGunUser"), bp::arg("Reason") ) );
-        
-        }
-        { //::CRagdollProp::OnPhysGunPickup
-        
-            typedef void ( ::CRagdollProp::*OnPhysGunPickup_function_type )( ::CBasePlayer *,::PhysGunPickup_t ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnPhysGunPickup"
-                , OnPhysGunPickup_function_type( &::CRagdollProp::OnPhysGunPickup )
-                , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) );
-        
-        }
-        { //::CRagdollProp::OnRestore
-        
-            typedef void ( ::CRagdollProp::*OnRestore_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_OnRestore_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnRestore"
-                , OnRestore_function_type(&::CRagdollProp::OnRestore)
-                , default_OnRestore_function_type(&CRagdollProp_wrapper::default_OnRestore) );
-        
-        }
-        { //::CRagdollProp::OnTakeDamage
-        
-            typedef int ( ::CRagdollProp::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CRagdollProp_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CRagdollProp::OnTakeDamage)
-                , default_OnTakeDamage_function_type(&CRagdollProp_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CRagdollProp::PhysGunLaunchAngularImpulse
-        
-            typedef ::AngularImpulse ( ::CRagdollProp::*PhysGunLaunchAngularImpulse_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "PhysGunLaunchAngularImpulse"
-                , PhysGunLaunchAngularImpulse_function_type( &::CRagdollProp::PhysGunLaunchAngularImpulse ) );
-        
-        }
-        { //::CRagdollProp::Precache
-        
-            typedef void ( ::CRagdollProp::*Precache_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_Precache_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Precache"
-                , Precache_function_type(&::CRagdollProp::Precache)
-                , default_Precache_function_type(&CRagdollProp_wrapper::default_Precache) );
-        
-        }
-        { //::CRagdollProp::RecheckCollisionFilter
-        
-            typedef void ( ::CRagdollProp::*RecheckCollisionFilter_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "RecheckCollisionFilter"
-                , RecheckCollisionFilter_function_type( &::CRagdollProp::RecheckCollisionFilter ) );
-        
-        }
-        { //::CRagdollProp::SetBlendWeight
-        
-            typedef void ( ::CRagdollProp::*SetBlendWeight_function_type )( float ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetBlendWeight"
-                , SetBlendWeight_function_type( &::CRagdollProp::SetBlendWeight )
-                , ( bp::arg("weight") ) );
-        
-        }
-        { //::CRagdollProp::SetDamageEntity
-        
-            typedef void ( ::CRagdollProp::*SetDamageEntity_function_type )( ::CBaseEntity * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetDamageEntity"
-                , SetDamageEntity_function_type( &::CRagdollProp::SetDamageEntity )
-                , ( bp::arg("pEntity") ) );
-        
-        }
-        { //::CRagdollProp::SetDebrisThink
-        
-            typedef void ( ::CRagdollProp::*SetDebrisThink_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetDebrisThink"
-                , SetDebrisThink_function_type( &::CRagdollProp::SetDebrisThink ) );
-        
-        }
-        { //::CRagdollProp::SetKiller
-        
-            typedef void ( ::CRagdollProp::*SetKiller_function_type )( ::CBaseEntity * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetKiller"
-                , SetKiller_function_type( &::CRagdollProp::SetKiller )
-                , ( bp::arg("pKiller") ) );
-        
-        }
-        { //::CRagdollProp::SetOverlaySequence
-        
-            typedef void ( ::CRagdollProp::*SetOverlaySequence_function_type )( ::Activity ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetOverlaySequence"
-                , SetOverlaySequence_function_type( &::CRagdollProp::SetOverlaySequence )
-                , ( bp::arg("activity") ) );
-        
-        }
-        { //::CRagdollProp::SetSourceClassName
-        
-            typedef void ( ::CRagdollProp::*SetSourceClassName_function_type )( char const * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetSourceClassName"
-                , SetSourceClassName_function_type( &::CRagdollProp::SetSourceClassName )
-                , ( bp::arg("pClassname") ) );
-        
-        }
-        { //::CRagdollProp::SetUnragdoll
-        
-            typedef void ( ::CRagdollProp::*SetUnragdoll_function_type )( ::CBaseAnimating * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetUnragdoll"
-                , SetUnragdoll_function_type( &::CRagdollProp::SetUnragdoll )
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CRagdollProp::SetupBones
-        
-            typedef void ( ::CRagdollProp::*SetupBones_function_type )( ::matrix3x4a_t *,int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "SetupBones"
-                , SetupBones_function_type( &::CRagdollProp::SetupBones )
-                , ( bp::arg("pBoneToWorld"), bp::arg("boneMask") ) );
-        
-        }
-        { //::CRagdollProp::Spawn
-        
-            typedef void ( ::CRagdollProp::*Spawn_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_Spawn_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Spawn"
-                , Spawn_function_type(&::CRagdollProp::Spawn)
-                , default_Spawn_function_type(&CRagdollProp_wrapper::default_Spawn) );
-        
-        }
-        { //::CRagdollProp::Teleport
-        
-            typedef void ( ::CRagdollProp::*Teleport_function_type )( ::Vector const *,::QAngle const *,::Vector const * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Teleport"
-                , Teleport_function_type( &::CRagdollProp::Teleport )
-                , ( bp::arg("newPosition"), bp::arg("newAngles"), bp::arg("newVelocity") ) );
-        
-        }
-        { //::CRagdollProp::TraceAttack
-        
-            typedef void ( ::CRagdollProp::*TraceAttack_function_type )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "TraceAttack"
-                , TraceAttack_function_type( &::CRagdollProp::TraceAttack )
-                , ( bp::arg("info"), bp::arg("dir"), bp::arg("ptr") ) );
-        
-        }
-        { //::CRagdollProp::UpdateOnRemove
-        
-            typedef void ( ::CRagdollProp::*UpdateOnRemove_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CRagdollProp::UpdateOnRemove)
-                , default_UpdateOnRemove_function_type(&CRagdollProp_wrapper::default_UpdateOnRemove) );
-        
-        }
-        { //::CRagdollProp::VPhysicsCollision
-        
-            typedef void ( ::CRagdollProp::*VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_VPhysicsCollision_function_type )( int,::gamevcollisionevent_t * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "VPhysicsCollision"
-                , VPhysicsCollision_function_type(&::CRagdollProp::VPhysicsCollision)
-                , default_VPhysicsCollision_function_type(&CRagdollProp_wrapper::default_VPhysicsCollision)
-                , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CRagdollProp::VPhysicsUpdate
-        
-            typedef void ( ::CRagdollProp::*VPhysicsUpdate_function_type )( ::IPhysicsObject * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "VPhysicsUpdate"
-                , VPhysicsUpdate_function_type( &::CRagdollProp::VPhysicsUpdate )
-                , ( bp::arg("pPhysics") ) );
-        
-        }
-        { //::CBaseAnimating::Activate
-        
-            typedef void ( ::CBaseAnimating::*Activate_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_Activate_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Activate"
-                , Activate_function_type(&::CBaseAnimating::Activate)
-                , default_Activate_function_type(&CRagdollProp_wrapper::default_Activate) );
-        
-        }
-        { //::CBaseAnimating::CanBecomeRagdoll
-        
-            typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_CanBecomeRagdoll_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "CanBecomeRagdoll"
-                , CanBecomeRagdoll_function_type(&::CBaseAnimating::CanBecomeRagdoll)
-                , default_CanBecomeRagdoll_function_type(&CRagdollProp_wrapper::default_CanBecomeRagdoll) );
-        
-        }
-        { //::CBaseEntity::ComputeWorldSpaceSurroundingBox
-        
-            typedef void ( ::CBaseEntity::*ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_ComputeWorldSpaceSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "ComputeWorldSpaceSurroundingBox"
-                , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-                , default_ComputeWorldSpaceSurroundingBox_function_type(&CRagdollProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
-                , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseEntity::CreateVPhysics
-        
-            typedef bool ( ::CBaseEntity::*CreateVPhysics_function_type )(  ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_CreateVPhysics_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "CreateVPhysics"
-                , CreateVPhysics_function_type(&::CBaseEntity::CreateVPhysics)
-                , default_CreateVPhysics_function_type(&CRagdollProp_wrapper::default_CreateVPhysics) );
-        
-        }
-        { //::CBaseEntity::DeathNotice
-        
-            typedef void ( ::CBaseEntity::*DeathNotice_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_DeathNotice_function_type )( ::CBaseEntity * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DeathNotice"
-                , DeathNotice_function_type(&::CBaseEntity::DeathNotice)
-                , default_DeathNotice_function_type(&CRagdollProp_wrapper::default_DeathNotice)
-                , ( bp::arg("pVictim") ) );
-        
-        }
-        { //::CBaseEntity::DoImpactEffect
-        
-            typedef void ( ::CBaseEntity::*DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            typedef void ( CRagdollProp_wrapper::*default_DoImpactEffect_function_type )( ::trace_t &,int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "DoImpactEffect"
-                , DoImpactEffect_function_type(&::CBaseEntity::DoImpactEffect)
-                , default_DoImpactEffect_function_type(&CRagdollProp_wrapper::default_DoImpactEffect)
-                , ( bp::arg("tr"), bp::arg("nDamageType") ) );
-        
-        }
-        { //::CBaseEntity::EndTouch
-        
-            typedef void ( ::CBaseEntity::*EndTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_EndTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "EndTouch"
-                , EndTouch_function_type(&::CBaseEntity::EndTouch)
-                , default_EndTouch_function_type(&CRagdollProp_wrapper::default_EndTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::Event_Killed
-        
-            typedef void ( ::CBaseEntity::*Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef void ( CRagdollProp_wrapper::*default_Event_Killed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Event_Killed"
-                , Event_Killed_function_type(&::CBaseEntity::Event_Killed)
-                , default_Event_Killed_function_type(&CRagdollProp_wrapper::default_Event_Killed)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::Event_KilledOther
-        
-            typedef void ( ::CBaseEntity::*Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            typedef void ( CRagdollProp_wrapper::*default_Event_KilledOther_function_type )( ::CBaseEntity *,::CTakeDamageInfo const & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "Event_KilledOther"
-                , Event_KilledOther_function_type(&::CBaseEntity::Event_KilledOther)
-                , default_Event_KilledOther_function_type(&CRagdollProp_wrapper::default_Event_KilledOther)
-                , ( bp::arg("pVictim"), bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::GetIMouse
-        
-            typedef ::IMouse * ( ::CBaseEntity::*GetIMouse_function_type )(  ) ;
-            typedef ::IMouse * ( CRagdollProp_wrapper::*default_GetIMouse_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "GetIMouse"
-                , GetIMouse_function_type(&::CBaseEntity::GetIMouse)
-                , default_GetIMouse_function_type(&CRagdollProp_wrapper::default_GetIMouse)
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::CBaseEntity::GetTracerType
-        
-            typedef char const * ( ::CBaseEntity::*GetTracerType_function_type )(  ) ;
-            typedef char const * ( CRagdollProp_wrapper::*default_GetTracerType_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "GetTracerType"
-                , GetTracerType_function_type(&::CBaseEntity::GetTracerType)
-                , default_GetTracerType_function_type(&CRagdollProp_wrapper::default_GetTracerType) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,char const * ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_KeyValue_function_type )( char const *,char const * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CRagdollProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("szValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,float ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_KeyValue_function_type )( char const *,float ) ;
-            
-            CRagdollProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CRagdollProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("flValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,int ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_KeyValue_function_type )( char const *,int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CRagdollProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("nValue") ) );
-        
-        }
-        { //::CBaseEntity::KeyValue
-        
-            typedef bool ( ::CBaseEntity::*KeyValue_function_type )( char const *,::Vector const & ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_KeyValue_function_type )( char const *,::Vector const & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "KeyValue"
-                , KeyValue_function_type(&::CBaseEntity::KeyValue)
-                , default_KeyValue_function_type(&CRagdollProp_wrapper::default_KeyValue)
-                , ( bp::arg("szKeyName"), bp::arg("vecValue") ) );
-        
-        }
-        { //::CBaseEntity::MakeTracer
-        
-            typedef void ( ::CBaseEntity::*MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            typedef void ( CRagdollProp_wrapper::*default_MakeTracer_function_type )( ::Vector const &,::trace_t const &,int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "MakeTracer"
-                , MakeTracer_function_type(&::CBaseEntity::MakeTracer)
-                , default_MakeTracer_function_type(&CRagdollProp_wrapper::default_MakeTracer)
-                , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) );
-        
-        }
-        { //::CBaseEntity::OnChangeOwnerNumber
-        
-            typedef void ( ::CBaseEntity::*OnChangeOwnerNumber_function_type )( int ) ;
-            typedef void ( CRagdollProp_wrapper::*default_OnChangeOwnerNumber_function_type )( int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnChangeOwnerNumber"
-                , OnChangeOwnerNumber_function_type(&::CBaseEntity::OnChangeOwnerNumber)
-                , default_OnChangeOwnerNumber_function_type(&CRagdollProp_wrapper::default_OnChangeOwnerNumber)
-                , ( bp::arg("old_owner_number") ) );
-        
-        }
-        { //::CBaseAnimating::OnSequenceSet
-        
-            typedef void ( ::CBaseAnimating::*OnSequenceSet_function_type )( int ) ;
-            typedef void ( CRagdollProp_wrapper::*default_OnSequenceSet_function_type )( int ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnSequenceSet"
-                , OnSequenceSet_function_type(&::CBaseAnimating::OnSequenceSet)
-                , default_OnSequenceSet_function_type(&CRagdollProp_wrapper::default_OnSequenceSet)
-                , ( bp::arg("nOldSequence") ) );
-        
-        }
-        { //::CBaseEntity::PassesDamageFilter
-        
-            typedef bool ( ::CBaseEntity::*PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CRagdollProp_wrapper::*default_PassesDamageFilter_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CRagdollProp_exposer.def( 
-                "PassesDamageFilter"
-                , PassesDamageFilter_function_type(&::CBaseEntity::PassesDamageFilter)
-                , default_PassesDamageFilter_function_type(&CRagdollProp_wrapper::default_PassesDamageFilter)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::PostClientActive
-        
-            typedef void ( ::CBaseEntity::*PostClientActive_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_PostClientActive_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "PostClientActive"
-                , PostClientActive_function_type(&::CBaseEntity::PostClientActive)
-                , default_PostClientActive_function_type(&CRagdollProp_wrapper::default_PostClientActive) );
-        
-        }
-        { //::CBaseEntity::PostConstructor
-        
-            typedef void ( ::CBaseEntity::*PostConstructor_function_type )( char const * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_PostConstructor_function_type )( char const * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "PostConstructor"
-                , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
-                , default_PostConstructor_function_type(&CRagdollProp_wrapper::default_PostConstructor)
-                , ( bp::arg("szClassname") ) );
-        
-        }
-        { //::CBaseAnimating::PyOnNewModel
-        
-            typedef void ( CRagdollProp_wrapper::*OnNewModel_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type( &CRagdollProp_wrapper::default_OnNewModel ) );
-        
-        }
-        { //::CBaseEntity::StartTouch
-        
-            typedef void ( ::CBaseEntity::*StartTouch_function_type )( ::CBaseEntity * ) ;
-            typedef void ( CRagdollProp_wrapper::*default_StartTouch_function_type )( ::CBaseEntity * ) ;
-            
-            CRagdollProp_exposer.def( 
-                "StartTouch"
-                , StartTouch_function_type(&::CBaseEntity::StartTouch)
-                , default_StartTouch_function_type(&CRagdollProp_wrapper::default_StartTouch)
-                , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseEntity::StopLoopingSounds
-        
-            typedef void ( ::CBaseEntity::*StopLoopingSounds_function_type )(  ) ;
-            typedef void ( CRagdollProp_wrapper::*default_StopLoopingSounds_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "StopLoopingSounds"
-                , StopLoopingSounds_function_type(&::CBaseEntity::StopLoopingSounds)
-                , default_StopLoopingSounds_function_type(&CRagdollProp_wrapper::default_StopLoopingSounds) );
-        
-        }
-        { //::CBaseEntity::UpdateTransmitState
-        
-            typedef int ( ::CBaseEntity::*UpdateTransmitState_function_type )(  ) ;
-            typedef int ( CRagdollProp_wrapper::*default_UpdateTransmitState_function_type )(  ) ;
-            
-            CRagdollProp_exposer.def( 
-                "UpdateTransmitState"
-                , UpdateTransmitState_function_type(&::CBaseEntity::UpdateTransmitState)
-                , default_UpdateTransmitState_function_type(&CRagdollProp_wrapper::default_UpdateTransmitState) );
-        
-        }
-        { //::CRagdollProp::TestCollision
-            
-                typedef bool ( ::CRagdollProp::*TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-                typedef bool ( CRagdollProp_wrapper::*default_TestCollision_function_type )( ::Ray_t const &,unsigned int,::trace_t & ) ;
-
-                CRagdollProp_exposer.def( 
-                    "TestCollision"
-                    , TestCollision_function_type(&::CRagdollProp::TestCollision)
-                    , default_TestCollision_function_type(&CRagdollProp_wrapper::default_TestCollision)
-                    , ( bp::arg("ray"), bp::arg("mask"), bp::arg("trace") ) );
-
-            }
-    }
+    bp::class_< CRagdollProp_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CRagdollProp", bp::init< >() )    
+        .def( 
+            "ClearFlagsThink"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::ClearFlagsThink ) )    
+        .def( 
+            "DisableAutoFade"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::DisableAutoFade ) )    
+        .def( 
+            "DisableMotion"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::DisableMotion ) )    
+        .def( 
+            "DrawDebugGeometryOverlays"
+            , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::DrawDebugGeometryOverlays)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::DrawDebugTextOverlays)
+            , (int ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_DrawDebugTextOverlays) )    
+        .def( 
+            "FadeOut"
+            , (void ( ::CRagdollProp::* )( float,float ) )( &::CRagdollProp::FadeOut )
+            , ( bp::arg("flDelay")=0, bp::arg("fadeTime")=-0x000000001 ) )    
+        .def( 
+            "GetAngleOverrideFromCurrentState"
+            , (void ( ::CRagdollProp::* )( char *,int ) )( &::CRagdollProp::GetAngleOverrideFromCurrentState )
+            , ( bp::arg("pOut"), bp::arg("size") ) )    
+        .def( 
+            "GetKiller"
+            , (::CBaseEntity * ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::GetKiller )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetRagdoll"
+            , (::ragdoll_t * ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::GetRagdoll )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "HandleFirstCollisionInteractions"
+            , (void ( ::CRagdollProp::* )( int,::gamevcollisionevent_t * ) )( &::CRagdollProp::HandleFirstCollisionInteractions )
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .def( 
+            "HasPhysgunInteraction"
+            , (bool ( ::CRagdollProp::* )( char const *,char const * ) )( &::CRagdollProp::HasPhysgunInteraction )
+            , ( bp::arg("pszKeyName"), bp::arg("pszValue") ) )    
+        .def( 
+            "HasPhysicsAttacker"
+            , (::CBasePlayer * ( ::CRagdollProp::* )( float ) )( &::CRagdollProp::HasPhysicsAttacker )
+            , ( bp::arg("dt") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "InitRagdoll"
+            , (void ( ::CRagdollProp::* )( ::Vector const &,int,::Vector const &,::matrix3x4_t *,::matrix3x4_t *,float,int,bool,bool ) )( &::CRagdollProp::InitRagdoll )
+            , ( bp::arg("forceVector"), bp::arg("forceBone"), bp::arg("forcePos"), bp::arg("pPrevBones"), bp::arg("pBoneToWorld"), bp::arg("dt"), bp::arg("collisionGroup"), bp::arg("activateRagdoll"), bp::arg("bWakeRagdoll")=(bool)(true) ) )    
+        .def( 
+            "InitRagdollAnimation"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::InitRagdollAnimation ) )    
+        .def( 
+            "InputDisableMotion"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputDisableMotion )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputEnableMotion"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputEnableMotion )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputFadeAndRemove"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputFadeAndRemove )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputStartRadgollBoogie"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputStartRadgollBoogie )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputTurnOff"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputTurnOff )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "InputTurnOn"
+            , (void ( ::CRagdollProp::* )( ::inputdata_t & ) )( &::CRagdollProp::InputTurnOn )
+            , ( bp::arg("inputdata") ) )    
+        .def( 
+            "IsAlive"
+            , (bool ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::IsAlive ) )    
+        .def( 
+            "IsFading"
+            , (bool ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::IsFading ) )    
+        .def( 
+            "IsRagdoll"
+            , (bool ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::IsRagdoll ) )    
+        .def( 
+            "ModifyOrAppendCriteria"
+            , (void ( ::CRagdollProp::* )( ::ResponseRules::CriteriaSet & ) )(&::CRagdollProp::ModifyOrAppendCriteria)
+            , (void ( CRagdollProp_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CRagdollProp_wrapper::default_ModifyOrAppendCriteria)
+            , ( bp::arg("set") ) )    
+        .def( 
+            "ObjectCaps"
+            , (int ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::ObjectCaps ) )    
+        .def( 
+            "OnPhysGunDrop"
+            , (void ( ::CRagdollProp::* )( ::CBasePlayer *,::PhysGunDrop_t ) )( &::CRagdollProp::OnPhysGunDrop )
+            , ( bp::arg("pPhysGunUser"), bp::arg("Reason") ) )    
+        .def( 
+            "OnPhysGunPickup"
+            , (void ( ::CRagdollProp::* )( ::CBasePlayer *,::PhysGunPickup_t ) )( &::CRagdollProp::OnPhysGunPickup )
+            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
+        .def( 
+            "OnRestore"
+            , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::OnRestore)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_OnRestore) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CRagdollProp::* )( ::CTakeDamageInfo const & ) )(&::CRagdollProp::OnTakeDamage)
+            , (int ( CRagdollProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CRagdollProp_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PhysGunLaunchAngularImpulse"
+            , (::AngularImpulse ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::PhysGunLaunchAngularImpulse ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::Precache)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_Precache) )    
+        .def( 
+            "RecheckCollisionFilter"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::RecheckCollisionFilter ) )    
+        .def( 
+            "SetBlendWeight"
+            , (void ( ::CRagdollProp::* )( float ) )( &::CRagdollProp::SetBlendWeight )
+            , ( bp::arg("weight") ) )    
+        .def( 
+            "SetDamageEntity"
+            , (void ( ::CRagdollProp::* )( ::CBaseEntity * ) )( &::CRagdollProp::SetDamageEntity )
+            , ( bp::arg("pEntity") ) )    
+        .def( 
+            "SetDebrisThink"
+            , (void ( ::CRagdollProp::* )(  ) )( &::CRagdollProp::SetDebrisThink ) )    
+        .def( 
+            "SetKiller"
+            , (void ( ::CRagdollProp::* )( ::CBaseEntity * ) )( &::CRagdollProp::SetKiller )
+            , ( bp::arg("pKiller") ) )    
+        .def( 
+            "SetOverlaySequence"
+            , (void ( ::CRagdollProp::* )( ::Activity ) )( &::CRagdollProp::SetOverlaySequence )
+            , ( bp::arg("activity") ) )    
+        .def( 
+            "SetSourceClassName"
+            , (void ( ::CRagdollProp::* )( char const * ) )( &::CRagdollProp::SetSourceClassName )
+            , ( bp::arg("pClassname") ) )    
+        .def( 
+            "SetUnragdoll"
+            , (void ( ::CRagdollProp::* )( ::CBaseAnimating * ) )( &::CRagdollProp::SetUnragdoll )
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "SetupBones"
+            , (void ( ::CRagdollProp::* )( ::matrix3x4a_t *,int ) )( &::CRagdollProp::SetupBones )
+            , ( bp::arg("pBoneToWorld"), bp::arg("boneMask") ) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::Spawn)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_Spawn) )    
+        .def( 
+            "Teleport"
+            , (void ( ::CRagdollProp::* )( ::Vector const *,::QAngle const *,::Vector const * ) )( &::CRagdollProp::Teleport )
+            , ( bp::arg("newPosition"), bp::arg("newAngles"), bp::arg("newVelocity") ) )    
+        .def( 
+            "TraceAttack"
+            , (void ( ::CRagdollProp::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )( &::CRagdollProp::TraceAttack )
+            , ( bp::arg("info"), bp::arg("dir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::UpdateOnRemove)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_UpdateOnRemove) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CRagdollProp::* )( int,::gamevcollisionevent_t * ) )(&::CRagdollProp::VPhysicsCollision)
+            , (void ( CRagdollProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CRagdollProp_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .def( 
+            "VPhysicsUpdate"
+            , (void ( ::CRagdollProp::* )( ::IPhysicsObject * ) )( &::CRagdollProp::VPhysicsUpdate )
+            , ( bp::arg("pPhysics") ) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_Activate) )    
+        .def( 
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_CanBecomeRagdoll) )    
+        .def( 
+            "ComputeWorldSpaceSurroundingBox"
+            , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
+            , (void ( CRagdollProp_wrapper::* )( ::Vector *,::Vector * ) )(&CRagdollProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_CreateVPhysics) )    
+        .def( 
+            "DeathNotice"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
+            , (void ( CRagdollProp_wrapper::* )( ::CBaseEntity * ) )(&CRagdollProp_wrapper::default_DeathNotice)
+            , ( bp::arg("pVictim") ) )    
+        .def( 
+            "DoImpactEffect"
+            , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
+            , (void ( CRagdollProp_wrapper::* )( ::trace_t &,int ) )(&CRagdollProp_wrapper::default_DoImpactEffect)
+            , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
+        .def( 
+            "EndTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
+            , (void ( CRagdollProp_wrapper::* )( ::CBaseEntity * ) )(&CRagdollProp_wrapper::default_EndTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "Event_Killed"
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CRagdollProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CRagdollProp_wrapper::default_Event_Killed)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "Event_KilledOther"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
+            , (void ( CRagdollProp_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CRagdollProp_wrapper::default_Event_KilledOther)
+            , ( bp::arg("pVictim"), bp::arg("info") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
+            , (::IMouse * ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
+            "GetTracerType"
+            , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
+            , (char const * ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CRagdollProp_wrapper::* )( char const *,char const * ) )(&CRagdollProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CRagdollProp_wrapper::* )( char const *,float ) )(&CRagdollProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CRagdollProp_wrapper::* )( char const *,int ) )(&CRagdollProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CRagdollProp_wrapper::* )( char const *,::Vector const & ) )(&CRagdollProp_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
+        .def( 
+            "MakeTracer"
+            , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
+            , (void ( CRagdollProp_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CRagdollProp_wrapper::default_MakeTracer)
+            , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
+        .def( 
+            "OnChangeOwnerNumber"
+            , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
+            , (void ( CRagdollProp_wrapper::* )( int ) )(&CRagdollProp_wrapper::default_OnChangeOwnerNumber)
+            , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CRagdollProp_wrapper::* )( int ) )(&CRagdollProp_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "PassesDamageFilter"
+            , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
+            , (bool ( CRagdollProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CRagdollProp_wrapper::default_PassesDamageFilter)
+            , ( bp::arg("info") ) )    
+        .def( 
+            "PostClientActive"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_PostClientActive) )    
+        .def( 
+            "PostConstructor"
+            , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
+            , (void ( CRagdollProp_wrapper::* )( char const * ) )(&CRagdollProp_wrapper::default_PostConstructor)
+            , ( bp::arg("szClassname") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_OnNewModel) )    
+        .def( 
+            "StartTouch"
+            , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
+            , (void ( CRagdollProp_wrapper::* )( ::CBaseEntity * ) )(&CRagdollProp_wrapper::default_StartTouch)
+            , ( bp::arg("pOther") ) )    
+        .def( 
+            "StopLoopingSounds"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
+            , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_StopLoopingSounds) )    
+        .def( 
+            "UpdateTransmitState"
+            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
+            , (int ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_UpdateTransmitState) );
 
 }
 

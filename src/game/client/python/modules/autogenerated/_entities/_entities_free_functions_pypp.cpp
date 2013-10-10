@@ -38,6 +38,18 @@ namespace bp = boost::python;
 
 void _entities_register_free_functions(){
 
+    { //::CreateEntityByName
+    
+        typedef ::C_BaseEntity * ( *CreateEntityByName_function_type )( char const * );
+        
+        bp::def( 
+            "CreateEntityByName"
+            , CreateEntityByName_function_type( &::CreateEntityByName )
+            , ( bp::arg("className") )
+            , bp::return_value_policy< bp::return_by_value >() );
+    
+    }
+
     { //::GetPlayerRelationShip
     
         typedef ::Disposition_t ( *GetPlayerRelationShip_function_type )( int,int );
