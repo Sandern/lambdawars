@@ -8,7 +8,7 @@ from pyplusplus import messages
 from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 from pyplusplus import code_creators
 
-from src_helper import HasArgType, AddWrapReg, AddWrapRegs, CreateEntityArg, AddNetworkVarProperty, DisableKnownWarnings
+from src_helper import HasArgType, AddWrapReg, AddWrapRegs, CreateEntityArg
 
 # Templates for client and server class
 tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
@@ -1169,7 +1169,6 @@ class Entities(SemiSharedModuleGenerator):
         if self.isserver:
             cls = mb.class_('CTriggerMultiple')
             mb.class_('CTriggerMultiple').no_init = False
-            mb.mem_funs('GetTouchedEntityOfType').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             self.IncludeVarAndRename('m_bDisabled', 'disabled')
             self.IncludeVarAndRename('m_hFilter', 'filter')
             self.IncludeVarAndRename('m_iFilterName', 'filtername')
