@@ -9,6 +9,13 @@
 #include "mapentities_shared.h"
 #include "gamestringpool.h"
 
+#include "hl2wars_util_shared.h"
+
+#ifdef CLIENT_DLL
+#include "c_hl2wars_player.h"
+#include "cdll_util.h"
+#endif // CLIENT_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -144,7 +151,6 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 
 void CWarsFlora::SpawnMapFlora()
 {
-	DevMsg("CWarsFlora::SpawnMapFlora\n");
 	const char *pMapData = engine->GetMapEntitiesString();
 	if( !pMapData )
 	{
@@ -188,4 +194,73 @@ void CWarsFlora::SpawnMapFlora()
 		nEntities++;
 	}
 }
+
+CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
+{
+	if( args.ArgC() < 2 )
+	{
+		Warning("wars_flora_spawn: Not enough arguments\n");
+		return;
+	}
+
+	CHL2WarsPlayer *pPlayer = CHL2WarsPlayer::GetLocalHL2WarsPlayer(); 
+	if( !pPlayer )
+		return;
+
+	const MouseTraceData_t &data = pPlayer->GetMouseData();
+
+	// Collect arguments
+	const char *pModelName = args[1];
+
+	// Load model and determine size
+	const model_t *pModel = modelinfo->FindOrLoadModel( pModelName );
+	if( !pModel )
+	{
+		Warning("wars_flora_spawn: Failed to load model\n");
+		return;
+	}
+
+	Vector mins, maxs;
+	modelinfo->GetModelBounds( pModel, mins, maxs );
+
+	// Determine position
+	float startradius = 0;
+	float maxradius = 0.0f;
+	float radiusgrow = 0.0f;
+	float radiusstep = 0.0f;
+	CBaseEntity *ignore = NULL;
+
+	positioninfo_t info( data.m_vEndPos, mins, maxs, startradius, maxradius, radiusgrow, radiusstep, ignore );
+	UTIL_FindPosition( info );
+
+	if( !info.m_bSuccess )
+	{
+		Warning("wars_flora_spawn: Could not find a valid position\n");
+		return;
+	}
+
+	// Create flora entity
+	CWarsFlora *pEntity = new CWarsFlora();
+	if ( !pEntity )
+	{	
+		Warning("wars_flora_spawn: Failed to create entity\n");
+		return;
+	}
+
+	// Apply data
+	QAngle angles(0, random->RandomFloat(0, 360), 0);
+	pEntity->KeyValue( "model", pModelName );
+	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", angles.x, angles.y, angles.z ) );
+	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", info.m_vPosition.x, info.m_vPosition.y, info.m_vPosition.z ) );
+
+	// Initialize
+	if ( !pEntity->Initialize() )
+	{	
+		pEntity->Release();
+		Warning("wars_flora_spawn: Failed to initialize entity\n");
+		return;
+	}
+		
+}
+
 #endif // CLIENT_DLL
