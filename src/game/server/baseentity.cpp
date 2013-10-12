@@ -8837,7 +8837,7 @@ void CBaseEntity::FOWForceUpdate( int iPlayerIndex )
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-void CBaseEntity::ClearPyInstance()
+void CBaseEntity::DestroyPyInstance()
 {
 	// Used in destructor
 	m_bPyManaged = true;

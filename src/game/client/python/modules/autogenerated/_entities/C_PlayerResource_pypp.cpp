@@ -859,8 +859,7 @@ void register_C_PlayerResource_class(){
         .def( 
             "GetTeam"
             , (int ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetTeam )
-            , ( bp::arg("index") )
-            , bp::return_value_policy< bp::return_by_value >() )    
+            , ( bp::arg("index") ) )    
         .def( 
             "GetTeamColor"
             , (::Color const & ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetTeamColor )

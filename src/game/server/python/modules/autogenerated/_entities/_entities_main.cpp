@@ -37,6 +37,8 @@
 
 #include "iservervehicle.h"
 
+#include "gib.h"
+
 #include "spark.h"
 
 #include "physics_prop_ragdoll.h"
@@ -44,8 +46,6 @@
 #include "filters.h"
 
 #include "EntityFlame.h"
-
-#include "gib.h"
 
 #include "props.h"
 
@@ -469,42 +469,6 @@ struct handle_to_CBaseCombatWeapon
     }
 };
 
-typedef CEPyHandle< CGib > CGibHANDLE;
-
-struct ptr_CGib_to_handle : bp::to_python_converter<CGib *, ptr_CGib_to_handle>
-{
-    static PyObject* convert(CGib *s)
-    {
-        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
-    }
-};
-
-struct CGib_to_handle : bp::to_python_converter<CGib, CGib_to_handle>
-{
-    static PyObject* convert(const CGib &s)
-    {
-        return bp::incref(s.GetPyHandle().ptr());
-    }
-};
-
-struct handle_to_CGib
-{
-    handle_to_CGib()
-    {
-        bp::converter::registry::insert(
-            &extract_CGib, 
-            bp::type_id<CGib>()
-            );
-    }
-
-    static void* extract_CGib(PyObject* op){
-       CBaseHandle h = bp::extract<CBaseHandle>(op);
-       if( h.Get() == NULL )
-           return Py_None;
-       return h.Get();
-    }
-};
-
 typedef CEPyHandle< CPointEntity > CPointEntityHANDLE;
 
 struct ptr_CPointEntity_to_handle : bp::to_python_converter<CPointEntity *, ptr_CPointEntity_to_handle>
@@ -793,6 +757,78 @@ struct handle_to_CTriggerMultiple
     }
 };
 
+typedef CEPyHandle< CBaseFilter > CBaseFilterHANDLE;
+
+struct ptr_CBaseFilter_to_handle : bp::to_python_converter<CBaseFilter *, ptr_CBaseFilter_to_handle>
+{
+    static PyObject* convert(CBaseFilter *s)
+    {
+        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
+    }
+};
+
+struct CBaseFilter_to_handle : bp::to_python_converter<CBaseFilter, CBaseFilter_to_handle>
+{
+    static PyObject* convert(const CBaseFilter &s)
+    {
+        return bp::incref(s.GetPyHandle().ptr());
+    }
+};
+
+struct handle_to_CBaseFilter
+{
+    handle_to_CBaseFilter()
+    {
+        bp::converter::registry::insert(
+            &extract_CBaseFilter, 
+            bp::type_id<CBaseFilter>()
+            );
+    }
+
+    static void* extract_CBaseFilter(PyObject* op){
+       CBaseHandle h = bp::extract<CBaseHandle>(op);
+       if( h.Get() == NULL )
+           return Py_None;
+       return h.Get();
+    }
+};
+
+typedef CEPyHandle< CGib > CGibHANDLE;
+
+struct ptr_CGib_to_handle : bp::to_python_converter<CGib *, ptr_CGib_to_handle>
+{
+    static PyObject* convert(CGib *s)
+    {
+        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
+    }
+};
+
+struct CGib_to_handle : bp::to_python_converter<CGib, CGib_to_handle>
+{
+    static PyObject* convert(const CGib &s)
+    {
+        return bp::incref(s.GetPyHandle().ptr());
+    }
+};
+
+struct handle_to_CGib
+{
+    handle_to_CGib()
+    {
+        bp::converter::registry::insert(
+            &extract_CGib, 
+            bp::type_id<CGib>()
+            );
+    }
+
+    static void* extract_CGib(PyObject* op){
+       CBaseHandle h = bp::extract<CBaseHandle>(op);
+       if( h.Get() == NULL )
+           return Py_None;
+       return h.Get();
+    }
+};
+
 typedef CEPyHandle< CBaseProp > CBasePropHANDLE;
 
 struct ptr_CBaseProp_to_handle : bp::to_python_converter<CBaseProp *, ptr_CBaseProp_to_handle>
@@ -930,42 +966,6 @@ struct handle_to_CRagdollProp
     }
 
     static void* extract_CRagdollProp(PyObject* op){
-       CBaseHandle h = bp::extract<CBaseHandle>(op);
-       if( h.Get() == NULL )
-           return Py_None;
-       return h.Get();
-    }
-};
-
-typedef CEPyHandle< CBaseFilter > CBaseFilterHANDLE;
-
-struct ptr_CBaseFilter_to_handle : bp::to_python_converter<CBaseFilter *, ptr_CBaseFilter_to_handle>
-{
-    static PyObject* convert(CBaseFilter *s)
-    {
-        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
-    }
-};
-
-struct CBaseFilter_to_handle : bp::to_python_converter<CBaseFilter, CBaseFilter_to_handle>
-{
-    static PyObject* convert(const CBaseFilter &s)
-    {
-        return bp::incref(s.GetPyHandle().ptr());
-    }
-};
-
-struct handle_to_CBaseFilter
-{
-    handle_to_CBaseFilter()
-    {
-        bp::converter::registry::insert(
-            &extract_CBaseFilter, 
-            bp::type_id<CBaseFilter>()
-            );
-    }
-
-    static void* extract_CBaseFilter(PyObject* op){
        CBaseHandle h = bp::extract<CBaseHandle>(op);
        if( h.Get() == NULL )
            return Py_None;
@@ -2094,81 +2094,6 @@ BOOST_PYTHON_MODULE(_entities){
 
     handle_to_CBaseCombatWeapon();
 
-    { //::CGibHANDLE
-        typedef bp::class_< CGibHANDLE, bp::bases< CBaseHandle > > CGibHANDLE_exposer_t;
-        CGibHANDLE_exposer_t CGibHANDLE_exposer = CGibHANDLE_exposer_t( "CGibHANDLE", bp::init< >() );
-        CGibHANDLE_exposer.def( bp::init< CGib * >(( bp::arg("pVal") )) );
-        CGibHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
-        { //::CGibHANDLE::GetAttr
-        
-            typedef bp::object ( ::CGibHANDLE::*GetAttr_function_type )( const char * ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "__getattr__"
-                , GetAttr_function_type( &::CGibHANDLE::GetAttr )
-            );
-        
-        }
-        { //::CGibHANDLE::Cmp
-        
-            typedef bool ( ::CGibHANDLE::*Cmp_function_type )( bp::object ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "__cmp__"
-                , Cmp_function_type( &::CGibHANDLE::Cmp )
-            );
-        
-        }
-        { //::CGibHANDLE::NonZero
-        
-            typedef bool ( ::CGibHANDLE::*NonZero_function_type )( ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "__nonzero__"
-                , NonZero_function_type( &::CGibHANDLE::NonZero )
-            );
-        
-        }
-        { //::CGibHANDLE::Set
-        
-            typedef void ( ::CGibHANDLE::*Set_function_type )( CGib * ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "Set"
-                , Set_function_type( &::CGibHANDLE::Set )
-            );
-        
-        }
-        { //::CGibHANDLE::GetSerialNumber
-        
-            typedef int ( ::CGibHANDLE::*GetSerialNumber_function_type )( ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "GetSerialNumber"
-                , GetSerialNumber_function_type( &::CGibHANDLE::GetSerialNumber )
-            );
-        
-        }
-        { //::CGibHANDLE::GetEntryIndex
-        
-            typedef int ( ::CGibHANDLE::*GetEntryIndex_function_type )(  ) const;
-            
-            CGibHANDLE_exposer.def( 
-                "GetEntryIndex"
-                , GetEntryIndex_function_type( &::CGibHANDLE::GetEntryIndex )
-            );
-        
-        }
-        CGibHANDLE_exposer.def( bp::self != bp::self );
-        CGibHANDLE_exposer.def( bp::self == bp::self );
-    }
-
-    ptr_CGib_to_handle();
-
-    CGib_to_handle();
-
-    handle_to_CGib();
-
     { //::CPointEntityHANDLE
         typedef bp::class_< CPointEntityHANDLE, bp::bases< CBaseHandle > > CPointEntityHANDLE_exposer_t;
         CPointEntityHANDLE_exposer_t CPointEntityHANDLE_exposer = CPointEntityHANDLE_exposer_t( "CPointEntityHANDLE", bp::init< >() );
@@ -2769,6 +2694,156 @@ BOOST_PYTHON_MODULE(_entities){
 
     handle_to_CTriggerMultiple();
 
+    { //::CBaseFilterHANDLE
+        typedef bp::class_< CBaseFilterHANDLE, bp::bases< CBaseHandle > > CBaseFilterHANDLE_exposer_t;
+        CBaseFilterHANDLE_exposer_t CBaseFilterHANDLE_exposer = CBaseFilterHANDLE_exposer_t( "CBaseFilterHANDLE", bp::init< >() );
+        CBaseFilterHANDLE_exposer.def( bp::init< CBaseFilter * >(( bp::arg("pVal") )) );
+        CBaseFilterHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::CBaseFilterHANDLE::GetAttr
+        
+            typedef bp::object ( ::CBaseFilterHANDLE::*GetAttr_function_type )( const char * ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::CBaseFilterHANDLE::GetAttr )
+            );
+        
+        }
+        { //::CBaseFilterHANDLE::Cmp
+        
+            typedef bool ( ::CBaseFilterHANDLE::*Cmp_function_type )( bp::object ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "__cmp__"
+                , Cmp_function_type( &::CBaseFilterHANDLE::Cmp )
+            );
+        
+        }
+        { //::CBaseFilterHANDLE::NonZero
+        
+            typedef bool ( ::CBaseFilterHANDLE::*NonZero_function_type )( ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "__nonzero__"
+                , NonZero_function_type( &::CBaseFilterHANDLE::NonZero )
+            );
+        
+        }
+        { //::CBaseFilterHANDLE::Set
+        
+            typedef void ( ::CBaseFilterHANDLE::*Set_function_type )( CBaseFilter * ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "Set"
+                , Set_function_type( &::CBaseFilterHANDLE::Set )
+            );
+        
+        }
+        { //::CBaseFilterHANDLE::GetSerialNumber
+        
+            typedef int ( ::CBaseFilterHANDLE::*GetSerialNumber_function_type )( ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "GetSerialNumber"
+                , GetSerialNumber_function_type( &::CBaseFilterHANDLE::GetSerialNumber )
+            );
+        
+        }
+        { //::CBaseFilterHANDLE::GetEntryIndex
+        
+            typedef int ( ::CBaseFilterHANDLE::*GetEntryIndex_function_type )(  ) const;
+            
+            CBaseFilterHANDLE_exposer.def( 
+                "GetEntryIndex"
+                , GetEntryIndex_function_type( &::CBaseFilterHANDLE::GetEntryIndex )
+            );
+        
+        }
+        CBaseFilterHANDLE_exposer.def( bp::self != bp::self );
+        CBaseFilterHANDLE_exposer.def( bp::self == bp::self );
+    }
+
+    ptr_CBaseFilter_to_handle();
+
+    CBaseFilter_to_handle();
+
+    handle_to_CBaseFilter();
+
+    { //::CGibHANDLE
+        typedef bp::class_< CGibHANDLE, bp::bases< CBaseHandle > > CGibHANDLE_exposer_t;
+        CGibHANDLE_exposer_t CGibHANDLE_exposer = CGibHANDLE_exposer_t( "CGibHANDLE", bp::init< >() );
+        CGibHANDLE_exposer.def( bp::init< CGib * >(( bp::arg("pVal") )) );
+        CGibHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::CGibHANDLE::GetAttr
+        
+            typedef bp::object ( ::CGibHANDLE::*GetAttr_function_type )( const char * ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::CGibHANDLE::GetAttr )
+            );
+        
+        }
+        { //::CGibHANDLE::Cmp
+        
+            typedef bool ( ::CGibHANDLE::*Cmp_function_type )( bp::object ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "__cmp__"
+                , Cmp_function_type( &::CGibHANDLE::Cmp )
+            );
+        
+        }
+        { //::CGibHANDLE::NonZero
+        
+            typedef bool ( ::CGibHANDLE::*NonZero_function_type )( ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "__nonzero__"
+                , NonZero_function_type( &::CGibHANDLE::NonZero )
+            );
+        
+        }
+        { //::CGibHANDLE::Set
+        
+            typedef void ( ::CGibHANDLE::*Set_function_type )( CGib * ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "Set"
+                , Set_function_type( &::CGibHANDLE::Set )
+            );
+        
+        }
+        { //::CGibHANDLE::GetSerialNumber
+        
+            typedef int ( ::CGibHANDLE::*GetSerialNumber_function_type )( ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "GetSerialNumber"
+                , GetSerialNumber_function_type( &::CGibHANDLE::GetSerialNumber )
+            );
+        
+        }
+        { //::CGibHANDLE::GetEntryIndex
+        
+            typedef int ( ::CGibHANDLE::*GetEntryIndex_function_type )(  ) const;
+            
+            CGibHANDLE_exposer.def( 
+                "GetEntryIndex"
+                , GetEntryIndex_function_type( &::CGibHANDLE::GetEntryIndex )
+            );
+        
+        }
+        CGibHANDLE_exposer.def( bp::self != bp::self );
+        CGibHANDLE_exposer.def( bp::self == bp::self );
+    }
+
+    ptr_CGib_to_handle();
+
+    CGib_to_handle();
+
+    handle_to_CGib();
+
     { //::CBasePropHANDLE
         typedef bp::class_< CBasePropHANDLE, bp::bases< CBaseHandle > > CBasePropHANDLE_exposer_t;
         CBasePropHANDLE_exposer_t CBasePropHANDLE_exposer = CBasePropHANDLE_exposer_t( "CBasePropHANDLE", bp::init< >() );
@@ -3068,81 +3143,6 @@ BOOST_PYTHON_MODULE(_entities){
     CRagdollProp_to_handle();
 
     handle_to_CRagdollProp();
-
-    { //::CBaseFilterHANDLE
-        typedef bp::class_< CBaseFilterHANDLE, bp::bases< CBaseHandle > > CBaseFilterHANDLE_exposer_t;
-        CBaseFilterHANDLE_exposer_t CBaseFilterHANDLE_exposer = CBaseFilterHANDLE_exposer_t( "CBaseFilterHANDLE", bp::init< >() );
-        CBaseFilterHANDLE_exposer.def( bp::init< CBaseFilter * >(( bp::arg("pVal") )) );
-        CBaseFilterHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
-        { //::CBaseFilterHANDLE::GetAttr
-        
-            typedef bp::object ( ::CBaseFilterHANDLE::*GetAttr_function_type )( const char * ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "__getattr__"
-                , GetAttr_function_type( &::CBaseFilterHANDLE::GetAttr )
-            );
-        
-        }
-        { //::CBaseFilterHANDLE::Cmp
-        
-            typedef bool ( ::CBaseFilterHANDLE::*Cmp_function_type )( bp::object ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "__cmp__"
-                , Cmp_function_type( &::CBaseFilterHANDLE::Cmp )
-            );
-        
-        }
-        { //::CBaseFilterHANDLE::NonZero
-        
-            typedef bool ( ::CBaseFilterHANDLE::*NonZero_function_type )( ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "__nonzero__"
-                , NonZero_function_type( &::CBaseFilterHANDLE::NonZero )
-            );
-        
-        }
-        { //::CBaseFilterHANDLE::Set
-        
-            typedef void ( ::CBaseFilterHANDLE::*Set_function_type )( CBaseFilter * ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "Set"
-                , Set_function_type( &::CBaseFilterHANDLE::Set )
-            );
-        
-        }
-        { //::CBaseFilterHANDLE::GetSerialNumber
-        
-            typedef int ( ::CBaseFilterHANDLE::*GetSerialNumber_function_type )( ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "GetSerialNumber"
-                , GetSerialNumber_function_type( &::CBaseFilterHANDLE::GetSerialNumber )
-            );
-        
-        }
-        { //::CBaseFilterHANDLE::GetEntryIndex
-        
-            typedef int ( ::CBaseFilterHANDLE::*GetEntryIndex_function_type )(  ) const;
-            
-            CBaseFilterHANDLE_exposer.def( 
-                "GetEntryIndex"
-                , GetEntryIndex_function_type( &::CBaseFilterHANDLE::GetEntryIndex )
-            );
-        
-        }
-        CBaseFilterHANDLE_exposer.def( bp::self != bp::self );
-        CBaseFilterHANDLE_exposer.def( bp::self == bp::self );
-    }
-
-    ptr_CBaseFilter_to_handle();
-
-    CBaseFilter_to_handle();
-
-    handle_to_CBaseFilter();
 
     { //::CEntityFlameHANDLE
         typedef bp::class_< CEntityFlameHANDLE, bp::bases< CBaseHandle > > CEntityFlameHANDLE_exposer_t;

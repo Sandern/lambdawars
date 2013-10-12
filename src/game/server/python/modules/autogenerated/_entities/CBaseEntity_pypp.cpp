@@ -18,11 +18,11 @@
 #include "saverestore.h"
 #include "vcollide_parse.h"
 #include "iservervehicle.h"
+#include "gib.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
-#include "gib.h"
 #include "props.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
@@ -3393,6 +3393,17 @@ void register_CBaseEntity_class(){
                 "InputUse"
                 , InputUse_function_type( &::CBaseEntity::InputUse )
                 , ( bp::arg("inputdata") ) );
+        
+        }
+        { //::CBaseEntity::Instance
+        
+            typedef ::CBaseEntity * ( *Instance_function_type )( ::CBaseHandle const & );
+            
+            CBaseEntity_exposer.def( 
+                "Instance"
+                , Instance_function_type( &::CBaseEntity::Instance )
+                , ( bp::arg("hEnt") )
+                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::CBaseEntity::Instance

@@ -364,14 +364,9 @@ class GameInterface(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"FCVAR_CLIENTCMD_CAN_EXECUTE\" ) = (int)FCVAR_CLIENTCMD_CAN_EXECUTE;" )
         
         # Excludes
-        if self.isserver:
-            excludetypes = [
-                        pointer_t(declarated_t(mb.class_('CTeam'))),
-            ]
-        else:
-            excludetypes = [
-                        pointer_t(declarated_t(mb.class_('C_Team'))),
-            ]
+        excludetypes = [
+            pointer_t(declarated_t(mb.class_('CTeam' if self.isserver else 'C_Team'))),
+        ]
         mb.calldefs( calldef_withtypes( excludetypes ) ).exclude()
     
     def AddAdditionalCode(self, mb):

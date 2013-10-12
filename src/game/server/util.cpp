@@ -518,7 +518,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 		// gEntList.RemoveEntity( oldObj->GetRefEHandle() );
 
 		// Clear our py instance which keeps the entity alive for sure
-		oldObj->ClearPyInstance();
+		oldObj->DestroyPyInstance();
 	}
 	else
 #endif // ENABLE_PYTHON

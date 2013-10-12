@@ -35,7 +35,7 @@ public:
 	CBaseAnimating();
 	~CBaseAnimating();
 #ifdef ENABLE_PYTHON
-	virtual void		ClearPyInstance();
+	virtual void		DestroyPyInstance();
 #endif // ENABLE_PYTHON
 
 	DECLARE_PREDICTABLE();

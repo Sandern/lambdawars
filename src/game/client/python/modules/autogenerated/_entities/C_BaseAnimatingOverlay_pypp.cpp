@@ -884,17 +884,6 @@ void register_C_BaseAnimatingOverlay_class(){
                 , ( bp::arg("pStudioHdr") ) );
         
         }
-        { //::C_BaseAnimatingOverlay::GetAnimOverlay
-        
-            typedef ::C_AnimationLayer * ( ::C_BaseAnimatingOverlay::*GetAnimOverlay_function_type )( int ) ;
-            
-            C_BaseAnimatingOverlay_exposer.def( 
-                "GetAnimOverlay"
-                , GetAnimOverlay_function_type( &::C_BaseAnimatingOverlay::GetAnimOverlay )
-                , ( bp::arg("i") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
         { //::C_BaseAnimatingOverlay::GetNumAnimOverlays
         
             typedef int ( ::C_BaseAnimatingOverlay::*GetNumAnimOverlays_function_type )(  ) const;

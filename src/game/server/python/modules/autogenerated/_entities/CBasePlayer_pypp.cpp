@@ -18,11 +18,11 @@
 #include "saverestore.h"
 #include "vcollide_parse.h"
 #include "iservervehicle.h"
+#include "gib.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
-#include "gib.h"
 #include "props.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
@@ -2349,6 +2349,10 @@ void register_CBasePlayer_class(){
             "SetLaggedMovementValue"
             , (void ( ::CBasePlayer::* )( float ) )( &::CBasePlayer::SetLaggedMovementValue )
             , ( bp::arg("flValue") ) )    
+        .def( 
+            "SetLastUserCommand"
+            , (void ( ::CBasePlayer::* )( ::CUserCmd const & ) )( &::CBasePlayer::SetLastUserCommand )
+            , ( bp::arg("cmd") ) )    
         .def( 
             "SetMaxSpeed"
             , (void ( ::CBasePlayer::* )( float ) )( &::CBasePlayer::SetMaxSpeed )

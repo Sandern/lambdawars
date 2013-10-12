@@ -18,11 +18,11 @@
 #include "saverestore.h"
 #include "vcollide_parse.h"
 #include "iservervehicle.h"
+#include "gib.h"
 #include "spark.h"
 #include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
-#include "gib.h"
 #include "props.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
@@ -1162,17 +1162,6 @@ void register_CBaseAnimatingOverlay_class(){
                 "FindGestureLayer"
                 , FindGestureLayer_function_type( &::CBaseAnimatingOverlay::FindGestureLayer )
                 , ( bp::arg("activity") ) );
-        
-        }
-        { //::CBaseAnimatingOverlay::GetAnimOverlay
-        
-            typedef ::CAnimationLayer * ( ::CBaseAnimatingOverlay::*GetAnimOverlay_function_type )( int ) ;
-            
-            CBaseAnimatingOverlay_exposer.def( 
-                "GetAnimOverlay"
-                , GetAnimOverlay_function_type( &::CBaseAnimatingOverlay::GetAnimOverlay )
-                , ( bp::arg("iIndex") )
-                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::CBaseAnimatingOverlay::GetLayerActivity

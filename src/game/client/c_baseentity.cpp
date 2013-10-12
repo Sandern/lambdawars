@@ -1500,7 +1500,7 @@ void C_BaseEntity::Release()
 #ifdef ENABLE_PYTHON
 	if( m_pyInstance.ptr() != Py_None )
 	{
-		ClearPyInstance();	
+		DestroyPyInstance();	
 	}
 	else
 #endif // ENABLE_PYTHON
@@ -6639,8 +6639,10 @@ Vector &CBaseEntity::GetTeamColor( bool bDirect )
 }
 
 #ifdef ENABLE_PYTHON
-//------------------------------------------------------------------------------
-void C_BaseEntity::ClearPyInstance()
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_BaseEntity::DestroyPyInstance()
 {
 	m_bPyManaged = true;
 

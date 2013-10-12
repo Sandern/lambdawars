@@ -119,7 +119,7 @@ public:
 	C_BaseAnimating();
 	~C_BaseAnimating();
 #ifdef ENABLE_PYTHON
-	virtual void					ClearPyInstance();
+	virtual void					DestroyPyInstance();
 #endif // ENABLE_PYTHON
 
 	virtual C_BaseAnimating*		GetBaseAnimating() { return this; }

@@ -416,7 +416,7 @@ void CGlobalEntityList::CleanupDeleteList( void )
 		if( g_DeleteList[i]->GetBaseEntity()->GetPyInstance().ptr() != Py_None )
 		{
 			// Clear our py instance which keeps the entity alive for sure
-			g_DeleteList[i]->GetBaseEntity()->ClearPyInstance();
+			g_DeleteList[i]->GetBaseEntity()->DestroyPyInstance();
 		}
 		else
 #endif // ENABLE_PYTHON

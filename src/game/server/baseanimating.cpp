@@ -322,14 +322,14 @@ CBaseAnimating::~CBaseAnimating()
 }
 
 #ifdef ENABLE_PYTHON
-void CBaseAnimating::ClearPyInstance()
+void CBaseAnimating::DestroyPyInstance()
 {
 	Studio_DestroyBoneCache( m_boneCacheHandle );
 	delete m_pIk;
 	UnlockStudioHdr();
 	delete m_pStudioHdr;
 
-	BaseClass::ClearPyInstance();
+	BaseClass::DestroyPyInstance();
 }
 #endif // ENABLE_PYTHON
 

@@ -183,15 +183,20 @@ class Entities(SemiSharedModuleGenerator):
         '%choreoactor.h',
         '$steam/steamclientpublic.h', # CSteamID
         '$view_shared.h', # CViewSetup
+        '#gib.h',
         '#spark.h',
         '#physics_prop_ragdoll.h',
         '#filters.h',
         '#EntityFlame.h',
-        '#gib.h',
         '$c_playerresource.h',
         '#props.h',
-        '$%baseviewmodel_shared.h',
         
+        # For parsing only (used to exclude functions based on return value)
+        '$%baseviewmodel_shared.h',
+        '#%team.h',
+        '$%c_team.h',
+        
+        # Effects. Would be nice to remove these since they can be achieved using the particle system.
         'Sprite.h',
         'SpriteTrail.h',
         '$c_smoke_trail.h',
@@ -225,6 +230,7 @@ class Entities(SemiSharedModuleGenerator):
         'C_BaseTrigger',
         'C_FuncBrush',
         
+		# Effects
         'C_Sprite',
         'C_SpriteTrail',
         'C_BaseParticleEntity',
@@ -232,6 +238,7 @@ class Entities(SemiSharedModuleGenerator):
         'C_RocketTrail',
         'C_Beam',
         
+		# Wars
         'C_HL2WarsPlayer',
         'C_UnitBase',
         'C_FuncUnit',
@@ -248,7 +255,6 @@ class Entities(SemiSharedModuleGenerator):
         'CBaseGrenade',
         'CBasePlayer',
         'CBaseCombatWeapon',
-        'CGib',
         'CPointEntity',
         'CServerOnlyEntity',
         'CServerOnlyPointEntity',
@@ -257,13 +263,15 @@ class Entities(SemiSharedModuleGenerator):
         'CBaseToggle',
         'CBaseTrigger',
         'CTriggerMultiple',
+        'CBaseFilter',
+        'CGib',
         'CBaseProp',
         'CBreakableProp',
         'CPhysicsProp',
         'CRagdollProp',
-        'CBaseFilter',
         'CEntityFlame',
         
+        # Effects. Would be nice to remove these since they can be achieved using the particle system.
         'CSprite',
         'CSpriteTrail',
         'CBaseParticleEntity', # Baseclass for SmokeTrail
@@ -271,6 +279,7 @@ class Entities(SemiSharedModuleGenerator):
         'RocketTrail',
         'CBeam',
         
+        # Wars
         'CHL2WarsPlayer',
         'CUnitBase',
         'CFuncUnit',
@@ -334,9 +343,7 @@ class Entities(SemiSharedModuleGenerator):
         self.AddEntityConverter(mb, clsname)  
         
         # Use by converters to check if a Python Object is attached
-        cls.add_wrapper_code(
-            'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
-        )
+        cls.add_wrapper_code('virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }')
         
         # Test if the Entity class is setup right
         try:
@@ -350,15 +357,32 @@ class Entities(SemiSharedModuleGenerator):
         cls.classes(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(lambda decl: 'YouForgotToImplement' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(function=lambda decl: 'NetworkStateChanged_' in decl.name, allow_empty=True).exclude()
-        cls.mem_funs('ClearPyInstance', allow_empty=True).exclude()        # Not needed, used for cleaning up python entities
         cls.mem_funs('GetBaseMap', allow_empty=True).exclude()             # Not needed
         cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
         cls.mem_funs('GetDataDescMap', allow_empty=True).exclude()         # Not needed
+        
+        cls.mem_funs('DestroyPyInstance', allow_empty=True).exclude()      # Not needed, used for cleaning up python entities
 
         # matrix3x4_t is always returned by value
         matrix3x4 = mb.class_('matrix3x4_t')
         cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(declarated_t(matrix3x4))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         cls.calldefs(matchers.calldef_matcher_t(return_type=reference_t(const_t(declarated_t(matrix3x4)))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        
+        # Exclude functions with CTeam, CUserCmd, edict_t
+        usercmd = mb.class_('CUserCmd')
+        edict = mb.class_('edict_t')
+        excludetypes = [
+            pointer_t(declarated_t(mb.class_('CTeam' if self.isserver else 'C_Team'))),
+            pointer_t(const_t(declarated_t(usercmd))),
+            pointer_t(declarated_t(usercmd)),
+            pointer_t(const_t(declarated_t(edict))),
+            pointer_t(declarated_t(edict)),
+        ]
+        cls.calldefs(calldef_withtypes( excludetypes ), allow_empty=True).exclude()
+        
+        # Returning a physics object -> Convert by value, which results in the wrapper object being returned
+        physicsobject = mb.class_('IPhysicsObject')
+        cls.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(physicsobject))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # All public variables are excluded by default
         cls.vars(allow_empty=True).exclude()
@@ -389,6 +413,10 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('OnNewModel', allow_empty=True).exclude() # Don't care for now
             cls.mem_funs('GetClientClass', allow_empty=True).exclude()
             cls.mem_funs('GetMouth', allow_empty=True).exclude()
+            
+            # Remove anything returning a pointer to C_CommandContext
+            commandcontext = mb.class_('C_CommandContext')
+            cls.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(commandcontext))), allow_empty=True).exclude()
 
         mb.mem_funs('SetThinkHandle').exclude()
         mb.mem_funs('GetThinkHandle').exclude()
@@ -444,7 +472,7 @@ class Entities(SemiSharedModuleGenerator):
         )
     
     def ParseBaseEntity(self, mb):
-        cls = mb.class_('C_BaseEntity') if self.isclient else mb.class_('CBaseEntity')
+        cls = mb.class_('C_BaseEntity' if self.isclient else 'CBaseEntity')
     
         # Free Send Properties
         count = 4
@@ -460,12 +488,32 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude operators
         mb.global_ns.mem_opers('new').exclude()
         mb.global_ns.mem_opers('delete').exclude()
+    
+        # List of shared functions overridable in Python
+        mb.mem_funs('Precache').virtuality = 'virtual'
+        mb.mem_funs('Spawn').virtuality = 'virtual'
+        mb.mem_funs('Activate').virtuality = 'virtual'
+        mb.mem_funs('KeyValue').virtuality = 'virtual'
+        mb.mem_funs('UpdateOnRemove').virtuality = 'virtual'
+        mb.mem_funs('CreateVPhysics').virtuality = 'virtual'
+        mb.mem_funs('GetTracerType').virtuality = 'virtual'
+        mb.mem_funs('MakeTracer').virtuality = 'virtual'
+        mb.mem_funs('DoImpactEffect').virtuality = 'virtual'
+        mb.mem_funs('StartTouch').virtuality = 'virtual'
+        mb.mem_funs('EndTouch').virtuality = 'virtual'
+        mb.mem_funs('UpdateTransmitState').virtuality = 'virtual'
+        mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
+        mb.mem_funs('OnRestore').virtuality = 'virtual'
+        
+        # Call policies
+        cls.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference()
+        mb.mem_funs('GetBeamTraceFilter').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs('GetTouchTrace').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  # unsafe
         
         # Excludes
         mb.mem_funs('Release').exclude()                # Don't care
         mb.mem_funs('GetPyInstance').exclude()          # Not needed, used when converting entities to python
         mb.mem_funs('SetPyInstance').exclude()          # Not needed, used when converting entities to python
-        mb.mem_funs('ClearPyInstance').exclude()        # Not needed, used for cleaning up python entities
         mb.mem_funs('GetBaseMap').exclude()             # Not needed
         mb.mem_funs('GetDataDescMap').exclude()         # Not needed
         mb.mem_funs('GetRefEHandle').exclude()          # We already got an auto conversion to a safe handle
@@ -473,7 +521,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetCollideable').exclude()         # Don't care for now
         mb.mem_funs('GetModel').exclude()               # Do we want this? 
         mb.mem_funs('VPhysicsGetObjectList').exclude()  # Don't care for now
-        mb.mem_funs('Instance', function=lambda decl: not HasArgType(decl, 'int')).exclude()               # I don't think this is needed
         mb.mem_funs('PhysicsDispatchThink').exclude()   # Don't care
         mb.mem_funs('ThinkSet').exclude()               # Maybe write a python version
         mb.mem_funs('GetBeamTraceFilter').exclude()     # Don't care
@@ -482,9 +529,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetBaseAnimating').exclude() # Automatically done by converter
         mb.mem_funs('MyUnitPointer').exclude() # Automatically done by converter
         mb.mem_funs('GetIUnit').exclude()
-        
-        #mb.mem_funs('GetParametersForSound').exclude()  # Don't care for now
-        #mb.mem_funs('LookupSoundLevel').exclude()       # Don't care for now
         
         mb.mem_funs('PhysicsRunThink').exclude()            # Don't care  
         mb.mem_funs('PhysicsRunSpecificThink').exclude()    # Don't care   
@@ -496,7 +540,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('RemoveDataObjectType').exclude() # Don't care
         mb.mem_funs('HasDataObjectType').exclude() # Don't care
         
-        mb.mem_funs('OnChangeOwnerNumberInternal').exclude()
         mb.mem_funs('GetTextureFrameIndex').exclude() # Don't care
         mb.mem_funs('SetTextureFrameIndex').exclude() # Don't care
         
@@ -510,16 +553,6 @@ class Entities(SemiSharedModuleGenerator):
             
         mb.mem_funs('PyAllocate').exclude()
         mb.mem_funs('PyDeallocate').exclude()
-        
-        # Call policies
-        mb.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference() 
-        mb.mem_funs('GetTeam').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetBeamTraceFilter').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
-        # Transformations
-        #mb.mem_funs( name='EmitSound', function=lambda decl: HasArgType(decl, 'HSOUNDSCRIPTHANDLE') ).add_transformation( FT.input("handle") )
-        #mb.mem_funs( name='StopSound', function=lambda decl: HasArgType(decl, 'HSOUNDSCRIPTHANDLE') ).add_transformation( FT.input("handle") )
         
         # Emit sound replacements
         mb.mem_funs('EmitSound').exclude()
@@ -538,7 +571,6 @@ class Entities(SemiSharedModuleGenerator):
         
         # Don't give a shit about the following functions
         mb.mem_funs( lambda decl: HasArgType(decl, 'CEntityMapData') ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'CUserCmd') ).exclude()
         
         # Exclude with certain arguments
         mb.mem_funs( lambda decl: HasArgType(decl, 'groundlink_t') ).exclude()
@@ -549,32 +581,7 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude trace stuff for now
         mb.mem_funs( lambda decl: HasArgType(decl, 'Ray_t') ).exclude()    
         
-        # LIST OF FUNCTIONS TO OVERRIDE IN PYTHON
-        mb.mem_funs('Precache').virtuality = 'virtual'
-        mb.mem_funs('Spawn').virtuality = 'virtual'
-        mb.mem_funs('Activate').virtuality = 'virtual'
-        mb.mem_funs('KeyValue').virtuality = 'virtual'
-        mb.mem_funs('UpdateOnRemove').virtuality = 'virtual'
-        mb.mem_funs('CreateVPhysics').virtuality = 'virtual'
-        mb.mem_funs('GetTracerType').virtuality = 'virtual'
-        mb.mem_funs('MakeTracer').virtuality = 'virtual'
-        mb.mem_funs('DoImpactEffect').virtuality = 'virtual'
-        mb.mem_funs('StartTouch').virtuality = 'virtual'
-        mb.mem_funs('EndTouch').virtuality = 'virtual'
-        mb.mem_funs('UpdateTransmitState').virtuality = 'virtual'
-        mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
-        #mb.mem_funs('TestCollision').virtuality = 'virtual'
-        mb.mem_funs('OnRestore').virtuality = 'virtual'
-        
-        mb.mem_funs('GetIMouse').virtuality = 'virtual'
-        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
-        
-        # Returning a physics object -> Convert by value, which results in the wrapper object being returned
-        physicsobject = mb.class_('IPhysicsObject')
-        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(physicsobject))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-        
         if self.isclient:
-            # LIST OF CLIENT FUNCTIONS TO OVERRIDE
             # List of client functions overridable in Python
             mb.mem_funs('ShouldDraw').virtuality = 'virtual' # Called when visibility is updated, doesn't happens a lot.
             mb.mem_funs('GetCollideType').virtuality = 'virtual'
@@ -630,7 +637,7 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('AlphaProp').exclude()
                 
             # Transform
-            #mb.mem_funs( 'GetShadowCastDistance' ).add_transformation( FT.output('pDist') )
+            mb.mem_funs('GetShadowCastDistance').add_transformation(FT.output('pDist'))
                 
             # Call policies
             mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -664,8 +671,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CInterpolatedVar') != -1 ).exclude()
             
             # Exclude the following for now until we decide if we want them ( need fixes/exposed classes )
-            mb.mem_funs( lambda decl: HasArgType(decl, 'C_Team') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_Team') != -1 ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'IClientVehicle') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientVehicle') != -1 ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientRenderable') != -1 ).exclude()
@@ -750,7 +755,6 @@ class Entities(SemiSharedModuleGenerator):
             # Excludes
             mb.mem_funs('GetNetworkable').exclude()         # Don't care for now
             mb.mem_funs('NetworkProp').exclude()            # Don't care
-            mb.mem_funs('edict').exclude()                  # Not needed
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
@@ -803,12 +807,9 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetServerVehicle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             mb.mem_funs('AddEntityToGroundList').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
             
-            mb.mem_funs('GetTouchTrace').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  # Temp fix
-            
             # Don't give a shit about the following functions
            # mb.mem_funs( lambda decl: HasArgType(decl, 'CAI_BaseNPC') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CAI_BaseNPC') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'edict_t') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'IEntitySaveUtils') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CEventAction') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CCheckTransmitInfo') ).exclude()
@@ -817,28 +818,13 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: HasArgType(decl, 'CRecipientFilter') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'IServerVehicle') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IServerVehicle') != -1 ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CTeam') != -1 ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CSkyCamera') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CTeam') ).exclude()
             
             # Do not want the firebullets function with multiple arguments. Only the one with the struct.
             mb.mem_funs( name='FireBullets', function=lambda decl: HasArgType(decl, 'int') ).exclude()
-            
-            # Manually exclude network vars
-            mb.vars( 'm_nHitboxSet' ).exclude()
-            mb.vars( 'm_nSkin' ).exclude()
-            mb.vars( 'm_flPlaybackRate' ).exclude()
-            if self.settings.branch != 'swarm':
-                mb.vars( 'm_flModelWidthScale' ).exclude()
-            mb.vars( 'm_nBody' ).exclude()
-            mb.vars( 'm_bIsLive' ).exclude()
-            mb.vars( 'm_vecForce' ).exclude()
-            mb.vars( 'm_flNextAttack' ).exclude()
-            mb.vars( 'm_DmgRadius' ).exclude()
-            mb.vars( 'm_nForceBone' ).exclude()
 
     def ParseBaseAnimating(self, mb):
-        cls = mb.class_('C_BaseAnimating') if self.isclient else mb.class_('CBaseAnimating')
+        cls = mb.class_('C_BaseAnimating' if self.isclient else 'CBaseAnimating')
     
         # Transformations
         mb.mem_funs('GetPoseParameterRange').add_transformation(FT.output('minValue'), FT.output('maxValue'))
@@ -909,8 +895,8 @@ class Entities(SemiSharedModuleGenerator):
     def ParseBaseAnimatingOverlay(self, mb):
         cls = mb.class_('C_BaseAnimatingOverlay') if self.isclient else mb.class_('CBaseAnimatingOverlay')
     
-        cls.mem_funs('GetAnimOverlay').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        
+        cls.mem_funs('GetAnimOverlay').exclude()
+
     def ParseBaseFlex(self, mb):
         cls = mb.class_('C_BaseFlex') if self.isclient else mb.class_('CBaseFlex')
 
@@ -927,8 +913,6 @@ class Entities(SemiSharedModuleGenerator):
             if self.settings.branch == 'swarm':
                 mb.mem_funs('ScriptGetOldestScene').exclude()
                 mb.mem_funs('ScriptGetSceneByIndex').exclude()
-        else:
-            mb.mem_funs('FindSceneFile').exclude() # Don't care
             
     def ParseBaseCombatWeapon(self, mb):
         cls_name = 'C_BaseCombatWeapon' if self.isclient else 'CBaseCombatWeapon'
@@ -1033,9 +1017,7 @@ class Entities(SemiSharedModuleGenerator):
             self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon')
         
             # Exclude
-            #mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseCombatWeapon') != -1 ).exclude()
-            #mb.mem_funs( lambda decl: HasArgType(decl, 'CBaseCombatWeapon') ).exclude() 
-            mb.mem_funs('RemoveWeapon').exclude() # Declaration only, lol
+            mb.mem_funs('RemoveWeapon').exclude() # Declaration only
             mb.mem_funs('CauseDeath').exclude()
             #mb.mem_funs('FInViewCone').exclude()
             mb.mem_funs('OnPursuedBy').exclude()
@@ -1062,6 +1044,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_afButtonLast', 'buttonslast')
         self.IncludeVarAndRename('m_afButtonPressed', 'buttonspressed')
         self.IncludeVarAndRename('m_afButtonReleased', 'buttonsreleased')
+        
         if self.isclient:
             mb.mem_funs('GetRepresentativeRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -1072,8 +1055,6 @@ class Entities(SemiSharedModuleGenerator):
             
             # Exclude for now
             mb.mem_funs('Hints').exclude()
-            mb.mem_funs('GetCommandContext').exclude()
-            mb.mem_funs('GetCurrentUserCommand').exclude()
             mb.mem_funs('GetHeadLabelMaterial').exclude()
             mb.mem_funs('OverrideView').exclude()
             mb.mem_funs('ShouldGoSouth').exclude() # <-- Declaration only :)
@@ -1199,6 +1180,20 @@ class Entities(SemiSharedModuleGenerator):
         
 
     # Wars Entity Parsing
+    def ParseWars(self, mb):
+        ''' Parsing wars additions for base entity classes. '''
+        baseentcls  = mb.class_('C_BaseEntity' if self.isclient else 'CBaseEntity')
+        
+        # Overridables
+        mb.mem_funs('GetIMouse').virtuality = 'virtual'
+        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
+        
+        # Call policies
+        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        
+        # Excludes
+        mb.mem_funs('OnChangeOwnerNumberInternal').exclude()
+        
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
 
@@ -1608,6 +1603,7 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseProps(mb)
         self.ParseRemainingEntities(mb)
         
+        self.ParseWars(mb)
         self.ParseHL2WarsPlayer(mb)
         self.ParseUnitBase(mb)
         self.ParseWarsWeapon(mb)

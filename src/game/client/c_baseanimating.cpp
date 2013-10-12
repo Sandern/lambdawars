@@ -794,7 +794,7 @@ C_BaseAnimating::~C_BaseAnimating()
 }
 
 #ifdef ENABLE_PYTHON
-void C_BaseAnimating::ClearPyInstance()
+void C_BaseAnimating::DestroyPyInstance()
 {
 	Assert( !g_bInThreadedBoneSetup );
 	if ( m_iMostRecentBoneSetupRequest == g_iPreviousBoneCounter )
@@ -824,7 +824,7 @@ void C_BaseAnimating::ClearPyInstance()
 		m_pJiggleBones = NULL;
 	}
 
-	BaseClass::ClearPyInstance();
+	BaseClass::DestroyPyInstance();
 }
 #endif // ENABLE_PYTHON
 

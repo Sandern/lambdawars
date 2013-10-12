@@ -873,6 +873,11 @@ void register_C_BaseFlex_class(){
             , (::LocalFlexController_t ( ::C_BaseFlex::* )( char const * ) )( &::C_BaseFlex::FindFlexController )
             , ( bp::arg("szName") ) )    
         .def( 
+            "FindSceneFile"
+            , (void const * ( ::C_BaseFlex::* )( char const * ) )( &::C_BaseFlex::FindSceneFile )
+            , ( bp::arg("filename") )
+            , bp::return_value_policy< bp::return_opaque_pointer >() )    
+        .def( 
             "FlexControllerLocalToGlobal"
             , (int ( ::C_BaseFlex::* )( ::flexsettinghdr_t const *,int ) )( &::C_BaseFlex::FlexControllerLocalToGlobal )
             , ( bp::arg("pSettinghdr"), bp::arg("key") ) )    

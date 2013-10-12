@@ -1965,7 +1965,7 @@ public:
 	boost::python::object			GetPyInstance() const;
 	void							SetPyInstance( boost::python::object inst );
 
-	virtual void		ClearPyInstance();
+	virtual void		DestroyPyInstance();
 	bp::object			GetPyHandle() const;
 	void				SetPyTouch( bp::object touch_method );
 	void				PyTouch( CBaseEntity *pOther );
