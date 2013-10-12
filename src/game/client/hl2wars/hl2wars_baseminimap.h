@@ -16,7 +16,7 @@
 
 struct EntityObject
 {
-	EntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide = 1, int iHalfTall = 1, bool bTestShowInFOW = true, bool bFlashOnAttacked = false )
+	EntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide = 1, int iHalfTall = 1, bool bTestShowInFOW = true, bool bFlashOnAttacked = false, int iLayer = 0 )
 	{
 		m_hEntity = pEnt;
 		m_pIcon = pIcon;
@@ -25,6 +25,7 @@ struct EntityObject
 		m_bTestShowInFOW = bTestShowInFOW;
 		m_bFlashOnAttacked = bFlashOnAttacked;
 		m_fFlashTimeOut = 0;
+		m_iLayer = iLayer;
 	}
 
 	EHANDLE m_hEntity;
@@ -34,6 +35,7 @@ struct EntityObject
 	float m_fFlashTimeOut;
 	bool m_bTestShowInFOW;
 	bool m_bFlashOnAttacked; // Units only
+	int m_iLayer;
 };
 
 class CBaseMinimap :  public vgui::Panel, public CGameEventListener
@@ -51,7 +53,7 @@ public:
 	// General
 	virtual void			SetMap(const char * map);
 	void					InsertEntityObject( CBaseEntity *ent, CHudTexture *icon=NULL, int iHalfWide = 1, int iHalfTall = 1, 
-												bool testshowinfow = true, bool bFlashOnAttacked = false );
+												bool testshowinfow = true, bool bFlashOnAttacked = false, int layer = 0 );
 	void					RemoveEntityObject( CBaseEntity *ent );
 	void					RemoveAllEntityObjects() { m_EntityObjects.RemoveAll(); }		
 	void					FlashEntity( CBaseEntity *ent, float duration );

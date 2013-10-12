@@ -74,7 +74,8 @@ void CBaseMinimap::SetMap(const char * levelname)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall, bool bTestShowInFOW, bool bFlashOnAttacked )
+void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, int iHalfWide, int iHalfTall, 
+										bool bTestShowInFOW, bool bFlashOnAttacked, int iLayer )
 {
 	if( !pEnt ) 
 	{
@@ -82,7 +83,16 @@ void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, in
 		return;
 	}
 
-	m_EntityObjects.AddToTail( EntityObject( pEnt, pIcon, iHalfWide, iHalfTall, bTestShowInFOW, bFlashOnAttacked ) );
+	// Find layer at which we should insert
+	int idx = 0;
+	for( int idx = 0; idx < m_EntityObjects.Count(); idx++ )
+	{
+		if( m_EntityObjects[idx].m_iLayer > iLayer )
+			break;
+	}
+
+	// Inserts at end if not found
+	m_EntityObjects.InsertBefore( idx, EntityObject( pEnt, pIcon, iHalfWide, iHalfTall, bTestShowInFOW, bFlashOnAttacked, iLayer ) );
 }
 
 //-----------------------------------------------------------------------------
