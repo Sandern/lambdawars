@@ -2158,6 +2158,16 @@ void register_CBaseEntity_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::CBaseEntity::GetBeamTraceFilter
+        
+            typedef ::ITraceFilter * ( ::CBaseEntity::*GetBeamTraceFilter_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "GetBeamTraceFilter"
+                , GetBeamTraceFilter_function_type( &::CBaseEntity::GetBeamTraceFilter )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CBaseEntity::GetCheckUntouch
         
             typedef bool ( ::CBaseEntity::*GetCheckUntouch_function_type )(  ) const;
@@ -2690,6 +2700,17 @@ void register_CBaseEntity_class(){
                 , GetParentAttachment_function_type( &::CBaseEntity::GetParentAttachment ) );
         
         }
+        { //::CBaseEntity::GetParentToWorldTransform
+        
+            typedef ::matrix3x4_t & ( ::CBaseEntity::*GetParentToWorldTransform_function_type )( ::matrix3x4_t & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "GetParentToWorldTransform"
+                , GetParentToWorldTransform_function_type( &::CBaseEntity::GetParentToWorldTransform )
+                , ( bp::arg("tempMatrix") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CBaseEntity::GetPlayerName
         
             typedef char const * ( ::CBaseEntity::*GetPlayerName_function_type )(  ) const;
@@ -2909,6 +2930,15 @@ void register_CBaseEntity_class(){
             CBaseEntity_exposer.def( 
                 "GetTeamNumber"
                 , GetTeamNumber_function_type( &::CBaseEntity::GetTeamNumber ) );
+        
+        }
+        { //::CBaseEntity::GetTextureFrameIndex
+        
+            typedef int ( ::CBaseEntity::*GetTextureFrameIndex_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "GetTextureFrameIndex"
+                , GetTextureFrameIndex_function_type( &::CBaseEntity::GetTextureFrameIndex ) );
         
         }
         { //::CBaseEntity::GetTouchTrace
@@ -5932,6 +5962,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("flags") ) );
         
         }
+        { //::CBaseEntity::SetTextureFrameIndex
+        
+            typedef void ( ::CBaseEntity::*SetTextureFrameIndex_function_type )( int ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetTextureFrameIndex"
+                , SetTextureFrameIndex_function_type( &::CBaseEntity::SetTextureFrameIndex )
+                , ( bp::arg("iIndex") ) );
+        
+        }
         { //::CBaseEntity::SetTransmitState
         
             typedef int ( ::CBaseEntity::*SetTransmitState_function_type )( int ) ;
@@ -6707,17 +6747,6 @@ void register_CBaseEntity_class(){
                 , fset( &::CBaseEntity::PySetPropInt4 ) );
         
         }
-        { //property "viewdistance"[fget=::CBaseEntity::GetViewDistance, fset=::CBaseEntity::SetViewDistance]
-        
-            typedef float ( ::CBaseEntity::*fget )(  ) ;
-            typedef void ( ::CBaseEntity::*fset )( float ) ;
-            
-            CBaseEntity_exposer.add_property( 
-                "viewdistance"
-                , fget( &::CBaseEntity::GetViewDistance )
-                , fset( &::CBaseEntity::SetViewDistance ) );
-        
-        }
         { //property "health"[fget=::CBaseEntity::GetHealth, fset=::CBaseEntity::SetHealth]
         
             typedef int ( ::CBaseEntity::*fget )(  ) const;
@@ -6793,6 +6822,17 @@ void register_CBaseEntity_class(){
                 "rendermode"
                 , fget( &::CBaseEntity::GetRenderMode )
                 , fset( &::CBaseEntity::SetRenderMode ) );
+        
+        }
+        { //property "viewdistance"[fget=::CBaseEntity::GetViewDistance, fset=::CBaseEntity::SetViewDistance]
+        
+            typedef float ( ::CBaseEntity::*fget )(  ) ;
+            typedef void ( ::CBaseEntity::*fset )( float ) ;
+            
+            CBaseEntity_exposer.add_property( 
+                "viewdistance"
+                , fget( &::CBaseEntity::GetViewDistance )
+                , fset( &::CBaseEntity::SetViewDistance ) );
         
         }
     }

@@ -1740,6 +1740,16 @@ void register_C_BaseEntity_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::C_BaseEntity::GetBeamTraceFilter
+        
+            typedef ::ITraceFilter * ( ::C_BaseEntity::*GetBeamTraceFilter_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetBeamTraceFilter"
+                , GetBeamTraceFilter_function_type( &::C_BaseEntity::GetBeamTraceFilter )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::C_BaseEntity::GetBody
         
             typedef int ( ::C_BaseEntity::*GetBody_function_type )(  ) ;
@@ -2368,6 +2378,17 @@ void register_C_BaseEntity_class(){
                 , GetParentAttachment_function_type( &::C_BaseEntity::GetParentAttachment ) );
         
         }
+        { //::C_BaseEntity::GetParentToWorldTransform
+        
+            typedef ::matrix3x4_t & ( ::C_BaseEntity::*GetParentToWorldTransform_function_type )( ::matrix3x4_t & ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetParentToWorldTransform"
+                , GetParentToWorldTransform_function_type( &::C_BaseEntity::GetParentToWorldTransform )
+                , ( bp::arg("tempMatrix") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::C_BaseEntity::GetPlayerName
         
             typedef char const * ( ::C_BaseEntity::*GetPlayerName_function_type )(  ) const;
@@ -2761,6 +2782,15 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "GetTextureAnimationStartTime"
                 , GetTextureAnimationStartTime_function_type( &::C_BaseEntity::GetTextureAnimationStartTime ) );
+        
+        }
+        { //::C_BaseEntity::GetTextureFrameIndex
+        
+            typedef int ( ::C_BaseEntity::*GetTextureFrameIndex_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetTextureFrameIndex"
+                , GetTextureFrameIndex_function_type( &::C_BaseEntity::GetTextureFrameIndex ) );
         
         }
         { //::C_BaseEntity::GetToolHandle
@@ -5662,6 +5692,16 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("vTeamColor") ) );
         
         }
+        { //::C_BaseEntity::SetTextureFrameIndex
+        
+            typedef void ( ::C_BaseEntity::*SetTextureFrameIndex_function_type )( int ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetTextureFrameIndex"
+                , SetTextureFrameIndex_function_type( &::C_BaseEntity::SetTextureFrameIndex )
+                , ( bp::arg("iIndex") ) );
+        
+        }
         { //::C_BaseEntity::SetToolHandle
         
             typedef void ( ::C_BaseEntity::*SetToolHandle_function_type )( ::HTOOLHANDLE ) ;
@@ -6415,15 +6455,6 @@ void register_C_BaseEntity_class(){
                 , fset( &::C_BaseEntity::PySetPropInt4 ) );
         
         }
-        { //property "viewdistance"[fget=::C_BaseEntity::GetViewDistance]
-        
-            typedef float ( ::C_BaseEntity::*fget )(  ) ;
-            
-            C_BaseEntity_exposer.add_property( 
-                "viewdistance"
-                , fget( &::C_BaseEntity::GetViewDistance ) );
-        
-        }
         { //property "lifestate"[fget=::C_BaseEntity::PyGetLifeState, fset=::C_BaseEntity::PySetLifeState]
         
             typedef int ( ::C_BaseEntity::*fget )(  ) ;
@@ -6444,6 +6475,15 @@ void register_C_BaseEntity_class(){
                 "takedamage"
                 , fget( &::C_BaseEntity::PyGetTakeDamage )
                 , fset( &::C_BaseEntity::PySetTakeDamage ) );
+        
+        }
+        { //property "viewdistance"[fget=::C_BaseEntity::GetViewDistance]
+        
+            typedef float ( ::C_BaseEntity::*fget )(  ) ;
+            
+            C_BaseEntity_exposer.add_property( 
+                "viewdistance"
+                , fget( &::C_BaseEntity::GetViewDistance ) );
         
         }
     }
