@@ -319,7 +319,7 @@ void CEnvLight::Activate( void )
 			pGlobalLight->KeyValue( "spawnflags", DEFLIGHTGLOBAL_ENABLED | DEFLIGHTGLOBAL_SHADOW_ENABLED );
 			pGlobalLight->KeyValue( "angles", UTIL_VarArgs("%f %f %f", -m_fLightPitch, vecAngles.y, vecAngles.z ) );
 			DispatchSpawn( pGlobalLight );
-			pGlobalLight->Activate();
+			//pGlobalLight->Activate(); // Should not be activated. This will be called before the level activates all entities.
 		}
 	}
 
