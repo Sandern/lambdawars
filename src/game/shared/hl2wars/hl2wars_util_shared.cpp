@@ -94,7 +94,6 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 #endif // ENABLE_PYTHON
             if( vEndPos == vec3_origin )
                 continue;
-            vEndPos.z += 8.0f;
 		}
 		else
 		{
@@ -153,8 +152,6 @@ void UTIL_FindPosition( positioninfo_t &info )
 #else
 			vEndPos= vec3_origin;
 #endif // ENABLE_PYTHON
-            if( vEndPos != vec3_origin )
-				vEndPos.z += 8.0f;
 		}
 		else
 		{

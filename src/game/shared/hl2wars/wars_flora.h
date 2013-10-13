@@ -23,7 +23,10 @@ class CWarsFlora : public CBaseAnimating
 
 public:
 	CWarsFlora();
-
+	
+#ifndef CLIENT_DLL
+	virtual void Precache( void );
+#endif // CLIENT_DLL
 	virtual void Spawn();
 
 #ifdef CLIENT_DLL

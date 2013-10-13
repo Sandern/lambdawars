@@ -14,6 +14,8 @@
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
 #include "cdll_util.h"
+#else
+#include "hl2wars_player.h"
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -27,6 +29,24 @@ CWarsFlora::CWarsFlora()
 	AddEFlags( EFL_SERVER_ONLY );
 #endif // CLIENT_DLL
 }
+
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::Precache( void )
+{
+	if ( GetModelName() == NULL_STRING )
+	{
+		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		SetModelName( AllocPooledString( "models/error.mdl" ) );
+	}
+
+	PrecacheModel( STRING( GetModelName() ) );
+
+	BaseClass::Precache();
+}
+#endif // CLIENT_DLL
 
 void CWarsFlora::Spawn()
 {
@@ -195,15 +215,26 @@ void CWarsFlora::SpawnMapFlora()
 	}
 }
 
+#endif // CLIENT_DLL
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
+#else
 CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
+#define VarArgs UTIL_VarArgs
+#endif // CLIENT_DLL
 {
 	if( args.ArgC() < 2 )
 	{
 		Warning("wars_flora_spawn: Not enough arguments\n");
 		return;
 	}
-
+	
+#ifdef CLIENT_DLL
 	CHL2WarsPlayer *pPlayer = CHL2WarsPlayer::GetLocalHL2WarsPlayer(); 
+#else
+	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( UTIL_GetCommandClientIndex() ) );
+#endif // CLIENT_DLL
 	if( !pPlayer )
 		return;
 
@@ -211,6 +242,10 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 
 	// Collect arguments
 	const char *pModelName = args[1];
+
+#ifndef CLIENT_DLL
+	CBaseEntity::PrecacheModel( pModelName );
+#endif // CLIENT_DLL
 
 	// Load model and determine size
 	const model_t *pModel = modelinfo->FindOrLoadModel( pModelName );
@@ -240,7 +275,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	}
 
 	// Create flora entity
-	CWarsFlora *pEntity = new CWarsFlora();
+	CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName("wars_flora"); //new CWarsFlora();
 	if ( !pEntity )
 	{	
 		Warning("wars_flora_spawn: Failed to create entity\n");
@@ -253,6 +288,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", angles.x, angles.y, angles.z ) );
 	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", info.m_vPosition.x, info.m_vPosition.y, info.m_vPosition.z ) );
 
+#ifdef CLIENT_DLL
 	// Initialize
 	if ( !pEntity->Initialize() )
 	{	
@@ -260,7 +296,9 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 		Warning("wars_flora_spawn: Failed to initialize entity\n");
 		return;
 	}
-		
-}
+#else
+	DispatchSpawn( pEntity );
 
+	engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
 #endif // CLIENT_DLL
+}
