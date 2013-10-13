@@ -295,11 +295,9 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
 	// CEF has key focus, so don't process any keys (apart from the escape key)
-	if( m_bHasKeyFocus && keynum != KEY_ESCAPE )
+	if( m_bHasKeyFocus && ( keynum != KEY_ESCAPE || V_strcmp( "toggleconsole", pszCurrentBinding ) == 0  ) )
 		return 0;
 
-	return 1;
-	/*
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() )
@@ -309,7 +307,7 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 		if( ret == 0 )
 			return 0;
 	}
-	return 1;*/
+	return 1;
 }
 
 

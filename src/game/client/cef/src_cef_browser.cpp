@@ -668,29 +668,6 @@ int SrcCefBrowser::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 	if( !IsGameInputEnabled() )
 		return 1;
 
-#if 0
-	// Prevent certain keys from being sent to CEF
-	if( keynum == KEY_ESCAPE )
-		return 1;
-
-	CefRefPtr<CefBrowser> browser = GetBrowser();
-	if( down )
-	{
-		Msg("down keynum: %d, char: %c\n", keynum, CEFSystem().GetLastKeyDownEvent().character);
-		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyDownEvent() );
-		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyCharEvent() );
-	}
-	else
-	{
-		browser->GetHost()->SendKeyEvent( CEFSystem().GetLastKeyUpEvent() );
-		Msg("up keynum: %d, char: %c\n", keynum, CEFSystem().GetLastKeyUpEvent().character);
-	}
-
-	//const char *pKeyStr = g_pInputSystem->ButtonCodeToString( keynum );
-	//g_pInputSystem->ButtonCodeToVirtualKey( keynum );
-	//wchar_t unichar = (wchar_t)keynum;
-	//Msg("Keyname: %s, key: %lc\n", pKeyStr, unichar);
-#endif // 0
 	return 1;
 }
 
