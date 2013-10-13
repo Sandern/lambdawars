@@ -50,6 +50,10 @@ void CWarsFlora::Precache( void )
 
 void CWarsFlora::Spawn()
 {
+#ifndef CLIENT_DLL
+	Precache();
+#endif // CLIENT_DLL
+
 	BaseClass::Spawn();
 
 	SetSolid( SOLID_NONE );
