@@ -38,47 +38,47 @@
 #include "wars_weapon.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "CBaseParticleEntity_pypp.hpp"
+#include "CPlayerResource_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBaseParticleEntity > {
+struct CPlayerResource_wrapper : CPlayerResource, bp::wrapper< CPlayerResource > {
 
-    CBaseParticleEntity_wrapper( )
-    : CBaseParticleEntity( )
-      , bp::wrapper< CBaseParticleEntity >(){
+    CPlayerResource_wrapper()
+    : CPlayerResource()
+      , bp::wrapper< CPlayerResource >(){
         // null constructor
-    
+        
     }
 
-    virtual void Activate(  ) {
+    virtual void Spawn(  ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
         Assert( SrcPySystem()->IsPythonRunning() );
         Assert( GetCurrentThreadId() == g_hPythonThreadID );
         #elif defined(PY_CHECKTHREADID)
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Activate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
         #endif // _DEBUG/PY_CHECKTHREADID
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling Activate(  ) of Class: CBaseParticleEntity\n");
+            Msg("Calling Spawn(  ) of Class: CPlayerResource\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Activate = this->get_override( "Activate" );
-        if( func_Activate.ptr() != Py_None )
+        bp::override func_Spawn = this->get_override( "Spawn" );
+        if( func_Spawn.ptr() != Py_None )
             try {
-                func_Activate(  );
+                func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseParticleEntity::Activate(  );
+                this->CPlayerResource::Spawn(  );
             }
         else
-            this->CBaseParticleEntity::Activate(  );
+            this->CPlayerResource::Spawn(  );
     }
     
-    void default_Activate(  ) {
-        CBaseParticleEntity::Activate( );
+    void default_Spawn(  ) {
+        CPlayerResource::Spawn( );
     }
 
     virtual int UpdateTransmitState(  ) {
@@ -93,7 +93,7 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
         #endif // _WIN32
         #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
         if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateTransmitState(  ) of Class: CBaseParticleEntity\n");
+            Msg("Calling UpdateTransmitState(  ) of Class: CPlayerResource\n");
         #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
         bp::override func_UpdateTransmitState = this->get_override( "UpdateTransmitState" );
         if( func_UpdateTransmitState.ptr() != Py_None )
@@ -101,14 +101,44 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
                 return func_UpdateTransmitState(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseParticleEntity::UpdateTransmitState(  );
+                return this->CPlayerResource::UpdateTransmitState(  );
             }
         else
-            return this->CBaseParticleEntity::UpdateTransmitState(  );
+            return this->CPlayerResource::UpdateTransmitState(  );
     }
     
     int default_UpdateTransmitState(  ) {
-        return CBaseParticleEntity::UpdateTransmitState( );
+        return CPlayerResource::UpdateTransmitState( );
+    }
+
+    virtual void Activate(  ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "Activate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling Activate(  ) of Class: CBaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_Activate = this->get_override( "Activate" );
+        if( func_Activate.ptr() != Py_None )
+            try {
+                func_Activate(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseEntity::Activate(  );
+            }
+        else
+            this->CBaseEntity::Activate(  );
+    }
+    
+    void default_Activate(  ) {
+        CBaseEntity::Activate( );
     }
 
     virtual void ComputeWorldSpaceSurroundingBox( ::Vector * pWorldMins, ::Vector * pWorldMaxs ) {
@@ -831,36 +861,6 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
         CBaseEntity::Precache( );
     }
 
-    virtual void Spawn(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: CBaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_Spawn = this->get_override( "Spawn" );
-        if( func_Spawn.ptr() != Py_None )
-            try {
-                func_Spawn(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseEntity::Spawn(  );
-            }
-        else
-            this->CBaseEntity::Spawn(  );
-    }
-    
-    void default_Spawn(  ) {
-        CBaseEntity::Spawn( );
-    }
-
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -987,169 +987,190 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    virtual ServerClass* GetServerClass() {
+#if defined(_WIN32)
+#if defined(_DEBUG)
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+#elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetServerClass: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+#endif // _DEBUG/PY_CHECKTHREADID
+#endif // _WIN32
+#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetServerClass(  ) of Class: CPlayerResource\n");
+#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
+        if( pServerClass )
+            return pServerClass;
+        return CPlayerResource::GetServerClass();
+    }
+
 };
 
-void register_CBaseParticleEntity_class(){
+void register_CPlayerResource_class(){
 
-    bp::class_< CBaseParticleEntity_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CBaseParticleEntity", bp::init< >() )    
+    bp::class_< CPlayerResource_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CPlayerResource" )    
         .def( 
-            "Activate"
-            , (void ( ::CBaseParticleEntity::* )(  ) )(&::CBaseParticleEntity::Activate)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_Activate) )    
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CPlayerResource::GetPyNetworkType ) )    
         .def( 
-            "FollowEntity"
-            , (void ( ::CBaseParticleEntity::* )( ::CBaseEntity * ) )( &::CBaseParticleEntity::FollowEntity )
-            , ( bp::arg("pEntity") ) )    
+            "ObjectCaps"
+            , (int ( ::CPlayerResource::* )(  ) )( &::CPlayerResource::ObjectCaps ) )    
         .def( 
-            "SetLifetime"
-            , (void ( ::CBaseParticleEntity::* )( float ) )( &::CBaseParticleEntity::SetLifetime )
-            , ( bp::arg("lifetime") ) )    
+            "ResourceThink"
+            , (void ( ::CPlayerResource::* )(  ) )( &::CPlayerResource::ResourceThink ) )    
         .def( 
-            "Think"
-            , (void ( ::CBaseParticleEntity::* )(  ) )( &::CBaseParticleEntity::Think ) )    
+            "Spawn"
+            , (void ( ::CPlayerResource::* )(  ) )(&::CPlayerResource::Spawn)
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_Spawn) )    
+        .def( 
+            "UpdatePlayerData"
+            , (void ( ::CPlayerResource::* )(  ) )( &::CPlayerResource::UpdatePlayerData ) )    
         .def( 
             "UpdateTransmitState"
-            , (int ( ::CBaseParticleEntity::* )(  ) )(&::CBaseParticleEntity::UpdateTransmitState)
-            , (int ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_UpdateTransmitState) )    
+            , (int ( ::CPlayerResource::* )(  ) )(&::CPlayerResource::UpdateTransmitState)
+            , (int ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "Activate"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Activate)
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_Activate) )    
         .def( 
             "ComputeWorldSpaceSurroundingBox"
             , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::Vector *,::Vector * ) )(&CBaseParticleEntity_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , (void ( CPlayerResource_wrapper::* )( ::Vector *,::Vector * ) )(&CPlayerResource_wrapper::default_ComputeWorldSpaceSurroundingBox)
             , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
         .def( 
             "CreateVPhysics"
             , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
-            , (bool ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_CreateVPhysics) )    
+            , (bool ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_CreateVPhysics) )    
         .def( 
             "DeathNotice"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CBaseEntity * ) )(&CBaseParticleEntity_wrapper::default_DeathNotice)
+            , (void ( CPlayerResource_wrapper::* )( ::CBaseEntity * ) )(&CPlayerResource_wrapper::default_DeathNotice)
             , ( bp::arg("pVictim") ) )    
         .def( 
             "DoImpactEffect"
             , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::trace_t &,int ) )(&CBaseParticleEntity_wrapper::default_DoImpactEffect)
+            , (void ( CPlayerResource_wrapper::* )( ::trace_t &,int ) )(&CPlayerResource_wrapper::default_DoImpactEffect)
             , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
         .def( 
             "DrawDebugGeometryOverlays"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_DrawDebugGeometryOverlays) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_DrawDebugGeometryOverlays) )    
         .def( 
             "DrawDebugTextOverlays"
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
-            , (int ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_DrawDebugTextOverlays) )    
+            , (int ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_DrawDebugTextOverlays) )    
         .def( 
             "EndTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CBaseEntity * ) )(&CBaseParticleEntity_wrapper::default_EndTouch)
+            , (void ( CPlayerResource_wrapper::* )( ::CBaseEntity * ) )(&CPlayerResource_wrapper::default_EndTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "Event_Killed"
             , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseParticleEntity_wrapper::default_Event_Killed)
+            , (void ( CPlayerResource_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPlayerResource_wrapper::default_Event_Killed)
             , ( bp::arg("info") ) )    
         .def( 
             "Event_KilledOther"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBaseParticleEntity_wrapper::default_Event_KilledOther)
+            , (void ( CPlayerResource_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CPlayerResource_wrapper::default_Event_KilledOther)
             , ( bp::arg("pVictim"), bp::arg("info") ) )    
         .def( 
             "GetIMouse"
             , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
-            , (::IMouse * ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_GetIMouse)
+            , (::IMouse * ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetTracerType"
             , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
-            , (char const * ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_GetTracerType) )    
+            , (char const * ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_GetTracerType) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CBaseParticleEntity_wrapper::* )( char const *,char const * ) )(&CBaseParticleEntity_wrapper::default_KeyValue)
+            , (bool ( CPlayerResource_wrapper::* )( char const *,char const * ) )(&CPlayerResource_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CBaseParticleEntity_wrapper::* )( char const *,float ) )(&CBaseParticleEntity_wrapper::default_KeyValue)
+            , (bool ( CPlayerResource_wrapper::* )( char const *,float ) )(&CPlayerResource_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CBaseParticleEntity_wrapper::* )( char const *,int ) )(&CBaseParticleEntity_wrapper::default_KeyValue)
+            , (bool ( CPlayerResource_wrapper::* )( char const *,int ) )(&CPlayerResource_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CBaseParticleEntity_wrapper::* )( char const *,::Vector const & ) )(&CBaseParticleEntity_wrapper::default_KeyValue)
+            , (bool ( CPlayerResource_wrapper::* )( char const *,::Vector const & ) )(&CPlayerResource_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
         .def( 
             "MakeTracer"
             , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBaseParticleEntity_wrapper::default_MakeTracer)
+            , (void ( CPlayerResource_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CPlayerResource_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
             "ModifyOrAppendCriteria"
             , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBaseParticleEntity_wrapper::default_ModifyOrAppendCriteria)
+            , (void ( CPlayerResource_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CPlayerResource_wrapper::default_ModifyOrAppendCriteria)
             , ( bp::arg("set") ) )    
         .def( 
             "OnChangeOwnerNumber"
             , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
-            , (void ( CBaseParticleEntity_wrapper::* )( int ) )(&CBaseParticleEntity_wrapper::default_OnChangeOwnerNumber)
+            , (void ( CPlayerResource_wrapper::* )( int ) )(&CPlayerResource_wrapper::default_OnChangeOwnerNumber)
             , ( bp::arg("old_owner_number") ) )    
         .def( 
             "OnRestore"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::OnRestore)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_OnRestore) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_OnRestore) )    
         .def( 
             "OnTakeDamage"
             , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
-            , (int ( CBaseParticleEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseParticleEntity_wrapper::default_OnTakeDamage)
+            , (int ( CPlayerResource_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPlayerResource_wrapper::default_OnTakeDamage)
             , ( bp::arg("info") ) )    
         .def( 
             "PassesDamageFilter"
             , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
-            , (bool ( CBaseParticleEntity_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseParticleEntity_wrapper::default_PassesDamageFilter)
+            , (bool ( CPlayerResource_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPlayerResource_wrapper::default_PassesDamageFilter)
             , ( bp::arg("info") ) )    
         .def( 
             "PostClientActive"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_PostClientActive) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_PostClientActive) )    
         .def( 
             "PostConstructor"
             , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
-            , (void ( CBaseParticleEntity_wrapper::* )( char const * ) )(&CBaseParticleEntity_wrapper::default_PostConstructor)
+            , (void ( CPlayerResource_wrapper::* )( char const * ) )(&CPlayerResource_wrapper::default_PostConstructor)
             , ( bp::arg("szClassname") ) )    
         .def( 
             "Precache"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Precache)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_Precache) )    
-        .def( 
-            "Spawn"
-            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Spawn)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_Spawn) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_Precache) )    
         .def( 
             "StartTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CBaseEntity * ) )(&CBaseParticleEntity_wrapper::default_StartTouch)
+            , (void ( CPlayerResource_wrapper::* )( ::CBaseEntity * ) )(&CPlayerResource_wrapper::default_StartTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "StopLoopingSounds"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_StopLoopingSounds) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_StopLoopingSounds) )    
         .def( 
             "TraceAttack"
-            , (void ( CBaseParticleEntity_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseParticleEntity_wrapper::TraceAttack)
+            , (void ( CPlayerResource_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CPlayerResource_wrapper::TraceAttack)
             , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
         .def( 
             "UpdateOnRemove"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
-            , (void ( CBaseParticleEntity_wrapper::* )(  ) )(&CBaseParticleEntity_wrapper::default_UpdateOnRemove) )    
+            , (void ( CPlayerResource_wrapper::* )(  ) )(&CPlayerResource_wrapper::default_UpdateOnRemove) )    
         .def( 
             "VPhysicsCollision"
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
-            , (void ( CBaseParticleEntity_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseParticleEntity_wrapper::default_VPhysicsCollision)
-            , ( bp::arg("index"), bp::arg("pEvent") ) );
+            , (void ( CPlayerResource_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CPlayerResource_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "GetPyNetworkType" );
 
 }
 

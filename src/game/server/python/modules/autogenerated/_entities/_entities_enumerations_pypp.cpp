@@ -23,6 +23,7 @@
 #include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
+#include "player_resource.h"
 #include "props.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"

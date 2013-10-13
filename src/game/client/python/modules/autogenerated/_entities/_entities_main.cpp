@@ -327,6 +327,42 @@ struct handle_to_C_BaseCombatCharacter
     }
 };
 
+typedef CEPyHandle< C_BaseCombatWeapon > C_BaseCombatWeaponHANDLE;
+
+struct ptr_C_BaseCombatWeapon_to_handle : bp::to_python_converter<C_BaseCombatWeapon *, ptr_C_BaseCombatWeapon_to_handle>
+{
+    static PyObject* convert(C_BaseCombatWeapon *s)
+    {
+        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
+    }
+};
+
+struct C_BaseCombatWeapon_to_handle : bp::to_python_converter<C_BaseCombatWeapon, C_BaseCombatWeapon_to_handle>
+{
+    static PyObject* convert(const C_BaseCombatWeapon &s)
+    {
+        return bp::incref(s.GetPyHandle().ptr());
+    }
+};
+
+struct handle_to_C_BaseCombatWeapon
+{
+    handle_to_C_BaseCombatWeapon()
+    {
+        bp::converter::registry::insert(
+            &extract_C_BaseCombatWeapon, 
+            bp::type_id<C_BaseCombatWeapon>()
+            );
+    }
+
+    static void* extract_C_BaseCombatWeapon(PyObject* op){
+       CBaseHandle h = bp::extract<CBaseHandle>(op);
+       if( h.Get() == NULL )
+           return Py_None;
+       return h.Get();
+    }
+};
+
 typedef CEPyHandle< C_BaseGrenade > C_BaseGrenadeHANDLE;
 
 struct ptr_C_BaseGrenade_to_handle : bp::to_python_converter<C_BaseGrenade *, ptr_C_BaseGrenade_to_handle>
@@ -392,42 +428,6 @@ struct handle_to_C_BasePlayer
     }
 
     static void* extract_C_BasePlayer(PyObject* op){
-       CBaseHandle h = bp::extract<CBaseHandle>(op);
-       if( h.Get() == NULL )
-           return Py_None;
-       return h.Get();
-    }
-};
-
-typedef CEPyHandle< C_BaseCombatWeapon > C_BaseCombatWeaponHANDLE;
-
-struct ptr_C_BaseCombatWeapon_to_handle : bp::to_python_converter<C_BaseCombatWeapon *, ptr_C_BaseCombatWeapon_to_handle>
-{
-    static PyObject* convert(C_BaseCombatWeapon *s)
-    {
-        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
-    }
-};
-
-struct C_BaseCombatWeapon_to_handle : bp::to_python_converter<C_BaseCombatWeapon, C_BaseCombatWeapon_to_handle>
-{
-    static PyObject* convert(const C_BaseCombatWeapon &s)
-    {
-        return bp::incref(s.GetPyHandle().ptr());
-    }
-};
-
-struct handle_to_C_BaseCombatWeapon
-{
-    handle_to_C_BaseCombatWeapon()
-    {
-        bp::converter::registry::insert(
-            &extract_C_BaseCombatWeapon, 
-            bp::type_id<C_BaseCombatWeapon>()
-            );
-    }
-
-    static void* extract_C_BaseCombatWeapon(PyObject* op){
        CBaseHandle h = bp::extract<CBaseHandle>(op);
        if( h.Get() == NULL )
            return Py_None;
@@ -1420,6 +1420,81 @@ BOOST_PYTHON_MODULE(_entities){
 
     handle_to_C_BaseCombatCharacter();
 
+    { //::C_BaseCombatWeaponHANDLE
+        typedef bp::class_< C_BaseCombatWeaponHANDLE, bp::bases< CBaseHandle > > C_BaseCombatWeaponHANDLE_exposer_t;
+        C_BaseCombatWeaponHANDLE_exposer_t C_BaseCombatWeaponHANDLE_exposer = C_BaseCombatWeaponHANDLE_exposer_t( "C_BaseCombatWeaponHANDLE", bp::init< >() );
+        C_BaseCombatWeaponHANDLE_exposer.def( bp::init< C_BaseCombatWeapon * >(( bp::arg("pVal") )) );
+        C_BaseCombatWeaponHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::C_BaseCombatWeaponHANDLE::GetAttr
+        
+            typedef bp::object ( ::C_BaseCombatWeaponHANDLE::*GetAttr_function_type )( const char * ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::C_BaseCombatWeaponHANDLE::GetAttr )
+            );
+        
+        }
+        { //::C_BaseCombatWeaponHANDLE::Cmp
+        
+            typedef bool ( ::C_BaseCombatWeaponHANDLE::*Cmp_function_type )( bp::object ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "__cmp__"
+                , Cmp_function_type( &::C_BaseCombatWeaponHANDLE::Cmp )
+            );
+        
+        }
+        { //::C_BaseCombatWeaponHANDLE::NonZero
+        
+            typedef bool ( ::C_BaseCombatWeaponHANDLE::*NonZero_function_type )( ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "__nonzero__"
+                , NonZero_function_type( &::C_BaseCombatWeaponHANDLE::NonZero )
+            );
+        
+        }
+        { //::C_BaseCombatWeaponHANDLE::Set
+        
+            typedef void ( ::C_BaseCombatWeaponHANDLE::*Set_function_type )( C_BaseCombatWeapon * ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "Set"
+                , Set_function_type( &::C_BaseCombatWeaponHANDLE::Set )
+            );
+        
+        }
+        { //::C_BaseCombatWeaponHANDLE::GetSerialNumber
+        
+            typedef int ( ::C_BaseCombatWeaponHANDLE::*GetSerialNumber_function_type )( ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "GetSerialNumber"
+                , GetSerialNumber_function_type( &::C_BaseCombatWeaponHANDLE::GetSerialNumber )
+            );
+        
+        }
+        { //::C_BaseCombatWeaponHANDLE::GetEntryIndex
+        
+            typedef int ( ::C_BaseCombatWeaponHANDLE::*GetEntryIndex_function_type )(  ) const;
+            
+            C_BaseCombatWeaponHANDLE_exposer.def( 
+                "GetEntryIndex"
+                , GetEntryIndex_function_type( &::C_BaseCombatWeaponHANDLE::GetEntryIndex )
+            );
+        
+        }
+        C_BaseCombatWeaponHANDLE_exposer.def( bp::self != bp::self );
+        C_BaseCombatWeaponHANDLE_exposer.def( bp::self == bp::self );
+    }
+
+    ptr_C_BaseCombatWeapon_to_handle();
+
+    C_BaseCombatWeapon_to_handle();
+
+    handle_to_C_BaseCombatWeapon();
+
     { //::C_BaseGrenadeHANDLE
         typedef bp::class_< C_BaseGrenadeHANDLE, bp::bases< CBaseHandle > > C_BaseGrenadeHANDLE_exposer_t;
         C_BaseGrenadeHANDLE_exposer_t C_BaseGrenadeHANDLE_exposer = C_BaseGrenadeHANDLE_exposer_t( "C_BaseGrenadeHANDLE", bp::init< >() );
@@ -1569,81 +1644,6 @@ BOOST_PYTHON_MODULE(_entities){
     C_BasePlayer_to_handle();
 
     handle_to_C_BasePlayer();
-
-    { //::C_BaseCombatWeaponHANDLE
-        typedef bp::class_< C_BaseCombatWeaponHANDLE, bp::bases< CBaseHandle > > C_BaseCombatWeaponHANDLE_exposer_t;
-        C_BaseCombatWeaponHANDLE_exposer_t C_BaseCombatWeaponHANDLE_exposer = C_BaseCombatWeaponHANDLE_exposer_t( "C_BaseCombatWeaponHANDLE", bp::init< >() );
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::init< C_BaseCombatWeapon * >(( bp::arg("pVal") )) );
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
-        { //::C_BaseCombatWeaponHANDLE::GetAttr
-        
-            typedef bp::object ( ::C_BaseCombatWeaponHANDLE::*GetAttr_function_type )( const char * ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "__getattr__"
-                , GetAttr_function_type( &::C_BaseCombatWeaponHANDLE::GetAttr )
-            );
-        
-        }
-        { //::C_BaseCombatWeaponHANDLE::Cmp
-        
-            typedef bool ( ::C_BaseCombatWeaponHANDLE::*Cmp_function_type )( bp::object ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "__cmp__"
-                , Cmp_function_type( &::C_BaseCombatWeaponHANDLE::Cmp )
-            );
-        
-        }
-        { //::C_BaseCombatWeaponHANDLE::NonZero
-        
-            typedef bool ( ::C_BaseCombatWeaponHANDLE::*NonZero_function_type )( ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "__nonzero__"
-                , NonZero_function_type( &::C_BaseCombatWeaponHANDLE::NonZero )
-            );
-        
-        }
-        { //::C_BaseCombatWeaponHANDLE::Set
-        
-            typedef void ( ::C_BaseCombatWeaponHANDLE::*Set_function_type )( C_BaseCombatWeapon * ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "Set"
-                , Set_function_type( &::C_BaseCombatWeaponHANDLE::Set )
-            );
-        
-        }
-        { //::C_BaseCombatWeaponHANDLE::GetSerialNumber
-        
-            typedef int ( ::C_BaseCombatWeaponHANDLE::*GetSerialNumber_function_type )( ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "GetSerialNumber"
-                , GetSerialNumber_function_type( &::C_BaseCombatWeaponHANDLE::GetSerialNumber )
-            );
-        
-        }
-        { //::C_BaseCombatWeaponHANDLE::GetEntryIndex
-        
-            typedef int ( ::C_BaseCombatWeaponHANDLE::*GetEntryIndex_function_type )(  ) const;
-            
-            C_BaseCombatWeaponHANDLE_exposer.def( 
-                "GetEntryIndex"
-                , GetEntryIndex_function_type( &::C_BaseCombatWeaponHANDLE::GetEntryIndex )
-            );
-        
-        }
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::self == bp::self );
-    }
-
-    ptr_C_BaseCombatWeapon_to_handle();
-
-    C_BaseCombatWeapon_to_handle();
-
-    handle_to_C_BaseCombatWeapon();
 
     { //::C_PlayerResourceHANDLE
         typedef bp::class_< C_PlayerResourceHANDLE, bp::bases< CBaseHandle > > C_PlayerResourceHANDLE_exposer_t;

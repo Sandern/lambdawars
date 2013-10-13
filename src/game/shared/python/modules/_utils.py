@@ -215,9 +215,7 @@ class Utils(SemiSharedModuleGenerator):
         # By default, it's not possible to override TraceFilter methods
         cls = mb.class_('ITraceFilter')
         cls.include()
-        cls.no_init = True
         cls.calldefs().exclude()
-        cls.mem_fun('ShouldHitEntity').virtuality = 'not virtual'
         
         tracefilters = [
             'CTraceFilter',
@@ -236,7 +234,7 @@ class Utils(SemiSharedModuleGenerator):
             'CTraceFilterSimpleClassnameList',
             'CTraceFilterChain',
             'CPyTraceFilterSimple',
-			
+            
             'CTraceFilterOnlyUnitsAndPlayer',
             'CTraceFilterNoUnitsOrPlayer',
             'CTraceFilterIgnoreTeam',

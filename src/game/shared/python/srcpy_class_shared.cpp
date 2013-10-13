@@ -17,9 +17,16 @@ boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char 
 	boost::python::object clshandle;
 	if( pEnt->GetPyInstance().ptr() != Py_None )	
 	{							
-		try {																
+		try 
+		{																
 			clshandle = _entities.attr("PyHandle");							
-		} catch(boost::python::error_already_set &) {					
+		} 
+		catch(boost::python::error_already_set &) {
+#ifdef CLIENT_DLL
+			Warning("CLIENT: ");
+#else
+			Warning("SERVER: ");
+#endif // CLIENT_DLL
 			Warning("Failed to create a PyHandle\n");				
 			PyErr_Print();																		
 			PyErr_Clear();																		
@@ -27,9 +34,17 @@ boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char 
 		}																						
 		return clshandle(pEnt->GetPyInstance());														
 	}																							
-	try {																												
+	try 
+	{																												
 		clshandle = _entities.attr(handlename);													
-	} catch(boost::python::error_already_set &) {												
+	} 
+	catch(boost::python::error_already_set &) 
+	{				
+#ifdef CLIENT_DLL
+			Warning("CLIENT: ");
+#else
+			Warning("SERVER: ");
+#endif // CLIENT_DLL
 		Warning("Failed to create handle %s\n", handlename);								
 		PyErr_Print();																			
 		PyErr_Clear();																			

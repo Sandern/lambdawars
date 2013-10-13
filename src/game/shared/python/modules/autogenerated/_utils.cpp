@@ -53,6 +53,46 @@ struct CGameTrace_wrapper : CGameTrace, bp::wrapper< CGameTrace > {
 
 };
 
+struct CTraceFilter_wrapper : CTraceFilter, bp::wrapper< CTraceFilter > {
+
+    CTraceFilter_wrapper()
+    : CTraceFilter()
+      , bp::wrapper< CTraceFilter >(){
+        // null constructor
+        
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        try {
+            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
+        } catch(bp::error_already_set &) {
+            throw boost::python::error_already_set();
+        }
+    }
+
+};
+
+struct CTraceFilterEntitiesOnly_wrapper : CTraceFilterEntitiesOnly, bp::wrapper< CTraceFilterEntitiesOnly > {
+
+    CTraceFilterEntitiesOnly_wrapper()
+    : CTraceFilterEntitiesOnly()
+      , bp::wrapper< CTraceFilterEntitiesOnly >(){
+        // null constructor
+        
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        try {
+            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
+        } catch(bp::error_already_set &) {
+            throw boost::python::error_already_set();
+        }
+    }
+
+};
+
 static boost::python::tuple GetTargetInScreenSpace_428767104c56b38864e43c8a491bdb7a( ::C_BaseEntity * pTargetEntity, ::Vector * vecOffset=0 ){
     int iX2;
     int iY2;
@@ -143,10 +183,14 @@ BOOST_PYTHON_MODULE(_utils){
 
     bp::class_< ITraceFilter, boost::noncopyable >( "ITraceFilter", bp::no_init );
 
-    bp::class_< CTraceFilter, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter", bp::no_init )    
+    bp::class_< CTraceFilter_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) );
+            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) )    
+        .def( 
+            "ShouldHitEntity"
+            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
+            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimple, bp::bases< CTraceFilter > >( "CTraceFilterSimpleInternal", bp::no_init )    
         .def( 
@@ -166,10 +210,14 @@ BOOST_PYTHON_MODULE(_utils){
 
     bp::class_< CTraceFilterChain, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) );
 
-    bp::class_< CTraceFilterEntitiesOnly, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly", bp::no_init )    
+    bp::class_< CTraceFilterEntitiesOnly_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) );
+            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) )    
+        .def( 
+            "ShouldHitEntity"
+            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
+            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterHitAll, bp::bases< CTraceFilter > >( "CTraceFilterHitAll" );
 
@@ -1972,6 +2020,46 @@ struct CGameTrace_wrapper : CGameTrace, bp::wrapper< CGameTrace > {
 
 };
 
+struct CTraceFilter_wrapper : CTraceFilter, bp::wrapper< CTraceFilter > {
+
+    CTraceFilter_wrapper()
+    : CTraceFilter()
+      , bp::wrapper< CTraceFilter >(){
+        // null constructor
+        
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        try {
+            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
+        } catch(bp::error_already_set &) {
+            throw boost::python::error_already_set();
+        }
+    }
+
+};
+
+struct CTraceFilterEntitiesOnly_wrapper : CTraceFilterEntitiesOnly, bp::wrapper< CTraceFilterEntitiesOnly > {
+
+    CTraceFilterEntitiesOnly_wrapper()
+    : CTraceFilterEntitiesOnly()
+      , bp::wrapper< CTraceFilterEntitiesOnly >(){
+        // null constructor
+        
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pEntity, int contentsMask ){
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        try {
+            return func_ShouldHitEntity( boost::python::ptr(pEntity), contentsMask );
+        } catch(bp::error_already_set &) {
+            throw boost::python::error_already_set();
+        }
+    }
+
+};
+
 struct CTraceFilterMelee_wrapper : CTraceFilterMelee, bp::wrapper< CTraceFilterMelee > {
 
     CTraceFilterMelee_wrapper(CTraceFilterMelee const & arg )
@@ -2119,10 +2207,14 @@ BOOST_PYTHON_MODULE(_utils){
 
     bp::class_< ITraceFilter, boost::noncopyable >( "ITraceFilter", bp::no_init );
 
-    bp::class_< CTraceFilter, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter", bp::no_init )    
+    bp::class_< CTraceFilter_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilter" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) );
+            , (::TraceType_t ( ::CTraceFilter::* )(  ) const)( &::CTraceFilter::GetTraceType ) )    
+        .def( 
+            "ShouldHitEntity"
+            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
+            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterSimple, bp::bases< CTraceFilter > >( "CTraceFilterSimpleInternal", bp::no_init )    
         .def( 
@@ -2142,10 +2234,14 @@ BOOST_PYTHON_MODULE(_utils){
 
     bp::class_< CTraceFilterChain, bp::bases< CTraceFilter > >( "CTraceFilterChain", bp::init< ITraceFilter *, ITraceFilter * >(( bp::arg("pTraceFilter1"), bp::arg("pTraceFilter2") )) );
 
-    bp::class_< CTraceFilterEntitiesOnly, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly", bp::no_init )    
+    bp::class_< CTraceFilterEntitiesOnly_wrapper, bp::bases< ITraceFilter >, boost::noncopyable >( "CTraceFilterEntitiesOnly" )    
         .def( 
             "GetTraceType"
-            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) );
+            , (::TraceType_t ( ::CTraceFilterEntitiesOnly::* )(  ) const)( &::CTraceFilterEntitiesOnly::GetTraceType ) )    
+        .def( 
+            "ShouldHitEntity"
+            , bp::pure_virtual( (bool ( ::ITraceFilter::* )( ::IHandleEntity *,int ) )(&::ITraceFilter::ShouldHitEntity) )
+            , ( bp::arg("pEntity"), bp::arg("contentsMask") ) );
 
     bp::class_< CTraceFilterHitAll, bp::bases< CTraceFilter > >( "CTraceFilterHitAll" );
 
