@@ -117,8 +117,11 @@
 #if CSM_USE_COMPOSITED_TARGET
 /* Composited resolution
  */
-#	define CSM_COMP_RES_X 4096
-#	define CSM_COMP_RES_Y 2048
+//#	define CSM_COMP_RES_X 4096
+//#	define CSM_COMP_RES_Y 4096 //2048
+
+#	define CSM_COMP_RES_X 8192
+#	define CSM_COMP_RES_Y 4096
 #endif
 
 

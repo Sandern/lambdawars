@@ -25,6 +25,8 @@ const float3 g_light_diffuse				: register( c16 );
 const float3 g_light_ambient_high			: register( c17 );
 const float3 g_light_ambient_low_half		: register( c18 );
 
+const float3 g_light_shadow_threshold		: register( c19 );
+
 struct PS_INPUT
 {
 	float2 vTexCoord				: TEXCOORD0;
@@ -72,10 +74,9 @@ PS_OUTPUT main( const PS_INPUT In )
 		float shadowMult = PerformCascadedShadow( sShadowDepth, worldPos, g_matOrtho, g_vecUVTransform, g_vecSlopeData,
 									g_vecFilterConfig_A, g_vecFilterConfig_B, flLitNormal, viewFwdDot );
 
-		if( shadowMult >= 0.7 )
+		if( shadowMult >= g_light_shadow_threshold.x )
 		{
 			Out.vColor_0 = WriteLighting( float4(0,0,0,0) );
-
 			return Out;
 		}
 #if 0
@@ -87,8 +88,8 @@ PS_OUTPUT main( const PS_INPUT In )
 	}
 #endif
 
-	//float4 lighting = float4( lerp( ambient, diffuse * ( litDot ), lightAmount ), flSpecular * lightAmount );
-	float4 lighting = float4( lerp( ambient, diffuse, lightAmount ), lightAmount );
+	float4 lighting = float4( lerp( ambient, diffuse * ( litDot ), lightAmount ), flSpecular * lightAmount );
+	//float4 lighting = float4( lerp( ambient, diffuse, lightAmount ), lightAmount );
 	
 	Out.vColor_0 = WriteLighting( lighting );
 

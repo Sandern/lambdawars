@@ -753,9 +753,6 @@ public:
 	virtual void	PushView( float waterHeight );
 	virtual void	PopView();
 
-	//static void PushGBuffer( bool bInitial, float zScale = 1.0f, bool bClearDepth = true );
-	//static void PopGBuffer();
-
 private: 
 	VisibleFogVolumeInfo_t m_fogInfo;
 	bool m_bDrewSkybox;
@@ -2410,7 +2407,7 @@ void CViewRender::ViewDrawGBuffer( const CViewSetup &view, bool &bDrew3dSkybox, 
 	int oldViewID = g_CurrentViewID;
 	g_CurrentViewID = VIEW_DEFERRED_GBUFFER;
 
-	int nClearFlags = 0; // ?? TODO
+	int nClearFlags = VIEW_CLEAR_DEPTH;
 	CSkyboxView *pSkyView = new CSkyboxView( this );
 	if ( ( bDrew3dSkybox = pSkyView->Setup( view, &nClearFlags, &nSkyboxVisible, true ) ) != false )
 		AddViewToScene( pSkyView );
@@ -5912,7 +5909,8 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 		}
 	}
 
-	Enable3dSkyboxFog();
+	if ( !m_bGBufferPass )
+		Enable3dSkyboxFog();
 
 	// BUGBUG: Fix this!!!  We shouldn't need to call setup vis for the sky if we're connecting
 	// the areas.  We'd have to mark all the clusters in the skybox area in the PVS of any 
@@ -5945,7 +5943,7 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 
 	render->BeginUpdateLightmaps();
 	BuildWorldRenderLists( true, -1, true );
-	BuildRenderableRenderLists( iSkyBoxViewID );
+	BuildRenderableRenderLists( m_bGBufferPass ? VIEW_SHADOW_DEPTH_TEXTURE : iSkyBoxViewID );
 	render->EndUpdateLightmaps();
 
 	// FIXME: Don't do deferred shadows on 3D skybox for now.
@@ -5959,15 +5957,21 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 	// Iterate over all leaves and render objects in those leaves
 	DrawOpaqueRenderables( false );
 
-	// Iterate over all leaves and render objects in those leaves
-	DrawTranslucentRenderables( true, false );
-	DrawNoZBufferTranslucentRenderables();
+	if ( !m_bGBufferPass )
+	{
+		// Iterate over all leaves and render objects in those leaves
+		DrawTranslucentRenderables( true, false );
+		DrawNoZBufferTranslucentRenderables();
+	}
 
-	m_pMainView->DisableFog();
+	if ( !m_bGBufferPass )
+	{
+		m_pMainView->DisableFog();
 
-	CGlowOverlay::UpdateSkyOverlays( zFar, m_bCacheFullSceneState );
+		CGlowOverlay::UpdateSkyOverlays( zFar, m_bCacheFullSceneState );
 
-	PixelVisibility_EndCurrentView();
+		PixelVisibility_EndCurrentView();
+	}
 
 	// restore old area bits
 	*areabits = savebits;
@@ -6042,7 +6046,7 @@ bool CSkyboxView::Setup( const CViewSetup &view, int *pClearFlags, SkyboxVisibil
 	*pClearFlags |= VIEW_CLEAR_DEPTH; // Need to clear depth after rendering the skybox
 
 	m_DrawFlags = DF_RENDER_UNDERWATER | DF_RENDER_ABOVEWATER | DF_RENDER_WATER;
-	if( r_skybox.GetBool() )
+	if( !m_bGBufferPass && r_skybox.GetBool() )
 	{
 		m_DrawFlags |= DF_DRAWSKYBOX;
 	}
@@ -7674,6 +7678,8 @@ void CBaseShadowBlendView::SetRadiosityOutputEnabled( bool bEnabled )
 	m_bOutputRadiosity = bEnabled;
 }
 
+//#define ORTHO_TESTVALUES_DEBUG
+
 void COrthoShadowBlendView::CalcShadowView()
 {
 	const cascade_t &m_data = GetCascadeInfo( iCascadeIndex );
@@ -7687,7 +7693,39 @@ void COrthoShadowBlendView::CalcShadowView()
 	Vector viewFwd, viewRight, viewUp;
 	AngleVectors( lightAng, &viewFwd, &viewRight, &viewUp );
 
+#ifdef ORTHO_TESTVALUES_DEBUG
+	float flProjectionSize = m_data.flProjectionSize;
+	if( iCascadeIndex == 1 )
+	{
+		static ConVar def_test_ortho1("def_test_ortho1", "0");
+		if( def_test_ortho1.GetInt() != 0 )
+			flProjectionSize = def_test_ortho1.GetFloat();
+	}
+	else
+	{
+		static ConVar def_test_ortho0("def_test_ortho0", "0");
+		if( def_test_ortho0.GetInt() != 0 )
+			flProjectionSize = def_test_ortho0.GetFloat();
+	}
+
+	int iResolution = m_data.iResolution;
+	if( iCascadeIndex == 1 )
+	{
+		static ConVar def_test_add_res1("def_test_add_res1", "0");
+		if( def_test_add_res1.GetInt() != 0 )
+			iResolution = def_test_add_res1.GetInt();
+	}
+	else
+	{
+		static ConVar def_test_add_res0("def_test_add_res0", "0");
+		if( def_test_add_res0.GetInt() != 0 )
+			iResolution = def_test_add_res0.GetInt();
+	}
+
+	const float halfOrthoSize = flProjectionSize * 0.5f;
+#else
 	const float halfOrthoSize = m_data.flProjectionSize * 0.5f;
+#endif // ORTHO_TESTVALUES_DEBUG
 
 	origin += -viewFwd * m_data.flOriginOffset +
 		viewUp * halfOrthoSize -
@@ -7698,20 +7736,33 @@ void COrthoShadowBlendView::CalcShadowView()
 
 	x = 0;
 	y = 0;
+#ifndef ORTHO_TESTVALUES_DEBUG
 	height = m_data.iResolution;
 	width = m_data.iResolution;
+#else
+	height = width = iResolution;
+#endif // ORTHO_TESTVALUES_DEBUG
 
 	m_bOrtho = true;
 	m_OrthoLeft = 0;
+#ifndef ORTHO_TESTVALUES_DEBUG
 	m_OrthoTop = -m_data.flProjectionSize;
 	m_OrthoRight = m_data.flProjectionSize;
+#else
+	m_OrthoTop = -flProjectionSize;
+	m_OrthoRight = flProjectionSize;
+#endif // ORTHO_TESTVALUES_DEBUG
 	m_OrthoBottom = 0;
 
 	zNear = zNearViewmodel = 0;
 	zFar = zFarViewmodel = m_data.flFarZ;
 	m_flAspectRatio = 0;
 
+#ifndef ORTHO_TESTVALUES_DEBUG
 	float mapping_world = m_data.flProjectionSize / m_data.iResolution;
+#else
+	float mapping_world = flProjectionSize / iResolution;
+#endif // ORTHO_TESTVALUES_DEBUG
 	origin -= fmod( DotProduct( viewRight, origin ), mapping_world ) * viewRight;
 	origin -= fmod( DotProduct( viewUp, origin ), mapping_world ) * viewUp;
 
@@ -7720,6 +7771,23 @@ void COrthoShadowBlendView::CalcShadowView()
 #if CSM_USE_COMPOSITED_TARGET
 	x = m_data.iViewport_x;
 	y = m_data.iViewport_y;
+
+#ifdef ORTHO_TESTVALUES_DEBUG
+	if( iCascadeIndex == 1 )
+	{
+		static ConVar def_test_add_x1("def_test_add_x1", "0");
+		static ConVar def_test_add_y1("def_test_add_y1", "0");
+		x += def_test_add_x1.GetInt();
+		y += def_test_add_y1.GetInt();
+	}
+	else
+	{
+		static ConVar def_test_add_x0("def_test_add_x0", "0");
+		static ConVar def_test_add_y0("def_test_add_y0", "0");
+		x += def_test_add_x0.GetInt();
+		y += def_test_add_y0.GetInt();
+	}
+#endif // ORTHO_TESTVALUES_DEBUG
 #endif
 }
 

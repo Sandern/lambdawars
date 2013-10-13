@@ -125,6 +125,19 @@ BEGIN_VS_SHADER( DEFERRED_BRUSH, "" )
 		p.iAlbedo3 = BASETEXTURE3;
 		p.iAlbedo4 = BASETEXTURE4;
 
+		p.nSpecTexture = SPECTEXTURE;
+		p.nSpecTexture2 = SPECTEXTURE2;
+		p.nSpecTexture3 = SPECTEXTURE3;
+		p.nSpecTexture4 = SPECTEXTURE4;
+		p.nRotation = ROTATION;
+		p.nRotation2 = ROTATION2;
+		p.nRotation3 = ROTATION3;
+		p.nRotation4 = ROTATION4;
+		p.nScale = SCALE;
+		p.nScale2 = SCALE2;
+		p.nScale3 = SCALE3;
+		p.nScale4 = SCALE4;
+
 		p.iAlphatestRef = ALPHATESTREFERENCE;
 		p.iMultiblend = MULTIBLEND;
 	}

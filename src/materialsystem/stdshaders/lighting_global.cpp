@@ -4,6 +4,8 @@
 #include "defconstruct_vs30.inc"
 #include "lightingpass_global_ps30.inc"
 
+ConVar mat_def_shadow_threshold( "mat_def_shadow_threshold", "0.85" );
+
 BEGIN_VS_SHADER( LIGHTING_GLOBAL, "" )
 	BEGIN_SHADER_PARAMS
 
@@ -81,6 +83,9 @@ BEGIN_VS_SHADER( LIGHTING_GLOBAL, "" )
 			pShaderAPI->SetPixelShaderConstant( 16, data.diff.Base() );
 			pShaderAPI->SetPixelShaderConstant( 17, data.ambh.Base() );
 			pShaderAPI->SetPixelShaderConstant( 18, MakeHalfAmbient( data.ambl, data.ambh ).Base() );
+
+			Vector shadowConstants( mat_def_shadow_threshold.GetFloat(), 0.0, 0.0 );
+			pShaderAPI->SetPixelShaderConstant( 19, shadowConstants.Base() );
 		}
 
 		Draw();
