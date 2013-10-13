@@ -4,7 +4,7 @@ from . basegenerator import ModuleGenerator
 from .. src_module_builder import src_module_builder_t
 from pyplusplus import code_creators
 from pyplusplus.module_builder import call_policies
-from pygccxml.declarations import matchers, pointer_t, reference_t, declarated_t, void_t, compound_t
+from pygccxml.declarations import matchers, pointer_t, reference_t, const_t, declarated_t, void_t, compound_t
 
 class SourceModuleGenerator(ModuleGenerator):
     # Choices: client, server, semi_shared and pure_shared
@@ -141,4 +141,5 @@ class SourceModuleGenerator(ModuleGenerator):
         
         # Anything returning a void pointer is excluded by default
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(void_t()))), allow_empty=True).exclude()
+        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(const_t(declarated_t(void_t())))), allow_empty=True).exclude()
         
