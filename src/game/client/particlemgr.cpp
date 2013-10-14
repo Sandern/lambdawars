@@ -963,6 +963,7 @@ CParticleMgr::~CParticleMgr()
 	Term();
 }
 
+extern void AddWarsParticleOperators();
 
 //-----------------------------------------------------------------------------
 // Initialization and shutdown
@@ -976,6 +977,16 @@ bool CParticleMgr::Init(unsigned long count, IMaterialSystem *pMaterials)
 	// Initialize the particle system
 	bool bPrecacheParticles = IsPC() && !engine->IsCreatingXboxReslist();
 	g_pParticleSystemMgr->Init( g_pParticleSystemQuery, bPrecacheParticles );
+
+#ifdef HL2WARS_DLL
+	static bool s_DidAddWars = false;
+	if ( ! s_DidAddWars )
+	{
+		AddWarsParticleOperators();
+		s_DidAddWars = true;
+	}
+#endif // HL2WARS_DLL
+
 	// tell particle mgr to add the default simulation + rendering ops
 	g_pParticleSystemMgr->AddBuiltinSimulationOperators();
 	g_pParticleSystemMgr->AddBuiltinRenderingOperators();
