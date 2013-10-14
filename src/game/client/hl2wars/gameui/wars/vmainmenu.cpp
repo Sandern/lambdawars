@@ -40,10 +40,15 @@
 
 #include "matchmaking/swarm/imatchext_swarm.h"
 
-//#include "hl2wars/vgui/vgui_news.h"
+
+#ifdef HL2WARS_DLL
 #include "cbase.h"
 #include "python/srcpy.h"
+
+#ifdef ENABLE_CEF
 #include "src_cef.h"
+#endif // ENABLE_CEF
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

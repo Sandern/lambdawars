@@ -45,8 +45,12 @@
 #include "iunit.h"
 
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
+#include "srcpy.h"
 #endif // ENABLE_PYTHON
+
+#ifdef ENABLE_CEF
+#include "src_cef.h"
+#endif // ENABLE_CEF
 
 extern ConVar cl_leveloverviewmarker;
 
@@ -146,6 +150,7 @@ void HL2WarsViewport::ApplySchemeSettings( vgui::IScheme *pScheme )
 	GetHud().InitColors( pScheme );
 
 	SetPaintBackgroundEnabled( false );
+	SetPostChildPaintEnabled( true );
 
 	// TODO: Find out a way to override dc_arrow
 	m_iDefaultMouseCursor = vgui::surface()->CreateCursorFromFile( "resource/arrows/default_cursor.cur" );
@@ -207,33 +212,7 @@ void HL2WarsViewport::OnThink()
 	// Super lame fix to ensure this panel is always behind all other panels
 	surface()->MovePopupToBack(GetVPanel());
 
-	/*
-	
-	bool bHadFocus = HasFocus();
-	surface()->MovePopupToBack(GetVPanel());
-	if( bHadFocus )
-	{
-		Msg("Restoring focus viewport\n");
-		RequestFocus();
-		surface()->SetTopLevelFocus( GetVPanel() );
-	}
-	*/
-
-	/*
-	bool bIsTopMost = ipanel()->IsTopmostPopup(GetVPanel());
-	surface()->MovePopupToBack(GetVPanel());
-	if( bIsTopMost )
-	{
-		Msg("Restoring focus viewport\n");
-		ipanel()->SetTopmostPopup( GetVPanel(), true );
-	}
-	*/
-
-	//if( vgui::input()->GetMouseOver() == GetVPanel() )
-	{
-		UpdateCursor();
-		//Msg("Updating cursor %f, %d == %d\n", gpGlobals->curtime, vgui::input()->GetMouseOver(), GetVPanel());
-	}
+	UpdateCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -345,6 +324,27 @@ void HL2WarsViewport::Paint()
 		DrawSelectBox();
 	}
 }
+
+#ifdef ENABLE_CEF
+void HL2WarsViewport::PostChildPaint()
+{
+	BaseClass::PostChildPaint();
+
+	SrcCefBrowser *pBrowser = CEFSystem().FindBrowserByName( "CefViewPort" );
+	if( pBrowser && pBrowser->GetPanel() )
+	{
+		SrcCefVGUIPanel *pPanel = pBrowser->GetPanel();
+		int iTextureID = pPanel->GetTextureID();
+		pPanel->SetDoNotDraw( true ); // we draw it here
+		if( iTextureID != -1 )
+		{
+			vgui::surface()->DrawSetColor( 255, 255, 255, 255 );
+			vgui::surface()->DrawSetTexture( iTextureID );
+			vgui::surface()->DrawTexturedSubRect( 0, 0, pPanel->GetWide(), pPanel->GetTall(), 0, 0, pPanel->GetTexS1(), pPanel->GetTexT1() );
+		}
+	}
+}
+#endif // ENABLE_CEF
 
 extern ConVar cl_mouse_selectionbox_threshold;
 void HL2WarsViewport::DrawSelectBox()

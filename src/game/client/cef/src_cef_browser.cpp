@@ -343,10 +343,10 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL)
 {
-	m_Name = name ? name : "";
+	m_Name = name ? name : "UnknownCefBrowser";
 
 	// Create panel and texture generator
-	m_pPanel = new SrcCefVGUIPanel( this, NULL );
+	m_pPanel = new SrcCefVGUIPanel( name, this, NULL );
 
 	// Initialize browser
 	CEFSystem().AddBrowser( this );

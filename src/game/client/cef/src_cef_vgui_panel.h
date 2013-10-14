@@ -24,12 +24,13 @@ class SrcCefVGUIPanel : public vgui::Panel
 public:
 	DECLARE_CLASS_SIMPLE(SrcCefVGUIPanel, vgui::Panel);
 
-	SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pParent );
+	SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent );
 	~SrcCefVGUIPanel();
 
 	virtual bool ResizeTexture( int width, int height );
 	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend );
 
+	virtual void OnThink();
 	virtual void Paint();
 	virtual void OnSizeChanged(int newWide, int newTall);
 	virtual void PerformLayout();
@@ -51,7 +52,17 @@ public:
 
 	//virtual void InternalFocusChanged(bool lost);
 
+	virtual void CallSiblingBeneathUs( KeyValues *message, int x, int y );
+
 	virtual vgui::HCursor GetCursor();
+
+	// Hack for working nice with VGUI input
+	// Should be removed once we mix with VGUI anymore
+	int GetTextureID();
+	float GetTexS1();
+	float GetTexT1();
+	void SetDoNotDraw( bool state );
+	bool GetDoNotDraw( void );
 
 protected:
 	int	GetBrowserID();
@@ -84,6 +95,36 @@ private:
 	float m_fTexS1, m_fTexT1;
 
 	int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+
+	// Hack for working nice with VGUI input
+	int m_iTopZPos, m_iBottomZPos;
+	bool m_bDontDraw;
 };
+
+// Hack for working nice with VGUI input
+inline int SrcCefVGUIPanel::GetTextureID()
+{
+	return m_iTextureID;
+}
+
+inline float SrcCefVGUIPanel::GetTexS1()
+{
+	return m_fTexS1;
+}
+
+inline float SrcCefVGUIPanel::GetTexT1()
+{
+	return m_fTexT1;
+}
+
+inline void SrcCefVGUIPanel::SetDoNotDraw( bool state )
+{
+	m_bDontDraw = state;
+}
+
+inline bool SrcCefVGUIPanel::GetDoNotDraw( void )
+{
+	return m_bDontDraw;
+}
 
 #endif // SRC_CEF_VGUI_PANEL_H

@@ -292,12 +292,22 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+SrcCefBrowser *CCefSystem::FindBrowserByName( const char *pName )
+{
+	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	{
+		if( m_CefBrowsers[i]->IsValid() && V_strcmp( m_CefBrowsers[i]->GetName(), pName ) == 0 )
+			return m_CefBrowsers[i];
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
-	// CEF has key focus, so don't process any keys (apart from the escape key)
-	if( m_bHasKeyFocus && ( keynum != KEY_ESCAPE || V_strcmp( "toggleconsole", pszCurrentBinding ) == 0  ) )
-		return 0;
-
+	// Give browser implementations directly a chance to override the input
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() )
@@ -307,6 +317,11 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 		if( ret == 0 )
 			return 0;
 	}
+
+	// CEF has key focus, so don't process any keys (apart from the escape key)
+	if( m_bHasKeyFocus && ( keynum != KEY_ESCAPE && (!pszCurrentBinding || V_strcmp( "toggleconsole", pszCurrentBinding ) != 0)  ) )
+		return 0;
+
 	return 1;
 }
 

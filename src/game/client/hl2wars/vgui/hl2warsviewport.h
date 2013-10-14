@@ -42,6 +42,7 @@ public:
 	void			GetPointInScreen( Vector2D *point, Vector *world );
 	virtual void	DrawMapBounderies();
 	virtual void	Paint();
+	virtual void PostChildPaint();
 
 	void			DrawSelectBox();
 	void			DrawRightClick();

@@ -38,7 +38,7 @@ static int nexthigher( int k )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pParent ) 
+SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent ) 
 	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bSizeChanged(false), m_pTextureRegen(NULL)
 {
 	// WarsSplitscreen: only one player
@@ -61,6 +61,11 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( SrcCefBrowser *pController, vgui::Panel *pPare
 
 	static int staticMatWebViewID = 0;
 	V_snprintf( m_MatWebViewName, _MAX_PATH, "vgui/webview/webview_test%d", staticMatWebViewID++ );
+
+	// Hack for working nice with VGUI input
+	m_iTopZPos = 10;
+	m_iBottomZPos = -15;
+	m_bDontDraw = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -199,12 +204,37 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::OnThink()
+{
+	BaseClass::OnThink();
+
+	if( m_pBrowser->GetPassMouseTruIfAlphaZero() )
+	{
+		// Hack for working nice with VGUI input
+		// Move to back in case the mouse is on nothing
+		// Move to front in case on something
+		int x, y;
+		vgui::input()->GetCursorPos( x, y );
+		ScreenToLocal( x, y );
+
+		if( m_pBrowser->IsAlphaZeroAt( x, y ) )
+		{
+			SetZPos( m_iBottomZPos );
+		}
+		else
+		{
+			SetZPos( m_iTopZPos );
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::Paint()
 {
 	int iWide, iTall;
 	GetSize( iWide, iTall );
-
-	//Msg("SrcCefVGUIPanel::Paint\n");
 
 	// Update texture if needed
 	if( m_bSizeChanged )
@@ -230,9 +260,7 @@ void SrcCefVGUIPanel::Paint()
 	if( !m_pTextureRegen )
 		return;
 
-	//m_pBrowser->GetOSRHandler()->LockTextureBuffer();
-
-	// Draw
+	// Regenerate texture (partially) if needed
 	if( m_pTextureRegen->IsDirty() )
 	{
 		//if( g_cef_debug_texture.GetBool() )
@@ -261,28 +289,29 @@ void SrcCefVGUIPanel::Paint()
 	}
 
 	// Must have a valid texture and the texture regenerator should be valid
-	if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
+	if( !m_bDontDraw )
 	{
-		vgui::surface()->DrawSetColor( m_Color );
-		vgui::surface()->DrawSetTexture( m_iTextureID );
-		vgui::surface()->DrawTexturedSubRect( 0, 0, iWide, iTall, 0, 0, m_fTexS1, m_fTexT1 );
-	}
-	else
-	{
-		if( g_cef_debug_texture.GetBool() )
+		if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
 		{
-			DevMsg("CEF: not drawing");
-			if( m_iTextureID == -1 )
-				DevMsg(", texture does not exists");
-			if( m_pTextureRegen->IsDirty() )
-				DevMsg(", texture is dirty");
-			if( !g_cef_draw.GetBool() )
-				DevMsg(", g_cef_draw is 0");
-			DevMsg("\n");
+			vgui::surface()->DrawSetColor( m_Color );
+			vgui::surface()->DrawSetTexture( m_iTextureID );
+			vgui::surface()->DrawTexturedSubRect( 0, 0, iWide, iTall, 0, 0, m_fTexS1, m_fTexT1 );
+		}
+		else
+		{
+			if( g_cef_debug_texture.GetBool() )
+			{
+				DevMsg("CEF: not drawing");
+				if( m_iTextureID == -1 )
+					DevMsg(", texture does not exists");
+				if( m_pTextureRegen->IsDirty() )
+					DevMsg(", texture is dirty");
+				if( !g_cef_draw.GetBool() )
+					DevMsg(", g_cef_draw is 0");
+				DevMsg("\n");
+			}
 		}
 	}
-
-	//m_pBrowser->GetOSRHandler()->UnlockTextureBuffer();
 }
 
 //-----------------------------------------------------------------------------
@@ -345,6 +374,14 @@ int	SrcCefVGUIPanel::GetEventFlags()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorEntered()
 {
+	// Called before OnCursorMoved, so mouse coordinates might be outdated
+	int x, y;
+	vgui::input()->GetCursorPos( x, y );
+	ScreenToLocal( x, y );
+
+	m_iMouseX = x;
+	m_iMouseY = y;
+
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -371,7 +408,7 @@ void SrcCefVGUIPanel::OnCursorExited()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnCursorMoved( int x,int y )
+void SrcCefVGUIPanel::OnCursorMoved( int x, int y )
 {
 	m_iMouseX = x;
 	m_iMouseY = y;
@@ -524,7 +561,7 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 
 	me.modifiers = GetEventFlags();
 
-	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 1 );
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseClickEvent( me, iMouseType, false, 2 );
 
 	CefDbgMsg( 1, "Cef#%d: injected mouse double pressed %d %d\n", GetBrowserID(), m_iMouseX, m_iMouseY );
 }

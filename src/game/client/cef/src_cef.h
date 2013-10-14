@@ -36,8 +36,8 @@ extern ConVar g_debug_cef;
 
 // Debug
 #define CefDbgMsg( lvl, fmt, ... )				\
-	if( g_debug_cef.GetBool() )	\
-		DevMsg( lvl, fmt, ##__VA_ARGS__ );		\
+	if( g_debug_cef.GetInt() >= lvl )			\
+		DevMsg( 1, fmt, ##__VA_ARGS__ );		\
 
 //-----------------------------------------------------------------------------
 // Purpose: SrcCEF system
@@ -78,6 +78,7 @@ public:
 	int CountBrowsers( void );
 	SrcCefBrowser *GetBrowser( int idx );
 	SrcCefBrowser *FindBrowser( CefBrowser *pBrowser );
+	SrcCefBrowser *FindBrowserByName( const char *pName );
 
 	void OnScreenSizeChanged( int nOldWidth, int nOldHeight );
 

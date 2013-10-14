@@ -20,7 +20,10 @@
 #include "nb_header_footer.h"
 #include "glow_outline_effect.h"
 #include "c_hl2wars_player.h"
+
+#ifdef ENABLE_CEF
 #include "src_cef.h"
+#endif // ENABLE_CEF
 
 #include "vgui/surface_passthru.h"
 #include <vgui_controls/Controls.h>
@@ -412,10 +415,12 @@ int	ClientModeSDK::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 		}
 	}
 
+#ifdef ENABLE_CEF
 	// Pass input to cef browser if they want it
 	int ret = CEFSystem().KeyInput( down, keynum, pszCurrentBinding );
 	if( ret == 0 )
 		return 0;
+#endif // ENABLE_CEF
 
 	return BaseClass::KeyInput(down, keynum, pszCurrentBinding);
 }
