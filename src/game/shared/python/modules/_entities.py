@@ -1407,7 +1407,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_nBurstShotsRemaining', 'burstshotsremaining')
         
         if self.isclient:
-            cls.vars('m_vTracerColor').rename('tracercolor')
+            self.IncludeVarAndRename('m_vTracerColor', 'tracercolor')
         
         cls.mem_funs('GetPrimaryAttackActivity').exclude()
         cls.mem_funs('SetPrimaryAttackActivity').exclude()

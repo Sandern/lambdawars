@@ -1257,6 +1257,7 @@ void register_C_WarsWeapon_class(){
         C_WarsWeapon_exposer.def_readwrite( "minburst", &C_WarsWeapon::m_iMinBurst );
         C_WarsWeapon_exposer.def_readwrite( "burstshotsremaining", &C_WarsWeapon::m_nBurstShotsRemaining );
         C_WarsWeapon_exposer.def_readwrite( "bulletspread", &C_WarsWeapon::m_vBulletSpread );
+        C_WarsWeapon_exposer.def_readwrite( "tracercolor", &C_WarsWeapon::m_vTracerColor );
         { //::C_BaseCombatWeapon::Activate
         
             typedef void ( ::C_BaseCombatWeapon::*Activate_function_type )(  ) ;
