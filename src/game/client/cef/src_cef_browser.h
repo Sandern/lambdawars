@@ -97,6 +97,7 @@ public:
 		NT_ONLYFILEPROT, // Only allow navigating to file protocol urls
 	};
 	virtual void SetNavigationBehavior( NavigationType behavior );
+	virtual NavigationType GetNavigationBehavior();
 
 	// Javascript methods
 	void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
@@ -178,6 +179,11 @@ inline const char *SrcCefBrowser::GetName()
 inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
 {
 	return GetAlphaAt( x, y ) == 0;
+}
+
+inline SrcCefBrowser::NavigationType SrcCefBrowser::GetNavigationBehavior()
+{
+	return m_navigationBehavior;
 }
 
 #endif // SRC_CEF_BROWSER_H

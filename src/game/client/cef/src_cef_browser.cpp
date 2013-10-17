@@ -37,6 +37,32 @@
 #include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
+// Purpose: Small helper function for opening urls
+//-----------------------------------------------------------------------------
+static void OpenURL( const char *url )
+{
+	// Open url in steam browser if fullscreen
+	// If windowed, just do a shell execute so it executes in the default browser
+#ifdef WIN32
+	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+	if( config.Windowed() )
+	{
+		ShellExecute(NULL, "open", url,
+						NULL, NULL, SW_SHOWNORMAL);
+	}
+	else
+#endif // WIN32
+	{
+		if( !steamapicontext || !steamapicontext->SteamFriends() )
+		{
+			Warning("OpenURL: could not get steam api context!\n");
+			return;
+		}
+		steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( url );
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Cef browser internal implementation
 //-----------------------------------------------------------------------------
 class CefClientHandler : public CefClient,
@@ -124,6 +150,11 @@ public:
 
 
 	// CefRequestHandler
+	virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								CefRefPtr<CefRequest> request,
+								bool is_redirect);
+
 	virtual void OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 								CefRefPtr<CefFrame> frame,
 								const CefString& old_url,
@@ -210,21 +241,7 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "openurl" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-
-		// Open url in steam browser if fullscreen
-		// If windowed, just do a shell execute so it executes in the default browser
-#ifdef WIN32
-		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		if( config.Windowed() )
-		{
-			ShellExecute(NULL, "open", args->GetString( 0 ).ToString().c_str(),
-							NULL, NULL, SW_SHOWNORMAL);
-		}
-		else
-#endif // WIN32
-		{
-			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( args->GetString( 0 ).ToString().c_str() );
-		}
+		OpenURL( args->GetString( 0 ).ToString().c_str() );
 	}
 	else if( message->GetName() == "msg" )
 	{
@@ -330,6 +347,44 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+							CefRefPtr<CefFrame> frame,
+							CefRefPtr<CefRequest> request,
+							bool is_redirect)
+{
+	if( !m_pSrcBrowser )
+		return false;
+
+	// Default behavior: allow navigating away
+	bool bDenyNavigation = false;
+
+	if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+	{
+		// This mode prevents from navigating away from the current page
+		if( browser->GetMainFrame()->GetURL() != request->GetURL() )
+			bDenyNavigation = true;
+	}
+	else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
+	{
+		// This mode only allows navigating to urls starting with the file protocol
+		std::string url = request->GetURL().ToString();
+		std::string filepro( "file://");
+		if( url.compare( 0, filepro.size(), filepro ) )
+			bDenyNavigation = true;
+	}
+
+	// If we don't allow navigation, open the url in a new window
+	if( bDenyNavigation )
+	{
+		OpenURL( request->GetURL().ToString().c_str() );
+	}
+	
+	return bDenyNavigation;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 								CefRefPtr<CefFrame> frame,
 								const CefString& old_url,
@@ -374,7 +429,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	if( g_debug_cef.GetBool() )
 		DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
 	
-	if( !CefBrowserHost::CreateBrowser(info, m_CefClientHandler, m_URL, settings) )
+	if( !CefBrowserHost::CreateBrowser( info, m_CefClientHandler, m_URL, settings, NULL ) )
 	{
 		Warning(" Failed to create CEF browser %s\n", name );
 	}
@@ -794,12 +849,6 @@ void SrcCefBrowser::SetNavigationBehavior( NavigationType behavior )
 		return;
 
 	m_navigationBehavior = behavior; 
-
-	CefRefPtr<CefProcessMessage> message =
-		CefProcessMessage::Create("navigationbehavior");
-	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, (int)m_navigationBehavior );
-	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
 }
 
 //-----------------------------------------------------------------------------

@@ -45,13 +45,6 @@ public:
 									CefRefPtr<CefFrame> frame,
 									CefRefPtr<CefV8Context> context);
 
-	// CefRenderProcessHandler
-	virtual bool OnBeforeNavigation(CefRefPtr<CefBrowser> browser,
-                                  CefRefPtr<CefFrame> frame,
-                                  CefRefPtr<CefRequest> request,
-                                  NavigationType navigation_type,
-                                  bool is_redirect);
-
 	// Message functions
 	virtual void SendMsg( CefRefPtr<CefBrowser> browser, const char *pMsg, ... );
 

@@ -111,12 +111,6 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 
 		return true;
 	}
-	else if( msgname == "navigationbehavior" )
-	{
-		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		renderBrowser->SetNavigationBehavior( (RenderBrowser::NavigationType)args->GetInt( 0 ) );
-		return true;
-	}
 	else
 	{
 		SendWarning( browser, "Unknown proccess message %ls\n", msgname.c_str() );
@@ -220,54 +214,6 @@ void ClientApp::OnContextReleased(CefRefPtr<CefBrowser> browser,
 		return;
 
 	renderBrowser->SetV8Context( NULL );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool ClientApp::OnBeforeNavigation(CefRefPtr<CefBrowser> browser,
-                                  CefRefPtr<CefFrame> frame,
-                                  CefRefPtr<CefRequest> request,
-								  NavigationType navigation_type,
-                                  bool is_redirect)
-{
-	CefRefPtr<RenderBrowser> renderBrowser = FindBrowser( browser );
-	if( !renderBrowser )
-	{
-		SendWarning(browser, "OnBeforeNavigation: No render process found\n");
-		return false;
-	}
-
-	// Default behavior: allow navigating away
-	bool bDenyNavigation = false;
-
-	if( renderBrowser->GetNavigationBehavior() == RenderBrowser::NT_PREVENTALL )
-	{
-		// This mode prevents from navigating away from the current page
-		if( browser->GetMainFrame()->GetURL() != request->GetURL() )
-			bDenyNavigation = true;
-	}
-	else if( renderBrowser->GetNavigationBehavior() == RenderBrowser::NT_ONLYFILEPROT )
-	{
-		// This mode only allows navigating to urls starting with the file protocol
-		std::string url = request->GetURL().ToString();
-		std::string filepro( "file://");
-		if( url.compare( 0, filepro.size(), filepro ) )
-			bDenyNavigation = true;
-	}
-
-	// If we don't allow navigation, open the url in a new window
-	if( bDenyNavigation )
-	{
-		CefRefPtr<CefProcessMessage> retmessage =
-			CefProcessMessage::Create("openurl");
-		CefRefPtr<CefListValue> args = retmessage->GetArgumentList();
-		args->SetString( 0, request->GetURL() );
-
-		browser->SendProcessMessage(PID_BROWSER, retmessage);
-	}
-	
-	return bDenyNavigation;
 }
 
 //-----------------------------------------------------------------------------

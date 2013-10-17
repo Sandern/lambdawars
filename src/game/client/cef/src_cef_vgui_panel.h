@@ -50,10 +50,6 @@ public:
 	virtual void OnKeyTyped(wchar_t unichar);
 	virtual void OnKeyCodeReleased(vgui::KeyCode code);
 
-	//virtual void InternalFocusChanged(bool lost);
-
-	virtual void CallSiblingBeneathUs( KeyValues *message, int x, int y );
-
 	virtual vgui::HCursor GetCursor();
 
 	// Hack for working nice with VGUI input
