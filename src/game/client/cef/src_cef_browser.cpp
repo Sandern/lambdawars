@@ -358,27 +358,31 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 	// Default behavior: allow navigating away
 	bool bDenyNavigation = false;
 
-	if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+	// Always allow sub frames to navigate to anything
+	if( frame->IsMain() )
 	{
-		// This mode prevents from navigating away from the current page
-		if( browser->GetMainFrame()->GetURL() != request->GetURL() )
-			bDenyNavigation = true;
-	}
-	else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
-	{
-		// This mode only allows navigating to urls starting with the file protocol
-		std::string url = request->GetURL().ToString();
-		std::string filepro( "file://");
-		if( url.compare( 0, filepro.size(), filepro ) )
-			bDenyNavigation = true;
+		if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+		{
+			// This mode prevents from navigating away from the current page
+			if( browser->GetMainFrame()->GetURL() != request->GetURL() )
+				bDenyNavigation = true;
+		}
+		else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
+		{
+			// This mode only allows navigating to urls starting with the file protocol
+			std::string url = request->GetURL().ToString();
+			std::string filepro( "file://");
+			if( url.compare( 0, filepro.size(), filepro ) )
+				bDenyNavigation = true;
+		}
+
+		// If we don't allow navigation, open the url in a new window
+		if( bDenyNavigation )
+		{
+			OpenURL( request->GetURL().ToString().c_str() );
+		}
 	}
 
-	// If we don't allow navigation, open the url in a new window
-	if( bDenyNavigation )
-	{
-		OpenURL( request->GetURL().ToString().c_str() );
-	}
-	
 	return bDenyNavigation;
 }
 
