@@ -93,10 +93,10 @@ int PyMeshBuilder::GetNumPrimitives()
 	switch( m_nType )
 	{
 	case MATERIAL_TRIANGLE_STRIP:
-		iCount = MAX(0, m_pyMeshVertices.Count()-2);
+		iCount = Max(0, m_pyMeshVertices.Count()-2);
 		break;
 	case MATERIAL_QUADS:
-		iCount = MAX(0, m_pyMeshVertices.Count()-3);
+		iCount = Max(0, m_pyMeshVertices.Count()-3);
 		break;	
 	default:
 		iCount = m_pyMeshVertices.Count();
@@ -182,10 +182,10 @@ void PyMeshRallyLine::Draw( double frametime )
 
 	Vector normal(0, 0, 0);
 
-	float fLineLength = MAX(1.0f, (drawpoint2 - drawpoint1).Length());
+	float fLineLength = Max(1.0f, (drawpoint2 - drawpoint1).Length());
 
 	float l = fLineLength / m_fLineLength;
-	float send = m_fLineLength / MAX(0.01f, texturey/textureyscale);
+	float send = m_fLineLength / Max(0.01f, texturey/textureyscale);
 	float sstart = (1.0f - l) * send;
 
 	// Setup the four points

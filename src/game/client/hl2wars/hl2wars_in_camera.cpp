@@ -76,7 +76,7 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 		pPlayer->CalculateHeight( pPlayer->GetAbsOrigin() );
 	}
 
-	float fMaxCamHeight = MIN( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
+	float fMaxCamHeight = Min( cl_strategic_cam_max_dist.GetFloat(), pPlayer->GetCamMaxHeight() );
 
 	// Reset if desired height or max height is not yet set
 	if( m_flDesiredCameraDist == -1 )
@@ -109,11 +109,11 @@ float CHL2WarsInput::WARS_GetCameraDist( )
 		m_vecCameraVelocity.z = clamp( m_vecCameraVelocity.z, 0.1f, cl_strategic_cam_spring_vel_max.GetFloat() );
 		if ( m_flCurrentCameraDist < m_flDesiredCameraDist )
 		{
-			m_flCurrentCameraDist = MIN( m_flCurrentCameraDist + m_vecCameraVelocity.z * flFrameTime, m_flDesiredCameraDist );
+			m_flCurrentCameraDist = Min( m_flCurrentCameraDist + m_vecCameraVelocity.z * flFrameTime, m_flDesiredCameraDist );
 		}
 		else
 		{
-			m_flCurrentCameraDist = MAX( m_flCurrentCameraDist - m_vecCameraVelocity.z * flFrameTime, m_flDesiredCameraDist );
+			m_flCurrentCameraDist = Max( m_flCurrentCameraDist - m_vecCameraVelocity.z * flFrameTime, m_flDesiredCameraDist );
 		}
 	}
 	else

@@ -60,9 +60,9 @@ void UnitBaseAirLocomotion::FullAirMove()
 		float fGroundDist = fabs(pm.endpos.z-mv->origin.z);
 		float fDiff = m_fDesiredHeight - fGroundDist;
 		if( fDiff < 0.0f )
-			mv->velocity.z = MAX(fDiff, -mv->maxspeed); 
+			mv->velocity.z = Max(fDiff, -mv->maxspeed); 
 		else
-			mv->velocity.z = MIN(fDiff, mv->maxspeed);
+			mv->velocity.z = Min(fDiff, mv->maxspeed);
 
 		if( m_fFlyNoiseZ > DIST_EPSILON && mv->sidemove == 0.0f && mv->forwardmove == 0.0f  )
 		{
@@ -83,7 +83,7 @@ void UnitBaseAirLocomotion::FullAirMove()
 	}
 	else
 	{
-		mv->velocity.z = MIN(mv->upmove, mv->maxspeed);
+		mv->velocity.z = Min(mv->upmove, mv->maxspeed);
 	}
 
 	// Always air move

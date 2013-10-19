@@ -64,12 +64,15 @@ public:
 
 	}
 
+#if 0
 	virtual CParticleOperatorInstance *CreateInstance( const DmObjectId_t &id ) const
 	{
 		CParticleOperatorInstance *pOp = CParticleOperatorDefinition<C_OP_TeamColor>::CreateInstance( id );
+		pOp->SetDefinition( this, id );
 		Msg("Created C_OP_TeamColor: %d\n" ,pOp );
 		return pOp;
 	}
+#endif // 0
 
 	virtual const DmxElementUnpackStructure_t* GetUnpackStructure() const
 	{
@@ -91,8 +94,8 @@ public:
 	}
 };
 
-//DEFINE_PARTICLE_OPERATOR( C_OP_TeamColor, "Color Team", OPERATOR_GENERIC );
-static ParticleOpTestDef s_C_OP_TeamColorFactory( "Color Team", OPERATOR_GENERIC, false );
+DEFINE_PARTICLE_OPERATOR( C_OP_TeamColor, "Color Team", OPERATOR_GENERIC );
+//static ParticleOpTestDef s_C_OP_TeamColorFactory( "Color Team", OPERATOR_GENERIC, false );
 
 BEGIN_PARTICLE_OPERATOR_UNPACK( C_OP_TeamColor ) 
 	DMXELEMENT_UNPACK_FIELD( "team_color", "255 255 255 255", Color, m_TeamColor )
@@ -103,7 +106,8 @@ void AddWarsParticleOperators( void )
 	REGISTER_PARTICLE_OPERATOR( FUNCTION_OPERATOR, C_OP_TeamColor );
 }
 
-CON_COMMAND_F( wars_print_particle_ops, "test", FCVAR_CHEAT )
+#if 0
+CON_COMMAND_F( wars_particle_print_ops, "test", FCVAR_CHEAT )
 {
 	for( int i = 0; i < PARTICLE_FUNCTION_COUNT; i++ )
 	{
@@ -115,3 +119,48 @@ CON_COMMAND_F( wars_print_particle_ops, "test", FCVAR_CHEAT )
 		}
 	}
 }
+
+CON_COMMAND_F( wars_particle_add_ops, "test", FCVAR_CHEAT )
+{
+	AddWarsParticleOperators();
+}
+
+#include <vgui_controls/Panel.h>
+#include "EngineInterface.h"
+#include "IGameUIFuncs.h"
+#include "IEngineVGUI.h"
+#include "vgui/IPanel.h"
+#include "vgui/IVGui.h"
+#include "vgui_int.h"
+
+static vgui::VPANEL FindPanelByName( vgui::VPANEL parent, const char *pName )
+{
+	for( int i = 0; i < vgui::ipanel()->GetChildCount( parent ); i++ )
+	{
+		vgui::VPANEL child = vgui::ipanel()->GetChild( parent, i );
+		const char *pPanelName = vgui::ipanel()->GetName( child );
+		Msg("Testing: %s\n", pPanelName );
+		if( V_strcmp( pName, pPanelName ) == 0 )
+		{
+			return child;
+		}
+
+		vgui::VPANEL testPanel = FindPanelByName( child, pName );
+		if( testPanel != vgui::INVALID_PANEL )
+			return testPanel;
+	}
+
+	return vgui::INVALID_PANEL;
+}
+
+CON_COMMAND_F( wars_particle_reload_panel, "test", FCVAR_CHEAT )
+{
+	vgui::VPANEL clientDllPanel = enginevguifuncs->GetPanel( PANEL_GAMEDLL );
+	vgui::VPANEL target = FindPanelByName( clientDllPanel, "ParticleSystemPropertiesPanel" );
+	Msg("Panel: %d\n" , target );
+	vgui::ipanel()->PerformApplySchemeSettings( target );
+	vgui::Panel *pPanel = vgui::ipanel()->GetPanel( target, "pet" );
+	Msg("Panel 2: %d\n" , pPanel );
+	//particlesystempropertiespanel
+}
+#endif // 0

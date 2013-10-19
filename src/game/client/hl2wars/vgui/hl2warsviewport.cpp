@@ -369,10 +369,10 @@ void HL2WarsViewport::DrawSelectBox()
 
 	// Draw the selection box
 	short xmin, ymin, xmax, ymax;
-	xmin = MIN( leftpressed.m_iX, curdata.m_iX );
-	xmax = MAX( leftpressed.m_iX, curdata.m_iX );
-	ymin = MIN( leftpressed.m_iY, curdata.m_iY );
-	ymax = MAX( leftpressed.m_iY, curdata.m_iY );
+	xmin = Min( leftpressed.m_iX, curdata.m_iX );
+	xmax = Max( leftpressed.m_iX, curdata.m_iX );
+	ymin = Min( leftpressed.m_iY, curdata.m_iY );
+	ymax = Max( leftpressed.m_iY, curdata.m_iY );
 
 	vgui::surface()->DrawSetColor( Color( 0, 0, 0, 115 ) );
 	vgui::surface()->DrawOutlinedRect( xmin, ymin, xmax, ymax );

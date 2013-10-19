@@ -241,7 +241,7 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 				fSpeed = pEnt->GetSmoothedVelocity().Length();
 #endif // CLIENT_DLL
 				fDist = (tr.endpos - pEnt->GetAbsOrigin()).Length();
-				if( fDist < MOUSE_ENT_TOLERANCE * MAX(0.1, (fSpeed/125.0)) )
+				if( fDist < MOUSE_ENT_TOLERANCE * Max(0.1, (fSpeed/125.0)) )
 				{
 					if( pBest )
 					{
@@ -651,10 +651,10 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 	if( abs( GetMouseDataLeftPressed().m_iX - GetMouseDataLeftReleased().m_iX ) > XRES( cl_mouse_selectionbox_threshold.GetInt() ) ||
 		abs( GetMouseDataLeftPressed().m_iY - GetMouseDataLeftReleased().m_iY ) > YRES( cl_mouse_selectionbox_threshold.GetInt() ) )
 	{
-		SelectBox(	MIN( GetMouseDataLeftPressed().m_iX, GetMouseDataLeftReleased().m_iX ), 
-					MIN( GetMouseDataLeftPressed().m_iY, GetMouseDataLeftReleased().m_iY ),
-					MAX( GetMouseDataLeftPressed().m_iX, GetMouseDataLeftReleased().m_iX ), 
-					MAX( GetMouseDataLeftPressed().m_iY, GetMouseDataLeftReleased().m_iY ));
+		SelectBox(	Min( GetMouseDataLeftPressed().m_iX, GetMouseDataLeftReleased().m_iX ), 
+					Min( GetMouseDataLeftPressed().m_iY, GetMouseDataLeftReleased().m_iY ),
+					Max( GetMouseDataLeftPressed().m_iX, GetMouseDataLeftReleased().m_iX ), 
+					Max( GetMouseDataLeftPressed().m_iY, GetMouseDataLeftReleased().m_iY ));
 		engine->ServerCmd( "player_cm" ); // Just clear mouse
 		return;
 	}

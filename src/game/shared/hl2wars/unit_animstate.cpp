@@ -689,7 +689,7 @@ void UnitAnimState::OptimizeLayerWeights( int iFirstLayer, int nLayers )
 	if ( pLayer->IsActive() && pLayer->GetWeight() > 0.0f )
 	{
 		float flWeight = 1.0f - totalWeight;
-		flWeight = MAX( flWeight, 0.0f );
+		flWeight = Max( flWeight, 0.0f );
 		pLayer->SetWeight( flWeight );
 	}
 
@@ -1196,7 +1196,7 @@ int UnitAnimState::ConvergeAngles( float goal,float maxrate, float maxgap, float
 	{
 		// gap is too big, jump
 		//maxmove = (anglediffabs - maxgap);
-		float flTooFar = MIN( anglediffabs - maxgap, maxmove * 5 );
+		float flTooFar = Min( anglediffabs - maxgap, maxmove * 5 );
 		if ( anglediff > 0 )
 		{
 			current += flTooFar;
@@ -1364,9 +1364,9 @@ void UnitAnimState::ComputePoseParam_Lean()
 		float targetLean = GetOuter()->GetPoseParameter( m_iMoveY ) * 30.0f;
 		float curLean = GetOuter()->GetPoseParameter( m_iLeanYaw );
 		if( curLean < targetLean )
-			curLean += MIN(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean += Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		else
-			curLean -= MIN(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean -= Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		SetOuterPoseParameter( m_iLeanYaw, curLean );
 	}
 
@@ -1375,9 +1375,9 @@ void UnitAnimState::ComputePoseParam_Lean()
 		float targetLean = GetOuter()->GetPoseParameter( m_iMoveX ) * -30.0f;
 		float curLean = GetOuter()->GetPoseParameter( m_iLeanPitch );
 		if( curLean < targetLean )
-			curLean += MIN(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean += Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		else
-			curLean -= MIN(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean -= Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		SetOuterPoseParameter( m_iLeanPitch, curLean );
 	}
 }

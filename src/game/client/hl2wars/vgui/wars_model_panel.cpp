@@ -358,10 +358,10 @@ void CWars_Model_Panel::LookAtBounds( const Vector &vecBoundsMin, const Vector &
 	Vector2D vecScreenMin( 99999.0f, 99999.0f ), vecScreenMax( -99999.0f, -99999.0f );
 	for ( int iPoint = 0; iPoint < 8; ++iPoint )
 	{
-		vecScreenMin.x = MIN( vecScreenMin.x, aScreenPoints[iPoint].x );
-		vecScreenMin.y = MIN( vecScreenMin.y, aScreenPoints[iPoint].y );
-		vecScreenMax.x = MAX( vecScreenMax.x, aScreenPoints[iPoint].x );
-		vecScreenMax.y = MAX( vecScreenMax.y, aScreenPoints[iPoint].y );
+		vecScreenMin.x = Min( vecScreenMin.x, aScreenPoints[iPoint].x );
+		vecScreenMin.y = Min( vecScreenMin.y, aScreenPoints[iPoint].y );
+		vecScreenMax.x = Max( vecScreenMax.x, aScreenPoints[iPoint].x );
+		vecScreenMax.y = Max( vecScreenMax.y, aScreenPoints[iPoint].y );
 	}
 
 	// Offset the model to the be the correct distance away from the camera.

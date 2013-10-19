@@ -44,7 +44,7 @@ void UnitBaseAirNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		if( GetPath()->GetCurWaypoint()->GetPos().z + 32.0f > GetAbsOrigin().z )
 		{
 			// Calculate needed up movement
-			/*MoveCommand.upmove = MIN(
+			/*MoveCommand.upmove = Min(
 				GetPath()->GetCurWaypoint()->GetPos().z - GetAbsOrigin().z,
 				MoveCommand.maxspeed
 			);*/

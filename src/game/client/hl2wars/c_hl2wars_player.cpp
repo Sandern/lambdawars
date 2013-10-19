@@ -496,14 +496,14 @@ C_BaseCombatWeapon *C_HL2WarsPlayer::GetWeapon( int i ) const
 static void UpdateMinMaxUnit( const Vector &vPoint, int &iXMin, int &iYMin, int &iXMax, int &iYMax )
 {
 	int iX, iY;
-	bool bInScreen = GetVectorInScreenSpace(vPoint, iX, iY);
+	bool bInScreen = GetVectorInScreenSpace( vPoint, iX, iY );
 	if( !bInScreen )
 		return;
 
-	iXMin = MIN(iX, iXMin);
-	iYMin = MIN(iY, iYMin);
-	iXMax = MAX(iX, iXMax);
-	iYMax = MAX(iY, iYMax);
+	iXMin = Min( iX, iXMin );
+	iYMin = Min( iY, iYMin );
+	iXMax = Max( iX, iXMax );
+	iYMax = Max( iY, iYMax );
 }
 
 //-----------------------------------------------------------------------------
