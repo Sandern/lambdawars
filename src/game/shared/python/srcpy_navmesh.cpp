@@ -158,12 +158,12 @@ Vector RandomNavAreaPosition( float minimumarea, int maxtries )
 		Vector othermins, othermaxs;
 		pEnt->GetMapBoundary( othermins, othermaxs );
 
-		mins.x = MIN(mins.x, othermins.x);
-		mins.y = MIN(mins.y, othermins.y);
-		mins.z = MIN(mins.z, othermins.z);
-		maxs.x = MAX(maxs.x, othermaxs.x);
-		maxs.y = MAX(maxs.y, othermaxs.y);
-		maxs.z = MAX(maxs.z, othermaxs.z);
+		mins.x = Min(mins.x, othermins.x);
+		mins.y = Min(mins.y, othermins.y);
+		mins.z = Min(mins.z, othermins.z);
+		maxs.x = Max(maxs.x, othermaxs.x);
+		maxs.y = Max(maxs.y, othermaxs.y);
+		maxs.z = Max(maxs.z, othermaxs.z);
 	}
 
 	return RandomNavAreaPositionWithin( mins, maxs, minimumarea, maxtries );
@@ -534,16 +534,12 @@ typedef struct HidingSpotResult_t
 	float fDist;
 } HidingSpotResult_t;
 
-#define USE_NAVAREA_BASED_DIST
 class HidingSpotCollector
 {
 public:
 	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : 
 			m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL)
 	{
-#ifndef USE_NAVAREA_BASED_DIST
-		m_fRadiusSqr = fRadius * fRadius;
-#else
 		m_fRadius = fRadius;
 
 		if( vPos.IsValid() )
@@ -565,7 +561,6 @@ public:
 				NDebugOverlay::Text( vPos, buf, false, HIDESPOT_DEBUG_DURATION );
 			}
 		}
-#endif // USE_NAVAREA_BASED_DIST
 	}
 
 	bool operator() ( CNavArea *area )
@@ -628,11 +623,6 @@ public:
 			//if( !pSpot->HasGoodCover() )
 			//	continue;
 
-#ifndef USE_NAVAREA_BASED_DIST
-			float fDist = (vPos - m_vPos).LengthSqr();
-			if( fDist < m_fRadiusSqr )
-				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
-#else
 			if( fDist < m_fRadius )
 			{
 				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, /*m_pUnit ? (vPos - m_pUnit->GetAbsOrigin()).LengthSqr() :*/ fDist ) );
@@ -646,20 +636,15 @@ public:
 					NDebugOverlay::Box( pSpot->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, true, HIDESPOT_DEBUG_DURATION );
 				}
 			}
-#endif // USE_NAVAREA_BASED_DIST
 		}
 
 		return true;
 	}
 
 private:
-#ifndef USE_NAVAREA_BASED_DIST
-	float m_fRadiusSqr;
-#else
 	CUnitBase *m_pUnit;
 	CNavArea *m_pOrderArea;
 	float m_fRadius;
-#endif // USE_NAVAREA_BASED_DIST
 	const Vector &m_vPos;
 	CUtlVector< HidingSpotResult_t > &m_HidingSpots;
 };
@@ -694,7 +679,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
 	if( g_pynavmesh_hidespot_searchmethod.GetInt() == 1 )
 	{
-		TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, MAX(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
+		TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, Max(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
 	}
 	else
 	{
