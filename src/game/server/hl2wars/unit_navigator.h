@@ -341,6 +341,7 @@ public:
 	Vector m_vStartPosition; // The initial start position of the unit
 	float m_fMaxMoveDist;
 	bool m_bSuccess; // Can be queried after path completion by other components
+	boost::python::object m_fnCustomLOSCheck;
 };
 
 #define CONSIDER_SIZE 48

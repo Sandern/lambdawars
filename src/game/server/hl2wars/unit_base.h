@@ -21,33 +21,33 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 class BaseAnimEventHandler
 {
 public:
-	virtual void HandleEvent(CUnitBase *pUnit, animevent_t *event) {}
+	virtual void HandleEvent( CUnitBase *pUnit, animevent_t *event ) {}
 };
 
 class EmitSoundAnimEventHandler : public BaseAnimEventHandler
 {
 public:
-	EmitSoundAnimEventHandler(const char *soundscript);
+	EmitSoundAnimEventHandler( const char *soundscript );
 
-	void HandleEvent(CUnitBase *pUnit, animevent_t *event);
+	void HandleEvent( CUnitBase *pUnit, animevent_t *event );
 
 private:
-	char m_SoundScript[ 256 ];
+	char m_SoundScript[256];
 };
 
 
 class TossGrenadeAnimEventHandler : public BaseAnimEventHandler
 {
 public:
-	TossGrenadeAnimEventHandler(const char *pEntityName, float fSpeed);
+	TossGrenadeAnimEventHandler( const char *pEntityName, float fSpeed );
 
-	virtual void HandleEvent(CUnitBase *pUnit, animevent_t *event) {}
+	virtual void HandleEvent( CUnitBase *pUnit, animevent_t *event ) {}
 
-	bool GetTossVector(CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut );
-	CBaseEntity *TossGrenade(CUnitBase *pUnit, Vector &vecStartPos, Vector &vecTarget, int iCollisionGroup);
+	bool GetTossVector( CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut );
+	CBaseEntity *TossGrenade( CUnitBase *pUnit, Vector &vecStartPos, Vector &vecTarget, int iCollisionGroup );
 
 private:
-	char m_EntityName[ 40 ];
+	char m_EntityName[40];
 	float m_fSpeed;
 };
 

@@ -41,7 +41,7 @@ static ConVar unit_nextserveranimupdatetime("unit_nextserveranimupdatetime", "0.
 extern ConVar sv_gravity;
 Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance, int iCollisionGroup )
 {
-	flSpeed = MAX( 1.0f, flSpeed );
+	flSpeed = Max( 1.0f, flSpeed );
 
 	float flGravity = sv_gravity.GetFloat();
 
@@ -115,13 +115,13 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 	return vecGrenadeVel;
 }
 
-TossGrenadeAnimEventHandler::TossGrenadeAnimEventHandler(const char *pEntityName, float fSpeed)
+TossGrenadeAnimEventHandler::TossGrenadeAnimEventHandler( const char *pEntityName, float fSpeed )
 {
-	Q_strncpy(m_EntityName, pEntityName, 40);
+	V_strncpy( m_EntityName, pEntityName, 40 );
 	m_fSpeed = fSpeed;
 }
 
-bool TossGrenadeAnimEventHandler::GetTossVector(CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut )
+bool TossGrenadeAnimEventHandler::GetTossVector( CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut )
 {
 	if( !pUnit || !vecOut )
 		return false;
@@ -146,7 +146,7 @@ bool TossGrenadeAnimEventHandler::GetTossVector(CUnitBase *pUnit, const Vector &
 	return true;
 }
 
-CBaseEntity *TossGrenadeAnimEventHandler::TossGrenade(CUnitBase *pUnit, Vector &vecStartPos, Vector &vecTarget, int iCollisionGroup)
+CBaseEntity *TossGrenadeAnimEventHandler::TossGrenade( CUnitBase *pUnit, Vector &vecStartPos, Vector &vecTarget, int iCollisionGroup )
 {
 	if( !pUnit )
 		return NULL;

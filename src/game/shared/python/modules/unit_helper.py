@@ -209,6 +209,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_fMaxMoveDist').rename('maxmovedist')
         cls.var('m_vStartPosition').rename('startposition')
         cls.var('m_bSuccess').rename('success')
+        cls.var('m_fnCustomLOSCheck').rename('fncustomloscheck')
         
         cls.mem_fun('GetTarget').exclude()
         cls.mem_fun('SetTarget').exclude()

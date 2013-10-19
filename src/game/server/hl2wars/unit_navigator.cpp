@@ -1481,7 +1481,23 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		if( (GetPath()->m_iGoalFlags & GF_NOLOSREQUIRED) == 0 )
 		{
 			// Check LOS
-			if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
+			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
+			{
+				try
+				{
+					if( !GetPath()->m_fnCustomLOSCheck( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ), GetPath()->m_hTarget->GetPyHandle() ) )
+					{
+						if( unit_navigator_debug_inrange.GetBool() )
+							DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS to target using HasRangeAttackLOS\n", GetOuter()->entindex() );
+						return false;
+					}
+				}
+				catch( boost::python::error_already_set & )
+				{
+					PyErr_Print();
+				}
+			}
+			else if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
 			{
 				if( !m_pOuter->HasRangeAttackLOS( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ) ) )
 				{
@@ -1530,15 +1546,34 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		{
 			Vector vTestPos = GetPath()->m_vGoalPos;
 
-			// Check own los
-			trace_t result;
-			CTraceFilterNoNPCsOrPlayer traceFilter( NULL, COLLISION_GROUP_NONE );
-			UTIL_TraceLine( m_pOuter->EyePosition(), vTestPos, MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &result );
-			if (result.fraction != 1.0f)
+			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
 			{
-				if( unit_navigator_debug_inrange.GetBool() )
-					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS\n", GetOuter()->entindex() );
-				return false;
+				try
+				{
+					if( !GetPath()->m_fnCustomLOSCheck( vTestPos, NULL ) )
+					{
+						if( unit_navigator_debug_inrange.GetBool() )
+							DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS to target using HasRangeAttackLOS\n", GetOuter()->entindex() );
+						return false;
+					}
+				}
+				catch( boost::python::error_already_set & )
+				{
+					PyErr_Print();
+				}
+			}
+			else
+			{
+				// Check own los
+				trace_t result;
+				CTraceFilterNoNPCsOrPlayer traceFilter( NULL, COLLISION_GROUP_NONE );
+				UTIL_TraceLine( m_pOuter->EyePosition(), vTestPos, MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &traceFilter, &result );
+				if (result.fraction != 1.0f)
+				{
+					if( unit_navigator_debug_inrange.GetBool() )
+						DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS\n", GetOuter()->entindex() );
+					return false;
+				}
 			}
 		}
 

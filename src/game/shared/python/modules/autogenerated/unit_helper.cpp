@@ -4303,6 +4303,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBasePath_exposer.def_readwrite( "maxmovedist", &UnitBasePath::m_fMaxMoveDist );
         UnitBasePath_exposer.def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange );
         UnitBasePath_exposer.def_readwrite( "minrange", &UnitBasePath::m_fMinRange );
+        UnitBasePath_exposer.def_readwrite( "fncustomloscheck", &UnitBasePath::m_fnCustomLOSCheck );
         UnitBasePath_exposer.def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags );
         UnitBasePath_exposer.def_readwrite( "goaltype", &UnitBasePath::m_iGoalType );
         UnitBasePath_exposer.def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos );
