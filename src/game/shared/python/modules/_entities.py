@@ -695,8 +695,8 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('RemoveFromEntityList').include()
                 mb.enum('entity_list_ids_t').include()
         else:
-            mb.mem_funs('PySendEvent').include()
-            mb.mem_funs('PySendEvent').rename('SendEvent')
+            cls.mem_funs('PySendEvent').include()
+            cls.mem_funs('PySendEvent').rename('SendEvent')
             self.IncludeVarAndRename('m_flPrevAnimTime', 'prevanimtime')
             self.IncludeVarAndRename('m_nNextThinkTick', 'nextthinktick')
             self.IncludeVarAndRename('m_nLastThinkTick', 'lastthinktick')

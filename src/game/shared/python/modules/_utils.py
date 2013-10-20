@@ -244,9 +244,7 @@ class Utils(SemiSharedModuleGenerator):
         ]
         for clsname in tracefilters:
             self.SetupTraceFilter(mb, clsname)
-            
-        mb.mem_funs('ShouldHitEntity').exclude()
-
+        
         mb.class_('CTraceFilterSimple').rename('CTraceFilterSimpleInternal')
         mb.class_('CPyTraceFilterSimple').rename('CTraceFilterSimple')
         

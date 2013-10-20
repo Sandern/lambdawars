@@ -76,10 +76,11 @@
 #include "fowmgr.h"
 
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
-	#include "srcpy_util.h"
-	#include "srcpy_networkvar.h"
-	#include "srcpy_usermessage.h"
+#include "srcpy.h"
+#include "srcpy_util.h"
+#include "srcpy_networkvar.h"
+#include "srcpy_usermessage.h"
+#include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -678,12 +679,15 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt( SENDINFO(m_nMaxGPULevel),				GPU_LEVEL_BIT_COUNT, SPROP_UNSIGNED ),
 #endif
 
+#ifdef HL2WARS_DLL
 	// Hl2wars data
 	SendPropInt	(SENDINFO( m_iOwnerNumber ),				4, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hMousePassEntity)),
 	SendPropInt( SENDINFO( m_nFOWFlags ),					FOWFLAG_BITCOUNT, SPROP_UNSIGNED ),
 	SendPropFloat(SENDINFO(m_fViewDistance),				0, SPROP_COORD),
+#endif // HL2WARS_DLL
 
+#ifdef ENABLE_PYTHON
 	// Free Python sendprops
 	SendPropFloat	(SENDINFO( m_PySendPropFloat1 ),				0, SPROP_NOSCALE ),
 	SendPropFloat	(SENDINFO( m_PySendPropFloat2 ),				0, SPROP_NOSCALE ),
@@ -693,6 +697,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt	(SENDINFO( m_PySendPropInt2 ),				15, 0 ),
 	SendPropInt	(SENDINFO( m_PySendPropInt3 ),				15, 0 ),
 	SendPropInt	(SENDINFO( m_PySendPropInt4 ),				15, 0 ),
+#endif // ENABLE_PYTHON
 END_SEND_TABLE()
 
 CBaseEntity::CBaseEntity( bool bServerOnly )
@@ -2487,12 +2492,14 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_THINKFUNC( PyThink ),
 #endif // ENABLE_PYTHON
 
+#ifdef HL2WARS_DLL
 	DEFINE_FIELD( m_iOwnerNumber, FIELD_INTEGER ),
 	DEFINE_FIELD( m_hMousePassEntity, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_nFOWFlagsIntern, FIELD_INTEGER ),
 	DEFINE_FIELD( m_fViewDistance, FIELD_FLOAT ),
 
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "ChangeOwner", InputChangeOwnerNumber ),
+#endif // HL2WARS_DLL
 END_DATADESC()
 
 BEGIN_ENT_SCRIPTDESC_ROOT( CBaseEntity, "Root class of all server-side entities" )
@@ -8962,10 +8969,9 @@ void CBaseEntity::PyDeallocate(PyObject* self_, void *storage)
 //------------------------------------------------------------------------------
 // Purpose: 
 //------------------------------------------------------------------------------
-extern void PySendEvent(IRecipientFilter &filter, EHANDLE ent, int event, int data);
 void CBaseEntity::PySendEvent( IRecipientFilter &filter, int event, int data )
 {
-	::PySendEvent(filter, this, event, data);
+	::PySendEvent( filter, this, event, data );
 }
 
 //------------------------------------------------------------------------------
