@@ -499,6 +499,36 @@ struct C_FuncBrush_wrapper : C_FuncBrush, bp::wrapper< C_FuncBrush > {
         C_BaseEntity::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
     }
 
+    virtual void NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "NotifyShouldTransmit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling NotifyShouldTransmit( state ) of Class: C_BaseEntity\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
+        if( func_NotifyShouldTransmit.ptr() != Py_None )
+            try {
+                func_NotifyShouldTransmit( state );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseEntity::NotifyShouldTransmit( state );
+            }
+        else
+            this->C_BaseEntity::NotifyShouldTransmit( state );
+    }
+    
+    void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
+        C_BaseEntity::NotifyShouldTransmit( state );
+    }
+
     virtual void OnChangeOwnerNumber( int old_owner_number ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -587,36 +617,6 @@ struct C_FuncBrush_wrapper : C_FuncBrush, bp::wrapper< C_FuncBrush > {
     
     void default_Precache(  ) {
         C_BaseEntity::Precache( );
-    }
-
-    virtual void PyNotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "NotifyShouldTransmit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyNotifyShouldTransmit( state ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
-        if( func_NotifyShouldTransmit.ptr() != Py_None )
-            try {
-                func_NotifyShouldTransmit( state );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_BaseEntity::PyNotifyShouldTransmit( state );
-            }
-        else
-            this->C_BaseEntity::PyNotifyShouldTransmit( state );
-    }
-    
-    void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        C_BaseEntity::PyNotifyShouldTransmit( state );
     }
 
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
@@ -893,6 +893,11 @@ void register_C_FuncBrush_class(){
             , (void ( C_FuncBrush_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_FuncBrush_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
+            "NotifyShouldTransmit"
+            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::NotifyShouldTransmit)
+            , (void ( C_FuncBrush_wrapper::* )( ::ShouldTransmitState_t ) )(&C_FuncBrush_wrapper::default_NotifyShouldTransmit)
+            , ( bp::arg("state") ) )    
+        .def( 
             "OnChangeOwnerNumber"
             , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
             , (void ( C_FuncBrush_wrapper::* )( int ) )(&C_FuncBrush_wrapper::default_OnChangeOwnerNumber)
@@ -905,11 +910,6 @@ void register_C_FuncBrush_class(){
             "Precache"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Precache)
             , (void ( C_FuncBrush_wrapper::* )(  ) )(&C_FuncBrush_wrapper::default_Precache) )    
-        .def( 
-            "NotifyShouldTransmit"
-            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::PyNotifyShouldTransmit)
-            , (void ( C_FuncBrush_wrapper::* )( ::ShouldTransmitState_t ) )(&C_FuncBrush_wrapper::default_NotifyShouldTransmit)
-            , ( bp::arg("state") ) )    
         .def( 
             "ReceiveMessage"
             , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)

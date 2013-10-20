@@ -197,6 +197,7 @@ class Entities(SemiSharedModuleGenerator):
         '#%team.h',
         '$%c_team.h',
         '%mapentities_shared.h',
+        '%ai_responsesystem.h',
         
         # Effects. Would be nice to remove these since they can be achieved using the particle system.
         'Sprite.h',
@@ -392,7 +393,10 @@ class Entities(SemiSharedModuleGenerator):
             reference_t(const_t(declarated_t(ray))),
             pointer_t(declarated_t(mb.class_('ICollideable'))),
         ]
-        cls.calldefs(calldef_withtypes( excludetypes ), allow_empty=True).exclude()
+        if self.settings.branch == 'swarm':
+            # In source2013, this only exists on the server
+            excludetypes.append(pointer_t(declarated_t(mb.class_('IResponseSystem'))))
+        cls.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
         
         # Returning a physics object -> Convert by value, which results in the wrapper object being returned
         physicsobject = mb.class_('IPhysicsObject')
@@ -434,6 +438,7 @@ class Entities(SemiSharedModuleGenerator):
             commandcontext = mb.class_('C_CommandContext')
             cls.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(commandcontext))), allow_empty=True).exclude()
             
+            # Exclude a list of functions with certain types
             interpvarvector = mb.class_('CInterpolatedVar< Vector >')
             interpvarqangle = mb.class_('CInterpolatedVar< QAngle >')
             excludetypes = [
@@ -473,7 +478,13 @@ class Entities(SemiSharedModuleGenerator):
                 pointer_t(declarated_t(mb.class_('IServerVehicle'))),
                 pointer_t(const_t(declarated_t(mb.class_('IServerVehicle')))),
                 pointer_t(declarated_t(mb.class_('IServerNetworkable'))),
+                pointer_t(declarated_t(mb.class_('CEventAction'))),
+                pointer_t(declarated_t(mb.class_('CCheckTransmitInfo'))),
+                pointer_t(const_t(declarated_t(mb.class_('CCheckTransmitInfo')))),
             ]
+            if self.settings.branch == 'source2013':
+                # In swarm, this also exists on the server
+                excludetypes.append(pointer_t(declarated_t(mb.class_('IResponseSystem'))))
             cls.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
 
         # Spawning helper
@@ -569,6 +580,7 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetBaseEntity').exclude()          # Automatically done by converter
         mb.mem_funs('GetBaseAnimating').exclude() # Automatically done by converter
         mb.mem_funs('MyCombatCharacterPointer').exclude() # Automatically done by converter
+        mb.mem_funs('MyNPCPointer').exclude()
         mb.mem_funs('MyCombatWeaponPointer').exclude() # Automatically done by converter
         
         mb.mem_funs('ThinkSet').exclude()               # Replaced by SetPyThink
@@ -612,10 +624,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('ClientThink').virtuality = 'virtual'
             mb.mem_funs('OnDataChanged').virtuality = 'virtual'
             mb.mem_funs('Simulate').virtuality = 'virtual'
-            mb.mem_funs('NotifyShouldTransmit').exclude()
-            mb.mem_funs('PyNotifyShouldTransmit').rename('NotifyShouldTransmit')
-            mb.mem_funs('PyNotifyShouldTransmit').virtuality = 'virtual'
-            
+            mb.mem_funs('NotifyShouldTransmit').virtuality = 'virtual'
             mb.mem_funs('PyReceiveMessage').virtuality = 'virtual'
             mb.mem_funs('PyReceiveMessage').rename('ReceiveMessage')
 
@@ -632,6 +641,9 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('PhysicsAddHalfGravity').exclude() # No definition on the client
             cls.mem_funs('SetModelPointer').exclude() # Likely never needed, can use SetModel or SetModelIndex
             mb.mem_funs('OnNewModel').exclude() # TODO
+            cls.mem_fun('OnNewParticleEffect').exclude()
+            if self.settings.branch == 'swarm':
+                cls.mem_fun('OnParticleEffectDeleted').exclude()
             
             mb.mem_funs('AllocateIntermediateData').exclude()
             mb.mem_funs('DestroyIntermediateData').exclude()
@@ -639,6 +651,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetPredictedFrame').exclude()
             mb.mem_funs('GetOriginalNetworkDataObject').exclude()
             mb.mem_funs('IsIntermediateDataAllocated').exclude()
+            cls.mem_funs('AttemptToPowerup').exclude() # CDamageModifier has no class on the client...
             
             mb.mem_funs('PyUpdateNetworkVar').exclude() # Internal for network vars
             
@@ -671,17 +684,7 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_nLastThinkTick', 'lastthinktick')  
             self.IncludeVarAndRename('m_iClassname', 'classname')    
             self.IncludeVarAndRename('m_flSpeed', 'speed')
-                    
-            # Don't give a shit about the following functions
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_AI_BaseNPC') != -1 ).exclude()
-            
-            # Exclude the following for now until we decide if we want them ( need fixes/exposed classes )
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CNewParticleEffect') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseHandle') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CDamageModifier') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'Quaternion') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'SpatializationInfo_t') ).exclude()
-            
+
             # Client thinking vars
             mb.add_registration_code( "bp::scope().attr( \"CLIENT_THINK_ALWAYS\" ) = CLIENT_THINK_ALWAYS;" )
             mb.add_registration_code( "bp::scope().attr( \"CLIENT_THINK_NEVER\" ) = CLIENT_THINK_NEVER;" )
@@ -708,7 +711,6 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_nDebugPlayer', 'debugplayer')
             self.IncludeVarAndRename('m_target', 'target')
             self.IncludeVarAndRename('m_iszDamageFilterName', 'damagefiltername')
-            
 
             # Properties
             self.SetupProperty(cls, 'health', 'GetHealth', 'SetHealth')
@@ -747,13 +749,10 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('DeathNotice').virtuality = 'virtual'
         
             # Excludes
-            mb.mem_funs('NetworkProp').exclude()            # Don't care
-            mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
-            mb.mem_funs('NotifySystemEvent').exclude()          # Don't care
-            mb.mem_funs('Entity').exclude()          # Don't care
-            mb.mem_funs('GetEntityNameAsCStr').exclude() # Always use GetEntityName()
-            
-            mb.mem_funs('EmitSentenceByIndex').exclude()    # Don't care for now
+            cls.mem_funs('NetworkProp').exclude()
+            cls.mem_funs('MyNextBotPointer').exclude()
+            mb.mem_funs('NotifySystemEvent').exclude()
+            mb.mem_funs('Entity').exclude()
             
             mb.mem_funs('PhysicsTestEntityPosition').exclude()  # Don't care  
             mb.mem_funs('PhysicsCheckRotateMove').exclude()     # Don't care  
@@ -762,14 +761,15 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('ForceVPhysicsCollide').exclude() # Don't care
             mb.mem_funs('GetGroundVelocityToApply').exclude() # Don't care
             mb.mem_funs('GetMaxHealth').exclude() # Use property maxhealth
-            mb.mem_funs('FOWShouldTransmit').exclude()
             mb.mem_funs('SetModelIndex').exclude()
             
             if self.settings.branch == 'swarm':
+                mb.mem_funs('GetEntityNameAsCStr').exclude() # Always use GetEntityName()
+                
                 mb.mem_funs('SendProxy_AnglesX').exclude()
                 mb.mem_funs('SendProxy_AnglesY').exclude()
                 mb.mem_funs('SendProxy_AnglesZ').exclude()
-			
+                
                 mb.mem_funs('FindNamedOutput').exclude()
                 mb.mem_funs('GetBaseAnimatingOverlay').exclude()
                 mb.mem_funs('GetContextData').exclude()
@@ -777,29 +777,15 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetScriptInstance').exclude()
                 mb.mem_funs('GetScriptOwnerEntity').exclude()
                 mb.mem_funs('GetScriptScope').exclude()
-                mb.mem_funs('MyNextBotPointer').exclude()
                 mb.mem_funs('ScriptFirstMoveChild').exclude()
                 mb.mem_funs('ScriptGetModelKeyValues').exclude()
                 mb.mem_funs('ScriptGetMoveParent').exclude()
                 mb.mem_funs('ScriptGetRootMoveParent').exclude()
                 mb.mem_funs('ScriptNextMovePeer').exclude()
                 mb.mem_funs('InputDispatchEffect').exclude() # No def?
-          
-            # Call policies
-            mb.mem_funs('GetResponseSystem').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-
-            # Don't give a shit about the following functions
-           # mb.mem_funs( lambda decl: HasArgType(decl, 'CAI_BaseNPC') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CAI_BaseNPC') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'IEntitySaveUtils') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CEventAction') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CCheckTransmitInfo') ).exclude()
-            
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IResponseSystem') != -1 ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CSkyCamera') != -1 ).exclude()
             
             # Do not want the firebullets function with multiple arguments. Only the one with the struct.
-            mb.mem_funs( name='FireBullets', function=lambda decl: HasArgType(decl, 'int') ).exclude()
+            mb.mem_funs(name='FireBullets', function=calldef_withtypes('int')).exclude()
 
     def ParseBaseAnimating(self, mb):
         cls = mb.class_('C_BaseAnimating' if self.isclient else 'CBaseAnimating')
@@ -1011,6 +997,7 @@ class Entities(SemiSharedModuleGenerator):
             
     def ParseBasePlayer(self, mb):
         cls = mb.class_('C_BasePlayer') if self.isclient else mb.class_('CBasePlayer')
+ 
         self.IncludeVarAndRename('m_nButtons', 'buttons')
         self.IncludeVarAndRename('m_afButtonLast', 'buttonslast')
         self.IncludeVarAndRename('m_afButtonPressed', 'buttonspressed')
@@ -1178,6 +1165,7 @@ class Entities(SemiSharedModuleGenerator):
         
         mb.mem_funs('CanBeSeenBy').exclude()
         if self.isserver:
+            mb.mem_funs('FOWShouldTransmit').exclude()
             mb.mem_funs('DensityMap').exclude() # Don't care for now.
     
     def ParseHL2WarsPlayer(self, mb):

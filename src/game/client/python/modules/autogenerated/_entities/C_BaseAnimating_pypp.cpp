@@ -84,6 +84,36 @@ struct C_BaseAnimating_wrapper : C_BaseAnimating, bp::wrapper< C_BaseAnimating >
         return bp::make_tuple( result, minValue2, maxValue2 );
     }
 
+    virtual void NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
+        #if defined(_WIN32)
+        #if defined(_DEBUG)
+        Assert( SrcPySystem()->IsPythonRunning() );
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+        #elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "NotifyShouldTransmit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+        #endif // _DEBUG/PY_CHECKTHREADID
+        #endif // _WIN32
+        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling NotifyShouldTransmit( state ) of Class: C_BaseAnimating\n");
+        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
+        if( func_NotifyShouldTransmit.ptr() != Py_None )
+            try {
+                func_NotifyShouldTransmit( state );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseAnimating::NotifyShouldTransmit( state );
+            }
+        else
+            this->C_BaseAnimating::NotifyShouldTransmit( state );
+    }
+    
+    void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
+        C_BaseAnimating::NotifyShouldTransmit( state );
+    }
+
     virtual void OnDataChanged( ::DataUpdateType_t updateType ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -658,36 +688,6 @@ struct C_BaseAnimating_wrapper : C_BaseAnimating, bp::wrapper< C_BaseAnimating >
         C_BaseEntity::Precache( );
     }
 
-    virtual void PyNotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "NotifyShouldTransmit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyNotifyShouldTransmit( state ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
-        bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
-        if( func_NotifyShouldTransmit.ptr() != Py_None )
-            try {
-                func_NotifyShouldTransmit( state );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_BaseEntity::PyNotifyShouldTransmit( state );
-            }
-        else
-            this->C_BaseEntity::PyNotifyShouldTransmit( state );
-    }
-    
-    void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        C_BaseEntity::PyNotifyShouldTransmit( state );
-    }
-
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
         #if defined(_WIN32)
         #if defined(_DEBUG)
@@ -875,6 +875,16 @@ void register_C_BaseAnimating_class(){
         bp::scope().attr("NUM_BONECTRLS") = (int)C_BaseAnimating::NUM_BONECTRLS;
         bp::class_< C_BaseAnimating::AutoAllowBoneAccess >( "AutoAllowBoneAccess", bp::init< bool, bool >(( bp::arg("bAllowForNormalModels"), bp::arg("bAllowForViewModels") )) );
         C_BaseAnimating_exposer.def( bp::init< >() );
+        { //::C_BaseAnimating::AccumulateLayers
+        
+            typedef void ( ::C_BaseAnimating::*AccumulateLayers_function_type )( ::IBoneSetup &,::Vector *,::Quaternion *,float ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "AccumulateLayers"
+                , AccumulateLayers_function_type( &::C_BaseAnimating::AccumulateLayers )
+                , ( bp::arg("boneSetup"), bp::arg("pos"), bp::arg("q"), bp::arg("currentTime") ) );
+        
+        }
         { //::C_BaseAnimating::AddToClientSideAnimationList
         
             typedef void ( ::C_BaseAnimating::*AddToClientSideAnimationList_function_type )(  ) ;
@@ -902,6 +912,16 @@ void register_C_BaseAnimating_class(){
                 "BecomeRagdollOnClient"
                 , BecomeRagdollOnClient_function_type( &::C_BaseAnimating::BecomeRagdollOnClient )
                 , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BaseAnimating::BuildTransformations
+        
+            typedef void ( ::C_BaseAnimating::*BuildTransformations_function_type )( ::CStudioHdr *,::Vector *,::Quaternion *,::matrix3x4_t const &,int,::CBoneBitList & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "BuildTransformations"
+                , BuildTransformations_function_type( &::C_BaseAnimating::BuildTransformations )
+                , ( bp::arg("pStudioHdr"), bp::arg("pos"), bp::arg("q"), bp::arg("cameraTransform"), bp::arg("boneMask"), bp::arg("boneComputed") ) );
         
         }
         { //::C_BaseAnimating::CalcBoneMerge
@@ -1352,6 +1372,16 @@ void register_C_BaseAnimating_class(){
                 "GetAttachmentLocal"
                 , GetAttachmentLocal_function_type( &::C_BaseAnimating::GetAttachmentLocal )
                 , ( bp::arg("iAttachment"), bp::arg("origin") ) );
+        
+        }
+        { //::C_BaseAnimating::GetAttachmentVelocity
+        
+            typedef bool ( ::C_BaseAnimating::*GetAttachmentVelocity_function_type )( int,::Vector &,::Quaternion & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetAttachmentVelocity"
+                , GetAttachmentVelocity_function_type( &::C_BaseAnimating::GetAttachmentVelocity )
+                , ( bp::arg("number"), bp::arg("originVel"), bp::arg("angleVel") ) );
         
         }
         { //::C_BaseAnimating::GetBlendedLinearVelocity
@@ -1821,6 +1851,16 @@ void register_C_BaseAnimating_class(){
                 , GetServerIntendedCycle_function_type( &::C_BaseAnimating::GetServerIntendedCycle ) );
         
         }
+        { //::C_BaseAnimating::GetSoundSpatialization
+        
+            typedef bool ( ::C_BaseAnimating::*GetSoundSpatialization_function_type )( ::SpatializationInfo_t & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetSoundSpatialization"
+                , GetSoundSpatialization_function_type( &::C_BaseAnimating::GetSoundSpatialization )
+                , ( bp::arg("info") ) );
+        
+        }
         { //::C_BaseAnimating::GetToolRecordingState
         
             typedef void ( ::C_BaseAnimating::*GetToolRecordingState_function_type )( ::KeyValues * ) ;
@@ -2142,6 +2182,16 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("label") ) );
         
         }
+        { //::C_BaseAnimating::MaintainSequenceTransitions
+        
+            typedef void ( ::C_BaseAnimating::*MaintainSequenceTransitions_function_type )( ::IBoneSetup &,float,::Vector *,::Quaternion * ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "MaintainSequenceTransitions"
+                , MaintainSequenceTransitions_function_type( &::C_BaseAnimating::MaintainSequenceTransitions )
+                , ( bp::arg("boneSetup"), bp::arg("flCycle"), bp::arg("pos"), bp::arg("q") ) );
+        
+        }
         { //::C_BaseAnimating::MarkForThreadedBoneSetup
         
             typedef void ( ::C_BaseAnimating::*MarkForThreadedBoneSetup_function_type )(  ) ;
@@ -2149,6 +2199,18 @@ void register_C_BaseAnimating_class(){
             C_BaseAnimating_exposer.def( 
                 "MarkForThreadedBoneSetup"
                 , MarkForThreadedBoneSetup_function_type( &::C_BaseAnimating::MarkForThreadedBoneSetup ) );
+        
+        }
+        { //::C_BaseAnimating::NotifyShouldTransmit
+        
+            typedef void ( ::C_BaseAnimating::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
+            typedef void ( C_BaseAnimating_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "NotifyShouldTransmit"
+                , NotifyShouldTransmit_function_type(&::C_BaseAnimating::NotifyShouldTransmit)
+                , default_NotifyShouldTransmit_function_type(&C_BaseAnimating_wrapper::default_NotifyShouldTransmit)
+                , ( bp::arg("state") ) );
         
         }
         { //::C_BaseAnimating::OnDataChanged
@@ -2315,6 +2377,16 @@ void register_C_BaseAnimating_class(){
             C_BaseAnimating_exposer.def( 
                 "ResetSequenceInfo"
                 , ResetSequenceInfo_function_type( &::C_BaseAnimating::ResetSequenceInfo ) );
+        
+        }
+        { //::C_BaseAnimating::RetrieveRagdollInfo
+        
+            typedef bool ( ::C_BaseAnimating::*RetrieveRagdollInfo_function_type )( ::Vector *,::Quaternion * ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "RetrieveRagdollInfo"
+                , RetrieveRagdollInfo_function_type( &::C_BaseAnimating::RetrieveRagdollInfo )
+                , ( bp::arg("pos"), bp::arg("q") ) );
         
         }
         { //::C_BaseAnimating::SaveRagdollInfo
@@ -2631,6 +2703,16 @@ void register_C_BaseAnimating_class(){
                 , default_Simulate_function_type(&C_BaseAnimating_wrapper::default_Simulate) );
         
         }
+        { //::C_BaseAnimating::StandardBlendingRules
+        
+            typedef void ( ::C_BaseAnimating::*StandardBlendingRules_function_type )( ::CStudioHdr *,::Vector *,::QuaternionAligned *,float,int ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "StandardBlendingRules"
+                , StandardBlendingRules_function_type( &::C_BaseAnimating::StandardBlendingRules )
+                , ( bp::arg("pStudioHdr"), bp::arg("pos"), bp::arg("q"), bp::arg("currentTime"), bp::arg("boneMask") ) );
+        
+        }
         { //::C_BaseAnimating::StudioFrameAdvance
         
             typedef void ( ::C_BaseAnimating::*StudioFrameAdvance_function_type )(  ) ;
@@ -2667,6 +2749,16 @@ void register_C_BaseAnimating_class(){
                 "UncorrectViewModelAttachment"
                 , UncorrectViewModelAttachment_function_type( &::C_BaseAnimating::UncorrectViewModelAttachment )
                 , ( bp::arg("vOrigin") ) );
+        
+        }
+        { //::C_BaseAnimating::UnragdollBlend
+        
+            typedef void ( ::C_BaseAnimating::*UnragdollBlend_function_type )( ::CStudioHdr *,::Vector *,::Quaternion *,float ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "UnragdollBlend"
+                , UnragdollBlend_function_type( &::C_BaseAnimating::UnragdollBlend )
+                , ( bp::arg("hdr"), bp::arg("pos"), bp::arg("q"), bp::arg("currentTime") ) );
         
         }
         { //::C_BaseAnimating::UpdateClientSideAnimation
@@ -2910,18 +3002,6 @@ void register_C_BaseAnimating_class(){
                 "Precache"
                 , Precache_function_type(&::C_BaseEntity::Precache)
                 , default_Precache_function_type(&C_BaseAnimating_wrapper::default_Precache) );
-        
-        }
-        { //::C_BaseEntity::PyNotifyShouldTransmit
-        
-            typedef void ( ::C_BaseEntity::*NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            typedef void ( C_BaseAnimating_wrapper::*default_NotifyShouldTransmit_function_type )( ::ShouldTransmitState_t ) ;
-            
-            C_BaseAnimating_exposer.def( 
-                "NotifyShouldTransmit"
-                , NotifyShouldTransmit_function_type(&::C_BaseEntity::PyNotifyShouldTransmit)
-                , default_NotifyShouldTransmit_function_type(&C_BaseAnimating_wrapper::default_NotifyShouldTransmit)
-                , ( bp::arg("state") ) );
         
         }
         { //::C_BaseEntity::PyReceiveMessage

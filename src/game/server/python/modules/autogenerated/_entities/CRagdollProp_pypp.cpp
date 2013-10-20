@@ -1180,6 +1180,10 @@ void register_CRagdollProp_class(){
             , (void ( ::CRagdollProp::* )(  ) )(&::CRagdollProp::OnRestore)
             , (void ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_OnRestore) )    
         .def( 
+            "OnSave"
+            , (void ( ::CRagdollProp::* )( ::IEntitySaveUtils * ) )( &::CRagdollProp::OnSave )
+            , ( bp::arg("pUtils") ) )    
+        .def( 
             "OnTakeDamage"
             , (int ( ::CRagdollProp::* )( ::CTakeDamageInfo const & ) )(&::CRagdollProp::OnTakeDamage)
             , (int ( CRagdollProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CRagdollProp_wrapper::default_OnTakeDamage)

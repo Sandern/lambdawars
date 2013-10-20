@@ -1828,6 +1828,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("filter"), bp::arg("entindex"), bp::arg("token"), bp::arg("soundorigins"), bp::arg("duration"), bp::arg("warnifmissing")=(bool)(false) ) );
         
         }
+        { //::CBaseEntity::EmitSentenceByIndex
+        
+            typedef void ( *EmitSentenceByIndex_function_type )( ::IRecipientFilter &,int,int,int,float,::soundlevel_t,int,int,::Vector const *,::Vector const *,bool,float );
+            
+            CBaseEntity_exposer.def( 
+                "EmitSentenceByIndex"
+                , EmitSentenceByIndex_function_type( &::CBaseEntity::EmitSentenceByIndex )
+                , ( bp::arg("filter"), bp::arg("iEntIndex"), bp::arg("iChannel"), bp::arg("iSentenceIndex"), bp::arg("flVolume"), bp::arg("iSoundlevel"), bp::arg("iFlags")=(int)(0), bp::arg("iPitch")=(int)(100), bp::arg("pOrigin")=bp::object(), bp::arg("pDirection")=bp::object(), bp::arg("bUpdatePositions")=(bool)(true), bp::arg("soundtime")=0.0f ) );
+        
+        }
         { //::CBaseEntity::EndBlocked
         
             typedef void ( ::CBaseEntity::*EndBlocked_function_type )(  ) ;
@@ -2341,6 +2351,16 @@ void register_CBaseEntity_class(){
             CBaseEntity_exposer.def( 
                 "GetEntityName"
                 , GetEntityName_function_type( &::CBaseEntity::GetEntityName ) );
+        
+        }
+        { //::CBaseEntity::GetEntitySkybox
+        
+            typedef ::CSkyCamera * ( ::CBaseEntity::*GetEntitySkybox_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "GetEntitySkybox"
+                , GetEntitySkybox_function_type( &::CBaseEntity::GetEntitySkybox )
+                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::CBaseEntity::GetEyeAngleOffset
@@ -4140,6 +4160,16 @@ void register_CBaseEntity_class(){
                 "OnRestore"
                 , OnRestore_function_type(&::CBaseEntity::OnRestore)
                 , default_OnRestore_function_type(&CBaseEntity_wrapper::default_OnRestore) );
+        
+        }
+        { //::CBaseEntity::OnSave
+        
+            typedef void ( ::CBaseEntity::*OnSave_function_type )( ::IEntitySaveUtils * ) ;
+            
+            CBaseEntity_exposer.def( 
+                "OnSave"
+                , OnSave_function_type( &::CBaseEntity::OnSave )
+                , ( bp::arg("pSaveUtils") ) );
         
         }
         { //::CBaseEntity::OnTakeDamage
@@ -6647,6 +6677,7 @@ void register_CBaseEntity_class(){
         CBaseEntity_exposer.staticmethod( "Debug_Step" );
         CBaseEntity_exposer.staticmethod( "EmitAmbientSound" );
         CBaseEntity_exposer.staticmethod( "EmitCloseCaption" );
+        CBaseEntity_exposer.staticmethod( "EmitSentenceByIndex" );
         CBaseEntity_exposer.staticmethod( "GetParametersForSound" );
         CBaseEntity_exposer.staticmethod( "GetPredictionPlayer" );
         CBaseEntity_exposer.staticmethod( "GetPredictionRandomSeed" );

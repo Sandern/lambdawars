@@ -2532,10 +2532,6 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 		Assert( 0 );
 		break;
 	}
-
-#ifdef ENABLE_PYTHON
-	PyNotifyShouldTransmit(state);
-#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
