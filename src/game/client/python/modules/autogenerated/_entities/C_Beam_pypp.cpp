@@ -816,6 +816,14 @@ struct C_Beam_wrapper : C_Beam, bp::wrapper< C_Beam > {
         return C_Beam::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_Beam_class(){
@@ -1833,6 +1841,8 @@ void register_C_Beam_class(){
         C_Beam_exposer.staticmethod( "BeamCreate" );
         C_Beam_exposer.staticmethod( "BeamCreatePredictable" );
         C_Beam_exposer.staticmethod( "GetPyNetworkType" );
+        C_Beam_exposer.add_property( "lifestate", &C_Beam_wrapper::m_lifeState_Get, &C_Beam_wrapper::m_lifeState_Set );
+        C_Beam_exposer.add_property( "takedamage", &C_Beam_wrapper::m_takedamage_Get, &C_Beam_wrapper::m_takedamage_Set );
     }
 
 }

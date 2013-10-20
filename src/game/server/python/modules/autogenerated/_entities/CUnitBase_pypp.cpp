@@ -1499,6 +1499,14 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
     virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
         if( func_IsSelectableByPlayer.ptr() != Py_None )
@@ -3039,6 +3047,8 @@ void register_CUnitBase_class(){
                 , fset( &::CUnitBase::SetAttackLOSMask ) );
         
         }
+        CUnitBase_exposer.add_property( "lifestate", &CUnitBase_wrapper::m_lifeState_Get, &CUnitBase_wrapper::m_lifeState_Set );
+        CUnitBase_exposer.add_property( "takedamage", &CUnitBase_wrapper::m_takedamage_Get, &CUnitBase_wrapper::m_takedamage_Set );
         CUnitBase_exposer.def( 
             "IsSelectableByPlayer"
             , (bool ( ::CUnitBase::* )( ::CHL2WarsPlayer *,::boost::python::object ) )(&::CUnitBase::IsSelectableByPlayer)

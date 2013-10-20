@@ -816,6 +816,14 @@ struct C_BaseFuncMapBoundary_wrapper : C_BaseFuncMapBoundary, bp::wrapper< C_Bas
         return C_BaseFuncMapBoundary::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseFuncMapBoundary_class(){
@@ -973,7 +981,9 @@ void register_C_BaseFuncMapBoundary_class(){
         .staticmethod( "DidHitMapBoundary" )    
         .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "IsWithinAnyMapBoundary" )    
-        .staticmethod( "SnapToNearestBoundary" );
+        .staticmethod( "SnapToNearestBoundary" )    
+        .add_property( "lifestate", &C_BaseFuncMapBoundary_wrapper::m_lifeState_Get, &C_BaseFuncMapBoundary_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BaseFuncMapBoundary_wrapper::m_takedamage_Get, &C_BaseFuncMapBoundary_wrapper::m_takedamage_Set );
 
 }
 

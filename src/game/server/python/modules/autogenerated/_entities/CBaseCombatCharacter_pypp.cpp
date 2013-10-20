@@ -1323,6 +1323,14 @@ struct CBaseCombatCharacter_wrapper : CBaseCombatCharacter, bp::wrapper< CBaseCo
         return CBaseCombatCharacter::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseCombatCharacter_class(){
@@ -3236,6 +3244,8 @@ void register_CBaseCombatCharacter_class(){
                 , fset( &::CBaseCombatCharacter::SetActiveWeapon ) );
         
         }
+        CBaseCombatCharacter_exposer.add_property( "lifestate", &CBaseCombatCharacter_wrapper::m_lifeState_Get, &CBaseCombatCharacter_wrapper::m_lifeState_Set );
+        CBaseCombatCharacter_exposer.add_property( "takedamage", &CBaseCombatCharacter_wrapper::m_takedamage_Get, &CBaseCombatCharacter_wrapper::m_takedamage_Set );
     }
 
 }

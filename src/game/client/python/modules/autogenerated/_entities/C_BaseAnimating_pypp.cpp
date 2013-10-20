@@ -855,6 +855,14 @@ struct C_BaseAnimating_wrapper : C_BaseAnimating, bp::wrapper< C_BaseAnimating >
         return C_BaseAnimating::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseAnimating_class(){
@@ -3007,6 +3015,8 @@ void register_C_BaseAnimating_class(){
                 , fset( &::C_BaseAnimating::SetCustomLightingOffset ) );
         
         }
+        C_BaseAnimating_exposer.add_property( "lifestate", &C_BaseAnimating_wrapper::m_lifeState_Get, &C_BaseAnimating_wrapper::m_lifeState_Set );
+        C_BaseAnimating_exposer.add_property( "takedamage", &C_BaseAnimating_wrapper::m_takedamage_Get, &C_BaseAnimating_wrapper::m_takedamage_Set );
     }
 
 }

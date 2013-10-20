@@ -846,6 +846,14 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         return C_BaseGrenade::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseGrenade_class(){
@@ -1396,6 +1404,8 @@ void register_C_BaseGrenade_class(){
                 , fset( &::C_BaseGrenade::SetDamageRadius ) );
         
         }
+        C_BaseGrenade_exposer.add_property( "lifestate", &C_BaseGrenade_wrapper::m_lifeState_Get, &C_BaseGrenade_wrapper::m_lifeState_Set );
+        C_BaseGrenade_exposer.add_property( "takedamage", &C_BaseGrenade_wrapper::m_takedamage_Get, &C_BaseGrenade_wrapper::m_takedamage_Set );
     }
 
 }

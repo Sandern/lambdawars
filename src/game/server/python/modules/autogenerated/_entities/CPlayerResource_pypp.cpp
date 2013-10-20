@@ -1006,6 +1006,14 @@ struct CPlayerResource_wrapper : CPlayerResource, bp::wrapper< CPlayerResource >
         return CPlayerResource::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CPlayerResource_class(){
@@ -1170,7 +1178,9 @@ void register_CPlayerResource_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CPlayerResource_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CPlayerResource_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CPlayerResource_wrapper::m_lifeState_Get, &CPlayerResource_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CPlayerResource_wrapper::m_takedamage_Get, &CPlayerResource_wrapper::m_takedamage_Set );
 
 }
 

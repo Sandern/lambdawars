@@ -816,6 +816,14 @@ struct C_PlayerResource_wrapper : C_PlayerResource, bp::wrapper< C_PlayerResourc
         return C_PlayerResource::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_PlayerResource_class(){
@@ -1014,7 +1022,9 @@ void register_C_PlayerResource_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_PlayerResource_wrapper::* )(  ) )(&C_PlayerResource_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &C_PlayerResource_wrapper::m_lifeState_Get, &C_PlayerResource_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_PlayerResource_wrapper::m_takedamage_Get, &C_PlayerResource_wrapper::m_takedamage_Set );
 
 }
 

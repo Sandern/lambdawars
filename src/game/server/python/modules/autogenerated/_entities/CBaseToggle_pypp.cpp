@@ -1036,6 +1036,14 @@ struct CBaseToggle_wrapper : CBaseToggle, bp::wrapper< CBaseToggle > {
         return CBaseToggle::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseToggle_class(){
@@ -1232,7 +1240,9 @@ void register_CBaseToggle_class(){
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "AxisDelta" )    
         .staticmethod( "AxisValue" )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CBaseToggle_wrapper::m_lifeState_Get, &CBaseToggle_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBaseToggle_wrapper::m_takedamage_Get, &CBaseToggle_wrapper::m_takedamage_Set );
 
 }
 

@@ -1006,6 +1006,14 @@ struct CBaseEntity_wrapper : CBaseEntity, bp::wrapper< CBaseEntity > {
         return CBaseEntity::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseEntity_class(){
@@ -6770,28 +6778,6 @@ void register_CBaseEntity_class(){
                 , fset( &::CBaseEntity::SetMaxHealth ) );
         
         }
-        { //property "lifestate"[fget=::CBaseEntity::PyGetLifeState, fset=::CBaseEntity::PySetLifeState]
-        
-            typedef int ( ::CBaseEntity::*fget )(  ) ;
-            typedef void ( ::CBaseEntity::*fset )( int ) ;
-            
-            CBaseEntity_exposer.add_property( 
-                "lifestate"
-                , fget( &::CBaseEntity::PyGetLifeState )
-                , fset( &::CBaseEntity::PySetLifeState ) );
-        
-        }
-        { //property "takedamage"[fget=::CBaseEntity::PyGetTakeDamage, fset=::CBaseEntity::PySetTakeDamage]
-        
-            typedef int ( ::CBaseEntity::*fget )(  ) ;
-            typedef void ( ::CBaseEntity::*fset )( int ) ;
-            
-            CBaseEntity_exposer.add_property( 
-                "takedamage"
-                , fget( &::CBaseEntity::PyGetTakeDamage )
-                , fset( &::CBaseEntity::PySetTakeDamage ) );
-        
-        }
         { //property "animtime"[fget=::CBaseEntity::GetAnimTime, fset=::CBaseEntity::SetAnimTime]
         
             typedef float ( ::CBaseEntity::*fget )(  ) const;
@@ -6836,6 +6822,8 @@ void register_CBaseEntity_class(){
                 , fset( &::CBaseEntity::SetViewDistance ) );
         
         }
+        CBaseEntity_exposer.add_property( "lifestate", &CBaseEntity_wrapper::m_lifeState_Get, &CBaseEntity_wrapper::m_lifeState_Set );
+        CBaseEntity_exposer.add_property( "takedamage", &CBaseEntity_wrapper::m_takedamage_Get, &CBaseEntity_wrapper::m_takedamage_Set );
     }
 
 }

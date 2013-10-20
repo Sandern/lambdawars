@@ -1957,12 +1957,6 @@ public:
 	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, short handle )
 	{ EmitSound(filter, iEntIndex, params, (HSOUNDSCRIPTHANDLE &)handle); }
 
-	// Network accessor wrappers
-	int PyGetLifeState();
-	void PySetLifeState( int lifestate );
-	int PyGetTakeDamage();
-	void PySetTakeDamage( int takedamage );
-
 	virtual void PyNotifyShouldTransmit( ShouldTransmitState_t state ) {}
 #endif // ENABLE_PYTHON
 
@@ -2645,28 +2639,6 @@ inline bp::object CBaseEntity::GetPyHandle() const
 inline bp::object CBaseEntity::GetPyThink()
 {
 	return m_pyThink; 
-}
-
-//-----------------------------------------------------------------------------
-// Network var accessors
-//-----------------------------------------------------------------------------
-inline int CBaseEntity::PyGetLifeState()
-{
-	return m_lifeState;
-}
-inline void CBaseEntity::PySetLifeState( int lifestate )
-{
-	m_lifeState = lifestate;
-}
-
-inline int CBaseEntity::PyGetTakeDamage()
-{
-	return m_takedamage;
-}
-
-inline void CBaseEntity::PySetTakeDamage( int takedamage )
-{
-	m_takedamage = takedamage;
 }
 #endif // ENABLE_PYTHON
 

@@ -1006,6 +1006,14 @@ struct CSprite_wrapper : CSprite, bp::wrapper< CSprite > {
         return CSprite::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CSprite_class(){
@@ -1307,7 +1315,9 @@ void register_CSprite_class(){
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "SpriteCreate" )    
-        .staticmethod( "SpriteCreatePredictable" );
+        .staticmethod( "SpriteCreatePredictable" )    
+        .add_property( "lifestate", &CSprite_wrapper::m_lifeState_Get, &CSprite_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CSprite_wrapper::m_takedamage_Get, &CSprite_wrapper::m_takedamage_Set );
 
 }
 

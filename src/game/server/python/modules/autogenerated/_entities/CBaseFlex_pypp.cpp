@@ -1083,6 +1083,14 @@ struct CBaseFlex_wrapper : CBaseFlex, bp::wrapper< CBaseFlex > {
         return CBaseFlex::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseFlex_class(){
@@ -1323,7 +1331,9 @@ void register_CBaseFlex_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBaseFlex_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseFlex_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CBaseFlex_wrapper::m_lifeState_Get, &CBaseFlex_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBaseFlex_wrapper::m_takedamage_Get, &CBaseFlex_wrapper::m_takedamage_Set );
 
 }
 

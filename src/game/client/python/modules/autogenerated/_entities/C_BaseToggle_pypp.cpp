@@ -816,6 +816,14 @@ struct C_BaseToggle_wrapper : C_BaseToggle, bp::wrapper< C_BaseToggle > {
         return C_BaseToggle::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseToggle_class(){
@@ -950,7 +958,9 @@ void register_C_BaseToggle_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseToggle_wrapper::* )(  ) )(&C_BaseToggle_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &C_BaseToggle_wrapper::m_lifeState_Get, &C_BaseToggle_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BaseToggle_wrapper::m_takedamage_Get, &C_BaseToggle_wrapper::m_takedamage_Set );
 
 }
 

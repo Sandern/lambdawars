@@ -1064,6 +1064,14 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CPhysicsProp_class(){
@@ -1325,7 +1333,9 @@ void register_CPhysicsProp_class(){
         .def( 
             "UpdateTransmitState"
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
-            , (int ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_UpdateTransmitState) );
+            , (int ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_UpdateTransmitState) )    
+        .add_property( "lifestate", &CPhysicsProp_wrapper::m_lifeState_Get, &CPhysicsProp_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CPhysicsProp_wrapper::m_takedamage_Get, &CPhysicsProp_wrapper::m_takedamage_Set );
 
 }
 

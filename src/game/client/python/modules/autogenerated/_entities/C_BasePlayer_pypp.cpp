@@ -856,6 +856,14 @@ struct C_BasePlayer_wrapper : C_BasePlayer, bp::wrapper< C_BasePlayer > {
         return C_BasePlayer::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BasePlayer_class(){
@@ -1683,7 +1691,9 @@ void register_C_BasePlayer_class(){
         .staticmethod( "RecvProxy_NonLocalOriginZ" )    
         .staticmethod( "RecvProxy_ObserverMode" )    
         .staticmethod( "RecvProxy_ObserverTarget" )    
-        .staticmethod( "SetRemoteSplitScreenPlayerViewsAreLocalPlayer" );
+        .staticmethod( "SetRemoteSplitScreenPlayerViewsAreLocalPlayer" )    
+        .add_property( "lifestate", &C_BasePlayer_wrapper::m_lifeState_Get, &C_BasePlayer_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BasePlayer_wrapper::m_takedamage_Get, &C_BasePlayer_wrapper::m_takedamage_Set );
 
 }
 

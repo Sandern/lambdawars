@@ -1113,6 +1113,14 @@ struct CBaseAnimating_wrapper : CBaseAnimating, bp::wrapper< CBaseAnimating > {
         return CBaseAnimating::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseAnimating_class(){
@@ -1400,6 +1408,16 @@ void register_CBaseAnimating_class(){
                 "FindTransitionSequence"
                 , FindTransitionSequence_function_type( &::CBaseAnimating::FindTransitionSequence )
                 , ( bp::arg("iCurrentSequence"), bp::arg("iGoalSequence"), bp::arg("piDir") ) );
+        
+        }
+        { //::CBaseAnimating::Freeze
+        
+            typedef void ( ::CBaseAnimating::*Freeze_function_type )( float,::CBaseEntity *,::Ray_t * ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "Freeze"
+                , Freeze_function_type( &::CBaseAnimating::Freeze )
+                , ( bp::arg("flFreezeAmount")=-1.0e+0f, bp::arg("pFreezer")=bp::object(), bp::arg("pFreezeRay")=bp::object() ) );
         
         }
         { //::CBaseAnimating::GetAnimTimeInterval
@@ -3382,6 +3400,8 @@ void register_CBaseAnimating_class(){
                 , fset( &::CBaseAnimating::SetSkin ) );
         
         }
+        CBaseAnimating_exposer.add_property( "lifestate", &CBaseAnimating_wrapper::m_lifeState_Get, &CBaseAnimating_wrapper::m_lifeState_Set );
+        CBaseAnimating_exposer.add_property( "takedamage", &CBaseAnimating_wrapper::m_takedamage_Get, &CBaseAnimating_wrapper::m_takedamage_Set );
     }
 
 }

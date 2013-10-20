@@ -1036,6 +1036,14 @@ struct CBaseTrigger_wrapper : CBaseTrigger, bp::wrapper< CBaseTrigger > {
         return CBaseTrigger::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
     virtual boost::python::list GetTouchingEntities( void ) {
         return UtlVectorToListByValue<EHANDLE>(m_hTouchingEntities);
     }
@@ -1620,6 +1628,8 @@ void register_CBaseTrigger_class(){
                 , fset( &::CBaseTrigger::SetClientSidePredicted ) );
         
         }
+        CBaseTrigger_exposer.add_property( "lifestate", &CBaseTrigger_wrapper::m_lifeState_Get, &CBaseTrigger_wrapper::m_lifeState_Set );
+        CBaseTrigger_exposer.add_property( "takedamage", &CBaseTrigger_wrapper::m_takedamage_Get, &CBaseTrigger_wrapper::m_takedamage_Set );
         CBaseTrigger_exposer.def( 
             "GetTouchingEntities"
             , (boost::python::list ( ::CBaseTrigger_wrapper::* )( void ) )(&::CBaseTrigger_wrapper::GetTouchingEntities)

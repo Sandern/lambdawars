@@ -846,6 +846,14 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
         return C_BaseCombatCharacter::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseCombatCharacter_class(){
@@ -1500,6 +1508,8 @@ void register_C_BaseCombatCharacter_class(){
                     , bp::return_value_policy< bp::return_by_value >() )  );
         
         }
+        C_BaseCombatCharacter_exposer.add_property( "lifestate", &C_BaseCombatCharacter_wrapper::m_lifeState_Get, &C_BaseCombatCharacter_wrapper::m_lifeState_Set );
+        C_BaseCombatCharacter_exposer.add_property( "takedamage", &C_BaseCombatCharacter_wrapper::m_takedamage_Get, &C_BaseCombatCharacter_wrapper::m_takedamage_Set );
     }
 
 }

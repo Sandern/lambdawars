@@ -824,6 +824,14 @@ struct C_BaseEntity_wrapper : C_BaseEntity, bp::wrapper< C_BaseEntity > {
         return C_BaseEntity::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseEntity_class(){
@@ -1064,16 +1072,6 @@ void register_C_BaseEntity_class(){
             C_BaseEntity_exposer.def( 
                 "CanBePoweredUp"
                 , CanBePoweredUp_function_type( &::C_BaseEntity::CanBePoweredUp ) );
-        
-        }
-        { //::C_BaseEntity::CanBeSeenBy
-        
-            typedef bool ( ::C_BaseEntity::*CanBeSeenBy_function_type )( ::C_BaseEntity * ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "CanBeSeenBy"
-                , CanBeSeenBy_function_type( &::C_BaseEntity::CanBeSeenBy )
-                , ( bp::arg("pEnt") ) );
         
         }
         { //::C_BaseEntity::ChangeTeam
@@ -6318,10 +6316,8 @@ void register_C_BaseEntity_class(){
         C_BaseEntity_exposer.def_readwrite( "speed", &C_BaseEntity::m_flSpeed );
         C_BaseEntity_exposer.def_readwrite( "classname", &C_BaseEntity::m_iClassname );
         C_BaseEntity_exposer.def_readwrite( "health", &C_BaseEntity::m_iHealth );
-        C_BaseEntity_exposer.def_readwrite( "lifestate", &C_BaseEntity::m_lifeState );
         C_BaseEntity_exposer.def_readwrite( "lastthinktick", &C_BaseEntity::m_nLastThinkTick );
         C_BaseEntity_exposer.def_readwrite( "nextthinktick", &C_BaseEntity::m_nNextThinkTick );
-        C_BaseEntity_exposer.def_readwrite( "takedamage", &C_BaseEntity::m_takedamage );
         C_BaseEntity_exposer.staticmethod( "CalcAimEntPositions" );
         C_BaseEntity_exposer.staticmethod( "CheckCLInterpChanged" );
         C_BaseEntity_exposer.staticmethod( "CreatePredictedEntityByName" );
@@ -6455,28 +6451,6 @@ void register_C_BaseEntity_class(){
                 , fset( &::C_BaseEntity::PySetPropInt4 ) );
         
         }
-        { //property "lifestate"[fget=::C_BaseEntity::PyGetLifeState, fset=::C_BaseEntity::PySetLifeState]
-        
-            typedef int ( ::C_BaseEntity::*fget )(  ) ;
-            typedef void ( ::C_BaseEntity::*fset )( int ) ;
-            
-            C_BaseEntity_exposer.add_property( 
-                "lifestate"
-                , fget( &::C_BaseEntity::PyGetLifeState )
-                , fset( &::C_BaseEntity::PySetLifeState ) );
-        
-        }
-        { //property "takedamage"[fget=::C_BaseEntity::PyGetTakeDamage, fset=::C_BaseEntity::PySetTakeDamage]
-        
-            typedef int ( ::C_BaseEntity::*fget )(  ) ;
-            typedef void ( ::C_BaseEntity::*fset )( int ) ;
-            
-            C_BaseEntity_exposer.add_property( 
-                "takedamage"
-                , fget( &::C_BaseEntity::PyGetTakeDamage )
-                , fset( &::C_BaseEntity::PySetTakeDamage ) );
-        
-        }
         { //property "viewdistance"[fget=::C_BaseEntity::GetViewDistance]
         
             typedef float ( ::C_BaseEntity::*fget )(  ) ;
@@ -6486,6 +6460,8 @@ void register_C_BaseEntity_class(){
                 , fget( &::C_BaseEntity::GetViewDistance ) );
         
         }
+        C_BaseEntity_exposer.add_property( "lifestate", &C_BaseEntity_wrapper::m_lifeState_Get, &C_BaseEntity_wrapper::m_lifeState_Set );
+        C_BaseEntity_exposer.add_property( "takedamage", &C_BaseEntity_wrapper::m_takedamage_Get, &C_BaseEntity_wrapper::m_takedamage_Set );
     }
 
 }

@@ -987,6 +987,14 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CEntityFlame_class(){
@@ -1182,7 +1190,9 @@ void register_CEntityFlame_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CEntityFlame_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CEntityFlame_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "Create" );
+        .staticmethod( "Create" )    
+        .add_property( "lifestate", &CEntityFlame_wrapper::m_lifeState_Get, &CEntityFlame_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CEntityFlame_wrapper::m_takedamage_Get, &CEntityFlame_wrapper::m_takedamage_Set );
 
 }
 

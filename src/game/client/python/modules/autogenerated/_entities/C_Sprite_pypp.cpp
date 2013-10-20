@@ -816,6 +816,14 @@ struct C_Sprite_wrapper : C_Sprite, bp::wrapper< C_Sprite > {
         return C_Sprite::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_Sprite_class(){
@@ -1077,7 +1085,9 @@ void register_C_Sprite_class(){
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_UpdateOnRemove) )    
         .staticmethod( "GetPyNetworkType" )    
-        .staticmethod( "SpriteCreatePredictable" );
+        .staticmethod( "SpriteCreatePredictable" )    
+        .add_property( "lifestate", &C_Sprite_wrapper::m_lifeState_Get, &C_Sprite_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_Sprite_wrapper::m_takedamage_Get, &C_Sprite_wrapper::m_takedamage_Set );
 
 }
 

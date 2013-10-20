@@ -1064,6 +1064,14 @@ struct CBaseProp_wrapper : CBaseProp, bp::wrapper< CBaseProp > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseProp_class(){
@@ -1239,7 +1247,9 @@ void register_CBaseProp_class(){
             "VPhysicsCollision"
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBaseProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseProp_wrapper::default_VPhysicsCollision)
-            , ( bp::arg("index"), bp::arg("pEvent") ) );
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .add_property( "lifestate", &CBaseProp_wrapper::m_lifeState_Get, &CBaseProp_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBaseProp_wrapper::m_takedamage_Get, &CBaseProp_wrapper::m_takedamage_Set );
 
 }
 

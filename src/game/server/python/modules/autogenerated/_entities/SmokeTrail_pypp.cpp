@@ -987,6 +987,14 @@ struct SmokeTrail_wrapper : SmokeTrail, bp::wrapper< SmokeTrail > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
     Vector GetEndColor() { return m_EndColor; }
 
     void SetEndColor(Vector &endcolor) { m_EndColor = endcolor; }
@@ -1417,6 +1425,8 @@ void register_SmokeTrail_class(){
         
         }
         SmokeTrail_exposer.staticmethod( "CreateSmokeTrail" );
+        SmokeTrail_exposer.add_property( "lifestate", &SmokeTrail_wrapper::m_lifeState_Get, &SmokeTrail_wrapper::m_lifeState_Set );
+        SmokeTrail_exposer.add_property( "takedamage", &SmokeTrail_wrapper::m_takedamage_Get, &SmokeTrail_wrapper::m_takedamage_Set );
         { //property "endcolor"[fget=::SmokeTrail_wrapper::GetEndColor, fset=::SmokeTrail_wrapper::SetEndColor]
             
                 typedef Vector ( ::SmokeTrail_wrapper::*fget )(  ) const;

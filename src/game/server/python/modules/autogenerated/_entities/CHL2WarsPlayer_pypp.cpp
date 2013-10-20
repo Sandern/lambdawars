@@ -1503,6 +1503,14 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         return CHL2WarsPlayer::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CHL2WarsPlayer_class(){
@@ -2897,6 +2905,8 @@ void register_CHL2WarsPlayer_class(){
                 , fset( &::CHL2WarsPlayer::SetControlledUnit ) );
         
         }
+        CHL2WarsPlayer_exposer.add_property( "lifestate", &CHL2WarsPlayer_wrapper::m_lifeState_Get, &CHL2WarsPlayer_wrapper::m_lifeState_Set );
+        CHL2WarsPlayer_exposer.add_property( "takedamage", &CHL2WarsPlayer_wrapper::m_takedamage_Get, &CHL2WarsPlayer_wrapper::m_takedamage_Set );
     }
 
 }

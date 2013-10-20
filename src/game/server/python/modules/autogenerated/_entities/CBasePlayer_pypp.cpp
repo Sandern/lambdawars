@@ -1319,6 +1319,14 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
         return CBasePlayer::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBasePlayer_class(){
@@ -2801,7 +2809,9 @@ void register_CBasePlayer_class(){
         .staticmethod( "GetOffset_m_Local" )    
         .staticmethod( "GetOffset_m_PlayerFog" )    
         .staticmethod( "GetOffset_pl" )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CBasePlayer_wrapper::m_lifeState_Get, &CBasePlayer_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBasePlayer_wrapper::m_takedamage_Get, &CBasePlayer_wrapper::m_takedamage_Set );
 
 }
 

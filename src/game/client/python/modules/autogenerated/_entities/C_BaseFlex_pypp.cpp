@@ -846,6 +846,14 @@ struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
         return C_BaseFlex::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseFlex_class(){
@@ -1047,7 +1055,9 @@ void register_C_BaseFlex_class(){
         .staticmethod( "AddGlobalFlexController" )    
         .staticmethod( "GetGlobalFlexControllerName" )    
         .staticmethod( "GetPyNetworkType" )    
-        .staticmethod( "InvalidateFlexCaches" );
+        .staticmethod( "InvalidateFlexCaches" )    
+        .add_property( "lifestate", &C_BaseFlex_wrapper::m_lifeState_Get, &C_BaseFlex_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BaseFlex_wrapper::m_takedamage_Get, &C_BaseFlex_wrapper::m_takedamage_Set );
 
 }
 

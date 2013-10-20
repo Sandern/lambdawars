@@ -1006,6 +1006,14 @@ struct CBeam_wrapper : CBeam, bp::wrapper< CBeam > {
         return CBeam::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBeam_class(){
@@ -2035,6 +2043,8 @@ void register_CBeam_class(){
         CBeam_exposer.staticmethod( "BeamCreate" );
         CBeam_exposer.staticmethod( "BeamCreatePredictable" );
         CBeam_exposer.staticmethod( "GetPyNetworkType" );
+        CBeam_exposer.add_property( "lifestate", &CBeam_wrapper::m_lifeState_Get, &CBeam_wrapper::m_lifeState_Set );
+        CBeam_exposer.add_property( "takedamage", &CBeam_wrapper::m_takedamage_Get, &CBeam_wrapper::m_takedamage_Set );
     }
 
 }

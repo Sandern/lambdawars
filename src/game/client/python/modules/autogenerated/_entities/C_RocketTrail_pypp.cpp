@@ -805,6 +805,14 @@ struct C_RocketTrail_wrapper : C_RocketTrail, bp::wrapper< C_RocketTrail > {
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_RocketTrail_class(){
@@ -955,7 +963,9 @@ void register_C_RocketTrail_class(){
         .def( 
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
-            , (void ( C_RocketTrail_wrapper::* )(  ) )(&C_RocketTrail_wrapper::default_UpdateOnRemove) );
+            , (void ( C_RocketTrail_wrapper::* )(  ) )(&C_RocketTrail_wrapper::default_UpdateOnRemove) )    
+        .add_property( "lifestate", &C_RocketTrail_wrapper::m_lifeState_Get, &C_RocketTrail_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_RocketTrail_wrapper::m_takedamage_Get, &C_RocketTrail_wrapper::m_takedamage_Set );
 
 }
 

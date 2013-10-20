@@ -1143,6 +1143,14 @@ struct CBaseCombatWeapon_wrapper : CBaseCombatWeapon, bp::wrapper< CBaseCombatWe
         return CBaseCombatWeapon::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
     float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack.Get(); }
 
     void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack.Set( val ); }
@@ -1749,16 +1757,8 @@ void register_CBaseCombatWeapon_class(){
         .def_readwrite( "minrange1", &CBaseCombatWeapon::m_fMinRange1 )    
         .def_readwrite( "minrange2", &CBaseCombatWeapon::m_fMinRange2 )    
         .def_readwrite( "nextemptysoundtime", &CBaseCombatWeapon::m_flNextEmptySoundTime )    
-        .def_readwrite( "nextprimaryattack", &CBaseCombatWeapon::m_flNextPrimaryAttack )    
-        .def_readwrite( "nextsecondaryattack", &CBaseCombatWeapon::m_flNextSecondaryAttack )    
-        .def_readwrite( "timeweaponidle", &CBaseCombatWeapon::m_flTimeWeaponIdle )    
         .def_readwrite( "unlocktime", &CBaseCombatWeapon::m_flUnlockTime )    
         .def_readwrite( "locker", &CBaseCombatWeapon::m_hLocker )    
-        .def_readwrite( "clip1", &CBaseCombatWeapon::m_iClip1 )    
-        .def_readwrite( "clip2", &CBaseCombatWeapon::m_iClip2 )    
-        .def_readwrite( "primaryammotype", &CBaseCombatWeapon::m_iPrimaryAmmoType )    
-        .def_readwrite( "secondaryammotype", &CBaseCombatWeapon::m_iSecondaryAmmoType )    
-        .def_readwrite( "state", &CBaseCombatWeapon::m_iState )    
         .def_readwrite( "subtype", &CBaseCombatWeapon::m_iSubType )    
         .def_readwrite( "viewmodelindex", &CBaseCombatWeapon::m_iViewModelIndex )    
         .def_readwrite( "worldmodelindex", &CBaseCombatWeapon::m_iWorldModelIndex )    
@@ -1904,6 +1904,8 @@ void register_CBaseCombatWeapon_class(){
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "GetAvailableWeaponsInBox" )    
         .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CBaseCombatWeapon_wrapper::m_lifeState_Get, &CBaseCombatWeapon_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBaseCombatWeapon_wrapper::m_takedamage_Get, &CBaseCombatWeapon_wrapper::m_takedamage_Set )    
         .add_property( "nextprimaryattack", &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set )    
         .add_property( "nextsecondaryattack", &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set )    
         .add_property( "timeweaponidle", &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get, &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set )    

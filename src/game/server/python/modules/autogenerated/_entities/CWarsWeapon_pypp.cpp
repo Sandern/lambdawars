@@ -1152,6 +1152,14 @@ struct CWarsWeapon_wrapper : CWarsWeapon, bp::wrapper< CWarsWeapon > {
         return CWarsWeapon::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
     float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack.Get(); }
 
     void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack.Set( val ); }
@@ -1839,6 +1847,8 @@ void register_CWarsWeapon_class(){
                 , fset( &::CWarsWeapon::SetSecondaryAttackActivity ) );
         
         }
+        CWarsWeapon_exposer.add_property( "lifestate", &CWarsWeapon_wrapper::m_lifeState_Get, &CWarsWeapon_wrapper::m_lifeState_Set );
+        CWarsWeapon_exposer.add_property( "takedamage", &CWarsWeapon_wrapper::m_takedamage_Get, &CWarsWeapon_wrapper::m_takedamage_Set );
         CWarsWeapon_exposer.add_property( "nextprimaryattack", &CWarsWeapon_wrapper::m_flNextPrimaryAttack_Get, &CWarsWeapon_wrapper::m_flNextPrimaryAttack_Set );
         CWarsWeapon_exposer.add_property( "nextsecondaryattack", &CWarsWeapon_wrapper::m_flNextSecondaryAttack_Get, &CWarsWeapon_wrapper::m_flNextSecondaryAttack_Set );
         CWarsWeapon_exposer.add_property( "timeweaponidle", &CWarsWeapon_wrapper::m_flTimeWeaponIdle_Get, &CWarsWeapon_wrapper::m_flTimeWeaponIdle_Set );

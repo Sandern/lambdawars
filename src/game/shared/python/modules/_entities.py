@@ -374,6 +374,10 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude functions with CTeam, CUserCmd, edict_t
         usercmd = mb.class_('CUserCmd')
         edict = mb.class_('edict_t')
+        groundlink = mb.class_('groundlink_t')
+        touchlink = mb.class_('touchlink_t')
+        bf_read = mb.class_('bf_read')
+        ray = mb.class_('Ray_t')
         excludetypes = [
             pointer_t(declarated_t(mb.class_('CTeam' if self.isserver else 'C_Team'))),
             pointer_t(const_t(declarated_t(usercmd))),
@@ -381,6 +385,11 @@ class Entities(SemiSharedModuleGenerator):
             pointer_t(const_t(declarated_t(edict))),
             pointer_t(declarated_t(edict)),
             pointer_t(declarated_t(mb.class_('CEntityMapData'))),
+            pointer_t(declarated_t(groundlink)),
+            pointer_t(declarated_t(touchlink)),
+            pointer_t(declarated_t(bf_read)),
+            reference_t(declarated_t(bf_read)),
+            reference_t(const_t(declarated_t(ray))),
         ]
         cls.calldefs(calldef_withtypes( excludetypes ), allow_empty=True).exclude()
         
@@ -565,14 +574,11 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('PyEmitSoundFilter').rename('EmitSoundFilter')
         mb.mem_funs('PyStopSound').rename('StopSound')
         
-        # Exclude with certain arguments
-        mb.mem_funs( lambda decl: HasArgType(decl, 'groundlink_t') ).exclude()
-        mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('groundlink_t') != -1 ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'touchlink_t') ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'bf_read') ).exclude()
-        
-        # Exclude trace stuff for now
-        mb.mem_funs( lambda decl: HasArgType(decl, 'Ray_t') ).exclude()    
+        # Create properties for the following variables, since they are networked
+        for entcls in self.entclasses:
+            if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                self.AddNetworkVarProperty('lifestate', 'm_lifeState', 'int', entcls)
+                self.AddNetworkVarProperty('takedamage', 'm_takedamage', 'int', entcls)
         
         if self.isclient:
             # List of client functions overridable in Python
@@ -589,7 +595,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyReceiveMessage').rename('ReceiveMessage')
 
             # Excludes
-            mb.mem_funs('GetDataTableBasePtr').exclude()
             mb.mem_funs('OnNewModel').exclude()  
 
             # Excludes  
@@ -634,13 +639,11 @@ class Entities(SemiSharedModuleGenerator):
             
             # Rename public variables
             self.IncludeVarAndRename('m_iHealth', 'health')
-            self.IncludeVarAndRename('m_lifeState', 'lifestate')
             self.IncludeVarAndRename('m_nRenderFX', 'renderfx')
             if self.settings.branch == 'source2013':
                 self.IncludeVarAndRename('m_nRenderFXBlend', 'renderfxblend')
             self.IncludeVarAndRename('m_nRenderMode', 'rendermode')
             self.IncludeVarAndRename('m_clrRender', 'clrender')
-            self.IncludeVarAndRename('m_takedamage', 'takedamage')
             self.IncludeVarAndRename('m_flAnimTime', 'animtime')
             self.IncludeVarAndRename('m_flOldAnimTime', 'oldanimtime')
             self.IncludeVarAndRename('m_flSimulationTime', 'simulationtime')
@@ -649,10 +652,7 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_nLastThinkTick', 'lastthinktick')  
             self.IncludeVarAndRename('m_iClassname', 'classname')    
             self.IncludeVarAndRename('m_flSpeed', 'speed')
-            
-            self.SetupProperty(cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
-            self.SetupProperty(cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
-
+                    
             # Don't give a shit about the following functions
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_AI_BaseNPC') != -1 ).exclude()
             mb.mem_funs( lambda decl: 'Interp_' in decl.name ).exclude()
@@ -663,7 +663,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: HasArgType(decl, 'IClientVehicle') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientVehicle') != -1 ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientRenderable') != -1 ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('touchlink_t') != -1 ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'C_RecipientFilter') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CNewParticleEffect') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'IClientEntity') ).exclude()
@@ -703,8 +702,6 @@ class Entities(SemiSharedModuleGenerator):
             # Properties
             self.SetupProperty(cls, 'health', 'GetHealth', 'SetHealth')
             self.SetupProperty(cls, 'maxhealth', 'GetMaxHealth', 'SetMaxHealth')
-            self.SetupProperty(cls, 'lifestate', 'PyGetLifeState', 'PySetLifeState')
-            self.SetupProperty(cls, 'takedamage', 'PyGetTakeDamage', 'PySetTakeDamage')
             self.SetupProperty(cls, 'animtime', 'GetAnimTime', 'SetAnimTime')
             self.SetupProperty(cls, 'simulationtime', 'GetSimulationTime', 'SetSimulationTime')
             self.SetupProperty(cls, 'rendermode', 'GetRenderMode', 'SetRenderMode', excludesetget=False)
@@ -784,10 +781,6 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('ScriptNextMovePeer').exclude()
                 mb.mem_funs('InputDispatchEffect').exclude() # No def?
           
-            # Replaced
-            mb.mem_funs('CanBeSeenBy').exclude()      
-            mb.mem_funs('DensityMap').exclude() # Don't care for now.
-            
             # Call policies
             mb.mem_funs('GetResponseSystem').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
             mb.mem_funs('GetServerVehicle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
@@ -814,9 +807,10 @@ class Entities(SemiSharedModuleGenerator):
     
         # Transformations
         mb.mem_funs('GetPoseParameterRange').add_transformation(FT.output('minValue'), FT.output('maxValue'))
-
-        # Call policies   
-        mb.mem_funs('GetModelPtr').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
+        
+        # Give back a direct reference to CStudioHdr (not fully safe, but should be OK)
+        studiohdr = mb.class_('CStudioHdr')
+        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(studiohdr))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  
         
         # Properties
         self.SetupProperty(cls, 'skin', 'GetSkin', 'SetSkin')
@@ -933,7 +927,8 @@ class Entities(SemiSharedModuleGenerator):
             # Server excludes
             mb.mem_funs('RepositionWeapon').exclude() # Declaration only...
             mb.mem_funs('IsInBadPosition').exclude() # Declaration only...
-            mb.mem_funs('IsCarrierAlive').exclude() # Declaration only..
+            if self.settings.branch == 'swarm':
+                mb.mem_funs('IsCarrierAlive').exclude() # Declaration only..
             if self.settings.branch == 'source2013':
                 mb.mem_funs('GetDmgAccumulator').exclude()
                 
@@ -949,22 +944,15 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_fMinRange1', 'minrange1')
         self.IncludeVarAndRename('m_fMinRange2', 'minrange2')
         self.IncludeVarAndRename('m_flNextEmptySoundTime', 'nextemptysoundtime')
-        self.IncludeVarAndRename('m_flNextPrimaryAttack', 'nextprimaryattack')
-        self.IncludeVarAndRename('m_flNextSecondaryAttack', 'nextsecondaryattack')
-        self.IncludeVarAndRename('m_flTimeWeaponIdle', 'timeweaponidle')
         self.IncludeVarAndRename('m_flUnlockTime', 'unlocktime')
         self.IncludeVarAndRename('m_hLocker', 'locker')
-        self.IncludeVarAndRename('m_iClip1', 'clip1')
-        self.IncludeVarAndRename('m_iClip2', 'clip2')
-        self.IncludeVarAndRename('m_iPrimaryAmmoType', 'primaryammotype')
-        self.IncludeVarAndRename('m_iSecondaryAmmoType', 'secondaryammotype')
-        self.IncludeVarAndRename('m_iState', 'state')
         self.IncludeVarAndRename('m_iSubType', 'subtype')
         self.IncludeVarAndRename('m_iViewModelIndex', 'viewmodelindex')
         self.IncludeVarAndRename('m_iWorldModelIndex', 'worldmodelindex')
         self.IncludeVarAndRename('m_iszName', 'name')
         self.IncludeVarAndRename('m_nViewModelIndex', 'viewmodelindex')
         
+        # Create properties for the following variables, since they are networked
         for entcls in self.entclasses:
             if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
                 self.AddNetworkVarProperty('nextprimaryattack', 'm_flNextPrimaryAttack', 'float', entcls)
@@ -975,7 +963,6 @@ class Entities(SemiSharedModuleGenerator):
                 self.AddNetworkVarProperty('secondaryammotype', 'm_iSecondaryAmmoType', 'int', entcls)
                 self.AddNetworkVarProperty('clip1', 'm_iClip1', 'int', entcls)
                 self.AddNetworkVarProperty('clip2', 'm_iClip2', 'int', entcls)
-            
             
         # Misc
         mb.enum('WeaponSound_t').include()
@@ -1193,6 +1180,10 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('OnChangeOwnerNumberInternal').exclude()
         mb.mem_funs('MyUnitPointer').exclude() # Automatically done by converter
         mb.mem_funs('GetIUnit').exclude()
+        
+        mb.mem_funs('CanBeSeenBy').exclude()
+        if self.isserver:
+            mb.mem_funs('DensityMap').exclude() # Don't care for now.
     
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')

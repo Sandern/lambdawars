@@ -1323,6 +1323,14 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         return CBaseGrenade::GetServerClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState.Get(); }
+
+    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+
+    int m_takedamage_Get() { return m_takedamage.Get(); }
+
+    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+
 };
 
 void register_CBaseGrenade_class(){
@@ -2060,6 +2068,8 @@ void register_CBaseGrenade_class(){
                 , fset( &::CBaseGrenade::SetDamageRadius ) );
         
         }
+        CBaseGrenade_exposer.add_property( "lifestate", &CBaseGrenade_wrapper::m_lifeState_Get, &CBaseGrenade_wrapper::m_lifeState_Set );
+        CBaseGrenade_exposer.add_property( "takedamage", &CBaseGrenade_wrapper::m_takedamage_Get, &CBaseGrenade_wrapper::m_takedamage_Set );
     }
 
 }

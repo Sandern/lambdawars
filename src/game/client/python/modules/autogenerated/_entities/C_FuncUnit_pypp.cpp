@@ -1026,6 +1026,14 @@ struct C_FuncUnit_wrapper : C_FuncUnit, bp::wrapper< C_FuncUnit > {
         return C_FuncUnit::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
     virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
         if( func_IsSelectableByPlayer.ptr() != Py_None )
@@ -1922,6 +1930,8 @@ void register_C_FuncUnit_class(){
                 , fset( &::C_FuncUnit::SetKills ) );
         
         }
+        C_FuncUnit_exposer.add_property( "lifestate", &C_FuncUnit_wrapper::m_lifeState_Get, &C_FuncUnit_wrapper::m_lifeState_Set );
+        C_FuncUnit_exposer.add_property( "takedamage", &C_FuncUnit_wrapper::m_takedamage_Get, &C_FuncUnit_wrapper::m_takedamage_Set );
         C_FuncUnit_exposer.def( 
             "IsSelectableByPlayer"
             , (bool ( ::C_FuncUnit::* )( ::C_HL2WarsPlayer *,::boost::python::object ) )(&::C_FuncUnit::IsSelectableByPlayer)

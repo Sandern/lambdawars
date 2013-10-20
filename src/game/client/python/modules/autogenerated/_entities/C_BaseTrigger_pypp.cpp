@@ -816,6 +816,14 @@ struct C_BaseTrigger_wrapper : C_BaseTrigger, bp::wrapper< C_BaseTrigger > {
         return C_BaseTrigger::GetClientClass();
     }
 
+    int m_lifeState_Get() { return m_lifeState; }
+
+    void m_lifeState_Set( int val ) { m_lifeState = val; }
+
+    int m_takedamage_Get() { return m_takedamage; }
+
+    void m_takedamage_Set( int val ) { m_takedamage = val; }
+
 };
 
 void register_C_BaseTrigger_class(){
@@ -950,7 +958,9 @@ void register_C_BaseTrigger_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseTrigger_wrapper::* )(  ) )(&C_BaseTrigger_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &C_BaseTrigger_wrapper::m_lifeState_Get, &C_BaseTrigger_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BaseTrigger_wrapper::m_takedamage_Get, &C_BaseTrigger_wrapper::m_takedamage_Set );
 
 }
 
