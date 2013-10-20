@@ -47,12 +47,6 @@ struct QAngle_wrapper : QAngle, bp::wrapper< QAngle > {
     
     }
 
-    static boost::python::object Str( QAngle const & inst ) {
-       char buf[256];
-       Q_snprintf(buf, 256, "(%f, %f, %f)", inst.x, inst.y, inst.z);
-       return boost::python::object(buf);
-    }
-
     static ::vec_t GetItem( QAngle const & inst, int i ) {
        if( i < 0 || i > 2 ) {
            PyErr_SetString(PyExc_IndexError, "Index out of range" );
@@ -137,12 +131,6 @@ struct Vector_wrapper : Vector, bp::wrapper< Vector > {
     
     }
 
-    static boost::python::object Str( Vector const & inst ) {
-       char buf[256];
-       Q_snprintf(buf, 256, "(%f, %f, %f)", inst.x, inst.y, inst.z);
-       return boost::python::object(buf);
-    }
-
     static ::vec_t GetItem( Vector const & inst, int i ) {
        if( i < 0 || i > 2 ) {
            PyErr_SetString(PyExc_IndexError, "Index out of range" );
@@ -177,24 +165,11 @@ struct Vector2D_wrapper : Vector2D, bp::wrapper< Vector2D > {
     
     }
 
-    Vector2D_wrapper(float const * pFloat )
-    : Vector2D( pFloat )
-      , bp::wrapper< Vector2D >(){
-        // constructor
-    
-    }
-
     Vector2D_wrapper(::Vector2D const & vOther )
     : Vector2D( boost::ref(vOther) )
       , bp::wrapper< Vector2D >(){
         // copy constructor
     
-    }
-
-    static boost::python::object Str( Vector2D const & inst ) {
-       char buf[256];
-       Q_snprintf(buf, 256, "(%f, %f)", inst.x, inst.y);
-       return boost::python::object(buf);
     }
 
     static ::vec_t GetItem( Vector2D const & inst, int i ) {
@@ -357,7 +332,6 @@ BOOST_PYTHON_MODULE(_vmath){
         QAngle_exposer.def_readwrite( "x", &QAngle::x );
         QAngle_exposer.def_readwrite( "y", &QAngle::y );
         QAngle_exposer.def_readwrite( "z", &QAngle::z );
-        QAngle_exposer.def( "__str__", &::QAngle_wrapper::Str );
         QAngle_exposer.def( "__getitem__", &::QAngle_wrapper::GetItem );
         QAngle_exposer.def( "__setitem__", &::QAngle_wrapper::SetItem );
         QAngle_exposer.def( bp::init< const QAngle & >(( bp::arg("vOther") )) );
@@ -801,16 +775,6 @@ BOOST_PYTHON_MODULE(_vmath){
                 , bp::return_internal_reference< >() );
         
         }
-        { //::Vector::CopyToArray
-        
-            typedef void ( ::Vector::*CopyToArray_function_type )( float * ) const;
-            
-            Vector_exposer.def( 
-                "CopyToArray"
-                , CopyToArray_function_type( &::Vector::CopyToArray )
-                , ( bp::arg("rgfl") ) );
-        
-        }
         { //::Vector::Cross
         
             typedef ::Vector ( ::Vector::*Cross_function_type )( ::Vector const & ) const;
@@ -1089,7 +1053,6 @@ BOOST_PYTHON_MODULE(_vmath){
         Vector_exposer.def_readwrite( "x", &Vector::x );
         Vector_exposer.def_readwrite( "y", &Vector::y );
         Vector_exposer.def_readwrite( "z", &Vector::z );
-        Vector_exposer.def( "__str__", &::Vector_wrapper::Str );
         Vector_exposer.def( "__getitem__", &::Vector_wrapper::GetItem );
         Vector_exposer.def( "__setitem__", &::Vector_wrapper::SetItem );
         Vector_exposer.def( bp::init< const Vector & >(( bp::arg("vOther") )) );
@@ -1100,19 +1063,7 @@ BOOST_PYTHON_MODULE(_vmath){
         Vector2D_exposer_t Vector2D_exposer = Vector2D_exposer_t( "Vector2D", bp::init< >() );
         bp::scope Vector2D_scope( Vector2D_exposer );
         Vector2D_exposer.def( bp::init< vec_t, vec_t >(( bp::arg("X"), bp::arg("Y") )) );
-        Vector2D_exposer.def( bp::init< float const * >(( bp::arg("pFloat") )) );
-        bp::implicitly_convertible< float const *, Vector2D >();
         Vector2D_exposer.def( bp::init< Vector2D const & >(( bp::arg("vOther") )) );
-        { //::Vector2D::CopyToArray
-        
-            typedef void ( ::Vector2D::*CopyToArray_function_type )( float * ) const;
-            
-            Vector2D_exposer.def( 
-                "CopyToArray"
-                , CopyToArray_function_type( &::Vector2D::CopyToArray )
-                , ( bp::arg("rgfl") ) );
-        
-        }
         { //::Vector2D::DistTo
         
             typedef ::vec_t ( ::Vector2D::*DistTo_function_type )( ::Vector2D const & ) const;
@@ -1285,7 +1236,6 @@ BOOST_PYTHON_MODULE(_vmath){
         Vector2D_exposer.def( bp::self == bp::self );
         Vector2D_exposer.def_readwrite( "x", &Vector2D::x );
         Vector2D_exposer.def_readwrite( "y", &Vector2D::y );
-        Vector2D_exposer.def( "__str__", &::Vector2D_wrapper::Str );
         Vector2D_exposer.def( "__getitem__", &::Vector2D_wrapper::GetItem );
         Vector2D_exposer.def( "__setitem__", &::Vector2D_wrapper::SetItem );
     }
@@ -1346,12 +1296,56 @@ BOOST_PYTHON_MODULE(_vmath){
 
     { //::AngleIMatrix
     
+        typedef void ( *AngleIMatrix_function_type )( ::RadianEuler const &,::matrix3x4_t & );
+        
+        bp::def( 
+            "AngleIMatrix"
+            , AngleIMatrix_function_type( &::AngleIMatrix )
+            , ( bp::arg("angles"), bp::arg("mat") ) );
+    
+    }
+
+    { //::AngleIMatrix
+    
         typedef void ( *AngleIMatrix_function_type )( ::QAngle const &,::Vector const &,::matrix3x4_t & );
         
         bp::def( 
             "AngleIMatrix"
             , AngleIMatrix_function_type( &::AngleIMatrix )
             , ( bp::arg("angles"), bp::arg("position"), bp::arg("mat") ) );
+    
+    }
+
+    { //::AngleIMatrix
+    
+        typedef void ( *AngleIMatrix_function_type )( ::QAngle const &,::matrix3x4_t & );
+        
+        bp::def( 
+            "AngleIMatrix"
+            , AngleIMatrix_function_type( &::AngleIMatrix )
+            , ( bp::arg("angles"), bp::arg("mat") ) );
+    
+    }
+
+    { //::AngleMatrix
+    
+        typedef void ( *AngleMatrix_function_type )( ::RadianEuler const &,::Vector const &,::matrix3x4_t & );
+        
+        bp::def( 
+            "AngleMatrix"
+            , AngleMatrix_function_type( &::AngleMatrix )
+            , ( bp::arg("angles"), bp::arg("position"), bp::arg("mat") ) );
+    
+    }
+
+    { //::AngleMatrix
+    
+        typedef void ( *AngleMatrix_function_type )( ::RadianEuler const &,::matrix3x4_t & );
+        
+        bp::def( 
+            "AngleMatrix"
+            , AngleMatrix_function_type( &::AngleMatrix )
+            , ( bp::arg("angles"), bp::arg("mat") ) );
     
     }
 
@@ -1586,94 +1580,6 @@ BOOST_PYTHON_MODULE(_vmath){
     
     }
 
-    { //::CalcClosestPointOnLine
-    
-        typedef void ( *CalcClosestPointOnLine_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector &,float * );
-        
-        bp::def( 
-            "CalcClosestPointOnLine"
-            , CalcClosestPointOnLine_function_type( &::CalcClosestPointOnLine )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcClosestPointOnLine2D
-    
-        typedef void ( *CalcClosestPointOnLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,::Vector2D &,float * );
-        
-        bp::def( 
-            "CalcClosestPointOnLine2D"
-            , CalcClosestPointOnLine2D_function_type( &::CalcClosestPointOnLine2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcClosestPointOnLineSegment
-    
-        typedef void ( *CalcClosestPointOnLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector &,float * );
-        
-        bp::def( 
-            "CalcClosestPointOnLineSegment"
-            , CalcClosestPointOnLineSegment_function_type( &::CalcClosestPointOnLineSegment )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcClosestPointOnLineSegment2D
-    
-        typedef void ( *CalcClosestPointOnLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,::Vector2D &,float * );
-        
-        bp::def( 
-            "CalcClosestPointOnLineSegment2D"
-            , CalcClosestPointOnLineSegment2D_function_type( &::CalcClosestPointOnLineSegment2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceSqrToLine
-    
-        typedef float ( *CalcDistanceSqrToLine_function_type )( ::Vector const &,::Vector const &,::Vector const &,float * );
-        
-        bp::def( 
-            "CalcDistanceSqrToLine"
-            , CalcDistanceSqrToLine_function_type( &::CalcDistanceSqrToLine )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceSqrToLine2D
-    
-        typedef float ( *CalcDistanceSqrToLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,float * );
-        
-        bp::def( 
-            "CalcDistanceSqrToLine2D"
-            , CalcDistanceSqrToLine2D_function_type( &::CalcDistanceSqrToLine2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceSqrToLineSegment
-    
-        typedef float ( *CalcDistanceSqrToLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const &,float * );
-        
-        bp::def( 
-            "CalcDistanceSqrToLineSegment"
-            , CalcDistanceSqrToLineSegment_function_type( &::CalcDistanceSqrToLineSegment )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceSqrToLineSegment2D
-    
-        typedef float ( *CalcDistanceSqrToLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,float * );
-        
-        bp::def( 
-            "CalcDistanceSqrToLineSegment2D"
-            , CalcDistanceSqrToLineSegment2D_function_type( &::CalcDistanceSqrToLineSegment2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
     { //::CalcDistanceToAABB
     
         typedef float ( *CalcDistanceToAABB_function_type )( ::Vector const &,::Vector const &,::Vector const & );
@@ -1682,61 +1588,6 @@ BOOST_PYTHON_MODULE(_vmath){
             "CalcDistanceToAABB"
             , CalcDistanceToAABB_function_type( &::CalcDistanceToAABB )
             , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("point") ) );
-    
-    }
-
-    { //::CalcDistanceToLine
-    
-        typedef float ( *CalcDistanceToLine_function_type )( ::Vector const &,::Vector const &,::Vector const &,float * );
-        
-        bp::def( 
-            "CalcDistanceToLine"
-            , CalcDistanceToLine_function_type( &::CalcDistanceToLine )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceToLine2D
-    
-        typedef float ( *CalcDistanceToLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,float * );
-        
-        bp::def( 
-            "CalcDistanceToLine2D"
-            , CalcDistanceToLine2D_function_type( &::CalcDistanceToLine2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceToLineSegment
-    
-        typedef float ( *CalcDistanceToLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const &,float * );
-        
-        bp::def( 
-            "CalcDistanceToLineSegment"
-            , CalcDistanceToLineSegment_function_type( &::CalcDistanceToLineSegment )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcDistanceToLineSegment2D
-    
-        typedef float ( *CalcDistanceToLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,float * );
-        
-        bp::def( 
-            "CalcDistanceToLineSegment2D"
-            , CalcDistanceToLineSegment2D_function_type( &::CalcDistanceToLineSegment2D )
-            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("t")=bp::object() ) );
-    
-    }
-
-    { //::CalcLineToLineIntersectionSegment
-    
-        typedef bool ( *CalcLineToLineIntersectionSegment_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector const &,::Vector *,::Vector *,float *,float * );
-        
-        bp::def( 
-            "CalcLineToLineIntersectionSegment"
-            , CalcLineToLineIntersectionSegment_function_type( &::CalcLineToLineIntersectionSegment )
-            , ( bp::arg("p1"), bp::arg("p2"), bp::arg("p3"), bp::arg("p4"), bp::arg("s1"), bp::arg("s2"), bp::arg("t1"), bp::arg("t2") ) );
     
     }
 
@@ -2191,17 +2042,6 @@ BOOST_PYTHON_MODULE(_vmath){
     
     }
 
-    { //::GetBarycentricCoords2D
-    
-        typedef void ( *GetBarycentricCoords2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,::Vector2D const &,float * );
-        
-        bp::def( 
-            "GetBarycentricCoords2D"
-            , GetBarycentricCoords2D_function_type( &::GetBarycentricCoords2D )
-            , ( bp::arg("A"), bp::arg("B"), bp::arg("C"), bp::arg("pt"), bp::arg("bcCoords") ) );
-    
-    }
-
     { //::GreatestCommonDivisor
     
         typedef int ( *GreatestCommonDivisor_function_type )( int,int );
@@ -2463,6 +2303,39 @@ BOOST_PYTHON_MODULE(_vmath){
             "MatricesAreEqual"
             , MatricesAreEqual_function_type( &::MatricesAreEqual )
             , ( bp::arg("src1"), bp::arg("src2"), bp::arg("flTolerance")=1.00000000000000008180305391403130954586231382564e-5 ) );
+    
+    }
+
+    { //::MatrixAngles
+    
+        typedef void ( *MatrixAngles_function_type )( ::matrix3x4_t const &,::Quaternion &,::Vector & );
+        
+        bp::def( 
+            "MatrixAngles"
+            , MatrixAngles_function_type( &::MatrixAngles )
+            , ( bp::arg("mat"), bp::arg("q"), bp::arg("position") ) );
+    
+    }
+
+    { //::MatrixAngles
+    
+        typedef void ( *MatrixAngles_function_type )( ::matrix3x4_t const &,::RadianEuler &,::Vector & );
+        
+        bp::def( 
+            "MatrixAngles"
+            , MatrixAngles_function_type( &::MatrixAngles )
+            , ( bp::arg("mat"), bp::arg("angles"), bp::arg("position") ) );
+    
+    }
+
+    { //::MatrixAngles
+    
+        typedef void ( *MatrixAngles_function_type )( ::matrix3x4_t const &,::RadianEuler & );
+        
+        bp::def( 
+            "MatrixAngles"
+            , MatrixAngles_function_type( &::MatrixAngles )
+            , ( bp::arg("matrix"), bp::arg("angles") ) );
     
     }
 
@@ -3390,17 +3263,6 @@ BOOST_PYTHON_MODULE(_vmath){
     
     }
 
-    { //::SinCos
-    
-        typedef void ( *SinCos_function_type )( float,float *,float * );
-        
-        bp::def( 
-            "SinCos"
-            , SinCos_function_type( &::SinCos )
-            , ( bp::arg("radians"), bp::arg("sine"), bp::arg("cosine") ) );
-    
-    }
-
     { //::SmallestPowerOfTwoGreaterOrEqual
     
         typedef ::uint ( *SmallestPowerOfTwoGreaterOrEqual_function_type )( ::uint );
@@ -3755,6 +3617,17 @@ BOOST_PYTHON_MODULE(_vmath){
 
     { //::VectorAdd
     
+        typedef void ( *VectorAdd_function_type )( ::QAngle const &,::QAngle const &,::QAngle & );
+        
+        bp::def( 
+            "VectorAdd"
+            , VectorAdd_function_type( &::VectorAdd )
+            , ( bp::arg("a"), bp::arg("b"), bp::arg("result") ) );
+    
+    }
+
+    { //::VectorAdd
+    
         typedef void ( *VectorAdd_function_type )( ::Vector const &,::Vector const &,::Vector & );
         
         bp::def( 
@@ -3816,6 +3689,28 @@ BOOST_PYTHON_MODULE(_vmath){
             "VectorCompare"
             , VectorCompare_function_type( &::VectorCompare )
             , ( bp::arg("v1"), bp::arg("v2") ) );
+    
+    }
+
+    { //::VectorCopy
+    
+        typedef void ( *VectorCopy_function_type )( ::QAngle const &,::QAngle & );
+        
+        bp::def( 
+            "VectorCopy"
+            , VectorCopy_function_type( &::VectorCopy )
+            , ( bp::arg("src"), bp::arg("dst") ) );
+    
+    }
+
+    { //::VectorCopy
+    
+        typedef void ( *VectorCopy_function_type )( ::RadianEuler const &,::RadianEuler & );
+        
+        bp::def( 
+            "VectorCopy"
+            , VectorCopy_function_type( &::VectorCopy )
+            , ( bp::arg("src"), bp::arg("dst") ) );
     
     }
 
@@ -3915,6 +3810,17 @@ BOOST_PYTHON_MODULE(_vmath){
             "VectorLerp"
             , VectorLerp_function_type( &::VectorLerp )
             , ( bp::arg("src1"), bp::arg("src2"), bp::arg("t"), bp::arg("dest") ) );
+    
+    }
+
+    { //::VectorMA
+    
+        typedef void ( *VectorMA_function_type )( ::QAngle const &,float,::QAngle const &,::QAngle & );
+        
+        bp::def( 
+            "VectorMA"
+            , VectorMA_function_type( &::VectorMA )
+            , ( bp::arg("start"), bp::arg("scale"), bp::arg("direction"), bp::arg("dest") ) );
     
     }
 
@@ -4091,6 +3997,17 @@ BOOST_PYTHON_MODULE(_vmath){
             "VectorRotate"
             , VectorRotate_function_type( &::VectorRotate )
             , ( bp::arg("in1"), bp::arg("in2"), bp::arg("out") ) );
+    
+    }
+
+    { //::VectorScale
+    
+        typedef void ( *VectorScale_function_type )( ::RadianEuler const &,float,::RadianEuler & );
+        
+        bp::def( 
+            "VectorScale"
+            , VectorScale_function_type( &::VectorScale )
+            , ( bp::arg("src"), bp::arg("b"), bp::arg("dst") ) );
     
     }
 

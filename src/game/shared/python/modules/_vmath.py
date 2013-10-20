@@ -1,11 +1,9 @@
 from srcpy.module_generators import SharedModuleGenerator
-from src_helper import *
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
 from pyplusplus import messages
-from pygccxml.declarations import matchers
-
-import settings
+from pygccxml.declarations import matchers, pointer_t, reference_t, declarated_t, const_t, float_t, cpptypes
+from srcpy.matchers import calldef_withtypes
 
 class VMath(SharedModuleGenerator):
     module_name = '_vmath'
@@ -44,32 +42,18 @@ class VMath(SharedModuleGenerator):
         setitem_reg = '%(cls_name)s_exposer.def( "__setitem__", &::%(cls_name)s_wrapper::SetItem );\r\n'
         
         
-        # String
-        str_3d_wrapper = 'static boost::python::object Str( %(cls_name)s const & inst ) {\r\n' + \
-                                '   char buf[256];\r\n' + \
-                                '   Q_snprintf(buf, 256, "(%%f, %%f, %%f)", inst.x, inst.y, inst.z);\r\n' + \
-                                '   return boost::python::object(buf);\r\n' + \
-                                '}\r\n'
-        str_2d_wrapper = 'static boost::python::object Str( Vector2D const & inst ) {\r\n' + \
-                                '   char buf[256];\r\n' + \
-                                '   Q_snprintf(buf, 256, "(%f, %f)", inst.x, inst.y);\r\n' + \
-                                '   return boost::python::object(buf);\r\n' + \
-                                '}\r\n'
-                                
+        # String         
         str_vmatrix_wrapper = 'static boost::python::object Str( VMatrix const & inst ) {\r\n' + \
                                 '   return boost::python::object(VMatToString(inst));\r\n' + \
                                 '}\r\n'
                                 
         str_reg =   '%(cls_name)s_exposer.def( "__str__", &::%(cls_name)s_wrapper::Str );\r\n'
-                                
+        
         # Classes
         cls = mb.class_('Vector')
         cls.include()
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
 
-        cls.add_wrapper_code( str_3d_wrapper % {'cls_name':'Vector'} )
-        cls.add_registration_code( str_reg % {'cls_name':'Vector'}, False)
-        
         cls.add_wrapper_code( getitem_wrapper % {'cls_name' : 'Vector', 'nitems' : '2' } )
         cls.add_registration_code( getitem_reg % {'cls_name':'Vector'}, False)
         cls.add_wrapper_code( setitem_wrapper % {'cls_name' : 'Vector', 'nitems' : '2' } )
@@ -79,9 +63,6 @@ class VMath(SharedModuleGenerator):
         cls.include()
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
         
-        cls.add_wrapper_code( str_2d_wrapper)
-        cls.add_registration_code( str_reg % {'cls_name':'Vector2D'}, False)
-        
         cls.add_wrapper_code( getitem_wrapper % {'cls_name' : 'Vector2D', 'nitems' : '1' } )
         cls.add_registration_code( getitem_reg % {'cls_name':'Vector2D'}, False)
         cls.add_wrapper_code( setitem_wrapper % {'cls_name' : 'Vector2D', 'nitems' : '1' } )
@@ -90,10 +71,7 @@ class VMath(SharedModuleGenerator):
         cls = mb.class_('QAngle')
         cls.include()
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
-        
-        cls.add_wrapper_code( str_3d_wrapper % {'cls_name':'QAngle'} )
-        cls.add_registration_code( str_reg % {'cls_name':'QAngle'}, False)
-        
+
         cls.add_wrapper_code( getitem_wrapper % {'cls_name' : 'QAngle', 'nitems' : '2' } )
         cls.add_registration_code( getitem_reg % {'cls_name':'QAngle'}, False)
         cls.add_wrapper_code( setitem_wrapper % {'cls_name' : 'QAngle', 'nitems' : '2' } )
@@ -143,16 +121,17 @@ class VMath(SharedModuleGenerator):
         # Mathlib.h functions
         mb.free_function('RandomAngularImpulse').include()
         
-        mb.free_functions('VectorMaximum', lambda decl: HasArgType(decl, 'Vector') ).include()
-        mb.free_functions('VectorMAInline', lambda decl: HasArgType(decl, 'Vector') ).include()
-        mb.free_functions('VectorMA', lambda decl: HasArgType(decl, 'Vector') ).include()
-        
+        mb.free_functions('VectorMaximum').include()
+        mb.free_functions('VectorMAInline').include()
+        mb.free_functions('VectorMA').include()
+ 
         mb.free_functions('RoundInt').include()
         mb.free_functions('Q_log2').include()
         mb.free_functions('SinCos').include()
         mb.free_functions('TableCos').include()
         mb.free_functions('TableSin').include()
-        mb.free_functions('IsPowerOfTwo').include()
+        if self.settings.branch == 'swarm':
+            mb.free_functions('IsPowerOfTwo').include()
         mb.free_functions('SmallestPowerOfTwoGreaterOrEqual').include()
         mb.free_functions('LargestPowerOfTwoLessThanOrEqual').include()
         mb.free_functions('FloorDivMod').include()
@@ -160,7 +139,7 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('IsDenormal').include()
         
         mb.free_functions('MatrixVectors').include()
-        mb.free_functions('VectorRotate', lambda decl: HasArgType(decl, 'Vector') ).include()
+        mb.free_functions('VectorRotate').include()
         mb.free_functions('TransformAnglesToLocalSpace').include()
         
         mb.free_functions('MatrixInitialize').include()
@@ -206,36 +185,37 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('Sign').include()
         mb.free_functions('ClampArrayBounds').include()
         
-        mb.free_functions('AngleVectors', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('AngleVectors', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('AngleVectorsTranspose', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('AngleMatrix', lambda decl: HasArgType(decl, 'QAngle')).include()
-        mb.free_functions('AngleIMatrix', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorAngles', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorMatrix', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorVectors', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('AngleVectors').include()
+        mb.free_functions('AngleVectors').include()
+        mb.free_functions('AngleVectorsTranspose').include()
+        mb.free_functions('AngleMatrix').include()
+        mb.free_functions('AngleMatrix').include()
+        mb.free_functions('AngleIMatrix').include()
+        mb.free_functions('VectorAngles').include()
+        mb.free_functions('VectorMatrix').include()
+        mb.free_functions('VectorVectors').include()
         mb.free_functions('SetIdentityMatrix').include()
         mb.free_functions('SetScaleMatrix').include()
-        mb.free_functions('MatrixBuildRotationAboutAxis', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('MatrixBuildRotationAboutAxis').include()
         
         mb.free_functions('MatrixTranspose').include()
         mb.free_functions('MatrixInverseTranspose').include()
         mb.free_functions('PositionMatrix').include()
         mb.free_functions('MatrixPosition').include()
-        mb.free_functions('VectorRotate', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorIRotate', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('MatrixAngles', lambda decl: HasArgType(decl, 'QAngle')).include()
-        mb.free_functions('VectorCompare', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorTransform', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorITransform', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('VectorRotate').include()
+        mb.free_functions('VectorIRotate').include()
+        mb.free_functions('MatrixAngles').include()
+        mb.free_functions('VectorCompare').include()
+        mb.free_functions('VectorTransform').include()
+        mb.free_functions('VectorITransform').include()
         
-        mb.free_functions('BoxOnPlaneSide', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorFill', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorNegate', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorAvg', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('BoxOnPlaneSide2', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('ClearBounds', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('AddPointToBounds', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('BoxOnPlaneSide').include()
+        mb.free_functions('VectorFill').include()
+        mb.free_functions('VectorNegate').include()
+        mb.free_functions('VectorAvg').include()
+        mb.free_functions('BoxOnPlaneSide2').include()
+        mb.free_functions('ClearBounds').include()
+        mb.free_functions('AddPointToBounds').include()
         
         mb.free_functions('BuildGammaTable').include()
         mb.free_functions('TexLightToLinear').include()
@@ -248,7 +228,7 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('SolveInverseQuadraticMonotonic').include()
         mb.free_functions('SolveInverseReciprocalQuadratic').include()
         
-        mb.free_functions('VectorYawRotate', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('VectorYawRotate').include()
         
         mb.free_functions('Bias').include()
         mb.free_functions('Gain').include()
@@ -270,9 +250,9 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('ClampToMsec').include()
         mb.free_functions('Ceil2Int').include()
         
-        mb.free_functions('GetBarycentricCoords2D', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('QuickBoxSphereTest', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('QuickBoxIntersectTest', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('GetBarycentricCoords2D').include()
+        mb.free_functions('QuickBoxSphereTest').include()
+        mb.free_functions('QuickBoxIntersectTest').include()
         
         mb.free_functions('GammaToLinearFullRange').include()
         mb.free_functions('LinearToGammaFullRange').include()
@@ -356,47 +336,47 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('HSVtoRGB').include()
         
         # Vector.h functions
-        mb.free_functions('VectorClear', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorCopy', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorAdd', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorSubtract', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorMultiply', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorDivide', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorScale', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorMA', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorsAreEqual', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('ComputeClosestPoint', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorAbs', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorLength', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('DotProduct', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('CrossProduct', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorMin', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorMax', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorLerp', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('VectorClear').include()
+        mb.free_functions('VectorCopy').include()
+        mb.free_functions('VectorAdd').include()
+        mb.free_functions('VectorSubtract').include()
+        mb.free_functions('VectorMultiply').include()
+        mb.free_functions('VectorDivide').include()
+        mb.free_functions('VectorScale').include()
+        mb.free_functions('VectorMA').include()
+        mb.free_functions('VectorsAreEqual').include()
+        mb.free_functions('ComputeClosestPoint').include()
+        mb.free_functions('VectorAbs').include()
+        mb.free_functions('VectorLength').include()
+        mb.free_functions('DotProduct').include()
+        mb.free_functions('CrossProduct').include()
+        mb.free_functions('VectorMin').include()
+        mb.free_functions('VectorMax').include()
+        mb.free_functions('VectorLerp').include()
         mb.free_functions('RandomVector').include()
         
-        mb.free_functions('QAnglesAreEqual', lambda decl: HasArgType(decl, 'QAngle')).include()
-        #mb.free_functions('QAngleToAngularImpulse', lambda decl: HasArgType(decl, 'QAngle')).include()
-        #mb.free_functions('AngularImpulseToQAngle', lambda decl: HasArgType(decl, 'QAngle')).include()
+        mb.free_functions('QAnglesAreEqual').include()
+        #mb.free_functions('QAngleToAngularImpulse').include()
+        #mb.free_functions('AngularImpulseToQAngle').include()
         
-        mb.free_functions('VectorNormalize', lambda decl: HasArgType(decl, 'Vector')).include()
-        mb.free_functions('VectorNormalizeFast', lambda decl: HasArgType(decl, 'Vector')).include()
+        mb.free_functions('VectorNormalize').include()
+        mb.free_functions('VectorNormalizeFast').include()
         
         # Vector2d.h functions
-        mb.free_functions('Vector2DClear', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DCopy', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DAdd', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DSubtract', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DMultiply', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DDivide', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DMA', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DMin', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DMax', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DLength', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('DotProduct2D', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DLerp', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('Vector2DNormalize', lambda decl: HasArgType(decl, 'Vector2D')).include()
-        mb.free_functions('ComputeClosestPoint2D', lambda decl: HasArgType(decl, 'Vector2D')).include()
+        mb.free_functions('Vector2DClear').include()
+        mb.free_functions('Vector2DCopy').include()
+        mb.free_functions('Vector2DAdd').include()
+        mb.free_functions('Vector2DSubtract').include()
+        mb.free_functions('Vector2DMultiply').include()
+        mb.free_functions('Vector2DDivide').include()
+        mb.free_functions('Vector2DMA').include()
+        mb.free_functions('Vector2DMin').include()
+        mb.free_functions('Vector2DMax').include()
+        mb.free_functions('Vector2DLength').include()
+        mb.free_functions('DotProduct2D').include()
+        mb.free_functions('Vector2DLerp').include()
+        mb.free_functions('Vector2DNormalize').include()
+        mb.free_functions('ComputeClosestPoint2D').include()
         
         # QAngle functions
         mb.free_function('RandomAngle').include()
@@ -433,21 +413,32 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('MatrixToAngles').include()
 
         # Exclude
-        if self.settings.branch != 'swarm':
+        if self.settings.branch not in ['swarm', 'source2013']:
             mb.vars('pfVectorNormalizeFast').exclude()
             mb.vars('pfVectorNormalize').exclude()
             mb.vars('pfInvRSquared').exclude()
         mb.vars('m_flMatVal').exclude()
-        mb.vars('quat_identity').exclude() # <- Does not even exist except for a declaration!?
+        mb.vars('quat_identity').exclude() # <- Does not even exist except for a declaration?
         
         # Exclude some functions
         mb.mem_funs('Base').exclude()           # Base gives a pointer to the address of the data. Not very python like.
         mb.free_functions( 'AllocTempVector' ).exclude()
-        mb.class_('Vector2D').mem_funs('Cross').exclude()   # <- Does not even exist except for a declaration!?
-        mb.free_function('ConcatRotations').exclude() # Declaration only...    
+        mb.class_('Vector2D').mem_funs('Cross').exclude() # Declaration only?
+        mb.free_function('ConcatRotations').exclude() # Declaration only?  
         
         # Remove any protected function 
         mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
-        # Shut up about warnings of generating class wrappers
+        # Remove any function with "float *" values
+        # A lot of functions have two versions (or more), of which one takes "float *" arguments
+        vec_t = mb.typedef('vec_t')
+        excludetypes = [
+            pointer_t(float_t()),
+            pointer_t(const_t(float_t())),
+            pointer_t(declarated_t(vec_t)),
+            pointer_t(const_t(declarated_t(vec_t))),
+        ]
+        mb.calldefs( calldef_withtypes( excludetypes ) ).exclude()
+        
+        # Silent warnings of generating class wrappers
         mb.classes().disable_warnings( messages.W1027 )
