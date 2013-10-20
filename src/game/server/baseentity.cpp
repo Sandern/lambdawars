@@ -9007,7 +9007,8 @@ void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	try {
+	try 
+	{
 		length = boost::python::len(msg);
 		for( int i = 0; i < length; i++ )
 		{
@@ -9015,7 +9016,9 @@ void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
 			PyFillWriteElement( write, boost::python::object(msg[i]) );
 			writelist.AddToTail( write );
 		}
-	} catch( boost::python::error_already_set & ) {
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;

@@ -819,6 +819,10 @@ void register_C_RocketTrail_class(){
 
     bp::class_< C_RocketTrail_wrapper, bp::bases< C_BaseParticleEntity >, boost::noncopyable >( "C_RocketTrail", bp::init< >() )    
         .def( 
+            "GetAimEntOrigin"
+            , (void ( ::C_RocketTrail::* )( ::IClientEntity *,::Vector *,::QAngle * ) )( &::C_RocketTrail::GetAimEntOrigin )
+            , ( bp::arg("pAttachedTo"), bp::arg("pAbsOrigin"), bp::arg("pAbsAngles") ) )    
+        .def( 
             "OnDataChanged"
             , (void ( ::C_RocketTrail::* )( ::DataUpdateType_t ) )(&::C_RocketTrail::OnDataChanged)
             , (void ( C_RocketTrail_wrapper::* )( ::DataUpdateType_t ) )(&C_RocketTrail_wrapper::default_OnDataChanged)

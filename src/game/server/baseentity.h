@@ -1973,7 +1973,7 @@ public:
 
 	virtual void		PySetModel( const char *szModelName );		// Python safe version		
 	void				PySetSize( const Vector &vecMin, const Vector &vecMax );		// Python safe version
-	void				PySendMessage( bp::list msg, bool reliable=false );
+	void				PySendMessage( boost::python::list msg, bool reliable = false );
 
 	void				SetPyThink( bp::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
 	bp::object			GetPyThink();

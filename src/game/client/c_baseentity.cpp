@@ -6710,23 +6710,20 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 	length = msg.ReadByte();
 	for( i=0; i<length; i++)
 	{
-		try {
+		try 
+		{
 			recvlist.append( PyReadElement(msg) );
-		} catch(boost::python::error_already_set &) {
+		} 
+		catch(boost::python::error_already_set &) 
+		{
 			PyErr_Print();
 			PyErr_Clear();
 			return;
 		}
 	}
 
-	PyReceiveMessage(recvlist);
+	PyReceiveMessage( recvlist );
 }
-
-void C_BaseEntity::PyReceiveMessage( bp::list msg )
-{
-
-}
-
 
 //------------------------------------------------------------------------------
 // Purpose:

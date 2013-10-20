@@ -390,6 +390,7 @@ class Entities(SemiSharedModuleGenerator):
             pointer_t(declarated_t(bf_read)),
             reference_t(declarated_t(bf_read)),
             reference_t(const_t(declarated_t(ray))),
+            pointer_t(declarated_t(mb.class_('ICollideable'))),
         ]
         cls.calldefs(calldef_withtypes( excludetypes ), allow_empty=True).exclude()
         
@@ -432,7 +433,23 @@ class Entities(SemiSharedModuleGenerator):
             # Remove anything returning a pointer to C_CommandContext
             commandcontext = mb.class_('C_CommandContext')
             cls.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(commandcontext))), allow_empty=True).exclude()
-
+            
+            interpvarvector = mb.class_('CInterpolatedVar< Vector >')
+            interpvarqangle = mb.class_('CInterpolatedVar< QAngle >')
+            excludetypes = [
+                pointer_t(declarated_t(mb.class_('IClientRenderable'))),
+                pointer_t(declarated_t(mb.class_('IClientNetworkable'))),
+                pointer_t(declarated_t(mb.class_('IClientThinkable'))),
+                pointer_t(declarated_t(mb.class_('IClientVehicle'))),
+                pointer_t(const_t(declarated_t(mb.class_('IClientVehicle')))),
+                pointer_t(declarated_t(mb.class_('IInterpolatedVar'))),
+                pointer_t(declarated_t(interpvarvector)),
+                reference_t(declarated_t(interpvarvector)),
+                pointer_t(declarated_t(interpvarqangle)),
+                reference_t(declarated_t(interpvarqangle)),
+            ]
+            cls.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
+            
         mb.mem_funs('SetThinkHandle').exclude()
         mb.mem_funs('GetThinkHandle').exclude()
             
@@ -450,8 +467,14 @@ class Entities(SemiSharedModuleGenerator):
                 cls.add_wrapper_code(tmpl_serverclass % {'clsname' : clsname})
                 
             # Apply common rules
-            # Excludes
-            cls.mem_funs('GetServerClass', allow_empty=True).exclude()         # Don't care about this one
+            cls.mem_funs('GetServerClass', allow_empty=True).exclude()
+            
+            excludetypes = [
+                pointer_t(declarated_t(mb.class_('IServerVehicle'))),
+                pointer_t(const_t(declarated_t(mb.class_('IServerVehicle')))),
+                pointer_t(declarated_t(mb.class_('IServerNetworkable'))),
+            ]
+            cls.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
 
         # Spawning helper
         mb.free_functions('DispatchSpawn').include()
@@ -541,12 +564,12 @@ class Entities(SemiSharedModuleGenerator):
         
         mb.mem_funs('GetRefEHandle').exclude()          # We already got an auto conversion to a safe handle
         mb.mem_funs('SetRefEHandle').exclude()          # We already got an auto conversion to a safe handle
-        mb.mem_funs('GetCollideable').exclude()         # Don't care for now
         mb.mem_funs('GetModel').exclude()               # Probably not needed
 
         mb.mem_funs('GetBaseEntity').exclude()          # Automatically done by converter
         mb.mem_funs('GetBaseAnimating').exclude() # Automatically done by converter
         mb.mem_funs('MyCombatCharacterPointer').exclude() # Automatically done by converter
+        mb.mem_funs('MyCombatWeaponPointer').exclude() # Automatically done by converter
         
         mb.mem_funs('ThinkSet').exclude()               # Replaced by SetPyThink
         mb.mem_funs('PhysicsRunThink').exclude()            # Don't care  
@@ -581,6 +604,8 @@ class Entities(SemiSharedModuleGenerator):
                 self.AddNetworkVarProperty('takedamage', 'm_takedamage', 'int', entcls)
         
         if self.isclient:
+            cls.mem_funs('ParticleProp').call_policies = call_policies.return_internal_reference() 
+            
             # List of client functions overridable in Python
             mb.mem_funs('ShouldDraw').virtuality = 'virtual' # Called when visibility is updated, doesn't happens a lot.
             mb.mem_funs('GetCollideType').virtuality = 'virtual'
@@ -595,36 +620,27 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyReceiveMessage').rename('ReceiveMessage')
 
             # Excludes
-            mb.mem_funs('OnNewModel').exclude()  
-
-            # Excludes  
-            mb.mem_funs('Release').exclude()                # Should not be called directly from Python
-            mb.mem_funs('GetPredDescMap').exclude()         # Don't care about this one
-            mb.mem_funs('GetIClientUnknown').exclude()      # Don't care about this one
-            mb.mem_funs('GetClientNetworkable').exclude()   # Don't care about this one
-            mb.mem_funs('GetClientRenderable').exclude()    # Don't care about this one
-            mb.mem_funs('GetIClientEntity').exclude()       # Don't care about this one
-            mb.mem_funs('GetClientThinkable').exclude()     # Don't care about this one
-            mb.mem_funs('GetPVSNotifyInterface').exclude()  # Do we need this?
-            mb.mem_funs('GetThinkHandle').exclude()         # Don't care about this one
-            mb.mem_funs('RenderHandle').exclude()           # Don't care about this one
-            mb.mem_funs('GetRotationInterpolator').exclude()    # Not needed
-            mb.mem_funs('SetThinkHandle').exclude()         # Don't care
-            mb.mem_funs('GetClientHandle').exclude()        # Not needed
-            mb.mem_funs('GetRenderClipPlane').exclude()     # Don't care for now
-            mb.mem_funs('GetIDString').exclude()            # Don't care for now
-            mb.mem_funs('PhysicsAddHalfGravity').exclude()  # Declartion only
-            mb.mem_funs('PyUpdateNetworkVar').exclude()     # Internal for network vars
-            mb.mem_funs('BuildJiggleTransformations').exclude() # No declaration
+            mb.mem_funs('Release').exclude() # Should not be called directly from Python
+            cls.mem_funs('GetIClientUnknown').exclude()
+            cls.mem_funs('GetIClientEntity').exclude()
+            cls.mem_funs('GetClientHandle').exclude()
+            cls.mem_funs('RenderHandle').exclude()
             
-            mb.mem_funs('AllocateIntermediateData').exclude()            # Don't care
-            mb.mem_funs('DestroyIntermediateData').exclude()            # Don't care
-            mb.mem_funs('ShiftIntermediateDataForward').exclude()            # Don't care
-            mb.mem_funs('GetPredictedFrame').exclude()            # Don't care
-            mb.mem_funs('GetOriginalNetworkDataObject').exclude()            # Don't care
-            mb.mem_funs('IsIntermediateDataAllocated').exclude()            # Don't care
+            cls.mem_funs('GetPVSNotifyInterface').exclude()
+            cls.mem_funs('GetRenderClipPlane').exclude() # Pointer to 4 floats, requires manual conversion...
+            cls.mem_funs('GetIDString').exclude()
+            cls.mem_funs('PhysicsAddHalfGravity').exclude() # No definition on the client
+            cls.mem_funs('SetModelPointer').exclude() # Likely never needed, can use SetModel or SetModelIndex
+            mb.mem_funs('OnNewModel').exclude() # TODO
             
-            mb.mem_funs('MyCombatWeaponPointer').exclude()
+            mb.mem_funs('AllocateIntermediateData').exclude()
+            mb.mem_funs('DestroyIntermediateData').exclude()
+            mb.mem_funs('ShiftIntermediateDataForward').exclude()
+            mb.mem_funs('GetPredictedFrame').exclude()
+            mb.mem_funs('GetOriginalNetworkDataObject').exclude()
+            mb.mem_funs('IsIntermediateDataAllocated').exclude()
+            
+            mb.mem_funs('PyUpdateNetworkVar').exclude() # Internal for network vars
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetClientAlphaProperty').exclude()
@@ -633,6 +649,9 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetScriptDesc').exclude()
                 mb.mem_funs('GetScriptInstance').exclude()
                 mb.mem_funs('AlphaProp').exclude()
+                
+            # Not interested in Interpolation related functions
+            mb.mem_funs( lambda decl: 'Interp_' in decl.name ).exclude()
                 
             # Transform
             mb.mem_funs('GetShadowCastDistance').add_transformation(FT.output('pDist'))
@@ -655,17 +674,9 @@ class Entities(SemiSharedModuleGenerator):
                     
             # Don't give a shit about the following functions
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('C_AI_BaseNPC') != -1 ).exclude()
-            mb.mem_funs( lambda decl: 'Interp_' in decl.name ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'IInterpolatedVar') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CInterpolatedVar') != -1 ).exclude()
             
             # Exclude the following for now until we decide if we want them ( need fixes/exposed classes )
-            mb.mem_funs( lambda decl: HasArgType(decl, 'IClientVehicle') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientVehicle') != -1 ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IClientRenderable') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'C_RecipientFilter') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CNewParticleEffect') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'IClientEntity') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBaseHandle') != -1 ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'CDamageModifier') ).exclude()
             mb.mem_funs( lambda decl: HasArgType(decl, 'Quaternion') ).exclude()
@@ -736,12 +747,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('DeathNotice').virtuality = 'virtual'
         
             # Excludes
-            mb.mem_funs('GetNetworkable').exclude()         # Don't care for now
             mb.mem_funs('NetworkProp').exclude()            # Don't care
-            mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
-            mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
-            mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
-            mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('PhysicsMarkEntityAsTouched').exclude() # Don't care for now
             mb.mem_funs('NotifySystemEvent').exclude()          # Don't care
             mb.mem_funs('Entity').exclude()          # Don't care
@@ -759,13 +765,11 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('FOWShouldTransmit').exclude()
             mb.mem_funs('SetModelIndex').exclude()
             
-            mb.mem_funs('SendProxy_AnglesX').exclude()
-            mb.mem_funs('SendProxy_AnglesY').exclude()
-            mb.mem_funs('SendProxy_AnglesZ').exclude()
-            
-            mb.mem_funs('MyCombatWeaponPointer').exclude()
-            
             if self.settings.branch == 'swarm':
+                mb.mem_funs('SendProxy_AnglesX').exclude()
+                mb.mem_funs('SendProxy_AnglesY').exclude()
+                mb.mem_funs('SendProxy_AnglesZ').exclude()
+			
                 mb.mem_funs('FindNamedOutput').exclude()
                 mb.mem_funs('GetBaseAnimatingOverlay').exclude()
                 mb.mem_funs('GetContextData').exclude()
@@ -783,9 +787,7 @@ class Entities(SemiSharedModuleGenerator):
           
             # Call policies
             mb.mem_funs('GetResponseSystem').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetServerVehicle').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('AddEntityToGroundList').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
+
             # Don't give a shit about the following functions
            # mb.mem_funs( lambda decl: HasArgType(decl, 'CAI_BaseNPC') ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CAI_BaseNPC') != -1 ).exclude()
@@ -794,9 +796,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs( lambda decl: HasArgType(decl, 'CCheckTransmitInfo') ).exclude()
             
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IResponseSystem') != -1 ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'CRecipientFilter') ).exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'IServerVehicle') ).exclude()
-            mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('IServerVehicle') != -1 ).exclude()
             mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CSkyCamera') != -1 ).exclude()
             
             # Do not want the firebullets function with multiple arguments. Only the one with the struct.
@@ -816,14 +815,10 @@ class Entities(SemiSharedModuleGenerator):
         self.SetupProperty(cls, 'skin', 'GetSkin', 'SetSkin')
     
         if self.isclient:
-            
             cls.vars('m_SequenceTransitioner').exclude()
             cls.vars('m_nHitboxSet').exclude()
             cls.vars('m_pClientsideRagdoll').exclude()
             cls.vars('m_pRagdoll').exclude()
-            
-            #mb.mem_funs('OnNewModel').call_policies = call_policies.return_internal_reference() #call_policies.return_value_policy( call_policies.reference_existing_object ) 
-            mb.mem_funs('ParticleProp').call_policies = call_policies.return_internal_reference() 
             
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'

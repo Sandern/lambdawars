@@ -1922,7 +1922,7 @@ public:
 
 	// Python Entity Messages
 	void							PyReceiveMessageInternal( int classID, bf_read &msg );
-	virtual void					PyReceiveMessage( bp::list msg );
+	virtual void					PyReceiveMessage( boost::python::list msg ) {}
 
 	void							PyUpdateNetworkVar( const char *pName, bp::object data, bool callchanged = false );
 

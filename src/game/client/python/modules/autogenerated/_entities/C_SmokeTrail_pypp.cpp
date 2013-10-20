@@ -823,6 +823,10 @@ void register_C_SmokeTrail_class(){
             , (void ( ::C_SmokeTrail::* )( ::KeyValues * ) )( &::C_SmokeTrail::CleanupToolRecordingState )
             , ( bp::arg("msg") ) )    
         .def( 
+            "GetAimEntOrigin"
+            , (void ( ::C_SmokeTrail::* )( ::IClientEntity *,::Vector *,::QAngle * ) )( &::C_SmokeTrail::GetAimEntOrigin )
+            , ( bp::arg("pAttachedTo"), bp::arg("pAbsOrigin"), bp::arg("pAbsAngles") ) )    
+        .def( 
             "OnDataChanged"
             , (void ( ::C_SmokeTrail::* )( ::DataUpdateType_t ) )(&::C_SmokeTrail::OnDataChanged)
             , (void ( C_SmokeTrail_wrapper::* )( ::DataUpdateType_t ) )(&C_SmokeTrail_wrapper::default_OnDataChanged)

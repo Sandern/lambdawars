@@ -4818,6 +4818,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("flagsToRemove") ) );
         
         }
+        { //::CBaseEntity::RemoveRecipientsIfNotCloseCaptioning
+        
+            typedef void ( *RemoveRecipientsIfNotCloseCaptioning_function_type )( ::CRecipientFilter & );
+            
+            CBaseEntity_exposer.def( 
+                "RemoveRecipientsIfNotCloseCaptioning"
+                , RemoveRecipientsIfNotCloseCaptioning_function_type( &::CBaseEntity::RemoveRecipientsIfNotCloseCaptioning )
+                , ( bp::arg("filter") ) );
+        
+        }
         { //::CBaseEntity::RemoveSolidFlags
         
             typedef void ( ::CBaseEntity::*RemoveSolidFlags_function_type )( int ) ;
@@ -6659,6 +6669,7 @@ void register_CBaseEntity_class(){
         CBaseEntity_exposer.staticmethod( "PrecacheSoundHelper" );
         CBaseEntity_exposer.staticmethod( "PrefetchScriptSound" );
         CBaseEntity_exposer.staticmethod( "PrefetchSound" );
+        CBaseEntity_exposer.staticmethod( "RemoveRecipientsIfNotCloseCaptioning" );
         CBaseEntity_exposer.staticmethod( "SendProxy_CellOrigin" );
         CBaseEntity_exposer.staticmethod( "SendProxy_CellOriginXY" );
         CBaseEntity_exposer.staticmethod( "SendProxy_CellOriginZ" );

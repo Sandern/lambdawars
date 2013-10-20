@@ -1680,6 +1680,16 @@ void register_C_BaseEntity_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
+        { //::C_BaseEntity::GetAimEntOrigin
+        
+            typedef void ( ::C_BaseEntity::*GetAimEntOrigin_function_type )( ::IClientEntity *,::Vector *,::QAngle * ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetAimEntOrigin"
+                , GetAimEntOrigin_function_type( &::C_BaseEntity::GetAimEntOrigin )
+                , ( bp::arg("pAttachedTo"), bp::arg("pAbsOrigin"), bp::arg("pAbsAngles") ) );
+        
+        }
         { //::C_BaseEntity::GetAnimTime
         
             typedef float ( ::C_BaseEntity::*GetAnimTime_function_type )(  ) const;
@@ -3021,6 +3031,17 @@ void register_C_BaseEntity_class(){
                 "Instance"
                 , Instance_function_type( &::C_BaseEntity::Instance )
                 , ( bp::arg("hEnt") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::C_BaseEntity::Instance
+        
+            typedef ::C_BaseEntity * ( *Instance_function_type )( ::IClientEntity * );
+            
+            C_BaseEntity_exposer.def( 
+                "Instance"
+                , Instance_function_type( &::C_BaseEntity::Instance )
+                , ( bp::arg("ent") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
@@ -4704,6 +4725,16 @@ void register_C_BaseEntity_class(){
                 , RemoveFromLeafSystem_function_type( &::C_BaseEntity::RemoveFromLeafSystem ) );
         
         }
+        { //::C_BaseEntity::RemoveRecipientsIfNotCloseCaptioning
+        
+            typedef void ( *RemoveRecipientsIfNotCloseCaptioning_function_type )( ::C_RecipientFilter & );
+            
+            C_BaseEntity_exposer.def( 
+                "RemoveRecipientsIfNotCloseCaptioning"
+                , RemoveRecipientsIfNotCloseCaptioning_function_type( &::C_BaseEntity::RemoveRecipientsIfNotCloseCaptioning )
+                , ( bp::arg("filter") ) );
+        
+        }
         { //::C_BaseEntity::RemoveSolidFlags
         
             typedef void ( ::C_BaseEntity::*RemoveSolidFlags_function_type )( int ) ;
@@ -5348,16 +5379,6 @@ void register_C_BaseEntity_class(){
                 "SetModelName"
                 , SetModelName_function_type( &::C_BaseEntity::SetModelName )
                 , ( bp::arg("name") ) );
-        
-        }
-        { //::C_BaseEntity::SetModelPointer
-        
-            typedef void ( ::C_BaseEntity::*SetModelPointer_function_type )( ::model_t const * ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "SetModelPointer"
-                , SetModelPointer_function_type( &::C_BaseEntity::SetModelPointer )
-                , ( bp::arg("pModel") ) );
         
         }
         { //::C_BaseEntity::SetMousePassEntity
@@ -6358,6 +6379,7 @@ void register_C_BaseEntity_class(){
         C_BaseEntity_exposer.staticmethod( "RecvProxy_CellX" );
         C_BaseEntity_exposer.staticmethod( "RecvProxy_CellY" );
         C_BaseEntity_exposer.staticmethod( "RecvProxy_CellZ" );
+        C_BaseEntity_exposer.staticmethod( "RemoveRecipientsIfNotCloseCaptioning" );
         C_BaseEntity_exposer.staticmethod( "SetAbsQueriesValid" );
         C_BaseEntity_exposer.staticmethod( "SetAllowPrecache" );
         C_BaseEntity_exposer.staticmethod( "SetPredictionPlayer" );

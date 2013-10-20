@@ -1255,6 +1255,16 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("flInterval")=0.0f ) );
         
         }
+        { //::C_BaseAnimating::GetAimEntOrigin
+        
+            typedef void ( ::C_BaseAnimating::*GetAimEntOrigin_function_type )( ::IClientEntity *,::Vector *,::QAngle * ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "GetAimEntOrigin"
+                , GetAimEntOrigin_function_type( &::C_BaseAnimating::GetAimEntOrigin )
+                , ( bp::arg("pAttachedTo"), bp::arg("pAbsOrigin"), bp::arg("pAbsAngles") ) );
+        
+        }
         { //::C_BaseAnimating::GetAnimTimeInterval
         
             typedef float ( ::C_BaseAnimating::*GetAnimTimeInterval_function_type )(  ) const;
