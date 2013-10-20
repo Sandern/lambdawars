@@ -195,6 +195,7 @@ void CefClientHandler::Destroy()
 {
 	if( GetBrowser() )
 	{
+		GetBrowser()->GetHost()->ParentWindowWillClose();
 		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
 
