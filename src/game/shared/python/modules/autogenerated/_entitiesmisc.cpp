@@ -3167,6 +3167,11 @@ struct variant_t_wrapper : variant_t, bp::wrapper< variant_t > {
         return variant_t::ToString(  );
     }
 
+    static bp::object PyEntity( variant_t &inst )
+    {
+       return inst.Entity() ? inst.Entity()->GetPyHandle() : bp::object();
+    }
+
 };
 
 BOOST_PYTHON_MODULE(_entitiesmisc){
@@ -5073,10 +5078,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (bool ( ::variant_t::* )( ::fieldtype_t ) )( &::variant_t::Convert )
             , ( bp::arg("newType") ) )    
         .def( 
-            "Entity"
-            , (::CHandle< CBaseEntity > const & ( ::variant_t::* )(  ) const)( &::variant_t::Entity )
-            , bp::return_value_policy< bp::copy_const_reference >() )    
-        .def( 
             "FieldType"
             , (::fieldtype_t ( ::variant_t::* )(  ) )( &::variant_t::FieldType ) )    
         .def( 
@@ -5141,7 +5142,8 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .def( 
             "Vector3D"
             , (void ( ::variant_t::* )( ::Vector & ) const)( &::variant_t::Vector3D )
-            , ( bp::arg("vec") ) );
+            , ( bp::arg("vec") ) )    
+        .def("Entity", &::variant_t_wrapper::PyEntity);
 
     { //::AddMultiDamage
     

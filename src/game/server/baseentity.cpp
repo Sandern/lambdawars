@@ -4627,9 +4627,19 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 			PyErr_Clear();
 		}
 
+		bp::object inputmethod;
 		try
 		{
-			bp::object inputmethod = inputmap.attr("get")(szInputName, bp::object());
+			inputmethod = inputmap.attr("get")( szInputName, bp::object() );
+		} 
+		catch( bp::error_already_set & )
+		{
+			Warning( "Python entity has an invalid inputmap map!\n" );
+			PyErr_Print();
+		}
+
+		try
+		{
 			if( inputmethod.ptr() != Py_None )
 			{
 				// found a match
@@ -4638,11 +4648,11 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 				// mapper debug message
 				if (pCaller != NULL)
 				{
-					Q_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input %s: %s.%s(%s)\n", gpGlobals->curtime, STRING(pCaller->m_iName.Get()), GetDebugName(), szInputName, Value.String() );
+					V_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input %s: %s.%s(%s)\n", gpGlobals->curtime, STRING(pCaller->m_iName.Get()), GetDebugName(), szInputName, Value.String() );
 				}
 				else
 				{
-					Q_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input <NULL>: %s.%s(%s)\n", gpGlobals->curtime, GetDebugName(), szInputName, Value.String() );
+					V_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input <NULL>: %s.%s(%s)\n", gpGlobals->curtime, GetDebugName(), szInputName, Value.String() );
 				}
 				DevMsg( 2, szBuffer );
 				ADD_DEBUG_HISTORY( HISTORY_ENTITY_IO, szBuffer );
@@ -4677,13 +4687,13 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 				data.value = Value;
 				data.nOutputID = outputID;
 
-				inputmethod(m_pyInstance, data);
+				inputmethod( m_pyInstance, data );
 				return true;
 			}
-		} 
+		}
 		catch( bp::error_already_set & )
 		{
-			Warning("Python entity has an invalid inputmap map!\n");
+			Warning( "Failed to execute input method %s!\n", szInputName );
 			PyErr_Print();
 		}
 	}
