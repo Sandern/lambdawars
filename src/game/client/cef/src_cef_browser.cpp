@@ -139,6 +139,8 @@ public:
 	// CefLifeSpanHandler methods
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
 
+	virtual bool DoClose(CefRefPtr<CefBrowser> browser);
+
 	virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 										TerminationStatus status);
 
@@ -195,7 +197,6 @@ void CefClientHandler::Destroy()
 {
 	if( GetBrowser() )
 	{
-		GetBrowser()->GetHost()->ParentWindowWillClose();
 		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
 
@@ -312,6 +313,17 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 	}
 
 	m_pSrcBrowser->OnAfterCreated();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
+{
+	if( browser->IsLoading() )
+		browser->StopLoad();
+	browser->GetHost()->ParentWindowWillClose();
+	return false;
 }
 
 //-----------------------------------------------------------------------------
