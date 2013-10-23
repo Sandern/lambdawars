@@ -117,11 +117,11 @@ class SourceModuleGenerator(ModuleGenerator):
             'clsname' : cls.name,
         }
         if not self.isclient:
-            cls.add_wrapper_code('%(type)s %(varname)s_Get() { return %(varname)s.Get(); }' % args)
-            cls.add_wrapper_code('void %(varname)s_Set( %(type)s val ) { %(varname)s.Set( val ); }' % args)
+            cls.add_wrapper_code('static %(type)s %(varname)s_Get( %(clsname)s const & inst ) { return inst.%(varname)s.Get(); }' % args)
+            cls.add_wrapper_code('static void %(varname)s_Set( %(clsname)s & inst, %(type)s val ) { inst.%(varname)s.Set( val ); }' % args)
         else:
-            cls.add_wrapper_code('%(type)s %(varname)s_Get() { return %(varname)s; }' % args)
-            cls.add_wrapper_code('void %(varname)s_Set( %(type)s val ) { %(varname)s = val; }' % args)
+            cls.add_wrapper_code('static %(type)s %(varname)s_Get( %(clsname)s const & inst ) { return inst.%(varname)s; }' % args)
+            cls.add_wrapper_code('static void %(varname)s_Set( %(clsname)s & inst, %(type)s val ) { inst.%(varname)s = val; }' % args)
         cls.add_registration_code('add_property( "%(exposename)s", &%(clsname)s_wrapper::%(varname)s_Get, &%(clsname)s_wrapper::%(varname)s_Set )' % (args))
             
     # Applies common rules to code
