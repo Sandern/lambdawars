@@ -1114,7 +1114,7 @@ BOOST_PYTHON_MODULE(_utils){
         .def_readwrite( "hitbox", &CGameTrace::hitbox )    
         .def_readwrite( "hitgroup", &CGameTrace::hitgroup )    
         .add_property( "ent"
-                    , bp::make_function( (::C_BaseEntity * (*)( ::CGameTrace const & ))(&CGameTrace_wrapper::get_m_pEnt), bp::return_internal_reference< >() )
+                    , bp::make_function( (::C_BaseEntity * (*)( ::CGameTrace const & ))(&CGameTrace_wrapper::get_m_pEnt), bp::return_value_policy< bp::return_by_value >() )
                     , bp::make_function( (void (*)( ::CGameTrace &,::C_BaseEntity * ))(&CGameTrace_wrapper::set_m_pEnt), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
         .def_readwrite( "physicsbone", &CGameTrace::physicsbone )    
         .def_readwrite( "surface", &CGameTrace::surface )    
@@ -4198,7 +4198,7 @@ BOOST_PYTHON_MODULE(_utils){
         .def_readwrite( "hitbox", &CGameTrace::hitbox )    
         .def_readwrite( "hitgroup", &CGameTrace::hitgroup )    
         .add_property( "ent"
-                    , bp::make_function( (::CBaseEntity * (*)( ::CGameTrace const & ))(&CGameTrace_wrapper::get_m_pEnt), bp::return_internal_reference< >() )
+                    , bp::make_function( (::CBaseEntity * (*)( ::CGameTrace const & ))(&CGameTrace_wrapper::get_m_pEnt), bp::return_value_policy< bp::return_by_value >() )
                     , bp::make_function( (void (*)( ::CGameTrace &,::CBaseEntity * ))(&CGameTrace_wrapper::set_m_pEnt), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
         .def_readwrite( "physicsbone", &CGameTrace::physicsbone )    
         .def_readwrite( "surface", &CGameTrace::surface )    

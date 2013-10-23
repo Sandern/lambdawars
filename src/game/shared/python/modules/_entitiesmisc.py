@@ -233,25 +233,20 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             cls.mem_funs('GetActionForTarget').exclude()
             cls.mem_funs('GetFirstAction').exclude()
             
+        # Note: PyOutputEvent covers all the other types
+        # There is no need for COutputInt, COutputFloat, etc.
         cls = mb.class_('PyOutputEvent')
         cls.include()
-        cls.rename('COutputEvent')
-        #mb.class_('COutputVariant').include()
-        #mb.class_('COutputInt').include()
-        #mb.class_('COutputFloat').include()
-        #mb.class_('COutputString').include()
-        #mb.class_('COutputEHANDLE').include()
-        #mb.class_('COutputVector').include()
-        #mb.class_('COutputPositionVector').include()
-        #mb.class_('COutputColor32').include()        
+        cls.rename('COutputEvent') 
         
         # Inputdata_t and variant_t
         cls = mb.class_('inputdata_t')
         cls.include()
-        if self.settings.branch == 'source2013':
-            cls.var('nOutputID').rename('outputid')
-            cls.var('pActivator').rename('activator')
-            cls.var('pCaller').rename('caller')
+        cls.var('pActivator').getter_call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.var('pCaller').getter_call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.var('nOutputID').rename('outputid')
+        cls.var('pActivator').rename('activator')
+        cls.var('pCaller').rename('caller')
         
         cls = mb.class_('variant_t')
         cls.include()
