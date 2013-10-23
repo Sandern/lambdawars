@@ -1116,13 +1116,13 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
         return C_UnitBase::GetClientClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_UnitBase const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_UnitBase & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_UnitBase const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_UnitBase & inst, int val ) { inst.m_takedamage = val; }
 
     virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );

@@ -1035,13 +1035,13 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         return C_HL2WarsPlayer::GetClientClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_HL2WarsPlayer const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_HL2WarsPlayer & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_HL2WarsPlayer const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_HL2WarsPlayer & inst, int val ) { inst.m_takedamage = val; }
 
 };
 

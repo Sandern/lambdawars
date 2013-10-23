@@ -915,45 +915,45 @@ struct C_WarsWeapon_wrapper : C_WarsWeapon, bp::wrapper< C_WarsWeapon > {
         return C_WarsWeapon::GetClientClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_WarsWeapon const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_WarsWeapon & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_WarsWeapon const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_WarsWeapon & inst, int val ) { inst.m_takedamage = val; }
 
-    float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack; }
+    static float m_flNextPrimaryAttack_Get( C_WarsWeapon const & inst ) { return inst.m_flNextPrimaryAttack; }
 
-    void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack = val; }
+    static void m_flNextPrimaryAttack_Set( C_WarsWeapon & inst, float val ) { inst.m_flNextPrimaryAttack = val; }
 
-    float m_flNextSecondaryAttack_Get() { return m_flNextSecondaryAttack; }
+    static float m_flNextSecondaryAttack_Get( C_WarsWeapon const & inst ) { return inst.m_flNextSecondaryAttack; }
 
-    void m_flNextSecondaryAttack_Set( float val ) { m_flNextSecondaryAttack = val; }
+    static void m_flNextSecondaryAttack_Set( C_WarsWeapon & inst, float val ) { inst.m_flNextSecondaryAttack = val; }
 
-    float m_flTimeWeaponIdle_Get() { return m_flTimeWeaponIdle; }
+    static float m_flTimeWeaponIdle_Get( C_WarsWeapon const & inst ) { return inst.m_flTimeWeaponIdle; }
 
-    void m_flTimeWeaponIdle_Set( float val ) { m_flTimeWeaponIdle = val; }
+    static void m_flTimeWeaponIdle_Set( C_WarsWeapon & inst, float val ) { inst.m_flTimeWeaponIdle = val; }
 
-    int m_iState_Get() { return m_iState; }
+    static int m_iState_Get( C_WarsWeapon const & inst ) { return inst.m_iState; }
 
-    void m_iState_Set( int val ) { m_iState = val; }
+    static void m_iState_Set( C_WarsWeapon & inst, int val ) { inst.m_iState = val; }
 
-    int m_iPrimaryAmmoType_Get() { return m_iPrimaryAmmoType; }
+    static int m_iPrimaryAmmoType_Get( C_WarsWeapon const & inst ) { return inst.m_iPrimaryAmmoType; }
 
-    void m_iPrimaryAmmoType_Set( int val ) { m_iPrimaryAmmoType = val; }
+    static void m_iPrimaryAmmoType_Set( C_WarsWeapon & inst, int val ) { inst.m_iPrimaryAmmoType = val; }
 
-    int m_iSecondaryAmmoType_Get() { return m_iSecondaryAmmoType; }
+    static int m_iSecondaryAmmoType_Get( C_WarsWeapon const & inst ) { return inst.m_iSecondaryAmmoType; }
 
-    void m_iSecondaryAmmoType_Set( int val ) { m_iSecondaryAmmoType = val; }
+    static void m_iSecondaryAmmoType_Set( C_WarsWeapon & inst, int val ) { inst.m_iSecondaryAmmoType = val; }
 
-    int m_iClip1_Get() { return m_iClip1; }
+    static int m_iClip1_Get( C_WarsWeapon const & inst ) { return inst.m_iClip1; }
 
-    void m_iClip1_Set( int val ) { m_iClip1 = val; }
+    static void m_iClip1_Set( C_WarsWeapon & inst, int val ) { inst.m_iClip1 = val; }
 
-    int m_iClip2_Get() { return m_iClip2; }
+    static int m_iClip2_Get( C_WarsWeapon const & inst ) { return inst.m_iClip2; }
 
-    void m_iClip2_Set( int val ) { m_iClip2 = val; }
+    static void m_iClip2_Set( C_WarsWeapon & inst, int val ) { inst.m_iClip2 = val; }
 
 };
 

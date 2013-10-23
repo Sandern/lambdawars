@@ -846,13 +846,13 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         return C_BaseGrenade::GetClientClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_BaseGrenade const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_BaseGrenade & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_BaseGrenade const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_BaseGrenade & inst, int val ) { inst.m_takedamage = val; }
 
 };
 

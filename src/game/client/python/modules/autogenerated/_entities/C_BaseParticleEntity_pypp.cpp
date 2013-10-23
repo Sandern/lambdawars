@@ -805,13 +805,13 @@ struct C_BaseParticleEntity_wrapper : C_BaseParticleEntity, bp::wrapper< C_BaseP
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_BaseParticleEntity const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_BaseParticleEntity & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_BaseParticleEntity const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_BaseParticleEntity & inst, int val ) { inst.m_takedamage = val; }
 
 };
 

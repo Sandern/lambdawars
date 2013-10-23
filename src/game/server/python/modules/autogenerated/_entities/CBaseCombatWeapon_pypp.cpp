@@ -1143,45 +1143,45 @@ struct CBaseCombatWeapon_wrapper : CBaseCombatWeapon, bp::wrapper< CBaseCombatWe
         return CBaseCombatWeapon::GetServerClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState.Get(); }
+    static int m_lifeState_Get( CBaseCombatWeapon const & inst ) { return inst.m_lifeState.Get(); }
 
-    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+    static void m_lifeState_Set( CBaseCombatWeapon & inst, int val ) { inst.m_lifeState.Set( val ); }
 
-    int m_takedamage_Get() { return m_takedamage.Get(); }
+    static int m_takedamage_Get( CBaseCombatWeapon const & inst ) { return inst.m_takedamage.Get(); }
 
-    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+    static void m_takedamage_Set( CBaseCombatWeapon & inst, int val ) { inst.m_takedamage.Set( val ); }
 
-    float m_flNextPrimaryAttack_Get() { return m_flNextPrimaryAttack.Get(); }
+    static float m_flNextPrimaryAttack_Get( CBaseCombatWeapon const & inst ) { return inst.m_flNextPrimaryAttack.Get(); }
 
-    void m_flNextPrimaryAttack_Set( float val ) { m_flNextPrimaryAttack.Set( val ); }
+    static void m_flNextPrimaryAttack_Set( CBaseCombatWeapon & inst, float val ) { inst.m_flNextPrimaryAttack.Set( val ); }
 
-    float m_flNextSecondaryAttack_Get() { return m_flNextSecondaryAttack.Get(); }
+    static float m_flNextSecondaryAttack_Get( CBaseCombatWeapon const & inst ) { return inst.m_flNextSecondaryAttack.Get(); }
 
-    void m_flNextSecondaryAttack_Set( float val ) { m_flNextSecondaryAttack.Set( val ); }
+    static void m_flNextSecondaryAttack_Set( CBaseCombatWeapon & inst, float val ) { inst.m_flNextSecondaryAttack.Set( val ); }
 
-    float m_flTimeWeaponIdle_Get() { return m_flTimeWeaponIdle.Get(); }
+    static float m_flTimeWeaponIdle_Get( CBaseCombatWeapon const & inst ) { return inst.m_flTimeWeaponIdle.Get(); }
 
-    void m_flTimeWeaponIdle_Set( float val ) { m_flTimeWeaponIdle.Set( val ); }
+    static void m_flTimeWeaponIdle_Set( CBaseCombatWeapon & inst, float val ) { inst.m_flTimeWeaponIdle.Set( val ); }
 
-    int m_iState_Get() { return m_iState.Get(); }
+    static int m_iState_Get( CBaseCombatWeapon const & inst ) { return inst.m_iState.Get(); }
 
-    void m_iState_Set( int val ) { m_iState.Set( val ); }
+    static void m_iState_Set( CBaseCombatWeapon & inst, int val ) { inst.m_iState.Set( val ); }
 
-    int m_iPrimaryAmmoType_Get() { return m_iPrimaryAmmoType.Get(); }
+    static int m_iPrimaryAmmoType_Get( CBaseCombatWeapon const & inst ) { return inst.m_iPrimaryAmmoType.Get(); }
 
-    void m_iPrimaryAmmoType_Set( int val ) { m_iPrimaryAmmoType.Set( val ); }
+    static void m_iPrimaryAmmoType_Set( CBaseCombatWeapon & inst, int val ) { inst.m_iPrimaryAmmoType.Set( val ); }
 
-    int m_iSecondaryAmmoType_Get() { return m_iSecondaryAmmoType.Get(); }
+    static int m_iSecondaryAmmoType_Get( CBaseCombatWeapon const & inst ) { return inst.m_iSecondaryAmmoType.Get(); }
 
-    void m_iSecondaryAmmoType_Set( int val ) { m_iSecondaryAmmoType.Set( val ); }
+    static void m_iSecondaryAmmoType_Set( CBaseCombatWeapon & inst, int val ) { inst.m_iSecondaryAmmoType.Set( val ); }
 
-    int m_iClip1_Get() { return m_iClip1.Get(); }
+    static int m_iClip1_Get( CBaseCombatWeapon const & inst ) { return inst.m_iClip1.Get(); }
 
-    void m_iClip1_Set( int val ) { m_iClip1.Set( val ); }
+    static void m_iClip1_Set( CBaseCombatWeapon & inst, int val ) { inst.m_iClip1.Set( val ); }
 
-    int m_iClip2_Get() { return m_iClip2.Get(); }
+    static int m_iClip2_Get( CBaseCombatWeapon const & inst ) { return inst.m_iClip2.Get(); }
 
-    void m_iClip2_Set( int val ) { m_iClip2.Set( val ); }
+    static void m_iClip2_Set( CBaseCombatWeapon & inst, int val ) { inst.m_iClip2.Set( val ); }
 
 };
 

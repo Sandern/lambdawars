@@ -4627,19 +4627,9 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 			PyErr_Clear();
 		}
 
-		bp::object inputmethod;
 		try
 		{
-			inputmethod = inputmap.attr("get")( szInputName, bp::object() );
-		} 
-		catch( bp::error_already_set & )
-		{
-			Warning( "Python entity has an invalid inputmap map!\n" );
-			PyErr_Print();
-		}
-
-		try
-		{
+			bp::object inputmethod = inputmap.attr("get")( szInputName, bp::object() );
 			if( inputmethod.ptr() != Py_None )
 			{
 				// found a match

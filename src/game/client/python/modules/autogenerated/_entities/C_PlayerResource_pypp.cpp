@@ -816,13 +816,13 @@ struct C_PlayerResource_wrapper : C_PlayerResource, bp::wrapper< C_PlayerResourc
         return C_PlayerResource::GetClientClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState; }
+    static int m_lifeState_Get( C_PlayerResource const & inst ) { return inst.m_lifeState; }
 
-    void m_lifeState_Set( int val ) { m_lifeState = val; }
+    static void m_lifeState_Set( C_PlayerResource & inst, int val ) { inst.m_lifeState = val; }
 
-    int m_takedamage_Get() { return m_takedamage; }
+    static int m_takedamage_Get( C_PlayerResource const & inst ) { return inst.m_takedamage; }
 
-    void m_takedamage_Set( int val ) { m_takedamage = val; }
+    static void m_takedamage_Set( C_PlayerResource & inst, int val ) { inst.m_takedamage = val; }
 
 };
 

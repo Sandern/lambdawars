@@ -1323,13 +1323,13 @@ struct CBaseCombatCharacter_wrapper : CBaseCombatCharacter, bp::wrapper< CBaseCo
         return CBaseCombatCharacter::GetServerClass();
     }
 
-    int m_lifeState_Get() { return m_lifeState.Get(); }
+    static int m_lifeState_Get( CBaseCombatCharacter const & inst ) { return inst.m_lifeState.Get(); }
 
-    void m_lifeState_Set( int val ) { m_lifeState.Set( val ); }
+    static void m_lifeState_Set( CBaseCombatCharacter & inst, int val ) { inst.m_lifeState.Set( val ); }
 
-    int m_takedamage_Get() { return m_takedamage.Get(); }
+    static int m_takedamage_Get( CBaseCombatCharacter const & inst ) { return inst.m_takedamage.Get(); }
 
-    void m_takedamage_Set( int val ) { m_takedamage.Set( val ); }
+    static void m_takedamage_Set( CBaseCombatCharacter & inst, int val ) { inst.m_takedamage.Set( val ); }
 
 };
 
