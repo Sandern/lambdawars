@@ -65,6 +65,8 @@ class member_variable_t( member_variable_base_t ):
         #according to David Abrahams:
         #http://mail.python.org/pipermail/c++-sig/2003-January/003276.html
         call_pol = call_policies.return_internal_reference().create( self )
+        if self.declaration.getter_call_policies:
+            call_pol = self.declaration.getter_call_policies.create( self )
         make_function = algorithm.create_identifier( self, '::boost::python::make_function' )
 
         answer.append( '%(mk_func)s( (%(getter_type)s)(&%(wfname)s), %(call_pol)s )'
@@ -77,7 +79,9 @@ class member_variable_t( member_variable_base_t ):
         if self.wrapper.has_setter:
             answer.append( self.PARAM_SEPARATOR )
             call_pol = ''
-            if not self.declaration.type_qualifiers.has_static:
+            if self.declaration.setter_call_policies:
+                call_pol = self.declaration.setter_call_policies.create( self )
+            elif not self.declaration.type_qualifiers.has_static:
                 call_pol = ", " + call_policies.with_custodian_and_ward_postcall( 1, 2 ).create(self)
             answer.append( '%(mk_func)s( (%(setter_type)s)(&%(wfname)s)%(call_pol)s )'
                        % { 'mk_func' : make_function
