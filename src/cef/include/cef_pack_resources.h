@@ -317,6 +317,7 @@
 #define IDR_CEF_CREDITS_SWIFTSHADER_JPG 27503
 #define IDR_CEF_LICENSE_TXT 27504
 #define IDR_CEF_VERSION_HTML 27505
+#define IDR_PRINT_PREVIEW_PAGE 27506
 
 // ---------------------------------------------------------------------------
 // From content_resources.h:

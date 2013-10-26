@@ -36,7 +36,7 @@
 #define CEF_INCLUDE_CEF_VERSION_H_
 
 #define CEF_VERSION_MAJOR 3
-#define CEF_REVISION 1468
+#define CEF_REVISION 1492
 #define COPYRIGHT_YEAR 2013
 
 #define CHROME_VERSION_MAJOR 31
@@ -61,13 +61,13 @@ extern "C" {
 // universal hash value will change if any platform is affected whereas the
 // platform hash values will change only if that particular platform is
 // affected.
-#define CEF_API_HASH_UNIVERSAL "3e423846a27022b3d96950a1f6f783a1f226a94b"
+#define CEF_API_HASH_UNIVERSAL "026aaf10a0738d97cef6265c6600449a60b48ac6"
 #if defined(OS_WIN)
-#define CEF_API_HASH_PLATFORM "34d3c0c4ccb27ad5732e82b553844d9454e90c5e"
+#define CEF_API_HASH_PLATFORM "7095515ba3de7e4469c9670fbab90db580be985f"
 #elif defined(OS_MACOSX)
-#define CEF_API_HASH_PLATFORM "16c5135a6dd7c0a37f1e4cbe3b5982290e7b50cc"
+#define CEF_API_HASH_PLATFORM "ba2e1a472bc0e8eb61ede0fbd5ae560257a3e6b3"
 #elif defined(OS_LINUX)
-#define CEF_API_HASH_PLATFORM "e86349cade7079ca515627f26bdd8ca38d2aef0a"
+#define CEF_API_HASH_PLATFORM "6196ded9aa05fe1fc205fb88c16dc61ecd16709f"
 #endif
 
 ///
