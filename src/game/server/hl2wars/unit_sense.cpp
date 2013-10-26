@@ -401,7 +401,7 @@ bp::list UnitBaseSense::PyGetOthers( const char *unittype )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool UnitBaseSense::AddEnenmyInRangeCallback( boost::python::object callback, int range, float frequency )
+bool UnitBaseSense::AddEnemyInRangeCallback( boost::python::object callback, int range, float frequency )
 {
 	for( int i = 0; i < m_Callbacks.Count(); i++ )
 	{

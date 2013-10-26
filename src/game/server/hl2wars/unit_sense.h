@@ -53,7 +53,7 @@ public:
 	bp::list PyGetEnemies( const char *unittype = NULL );
 	bp::list PyGetOthers( const char *unittype = NULL );
 
-	bool AddEnenmyInRangeCallback( boost::python::object callback, int range, float frequency );
+	bool AddEnemyInRangeCallback( boost::python::object callback, int range, float frequency );
 	bool RemoveEnemyInRangeCallback( boost::python::object callback, int range = -1 );
 #endif // ENABLE_PYTHON
 

@@ -4663,13 +4663,13 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseSense_exposer_t UnitBaseSense_exposer = UnitBaseSense_exposer_t( "UnitBaseSense", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseSense_scope( UnitBaseSense_exposer );
         bp::implicitly_convertible< bp::object, UnitBaseSense >();
-        { //::UnitBaseSense::AddEnenmyInRangeCallback
+        { //::UnitBaseSense::AddEnemyInRangeCallback
         
-            typedef bool ( ::UnitBaseSense::*AddEnenmyInRangeCallback_function_type )( ::boost::python::object,int,float ) ;
+            typedef bool ( ::UnitBaseSense::*AddEnemyInRangeCallback_function_type )( ::boost::python::object,int,float ) ;
             
             UnitBaseSense_exposer.def( 
-                "AddEnenmyInRangeCallback"
-                , AddEnenmyInRangeCallback_function_type( &::UnitBaseSense::AddEnenmyInRangeCallback )
+                "AddEnemyInRangeCallback"
+                , AddEnemyInRangeCallback_function_type( &::UnitBaseSense::AddEnemyInRangeCallback )
                 , ( bp::arg("callback"), bp::arg("range"), bp::arg("frequency") ) );
         
         }
