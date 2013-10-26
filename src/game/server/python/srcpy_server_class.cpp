@@ -16,30 +16,28 @@ PyServerClass *g_pPyServerClassHead = NULL;
 
 bool g_SetupNetworkTablesOnHold = false;
 
-#define EXTERN_SENDTABLE( DT_ClassName ) namespace DT_ClassName { extern SendTable g_SendTable; }
-
-EXTERN_SENDTABLE( DT_BaseEntity );
-EXTERN_SENDTABLE( DT_BaseAnimating );
-EXTERN_SENDTABLE( DT_BaseAnimatingOverlay );
-EXTERN_SENDTABLE( DT_BaseFlex );
-EXTERN_SENDTABLE( DT_BaseCombatWeapon );
-EXTERN_SENDTABLE( DT_BaseCombatCharacter );
-EXTERN_SENDTABLE( DT_BasePlayer );
-EXTERN_SENDTABLE( DT_BaseGrenade );
-EXTERN_SENDTABLE( DT_Beam );
-EXTERN_SENDTABLE( DT_Sprite );
-EXTERN_SENDTABLE( DT_SmokeTrail );
-EXTERN_SENDTABLE( DT_BaseToggle );
-EXTERN_SENDTABLE( DT_BaseTrigger );
-EXTERN_SENDTABLE( DT_PlayerResource );
+EXTERN_SEND_TABLE( DT_BaseEntity );
+EXTERN_SEND_TABLE( DT_BaseAnimating );
+EXTERN_SEND_TABLE( DT_BaseAnimatingOverlay );
+EXTERN_SEND_TABLE( DT_BaseFlex );
+EXTERN_SEND_TABLE( DT_BaseCombatWeapon );
+EXTERN_SEND_TABLE( DT_BaseCombatCharacter );
+EXTERN_SEND_TABLE( DT_BasePlayer );
+EXTERN_SEND_TABLE( DT_BaseGrenade );
+EXTERN_SEND_TABLE( DT_Beam );
+EXTERN_SEND_TABLE( DT_Sprite );
+EXTERN_SEND_TABLE( DT_SmokeTrail );
+EXTERN_SEND_TABLE( DT_BaseToggle );
+EXTERN_SEND_TABLE( DT_BaseTrigger );
+EXTERN_SEND_TABLE( DT_PlayerResource );
 
 #ifdef HL2WARS_DLL
-EXTERN_SENDTABLE( DT_HL2WarsPlayer );
-EXTERN_SENDTABLE( DT_UnitBase );
-EXTERN_SENDTABLE( DT_WarsWeapon );
-EXTERN_SENDTABLE( DT_FuncUnit );
-EXTERN_SENDTABLE( DT_HL2WarsPlayer );
-EXTERN_SENDTABLE( DT_BaseFuncMapBoundary );
+EXTERN_SEND_TABLE( DT_HL2WarsPlayer );
+EXTERN_SEND_TABLE( DT_UnitBase );
+EXTERN_SEND_TABLE( DT_WarsWeapon );
+EXTERN_SEND_TABLE( DT_FuncUnit );
+EXTERN_SEND_TABLE( DT_HL2WarsPlayer );
+EXTERN_SEND_TABLE( DT_BaseFuncMapBoundary );
 #endif // HL2WARS_DLL
 
 namespace bp = boost::python;

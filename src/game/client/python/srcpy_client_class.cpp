@@ -40,31 +40,29 @@ PyClientClassBase *g_pPyClientClassHead = NULL;
 
 namespace bp = boost::python;
 
-#define EXTERN_RECVTABLE( DT_ClassName ) namespace DT_ClassName { extern RecvTable g_RecvTable; }
-
 // Recv tables
-EXTERN_RECVTABLE( DT_BaseAnimating );
-EXTERN_RECVTABLE( DT_BaseAnimatingOverlay );
-EXTERN_RECVTABLE( DT_BaseFlex );
-EXTERN_RECVTABLE( DT_BaseCombatCharacter );
-EXTERN_RECVTABLE( DT_BasePlayer );
-EXTERN_RECVTABLE( DT_BaseGrenade );
-EXTERN_RECVTABLE( DT_Sprite );
-EXTERN_RECVTABLE( DT_SmokeTrail );
-EXTERN_RECVTABLE( DT_Beam );
-EXTERN_RECVTABLE( DT_BaseCombatWeapon );
-EXTERN_RECVTABLE( DT_Sprite );
-EXTERN_RECVTABLE( DT_BaseToggle );
-EXTERN_RECVTABLE( DT_BaseTrigger );
-EXTERN_RECVTABLE( DT_PlayerResource );
+EXTERN_RECV_TABLE( DT_BaseAnimating );
+EXTERN_RECV_TABLE( DT_BaseAnimatingOverlay );
+EXTERN_RECV_TABLE( DT_BaseFlex );
+EXTERN_RECV_TABLE( DT_BaseCombatCharacter );
+EXTERN_RECV_TABLE( DT_BasePlayer );
+EXTERN_RECV_TABLE( DT_BaseGrenade );
+EXTERN_RECV_TABLE( DT_Sprite );
+EXTERN_RECV_TABLE( DT_SmokeTrail );
+EXTERN_RECV_TABLE( DT_Beam );
+EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
+EXTERN_RECV_TABLE( DT_Sprite );
+EXTERN_RECV_TABLE( DT_BaseToggle );
+EXTERN_RECV_TABLE( DT_BaseTrigger );
+EXTERN_RECV_TABLE( DT_PlayerResource );
 
 #ifdef HL2WARS_DLL
-EXTERN_RECVTABLE( DT_HL2WarsPlayer );
-EXTERN_RECVTABLE( DT_UnitBase );
-EXTERN_RECVTABLE( DT_WarsWeapon );
-EXTERN_RECVTABLE( DT_FuncUnit );
-EXTERN_RECVTABLE( DT_HL2WarsPlayer );
-EXTERN_RECVTABLE( DT_BaseFuncMapBoundary );
+EXTERN_RECV_TABLE( DT_HL2WarsPlayer );
+EXTERN_RECV_TABLE( DT_UnitBase );
+EXTERN_RECV_TABLE( DT_WarsWeapon );
+EXTERN_RECV_TABLE( DT_FuncUnit );
+EXTERN_RECV_TABLE( DT_HL2WarsPlayer );
+EXTERN_RECV_TABLE( DT_BaseFuncMapBoundary );
 #endif // HL2WARS_DLL
 
 // A lot of factories
