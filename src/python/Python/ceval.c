@@ -672,40 +672,6 @@ PyEval_EvalCode(PyCodeObject *co, PyObject *globals, PyObject *locals)
                       NULL);
 }
 
-/* */
-void
-PyEval_RunThreads()
-{
-	register enum why_code why; /* Reason for block stack unwind */
-	register PyObject *x;       /* Result object -- NULL if error */
-	PyThreadState *tstate = PyThreadState_GET();
-#ifdef WITH_THREAD
-    if (interpreter_lock) {
-        /* Give another thread a chance */
-
-        if (PyThreadState_Swap(NULL) != tstate)
-            Py_FatalError("ceval: tstate mix-up");
-        PyThread_release_lock(interpreter_lock);
-
-        /* Other threads may run now */
-
-        PyThread_acquire_lock(interpreter_lock, 1);
-        if (PyThreadState_Swap(tstate) != NULL)
-            Py_FatalError("ceval: orphan tstate");
-
-        /* Check for thread interrupts */
-
-        if (tstate->async_exc != NULL) {
-            x = tstate->async_exc;
-            tstate->async_exc = NULL;
-            PyErr_SetNone(x);
-            Py_DECREF(x);
-            why = WHY_EXCEPTION;
-           // goto on_error;
-        }
-    }
-#endif
-}
 
 /* Interpreter main loop */
 
