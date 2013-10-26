@@ -854,6 +854,10 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
 
     static void m_takedamage_Set( C_BaseGrenade & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_BaseGrenade const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BaseGrenade & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_BaseGrenade_class(){
@@ -1406,6 +1410,7 @@ void register_C_BaseGrenade_class(){
         }
         C_BaseGrenade_exposer.add_property( "lifestate", &C_BaseGrenade_wrapper::m_lifeState_Get, &C_BaseGrenade_wrapper::m_lifeState_Set );
         C_BaseGrenade_exposer.add_property( "takedamage", &C_BaseGrenade_wrapper::m_takedamage_Get, &C_BaseGrenade_wrapper::m_takedamage_Set );
+        C_BaseGrenade_exposer.add_property( "skin", &C_BaseGrenade_wrapper::m_nSkin_Get, &C_BaseGrenade_wrapper::m_nSkin_Set );
     }
 
 }

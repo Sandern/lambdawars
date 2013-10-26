@@ -1068,6 +1068,10 @@ struct CRagdollProp_wrapper : CRagdollProp, bp::wrapper< CRagdollProp > {
 
     static void m_takedamage_Set( CRagdollProp & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CRagdollProp const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CRagdollProp & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CRagdollProp_class(){
@@ -1371,7 +1375,8 @@ void register_CRagdollProp_class(){
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
             , (int ( CRagdollProp_wrapper::* )(  ) )(&CRagdollProp_wrapper::default_UpdateTransmitState) )    
         .add_property( "lifestate", &CRagdollProp_wrapper::m_lifeState_Get, &CRagdollProp_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CRagdollProp_wrapper::m_takedamage_Get, &CRagdollProp_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &CRagdollProp_wrapper::m_takedamage_Get, &CRagdollProp_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CRagdollProp_wrapper::m_nSkin_Get, &CRagdollProp_wrapper::m_nSkin_Set );
 
 }
 

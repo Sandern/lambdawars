@@ -1121,6 +1121,10 @@ struct CBaseAnimating_wrapper : CBaseAnimating, bp::wrapper< CBaseAnimating > {
 
     static void m_takedamage_Set( CBaseAnimating & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CBaseAnimating const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBaseAnimating & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CBaseAnimating_class(){
@@ -2544,16 +2548,6 @@ void register_CBaseAnimating_class(){
                 , OnNewModel_function_type( &CBaseAnimating_wrapper::default_OnNewModel ) );
         
         }
-        { //::CBaseAnimating::PySetModel
-        
-            typedef void ( ::CBaseAnimating::*SetModel_function_type )( char const * ) ;
-            
-            CBaseAnimating_exposer.def( 
-                "SetModel"
-                , SetModel_function_type( &::CBaseAnimating::PySetModel )
-                , ( bp::arg("szModelName") ) );
-        
-        }
         { //::CBaseAnimating::RandomizeBodygroups
         
             typedef void ( ::CBaseAnimating::*RandomizeBodygroups_function_type )( ::CUtlVector< char const*, CUtlMemory< char const*, int > > & ) ;
@@ -2841,6 +2835,16 @@ void register_CBaseAnimating_class(){
         }
         { //::CBaseAnimating::SetLightingOrigin
         
+            typedef void ( ::CBaseAnimating::*SetLightingOrigin_function_type )( ::string_t ) ;
+            
+            CBaseAnimating_exposer.def( 
+                "SetLightingOrigin"
+                , SetLightingOrigin_function_type( &::CBaseAnimating::SetLightingOrigin )
+                , ( bp::arg("strLightingOrigin") ) );
+        
+        }
+        { //::CBaseAnimating::SetLightingOrigin
+        
             typedef void ( ::CBaseAnimating::*SetLightingOrigin_function_type )( ::CBaseEntity * ) ;
             
             CBaseAnimating_exposer.def( 
@@ -2849,14 +2853,14 @@ void register_CBaseAnimating_class(){
                 , ( bp::arg("pLightingOrigin") ) );
         
         }
-        { //::CBaseAnimating::SetLightingOrigin
+        { //::CBaseAnimating::SetLightingOriginRelative
         
-            typedef void ( ::CBaseAnimating::*SetLightingOrigin_function_type )( ::string_t ) ;
+            typedef void ( ::CBaseAnimating::*SetLightingOriginRelative_function_type )( ::string_t ) ;
             
             CBaseAnimating_exposer.def( 
-                "SetLightingOrigin"
-                , SetLightingOrigin_function_type( &::CBaseAnimating::SetLightingOrigin )
-                , ( bp::arg("strLightingOrigin") ) );
+                "SetLightingOriginRelative"
+                , SetLightingOriginRelative_function_type( &::CBaseAnimating::SetLightingOriginRelative )
+                , ( bp::arg("strLightingOriginRelative") ) );
         
         }
         { //::CBaseAnimating::SetLightingOriginRelative
@@ -2869,14 +2873,14 @@ void register_CBaseAnimating_class(){
                 , ( bp::arg("pLightingOriginRelative") ) );
         
         }
-        { //::CBaseAnimating::SetLightingOriginRelative
+        { //::CBaseAnimating::SetModel
         
-            typedef void ( ::CBaseAnimating::*SetLightingOriginRelative_function_type )( ::string_t ) ;
+            typedef void ( ::CBaseAnimating::*SetModel_function_type )( char const * ) ;
             
             CBaseAnimating_exposer.def( 
-                "SetLightingOriginRelative"
-                , SetLightingOriginRelative_function_type( &::CBaseAnimating::SetLightingOriginRelative )
-                , ( bp::arg("strLightingOriginRelative") ) );
+                "SetModel"
+                , SetModel_function_type( &::CBaseAnimating::SetModel )
+                , ( bp::arg("szModelName") ) );
         
         }
         { //::CBaseAnimating::SetModelScale
@@ -3389,19 +3393,9 @@ void register_CBaseAnimating_class(){
         
         }
         CBaseAnimating_exposer.staticmethod( "GetPyNetworkType" );
-        { //property "skin"[fget=::CBaseAnimating::GetSkin, fset=::CBaseAnimating::SetSkin]
-        
-            typedef int ( ::CBaseAnimating::*fget )(  ) ;
-            typedef void ( ::CBaseAnimating::*fset )( int ) ;
-            
-            CBaseAnimating_exposer.add_property( 
-                "skin"
-                , fget( &::CBaseAnimating::GetSkin )
-                , fset( &::CBaseAnimating::SetSkin ) );
-        
-        }
         CBaseAnimating_exposer.add_property( "lifestate", &CBaseAnimating_wrapper::m_lifeState_Get, &CBaseAnimating_wrapper::m_lifeState_Set );
         CBaseAnimating_exposer.add_property( "takedamage", &CBaseAnimating_wrapper::m_takedamage_Get, &CBaseAnimating_wrapper::m_takedamage_Set );
+        CBaseAnimating_exposer.add_property( "skin", &CBaseAnimating_wrapper::m_nSkin_Get, &CBaseAnimating_wrapper::m_nSkin_Set );
     }
 
 }

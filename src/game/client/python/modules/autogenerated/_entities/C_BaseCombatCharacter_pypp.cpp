@@ -854,6 +854,10 @@ struct C_BaseCombatCharacter_wrapper : C_BaseCombatCharacter, bp::wrapper< C_Bas
 
     static void m_takedamage_Set( C_BaseCombatCharacter & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_BaseCombatCharacter const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BaseCombatCharacter & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_BaseCombatCharacter_class(){
@@ -1510,6 +1514,7 @@ void register_C_BaseCombatCharacter_class(){
         }
         C_BaseCombatCharacter_exposer.add_property( "lifestate", &C_BaseCombatCharacter_wrapper::m_lifeState_Get, &C_BaseCombatCharacter_wrapper::m_lifeState_Set );
         C_BaseCombatCharacter_exposer.add_property( "takedamage", &C_BaseCombatCharacter_wrapper::m_takedamage_Get, &C_BaseCombatCharacter_wrapper::m_takedamage_Set );
+        C_BaseCombatCharacter_exposer.add_property( "skin", &C_BaseCombatCharacter_wrapper::m_nSkin_Get, &C_BaseCombatCharacter_wrapper::m_nSkin_Set );
     }
 
 }

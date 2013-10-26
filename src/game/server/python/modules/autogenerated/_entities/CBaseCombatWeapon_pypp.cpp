@@ -1151,6 +1151,10 @@ struct CBaseCombatWeapon_wrapper : CBaseCombatWeapon, bp::wrapper< CBaseCombatWe
 
     static void m_takedamage_Set( CBaseCombatWeapon & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CBaseCombatWeapon const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBaseCombatWeapon & inst, int val ) { inst.m_nSkin.Set( val ); }
+
     static float m_flNextPrimaryAttack_Get( CBaseCombatWeapon const & inst ) { return inst.m_flNextPrimaryAttack.Get(); }
 
     static void m_flNextPrimaryAttack_Set( CBaseCombatWeapon & inst, float val ) { inst.m_flNextPrimaryAttack.Set( val ); }
@@ -1906,6 +1910,7 @@ void register_CBaseCombatWeapon_class(){
         .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &CBaseCombatWeapon_wrapper::m_lifeState_Get, &CBaseCombatWeapon_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBaseCombatWeapon_wrapper::m_takedamage_Get, &CBaseCombatWeapon_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CBaseCombatWeapon_wrapper::m_nSkin_Get, &CBaseCombatWeapon_wrapper::m_nSkin_Set )    
         .add_property( "nextprimaryattack", &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextPrimaryAttack_Set )    
         .add_property( "nextsecondaryattack", &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Get, &CBaseCombatWeapon_wrapper::m_flNextSecondaryAttack_Set )    
         .add_property( "timeweaponidle", &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Get, &CBaseCombatWeapon_wrapper::m_flTimeWeaponIdle_Set )    

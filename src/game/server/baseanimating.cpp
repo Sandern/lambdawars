@@ -2769,51 +2769,6 @@ void CBaseAnimating::SetModel( const char *szModelName )
 
 }
 
-#ifdef ENABLE_PYTHON
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *szModelName - 
-//-----------------------------------------------------------------------------
-void CBaseAnimating::PySetModel( const char *szModelName )
-{
-	MDLCACHE_CRITICAL_SECTION();
-
-	UnlockStudioHdr();
-
-	if ( szModelName[0] )
-	{
-		int modelIndex = modelinfo->GetModelIndex( szModelName );
-		const model_t *model = modelinfo->GetModel( modelIndex );
-		if ( model && ( modelinfo->GetModelType( model ) != mod_studio ) )
-		{
-			Msg( "Setting CBaseAnimating to non-studio model %s  (type:%i)\n",	szModelName, modelinfo->GetModelType( model ) );
-		}
-	}
-	Studio_DestroyBoneCache( m_boneCacheHandle );
-	m_boneCacheHandle = 0;
-
-	UTIL_PySetModel( this, szModelName );
-
-	// delete exiting studio model container
-	if (m_pStudioHdr != NULL)
-	{
-		delete m_pStudioHdr;
-		m_pStudioHdr = NULL;
-	}
-
-
-	if ( GetModelPtr() )
-	{
-		InitBoneControllers( );
-
-		// TODO: what other model data should be initialized?
-		SetSequence( 0 );
-	}
-
-	PopulatePoseParameters();
-}
-#endif // ENABLE_PYTHON
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  :

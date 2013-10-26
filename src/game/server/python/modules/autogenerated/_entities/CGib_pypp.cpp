@@ -1132,6 +1132,10 @@ struct CGib_wrapper : CGib, bp::wrapper< CGib > {
 
     static void m_takedamage_Set( CGib & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CGib const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CGib & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CGib_class(){
@@ -1395,7 +1399,8 @@ void register_CGib_class(){
         .staticmethod( "SpawnSpecificGibs" )    
         .staticmethod( "SpawnStickyGibs" )    
         .add_property( "lifestate", &CGib_wrapper::m_lifeState_Get, &CGib_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CGib_wrapper::m_takedamage_Get, &CGib_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &CGib_wrapper::m_takedamage_Get, &CGib_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CGib_wrapper::m_nSkin_Get, &CGib_wrapper::m_nSkin_Set );
 
 }
 

@@ -602,12 +602,20 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('IsClient').exclude() 
         mb.mem_funs('GetDLLType').exclude() 
         
-        # Emit sound replacements
-        mb.mem_funs('EmitSound').exclude()
-        mb.mem_funs('StopSound').exclude()
-        mb.mem_funs('PyEmitSound').rename('EmitSound')
-        mb.mem_funs('PyEmitSoundFilter').rename('EmitSoundFilter')
-        mb.mem_funs('PyStopSound').rename('StopSound')
+        # Transform EmitSound
+        # There seems to be a problem with static and member functions with the same name
+        # Rename EmitSound with filter into "EmitSoundFilter"
+        # Rename static StopSound to StopSoundStatic
+        decls = mb.mem_funs('EmitSound')
+        
+        mb.mem_funs('EmitSound', calldef_withtypes(reference_t(declarated_t(mb.class_('IRecipientFilter'))))).rename('EmitSoundFilter')
+        mb.mem_funs('StopSound', lambda decl: decl.has_static).rename('StopSoundStatic')
+        
+        for decl in decls:
+            for arg in decl.arguments:
+                if arg.name == 'duration':
+                    decl.add_transformation(FT.output('duration'))
+        mb.typedef('HSOUNDSCRIPTHANDLE').include()
         
         # Create properties for the following variables, since they are networked
         for entcls in self.entclasses:
@@ -719,12 +727,6 @@ class Entities(SemiSharedModuleGenerator):
             self.SetupProperty(cls, 'simulationtime', 'GetSimulationTime', 'SetSimulationTime')
             self.SetupProperty(cls, 'rendermode', 'GetRenderMode', 'SetRenderMode', excludesetget=False)
             
-            # Replace and rename
-            mb.mem_funs('SetModel').exclude()
-            mb.mem_funs('PySetModel').rename('SetModel')
-            mb.mem_funs('SetSize').exclude()
-            mb.mem_funs('PySetSize').rename('SetSize')
-            
             mb.mem_funs('PySendMessage').rename('SendMessage')
             
             # List of server functions overridable in Python
@@ -797,9 +799,16 @@ class Entities(SemiSharedModuleGenerator):
         studiohdr = mb.class_('CStudioHdr')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(studiohdr))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  
         
-        # Properties
-        self.SetupProperty(cls, 'skin', 'GetSkin', 'SetSkin')
-    
+        # Create properties for the following variables, since they are networked
+        cls.mem_fun('GetSkin').exclude()
+        for entcls in self.entclasses:
+            if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                self.AddNetworkVarProperty('skin', 'm_nSkin', 'int', entcls)    
+
+        # Exclude anything return CBoneCache
+        bonecache = mb.class_('CBoneCache')
+        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(bonecache))), allow_empty=True).exclude()
+            
         if self.isclient:
             cls.vars('m_SequenceTransitioner').exclude()
             cls.vars('m_nHitboxSet').exclude()
@@ -810,12 +819,9 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             
             # Exclude
-            if self.settings.branch != 'swarm':
-                mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBoneCache') != -1 ).exclude()
-            else:
+            if self.settings.branch == 'swarm':
                 mb.mem_funs('GetBoneArrayForWrite').exclude()
-                mb.mem_funs('CreateClientRagdoll').exclude()
-            mb.mem_funs('GetBoneForWrite').exclude() # Don't care for now     
+                mb.mem_funs('GetBoneForWrite').exclude()
 
             cls.add_property( 'customlightingoffset',
                                cls.mem_fun('GetCustomLightingOffset'),
@@ -829,8 +835,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
             
             # excludes
-            if self.settings.branch != 'swarm':
-                mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('CBoneCache') != -1 ).exclude()
             mb.mem_funs('GetPoseParameterArray').exclude()
             mb.mem_funs('GetEncodedControllerArray').exclude()
 
@@ -1002,21 +1006,20 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_afButtonLast', 'buttonslast')
         self.IncludeVarAndRename('m_afButtonPressed', 'buttonspressed')
         self.IncludeVarAndRename('m_afButtonReleased', 'buttonsreleased')
+ 
+        cls.mem_fun('GetLadderSurface').exclude()
+        cls.mem_fun('Hints').exclude()
+        if self.settings.branch == 'source2013' or self.isserver:
+            cls.mem_fun('GetSurfaceData').exclude()
         
         if self.isclient:
-            mb.mem_funs('GetRepresentativeRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetSurfaceData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetViewModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetFogParams').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetFootstepSurface').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetLadderSurface').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
             # Exclude for now
-            mb.mem_funs('Hints').exclude()
-            mb.mem_funs('GetHeadLabelMaterial').exclude()
-            mb.mem_funs('OverrideView').exclude()
-            mb.mem_funs('ShouldGoSouth').exclude() # <-- Declaration only :)
-            mb.mem_funs('GetFootstepSurface').exclude()
+            cls.mem_fun('GetFogParams').exclude()
+            cls.mem_fun('OverrideView').exclude()
+            cls.mem_fun('GetFootstepSurface').exclude()
+            cls.mem_fun('GetHeadLabelMaterial').exclude()
+            cls.mem_fun('GetRepresentativeRagdoll').exclude()
+            cls.mem_fun('ShouldGoSouth').exclude() # No definition
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('ActivePlayerCombatCharacter').exclude()
@@ -1041,20 +1044,10 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetBotController').exclude()
             mb.mem_funs('GetViewModel').exclude()
             mb.mem_funs('PlayerData').exclude()
-            mb.mem_funs('GetLadderSurface').exclude()
-            if self.settings.branch != 'swarm':
-                mb.mem_funs('GetCurrentCommand').exclude()
             mb.mem_funs('GetLastKnownArea').exclude()
             mb.mem_funs('GetPhysicsController').exclude()
             mb.mem_funs('GetGroundVPhysics').exclude()
-            mb.mem_funs('Hints').exclude()
-            mb.mem_funs('GetLastUserCommand').exclude()
-            mb.mem_funs('GetCurrentUserCommand').exclude()
-            mb.mem_funs('GetSurfaceData').exclude()
             mb.mem_funs('GetExpresser').exclude()
-            mb.mem_funs('GetCommandContext').exclude()
-            mb.mem_funs('AllocCommandContext').exclude()
-            mb.mem_funs('RemoveAllCommandContextsExceptNewest').exclude()
             mb.mem_funs('GetAudioParams').exclude()
             mb.mem_funs('SetupVPhysicsShadow').exclude()
             
@@ -1067,28 +1060,11 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetSplitScreenPlayers').exclude()
                 mb.mem_funs('GetTonemapController').exclude()
                 mb.mem_funs('FindPickerAINode').exclude()
-                
-                mb.mem_funs('FindEntityClassForward').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-                mb.mem_funs('FindEntityForward').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-                mb.mem_funs('GetPotentialUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-                mb.mem_funs('FindPickerEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-                mb.mem_funs('FindPickerEntityClass').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            
-            # Call poilicies
-            mb.mem_funs('GetObserverTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('FindNextObserverTarget').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('HasNamedPlayerItem').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GiveNamedItem').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('FindUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('DoubleCheckUseNPC').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            if self.settings.branch != 'swarm':
-                mb.mem_funs('GetHeldObject').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetViewEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetFOVOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('GetUseEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            mb.mem_funs('Weapon_GetLast').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
 
     def ParseTriggers(self, mb):
+        if self.isclient and self.settings.branch == 'source2013':
+            return
+            
         # CBaseTrigger
         cls_name = 'C_BaseTrigger' if self.isclient else 'CBaseTrigger'
         cls = mb.class_(cls_name)
@@ -1134,265 +1110,8 @@ class Entities(SemiSharedModuleGenerator):
             cls = mb.class_('CPhysicsProp')
                 
             cls = mb.class_('CRagdollProp')
-            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
-
-    # Wars Entity Parsing
-    def ParseWars(self, mb):
-        ''' Parsing wars additions for base entity classes. '''
-        baseentcls  = mb.class_('C_BaseEntity' if self.isclient else 'CBaseEntity')
-        
-        # Overridables
-        mb.mem_funs('GetIMouse').virtuality = 'virtual'
-        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
-        
-        # Call policies
-        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-                
-        if self.isclient:
-            mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-        
-        # Properties
-        if self.isclient:
-            self.SetupProperty(baseentcls, 'viewdistance', 'GetViewDistance')
-        else:
-            self.SetupProperty(baseentcls, 'viewdistance', 'GetViewDistance', 'SetViewDistance')
-        
-        # Excludes
-        mb.mem_funs('OnChangeOwnerNumberInternal').exclude()
-        mb.mem_funs('MyUnitPointer').exclude() # Automatically done by converter
-        mb.mem_funs('GetIUnit').exclude()
-        
-        mb.mem_funs('CanBeSeenBy').exclude()
-        if self.isserver:
-            mb.mem_funs('FOWShouldTransmit').exclude()
-            mb.mem_funs('DensityMap').exclude() # Don't care for now.
-    
-    def ParseHL2WarsPlayer(self, mb):
-        cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
-
-        cls.mem_funs('GetUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetGroupUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetControlledUnit').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        cls.mem_funs('GetMouseCapture').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
-        cls.mem_funs('OnLeftMouseButtonPressed').virtuality = 'virtual'
-        cls.mem_funs('OnLeftMouseButtonDoublePressed').virtuality = 'virtual'
-        cls.mem_funs('OnLeftMouseButtonReleased').virtuality = 'virtual'
-        cls.mem_funs('OnRightMouseButtonPressed').virtuality = 'virtual'
-        cls.mem_funs('OnRightMouseButtonDoublePressed').virtuality = 'virtual'
-        cls.mem_funs('OnRightMouseButtonReleased').virtuality = 'virtual'
-    
-        if self.isclient:
-            mb.mem_funs('GetLocalHL2WarsPlayer').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-            mb.mem_funs('GetSelectedUnitTypeRange').add_transformation( FT.output('iMin'), FT.output('iMax') )
-            
-            cls.add_property( 'unit'
-                             , cls.mem_fun('GetControlledUnit')) 
-                             
-            cls.mem_fun('CamFollowGroup').exclude()
-            cls.mem_fun('PyCamFollowGroup').rename('CamFollowGroup')
-            
-            cls.mem_fun('MakeSelection').exclude()
-            cls.mem_fun('PyMakeSelection').rename('MakeSelection')
-        else:
-            mb.mem_funs('EntSelectSpawnPoint').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-            
-            cls.add_property( 'unit'
-                             , cls.mem_fun('GetControlledUnit')
-                             , cls.mem_fun('SetControlledUnit')) 
-                             
-        mb.add_registration_code( "bp::scope().attr( \"PLAYER_MAX_GROUPS\" ) = PLAYER_MAX_GROUPS;" )
-        
-    def ParseUnitBaseShared(self, mb, cls_name):
-        cls = mb.class_(cls_name)
-        AddWrapReg( mb, cls_name, cls.mem_fun('IsSelectableByPlayer'), [CreateEntityArg('pPlayer'), 'target_selection'] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('Select'), [CreateEntityArg('pPlayer'), 'bTriggerOnSel'] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnSelected'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnDeSelected'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('Order'), [CreateEntityArg('pPlayer')] )
-        #AddWrapReg( mb, cls_name, cls.mem_fun('UserCmd'), ['*pMoveData'] )   
-        cls.mem_funs('UserCmd').include()
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserControl'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserLeftControl'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('CanUserControl'), [CreateEntityArg('pPlayer')] )
-        cls.mem_funs( lambda decl: 'OnClick' in decl.name ).exclude()
-        cls.mem_funs( lambda decl: 'OnCursor' in decl.name ).exclude()
-        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnClick' in decl.name ), [CreateEntityArg('player')] )
-        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnCursor' in decl.name ), [CreateEntityArg('player')] )
-        
-        if self.isclient:
-            cls.mem_funs('OnInSelectionBox').virtuality = 'virtual'
-            cls.mem_funs('OnOutSelectionBox').virtuality = 'virtual'
-            
-        cls.add_property( 'selectionpriority'
-                         , cls.mem_fun('GetSelectionPriority')
-                         , cls.mem_fun('SetSelectionPriority')) 
-        cls.add_property( 'attackpriority'
-                         , cls.mem_fun('GetAttackPriority')
-                         , cls.mem_fun('SetAttackPriority')) 
-                         
-        cls.mem_fun('GetSelectionPriority').exclude()
-        cls.mem_fun('SetSelectionPriority').exclude()
-        cls.mem_fun('GetAttackPriority').exclude()
-        cls.mem_fun('SetAttackPriority').exclude()
-        
-        if self.isclient:
-            self.AddProperty(cls, 'energy', 'GetEnergy')
-            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
-        else:
-            self.AddProperty(cls, 'energy', 'GetEnergy', 'SetEnergy')
-            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy', 'SetMaxEnergy')
-        self.AddProperty(cls, 'kills', 'GetKills', 'SetKills')
-        
-    def ParseUnitBase(self, mb):
-        cls_name = 'C_UnitBase' if self.isclient else 'CUnitBase'
-        cls = mb.class_(cls_name)
-        mb.free_function('SetPlayerRelationShip').include()
-        mb.free_function('GetPlayerRelationShip').include()
-        
-        self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
-        
-        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
-        self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
-        
-        self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
-        self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
-        
-        self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
-        
-        # List of overridables
-        mb.mem_funs('OnUnitTypeChanged').virtuality = 'virtual'
-        mb.mem_funs('UserCmd').virtuality = 'virtual'
-        mb.mem_funs('OnButtonsChanged').virtuality = 'virtual'
-        mb.mem_funs('CustomCanBeSeen').virtuality = 'virtual'
-        if self.isclient:
-            mb.mem_funs('OnHoverPaint').virtuality = 'virtual'
-            mb.mem_funs('GetCursor').virtuality = 'virtual'
-
-        mb.mem_funs('OnClickLeftPressed').exclude()
-        mb.mem_funs('OnClickRightPressed').exclude()
-        mb.mem_funs('OnClickLeftReleased').exclude()
-        mb.mem_funs('OnClickRightReleased').exclude()
-        mb.mem_funs('OnClickLeftDoublePressed').exclude()
-        mb.mem_funs('OnClickRightDoublePressed').exclude()
-        mb.mem_funs('IsSelectableByPlayer').exclude()
-        mb.mem_funs('Select').exclude()
-        mb.mem_funs('OnSelected').exclude()
-        mb.mem_funs('OnDeSelected').exclude()
-        mb.mem_funs('Order').exclude()
-        #mb.mem_funs('UserCmd').exclude()
-        mb.mem_funs('OnUserControl').exclude()
-        mb.mem_funs('OnUserLeftControl').exclude()
-        mb.mem_funs('CanUserControl').exclude() 
-        
-        mb.free_function('MapUnits').include()
-        
-        self.ParseUnitBaseShared(mb, cls_name)
-        
-        cls.mem_funs('PyGetAnimState').exclude() 
-        cls.mem_funs('GetAnimState').exclude() 
-        cls.mem_funs('SetAnimState').exclude() 
-        cls.add_property( 'animstate'
-                         , cls.mem_fun('PyGetAnimState')
-                         , cls.mem_fun('SetAnimState') )
-        
-        #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        mb.mem_funs('GetEnemy').exclude() 
-        if self.isclient:
-            self.IncludeVarAndRename('m_iMaxHealth', 'maxhealth')
-            cls.add_property( 'enemy'
-                             , cls.mem_fun('GetEnemy'))
-                             
-            cls.add_property( 'crouching'
-                             , cls.mem_fun('IsCrouching')) 
-            cls.add_property( 'climbing'
-                             , cls.mem_fun('IsClimbing'))    
-            self.IncludeVarAndRename('m_bUpdateClientAnimations', 'updateclientanimations')
-        else:
-            cls.mem_funs('GetLastTakeDamageTime').exclude()
-                 
-            cls.vars('m_fDeathDrop').rename('deathdrop')
-            cls.vars('m_fSaveDrop').rename('savedrop')
-            cls.vars('m_fMaxClimbHeight').rename('maxclimbheight')
-            cls.vars('m_fTestRouteStartHeight').rename('testroutestartheight')
-            cls.vars('m_fMinSlope').rename('minslope')
-            
-            cls.vars('m_fEnemyChangeToleranceSqr').rename('enemychangetolerancesqr')
-            
-            cls.mem_funs('SetEnemy').exclude() 
-            cls.add_property( 'enemy'
-                             , cls.mem_fun('GetEnemy')
-                             , cls.mem_fun('SetEnemy')) 
-                             
-            cls.mem_funs('SetCrouching').exclude()
-            cls.mem_funs('SetClimbing').exclude() 
-            cls.add_property( 'crouching'
-                             , cls.mem_fun('IsCrouching')
-                             , cls.mem_fun('SetCrouching')) 
-            cls.add_property( 'climbing'
-                             , cls.mem_fun('IsClimbing')
-                             , cls.mem_fun('SetClimbing')) 
-                             
-            cls.mem_funs('PyGetNavigator').exclude() 
-            cls.mem_funs('GetNavigator').exclude() 
-            cls.mem_funs('SetNavigator').exclude() 
-            cls.add_property( 'navigator'
-                             , cls.mem_fun('PyGetNavigator')
-                             , cls.mem_fun('SetNavigator') )
-                             
-            # cls.mem_funs('PyGetExpresser').exclude() 
-            # cls.mem_funs('GetExpresser').exclude() 
-            # cls.mem_funs('SetExpresser').exclude() 
-            # cls.add_property( 'expresser'
-                             # , cls.mem_fun('PyGetExpresser')
-                             # , cls.mem_fun('SetExpresser') )
-                             
-            cls.mem_funs('GetAttackLOSMask').exclude() 
-            cls.mem_funs('SetAttackLOSMask').exclude() 
-            cls.add_property( 'attacklosmask'
-                             , cls.mem_fun('GetAttackLOSMask')
-                             , cls.mem_fun('SetAttackLOSMask') )
-                             
-            # LIST OF SERVER FUNCTIONS TO OVERRIDE
-            mb.mem_funs('OnFullHealth').virtuality = 'virtual'
-            mb.mem_funs('OnLostFullHealth').virtuality = 'virtual'
-            
-        # CFuncUnit
-        cls_name = 'CFuncUnit' if self.isserver else 'C_FuncUnit'
-        cls = mb.class_(cls_name)
-        cls.no_init = False
-        self.ParseUnitBaseShared(mb, cls_name)
-        if self.isclient:
-            cls.vars('m_iMaxHealth').rename('maxhealth')
-            
-    def ParseWarsWeapon(self, mb):
-        cls = mb.class_('C_WarsWeapon' if self.isclient else 'CWarsWeapon')
-        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
-        self.IncludeVarAndRename('m_fFireRate', 'firerate')
-        self.IncludeVarAndRename('m_vBulletSpread', 'bulletspread')
-        self.IncludeVarAndRename('m_fOverrideAmmoDamage', 'overrideammodamage')
-        self.IncludeVarAndRename('m_fMaxBulletRange', 'maxbulletrange')
-        self.IncludeVarAndRename('m_iMinBurst', 'minburst')
-        self.IncludeVarAndRename('m_iMaxBurst', 'maxburst')
-        self.IncludeVarAndRename('m_fMinRestTime', 'minresttime')
-        self.IncludeVarAndRename('m_fMaxRestTime', 'maxresttime')
-        self.IncludeVarAndRename('m_bEnableBurst', 'enableburst')
-        self.IncludeVarAndRename('m_nBurstShotsRemaining', 'burstshotsremaining')
-        
-        if self.isclient:
-            self.IncludeVarAndRename('m_vTracerColor', 'tracercolor')
-        
-        cls.mem_funs('GetPrimaryAttackActivity').exclude()
-        cls.mem_funs('SetPrimaryAttackActivity').exclude()
-        cls.mem_funs('GetSecondaryAttackActivity').exclude()
-        cls.mem_funs('SetSecondaryAttackActivity').exclude()
-        cls.add_property( 'primaryattackactivity'
-                         , cls.member_function( 'GetPrimaryAttackActivity' )
-                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
-        cls.add_property( 'secondaryattackactivity'
-                         , cls.member_function( 'GetSecondaryAttackActivity' )
-                         , cls.member_function( 'SetSecondaryAttackActivity' ) )
 
     def ParseRemainingEntities(self, mb):
         # CBaseGrenade
@@ -1545,12 +1264,269 @@ class Entities(SemiSharedModuleGenerator):
            
             # C_Sprite
             mb.mem_funs('GlowBlend').exclude()
+
+    # Wars Entity Parsing
+    def ParseWars(self, mb):
+        ''' Parsing wars additions for base entity classes. '''
+        baseentcls  = mb.class_('C_BaseEntity' if self.isclient else 'CBaseEntity')
+        
+        # Overridables
+        mb.mem_funs('GetIMouse').virtuality = 'virtual'
+        mb.mem_funs('OnChangeOwnerNumber').virtuality = 'virtual'
+        
+        # Call policies
+        mb.mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+                
+        if self.isclient:
+            mb.mem_funs('GetTeamColor').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        
+        # Properties
+        if self.isclient:
+            self.SetupProperty(baseentcls, 'viewdistance', 'GetViewDistance')
+        else:
+            self.SetupProperty(baseentcls, 'viewdistance', 'GetViewDistance', 'SetViewDistance')
+        
+        # Excludes
+        mb.mem_funs('OnChangeOwnerNumberInternal').exclude()
+        mb.mem_funs('MyUnitPointer').exclude() # Automatically done by converter
+        mb.mem_funs('GetIUnit').exclude()
+        
+        mb.mem_funs('CanBeSeenBy').exclude()
+        if self.isserver:
+            mb.mem_funs('FOWShouldTransmit').exclude()
+            mb.mem_funs('DensityMap').exclude() # Don't care for now.
             
         # Map boundary
         cls_name = 'C_BaseFuncMapBoundary' if self.isclient else 'CBaseFuncMapBoundary'
         cls = mb.class_(cls_name)
         cls.vars('m_pNext').exclude()
-        mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+        mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+    
+    def ParseHL2WarsPlayer(self, mb):
+        cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')
+
+        cls.mem_funs('GetUnit').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetGroupUnit').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetControlledUnit').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetMouseCapture').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        
+        cls.mem_funs('OnLeftMouseButtonPressed').virtuality = 'virtual'
+        cls.mem_funs('OnLeftMouseButtonDoublePressed').virtuality = 'virtual'
+        cls.mem_funs('OnLeftMouseButtonReleased').virtuality = 'virtual'
+        cls.mem_funs('OnRightMouseButtonPressed').virtuality = 'virtual'
+        cls.mem_funs('OnRightMouseButtonDoublePressed').virtuality = 'virtual'
+        cls.mem_funs('OnRightMouseButtonReleased').virtuality = 'virtual'
+    
+        if self.isclient:
+            mb.mem_funs('GetLocalHL2WarsPlayer').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs('GetSelectedUnitTypeRange').add_transformation( FT.output('iMin'), FT.output('iMax') )
+            
+            cls.add_property( 'unit'
+                             , cls.mem_fun('GetControlledUnit')) 
+                             
+            cls.mem_fun('CamFollowGroup').exclude()
+            cls.mem_fun('PyCamFollowGroup').rename('CamFollowGroup')
+            
+            cls.mem_fun('MakeSelection').exclude()
+            cls.mem_fun('PyMakeSelection').rename('MakeSelection')
+        else:
+            mb.mem_funs('EntSelectSpawnPoint').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            
+            cls.add_property( 'unit'
+                             , cls.mem_fun('GetControlledUnit')
+                             , cls.mem_fun('SetControlledUnit')) 
+                             
+        mb.add_registration_code( "bp::scope().attr( \"PLAYER_MAX_GROUPS\" ) = PLAYER_MAX_GROUPS;" )
+        
+    def ParseUnitBaseShared(self, mb, cls_name):
+        cls = mb.class_(cls_name)
+        AddWrapReg( mb, cls_name, cls.mem_fun('IsSelectableByPlayer'), [CreateEntityArg('pPlayer'), 'target_selection'] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('Select'), [CreateEntityArg('pPlayer'), 'bTriggerOnSel'] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('OnSelected'), [CreateEntityArg('pPlayer')] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('OnDeSelected'), [CreateEntityArg('pPlayer')] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('Order'), [CreateEntityArg('pPlayer')] )
+        #AddWrapReg( mb, cls_name, cls.mem_fun('UserCmd'), ['*pMoveData'] )   
+        cls.mem_funs('UserCmd').include()
+        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserControl'), [CreateEntityArg('pPlayer')] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserLeftControl'), [CreateEntityArg('pPlayer')] )
+        AddWrapReg( mb, cls_name, cls.mem_fun('CanUserControl'), [CreateEntityArg('pPlayer')] )
+        cls.mem_funs( lambda decl: 'OnClick' in decl.name ).exclude()
+        cls.mem_funs( lambda decl: 'OnCursor' in decl.name ).exclude()
+        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnClick' in decl.name ), [CreateEntityArg('player')] )
+        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnCursor' in decl.name ), [CreateEntityArg('player')] )
+        
+        if self.isclient:
+            cls.mem_funs('OnInSelectionBox').virtuality = 'virtual'
+            cls.mem_funs('OnOutSelectionBox').virtuality = 'virtual'
+            
+        cls.add_property( 'selectionpriority'
+                         , cls.mem_fun('GetSelectionPriority')
+                         , cls.mem_fun('SetSelectionPriority')) 
+        cls.add_property( 'attackpriority'
+                         , cls.mem_fun('GetAttackPriority')
+                         , cls.mem_fun('SetAttackPriority')) 
+                         
+        cls.mem_fun('GetSelectionPriority').exclude()
+        cls.mem_fun('SetSelectionPriority').exclude()
+        cls.mem_fun('GetAttackPriority').exclude()
+        cls.mem_fun('SetAttackPriority').exclude()
+        
+        if self.isclient:
+            self.AddProperty(cls, 'energy', 'GetEnergy')
+            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
+        else:
+            self.AddProperty(cls, 'energy', 'GetEnergy', 'SetEnergy')
+            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy', 'SetMaxEnergy')
+        self.AddProperty(cls, 'kills', 'GetKills', 'SetKills')
+        
+    def ParseUnitBase(self, mb):
+        cls_name = 'C_UnitBase' if self.isclient else 'CUnitBase'
+        cls = mb.class_(cls_name)
+        mb.free_function('SetPlayerRelationShip').include()
+        mb.free_function('GetPlayerRelationShip').include()
+        
+        self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
+        
+        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
+        self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
+        
+        self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
+        self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
+        
+        self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
+        
+        # List of overridables
+        mb.mem_funs('OnUnitTypeChanged').virtuality = 'virtual'
+        mb.mem_funs('UserCmd').virtuality = 'virtual'
+        mb.mem_funs('OnButtonsChanged').virtuality = 'virtual'
+        mb.mem_funs('CustomCanBeSeen').virtuality = 'virtual'
+        if self.isclient:
+            mb.mem_funs('OnHoverPaint').virtuality = 'virtual'
+            mb.mem_funs('GetCursor').virtuality = 'virtual'
+
+        mb.mem_funs('OnClickLeftPressed').exclude()
+        mb.mem_funs('OnClickRightPressed').exclude()
+        mb.mem_funs('OnClickLeftReleased').exclude()
+        mb.mem_funs('OnClickRightReleased').exclude()
+        mb.mem_funs('OnClickLeftDoublePressed').exclude()
+        mb.mem_funs('OnClickRightDoublePressed').exclude()
+        mb.mem_funs('IsSelectableByPlayer').exclude()
+        mb.mem_funs('Select').exclude()
+        mb.mem_funs('OnSelected').exclude()
+        mb.mem_funs('OnDeSelected').exclude()
+        mb.mem_funs('Order').exclude()
+        #mb.mem_funs('UserCmd').exclude()
+        mb.mem_funs('OnUserControl').exclude()
+        mb.mem_funs('OnUserLeftControl').exclude()
+        mb.mem_funs('CanUserControl').exclude() 
+        
+        mb.free_function('MapUnits').include()
+        
+        self.ParseUnitBaseShared(mb, cls_name)
+        
+        cls.mem_funs('PyGetAnimState').exclude() 
+        cls.mem_funs('GetAnimState').exclude() 
+        cls.mem_funs('SetAnimState').exclude() 
+        cls.add_property( 'animstate'
+                         , cls.mem_fun('PyGetAnimState')
+                         , cls.mem_fun('SetAnimState') )
+        
+        #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        mb.mem_funs('GetEnemy').exclude() 
+        if self.isclient:
+            self.IncludeVarAndRename('m_iMaxHealth', 'maxhealth')
+            cls.add_property( 'enemy'
+                             , cls.mem_fun('GetEnemy'))
+                             
+            cls.add_property( 'crouching'
+                             , cls.mem_fun('IsCrouching')) 
+            cls.add_property( 'climbing'
+                             , cls.mem_fun('IsClimbing'))    
+            self.IncludeVarAndRename('m_bUpdateClientAnimations', 'updateclientanimations')
+        else:
+            cls.mem_funs('GetLastTakeDamageTime').exclude()
+                 
+            cls.vars('m_fDeathDrop').rename('deathdrop')
+            cls.vars('m_fSaveDrop').rename('savedrop')
+            cls.vars('m_fMaxClimbHeight').rename('maxclimbheight')
+            cls.vars('m_fTestRouteStartHeight').rename('testroutestartheight')
+            cls.vars('m_fMinSlope').rename('minslope')
+            
+            cls.vars('m_fEnemyChangeToleranceSqr').rename('enemychangetolerancesqr')
+            
+            cls.mem_funs('SetEnemy').exclude() 
+            cls.add_property( 'enemy'
+                             , cls.mem_fun('GetEnemy')
+                             , cls.mem_fun('SetEnemy')) 
+                             
+            cls.mem_funs('SetCrouching').exclude()
+            cls.mem_funs('SetClimbing').exclude() 
+            cls.add_property( 'crouching'
+                             , cls.mem_fun('IsCrouching')
+                             , cls.mem_fun('SetCrouching')) 
+            cls.add_property( 'climbing'
+                             , cls.mem_fun('IsClimbing')
+                             , cls.mem_fun('SetClimbing')) 
+                             
+            cls.mem_funs('PyGetNavigator').exclude() 
+            cls.mem_funs('GetNavigator').exclude() 
+            cls.mem_funs('SetNavigator').exclude() 
+            cls.add_property( 'navigator'
+                             , cls.mem_fun('PyGetNavigator')
+                             , cls.mem_fun('SetNavigator') )
+                             
+            # cls.mem_funs('PyGetExpresser').exclude() 
+            # cls.mem_funs('GetExpresser').exclude() 
+            # cls.mem_funs('SetExpresser').exclude() 
+            # cls.add_property( 'expresser'
+                             # , cls.mem_fun('PyGetExpresser')
+                             # , cls.mem_fun('SetExpresser') )
+                             
+            cls.mem_funs('GetAttackLOSMask').exclude() 
+            cls.mem_funs('SetAttackLOSMask').exclude() 
+            cls.add_property( 'attacklosmask'
+                             , cls.mem_fun('GetAttackLOSMask')
+                             , cls.mem_fun('SetAttackLOSMask') )
+                             
+            # LIST OF SERVER FUNCTIONS TO OVERRIDE
+            mb.mem_funs('OnFullHealth').virtuality = 'virtual'
+            mb.mem_funs('OnLostFullHealth').virtuality = 'virtual'
+            
+        # CFuncUnit
+        cls_name = 'CFuncUnit' if self.isserver else 'C_FuncUnit'
+        cls = mb.class_(cls_name)
+        cls.no_init = False
+        self.ParseUnitBaseShared(mb, cls_name)
+        if self.isclient:
+            cls.vars('m_iMaxHealth').rename('maxhealth')
+            
+    def ParseWarsWeapon(self, mb):
+        cls = mb.class_('C_WarsWeapon' if self.isclient else 'CWarsWeapon')
+        cls.mem_funs( 'GetShootOriginAndDirection' ).add_transformation( FT.output('vShootOrigin'), FT.output('vShootDirection') )
+        self.IncludeVarAndRename('m_fFireRate', 'firerate')
+        self.IncludeVarAndRename('m_vBulletSpread', 'bulletspread')
+        self.IncludeVarAndRename('m_fOverrideAmmoDamage', 'overrideammodamage')
+        self.IncludeVarAndRename('m_fMaxBulletRange', 'maxbulletrange')
+        self.IncludeVarAndRename('m_iMinBurst', 'minburst')
+        self.IncludeVarAndRename('m_iMaxBurst', 'maxburst')
+        self.IncludeVarAndRename('m_fMinRestTime', 'minresttime')
+        self.IncludeVarAndRename('m_fMaxRestTime', 'maxresttime')
+        self.IncludeVarAndRename('m_bEnableBurst', 'enableburst')
+        self.IncludeVarAndRename('m_nBurstShotsRemaining', 'burstshotsremaining')
+        
+        if self.isclient:
+            self.IncludeVarAndRename('m_vTracerColor', 'tracercolor')
+        
+        cls.mem_funs('GetPrimaryAttackActivity').exclude()
+        cls.mem_funs('SetPrimaryAttackActivity').exclude()
+        cls.mem_funs('GetSecondaryAttackActivity').exclude()
+        cls.mem_funs('SetSecondaryAttackActivity').exclude()
+        cls.add_property( 'primaryattackactivity'
+                         , cls.member_function( 'GetPrimaryAttackActivity' )
+                         , cls.member_function( 'SetPrimaryAttackActivity' ) )
+        cls.add_property( 'secondaryattackactivity'
+                         , cls.member_function( 'GetSecondaryAttackActivity' )
+                         , cls.member_function( 'SetSecondaryAttackActivity' ) ) 
         
     def ParseEntities(self, mb):
         self.ParseBaseEntityHandles(mb)

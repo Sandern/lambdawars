@@ -1139,6 +1139,10 @@ void register_CSprite_class(){
             , (void ( ::CSprite::* )( float ) )( &::CSprite::SetGlowProxySize )
             , ( bp::arg("flSize") ) )    
         .def( 
+            "SetModel"
+            , (void ( ::CSprite::* )( char const * ) )( &::CSprite::SetModel )
+            , ( bp::arg("szModelName") ) )    
+        .def( 
             "SetScale"
             , (void ( ::CSprite::* )( float,float ) )( &::CSprite::SetScale )
             , ( bp::arg("scale"), bp::arg("duration")=0.0f ) )    

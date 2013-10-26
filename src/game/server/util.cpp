@@ -1354,7 +1354,25 @@ static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& 
 	{
 		if ( mins[i] > maxs[i] )
 		{
-			Error( "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>" );
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+			if( pEnt->GetPyInstance().ptr() != Py_None )
+			{
+				char buf[256];
+				Q_snprintf(buf, 256, "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>");
+				PyErr_SetString(PyExc_ValueError, buf );
+				throw boost::python::error_already_set(); 
+			}
+			else
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+			{
+				Error( "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>" );
+			}
 		}
 	}
 
@@ -1382,9 +1400,29 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 	int i = modelinfo->GetModelIndex( pModelName );
 	if ( i < 0 )
 	{
-		Error("%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
-			STRING( pEntity->GetEntityName() ),
-			pEntity->GetClassname(), pModelName);
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+		if( pEntity->GetPyInstance().ptr() != Py_None )
+		{
+			char buf[256];
+			Q_snprintf(buf, 256, "%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
+				STRING( pEntity->GetEntityName() ),
+				pEntity->GetClassname(), pModelName );
+			PyErr_SetString(PyExc_ValueError, buf );
+			throw boost::python::error_already_set(); 
+		}
+		else
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+		{
+			Error("%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
+				STRING( pEntity->GetEntityName() ),
+				pEntity->GetClassname(), pModelName);
+		}
 	}
 
 	pEntity->SetModelIndex( i ) ;

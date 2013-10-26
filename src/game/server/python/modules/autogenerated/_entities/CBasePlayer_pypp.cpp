@@ -1327,6 +1327,10 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
 
     static void m_takedamage_Set( CBasePlayer & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CBasePlayer const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBasePlayer & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CBasePlayer_class(){
@@ -2367,6 +2371,10 @@ void register_CBasePlayer_class(){
             , (void ( ::CBasePlayer::* )( float ) )( &::CBasePlayer::SetMaxSpeed )
             , ( bp::arg("flMaxSpeed") ) )    
         .def( 
+            "SetModel"
+            , (void ( ::CBasePlayer::* )( char const * ) )( &::CBasePlayer::SetModel )
+            , ( bp::arg("szModelName") ) )    
+        .def( 
             "SetMuzzleFlashTime"
             , (void ( ::CBasePlayer::* )( float ) )( &::CBasePlayer::SetMuzzleFlashTime )
             , ( bp::arg("flTime") ) )    
@@ -2811,7 +2819,8 @@ void register_CBasePlayer_class(){
         .staticmethod( "GetOffset_pl" )    
         .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &CBasePlayer_wrapper::m_lifeState_Get, &CBasePlayer_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CBasePlayer_wrapper::m_takedamage_Get, &CBasePlayer_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &CBasePlayer_wrapper::m_takedamage_Get, &CBasePlayer_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CBasePlayer_wrapper::m_nSkin_Get, &CBasePlayer_wrapper::m_nSkin_Set );
 
 }
 

@@ -1900,10 +1900,8 @@ public:
 		return s_bAbsQueriesValid;
 	}
 
-	// HL2Wars/Python 
+	// Lambda 
 public:
-	DECLARE_PYSERVERCLASS( CBaseEntity, PN_BASEENTITY );
-
 	friend class PyEntityFactory;
 	friend class CFogOfWarMgr;
 	friend class UnitBaseLocomotion;
@@ -1949,68 +1947,65 @@ public:
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
 
-#ifdef ENABLE_PYTHON
-	// Python generic
-	virtual PyObject *GetPySelf() const { return NULL; }
+private:
+	DensityWeightsMap m_DensityMap;
 
-	// Default placement versions of operator new. TODO/FIXME
+	bool m_bDoNotRegisterEntity;
+
+	bool					m_bAllowNavIgnore;
+	CNetworkHandle( CBaseEntity, m_hMousePassEntity ); // Passes mouse to this entity
+	CNetworkVar( int,		m_iOwnerNumber );
+	int						m_nFOWFlagsIntern;
+	CNetworkVar( int,		m_nFOWFlags );
+	bool					m_bInFOW[FOWMAXPLAYERS];
+	CNetworkVar( float,		m_fViewDistance );
+	int m_iFOWOldPosX, m_iFOWOldPosY;
+	int m_iFOWPosX, m_iFOWPosY;
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+public:
+	DECLARE_PYSERVERCLASS( CBaseEntity, PN_BASEENTITY );
+
+	// TODO/FIXME: Default placement versions of operator new, boost python seems to wants these...
 	inline void* operator new(std::size_t, void* __p) throw() { Assert(0); Error("CBaseEntity new\n");return __p; }
 	inline void* operator new[](std::size_t, void* __p) throw() { Assert(0); Error("CBaseEntity new[]\n");return __p; }
 
 	// Memory allocators for python instances of entities
-	static void *PyAllocate(PyObject* self_, std::size_t holder_offset, std::size_t holder_size);
-	static void PyDeallocate(PyObject* self_, void *storage);
+	static void *PyAllocate( PyObject* self_, std::size_t holder_offset, std::size_t holder_size );
+	static void PyDeallocate( PyObject* self_, void *storage );
 
-	// This function returns the reference to the Python instance (if any)
+	// This directly returns the PyObject (if any)
+	virtual PyObject *GetPySelf() const { return NULL; }
+
+	// This returns the reference to the Python instance (if any)
 	boost::python::object			GetPyInstance() const;
 	void							SetPyInstance( boost::python::object inst );
 
-	virtual void		DestroyPyInstance();
-	bp::object			GetPyHandle() const;
-	void				SetPyTouch( bp::object touch_method );
-	void				PyTouch( CBaseEntity *pOther );
-	void				PySendEvent( IRecipientFilter &filter, int event, int data = 0 );
+	// This returns the entity handle for usage in Python
+	boost::python::object			GetPyHandle() const;
 
-	virtual void		PySetModel( const char *szModelName );		// Python safe version		
-	void				PySetSize( const Vector &vecMin, const Vector &vecMax );		// Python safe version
-	void				PySendMessage( boost::python::list msg, bool reliable = false );
+	// This functions destroys the entity
+	virtual void					DestroyPyInstance();
 
-	void				SetPyThink( bp::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
-	bp::object			GetPyThink();
-	void				PyThink();
-	bool				PhysicsPyRunSpecificThink( int nContextIndex, bp::object thinkFunc );
-	void				PhysicsPyDispatchThink( bp::object thinkFunc );
+	// Python Think support
+	void							SetPyThink( boost::python::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
+	boost::python::object			GetPyThink();
+	void							PyThink();
+	bool							PhysicsPyRunSpecificThink( int nContextIndex, boost::python::object thinkFunc );
+	void							PhysicsPyDispatchThink( boost::python::object thinkFunc );
 
-	// EmitSound Wrappers
-	void PyEmitSound( const char *soundname ) { EmitSound(soundname); }
-	void PyEmitSound( const char *soundname, float soundtime ) { EmitSound(soundname, soundtime); }
-	void PyEmitSound( const char *soundname, float soundtime, float duration ) { EmitSound(soundname, soundtime, &duration); }
-	void PyEmitSound( const char *soundname, short handle ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle); }
-	void PyEmitSound( const char *soundname, short handle, float soundtime ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle, soundtime); }
-	void PyEmitSound( const char *soundname, short handle, float soundtime, float duration ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle, soundtime, &duration); }
-	void PyStopSound( const char *soundname ) { StopSound(soundname); }
-	void PyStopSound( const char *soundname, short handle ) { StopSound(soundname, (HSOUNDSCRIPTHANDLE &)handle); }
-	void PyStopSound( int iEntIndex, const char *soundname ) { StopSound( iEntIndex, soundname); }
-	void PyStopSound( int iEntIndex, int iChannel, const char *pSample ) { StopSound( iEntIndex, pSample ); }
+	// Python touch support
+	void							SetPyTouch( boost::python::object touch_method );
+	void							PyTouch( ::CBaseEntity *pOther );
 
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL)
-		{ EmitSound(filter, iEntIndex, soundname, pOrigin); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f )
-		{ EmitSound(filter, iEntIndex, soundname, pOrigin, soundtime); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f, float duration = 0.0f )
-		{ EmitSound(filter, iEntIndex, soundname, pOrigin, soundtime, &duration); }
+	// Allows sending messages in Python on this entity
+	void							PySendMessage( boost::python::list msg, bool reliable = false );
 
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL)
-		{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL, float soundtime = 0.0f )
-		{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin, soundtime); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL, float soundtime = 0.0f, float duration = 0.0f )
-		{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin, soundtime, &duration); }
-
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params ) 
-	{ EmitSound(filter, iEntIndex, params); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, short handle )
-	{ EmitSound(filter, iEntIndex, params, (HSOUNDSCRIPTHANDLE &)handle); }
+	// Allows sending an event on this Python entity
+	void							PySendEvent( IRecipientFilter &filter, int event, int data = 0 );
 
 protected:
 	bool		ValidatePyInstance();
@@ -2023,7 +2018,6 @@ public:
 
 	// This bit vector tells to who we may send data
 	CBitVec<ABSOLUTE_PLAYER_LIMIT> m_PyNetworkVarsPlayerTransmitBits;
-#endif // ENABLE_PYTHON
 
 public:
 	// Free Python sendprops
@@ -2054,27 +2048,14 @@ private:
 	CNetworkVar( int,		m_PySendPropInt3 );
 	CNetworkVar( int,		m_PySendPropInt4 );
 
-private:
-	bool					m_bAllowNavIgnore;
-	CNetworkHandle( CBaseEntity, m_hMousePassEntity ); // Passes mouse to this entity
-	CNetworkVar( int,		m_iOwnerNumber );
-	int						m_nFOWFlagsIntern;
-	CNetworkVar( int,		m_nFOWFlags );
-	bool					m_bInFOW[FOWMAXPLAYERS];
-	CNetworkVar( float,		m_fViewDistance );
-	int m_iFOWOldPosX, m_iFOWOldPosY;
-	int m_iFOWPosX, m_iFOWPosY;
-
-#ifdef ENABLE_PYTHON
 	bp::object m_pyInstance;		// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
 	bp::object m_pyHandle;			// Holds a ref to a handle to the instance. 
 	bp::object m_pyTouchMethod;
 	bp::object m_pyThink;
 #endif // ENABLE_PYTHON
-
-	DensityWeightsMap m_DensityMap;
-
-	bool m_bDoNotRegisterEntity;
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 // Send tables exposed in this module.

@@ -1072,6 +1072,10 @@ struct CBaseProp_wrapper : CBaseProp, bp::wrapper< CBaseProp > {
 
     static void m_takedamage_Set( CBaseProp & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CBaseProp const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBaseProp & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CBaseProp_class(){
@@ -1249,7 +1253,8 @@ void register_CBaseProp_class(){
             , (void ( CBaseProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseProp_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .add_property( "lifestate", &CBaseProp_wrapper::m_lifeState_Get, &CBaseProp_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CBaseProp_wrapper::m_takedamage_Get, &CBaseProp_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &CBaseProp_wrapper::m_takedamage_Get, &CBaseProp_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CBaseProp_wrapper::m_nSkin_Get, &CBaseProp_wrapper::m_nSkin_Set );
 
 }
 

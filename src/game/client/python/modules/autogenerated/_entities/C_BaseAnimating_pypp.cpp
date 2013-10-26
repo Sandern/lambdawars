@@ -863,6 +863,10 @@ struct C_BaseAnimating_wrapper : C_BaseAnimating, bp::wrapper< C_BaseAnimating >
 
     static void m_takedamage_Set( C_BaseAnimating & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_BaseAnimating const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BaseAnimating & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_BaseAnimating_class(){
@@ -1038,6 +1042,17 @@ void register_C_BaseAnimating_class(){
                 "CopySequenceTransitions"
                 , CopySequenceTransitions_function_type( &::C_BaseAnimating::CopySequenceTransitions )
                 , ( bp::arg("pCopyFrom") ) );
+        
+        }
+        { //::C_BaseAnimating::CreateClientRagdoll
+        
+            typedef ::C_ClientRagdoll * ( ::C_BaseAnimating::*CreateClientRagdoll_function_type )( bool ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "CreateClientRagdoll"
+                , CreateClientRagdoll_function_type( &::C_BaseAnimating::CreateClientRagdoll )
+                , ( bp::arg("bRestoring")=(bool)(false) )
+                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::C_BaseAnimating::CreateRagdollCopy
@@ -2431,15 +2446,6 @@ void register_C_BaseAnimating_class(){
         }
         { //::C_BaseAnimating::SequenceDuration
         
-            typedef float ( ::C_BaseAnimating::*SequenceDuration_function_type )(  ) ;
-            
-            C_BaseAnimating_exposer.def( 
-                "SequenceDuration"
-                , SequenceDuration_function_type( &::C_BaseAnimating::SequenceDuration ) );
-        
-        }
-        { //::C_BaseAnimating::SequenceDuration
-        
             typedef float ( ::C_BaseAnimating::*SequenceDuration_function_type )( ::CStudioHdr *,int ) ;
             
             C_BaseAnimating_exposer.def( 
@@ -2456,6 +2462,15 @@ void register_C_BaseAnimating_class(){
                 "SequenceDuration"
                 , SequenceDuration_function_type( &::C_BaseAnimating::SequenceDuration )
                 , ( bp::arg("iSequence") ) );
+        
+        }
+        { //::C_BaseAnimating::SequenceDuration
+        
+            typedef float ( ::C_BaseAnimating::*SequenceDuration_function_type )(  ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "SequenceDuration"
+                , SequenceDuration_function_type( &::C_BaseAnimating::SequenceDuration ) );
         
         }
         { //::C_BaseAnimating::SequenceLoops
@@ -2634,6 +2649,16 @@ void register_C_BaseAnimating_class(){
                 "SetServerIntendedCycle"
                 , SetServerIntendedCycle_function_type( &::C_BaseAnimating::SetServerIntendedCycle )
                 , ( bp::arg("intended") ) );
+        
+        }
+        { //::C_BaseAnimating::SetSkin
+        
+            typedef void ( ::C_BaseAnimating::*SetSkin_function_type )( int ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "SetSkin"
+                , SetSkin_function_type( &::C_BaseAnimating::SetSkin )
+                , ( bp::arg("iSkin") ) );
         
         }
         { //::C_BaseAnimating::SetupBones
@@ -3081,17 +3106,6 @@ void register_C_BaseAnimating_class(){
         C_BaseAnimating_exposer.staticmethod( "ShutdownBoneSetupThreadPool" );
         C_BaseAnimating_exposer.staticmethod( "ThreadedBoneSetup" );
         C_BaseAnimating_exposer.staticmethod( "UpdateClientSideAnimations" );
-        { //property "skin"[fget=::C_BaseAnimating::GetSkin, fset=::C_BaseAnimating::SetSkin]
-        
-            typedef int ( ::C_BaseAnimating::*fget )(  ) ;
-            typedef void ( ::C_BaseAnimating::*fset )( int ) ;
-            
-            C_BaseAnimating_exposer.add_property( 
-                "skin"
-                , fget( &::C_BaseAnimating::GetSkin )
-                , fset( &::C_BaseAnimating::SetSkin ) );
-        
-        }
         { //property "customlightingoffset"[fget=::C_BaseAnimating::GetCustomLightingOffset, fset=::C_BaseAnimating::SetCustomLightingOffset]
         
             typedef ::Vector const & ( ::C_BaseAnimating::*fget )(  ) ;
@@ -3107,6 +3121,7 @@ void register_C_BaseAnimating_class(){
         }
         C_BaseAnimating_exposer.add_property( "lifestate", &C_BaseAnimating_wrapper::m_lifeState_Get, &C_BaseAnimating_wrapper::m_lifeState_Set );
         C_BaseAnimating_exposer.add_property( "takedamage", &C_BaseAnimating_wrapper::m_takedamage_Get, &C_BaseAnimating_wrapper::m_takedamage_Set );
+        C_BaseAnimating_exposer.add_property( "skin", &C_BaseAnimating_wrapper::m_nSkin_Get, &C_BaseAnimating_wrapper::m_nSkin_Set );
     }
 
 }

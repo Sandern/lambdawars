@@ -8975,26 +8975,6 @@ void CBaseEntity::PySendEvent( IRecipientFilter &filter, int event, int data )
 }
 
 //------------------------------------------------------------------------------
-// Purpose: Safe python version of SetModel. Instead of throwing the user to the desktop
-//			we set the error model if the model is not precached or not valid
-//------------------------------------------------------------------------------
-void CBaseEntity::PySetModel( const char *szModelName )
-{
-	int modelIndex = modelinfo->GetModelIndex( szModelName );
-	const model_t *model = modelinfo->GetModel( modelIndex );
-	if ( model && modelinfo->GetModelType( model ) != mod_brush )
-	{
-		Msg( "Setting CBaseEntity to non-brush model %s\n", szModelName );
-	}
-	UTIL_PySetModel( this, szModelName );
-}
-
-void CBaseEntity::PySetSize( const Vector &vecMin, const Vector &vecMax )
-{
-	UTIL_PySetSize( this, vecMin, vecMax );
-}
-
-//------------------------------------------------------------------------------
 // Purpose: Send Python Entity Message
 //------------------------------------------------------------------------------
 void CBaseEntity::PySendMessage( bp::list msg, bool reliable )

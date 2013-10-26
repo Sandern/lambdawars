@@ -1048,6 +1048,10 @@ void register_CEntityFlame_class(){
             , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetLifetime )
             , ( bp::arg("lifetime") ) )    
         .def( 
+            "SetSize"
+            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetSize )
+            , ( bp::arg("size") ) )    
+        .def( 
             "Spawn"
             , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Spawn)
             , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Spawn) )    

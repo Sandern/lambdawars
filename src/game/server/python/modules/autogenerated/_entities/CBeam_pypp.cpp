@@ -1574,6 +1574,16 @@ void register_CBeam_class(){
                 , ( bp::arg("spriteIndex") ) );
         
         }
+        { //::CBeam::SetModel
+        
+            typedef void ( ::CBeam::*SetModel_function_type )( char const * ) ;
+            
+            CBeam_exposer.def( 
+                "SetModel"
+                , SetModel_function_type( &::CBeam::SetModel )
+                , ( bp::arg("szModelName") ) );
+        
+        }
         { //::CBeam::SetNoise
         
             typedef void ( ::CBeam::*SetNoise_function_type )( float ) ;

@@ -52,9 +52,6 @@ public:
 	DECLARE_PYSERVERCLASS( CBaseAnimating, PN_BASEANIMATING );
 
 	virtual void SetModel( const char *szModelName );
-#ifdef ENABLE_PYTHON
-	virtual void PySetModel( const char *szModelName );		// Python safe version
-#endif // ENABLE_PYTHON
 	virtual void Activate();
 	virtual void Spawn();
 	virtual void Precache();
@@ -214,7 +211,6 @@ public:
 	void SetBodygroup( int iGroup, int iValue );
 	int GetBodygroup( int iGroup );
 	int GetSkin() { return m_nSkin; }
-	void SetSkin( int nSkin ) { m_nSkin = nSkin; }
 
 	const char *GetBodygroupName( int iGroup );
 	int FindBodygroupByName( const char *name );

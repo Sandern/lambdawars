@@ -1854,10 +1854,8 @@ protected:
 private:
 	bool							m_bIsBlurred;
 
-	// hl2wars
+	// Lambda Wars
 public:
-	DECLARE_PYCLIENTCLASS( C_BaseEntity, PN_BASEENTITY );
-
 	friend class CFogOfWarMgr;
 	friend class UnitBaseLocomotion;
 
@@ -1899,69 +1897,77 @@ public:
 	void							SetTeamColor( Vector &vTeamColor );
 	Vector &						GetTeamColor( bool bDirect=true );
 
-#ifdef ENABLE_PYTHON
-	// Python generic
-	static void *PyAllocate(PyObject* self_, std::size_t holder_offset, std::size_t holder_size);
-	static void PyDeallocate(PyObject* self_, void *storage);
+	// Hack for keeper package due edict limit
+	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
 
-	virtual PyObject *				GetPySelf() const { return NULL; }
+private:
+	string_t m_iszOverrideClassname; 
+	int m_iOldOwnerNumber;
+	int m_iOwnerNumber;
+	EHANDLE	m_hMousePassEntity;
+	int	m_nFOWFlags;
+	int	m_nOldFOWFlags;
+	bool m_bInFOW;
+	float m_fViewDistance;
+	int m_iFOWOldPosX, m_iFOWOldPosY;
+	int m_iFOWPosX, m_iFOWPosY;
+	CUtlVector< FowPos_t > m_FOWMesh;
+
+	Vector m_vTeamColor; // Real team color
+	Vector m_vCurTeamColor; // Current used team color
+	Vector m_vTargetTeamColor; // Current target team color
+	bool m_bUseRelationBasedTeamColor;
+	bool m_bCheckTeamColor;
+	float m_fTeamColorLastUpdateFrame;
+
+	bool m_bAllowNavIgnore;
+	float m_flNavIgnoreUntilTime;
+
+	ShouldTransmitState_t m_LastShouldTransmitState;
+
+	bool m_bDoNotRegisterEntity;
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+public:
+	DECLARE_PYCLIENTCLASS( CBaseEntity, PN_BASEENTITY );
+
+	// Memory allocators for python instances of entities
+	static void *PyAllocate( PyObject* self_, std::size_t holder_offset, std::size_t holder_size );
+	static void PyDeallocate( PyObject* self_, void *storage );
 
 	// This function returns the reference to the Python instance (if any)
 	boost::python::object			GetPyInstance() const;
 	void							SetPyInstance( boost::python::object inst );
 
-	virtual void					DestroyPyInstance();
-	bp::object						GetPyHandle() const;
-	void							SetPyTouch( bp::object touch_method );
-	void							PyTouch( C_BaseEntity *pOther );
-	void							SetPyThink( bp::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
-	bp::object						GetPyThink();
-	void							PyThink();
-	bool							PhysicsPyRunSpecificThink( int nContextIndex, bp::object thinkFunc );
-	void							PhysicsPyDispatchThink( bp::object thinkFunc );
+	// This directly returns the PyObject (if any)
+	virtual PyObject *GetPySelf() const { return NULL; }
 
-	// Python Entity Messages
+	// This returns the entity handle for usage in Python
+	boost::python::object			GetPyHandle() const;
+
+	// This functions destroys the entity
+	virtual void					DestroyPyInstance();
+
+	// For receiving messages on this entity
 	void							PyReceiveMessageInternal( int classID, bf_read &msg );
 	virtual void					PyReceiveMessage( boost::python::list msg ) {}
 
-	void							PyUpdateNetworkVar( const char *pName, bp::object data, bool callchanged = false );
+	// Updates a Python network var after receiving
+	void							PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged = false );
 
-	// EmitSound Wrappers
-	void PyEmitSound( const char *soundname ) { EmitSound(soundname); }
-	void PyEmitSound( const char *soundname, float soundtime ) { EmitSound(soundname, soundtime); }
-	void PyEmitSound( const char *soundname, float soundtime, float duration ) { EmitSound(soundname, soundtime, &duration); }
-	void PyEmitSound( const char *soundname, short handle ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle); }
-	void PyEmitSound( const char *soundname, short handle, float soundtime ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle, soundtime); }
-	void PyEmitSound( const char *soundname, short handle, float soundtime, float duration ) { EmitSound(soundname, (HSOUNDSCRIPTHANDLE &)handle, soundtime, &duration); }
-	void PyStopSound( const char *soundname ) { StopSound(soundname); }
-	void PyStopSound( const char *soundname, short handle ) { StopSound(soundname, (HSOUNDSCRIPTHANDLE &)handle); }
-	void PyStopSound( int iEntIndex, const char *soundname ) { StopSound( iEntIndex, soundname); }
-	void PyStopSound( int iEntIndex, int iChannel, const char *pSample ) { StopSound( iEntIndex, pSample ); }
+	// Python Think support
+	void							SetPyThink( boost::python::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );
+	boost::python::object			GetPyThink();
+	void							PyThink();
+	bool							PhysicsPyRunSpecificThink( int nContextIndex, boost::python::object thinkFunc );
+	void							PhysicsPyDispatchThink( boost::python::object thinkFunc );
 
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL)
-	{ EmitSound(filter, iEntIndex, soundname, pOrigin); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f )
-	{ EmitSound(filter, iEntIndex, soundname, pOrigin, soundtime); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f, float duration = 0.0f )
-	{ EmitSound(filter, iEntIndex, soundname, pOrigin, soundtime, &duration); }
-
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL)
-	{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL, float soundtime = 0.0f )
-	{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin, soundtime); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const char *soundname, short handle, const Vector *pOrigin = NULL, float soundtime = 0.0f, float duration = 0.0f )
-	{ EmitSound(filter, iEntIndex, soundname, (HSOUNDSCRIPTHANDLE &)handle, pOrigin, soundtime, &duration); }
-
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params ) 
-	{ EmitSound(filter, iEntIndex, params); }
-	void PyEmitSoundFilter( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, short handle )
-	{ EmitSound(filter, iEntIndex, params, (HSOUNDSCRIPTHANDLE &)handle); }
-
-	virtual void PyNotifyShouldTransmit( ShouldTransmitState_t state ) {}
-#endif // ENABLE_PYTHON
-
-	// Hack for keeper package due edict limit
-	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
+	// Python touch support
+	void							SetPyTouch( boost::python::object touch_method );
+	void							PyTouch( ::CBaseEntity *pOther );
 
 public:
 	// Free Python sendprops
@@ -1993,46 +1999,16 @@ private:
 	 int m_PySendPropInt3;
 	 int m_PySendPropInt4;
 
-private:
-	string_t m_iszOverrideClassname; 
-	int m_iOldOwnerNumber;
-	int m_iOwnerNumber;
-	EHANDLE	m_hMousePassEntity;
-	int	m_nFOWFlags;
-	int	m_nOldFOWFlags;
-	bool m_bInFOW;
-	float m_fViewDistance;
-	int m_iFOWOldPosX, m_iFOWOldPosY;
-	int m_iFOWPosX, m_iFOWPosY;
-	CUtlVector< FowPos_t > m_FOWMesh;
-
-	Vector m_vTeamColor; // Real team color
-	Vector m_vCurTeamColor; // Current used team color
-	Vector m_vTargetTeamColor; // Current target team color
-	bool m_bUseRelationBasedTeamColor;
-	bool m_bCheckTeamColor;
-	float m_fTeamColorLastUpdateFrame;
-
-	bool m_bAllowNavIgnore;
-	float m_flNavIgnoreUntilTime;
-
-	ShouldTransmitState_t m_LastShouldTransmitState;
-
-	bool m_bDoNotRegisterEntity;
-
-#ifdef ENABLE_PYTHON
 protected:
 	bool		m_bPyManaged;
-
-private:
-	bp::object m_pyTouchMethod;
-	bp::object m_pyThink;
-
-public:
-	// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
-	bp::object m_pyInstance;	
-	bp::object m_pyHandle;	
+	boost::python::object m_pyInstance; // Holds a ref to the instance. Keeps the object always alive util Remove() is called.
+	boost::python::object m_pyHandle;
+	boost::python::object m_pyTouchMethod;
+	boost::python::object m_pyThink;
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 EXTERN_RECV_TABLE(DT_BaseEntity);

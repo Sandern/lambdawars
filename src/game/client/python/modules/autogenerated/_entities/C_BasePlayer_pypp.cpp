@@ -864,6 +864,10 @@ struct C_BasePlayer_wrapper : C_BasePlayer, bp::wrapper< C_BasePlayer > {
 
     static void m_takedamage_Set( C_BasePlayer & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_BasePlayer const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BasePlayer & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_BasePlayer_class(){
@@ -1036,10 +1040,6 @@ void register_C_BasePlayer_class(){
             "GetFlashlightTextureName"
             , (char const * ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetFlashlightTextureName ) )    
         .def( 
-            "GetFogParams"
-            , (::fogparams_t * ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::GetFogParams )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
             "GetHealth"
             , (int ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetHealth ) )    
         .def( 
@@ -1049,11 +1049,6 @@ void register_C_BasePlayer_class(){
             "GetLadderNormal"
             , (::Vector const & ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetLadderNormal )
             , bp::return_value_policy< bp::copy_const_reference >() )    
-        .def( 
-            "GetLadderSurface"
-            , (::surfacedata_t * ( ::C_BasePlayer::* )( ::Vector const & ) )( &::C_BasePlayer::GetLadderSurface )
-            , ( bp::arg("origin") )
-            , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetLadderSurfaceProps"
             , (int ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetLadderSurfaceProps ) )    
@@ -1128,10 +1123,6 @@ void register_C_BasePlayer_class(){
         .def( 
             "GetRenderedWeaponModel"
             , (::C_BaseAnimating * ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::GetRenderedWeaponModel )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetRepresentativeRagdoll"
-            , (::IRagdoll * ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetRepresentativeRagdoll )
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetSplitScreenPlayerSlot"
@@ -1693,7 +1684,8 @@ void register_C_BasePlayer_class(){
         .staticmethod( "RecvProxy_ObserverTarget" )    
         .staticmethod( "SetRemoteSplitScreenPlayerViewsAreLocalPlayer" )    
         .add_property( "lifestate", &C_BasePlayer_wrapper::m_lifeState_Get, &C_BasePlayer_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &C_BasePlayer_wrapper::m_takedamage_Get, &C_BasePlayer_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &C_BasePlayer_wrapper::m_takedamage_Get, &C_BasePlayer_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &C_BasePlayer_wrapper::m_nSkin_Get, &C_BasePlayer_wrapper::m_nSkin_Set );
 
 }
 

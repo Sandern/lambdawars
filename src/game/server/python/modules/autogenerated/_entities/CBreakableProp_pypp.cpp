@@ -1072,6 +1072,10 @@ struct CBreakableProp_wrapper : CBreakableProp, bp::wrapper< CBreakableProp > {
 
     static void m_takedamage_Set( CBreakableProp & inst, int val ) { inst.m_takedamage.Set( val ); }
 
+    static int m_nSkin_Get( CBreakableProp const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBreakableProp & inst, int val ) { inst.m_nSkin.Set( val ); }
+
 };
 
 void register_CBreakableProp_class(){
@@ -1458,7 +1462,8 @@ void register_CBreakableProp_class(){
             , (void ( CBreakableProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBreakableProp_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .add_property( "lifestate", &CBreakableProp_wrapper::m_lifeState_Get, &CBreakableProp_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CBreakableProp_wrapper::m_takedamage_Get, &CBreakableProp_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &CBreakableProp_wrapper::m_takedamage_Get, &CBreakableProp_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CBreakableProp_wrapper::m_nSkin_Get, &CBreakableProp_wrapper::m_nSkin_Set );
 
 }
 

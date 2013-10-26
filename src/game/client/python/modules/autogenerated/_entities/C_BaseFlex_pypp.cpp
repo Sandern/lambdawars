@@ -854,6 +854,10 @@ struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
 
     static void m_takedamage_Set( C_BaseFlex & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_BaseFlex const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BaseFlex & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_BaseFlex_class(){
@@ -1069,7 +1073,8 @@ void register_C_BaseFlex_class(){
         .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "InvalidateFlexCaches" )    
         .add_property( "lifestate", &C_BaseFlex_wrapper::m_lifeState_Get, &C_BaseFlex_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &C_BaseFlex_wrapper::m_takedamage_Get, &C_BaseFlex_wrapper::m_takedamage_Set );
+        .add_property( "takedamage", &C_BaseFlex_wrapper::m_takedamage_Get, &C_BaseFlex_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &C_BaseFlex_wrapper::m_nSkin_Get, &C_BaseFlex_wrapper::m_nSkin_Set );
 
 }
 

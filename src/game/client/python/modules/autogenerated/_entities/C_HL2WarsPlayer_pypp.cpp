@@ -1043,6 +1043,10 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
 
     static void m_takedamage_Set( C_HL2WarsPlayer & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_HL2WarsPlayer const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_HL2WarsPlayer & inst, int val ) { inst.m_nSkin = val; }
+
 };
 
 void register_C_HL2WarsPlayer_class(){
@@ -2351,6 +2355,7 @@ void register_C_HL2WarsPlayer_class(){
         }
         C_HL2WarsPlayer_exposer.add_property( "lifestate", &C_HL2WarsPlayer_wrapper::m_lifeState_Get, &C_HL2WarsPlayer_wrapper::m_lifeState_Set );
         C_HL2WarsPlayer_exposer.add_property( "takedamage", &C_HL2WarsPlayer_wrapper::m_takedamage_Get, &C_HL2WarsPlayer_wrapper::m_takedamage_Set );
+        C_HL2WarsPlayer_exposer.add_property( "skin", &C_HL2WarsPlayer_wrapper::m_nSkin_Get, &C_HL2WarsPlayer_wrapper::m_nSkin_Set );
     }
 
 }

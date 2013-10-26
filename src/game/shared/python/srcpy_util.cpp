@@ -86,9 +86,6 @@ void UTIL_PySetModel( CBaseEntity *pEntity, const char *pModelName )
 	}
 }
 
-#else
-
-
 #endif // CLIENT_DLL
 
 int UTIL_GetModuleIndex( const char *module )

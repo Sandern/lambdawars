@@ -534,8 +534,10 @@ protected:
 	float							m_flPlaybackRate;// Animation playback framerate
 
 // FTYPEDESC_INSENDTABLE STUFF (end)
+public:
 	int								m_nSkin;// Texture group to use
 	int								m_nBody;// Object bodygroup
+protected:
 	int								m_nNewSequenceParity;
 	int								m_nResetEventsParity;
 	int								m_nPrevNewSequenceParity;

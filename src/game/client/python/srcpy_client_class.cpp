@@ -21,9 +21,9 @@
 #include "c_smoke_trail.h"
 #include "beam_shared.h"
 #include "basecombatweapon_shared.h"
+#include "c_playerresource.h"
 #include "c_basetoggle.h"
 #include "c_triggers.h"
-#include "c_playerresource.h"
 
 #ifdef HL2WARS_DLL
 #include "c_hl2wars_player.h"
@@ -47,14 +47,13 @@ EXTERN_RECV_TABLE( DT_BaseFlex );
 EXTERN_RECV_TABLE( DT_BaseCombatCharacter );
 EXTERN_RECV_TABLE( DT_BasePlayer );
 EXTERN_RECV_TABLE( DT_BaseGrenade );
+EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
+EXTERN_RECV_TABLE( DT_PlayerResource );
+EXTERN_RECV_TABLE( DT_BaseToggle );
+EXTERN_RECV_TABLE( DT_BaseTrigger );
 EXTERN_RECV_TABLE( DT_Sprite );
 EXTERN_RECV_TABLE( DT_SmokeTrail );
 EXTERN_RECV_TABLE( DT_Beam );
-EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
-EXTERN_RECV_TABLE( DT_Sprite );
-EXTERN_RECV_TABLE( DT_BaseToggle );
-EXTERN_RECV_TABLE( DT_BaseTrigger );
-EXTERN_RECV_TABLE( DT_PlayerResource );
 
 #ifdef HL2WARS_DLL
 EXTERN_RECV_TABLE( DT_HL2WarsPlayer );
@@ -90,9 +89,9 @@ IMPLEMENT_FALLBACK_FACTORY(C_Sprite)
 IMPLEMENT_FALLBACK_FACTORY(C_SmokeTrail)
 IMPLEMENT_FALLBACK_FACTORY(C_Beam)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatWeapon)
+IMPLEMENT_FALLBACK_FACTORY(C_PlayerResource)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseToggle)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseTrigger)
-IMPLEMENT_FALLBACK_FACTORY(C_PlayerResource)
 
 #ifdef HL2WARS_DLL
 IMPLEMENT_FALLBACK_FACTORY(C_HL2WarsPlayer)
@@ -128,6 +127,18 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 	case PN_BASEGRENADE:
 		p->m_pRecvTable = &(DT_BaseGrenade::g_RecvTable);
 		break;
+	case PN_BASECOMBATWEAPON:
+		p->m_pRecvTable = &(DT_BaseCombatWeapon::g_RecvTable);
+		break;
+	case PN_PLAYERRESOURCE:
+		p->m_pRecvTable = &(DT_PlayerResource::g_RecvTable);
+		break;
+	case PN_BASETOGGLE:
+		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
+		break;
+	case PN_BASETRIGGER:
+		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
+		break;
 	case PN_SPRITE:
 		p->m_pRecvTable = &(DT_Sprite::g_RecvTable);
 		break;	
@@ -136,18 +147,6 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 		break;	
 	case PN_BEAM:
 		p->m_pRecvTable = &(DT_Beam::g_RecvTable);
-		break;
-	case PN_BASECOMBATWEAPON:
-		p->m_pRecvTable = &(DT_BaseCombatWeapon::g_RecvTable);
-		break;
-	case PN_BASETOGGLE:
-		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
-		break;
-	case PN_BASETRIGGER:
-		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
-		break;
-	case PN_PLAYERRESOURCE:
-		p->m_pRecvTable = &(DT_PlayerResource::g_RecvTable);
 		break;
 #ifdef HL2WARS_DLL
 	case PN_HL2WARSPLAYER:
@@ -207,7 +206,7 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 			return NULL;
 		}
 
-		pRet->m_pyInstance = inst;
+		pRet->SetPyInstance( inst );
 		pRet->Init( entnum, serialNum );
 		return pRet;
 	}
@@ -239,11 +238,17 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 		case PN_BASEPLAYER:
 			pResult = CALL_FALLBACK_FACTORY( C_BasePlayer, entnum, serialNum );
 			break;
-		case PN_HL2WARSPLAYER:
-			pResult = CALL_FALLBACK_FACTORY( C_HL2WarsPlayer, entnum, serialNum );
-			break;
 		case PN_BASEGRENADE:
 			pResult = CALL_FALLBACK_FACTORY( C_BaseGrenade, entnum, serialNum );
+			break;
+		case PN_BASECOMBATWEAPON:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseCombatWeapon, entnum, serialNum );
+			break;
+		case PN_BASETOGGLE:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseToggle, entnum, serialNum );
+			break;
+		case PN_BASETRIGGER:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseTrigger, entnum, serialNum );
 			break;
 		case PN_UNITBASE:
 			pResult = CALL_FALLBACK_FACTORY( C_UnitBase, entnum, serialNum );
@@ -254,20 +259,14 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 		case PN_BEAM:
 			pResult = CALL_FALLBACK_FACTORY( C_Beam, entnum, serialNum );
 			break;
-		case PN_BASECOMBATWEAPON:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseCombatWeapon, entnum, serialNum );
+		case PN_HL2WARSPLAYER:
+			pResult = CALL_FALLBACK_FACTORY( C_HL2WarsPlayer, entnum, serialNum );
 			break;
 		case PN_WARSWEAPON:
 			pResult = CALL_FALLBACK_FACTORY( C_WarsWeapon, entnum, serialNum );
 			break;
 		case PN_FUNCUNIT:
 			pResult = CALL_FALLBACK_FACTORY( C_FuncUnit, entnum, serialNum );
-			break;
-		case PN_BASETOGGLE:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseToggle, entnum, serialNum );
-			break;
-		case PN_BASETRIGGER:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseTrigger, entnum, serialNum );
 			break;
 		default:
 			Warning( "No default fallback for networktype %d. Warn a dev.\n", iType );

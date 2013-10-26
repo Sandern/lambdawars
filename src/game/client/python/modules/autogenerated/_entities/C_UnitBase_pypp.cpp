@@ -1124,6 +1124,10 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
 
     static void m_takedamage_Set( C_UnitBase & inst, int val ) { inst.m_takedamage = val; }
 
+    static int m_nSkin_Get( C_UnitBase const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_UnitBase & inst, int val ) { inst.m_nSkin = val; }
+
     virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
         boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
         if( func_IsSelectableByPlayer.ptr() != Py_None )
@@ -2461,6 +2465,7 @@ void register_C_UnitBase_class(){
         }
         C_UnitBase_exposer.add_property( "lifestate", &C_UnitBase_wrapper::m_lifeState_Get, &C_UnitBase_wrapper::m_lifeState_Set );
         C_UnitBase_exposer.add_property( "takedamage", &C_UnitBase_wrapper::m_takedamage_Get, &C_UnitBase_wrapper::m_takedamage_Set );
+        C_UnitBase_exposer.add_property( "skin", &C_UnitBase_wrapper::m_nSkin_Get, &C_UnitBase_wrapper::m_nSkin_Set );
         C_UnitBase_exposer.def( 
             "IsSelectableByPlayer"
             , (bool ( ::C_UnitBase::* )( ::C_HL2WarsPlayer *,::boost::python::object ) )(&::C_UnitBase::IsSelectableByPlayer)
