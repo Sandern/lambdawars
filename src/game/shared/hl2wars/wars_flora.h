@@ -37,6 +37,12 @@ public:
 	static const char *ParseEntity( const char *pEntData );
 	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
+
+private:
+	string_t		m_iszIdleAnimationName;
+	string_t		m_iszSqueezeDownAnimationName;
+	string_t		m_iszSqueezeUpAnimationName;
+	string_t		m_iszDestructionAnimationName;
 };
 
 #endif // WARS_FLORA_H

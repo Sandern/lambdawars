@@ -93,6 +93,22 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		SetSkin( Q_atoi(szValue) );
 	}
+	else if (FStrEq(szKeyName, "idleanimation"))
+	{
+		m_iszIdleAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "squeezedownanimation"))
+	{
+		m_iszSqueezeDownAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "squeezeupanimation"))
+	{
+		m_iszSqueezeUpAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "destructionanimation"))
+	{
+		m_iszDestructionAnimationName = AllocPooledString( szValue );
+	}
 
 	else
 	{
@@ -303,6 +319,12 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 #else
 	DispatchSpawn( pEntity );
 
-	engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
+	for( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if( !pPlayer || !pPlayer->IsConnected() )
+			continue;
+		engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
+	}
 #endif // CLIENT_DLL
 }
