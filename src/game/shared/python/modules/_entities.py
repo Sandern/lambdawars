@@ -800,7 +800,8 @@ class Entities(SemiSharedModuleGenerator):
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(studiohdr))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)  
         
         # Create properties for the following variables, since they are networked
-        cls.mem_fun('GetSkin').exclude()
+        if self.isclient or self.settings.branch != 'source2013':
+            cls.mem_fun('GetSkin').exclude()
         for entcls in self.entclasses:
             if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
                 self.AddNetworkVarProperty('skin', 'm_nSkin', 'int', entcls)    

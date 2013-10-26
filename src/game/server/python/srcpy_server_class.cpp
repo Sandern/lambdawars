@@ -20,16 +20,17 @@ EXTERN_SEND_TABLE( DT_BaseEntity );
 EXTERN_SEND_TABLE( DT_BaseAnimating );
 EXTERN_SEND_TABLE( DT_BaseAnimatingOverlay );
 EXTERN_SEND_TABLE( DT_BaseFlex );
-EXTERN_SEND_TABLE( DT_BaseCombatWeapon );
 EXTERN_SEND_TABLE( DT_BaseCombatCharacter );
 EXTERN_SEND_TABLE( DT_BasePlayer );
 EXTERN_SEND_TABLE( DT_BaseGrenade );
+EXTERN_SEND_TABLE( DT_BaseCombatWeapon );
+EXTERN_SEND_TABLE( DT_PlayerResource );
+
+EXTERN_SEND_TABLE( DT_BaseToggle );
+EXTERN_SEND_TABLE( DT_BaseTrigger );
 EXTERN_SEND_TABLE( DT_Beam );
 EXTERN_SEND_TABLE( DT_Sprite );
 EXTERN_SEND_TABLE( DT_SmokeTrail );
-EXTERN_SEND_TABLE( DT_BaseToggle );
-EXTERN_SEND_TABLE( DT_BaseTrigger );
-EXTERN_SEND_TABLE( DT_PlayerResource );
 
 #ifdef HL2WARS_DLL
 EXTERN_SEND_TABLE( DT_HL2WarsPlayer );
@@ -82,6 +83,18 @@ void PyServerClass::SetupServerClass( int iType )
 	case PN_BASEGRENADE:
 		m_pTable = &(DT_BaseGrenade::g_SendTable);
 		break;
+	case PN_BASECOMBATWEAPON:
+		m_pTable = &(DT_BaseCombatWeapon::g_SendTable);
+		break;
+	case PN_PLAYERRESOURCE:
+		m_pTable = &(DT_PlayerResource::g_SendTable);
+		break;
+	case PN_BASETOGGLE:
+		m_pTable = &(DT_BaseToggle::g_SendTable);
+		break;
+	case PN_BASETRIGGER:
+		m_pTable = &(DT_BaseTrigger::g_SendTable);
+		break;
 	case PN_SPRITE:
 		m_pTable = &(DT_Sprite::g_SendTable);
 		break;
@@ -90,18 +103,6 @@ void PyServerClass::SetupServerClass( int iType )
 		break;
 	case PN_BEAM:
 		m_pTable = &(DT_Beam::g_SendTable);
-		break;
-	case PN_BASECOMBATWEAPON:
-		m_pTable = &(DT_BaseCombatWeapon::g_SendTable);
-		break;
-	case PN_BASETOGGLE:
-		m_pTable = &(DT_BaseToggle::g_SendTable);
-		break;
-	case PN_BASETRIGGER:
-		m_pTable = &(DT_BaseTrigger::g_SendTable);
-		break;
-	case PN_PLAYERRESOURCE:
-		m_pTable = &(DT_PlayerResource::g_SendTable);
 		break;
 #ifdef HL2WARS_DLL
 	case PN_HL2WARSPLAYER:
