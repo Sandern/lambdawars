@@ -78,16 +78,6 @@ void AddSetupNetworkTablesOnHoldEnt( EntityInfoOnHold info );
 bool SetupNetworkTablesRelease();
 void PyResetAllNetworkTables();
 
-#if 0
-// Implement a python class. For python/c++ handle conversion
-#define DECLARE_PYCLASS( name )																		\
-	public:																							\
-	virtual boost::python::object CreatePyHandle( void ) const										\
-	{																								\
-		return CreatePyHandleHelper(this, #name "HANDLE");											\
-	}
-#endif // 0
-
 // Implement a networkable python class. Used to determine the right recv/send tables
 #define DECLARE_PYSERVERCLASS( name, networkType )													\
 	DECLARE_PYCLASS( name )																			\

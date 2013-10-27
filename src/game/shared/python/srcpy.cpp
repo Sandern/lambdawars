@@ -229,7 +229,6 @@ static void VSPTParmRemove( const char *pParmToCheck )
 bool CSrcPython::InitInterpreter( void )
 {
 	const bool bEnabled = CommandLine() && CommandLine()->FindParm("-disablepython") == 0;
-	const bool bRunInterpreter = CommandLine() && CommandLine()->FindParm("-interpreter") != 0;
 	//const bool bToolsMode = CommandLine() && CommandLine()->FindParm("-tools") != 0;
 
 	/*const char *pGameDir = COM_GetModDirectory();
@@ -350,7 +349,9 @@ bool CSrcPython::InitInterpreter( void )
 	{
 #ifdef CLIENT_DLL
 		builtins.attr("isclient") = true;
+		builtins.attr("isserver") = false;
 #else
+		builtins.attr("isclient") = false;
 		builtins.attr("isserver") = true;
 #endif // CLIENT_DLL
 		builtins.attr("gpGlobals") = boost::ref( gpGlobals );
@@ -362,9 +363,8 @@ bool CSrcPython::InitInterpreter( void )
 
 	fntype = builtins.attr("type");
 
-	// Add the maps directory to the modulse path
+	// Add the maps directory to the modules path
 	SysAppendPath("maps");
-	SysAppendPath("python//base");
 	SysAppendPath("python//srclib");
 
 	srcmgr = Import("srcmgr");
@@ -401,102 +401,11 @@ bool CSrcPython::InitInterpreter( void )
 #endif // CLIENT_DLL
 	DevMsg( "Initialized Python default modules... (%f seconds)\n", Plat_FloatTime() - fStartTime );
 
-#ifdef WIN32
-	// Support for Visual Studio Python Tools
-	if( bRunInterpreter && CommandLine() )
-	{
-		bool bSuccess = false;
+	if( !CheckVSPTInterpreter() )
+		return false;
 
-#ifndef CLIENT_DLL
-		engine->ServerCommand("log on");
-		engine->ServerExecute();
-#endif // CLIENT_DLL
-
-		char interpreterFile[MAX_PATH];
-		interpreterFile[0] = 0;
-		const char *pParmInterpreterFile = CommandLine()->ParmValue( "-interpreter" );
-		if( pParmInterpreterFile )
-			V_strncpy( interpreterFile, pParmInterpreterFile, MAX_PATH );
-
-		if( interpreterFile[0] != 0 )
-		{
-			char vtptpath[MAX_PATH];
-			V_strncpy( vtptpath, interpreterFile, MAX_PATH );
-			V_StripFilename( vtptpath );
-			this->SysAppendPath( vtptpath );
-
-			VSPTParmRemove("-insecure");
-			/*VSPTParmRemove("-dev");
-			VSPTParmRemove("-textmode");
-			VSPTParmRemove("-game");
-			VSPTParmRemove("-interpreter");*/
-
-			//bp::list argv = bp::list();
-			//argv.append( interpreterFile );
-
-			/*
-			int n = CommandLine()->ParmCount();
-			for( int i = 1; i < n; i++ )
-			{
-				Msg("VSPT Parm #%d: %s\n", i, CommandLine()->GetParm( i ) );
-				argv.append( CommandLine()->GetParm( i ) );
-			}*/
-
-			// Check "visualstudio_py_repl.py" from visual studio python tools for all arguments
-			//VSPTCheckForParm( argv, "--port" );
-			//VSPTCheckForParm( argv, "--execution_mode" );
-			//VSPTCheckForParm( argv, "--enable-attach" );
-			//VSPTCheckForParm( argv, "--launch_file" );
-
-			bp::str args( CommandLine()->GetCmdLine() );
-
-			try
-			{
-				bp::str remainder( args.split( "-interpreter", 1 )[1] );
-
-				bp::exec( "import shlex", mainnamespace, mainnamespace );
-				bp::object shlex = Import("shlex");
-
-				bp::str newCmd( /*"\"" + bp::str(interpreterFile) + "\" " +*/ remainder );
-				newCmd = newCmd.replace( "\\\"", "\\\\\"" );
-
-				builtins.attr("print")( newCmd );
-
-				bp::list argv( shlex.attr("split")( newCmd ) );
-				bp::setattr( sys, bp::object("argv"), argv );
-			}
-			catch( bp::error_already_set & ) 
-			{
-				PyErr_Print();
-			}
-
-			DevMsg("New CommandLine: %s\n", CommandLine()->GetCmdLine() );
-
-			// Change working directory	
-			V_SetCurrentDirectory( vtptpath );
-
-			Msg("Running interpreter file: %s\n", interpreterFile );
-			Run("import encodings.idna");
-			bSuccess = this->ExecuteFile( interpreterFile );
-		}
-
-		// Make sure logs are saved
-#ifndef CLIENT_DLL
-		engine->ServerExecute();
-#endif // CLIENT_DLL
-		filesystem->AsyncFinishAllWrites();
-
-		if( bSuccess )
-		{
-			::TerminateProcess( ::GetCurrentProcess(), 0 );
-		}
-		else
-		{
-			Warning("PySource: Failed to execute interpreter file. Please check log.\n");
-		}
-		return true;
-	}
-#endif // WIN32
+	if( !CheckVSPTDebugger() )
+		return false;
 
 	return true;
 }
@@ -600,6 +509,187 @@ void CSrcPython::PostInit()
 
 	// Autorun once
 	ExecuteAllScriptsInPath("python/autorun_once/");
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Support for Visual Studio Python Tools Interpreter
+//-----------------------------------------------------------------------------
+bool CSrcPython::CheckVSPTInterpreter()
+{
+#ifdef CLIENT_DLL
+	return true; // TODO
+#endif // CLIENT_DLL
+
+	const bool bRunInterpreter = CommandLine() && CommandLine()->FindParm("-interpreter") != 0;
+	if( !bRunInterpreter )
+		return true;
+
+#ifdef WIN32
+	bool bSuccess = false;
+
+#ifndef CLIENT_DLL
+	tm today;
+	Plat_GetLocalTime( &today );
+
+	// Note: appends to the same log on the same day
+	char logfilename[MAX_PATH];
+	Q_snprintf( logfilename, sizeof( logfilename ), "con_logfile vspt_%02i-%02i-%04i.txt\n",
+		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year );
+
+	engine->ServerCommand( logfilename );
+	engine->ServerExecute();
+#endif // CLIENT_DLL
+
+	Msg("\n\n=======================================\n");
+	Msg("Running in PySource Interpreter mode...\n");
+	Msg("=======================================\n");
+
+	// "-insecure" is added at the back. Remove it, so we can just take the remainder
+	// after "-interpreter" argument.
+	VSPTParmRemove("-insecure");
+
+	std::string command("<null>");
+	std::string cmdline = CommandLine()->GetCmdLine();
+	std::string needle( "-interpreter " );
+	std::size_t found = cmdline.find( needle );
+
+	if( found == std::string::npos )
+	{
+		Warning("CheckVSPTInterpreter: -interpreter argument not found!\n");
+		return true;
+	}
+
+	command = cmdline.substr( found + needle.length() );
+	Msg( "Command: %s\n", command.c_str() );
+
+	try
+	{
+		// Parse arguments for Python
+		bp::str args( command.c_str() );
+
+		bp::exec( "import shlex", mainnamespace, mainnamespace );
+		bp::object shlex = Import("shlex");
+
+		bp::str newCmd( args );
+		newCmd = newCmd.replace( "\\\"", "\\\\\"" );
+
+		builtins.attr("print")( newCmd );
+
+		bp::list argv( shlex.attr("split")( newCmd ) );
+		bp::setattr( sys, bp::object("argv"), argv );
+
+		const char *pFilePath = bp::extract< const char * >( argv[0] );
+
+		// Add path
+		char vtptpath[MAX_PATH];
+		V_strncpy( vtptpath, pFilePath, MAX_PATH );
+		V_StripFilename( vtptpath );
+		this->SysAppendPath( vtptpath );
+
+		// Support 3 modes:
+		// 1. Run a command with "-c"
+		// 2. Run a module with "-m"
+		// 3. Execute a file
+		std::string firstchars = command.substr(0, 3);
+		if( firstchars == "-c " )
+		{
+			command = command.substr( 3 );
+			Msg("Running interpreter command: %s\n", command.c_str() );
+
+			bp::exec( command.c_str() );
+			bSuccess = true;
+		}
+		else if( firstchars == "-m " )
+		{
+			command = command.substr( 3 );
+			Msg("Running interpreter module: %s\n", command.c_str() );
+
+			bp::str newCmd( command.c_str() );
+			newCmd = newCmd.replace( "\\\"", "\\\\\"" );
+
+			builtins.attr("print")( newCmd );
+
+			bp::list argv( shlex.attr("split")( newCmd ) );
+			bp::setattr( sys, bp::object("argv"), argv );
+
+			bp::object runpy = bp::import( "runpy" );
+			boost::python::dict kwargs;
+			kwargs["run_name"] = bp::object("__main__");
+			kwargs["alter_sys"] = (bool)(true);
+			runpy.attr("run_module")( *bp::make_tuple(argv[0]), **kwargs );
+			bSuccess = true;
+		}
+		else
+		{
+			// Change working directory	
+			V_SetCurrentDirectory( vtptpath );
+
+			Msg("Running interpreter file: %s\n", pFilePath );
+			Run("import encodings.idna");
+			bSuccess = this->ExecuteFile( pFilePath );
+		}
+	}
+	catch( bp::error_already_set & ) 
+	{
+		PyErr_Print();
+	}
+
+	if( !bSuccess )
+	{
+		Warning("PySource: Failed to execute interpreter file (%s). Please check log.\n", command.c_str() );
+	}
+	// Make sure logs are saved
+#ifndef CLIENT_DLL
+	engine->ServerExecute();
+#endif // CLIENT_DLL
+	filesystem->AsyncFinishAllWrites();
+	::TerminateProcess( ::GetCurrentProcess(), 0 );
+	return true;
+#endif // WIN32
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::CheckVSPTDebugger()
+{
+#ifdef CLIENT_DLL
+	return true; // TODO
+#endif // CLIENT_DLL
+
+	const bool bRunDebugger = CommandLine() && CommandLine()->FindParm("-vsptdebug") != 0;
+	if( !bRunDebugger )
+		return true;
+
+	Msg("Running VSPT Debug mode\n");
+
+	// "-insecure" is added at the back. Remove it, so we can just take the remainder
+	// after "-interpreter" argument.
+	VSPTParmRemove("-insecure");
+
+	std::string command("<null>");
+	std::string cmdline = CommandLine()->GetCmdLine();
+	std::string needle( "-vsptdebug " );
+	std::size_t found = cmdline.find( needle );
+
+	if( found != std::string::npos )
+	{
+		command = cmdline.substr( found + needle.length() );
+		Msg( "Command: %s\n", command.c_str() );
+
+		try
+		{
+			bp::object vsptdebug = bp::import("vsptdebug");
+
+			vsptdebug.attr("run_vspt_debug")( command.c_str() );
+		}
+		catch( bp::error_already_set & ) 
+		{
+			PyErr_Print();
+		}
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

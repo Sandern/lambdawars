@@ -19,20 +19,17 @@ class Materials(SemiSharedModuleGenerator):
     ]
 
     def Parse(self, mb):
-        # Exclude everything, then add what we need
-        # Otherwise we get very big source code and dll's
         mb.decls().exclude()  
 
         # Material reference
         cls = mb.class_('CMaterialReference')
         cls.include()
-        mb.global_ns.mem_opers('*').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
-        #mb.global_ns.mem_opers('::IMaterial const *').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
-        #mb.global_ns.casting_operators( '*' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
-        mb.global_ns.mem_opers().exclude() # Fuck them for now
+        mb.global_ns.mem_opers('*').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
+        mb.global_ns.mem_opers().exclude()
         mb.global_ns.casting_operators().exclude()
 
         if self.isclient:
+            # Glow Outline manager
             cls = mb.class_('CGlowObjectManager')
             cls.include()
             cls.mem_funs().virtuality = 'not virtual'
@@ -40,17 +37,19 @@ class Materials(SemiSharedModuleGenerator):
             
             mb.add_registration_code( "bp::scope().attr( \"glowobjectmanager\" ) = boost::ref(g_GlowObjectManager);" )
             
+            # A way for creating procedural materials in Python
             cls = mb.class_('PyProceduralTexture')
             cls.rename('ProceduralTexture')
             cls.include()
             
             mb.enum('ImageFormat').include()
             
-            mb.free_function('SetUITeamColor').include()
-            
             # Material lights
             cls = mb.class_('LightDesc_t')
             cls.include()
+			
+            # Wars
+            mb.free_function('SetUITeamColor').include()
 
         
         # Remove any protected function 

@@ -128,18 +128,6 @@ public:
 	boost::python::object m_pyClass;
 };
 
-#if 0
-// Implement a python class. For python/c++ handle conversion
-#define DECLARE_PYCLASS_HELPER(a,b)																	\
-	public:																							\
-	virtual boost::python::object CreatePyHandle( void ) const										\
-{																									\
-	return CreatePyHandleHelper(this, #name "HANDLE");												\
-}
-
-#define DECLARE_PYCLASS( name ) DECLARE_PYCLASS_HELPER( name )
-#endif // 0
-
 // Implement a networkable python class. Used to determine the right recv/send tables
 #define DECLARE_PYCLIENTCLASS( name, networkType )													\
 	DECLARE_PYCLASS( name )																			\

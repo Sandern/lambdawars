@@ -209,6 +209,10 @@ public:
 	bool					IsPythonFinalizing(); // Special case
 	bool					IsPathProtected(); // For file writing
 
+	// Visual Studio Python Tools support
+	bool					CheckVSPTInterpreter();
+	bool					CheckVSPTDebugger();
+
 #ifdef CLIENT_DLL
 	// Gets called each frame
 	virtual void Update( float frametime );
