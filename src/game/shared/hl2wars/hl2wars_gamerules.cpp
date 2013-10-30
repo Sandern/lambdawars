@@ -83,6 +83,16 @@ bool CHL2WarsGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 
 			( collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_ALL_UNITS ) )
 		return false;
 
+	// Anything unit collision group + WARS_COLLISION_GROUP_IGNORE_ALL_UNITS
+	// + WARS_COLLISION_GROUP_BUILDING + WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD will not collide
+	if( collisionGroup0 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD && 
+			( collisionGroup1 == WARS_COLLISION_GROUP_BUILDING || 
+			( collisionGroup1 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup1 <= WARS_COLLISION_GROUP_IGNORE_ALL_UNITS ) ) )
+		return false;
+	if( collisionGroup1 == WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD &&
+			collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_ALL_UNITS )
+		return false;
+
 	// If the first collision group is one of the ignore groups, and the other group one of the unit groups, then don't collide
 	if( collisionGroup0 >= WARS_COLLISION_GROUP_IGNORE_UNIT_START && collisionGroup0 <= WARS_COLLISION_GROUP_IGNORE_UNIT_END )
 	{
