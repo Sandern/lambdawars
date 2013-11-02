@@ -24,7 +24,8 @@ class CGlowObjectManager
 {
 public:
 	CGlowObjectManager() :
-	m_nFirstFreeSlot( GlowObjectDefinition_t::END_OF_FREE_LIST )
+	m_nFirstFreeSlot( GlowObjectDefinition_t::END_OF_FREE_LIST ),
+	m_bRenderingGlowEffects(false)
 	{
 	}
 
@@ -109,6 +110,8 @@ public:
 
 	void RenderGlowEffects( const CViewSetup *pSetup, int nSplitScreenSlot );
 
+	bool IsRenderingGlowEffects() { return m_bRenderingGlowEffects; }
+
 private:
 
 	void RenderGlowModels( const CViewSetup *pSetup, int nSplitScreenSlot, CMatRenderContextPtr &pRenderContext );
@@ -140,6 +143,8 @@ private:
 
 	CUtlVector< GlowObjectDefinition_t > m_GlowObjectDefinitions;
 	int m_nFirstFreeSlot;
+
+	bool m_bRenderingGlowEffects;
 };
 
 extern CGlowObjectManager g_GlowObjectManager;

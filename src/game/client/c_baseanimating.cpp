@@ -63,6 +63,10 @@
 #include "demo_polish/demo_polish.h"
 #endif
 
+#ifdef HL2WARS_DLL
+#include "glow_outline_effect.h"
+#endif // HL2WARS_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -3228,18 +3232,24 @@ int C_BaseAnimating::DrawModel( int flags, const RenderableInstance_t &instance 
 
 		if ( !IsFollowingEntity() )
 		{
-			if( m_pOverrideMaterial )
+#ifdef HL2WARS_DLL
+			bool bOverrideMaterialSet = false;
+			if( m_pOverrideMaterial && !g_GlowObjectManager.IsRenderingGlowEffects() )
 			{
 				float color[3];
 				GetColorModulation( color );
 				m_pOverrideMaterial->ColorModulate( color[0], color[1], color[2] );
 				modelrender->ForcedMaterialOverride( m_pOverrideMaterial, m_nOverrideMaterialType );
+				bOverrideMaterialSet = true;
 			}
+#endif //HL2WARS_DLL
 
 			drawn = InternalDrawModel( flags|extraFlags, instance );
 
-			if( m_pOverrideMaterial )
+#ifdef HL2WARS_DLL
+			if( bOverrideMaterialSet )
 				modelrender->ForcedMaterialOverride( 0 );
+#endif //HL2WARS_DLL
 		}
 		else
 		{
@@ -3255,18 +3265,24 @@ int C_BaseAnimating::DrawModel( int flags, const RenderableInstance_t &instance 
 				// BUGBUG: Fixup bbox and do a separate cull for follow object
 				if ( baseDrawn )
 				{
-					if( m_pOverrideMaterial )
+#ifdef HL2WARS_DLL
+					bool bOverrideMaterialSet = false;
+					if( m_pOverrideMaterial && !g_GlowObjectManager.IsRenderingGlowEffects() )
 					{
 						float color[3];
 						GetColorModulation( color );
 						m_pOverrideMaterial->ColorModulate( color[0], color[1], color[2] );
 						modelrender->ForcedMaterialOverride( m_pOverrideMaterial, m_nOverrideMaterialType );
+						bOverrideMaterialSet = true;
 					}
+#endif // HL2WARS_DLL
 
 					drawn = InternalDrawModel( STUDIO_RENDER|extraFlags, instance );
 
-					if( m_pOverrideMaterial )
+#ifdef HL2WARS_DLL
+					if( bOverrideMaterialSet )
 						modelrender->ForcedMaterialOverride( 0 );
+#endif // HL2WARS_DLL
 				}
 			}
 		}

@@ -22,6 +22,8 @@ void CGlowObjectManager::RenderGlowEffects( const CViewSetup *pSetup, int nSplit
 {
 	if ( glow_outline_effect_enable.GetBool() )
 	{
+		m_bRenderingGlowEffects = true;
+
 		CMatRenderContextPtr pRenderContext( materials );
 
 		int nX, nY, nWidth, nHeight;
@@ -29,6 +31,8 @@ void CGlowObjectManager::RenderGlowEffects( const CViewSetup *pSetup, int nSplit
 
 		PIXEvent _pixEvent( pRenderContext, "EntityGlowEffects" );
 		ApplyEntityGlowEffects( pSetup, nSplitScreenSlot, pRenderContext, glow_outline_effect_width.GetFloat(), nX, nY, nWidth, nHeight );
+
+		m_bRenderingGlowEffects = false;
 	}
 }
 
