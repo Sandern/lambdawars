@@ -919,7 +919,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="hl2wars\vgui\wars_vgui_music_importer.cpp" />
     <ClCompile Include="hl2wars\vgui_rootpanel_wars.cpp" />
     <ClCompile Include="hl2wars\vgui_video_general.cpp" />
-    <ClCompile Include="hl2wars\wars_mesh_builder.cpp" />
     <ClCompile Include="hl2wars\wars_vgui_screen.cpp" />
     <ClCompile Include="hl2\C_Func_Monitor.cpp" />
     <ClCompile Include="c_func_movelinear.cpp" />
@@ -1696,7 +1695,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="hl2wars\vgui\wars_logo_panel.h" />
     <ClInclude Include="hl2wars\vgui\wars_vgui_music_importer.h" />
     <ClInclude Include="hl2wars\vgui_video_general.h" />
-    <ClInclude Include="hl2wars\wars_mesh_builder.h" />
     <ClInclude Include="hl2wars\wars_vgui_screen.h" />
     <ClInclude Include="hud_locator_target.h" />
     <ClInclude Include="..\..\engine\iblackbox.h" />

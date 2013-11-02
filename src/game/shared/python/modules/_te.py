@@ -24,8 +24,6 @@ class TE(SemiSharedModuleGenerator):
         '$c_strider_fx.h',
         
         '#te_effect_dispatch.h',
-        
-        '$wars_mesh_builder.h',
     ]
     
     def ParseServer(self, mb):
@@ -87,47 +85,15 @@ class TE(SemiSharedModuleGenerator):
         
         mb.add_registration_code( 'bp::scope().attr( "tempents" ) = boost::ref(tempents);' )
         
-        mb.mem_funs('DefaultSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('TempSprite').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs('ClientProjectile').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs('DefaultSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        mb.mem_funs('TempSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        mb.mem_funs('ClientProjectile').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         mb.mem_funs('RicochetSprite').exclude()
         mb.mem_funs('SpawnTempModel').exclude()
         mb.mem_funs('ClientProjectile').exclude() # Debug mode problem
         mb.mem_funs('DefaultSprite').exclude() # Debug mode problem
         mb.mem_funs('TempSprite').exclude() # Debug mode problem
-        
-        # Mesh builder
-        cls = mb.class_('PyMeshVertex')
-        cls.include()
-        cls.rename('MeshVertex')
-        
-        cls.var('m_hEnt').exclude()
-        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent'
-                         , cls.member_function( 'GetEnt' )
-                         , cls.member_function( 'SetEnt' ) )
-                         
-        cls = mb.class_('PyMeshBuilder')
-        cls.include()
-        cls.rename('MeshBuilder')
-        cls.mem_funs().virtuality = 'not virtual' 
-        
-        cls = mb.class_('PyMeshRallyLine')
-        cls.include()
-        cls.rename('MeshRallyLine')
-        cls.mem_funs().virtuality = 'not virtual' 
-        
-        cls.mem_funs('GetEnt1').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent1'
-                         , cls.member_function( 'GetEnt1' )
-                         , cls.member_function( 'SetEnt1' ) )
-        cls.mem_funs('GetEnt2').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent2'
-                         , cls.member_function( 'GetEnt2' )
-                         , cls.member_function( 'SetEnt2' ) )
-        
-        mb.enum('MaterialPrimitiveType_t').include()
         
         # Add client effects class (you can only add mesh builders to it)
         cls = mb.class_('PyClientSideEffect')
@@ -161,6 +127,38 @@ class TE(SemiSharedModuleGenerator):
         
         mb.free_function('AddToClientEffectList').include()
         
+        # Mesh builder
+        cls = mb.class_('PyMeshVertex')
+        cls.include()
+        cls.rename('MeshVertex')
+        
+        cls.var('m_hEnt').exclude()
+        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.add_property( 'ent'
+                         , cls.member_function( 'GetEnt' )
+                         , cls.member_function( 'SetEnt' ) )
+                         
+        cls = mb.class_('PyMeshBuilder')
+        cls.include()
+        cls.rename('MeshBuilder')
+        cls.mem_funs().virtuality = 'not virtual' 
+        
+        cls = mb.class_('PyMeshRallyLine')
+        cls.include()
+        cls.rename('MeshRallyLine')
+        cls.mem_funs().virtuality = 'not virtual' 
+        
+        cls.mem_funs('GetEnt1').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.add_property( 'ent1'
+                         , cls.member_function( 'GetEnt1' )
+                         , cls.member_function( 'SetEnt1' ) )
+        cls.mem_funs('GetEnt2').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.add_property( 'ent2'
+                         , cls.member_function( 'GetEnt2' )
+                         , cls.member_function( 'SetEnt2' ) )
+        
+        mb.enum('MaterialPrimitiveType_t').include()
+        
         # FX Envelope + strider fx
         cls = mb.class_('C_EnvelopeFX')
         cls.include()
@@ -170,7 +168,7 @@ class TE(SemiSharedModuleGenerator):
         cls.include()
         cls.mem_funs().virtuality = 'not virtual' 
         
-        # //--------------------------------------------------------------------------------------------------------------------------------
+        # Constants
         mb.add_registration_code( "bp::scope().attr( \"FTENT_NONE\" ) = (int)FTENT_NONE;" )
         mb.add_registration_code( "bp::scope().attr( \"FTENT_SINEWAVE\" ) = (int)FTENT_SINEWAVE;" )
         mb.add_registration_code( "bp::scope().attr( \"FTENT_GRAVITY\" ) = (int)FTENT_GRAVITY;" )
@@ -206,9 +204,9 @@ class TE(SemiSharedModuleGenerator):
         # Exclude everything by default
         mb.decls().exclude() 
         
-        mb.free_functions( 'DispatchEffect' ).include()
+        mb.free_functions('DispatchEffect').include()
         
-        # Data for dispatcheffect
+        # Data for DispatchEffect
         mb.class_('CEffectData').include()
         mb.class_('CEffectData').vars('m_vOrigin').rename('origin')
         mb.class_('CEffectData').vars('m_vStart').rename('start')
@@ -235,7 +233,4 @@ class TE(SemiSharedModuleGenerator):
         if self.isserver:
             self.ParseServer(mb)
         else:
-            self.ParseClient(mb)
-            
-        # Disable shared warnings
-        DisableKnownWarnings(mb)    
+            self.ParseClient(mb) 

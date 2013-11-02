@@ -26,8 +26,6 @@
 
 #include "c_strider_fx.h"
 
-#include "wars_mesh_builder.h"
-
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"

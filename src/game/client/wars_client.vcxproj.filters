@@ -1607,9 +1607,6 @@
     <ClCompile Include="..\shared\hl2wars\unit_airlocomotion.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\wars_mesh_builder.cpp">
-      <Filter>Source Files\wars</Filter>
-    </ClCompile>
     <ClCompile Include="hl2wars\hl2wars_fx_impacts.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
@@ -4305,9 +4302,6 @@
     </ClInclude>
     <ClInclude Include="..\shared\hl2wars\unit_airlocomotion.h">
       <Filter>Source Files\wars\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="hl2wars\wars_mesh_builder.h">
-      <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="hl2wars\hl2wars_hud_chat.h">
       <Filter>Source Files\wars\HUD Elements</Filter>
