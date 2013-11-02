@@ -39,6 +39,7 @@ struct Cloak_DX9_Vars_t
 	int m_nMasked;
 	int m_nCloakFactor;
 	int m_nDiffuseWarpTexture;
+	int m_nBlurAmount;
 
 	int m_nPhongExponent;
 	int m_nPhongTint;

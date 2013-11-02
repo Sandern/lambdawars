@@ -769,9 +769,11 @@ BEGIN_VS_SHADER( Water_DX90,
 				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
 				: DEFERRED_RENDER_STAGE_INVALID;
 
-			if( pShaderShadow == NULL &&
-							iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+			if( pShaderShadow == NULL && iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+			{
+				Draw( false );
 				return;
+			}
 		}
 #endif // DEFERRED_ENABLED
 

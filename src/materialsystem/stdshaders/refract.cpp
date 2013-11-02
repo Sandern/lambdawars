@@ -9,6 +9,10 @@
 #include "convar.h"
 #include "refract_dx9_helper.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred_includes.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -103,6 +107,22 @@ BEGIN_VS_SHADER( Refract_DX90, "Help for Refract" )
 
 	SHADER_DRAW
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			if( pShaderShadow == NULL && iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+			{
+				Draw( false );
+				return;
+			}
+		}
+#endif // DEFERRED_ENABLED
+
 		Refract_DX9_Vars_t info;
 		SetupVars( info );
 		

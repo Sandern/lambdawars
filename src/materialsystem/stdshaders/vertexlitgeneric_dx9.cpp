@@ -171,6 +171,9 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 		// Team coloring
 		SHADER_PARAM( TEAMCOLOR, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "Team color" )
 		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
+
+		// Deferred
+		SHADER_PARAM( NOSHADOWPASS, SHADER_PARAM_TYPE_BOOL, "0", "Allows turning off the shadow pass of this material" )
 	END_SHADER_PARAMS
 
 	void SetupVars( VertexLitGeneric_DX9_Vars_t& info )
@@ -593,7 +596,7 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 					Draw( false );
 
 				if ( pShaderShadow != NULL ||
-					iDeferredRenderStage == DEFERRED_RENDER_STAGE_SHADOWPASS )
+					(iDeferredRenderStage == DEFERRED_RENDER_STAGE_SHADOWPASS && params[NOSHADOWPASS]->GetIntValue() == 0 ) )
 				{
 					defParms_shadow parms_shadow;
 					SetupParmsShadow( parms_shadow );

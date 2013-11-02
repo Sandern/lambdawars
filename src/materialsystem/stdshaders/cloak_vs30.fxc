@@ -17,14 +17,12 @@
 static const bool g_bSkinning		= SKINNING ? true : false;
 static const int g_FogType			= DOWATERFOG;
 
-#ifdef SHADER_MODEL_VS_3_0
 // NOTE: cMorphTargetTextureDim.xy = target dimensions,
 //		 cMorphTargetTextureDim.z = 4tuples/morph
 const float3 cMorphTargetTextureDim			: register( SHADER_SPECIFIC_CONST_6 );
 const float4 cMorphSubrect					: register( SHADER_SPECIFIC_CONST_7 );
 
 sampler2D morphSampler : register( D3DVERTEXTEXTURESAMPLER0, s0 );
-#endif
 
 struct VS_INPUT
 {
@@ -39,9 +37,7 @@ struct VS_INPUT
 	float3 vPosFlex					: POSITION1;
 	float3 vNormalFlex				: NORMAL1;
 
-#ifdef SHADER_MODEL_VS_3_0
 	float vVertexID					: POSITION2;
-#endif
 };
 
 struct VS_OUTPUT
@@ -69,7 +65,7 @@ VS_OUTPUT main( const VS_INPUT v )
 
 	DecompressVertex_NormalTangent( v.vNormal, v.vUserData, vNormal, vTangent );
 
-#if !defined( SHADER_MODEL_VS_3_0 ) || !MORPHING
+#if !MORPHING
 	ApplyMorph( v.vPosFlex, v.vNormalFlex, vPosition.xyz, vNormal, vTangent.xyz );
 #else
 	ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect, v.vVertexID, float3( 0, 0, 0 ),

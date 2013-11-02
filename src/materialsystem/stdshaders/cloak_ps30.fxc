@@ -20,7 +20,7 @@ sampler NormalizeSampler			: register( s5 );	// Normalization cube map
 const float3x3 g_ViewProj			: register( c0 );	// 1st row of Projection matrix
 //                                              c1		// 2nd row
 //                                              c2		// 4th row
-const float2 g_CloakControl			: register( c3 );	// { refract amount, cloak, ?, ? }
+const float3 g_CloakControl			: register( c3 );	// { refract amount, cloak, blur amount, ? }
 const float3 cAmbientCube[6]		: register( PSREG_AMBIENT_CUBE );
 const float4 g_EyePos_SpecExponent	: register( PSREG_EYEPOS_SPEC_EXPONENT );
 const float4 g_FogParams			: register( PSREG_FOG_PARAMS );
@@ -82,10 +82,6 @@ float4 main( PS_INPUT i ) : COLOR
 													nNumLights, cLightInfo, true,
 													bDoDiffuseWarp, DiffuseWarpSampler );
 
-
-
-
-
 	// Transform world space normal into clip space and project
 	float2 vProjNormal;
 	vProjNormal.x = dot( vWorldNormal, g_ViewProj[0] );	// 1st row
@@ -98,14 +94,9 @@ float4 main( PS_INPUT i ) : COLOR
 	vRefractTexCoord *= scale;
 	vRefractTexCoord += vRefractTexCoordNoWarp;
 
-#ifdef SHADER_MODEL_PS_2_0
-	float3 vRefract = tex2D( RefractSampler, vRefractTexCoordNoWarp );
-#endif
-
-	// Extra refraction rays, specular, rim etc are only done on ps_2_b
-#if defined( SHADER_MODEL_PS_2_B ) || defined( SHADER_MODEL_PS_3_0 )
+	// Extra refraction rays, specular, rim etc
 	// Blur by scalable Poisson filter
-	float fBlurAmount = lerp( 0.05f, 0.0f, g_CloakControl.y );
+	float fBlurAmount = lerp( g_CloakControl.z, 0.0f, g_CloakControl.y );
 	float3 vRefract = tex2D( RefractSampler, vRefractTexCoord );
 	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[0].xy * fBlurAmount );
 	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[0].wz * fBlurAmount );
@@ -113,11 +104,9 @@ float4 main( PS_INPUT i ) : COLOR
 	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[1].wz * fBlurAmount );
 	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[2].xy * fBlurAmount );
 	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[2].wz * fBlurAmount );
-
-// We're right at the hairy edge of constant register usage and hence have to drop these taps...
-//	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[3].xy * fBlurAmount );
-//	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[3].wz * fBlurAmount );
-	vRefract /= 7.0f;
+	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[3].xy * fBlurAmount );
+	vRefract += tex2D( RefractSampler, vRefractTexCoord + gPoissonOffset[3].wz * fBlurAmount );
+	vRefract /= 9.0f;
 
 	float3 rimLighting = float3( 0.0f, 0.0f, 0.0f );
 	float3 specularLighting = float3( 0.0f, 0.0f, 0.0f );
@@ -126,7 +115,7 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float4 vSpecExpMap = tex2D( SpecExponentSampler, i.vBaseTexCoord );
 	float fSpecExpMap = vSpecExpMap.r;
-	float fRimMask = 1.0f;//lerp( 1.0f, vSpecExpMap.a, g_RimMaskControl );						// Select rim mask
+	float fRimMask = lerp( 1.0f, vSpecExpMap.a, g_RimMaskControl );						// Select rim mask
 	float3 vSpecularTint;
 
 	// If the exponent passed in as a constant is zero, use the value from the map as the exponent
@@ -170,7 +159,6 @@ float4 main( PS_INPUT i ) : COLOR
 	vRefract = lerp( vRefract, vTintedRefract, tintLerpFactor );
 
 	vSpecular = specularLighting * smoothstep( 0.98, 0.8, saturate(g_CloakControl.y ));
-#endif
 
 	// Blend refraction component with diffusely lit model
 	float diffuseLerpFactor = saturate(lerp( 1, fresnel - 1.35, saturate(g_CloakControl.y)));
@@ -184,7 +172,7 @@ float4 main( PS_INPUT i ) : COLOR
 	// Emulate LinearColorToHDROutput() when uncloaked
 	result = lerp( result.xyz * LINEAR_LIGHT_SCALE, result, saturate(g_CloakControl.y) );
 
-	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.xyz, i.worldPos.xyz, i.projPos.z );
+	float fogFactor = 0.0f; // CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.xyz, i.worldPos.xyz, i.projPos.z );
 	
 #if WRITEWATERFOGTODESTALPHA && (PIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT)
 	alpha = fogFactor;

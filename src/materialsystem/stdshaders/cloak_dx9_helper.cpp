@@ -10,14 +10,9 @@
 #include "..\shaderapidx9\locald3dtypes.h"												   
 #include "convar.h"
 #include "cpp_shader_constant_register_map.h"
-#include "cloak_vs20.inc"
-#include "cloak_ps20.inc"
-#include "cloak_ps20b.inc"
 
-#ifndef _X360
 #include "cloak_vs30.inc"
 #include "cloak_ps30.inc"
-#endif
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -42,6 +37,9 @@ void InitParamsCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, const c
 		params[info.m_nMasked]->SetIntValue( 0 );
 	}
 	SET_FLAGS2( MATERIAL_VAR2_NEEDS_POWER_OF_TWO_FRAME_BUFFER_TEXTURE );
+
+	// This shader can be used with hw skinning
+	SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
 }
 
 void InitCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, Cloak_DX9_Vars_t &info )
@@ -113,6 +111,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		{
 			// The vertex shader uses the vertex id stream
 			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+			SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_TESSELLATION );
 		}
 
 		DECLARE_STATIC_VERTEX_SHADER( cloak_vs30 );
@@ -164,52 +163,20 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		LightState_t lightState;
 		pShaderAPI->GetDX9LightState( &lightState );
 
-#ifndef _X360
-		if ( !g_pHardwareConfig->HasFastVertexTextures() )
-#endif
-		{
-			DECLARE_DYNAMIC_VERTEX_SHADER( cloak_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
-			SET_DYNAMIC_VERTEX_SHADER( cloak_vs20 );
-
-			// Bind ps_2_b shader so we can get Phong, rim and a cloudier refraction
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( cloak_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA,  fogType == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
-				SET_DYNAMIC_PIXEL_SHADER( cloak_ps20b );
-			}
-			else
-			{
-				// JasonM Hack
-				//
-				// In general, cloaking on ps_2_0 needs re-working for multipass...yuck...
-				//
-				int nPS20NumLights = MAX( lightState.m_nNumLights, 1 );
-				DECLARE_DYNAMIC_PIXEL_SHADER( cloak_ps20 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, nPS20NumLights );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA,  fogType == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
-				SET_DYNAMIC_PIXEL_SHADER( cloak_ps20 );
-			}
-		}
-#ifndef _X360
-		else
+		if( g_pHardwareConfig->HasFastVertexTextures() )
 		{
 			pShader->SetHWMorphVertexShaderState( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, SHADER_VERTEXTEXTURE_SAMPLER0 );
-
-			DECLARE_DYNAMIC_VERTEX_SHADER( cloak_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
-			SET_DYNAMIC_VERTEX_SHADER( cloak_vs30 );
-
-			DECLARE_DYNAMIC_PIXEL_SHADER( cloak_ps30 );
-			SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
-			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA,  fogType == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
-			SET_DYNAMIC_PIXEL_SHADER( cloak_ps30 );
 		}
-#endif
+
+		DECLARE_DYNAMIC_VERTEX_SHADER( cloak_vs30 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,      pShaderAPI->GetCurrentNumBones() > 0 );
+		SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
+		SET_DYNAMIC_VERTEX_SHADER( cloak_vs30 );
+
+		DECLARE_DYNAMIC_PIXEL_SHADER( cloak_ps30 );
+		SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
+		SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITEWATERFOGTODESTALPHA,  fogType == MATERIAL_FOG_LINEAR_BELOW_FOG_Z );
+		SET_DYNAMIC_PIXEL_SHADER( cloak_ps30 );
 
 		pShader->SetVertexShaderTextureTransform( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, info.m_nBumpTransform );
 
@@ -297,7 +264,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 		pShaderAPI->SetPixelShaderConstant( 0, matViewProj.m[0], 2 );
 
 		// Cloaking control constants
-		float vCloakControls[4] = { params[info.m_nRefractAmount]->GetFloatValue(), params[info.m_nCloakFactor]->GetFloatValue(), 0.0f, 0.0f };
+		float vCloakControls[4] = { params[info.m_nRefractAmount]->GetFloatValue(), params[info.m_nCloakFactor]->GetFloatValue(), params[info.m_nBlurAmount]->GetFloatValue(), 0.0f };
 		pShaderAPI->SetPixelShaderConstant( 3, vCloakControls, 1 );
 	}
 	pShader->Draw();

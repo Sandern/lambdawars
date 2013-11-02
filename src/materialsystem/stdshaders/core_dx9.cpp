@@ -9,6 +9,10 @@
 #include "core_vs30.inc"
 #include "core_ps30.inc"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred_includes.h"
+#endif // DEFERRED_ENABLED
+
 #define MAXBLUR 1
 
 DEFINE_FALLBACK_SHADER( Core, Core_DX90 )
@@ -286,6 +290,22 @@ BEGIN_VS_SHADER( Core_DX90,
 
 	SHADER_DRAW
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			if( pShaderShadow == NULL && iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+			{
+				Draw( false );
+				return;
+			}
+		}
+#endif // DEFERRED_ENABLED
+
 		DrawPass( params, pShaderShadow, pShaderAPI, 0, vertexCompression );
 		DrawPass( params, pShaderShadow, pShaderAPI, 1, vertexCompression );
 	}

@@ -79,7 +79,7 @@ PS_OUTPUT main( const PS_INPUT In )
 			Out.vColor_0 = WriteLighting( float4(0,0,0,0) );
 			return Out;
 		}
-#if 0
+#if 1
 		// fixes self shadowing for half lambertian, but, i don't like it!
 		lightAmount *= max( shadowMult, (1.0f - saturate( viewFwdDot )) * half_lambert );
 #else

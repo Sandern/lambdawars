@@ -9,6 +9,10 @@
 #include "convar.h"
 #include "cloak_dx9_helper.h"
 
+#ifdef DEFERRED_ENABLED
+#include "deferred_includes.h"
+#endif // DEFERRED_ENABLED
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -39,6 +43,7 @@ BEGIN_VS_SHADER( Cloak_DX90, "Help for Cloak" )
 		SHADER_PARAM( PHONGFRESNELRANGES, SHADER_PARAM_TYPE_VEC3, "[0  0.5  1]", "Parameters for remapping fresnel output" )
 		SHADER_PARAM( PHONGBOOST, SHADER_PARAM_TYPE_FLOAT, "1.0", "Phong overbrightening factor (specular mask channel should be authored to account for this)" )
 		SHADER_PARAM( PHONGEXPONENTTEXTURE, SHADER_PARAM_TYPE_TEXTURE, "shadertest/BaseTexture", "Phong Exponent map" )
+		SHADER_PARAM( BLURAMOUNT, SHADER_PARAM_TYPE_FLOAT, "0.05", "" )
 
 		// Rim lighting terms
 		SHADER_PARAM( RIMLIGHT, SHADER_PARAM_TYPE_BOOL, "0", "enables rim lighting" )
@@ -68,6 +73,7 @@ BEGIN_VS_SHADER( Cloak_DX90, "Help for Cloak" )
 		info.m_nPhongExponentTexture = PHONGEXPONENTTEXTURE;
 		info.m_nPhongBoost = PHONGBOOST;
 		info.m_nPhongFresnelRanges = PHONGFRESNELRANGES;
+		info.m_nBlurAmount = BLURAMOUNT;
 
 		// Rim lighting parameters
 		info.m_nRimLight = RIMLIGHT;
@@ -76,7 +82,7 @@ BEGIN_VS_SHADER( Cloak_DX90, "Help for Cloak" )
 		info.m_nRimMask = RIMMASK;
 	}
 
-	bool NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame ) const 
+	bool NeedsPowerOfTwoFrameBufferTexture( IMaterialVar **params, bool bCheckSpecificToThisFrame = true ) const 
 	{ 
 		if ( bCheckSpecificToThisFrame == false ) // For setting model flag at load time
 			return true;
@@ -115,6 +121,22 @@ BEGIN_VS_SHADER( Cloak_DX90, "Help for Cloak" )
 
 	SHADER_DRAW
 	{
+#ifdef DEFERRED_ENABLED
+		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive )
+		{
+			const int iDeferredRenderStage = pShaderAPI ?
+				pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+				: DEFERRED_RENDER_STAGE_INVALID;
+
+			if( pShaderShadow == NULL && iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+			{
+				Draw( false );
+				return;
+			}
+		}
+#endif // DEFERRED_ENABLED
+
 		Cloak_DX9_Vars_t info;
 		SetupVars( info );
 		DrawCloak_DX9( this, params, pShaderAPI, pShaderShadow, info, vertexCompression );
