@@ -987,6 +987,25 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
+    virtual ServerClass* GetServerClass() {
+#if defined(_WIN32)
+#if defined(_DEBUG)
+        Assert( GetCurrentThreadId() == g_hPythonThreadID );
+#elif defined(PY_CHECKTHREADID)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            Error( "GetServerClass: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+#endif // _DEBUG/PY_CHECKTHREADID
+#endif // _WIN32
+#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+        if( py_log_overrides.GetBool() )
+            Msg("Calling GetServerClass(  ) of Class: CBaseEntity\n");
+#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
+        if( pServerClass )
+            return pServerClass;
+        return CBaseEntity::GetServerClass();
+    }
+
     static int m_lifeState_Get( CServerOnlyPointEntity const & inst ) { return inst.m_lifeState.Get(); }
 
     static void m_lifeState_Set( CServerOnlyPointEntity & inst, int val ) { inst.m_lifeState.Set( val ); }

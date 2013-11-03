@@ -406,7 +406,20 @@ class Entities(SemiSharedModuleGenerator):
         cls.vars(allow_empty=True).exclude()
         
         return cls
+        
+    def FindNetworkClass(self, mb, cls):
+        # Test current class
+        decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
+        if decl:
+            return cls
             
+        # Search bases
+        for base in cls.bases:
+            foundcls = self.FindNetworkClass(mb, base.related_class)
+            if foundcls:
+                return foundcls
+        return None
+                
     def ParseClientEntities(self, mb):
         # Made not virtual so no wrapper code is generated in IClientUnknown and IClientEntity
         mb.class_('IClientRenderable').mem_funs().virtuality = 'not virtual' 
@@ -420,10 +433,9 @@ class Entities(SemiSharedModuleGenerator):
             cls = self.SetupEntityClass(mb, clsname)
 
             # Check if the python class is networkable. Add code for getting the "ClientClass" if that's the case.
-            decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
-            if decl:
-                decl.include()
-                cls.add_wrapper_code( tmpl_clientclass % {'clsname' : clsname})
+            networkcls = self.FindNetworkClass(mb, cls)
+            if networkcls:
+                cls.add_wrapper_code(tmpl_clientclass % {'clsname' : networkcls.name})
                 
             # Apply common rules
             # Excludes
@@ -466,10 +478,9 @@ class Entities(SemiSharedModuleGenerator):
             cls = self.SetupEntityClass(mb, clsname)
             
             # Check if the python class is networkable. Add code for getting the "ServerClass" if that's the case.
-            decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
-            if decl:
-                decl.include()
-                cls.add_wrapper_code(tmpl_serverclass % {'clsname' : clsname})
+            networkcls = self.FindNetworkClass(mb, cls)
+            if networkcls:
+                cls.add_wrapper_code(tmpl_serverclass % {'clsname' : networkcls.name})
                 
             # Apply common rules
             cls.mem_funs('GetServerClass', allow_empty=True).exclude()

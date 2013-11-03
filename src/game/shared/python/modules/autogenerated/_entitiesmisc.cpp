@@ -1969,7 +1969,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "name"
             , (char const * ( ::CStudioHdr::* )(  ) const)( &::CStudioHdr::pszName ) );
 
-    bp::class_< ClientClass >( "ClientClass", bp::no_init );
+    bp::class_< ClientClass >( "ClientClass", bp::no_init )    
+        .def( 
+            "GetName"
+            , (char const * ( ::ClientClass::* )(  ) )( &::ClientClass::GetName ) );
 
     bp::class_< FireBulletsInfo_t_wrapper >( "FireBulletsInfo_t", bp::init< >() )    
         .def( bp::init< int, Vector const &, Vector const &, Vector const &, float, int, bp::optional< bool > >(( bp::arg("nShots"), bp::arg("vecSrc"), bp::arg("vecDir"), bp::arg("vecSpread"), bp::arg("flDistance"), bp::arg("nAmmoType"), bp::arg("bPrimaryAttack")=(bool)(true) )) )    
@@ -4946,7 +4949,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (void ( ::PyOutputEvent::* )( ::variant_t ) )( &::PyOutputEvent::Set )
             , ( bp::arg("value") ) );
 
-    bp::class_< ServerClass >( "ServerClass", bp::no_init );
+    bp::class_< ServerClass >( "ServerClass", bp::no_init )    
+        .def( 
+            "GetName"
+            , (char const * ( ::ServerClass::* )(  ) )( &::ServerClass::GetName ) );
 
     bp::class_< animevent_t_wrapper >( "animevent_t" )    
         .def_readwrite( "_event_lowword", &animevent_t::_event_lowword )    

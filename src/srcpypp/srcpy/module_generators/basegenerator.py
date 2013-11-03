@@ -97,6 +97,7 @@ class ModuleGenerator(object):
             c.vars(allow_empty=True).exclude()
         if c.enums(allow_empty=True):
             c.enums(allow_empty=True).exclude()  
+        return c
         
     def SetupProperty(self, cls, pyname, gettername, settername=None, excludesetget=True):
         ''' Shortcut for adding a property and exluding the getter/setter functions. '''
