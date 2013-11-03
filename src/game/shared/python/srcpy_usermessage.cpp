@@ -43,32 +43,32 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 {
 	bp::object datatype = fntype(data);
 
-	if( datatype == types.attr("IntType") )
+	if( datatype == builtins.attr("int") )
 	{
 		w.type = PYTYPE_INT;
 		w.writeint = boost::python::extract<int>(data);
 	}
-	else if( datatype == types.attr("FloatType") )
+	else if( datatype == builtins.attr("float") )
 	{
 		w.type = PYTYPE_FLOAT;
 		w.writefloat = boost::python::extract<float>(data);
 	}
-	else if( datatype == types.attr("StringType") )
+	else if( datatype == builtins.attr("str") )
 	{
 		w.type = PYTYPE_STRING;
 		w.writestr = boost::python::extract<const char *>(data);
 	}
-	else if( datatype == types.attr("BooleanType") )
+	else if( datatype == builtins.attr("bool") )
 	{
 		w.type = PYTYPE_BOOL;
 		w.writebool = boost::python::extract<bool>(data);
 	}
-	else if( datatype == types.attr("NoneType") )
+	else if( data == boost::python::object() )
 	{
 		w.type = PYTYPE_NONE;
 
 	}
-	else if( datatype == types.attr("ListType") )
+	else if( datatype == builtins.attr("list") )
 	{
 		w.type = PYTYPE_LIST;
 
@@ -94,7 +94,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( datatype == types.attr("TupleType") )
+	else if( datatype == builtins.attr("tuple") )
 	{
 		w.type = PYTYPE_TUPLE;
 
@@ -106,7 +106,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( datatype == types.attr("DictType") )
+	else if( datatype == builtins.attr("dict") )
 	{
 		w.type = PYTYPE_DICT;
 

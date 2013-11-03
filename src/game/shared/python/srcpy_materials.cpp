@@ -140,7 +140,11 @@ void PyProceduralTexture::SetAllPixels( int i )
 {
 	if( !IsValid() )
 		return;
-	m_TextureData.FillWithValue( (char)i );
+	for ( int i = 0; i < m_TextureData.Count(); i++ )
+	{
+		m_TextureData.Element(i) = (char)i;
+	}
+
 	m_bIsModified = true;
 }
 

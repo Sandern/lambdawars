@@ -19,8 +19,6 @@ struct	FXLineData_t;
 abstract_class CClientSideEffect
 {
 public:
-	friend class CEffectsList;
-
 	// Constructs the named effect
 						CClientSideEffect( const char *name );
 	virtual				~CClientSideEffect( void );
@@ -35,13 +33,22 @@ public:
 	// Sets the effect to inactive so it can be destroed
 	virtual void		Destroy( void );
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
+	friend class CEffectsList;
+
 	// Get python instance
-	bp::object			GetPyInstance();
+	boost::python::object	GetPyInstance();
+
 protected:
 	// Python allocated?
-	bp::object			m_pyRef;
+	boost::python::object	m_pyRef;
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 private:
 	// Name of effect ( static data )

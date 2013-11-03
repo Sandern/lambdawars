@@ -133,23 +133,23 @@ public:
 
 	virtual void		Destroy( void );
 
-	void AddMeshBuilder( bp::object meshbuilder );
-	void RemoveMeshBuilder( bp::object meshbuilder );
+	void AddMeshBuilder( boost::python::object meshbuilder );
+	void RemoveMeshBuilder( boost::python::object meshbuilder );
 	void ClearMeshBuilders();
 
-	void AddToEffectList( bp::object effect );
+	void AddToEffectList( boost::python::object effect );
 
 private:
 	struct PyMeshBuilderEntry 
 	{
-		bp::object m_pyRef;
+		boost::python::object m_pyRef;
 		PyMeshBuilder *m_pMeshBuilder;
 	};
 	CUtlVector<PyMeshBuilderEntry> m_pyMeshBuilders;
 };
 
 // Must add to list
-void AddToClientEffectList( bp::object effect );
+void AddToClientEffectList( boost::python::object effect );
 
 #else
 

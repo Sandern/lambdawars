@@ -299,9 +299,9 @@ void PyClientSideEffect::Destroy( void )
 	SrcPySystem()->AddToDeleteList( m_pyRef ); // Don't destroy immediately. Can potentially cause problems.
 }
 
-void PyClientSideEffect::AddMeshBuilder( bp::object meshbuilder )
+void PyClientSideEffect::AddMeshBuilder( boost::python::object meshbuilder )
 {
-	PyMeshBuilder *pBuilder = bp::extract<PyMeshBuilder *>(meshbuilder);
+	PyMeshBuilder *pBuilder = boost::python::extract<PyMeshBuilder *>(meshbuilder);
 	if( !pBuilder )
 	{
 		return;
@@ -313,7 +313,7 @@ void PyClientSideEffect::AddMeshBuilder( bp::object meshbuilder )
 	m_pyMeshBuilders.AddToTail( entry );
 }
 
-void PyClientSideEffect::RemoveMeshBuilder( bp::object meshbuilder )
+void PyClientSideEffect::RemoveMeshBuilder( boost::python::object meshbuilder )
 {
 	for( int i = 0; i < m_pyMeshBuilders.Count(); i++ )
 	{
@@ -330,7 +330,7 @@ void PyClientSideEffect::ClearMeshBuilders()
 	m_pyMeshBuilders.Purge();
 }
 
-void PyClientSideEffect::AddToEffectList( bp::object effect )
+void PyClientSideEffect::AddToEffectList( boost::python::object effect )
 {
 	if( m_pyRef.ptr() != Py_None )
 		return;
@@ -338,9 +338,9 @@ void PyClientSideEffect::AddToEffectList( bp::object effect )
 	clienteffects->AddEffect(this);
 }
 
-void AddToClientEffectList( bp::object effect )
+void AddToClientEffectList( boost::python::object effect )
 {
-	PyClientSideEffect *pEffect = bp::extract<PyClientSideEffect *>(effect);
+	PyClientSideEffect *pEffect = boost::python::extract<PyClientSideEffect *>(effect);
 	if( !pEffect )
 		return;
 
