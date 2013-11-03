@@ -24,7 +24,7 @@ struct EntityObject
 		m_iHalfTall = iHalfTall;
 		m_bTestShowInFOW = bTestShowInFOW;
 		m_bFlashOnAttacked = bFlashOnAttacked;
-		m_fFlashTimeOut = 0;
+		m_fFlashTimeOut = -1;
 		m_iLayer = iLayer;
 	}
 

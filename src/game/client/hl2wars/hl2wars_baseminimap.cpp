@@ -200,9 +200,10 @@ void CBaseMinimap::DrawEntityObjects()
 		bool flash = false;
 		if( eo.m_bFlashOnAttacked && pEnt->MyUnitPointer() )
 		{
-			flash = bFlashCycle && ( gpGlobals->curtime - pEnt->MyUnitPointer()->GetLastTakeDamageTime() < 3.0f );
+			float fLastTakeDamageTime = pEnt->MyUnitPointer()->GetLastTakeDamageTime();
+			flash = bFlashCycle && fLastTakeDamageTime > 0.0f && ( gpGlobals->curtime - pEnt->MyUnitPointer()->GetLastTakeDamageTime() < 3.0f );
 		}
-		else
+		else if( eo.m_fFlashTimeOut > 0.0f )
 		{
 			flash = bFlashCycle && eo.m_fFlashTimeOut > gpGlobals->curtime;
 		}
