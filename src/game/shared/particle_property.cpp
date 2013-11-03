@@ -339,6 +339,9 @@ void CParticleProperty::StopEmissionAndDestroyImmediately( CNewParticleEffect *p
 			CNewParticleEffect *pTmp = m_ParticleEffects[i].pParticleEffect.GetObject();
 			m_ParticleEffects.Remove( i );
 
+			if( !pTmp )
+				continue;
+
 			// Clear the owner so it doesn't try to call back to us on deletion
 			pTmp->SetOwner( NULL );
 			pTmp->StopEmission( false, true );
