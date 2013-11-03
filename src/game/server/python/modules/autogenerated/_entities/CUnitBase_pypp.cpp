@@ -2586,6 +2586,7 @@ void register_CUnitBase_class(){
         }
         CUnitBase_exposer.def_readwrite( "bodytargetoriginbased", &CUnitBase::m_bBodyTargetOriginBased );
         CUnitBase_exposer.def_readwrite( "fowfilterfriendly", &CUnitBase::m_bFOWFilterFriendly );
+        CUnitBase_exposer.def_readwrite( "friendlydamage", &CUnitBase::m_bFriendlyDamage );
         CUnitBase_exposer.def_readwrite( "neverignoreattacks", &CUnitBase::m_bNeverIgnoreAttacks );
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
         CUnitBase_exposer.def_readwrite( "eyepitch", &CUnitBase::m_fEyePitch );

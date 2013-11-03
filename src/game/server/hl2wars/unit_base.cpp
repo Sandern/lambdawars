@@ -943,7 +943,7 @@ bool CUnitBase::PassesDamageFilter( const CTakeDamageInfo &info )
 	if( info.GetAttacker() )
 	{
 		CUnitBase *pUnit = info.GetAttacker()->MyUnitPointer();
-		if( pUnit && pUnit->GetCommander() == NULL )
+		if( pUnit && pUnit->GetCommander() == NULL && !pUnit->m_bFriendlyDamage )
 		{
 			if( pUnit->IRelationType(this) != D_HT )
 				return false;
