@@ -94,7 +94,12 @@ public:
 
 	int		m_spriteTexture;
 
-	CConcussiveBlast( void ) {}
+	CConcussiveBlast( void ) : m_fDamage(200.0f), m_fDamageRadius(256.0f) {}
+
+	virtual float	GetDamage() { return m_fDamage; }
+	virtual void	SetDamage(float flDamage) { m_fDamage = flDamage; }
+	virtual float	GetDamageRadius() { return m_fDamageRadius; }
+	virtual void	SetDamageRadius(float flDamageRadius) { m_fDamageRadius = flDamageRadius; }
 
 	//-----------------------------------------------------------------------------
 	// Purpose: 
@@ -122,7 +127,7 @@ public:
 		TE_ConcussiveExplosion( filter, 0.0,
 			&GetAbsOrigin(),//position
 			1.0f,	//scale
-			256*magnitude,	//radius
+			GetDamageRadius()*magnitude,	//radius
 			175*magnitude,	//magnitude
 			&vecForward );	//normal
 		
@@ -133,7 +138,7 @@ public:
 		te->BeamRingPoint( filter2, 0, 
 			GetAbsOrigin(),	//origin
 			16,			//start radius
-			300*magnitude,		//end radius
+			GetDamageRadius()*1.17f*magnitude,		//end radius
 			m_spriteTexture, //texture
 			0,			//halo index
 			0,			//start frame
@@ -150,10 +155,14 @@ public:
 			);
 
 		//Do the radius damage
-		RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), 200, DMG_BLAST|DMG_DISSOLVE ), GetAbsOrigin(), 256, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), GetDamage(), DMG_BLAST|DMG_DISSOLVE ), GetAbsOrigin(), GetDamageRadius(), CLASS_NONE, NULL );
 
 		UTIL_Remove( this );
 	}
+
+private:
+	float	m_fDamage;
+	float	m_fDamageRadius;
 };
 
 LINK_ENTITY_TO_CLASS( concussiveblast, CConcussiveBlast );
@@ -171,7 +180,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 // Purpose: Create a concussive blast entity and detonate it
 //-----------------------------------------------------------------------------
-void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, CBaseEntity *pOwner, float magnitude )
+void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, CBaseEntity *pOwner, float magnitude, float damage = 200.0f, float dmgradius = 256.0f )
 {
 	QAngle angles;
 	VectorAngles( surfaceNormal, angles );
@@ -179,6 +188,8 @@ void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, C
 
 	if ( pBlast )
 	{
+		pBlast->SetDamage( damage );
+		pBlast->SetDamageRadius( dmgradius );
 		pBlast->Explode( magnitude );
 	}
 }

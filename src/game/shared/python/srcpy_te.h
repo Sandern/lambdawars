@@ -154,7 +154,7 @@ void AddToClientEffectList( boost::python::object effect );
 #else
 
 // Creates a concussive blast effect
-void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, CBaseEntity *pOwner, float magnitude );
+void CreateConcussiveBlast( const Vector &origin, const Vector &surfaceNormal, CBaseEntity *pOwner, float magnitude, float damage = 200.0f, float dmgradius = 256.0f );
 
 #endif // CLIENT_DLL
 

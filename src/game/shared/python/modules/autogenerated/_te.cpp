@@ -1456,12 +1456,12 @@ BOOST_PYTHON_MODULE(_te){
 
     { //::CreateConcussiveBlast
     
-        typedef void ( *CreateConcussiveBlast_function_type )( ::Vector const &,::Vector const &,::CBaseEntity *,float );
+        typedef void ( *CreateConcussiveBlast_function_type )( ::Vector const &,::Vector const &,::CBaseEntity *,float,float,float );
         
         bp::def( 
             "CreateConcussiveBlast"
             , CreateConcussiveBlast_function_type( &::CreateConcussiveBlast )
-            , ( bp::arg("origin"), bp::arg("surfaceNormal"), bp::arg("pOwner"), bp::arg("magnitude") ) );
+            , ( bp::arg("origin"), bp::arg("surfaceNormal"), bp::arg("pOwner"), bp::arg("magnitude"), bp::arg("damage")=2.0e+2f, bp::arg("dmgradius")=2.56e+2f ) );
     
     }
 
