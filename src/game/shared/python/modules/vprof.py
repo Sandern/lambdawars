@@ -21,6 +21,8 @@ class VProf(SemiSharedModuleGenerator):
         mb.mem_funs('RegisterNumBudgetGroupsChangedCallBack').exclude()
         mb.mem_funs('FindOrCreateCounter').exclude()
         mb.mem_funs('GetCounterNameAndValue').exclude()
+        if self.settings.branch == 'source2013':
+                mb.mem_funs('GetCurrentNode').exclude()
         mb.vars('m_pNumBudgetGroupsChangedCallBack').exclude()
         mb.vars('m_pName').exclude()
         
