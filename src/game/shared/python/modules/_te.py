@@ -1,9 +1,9 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import *
+from srcpy.matchers import calldef_withtypes
 
 from pyplusplus.module_builder import call_policies
 from pyplusplus import function_transformers as FT
-from pygccxml.declarations import matchers
+from pygccxml.declarations import matchers, pointer_t, const_t, reference_t, declarated_t
 
 class TE(SemiSharedModuleGenerator):
     module_name = '_te'
@@ -81,19 +81,17 @@ class TE(SemiSharedModuleGenerator):
         cls = mb.class_('CTempEnts')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual' 
-        cls.calldefs( matchers.access_type_matcher_t( 'protected' ), allow_empty=True ).exclude()
+        cls.calldefs(matchers.access_type_matcher_t( 'protected' ), allow_empty=True).exclude()
         
         mb.add_registration_code( 'bp::scope().attr( "tempents" ) = boost::ref(tempents);' )
         
-        mb.mem_funs('DefaultSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.mem_funs('TempSprite').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.mem_funs('ClientProjectile').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        
-        mb.mem_funs('RicochetSprite').exclude()
-        mb.mem_funs('SpawnTempModel').exclude()
-        mb.mem_funs('ClientProjectile').exclude() # Debug mode problem
-        mb.mem_funs('DefaultSprite').exclude() # Debug mode problem
-        mb.mem_funs('TempSprite').exclude() # Debug mode problem
+        # C_LocalTempEntity is not exposed and shouldn't be needed (deprecated)
+        localtempentity = mb.class_('C_LocalTempEntity')
+        excludetypes = [
+            pointer_t(declarated_t(localtempentity)),
+            pointer_t(const_t(declarated_t(localtempentity))),
+        ]
+        cls.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
         
         # Add client effects class (you can only add mesh builders to it)
         cls = mb.class_('PyClientSideEffect')
@@ -103,28 +101,6 @@ class TE(SemiSharedModuleGenerator):
         cls.mem_funs('AddToEffectList').exclude()
         cls.mem_funs('Draw').virtuality = 'virtual'
         
-        cls.add_registration_code( 
-        ('{ //::PyClientSideEffect::IsActive\r\n'
-        '\r\n'
-        '    typedef bool ( ::PyClientSideEffect::*IsActive_function_type )(  ) ;\r\n'
-        '    \r\n'
-        '    ClientSideEffect_exposer.def( \r\n'
-        '        "IsActive"\r\n'
-        '        , IsActive_function_type( &::PyClientSideEffect::IsActive ) );\r\n'
-        '\r\n'
-        '}\r\n'), False)
-        
-        cls.add_registration_code( 
-        ('{ //::PyClientSideEffect::Destroy\r\n'
-        '\r\n'
-        '    typedef void ( ::PyClientSideEffect::*Destroy_function_type )(  ) ;\r\n'
-        '    \r\n'
-        '    ClientSideEffect_exposer.def( \r\n'
-        '        "Destroy"\r\n'
-        '        , Destroy_function_type( &::PyClientSideEffect::Destroy ) );\r\n'
-        '\r\n'
-        '}\r\n'), False)
-        
         mb.free_function('AddToClientEffectList').include()
         
         # Mesh builder
@@ -133,10 +109,8 @@ class TE(SemiSharedModuleGenerator):
         cls.rename('MeshVertex')
         
         cls.var('m_hEnt').exclude()
-        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent'
-                         , cls.member_function( 'GetEnt' )
-                         , cls.member_function( 'SetEnt' ) )
+        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        self.SetupProperty(cls, 'ent', 'GetEnt', 'SetEnt')
                          
         cls = mb.class_('PyMeshBuilder')
         cls.include()
@@ -146,16 +120,11 @@ class TE(SemiSharedModuleGenerator):
         cls = mb.class_('PyMeshRallyLine')
         cls.include()
         cls.rename('MeshRallyLine')
-        cls.mem_funs().virtuality = 'not virtual' 
-        
-        cls.mem_funs('GetEnt1').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent1'
-                         , cls.member_function( 'GetEnt1' )
-                         , cls.member_function( 'SetEnt1' ) )
-        cls.mem_funs('GetEnt2').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.add_property( 'ent2'
-                         , cls.member_function( 'GetEnt2' )
-                         , cls.member_function( 'SetEnt2' ) )
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.mem_funs('GetEnt1').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_funs('GetEnt2').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        self.SetupProperty(cls, 'ent1', 'GetEnt1', 'SetEnt1')
+        self.SetupProperty(cls, 'ent2', 'GetEnt2', 'SetEnt2')
         
         mb.enum('MaterialPrimitiveType_t').include()
         
@@ -166,7 +135,7 @@ class TE(SemiSharedModuleGenerator):
         
         cls = mb.class_('C_StriderFX')
         cls.include()
-        cls.mem_funs().virtuality = 'not virtual' 
+        cls.mem_funs().virtuality = 'not virtual'
         
         # Constants
         mb.add_registration_code( "bp::scope().attr( \"FTENT_NONE\" ) = (int)FTENT_NONE;" )

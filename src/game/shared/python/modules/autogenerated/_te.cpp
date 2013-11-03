@@ -296,9 +296,9 @@ BOOST_PYTHON_MODULE(_te){
             , (void ( ::CTempEnts::* )( int,int,::Vector const &,::QAngle const &,::Vector const &,int,int ) )( &::CTempEnts::PhysicsProp )
             , ( bp::arg("modelindex"), bp::arg("skin"), bp::arg("pos"), bp::arg("angles"), bp::arg("vel"), bp::arg("flags"), bp::arg("effects")=(int)(0) ) )    
         .def( 
-            "PlaySound"
-            , (void ( ::CTempEnts::* )( ::C_LocalTempEntity *,float ) )( &::CTempEnts::PlaySound )
-            , ( bp::arg("pTemp"), bp::arg("damp") ) )    
+            "RicochetSprite"
+            , (void ( ::CTempEnts::* )( ::Vector const &,::model_t *,float,float ) )( &::CTempEnts::RicochetSprite )
+            , ( bp::arg("pos"), bp::arg("pmodel"), bp::arg("duration"), bp::arg("scale") ) )    
         .def( 
             "RocketFlare"
             , (void ( ::CTempEnts::* )( ::Vector const & ) )( &::CTempEnts::RocketFlare )
@@ -306,14 +306,6 @@ BOOST_PYTHON_MODULE(_te){
         .def( 
             "Shutdown"
             , (void ( ::CTempEnts::* )(  ) )( &::CTempEnts::Shutdown ) )    
-        .def( 
-            "Sprite_Explode"
-            , (void ( ::CTempEnts::* )( ::C_LocalTempEntity *,float,int ) )( &::CTempEnts::Sprite_Explode )
-            , ( bp::arg("pTemp"), bp::arg("scale"), bp::arg("flags") ) )    
-        .def( 
-            "Sprite_Smoke"
-            , (void ( ::CTempEnts::* )( ::C_LocalTempEntity *,float ) )( &::CTempEnts::Sprite_Smoke )
-            , ( bp::arg("pTemp"), bp::arg("scale") ) )    
         .def( 
             "Sprite_Spray"
             , (void ( ::CTempEnts::* )( ::Vector const &,::Vector const &,int,int,int,int ) )( &::CTempEnts::Sprite_Spray )
@@ -484,6 +476,10 @@ BOOST_PYTHON_MODULE(_te){
             , (void ( ::ITempEntsSystem::* )( ::IRecipientFilter &,float,::Vector const *,::Vector const *,float,int,int,float ) )( &::ITempEntsSystem::Bubbles )
             , ( bp::arg("filer"), bp::arg("delay"), bp::arg("mins"), bp::arg("maxs"), bp::arg("height"), bp::arg("modelindex"), bp::arg("count"), bp::arg("speed") ) )    
         .def( 
+            "ClientProjectile"
+            , (void ( ::ITempEntsSystem::* )( ::IRecipientFilter &,float,::Vector const *,::Vector const *,int,int,::C_BaseEntity * ) )( &::ITempEntsSystem::ClientProjectile )
+            , ( bp::arg("filter"), bp::arg("delay"), bp::arg("vecOrigin"), bp::arg("vecVelocity"), bp::arg("modelindex"), bp::arg("lifetime"), bp::arg("pOwner") ) )    
+        .def( 
             "Decal"
             , (void ( ::ITempEntsSystem::* )( ::IRecipientFilter &,float,::Vector const *,::Vector const *,int,int,int ) )( &::ITempEntsSystem::Decal )
             , ( bp::arg("filer"), bp::arg("delay"), bp::arg("pos"), bp::arg("start"), bp::arg("entity"), bp::arg("hitbox"), bp::arg("index") ) )    
@@ -650,24 +646,6 @@ BOOST_PYTHON_MODULE(_te){
                 , ( bp::arg("meshbuilder") ) );
         
         }
-        { //::PyClientSideEffect::IsActive
-        
-            typedef bool ( ::PyClientSideEffect::*IsActive_function_type )(  ) ;
-            
-            ClientSideEffect_exposer.def( 
-                "IsActive"
-                , IsActive_function_type( &::PyClientSideEffect::IsActive ) );
-        
-        }
-        { //::PyClientSideEffect::Destroy
-        
-            typedef void ( ::PyClientSideEffect::*Destroy_function_type )(  ) ;
-            
-            ClientSideEffect_exposer.def( 
-                "Destroy"
-                , Destroy_function_type( &::PyClientSideEffect::Destroy ) );
-        
-        }
     }
 
     { //::PyMeshBuilder
@@ -731,26 +709,6 @@ BOOST_PYTHON_MODULE(_te){
                 , ( bp::arg("frametime") ) );
         
         }
-        { //::PyMeshRallyLine::GetEnt1
-        
-            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*GetEnt1_function_type )(  ) ;
-            
-            MeshRallyLine_exposer.def( 
-                "GetEnt1"
-                , GetEnt1_function_type( &::PyMeshRallyLine::GetEnt1 )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyMeshRallyLine::GetEnt2
-        
-            typedef ::C_BaseEntity * ( ::PyMeshRallyLine::*GetEnt2_function_type )(  ) ;
-            
-            MeshRallyLine_exposer.def( 
-                "GetEnt2"
-                , GetEnt2_function_type( &::PyMeshRallyLine::GetEnt2 )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
         { //::PyMeshRallyLine::Init
         
             typedef void ( ::PyMeshRallyLine::*Init_function_type )(  ) ;
@@ -758,26 +716,6 @@ BOOST_PYTHON_MODULE(_te){
             MeshRallyLine_exposer.def( 
                 "Init"
                 , Init_function_type( &::PyMeshRallyLine::Init ) );
-        
-        }
-        { //::PyMeshRallyLine::SetEnt1
-        
-            typedef void ( ::PyMeshRallyLine::*SetEnt1_function_type )( ::C_BaseEntity * ) ;
-            
-            MeshRallyLine_exposer.def( 
-                "SetEnt1"
-                , SetEnt1_function_type( &::PyMeshRallyLine::SetEnt1 )
-                , ( bp::arg("pEnt") ) );
-        
-        }
-        { //::PyMeshRallyLine::SetEnt2
-        
-            typedef void ( ::PyMeshRallyLine::*SetEnt2_function_type )( ::C_BaseEntity * ) ;
-            
-            MeshRallyLine_exposer.def( 
-                "SetEnt2"
-                , SetEnt2_function_type( &::PyMeshRallyLine::SetEnt2 )
-                , ( bp::arg("pEnt") ) );
         
         }
         MeshRallyLine_exposer.def_readwrite( "color", &PyMeshRallyLine::color );
@@ -839,26 +777,6 @@ BOOST_PYTHON_MODULE(_te){
                 , Draw_function_type(&::PyMeshVertex::Draw)
                 , default_Draw_function_type(&PyMeshVertex_wrapper::default_Draw)
                 , ( bp::arg("builder") ) );
-        
-        }
-        { //::PyMeshVertex::GetEnt
-        
-            typedef ::C_BaseEntity * ( ::PyMeshVertex::*GetEnt_function_type )(  ) ;
-            
-            MeshVertex_exposer.def( 
-                "GetEnt"
-                , GetEnt_function_type( &::PyMeshVertex::GetEnt )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyMeshVertex::SetEnt
-        
-            typedef void ( ::PyMeshVertex::*SetEnt_function_type )( ::C_BaseEntity * ) ;
-            
-            MeshVertex_exposer.def( 
-                "SetEnt"
-                , SetEnt_function_type( &::PyMeshVertex::SetEnt )
-                , ( bp::arg("pEnt") ) );
         
         }
         MeshVertex_exposer.def_readwrite( "color", &PyMeshVertex::color );
