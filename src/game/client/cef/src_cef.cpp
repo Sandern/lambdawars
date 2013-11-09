@@ -201,7 +201,13 @@ bool CCefSystem::Init()
 //-----------------------------------------------------------------------------
 void CCefSystem::Shutdown() 
 {
+	if( !m_bIsRunning )
+		return;
+
 	DevMsg("Shutting down CEF\n");
+
+	// Restore window process to prevent unwanted callbacks
+	SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)RealWndProc);
 
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
@@ -210,6 +216,8 @@ void CCefSystem::Shutdown()
 
 	// Shut down CEF.
 	CefShutdown();
+
+	m_bIsRunning = false;
 }
 
 //-----------------------------------------------------------------------------

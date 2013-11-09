@@ -12,7 +12,6 @@
 
 #include "srcpy_boostpython.h"
 
-//class WebNews;
 class SrcCefBrowser;
 
 namespace BaseModUI {
@@ -65,7 +64,6 @@ private:
 	
 	int					m_iQuickJoinHelpText;
 
-	//WebNews *m_pNews;
 	// Eventually this should replace the entire main menu
 	SrcCefBrowser *m_pCefMainMenu;
 	boost::python::object m_refCefMainMenu;
