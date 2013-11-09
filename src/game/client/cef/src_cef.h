@@ -71,6 +71,9 @@ public:
 #ifdef WIN32
 	HWND GetMainWindow( void );
 	void SetMainWIndow( HWND hWnd );
+
+	short GetLastMouseWheelDist() { return m_iLastMouseWheelDist; }
+	void SetLastMouseWheelDist( short dist ) { m_iLastMouseWheelDist = dist; }
 #endif WIN32
 
 	void AddBrowser( SrcCefBrowser *pBrowser );
@@ -99,6 +102,8 @@ private:
 #ifdef WIN32
 	// Main Window..
 	HWND m_MainWindow;
+	// Stores the last mouse movement
+	short m_iLastMouseWheelDist;
 #endif WIN32
 
 	// Browser

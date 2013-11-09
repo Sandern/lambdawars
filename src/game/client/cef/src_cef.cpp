@@ -30,6 +30,7 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 ConVar g_debug_cef("g_debug_cef", "0");
 
+#ifdef WIN32
 //-----------------------------------------------------------------------------
 // Purpose: Helper for finding the main window
 //-----------------------------------------------------------------------------
@@ -45,8 +46,6 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 	return true;
 }
 
-//static HANDLE g_hArrow;
-
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -61,12 +60,18 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		CEFSystem().ProcessKeyInput( message, wParam, lParam );
 		break;
 	}
+	case WM_MOUSEWHEEL:
+	{
+		CEFSystem().SetLastMouseWheelDist( (short)HIWORD(wParam) );
+		break;
+	}
 	default:
 		break;
 	}
  
 	return CallWindowProc(RealWndProc, hWnd, message, wParam, lParam);
 }
+#endif // WIN32
 
 //-----------------------------------------------------------------------------
 // Purpose: Client App

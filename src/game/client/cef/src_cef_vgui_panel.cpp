@@ -637,10 +637,9 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 	me.y = m_iMouseY;
 	me.modifiers = GetEventFlags();
 
-	// VGUI just gives -1 or +1. SendMouseWheelEvent expects
-	// the number of pixels to shift.
-	// TODO: Scale/accelerate?
-	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, delta * 50 );
+	// VGUI just gives -1 or +1. SendMouseWheelEvent expects the number of pixels to shift.
+	// Use the last mouse wheel value from the window proc instead
+	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, CEFSystem().GetLastMouseWheelDist() );
 }
 
 //-----------------------------------------------------------------------------
