@@ -813,7 +813,7 @@ void CFogOfWarMgr::OnResolutionChanged()
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::Update( float frametime )
 {
-	if( !m_bActive )
+	if( !m_bActive || engine->IsPaused() )
 		return;
 
 #ifdef CLIENT_DLL
@@ -1393,6 +1393,9 @@ void CFogOfWarMgr::UpdateShared()
 		if( m_nTileSize != -1 ) Msg("Fog of war size changed, reallocating arrays...\n");
 		AllocateFogOfWar();
 	}
+
+	if( engine->IsPaused() )
+		return;
 
 	if( !NeedsUpdate() )
 		return;
