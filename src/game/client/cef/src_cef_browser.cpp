@@ -374,19 +374,24 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 	// Always allow sub frames to navigate to anything
 	if( frame->IsMain() )
 	{
-		if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+		// Always allow the dev tools url
+		std::string devtools_url = GetBrowser()->GetHost()->GetDevToolsURL( true );
+		if( request->GetURL() != devtools_url  )
 		{
-			// This mode prevents from navigating away from the current page
-			if( browser->GetMainFrame()->GetURL() != request->GetURL() )
-				bDenyNavigation = true;
-		}
-		else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
-		{
-			// This mode only allows navigating to urls starting with the file protocol
-			std::string url = request->GetURL().ToString();
-			std::string filepro( "file://");
-			if( url.compare( 0, filepro.size(), filepro ) )
-				bDenyNavigation = true;
+			if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+			{
+				// This mode prevents from navigating away from the current page
+				if( browser->GetMainFrame()->GetURL() != request->GetURL() )
+					bDenyNavigation = true;
+			}
+			else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
+			{
+				// This mode only allows navigating to urls starting with the file protocol
+				std::string url = request->GetURL().ToString();
+				std::string filepro( "file://");
+				if( url.compare( 0, filepro.size(), filepro ) )
+					bDenyNavigation = true;
+			}
 		}
 
 		// If we don't allow navigation, open the url in a new window
@@ -1165,23 +1170,13 @@ void SrcCefBrowser::Ping()
 void SrcCefBrowser::ShowDevTools( ) 
 {
 	std::string devtools_url = GetBrowser()->GetHost()->GetDevToolsURL(true);
-	if (!devtools_url.empty()) 
+	if( !devtools_url.empty() ) 
 	{
-#if 0
-		if (m_bExternalDevTools) 
-		{
-			// Open DevTools in an external browser window.
-			LaunchExternalBrowser(devtools_url);
-		} 
-		else if (m_OpenDevToolsURLs.find(devtools_url) ==
-				m_OpenDevToolsURLs.end()) 
-#endif // 0
-		{
-		// Open DevTools in a popup window.
-		//m_OpenDevToolsURLs.insert(devtools_url);
+		// Open DevTools in a browser (only works in Chrome)
+		//OpenURL( devtools_url.c_str() );
+		// Open new Window
 		GetBrowser()->GetMainFrame()->ExecuteJavaScript(
 			"window.open('" +  devtools_url + "');", "about:blank", 0);
-		}
 	}
 	else
 	{
