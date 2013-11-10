@@ -42,6 +42,10 @@ void UnitBaseAirLocomotion::Move( float interval, UnitBaseMoveCommand &move_comm
 	Friction();
 	FullAirMove();
 	MoveFacing();
+
+	// Sometimes an unit spawns with an invalid velocity and can't move
+	// Validate velocity after each move
+	CheckVelocity();
 }
 
 //-----------------------------------------------------------------------------
