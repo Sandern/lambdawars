@@ -157,7 +157,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 		} catch( bp::error_already_set & ) {
 			PyErr_Clear();
 		}
-		PyErr_SetString(PyExc_ValueError, "Unsupported type in message list" );
+		PyErr_SetString(PyExc_ValueError, "PyFillWriteElement: Unsupported type in message list" );
 		throw boost::python::error_already_set(); 
 	}
 }

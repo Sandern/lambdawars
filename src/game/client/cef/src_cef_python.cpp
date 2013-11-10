@@ -64,38 +64,38 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 	{
 		bp::object value = l[i];
 
-		if( type(value) == types.attr("NoneType") )
+		if( type(value) == boost::python::object() )
 		{
 			result->SetNull( i );
 		}
-		else if( type(value) == types.attr("IntType") )
+		else if( type(value) == builtins.attr("int") )
 		{
 			result->SetInt( i, boost::python::extract<int>(value) );
 		}
-		else if( type(value) == types.attr("FloatType") )
+		else if( type(value) == builtins.attr("float") )
 		{
 			result->SetDouble( i, boost::python::extract<float>(value) );
 		}
-		else if( type(value) == types.attr("StringType") )
+		else if( type(value) == builtins.attr("str") )
 		{
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( i, pStr );
 		}
-		else if( type(value) == types.attr("BooleanType") )
+		else if( type(value) == builtins.attr("bool") )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
 		}
-		else if( type(value) == types.attr("ListType") )
+		else if( type(value) == builtins.attr("list") )
 		{
 			result->SetList( i, PyToCefValueList( bp::list( value ) ) );
 		}
-		else if( type(value) == types.attr("DictType") )
+		else if( type(value) == builtins.attr("dict") )
 		{
 			result->SetDictionary( i, PyToCefDictionaryValue( bp::dict( value ) ) );
 		}
 		else
 		{
-			PyErr_SetString(PyExc_ValueError, "Unsupported type in message list" );
+			PyErr_SetString( PyExc_ValueError, "PyToCefValueList: Unsupported type in message list" );
 			throw boost::python::error_already_set(); 
 		}
 	}
@@ -177,38 +177,38 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 
 		CefString cefkey = bp::extract< const char * >( key );
 
-		if( type(value) == types.attr("NoneType") )
+		if( type(value) == boost::python::object() )
 		{
 			result->SetNull( cefkey );
 		}
-		else if( type(value) == types.attr("IntType") )
+		else if( type(value) == builtins.attr("int") )
 		{
 			result->SetInt( cefkey, boost::python::extract<int>(value) );
 		}
-		else if( type(value) == types.attr("FloatType") )
+		else if( type(value) == builtins.attr("float") )
 		{
 			result->SetDouble( cefkey, boost::python::extract<float>(value) );
 		}
-		else if( type(value) == types.attr("StringType") )
+		else if( type(value) == builtins.attr("str") )
 		{
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( cefkey, pStr );
 		}
-		else if( type(value) == types.attr("BooleanType") )
+		else if( type(value) == builtins.attr("bool") )
 		{
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
 		}
-		else if( type(value) == types.attr("ListType") )
+		else if( type(value) == builtins.attr("list") )
 		{
 			result->SetList( cefkey, PyToCefValueList( bp::list( value ) ) );
 		}
-		else if( type(value) == types.attr("DictType") )
+		else if( type(value) == builtins.attr("dict") )
 		{
 			result->SetDictionary( cefkey, PyToCefDictionaryValue( bp::dict( value ) ) );
 		}
 		else
 		{
-			PyErr_SetString(PyExc_ValueError, "Unsupported type in message list" );
+			PyErr_SetString(PyExc_ValueError, "PyToCefDictionaryValue: Unsupported type in message list" );
 			throw boost::python::error_already_set(); 
 		}
 	}
