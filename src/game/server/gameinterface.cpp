@@ -772,7 +772,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	MountExtraContent();
 
 #ifndef SWARMKEEPER_DLL
-	if ( !CommandLine()->CheckParm( "-noep2check" ) )
+	if ( !CommandLine()->CheckParm( "-noep2check" ) && !engine->IsDedicatedServer() )
 	{
 		if( !steamapicontext || !steamapicontext->SteamApps() )
 		{
@@ -780,7 +780,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 			return false;
 		}
 
-		if( !engine->IsDedicatedServer() && steamapicontext->SteamApps()->BIsSubscribedApp( 420 ) == false )
+		if( steamapicontext->SteamApps()->BIsSubscribedApp( 420 ) == false )
 		{
 			SrcShellExecute( "steam://store/420" );
 			Error( "This mod requires Half-Life 2: Episode Two." );
