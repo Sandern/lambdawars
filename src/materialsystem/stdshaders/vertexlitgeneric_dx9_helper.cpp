@@ -1588,7 +1588,7 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 	{
 		//360 only supports single pass flashlight, so bHasFlashlight == bSinglePassFlashlight. And single pass flashlights are the same as multipass when there's no flashlight.
 		DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-			pShaderShadow, bVertexLitGeneric, bHasFlashlight, IsX360(), info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
+			pShaderShadow, bVertexLitGeneric, bHasFlashlight, IsX360(), info, vertexCompression, pContextDataPtr, bDeferredActive );
 	}
 	else //single pass flashlight enabled material. Support both multipass and single pass flashlight
 	{
@@ -1596,9 +1596,9 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 		{
 			//snapshotting, grab a snapshot of both modes
 			DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-				pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
+				pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive );
 			DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-				pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
+				pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive );
 		}
 		else
 		{
@@ -1608,13 +1608,13 @@ void DrawVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, IS
 				//use only the second (singlepass flashlights) snapshot
 				pShader->Draw( false );
 				DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-					pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
+					pShaderShadow, bVertexLitGeneric, bHasFlashlight, true, info, vertexCompression, pContextDataPtr, bDeferredActive );
 			}
 			else
 			{
 				//use only the first (multipass flashlights) snapshot
 				DrawVertexLitGeneric_DX9_Internal( pShader, params, pShaderAPI,
-					pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive && bVertexLitGeneric );
+					pShaderShadow, bVertexLitGeneric, bHasFlashlight, false, info, vertexCompression, pContextDataPtr, bDeferredActive );
 				pShader->Draw( false );
 			}
 		}

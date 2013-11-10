@@ -68,6 +68,27 @@ public:
 		m_bFOW = true;
 #endif
 	}
+private:
+	int m_nVERTEXCOLOR;
+#ifdef _DEBUG
+	bool m_bVERTEXCOLOR;
+#endif
+public:
+	void SetVERTEXCOLOR( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nVERTEXCOLOR = i;
+#ifdef _DEBUG
+		m_bVERTEXCOLOR = true;
+#endif
+	}
+	void SetVERTEXCOLOR( bool i )
+	{
+		m_nVERTEXCOLOR = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bVERTEXCOLOR = true;
+#endif
+	}
 public:
 	// CONSTRUCTOR
 	globallitgeneric_vs30_Static_Index( IShaderShadow *pShaderShadow, IMaterialVar **params )
@@ -84,19 +105,23 @@ public:
 		m_bFOW = false;
 #endif // _DEBUG
 		m_nFOW = 0;
+#ifdef _DEBUG
+		m_bVERTEXCOLOR = false;
+#endif // _DEBUG
+		m_nVERTEXCOLOR = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bDOPIXELFOG && m_bHARDWAREFOGBLEND && m_bFOW;
+		bool bAllStaticVarsDefined = m_bDOPIXELFOG && m_bHARDWAREFOGBLEND && m_bFOW && m_bVERTEXCOLOR;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 2 * m_nDOPIXELFOG ) + ( 4 * m_nHARDWAREFOGBLEND ) + ( 4 * m_nFOW ) + 0;
+		return ( 2 * m_nDOPIXELFOG ) + ( 4 * m_nHARDWAREFOGBLEND ) + ( 4 * m_nFOW ) + ( 8 * m_nVERTEXCOLOR ) + 0;
 	}
 };
-#define shaderStaticTest_globallitgeneric_vs30 vsh_forgot_to_set_static_FOW + 0
+#define shaderStaticTest_globallitgeneric_vs30 vsh_forgot_to_set_static_FOW + vsh_forgot_to_set_static_VERTEXCOLOR + 0
 class globallitgeneric_vs30_Dynamic_Index
 {
 private:

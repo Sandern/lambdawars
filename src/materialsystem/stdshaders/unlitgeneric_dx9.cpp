@@ -105,6 +105,8 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		// Team coloring
 		SHADER_PARAM( TEAMCOLOR, SHADER_PARAM_TYPE_COLOR, "[1 1 1]", "Team color" )
 		SHADER_PARAM( TEAMCOLORMAP, SHADER_PARAM_TYPE_TEXTURE, "", "Texture describing which places should be team colored." )
+
+		SHADER_PARAM( DEFERRED, SHADER_PARAM_TYPE_BOOL, "0", "")
 	END_SHADER_PARAMS
 
 	void SetupVars( VertexLitGeneric_DX9_Vars_t& info )
@@ -211,9 +213,35 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		info.m_nTeamColorTexture = TEAMCOLORMAP;
 	}
 
+	void SetupParmsGBuffer( defParms_gBuffer &p )
+	{
+		p.bModel = true;
+
+		p.iAlbedo = BASETEXTURE;
+		p.iPhongExp = PHONGEXPONENT;
+
+		p.iAlphatestRef = ALPHATESTREFERENCE;
+		
+		p.m_nTreeSway = TREESWAY;
+		p.m_nTreeSwayHeight = TREESWAYHEIGHT;
+		p.m_nTreeSwayStartHeight = TREESWAYSTARTHEIGHT;
+		p.m_nTreeSwayRadius = TREESWAYRADIUS;
+		p.m_nTreeSwayStartRadius = TREESWAYSTARTRADIUS;
+		p.m_nTreeSwaySpeed = TREESWAYSPEED;
+		p.m_nTreeSwaySpeedHighWindMultiplier = TREESWAYSPEEDHIGHWINDMULTIPLIER;
+		p.m_nTreeSwayStrength = TREESWAYSTRENGTH;
+		p.m_nTreeSwayScrumbleSpeed = TREESWAYSCRUMBLESPEED;
+		p.m_nTreeSwayScrumbleStrength = TREESWAYSCRUMBLESTRENGTH;
+		p.m_nTreeSwayScrumbleFrequency = TREESWAYSCRUMBLEFREQUENCY;
+		p.m_nTreeSwayFalloffExp = TREESWAYFALLOFFEXP;
+		p.m_nTreeSwayScrumbleFalloffExp = TREESWAYSCRUMBLEFALLOFFEXP;		
+		p.m_nTreeSwaySpeedLerpStart = TREESWAYSPEEDLERPSTART;
+		p.m_nTreeSwaySpeedLerpEnd = TREESWAYSPEEDLERPEND;
+	}
+
 	void SetupParmsShadow( defParms_shadow &p )
 	{
-		p.bModel = false;
+		p.bModel = true;
 		p.iAlbedo = BASETEXTURE;
 		//p.iAlbedo2 = BASETEXTURE2;
 		//p.iAlbedo3 = BASETEXTURE3;
@@ -228,6 +256,14 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		VertexLitGeneric_DX9_Vars_t vars;
 		SetupVars( vars );
 		InitParamsVertexLitGeneric_DX9( this, params, pMaterialName, false, vars, false );
+
+		/*const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive && params[DEFERRED]->GetIntValue() )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitParmsGBuffer( parms_gbuffer, this, params );
+		}*/
 	}
 
 	SHADER_FALLBACK
@@ -240,6 +276,14 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		VertexLitGeneric_DX9_Vars_t vars;
 		SetupVars( vars );
 		InitVertexLitGeneric_DX9( this, params, false, vars );
+
+		/*const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
+		if( bDeferredActive && params[DEFERRED]->GetIntValue() )
+		{
+			defParms_gBuffer parms_gbuffer;
+			SetupParmsGBuffer( parms_gbuffer );
+			InitPassGBuffer( parms_gbuffer, this, params );
+		}*/
 	}
 
 	SHADER_DRAW
@@ -255,7 +299,37 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		}
 		else
 		{
-			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr, false );
+			bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled() && params[DEFERRED]->GetIntValue();
+			if( bDeferredActive )
+			{
+				const int iDeferredRenderStage = pShaderAPI ?
+					pShaderAPI->GetIntRenderingParameter( INT_RENDERPARM_DEFERRED_RENDER_STAGE )
+					: DEFERRED_RENDER_STAGE_INVALID;
+
+				/*if ( pShaderAPI != NULL && *pContextDataPtr == NULL )
+					*pContextDataPtr = new CVertexLitGeneric_DX9_Context();
+
+				CDeferredPerMaterialContextData *pDefContext = reinterpret_cast< CDeferredPerMaterialContextData* >(*pContextDataPtr);
+
+				if ( pShaderShadow != NULL ||
+					iDeferredRenderStage == DEFERRED_RENDER_STAGE_GBUFFER )
+				{
+					defParms_gBuffer parms_gbuffer;
+					SetupParmsGBuffer( parms_gbuffer );
+					DrawPassGBuffer( parms_gbuffer, this, params, pShaderShadow, pShaderAPI,
+						vertexCompression, pDefContext );
+				}
+				else
+					Draw( false );*/
+
+				if( pShaderShadow == NULL && iDeferredRenderStage != DEFERRED_RENDER_STAGE_COMPOSITION )
+				{
+					Draw( false );
+					return;
+				}
+			}
+
+			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr, params[DEFERRED]->GetIntValue() > 0 );
 		}
 	}
 END_SHADER

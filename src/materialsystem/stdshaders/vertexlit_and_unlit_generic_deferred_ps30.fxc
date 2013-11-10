@@ -457,17 +457,8 @@ float4 main( PS_INPUT i ) : COLOR
 	}
 	#endif
 
-	#if ( defined( SHADER_MODEL_PS_2_0 ) )
-	{
-		// This branch means that g_fInverseBlendTintByBaseAlpha doesn't work with ps20, but we don't care since we're dropping ps20
-		diffuseLighting *= g_DiffuseModulation.rgb;
-	}
-	#else
-	{
-		// Optionally use basealpha to blend in the diffuse modulation (saturated add of g_fInverseBlendTintByBaseAlpha turns this on/off)
-		diffuseLighting *= lerp( float3( 1.0f, 1.0f, 1.0f ), g_DiffuseModulation.rgb, saturate( baseColor.a + g_fInverseBlendTintByBaseAlpha ) );
-	}
-	#endif
+	// Optionally use basealpha to blend in the diffuse modulation (saturated add of g_fInverseBlendTintByBaseAlpha turns this on/off)
+	diffuseLighting *= lerp( float3( 1.0f, 1.0f, 1.0f ), g_DiffuseModulation.rgb, saturate( baseColor.a + g_fInverseBlendTintByBaseAlpha ) );
 
 	alpha *= g_DiffuseModulation.a;
 	

@@ -13,6 +13,9 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 		SHADER_PARAM( ALPHATESTREFERENCE, SHADER_PARAM_TYPE_FLOAT, "0.5", "" )
 
 		SHADER_PARAM( FOW, SHADER_PARAM_TYPE_TEXTURE, "_rt_fog_of_war", "FoW Render Target" )
+
+		// For deferred
+		SHADER_PARAM( PHONG_EXP, SHADER_PARAM_TYPE_FLOAT, "", "" )
 	END_SHADER_PARAMS
 
 	void SetupParmsGBuffer( defParms_gBuffer &p )
@@ -21,6 +24,7 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 		p.iAlbedo = BASETEXTURE;
 		p.iAlphatestRef = ALPHATESTREFERENCE;
+		p.iPhongExp = PHONG_EXP;
 	}
 
 	void SetupParmsShadow( defParms_shadow &p )
@@ -39,12 +43,16 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 		const bool bTranslucent = IS_FLAG_SET( MATERIAL_VAR_TRANSLUCENT );
 
 		return !bTranslucent && !bIsDecal;
-		//return !bTranslucent || bIsDecal;
 #endif
 	}
 
 	SHADER_INIT_PARAMS()
 	{
+		SET_FLAGS2( MATERIAL_VAR2_SUPPORTS_HW_SKINNING );
+
+		if ( g_pHardwareConfig->HasFastVertexTextures() )
+			SET_FLAGS2( MATERIAL_VAR2_USES_VERTEXID );
+
 		//const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
 		const bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled();
 		if( bDeferredActive )// && !bIsDecal )
@@ -95,10 +103,6 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 			InitPassShadowPass( parms_shadow, this, params );
 		}
 
-		//defParms_composite parms_composite;
-		//SetupParmsComposite( parms_composite );
-		//InitPassComposite( parms_composite, this, params );
-
 		if( params[BASETEXTURE]->IsDefined() )
 		{
 			LoadTexture( BASETEXTURE );
@@ -108,9 +112,10 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 	SHADER_FALLBACK
 	{
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
+		const bool bHasVertexColor = IS_FLAG_SET( MATERIAL_VAR_VERTEXCOLOR );
 		if( bIsDecal )
 			return "LightmappedGeneric";
-		if( params[FULLBRIGHT]->GetIntValue() == 0 && !bIsDecal )
+		if( params[FULLBRIGHT]->GetIntValue() == 0 && !bIsDecal && !bHasVertexColor )
 		{
 			return "VertexLitGeneric";
 		}
@@ -133,6 +138,7 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 		const bool bIsFullbright = params[FULLBRIGHT]->GetIntValue() != 0;
 		const bool bIsAlphaTested = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) != 0;
+		const bool bHasVertexColor = IS_FLAG_SET( MATERIAL_VAR_VERTEXCOLOR );
 
 		SHADOW_STATE
 		{
@@ -147,14 +153,17 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 			DefaultFog();
 
-			pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
+			pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
 
 			if ( bHasFoW )
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER10, true );
 			}
 
-			pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+			if( !bIsFullbright )
+			{
+				pShaderShadow->EnableTexture( SHADER_SAMPLER13, true );
+			}
 
 			int iVFmtFlags = VERTEX_POSITION;
 			int iUserDataSize = 0;
@@ -165,6 +174,11 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 			// This shader supports compressed vertices, so OR in that flag:
 			iVFmtFlags |= VERTEX_FORMAT_COMPRESSED;
+
+			if ( bHasVertexColor )
+			{
+				iVFmtFlags |= VERTEX_COLOR;
+			}
 
 			pShaderShadow->VertexShaderVertexFormat( iVFmtFlags, nTexCoordCount, pTexCoordDim, iUserDataSize );
 
@@ -177,11 +191,13 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 
 			DECLARE_STATIC_VERTEX_SHADER( globallitgeneric_vs30 );
 			SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
+			SET_STATIC_VERTEX_SHADER_COMBO( VERTEXCOLOR, bHasVertexColor );
 			SET_STATIC_VERTEX_SHADER( globallitgeneric_vs30 );
 
 			DECLARE_STATIC_PIXEL_SHADER( globallitgeneric_ps30 );
 			SET_STATIC_PIXEL_SHADER_COMBO( FULLBRIGHT, bIsFullbright );
 			SET_STATIC_PIXEL_SHADER_COMBO( FOW, bHasFoW );
+			SET_STATIC_PIXEL_SHADER_COMBO( VERTEXCOLOR, bHasVertexColor );
 			SET_STATIC_PIXEL_SHADER( globallitgeneric_ps30 );
 
 		}
@@ -189,7 +205,7 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 		{
 			pShaderAPI->SetDefaultState();
 
-			BindTexture( SHADER_SAMPLER1, BASETEXTURE );							// Base Map 1
+			BindTexture( SHADER_SAMPLER0, BASETEXTURE );							// Base Map 1
 
 			if ( bHasFoW )
 			{
@@ -205,12 +221,15 @@ BEGIN_VS_SHADER( GlobalLitSimple, "" )
 				pShaderAPI->SetVertexShaderConstant( 26, vFoWSize );
 			}
 
-			BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
-			int x, y, w, t;
-			pShaderAPI->GetCurrentViewport( x, y, w, t );
-			float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
+			if( !bIsFullbright )
+			{
+				BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum()  );
+				int x, y, w, t;
+				pShaderAPI->GetCurrentViewport( x, y, w, t );
+				float fl1[4] = { 1.0f / w, 1.0f / t, 0, 0 };
 
-			pShaderAPI->SetPixelShaderConstant( 3, fl1 );
+				pShaderAPI->SetPixelShaderConstant( 3, fl1 );
+			}
 
 			DECLARE_DYNAMIC_VERTEX_SHADER( globallitgeneric_vs30 );
 			SET_DYNAMIC_VERTEX_SHADER( globallitgeneric_vs30 );

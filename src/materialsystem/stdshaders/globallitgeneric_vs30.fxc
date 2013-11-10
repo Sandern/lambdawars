@@ -6,7 +6,8 @@
 
 #include "common_fog_vs_fxc.h"
 
-//  STATIC: "FOW"				"0..1"
+// STATIC: "FOW"				"0..1"
+// STATIC: "VERTEXCOLOR"			"0..1"
 
 #include "common_vs_fxc.h"
 #include "fow_vs_fxc.h"
@@ -25,6 +26,10 @@ struct VS_INPUT
 	float3 vPos							: POSITION;
 	float4 vNormal						: NORMAL;
 	float2 vBaseTexCoord				: TEXCOORD0;
+	
+#if VERTEXCOLOR
+	float4 vColor			: COLOR0;
+#endif
 };
 
 struct VS_OUTPUT
@@ -35,6 +40,10 @@ struct VS_OUTPUT
 #if FOW
 	float2 vFowCoord						: TEXCOORD2;
 #endif // FOW
+
+#if VERTEXCOLOR
+	float4 color							: TEXCOORD3;
+#endif
 };
 
 VS_OUTPUT main( const VS_INPUT v )
@@ -62,6 +71,12 @@ VS_OUTPUT main( const VS_INPUT v )
 	float3 vWorldNormal = mul( vObjNormal, ( float3x3 )cModel[0] );
 
 	o.vBaseTexCoord.xy = v.vBaseTexCoord;
+	
+#if ( VERTEXCOLOR )
+	// Assume that this is unlitgeneric if you are using vertex color.
+	o.color.rgb = GammaToLinear( v.vColor.rgb );
+	o.color.a = v.vColor.a;
+#endif // VERTEXCOLOR
 
 	return o;
 }

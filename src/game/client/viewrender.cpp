@@ -7312,7 +7312,7 @@ void CBaseWorldBlendViewDeferred::DrawExecute( float waterHeight, view_id_t view
 		m_DrawFlags &= ~DF_SKIP_WORLD;
 	}
 		
-	if ( !m_bDrawWorldNormal )
+	//if ( !m_bDrawWorldNormal )
 	{
 		if ( m_DrawFlags & DF_DRAW_ENTITITES )
 		{
