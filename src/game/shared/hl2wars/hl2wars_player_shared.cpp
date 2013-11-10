@@ -149,8 +149,7 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 	trace_t tr;
 	Vector vStartPos, vEndPos;
 
-	// Get information
-	// Note: Filter controlled unit rather then the player. 
+	// Note: Filter player "controlled unit" rather than the player. 
 	//		 The player is already not traceable. When activating mouse in direct control we need to ignore the unit.
 	vStartPos = vPos + vCamOffset;
 	vEndPos = vStartPos + (vMouseAim *  MAX_TRACE_LENGTH);
