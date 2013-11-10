@@ -2097,7 +2097,7 @@ bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, int owner )
 bool CFogOfWarMgr::PointInFOWByPlayerIndex( const Vector &vPoint, int iEntIndex )
 {
 	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iEntIndex );
-	if( !pPlayer )
+	if( !pPlayer || pPlayer->IsObserver() )
 		return false;
 	return PointInFOW( vPoint, pPlayer->GetOwnerNumber() );
 }
