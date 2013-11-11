@@ -201,7 +201,7 @@ END_SHADER_PARAMS
 
 	bool DrawToGBuffer( IMaterialVar **params )
 	{
-#if 1 || DEFCFG_DEFERRED_SHADING == 1
+#if 0 || DEFCFG_DEFERRED_SHADING == 1
 		return true;
 #else
 		const bool bIsDecal = IS_FLAG_SET( MATERIAL_VAR_DECAL );
@@ -312,8 +312,7 @@ END_SHADER_PARAMS
 			if( ( pShaderShadow != NULL ||
 				iDeferredRenderStage == DEFERRED_RENDER_STAGE_COMPOSITION ) )
 			{
-				DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr, bDrawToGBuffer );
-				//DrawLightmappedGeneric_Deferred_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pDefContext );
+				DrawLightmappedGeneric_DX9( this, params, pShaderAPI, pShaderShadow, s_info, pContextDataPtr, true );
 			}
 			else
 			{
