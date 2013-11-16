@@ -46,10 +46,12 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #include "rumble_shared.h"
 
+#ifdef HL2WARS_DLL
 #include "fowmgr.h"
+#endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
+#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!

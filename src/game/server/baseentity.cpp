@@ -72,8 +72,10 @@
 #include "sendprop_priorities.h"
 #include "videocfg/videocfg.h"
 
+#ifdef HL2WARS_DLL
 #include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
+#endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -4208,11 +4210,13 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	
 	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
 
-	// HL2Wars: Don't send when in the fow for the recv player.
+#ifdef HL2WARS_DLL
+	// Wars: Don't send when in the fow for the recv player.
 	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
 		return FL_EDICT_DONTSEND;
 	}
+#endif // HL2WARS_DLL
 
 	// FIXME: Refactor once notion of "team" is moved into HL2 code
 	// Team rules may tell us that we should
@@ -5012,6 +5016,23 @@ void CBaseEntity::PostClientMessagesSent( void )
 	{
 		RemoveEffects( EF_NOINTERP );
 	}
+
+#ifdef HL2WARS_DLL
+	for( int i = 0; i < gpGlobals->maxClients; i++ )
+	{
+		if( !FogOfWarMgr()->IsEntityKnownUpdatePending( i, entindex() ) )
+			continue;
+
+		// This is called after sending a new frame/snapshot
+		// Use GetEntityTransmitBitsForClient to determine if the entity was sent
+		const CBitVec<MAX_EDICTS>* pKnownEntities = engine->GetEntityTransmitBitsForClient( i );
+		if( pKnownEntities && pKnownEntities->Get( entindex() ) )
+		{
+			FogOfWarMgr()->MarkEntityKnown( i, entindex() );
+			FogOfWarMgr()->ClearEntityKnownUpdatePending( i, entindex() );
+		}
+	}
+#endif // HL2WARS_DLL
 }
 
 //================================================================================
@@ -8819,10 +8840,22 @@ bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 	// Entities that are not hidden should be transmitted at least once to the client
 	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 /*&& (GetFOWFlags() & FOWFLAG_INITTRANSMIT)*/ )
 	{
-		if( FogOfWarMgr()->IsEntityKnown( pPlayer->entindex() - 1, entindex() ) == false )
+		int iPlayerIndex = pPlayer->entindex() - 1;
+		if( FogOfWarMgr()->IsEntityKnownUpdatePending( iPlayerIndex, entindex() ) )
+		{
+			gEntList.AddPostClientMessageEntity( this ); // Still going
+			return true;
+		}
+
+		//const CBitVec<MAX_EDICTS>* pKnownEntities = engine->GetEntityTransmitBitsForClient( iPlayerIndex );
+
+		//if( pKnownEntities && !pKnownEntities->IsBitSet( entindex() ) )
+		if( !FogOfWarMgr()->IsEntityKnown( iPlayerIndex, entindex() ) )
 		{
 			// TODO: Shouldn't mark until I'm sure it pushes an update!
-			FogOfWarMgr()->MarkEntityKnown( pPlayer->entindex() - 1, entindex() );
+			//FogOfWarMgr()->MarkEntityKnown( iPlayerIndex, entindex() );
+			FogOfWarMgr()->SetEntityKnownUpdatePending( iPlayerIndex, entindex() );
+			gEntList.AddPostClientMessageEntity( this );
 			return true;
 		}
 	}

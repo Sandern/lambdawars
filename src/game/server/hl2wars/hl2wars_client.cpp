@@ -70,7 +70,6 @@ ClientPutInServer
 called each time a player is spawned into the game
 ============
 */
-//#include "inetchannel.h"
 void ClientPutInServer( edict_t *pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn

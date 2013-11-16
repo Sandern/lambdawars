@@ -176,6 +176,10 @@ public:
 	// 
 	virtual void			VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 
+	// AckTickCount
+	void					SetLastAckTickCount( int iAckTickCount ) { m_iLastAckTickCount = iAckTickCount; }
+	int						GetLastAckTickCount( void ) { return m_iLastAckTickCount; }
+
 private:
     void					OnLeftMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnLeftMouseButtonDoublePressedInternal( const MouseTraceData_t &data );
@@ -238,7 +242,10 @@ private:
 #ifdef ENABLE_PYTHON
 	CUtlVector<bp::object> m_vecActiveAbilities;
 #endif // ENABLE_PYTHON
-	CNetworkHandle( CBaseEntity, m_hControlledUnit );	
+	CNetworkHandle( CBaseEntity, m_hControlledUnit );
+
+	// Acknowledge tick
+	int m_iLastAckTickCount;
 };
 
 // Inlines

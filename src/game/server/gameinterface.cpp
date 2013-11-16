@@ -119,6 +119,9 @@
 #include "hl2wars/fowmgr.h"
 #include "hl2wars/wars_plat_misc.h"
 #include "hl2wars/wars_mount_system.h"
+
+#include "INetChannel.h"
+#include "IClient.h"
 #endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
@@ -231,6 +234,10 @@ ConVar *sv_maxreplay = NULL;
 
 static ConVar  *g_pcv_commentary = NULL;
 static ConVar *g_pcv_ThreadMode = NULL;
+
+#ifdef HL2WARS_DLL
+ConVar wars_reset_known_on_dropspackets( "wars_reset_known_on_dropspackets", "100", FCVAR_CHEAT, "Resets known entities for player after x drop packets" );
+#endif // HL2WARS_DLL
 
 #if !defined(NO_STEAM)
 //-----------------------------------------------------------------------------
@@ -2766,6 +2773,33 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		bool bUseMinimalSendTable = pUnit->GetCommander() != pRecipientPlayer && ( g_unit_force_minimal_sendtable.GetBool() || !netProp->IsInPVS( pInfo ) );
 		pUnit->SetUseMinimalSendTable( pRecipientPlayer->GetClientIndex(), bUseMinimalSendTable );
 	}
+
+	// FIXME: Ugly hack against losing "Known" info of entities
+	// After x packets are dropped, the engine will decide to do a full network update to the player
+	// A full network update will recreate all client entites
+	// Due this the "known" information of fog of war entities is lost
+	// Here we reset this info for certain units like control points (although regular player buildings will still be lost).
+	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( pRecipientPlayer );
+	if( pPlayer )
+	{
+		INetChannel *nc = (INetChannel *)engine->GetPlayerNetInfo( pRecipientPlayer->entindex() ); 
+		if ( nc )
+		{
+			IClient *pClient = (IClient *)nc->GetMsgHandler();
+			if( pClient )
+			{
+				int iCurAckTickCount = pClient->GetMaxAckTickCount();
+				if( iCurAckTickCount - pPlayer->GetLastAckTickCount() > wars_reset_known_on_dropspackets.GetInt() )
+				{
+					DevMsg( "Detected player %s not receiving new frames. Resetting known entities because player likely got a full update\n", pPlayer->GetPlayerName() );
+					// Seems this information gets lost upon receiving a full update
+					FogOfWarMgr()->ResetKnownEntitiesForPlayer( ENTINDEX(pPlayer) - 1 );
+				}
+
+				pPlayer->SetLastAckTickCount( iCurAckTickCount );
+			}
+		}
+	}
 #endif // HL2WARS_DLL
 }
 
@@ -2783,6 +2817,11 @@ void CServerGameEnts::PrepareForFullUpdate( edict_t *pEdict )
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( pEntity );
 	pPlayer->PrepareForFullUpdate();
+
+#ifdef HL2WARS_DLL
+	// Seems this information gets lost upon receiving a full update
+	FogOfWarMgr()->ResetKnownEntitiesForPlayer( ENTINDEX(pEdict) - 1 );
+#endif // HL2WARS_DLL
 }
 
 
@@ -2808,11 +2847,11 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 	// NOTE2: Dedicated servers send the message in the client active. They seem to check against CBaseEntity recv table.
 	if( (!engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1) )
 	{
-		//Msg("CServerGameClients::ClientConnect FullClientUpdatePyNetworkClsByEdict\n");
 		FullClientUpdatePyNetworkClsByEdict(pEdict);
 	}
 #endif // ENABLE_PYTHON
 
+#ifdef HL2WARS_DLL
 	// Reset known entities for the new player
 	FogOfWarMgr()->ResetToKnown( ENTINDEX(pEdict) - 1 );
 	CBaseEntity *pEnt = gEntList.FirstEnt();
@@ -2825,6 +2864,7 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 
 		pEnt = gEntList.NextEnt( pEnt );
 	}
+#endif // HL2WARS_DLL
 
 	return g_pGameRules->ClientConnected( pEdict, pszName, pszAddress, reject, maxrejectlen );
 }

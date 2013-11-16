@@ -176,10 +176,18 @@ public:
 	// For entities that are not hidden in the fog of war, but not updated (FOWFLAG_NOTRANSMIT, but not FOWFLAG_HIDDEN)
 	// These entities should be transmitted at least once.
 	bool				IsEntityKnown( int iPlayerIndex, int iEntIndex );
+	bool				IsEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex );
+	void				SetEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex );
+	void				ClearEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex );
 	void				MarkEntityKnown( int iPlayerIndex, int iEntIndex );
 	void				MarkEntityUnKnown( int iPlayerIndex, int iEntIndex );
 	void				ResetToUnknown( int iPlayerIndex );
 	void				ResetToKnown( int iPlayerIndex );
+
+	// Forces all "default" known entities to be sent again
+	// This is more of a hack around a problem with full network updates
+	void				ResetKnownEntitiesForPlayer( int iPlayerIndex );
+
 #endif // CLIENT_DLL
 
 	// Debug
@@ -202,7 +210,10 @@ private:
 	
 	// FOWFLAG_NOTRANSMIT related
 #ifndef CLIENT_DLL
-	CBitVec<MAX_EDICTS> m_KnownEntities[MAX_PLAYERS]; // Used for known functions
+	// Keeps track if the entity is known by the player
+	// Can also be used to force an update of the entity to a player despite being the fog of war
+	CBitVec<MAX_EDICTS> m_KnownEntities[MAX_PLAYERS];
+	CBitVec<MAX_EDICTS> m_KnownEntitiesUpdatePending[MAX_PLAYERS];
 #endif // CLIENT_DLL
 
 	// Visualization on the client
@@ -258,6 +269,21 @@ inline bool CFogOfWarMgr::PointInFOW( const Vector &vPoint, int iOwner )
 inline bool CFogOfWarMgr::IsEntityKnown( int iPlayerIndex, int iEntIndex )
 {
 	return m_KnownEntities[iPlayerIndex].IsBitSet( iEntIndex );
+}
+
+inline bool CFogOfWarMgr::IsEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex )
+{
+	return m_KnownEntitiesUpdatePending[iPlayerIndex].IsBitSet( iEntIndex );
+}
+
+inline void CFogOfWarMgr::SetEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex )
+{
+	m_KnownEntitiesUpdatePending[iPlayerIndex].Set( iEntIndex );
+}
+
+inline void CFogOfWarMgr::ClearEntityKnownUpdatePending( int iPlayerIndex, int iEntIndex )
+{
+	m_KnownEntitiesUpdatePending[iPlayerIndex].Clear( iEntIndex );
 }
 
 inline void CFogOfWarMgr::MarkEntityKnown( int iPlayerIndex, int iEntIndex )

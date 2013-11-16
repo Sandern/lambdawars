@@ -642,20 +642,6 @@ void CUnitBase::SetUseMinimalSendTable( int iClientIndex, bool bUseMinimalSendTa
 //-----------------------------------------------------------------------------
 int CUnitBase::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-#if 0 // Shouldn't be needed
-	int fFlags = DispatchUpdateTransmitState();
-
-	if ( fFlags & FL_EDICT_ALWAYS )
-	{
-		SetUseMinimalSendTable( iClientIndex, false ); // For determining low update rate
-		return FL_EDICT_ALWAYS;
-	}
-	else if ( fFlags & FL_EDICT_DONTSEND )
-	{
-		return FL_EDICT_DONTSEND;
-	}
-#endif // 0
-
 	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
 	Assert( pRecipientEntity->IsPlayer() );
 

@@ -2101,6 +2101,23 @@ bool CFogOfWarMgr::PointInFOWByPlayerIndex( const Vector &vPoint, int iEntIndex 
 		return false;
 	return PointInFOW( vPoint, pPlayer->GetOwnerNumber() );
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::ResetKnownEntitiesForPlayer( int iPlayerIndex )
+{
+	CBaseEntity *pEnt = gEntList.FirstEnt();
+	while( pEnt )
+	{
+		if( pEnt->GetFOWFlags() & FOWFLAG_INITTRANSMIT )
+		{
+			MarkEntityUnKnown( iPlayerIndex, pEnt->entindex() );
+		}
+
+		pEnt = gEntList.NextEnt( pEnt );
+	}
+}
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
