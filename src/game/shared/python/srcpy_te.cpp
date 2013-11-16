@@ -7,13 +7,8 @@
 #include "srcpy_te.h"
 #include "srcpy.h"
 
-#ifdef CLIENT_DLL
-	//#include "c_te_legacytempents.h"
-	//#include "tempent.h"
-#else
-
-#endif // CLIENT_DLL
-
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
 
