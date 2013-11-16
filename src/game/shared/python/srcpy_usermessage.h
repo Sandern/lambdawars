@@ -36,7 +36,7 @@
 
 	void PyFillWriteElement( pywrite &w, boost::python::object data );
 	void PyWriteElement( pywrite &w );
-	void PyPrintElement( pywrite &w );
+	void PyPrintElement( pywrite &w, int indent = 0 );
 	void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg );
 #else
 	boost::python::object PyReadElement( bf_read &msg );

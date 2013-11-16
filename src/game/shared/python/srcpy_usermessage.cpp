@@ -37,6 +37,12 @@ enum PyType{
 	PYTYPE_SET,
 };
 
+#if PY_VERSION_HEX >= 0x03000000
+#define PY_NEXT_METHODNAME "__next__"
+#else
+#define PY_NEXT_METHODNAME "next"
+#endif
+
 #ifndef CLIENT_DLL
 // TODO: Could use some optimization probably
 void PyFillWriteElement( pywrite &w, bp::object data )
@@ -66,14 +72,13 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	else if( data == boost::python::object() )
 	{
 		w.type = PYTYPE_NONE;
-
 	}
 	else if( datatype == builtins.attr("list") )
 	{
 		w.type = PYTYPE_LIST;
 
 		int length = boost::python::len(data);
-		for(int i=0; i<length; i++)
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
 			PyFillWriteElement( write, data[i] );
@@ -84,14 +89,14 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	{
 		w.type = PYTYPE_SET;
 
-		bp::list items( data );
+		boost::python::object iterator = data.attr("__iter__")();
 
-		int length = boost::python::len(data);
-		for(int i=0; i<length; i++)
+		int length = boost::python::len( data );
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
-			PyFillWriteElement( write, data[i] );
-			w.writelist.AddToTail(write);
+			PyFillWriteElement( write, iterator.attr( PY_NEXT_METHODNAME )() );
+			w.writelist.AddToTail( write );
 		}
 	}
 	else if( datatype == builtins.attr("tuple") )
@@ -99,7 +104,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 		w.type = PYTYPE_TUPLE;
 
 		int length = boost::python::len(data);
-		for(int i=0; i<length; i++)
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
 			PyFillWriteElement( write, data[i] );
@@ -110,21 +115,21 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	{
 		w.type = PYTYPE_DICT;
 
-		bp::object objectKey, objectValue;
-		const bp::object objectKeys = bp::dict(data).iterkeys();
-		const bp::object objectValues = bp::dict(data).itervalues();
-		unsigned long ulCount = bp::len(data); 
+		bp::dict dictdata( bp::detail::borrowed_reference(data.ptr()) );
+
+		bp::object items = dictdata.attr("items")();
+		bp::object iterator = items.attr("__iter__")();
+		unsigned long ulCount = bp::len(items); 
 		for( unsigned long u = 0; u < ulCount; u++ )
 		{
-			objectKey = objectKeys.attr( "next" )();
-			objectValue = objectValues.attr( "next" )();
+			bp::object item = iterator.attr( PY_NEXT_METHODNAME )();
 
 			pywrite write;
-			PyFillWriteElement( write, objectKey );
+			PyFillWriteElement( write, item[0] );
 			w.writelist.AddToTail(write);
 
 			pywrite write2;
-			PyFillWriteElement( write2, objectValue );
+			PyFillWriteElement( write2, item[1] );
 			w.writelist.AddToTail(write2);
 		}
 	}
@@ -141,20 +146,26 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	}
 	else
 	{
-		try {
+		try 
+		{
 			CBaseHandle handle = boost::python::extract<CBaseHandle>(data);
 			w.type = PYTYPE_HANDLE;
 			w.writehandle = handle;
 			return;
-		} catch( bp::error_already_set & ) {
+		} 
+		catch( bp::error_already_set & ) 
+		{
 			PyErr_Clear();
 		}
-		try {
+		try 
+		{
 			CBaseEntity *pEnt = boost::python::extract<CBaseEntity *>(data);
 			w.type = PYTYPE_HANDLE;
 			w.writehandle = pEnt;
 			return;
-		} catch( bp::error_already_set & ) {
+		} 
+		catch( bp::error_already_set & ) 
+		{
 			PyErr_Clear();
 		}
 		PyErr_SetString(PyExc_ValueError, "PyFillWriteElement: Unsupported type in message list" );
@@ -186,10 +197,14 @@ void PyWriteElement( pywrite &w )
 		WRITE_FLOAT(w.writevector[2]);
 		break;
 	case PYTYPE_LIST:
-	case PYTYPE_DICT:
 	case PYTYPE_TUPLE:
 	case PYTYPE_SET:
 		WRITE_SHORT(w.writelist.Count());
+		for( int i = 0; i < w.writelist.Count(); i++ )
+			PyWriteElement( w.writelist[i] );
+		break;
+	case PYTYPE_DICT:
+		WRITE_SHORT(w.writelist.Count()/2); // Dicts write in pairs of two (key/value)
 		for( int i = 0; i < w.writelist.Count(); i++ )
 			PyWriteElement( w.writelist[i] );
 		break;
@@ -201,8 +216,11 @@ void PyWriteElement( pywrite &w )
 	}
 }
 
-void PyPrintElement( pywrite &w )
+void PyPrintElement( pywrite &w, int indent )
 {
+	for( int i = 0; i < indent; i++ )
+		DevMsg(" ");
+
 	switch(w.type)
 	{
 	case PYTYPE_INT:
@@ -231,11 +249,24 @@ void PyPrintElement( pywrite &w )
 		DevMsg("None\n");
 		break;
 	case PYTYPE_LIST:
-	case PYTYPE_DICT:
-	case PYTYPE_TUPLE:
-	case PYTYPE_SET:
+		DevMsg("List:\n");
 		for( int i = 0; i < w.writelist.Count(); i++ )
-			PyPrintElement( w.writelist[i] );
+			PyPrintElement( w.writelist[i], indent + 4 );
+		break;
+	case PYTYPE_DICT:
+		DevMsg("Dict:\n");
+		for( int i = 0; i < w.writelist.Count(); i++ )
+			PyPrintElement( w.writelist[i], indent + 4 );
+		break;
+	case PYTYPE_TUPLE:
+		DevMsg("Tuple:\n");
+		for( int i = 0; i < w.writelist.Count(); i++ )
+			PyPrintElement( w.writelist[i], indent + 4 );
+		break;
+	case PYTYPE_SET:
+		DevMsg("Set:\n");
+		for( int i = 0; i < w.writelist.Count(); i++ )
+			PyPrintElement( w.writelist[i], indent + 4 );
 		break;
 	case PYTYPE_HANDLE:
 		DevMsg("Handle: %d\n", w.writehandle.Get());
@@ -264,15 +295,18 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
-	try {
+	try 
+	{
 		length = boost::python::len(msg);
-		for(int i=0; i<length; i++)
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
 			PyFillWriteElement( write, boost::python::object(msg[i]) );
 			writelist.AddToTail(write);
 		}
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -281,7 +315,7 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 	UserMessageBegin( filter, "PyMessage");
 	WRITE_STRING(messagename);
 	WRITE_BYTE(length);
-	for(int i=0; i<writelist.Count(); i++)
+	for( int i = 0; i < writelist.Count(); i++ )
 	{
 		PyWriteElement(writelist.Element(i));
 	}
@@ -311,73 +345,87 @@ boost::python::object PyReadElement( bf_read &msg )
 	boost::python::list embeddedlist;
 	boost::python::dict embeddeddict;
 
-	switch(type)
+	try
 	{
-	case PYTYPE_INT:
-		return boost::python::object( msg.ReadLong() );
-	case PYTYPE_FLOAT:
-		return boost::python::object( msg.ReadFloat() );
-	case PYTYPE_STRING:
-		msg.ReadString(buf, 255);
-		return boost::python::object( buf );
-	case PYTYPE_BOOL:
-		return boost::python::object( msg.ReadByte() );
-	case PYTYPE_NONE:
-		return boost::python::object();
-	case PYTYPE_VECTOR:
-		x = msg.ReadFloat();
-		y = msg.ReadFloat();
-		z = msg.ReadFloat();
-		return boost::python::object(Vector(x, y, z));
-	case PYTYPE_QANGLE:
-		x = msg.ReadFloat();
-		y = msg.ReadFloat();
-		z = msg.ReadFloat();
-		return boost::python::object(QAngle(x, y, z));
-	case PYTYPE_HANDLE:
-		// Decode handle
-		iEncodedEHandle = msg.ReadLong();
-		iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
-		iEntryIndex = iEncodedEHandle & ~(iSerialNum << MAX_EDICT_BITS);
+		switch(type)
+		{
+		case PYTYPE_INT:
+			return boost::python::object( msg.ReadLong() );
+		case PYTYPE_FLOAT:
+			return boost::python::object( msg.ReadFloat() );
+		case PYTYPE_STRING:
+			msg.ReadString(buf, 255);
+			return boost::python::object( buf );
+		case PYTYPE_BOOL:
+			return boost::python::object( msg.ReadByte() );
+		case PYTYPE_NONE:
+			return boost::python::object();
+		case PYTYPE_VECTOR:
+			x = msg.ReadFloat();
+			y = msg.ReadFloat();
+			z = msg.ReadFloat();
+			return boost::python::object(Vector(x, y, z));
+		case PYTYPE_QANGLE:
+			x = msg.ReadFloat();
+			y = msg.ReadFloat();
+			z = msg.ReadFloat();
+			return boost::python::object(QAngle(x, y, z));
+		case PYTYPE_HANDLE:
+			// Decode handle
+			iEncodedEHandle = msg.ReadLong();
+			iSerialNum = (iEncodedEHandle >> MAX_EDICT_BITS);
+			iEntryIndex = iEncodedEHandle & ~(iSerialNum << MAX_EDICT_BITS);
 
-		// If the entity already exists on te client, return the handle from the entity
-		handle = EHANDLE( iEntryIndex, iSerialNum );
-		if( handle )
-			return handle->GetPyHandle();
+			// If the entity already exists on te client, return the handle from the entity
+			handle = EHANDLE( iEntryIndex, iSerialNum );
+			if( handle )
+				return handle->GetPyHandle();
 
-		// If it does not exist, create a new handle
-		try {																
-			return _entities.attr("PyHandle")( iEntryIndex, iSerialNum );							
-		} catch(boost::python::error_already_set &) {					
-			Warning("Failed to create a PyHandle\n");				
-			PyErr_Print();																		
-			PyErr_Clear();												
-		}	
-		return bp::object();
-	case PYTYPE_LIST:
-		length = msg.ReadShort();
-		for( int i = 0; i < length; i++ )
-			embeddedlist.append( PyReadElement(msg) );
-		return embeddedlist;
-	case PYTYPE_TUPLE:
-		length = msg.ReadShort();
-		for( int i = 0; i < length; i++ )
-			embeddedlist.append( PyReadElement(msg) );
-		return bp::tuple(embeddedlist);
-	case PYTYPE_SET:
-		length = msg.ReadShort();
-		for( int i = 0; i < length; i++ )
-			embeddedlist.append( PyReadElement(msg) );
-		return builtins.attr("set")(embeddedlist);
-	case PYTYPE_DICT:
-		length = msg.ReadShort();
-		for( int i = 0; i < length; i++ )
-			embeddeddict[PyReadElement(msg)] = PyReadElement(msg);
-		return embeddeddict;
-	default:
-		Warning("PyReadElement: Unknown type %d\n", type);
-		break;
+			// If it does not exist, create a new handle
+			try 
+			{																
+				return _entities.attr("PyHandle")( iEntryIndex, iSerialNum );							
+			} 
+			catch(boost::python::error_already_set &) 
+			{					
+				Warning("PyReadElement: Failed to create a PyHandle\n");				
+				PyErr_Print();																		
+				PyErr_Clear();												
+			}	
+			return bp::object();
+		case PYTYPE_LIST:
+			length = msg.ReadShort();
+			for( int i = 0; i < length; i++ )
+				embeddedlist.append( PyReadElement(msg) );
+			return embeddedlist;
+		case PYTYPE_TUPLE:
+			length = msg.ReadShort();
+			for( int i = 0; i < length; i++ )
+				embeddedlist.append( PyReadElement(msg) );
+			return bp::tuple(embeddedlist);
+		case PYTYPE_SET:
+			length = msg.ReadShort();
+			for( int i = 0; i < length; i++ )
+				embeddedlist.append( PyReadElement(msg) );
+			return builtins.attr("set")(embeddedlist);
+		case PYTYPE_DICT:
+			length = msg.ReadShort();
+			for( int i = 0; i < length; i++ )
+				embeddeddict[PyReadElement(msg)] = PyReadElement(msg);
+			return embeddeddict;
+		default:
+			Warning("PyReadElement: Unknown type %d\n", type);
+			break;
+		}
 	}
+	catch(boost::python::error_already_set &) 
+	{
+		Warning( "PyReadElement: failed to parse element: \n" );
+		PyErr_Print();
+		PyErr_Clear();
+		return bp::object("<error>");
+	}
+
 	return bp::object();
 }
 
@@ -386,6 +434,8 @@ boost::python::object PyReadElement( bf_read &msg )
 //-----------------------------------------------------------------------------
 void __MsgFunc_PyMessage( bf_read &msg )
 {
+	// TODO: Would be nice to use a symbol/index instead of sending the full module name each time
+	// The main problem is adding the symbol to the client before sending the message
 	//short lookup = msg.ReadShort();
 	//const char *mod_name = SrcPySystem()->GetModuleNameFromIndex(lookup);
 	char messagename[128];
@@ -397,11 +447,15 @@ void __MsgFunc_PyMessage( bf_read &msg )
 	boost::python::list recvlist;
 	i = 0;
 	length = msg.ReadByte();
-	for( i=0; i<length; i++)
+	for( i = 0; i < length; i++)
 	{
-		try {
+		try 
+		{
 			recvlist.append( PyReadElement(msg) );
-		} catch(boost::python::error_already_set &) {
+		} 
+		catch(boost::python::error_already_set &) 
+		{
+			Warning( "__MsgFunc_PyMessage failed to parse message: \n" );
 			PyErr_Print();
 			PyErr_Clear();
 			return;
