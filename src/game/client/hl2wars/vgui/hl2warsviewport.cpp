@@ -326,9 +326,15 @@ void HL2WarsViewport::Paint()
 }
 
 #ifdef ENABLE_CEF
+extern ConVar g_cef_draw;
+extern ConVar cl_drawhud;
+
 void HL2WarsViewport::PostChildPaint()
 {
 	BaseClass::PostChildPaint();
+
+	if( !g_cef_draw.GetBool() || !cl_drawhud.GetBool() )
+		return;
 
 	SrcCefBrowser *pBrowser = CEFSystem().FindBrowserByName( "CefViewPort" );
 	if( pBrowser && pBrowser->GetPanel() )
