@@ -407,7 +407,7 @@ Vector2D CBaseMinimap::PanelToMap( const Vector2D &panelpos )
 	offset.y = ( panelpos.y - ( pheight * 0.5 ) ) / ( pheight );
 	offset.z = 0.0;
 
-	scale = zoom / OVERVIEW_MAP_SIZE;
+	scale = (zoom * fullzoom) / OVERVIEW_MAP_SIZE;
 	offset.x /= scale;
 	offset.y /= scale;
 
