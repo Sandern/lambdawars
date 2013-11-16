@@ -34,7 +34,7 @@ addpythonfiles = True
 modules = [
     # Base
     ('srcbuiltins', 'SrcBuiltins'),
-    ('srcbase', 'SrcBase'),
+    ('_srcbase', 'SrcBase'),
     ('_vmath', 'VMath'),
     
     # Game
@@ -47,8 +47,8 @@ modules = [
     ('_sound', 'Sound'),
     ('_particles', 'Particles'),
     ('materials', 'Materials'),
-	('_gamerules', 'GameRules'),
-	
+    ('_gamerules', 'GameRules'),
+    
     ('_te', 'TE'),
     ('_fow', 'FOW'),
     ('steam', 'Steam'),

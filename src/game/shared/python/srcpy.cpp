@@ -336,7 +336,7 @@ bool CSrcPython::InitInterpreter( void )
 	sys.attr("stderr") = srcbuiltins.attr("SrcPyStdErr")();
 
 	weakref = Import("weakref");
-	srcbase = Import("srcbase");
+	srcbase = Import("_srcbase");
 	
 #if PY_VERSION_HEX < 0x03000000
 	builtins = Import("__builtin__");

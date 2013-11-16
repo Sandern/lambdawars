@@ -14,10 +14,9 @@
 
 #include "srcpy_boostpython.h"
 
-#include "srcpy_base.h"
-
 namespace bp = boost::python;
 
+#if 0 // TODO
 // ---------------------------------------------------------------------------------------------------------
 // -- KeyValues converter
 struct ptr_keyvalues_to_py_keyvalues : boost::python::to_python_converter<KeyValues *, ptr_keyvalues_to_py_keyvalues>
@@ -77,7 +76,8 @@ struct py_keyvalues_to_keyvalues
 	}
 };
 
-#if 0
+#endif // 0
+
 // ---------------------------------------------------------------------------------------------------------
 // -- string_t converter
 struct string_t_to_python_str
@@ -104,7 +104,8 @@ struct python_str_to_string_t
 
 	static void* convertible(PyObject* obj_ptr)
 	{
-		if (!PyString_Check(obj_ptr)) return 0;
+		if( !PyUnicode_Check( obj_ptr ) )
+			return 0;
 		return obj_ptr;
 	}
 
@@ -112,8 +113,12 @@ struct python_str_to_string_t
 		PyObject* obj_ptr,
 		boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
-		char* value = PyString_AsString(obj_ptr);
-		if (value == 0) { 
+		PyObject *pDecoded = PyUnicode_AsUTF8String( obj_ptr );
+		char* value = PyBytes_AsString( pDecoded );
+		Py_DECREF( pDecoded );
+
+		if (value == 0) 
+		{ 
 			boost::python::throw_error_already_set();
 		}
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<string_t>*)data)->storage.bytes;
@@ -123,8 +128,6 @@ struct python_str_to_string_t
 		memcpy(storage, &s, sizeof(string_t));
 #else
 		boost::python::throw_error_already_set();
-		//new (storage) char[];
-		//memcpy(storage, value, )
 #endif // CLIENT_DLL
 		data->convertible = storage;
 	}
@@ -165,7 +168,8 @@ struct python_str_to_wchar_t
 
 	static void* convertible(PyObject* obj_ptr)
 	{
-		if (!PyString_Check(obj_ptr)) return 0;
+		if( !PyUnicode_Check( obj_ptr ) ) 
+			return 0;
 		return obj_ptr;
 	}
 
@@ -173,17 +177,19 @@ struct python_str_to_wchar_t
 		PyObject* obj_ptr,
 		boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
-		char* strvalue = PyString_AsString(obj_ptr);
-		if (strvalue == 0) { 
+		PyObject *pDecoded = PyUnicode_AsUTF8String( obj_ptr );
+		char* strvalue = PyBytes_AsString( pDecoded );
+		Py_DECREF( pDecoded );
+
+		if (strvalue == 0) 
+		{ 
 			boost::python::throw_error_already_set();
 			return;
 		}
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<wchar_t>*)data)->storage.bytes;
 		new (storage) wchar_t(strvalue[0]);
-		//*storage = 
 		data->convertible = storage;
 	}
 };
-#endif // 0
 
 #endif // SRCPYTHON_CONVERTERS_H

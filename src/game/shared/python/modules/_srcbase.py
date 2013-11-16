@@ -1,20 +1,18 @@
 from srcpy.module_generators import SharedModuleGenerator
 from pyplusplus import code_creators
 from pyplusplus import function_transformers as FT
-from src_helper import *
 from pyplusplus.module_builder import call_policies
 
+from src_helper import HasArgType
+
 class SrcBase(SharedModuleGenerator):
-    module_name = 'srcbase'
+    module_name = '_srcbase'
     
     files = [
         'cbase.h',
         'tier0\dbg.h',
         
-        'Color.h',
         'srcpy_base.h',
-        'globalvars_base.h',
-        'edict.h',
         'igamemovement.h',
         'in_buttons.h',
     ]
@@ -49,11 +47,6 @@ class SrcBase(SharedModuleGenerator):
                            )
         
         # Color
-        cls = mb.class_('Color')
-        cls.include()
-        cls.mem_funs('GetColor').add_transformation( FT.output('_r'), FT.output('_g'), FT.output('_b'), FT.output('_a') )
-        cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
-        
         cls = mb.class_('color32_s')
         cls.include()
         cls.mem_funs().exclude()
@@ -77,7 +70,7 @@ class SrcBase(SharedModuleGenerator):
         mb.add_declaration_code( 'PyTypeObject *g_PyKeyValuesType = NULL;' )
         cls = mb.class_('KeyValues')
         #mb.class_('KeyValues').include()
-        IncludeEmptyClass(mb, 'KeyValues')
+        self.IncludeEmptyClass(mb, 'KeyValues')
         cls.no_init = True # Destructor is private + new operator is overloaded = problems. Write a wrapper class
         cls.rename('RealKeyValues')
         cls.calldefs('KeyValues').exclude() # No constructors   
@@ -128,22 +121,9 @@ class SrcBase(SharedModuleGenerator):
         mb.add_registration_code( "keyvalues_to_py_keyvalues();" )
         mb.add_registration_code( "py_keyvalues_to_keyvalues();" )
         
-        mb.add_registration_code( "bp::to_python_converter<\r\n\tstring_t,\r\n\tstring_t_to_python_str>();")
-        mb.add_registration_code( "python_str_to_string_t();" )
-        
-        mb.add_registration_code( "wchar_t_to_python_str();" )
-        mb.add_registration_code( "ptr_wchar_t_to_python_str();" )
-        mb.add_registration_code( "python_str_to_wchar_t();" )
-        
         #mb.add_registration_code( "bp::to_python_converter<\r\n\tRay_t,\r\n\tray_t_to_python_ray>();")
         
         # //--------------------------------------------------------------------------------------------------------------------------------
-        # Global vars
-        mb.class_('CGlobalVarsBase').include()
-        mb.class_('CGlobalVars').include()
-        mb.vars('pSaveData').exclude()
-        mb.add_registration_code( "bp::scope().attr( \"gpGlobals\" ) = boost::ref(gpGlobals);" )
-
         mb.add_registration_code( "bp::scope().attr( \"MAX_PLAYERS\" ) = MAX_PLAYERS;" )
         mb.add_registration_code( "bp::scope().attr( \"TEAM_INVALID\" ) = TEAM_INVALID;" )
         mb.add_registration_code( "bp::scope().attr( \"TEAM_UNASSIGNED\" ) = TEAM_UNASSIGNED;" )
@@ -438,9 +418,6 @@ class SrcBase(SharedModuleGenerator):
         mb.enums('RenderFx_t').include()
         mb.enums('MoveType_t').include()
         mb.enums('MoveCollide_t').include()
-        
-        # Disable known warnings, but exposed in other modules
-        DisableKnownWarnings(mb)
         
     # Adds precompiled header + other default includes
     def AddAdditionalCode(self, mb):

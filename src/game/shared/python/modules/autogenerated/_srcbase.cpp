@@ -4,21 +4,11 @@
 
 
 
-#include "__convenience.pypp.hpp"
-
-#include "__call_policies.pypp.hpp"
-
 #include "cbase.h"
 
 #include "tier0/dbg.h"
 
-#include "Color.h"
-
 #include "srcpy_base.h"
-
-#include "globalvars_base.h"
-
-#include "edict.h"
 
 #include "igamemovement.h"
 
@@ -34,48 +24,13 @@
 
 namespace bp = boost::python;
 
-struct CGlobalVars_wrapper : CGlobalVars, bp::wrapper< CGlobalVars > {
-
-    CGlobalVars_wrapper(CGlobalVars const & arg )
-    : CGlobalVars( arg )
-      , bp::wrapper< CGlobalVars >(){
-        // copy constructor
-        
-    }
-
-    CGlobalVars_wrapper(bool bIsClient )
-    : CGlobalVars( bIsClient )
-      , bp::wrapper< CGlobalVars >(){
-        // constructor
-    
-    }
-
-    static ::edict_t * get_pEdicts(CGlobalVars const & inst ){
-        return inst.pEdicts;
-    }
-    
-    static void set_pEdicts( CGlobalVars & inst, ::edict_t * new_value ){ 
-        inst.pEdicts = new_value;
-    }
-
-};
-
-static boost::python::tuple GetColor_5697770b5e791413a33cc9b5367a16b8( ::Color const & inst ){
-    int _r2;
-    int _g2;
-    int _b2;
-    int _a2;
-    inst.GetColor(_r2, _g2, _b2, _a2);
-    return bp::make_tuple( _r2, _g2, _b2, _a2 );
-}
-
 #ifdef _LINUX
 typedef struct model_t {};
 #endif // _LINUX
 
 PyTypeObject *g_PyKeyValuesType = NULL;
 
-BOOST_PYTHON_MODULE(srcbase){
+BOOST_PYTHON_MODULE(_srcbase){
     bp::docstring_options doc_options( true, true, false );
 
     bp::enum_< Collision_Group_t>("Collision_Group_t")
@@ -214,63 +169,6 @@ BOOST_PYTHON_MODULE(srcbase){
         .export_values()
         ;
 
-    { //::CGlobalVarsBase
-        typedef bp::class_< CGlobalVarsBase > CGlobalVarsBase_exposer_t;
-        CGlobalVarsBase_exposer_t CGlobalVarsBase_exposer = CGlobalVarsBase_exposer_t( "CGlobalVarsBase", bp::init< bool >(( bp::arg("bIsClient") )) );
-        bp::scope CGlobalVarsBase_scope( CGlobalVarsBase_exposer );
-        bp::implicitly_convertible< bool, CGlobalVarsBase >();
-        { //::CGlobalVarsBase::GetNetworkBase
-        
-            typedef int ( ::CGlobalVarsBase::*GetNetworkBase_function_type )( int,int ) ;
-            
-            CGlobalVarsBase_exposer.def( 
-                "GetNetworkBase"
-                , GetNetworkBase_function_type( &::CGlobalVarsBase::GetNetworkBase )
-                , ( bp::arg("nTick"), bp::arg("nEntity") ) );
-        
-        }
-        { //::CGlobalVarsBase::IsClient
-        
-            typedef bool ( ::CGlobalVarsBase::*IsClient_function_type )(  ) const;
-            
-            CGlobalVarsBase_exposer.def( 
-                "IsClient"
-                , IsClient_function_type( &::CGlobalVarsBase::IsClient ) );
-        
-        }
-        CGlobalVarsBase_exposer.def_readwrite( "absoluteframetime", &CGlobalVarsBase::absoluteframetime );
-        CGlobalVarsBase_exposer.def_readwrite( "curtime", &CGlobalVarsBase::curtime );
-        CGlobalVarsBase_exposer.def_readwrite( "framecount", &CGlobalVarsBase::framecount );
-        CGlobalVarsBase_exposer.def_readwrite( "frametime", &CGlobalVarsBase::frametime );
-        CGlobalVarsBase_exposer.def_readwrite( "interpolation_amount", &CGlobalVarsBase::interpolation_amount );
-        CGlobalVarsBase_exposer.def_readwrite( "interval_per_tick", &CGlobalVarsBase::interval_per_tick );
-        CGlobalVarsBase_exposer.def_readwrite( "maxClients", &CGlobalVarsBase::maxClients );
-        CGlobalVarsBase_exposer.def_readwrite( "network_protocol", &CGlobalVarsBase::network_protocol );
-        CGlobalVarsBase_exposer.def_readwrite( "realtime", &CGlobalVarsBase::realtime );
-        CGlobalVarsBase_exposer.def_readwrite( "simTicksThisFrame", &CGlobalVarsBase::simTicksThisFrame );
-        CGlobalVarsBase_exposer.def_readwrite( "tickcount", &CGlobalVarsBase::tickcount );
-    }
-
-    { //::CGlobalVars
-        typedef bp::class_< CGlobalVars_wrapper, bp::bases< CGlobalVarsBase > > CGlobalVars_exposer_t;
-        CGlobalVars_exposer_t CGlobalVars_exposer = CGlobalVars_exposer_t( "CGlobalVars", bp::init< bool >(( bp::arg("bIsClient") )) );
-        bp::scope CGlobalVars_scope( CGlobalVars_exposer );
-        bp::implicitly_convertible< bool, CGlobalVars >();
-        CGlobalVars_exposer.def_readwrite( "bMapLoadFailed", &CGlobalVars::bMapLoadFailed );
-        CGlobalVars_exposer.def_readwrite( "coop", &CGlobalVars::coop );
-        CGlobalVars_exposer.def_readwrite( "deathmatch", &CGlobalVars::deathmatch );
-        CGlobalVars_exposer.def_readwrite( "eLoadType", &CGlobalVars::eLoadType );
-        CGlobalVars_exposer.def_readwrite( "mapname", &CGlobalVars::mapname );
-        CGlobalVars_exposer.def_readwrite( "mapversion", &CGlobalVars::mapversion );
-        CGlobalVars_exposer.def_readwrite( "maxEntities", &CGlobalVars::maxEntities );
-        CGlobalVars_exposer.add_property( "pEdicts"
-                    , bp::make_function( (::edict_t * (*)( ::CGlobalVars const & ))(&CGlobalVars_wrapper::get_pEdicts), bp::return_internal_reference< >() )
-                    , bp::make_function( (void (*)( ::CGlobalVars &,::edict_t * ))(&CGlobalVars_wrapper::set_pEdicts), bp::with_custodian_and_ward_postcall< 1, 2 >() ) );
-        CGlobalVars_exposer.def_readwrite( "serverCount", &CGlobalVars::serverCount );
-        CGlobalVars_exposer.def_readwrite( "startspot", &CGlobalVars::startspot );
-        CGlobalVars_exposer.def_readwrite( "teamplay", &CGlobalVars::teamplay );
-    }
-
     { //::CUserCmd
         typedef bp::class_< CUserCmd > CUserCmd_exposer_t;
         CUserCmd_exposer_t CUserCmd_exposer = CUserCmd_exposer_t( "CUserCmd" );
@@ -295,122 +193,6 @@ BOOST_PYTHON_MODULE(srcbase){
         CUserCmd_exposer.def_readwrite( "viewangles", &CUserCmd::viewangles );
         CUserCmd_exposer.def_readwrite( "weaponselect", &CUserCmd::weaponselect );
         CUserCmd_exposer.def_readwrite( "weaponsubtype", &CUserCmd::weaponsubtype );
-    }
-
-    { //::Color
-        typedef bp::class_< Color > Color_exposer_t;
-        Color_exposer_t Color_exposer = Color_exposer_t( "Color", bp::init< >() );
-        bp::scope Color_scope( Color_exposer );
-        Color_exposer.def( bp::init< int, int, int >(( bp::arg("_r"), bp::arg("_g"), bp::arg("_b") )) );
-        Color_exposer.def( bp::init< int, int, int, int >(( bp::arg("_r"), bp::arg("_g"), bp::arg("_b"), bp::arg("_a") )) );
-        { //::Color::GetColor
-        
-            typedef boost::python::tuple ( *GetColor_function_type )( ::Color const & );
-            
-            Color_exposer.def( 
-                "GetColor"
-                , GetColor_function_type( &GetColor_5697770b5e791413a33cc9b5367a16b8 )
-                , ( bp::arg("inst") ) );
-        
-        }
-        { //::Color::GetRawColor
-        
-            typedef int ( ::Color::*GetRawColor_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "GetRawColor"
-                , GetRawColor_function_type( &::Color::GetRawColor ) );
-        
-        }
-        { //::Color::SetColor
-        
-            typedef void ( ::Color::*SetColor_function_type )( int,int,int,int ) ;
-            
-            Color_exposer.def( 
-                "SetColor"
-                , SetColor_function_type( &::Color::SetColor )
-                , ( bp::arg("_r"), bp::arg("_g"), bp::arg("_b"), bp::arg("_a")=(int)(0) ) );
-        
-        }
-        { //::Color::SetRawColor
-        
-            typedef void ( ::Color::*SetRawColor_function_type )( int ) ;
-            
-            Color_exposer.def( 
-                "SetRawColor"
-                , SetRawColor_function_type( &::Color::SetRawColor )
-                , ( bp::arg("color32") ) );
-        
-        }
-        { //::Color::ToColor32
-        
-            typedef ::color32 ( ::Color::*ToColor32_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "ToColor32"
-                , ToColor32_function_type( &::Color::ToColor32 ) );
-        
-        }
-        { //::Color::a
-        
-            typedef int ( ::Color::*a_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "a"
-                , a_function_type( &::Color::a ) );
-        
-        }
-        { //::Color::b
-        
-            typedef int ( ::Color::*b_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "b"
-                , b_function_type( &::Color::b ) );
-        
-        }
-        { //::Color::g
-        
-            typedef int ( ::Color::*g_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "g"
-                , g_function_type( &::Color::g ) );
-        
-        }
-        Color_exposer.def( bp::self != bp::self );
-        Color_exposer.def( bp::self == bp::self );
-        { //::Color::operator[]
-        
-            typedef unsigned char & ( ::Color::*__getitem___function_type )( int ) ;
-            
-            Color_exposer.def( 
-                "__getitem__"
-                , __getitem___function_type( &::Color::operator[] )
-                , ( bp::arg("index") )
-                , bp::return_value_policy< bp::copy_non_const_reference >() );
-        
-        }
-        { //::Color::operator[]
-        
-            typedef unsigned char const & ( ::Color::*__getitem___function_type )( int ) const;
-            
-            Color_exposer.def( 
-                "__getitem__"
-                , __getitem___function_type( &::Color::operator[] )
-                , ( bp::arg("index") )
-                , bp::return_value_policy< bp::copy_const_reference >() );
-        
-        }
-        { //::Color::r
-        
-            typedef int ( ::Color::*r_function_type )(  ) const;
-            
-            Color_exposer.def( 
-                "r"
-                , r_function_type( &::Color::r ) );
-        
-        }
     }
 
     { //::KeyValues
@@ -1289,20 +1071,6 @@ BOOST_PYTHON_MODULE(srcbase){
     keyvalues_to_py_keyvalues();
 
     py_keyvalues_to_keyvalues();
-
-    bp::to_python_converter<
-    	string_t,
-    	string_t_to_python_str>();
-
-    python_str_to_string_t();
-
-    wchar_t_to_python_str();
-
-    ptr_wchar_t_to_python_str();
-
-    python_str_to_wchar_t();
-
-    bp::scope().attr( "gpGlobals" ) = boost::ref(gpGlobals);
 
     bp::scope().attr( "MAX_PLAYERS" ) = MAX_PLAYERS;
 
