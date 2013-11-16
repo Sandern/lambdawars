@@ -29,6 +29,8 @@ public:
 #endif // CLIENT_DLL
 	virtual void Spawn();
 
+	virtual void FloraTouch( CBaseEntity *pOther );
+
 #ifdef CLIENT_DLL
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	bool Initialize();
@@ -43,6 +45,11 @@ private:
 	string_t		m_iszSqueezeDownAnimationName;
 	string_t		m_iszSqueezeUpAnimationName;
 	string_t		m_iszDestructionAnimationName;
+
+	int				m_iIdleSequence;
+	int				m_iSqueezeDownSequence;
+	int				m_iSqueezeUpSequence;
+	int				m_iDestructSequence;
 };
 
 #endif // WARS_FLORA_H

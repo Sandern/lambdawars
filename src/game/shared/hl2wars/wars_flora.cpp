@@ -26,6 +26,8 @@ LINK_ENTITY_TO_CLASS( wars_flora, CWarsFlora );
 CWarsFlora::CWarsFlora()
 {
 #ifndef CLIENT_DLL
+	//UseClientSideAnimation();
+
 	AddEFlags( EFL_SERVER_ONLY );
 #endif // CLIENT_DLL
 }
@@ -48,6 +50,9 @@ void CWarsFlora::Precache( void )
 }
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::Spawn()
 {
 #ifndef CLIENT_DLL
@@ -56,7 +61,32 @@ void CWarsFlora::Spawn()
 
 	BaseClass::Spawn();
 
+#ifndef CLIENT_DLL
+	SetModel( STRING( GetModelName() ) );
+#endif // CLIENT_DLL
+
 	SetSolid( SOLID_NONE );
+	//SetSolid( SOLID_BBOX );
+	//AddSolidFlags( FSOLID_TRIGGER );
+
+	Vector vecMins = CollisionProp()->OBBMins();
+	Vector vecMaxs = CollisionProp()->OBBMaxs();
+	SetSize( vecMins, vecMaxs );
+
+	//SetTouch( &CWarsFlora::FloraTouch );
+
+	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
+	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
+	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
+	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::FloraTouch( CBaseEntity *pOther )
+{
+
 }
 
 // Client Spawning Code
@@ -131,7 +161,7 @@ bool CWarsFlora::Initialize()
 
 	Spawn();
 
-	SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
+	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	UpdatePartitionListEntry();
 
