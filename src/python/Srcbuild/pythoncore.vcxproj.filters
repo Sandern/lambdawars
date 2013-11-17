@@ -926,9 +926,6 @@
     <ClCompile Include="..\Python\traceback.c">
       <Filter>Python</Filter>
     </ClCompile>
-    <ClCompile Include="src\bltinmodule.c">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="src\getpathp.c">
       <Filter>Src</Filter>
     </ClCompile>
@@ -942,6 +939,9 @@
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="..\Python\random.c">
+      <Filter>Python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Python\bltinmodule.c">
       <Filter>Python</Filter>
     </ClCompile>
   </ItemGroup>

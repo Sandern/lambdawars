@@ -344,9 +344,11 @@ bool CSrcPython::InitInterpreter( void )
 	builtins = Import("builtins");
 #endif 
 
-	// Set isclient and isserver globals to the right values
+	// Bind common things to the builtins module, so they are available everywhere
 	try 
 	{
+		// isclient and isserver can be used to execute specific code on client or server
+		// Kind of the equivalent of CLIENT_DLL and GAME_DLL
 #ifdef CLIENT_DLL
 		builtins.attr("isclient") = true;
 		builtins.attr("isserver") = false;
@@ -354,7 +356,12 @@ bool CSrcPython::InitInterpreter( void )
 		builtins.attr("isclient") = false;
 		builtins.attr("isserver") = true;
 #endif // CLIENT_DLL
+
 		builtins.attr("gpGlobals") = boost::ref( gpGlobals );
+		
+		builtins.attr("Msg") = srcbuiltins.attr("Msg");
+		builtins.attr("DevMsg") = srcbuiltins.attr("DevMsg");
+		builtins.attr("PrintWarning") = srcbuiltins.attr("PrintWarning"); // Not "Warning" because Warning is already a builtin
 	} 
 	catch( bp::error_already_set & ) 
 	{

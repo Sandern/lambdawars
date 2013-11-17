@@ -734,6 +734,7 @@
     <ClCompile Include="..\PC\dl_nt.c" />
     <ClCompile Include="..\PC\import_nt.c" />
     <ClCompile Include="..\PC\msvcrtmodule.c" />
+    <ClCompile Include="..\Python\bltinmodule.c" />
     <ClCompile Include="..\Python\random.c" />
     <ClCompile Include="..\Python\_warnings.c" />
     <ClCompile Include="..\Python\asdl.c" />
@@ -776,7 +777,6 @@
     <ClCompile Include="src\sysmodule.c" />
     <ClCompile Include="..\Python\thread.c" />
     <ClCompile Include="..\Python\traceback.c" />
-    <ClCompile Include="src\bltinmodule.c" />
     <ClCompile Include="src\getpathp.c" />
     <ClCompile Include="src\srcfileobject.c" />
     <ClCompile Include="src\srcosmodule.c" />
