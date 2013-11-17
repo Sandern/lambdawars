@@ -104,8 +104,13 @@ struct python_str_to_string_t
 
 	static void* convertible(PyObject* obj_ptr)
 	{
+#if PY_VERSION_HEX < 0x03000000
+		if( !PyString_Check( obj_ptr ) )
+			return 0;
+#else
 		if( !PyUnicode_Check( obj_ptr ) )
 			return 0;
+#endif
 		return obj_ptr;
 	}
 
@@ -113,9 +118,13 @@ struct python_str_to_string_t
 		PyObject* obj_ptr,
 		boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
+#if PY_VERSION_HEX < 0x03000000
+		char* value = PyString_AsString( obj_ptr );
+#else
 		PyObject *pDecoded = PyUnicode_AsUTF8String( obj_ptr );
 		char* value = PyBytes_AsString( pDecoded );
 		Py_DECREF( pDecoded );
+#endif
 
 		if (value == 0) 
 		{ 
@@ -123,7 +132,6 @@ struct python_str_to_string_t
 		}
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<string_t>*)data)->storage.bytes;
 #ifndef CLIENT_DLL
-		//new (storage) castable_string_t(value);
 		string_t s = AllocPooledString(value);
 		memcpy(storage, &s, sizeof(string_t));
 #else
@@ -168,8 +176,13 @@ struct python_str_to_wchar_t
 
 	static void* convertible(PyObject* obj_ptr)
 	{
+#if PY_VERSION_HEX < 0x03000000
+		if( !PyString_Check( obj_ptr ) )
+			return 0;
+#else
 		if( !PyUnicode_Check( obj_ptr ) ) 
 			return 0;
+#endif
 		return obj_ptr;
 	}
 
@@ -177,9 +190,13 @@ struct python_str_to_wchar_t
 		PyObject* obj_ptr,
 		boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
+#if PY_VERSION_HEX < 0x03000000
+		char* strvalue = PyString_AsString( obj_ptr );
+#else
 		PyObject *pDecoded = PyUnicode_AsUTF8String( obj_ptr );
 		char* strvalue = PyBytes_AsString( pDecoded );
 		Py_DECREF( pDecoded );
+#endif
 
 		if (strvalue == 0) 
 		{ 
