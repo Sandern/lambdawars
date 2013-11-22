@@ -333,6 +333,10 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 {
 	if( !m_pSrcBrowser )
 		return;
+
+	if( g_debug_cef.GetBool() )
+		DevMsg( "#%d %s: SrcCefBrowser::OnLoadStart\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+
 	m_pSrcBrowser->OnLoadStart( frame );
 }
 
@@ -343,6 +347,10 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 {
 	if( !m_pSrcBrowser )
 		return;
+
+	if( g_debug_cef.GetBool() )
+		DevMsg( "#%d %s: SrcCefBrowser::OnLoadEnd\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+
 	m_pSrcBrowser->OnLoadEnd( frame, httpStatusCode );
 }
 
@@ -699,7 +707,10 @@ bool SrcCefBrowser::IsVisible()
 void SrcCefBrowser::SetMouseInputEnabled( bool state )
 {
 	if( !IsValid() )
+	{
+		Warning( "#%d %s: SrcCefBrowser::SetMouseInputEnabled: browser not valid yet!\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
 		return;
+	}
 
 	m_pPanel->SetMouseInputEnabled( state );
 }
@@ -710,7 +721,10 @@ void SrcCefBrowser::SetMouseInputEnabled( bool state )
 void SrcCefBrowser::SetKeyBoardInputEnabled( bool state )
 {
 	if( !IsValid() )
+	{
+		Warning( "#%d %s: SrcCefBrowser::SetKeyBoardInputEnabled: browser not valid yet!\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
 		return;
+	}
 
 	m_pPanel->SetKeyBoardInputEnabled( state );
 }

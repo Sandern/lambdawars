@@ -64,7 +64,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 	{
 		bp::object value = l[i];
 
-		if( type(value) == boost::python::object() )
+		if( value == boost::python::object() )
 		{
 			result->SetNull( i );
 		}
@@ -177,7 +177,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 
 		CefString cefkey = bp::extract< const char * >( key );
 
-		if( type(value) == boost::python::object() )
+		if( value == boost::python::object() )
 		{
 			result->SetNull( cefkey );
 		}
