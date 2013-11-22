@@ -518,6 +518,7 @@ void CSrcPython::PostInit()
 	ExecuteAllScriptsInPath("python/autorun_once/");
 }
 
+#ifdef WIN32
 //-----------------------------------------------------------------------------
 // Purpose: Support for Visual Studio Python Tools Interpreter
 //-----------------------------------------------------------------------------
@@ -698,6 +699,7 @@ bool CSrcPython::CheckVSPTDebugger()
 
 	return true;
 }
+#endif // WIN32
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1328,7 +1330,7 @@ bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
 	// of bp::object. Disabled for now...
 	return false;
-#endif // 0 
+#endif // _DEBUG
 
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
@@ -1394,7 +1396,7 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
 	// of bp::object. Disabled for now...
 	return false;
-#endif // 0 
+#endif // _DEBUG
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )

@@ -209,9 +209,11 @@ public:
 	bool					IsPythonFinalizing(); // Special case
 	bool					IsPathProtected(); // For file writing
 
+#ifdef WIN32
 	// Visual Studio Python Tools support
 	bool					CheckVSPTInterpreter();
 	bool					CheckVSPTDebugger();
+#endif // WIN32
 
 #ifdef CLIENT_DLL
 	// Gets called each frame

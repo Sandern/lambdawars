@@ -12,8 +12,6 @@
 
 #include "teamplay_gamerules.h"
 
-#include "srcpy_gamerules.h"
-
 #include "c_recipientfilter.h"
 
 #include "tier0/icommandline.h"

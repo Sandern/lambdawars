@@ -9,7 +9,6 @@
 #include "srcpy_gamerules.h"
 #include "srcpy.h"
 #include "hl2wars_gamerules.h"
-#include "gamerules_register.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

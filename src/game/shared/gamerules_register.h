@@ -13,9 +13,21 @@
 
 // Each game rules class must register using this in it's .cpp file.
 #if !defined(_STATIC_LINKED)
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
 #define REGISTER_GAMERULES_CLASS( className ) \
 	void __CreateGameRules_##className() { g_pGameRules = new className; } \
 	static CGameRulesRegister __g_GameRulesRegister_##className( #className, __CreateGameRules_##className );
+#else
+#define REGISTER_GAMERULES_CLASS( className ) \
+	void __CreateGameRules_##className() { new className; } \
+	static CGameRulesRegister __g_GameRulesRegister_##className( #className, __CreateGameRules_##className );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 #else
 #define REGISTER_GAMERULES_CLASS( className ) \
 	void MAKE_NAME_UNIQUE(__CreateGameRules_)##className() { new className; } \

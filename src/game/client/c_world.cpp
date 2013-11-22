@@ -13,10 +13,16 @@
 #include "shake.h"
 #include "precache_register.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
 	#include "srcpy_gamerules.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -83,9 +89,16 @@ bool C_World::Init( int entnum, int iSerialNum )
 
 void C_World::Release()
 {
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	g_bDoNotInitPythonClasses = true;
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 	Term();
 }
 
@@ -165,11 +178,18 @@ void C_World::Precache( void )
 {
 	// Get weapon precaches
 	W_Precache();	
+		
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// Python classes init
 	g_bDoNotInitPythonClasses = false;
 	InitAllPythonEntities();
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 void C_World::Spawn( void )

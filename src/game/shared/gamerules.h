@@ -109,12 +109,24 @@ private:
 	static CGameRulesProxy *s_pGameRulesProxy;
 };
 
-
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
 abstract_class CGameRules : public CBaseGameSystemPerFrame
 {
 public:
 	DECLARE_CLASS_GAMEROOT( CGameRules, CBaseGameSystemPerFrame );
+#else
+abstract_class CGameRules : public CAutoGameSystemPerFrame
+{
+public:
+	DECLARE_CLASS_GAMEROOT( CGameRules, CAutoGameSystemPerFrame );
+#endif // ENABLE_PYTHON
 
+// =======================================
+// END PySource Additions
+// =======================================
 	virtual char const *Name() { return "CGameRules"; }
 
 	// Stuff shared between client and server.

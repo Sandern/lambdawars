@@ -36,11 +36,17 @@
 #include "vscript/ivscript.h"
 #include "vscript_server.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
 	#include "srcpy_gamerules.h"
 	#include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -632,18 +638,31 @@ CWorld::~CWorld()
 	if ( g_pGameRules )
 	{
 		g_pGameRules->LevelShutdown();
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();	
 		else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 			delete g_pGameRules;
 		g_pGameRules = NULL;
 	}
 	g_WorldEntity = NULL;
+	
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	g_bDoNotInitPythonClasses = true;
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 
@@ -762,13 +781,28 @@ void CWorld::Precache( void )
 	Assert( !g_pGameRules );
 	if (g_pGameRules)
 	{
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 		if( PyGameRules().ptr() != Py_None )
 			ClearPyGameRules();	
 		else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 			delete g_pGameRules;
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+		// Set to NULL to avoid "accidents"
 		g_pGameRules = NULL;
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	}
 
 	InstallGameRules();
@@ -859,12 +893,18 @@ void CWorld::Precache( void )
 	COM_TimestampedLog( "g_pGameRules->Precache" );
 	// Call the gamerules precache after the AI precache so that games can precache NPCs that are always loaded
 	g_pGameRules->Precache();
-	
+
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// Python classes init
 	g_bDoNotInitPythonClasses = false;
 	InitAllPythonEntities();
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	if ( m_iszChapterTitle != NULL_STRING )
 	{
