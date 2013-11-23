@@ -46,7 +46,7 @@ bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
 bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolerance = 0.1f, bool requireisflat = true, float flattol = 0.7f );
 
 // Hiding/cover spot functions
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *unit = NULL, bool sort = true );
+bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *unit = NULL, bool sort = true, const Vector *sortpos = NULL );
 
 int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved = false, bool checkground = true );
 bool DestroyHidingSpot( const Vector &pos, float tolerance );

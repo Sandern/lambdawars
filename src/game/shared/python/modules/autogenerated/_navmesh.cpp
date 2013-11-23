@@ -123,12 +123,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase *,bool );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase *,bool,::Vector const * );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true) ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true), bp::arg("sortpos")=bp::object() ) );
     
     }
 
@@ -385,12 +385,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::GetHidingSpotsInRadius
     
-        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase *,bool );
+        typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase *,bool,::Vector const * );
         
         bp::def( 
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
-            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true) ) );
+            , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true), bp::arg("sortpos")=bp::object() ) );
     
     }
 

@@ -537,8 +537,8 @@ typedef struct HidingSpotResult_t
 class HidingSpotCollector
 {
 public:
-	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit ) : 
-			m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL)
+	HidingSpotCollector( CUtlVector< HidingSpotResult_t > &HidingSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit, const Vector *pSortPos ) : 
+			m_HidingSpots( HidingSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL), m_pSortPos( pSortPos )
 	{
 		m_fRadius = fRadius;
 
@@ -618,14 +618,19 @@ public:
 		{
 			HidingSpot *pSpot = spots->Element( i );
 			const Vector &vPos = pSpot->GetPosition();
-			float fDist = (vPos - m_vPos).Length2D();
+			float fDist = ( vPos - m_vPos ).Length2D();
 
 			//if( !pSpot->HasGoodCover() )
 			//	continue;
 
 			if( fDist < m_fRadius )
 			{
-				m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, /*m_pUnit ? (vPos - m_pUnit->GetAbsOrigin()).LengthSqr() :*/ fDist ) );
+				// When m_pSortPos is defined, an alternative distance is calculated for sorting
+				if( m_pSortPos )
+					m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, ( vPos - *m_pSortPos ).Length2D() ) );
+				else
+					m_HidingSpots.AddToTail( HidingSpotResult_t( pSpot, fDist ) );
+
 				if( g_pynavmesh_debug_hidespot.GetBool() )
 					NDebugOverlay::Box( pSpot->GetPosition(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, true, HIDESPOT_DEBUG_DURATION );
 			}
@@ -646,6 +651,7 @@ private:
 	CNavArea *m_pOrderArea;
 	float m_fRadius;
 	const Vector &m_vPos;
+	const Vector *m_pSortPos;
 	CUtlVector< HidingSpotResult_t > &m_HidingSpots;
 };
 
@@ -667,7 +673,7 @@ static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotRe
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort )
+bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort, const Vector *pSortPos )
 {
 	bp::list l;
 
@@ -676,7 +682,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 
 	// Get hiding spots in radius
 	CUtlVector< HidingSpotResult_t > HidingSpots;
-	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit );
+	HidingSpotCollector collector( HidingSpots, pos, radius, pUnit, pSortPos );
 	if( g_pynavmesh_hidespot_searchmethod.GetInt() == 1 )
 	{
 		TheNavMesh->ForAllAreasInRadius< HidingSpotCollector >( collector, pos, Max(1250.0f, radius * 2.0f) ); // Use a larger radius for testing the areas
