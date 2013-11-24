@@ -208,6 +208,9 @@ void SrcCefVGUIPanel::OnThink()
 {
 	BaseClass::OnThink();
 
+	if( !m_pBrowser )
+		return;
+
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() )
 	{
 		// Hack for working nice with VGUI input

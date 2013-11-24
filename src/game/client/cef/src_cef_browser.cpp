@@ -186,7 +186,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser )
+CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser ), m_OSRHandler( NULL )
 {
 }
 
@@ -789,6 +789,9 @@ vgui::HCursor SrcCefBrowser::GetCursor()
 //-----------------------------------------------------------------------------
 int SrcCefBrowser::GetAlphaAt( int x, int y )
 {
+	if( !IsValid() )
+		return 0;
+
 	if( GetOSRHandler() )
 		return GetOSRHandler()->GetAlphaAt( x, y );
 	return 0;
