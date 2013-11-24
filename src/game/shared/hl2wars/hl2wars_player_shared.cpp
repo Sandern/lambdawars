@@ -18,6 +18,7 @@
 #else
 	#include "hl2wars_player.h"
 	#include "hl2wars_gamerules.h"
+	#include "fowmgr.h"
 #endif // CLIENT_DLL
 
 #include "imouse.h"
@@ -59,6 +60,8 @@ END_DATADESC()
 	ConVar debug_snapcamerapos("debug_snapcamerapos", "0", FCVAR_CHEAT);
 
 	ConVar wars_debug_unit_mintable("wars_debug_unit_mintable", "0", FCVAR_CHEAT);
+
+	ConVar wars_debug_fow_tileheight("wars_debug_fow_tileheight", "0", FCVAR_CHEAT);
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -341,6 +344,23 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 		}
 
 		engine->Con_NPrintf( 1 + GetClientIndex(), "#%d: countMinTable: %d, countFullTable: %d", GetClientIndex(), countMinTable, countFullTable );
+	}
+
+	if( wars_debug_fow_tileheight.GetBool() )
+	{
+		float fHeight = FogOfWarMgr()->GetHeightAtPoint( m_MouseData.m_vEndPos );
+		Vector pos( m_MouseData.m_vEndPos.x, m_MouseData.m_vEndPos.y, fHeight );
+		NDebugOverlay::Cross3D( pos, 32.0, 0, 255, 0, false, 0.2f );
+		NDebugOverlay::Line( pos, m_MouseData.m_vEndPos, 0, 0, 220, false, 0.2f );
+		if( wars_debug_fow_tileheight.GetInt() > 1 )
+		{
+			int x, y;
+			FogOfWarMgr()->ComputeFOWPosition( m_MouseData.m_vEndPos, x, y );
+			Vector vTilePos = FogOfWarMgr()->ComputeWorldPosition( x, y );
+			vTilePos.z = m_MouseData.m_vEndPos.z;
+			float fTileSize = FogOfWarMgr()->GetTileSize();
+			NDebugOverlay::Box( vTilePos, -Vector(0, 0, 4.0), Vector(fTileSize, fTileSize, 4.0), 0, 255, 0, 150, 0.2f );
+		}
 	}
 #endif // CLIENT_DLL
 }
