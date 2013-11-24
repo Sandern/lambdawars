@@ -248,7 +248,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	// Use the custom LOS trace filter
 	CWarsWeaponLOSFilter traceFilter( npcOwner, npcOwner->GetEnemy(), COLLISION_GROUP_BREAKABLE_GLASS );
 	trace_t tr;
-	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT, &traceFilter, &tr );
+	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT|MASK_BLOCKLOS, &traceFilter, &tr );
 
 	CBaseEntity	*pHitEnt = tr.m_pEnt;
 
@@ -337,7 +337,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	// Use the custom LOS trace filter
 	CWarsWeaponLOSFilter traceFilter( pOwner, pTarget, COLLISION_GROUP_BREAKABLE_GLASS );
 	trace_t tr;
-	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT, &traceFilter, &tr );
+	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT|MASK_BLOCKLOS, &traceFilter, &tr );
 
 	CBaseEntity	*pHitEnt = tr.m_pEnt;
 
