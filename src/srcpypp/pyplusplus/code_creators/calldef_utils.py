@@ -88,11 +88,14 @@ class argument_utils_t:
             return args[ 0 ]
         return self.PARAM_SEPARATOR.join( args )
 
-    def call_args( self ):
+    def call_args( self, callpython=True ):
         params = []
         for index, arg in enumerate( self.__args ):
-            params.append( decl_wrappers.python_traits.call_traits( arg.type )
-                           % self.argument_name( index ) )
+            if callpython:
+                params.append( decl_wrappers.python_traits.call_traits( arg.type )
+                               % { 'arg' : self.argument_name( index ) } )
+            else:
+                params.append( self.argument_name( index ) )
         return ', '.join( params )
 
 class return_stmt_creator_t( object ):

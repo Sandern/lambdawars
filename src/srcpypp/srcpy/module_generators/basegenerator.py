@@ -18,6 +18,12 @@ class ModuleGenerator(object):
     dll_name = None
     path = 'specify a valid path'
     
+    # Variables set by generation code
+    includes = None
+    symbols = []
+    vpcdir = None
+    srcdir = None
+    
     def GetFiles(self):
         return self.files, []
     
@@ -27,6 +33,7 @@ class ModuleGenerator(object):
         self.mb = mb
         self.Parse(mb)
         self.FinalOutput(mb)
+        self.mb = None
         
     # Parse method. Implement this.
     def Parse(self, mb):
@@ -34,7 +41,7 @@ class ModuleGenerator(object):
         
     # Create builder
     def CreateBuilder(self, files, parseonlyfiles):
-        mb = src_module_builder_t(files, is_client=False)
+        mb = src_module_builder_t(files, self.includes, self.symbols, is_client=False)
         mb.parseonlyfiles = parseonlyfiles
         return mb
             

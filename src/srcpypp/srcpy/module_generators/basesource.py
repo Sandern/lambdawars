@@ -2,7 +2,6 @@ import os
 
 from . basegenerator import ModuleGenerator
 from .. src_module_builder import src_module_builder_t
-from pyplusplus import code_creators
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers, pointer_t, reference_t, const_t, declarated_t, void_t, compound_t
 
@@ -16,6 +15,44 @@ class SourceModuleGenerator(ModuleGenerator):
     # Set by generation code
     isclient = False
     isserver = False
+    
+    @property
+    def srcdir(self):
+        return self.clientsrcdir if self.isclient else self.serversrcdir
+        
+    @property
+    def vpcdir(self):
+        return self.clientvpcdir if self.isclient else self.servervpcdir
+    
+    @property
+    def includes(self):
+        return self.clientincludes if self.isclient else self.serverincludes
+            
+    @property
+    def symbols(self):
+        return self.clientsymbols if self.isclient else self.serversymbols
+        
+    @property
+    def path(self):
+        
+        return os.path.join('../../', self.settings.client_path)
+    
+    # Create builder
+    def CreateBuilder(self, files, parseonlyfiles):
+        os.chdir(self.vpcdir)
+        mb = src_module_builder_t(files, self.includes, self.symbols, is_client=self.isclient)
+        mb.parseonlyfiles = parseonlyfiles
+        return mb
+        
+    def GetFilenames(self):
+        path = rm.path
+        if not rm.split:
+            outfilename = '%s.cpp' % (rm.module_name)
+            return [os.path.relpath(os.path.join(path, outfilename), os.path.join(rm.servervpcdir, rm.serversrcpath))]
+        else:
+            files = os.listdir(os.path.join(rm.path, rm.module_name))
+            files = filter(lambda f: f.endswith('.cpp') or f.endswith('.hpp'), files)
+            return map(lambda f: os.path.join(path, rm.module_name, f), files)
     
     def GetFiles(self):
         parsefiles = list(self.files)
@@ -108,6 +145,14 @@ class SourceModuleGenerator(ModuleGenerator):
             
         return False
         
+    def TestCBaseEntity(self, cls):
+        baseentcls = self.baseentcls
+        recursive_bases = cls.recursive_bases
+        for testcls in recursive_bases:
+            if baseentcls == testcls.related_class:
+                return True
+        return cls == baseentcls
+        
     def AddNetworkVarProperty(self, exposename, varname, ctype, clsname):
         cls = self.mb.class_(clsname) if (type(clsname) == str) else clsname
         args = {
@@ -134,6 +179,14 @@ class SourceModuleGenerator(ModuleGenerator):
         self.ihandlecls = mb.class_('IHandleEntity')
         decls = mb.calldefs(matchers.custom_matcher_t(self.TestInheritIHandleEntity))
         decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        
+        # All CBaseEntity related classes should have a custom call trait
+        self.baseentcls = mb.class_('CBaseEntity' if self.isserver else 'C_BaseEntity')
+        def ent_call_trait(type_):
+            return '%(arg)s ? %(arg)s->GetPyHandle() : boost::python::object()'
+        entclasses = mb.classes(self.TestCBaseEntity)
+        for entcls in entclasses:
+            entcls.custom_call_trait = ent_call_trait
         
         # Anything returning KeyValues should be returned by value so it calls the converter
         keyvalues = mb.class_('KeyValues')

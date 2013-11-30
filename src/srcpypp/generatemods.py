@@ -10,7 +10,7 @@ import settings
 def Main():
     # Setup arguments
     parser = argparse.ArgumentParser(description='Generates Python modules for Source Engine')
-    parser.add_argument('-a', '--appendonly',
+    parser.add_argument('-a', '--appendonly', action='store_true',
                        help='Only generate append file for modules listed in settings.')
     parser.add_argument('-m', '--specificmodule',
                        help='Only parse code for the single specified module')

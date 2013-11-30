@@ -20,6 +20,14 @@ shared_path = os.path.normpath('game/shared/python/modules/%s/' % (autogenfolder
 
 # Branch (currently either "swarm" or "source2013")
 branch = "swarm"
+# VPC Project name
+vpcgamename = 'pysource'
+# VPC Project file paths
+vpcserverpath = os.path.join(srcpath, 'game/server/server_pysource.vpc')
+vpcclientpath = os.path.join(srcpath, 'game/client/client_pysource.vpc')
+# Output paths for generated VPC file, to be included in the game VPC files
+vpcserverautopath = os.path.join(os.path.dirname(vpcserverpath), '%s_autogen.vpc' % (os.path.splitext(os.path.basename(vpcserverpath))[0]))
+vpcclientautopath = os.path.join(os.path.dirname(vpcclientpath), '%s_autogen.vpc' % (os.path.splitext(os.path.basename(vpcclientpath))[0]))
 
 # Project project paths (see vxprojinfo.py for the available info)
 vcxprojserver = '../game/server/wars_server.vcxproj'
@@ -30,7 +38,8 @@ vcxprojclient = '../game/client/wars_client.vcxproj'
 autoupdatevxproj = False
 addpythonfiles = True
 
-# Modules
+# The list of modules
+# The parse code looks in the above paths
 modules = [
     # Base
     ('srcbuiltins', 'SrcBuiltins'),

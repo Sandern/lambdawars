@@ -12,4 +12,4 @@ class SharedModuleGenerator(SourceModuleGenerator):
     
     @property
     def path(self):
-        return os.path.join(self.settings.srcpath, self.settings.shared_path)
+        return os.path.join('../../', self.settings.shared_path)

@@ -10,4 +10,4 @@ class ServerModuleGenerator(SourceModuleGenerator):
     
     @property
     def path(self):
-        return os.path.join(self.settings.srcpath, self.settings.server_path)
+        return os.path.join('../../', self.settings.server_path)

@@ -150,9 +150,9 @@ class calldef_wrapper_t( code_creator.code_creator_t
     def override_identifier(self):
         return algorithm.create_identifier( self, '::boost::python::override' )
 
-    def function_call_args( self ):
+    def function_call_args( self, callpython=True ):
         arg_utils = calldef_utils.argument_utils_t( self.declaration, algorithm.make_id_creator( self ) )
-        return arg_utils.call_args()
+        return arg_utils.call_args(callpython=callpython)
 
     def args_declaration( self ):
         arg_utils = calldef_utils.argument_utils_t( self.declaration, algorithm.make_id_creator( self ) )
@@ -516,10 +516,10 @@ class mem_fun_v_wrapper_t( calldef_wrapper_t ):
         template.append( self.indent(self.indent('%(return_)sfunc_%(alias)s( %(args)s );' ) ) )
         template.append( self.indent('} catch(bp::error_already_set &) {') )
         template.append( self.indent(self.indent('PyErr_Print();')) )
-        template.append( self.indent(self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') ) )
+        template.append( self.indent(self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(cppargs)s );') ) )
         template.append( self.indent( '}' ) )    
         template.append( 'else' )
-        template.append( self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') )
+        template.append( self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(cppargs)s );') )
         
         #template.append('}')
         
@@ -535,13 +535,14 @@ class mem_fun_v_wrapper_t( calldef_wrapper_t ):
             , 'alias' : self.declaration.alias
             , 'return_' : return_
             , 'args' : self.function_call_args()
+            , 'cppargs' : self.function_call_args(callpython=False)
             , 'wrapped_class' : self.wrapped_class_identifier()
             , 'MsgInt' : '%d'
         }
 
     def create_default_body(self):
         function_call = declarations.call_invocation.join( self.declaration.partial_name
-                                                           , [ self.function_call_args() ] )
+                                                           , [ self.function_call_args(callpython=False) ] )
         body = self.wrapped_class_identifier() + '::' + function_call + ';'
         if not declarations.is_void( self.declaration.return_type ):
             body = 'return ' + body

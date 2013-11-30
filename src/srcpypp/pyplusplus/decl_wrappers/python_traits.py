@@ -20,16 +20,21 @@ def call_traits( type_ ):
     """http://boost.org/libs/utility/call_traits.htm"""
     type_ = declarations.remove_alias( type_ )
     if is_immutable( type_ ):
-        return "%s" #pass by value
+        return "%(arg)s" #pass by value
     elif declarations.is_reference( type_ ):
         no_ref = declarations.remove_reference( type_ )
         if is_immutable( no_ref ):
-            return "%s" #pass by value
+            return "%(arg)s" #pass by value
         else:
-            return "boost::ref(%s)" #pass by ref
+            return "boost::ref(%(arg)s)" #pass by ref
     elif declarations.is_pointer( type_ ) \
          and not is_immutable( type_.base ) \
          and not declarations.is_pointer( type_.base ):
-        return "boost::python::ptr(%s)" #pass by ptr
+        if hasattr(type_.base.declaration, 'custom_call_trait'):
+            custom_call_trait = type_.base.declaration.custom_call_trait
+            call_trait = custom_call_trait(type_) if custom_call_trait else None
+            if call_trait:
+                return call_trait
+        return "boost::python::ptr(%(arg)s)" #pass by ptr
     else:
-        return "%s" #pass by value
+        return "%(arg)s" #pass by value

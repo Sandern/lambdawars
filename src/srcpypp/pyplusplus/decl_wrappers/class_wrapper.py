@@ -196,6 +196,7 @@ class class_t( class_common_details_t
         self._fake_bases = []
         self._fake_constructors = []
         self._no_init = None
+        self._custom_call_trait = None
 
     @property
     def fake_constructors(self):
@@ -212,6 +213,14 @@ class class_t( class_common_details_t
             self._fake_constructors.append( f )
         else:
             self._fake_constructors.extend( f )
+            
+    @property
+    def custom_call_trait(self):
+        return self._custom_call_trait
+        
+    @custom_call_trait.setter
+    def custom_call_trait(self, fn):
+        self._custom_call_trait = fn
 
     def _get_redefine_operators( self ):
         return self._redefine_operators
