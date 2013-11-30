@@ -41,19 +41,8 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
         bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
         if( func_SelectWeightedSequence.ptr() != Py_None )
             try {
@@ -71,19 +60,8 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     }
 
     virtual void Update( float eyeYaw, float eyePitch ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Update: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Update( eyeYaw, eyePitch ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, Update )
         bp::override func_Update = this->get_override( "Update" );
         if( func_Update.ptr() != Py_None )
             try {
@@ -152,19 +130,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnEndSpecificActivity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnEndSpecificActivity( specificactivity ) of Class: UnitAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
         bp::override func_OnEndSpecificActivity = this->get_override( "OnEndSpecificActivity" );
         if( func_OnEndSpecificActivity.ptr() != Py_None )
             try {
@@ -182,19 +149,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual void OnNewModel(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnNewModel: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnNewModel(  ) of Class: UnitAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnNewModel )
         bp::override func_OnNewModel = this->get_override( "OnNewModel" );
         if( func_OnNewModel.ptr() != Py_None )
             try {
@@ -224,19 +180,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
         bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
         if( func_SelectWeightedSequence.ptr() != Py_None )
             try {
@@ -276,19 +221,8 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
     }
 
     virtual void HandleJump(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "HandleJump: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling HandleJump(  ) of Class: UnitBaseLocomotion\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
         bp::override func_HandleJump = this->get_override( "HandleJump" );
         if( func_HandleJump.ptr() != Py_None )
             try {
@@ -328,19 +262,8 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
     }
 
     virtual void HandleJump(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "HandleJump: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling HandleJump(  ) of Class: UnitBaseLocomotion\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
         bp::override func_HandleJump = this->get_override( "HandleJump" );
         if( func_HandleJump.ptr() != Py_None )
             try {
@@ -1764,7 +1687,7 @@ struct BaseAnimEventHandler_wrapper : BaseAnimEventHandler, bp::wrapper< BaseAni
     }
 
     void default_HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
-        BaseAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+        BaseAnimEventHandler::HandleEvent( pUnit, event );
     }
 
 };
@@ -1783,19 +1706,8 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
     }
 
     virtual bool IsSpeaking(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "IsSpeaking: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling IsSpeaking(  ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, IsSpeaking )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, IsSpeaking )
         bp::override func_IsSpeaking = this->get_override( "IsSpeaking" );
         if( func_IsSpeaking.ptr() != Py_None )
             try {
@@ -1813,19 +1725,8 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
     }
 
     virtual void OnSpeechFinished(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnSpeechFinished: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnSpeechFinished(  ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, OnSpeechFinished )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, OnSpeechFinished )
         bp::override func_OnSpeechFinished = this->get_override( "OnSpeechFinished" );
         if( func_OnSpeechFinished.ptr() != Py_None )
             try {
@@ -1847,33 +1748,22 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
     }
 
     virtual bool SpeakDispatchResponse( ::AIConcept_t & concept, ::AI_Response * response, ::ResponseRules::CriteriaSet * criteria, ::IRecipientFilter * filter=0 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SpeakDispatchResponse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, SpeakDispatchResponse )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, SpeakDispatchResponse )
         bp::override func_SpeakDispatchResponse = this->get_override( "SpeakDispatchResponse" );
         if( func_SpeakDispatchResponse.ptr() != Py_None )
             try {
                 return func_SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+                return this->CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
             }
         else
-            return this->CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+            return this->CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
     }
     
     bool default_SpeakDispatchResponse( ::AIConcept_t & concept, ::AI_Response * response, ::ResponseRules::CriteriaSet * criteria, ::IRecipientFilter * filter=0 ) {
-        return CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+        return CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
     }
 
     bool SpeakRawScene( char const * pszScene, float delay, ::AI_Response * response, ::IRecipientFilter * filter=0 ){
@@ -1881,33 +1771,22 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
     }
 
     virtual int SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SpeakRawSentence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, SpeakRawSentence )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, SpeakRawSentence )
         bp::override func_SpeakRawSentence = this->get_override( "SpeakRawSentence" );
         if( func_SpeakRawSentence.ptr() != Py_None )
             try {
                 return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+                return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
             }
         else
-            return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+            return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
     }
     
     int default_SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
-        return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+        return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
     }
 
 };
@@ -1942,7 +1821,7 @@ struct TossGrenadeAnimEventHandler_wrapper : TossGrenadeAnimEventHandler, bp::wr
     }
 
     void default_HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
-        TossGrenadeAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+        TossGrenadeAnimEventHandler::HandleEvent( pUnit, event );
     }
 
 };
@@ -1964,19 +1843,8 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
         bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
         if( func_SelectWeightedSequence.ptr() != Py_None )
             try {
@@ -1994,19 +1862,8 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     }
 
     virtual void Update( float eyeYaw, float eyePitch ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Update: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Update( eyeYaw, eyePitch ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, Update )
         bp::override func_Update = this->get_override( "Update" );
         if( func_Update.ptr() != Py_None )
             try {
@@ -2075,19 +1932,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnEndSpecificActivity: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnEndSpecificActivity( specificactivity ) of Class: UnitAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
         bp::override func_OnEndSpecificActivity = this->get_override( "OnEndSpecificActivity" );
         if( func_OnEndSpecificActivity.ptr() != Py_None )
             try {
@@ -2105,19 +1951,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual void OnNewModel(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnNewModel: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnNewModel(  ) of Class: UnitAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnNewModel )
         bp::override func_OnNewModel = this->get_override( "OnNewModel" );
         if( func_OnNewModel.ptr() != Py_None )
             try {
@@ -2147,19 +1982,8 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SelectWeightedSequence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SelectWeightedSequence( activity ) of Class: UnitBaseAnimState\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
         bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
         if( func_SelectWeightedSequence.ptr() != Py_None )
             try {
@@ -2199,19 +2023,8 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
     }
 
     virtual void HandleJump(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "HandleJump: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling HandleJump(  ) of Class: UnitBaseLocomotion\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
         bp::override func_HandleJump = this->get_override( "HandleJump" );
         if( func_HandleJump.ptr() != Py_None )
             try {
@@ -2251,19 +2064,8 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
     }
 
     virtual void HandleJump(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "HandleJump: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling HandleJump(  ) of Class: UnitBaseLocomotion\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
         bp::override func_HandleJump = this->get_override( "HandleJump" );
         if( func_HandleJump.ptr() != Py_None )
             try {
@@ -2296,19 +2098,8 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     }
 
     virtual bool IsSpeaking(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "IsSpeaking: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling IsSpeaking(  ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, IsSpeaking )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, IsSpeaking )
         bp::override func_IsSpeaking = this->get_override( "IsSpeaking" );
         if( func_IsSpeaking.ptr() != Py_None )
             try {
@@ -2326,19 +2117,8 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     }
 
     virtual void OnSpeechFinished(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnSpeechFinished: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnSpeechFinished(  ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, OnSpeechFinished )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, OnSpeechFinished )
         bp::override func_OnSpeechFinished = this->get_override( "OnSpeechFinished" );
         if( func_OnSpeechFinished.ptr() != Py_None )
             try {
@@ -2360,33 +2140,22 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     }
 
     virtual bool SpeakDispatchResponse( ::AIConcept_t & concept, ::AI_Response * response, ::ResponseRules::CriteriaSet * criteria, ::IRecipientFilter * filter=0 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SpeakDispatchResponse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, SpeakDispatchResponse )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, SpeakDispatchResponse )
         bp::override func_SpeakDispatchResponse = this->get_override( "SpeakDispatchResponse" );
         if( func_SpeakDispatchResponse.ptr() != Py_None )
             try {
                 return func_SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+                return this->CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
             }
         else
-            return this->CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+            return this->CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
     }
     
     bool default_SpeakDispatchResponse( ::AIConcept_t & concept, ::AI_Response * response, ::ResponseRules::CriteriaSet * criteria, ::IRecipientFilter * filter=0 ) {
-        return CAI_Expresser::SpeakDispatchResponse( boost::ref(concept), boost::python::ptr(response), boost::python::ptr(criteria), boost::python::ptr(filter) );
+        return CAI_Expresser::SpeakDispatchResponse( concept, response, criteria, filter );
     }
 
     bool SpeakRawScene( char const * pszScene, float delay, ::AI_Response * response, ::IRecipientFilter * filter=0 ){
@@ -2394,33 +2163,22 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     }
 
     virtual int SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SpeakRawSentence: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) ) of Class: CAI_Expresser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CAI_Expresser, SpeakRawSentence )
+        PY_OVERRIDE_LOG( unit_helper, CAI_Expresser, SpeakRawSentence )
         bp::override func_SpeakRawSentence = this->get_override( "SpeakRawSentence" );
         if( func_SpeakRawSentence.ptr() != Py_None )
             try {
                 return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+                return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
             }
         else
-            return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+            return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
     }
     
     int default_SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
-        return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+        return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
     }
 
 };

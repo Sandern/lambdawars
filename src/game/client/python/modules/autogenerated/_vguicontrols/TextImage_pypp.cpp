@@ -125,19 +125,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual bool Evict(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Evict: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Evict(  ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, Evict )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, Evict )
         bp::override func_Evict = this->get_override( "Evict" );
         if( func_Evict.ptr() != Py_None )
             try {
@@ -155,19 +144,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual ::vgui::HTexture GetID(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetID: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetID(  ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, GetID )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, GetID )
         bp::override func_GetID = this->get_override( "GetID" );
         if( func_GetID.ptr() != Py_None )
             try {
@@ -185,19 +163,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual int GetNumFrames(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetNumFrames: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetNumFrames(  ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, GetNumFrames )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, GetNumFrames )
         bp::override func_GetNumFrames = this->get_override( "GetNumFrames" );
         if( func_GetNumFrames.ptr() != Py_None )
             try {
@@ -265,19 +232,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual int GetTall(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTall: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTall(  ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, GetTall )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, GetTall )
         bp::override func_GetTall = this->get_override( "GetTall" );
         if( func_GetTall.ptr() != Py_None )
             try {
@@ -295,19 +251,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual int GetWide(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetWide: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetWide(  ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, GetWide )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, GetWide )
         bp::override func_GetWide = this->get_override( "GetWide" );
         if( func_GetWide.ptr() != Py_None )
             try {
@@ -325,19 +270,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual void SetFrame( int nFrame ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetFrame: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetFrame( nFrame ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, SetFrame )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, SetFrame )
         bp::override func_SetFrame = this->get_override( "SetFrame" );
         if( func_SetFrame.ptr() != Py_None )
             try {
@@ -355,19 +289,8 @@ struct TextImage_wrapper : vgui::TextImage, bp::wrapper< vgui::TextImage > {
     }
 
     virtual void SetRotation( int iRotation ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetRotation: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetRotation( iRotation ) of Class: vgui::Image\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Image, SetRotation )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Image, SetRotation )
         bp::override func_SetRotation = this->get_override( "SetRotation" );
         if( func_SetRotation.ptr() != Py_None )
             try {

@@ -48,19 +48,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void ClientThink(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ClientThink: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ClientThink(  ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, ClientThink )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, ClientThink )
         bp::override func_ClientThink = this->get_override( "ClientThink" );
         if( func_ClientThink.ptr() != Py_None )
             try {
@@ -85,19 +74,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void OnChangeOwnerNumber( int old_owner_number ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnChangeOwnerNumber: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnChangeOwnerNumber( old_owner_number ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnChangeOwnerNumber )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnChangeOwnerNumber )
         bp::override func_OnChangeOwnerNumber = this->get_override( "OnChangeOwnerNumber" );
         if( func_OnChangeOwnerNumber.ptr() != Py_None )
             try {
@@ -115,19 +93,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void OnDataChanged( ::DataUpdateType_t updateType ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnDataChanged: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnDataChanged( updateType ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnDataChanged )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnDataChanged )
         bp::override func_OnDataChanged = this->get_override( "OnDataChanged" );
         if( func_OnDataChanged.ptr() != Py_None )
             try {
@@ -145,199 +112,122 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void OnLeftMouseButtonDoublePressed( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLeftMouseButtonDoublePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnLeftMouseButtonDoublePressed( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnLeftMouseButtonDoublePressed )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnLeftMouseButtonDoublePressed )
         bp::override func_OnLeftMouseButtonDoublePressed = this->get_override( "OnLeftMouseButtonDoublePressed" );
         if( func_OnLeftMouseButtonDoublePressed.ptr() != Py_None )
             try {
                 func_OnLeftMouseButtonDoublePressed( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( data );
             }
         else
-            this->C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( data );
     }
     
     void default_OnLeftMouseButtonDoublePressed( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( boost::ref(data) );
+        C_HL2WarsPlayer::OnLeftMouseButtonDoublePressed( data );
     }
 
     virtual void OnLeftMouseButtonPressed( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLeftMouseButtonPressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnLeftMouseButtonPressed( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnLeftMouseButtonPressed )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnLeftMouseButtonPressed )
         bp::override func_OnLeftMouseButtonPressed = this->get_override( "OnLeftMouseButtonPressed" );
         if( func_OnLeftMouseButtonPressed.ptr() != Py_None )
             try {
                 func_OnLeftMouseButtonPressed( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnLeftMouseButtonPressed( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnLeftMouseButtonPressed( data );
             }
         else
-            this->C_HL2WarsPlayer::OnLeftMouseButtonPressed( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnLeftMouseButtonPressed( data );
     }
     
     void default_OnLeftMouseButtonPressed( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnLeftMouseButtonPressed( boost::ref(data) );
+        C_HL2WarsPlayer::OnLeftMouseButtonPressed( data );
     }
 
     virtual void OnLeftMouseButtonReleased( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLeftMouseButtonReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnLeftMouseButtonReleased( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnLeftMouseButtonReleased )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnLeftMouseButtonReleased )
         bp::override func_OnLeftMouseButtonReleased = this->get_override( "OnLeftMouseButtonReleased" );
         if( func_OnLeftMouseButtonReleased.ptr() != Py_None )
             try {
                 func_OnLeftMouseButtonReleased( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnLeftMouseButtonReleased( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnLeftMouseButtonReleased( data );
             }
         else
-            this->C_HL2WarsPlayer::OnLeftMouseButtonReleased( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnLeftMouseButtonReleased( data );
     }
     
     void default_OnLeftMouseButtonReleased( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnLeftMouseButtonReleased( boost::ref(data) );
+        C_HL2WarsPlayer::OnLeftMouseButtonReleased( data );
     }
 
     virtual void OnRightMouseButtonDoublePressed( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnRightMouseButtonDoublePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnRightMouseButtonDoublePressed( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnRightMouseButtonDoublePressed )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnRightMouseButtonDoublePressed )
         bp::override func_OnRightMouseButtonDoublePressed = this->get_override( "OnRightMouseButtonDoublePressed" );
         if( func_OnRightMouseButtonDoublePressed.ptr() != Py_None )
             try {
                 func_OnRightMouseButtonDoublePressed( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( data );
             }
         else
-            this->C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( data );
     }
     
     void default_OnRightMouseButtonDoublePressed( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( boost::ref(data) );
+        C_HL2WarsPlayer::OnRightMouseButtonDoublePressed( data );
     }
 
     virtual void OnRightMouseButtonPressed( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnRightMouseButtonPressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnRightMouseButtonPressed( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnRightMouseButtonPressed )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnRightMouseButtonPressed )
         bp::override func_OnRightMouseButtonPressed = this->get_override( "OnRightMouseButtonPressed" );
         if( func_OnRightMouseButtonPressed.ptr() != Py_None )
             try {
                 func_OnRightMouseButtonPressed( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnRightMouseButtonPressed( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnRightMouseButtonPressed( data );
             }
         else
-            this->C_HL2WarsPlayer::OnRightMouseButtonPressed( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnRightMouseButtonPressed( data );
     }
     
     void default_OnRightMouseButtonPressed( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnRightMouseButtonPressed( boost::ref(data) );
+        C_HL2WarsPlayer::OnRightMouseButtonPressed( data );
     }
 
     virtual void OnRightMouseButtonReleased( ::MouseTraceData_t const & data ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnRightMouseButtonReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnRightMouseButtonReleased( boost::ref(data) ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, OnRightMouseButtonReleased )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, OnRightMouseButtonReleased )
         bp::override func_OnRightMouseButtonReleased = this->get_override( "OnRightMouseButtonReleased" );
         if( func_OnRightMouseButtonReleased.ptr() != Py_None )
             try {
                 func_OnRightMouseButtonReleased( boost::ref(data) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_HL2WarsPlayer::OnRightMouseButtonReleased( boost::ref(data) );
+                this->C_HL2WarsPlayer::OnRightMouseButtonReleased( data );
             }
         else
-            this->C_HL2WarsPlayer::OnRightMouseButtonReleased( boost::ref(data) );
+            this->C_HL2WarsPlayer::OnRightMouseButtonReleased( data );
     }
     
     void default_OnRightMouseButtonReleased( ::MouseTraceData_t const & data ) {
-        C_HL2WarsPlayer::OnRightMouseButtonReleased( boost::ref(data) );
+        C_HL2WarsPlayer::OnRightMouseButtonReleased( data );
     }
 
     virtual void Spawn(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Spawn: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Spawn(  ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, Spawn )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, Spawn )
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
             try {
@@ -355,19 +245,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void UpdateOnRemove(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "UpdateOnRemove: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling UpdateOnRemove(  ) of Class: C_HL2WarsPlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, UpdateOnRemove )
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, UpdateOnRemove )
         bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
         if( func_UpdateOnRemove.ptr() != Py_None )
             try {
@@ -385,19 +264,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void Activate(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Activate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Activate(  ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, Activate )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Activate )
         bp::override func_Activate = this->get_override( "Activate" );
         if( func_Activate.ptr() != Py_None )
             try {
@@ -419,49 +287,27 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void ComputeWorldSpaceSurroundingBox( ::Vector * pVecWorldMins, ::Vector * pVecWorldMaxs ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ComputeWorldSpaceSurroundingBox: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ComputeWorldSpaceSurroundingBox( boost::python::ptr(pVecWorldMins), boost::python::ptr(pVecWorldMaxs) ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, ComputeWorldSpaceSurroundingBox )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, ComputeWorldSpaceSurroundingBox )
         bp::override func_ComputeWorldSpaceSurroundingBox = this->get_override( "ComputeWorldSpaceSurroundingBox" );
         if( func_ComputeWorldSpaceSurroundingBox.ptr() != Py_None )
             try {
                 func_ComputeWorldSpaceSurroundingBox( boost::python::ptr(pVecWorldMins), boost::python::ptr(pVecWorldMaxs) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::ComputeWorldSpaceSurroundingBox( boost::python::ptr(pVecWorldMins), boost::python::ptr(pVecWorldMaxs) );
+                this->C_BaseEntity::ComputeWorldSpaceSurroundingBox( pVecWorldMins, pVecWorldMaxs );
             }
         else
-            this->C_BaseEntity::ComputeWorldSpaceSurroundingBox( boost::python::ptr(pVecWorldMins), boost::python::ptr(pVecWorldMaxs) );
+            this->C_BaseEntity::ComputeWorldSpaceSurroundingBox( pVecWorldMins, pVecWorldMaxs );
     }
     
     void default_ComputeWorldSpaceSurroundingBox( ::Vector * pVecWorldMins, ::Vector * pVecWorldMaxs ) {
-        C_BaseEntity::ComputeWorldSpaceSurroundingBox( boost::python::ptr(pVecWorldMins), boost::python::ptr(pVecWorldMaxs) );
+        C_BaseEntity::ComputeWorldSpaceSurroundingBox( pVecWorldMins, pVecWorldMaxs );
     }
 
     virtual bool CreateVPhysics(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "CreateVPhysics: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling CreateVPhysics(  ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, CreateVPhysics )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, CreateVPhysics )
         bp::override func_CreateVPhysics = this->get_override( "CreateVPhysics" );
         if( func_CreateVPhysics.ptr() != Py_None )
             try {
@@ -479,79 +325,46 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void DoImpactEffect( ::trace_t & tr, int nDamageType ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "DoImpactEffect: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling DoImpactEffect( boost::ref(tr), nDamageType ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, DoImpactEffect )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, DoImpactEffect )
         bp::override func_DoImpactEffect = this->get_override( "DoImpactEffect" );
         if( func_DoImpactEffect.ptr() != Py_None )
             try {
                 func_DoImpactEffect( boost::ref(tr), nDamageType );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+                this->C_BaseEntity::DoImpactEffect( tr, nDamageType );
             }
         else
-            this->C_BaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+            this->C_BaseEntity::DoImpactEffect( tr, nDamageType );
     }
     
     void default_DoImpactEffect( ::trace_t & tr, int nDamageType ) {
-        C_BaseEntity::DoImpactEffect( boost::ref(tr), nDamageType );
+        C_BaseEntity::DoImpactEffect( tr, nDamageType );
     }
 
     virtual void EndTouch( ::C_BaseEntity * pOther ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "EndTouch: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling EndTouch( boost::python::ptr(pOther) ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, EndTouch )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, EndTouch )
         bp::override func_EndTouch = this->get_override( "EndTouch" );
         if( func_EndTouch.ptr() != Py_None )
             try {
-                func_EndTouch( boost::python::ptr(pOther) );
+                func_EndTouch( pOther ? pOther->GetPyHandle() : boost::python::object() );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::EndTouch( boost::python::ptr(pOther) );
+                this->C_BaseEntity::EndTouch( pOther );
             }
         else
-            this->C_BaseEntity::EndTouch( boost::python::ptr(pOther) );
+            this->C_BaseEntity::EndTouch( pOther );
     }
     
     void default_EndTouch( ::C_BaseEntity * pOther ) {
-        C_BaseEntity::EndTouch( boost::python::ptr(pOther) );
+        C_BaseEntity::EndTouch( pOther );
     }
 
     virtual ::CollideType_t GetCollideType(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetCollideType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetCollideType(  ) of Class: C_BaseAnimating\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseAnimating, GetCollideType )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, GetCollideType )
         bp::override func_GetCollideType = this->get_override( "GetCollideType" );
         if( func_GetCollideType.ptr() != Py_None )
             try {
@@ -569,19 +382,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual ::IMouse * GetIMouse(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetIMouse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetIMouse(  ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, GetIMouse )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, GetIMouse )
         bp::override func_GetIMouse = this->get_override( "GetIMouse" );
         if( func_GetIMouse.ptr() != Py_None )
             try {
@@ -599,19 +401,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual char const * GetTracerType(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetTracerType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetTracerType(  ) of Class: C_BasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BasePlayer, GetTracerType )
+        PY_OVERRIDE_LOG( _entities, C_BasePlayer, GetTracerType )
         bp::override func_GetTracerType = this->get_override( "GetTracerType" );
         if( func_GetTracerType.ptr() != Py_None )
             try {
@@ -629,19 +420,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling KeyValue( szKeyName, szValue ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, KeyValue )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, KeyValue )
         bp::override func_KeyValue = this->get_override( "KeyValue" );
         if( func_KeyValue.ptr() != Py_None )
             try {
@@ -659,19 +439,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool KeyValue( char const * szKeyName, float flValue ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling KeyValue( szKeyName, flValue ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, KeyValue )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, KeyValue )
         bp::override func_KeyValue = this->get_override( "KeyValue" );
         if( func_KeyValue.ptr() != Py_None )
             try {
@@ -689,19 +458,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool KeyValue( char const * szKeyName, int nValue ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling KeyValue( szKeyName, nValue ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, KeyValue )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, KeyValue )
         bp::override func_KeyValue = this->get_override( "KeyValue" );
         if( func_KeyValue.ptr() != Py_None )
             try {
@@ -719,79 +477,46 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool KeyValue( char const * szKeyName, ::Vector const & vecValue ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyValue: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling KeyValue( szKeyName, boost::ref(vecValue) ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, KeyValue )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, KeyValue )
         bp::override func_KeyValue = this->get_override( "KeyValue" );
         if( func_KeyValue.ptr() != Py_None )
             try {
                 return func_KeyValue( szKeyName, boost::ref(vecValue) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseEntity::KeyValue( szKeyName, boost::ref(vecValue) );
+                return this->C_BaseEntity::KeyValue( szKeyName, vecValue );
             }
         else
-            return this->C_BaseEntity::KeyValue( szKeyName, boost::ref(vecValue) );
+            return this->C_BaseEntity::KeyValue( szKeyName, vecValue );
     }
     
     bool default_KeyValue( char const * szKeyName, ::Vector const & vecValue ) {
-        return C_BaseEntity::KeyValue( szKeyName, boost::ref(vecValue) );
+        return C_BaseEntity::KeyValue( szKeyName, vecValue );
     }
 
     virtual void MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "MakeTracer: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType ) of Class: C_BasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BasePlayer, MakeTracer )
+        PY_OVERRIDE_LOG( _entities, C_BasePlayer, MakeTracer )
         bp::override func_MakeTracer = this->get_override( "MakeTracer" );
         if( func_MakeTracer.ptr() != Py_None )
             try {
                 func_MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+                this->C_BasePlayer::MakeTracer( vecTracerSrc, tr, iTracerType );
             }
         else
-            this->C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+            this->C_BasePlayer::MakeTracer( vecTracerSrc, tr, iTracerType );
     }
     
     void default_MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
-        C_BasePlayer::MakeTracer( boost::ref(vecTracerSrc), boost::ref(tr), iTracerType );
+        C_BasePlayer::MakeTracer( vecTracerSrc, tr, iTracerType );
     }
 
     virtual void NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "NotifyShouldTransmit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling NotifyShouldTransmit( state ) of Class: C_BaseAnimating\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseAnimating, NotifyShouldTransmit )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, NotifyShouldTransmit )
         bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
         if( func_NotifyShouldTransmit.ptr() != Py_None )
             try {
@@ -809,19 +534,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void OnRestore(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnRestore: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnRestore(  ) of Class: C_BasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BasePlayer, OnRestore )
+        PY_OVERRIDE_LOG( _entities, C_BasePlayer, OnRestore )
         bp::override func_OnRestore = this->get_override( "OnRestore" );
         if( func_OnRestore.ptr() != Py_None )
             try {
@@ -839,19 +553,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void Precache(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Precache: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Precache(  ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, Precache )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Precache )
         bp::override func_Precache = this->get_override( "Precache" );
         if( func_Precache.ptr() != Py_None )
             try {
@@ -869,19 +572,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void PyOnNewModel(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnNewModel: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnNewModel(  ) of Class: C_BaseAnimating\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseAnimating, PyOnNewModel )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, PyOnNewModel )
         bp::override func_OnNewModel = this->get_override( "OnNewModel" );
         if( func_OnNewModel.ptr() != Py_None )
             try {
@@ -899,19 +591,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ReceiveMessage: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyReceiveMessage( msg ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, PyReceiveMessage )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, PyReceiveMessage )
         bp::override func_ReceiveMessage = this->get_override( "ReceiveMessage" );
         if( func_ReceiveMessage.ptr() != Py_None )
             try {
@@ -933,19 +614,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool ShouldDraw(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldDraw: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldDraw(  ) of Class: C_BasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BasePlayer, ShouldDraw )
+        PY_OVERRIDE_LOG( _entities, C_BasePlayer, ShouldDraw )
         bp::override func_ShouldDraw = this->get_override( "ShouldDraw" );
         if( func_ShouldDraw.ptr() != Py_None )
             try {
@@ -963,19 +633,8 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual bool Simulate(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Simulate: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Simulate(  ) of Class: C_BasePlayer\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BasePlayer, Simulate )
+        PY_OVERRIDE_LOG( _entities, C_BasePlayer, Simulate )
         bp::override func_Simulate = this->get_override( "Simulate" );
         if( func_Simulate.ptr() != Py_None )
             try {
@@ -993,33 +652,22 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "StartTouch: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling StartTouch( boost::python::ptr(pOther) ) of Class: C_BaseEntity\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( C_BaseEntity, StartTouch )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, StartTouch )
         bp::override func_StartTouch = this->get_override( "StartTouch" );
         if( func_StartTouch.ptr() != Py_None )
             try {
-                func_StartTouch( boost::python::ptr(pOther) );
+                func_StartTouch( pOther ? pOther->GetPyHandle() : boost::python::object() );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::StartTouch( boost::python::ptr(pOther) );
+                this->C_BaseEntity::StartTouch( pOther );
             }
         else
-            this->C_BaseEntity::StartTouch( boost::python::ptr(pOther) );
+            this->C_BaseEntity::StartTouch( pOther );
     }
     
     void default_StartTouch( ::C_BaseEntity * pOther ) {
-        C_BaseEntity::StartTouch( boost::python::ptr(pOther) );
+        C_BaseEntity::StartTouch( pOther );
     }
 
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
@@ -1029,6 +677,7 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_HL2WarsPlayer::GetClientClass();
 #endif // _WIN32
+        PY_OVERRIDE_LOG( _entities, C_HL2WarsPlayer, GetClientClass )
         ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
         if( pClientClass )
             return pClientClass;

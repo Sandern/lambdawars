@@ -41,20 +41,22 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ){
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, ApplySchemeSettings )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, ApplySchemeSettings )
         bp::override func_ApplySchemeSettings = this->get_override( "ApplySchemeSettings" );
         if( func_ApplySchemeSettings.ptr() != Py_None )
             try {
                 func_ApplySchemeSettings( boost::python::ptr(pScheme) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::ScrollBar::ApplySchemeSettings( boost::python::ptr(pScheme) );
+                this->vgui::ScrollBar::ApplySchemeSettings( pScheme );
             }
         else
-            this->vgui::ScrollBar::ApplySchemeSettings( boost::python::ptr(pScheme) );
+            this->vgui::ScrollBar::ApplySchemeSettings( pScheme );
     }
     
     virtual void default_ApplySchemeSettings( ::vgui::IScheme * pScheme ){
-        vgui::ScrollBar::ApplySchemeSettings( boost::python::ptr(pScheme) );
+        vgui::ScrollBar::ApplySchemeSettings( pScheme );
     }
 
     static boost::python::tuple GetRange( ::vgui::ScrollBar & inst ){
@@ -65,19 +67,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseFocusTicked(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseFocusTicked: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseFocusTicked(  ) of Class: vgui::ScrollBar\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, OnMouseFocusTicked )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, OnMouseFocusTicked )
         bp::override func_OnMouseFocusTicked = this->get_override( "OnMouseFocusTicked" );
         if( func_OnMouseFocusTicked.ptr() != Py_None )
             try {
@@ -95,6 +86,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnSizeChanged( int wide, int tall ){
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, OnSizeChanged )
         bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
         if( func_OnSizeChanged.ptr() != Py_None )
             try {
@@ -120,6 +113,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void PerformLayout(  ){
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, PerformLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, PerformLayout )
         bp::override func_PerformLayout = this->get_override( "PerformLayout" );
         if( func_PerformLayout.ptr() != Py_None )
             try {
@@ -149,19 +144,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPaintBackgroundEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPaintBackgroundEnabled( state ) of Class: vgui::ScrollBar\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, SetPaintBackgroundEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, SetPaintBackgroundEnabled )
         bp::override func_SetPaintBackgroundEnabled = this->get_override( "SetPaintBackgroundEnabled" );
         if( func_SetPaintBackgroundEnabled.ptr() != Py_None )
             try {
@@ -179,19 +163,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetPaintBorderEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPaintBorderEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPaintBorderEnabled( state ) of Class: vgui::ScrollBar\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, SetPaintBorderEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, SetPaintBorderEnabled )
         bp::override func_SetPaintBorderEnabled = this->get_override( "SetPaintBorderEnabled" );
         if( func_SetPaintBorderEnabled.ptr() != Py_None )
             try {
@@ -209,19 +182,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetPaintEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPaintEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPaintEnabled( state ) of Class: vgui::ScrollBar\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::ScrollBar, SetPaintEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::ScrollBar, SetPaintEnabled )
         bp::override func_SetPaintEnabled = this->get_override( "SetPaintEnabled" );
         if( func_SetPaintEnabled.ptr() != Py_None )
             try {
@@ -283,19 +245,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnChildAdded( ::vgui::VPANEL child ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnChildAdded: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnChildAdded( child ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnChildAdded )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnChildAdded )
         bp::override func_OnChildAdded = this->get_override( "OnChildAdded" );
         if( func_OnChildAdded.ptr() != Py_None )
             try {
@@ -313,19 +264,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnCommand( char const * command ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnCommand: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnCommand( command ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnCommand )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCommand )
         bp::override func_OnCommand = this->get_override( "OnCommand" );
         if( func_OnCommand.ptr() != Py_None )
             try {
@@ -347,19 +287,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnCursorEntered(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnCursorEntered: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnCursorEntered(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnCursorEntered )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCursorEntered )
         bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
         if( func_OnCursorEntered.ptr() != Py_None )
             try {
@@ -377,19 +306,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnCursorExited(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnCursorExited: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnCursorExited(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnCursorExited )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCursorExited )
         bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
         if( func_OnCursorExited.ptr() != Py_None )
             try {
@@ -407,19 +325,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnCursorMoved( int x, int y ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnCursorMoved: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnCursorMoved( x, y ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnCursorMoved )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCursorMoved )
         bp::override func_OnCursorMoved = this->get_override( "OnCursorMoved" );
         if( func_OnCursorMoved.ptr() != Py_None )
             try {
@@ -441,19 +348,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnKeyCodePressed( ::vgui::KeyCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyCodePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyCodePressed )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyCodePressed )
         bp::override func_OnKeyCodePressed = this->get_override( "OnKeyCodePressed" );
         if( func_OnKeyCodePressed.ptr() != Py_None )
             try {
@@ -471,19 +367,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnKeyCodeReleased( ::vgui::KeyCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyCodeReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodeReleased( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyCodeReleased )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyCodeReleased )
         bp::override func_OnKeyCodeReleased = this->get_override( "OnKeyCodeReleased" );
         if( func_OnKeyCodeReleased.ptr() != Py_None )
             try {
@@ -501,19 +386,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnKeyCodeTyped( ::vgui::KeyCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyCodeTyped: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyCodeTyped( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyCodeTyped )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyCodeTyped )
         bp::override func_OnKeyCodeTyped = this->get_override( "OnKeyCodeTyped" );
         if( func_OnKeyCodeTyped.ptr() != Py_None )
             try {
@@ -531,19 +405,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnKeyFocusTicked(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKeyFocusTicked: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKeyFocusTicked(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyFocusTicked )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyFocusTicked )
         bp::override func_OnKeyFocusTicked = this->get_override( "OnKeyFocusTicked" );
         if( func_OnKeyFocusTicked.ptr() != Py_None )
             try {
@@ -561,19 +424,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnKillFocus(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnKillFocus: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnKillFocus(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKillFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKillFocus )
         bp::override func_OnKillFocus = this->get_override( "OnKillFocus" );
         if( func_OnKillFocus.ptr() != Py_None )
             try {
@@ -591,19 +443,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseCaptureLost(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseCaptureLost: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseCaptureLost(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMouseCaptureLost )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMouseCaptureLost )
         bp::override func_OnMouseCaptureLost = this->get_override( "OnMouseCaptureLost" );
         if( func_OnMouseCaptureLost.ptr() != Py_None )
             try {
@@ -621,19 +462,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseDoublePressed( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseDoublePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseDoublePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMouseDoublePressed )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMouseDoublePressed )
         bp::override func_OnMouseDoublePressed = this->get_override( "OnMouseDoublePressed" );
         if( func_OnMouseDoublePressed.ptr() != Py_None )
             try {
@@ -651,19 +481,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMousePressed( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMousePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMousePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMousePressed )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMousePressed )
         bp::override func_OnMousePressed = this->get_override( "OnMousePressed" );
         if( func_OnMousePressed.ptr() != Py_None )
             try {
@@ -681,19 +500,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseReleased( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseReleased: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseReleased( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMouseReleased )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMouseReleased )
         bp::override func_OnMouseReleased = this->get_override( "OnMouseReleased" );
         if( func_OnMouseReleased.ptr() != Py_None )
             try {
@@ -711,19 +519,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseTriplePressed( ::vgui::MouseCode code ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseTriplePressed: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseTriplePressed( code ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMouseTriplePressed )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMouseTriplePressed )
         bp::override func_OnMouseTriplePressed = this->get_override( "OnMouseTriplePressed" );
         if( func_OnMouseTriplePressed.ptr() != Py_None )
             try {
@@ -741,19 +538,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnMouseWheeled( int delta ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMouseWheeled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnMouseWheeled( delta ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnMouseWheeled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnMouseWheeled )
         bp::override func_OnMouseWheeled = this->get_override( "OnMouseWheeled" );
         if( func_OnMouseWheeled.ptr() != Py_None )
             try {
@@ -771,6 +557,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
+        PY_OVERRIDE_CHECK( vgui::Panel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnRequestFocus )
         bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
         if( func_OnRequestFocus.ptr() != Py_None )
             try {
@@ -788,6 +576,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnScreenSizeChanged( int oldwide, int oldtall ){
+        PY_OVERRIDE_CHECK( vgui::Panel, OnScreenSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnScreenSizeChanged )
         bp::override func_OnScreenSizeChanged = this->get_override( "OnScreenSizeChanged" );
         if( func_OnScreenSizeChanged.ptr() != Py_None )
             try {
@@ -805,19 +595,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnSetFocus(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnSetFocus: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnSetFocus(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSetFocus )
         bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
         if( func_OnSetFocus.ptr() != Py_None )
             try {
@@ -839,19 +618,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnThink(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnThink: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnThink(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnThink )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnThink )
         bp::override func_OnThink = this->get_override( "OnThink" );
         if( func_OnThink.ptr() != Py_None )
             try {
@@ -869,19 +637,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void OnTick(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnTick: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnTick(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, OnTick )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnTick )
         bp::override func_OnTick = this->get_override( "OnTick" );
         if( func_OnTick.ptr() != Py_None )
             try {
@@ -899,19 +656,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void PaintBuildOverlay(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PaintBuildOverlay: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PaintBuildOverlay(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, PaintBuildOverlay )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, PaintBuildOverlay )
         bp::override func_PaintBuildOverlay = this->get_override( "PaintBuildOverlay" );
         if( func_PaintBuildOverlay.ptr() != Py_None )
             try {
@@ -933,19 +679,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void PostChildPaint(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PostChildPaint: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PostChildPaint(  ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, PostChildPaint )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, PostChildPaint )
         bp::override func_PostChildPaint = this->get_override( "PostChildPaint" );
         if( func_PostChildPaint.ptr() != Py_None )
             try {
@@ -963,19 +698,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetBgColor( ::Color color ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetBgColor: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetBgColor( color ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetBgColor )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetBgColor )
         bp::override func_SetBgColor = this->get_override( "SetBgColor" );
         if( func_SetBgColor.ptr() != Py_None )
             try {
@@ -993,49 +717,27 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetBorder( ::vgui::IBorder * border ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetBorder: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetBorder( boost::python::ptr(border) ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetBorder )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetBorder )
         bp::override func_SetBorder = this->get_override( "SetBorder" );
         if( func_SetBorder.ptr() != Py_None )
             try {
                 func_SetBorder( boost::python::ptr(border) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::SetBorder( boost::python::ptr(border) );
+                this->vgui::Panel::SetBorder( border );
             }
         else
-            this->vgui::Panel::SetBorder( boost::python::ptr(border) );
+            this->vgui::Panel::SetBorder( border );
     }
     
     void default_SetBorder( ::vgui::IBorder * border ) {
-        vgui::Panel::SetBorder( boost::python::ptr(border) );
+        vgui::Panel::SetBorder( border );
     }
 
     virtual void SetCursor( ::vgui::HCursor cursor ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetCursor: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetCursor( cursor ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetCursor )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetCursor )
         bp::override func_SetCursor = this->get_override( "SetCursor" );
         if( func_SetCursor.ptr() != Py_None )
             try {
@@ -1053,19 +755,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetDragEnabled( bool enabled ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetDragEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetDragEnabled( enabled ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetDragEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetDragEnabled )
         bp::override func_SetDragEnabled = this->get_override( "SetDragEnabled" );
         if( func_SetDragEnabled.ptr() != Py_None )
             try {
@@ -1083,19 +774,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetEnabled( state ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetEnabled )
         bp::override func_SetEnabled = this->get_override( "SetEnabled" );
         if( func_SetEnabled.ptr() != Py_None )
             try {
@@ -1113,19 +793,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetFgColor( ::Color color ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetFgColor: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetFgColor( color ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetFgColor )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetFgColor )
         bp::override func_SetFgColor = this->get_override( "SetFgColor" );
         if( func_SetFgColor.ptr() != Py_None )
             try {
@@ -1143,19 +812,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetKeyBoardInputEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetKeyBoardInputEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetKeyBoardInputEnabled( state ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetKeyBoardInputEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetKeyBoardInputEnabled )
         bp::override func_SetKeyBoardInputEnabled = this->get_override( "SetKeyBoardInputEnabled" );
         if( func_SetKeyBoardInputEnabled.ptr() != Py_None )
             try {
@@ -1173,19 +831,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetMouseInputEnabled( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetMouseInputEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetMouseInputEnabled( state ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetMouseInputEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetMouseInputEnabled )
         bp::override func_SetMouseInputEnabled = this->get_override( "SetMouseInputEnabled" );
         if( func_SetMouseInputEnabled.ptr() != Py_None )
             try {
@@ -1223,19 +870,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetPaintBackgroundType( int type ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPaintBackgroundType: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPaintBackgroundType( type ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetPaintBackgroundType )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetPaintBackgroundType )
         bp::override func_SetPaintBackgroundType = this->get_override( "SetPaintBackgroundType" );
         if( func_SetPaintBackgroundType.ptr() != Py_None )
             try {
@@ -1253,19 +889,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetParent( ::vgui::VPANEL newParent ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetParent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetParent( newParent ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
         bp::override func_SetParent = this->get_override( "SetParent" );
         if( func_SetParent.ptr() != Py_None )
             try {
@@ -1283,19 +908,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetScheme( char const * tag ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetScheme: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetScheme( tag ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetScheme )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetScheme )
         bp::override func_SetScheme = this->get_override( "SetScheme" );
         if( func_SetScheme.ptr() != Py_None )
             try {
@@ -1313,19 +927,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetScheme( ::vgui::HScheme scheme ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetScheme: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetScheme( scheme ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetScheme )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetScheme )
         bp::override func_SetScheme = this->get_override( "SetScheme" );
         if( func_SetScheme.ptr() != Py_None )
             try {
@@ -1343,19 +946,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     virtual void SetVisible( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetVisible: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetVisible( state ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, SetVisible )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetVisible )
         bp::override func_SetVisible = this->get_override( "SetVisible" );
         if( func_SetVisible.ptr() != Py_None )
             try {
@@ -1375,19 +967,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     virtual void Paint(  ) {
         if( !IsSBufferEnabled() || ShouldRecordSBuffer( m_PaintCallBuffer ) )
         {
-            #if defined(_WIN32)
-            #if defined(_DEBUG)
-            Assert( SrcPySystem()->IsPythonRunning() );
-            Assert( GetCurrentThreadId() == g_hPythonThreadID );
-            #elif defined(PY_CHECKTHREADID)
-            if( GetCurrentThreadId() != g_hPythonThreadID )
-                Error( "Paint: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-            #endif // _DEBUG/PY_CHECKTHREADID
-            #endif // _WIN32
-            #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-            if( py_log_overrides.GetBool() )
-                Msg("Calling Paint(  ) of Class: vgui::vgui::Panel\n");
-            #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+            PY_OVERRIDE_CHECK( vgui::Panel, Paint )
+            PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, Paint )
             bp::override func_Paint = this->get_override( "Paint" );
             if( func_Paint.ptr() != Py_None )
                 try {
@@ -1415,19 +996,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     virtual void PaintBackground(  ) {
         if( !IsSBufferEnabled() || ShouldRecordSBuffer( m_PaintBackgroundCallBuffer ) )
         {
-            #if defined(_WIN32)
-            #if defined(_DEBUG)
-            Assert( SrcPySystem()->IsPythonRunning() );
-            Assert( GetCurrentThreadId() == g_hPythonThreadID );
-            #elif defined(PY_CHECKTHREADID)
-            if( GetCurrentThreadId() != g_hPythonThreadID )
-                Error( "PaintBackground: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-            #endif // _DEBUG/PY_CHECKTHREADID
-            #endif // _WIN32
-            #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-            if( py_log_overrides.GetBool() )
-                Msg("Calling PaintBackground(  ) of Class: vgui::vgui::Panel\n");
-            #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+            PY_OVERRIDE_CHECK( vgui::Panel, PaintBackground )
+            PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, PaintBackground )
             bp::override func_PaintBackground = this->get_override( "PaintBackground" );
             if( func_PaintBackground.ptr() != Py_None )
                 try {
@@ -1454,19 +1024,8 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     virtual void InvalidateLayout( bool layoutNow=false, bool reloadScheme=false ) {
         FlushSBuffer();
         
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "InvalidateLayout: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling InvalidateLayout( layoutNow, reloadScheme ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Panel, InvalidateLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, InvalidateLayout )
         bp::override func_InvalidateLayout = this->get_override( "InvalidateLayout" );
         if( func_InvalidateLayout.ptr() != Py_None )
             try {
@@ -1537,7 +1096,7 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     }
 
     void default_SetParent( ::vgui::Panel * newParent ) {
-        vgui::Panel::SetParent( boost::python::ptr(newParent) );
+        vgui::Panel::SetParent( newParent );
     }
 
 };

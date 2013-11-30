@@ -232,19 +232,8 @@ class VGUIControls(ClientModuleGenerator):
     virtual void Paint(  ) {
         if( !IsSBufferEnabled() || ShouldRecordSBuffer( m_PaintCallBuffer ) )
         {
-            #if defined(_WIN32)
-            #if defined(_DEBUG)
-            Assert( SrcPySystem()->IsPythonRunning() );
-            Assert( GetCurrentThreadId() == g_hPythonThreadID );
-            #elif defined(PY_CHECKTHREADID)
-            if( GetCurrentThreadId() != g_hPythonThreadID )
-                Error( "Paint: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-            #endif // _DEBUG/PY_CHECKTHREADID
-            #endif // _WIN32
-            #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-            if( py_log_overrides.GetBool() )
-                Msg("Calling Paint(  ) of Class: vgui::%(cls_name)s\n");
-            #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+            PY_OVERRIDE_CHECK( %(cls_name)s, Paint )
+            PY_OVERRIDE_LOG( %(modulename)s, %(cls_name)s, Paint )
             bp::override func_Paint = this->get_override( "Paint" );
             if( func_Paint.ptr() != Py_None )
                 try {
@@ -272,19 +261,8 @@ class VGUIControls(ClientModuleGenerator):
     virtual void PaintBackground(  ) {
         if( !IsSBufferEnabled() || ShouldRecordSBuffer( m_PaintBackgroundCallBuffer ) )
         {
-            #if defined(_WIN32)
-            #if defined(_DEBUG)
-            Assert( SrcPySystem()->IsPythonRunning() );
-            Assert( GetCurrentThreadId() == g_hPythonThreadID );
-            #elif defined(PY_CHECKTHREADID)
-            if( GetCurrentThreadId() != g_hPythonThreadID )
-                Error( "PaintBackground: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-            #endif // _DEBUG/PY_CHECKTHREADID
-            #endif // _WIN32
-            #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-            if( py_log_overrides.GetBool() )
-                Msg("Calling PaintBackground(  ) of Class: vgui::%(pb_cls_name)s\n");
-            #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+            PY_OVERRIDE_CHECK( %(cls_name)s, PaintBackground )
+            PY_OVERRIDE_LOG( %(modulename)s, %(cls_name)s, PaintBackground )
             bp::override func_PaintBackground = this->get_override( "PaintBackground" );
             if( func_PaintBackground.ptr() != Py_None )
                 try {
@@ -311,19 +289,8 @@ class VGUIControls(ClientModuleGenerator):
     virtual void InvalidateLayout( bool layoutNow=false, bool reloadScheme=false ) {
         FlushSBuffer();
         
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "InvalidateLayout: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling InvalidateLayout( layoutNow, reloadScheme ) of Class: vgui::Panel\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( %(cls_name)s, InvalidateLayout )
+        PY_OVERRIDE_LOG( %(modulename)s, %(cls_name)s, InvalidateLayout )
         bp::override func_InvalidateLayout = this->get_override( "InvalidateLayout" );
         if( func_InvalidateLayout.ptr() != Py_None )
             try {
@@ -340,9 +307,10 @@ class VGUIControls(ClientModuleGenerator):
         FlushSBuffer();
         %(il_cls_name)s::InvalidateLayout( layoutNow, reloadScheme );
     }
-    ''' %   {   'cls_name' : wrapperpaint.wrapped_class_identifier(), 
-                'pb_cls_name' : wrapperpaintbackground.wrapped_class_identifier(), 
+    ''' %   {   'cls_name' : wrapperpaint.wrapped_class_identifier(),
+                'pb_cls_name' : wrapperpaintbackground.wrapped_class_identifier(),
                 'il_cls_name' : wrapperinvalidatelayout.wrapped_class_identifier(),
+                'modulename' : self.module_name,
             })
             
             cls.add_registration_code(r'''

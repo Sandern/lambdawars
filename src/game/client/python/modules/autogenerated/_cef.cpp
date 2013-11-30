@@ -41,19 +41,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void Focus(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Focus: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Focus(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, Focus )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Focus )
         bp::override func_Focus = this->get_override( "Focus" );
         if( func_Focus.ptr() != Py_None )
             try {
@@ -70,20 +59,28 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::Focus( );
     }
 
+    virtual ::SrcCefBrowser::NavigationType GetNavigationBehavior(  ) {
+        PY_OVERRIDE_CHECK( SrcCefBrowser, GetNavigationBehavior )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, GetNavigationBehavior )
+        bp::override func_GetNavigationBehavior = this->get_override( "GetNavigationBehavior" );
+        if( func_GetNavigationBehavior.ptr() != Py_None )
+            try {
+                return func_GetNavigationBehavior(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->SrcCefBrowser::GetNavigationBehavior(  );
+            }
+        else
+            return this->SrcCefBrowser::GetNavigationBehavior(  );
+    }
+    
+    ::SrcCefBrowser::NavigationType default_GetNavigationBehavior(  ) {
+        return SrcCefBrowser::GetNavigationBehavior( );
+    }
+
     virtual void InvalidateLayout(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "InvalidateLayout: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling InvalidateLayout(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, InvalidateLayout )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, InvalidateLayout )
         bp::override func_InvalidateLayout = this->get_override( "InvalidateLayout" );
         if( func_InvalidateLayout.ptr() != Py_None )
             try {
@@ -101,19 +98,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual bool IsLoading(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "IsLoading: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling IsLoading(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, IsLoading )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, IsLoading )
         bp::override func_IsLoading = this->get_override( "IsLoading" );
         if( func_IsLoading.ptr() != Py_None )
             try {
@@ -131,19 +117,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual bool IsVisible(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "IsVisible: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling IsVisible(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, IsVisible )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, IsVisible )
         bp::override func_IsVisible = this->get_override( "IsVisible" );
         if( func_IsVisible.ptr() != Py_None )
             try {
@@ -161,19 +136,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual int KeyInput( int down, ::ButtonCode_t keynum, char const * pszCurrentBinding ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "KeyInput: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling KeyInput( down, keynum, pszCurrentBinding ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, KeyInput )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, KeyInput )
         bp::override func_KeyInput = this->get_override( "KeyInput" );
         if( func_KeyInput.ptr() != Py_None )
             try {
@@ -191,19 +155,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void LoadURL( char const * url ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "LoadURL: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling LoadURL( url ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, LoadURL )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, LoadURL )
         bp::override func_LoadURL = this->get_override( "LoadURL" );
         if( func_LoadURL.ptr() != Py_None )
             try {
@@ -221,19 +174,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void OnAfterCreated(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnAfterCreated: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnAfterCreated(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, OnAfterCreated )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnAfterCreated )
         bp::override func_OnAfterCreated = this->get_override( "OnAfterCreated" );
         if( func_OnAfterCreated.ptr() != Py_None )
             try {
@@ -251,19 +193,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void OnContextCreated(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnContextCreated: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnContextCreated(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, OnContextCreated )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnContextCreated )
         bp::override func_OnContextCreated = this->get_override( "OnContextCreated" );
         if( func_OnContextCreated.ptr() != Py_None )
             try {
@@ -281,19 +212,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void OnThink(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnThink: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnThink(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, OnThink )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnThink )
         bp::override func_OnThink = this->get_override( "OnThink" );
         if( func_OnThink.ptr() != Py_None )
             try {
@@ -311,19 +231,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void PerformLayout(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PerformLayout: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PerformLayout(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, PerformLayout )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PerformLayout )
         bp::override func_PerformLayout = this->get_override( "PerformLayout" );
         if( func_PerformLayout.ptr() != Py_None )
             try {
@@ -341,19 +250,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void PyOnLoadEnd( ::boost::python::object frame, int httpStatusCode ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLoadEnd: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnLoadEnd( frame, httpStatusCode ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadEnd )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadEnd )
         bp::override func_OnLoadEnd = this->get_override( "OnLoadEnd" );
         if( func_OnLoadEnd.ptr() != Py_None )
             try {
@@ -371,19 +269,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void PyOnLoadError( ::boost::python::object frame, int errorCode, wchar_t const * errorText, wchar_t const * failedUrl ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLoadError: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnLoadError( frame, errorCode, errorText, failedUrl ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadError )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadError )
         bp::override func_OnLoadError = this->get_override( "OnLoadError" );
         if( func_OnLoadError.ptr() != Py_None )
             try {
@@ -401,19 +288,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void PyOnLoadStart( ::boost::python::object frame ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnLoadStart: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnLoadStart( frame ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadStart )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadStart )
         bp::override func_OnLoadStart = this->get_override( "OnLoadStart" );
         if( func_OnLoadStart.ptr() != Py_None )
             try {
@@ -431,19 +307,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void PyOnMethodCall( int identifier, ::boost::python::object methodargs, ::boost::python::object callbackid ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnMethodCall: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PyOnMethodCall( identifier, methodargs, callbackid ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnMethodCall )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnMethodCall )
         bp::override func_OnMethodCall = this->get_override( "OnMethodCall" );
         if( func_OnMethodCall.ptr() != Py_None )
             try {
@@ -461,19 +326,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void Reload(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Reload: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Reload(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, Reload )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Reload )
         bp::override func_Reload = this->get_override( "Reload" );
         if( func_Reload.ptr() != Py_None )
             try {
@@ -491,19 +345,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void ReloadIgnoreCache(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ReloadIgnoreCache: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ReloadIgnoreCache(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, ReloadIgnoreCache )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, ReloadIgnoreCache )
         bp::override func_ReloadIgnoreCache = this->get_override( "ReloadIgnoreCache" );
         if( func_ReloadIgnoreCache.ptr() != Py_None )
             try {
@@ -521,19 +364,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void SetNavigationBehavior( ::SrcCefBrowser::NavigationType behavior ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetNavigationBehavior: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetNavigationBehavior( behavior ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, SetNavigationBehavior )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetNavigationBehavior )
         bp::override func_SetNavigationBehavior = this->get_override( "SetNavigationBehavior" );
         if( func_SetNavigationBehavior.ptr() != Py_None )
             try {
@@ -551,19 +383,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void SetPos( int x, int y ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetPos: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetPos( x, y ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, SetPos )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetPos )
         bp::override func_SetPos = this->get_override( "SetPos" );
         if( func_SetPos.ptr() != Py_None )
             try {
@@ -581,19 +402,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void SetSize( int wide, int tall ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetSize: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetSize( wide, tall ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, SetSize )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetSize )
         bp::override func_SetSize = this->get_override( "SetSize" );
         if( func_SetSize.ptr() != Py_None )
             try {
@@ -611,19 +421,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void SetVisible( bool state ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetVisible: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetVisible( state ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, SetVisible )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetVisible )
         bp::override func_SetVisible = this->get_override( "SetVisible" );
         if( func_SetVisible.ptr() != Py_None )
             try {
@@ -641,19 +440,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void SetZPos( int z ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetZPos: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetZPos( z ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, SetZPos )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetZPos )
         bp::override func_SetZPos = this->get_override( "SetZPos" );
         if( func_SetZPos.ptr() != Py_None )
             try {
@@ -671,19 +459,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void StopLoad(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "StopLoad: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling StopLoad(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, StopLoad )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, StopLoad )
         bp::override func_StopLoad = this->get_override( "StopLoad" );
         if( func_StopLoad.ptr() != Py_None )
             try {
@@ -701,19 +478,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     }
 
     virtual void Unfocus(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Unfocus: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Unfocus(  ) of Class: SrcCefBrowser\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( SrcCefBrowser, Unfocus )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Unfocus )
         bp::override func_Unfocus = this->get_override( "Unfocus" );
         if( func_Unfocus.ptr() != Py_None )
             try {
@@ -843,6 +609,17 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "GetName"
                 , GetName_function_type( &::SrcCefBrowser::GetName ) );
+        
+        }
+        { //::SrcCefBrowser::GetNavigationBehavior
+        
+            typedef ::SrcCefBrowser::NavigationType ( ::SrcCefBrowser::*GetNavigationBehavior_function_type )(  ) ;
+            typedef ::SrcCefBrowser::NavigationType ( SrcCefBrowser_wrapper::*default_GetNavigationBehavior_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "GetNavigationBehavior"
+                , GetNavigationBehavior_function_type(&::SrcCefBrowser::GetNavigationBehavior)
+                , default_GetNavigationBehavior_function_type(&SrcCefBrowser_wrapper::default_GetNavigationBehavior) );
         
         }
         { //::SrcCefBrowser::GetPassMouseTruIfAlphaZero

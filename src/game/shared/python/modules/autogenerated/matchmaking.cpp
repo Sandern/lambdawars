@@ -29,33 +29,22 @@ struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEvents
     }
 
     virtual void OnEvent( ::KeyValues * pEvent ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnEvent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnEvent( boost::python::ptr(pEvent) ) of Class: PyMatchEventsSink\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyMatchEventsSink, OnEvent )
+        PY_OVERRIDE_LOG( matchmaking, PyMatchEventsSink, OnEvent )
         bp::override func_OnEvent = this->get_override( "OnEvent" );
         if( func_OnEvent.ptr() != Py_None )
             try {
                 func_OnEvent( boost::python::ptr(pEvent) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+                this->PyMatchEventsSink::OnEvent( pEvent );
             }
         else
-            this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+            this->PyMatchEventsSink::OnEvent( pEvent );
     }
     
     void default_OnEvent( ::KeyValues * pEvent ) {
-        PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+        PyMatchEventsSink::OnEvent( pEvent );
     }
 
 };
@@ -257,33 +246,22 @@ struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEvents
     }
 
     virtual void OnEvent( ::KeyValues * pEvent ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnEvent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnEvent( boost::python::ptr(pEvent) ) of Class: PyMatchEventsSink\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyMatchEventsSink, OnEvent )
+        PY_OVERRIDE_LOG( matchmaking, PyMatchEventsSink, OnEvent )
         bp::override func_OnEvent = this->get_override( "OnEvent" );
         if( func_OnEvent.ptr() != Py_None )
             try {
                 func_OnEvent( boost::python::ptr(pEvent) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+                this->PyMatchEventsSink::OnEvent( pEvent );
             }
         else
-            this->PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+            this->PyMatchEventsSink::OnEvent( pEvent );
     }
     
     void default_OnEvent( ::KeyValues * pEvent ) {
-        PyMatchEventsSink::OnEvent( boost::python::ptr(pEvent) );
+        PyMatchEventsSink::OnEvent( pEvent );
     }
 
 };

@@ -16,6 +16,7 @@ tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return %(clsname)s::GetClientClass();
 #endif // _WIN32
+        PY_OVERRIDE_LOG( %(modulename)s, %(clsname)s, GetClientClass )
         ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
         if( pClientClass )
             return pClientClass;
@@ -24,18 +25,8 @@ tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
 '''
 
 tmpl_serverclass = '''virtual ServerClass* GetServerClass() {
-#if defined(_WIN32)
-#if defined(_DEBUG)
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-#elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetServerClass: Client? %%d. Thread ID is not the same as in which the python interpreter is initialized! %%d != %%d. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-#endif // _DEBUG/PY_CHECKTHREADID
-#endif // _WIN32
-#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetServerClass(  ) of Class: %(clsname)s\\n");
-#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( %(clsname)s, GetServerClass )
+        PY_OVERRIDE_LOG( %(modulename)s, %(clsname)s, GetServerClass )
         ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
@@ -435,7 +426,7 @@ class Entities(SemiSharedModuleGenerator):
             # Check if the python class is networkable. Add code for getting the "ClientClass" if that's the case.
             networkcls = self.FindNetworkClass(mb, cls)
             if networkcls:
-                cls.add_wrapper_code(tmpl_clientclass % {'clsname' : networkcls.name})
+                cls.add_wrapper_code(tmpl_clientclass % {'clsname' : networkcls.name, 'modulename' : self.module_name})
                 
             # Apply common rules
             # Excludes
@@ -480,7 +471,7 @@ class Entities(SemiSharedModuleGenerator):
             # Check if the python class is networkable. Add code for getting the "ServerClass" if that's the case.
             networkcls = self.FindNetworkClass(mb, cls)
             if networkcls:
-                cls.add_wrapper_code(tmpl_serverclass % {'clsname' : networkcls.name})
+                cls.add_wrapper_code(tmpl_serverclass % {'clsname' : networkcls.name, 'modulename' : self.module_name})
                 
             # Apply common rules
             cls.mem_funs('GetServerClass', allow_empty=True).exclude()

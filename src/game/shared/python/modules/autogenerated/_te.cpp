@@ -96,19 +96,8 @@ struct PyClientSideEffect_wrapper : PyClientSideEffect, bp::wrapper< PyClientSid
     }
 
     virtual void Draw( double frametime ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Draw: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Draw( frametime ) of Class: PyClientSideEffect\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyClientSideEffect, Draw )
+        PY_OVERRIDE_LOG( _te, PyClientSideEffect, Draw )
         bp::override func_Draw = this->get_override( "Draw" );
         if( func_Draw.ptr() != Py_None )
             try {
@@ -174,33 +163,22 @@ struct PyMeshVertex_wrapper : PyMeshVertex, bp::wrapper< PyMeshVertex > {
     }
 
     virtual void Draw( ::CMeshBuilder & builder ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Draw: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Draw( boost::ref(builder) ) of Class: PyMeshVertex\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyMeshVertex, Draw )
+        PY_OVERRIDE_LOG( _te, PyMeshVertex, Draw )
         bp::override func_Draw = this->get_override( "Draw" );
         if( func_Draw.ptr() != Py_None )
             try {
                 func_Draw( boost::ref(builder) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->PyMeshVertex::Draw( boost::ref(builder) );
+                this->PyMeshVertex::Draw( builder );
             }
         else
-            this->PyMeshVertex::Draw( boost::ref(builder) );
+            this->PyMeshVertex::Draw( builder );
     }
     
     void default_Draw( ::CMeshBuilder & builder ) {
-        PyMeshVertex::Draw( boost::ref(builder) );
+        PyMeshVertex::Draw( builder );
     }
 
 };

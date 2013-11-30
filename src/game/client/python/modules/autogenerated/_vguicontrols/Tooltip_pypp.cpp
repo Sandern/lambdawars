@@ -39,19 +39,8 @@ struct Tooltip_wrapper : vgui::Tooltip, bp::wrapper< vgui::Tooltip > {
     }
 
     virtual void PerformLayout(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "PerformLayout: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling PerformLayout(  ) of Class: vgui::Tooltip\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Tooltip, PerformLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Tooltip, PerformLayout )
         bp::override func_PerformLayout = this->get_override( "PerformLayout" );
         if( func_PerformLayout.ptr() != Py_None )
             try {
@@ -69,19 +58,8 @@ struct Tooltip_wrapper : vgui::Tooltip, bp::wrapper< vgui::Tooltip > {
     }
 
     virtual void SetEnabled( bool bState ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetEnabled: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetEnabled( bState ) of Class: vgui::Tooltip\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Tooltip, SetEnabled )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Tooltip, SetEnabled )
         bp::override func_SetEnabled = this->get_override( "SetEnabled" );
         if( func_SetEnabled.ptr() != Py_None )
             try {
@@ -99,19 +77,8 @@ struct Tooltip_wrapper : vgui::Tooltip, bp::wrapper< vgui::Tooltip > {
     }
 
     virtual void SetText( char const * text ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetText: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetText( text ) of Class: vgui::Tooltip\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( vgui::Tooltip, SetText )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Tooltip, SetText )
         bp::override func_SetText = this->get_override( "SetText" );
         if( func_SetText.ptr() != Py_None )
             try {

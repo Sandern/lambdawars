@@ -151,19 +151,8 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     }
 
     virtual ::IMouse * GetIMouse(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetIMouse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetIMouse(  ) of Class: IMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( IMouse, GetIMouse )
+        PY_OVERRIDE_LOG( _entitiesmisc, IMouse, GetIMouse )
         bp::override func_GetIMouse = this->get_override( "GetIMouse" );
         if( func_GetIMouse.ptr() != Py_None )
             try {
@@ -280,19 +269,8 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     virtual long unsigned int GetCursor(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetCursor: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetCursor(  ) of Class: PyMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyMouse, GetCursor )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, GetCursor )
         bp::override func_GetCursor = this->get_override( "GetCursor" );
         if( func_GetCursor.ptr() != Py_None )
             try {
@@ -310,19 +288,8 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     virtual void OnHoverPaint(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnHoverPaint: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnHoverPaint(  ) of Class: PyMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( PyMouse, OnHoverPaint )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnHoverPaint )
         bp::override func_OnHoverPaint = this->get_override( "OnHoverPaint" );
         if( func_OnHoverPaint.ptr() != Py_None )
             try {
@@ -340,19 +307,8 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     virtual ::IMouse * GetIMouse(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetIMouse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetIMouse(  ) of Class: IMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( IMouse, GetIMouse )
+        PY_OVERRIDE_LOG( _entitiesmisc, IMouse, GetIMouse )
         bp::override func_GetIMouse = this->get_override( "GetIMouse" );
         if( func_GetIMouse.ptr() != Py_None )
             try {
@@ -383,7 +339,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftPressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
+        PyMouse::OnClickLeftPressed( player );
     }
 
     virtual void OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
@@ -400,7 +356,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightPressed( boost::python::ptr(player) );
+        PyMouse::OnClickRightPressed( player );
     }
 
     virtual void OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
@@ -417,7 +373,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
+        PyMouse::OnClickLeftReleased( player );
     }
 
     virtual void OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
@@ -434,7 +390,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightReleased( boost::python::ptr(player) );
+        PyMouse::OnClickRightReleased( player );
     }
 
     virtual void OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
@@ -451,7 +407,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
+        PyMouse::OnClickLeftDoublePressed( player );
     }
 
     virtual void OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
@@ -468,7 +424,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
+        PyMouse::OnClickRightDoublePressed( player );
     }
 
     virtual void OnCursorEntered( ::C_HL2WarsPlayer * player ) {
@@ -485,7 +441,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnCursorEntered( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnCursorEntered( boost::python::ptr(player) );
+        PyMouse::OnCursorEntered( player );
     }
 
     virtual void OnCursorExited( ::C_HL2WarsPlayer * player ) {
@@ -502,7 +458,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnCursorExited( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnCursorExited( boost::python::ptr(player) );
+        PyMouse::OnCursorExited( player );
     }
 
 };
@@ -2527,37 +2483,41 @@ struct CGlobalEntityList_wrapper : CGlobalEntityList, bp::wrapper< CGlobalEntity
     }
 
     virtual void OnAddEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
+        PY_OVERRIDE_CHECK( CGlobalEntityList, OnAddEntity )
+        PY_OVERRIDE_LOG( _entitiesmisc, CGlobalEntityList, OnAddEntity )
         bp::override func_OnAddEntity = this->get_override( "OnAddEntity" );
         if( func_OnAddEntity.ptr() != Py_None )
             try {
                 func_OnAddEntity( boost::python::ptr(pEnt), handle );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CGlobalEntityList::OnAddEntity( boost::python::ptr(pEnt), handle );
+                this->CGlobalEntityList::OnAddEntity( pEnt, handle );
             }
         else
-            this->CGlobalEntityList::OnAddEntity( boost::python::ptr(pEnt), handle );
+            this->CGlobalEntityList::OnAddEntity( pEnt, handle );
     }
     
     virtual void default_OnAddEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
-        CGlobalEntityList::OnAddEntity( boost::python::ptr(pEnt), handle );
+        CGlobalEntityList::OnAddEntity( pEnt, handle );
     }
 
     virtual void OnRemoveEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
+        PY_OVERRIDE_CHECK( CGlobalEntityList, OnRemoveEntity )
+        PY_OVERRIDE_LOG( _entitiesmisc, CGlobalEntityList, OnRemoveEntity )
         bp::override func_OnRemoveEntity = this->get_override( "OnRemoveEntity" );
         if( func_OnRemoveEntity.ptr() != Py_None )
             try {
                 func_OnRemoveEntity( boost::python::ptr(pEnt), handle );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CGlobalEntityList::OnRemoveEntity( boost::python::ptr(pEnt), handle );
+                this->CGlobalEntityList::OnRemoveEntity( pEnt, handle );
             }
         else
-            this->CGlobalEntityList::OnRemoveEntity( boost::python::ptr(pEnt), handle );
+            this->CGlobalEntityList::OnRemoveEntity( pEnt, handle );
     }
     
     virtual void default_OnRemoveEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
-        CGlobalEntityList::OnRemoveEntity( boost::python::ptr(pEnt), handle );
+        CGlobalEntityList::OnRemoveEntity( pEnt, handle );
     }
 
 };
@@ -2579,33 +2539,22 @@ struct CPythonSendProxyBase_wrapper : CPythonSendProxyBase, bp::wrapper< CPython
     }
 
     virtual bool ShouldSend( ::CBaseEntity * pEnt, int iClient ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "ShouldSend: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling ShouldSend( boost::python::ptr(pEnt), iClient ) of Class: CPythonSendProxyBase\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CPythonSendProxyBase, ShouldSend )
+        PY_OVERRIDE_LOG( _entitiesmisc, CPythonSendProxyBase, ShouldSend )
         bp::override func_ShouldSend = this->get_override( "ShouldSend" );
         if( func_ShouldSend.ptr() != Py_None )
             try {
                 return func_ShouldSend( boost::python::ptr(pEnt), iClient );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+                return this->CPythonSendProxyBase::ShouldSend( pEnt, iClient );
             }
         else
-            return this->CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+            return this->CPythonSendProxyBase::ShouldSend( pEnt, iClient );
     }
     
     bool default_ShouldSend( ::CBaseEntity * pEnt, int iClient ) {
-        return CPythonSendProxyBase::ShouldSend( boost::python::ptr(pEnt), iClient );
+        return CPythonSendProxyBase::ShouldSend( pEnt, iClient );
     }
 
 };
@@ -2661,19 +2610,8 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     }
 
     virtual ::IMouse * GetIMouse(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetIMouse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetIMouse(  ) of Class: IMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( IMouse, GetIMouse )
+        PY_OVERRIDE_LOG( _entitiesmisc, IMouse, GetIMouse )
         bp::override func_GetIMouse = this->get_override( "GetIMouse" );
         if( func_GetIMouse.ptr() != Py_None )
             try {
@@ -2814,19 +2752,8 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     virtual ::IMouse * GetIMouse(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetIMouse: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetIMouse(  ) of Class: IMouse\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( IMouse, GetIMouse )
+        PY_OVERRIDE_LOG( _entitiesmisc, IMouse, GetIMouse )
         bp::override func_GetIMouse = this->get_override( "GetIMouse" );
         if( func_GetIMouse.ptr() != Py_None )
             try {
@@ -2857,7 +2784,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
+        PyMouse::OnClickLeftPressed( player );
     }
 
     virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ) {
@@ -2874,7 +2801,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightPressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightPressed( boost::python::ptr(player) );
+        PyMouse::OnClickRightPressed( player );
     }
 
     virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
@@ -2891,7 +2818,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
+        PyMouse::OnClickLeftReleased( player );
     }
 
     virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ) {
@@ -2908,7 +2835,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightReleased( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightReleased( boost::python::ptr(player) );
+        PyMouse::OnClickRightReleased( player );
     }
 
     virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
@@ -2925,7 +2852,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
+        PyMouse::OnClickLeftDoublePressed( player );
     }
 
     virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
@@ -2942,7 +2869,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
+        PyMouse::OnClickRightDoublePressed( player );
     }
 
     virtual void OnCursorEntered( ::CHL2WarsPlayer * player ) {
@@ -2959,7 +2886,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnCursorEntered( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnCursorEntered( boost::python::ptr(player) );
+        PyMouse::OnCursorEntered( player );
     }
 
     virtual void OnCursorExited( ::CHL2WarsPlayer * player ) {
@@ -2976,7 +2903,7 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     }
 
     void default_OnCursorExited( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnCursorExited( boost::python::ptr(player) );
+        PyMouse::OnCursorExited( player );
     }
 
 };

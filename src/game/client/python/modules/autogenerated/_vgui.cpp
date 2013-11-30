@@ -64,49 +64,27 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void FireGameEvent( ::IGameEvent * event ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "FireGameEvent: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling FireGameEvent( boost::python::ptr(event) ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, FireGameEvent )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, FireGameEvent )
         bp::override func_FireGameEvent = this->get_override( "FireGameEvent" );
         if( func_FireGameEvent.ptr() != Py_None )
             try {
                 func_FireGameEvent( boost::python::ptr(event) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CHudElement::FireGameEvent( boost::python::ptr(event) );
+                this->CHudElement::FireGameEvent( event );
             }
         else
-            this->CHudElement::FireGameEvent( boost::python::ptr(event) );
+            this->CHudElement::FireGameEvent( event );
     }
     
     void default_FireGameEvent( ::IGameEvent * event ) {
-        CHudElement::FireGameEvent( boost::python::ptr(event) );
+        CHudElement::FireGameEvent( event );
     }
 
     virtual int GetRenderGroupPriority(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "GetRenderGroupPriority: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling GetRenderGroupPriority(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, GetRenderGroupPriority )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, GetRenderGroupPriority )
         bp::override func_GetRenderGroupPriority = this->get_override( "GetRenderGroupPriority" );
         if( func_GetRenderGroupPriority.ptr() != Py_None )
             try {
@@ -124,19 +102,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void Init(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Init: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Init(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, Init )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, Init )
         bp::override func_Init = this->get_override( "Init" );
         if( func_Init.ptr() != Py_None )
             try {
@@ -154,19 +121,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void LevelInit(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "LevelInit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling LevelInit(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, LevelInit )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, LevelInit )
         bp::override func_LevelInit = this->get_override( "LevelInit" );
         if( func_LevelInit.ptr() != Py_None )
             try {
@@ -184,19 +140,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void LevelShutdown(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "LevelShutdown: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling LevelShutdown(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, LevelShutdown )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, LevelShutdown )
         bp::override func_LevelShutdown = this->get_override( "LevelShutdown" );
         if( func_LevelShutdown.ptr() != Py_None )
             try {
@@ -214,19 +159,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void OnSplitScreenStateChanged(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "OnSplitScreenStateChanged: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling OnSplitScreenStateChanged(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, OnSplitScreenStateChanged )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, OnSplitScreenStateChanged )
         bp::override func_OnSplitScreenStateChanged = this->get_override( "OnSplitScreenStateChanged" );
         if( func_OnSplitScreenStateChanged.ptr() != Py_None )
             try {
@@ -244,19 +178,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void Reset(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Reset: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Reset(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, Reset )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, Reset )
         bp::override func_Reset = this->get_override( "Reset" );
         if( func_Reset.ptr() != Py_None )
             try {
@@ -274,19 +197,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void SetHiddenBits( int iBits ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetHiddenBits: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetHiddenBits( iBits ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, SetHiddenBits )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, SetHiddenBits )
         bp::override func_SetHiddenBits = this->get_override( "SetHiddenBits" );
         if( func_SetHiddenBits.ptr() != Py_None )
             try {
@@ -304,49 +216,27 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual void SetHud( ::CHud * pHud ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "SetHud: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling SetHud( boost::python::ptr(pHud) ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, SetHud )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, SetHud )
         bp::override func_SetHud = this->get_override( "SetHud" );
         if( func_SetHud.ptr() != Py_None )
             try {
                 func_SetHud( boost::python::ptr(pHud) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CHudElement::SetHud( boost::python::ptr(pHud) );
+                this->CHudElement::SetHud( pHud );
             }
         else
-            this->CHudElement::SetHud( boost::python::ptr(pHud) );
+            this->CHudElement::SetHud( pHud );
     }
     
     void default_SetHud( ::CHud * pHud ) {
-        CHudElement::SetHud( boost::python::ptr(pHud) );
+        CHudElement::SetHud( pHud );
     }
 
     virtual void VidInit(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "VidInit: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling VidInit(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, VidInit )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, VidInit )
         bp::override func_VidInit = this->get_override( "VidInit" );
         if( func_VidInit.ptr() != Py_None )
             try {
@@ -364,19 +254,8 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     }
 
     virtual bool WantsHudLayoutEntry(  ) const  {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "WantsHudLayoutEntry: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling WantsHudLayoutEntry(  ) of Class: CHudElement\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( CHudElement, WantsHudLayoutEntry )
+        PY_OVERRIDE_LOG( _vgui, CHudElement, WantsHudLayoutEntry )
         bp::override func_WantsHudLayoutEntry = this->get_override( "WantsHudLayoutEntry" );
         if( func_WantsHudLayoutEntry.ptr() != Py_None )
             try {
@@ -529,19 +408,8 @@ struct WarsVGUIScreen_wrapper : WarsVGUIScreen, bp::wrapper< WarsVGUIScreen > {
     }
 
     virtual void Draw(  ) {
-        #if defined(_WIN32)
-        #if defined(_DEBUG)
-        Assert( SrcPySystem()->IsPythonRunning() );
-        Assert( GetCurrentThreadId() == g_hPythonThreadID );
-        #elif defined(PY_CHECKTHREADID)
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            Error( "Draw: Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d. Tell a developer.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
-        #endif // _DEBUG/PY_CHECKTHREADID
-        #endif // _WIN32
-        #if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
-        if( py_log_overrides.GetBool() )
-            Msg("Calling Draw(  ) of Class: WarsVGUIScreen\n");
-        #endif // _DEBUG/PY_CHECK_LOG_OVERRIDES
+        PY_OVERRIDE_CHECK( WarsVGUIScreen, Draw )
+        PY_OVERRIDE_LOG( _vgui, WarsVGUIScreen, Draw )
         bp::override func_Draw = this->get_override( "Draw" );
         if( func_Draw.ptr() != Py_None )
             try {
