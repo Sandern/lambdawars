@@ -136,6 +136,19 @@ public:
 	virtual ~CGameRules( void );
 
 	virtual	bool	Init();
+	
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	virtual void InitGamerules() {}
+	virtual void ShutdownGamerules() {}
+
+	virtual PyObject *GetPySelf() const { return NULL; }
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// Damage Queries - these need to be implemented by the various subclasses (single-player, multi-player, etc).
 	// The queries represent queries against damage types and properties.

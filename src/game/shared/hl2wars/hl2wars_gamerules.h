@@ -93,16 +93,14 @@ public:
 
 	virtual bool IsTeamplay( void ) { return false; }   // is this deathmatch game being played with team rules?
 
-	//Tony; define a default encryption key.
 	virtual const unsigned char *GetEncryptionKey( void ) { return (unsigned char *)"a1b2c3d4"; }
 	
-#ifdef CLIENT_DLL
-	virtual void InitGamerules() {}
-	virtual void ShutdownGamerules() {}
-#else
+#ifdef ENABLE_PYTHON
+#ifndef CLIENT_DLL
 	virtual void InitGamerules();
 	virtual void ShutdownGamerules();
 #endif // CLIENT_DLL
+#endif // ENABLE_PYTHON
 
 	virtual bool ShouldCollide( int collisionGroup0, int collisionGroup1 );
 
@@ -116,16 +114,6 @@ public:
 	
 	CHL2WarsGameRules();
 	virtual ~CHL2WarsGameRules();
-
-	virtual bool Init() { return BaseClass::Init(); }
-
-	// Called each frame. This just forwards the call to Think().
-	virtual void FrameUpdatePostEntityThink();
-#ifdef ENABLE_PYTHON
-	virtual PyObject *GetPySelf() const { return NULL; }
-#endif // ENABLE_PYTHON
-
-	virtual void Think();
 
 	void UpdateVoiceManager();
 
@@ -142,29 +130,29 @@ public:
 	virtual void Precache( void );
 
 	// Functions to verify the single/multiplayer status of a game
-	virtual bool IsDeathmatch( void ) { return BaseClass::IsDeathmatch(); } //is this a deathmatch game?
-	virtual bool IsCoOp( void ) { return BaseClass::IsCoOp(); } // is this a coop game?
+	//virtual bool IsDeathmatch( void ) { return BaseClass::IsDeathmatch(); } //is this a deathmatch game?
+	//virtual bool IsCoOp( void ) { return BaseClass::IsCoOp(); } // is this a coop game?
 	virtual const char *GetGameDescription( void ) { return "HL2Wars"; } 
 
 	// Client connection/disconnection
 	virtual bool ClientConnected( edict_t *pEntity, const char *name, const char *address, char *reject, int maxrejectlen ); // a client just connected to the server (player hasn't spawned yet)
 	virtual bool PyClientConnected( int clientindex, const char *name, const char *address, char *reject, int maxrejectlen ) { return true; }
-	virtual void InitHUD( CBasePlayer *pl ) { BaseClass::InitHUD(pl); }		// the client dll is ready for updating
+	//virtual void InitHUD( CBasePlayer *pl ) { BaseClass::InitHUD(pl); }		// the client dll is ready for updating
 	virtual void ClientDisconnected( edict_t *client ); // a client just disconnected from the server
 	virtual void PyClientDisconnected( CBasePlayer *client ) {}
 	virtual void ClientActive( CBasePlayer *client ) {}
 
 	// Client spawn/respawn control
 	virtual void PlayerSpawn( CBasePlayer *player );     // called by CBasePlayer::Spawn just before releasing player into the game
-	virtual void PlayerThink( CBasePlayer *player ) { BaseClass::PlayerThink(player); } // called by CBasePlayer::PreThink every frame, before physics are run and after keys are accepted
-	virtual bool FPlayerCanRespawn( CBasePlayer *player ) { return BaseClass::FPlayerCanRespawn(player); }// is this player allowed to respawn now?
-	virtual float FlPlayerSpawnTime( CBasePlayer *player ) { return BaseClass::FlPlayerSpawnTime(player); } // When in the future will this player be able to spawn?
-	virtual CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *player ) { return BaseClass::GetPlayerSpawnSpot(player); }  // Place this player on their spawnspot and face them the proper direction.
-	virtual bool IsSpawnPointValid( CBaseEntity *spot, CBasePlayer *player ) { return BaseClass::IsSpawnPointValid(spot, player); }
+	//virtual void PlayerThink( CBasePlayer *player ) { BaseClass::PlayerThink(player); } // called by CBasePlayer::PreThink every frame, before physics are run and after keys are accepted
+	//virtual bool FPlayerCanRespawn( CBasePlayer *player ) { return BaseClass::FPlayerCanRespawn(player); }// is this player allowed to respawn now?
+	//virtual float FlPlayerSpawnTime( CBasePlayer *player ) { return BaseClass::FlPlayerSpawnTime(player); } // When in the future will this player be able to spawn?
+	//virtual CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *player ) { return BaseClass::GetPlayerSpawnSpot(player); }  // Place this player on their spawnspot and face them the proper direction.
+	//virtual bool IsSpawnPointValid( CBaseEntity *spot, CBasePlayer *player ) { return BaseClass::IsSpawnPointValid(spot, player); }
 
-	virtual bool AllowAutoTargetCrosshair( void ) { return BaseClass::AllowAutoTargetCrosshair(); }
+	//virtual bool AllowAutoTargetCrosshair( void ) { return BaseClass::AllowAutoTargetCrosshair(); }
 	virtual bool ClientCommand( CBaseEntity *edict, const CCommand &args );  // handles the user commands;  returns TRUE if command handled properly
-	virtual void ClientSettingsChanged( CBasePlayer *player ) { BaseClass::ClientSettingsChanged(player); }		 // the player has changed cvars
+	//virtual void ClientSettingsChanged( CBasePlayer *player ) { BaseClass::ClientSettingsChanged(player); }		 // the player has changed cvars
 
 	// Informs about player changes
 	virtual void PlayerChangedOwnerNumber( CBasePlayer *player, int oldownernumber, int newownernumber ) {}
@@ -182,8 +170,8 @@ public:
 	virtual boost::python::object GetNextLevelName( bool bRandom = false );
 #endif // ENABLE_PYTHON
 
-	virtual void ChangeLevel( void ) { BaseClass::ChangeLevel(); }
-	virtual void GoToIntermission( void ) { BaseClass::GoToIntermission(); }
+	//virtual void ChangeLevel( void ) { BaseClass::ChangeLevel(); }
+	//virtual void GoToIntermission( void ) { BaseClass::GoToIntermission(); }
 
 	float GetIntermissionEndTime() { return m_flIntermissionEndTime; }
 	void SetintermissionEndTime( float endtime ) { m_flIntermissionEndTime = endtime; }
@@ -191,7 +179,7 @@ public:
 	bool GetGameOver() { return g_fGameOver; }
 	void SetGameOver( bool gameover ) { g_fGameOver = gameover; }
 
-	virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info ) {}
+	//virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info ) {}
 
 private:
 	void DestroyTeams();

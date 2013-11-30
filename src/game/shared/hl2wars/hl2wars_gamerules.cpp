@@ -219,6 +219,10 @@ CHL2WarsGameRules::~CHL2WarsGameRules()
 {
 }
 
+#ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CHL2WarsGameRules::InitGamerules()
 {
 	InitTeams();
@@ -231,6 +235,7 @@ void CHL2WarsGameRules::ShutdownGamerules()
 {
 	DestroyTeams();
 }
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -252,10 +257,6 @@ void CHL2WarsGameRules::DestroyTeams()
 			UTIL_Remove( m_Teams[i] );
 	}
 	m_Teams.Purge();
-
-	// Note, don't delete each team since they are in the gEntList and will 
-	// automatically be deleted from there, instead.
-	//g_Teams.Purge();
 }
 
 //-----------------------------------------------------------------------------
@@ -276,14 +277,12 @@ void CHL2WarsGameRules::InitTeams( void )
 
 	g_Teams.Purge();	// just in case
 
-	//Tony; we have a special unassigned team incase our mod is using classes but not teams.
 	CTeam *pUnassigned = static_cast<CTeam*>(CreateEntityByName( "hl2wars_team_unassigned" ));
 	Assert( pUnassigned );
 	pUnassigned->Init( pszTeamNames[TEAM_UNASSIGNED], TEAM_UNASSIGNED );
 	g_Teams.AddToTail( pUnassigned );
 	m_Teams.AddToTail( pUnassigned );
 
-	//Tony; just use a plain ole sdk_team_manager for spectators
 	CTeam *pSpectator = static_cast<CTeam*>(CreateEntityByName( "hl2wars_team_manager" ));
 	Assert( pSpectator );
 	pSpectator->Init( pszTeamNames[TEAM_SPECTATOR], TEAM_SPECTATOR );
@@ -335,30 +334,6 @@ bool CHL2WarsGameRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args
 		return true;
 	}
 	return false;
-}
-
-void CHL2WarsGameRules::FrameUpdatePostEntityThink()
-{
-	VPROF( "CHL2WarsGameRules::FrameUpdatePostEntityThink" );
-
-	// In case our reference count reaches zero during execution of the Think method
-	// TODO: Fix this for other CAutoGameSystemPerFrame methods?
-	// Note: Already done in ClearGamerules(), so commented out.
-	/*Msg("Making backup plan\n");
-	boost::python::object ref = boost::python::object(
-		boost::python::handle<>(
-		boost::python::borrowed(GetPySelf())
-		)
-	);
-	SrcPySystem()->AddToDeleteList(ref); // Not really deleting, but keeps it alive in case of delete this frame. Need a better fix.
-	*/
-
-	Think();
-}
-
-void CHL2WarsGameRules::Think()
-{
-	//BaseClass::Think();
 }
 
 void CHL2WarsGameRules::UpdateVoiceManager()
@@ -576,7 +551,6 @@ void CHL2WarsGameRules::ClientDisconnected( edict_t *client )
 
 const char *CHL2WarsGameRules::GetChatPrefix( bool bTeamOnly, CBasePlayer *pPlayer )
 {
-	//Tony; no prefix for now, it isn't needed.
 	return "";
 }
 

@@ -8,7 +8,6 @@
 #include "cbase.h"
 #include "srcpy_gamerules.h"
 #include "srcpy.h"
-#include "hl2wars_gamerules.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -23,6 +22,11 @@ bp::object g_pyGameRules;
 extern INetworkStringTable *g_StringTableGameRules;
 #endif // CLIENT_DLL
 
+static void InstallDefaultGamerules()
+{
+	CGameRulesRegister::FindByName( PYGAMERULES )->CreateGameRules();
+}
+
 static bool bLockGamerulesCreation = false;
 void PyInstallGameRulesInternal( boost::python::object gamerules )
 {
@@ -33,7 +37,7 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 		if( g_pyGameRules.ptr() != Py_None )
 		{
 			ClearPyGameRules();
-			CGameRulesRegister::FindByName("CHL2WarsGameRules")->CreateGameRules();
+			InstallDefaultGamerules();
 		}
 		return;
 	}
@@ -41,16 +45,19 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	// Verify the gamerules class is of the right type
 	bp::object issubclass;
 	bp::object cgamerules;
-	try {
+	try 
+	{
 		issubclass = builtins.attr("issubclass");
-		cgamerules = bp::import("_gamerules").attr("CHL2WarsGameRules");
+		cgamerules = bp::import("_gamerules").attr( PYGAMERULES );
 
 		bool bIsSubclass = bp::extract<bool>( issubclass(gamerules, cgamerules) );
-		if( bIsSubclass == false ) {
-			Warning("InstallGamerules: gamerules class not a subclass of CGameRules\n");
+		if( bIsSubclass == false ) 
+		{
+			Warning("InstallGamerules: gamerules class not a subclass of " PYGAMERULES "\n");
 			return;
 		}
-	} catch(bp::error_already_set &) {
+	} catch(bp::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
@@ -64,21 +71,25 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	g_pGameRules = NULL;
 
 	// Create the gamerules
-	CHL2WarsGameRules *pRules = NULL;
+	CGameRules *pRules = NULL;
 	bp::object inst;
-	try {
+	try 
+	{
 		inst = gamerules();
 		g_pyGameRules = inst;		// This keeps the python gamerules instance alive
-		pRules = bp::extract<CHL2WarsGameRules *>(g_pyGameRules);
-		if( !pRules ) {
+		pRules = bp::extract<CGameRules *>( g_pyGameRules );
+		if( !pRules ) 
+		{
 			Warning("Gamerules not valid\n");
-			CGameRulesRegister::FindByName("CHL2WarsGameRules")->CreateGameRules();
+			InstallDefaultGamerules();
 			return;
 		}
-	} catch(bp::error_already_set &) {
+	} 
+	catch(bp::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
-		CGameRulesRegister::FindByName("CHL2WarsGameRules")->CreateGameRules();
+		InstallDefaultGamerules();
 		return;
 	}
 
@@ -89,7 +100,7 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 #ifndef CLIENT_DLL
 	// Make sure the client gets a notification to make a new game rules object.
 	Assert( g_StringTableGameRules );
-	g_StringTableGameRules->AddString( true, "classname", strlen( "CHL2WarsGameRules" ) + 1, "CHL2WarsGameRules" );
+	g_StringTableGameRules->AddString( true, "classname", strlen( PYGAMERULES ) + 1, PYGAMERULES );
 
 	if ( g_pGameRules )
 	{
@@ -137,7 +148,7 @@ void ClearPyGameRules()
 	}
 
 	// If we have some rules installed already, tell it's going down
-	static_cast<CHL2WarsGameRules *>(g_pGameRules)->ShutdownGamerules();
+	g_pGameRules->ShutdownGamerules();
 	g_pGameRules->Remove( g_pGameRules ); // Remove from gamesystem, do not update anymore.
 	SrcPySystem()->AddToDeleteList(g_pyGameRules); // Might be deleted during a think call.
 	g_pyGameRules = boost::python::object();
