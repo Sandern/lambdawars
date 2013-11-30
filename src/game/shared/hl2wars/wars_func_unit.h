@@ -87,8 +87,11 @@ public:
 	virtual int			GetHealth() const { return m_iHealth; }
 	virtual int			GetMaxHealth()  const	{ return m_iMaxHealth; }
 
-	virtual int				DrawModel( int flags, const RenderableInstance_t &instance );
-	void					Blink( float blink_time = 3.0f );
+	virtual int			DrawModel( int flags, const RenderableInstance_t &instance );
+	void				Blink( float blink_time = 3.0f );
+
+	void				EnableTeamColorGlow( ) {}
+	void				DisableTeamColorGlow( ) {}
 #endif // CLIENT_DLL
 
 	void				SetCanBeSeen( bool canbeseen ) { m_bCanBeSeen = canbeseen; }
