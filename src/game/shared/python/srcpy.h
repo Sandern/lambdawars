@@ -27,7 +27,6 @@ extern const Color g_PythonColor;
 // If we want to support calling from multiple threads we must lock the GIL before calling
 extern unsigned int g_hPythonThreadID;
 
-
 #ifndef _DEBUG
 
 /* Undef this to remove the thread id checks */
