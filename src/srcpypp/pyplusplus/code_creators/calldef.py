@@ -615,7 +615,7 @@ class mem_fun_protected_wrapper_t( calldef_wrapper_t ):
         return tmpl % {
             'name' : self.declaration.partial_name
             , 'return_' : return_
-            , 'args' : self.function_call_args()
+            , 'args' : self.function_call_args(callpython=False)
             , 'wrapped_class' : self.wrapped_class_identifier()
         }
 
@@ -680,7 +680,7 @@ class mem_fun_protected_s_wrapper_t( calldef_wrapper_t ):
         return tmpl % {
             'name' : self.declaration.name
             , 'return_' : return_
-            , 'args' : self.function_call_args()
+            , 'args' : self.function_call_args(callpython=False)
             , 'wrapped_class' : self.wrapped_class_identifier()
         }
 
