@@ -30,8 +30,11 @@ def call_traits( type_ ):
     elif declarations.is_pointer( type_ ) \
          and not is_immutable( type_.base ) \
          and not declarations.is_pointer( type_.base ):
-        if hasattr(type_.base.declaration, 'custom_call_trait'):
-            custom_call_trait = type_.base.declaration.custom_call_trait
+        base = type_.base
+        while hasattr(base, 'base'):
+            base = base.base
+        if hasattr(base.declaration, 'custom_call_trait'):
+            custom_call_trait = base.declaration.custom_call_trait
             call_trait = custom_call_trait(type_) if custom_call_trait else None
             if call_trait:
                 return call_trait

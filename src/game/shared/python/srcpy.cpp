@@ -67,6 +67,7 @@ unsigned int g_hPythonThreadID;
 
 #if defined (PY_CHECK_LOG_OVERRIDES) || defined (_DEBUG)
 	ConVar py_log_overrides("py_log_overrides", "0", FCVAR_REPLICATED);
+	ConVar py_log_overrides_module("py_log_overrides_module", "", FCVAR_REPLICATED);
 #endif
 
 // Global main space

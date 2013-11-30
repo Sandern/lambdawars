@@ -27,6 +27,7 @@ extern const Color g_PythonColor;
 // If we want to support calling from multiple threads we must lock the GIL before calling
 extern unsigned int g_hPythonThreadID;
 
+
 #ifndef _DEBUG
 
 /* Undef this to remove the thread id checks */
@@ -39,6 +40,32 @@ extern unsigned int g_hPythonThreadID;
 
 #if defined (PY_CHECK_LOG_OVERRIDES) || defined (_DEBUG)
 	extern ConVar py_log_overrides;
+	extern ConVar py_log_overrides_module;
+#endif
+
+// PY_CHECKTHREADID verifies a overridable Python method is not called from a different thread
+// This would require setting up Python in a thread safe way (slower!)
+#ifdef WIN32
+#if defined(PY_CHECKTHREADID) && !defined(_DEBUG)
+#define PY_OVERRIDE_CHECK( clsname, methodname ) \
+    if( GetCurrentThreadId() != g_hPythonThreadID ) \
+	Error( #methodname ": Client? %d. Thread ID is not the same as in which the python interpreter is initialized! %d != %d.\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );
+#else
+#define PY_OVERRIDE_CHECK( clsname, methodname ) \
+    Assert( SrcPySystem()->IsPythonRunning() ); \
+    Assert( GetCurrentThreadId() == g_hPythonThreadID );
+#endif
+#else
+#define PY_OVERRIDE_CHECK( clsname, methodname ) // empty
+#endif // WIN32
+
+// PY_OVERRIDE_LOG logs all method calls
+#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)
+#define PY_OVERRIDE_LOG( modulename, clsname, methodname ) \
+	if( py_log_overrides.GetBool() && (V_strlen(py_log_overrides_module.GetString()) == 0 || V_strcmp( py_log_overrides_module.GetString(), #modulename ) == 0 ) ) \
+		Msg( #modulename ": Calling " #methodname "(  ) of Class \"" #clsname "\"\n" );
+#else
+#define PY_OVERRIDE_LOG( modulename, clsname, methodname ) // empty
 #endif
 
 //-----------------------------------------------------------------------------

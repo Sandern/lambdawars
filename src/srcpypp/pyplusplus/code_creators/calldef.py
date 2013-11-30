@@ -484,31 +484,19 @@ class mem_fun_v_wrapper_t( calldef_wrapper_t ):
         precall_code = self.declaration.override_precall_code
         if precall_code:
             template.append( os.linesep.join( precall_code ) )
+            
+        try:
+            modulename = self.top_parent.body.name
+        except AttributeError:
+            modulename = '<unknown module>'
 
-        # Debug code
+        # Add debug code
         # Thread check since we don't offer thread safe calls
-        #template.append( 'if( !SrcPySystem()->IsPythonRunning() ) %(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );' )
-        #template.append( 'else {' )
-        
-        template.append( '#if defined(_WIN32)' )
-        template.append( '#if defined(_DEBUG)' )
-        template.append( 'Assert( SrcPySystem()->IsPythonRunning() );' )
-        template.append( 'Assert( GetCurrentThreadId() == g_hPythonThreadID );' )
-        template.append( '#elif defined(PY_CHECKTHREADID)' )
-        template.append( 'if( GetCurrentThreadId() != g_hPythonThreadID )' )
-        template.append( self.indent( 'Error( "%(alias)s: Client? %(MsgInt)s. ' + \
-            'Thread ID is not the same as in which the python interpreter is initialized! ' + \
-            '%(MsgInt)s != %(MsgInt)s. Tell a developer.\\n", CBaseEntity::IsClient(), g_hPythonThreadID, GetCurrentThreadId() );' ) )
-        template.append( '#endif // _DEBUG/PY_CHECKTHREADID' )
-        template.append( '#endif // _WIN32' )
-        
+        template.append( 'PY_OVERRIDE_CHECK( %(wrapped_class)s, %(name)s )' )
         # Logging of all overrides if the convar is turned on. Calling overrides is expensive if we are doing it too frequently.
-        template.append( '#if defined(_DEBUG) || defined(PY_CHECK_LOG_OVERRIDES)' )
-        template.append( 'if( py_log_overrides.GetBool() )' )
-        template.append( self.indent('Msg("Calling %(name)s( %(args)s ) of Class: %(wrapped_class)s\\n");') )
-        template.append( '#endif // _DEBUG/PY_CHECK_LOG_OVERRIDES' )
+        template.append( 'PY_OVERRIDE_LOG( %(modulename)s, %(wrapped_class)s, %(name)s )' )
         
-        # NOTE: Comparing directly gives problems
+        # BUG: Comparing directly gives problems
         template.append( '%(override)s func_%(alias)s = this->get_override( "%(alias)s" );' )
         template.append( 'if( func_%(alias)s.ptr() != Py_None )' )
         #template.append( 'if( %(override)s func_%(alias)s = this->get_override( "%(alias)s" ) )' )
@@ -520,8 +508,6 @@ class mem_fun_v_wrapper_t( calldef_wrapper_t ):
         template.append( self.indent( '}' ) )    
         template.append( 'else' )
         template.append( self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(cppargs)s );') )
-        
-        #template.append('}')
         
         template = os.linesep.join( template )
 
@@ -538,6 +524,7 @@ class mem_fun_v_wrapper_t( calldef_wrapper_t ):
             , 'cppargs' : self.function_call_args(callpython=False)
             , 'wrapped_class' : self.wrapped_class_identifier()
             , 'MsgInt' : '%d'
+            , 'modulename' : modulename
         }
 
     def create_default_body(self):
@@ -761,9 +748,20 @@ class mem_fun_protected_v_wrapper_t( calldef_wrapper_t ):
 
         precall_code = self.declaration.override_precall_code
         if precall_code:
-            template.append( os.linesep.join( precall_code ) )    
+            template.append( os.linesep.join( precall_code ) )
+            
+        try:
+            modulename = self.top_parent.body.name
+        except AttributeError:
+            modulename = '<unknown module>'
+            
+        # Add debug code
+        # Thread check since we don't offer thread safe calls
+        template.append( 'PY_OVERRIDE_CHECK( %(wrapped_class)s, %(name)s )' )
+        # Logging of all overrides if the convar is turned on. Calling overrides is expensive if we are doing it too frequently.
+        template.append( 'PY_OVERRIDE_LOG( %(modulename)s, %(wrapped_class)s, %(name)s )' )
         
-        # NOTE: Comparing directly gives problems
+        # BUG: Comparing directly gives problems
         template.append( '%(override)s func_%(alias)s = this->get_override( "%(alias)s" );' )
         template.append( 'if( func_%(alias)s.ptr() != Py_None )' )
         #template.append( 'if( %(override)s func_%(alias)s = this->get_override( "%(alias)s" ) )' )
@@ -771,10 +769,10 @@ class mem_fun_protected_v_wrapper_t( calldef_wrapper_t ):
         template.append( self.indent(self.indent('%(return_)sfunc_%(alias)s( %(args)s );' ) ) )
         template.append( self.indent('} catch(bp::error_already_set &) {') )
         template.append( self.indent(self.indent('PyErr_Print();')) )
-        template.append( self.indent(self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') ) )
+        template.append( self.indent(self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(cppargs)s );') ) )
         template.append( self.indent( '}' ) )    
         template.append( 'else' )
-        template.append( self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(args)s );') )
+        template.append( self.indent('%(return_)sthis->%(wrapped_class)s::%(name)s( %(cppargs)s );') )
         
         template = os.linesep.join( template )
 
@@ -789,6 +787,8 @@ class mem_fun_protected_v_wrapper_t( calldef_wrapper_t ):
             , 'return_' : return_
             , 'args' : self.function_call_args()
             , 'wrapped_class' : self.wrapped_class_identifier()
+            , 'cppargs' : self.function_call_args(callpython=False)
+            , 'modulename' : modulename
         }
 
     def create_function(self):
@@ -800,7 +800,7 @@ class mem_fun_protected_v_wrapper_t( calldef_wrapper_t ):
 
     def create_default_body(self):
         function_call = declarations.call_invocation.join( self.declaration.partial_name
-                                                           , [ self.function_call_args() ] )
+                                                           , [ self.function_call_args(callpython=False) ] )
         body = self.wrapped_class_identifier() + '::' + function_call + ';'
         if not declarations.is_void( self.declaration.return_type ):
             body = 'return ' + body
