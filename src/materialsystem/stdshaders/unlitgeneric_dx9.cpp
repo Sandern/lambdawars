@@ -299,7 +299,7 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		}
 		else
 		{
-			bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled() && params[DEFERRED]->GetIntValue();
+			bool bDeferredActive = GetDeferredExt()->IsDeferredLightingEnabled() && params[DEFERRED]->GetIntValue() > 0;
 			if( bDeferredActive )
 			{
 				const int iDeferredRenderStage = pShaderAPI ?
@@ -329,7 +329,7 @@ BEGIN_VS_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 				}
 			}
 
-			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr, params[DEFERRED]->GetIntValue() > 0 );
+			DrawVertexLitGeneric_DX9( this, params, pShaderAPI, pShaderShadow, false, vars, vertexCompression, pContextDataPtr, bDeferredActive );
 		}
 	}
 END_SHADER
