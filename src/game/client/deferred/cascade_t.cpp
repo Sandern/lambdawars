@@ -2,8 +2,7 @@
 #include "cbase.h"
 #include "deferred/deferred_shared_common.h"
 
-#if 0
-static const cascade_t g_CascadeInfo[] = {
+static const cascade_t g_CascadeInfoLowRes[] = {
 	// res	orthosize	light offset	zFar		slopemin	slopemax	normalmax	renderdelay		rad		radcascade
 	{ 2048, 1024.0f,	10000.0f,		12000.0f,	1.0f,		2.0f,		2.0f,		0.0f,			true,	0
 #if CSM_USE_COMPOSITED_TARGET
@@ -18,7 +17,7 @@ static const cascade_t g_CascadeInfo[] = {
 #endif
 	},
 };
-#else
+
 static const cascade_t g_CascadeInfo[] = {
 	// res	orthosize	light offset	zFar		slopemin	slopemax	normalmax	renderdelay		rad		radcascade
 	{ 4096, 2048.0f,	10000.0f,		12000.0f,	1.0f,		2.0f,		2.0f,		0.0f,			true,	0
@@ -34,7 +33,6 @@ static const cascade_t g_CascadeInfo[] = {
 #endif
 	},
 };
-#endif // 0
 static const int iNumCascades = ARRAYSIZE( g_CascadeInfo );
 
 const cascade_t &GetCascadeInfo( int index )
@@ -42,5 +40,7 @@ const cascade_t &GetCascadeInfo( int index )
 	Assert( index >= 0 && index < iNumCascades );
 	COMPILE_TIME_ASSERT( iNumCascades == SHADOW_NUM_CASCADES );
 
+	if( IsCMSCompResLow() )
+		return g_CascadeInfoLowRes[ index ];
 	return g_CascadeInfo[ index ];
 }

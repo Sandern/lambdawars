@@ -1,5 +1,6 @@
 
 #include "cbase.h"
+#include "videocfg/videocfg.h"
 #include "deferred/deferred_shared_common.h"
 
 #include "materialsystem/itexture.h"
@@ -39,6 +40,12 @@ static CTextureReference g_tex_ProjectableVGUI[ NUM_PROJECTABLE_VGUI ];
 
 static float g_flDepthScalar = 65536.0f;
 
+#if CSM_USE_COMPOSITED_TARGET
+static int g_cms_comp_res_x = CSM_COMP_RES_X_LOW;
+static int g_cms_comp_res_y = CSM_COMP_RES_Y_LOW;
+static bool g_cms_comp_res_islow = true;
+#endif // CSM_USE_COMPOSITED_TARGET
+
 float GetDepthMapDepthResolution( float zDelta )
 {
 	return zDelta / g_flDepthScalar;
@@ -51,6 +58,23 @@ void DefRTsOnModeChanged()
 
 void InitDeferredRTs( bool bInitial )
 {
+	if( bInitial ) // TODO: Does not work correctly mid game
+	{
+		// First determine if we are using low or high
+		if( GetGPUMemLevel() <= GPU_LEVEL_LOW || GetCPULevel() <= CPU_LEVEL_LOW )
+		{
+			g_cms_comp_res_x = CSM_COMP_RES_X_LOW;
+			g_cms_comp_res_y = CSM_COMP_RES_Y_LOW;
+			g_cms_comp_res_islow = true;
+		}
+		else
+		{
+			g_cms_comp_res_x = CSM_COMP_RES_X_HIGH;
+			g_cms_comp_res_y = CSM_COMP_RES_Y_HIGH;
+			g_cms_comp_res_islow = false;
+		}
+	}
+
 	if ( !bInitial )
 		materials->ReEnableRenderTargetAllocation_IRealizeIfICallThisAllTexturesWillBeUnloadedAndLoadTimeWillSufferHorribly(); // HAHAHAHA. No.
 
@@ -415,6 +439,7 @@ const ImageFormat fmt_gbuffer0 =
 	
 
 	materials->EndRenderTargetAllocation();
+	materials->FinishRenderTargetAllocation();
 
 	GetDeferredExt()->CommitTexture_General( g_tex_Normals, g_tex_Depth,
 #if ( DEFCFG_LIGHTCTRL_PACKING == 0 )
@@ -614,3 +639,20 @@ ITexture *GetRadiosityNormalRT_Ortho( int index )
 	Assert( g_tex_ShadowRad_Normal_Ortho[ index ].IsValid() );
 	return g_tex_ShadowRad_Normal_Ortho[ index ];
 }
+
+#if CSM_USE_COMPOSITED_TARGET
+int GetCMSCompResX()
+{
+	return g_cms_comp_res_x;
+}
+
+int GetCMSCompResY()
+{
+	return g_cms_comp_res_y;
+}
+
+bool IsCMSCompResLow()
+{
+	return g_cms_comp_res_islow;
+}
+#endif // CSM_USE_COMPOSITED_TARGET

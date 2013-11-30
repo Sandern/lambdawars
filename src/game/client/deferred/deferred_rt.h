@@ -59,4 +59,10 @@ ITexture *GetProjectableVguiRT( int index );
 ITexture *GetRadiosityAlbedoRT_Ortho( int index );
 ITexture *GetRadiosityNormalRT_Ortho( int index );
 
+#if CSM_USE_COMPOSITED_TARGET
+int GetCMSCompResX();
+int GetCMSCompResY();
+bool IsCMSCompResLow();
+#endif // CSM_USE_COMPOSITED_TARGET
+
 #endif

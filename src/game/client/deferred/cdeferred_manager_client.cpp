@@ -78,10 +78,6 @@ bool CDeferredManagerClient::Init()
 			materials->AddModeChangeCallBack( &DefRTsOnModeChanged );
 
 			InitializeDeferredMaterials();
-
-			// Temporary
-			if( CommandLine() )
-				CommandLine()->AppendParm( "-deferred", "" );
 		}
 	}
 
@@ -152,8 +148,223 @@ ImageFormat CDeferredManagerClient::GetNullFormat()
 	return g_pMaterialSystemHardwareConfig->GetNullTextureFormat();
 }
 
+#define DEF_WRITE_VMT
+
 void CDeferredManagerClient::InitializeDeferredMaterials()
 {
+	// BUG!!! Creating the materials directly is causing some weird performance bug at map start (high cpu load)
+	// Instead write each material to file and then find them.
+#ifdef DEF_WRITE_VMT
+
+	// Make sure the directory exists
+	if( filesystem->FileExists("materials/deferred", "MOD") == false )
+	{
+		filesystem->CreateDirHierarchy("materials/deferred", "MOD");
+	}
+	
+#if DEBUG
+	m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ] = new KeyValues( "wireframe" );
+	if ( m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ]->SetString( "$color", "[1 0.5 0.1]" );
+		m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ]->SaveToFile( filesystem, "materials/deferred/lightworld_wirefram.vmt", "MOD" );
+	}
+	m_pMat_Def[ DEF_MAT_WIREFRAME_DEBUG ] = materials->FindMaterial( "deferred/lightworld_wirefram", NULL );
+#endif
+
+	// Create Materials
+	m_pKV_Def[ DEF_MAT_LIGHT_GLOBAL ] = new KeyValues( "LIGHTING_GLOBAL" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_GLOBAL ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_GLOBAL ]->SaveToFile( filesystem, "materials/deferred/lightpass_global.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_POINT_FULLSCREEN ] = new KeyValues( "LIGHTING_WORLD" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_POINT_FULLSCREEN ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_POINT_FULLSCREEN ]->SaveToFile( filesystem, "materials/deferred/lightpass_point_fs.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_POINT_WORLD ] = new KeyValues( "LIGHTING_WORLD" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_POINT_WORLD ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_POINT_WORLD ]->SetInt( "$WORLDPROJECTION", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_POINT_WORLD ]->SaveToFile( filesystem, "materials/deferred/lightpass_point_w.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_SPOT_FULLSCREEN ] = new KeyValues( "LIGHTING_WORLD" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_SPOT_FULLSCREEN ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_SPOT_FULLSCREEN ]->SetInt( "$LIGHTTYPE", DEFLIGHTTYPE_SPOT );
+		m_pKV_Def[ DEF_MAT_LIGHT_SPOT_FULLSCREEN ]->SaveToFile( filesystem, "materials/deferred/lightpass_spot_fs.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_SPOT_WORLD ] = new KeyValues( "LIGHTING_WORLD" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_SPOT_WORLD ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_SPOT_WORLD ]->SetInt( "$LIGHTTYPE", DEFLIGHTTYPE_SPOT );
+		m_pKV_Def[ DEF_MAT_LIGHT_SPOT_WORLD ]->SetInt( "$WORLDPROJECTION", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_SPOT_WORLD ]->SaveToFile( filesystem, "materials/deferred/lightpass_spot_w.vmt", "MOD" );
+	}
+
+	// Find the materials
+	m_pMat_Def[ DEF_MAT_LIGHT_GLOBAL ] = materials->FindMaterial( "deferred/lightpass_global", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_POINT_FULLSCREEN ] = materials->FindMaterial( "deferred/lightpass_point_fs", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_POINT_WORLD ] = materials->FindMaterial( "deferred/lightpass_point_w", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_SPOT_FULLSCREEN ] = materials->FindMaterial( "deferred/lightpass_spot_fs", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_SPOT_WORLD ] = materials->FindMaterial( "deferred/lightpass_spot_w", NULL );
+
+	/*
+
+	lighting volumes
+
+	*/
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_FULLSCREEN ] = new KeyValues( "LIGHTING_VOLUME" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_FULLSCREEN ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_FULLSCREEN ]->SaveToFile( filesystem, "materials/deferred/lightpass_point_vfs.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_WORLD ] = new KeyValues( "LIGHTING_VOLUME" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_WORLD ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_WORLD ]->SetInt( "$WORLDPROJECTION", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_POINT_WORLD ]->SaveToFile( filesystem, "materials/deferred/lightpass_point_v.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] = new KeyValues( "LIGHTING_VOLUME" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ]->SetInt( "$LIGHTTYPE", DEFLIGHTTYPE_SPOT );
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ]->SaveToFile( filesystem, "materials/deferred/lightpass_spot_vfs.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ] = new KeyValues( "LIGHTING_VOLUME" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ]->SetInt( "$WORLDPROJECTION", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ]->SetInt( "$LIGHTTYPE", DEFLIGHTTYPE_SPOT );
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ]->SaveToFile( filesystem, "materials/deferred/lightpass_spot_v.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_PREPASS ] = new KeyValues( "VOLUME_PREPASS" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_PREPASS ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_PREPASS ]->SaveToFile( filesystem, "materials/deferred/volume_prepass.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_BLEND ] = new KeyValues( "VOLUME_BLEND" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_BLEND ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_BLEND ]->SetString( "$BASETEXTURE", GetDefRT_VolumetricsBuffer( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_BLEND ]->SaveToFile( filesystem, "materials/deferred/volume_blend.vmt", "MOD" );
+	}
+
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_POINT_FULLSCREEN ] = materials->FindMaterial( "deferred/lightpass_point_vfs", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_POINT_WORLD ] = materials->FindMaterial( "deferred/lightpass_point_v", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] = materials->FindMaterial( "deferred/lightpass_spot_vfs", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ] = materials->FindMaterial( "deferred/lightpass_spot_v", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_PREPASS ] = materials->FindMaterial( "deferred/volume_prepass", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_BLEND ] = materials->FindMaterial( "deferred/volume_blend", NULL );
+
+	/*
+
+	radiosity
+
+	*/
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_GLOBAL ] = new KeyValues( "RADIOSITY_GLOBAL" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_GLOBAL ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_GLOBAL ]->SaveToFile( filesystem, "materials/deferred/radpass_global.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_DEBUG ] = new KeyValues( "DEBUG_RADIOSITY_GRID" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_DEBUG ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_DEBUG ]->SaveToFile( filesystem, "materials/deferred/radpass_dbg_grid.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ] = new KeyValues( "RADIOSITY_PROPAGATE" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ]->SetString( "$BASETEXTURE", GetDefRT_RadiosityBuffer( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ]->SetString( "$NORMALMAP", GetDefRT_RadiosityNormal( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ]->SaveToFile( filesystem, "materials/deferred/radpass_prop_0.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ] = new KeyValues( "RADIOSITY_PROPAGATE" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ]->SetString( "$BASETEXTURE", GetDefRT_RadiosityBuffer( 1 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ]->SetString( "$NORMALMAP", GetDefRT_RadiosityNormal( 1 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ]->SaveToFile( filesystem, "materials/deferred/radpass_prop_1.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ] = new KeyValues( "RADIOSITY_PROPAGATE" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SetInt( "$BLUR", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SetString( "$BASETEXTURE", GetDefRT_RadiosityBuffer( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SetString( "$NORMALMAP", GetDefRT_RadiosityNormal( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SaveToFile( filesystem, "materials/deferred/radpass_blur_0.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ] = new KeyValues( "RADIOSITY_PROPAGATE" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ]->SetInt( "$BLUR", 1 );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ]->SetString( "$BASETEXTURE", GetDefRT_RadiosityBuffer( 1 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ]->SetString( "$NORMALMAP", GetDefRT_RadiosityNormal( 1 )->GetName() );
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ]->SaveToFile( filesystem, "materials/deferred/radpass_blur_1.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] = new KeyValues( "RADIOSITY_BLEND" );
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] != NULL )
+		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ]->SaveToFile( filesystem, "materials/deferred/radpass_blend.vmt", "MOD" );
+
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_GLOBAL ] = materials->FindMaterial( "deferred/radpass_global", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_DEBUG ] = materials->FindMaterial( "deferred/radpass_dbg_grid", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ] = materials->FindMaterial( "deferred/radpass_prop_0", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_1 ] = materials->FindMaterial( "deferred/radpass_prop_1", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ] = materials->FindMaterial( "deferred/radpass_blur_0", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_1 ] = materials->FindMaterial( "deferred/radpass_blur_1", NULL );
+	m_pMat_Def[ DEF_MAT_LIGHT_RADIOSITY_BLEND ] = materials->FindMaterial( "deferred/radpass_blend", NULL );
+
+#if DEFCFG_DEFERRED_SHADING == 1
+	/*
+
+	deferred shading
+
+	*/
+
+	m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ] = new KeyValues( "SCREENSPACE_SHADING" );
+	if ( m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ] != NULL )
+		m_pKV_Def[ DEF_MAT_SCREENSPACE_SHADING ]->SaveToFile( filesystem, "materials/deferred/screenspace_shading.vmt", "MOD" );
+
+	m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ] = new KeyValues( "SCREENSPACE_COMBINE" );
+	if ( m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ] != NULL )
+		m_pKV_Def[ DEF_MAT_SCREENSPACE_COMBINE ]->SaveToFile( filesystem, "materials/deferred/screenspace_combine.vmt", "MOD" );
+
+	m_pMat_Def[ DEF_MAT_SCREENSPACE_SHADING ] = materials->FindMaterial( "deferred/screenspace_shading", NULL );
+	m_pMat_Def[ DEF_MAT_SCREENSPACE_COMBINE ] = materials->FindMaterial( "deferred/screenspace_combine", NULL );
+#endif
+
+	/*
+
+	blur
+
+	*/
+
+	m_pKV_Def[ DEF_MAT_BLUR_G6_X ] = new KeyValues( "GAUSSIAN_BLUR_6" );
+	if ( m_pKV_Def[ DEF_MAT_BLUR_G6_X ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_BLUR_G6_X ]->SetString( "$BASETEXTURE", GetDefRT_VolumetricsBuffer( 0 )->GetName() );
+		m_pKV_Def[ DEF_MAT_BLUR_G6_X ]->SaveToFile( filesystem, "materials/deferred/blurpass_vbuf_x.vmt", "MOD" );
+	}
+
+	m_pKV_Def[ DEF_MAT_BLUR_G6_Y ] = new KeyValues( "GAUSSIAN_BLUR_6" );
+	if ( m_pKV_Def[ DEF_MAT_BLUR_G6_Y ] != NULL )
+	{
+		m_pKV_Def[ DEF_MAT_BLUR_G6_Y ]->SetString( "$BASETEXTURE", GetDefRT_VolumetricsBuffer( 1 )->GetName() );
+		m_pKV_Def[ DEF_MAT_BLUR_G6_Y ]->SetInt( "$ISVERTICAL", 1 );
+		m_pKV_Def[ DEF_MAT_BLUR_G6_Y ]->SaveToFile( filesystem, "materials/deferred/blurpass_vbuf_y.vmt", "MOD" );
+	}
+
+	m_pMat_Def[ DEF_MAT_BLUR_G6_X ] = materials->FindMaterial( "deferred/blurpass_vbuf_x", NULL );
+	m_pMat_Def[ DEF_MAT_BLUR_G6_Y ] = materials->FindMaterial( "deferred/blurpass_vbuf_y", NULL );
+
+#else // Create materials directly (caused performance bug)
+
 #if DEBUG
 	m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ] = new KeyValues( "wireframe" );
 	if ( m_pKV_Def[ DEF_MAT_WIREFRAME_DEBUG ] != NULL )
@@ -215,7 +426,7 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 	if ( m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] != NULL )
 	{
 		m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ]->SetInt( "$LIGHTTYPE", DEFLIGHTTYPE_SPOT );
-		m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] = materials->CreateMaterial( "__lightpass_spot_v", m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] );
+		m_pMat_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] = materials->CreateMaterial( "__lightpass_spot_vfs", m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_FULLSCREEN ] );
 	}
 
 	m_pKV_Def[ DEF_MAT_LIGHT_VOLUME_SPOT_WORLD ] = new KeyValues( "LIGHTING_VOLUME" );
@@ -268,7 +479,7 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 	}
 
 	m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ] = new KeyValues( "RADIOSITY_PROPAGATE" );
-	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_PROPAGATE_0 ] != NULL )
+	if ( m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ] != NULL )
 	{
 		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SetInt( "$BLUR", 1 );
 		m_pKV_Def[ DEF_MAT_LIGHT_RADIOSITY_BLUR_0 ]->SetString( "$BASETEXTURE", GetDefRT_RadiosityBuffer( 0 )->GetName() );
@@ -325,6 +536,8 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 		m_pKV_Def[ DEF_MAT_BLUR_G6_Y ]->SetInt( "$ISVERTICAL", 1 );
 		m_pMat_Def[ DEF_MAT_BLUR_G6_Y ] = materials->CreateMaterial( "__blurpass_vbuf_y", m_pKV_Def[ DEF_MAT_BLUR_G6_Y ] );
 	}
+
+#endif // DEF_WRITE_VMT
 
 #if DEBUG
 	for ( int i = 0; i < DEF_MAT_COUNT; i++ )

@@ -118,10 +118,18 @@
 /* Composited resolution
  */
 //#	define CSM_COMP_RES_X 4096
-//#	define CSM_COMP_RES_Y 4096 //2048
+//#	define CSM_COMP_RES_Y 2048
 
-#	define CSM_COMP_RES_X 8192
-#	define CSM_COMP_RES_Y 4096
+#	define CSM_COMP_RES_X_LOW 4096
+#	define CSM_COMP_RES_Y_LOW 2048
+
+#	define CSM_COMP_RES_X_HIGH 8192
+#	define CSM_COMP_RES_Y_HIGH 4096
+
+#	define CSM_COMP_RES_X GetCMSCompResX()
+#	define CSM_COMP_RES_Y GetCMSCompResY()
+//#	define CSM_COMP_RES_X 8192
+//#	define CSM_COMP_RES_Y 4096
 #endif
 
 
