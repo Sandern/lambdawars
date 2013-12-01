@@ -205,6 +205,7 @@ public:
 	void					Blink( float blink_time = 3.0f );
 
 	virtual const Vector&			GetRenderOrigin( void );
+	virtual const QAngle&			GetRenderAngles();
 
 	virtual bool		OnInternalDrawModel( ClientModelRenderInfo_t *pInfo );
 	void				EnableTeamColorGlow( );

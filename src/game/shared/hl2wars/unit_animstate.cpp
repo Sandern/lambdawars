@@ -314,11 +314,7 @@ bool UnitAnimState::ShouldChangeSequences( void ) const
 }
 
 
-void UnitAnimState::SetOuterPoseParameter( int iParam, float flValue )
-{
-	// Make sure to set all the history values too, otherwise the server can overwrite them.
-	GetOuter()->SetPoseParameter( iParam, flValue );
-}
+
 
 
 void UnitAnimState::ClearAnimationLayers()
@@ -809,7 +805,7 @@ float UnitAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 	*bIsMoving = false;
 	float flReturnValue = 1;
 
-	if ( isMoving && CanThePlayerMove() )
+	if ( isMoving && CanTheUnitMove() )
 	{
 		float flGroundSpeed = GetInterpolatedGroundSpeed();
 		if ( flGroundSpeed < 0.001f )
@@ -888,7 +884,7 @@ const char *UnitAnimState::GetAimLayerSequence()
 	return STRING(m_sAimLayerSequence);
 }
 
-bool UnitAnimState::CanThePlayerMove()
+bool UnitAnimState::CanTheUnitMove()
 {
 	return true;
 }
@@ -1412,37 +1408,6 @@ const QAngle& UnitAnimState::GetRenderAngles()
 {
 	return m_angRender;
 }
-
-void UnitAnimState::GetOuterAbsVelocity( Vector& vel ) const
-{
-#if defined( CLIENT_DLL )
-	m_pOuter->EstimateAbsVelocity( vel );
-#else
-	vel = m_pOuter->GetAbsVelocity();
-#endif
-
-	// Special case: track train. Substract base velocity.
-	CBaseEntity *pEnt = m_pOuter->GetGroundEntity();
-	if( pEnt && pEnt->IsBaseTrain() )
-	{
-		Vector baseVel;
-#if defined( CLIENT_DLL )
-		pEnt->EstimateAbsVelocity( baseVel );
-#else
-		baseVel = pEnt->GetAbsVelocity();
-#endif
-		vel -= baseVel;
-	}
-}
-
-
-float UnitAnimState::GetOuterXYSpeed() const
-{
-	Vector vel;
-	GetOuterAbsVelocity( vel );
-	return vel.Length2D();
-}
-
 
 void UnitAnimState::UpdateLayerSequenceGeneric( int iLayer, bool &bEnabled,
 					float &flCurCycle, int &iSequence, bool bWaitAtEnd,

@@ -14,6 +14,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         'unit_locomotion.h',
         'unit_airlocomotion.h',
         'unit_animstate.h',
+        'unit_vehicleanimstate.h',
         #'wars_orders.h'
         
         '$c_baseplayer.h',
@@ -26,6 +27,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         '#unit_intention.h',
         '#unit_sense.h',
         '#unit_base.h',
+        '#unit_vehiclenavigator.h',
     ]
     
     def AddUnitComponent(self, mb):
@@ -36,7 +38,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.mem_funs('GetPyOuter').exclude()
         cls.add_property( 'outer'
                          , cls.mem_fun('GetPyOuter') )
-        cls.mem_funs('GetGroundEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        #cls.mem_funs('GetGroundEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
   
     def AddLocomotion(self, mb):
         mb.free_function('UnitComputePathDirection').include()
@@ -82,13 +84,13 @@ class UnitHelper(SemiSharedModuleGenerator):
         
         mb.enum('LegAnimType_t').include()
 
+        # Combat unit anim state (human like)
         cls = mb.class_('UnitAnimState')
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
-        cls.mem_fun('Update').include()
-        cls.mem_fun('TranslateActivity').include()
-        cls.mem_fun('CalcMainActivity').include()
-        cls.mem_fun('OnNewModel').include()
+        #cls.mem_fun('Update').include()
+        #cls.mem_fun('TranslateActivity').include()
+        #cls.mem_fun('CalcMainActivity').include()
         
         cls.var('m_pActivityMap').exclude()
         
@@ -98,7 +100,6 @@ class UnitHelper(SemiSharedModuleGenerator):
                          , cls.mem_fun('GetAimLayerSequence')
                          , cls.mem_fun('SetAimLayerSequence') )
         
-        cls.mem_fun('OnNewModel').virtuality = 'virtual'
         cls.mem_fun('OnEndSpecificActivity').virtuality = 'virtual'
         
         cls.mem_fun('GetCustomSpecificActPlaybackRate').exclude()
@@ -140,6 +141,17 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_fCombatStateTime').rename('combatstatetime')
         cls.var('m_bCombatStateIfEnemy').rename('combatstateifenemy')
         
+        # Vehicle Anim State
+        cls = mb.class_('UnitVehicleAnimState')
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
+        
+        cls.var('m_iVehicleSteer').rename('vehiclesteer')
+        cls.var('m_iVehicleFLSpin').rename('vehicleflspin')
+        cls.var('m_iVehicleFRSpin').rename('vehiclefrspin')
+        cls.var('m_iVehicleRLSpin').rename('vehiclerlspin')
+        cls.var('m_iVehicleRRSpin').rename('vehiclerrspin')
+        
     def AddNavigator(self, mb):
         # Main class
         cls = mb.class_('UnitBaseNavigator')
@@ -174,7 +186,6 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.add_property( 'idealyaw'
                          , cls.mem_fun('GetIdealYaw')
                          , cls.mem_fun('SetIdealYaw') )
-        cls.mem_funs('GetFacingTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         cls.add_property( 'facingtarget'
                          , cls.mem_fun('GetFacingTarget')
                          , cls.mem_fun('SetFacingTarget') )
@@ -213,7 +224,6 @@ class UnitHelper(SemiSharedModuleGenerator):
         
         cls.mem_fun('GetTarget').exclude()
         cls.mem_fun('SetTarget').exclude()
-        cls.mem_fun('GetTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         cls.add_property( 'target'
                          , cls.mem_fun('GetTarget')
                          , cls.mem_fun('SetTarget') )
@@ -222,7 +232,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         mb.enum('UnitGoalFlags').include()
         mb.enum('UnitGoalTypes').include()
         
-        # Special air version
+        # Air Unit version
         cls = mb.class_('UnitBaseAirNavigator')
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
@@ -237,6 +247,11 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.add_property( 'usesimplifiedroutebuilding'
                          , cls.mem_fun('GetUseSimplifiedRouteBuilding')
                          , cls.mem_fun('SetUseSimplifiedRouteBuilding') )
+                         
+        # Vehicle Unit version
+        cls = mb.class_('UnitVehicleNavigator')
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'
                          
     def AddIntention(self, mb):
         pass
@@ -254,20 +269,12 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual'
         
-        cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetOther').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        
         cls.mem_funs('GetEnemy').exclude()
         cls.mem_funs('GetOther').exclude()
         cls.mem_funs('PyGetEnemy').rename('GetEnemy')
         cls.mem_funs('PyGetOther').rename('GetOther')
         cls.mem_funs('PyGetEnemies').rename('GetEnemies')
         cls.mem_funs('PyGetOthers').rename('GetOthers')
-        
-        cls.mem_funs('GetNearestOther').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetNearestEnemy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetNearestFriendly').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_funs('GetNearestAttackedFriendly').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         
         cls.vars('m_fSenseDistance').rename('sensedistance')
         cls.vars('m_fSenseRate').rename('senserate')
@@ -284,18 +291,13 @@ class UnitHelper(SemiSharedModuleGenerator):
         
         cls = mb.class_('BaseAnimEventHandler')
         cls.include()
-        cls.mem_fun('HandleEvent').exclude()
-        AddWrapReg( mb, cls, cls.mem_fun('HandleEvent'), [CreateEntityArg('pUnit'), 'event'] )
-        
+
         cls = mb.class_('EmitSoundAnimEventHandler')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual' 
         
         cls = mb.class_('TossGrenadeAnimEventHandler')
         cls.include()
-        cls.mem_fun('TossGrenade').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
-        cls.mem_fun('HandleEvent').exclude()
-        AddWrapReg( mb, cls, cls.mem_fun('HandleEvent'), [CreateEntityArg('pUnit'), 'event'] )
         
     def AddExpresser(self, mb):
         if self.settings.branch == 'swarm':
@@ -346,4 +348,7 @@ class UnitHelper(SemiSharedModuleGenerator):
             self.AddAnimEventMap(mb)
             self.AddExpresser(mb)
         self.AddMisc(mb)
+        
+        # Finally apply common rules to all includes functions and classes, etc.
+        self.ApplyCommonRules(mb)
             

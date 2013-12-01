@@ -14,6 +14,8 @@
 
 #include "unit_animstate.h"
 
+#include "unit_vehicleanimstate.h"
+
 #include "c_baseplayer.h"
 
 #include "c_unit_base.h"
@@ -40,6 +42,33 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     }
 
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
     virtual int SelectWeightedSequence( ::Activity activity ) {
         PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
         PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
@@ -57,6 +86,10 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     int default_SelectWeightedSequence( ::Activity activity ) {
         return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
     virtual void Update( float eyeYaw, float eyePitch ) {
@@ -83,14 +116,14 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
 struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     UnitAnimState_wrapper(::boost::python::object outer, ::UnitAnimConfig & animconfig )
-    : UnitAnimState( outer, boost::ref(animconfig) )
+    : UnitAnimState( outer, animconfig )
       , bp::wrapper< UnitAnimState >(){
         // constructor
     
     }
 
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
-        UnitAnimState::ComputePoseParam_BodyPitch( boost::python::ptr(pStudioHdr) );
+        UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
     }
 
     void ComputePoseParam_BodyYaw(  ){
@@ -102,7 +135,7 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     void ComputePoseParam_MoveYaw( ::CStudioHdr * pStudioHdr ){
-        UnitAnimState::ComputePoseParam_MoveYaw( boost::python::ptr(pStudioHdr) );
+        UnitAnimState::ComputePoseParam_MoveYaw( pStudioHdr );
     }
 
     int ConvergeAngles( float goal, float maxrate, float maxgap, float dt, float & current ){
@@ -119,14 +152,6 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     float GetEyeYaw(  ) const {
         return UnitAnimState::GetEyeYaw(  );
-    }
-
-    void GetOuterAbsVelocity( ::Vector & vel ) const {
-        UnitAnimState::GetOuterAbsVelocity( boost::ref(vel) );
-    }
-
-    float GetOuterXYSpeed(  ) const {
-        return UnitAnimState::GetOuterXYSpeed(  );
     }
 
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
@@ -148,25 +173,6 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
     }
 
-    virtual void OnNewModel(  ) {
-        PY_OVERRIDE_CHECK( UnitAnimState, OnNewModel )
-        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnNewModel )
-        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
-        if( func_OnNewModel.ptr() != Py_None )
-            try {
-                func_OnNewModel(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->UnitAnimState::OnNewModel(  );
-            }
-        else
-            this->UnitAnimState::OnNewModel(  );
-    }
-    
-    void default_OnNewModel(  ) {
-        UnitAnimState::OnNewModel( );
-    }
-
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
     }
@@ -177,6 +183,33 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
         UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -196,6 +229,10 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     
     int default_SelectWeightedSequence( ::Activity activity ) {
         return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
 };
@@ -278,6 +315,74 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
     
     void default_HandleJump(  ) {
         UnitBaseLocomotion::HandleJump( );
+    }
+
+};
+
+struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVehicleAnimState > {
+
+    UnitVehicleAnimState_wrapper(UnitVehicleAnimState const & arg )
+    : UnitVehicleAnimState( arg )
+      , bp::wrapper< UnitVehicleAnimState >(){
+        // copy constructor
+        
+    }
+
+    UnitVehicleAnimState_wrapper(::boost::python::object outer )
+    : UnitVehicleAnimState( outer )
+      , bp::wrapper< UnitVehicleAnimState >(){
+        // constructor
+    
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
 };
@@ -665,6 +770,35 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetAnimTimeInterval_function_type( &::UnitBaseAnimState::GetAnimTimeInterval ) );
         
         }
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitBaseAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitBaseAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitBaseAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitBaseAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::GetRenderAngles
+        
+            typedef ::QAngle const & ( ::UnitBaseAnimState::*GetRenderAngles_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetRenderAngles"
+                , GetRenderAngles_function_type(&::UnitBaseAnimState::GetRenderAngles)
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::UnitBaseAnimState::HasActivity
         
             typedef bool ( ::UnitBaseAnimState::*HasActivity_function_type )( ::Activity ) ;
@@ -673,6 +807,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "HasActivity"
                 , HasActivity_function_type( &::UnitBaseAnimState::HasActivity )
                 , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitBaseAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitBaseAnimState_wrapper::default_OnNewModel) );
         
         }
         { //::UnitBaseAnimState::SelectWeightedSequence
@@ -685,6 +830,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
                 , default_SelectWeightedSequence_function_type(&UnitBaseAnimState_wrapper::default_SelectWeightedSequence)
                 , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitBaseAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitBaseAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
         
         }
         { //::UnitBaseAnimState::Update
@@ -737,13 +892,13 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("bIsMoving") ) );
         
         }
-        { //::UnitAnimState::CanThePlayerMove
+        { //::UnitAnimState::CanTheUnitMove
         
-            typedef bool ( ::UnitAnimState::*CanThePlayerMove_function_type )(  ) ;
+            typedef bool ( ::UnitAnimState::*CanTheUnitMove_function_type )(  ) ;
             
             UnitAnimState_exposer.def( 
-                "CanThePlayerMove"
-                , CanThePlayerMove_function_type( &::UnitAnimState::CanThePlayerMove ) );
+                "CanTheUnitMove"
+                , CanTheUnitMove_function_type( &::UnitAnimState::CanTheUnitMove ) );
         
         }
         { //::UnitAnimState::ClearAnimationLayers
@@ -914,25 +1069,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetMiscSequence_function_type( &::UnitAnimState::GetMiscSequence ) );
         
         }
-        { //::UnitAnimState::GetOuterAbsVelocity
-        
-            typedef void ( UnitAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
-            
-            UnitAnimState_exposer.def( 
-                "GetOuterAbsVelocity"
-                , GetOuterAbsVelocity_function_type( &UnitAnimState_wrapper::GetOuterAbsVelocity )
-                , ( bp::arg("vel") ) );
-        
-        }
-        { //::UnitAnimState::GetOuterXYSpeed
-        
-            typedef float ( UnitAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
-            
-            UnitAnimState_exposer.def( 
-                "GetOuterXYSpeed"
-                , GetOuterXYSpeed_function_type( &UnitAnimState_wrapper::GetOuterXYSpeed ) );
-        
-        }
         { //::UnitAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -993,17 +1129,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , OnEndSpecificActivity_function_type(&::UnitAnimState::OnEndSpecificActivity)
                 , default_OnEndSpecificActivity_function_type(&UnitAnimState_wrapper::default_OnEndSpecificActivity)
                 , ( bp::arg("specificactivity") ) );
-        
-        }
-        { //::UnitAnimState::OnNewModel
-        
-            typedef void ( ::UnitAnimState::*OnNewModel_function_type )(  ) ;
-            typedef void ( UnitAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
-            
-            UnitAnimState_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type(&::UnitAnimState::OnNewModel)
-                , default_OnNewModel_function_type(&UnitAnimState_wrapper::default_OnNewModel) );
         
         }
         { //::UnitAnimState::ResetGroundSpeed
@@ -1157,6 +1282,36 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "movey", &UnitAnimState::m_iMoveY );
         UnitAnimState_exposer.def_readwrite( "moveyaw", &UnitAnimState::m_iMoveYaw );
         UnitAnimState_exposer.def_readwrite( "specificmainactivity", &UnitAnimState::m_nSpecificMainActivity );
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitAnimState_wrapper::default_OnNewModel) );
+        
+        }
         { //::UnitBaseAnimState::SelectWeightedSequence
         
             typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
@@ -1167,6 +1322,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
                 , default_SelectWeightedSequence_function_type(&UnitAnimState_wrapper::default_SelectWeightedSequence)
                 , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
         
         }
         { //property "aimlayersequence"[fget=::UnitAnimState::GetAimLayerSequence, fset=::UnitAnimState::SetAimLayerSequence]
@@ -1602,6 +1767,108 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
         .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
+    { //::UnitVehicleAnimState
+        typedef bp::class_< UnitVehicleAnimState_wrapper, bp::bases< UnitBaseAnimState > > UnitVehicleAnimState_exposer_t;
+        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
+        bp::implicitly_convertible< bp::object, UnitVehicleAnimState >();
+        { //::UnitVehicleAnimState::GetRenderAngles
+        
+            typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetRenderAngles"
+                , GetRenderAngles_function_type( &::UnitVehicleAnimState::GetRenderAngles )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::UnitVehicleAnimState::Update
+        
+            typedef void ( ::UnitVehicleAnimState::*Update_function_type )( float,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "Update"
+                , Update_function_type( &::UnitVehicleAnimState::Update )
+                , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) );
+        
+        }
+        { //::UnitVehicleAnimState::UpdateSteering
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateSteering_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateSteering"
+                , UpdateSteering_function_type( &::UnitVehicleAnimState::UpdateSteering ) );
+        
+        }
+        { //::UnitVehicleAnimState::UpdateWheels
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateWheels_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateWheels"
+                , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
+        
+        }
+        UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrspin", &UnitVehicleAnimState::m_iVehicleRRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclesteer", &UnitVehicleAnimState::m_iVehicleSteer );
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitVehicleAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitVehicleAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitVehicleAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitVehicleAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitVehicleAnimState_wrapper::default_OnNewModel) );
+        
+        }
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitVehicleAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitVehicleAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitVehicleAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitVehicleAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
+        
+        }
+    }
+
     { //::UnitComputePathDirection
     
         typedef float ( *UnitComputePathDirection_function_type )( ::Vector const &,::Vector const &,::Vector & );
@@ -1637,6 +1904,8 @@ BOOST_PYTHON_MODULE(unit_helper){
 
 #include "unit_animstate.h"
 
+#include "unit_vehicleanimstate.h"
+
 #include "player.h"
 
 #include "unit_expresser.h"
@@ -1650,6 +1919,8 @@ BOOST_PYTHON_MODULE(unit_helper){
 #include "unit_sense.h"
 
 #include "unit_base.h"
+
+#include "unit_vehiclenavigator.h"
 
 #include "srcpy.h"
 
@@ -1674,18 +1945,20 @@ struct BaseAnimEventHandler_wrapper : BaseAnimEventHandler, bp::wrapper< BaseAni
     }
 
     virtual void HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
-        boost::python::override func_HandleEvent = this->get_override( "HandleEvent" );
+        PY_OVERRIDE_CHECK( BaseAnimEventHandler, HandleEvent )
+        PY_OVERRIDE_LOG( unit_helper, BaseAnimEventHandler, HandleEvent )
+        bp::override func_HandleEvent = this->get_override( "HandleEvent" );
         if( func_HandleEvent.ptr() != Py_None )
             try {
-                func_HandleEvent( pUnit ? pUnit->GetPyHandle() : bp::object(), event );
-            } catch(...) {
+                func_HandleEvent( pUnit ? pUnit->GetPyHandle() : boost::python::object(), boost::python::ptr(event) );
+            } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->BaseAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+                this->BaseAnimEventHandler::HandleEvent( pUnit, event );
             }
         else
-            this->BaseAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+            this->BaseAnimEventHandler::HandleEvent( pUnit, event );
     }
-
+    
     void default_HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
         BaseAnimEventHandler::HandleEvent( pUnit, event );
     }
@@ -1695,7 +1968,7 @@ struct BaseAnimEventHandler_wrapper : BaseAnimEventHandler, bp::wrapper< BaseAni
 struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
 
     CAI_Expresser_wrapper(::CBaseFlex * pOuter=0 )
-    : CAI_Expresser( boost::python::ptr(pOuter) )
+    : CAI_Expresser( pOuter )
       , bp::wrapper< CAI_Expresser >(){
         // constructor
     
@@ -1767,7 +2040,7 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
     }
 
     bool SpeakRawScene( char const * pszScene, float delay, ::AI_Response * response, ::IRecipientFilter * filter=0 ){
-        return CAI_Expresser::SpeakRawScene( pszScene, delay, boost::python::ptr(response), boost::python::ptr(filter) );
+        return CAI_Expresser::SpeakRawScene( pszScene, delay, response, filter );
     }
 
     virtual int SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
@@ -1776,7 +2049,7 @@ struct CAI_Expresser_wrapper : CAI_Expresser, bp::wrapper< CAI_Expresser > {
         bp::override func_SpeakRawSentence = this->get_override( "SpeakRawSentence" );
         if( func_SpeakRawSentence.ptr() != Py_None )
             try {
-                return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+                return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener ? pListener->GetPyHandle() : boost::python::object() );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
                 return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
@@ -1808,18 +2081,20 @@ struct TossGrenadeAnimEventHandler_wrapper : TossGrenadeAnimEventHandler, bp::wr
     }
 
     virtual void HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
-        boost::python::override func_HandleEvent = this->get_override( "HandleEvent" );
+        PY_OVERRIDE_CHECK( TossGrenadeAnimEventHandler, HandleEvent )
+        PY_OVERRIDE_LOG( unit_helper, TossGrenadeAnimEventHandler, HandleEvent )
+        bp::override func_HandleEvent = this->get_override( "HandleEvent" );
         if( func_HandleEvent.ptr() != Py_None )
             try {
-                func_HandleEvent( pUnit ? pUnit->GetPyHandle() : bp::object(), event );
-            } catch(...) {
+                func_HandleEvent( pUnit ? pUnit->GetPyHandle() : boost::python::object(), boost::python::ptr(event) );
+            } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->TossGrenadeAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+                this->TossGrenadeAnimEventHandler::HandleEvent( pUnit, event );
             }
         else
-            this->TossGrenadeAnimEventHandler::HandleEvent( boost::python::ptr(pUnit), boost::python::ptr(event) );
+            this->TossGrenadeAnimEventHandler::HandleEvent( pUnit, event );
     }
-
+    
     void default_HandleEvent( ::CUnitBase * pUnit, ::animevent_t * event ) {
         TossGrenadeAnimEventHandler::HandleEvent( pUnit, event );
     }
@@ -1842,6 +2117,33 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     }
 
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
     virtual int SelectWeightedSequence( ::Activity activity ) {
         PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
         PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
@@ -1859,6 +2161,10 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     int default_SelectWeightedSequence( ::Activity activity ) {
         return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
     virtual void Update( float eyeYaw, float eyePitch ) {
@@ -1885,14 +2191,14 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
 struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     UnitAnimState_wrapper(::boost::python::object outer, ::UnitAnimConfig & animconfig )
-    : UnitAnimState( outer, boost::ref(animconfig) )
+    : UnitAnimState( outer, animconfig )
       , bp::wrapper< UnitAnimState >(){
         // constructor
     
     }
 
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
-        UnitAnimState::ComputePoseParam_BodyPitch( boost::python::ptr(pStudioHdr) );
+        UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
     }
 
     void ComputePoseParam_BodyYaw(  ){
@@ -1904,7 +2210,7 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     }
 
     void ComputePoseParam_MoveYaw( ::CStudioHdr * pStudioHdr ){
-        UnitAnimState::ComputePoseParam_MoveYaw( boost::python::ptr(pStudioHdr) );
+        UnitAnimState::ComputePoseParam_MoveYaw( pStudioHdr );
     }
 
     int ConvergeAngles( float goal, float maxrate, float maxgap, float dt, float & current ){
@@ -1921,14 +2227,6 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     float GetEyeYaw(  ) const {
         return UnitAnimState::GetEyeYaw(  );
-    }
-
-    void GetOuterAbsVelocity( ::Vector & vel ) const {
-        UnitAnimState::GetOuterAbsVelocity( boost::ref(vel) );
-    }
-
-    float GetOuterXYSpeed(  ) const {
-        return UnitAnimState::GetOuterXYSpeed(  );
     }
 
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
@@ -1950,25 +2248,6 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
     }
 
-    virtual void OnNewModel(  ) {
-        PY_OVERRIDE_CHECK( UnitAnimState, OnNewModel )
-        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnNewModel )
-        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
-        if( func_OnNewModel.ptr() != Py_None )
-            try {
-                func_OnNewModel(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->UnitAnimState::OnNewModel(  );
-            }
-        else
-            this->UnitAnimState::OnNewModel(  );
-    }
-    
-    void default_OnNewModel(  ) {
-        UnitAnimState::OnNewModel( );
-    }
-
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
     }
@@ -1979,6 +2258,33 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
         UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -1998,6 +2304,10 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     
     int default_SelectWeightedSequence( ::Activity activity ) {
         return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
 };
@@ -2159,7 +2469,7 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     }
 
     bool SpeakRawScene( char const * pszScene, float delay, ::AI_Response * response, ::IRecipientFilter * filter=0 ){
-        return CAI_Expresser::SpeakRawScene( pszScene, delay, boost::python::ptr(response), boost::python::ptr(filter) );
+        return CAI_Expresser::SpeakRawScene( pszScene, delay, response, filter );
     }
 
     virtual int SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
@@ -2168,7 +2478,7 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
         bp::override func_SpeakRawSentence = this->get_override( "SpeakRawSentence" );
         if( func_SpeakRawSentence.ptr() != Py_None )
             try {
-                return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, boost::python::ptr(pListener) );
+                return func_SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener ? pListener->GetPyHandle() : boost::python::object() );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
                 return this->CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
@@ -2179,6 +2489,74 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     
     int default_SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
         return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
+    }
+
+};
+
+struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVehicleAnimState > {
+
+    UnitVehicleAnimState_wrapper(UnitVehicleAnimState const & arg )
+    : UnitVehicleAnimState( arg )
+      , bp::wrapper< UnitVehicleAnimState >(){
+        // copy constructor
+        
+    }
+
+    UnitVehicleAnimState_wrapper(::boost::python::object outer )
+    : UnitVehicleAnimState( outer )
+      , bp::wrapper< UnitVehicleAnimState >(){
+        // constructor
+    
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
     }
 
 };
@@ -2251,7 +2629,7 @@ BOOST_PYTHON_MODULE(unit_helper){
             "HandleEvent"
             , (void ( ::BaseAnimEventHandler::* )( ::CUnitBase *,::animevent_t * ) )(&::BaseAnimEventHandler::HandleEvent)
             , (void ( BaseAnimEventHandler_wrapper::* )( ::CUnitBase *,::animevent_t * ) )(&BaseAnimEventHandler_wrapper::default_HandleEvent)
-            , ( boost::python::arg("pUnit"), boost::python::arg("event") ) );
+            , ( bp::arg("pUnit"), bp::arg("event") ) );
 
     bp::class_< ResponseRules::CriteriaSet >( "CriteriaSet", bp::init< >() )    
         .def( bp::init< ResponseRules::CriteriaSet const & >(( bp::arg("src") )) )    
@@ -2713,15 +3091,15 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (bool ( ::TossGrenadeAnimEventHandler::* )( ::CUnitBase *,::Vector const &,::Vector const &,int,::Vector * ) )( &::TossGrenadeAnimEventHandler::GetTossVector )
             , ( bp::arg("pUnit"), bp::arg("vecStartPos"), bp::arg("vecTarget"), bp::arg("iCollisionGroup"), bp::arg("vecOut") ) )    
         .def( 
-            "TossGrenade"
-            , (::CBaseEntity * ( ::TossGrenadeAnimEventHandler::* )( ::CUnitBase *,::Vector &,::Vector &,int ) )( &::TossGrenadeAnimEventHandler::TossGrenade )
-            , ( bp::arg("pUnit"), bp::arg("vecStartPos"), bp::arg("vecTarget"), bp::arg("iCollisionGroup") )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
             "HandleEvent"
             , (void ( ::TossGrenadeAnimEventHandler::* )( ::CUnitBase *,::animevent_t * ) )(&::TossGrenadeAnimEventHandler::HandleEvent)
             , (void ( TossGrenadeAnimEventHandler_wrapper::* )( ::CUnitBase *,::animevent_t * ) )(&TossGrenadeAnimEventHandler_wrapper::default_HandleEvent)
-            , ( boost::python::arg("pUnit"), boost::python::arg("event") ) );
+            , ( bp::arg("pUnit"), bp::arg("event") ) )    
+        .def( 
+            "TossGrenade"
+            , (::CBaseEntity * ( ::TossGrenadeAnimEventHandler::* )( ::CUnitBase *,::Vector &,::Vector &,int ) )( &::TossGrenadeAnimEventHandler::TossGrenade )
+            , ( bp::arg("pUnit"), bp::arg("vecStartPos"), bp::arg("vecTarget"), bp::arg("iCollisionGroup") )
+            , bp::return_value_policy< bp::return_by_value >() );
 
     { //::TranslateActivityMap
         typedef bp::class_< TranslateActivityMap, boost::noncopyable > TranslateActivityMap_exposer_t;
@@ -3096,6 +3474,35 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetAnimTimeInterval_function_type( &::UnitBaseAnimState::GetAnimTimeInterval ) );
         
         }
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitBaseAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitBaseAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitBaseAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitBaseAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::GetRenderAngles
+        
+            typedef ::QAngle const & ( ::UnitBaseAnimState::*GetRenderAngles_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "GetRenderAngles"
+                , GetRenderAngles_function_type(&::UnitBaseAnimState::GetRenderAngles)
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::UnitBaseAnimState::HasActivity
         
             typedef bool ( ::UnitBaseAnimState::*HasActivity_function_type )( ::Activity ) ;
@@ -3104,6 +3511,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "HasActivity"
                 , HasActivity_function_type( &::UnitBaseAnimState::HasActivity )
                 , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitBaseAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitBaseAnimState_wrapper::default_OnNewModel) );
         
         }
         { //::UnitBaseAnimState::SelectWeightedSequence
@@ -3116,6 +3534,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
                 , default_SelectWeightedSequence_function_type(&UnitBaseAnimState_wrapper::default_SelectWeightedSequence)
                 , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitBaseAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitBaseAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
         
         }
         { //::UnitBaseAnimState::Update
@@ -3168,13 +3596,13 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("bIsMoving") ) );
         
         }
-        { //::UnitAnimState::CanThePlayerMove
+        { //::UnitAnimState::CanTheUnitMove
         
-            typedef bool ( ::UnitAnimState::*CanThePlayerMove_function_type )(  ) ;
+            typedef bool ( ::UnitAnimState::*CanTheUnitMove_function_type )(  ) ;
             
             UnitAnimState_exposer.def( 
-                "CanThePlayerMove"
-                , CanThePlayerMove_function_type( &::UnitAnimState::CanThePlayerMove ) );
+                "CanTheUnitMove"
+                , CanTheUnitMove_function_type( &::UnitAnimState::CanTheUnitMove ) );
         
         }
         { //::UnitAnimState::ClearAnimationLayers
@@ -3345,25 +3773,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetMiscSequence_function_type( &::UnitAnimState::GetMiscSequence ) );
         
         }
-        { //::UnitAnimState::GetOuterAbsVelocity
-        
-            typedef void ( UnitAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
-            
-            UnitAnimState_exposer.def( 
-                "GetOuterAbsVelocity"
-                , GetOuterAbsVelocity_function_type( &UnitAnimState_wrapper::GetOuterAbsVelocity )
-                , ( bp::arg("vel") ) );
-        
-        }
-        { //::UnitAnimState::GetOuterXYSpeed
-        
-            typedef float ( UnitAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
-            
-            UnitAnimState_exposer.def( 
-                "GetOuterXYSpeed"
-                , GetOuterXYSpeed_function_type( &UnitAnimState_wrapper::GetOuterXYSpeed ) );
-        
-        }
         { //::UnitAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -3424,17 +3833,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , OnEndSpecificActivity_function_type(&::UnitAnimState::OnEndSpecificActivity)
                 , default_OnEndSpecificActivity_function_type(&UnitAnimState_wrapper::default_OnEndSpecificActivity)
                 , ( bp::arg("specificactivity") ) );
-        
-        }
-        { //::UnitAnimState::OnNewModel
-        
-            typedef void ( ::UnitAnimState::*OnNewModel_function_type )(  ) ;
-            typedef void ( UnitAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
-            
-            UnitAnimState_exposer.def( 
-                "OnNewModel"
-                , OnNewModel_function_type(&::UnitAnimState::OnNewModel)
-                , default_OnNewModel_function_type(&UnitAnimState_wrapper::default_OnNewModel) );
         
         }
         { //::UnitAnimState::ResetGroundSpeed
@@ -3588,6 +3986,36 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "movey", &UnitAnimState::m_iMoveY );
         UnitAnimState_exposer.def_readwrite( "moveyaw", &UnitAnimState::m_iMoveYaw );
         UnitAnimState_exposer.def_readwrite( "specificmainactivity", &UnitAnimState::m_nSpecificMainActivity );
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitAnimState_wrapper::default_OnNewModel) );
+        
+        }
         { //::UnitBaseAnimState::SelectWeightedSequence
         
             typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
@@ -3598,6 +4026,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
                 , default_SelectWeightedSequence_function_type(&UnitAnimState_wrapper::default_SelectWeightedSequence)
                 , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
         
         }
         { //property "aimlayersequence"[fget=::UnitAnimState::GetAimLayerSequence, fset=::UnitAnimState::SetAimLayerSequence]
@@ -4758,6 +5196,115 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("pszSentence"), bp::arg("delay"), bp::arg("volume")=1.0e+0f, bp::arg("soundlevel")=::SNDLVL_80dB, bp::arg("pListener")=bp::object() ) );
         
         }
+    }
+
+    { //::UnitVehicleAnimState
+        typedef bp::class_< UnitVehicleAnimState_wrapper, bp::bases< UnitBaseAnimState > > UnitVehicleAnimState_exposer_t;
+        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
+        bp::implicitly_convertible< bp::object, UnitVehicleAnimState >();
+        { //::UnitVehicleAnimState::GetRenderAngles
+        
+            typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetRenderAngles"
+                , GetRenderAngles_function_type( &::UnitVehicleAnimState::GetRenderAngles )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::UnitVehicleAnimState::Update
+        
+            typedef void ( ::UnitVehicleAnimState::*Update_function_type )( float,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "Update"
+                , Update_function_type( &::UnitVehicleAnimState::Update )
+                , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) );
+        
+        }
+        { //::UnitVehicleAnimState::UpdateSteering
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateSteering_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateSteering"
+                , UpdateSteering_function_type( &::UnitVehicleAnimState::UpdateSteering ) );
+        
+        }
+        { //::UnitVehicleAnimState::UpdateWheels
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateWheels_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateWheels"
+                , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
+        
+        }
+        UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrspin", &UnitVehicleAnimState::m_iVehicleRRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclesteer", &UnitVehicleAnimState::m_iVehicleSteer );
+        { //::UnitBaseAnimState::GetOuterAbsVelocity
+        
+            typedef void ( UnitVehicleAnimState_wrapper::*GetOuterAbsVelocity_function_type )( ::Vector & ) const;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetOuterAbsVelocity"
+                , GetOuterAbsVelocity_function_type( &UnitVehicleAnimState_wrapper::GetOuterAbsVelocity )
+                , ( bp::arg("vel") ) );
+        
+        }
+        { //::UnitBaseAnimState::GetOuterXYSpeed
+        
+            typedef float ( UnitVehicleAnimState_wrapper::*GetOuterXYSpeed_function_type )(  ) const;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "GetOuterXYSpeed"
+                , GetOuterXYSpeed_function_type( &UnitVehicleAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::OnNewModel
+        
+            typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_OnNewModel_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "OnNewModel"
+                , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
+                , default_OnNewModel_function_type(&UnitVehicleAnimState_wrapper::default_OnNewModel) );
+        
+        }
+        { //::UnitBaseAnimState::SelectWeightedSequence
+        
+            typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
+            typedef int ( UnitVehicleAnimState_wrapper::*default_SelectWeightedSequence_function_type )( ::Activity ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type(&::UnitBaseAnimState::SelectWeightedSequence)
+                , default_SelectWeightedSequence_function_type(&UnitVehicleAnimState_wrapper::default_SelectWeightedSequence)
+                , ( bp::arg("activity") ) );
+        
+        }
+        { //::UnitBaseAnimState::SetOuterPoseParameter
+        
+            typedef void ( UnitVehicleAnimState_wrapper::*SetOuterPoseParameter_function_type )( int,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "SetOuterPoseParameter"
+                , SetOuterPoseParameter_function_type( &UnitVehicleAnimState_wrapper::SetOuterPoseParameter )
+                , ( bp::arg("iParam"), bp::arg("flValue") ) );
+        
+        }
+    }
+
+    { //::UnitVehicleNavigator
+        typedef bp::class_< UnitVehicleNavigator, bp::bases< UnitBaseNavigator >, boost::noncopyable > UnitVehicleNavigator_exposer_t;
+        UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
+        bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
+        bp::implicitly_convertible< bp::object, UnitVehicleNavigator >();
     }
 
     { //::UnitComputePathDirection

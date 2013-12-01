@@ -417,11 +417,11 @@ void CUnitBase::UpdateClientSideAnimation()
 		}
 
 		if( GetSequence() != -1 )
-			FrameAdvance(gpGlobals->frametime);
+			FrameAdvance( gpGlobals->frametime );
 
 		if( m_pAnimState )
 		{
-			m_pAnimState->Update(m_fEyeYaw, m_fEyePitch);
+			m_pAnimState->Update( m_fEyeYaw, m_fEyePitch );
 		}
 	}
 
@@ -526,6 +526,24 @@ void CUnitBase::PostDataUpdate( DataUpdateType_t updateType )
 	{
 		MDLCACHE_CRITICAL_SECTION();
 		ShutdownPredictable();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+const QAngle& CUnitBase::GetRenderAngles()
+{
+	if ( IsRagdoll() )
+	{
+		return vec3_angle;
+	}
+	else
+	{
+		if( !GetAnimState() )
+			return BaseClass::GetRenderAngles();
+
+		return GetAnimState()->GetRenderAngles();
 	}
 }
 

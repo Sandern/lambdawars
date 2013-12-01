@@ -1284,6 +1284,16 @@ void register_C_UnitBase_class(){
                 , GetPyNetworkType_function_type( &::C_UnitBase::GetPyNetworkType ) );
         
         }
+        { //::C_UnitBase::GetRenderAngles
+        
+            typedef ::QAngle const & ( ::C_UnitBase::*GetRenderAngles_function_type )(  ) ;
+            
+            C_UnitBase_exposer.def( 
+                "GetRenderAngles"
+                , GetRenderAngles_function_type( &::C_UnitBase::GetRenderAngles )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::C_UnitBase::GetRenderOrigin
         
             typedef ::Vector const & ( ::C_UnitBase::*GetRenderOrigin_function_type )(  ) ;

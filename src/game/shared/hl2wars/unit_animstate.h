@@ -95,7 +95,7 @@ public:
 class UnitAnimState : public UnitBaseAnimState
 {
 public:
-	DECLARE_CLASS_NOBASE( UnitAnimState );
+	DECLARE_CLASS( UnitAnimState, UnitBaseAnimState );
 
 	enum
 	{
@@ -108,15 +108,15 @@ public:
 #endif // ENABLE_PYTHON
 	virtual ~UnitAnimState();
 
-	// Update() and DoAnimationEvent() together maintain the entire player's animation state.
+	// Update() and DoAnimationEvent() together maintain the entire unit's animation state.
 	//
-	// Update() maintains the the lower body animation (the player's m_nSequence)
-	// and the upper body overlay based on the player's velocity and look direction.
+	// Update() maintains the the lower body animation (the unit's m_nSequence)
+	// and the upper body overlay based on the unit's velocity and look direction.
 	//
 	// It also modulates these based on events triggered by DoAnimationEvent.
 	virtual void Update( float eyeYaw, float eyePitch );
 
-	// This is called by the client when a new player enters the PVS to clear any events
+	// This is called by the client when a new unit enters the PVS to clear any events
 	// the dormant version of the entity may have been playing.
 	virtual void ClearAnimationState();
 
@@ -138,9 +138,6 @@ public:
 	// The base class figures out the main sequence and the aim sequence, and derived
 	// classes can overlay whatever other animations they want.
 	virtual void ComputeSequences( CStudioHdr *pStudioHdr );
-
-	// This is called when a new model is set. Used for one time setting up of paramters.
-	virtual void OnNewModel() {}
 
 	// This is called after a specific sequence is done. Can return a new specific sequence.
 	virtual Activity OnEndSpecificActivity( Activity specificactivity ) { return ACT_INVALID; } 
@@ -178,12 +175,12 @@ public:
 	// For the body left/right rotation, some models use a pose parameter and some use a bone controller.
 	virtual float SetOuterBodyYaw( float flValue );
 
-	// Return true if the player is allowed to move.
-	virtual bool CanThePlayerMove();
+	// Return true if the unit is allowed to move.
+	virtual bool CanTheUnitMove();
 
-	// This is called every frame to see what the maximum speed the player can move is.
+	// This is called every frame to see what the maximum speed the unit can move is.
 	// It is used to determine where to put the move_x/move_y pose parameters or to
-	// determine the animation playback rate, based on the player's movement speed.
+	// determine the animation playback rate, based on the unit's movement speed.
 	// The return value from here is interpolated so the playback rate or pose params don't move sharply.
 	virtual float GetCurrentMaxGroundSpeed();
 
@@ -236,9 +233,6 @@ protected:
 	virtual int CalcSequenceIndex( const char *pBaseName, ... );
 
 	Activity GetCurrentMainSequenceActivity() const;
-
-	void				GetOuterAbsVelocity( Vector& vel ) const;
-	float				GetOuterXYSpeed() const;
 
 	// How long has it been since we cleared the animation state?
 	float				TimeSinceLastAnimationStateClear() const;
@@ -310,12 +304,12 @@ public:
 	bool m_bCombatStateIfEnemy;
 
 protected:
-	// The player's eye yaw and pitch angles.
+	// The unit's eye yaw and pitch angles.
 	float m_flEyeYaw;
 	float m_flEyePitch;
 
 	// The following variables are used for tweaking the yaw of the upper body when standing still and
-	//  making sure that it smoothly blends in and out once the player starts moving
+	//  making sure that it smoothly blends in and out once the unit starts moving
 	// Direction feet were facing when we stopped moving
 	float				m_flGoalFeetYaw;
 
@@ -344,12 +338,12 @@ private:
 	// Update the prone state machine.
 	void		UpdateProneState();
 
-	// Get the string that's appended to animation names for the player's current weapon.
+	// Get the string that's appended to animation names for the unit's current weapon.
 	const char* GetWeaponSuffix();
 
 	Activity			BodyYawTranslateActivity( Activity activity );
 
-	void				SetOuterPoseParameter( int iParam, float flValue );
+	
 
 
 	void				EstimateYaw();

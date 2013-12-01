@@ -33,6 +33,19 @@ public:
 
 	// Allow inheriting classes to override SelectWeightedSequence
 	virtual int SelectWeightedSequence( Activity activity );
+
+	// This is called when a new model is set. Used for one time setting up of paramters.
+	virtual void OnNewModel() {}
+
+	// Returns the unit render angles. Defaults to the AbsAngles.
+	virtual const QAngle& GetRenderAngles() { return GetOuter()->GetAbsAngles(); }
+
+protected:
+	// Helpers
+	void				GetOuterAbsVelocity( Vector& vel ) const;
+	float				GetOuterXYSpeed() const;
+
+	void				SetOuterPoseParameter( int iParam, float flValue );
 };
 
 // Inlines
