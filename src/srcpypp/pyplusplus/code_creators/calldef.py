@@ -1068,7 +1068,7 @@ class constructor_wrapper_t( calldef_wrapper_t ):
         answer = [ algorithm.create_identifier( self, self.parent.declaration.decl_string ) ]
         answer.append( '( ' )
         arg_utils = calldef_utils.argument_utils_t( self.declaration, algorithm.make_id_creator( self ) )
-        params = arg_utils.call_args()
+        params = arg_utils.call_args(callpython=False)
         answer.append( params )
         if params:
             answer.append(' ')
