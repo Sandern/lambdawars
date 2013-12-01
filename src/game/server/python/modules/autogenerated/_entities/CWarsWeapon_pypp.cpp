@@ -707,7 +707,7 @@ struct CWarsWeapon_wrapper : CWarsWeapon, bp::wrapper< CWarsWeapon > {
     }
 
     void TraceAttack( ::CTakeDamageInfo const & info, ::Vector const & vecDir, ::trace_t * ptr ){
-        CBaseEntity::TraceAttack( boost::ref(info), boost::ref(vecDir), boost::python::ptr(ptr) );
+        CBaseEntity::TraceAttack( info, vecDir, ptr );
     }
 
     virtual void UpdateOnRemove(  ) {

@@ -603,7 +603,7 @@ struct CPlayerResource_wrapper : CPlayerResource, bp::wrapper< CPlayerResource >
     }
 
     void TraceAttack( ::CTakeDamageInfo const & info, ::Vector const & vecDir, ::trace_t * ptr ){
-        CBaseEntity::TraceAttack( boost::ref(info), boost::ref(vecDir), boost::python::ptr(ptr) );
+        CBaseEntity::TraceAttack( info, vecDir, ptr );
     }
 
     virtual void UpdateOnRemove(  ) {
