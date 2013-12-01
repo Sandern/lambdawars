@@ -24,7 +24,7 @@ public:
 		m_fBoundingRadius = m_pUnit->CollisionProp()->BoundingRadius2D();
 	}
 
-	bool IsAreaValid( CNavArea *area )
+	bool IsAreaValid( CNavArea *area, CNavArea *fromArea = NULL, NavTraverseType how = NUM_TRAVERSE_TYPES )
 	{
 		if( (area->GetAttributes() & NAV_MESH_JUMP) )
 		{
@@ -39,13 +39,45 @@ public:
 		}
 
 		// Must fit in the nav area. Take surrounding area's in consideration
-		float fTolX = area->GetSizeX();
-		float fTolY =  area->GetSizeY();
+		//float fTolX = area->GetSizeX();
+		//float fTolY =  area->GetSizeY();
 
-		if(m_fBoundingRadius > fTolX || m_fBoundingRadius > fTolY )
+		if( fromArea )
+		{
+			if( how == GO_NORTH || how == GO_SOUTH )
+			{
+				float fTolX = area->GetSizeX() + fromArea->GetSizeX();
+				if( m_fBoundingRadius > fTolX )
+					return false;
+
+				float fTolY =  area->GetSizeY();
+				if( m_fBoundingRadius > fTolY )
+					return false;
+			}
+			else if( how == GO_WEST || how == GO_EAST )
+			{
+				float fTolY = area->GetSizeY() + fromArea->GetSizeY();
+				if( m_fBoundingRadius > fTolY )
+					return false;
+
+				float fTolX =  area->GetSizeX();
+				if( m_fBoundingRadius > fTolX )
+					return false;
+			}
+		}
+		/*
+		// Per direction, check if the bounding radius fits
+		// If not, try to expand the tolerance by adding adj areas
+		if( m_fBoundingRadius > fTolX )
 		{
 			return false;
 		}
+
+		if( m_fBoundingRadius > fTolY )
+		{
+			//area->GetAdjacentArea(
+			return false;
+		}*/
 
 #ifndef CLIENT_DLL
 		// Figure out normal, calculate and check min slope
@@ -61,7 +93,7 @@ public:
 		return true;
 	}
 
-	float operator() ( CNavArea *area, CNavArea *fromArea, const CNavLadder *ladder, const CFuncElevator *elevator, float length )
+	float operator() ( CNavArea *area, CNavArea *fromArea, const CNavLadder *ladder, const CFuncElevator *elevator, NavTraverseType how, float length )
 	{
 		if ( fromArea == NULL )
 		{

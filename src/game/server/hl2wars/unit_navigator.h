@@ -217,6 +217,8 @@ public:
 		m_vStartPosition = src.m_vStartPosition;
 		m_fMaxMoveDist = src.m_fMaxMoveDist;
 		m_bSuccess = src.m_bSuccess;
+		m_bIsDirectPath = src.m_bIsDirectPath;
+		m_fnCustomLOSCheck = src.m_fnCustomLOSCheck;
 
 		// Copy waypoints
 		if( src.m_pWaypointHead )
@@ -270,6 +272,7 @@ public:
 		m_hTarget = NULL;
 		m_bAvoidEnemies = true;
 		m_fMaxMoveDist = 0;
+		m_bIsDirectPath = false;
 		SetWaypoint(NULL);
 	}
 
@@ -341,6 +344,7 @@ public:
 	Vector m_vStartPosition; // The initial start position of the unit
 	float m_fMaxMoveDist;
 	bool m_bSuccess; // Can be queried after path completion by other components
+	bool m_bIsDirectPath;
 	boost::python::object m_fnCustomLOSCheck;
 };
 

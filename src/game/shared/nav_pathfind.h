@@ -39,7 +39,7 @@ enum RouteType
 class ShortestPathCost
 {
 public:
-	float operator() ( CNavArea *area, CNavArea *fromArea, const CNavLadder *ladder, const CFuncElevator *elevator, float length )
+	float operator() ( CNavArea *area, CNavArea *fromArea, const CNavLadder *ladder, const CFuncElevator *elevator, NavTraverseType how, float length )
 	{
 		if ( fromArea == NULL )
 		{
@@ -139,7 +139,7 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 	/// @todo Cost might work as "manhattan distance"
 	startArea->SetTotalCost( (startArea->GetCenter() - actualGoalPos).Length() );
 
-	float initCost = costFunc( startArea, NULL, NULL, NULL, -1.0f );	
+	float initCost = costFunc( startArea, NULL, NULL, NULL, NUM_TRAVERSE_TYPES, -1.0f );	
 	if (initCost < 0.0f)
 		return false;
 	startArea->SetCostSoFar( initCost );
@@ -342,7 +342,7 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 			if ( newArea->IsBlocked( teamID, ignoreNavBlockers ) )
 				continue;
 
-			float newCostSoFar = costFunc( newArea, area, ladder, elevator, length );
+			float newCostSoFar = costFunc( newArea, area, ladder, elevator, how, length );
 			
 			// check if cost functor says this area is a dead-end
 			if ( newCostSoFar < 0.0f )
@@ -436,7 +436,7 @@ float NavAreaTravelDistance( CNavArea *startArea, CNavArea *endArea, CostFunctor
 		return 0.0f;
 
 	// compute path between areas using given cost heuristic
-	if (NavAreaBuildPath( startArea, endArea, NULL, costFunc, NULL, maxPathLength ) == false)
+	if (NavAreaBuildPath( startArea, endArea, NULL, costFunc, NULL, NUM_TRAVERSE_TYPES, maxPathLength ) == false)
 		return -1.0f;
 
 	// compute distance along path

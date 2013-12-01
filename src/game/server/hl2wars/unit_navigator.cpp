@@ -99,6 +99,9 @@ ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 ConVar unit_route_local_paths("unit_route_local_paths", "1");
 ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
+ConVar unit_blocked_lowvel_check("unit_blocked_lowvel_check", "1");
+ConVar unit_blocked_longdist_check("unit_blocked_longdist_check", "1");
+
 ConVar unit_navigator_debug("unit_navigator_debug", "0", 0, "Prints debug information about the unit navigator");
 ConVar unit_navigator_debug_inrange("unit_navigator_debug_inrange", "0", 0, "Prints debug information for in range checks");
 ConVar unit_navigator_debug_show("unit_navigator_debug_show", "0", 0, "Shows debug information about the unit navigator");
@@ -410,14 +413,17 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 
 	if( unit_navigator_debugscreen_ent.GetInt() == GetOuter()->entindex() )
 	{
-		engine->Con_NPrintf( 2, "Goal status: %d", m_LastGoalStatus );
-		engine->Con_NPrintf( 3, "Blocked status: %d", GetBlockedStatus() );
-		engine->Con_NPrintf( 4, "Velocity: %f %f %f (%f)", GetAbsVelocity().x, GetAbsVelocity().y, GetAbsVelocity().z, GetAbsVelocity().Length() );
-		engine->Con_NPrintf( 5, "m_bBlockedLongDistanceDetected: %d", m_bBlockedLongDistanceDetected );
-		engine->Con_NPrintf( 6, "m_bLowVelocityDetectionActive: %d", m_bLowVelocityDetectionActive );
-		engine->Con_NPrintf( 7, "m_bNoPathVelocity: %d", m_bNoPathVelocity );
-		engine->Con_NPrintf( 8, "m_bLimitPositionActive: %d", m_bLimitPositionActive );
-		engine->Con_NPrintf( 9, "(gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f: %d", (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f );
+		int offset = 2;
+		engine->Con_NPrintf( offset++, "Goal status: %d", m_LastGoalStatus );
+		engine->Con_NPrintf( offset++, "Blocked status: %d", GetBlockedStatus() );
+		engine->Con_NPrintf( offset++, "WishVel: %f %f %f (%f)", m_vLastWishVelocity.x, m_vLastWishVelocity.y, m_vLastWishVelocity.z, m_vLastWishVelocity.Length() );
+		engine->Con_NPrintf( offset++, "Velocity: %f %f %f (%f)", GetAbsVelocity().x, GetAbsVelocity().y, GetAbsVelocity().z, GetAbsVelocity().Length() );
+		engine->Con_NPrintf( offset++, "m_bBlockedLongDistanceDetected: %d", m_bBlockedLongDistanceDetected );
+		engine->Con_NPrintf( offset++, "m_fLastWaypointDistance: %f", m_fLastWaypointDistance );
+		engine->Con_NPrintf( offset++, "m_bLowVelocityDetectionActive: %d", m_bLowVelocityDetectionActive );
+		engine->Con_NPrintf( offset++, "m_bNoPathVelocity: %d", m_bNoPathVelocity );
+		engine->Con_NPrintf( offset++, "m_bLimitPositionActive: %d", m_bLimitPositionActive );
+		engine->Con_NPrintf( offset++, "(gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f: %d", (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f );
 	}
 }
 
@@ -580,14 +586,6 @@ void UnitBaseNavigator::CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angle
 
 	MoveCommand.forwardmove = move.x * speed;
 	MoveCommand.sidemove = move.y * speed;
-
-#if 0
-	// Zero out if the speed is too low
-	if( fabs(MoveCommand.forwardmove) < 2.0f )
-		MoveCommand.forwardmove = 0.0f;
-	if( fabs(MoveCommand.sidemove) < 2.0f )
-		MoveCommand.sidemove = 0.0f;
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -782,9 +780,9 @@ bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 {
 	if( unit_cost_nonavareacheck.GetBool() )
 		return false;
-	// Set when in BS_STUCK and we can't find anything nearby 
-	// Also don't consider nav meshes when really nearby our goal
-	if( m_bNoNavAreasNearby || m_fGoalDistance < 32.0f ) 
+	// m_bNoNavAreasNearby is set when in BS_STUCK and we can't find anything nearby 
+	// Also don't consider nav meshes when really nearby our goal or when this is a direct path
+	if( GetPath()->m_bIsDirectPath || m_bNoNavAreasNearby || m_fGoalDistance < 32.0f ) 
 		return false;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );
@@ -848,8 +846,9 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 				UnitShortestPathCost costFunc(m_pOuter);
 
 				// Add density from nav area
-				CNavArea *pAreaTo = TheNavMesh->GetNavArea(m_vTestPositions[iPos]+Vector(0,0,96.0f), 150.0f);
-				if( !pAreaTo || !costFunc.IsAreaValid( pAreaTo ) )
+				// TODO: Check if target area is valid? 
+				CNavArea *pAreaTo = TheNavMesh->GetNavArea( m_vTestPositions[iPos] + Vector(0,0,96.0f), 150.0f );
+				if( !pAreaTo /*|| !costFunc.IsAreaValid( pAreaTo )*/ )
 				{
 					float fDensity = THRESHOLD_MAX / 2.0f;
 					fSumDensity += fDensity;
@@ -1298,7 +1297,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					if( bPathBlocked )
 						DevMsg("blocked path detected");
 					if( GetBlockedStatus() > BS_NONE )
-						DevMsg(", blocked status higher than none");
+						DevMsg(", blocked status higher than BS_NONE");
 					for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
 					{
 						CBaseEntity *pBlocker = MoveCommand.blockers[i].blocker;
@@ -1720,8 +1719,8 @@ void UnitBaseNavigator::AdvancePath()
 	// while we might still be blocked. Disabled for now..
 	// Just reset the waypoint distance, used by the long distance blocked check
 	//ResetBlockedStatus();
-	m_fLastWaypointDistance = MAX_COORD_FLOAT;
-	m_bBlockedLongDistanceDetected = false;
+	m_fLastWaypointDistance = -MAX_COORD_FLOAT;
+	//m_bBlockedLongDistanceDetected = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2031,9 +2030,10 @@ void UnitBaseNavigator::ResetBlockedStatus()
 {
 	m_BlockedStatus = BS_NONE;
 
+	NavDbgMsg("#%d ResetBlockedStatus\n", GetOuter()->entindex());
 	m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
 	m_bBlockedLongDistanceDetected = false;
-	m_fLastWaypointDistance = MAX_COORD_FLOAT;
+	m_fLastWaypointDistance = -MAX_COORD_FLOAT;
 	m_bLowVelocityDetectionActive = false;
 }
 
@@ -2050,9 +2050,10 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 	}
 
 	// Detect low velocity situation (which means the unit is not moving from the current position)
+	float fWishSpeed = m_vLastWishVelocity.Length2DSqr();
 	float fVelocity2dSqr = GetAbsVelocity().Length2DSqr();
 
-	if( fVelocity2dSqr < 4.0 )
+	if( unit_blocked_lowvel_check.GetBool() && fWishSpeed > 100.0f && fVelocity2dSqr < 100.0 )
 	{
 		if( !m_bLowVelocityDetectionActive )
 		{
@@ -2079,19 +2080,23 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 		m_vBlockedLastPosition = GetAbsOrigin();
 #else
 		// Only perform this check if we have no target or if the target is not moving
-		if( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) )
+		if( unit_blocked_longdist_check.GetBool() && fWishSpeed > 100.0f && ( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) ) )
 		{
-			m_bBlockedLongDistanceDetected = ( m_fLastWaypointDistance - fWaypointDist ) > ( (MoveCommand.maxspeed * 1.0f) / 4.0f );
+			if( m_fLastWaypointDistance < 0 )
+				m_fLastWaypointDistance = fWaypointDist;
+			
+			m_bBlockedLongDistanceDetected = ( m_fLastWaypointDistance - fWaypointDist ) < ( (MoveCommand.maxspeed * 1.0f) / 4.0f );
 			m_fLastWaypointDistance = Min( m_fLastWaypointDistance, fWaypointDist );
+
 			//if( m_bBlockedLongDistanceDetected )
 			//	NavDbgMsg("#%d UpdateBlockedStatus: Long distance blocked detected.\n", GetOuter()->entindex());
 			m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
 		}
-		else if( GetPath()->m_hTarget )
+		else //if( GetPath()->m_hTarget )
 		{
 			// Target is moving, so always reset the distance to avoid incorrect blocked detection
-			m_fLastWaypointDistance = MAX_COORD_FLOAT;
-			m_bBlockedLongDistanceDetected = false;
+			m_fLastWaypointDistance = -MAX_COORD_FLOAT;
+			//m_bBlockedLongDistanceDetected = false;
 		}
 #endif // 0
 	}
@@ -2105,8 +2110,6 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 	// Only execute this part if blocked...
 	if( m_BlockedStatus == BS_NONE )
 	{
-		ResetBlockedStatus();
-
 		m_iBlockedPathRecomputations = 0;
 		m_fBlockedStartTime = gpGlobals->curtime;
 	}
@@ -2432,7 +2435,8 @@ bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, floa
 {
 	if( FindPathInternal( GetPath(), goaltype, vDestination, fGoalTolerance, iGoalFlags, fMinRange, fMaxRange, pTarget, bAvoidEnemies ) )
 	{
-		if( unit_reactivepath.GetBool() ) UpdateReactivePath( true );
+		if( unit_reactivepath.GetBool() ) 
+			UpdateReactivePath( true );
 		return true;
 	}
 	return false;
@@ -2475,6 +2479,8 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const 
 		UnitBaseWaypoint *pWayPoint = new UnitBaseWaypoint(vGoalPos);
 		pWayPoint->flToleranceX = pPath->m_waypointTolerance + 1.0f;
 		pWayPoint->flToleranceY = pPath->m_waypointTolerance + 1.0f;
+
+		pPath->m_bIsDirectPath = true;
 		return pWayPoint;
 	}
 	return NULL;
@@ -2780,6 +2786,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	// Special case: build a direct path
 	if( pPath->m_iGoalFlags & GF_DIRECTPATH )
 	{
+		pPath->m_bIsDirectPath = true;
 		return new UnitBaseWaypoint( pPath->m_vGoalPos );
 	}
 
@@ -2808,7 +2815,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	{
 		// Cheap: try to do trace from start to goal
 		waypoints = BuildLocalPath( pPath, pPath->m_vGoalPos );
-		if( waypoints )
+		if( waypoints ) 
 			return waypoints;
 
 		// Expensive: use nav mesh
@@ -2818,6 +2825,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	}
 
 	// Fallback to a direct path
+	pPath->m_bIsDirectPath = true;
 	return new UnitBaseWaypoint( pPath->m_vGoalPos );
 }
 
