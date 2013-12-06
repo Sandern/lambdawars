@@ -20,7 +20,7 @@ ConVar cl_strategic_cam_spring_vel_max( "cl_strategic_cam_spring_vel_max", "3000
 ConVar cl_strategic_cam_spring_const( "cl_strategic_cam_spring_const", "49", FCVAR_ARCHIVE, "Camera spring constant." );
 ConVar cl_strategic_cam_spring_dampening( "cl_strategic_cam_spring_dampening", "3.0", FCVAR_ARCHIVE, "Camera spring dampening." );
 extern ConVar cl_strategic_height_tol;
-ConVar cl_strategic_cam_delta_snap( "cl_strategic_cam_delta_snap", "4096.0", FCVAR_CHEAT, "Snaps camera directly to desired height if difference is larger than this" );
+ConVar cl_strategic_cam_delta_snap( "cl_strategic_cam_delta_snap", "4096.0", FCVAR_ARCHIVE, "Snaps camera directly to desired height if difference is larger than this" );
 
 ConVar cl_strategic_cam_min_dist( "cl_strategic_cam_min_dist", "240.0", FCVAR_CHEAT, "Camera minimum distance" );
 ConVar cl_strategic_cam_max_dist( "cl_strategic_cam_max_dist", "840.0", FCVAR_CHEAT, "Camera maximum distance" );
