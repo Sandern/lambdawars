@@ -1,22 +1,15 @@
-Half-Life 2: Wars code (Alien Swarm engine).
-
-==============================================================
-Description
-==============================================================
-Source code of Half-Life 2: Wars (http://hl2wars.com/).
+## Lambda Wars (Alien Swarm engine).
+## Description
+Source code of Lambda Wars (formerly known as Half-Life 2: Wars, http://lambdawars.com/).
 
 Game code can be found at: http://svn.hl2wars.com/
 
-==============================================================
-Compiling
-==============================================================
+## Compiling
 Tested with Visual Studio 2010 SP1.
 1. Open src/python/srcbuid/pcbuild.pln and build the pythoncore project
 2. Open src/hl2wars.sln and compile the full project
 
-==============================================================
-Generating Python bindings
-==============================================================
+## Generating Python bindings
 Bindings are automatically generated from python files.
 You can find the list of modules and other settings in "src/srcpypp/settings.py".
 The actually modules can be found in "game/(client|server|shared)/python/modules".
@@ -24,21 +17,17 @@ The actually modules can be found in "game/(client|server|shared)/python/modules
 Py++ is used to generate the actually bindings. You can find more information at:
 http://sourceforge.net/projects/pygccxml/
 
-Generating the modules (requires Python 2.7):
+Generating the modules (requires Python 3):
 Open a command prompt and go to the srcpypp folder.
 From here you can run a few commands:
 - Generate bindings for all modules: python generate_mods
 - Generate bindings for a single module: python generate_mods -m module_name
 
-==============================================================
-Compiling shaders
-==============================================================
+## Compiling shaders
 - Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
 - Update paths buildsdkshaders_wars.bat
 
-==============================================================
-License
-==============================================================
+## License
 Creative Commons Attribution-NonCommercial 3.0 Unported
 Only applies to the new code in the sdk (in particular the code in the hl2wars and python folders).
 
