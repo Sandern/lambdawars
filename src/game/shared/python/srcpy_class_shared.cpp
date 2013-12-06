@@ -37,7 +37,8 @@ boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char 
 	}																							
 	try 
 	{																												
-		clshandle = _entities.attr(handlename);													
+		clshandle = _entities.attr(handlename);		
+		return clshandle(boost::python::ptr(pEnt));
 	} 
 	catch(boost::python::error_already_set &) 
 	{				
@@ -51,6 +52,6 @@ boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char 
 		PyErr_Clear();																			
 		return boost::python::object();															
 	}																							
-	return clshandle(boost::python::ptr(pEnt));													
+	return boost::python::object();											
 }
  

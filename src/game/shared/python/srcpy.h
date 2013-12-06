@@ -99,6 +99,7 @@ extern boost::python::object fntype;
 //-----------------------------------------------------------------------------
 #define STRINGIZE(x) #x 
 #define XSTR(x) STRINGIZE(x)
+
 #if PY_VERSION_HEX < 0x03000000
 #define PYINIT(x) init##x
 #else

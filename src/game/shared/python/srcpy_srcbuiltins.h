@@ -30,8 +30,8 @@ public:
 };
 
 // Wrappers for Msg, Warning and DevMsg (Python does not use VarArgs)
-inline void SrcPyMsg( const char *msg ) { Msg( msg ); }
-inline void SrcPyWarning( const char *msg ) { Warning( msg ); }
-inline void SrcPyDevMsg( int level, const char *msg ) { DevMsg( level, msg ); }
+inline void SrcPyMsg( const char *msg ) { Msg( "%s", msg ); }
+inline void SrcPyWarning( const char *msg ) { Warning( "%s", msg ); }
+inline void SrcPyDevMsg( int level, const char *msg ) { DevMsg( level, "%s", msg ); }
 
 #endif // SRCPY_SRCBUILTINS_H
