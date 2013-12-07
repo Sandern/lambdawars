@@ -18,14 +18,28 @@
 class SrcPyStdOut 
 {
 public:
-	void write( boost::python::object msg );
+	void write( boost::python::object msg )
+	{
+		char* pMsg = PyString_AsString( msg.ptr() );
+		if( pMsg == NULL )
+			return;
+		Msg( "%s", pMsg );
+	}
+
 	void flush() {}
 };
 
 class SrcPyStdErr 
 {
 public:
-	void write( boost::python::object msg );
+	void write( boost::python::object msg )
+	{
+		char* pMsg = PyString_AsString( msg.ptr() );
+		if( pMsg == NULL )
+			return;
+		Warning( "%s", pMsg ); 
+	}
+
 	void flush() {}
 };
 
