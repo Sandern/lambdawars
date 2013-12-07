@@ -1650,7 +1650,7 @@ CON_COMMAND_F( test_client_converters, "Test client converters", FCVAR_CHEAT)
 		( SrcPySystem()->Get("test_panel", "test_converters", true), NULL, pToPython );
 
 	if( pFromPython )
-		Msg("Got Panel from python\n", pFromPython->GetName() );
+		Msg("Got Panel from python: %s\n", pFromPython->GetName() );
 	else
 		Msg("No data from python :(\n");
 }

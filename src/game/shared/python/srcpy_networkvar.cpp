@@ -160,10 +160,10 @@ bp::object CPythonNetworkVar::Get( void )
 //-----------------------------------------------------------------------------
 void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	m_PlayerUpdateBits.Clear(iClient);
-
 	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
 		return;
+
+	m_PlayerUpdateBits.Clear(iClient);
 
 	pywrite write;
 	try 
@@ -256,10 +256,10 @@ void CPythonNetworkArray::Set( bp::list data )
 //-----------------------------------------------------------------------------
 void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	m_PlayerUpdateBits.Clear(iClient);
-
 	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
 		return;
+
+	m_PlayerUpdateBits.Clear(iClient);
 
 	// Parse list
 	int length = 0;
@@ -267,7 +267,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	try 
 	{
 		length = boost::python::len(m_dataInternal);
-		for(int i=0; i<length; i++)
+		for( int i = 0; i < length; i++ )
 		{
 			pywrite write;
 			PyFillWriteElement( write, boost::python::object(m_dataInternal[i]) );
@@ -291,7 +291,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	WRITE_EHANDLE(pEnt);
 	WRITE_STRING(m_Name);
 	WRITE_BYTE(length);
-	for(int i=0; i<writelist.Count(); i++)
+	for( int i = 0; i < writelist.Count(); i++ )
 	{
 		PyWriteElement(writelist.Element(i));
 	}
@@ -300,7 +300,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	if( g_debug_pynetworkvar.GetBool() )
 	{
 		DevMsg("#%d:%s - %f - PyNetworkArray: %s\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name);
-		for(int i=0; i<writelist.Count(); i++)
+		for( int i = 0; i < writelist.Count(); i++ )
 		{
 			DevMsg("\t");
 			PyPrintElement(writelist.Element(i));
@@ -365,10 +365,10 @@ void CPythonNetworkDict::Set( bp::dict data )
 //-----------------------------------------------------------------------------
 void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	m_PlayerUpdateBits.Clear(iClient);
-
 	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
 		return;
+
+	m_PlayerUpdateBits.Clear(iClient);
 
 	// Create write list
 	// TODO: Only write changed keys if possible
@@ -404,7 +404,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 			}
 		}
 	} 
-	catch(boost::python::error_already_set &) 
+	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
 		PyErr_Clear();
@@ -419,7 +419,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 	WRITE_EHANDLE(pEnt);
 	WRITE_STRING(m_Name);
 	WRITE_BYTE((int)length);
-	for(int i=0; i<writelist.Count(); i++)
+	for( int i = 0; i < writelist.Count(); i++ )
 	{
 		PyWriteElement(writelist.Element(i));
 	}
@@ -428,7 +428,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 	if( g_debug_pynetworkvar.GetBool() )
 	{
 		DevMsg("#%d:%s - %f - PyNetworkDict: %s (length: %d)\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name, (int)length);
-		for(int i=0; i<writelist.Count(); i++)
+		for( int i = 0; i < writelist.Count(); i++ )
 		{
 			DevMsg("\t");
 			PyPrintElement(writelist.Element(i));
@@ -448,7 +448,7 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict )
 	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get(iEdict) == false )
 		return;
 
-	for( int i=0; i<pEnt->m_utlPyNetworkVars.Count(); i++ )
+	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
 		if( pEnt->m_utlPyNetworkVars.Element(i)->m_PlayerUpdateBits.Get(iEdict) == false )
 			continue;
