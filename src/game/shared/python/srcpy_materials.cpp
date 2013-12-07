@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "srcpy_materials.h"
 
-#include "materialsystem/ITexture.h"
+#include "materialsystem/itexture.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
