@@ -32,7 +32,7 @@ namespace bp = boost::python;
 struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText > {
 
     RichText_wrapper(::vgui::Panel * parent, char const * panelName )
-    : vgui::RichText( boost::python::ptr(parent), panelName )
+    : vgui::RichText( parent, panelName )
       , bp::wrapper< vgui::RichText >(){
         // constructor
     	g_PythonPanelCount++;
@@ -58,7 +58,7 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
     }
 
     void ApplySettings( ::KeyValues * inResourceData ){
-        vgui::RichText::ApplySettings( boost::python::ptr(inResourceData) );
+        vgui::RichText::ApplySettings( inResourceData );
     }
 
     char const * GetDescription(  ){
@@ -66,7 +66,7 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
     }
 
     void GetSettings( ::KeyValues * outResourceData ){
-        vgui::RichText::GetSettings( boost::python::ptr(outResourceData) );
+        vgui::RichText::GetSettings( outResourceData );
     }
 
     void OnClickPanel( int index ){
@@ -451,11 +451,11 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     void CreateDragData(  ){
@@ -483,7 +483,7 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnChildAdded( ::vgui::VPANEL child ) {
@@ -861,7 +861,7 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

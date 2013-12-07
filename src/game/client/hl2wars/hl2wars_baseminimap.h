@@ -54,8 +54,8 @@ public:
 	virtual void			SetMap(const char * map);
 	void					InsertEntityObject( CBaseEntity *ent, CHudTexture *icon=NULL, int iHalfWide = 1, int iHalfTall = 1, 
 												bool testshowinfow = true, bool bFlashOnAttacked = false, int layer = 0 );
-	void					RemoveEntityObject( CBaseEntity *ent );
-	void					RemoveAllEntityObjects() { m_EntityObjects.RemoveAll(); }		
+	bool					RemoveEntityObject( CBaseEntity *ent );
+	void					RemoveAllEntityObjects( bool unitsonly = false );	
 	void					FlashEntity( CBaseEntity *ent, float duration );
 
 	// Draw

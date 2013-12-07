@@ -32,7 +32,7 @@ namespace bp = boost::python;
 struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< VideoGeneralPanel > {
 
     VideoGeneralPanel_wrapper(::vgui::Panel * pParent, char const * pPanelName, char const * pFileName=0 )
-    : VideoGeneralPanel( boost::python::ptr(pParent), pPanelName, pFileName )
+    : VideoGeneralPanel( pParent, pPanelName, pFileName )
       , bp::wrapper< VideoGeneralPanel >(){
         // constructor
     	g_PythonPanelCount++;
@@ -58,11 +58,11 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -109,7 +109,7 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnCommand( char const * command ) {
@@ -677,7 +677,7 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

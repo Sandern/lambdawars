@@ -32,25 +32,25 @@ namespace bp = boost::python;
 struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::EditablePanel > {
 
     EditablePanel_wrapper(::vgui::Panel * parent, char const * panelName )
-    : vgui::EditablePanel( boost::python::ptr(parent), panelName )
+    : vgui::EditablePanel( parent, panelName )
       , bp::wrapper< vgui::EditablePanel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     EditablePanel_wrapper(::vgui::Panel * parent, char const * panelName, ::vgui::HScheme hScheme )
-    : vgui::EditablePanel( boost::python::ptr(parent), panelName, hScheme )
+    : vgui::EditablePanel( parent, panelName, hScheme )
       , bp::wrapper< vgui::EditablePanel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -97,7 +97,7 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnCommand( char const * command ) {
@@ -665,7 +665,7 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

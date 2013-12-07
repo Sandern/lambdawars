@@ -32,18 +32,18 @@ namespace bp = boost::python;
 struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWars_Model_Panel > {
 
     CWars_Model_Panel_wrapper(::vgui::Panel * parent, char const * name )
-    : CWars_Model_Panel( boost::python::ptr(parent), name )
+    : CWars_Model_Panel( parent, name )
       , bp::wrapper< CWars_Model_Panel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -90,7 +90,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnCommand( char const * command ) {
@@ -658,7 +658,7 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

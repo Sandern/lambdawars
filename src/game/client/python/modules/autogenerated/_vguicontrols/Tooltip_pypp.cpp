@@ -32,7 +32,7 @@ namespace bp = boost::python;
 struct Tooltip_wrapper : vgui::Tooltip, bp::wrapper< vgui::Tooltip > {
 
     Tooltip_wrapper(::vgui::Panel * parent, char const * text=0 )
-    : vgui::Tooltip( boost::python::ptr(parent), text )
+    : vgui::Tooltip( parent, text )
       , bp::wrapper< vgui::Tooltip >(){
         // constructor
     

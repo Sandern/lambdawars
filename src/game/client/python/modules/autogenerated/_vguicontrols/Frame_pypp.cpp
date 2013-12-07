@@ -34,7 +34,7 @@ namespace bp = boost::python;
 struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
 
     Frame_wrapper(::vgui::Panel * parent, char const * panelName, bool showTaskbarIcon=true, bool bPopup=true )
-    : vgui::Frame( boost::python::ptr(parent), panelName, showTaskbarIcon, bPopup )
+    : vgui::Frame( parent, panelName, showTaskbarIcon, bPopup )
       , bp::wrapper< vgui::Frame >(){
         // constructor
     	g_PythonPanelCount++;
@@ -98,11 +98,11 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void ApplySettings( ::KeyValues * inResourceData ){
-        vgui::Frame::ApplySettings( boost::python::ptr(inResourceData) );
+        vgui::Frame::ApplySettings( inResourceData );
     }
 
     void ApplyUserConfigSettings( ::KeyValues * userConfig ){
-        vgui::Frame::ApplyUserConfigSettings( boost::python::ptr(userConfig) );
+        vgui::Frame::ApplyUserConfigSettings( userConfig );
     }
 
     virtual void Close(  ) {
@@ -228,7 +228,7 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void GetSettings( ::KeyValues * outResourceData ){
-        vgui::Frame::GetSettings( boost::python::ptr(outResourceData) );
+        vgui::Frame::GetSettings( outResourceData );
     }
 
     void GetSizerClientArea( int & x, int & y, int & wide, int & tall ){
@@ -236,7 +236,7 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void GetUserConfigSettings( ::KeyValues * userConfig ){
-        vgui::Frame::GetUserConfigSettings( boost::python::ptr(userConfig) );
+        vgui::Frame::GetUserConfigSettings( userConfig );
     }
 
     bool HasUserConfigSettings(  ){
@@ -738,11 +738,11 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     void CreateDragData(  ){
@@ -770,7 +770,7 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     void OnContinueDragging(  ){
@@ -1224,7 +1224,7 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

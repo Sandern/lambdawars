@@ -98,26 +98,44 @@ void CBaseMinimap::InsertEntityObject( CBaseEntity *pEnt, CHudTexture *pIcon, in
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseMinimap::RemoveEntityObject( CBaseEntity *pEnt )
+bool CBaseMinimap::RemoveEntityObject( CBaseEntity *pEnt )
 {
 	if( !pEnt )
-		return;
+		return false;
 
 	for( int i = 0; i < m_EntityObjects.Count(); i++ )
 	{
 		if( m_EntityObjects.Element(i).m_hEntity == pEnt )
 		{
 			m_EntityObjects.Remove(i);
-			return;
+			return true;
 		}
 	}
 
-#ifdef ENABLE_PYTHON
-	PyErr_SetString(PyExc_ValueError, "CBaseMinimap.RemoveEntityObject: x not in entity object list" );
-	throw boost::python::error_already_set(); 
-#else
-	Warning( "CBaseMinimap.RemoveEntityObject: entity #%d not in entity object list\n", pEnt->entindex() );
-#endif // ENABLE_PYTHON
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Removes all entities or just the unit entities.
+//-----------------------------------------------------------------------------
+void CBaseMinimap::RemoveAllEntityObjects( bool unitsonly )
+{
+	if( !unitsonly )
+	{
+		m_EntityObjects.RemoveAll();
+		return;
+	}
+
+	int count = m_EntityObjects.Count();
+	for( int i = count - 1; i >= 0; i-- )
+	{
+		EntityObject &eo = m_EntityObjects.Element(i);
+		CBaseEntity *pEnt = eo.m_hEntity.Get();
+		if( !pEnt || !pEnt->IsUnit() )
+			continue;
+
+		m_EntityObjects.Remove( i );
+	}
 }
 
 //-----------------------------------------------------------------------------

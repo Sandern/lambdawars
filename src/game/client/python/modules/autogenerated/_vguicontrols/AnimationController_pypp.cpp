@@ -32,18 +32,18 @@ namespace bp = boost::python;
 struct AnimationController_wrapper : PyPanel, vgui::AnimationController, bp::wrapper< vgui::AnimationController > {
 
     AnimationController_wrapper(::vgui::Panel * parent )
-    : vgui::AnimationController( boost::python::ptr(parent) )
+    : vgui::AnimationController( parent )
       , bp::wrapper< vgui::AnimationController >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -90,7 +90,7 @@ struct AnimationController_wrapper : PyPanel, vgui::AnimationController, bp::wra
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnChildAdded( ::vgui::VPANEL child ) {
@@ -772,7 +772,7 @@ struct AnimationController_wrapper : PyPanel, vgui::AnimationController, bp::wra
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

@@ -32,18 +32,18 @@ namespace bp = boost::python;
 struct CBaseMinimap_wrapper : PyPanel, CBaseMinimap, bp::wrapper< CBaseMinimap > {
 
     CBaseMinimap_wrapper(::vgui::Panel * parent, char const * panelName, bool registerlisteners=true )
-    : CBaseMinimap( boost::python::ptr(parent), panelName, registerlisteners )
+    : CBaseMinimap( parent, panelName, registerlisteners )
       , bp::wrapper< CBaseMinimap >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -90,7 +90,7 @@ struct CBaseMinimap_wrapper : PyPanel, CBaseMinimap, bp::wrapper< CBaseMinimap >
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnChildAdded( ::vgui::VPANEL child ) {
@@ -772,7 +772,7 @@ struct CBaseMinimap_wrapper : PyPanel, CBaseMinimap, bp::wrapper< CBaseMinimap >
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {
@@ -1177,16 +1177,17 @@ void register_CBaseMinimap_class(){
         }
         { //::CBaseMinimap::RemoveAllEntityObjects
         
-            typedef void ( ::CBaseMinimap::*RemoveAllEntityObjects_function_type )(  ) ;
+            typedef void ( ::CBaseMinimap::*RemoveAllEntityObjects_function_type )( bool ) ;
             
             CBaseMinimap_exposer.def( 
                 "RemoveAllEntityObjects"
-                , RemoveAllEntityObjects_function_type( &::CBaseMinimap::RemoveAllEntityObjects ) );
+                , RemoveAllEntityObjects_function_type( &::CBaseMinimap::RemoveAllEntityObjects )
+                , ( bp::arg("unitsonly")=(bool)(false) ) );
         
         }
         { //::CBaseMinimap::RemoveEntityObject
         
-            typedef void ( ::CBaseMinimap::*RemoveEntityObject_function_type )( ::C_BaseEntity * ) ;
+            typedef bool ( ::CBaseMinimap::*RemoveEntityObject_function_type )( ::C_BaseEntity * ) ;
             
             CBaseMinimap_exposer.def( 
                 "RemoveEntityObject"

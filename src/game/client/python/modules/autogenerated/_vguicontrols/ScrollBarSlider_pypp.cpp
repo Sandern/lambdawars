@@ -34,7 +34,7 @@ namespace bp = boost::python;
 struct ScrollBarSlider_wrapper : PyPanel, vgui::ScrollBarSlider, bp::wrapper< vgui::ScrollBarSlider > {
 
     ScrollBarSlider_wrapper(::vgui::Panel * parent, char const * panelName, bool vertical )
-    : vgui::ScrollBarSlider( boost::python::ptr(parent), panelName, vertical )
+    : vgui::ScrollBarSlider( parent, panelName, vertical )
       , bp::wrapper< vgui::ScrollBarSlider >(){
         // constructor
     	g_PythonPanelCount++;
@@ -207,11 +207,11 @@ struct ScrollBarSlider_wrapper : PyPanel, vgui::ScrollBarSlider, bp::wrapper< vg
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     void CreateDragData(  ){
@@ -239,7 +239,7 @@ struct ScrollBarSlider_wrapper : PyPanel, vgui::ScrollBarSlider, bp::wrapper< vg
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     virtual void OnChildAdded( ::vgui::VPANEL child ) {
@@ -788,7 +788,7 @@ struct ScrollBarSlider_wrapper : PyPanel, vgui::ScrollBarSlider, bp::wrapper< vg
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {

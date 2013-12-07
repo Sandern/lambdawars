@@ -41,32 +41,32 @@ struct Panel_wrapper : PyPanel, vgui::Panel, bp::wrapper< vgui::Panel > {
     }
 
     Panel_wrapper(::vgui::Panel * parent )
-    : vgui::Panel( boost::python::ptr(parent) )
+    : vgui::Panel( parent )
       , bp::wrapper< vgui::Panel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     Panel_wrapper(::vgui::Panel * parent, char const * panelName )
-    : vgui::Panel( boost::python::ptr(parent), panelName )
+    : vgui::Panel( parent, panelName )
       , bp::wrapper< vgui::Panel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     Panel_wrapper(::vgui::Panel * parent, char const * panelName, ::vgui::HScheme scheme )
-    : vgui::Panel( boost::python::ptr(parent), panelName, scheme )
+    : vgui::Panel( parent, panelName, scheme )
       , bp::wrapper< vgui::Panel >(){
         // constructor
     	g_PythonPanelCount++;
     }
 
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
-        vgui::Panel::AddToOverridableColors( boost::python::ptr(pColor), scriptname );
+        vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
 
     void ApplyOverridableColors( ::vgui::IScheme * pScheme ){
-        vgui::Panel::ApplyOverridableColors( boost::python::ptr(pScheme) );
+        vgui::Panel::ApplyOverridableColors( pScheme );
     }
 
     virtual void ApplySchemeSettings( ::vgui::IScheme * pScheme ) {
@@ -189,7 +189,7 @@ struct Panel_wrapper : PyPanel, vgui::Panel, bp::wrapper< vgui::Panel > {
     }
 
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
-        vgui::Panel::InternalInitDefaultValues( boost::python::ptr(map) );
+        vgui::Panel::InternalInitDefaultValues( map );
     }
 
     static boost::python::tuple LocalToScreen( ::vgui::Panel & inst, int x, int y ){
@@ -886,7 +886,7 @@ struct Panel_wrapper : PyPanel, vgui::Panel, bp::wrapper< vgui::Panel > {
     }
 
     void SetOverridableColor( ::Color * pColor, ::Color const & newColor ){
-        vgui::Panel::SetOverridableColor( boost::python::ptr(pColor), boost::ref(newColor) );
+        vgui::Panel::SetOverridableColor( pColor, newColor );
     }
 
     virtual void SetPaintBackgroundEnabled( bool state ) {
