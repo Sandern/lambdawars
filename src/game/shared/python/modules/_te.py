@@ -82,7 +82,8 @@ class TE(SemiSharedModuleGenerator):
         cls.include()
         cls.mem_funs().virtuality = 'not virtual' 
         cls.calldefs(matchers.access_type_matcher_t( 'protected' ), allow_empty=True).exclude()
-        
+        cls.mem_fun('RicochetSprite').exclude() # Exclude because of model_t
+
         mb.add_registration_code( 'bp::scope().attr( "tempents" ) = boost::ref(tempents);' )
         
         # C_LocalTempEntity is not exposed and shouldn't be needed (deprecated)

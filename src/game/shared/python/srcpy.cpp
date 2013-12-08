@@ -520,6 +520,9 @@ bool CSrcPython::ShutdownInterpreter( void )
 	_vguicontrols = bp::object();
 #endif // CLIENT_DLL
 
+
+	fntype = bp::object();
+
 	// Finalize
 	m_bPythonIsFinalizing = true;
 	PyErr_Clear(); // Make sure it does not hold any references...

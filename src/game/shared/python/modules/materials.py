@@ -8,9 +8,10 @@ class Materials(SemiSharedModuleGenerator):
 
     files = [
         'cbase.h',
-        'materialsystem\imaterial.h',
-        'materialsystem\MaterialSystemUtil.h',
-        'python\srcpy_materials.h',
+        'materialsystem/imaterial.h',
+        'materialsystem/MaterialSystemUtil.h',
+        'python/srcpy_materials.h',
+        'view_shared.h',
         '$cdll_client_int.h',
         '$viewpostprocess.h',
         '$glow_outline_effect.h',

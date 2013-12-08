@@ -7,16 +7,19 @@ from pygccxml.declarations import matchers, pointer_t, const_t, declarated_t, ch
 class Steam(SemiSharedModuleGenerator):
     module_name = 'steam'
     
-    files = [
-        'cbase.h',
-        'steam/steam_api.h',
-        'steam/isteamfriends.h',
-        'steam/isteamutils.h',
-        'steam/steamclientpublic.h',
+    @property
+    def files(self):
+        files = [
+            'cbase.h',
+            'steam/steam_api.h',
+            'steam/isteamfriends.h',
+            'steam/isteamutils.h',
+            'steam/steamclientpublic.h',
+        ]
+        if self.settings.branch == 'swarm':
+            files.append('$vgui_avatarimage.h')
+        return files
         
-        '$vgui_avatarimage.h',
-    ]
-    
     def ParseClient(self, mb):
         # Accessor class for all
         mb.add_registration_code( "bp::scope().attr( \"steamapicontext\" ) = boost::ref(steamapicontext);" )

@@ -10,6 +10,8 @@
 
 #include "python/srcpy_materials.h"
 
+#include "view_shared.h"
+
 #include "cdll_client_int.h"
 
 #include "viewpostprocess.h"
@@ -434,6 +436,8 @@ BOOST_PYTHON_MODULE(materials){
 #include "materialsystem/MaterialSystemUtil.h"
 
 #include "python/srcpy_materials.h"
+
+#include "view_shared.h"
 
 #include "srcpy.h"
 
