@@ -356,7 +356,7 @@ public:
 //-----------------------------------------------------------------------------
 class UnitBaseNavigator : public UnitComponent
 {
-	DECLARE_CLASS(UnitBaseNavigator, UnitComponent);
+	DECLARE_CLASS( UnitBaseNavigator, UnitComponent );
 public:
 	friend class CUnitBase;
 
@@ -373,13 +373,13 @@ public:
 	void				DispatchOnNavLostGoal();
 	virtual void		Update( UnitBaseMoveCommand &mv );
 	virtual void		UpdateFacingTargetState( bool bIsFacing );
-	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir=NULL );
+	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir = NULL );
 	virtual void		UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
 	virtual void		CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angles, float speed );
 
 	// flow stuff
 	float				GetDensityMultiplier();
-	Vector				GetWishVelocity() { return m_vLastWishVelocity; }
+	const Vector &		GetWishVelocity() { return m_vLastWishVelocity; }
 
 	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
 	virtual void		RegenerateConsiderList( Vector &vPathDir, CheckGoalStatus_t GoalStatus );

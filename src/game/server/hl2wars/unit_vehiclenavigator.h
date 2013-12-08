@@ -15,14 +15,14 @@
 
 class UnitVehicleNavigator : public UnitBaseNavigator
 {
-	DECLARE_CLASS(UnitVehicleNavigator, UnitBaseNavigator);
-public:
-	friend class CUnitBase;
+	DECLARE_CLASS( UnitVehicleNavigator, UnitBaseNavigator );
 
+public:
 #ifdef ENABLE_PYTHON
 	UnitVehicleNavigator( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
+	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir = NULL );
 };
 
 #endif // UNIT_VEHICLENAVIGATOR_H

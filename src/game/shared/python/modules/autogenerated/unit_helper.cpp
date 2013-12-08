@@ -1801,6 +1801,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateSteering_function_type( &::UnitVehicleAnimState::UpdateSteering ) );
         
         }
+        { //::UnitVehicleAnimState::UpdateWheel
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateWheel_function_type )( int,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateWheel"
+                , UpdateWheel_function_type( &::UnitVehicleAnimState::UpdateWheel )
+                , ( bp::arg("iParam"), bp::arg("wheelAdvancement") ) );
+        
+        }
         { //::UnitVehicleAnimState::UpdateWheels
         
             typedef void ( ::UnitVehicleAnimState::*UpdateWheels_function_type )(  ) ;
@@ -4493,6 +4503,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
         UnitBasePath_exposer.def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies );
+        UnitBasePath_exposer.def_readwrite( "m_bIsDirectPath", &UnitBasePath::m_bIsDirectPath );
         UnitBasePath_exposer.def_readwrite( "success", &UnitBasePath::m_bSuccess );
         UnitBasePath_exposer.def_readwrite( "m_fAtGoalTolerance", &UnitBasePath::m_fAtGoalTolerance );
         UnitBasePath_exposer.def_readwrite( "goaltolerance", &UnitBasePath::m_fGoalTolerance );
@@ -5232,6 +5243,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateSteering_function_type( &::UnitVehicleAnimState::UpdateSteering ) );
         
         }
+        { //::UnitVehicleAnimState::UpdateWheel
+        
+            typedef void ( ::UnitVehicleAnimState::*UpdateWheel_function_type )( int,float ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "UpdateWheel"
+                , UpdateWheel_function_type( &::UnitVehicleAnimState::UpdateWheel )
+                , ( bp::arg("iParam"), bp::arg("wheelAdvancement") ) );
+        
+        }
         { //::UnitVehicleAnimState::UpdateWheels
         
             typedef void ( ::UnitVehicleAnimState::*UpdateWheels_function_type )(  ) ;
@@ -5305,6 +5326,16 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
         bp::implicitly_convertible< bp::object, UnitVehicleNavigator >();
+        { //::UnitVehicleNavigator::UpdateIdealAngles
+        
+            typedef void ( ::UnitVehicleNavigator::*UpdateIdealAngles_function_type )( ::UnitBaseMoveCommand &,::Vector * ) ;
+            
+            UnitVehicleNavigator_exposer.def( 
+                "UpdateIdealAngles"
+                , UpdateIdealAngles_function_type( &::UnitVehicleNavigator::UpdateIdealAngles )
+                , ( bp::arg("MoveCommand"), bp::arg("pathdir")=bp::object() ) );
+        
+        }
     }
 
     { //::UnitComputePathDirection

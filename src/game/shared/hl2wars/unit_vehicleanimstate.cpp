@@ -43,6 +43,7 @@ void UnitVehicleAnimState::UpdateSteering()
 	if( m_iVehicleSteer == -1 )
 		return;
 
+	// TODO: Calculate direction we are steering
 	SetOuterPoseParameter( m_iVehicleSteer, 0 );
 }
 
