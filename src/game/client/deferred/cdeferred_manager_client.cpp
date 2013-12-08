@@ -1,5 +1,6 @@
 
 #include "cbase.h"
+#include "videocfg/videocfg.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imaterialvar.h"
@@ -42,9 +43,10 @@ bool CDeferredManagerClient::Init()
 {
 	AssertMsg( g_pCurrentViewRender == NULL, "viewrender already allocated?!" );
 
+	const bool bLowPerfSystem = GetGPULevel() <= GPU_LEVEL_LOW || GetGPUMemLevel() <= GPU_MEM_LEVEL_LOW || GetCPULevel() <= CPU_LEVEL_LOW;
+
 	const int iDeferredLevel = CommandLine() ? CommandLine()->ParmValue("-deferred", 1) : 1;
-	//const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-deferred") != 0;
-	const bool bAllowDeferred = CommandLine() && CommandLine()->FindParm("-disabledeferred") == 0;
+	const bool bAllowDeferred = !bLowPerfSystem && (!CommandLine() || CommandLine()->FindParm("-disabledeferred") == 0);
 	const bool bForceDeferred = CommandLine() && CommandLine()->FindParm("-forcedeferred") != 0;
 	bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
 

@@ -61,7 +61,7 @@ void InitDeferredRTs( bool bInitial )
 	if( bInitial ) // TODO: Does not work correctly mid game
 	{
 		// First determine if we are using low or high
-		if( GetGPUMemLevel() <= GPU_LEVEL_LOW || GetCPULevel() <= CPU_LEVEL_LOW )
+		if( GetGPUMemLevel() <= GPU_MEM_LEVEL_LOW || GetCPULevel() <= CPU_LEVEL_LOW )
 		{
 			g_cms_comp_res_x = CSM_COMP_RES_X_LOW;
 			g_cms_comp_res_y = CSM_COMP_RES_Y_LOW;
