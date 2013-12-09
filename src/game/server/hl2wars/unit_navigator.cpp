@@ -1272,18 +1272,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				bPathBlocked = UpdateReactivePath();
 			}
 
-			if( m_fGoalDistance < GetPath()->m_fMinRange )
-			{
-				// Back off if too close
-				vPathDir = GetAbsOrigin() - GetPath()->m_vGoalPos;
-				vPathDir.z = 0.0f;
-				fWaypointDist = VectorNormalize( vPathDir );
-			}
-			else
-			{
-				// Calculate path direction to next waypoint
-				fWaypointDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
-			}
+			fWaypointDist = ComputeWaypointDistanceAndDir( vPathDir );
 		}
 
 		// Path might be blocked. Recompute or add density seeds
@@ -1314,6 +1303,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					DoFindPathToPosInRange();
 				else
 					DoFindPathToPos();
+				fWaypointDist = ComputeWaypointDistanceAndDir( vPathDir );
 				m_iBlockedPathRecomputations++;
 
 				// Don't allow too many recomputations
@@ -1809,6 +1799,26 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 
 	return bBlocked;
 }
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+float UnitBaseNavigator::ComputeWaypointDistanceAndDir( Vector &vPathDir )
+{
+	float fWaypointDist;
+	if( m_fGoalDistance < GetPath()->m_fMinRange )
+	{
+		// Back off if too close
+		vPathDir = GetAbsOrigin() - GetPath()->m_vGoalPos;
+		vPathDir.z = 0.0f;
+		fWaypointDist = VectorNormalize( vPathDir );
+	}
+	else
+	{
+		// Calculate path direction to next waypoint
+		fWaypointDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
+	}
+	return fWaypointDist;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2083,21 +2093,27 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 		if( unit_blocked_longdist_check.GetBool() && fWishSpeed > 100.0f && ( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) ) )
 		{
 			if( m_fLastWaypointDistance < 0 )
+			{
 				m_fLastWaypointDistance = fWaypointDist;
-			
-			m_bBlockedLongDistanceDetected = ( m_fLastWaypointDistance - fWaypointDist ) < ( (MoveCommand.maxspeed * 1.0f) / 4.0f );
-			m_fLastWaypointDistance = Min( m_fLastWaypointDistance, fWaypointDist );
+				//m_bBlockedLongDistanceDetected = false;
+			}
+			else
+			{
+				m_bBlockedLongDistanceDetected = ( m_fLastWaypointDistance - fWaypointDist ) < ( (MoveCommand.maxspeed * 1.0f) / 4.0f );
+				m_fLastWaypointDistance = Min( m_fLastWaypointDistance, fWaypointDist );
+			}
 
 			//if( m_bBlockedLongDistanceDetected )
 			//	NavDbgMsg("#%d UpdateBlockedStatus: Long distance blocked detected.\n", GetOuter()->entindex());
-			m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
 		}
 		else //if( GetPath()->m_hTarget )
 		{
 			// Target is moving, so always reset the distance to avoid incorrect blocked detection
 			m_fLastWaypointDistance = -MAX_COORD_FLOAT;
-			//m_bBlockedLongDistanceDetected = false;
+			m_bBlockedLongDistanceDetected = false;
 		}
+
+		m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
 #endif // 0
 	}
 
@@ -2435,7 +2451,7 @@ bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, floa
 {
 	if( FindPathInternal( GetPath(), goaltype, vDestination, fGoalTolerance, iGoalFlags, fMinRange, fMaxRange, pTarget, bAvoidEnemies ) )
 	{
-		if( unit_reactivepath.GetBool() ) 
+		if( unit_reactivepath.GetBool() )
 			UpdateReactivePath( true );
 		return true;
 	}

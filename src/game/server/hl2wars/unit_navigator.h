@@ -402,6 +402,7 @@ public:
 	Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
 	virtual void		AdvancePath();
 	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
+	virtual float		ComputeWaypointDistanceAndDir( Vector &vPathDir );
 
 	virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
 	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
