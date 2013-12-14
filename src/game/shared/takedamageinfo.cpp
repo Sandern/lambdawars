@@ -58,6 +58,7 @@ void CTakeDamageInfo::Init( CBaseEntity *pInflictor, CBaseEntity *pAttacker, CBa
 	m_vecReportedPosition = reportedPosition;
 	m_iAmmoType = -1;
 	m_flRadius = 0.0f;
+	m_bForceFriendlyFire = false;
 }
 
 CTakeDamageInfo::CTakeDamageInfo()

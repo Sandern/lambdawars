@@ -1753,6 +1753,11 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		}
 	}
 
+#ifdef HL2WARS_DLL
+	// Don't want damage filtered for explosive breakables
+	pAttacker = NULL;
+#endif // HL2WARS_DLL
+
 	if ( m_explodeDamage > 0 || m_explodeRadius > 0 )
 	{
 		if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ) )

@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -75,6 +75,8 @@ public:
 	void			SetDamageCustom( int iDamageCustom );
 	int				GetDamageStats( void ) const;
 	void			SetDamageStats( int iDamageStats );
+	void			SetForceFriendlyFire( bool bValue ) { m_bForceFriendlyFire = bValue; }
+	bool			IsForceFriendlyFire( void ) const { return m_bForceFriendlyFire; }
 
 	int				GetAmmoType() const;
 	void			SetAmmoType( int iAmmoType );
@@ -116,6 +118,7 @@ protected:
 	int				m_iDamageStats;
 	int				m_iAmmoType;			// AmmoType of the weapon used to cause this damage, if any
 	float			m_flRadius;
+	bool			m_bForceFriendlyFire;	// Ideally this would be a dmg type, but we can't add more
 
 	DECLARE_SIMPLE_DATADESC();
 };
