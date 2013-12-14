@@ -2,6 +2,7 @@ import os
 
 from . basegenerator import ModuleGenerator
 from .. src_module_builder import src_module_builder_t
+from .. matchers import MatcherTestInheritClass
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers, pointer_t, reference_t, const_t, declarated_t, void_t, compound_t
 
@@ -34,7 +35,6 @@ class SourceModuleGenerator(ModuleGenerator):
         
     @property
     def path(self):
-        
         return os.path.join('../../', self.settings.client_path)
     
     # Create builder
@@ -115,35 +115,6 @@ class SourceModuleGenerator(ModuleGenerator):
                     pass
             if not found:
                 raise Exception('Could not find %s header''' % (filename))
-    
-    def TestInheritIHandleEntity(self, decl):
-        ihandlecls = self.ihandlecls
-        
-        # Only consider declarated and compound types
-        return_type = decl.return_type
-        if type(return_type) != declarated_t and not isinstance(return_type, compound_t):
-            return False
-            
-        # Traverse bases of return type
-        declaration = None
-        while return_type:
-            if type(return_type) == declarated_t:
-                declaration = return_type.declaration
-                break
-            if not isinstance(return_type, compound_t):
-                break
-            return_type = return_type.base
-            
-        if not declaration or not hasattr(declaration, 'recursive_bases'):
-            return False
-            
-        # Look through all bases of the class we are testing
-        recursive_bases = declaration.recursive_bases
-        for testcls in recursive_bases:
-            if ihandlecls == testcls.related_class:
-                return True
-            
-        return False
         
     def TestCBaseEntity(self, cls):
         baseentcls = self.baseentcls
@@ -176,8 +147,8 @@ class SourceModuleGenerator(ModuleGenerator):
         
         # All return values derived from IHandleEntity entity will be returned by value.
         # This ensures the converter is called
-        self.ihandlecls = mb.class_('IHandleEntity')
-        decls = mb.calldefs(matchers.custom_matcher_t(self.TestInheritIHandleEntity))
+        testinherit = MatcherTestInheritClass(mb.class_('IHandleEntity'))
+        decls = mb.calldefs(matchers.custom_matcher_t(testinherit))
         decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # All CBaseEntity related classes should have a custom call trait
@@ -191,6 +162,7 @@ class SourceModuleGenerator(ModuleGenerator):
         # Anything returning KeyValues should be returned by value so it calls the converter
         keyvalues = mb.class_('KeyValues')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(keyvalues))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(const_t(declarated_t(keyvalues)))), allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         # Anything returning a void pointer is excluded by default
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(void_t()))), allow_empty=True).exclude()

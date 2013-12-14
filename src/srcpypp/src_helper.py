@@ -301,25 +301,20 @@ def GenerateEntHandleExposeCode( cls_name, handle_name ):
     '    '+handle_name+'_exposer.def( bp::self == bp::self );\r\n' + \
     '}\r\n'
     return code
-    
-# Pretty much the same as above, but that might change    
-def GenerateVGUIHandleExposeCode( cls_name, handle_name ):
-    code = '{ //::'+handle_name+'\r\n' + \
-    '    typedef bp::class_< '+handle_name+', bp::bases<PyBaseVGUIHandle> > '+handle_name+'_exposer_t;\r\n' + \
-    '    '+handle_name+'_exposer_t '+handle_name+'_exposer = '+handle_name+'_exposer_t( "'+handle_name+'", bp::init< >() );\r\n' + \
-    '    '+handle_name+'_exposer.def( bp::init< '+cls_name+' * >(( bp::arg("pVal") )) );\r\n' + \
-    '    { //::'+handle_name+'::GetAttr\r\n' + \
-    '    \r\n' + \
-    '        typedef bp::object ( ::'+handle_name+'::*GetAttr_function_type )( const char * ) const;\r\n' + \
-    '        \r\n' + \
-    '        '+handle_name+'_exposer.def( \r\n' + \
-    '            "__getattr__"\r\n' + \
-    '            , GetAttr_function_type( &::'+handle_name+'::GetAttr )\r\n' + \
-    '        );\r\n' + \
-    '    \r\n' + \
-    '    }\r\n' + \
-    '}\r\n'
-    return code
+ 
+vguihandle_template = '''{ //::%(handlename)s
+        typedef bp::class_< %(handlename)s, bp::bases<PyBaseVGUIHandle> > %(handlename)s_exposer_t;
+        %(handlename)s_exposer_t %(handlename)s_exposer = %(handlename)s_exposer_t( "%(handlename)s", bp::init< >() );
+        %(handlename)s_exposer.def( bp::init<  %(clsname)s * >(( bp::arg("val") )) );
+        { //::%(handlename)s::GetAttr
+            typedef bp::object ( ::%(handlename)s::*GetAttr_function_type )( const char * ) const;
+            %(handlename)s_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::%(handlename)s::GetAttr )
+            );
+        }
+    }
+'''
 
 # Converters
 def AddEntityConverter( mb, cls_name ):
@@ -385,7 +380,7 @@ def AddEntityConverter( mb, cls_name ):
     mb.add_registration_code( ptr_convert_to_py_name+"();" )
     mb.add_registration_code( convert_to_py_name+"();" )
     mb.add_registration_code( convert_from_py_name+"();" )
-    
+
 # Convert templates for without vgui lib
 ptr_convert_to_py_name_template_novguilib = '''struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
 {
@@ -508,7 +503,7 @@ def AddVGUIConverter(mb, cls_name, novguilib, containsabstract=False):
     mb.add_declaration_code( 'typedef PyVGUIHandle<%(clsname)s> %(handlename)s;\r\n' % strargs )
     
     # Expose handle code
-    mb.add_registration_code( GenerateVGUIHandleExposeCode(cls_name, handlename), True )
+    mb.add_registration_code(vguihandle_template % {'clsname' : cls_name, 'handlename' : handlename}, True)
     
     # Add to python converters
     if novguilib:

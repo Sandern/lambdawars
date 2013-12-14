@@ -40,6 +40,8 @@ def GenerateVPCs(settings, filepaths, outpath):
     content = ''
     filters = defaultdict(str)
     
+    filepaths = sorted(filepaths)
+    
     for path in filepaths:
         basepath, filtername = path.split(settings.autogenfoldername)
         filtername = os.path.dirname(filtername).lstrip('\\')
@@ -48,7 +50,7 @@ def GenerateVPCs(settings, filepaths, outpath):
         else:
             content += '\t\t\t\t\t$File	"$SRCDIR\%s"\n' % (path)
             
-    for filter, filtercontent in filters.items():
+    for filter, filtercontent in sorted(filters.items()):
         content += filtertemplate % {'FilterName' : filter, 'Content' : filtercontent}
         
     # Write out file using the template
