@@ -88,8 +88,8 @@ struct C_StriderFX_wrapper : C_StriderFX, bp::wrapper< C_StriderFX > {
 
 struct PyClientSideEffect_wrapper : PyClientSideEffect, bp::wrapper< PyClientSideEffect > {
 
-    PyClientSideEffect_wrapper(char const * name )
-    : PyClientSideEffect( name )
+    PyClientSideEffect_wrapper(char const * name, int flags=int(::BITS_CLIENTEFFECT_NORMAL) )
+    : PyClientSideEffect( name, flags )
       , bp::wrapper< PyClientSideEffect >(){
         // constructor
     
@@ -558,7 +558,7 @@ BOOST_PYTHON_MODULE(_te){
 
     { //::PyClientSideEffect
         typedef bp::class_< PyClientSideEffect_wrapper, boost::noncopyable > ClientSideEffect_exposer_t;
-        ClientSideEffect_exposer_t ClientSideEffect_exposer = ClientSideEffect_exposer_t( "ClientSideEffect", bp::init< char const * >(( bp::arg("name") )) );
+        ClientSideEffect_exposer_t ClientSideEffect_exposer = ClientSideEffect_exposer_t( "ClientSideEffect", bp::init< char const *, bp::optional< int > >(( bp::arg("name"), bp::arg("flags")=int(::BITS_CLIENTEFFECT_NORMAL) )) );
         bp::scope ClientSideEffect_scope( ClientSideEffect_exposer );
         bp::implicitly_convertible< char const *, PyClientSideEffect >();
         { //::PyClientSideEffect::AddMeshBuilder

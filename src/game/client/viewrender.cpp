@@ -3425,6 +3425,12 @@ void CViewRender::RenderView( const CViewSetup &view, const CViewSetup &hudViewS
 
 		GetClientMode()->DoPostScreenSpaceEffects( &worldView );
 
+#ifdef HL2WARS_DLL
+		// Draw client side effects post screen effects
+		// NOTE: These are not sorted against the rest of the frame
+		clienteffects->DrawEffects( gpGlobals->frametime, BITS_CLIENTEFFECT_POSTSCREEN );	
+#endif // HL2WARS_DLL
+
 		CleanupMain3DView( worldView );
 
 		if ( m_FreezeParams[ slot ].m_bTakeFreezeFrame )

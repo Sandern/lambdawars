@@ -13,6 +13,15 @@
 class	Vector;
 struct	FXQuadData_t;
 struct	FXLineData_t;
+
+#ifdef HL2WARS_DLL
+enum ClientSideEffectFlag_t
+{
+	BITS_CLIENTEFFECT_NORMAL			= 0x00000001,
+	BITS_CLIENTEFFECT_POSTSCREEN		= 0x00000002,
+};
+#endif // HL2WARS_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: Base class for client side effects
 //-----------------------------------------------------------------------------
@@ -20,7 +29,11 @@ abstract_class CClientSideEffect
 {
 public:
 	// Constructs the named effect
+#ifdef HL2WARS_DLL
+						CClientSideEffect( const char *name, int flags = BITS_CLIENTEFFECT_NORMAL );
+#else
 						CClientSideEffect( const char *name );
+#endif // HL2WARS_DLL
 	virtual				~CClientSideEffect( void );
 
 	// Update/Draw the effect
@@ -32,6 +45,10 @@ public:
 	virtual bool		IsActive( void );
 	// Sets the effect to inactive so it can be destroed
 	virtual void		Destroy( void );
+#ifdef HL2WARS_DLL
+	// Get draw flags
+	int					GetFlags() { return m_iFlags; }
+#endif // HL2WARS_DLL
 
 // =======================================
 // PySource Additions
@@ -55,6 +72,10 @@ private:
 	const char			*m_pszName;
 	// Is the effect active
 	bool				m_bActive;
+#ifdef HL2WARS_DLL
+	// Draw flags
+	int					m_iFlags;
+#endif // HL2WARS_DLL
 };
 
 //-----------------------------------------------------------------------------
@@ -67,8 +88,10 @@ public:
 
 	// Add an effect to the list of effects
 	virtual void	AddEffect( CClientSideEffect *effect ) = 0;
+#ifdef HL2WARS_DLL
 	// Simulate/Update/Draw effects on list
-	virtual void	DrawEffects( double frametime ) = 0;
+	virtual void	DrawEffects( double frametime, int flags = BITS_CLIENTEFFECT_NORMAL ) = 0;
+#endif // HL2WARS_DLL
 	// Flush out all effects fbrom the list
 	virtual void	Flush( void ) = 0;
 };

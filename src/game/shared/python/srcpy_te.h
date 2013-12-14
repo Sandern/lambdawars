@@ -123,7 +123,7 @@ private:
 class PyClientSideEffect : public CClientSideEffect
 {
 public:
-						PyClientSideEffect( const char *name );
+						PyClientSideEffect( const char *name, int flags = BITS_CLIENTEFFECT_NORMAL );
 	virtual				~PyClientSideEffect( void );
 
 	virtual void		Draw( double frametime );

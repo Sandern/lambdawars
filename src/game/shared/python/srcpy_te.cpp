@@ -265,8 +265,8 @@ void PyMeshRallyLine::Draw( double frametime )
 //=============================================================================
 // Python Client Side effect
 //=============================================================================
-PyClientSideEffect::PyClientSideEffect( const char *name )
-: CClientSideEffect( name )
+PyClientSideEffect::PyClientSideEffect( const char *name, int flags )
+: CClientSideEffect( name, flags )
 {
 }
 

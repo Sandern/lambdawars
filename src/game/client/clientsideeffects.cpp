@@ -44,9 +44,10 @@ bool FXCreationAllowed( void )
 // Purpose: Construct and activate effect
 // Input  : *name - 
 //-----------------------------------------------------------------------------
-CClientSideEffect::CClientSideEffect( const char *name )
+CClientSideEffect::CClientSideEffect( const char *name, int flags )
 {
 	m_pszName = name;
+	m_iFlags = flags;
 	Assert( name );
 
 	m_bActive = true;
@@ -115,8 +116,13 @@ public:
 	//	Add an effect to the effects list
 	void			AddEffect( CClientSideEffect *effect );
 	// Remove the specified effect
+#ifdef HL2WARS_DLL
+	// Draw/update all effects in the current list
+	void			DrawEffects( double frametime, int flags = BITS_CLIENTEFFECT_NORMAL );
+#else
 	// Draw/update all effects in the current list
 	void			DrawEffects( double frametime );
+#endif // #ifdef HL2WARS_DLL
 	// Flush out all effects from the list
 	void			Flush( void );
 private:
@@ -220,7 +226,11 @@ void CEffectsList::RemoveEffect( int effectIndex )
 // Purpose: Iterate through list and simulate/draw stuff
 // Input  : frametime - 
 //-----------------------------------------------------------------------------
+#ifdef HL2WARS_DLL
+void CEffectsList::DrawEffects( double frametime, int flags )
+#else
 void CEffectsList::DrawEffects( double frametime )
+#endif // HL2WARS_DLL
 {
 	VPROF_BUDGET( "CEffectsList::DrawEffects", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	int i;
@@ -230,9 +240,13 @@ void CEffectsList::DrawEffects( double frametime )
 	for ( i = m_nEffects - 1 ; i >= 0; i-- )
 	{
 		effect = m_rgEffects[ i ];
+#ifdef HL2WARS_DLL
+		if ( !effect || (effect->GetFlags() & flags) == 0 )
+			continue;
+#else
 		if ( !effect )
 			continue;
-
+#endif // HL2WARS_DLL
 		// Simulate
 		effect->Draw( frametime );
 
