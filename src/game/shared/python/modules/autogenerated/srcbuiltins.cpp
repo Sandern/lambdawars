@@ -255,7 +255,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyDevMsg
     
-        typedef void ( *DevMsg_function_type )( int,char const * );
+        typedef void ( *DevMsg_function_type )( int,::boost::python::object );
         
         bp::def( 
             "DevMsg"
@@ -266,7 +266,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyMsg
     
-        typedef void ( *Msg_function_type )( char const * );
+        typedef void ( *Msg_function_type )( ::boost::python::object );
         
         bp::def( 
             "Msg"
@@ -289,7 +289,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyWarning
     
-        typedef void ( *PrintWarning_function_type )( char const * );
+        typedef void ( *PrintWarning_function_type )( ::boost::python::object );
         
         bp::def( 
             "PrintWarning"

@@ -44,8 +44,28 @@ public:
 };
 
 // Wrappers for Msg, Warning and DevMsg (Python does not use VarArgs)
-inline void SrcPyMsg( const char *msg ) { Msg( "%s", msg ); }
-inline void SrcPyWarning( const char *msg ) { Warning( "%s", msg ); }
-inline void SrcPyDevMsg( int level, const char *msg ) { DevMsg( level, "%s", msg ); }
+inline void SrcPyMsg( boost::python::object msg ) 
+{ 
+	char* pMsg = PyString_AsString( msg.ptr() );
+	if( pMsg == NULL )
+		return;
+	Msg( "%s", pMsg ); 
+}
+
+inline void SrcPyWarning( boost::python::object msg ) 
+{ 
+	char* pMsg = PyString_AsString( msg.ptr() );
+	if( pMsg == NULL )
+		return;
+	Warning( "%s", pMsg ); 
+}
+
+inline void SrcPyDevMsg( int level, boost::python::object msg ) 
+{ 
+	char* pMsg = PyString_AsString( msg.ptr() );
+	if( pMsg == NULL )
+		return;
+	DevMsg( level, "%s", pMsg ); 
+}
 
 #endif // SRCPY_SRCBUILTINS_H
