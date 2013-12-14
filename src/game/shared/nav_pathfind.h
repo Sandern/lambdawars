@@ -436,7 +436,7 @@ float NavAreaTravelDistance( CNavArea *startArea, CNavArea *endArea, CostFunctor
 		return 0.0f;
 
 	// compute path between areas using given cost heuristic
-	if (NavAreaBuildPath( startArea, endArea, NULL, costFunc, NULL, NUM_TRAVERSE_TYPES, maxPathLength ) == false)
+	if (NavAreaBuildPath( startArea, endArea, NULL, costFunc, NULL, maxPathLength ) == false)
 		return -1.0f;
 
 	// compute distance along path
