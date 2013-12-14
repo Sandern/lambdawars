@@ -1,10 +1,10 @@
 from srcpy.module_generators import ClientModuleGenerator
+from srcpy.matchers import calldef_withtypes, MatcherTestInheritClass
 from src_helper import *
-import settings
 
 from pyplusplus.code_creators import calldef
 from pyplusplus import function_transformers as FT
-from pygccxml.declarations import matchers
+from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t, int_t, wchar_t
 from pyplusplus.module_builder import call_policies
 
 class VGUIControls(ClientModuleGenerator):
@@ -112,7 +112,7 @@ class VGUIControls(ClientModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-        cls.mem_funs( 'SetText', lambda decl: HasArgType(decl, 'wchar_t') ).exclude()
+        cls.calldefs('SetText', calldef_withtypes([pointer_t(const_t(declarated_t(wchar_t())))])).exclude()
         cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         cls.mem_funs( 'GetDrawWidth' ).add_transformation( FT.output('width') )
         cls.mem_funs( 'SizeText' ).exclude()     # DECLARATION ONLY
@@ -131,50 +131,14 @@ class VGUIControls(ClientModuleGenerator):
             '    , (boost::python::object ( TextImage_wrapper::* )())( &TextImage_wrapper::GetText ) )'
         )
         
-        """
-        cls.add_wrapper_code( 
-            '''virtual void GetTextSize( int & wide, int & tall ){
-                bp::override func_GetTextSize = this->get_override( "GetTextSize" );
-                if( func_GetTextSize.ptr() != Py_None )
-                    try {
-                        func_GetTextSize( wide, tall );
-                    } catch(bp::error_already_set &) {
-                        PyErr_Print();
-                        this->vgui::TextImage::GetTextSize( wide, tall );
-                    }
-                else
-                    this->vgui::TextImage::GetTextSize( wide, tall );
-            }
-            
-            virtual boost::python::tuple default_GetTextSize() {
-                int wide2;
-                int tall2;
-                vgui::TextImage::GetTextSize( wide2, tall2 );
-                return bp::make_tuple( wide2, tall2 );
-            }'''
-        )
-        cls.add_registration_code(
-            '''{ //::vgui::TextImage::GetTextSize
-        
-            typedef void ( TextImage_wrapper::*GetTextSize_function_type )() ;
-            
-            TextImage_exposer.def( 
-                "GetTextSize"
-                , GetTextSize_function_type( &TextImage_wrapper::default_GetTextSize ) );
-        
-            }'''
-            , works_on_instance=False
-        )
-        """
-        
         # BitmapImage
         cls = mb.class_('BitmapImage')
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
         #cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-        cls.mem_funs( 'GetColor', lambda decl: HasArgType(decl, 'int') ).add_transformation( FT.output('r'), FT.output('g'), FT.output('b'), FT.output('a') )
+        
+        cls.calldefs('GetColor', calldef_withtypes([reference_t(declarated_t(int_t()))])).add_transformation(FT.output('r'), FT.output('g'), FT.output('b'), FT.output('a'))
         cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
-
         
         # CAvatarImage
         cls = mb.class_('CAvatarImage')
@@ -366,11 +330,7 @@ class VGUIControls(ClientModuleGenerator):
             AddVGUIConverter(mb, cls_name, self.novguilib, containsabstract=(cls_name == 'CPotteryWheelPanel'))
             
             # # Add custom wrappers for functions who take keyvalues as input
-            if not self.novguilib: # FIXME/TODO
-                AddWrapReg( mb, cls_name, mb.mem_fun('PyOnMessage'), ['*params', 'fromPanel'] )
-            #AddWrapReg( mb, cls_name, mb.mem_fun('CallParentFunction'), ['*message'] )
-            #AddWrapReg( mb, cls_name, mb.mem_fun('PostActionSignal'), ['*message'] )
-            else:
+            if self.novguilib:
                 # No access to source code, so need to add message stuff for python here.
                 cls.add_wrapper_code('virtual void OnMessage(const KeyValues *params, VPANEL fromPanel) {\r\n' +
                                      '    if( Panel_DispatchMessage( m_PyMessageMap, params, fromPanel ) )\r\n' +
@@ -395,29 +355,6 @@ class VGUIControls(ClientModuleGenerator):
                                      '}\r\n' + \
                                      'virtual Panel *GetPanel() { return this; }\r\n'
                                      )
-                '''cls.add_wrapper_code('virtual void OnMessage(const KeyValues *params, VPANEL fromPanel) {\r\n' +
-                                     '    if( Panel_DispatchMessage( m_PyMessageMap, params, fromPanel ) )\r\n' +
-                                     '        return;\r\n' +
-                                     '    Panel::OnMessage(params, fromPanel);\r\n' +
-                                     '}\r\n' + \
-                                     '\r\n' + \
-                                     'void RegMessageMethod( const char *message, boost::python::object method, int numParams=0, \r\n' + \
-                                     '       const char *nameFirstParam="", int typeFirstParam=DATATYPE_VOID, \r\n' + \
-                                     '       const char *nameSecondParam="", int typeSecondParam=DATATYPE_VOID ) { \r\n' + \
-                                     '       py_message_entry_t entry;\r\n' + \
-                                     '       entry.method = method;\r\n' + \
-                                     '       entry.numParams = numParams;\r\n' + \
-                                     '       entry.firstParamName = nameFirstParam;\r\n' + \
-                                     '       entry.firstParamSymbol = KeyValuesSystem()->GetSymbolForString(nameFirstParam);\r\n' + \
-                                     '       entry.firstParamType = typeFirstParam;\r\n' + \
-                                     '       entry.secondParamName = nameSecondParam;\r\n' + \
-                                     '       entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);\r\n' + \
-                                     '       entry.secondParamType = typeSecondParam;\r\n' + \
-                                     '\r\n' + \
-                                     '       m_PyMessageMap.Insert(message, entry);\r\n' + \
-                                     '}\r\n' + \
-                                     'CUtlDict<py_message_entry_t, short> m_PyMessageMap;'
-                                    )'''
                 cls.add_registration_code('def( "RegMessageMethod", &'+cls_name+'_wrapper::RegMessageMethod\r\n' + \
                                                ', ( bp::arg("message"), bp::arg("method"), bp::arg("numParams")=(int)(0), bp::arg("nameFirstParam")="", bp::arg("typeFirstParam")=int(::vgui::DATATYPE_VOID), bp::arg("nameSecondParam")="", bp::arg("typeSecondParam")=int(::vgui::DATATYPE_VOID) ))' )
                                                
@@ -467,20 +404,17 @@ class VGUIControls(ClientModuleGenerator):
         mb.vars( lambda decl: '_register' in decl.name ).exclude()
         mb.vars( lambda decl: 'm_Register' in decl.name ).exclude()
         
-        # 
-        # I suppose there is a more elegant and faster way than this custom HasArgType method?
-        mb.mem_funs( lambda decl: HasArgType(decl, 'CUtlBuffer') ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'CUtlMemory') ).exclude()
-        #mb.mem_funs( lambda decl: HasArgType(decl, 'KeyValues') ).exclude()
-        
-        #mb.mem_funs( lambda decl: HasArgType(decl, 'vgui::Panel *') ).exclude()
-            
-        # The following methods with certain args or return types we will ingore for a while
-        mb.mem_funs( lambda decl: HasArgType(decl, 'Menu') ).exclude()
-        mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('Menu') != -1 ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'KeyBindingContextHandle_t') ).exclude()
-        mb.mem_funs( lambda decl: decl.return_type.build_decl_string().find('KeyBindingContextHandle_t') != -1 ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'IPanelAnimationPropertyConverter') ).exclude()
+        # Don't need the following:
+        menu = mb.class_('Menu')
+        keybindindcontexthandle = mb.enum('KeyBindingContextHandle_t')
+        excludetypes = [
+            pointer_t(const_t(declarated_t(menu))),
+            pointer_t(declarated_t(menu)),
+            reference_t(declarated_t(menu)),
+            pointer_t(declarated_t(mb.class_('IPanelAnimationPropertyConverter'))),
+            declarated_t(keybindindcontexthandle),
+        ]
+        mb.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
         
     def ParsePanel(self, mb):
         #all_classes = mb.classes(self.panel_cls_list)
@@ -592,52 +526,68 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs('IsBuildGroupEnabled').exclude()
         mb.mem_funs('CreateControlByName').exclude()
         
-        mb.mem_funs('LoadKeyBindings').exclude() # Not sure why this one is giving problems. Not that it is important.
-        
+        mb.mem_funs('LoadKeyBindings').exclude()
+        mb.mem_funs('SaveKeyBindingsToBuffer').exclude()
+        mb.mem_funs('LookupBoundKeys').exclude()
         mb.mem_funs('OnKeyTyped').exclude()
         mb.mem_funs('HasHotkey').exclude()
+
+        mb.mem_funs('GetDragData').exclude()
+        mb.mem_funs('GetDragFailCursor').exclude()
+        mb.mem_funs('GetDropCursor').exclude()
+        mb.mem_funs('GetDropTarget').exclude()
+        mb.mem_funs('IsDroppable').exclude()
+        mb.mem_funs('OnPanelDropped').exclude()
+        mb.mem_funs('OnPanelEnteredDroppablePanel').exclude()
+        mb.mem_funs('OnPanelExitedDroppablePanel').exclude()
+        mb.mem_funs('OnDragFailed').exclude()
+        mb.mem_funs('OnDropContextHoverHide').exclude()
+        mb.mem_funs('OnDropContextHoverShow').exclude()
+        mb.mem_funs('OnDroppablePanelPaint').exclude()
+        mb.mem_funs('OnGetAdditionalDragPanels').exclude()
+        mb.mem_funs('OnDragFailed').exclude()
         
         mb.vars('m_PanelMap').exclude()
         mb.vars('m_MessageMap').exclude()
         mb.mem_funs('GetPanelMap').exclude()
        
         # Must use return_by_value. Then the converter will be used to wrap the vgui element in a safe handle
-        mb.mem_funs( 'GetChild' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs( 'GetChild' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         mb.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
-        mb.mem_funs( 'GetParent' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'FindSiblingByName' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'FindChildByName' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'HasHotkey' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'GetPanelWithKeyBindings' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'LookupBinding' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'LookupBindingByKeyCode' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'LookupDefaultKey' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'LookupMapForBinding' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs( 'GetParent' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'FindSiblingByName' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'FindChildByName' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'HasHotkey' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'GetPanelWithKeyBindings' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'LookupBinding' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'LookupBindingByKeyCode' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'LookupDefaultKey' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'LookupMapForBinding' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         mb.mem_funs( 'GetTooltip' ).call_policies = call_policies.return_internal_reference()  
-        mb.mem_funs( 'GetDragDropInfo' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'GetDragPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'GetPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'FindPanelAnimationEntry' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'FindDropTargetPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+        mb.mem_funs( 'GetDragDropInfo' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'GetDragPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'GetPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'FindPanelAnimationEntry' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'FindDropTargetPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         if self.settings.branch == 'swarm':
-            mb.mem_funs( 'GetNavDown' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavDownPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavLeft' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavLeftPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavRight' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavRightPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavUp' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'GetNavUpPanel' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'NavigateDown' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'NavigateLeft' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'NavigateRight' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'NavigateTo' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'NavigateUp' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'SetNavDown' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'SetNavLeft' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'SetNavRight' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-            mb.mem_funs( 'SetNavUp' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+            mb.mem_funs( 'GetNavDown' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavDownPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavLeft' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavLeftPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavRight' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavRightPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavUp' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'GetNavUpPanel' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'NavigateDown' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'NavigateLeft' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'NavigateRight' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'NavigateTo' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'NavigateUp' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'SetNavDown' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'SetNavLeft' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'SetNavRight' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+            mb.mem_funs( 'SetNavUp' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
 
             # Exclude
             mb.mem_funs('OnUnserialized').exclude()
@@ -695,8 +645,8 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs( 'GetClientArea' ).add_transformation( FT.output('x'), FT.output('y'), FT.output('wide'), FT.output('tall') ) 
 
     def ScrollBar(self, mb):
-        mb.mem_funs( 'GetButton' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        mb.mem_funs( 'GetSlider' ).call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs( 'GetButton' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.mem_funs( 'GetSlider' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         mb.mem_funs( 'GetRange' ).add_transformation( FT.output('min'), FT.output('max') ) 
 
@@ -763,14 +713,6 @@ class VGUIControls(ClientModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"BIK_PRELOAD\" ) = BIK_PRELOAD;" )
         mb.add_registration_code( "bp::scope().attr( \"BIK_NO_AUDIO\" ) = BIK_NO_AUDIO;" )
         
-        # Model panels
-        #cls = mb.class_('CPotteryWheelPanel')
-        #cls.add_wrapper_code( 'private:\nvirtual void OnPaint3D() {}' )
-        #cls = mb.class_('CMDLPanel')
-        #cls = mb.class_('CBaseModelPanel')
-        #mb.mem_funs('GetLightProbeCubemap').exclude()
-        #mb.mem_funs('Select').exclude()
-        
     def Parse(self, mb):
         self.novguilib = (self.settings.branch == 'swarm')
         
@@ -790,6 +732,11 @@ class VGUIControls(ClientModuleGenerator):
         
         # Should already be included, but is for some reason not...
         mb.mem_funs('SetControlEnabled').include()
+        
+        # Anything that returns a Panel should be returned by Value to call the right converter
+        testinherit = MatcherTestInheritClass(mb.class_('Panel'))
+        decls = mb.calldefs(matchers.custom_matcher_t(testinherit))
+        decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # Remove any protected function
         #mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()

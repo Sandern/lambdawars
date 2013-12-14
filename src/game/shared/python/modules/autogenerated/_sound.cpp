@@ -55,7 +55,7 @@ struct EmitSound_t_wrapper : EmitSound_t, bp::wrapper< EmitSound_t > {
     }
 
     EmitSound_t_wrapper(::CSoundParameters const & src )
-    : EmitSound_t( boost::ref(src) )
+    : EmitSound_t( src )
       , bp::wrapper< EmitSound_t >(){
         // constructor
     
@@ -482,7 +482,7 @@ struct EmitSound_t_wrapper : EmitSound_t, bp::wrapper< EmitSound_t > {
     }
 
     EmitSound_t_wrapper(::CSoundParameters const & src )
-    : EmitSound_t( boost::ref(src) )
+    : EmitSound_t( src )
       , bp::wrapper< EmitSound_t >(){
         // constructor
     

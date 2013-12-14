@@ -142,10 +142,16 @@ private:
 	CUtlVector< int >			m_HudRenderGroups;
 	CHud						*m_pHud;
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 public:
 	boost::python::object		m_pyInstance;
 #endif // ENABLE_PYTHON
+// =======================================
+// PySource Additions
+// =======================================
 };
 
 #include "utlpriorityqueue.h"

@@ -89,14 +89,14 @@ struct VMatrix_wrapper : VMatrix, bp::wrapper< VMatrix > {
     }
 
     VMatrix_wrapper(::matrix3x4_t const & matrix3x4 )
-    : VMatrix( boost::ref(matrix3x4) )
+    : VMatrix( matrix3x4 )
       , bp::wrapper< VMatrix >(){
         // constructor
     
     }
 
     VMatrix_wrapper(::Vector const & xAxis, ::Vector const & yAxis, ::Vector const & zAxis )
-    : VMatrix( boost::ref(xAxis), boost::ref(yAxis), boost::ref(zAxis) )
+    : VMatrix( xAxis, yAxis, zAxis )
       , bp::wrapper< VMatrix >(){
         // constructor
     
@@ -166,7 +166,7 @@ struct Vector2D_wrapper : Vector2D, bp::wrapper< Vector2D > {
     }
 
     Vector2D_wrapper(::Vector2D const & vOther )
-    : Vector2D( boost::ref(vOther) )
+    : Vector2D( vOther )
       , bp::wrapper< Vector2D >(){
         // copy constructor
     

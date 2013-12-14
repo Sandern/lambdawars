@@ -429,11 +429,17 @@ void CHud::Shutdown( void )
 	int iMax = GetHudList().Count();
 	for ( int i = iMax-1; i >= 0; i-- )
 	{
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 		if( GetHudList()[i]->m_pyInstance.ptr() != Py_None ) {
 			continue; // Do not delete python panels
 		}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 		delete GetHudList()[i];
 	}
 	GetHudList().Purge();

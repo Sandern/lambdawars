@@ -108,7 +108,7 @@ struct FireBulletsInfo_t_wrapper : FireBulletsInfo_t, bp::wrapper< FireBulletsIn
     }
 
     FireBulletsInfo_t_wrapper(int nShots, ::Vector const & vecSrc, ::Vector const & vecDir, ::Vector const & vecSpread, float flDistance, int nAmmoType, bool bPrimaryAttack=true )
-    : FireBulletsInfo_t( nShots, boost::ref(vecSrc), boost::ref(vecDir), boost::ref(vecSpread), flDistance, nAmmoType, bPrimaryAttack )
+    : FireBulletsInfo_t( nShots, vecSrc, vecDir, vecSpread, flDistance, nAmmoType, bPrimaryAttack )
       , bp::wrapper< FireBulletsInfo_t >(){
         // constructor
     
@@ -496,7 +496,7 @@ struct animevent_t_wrapper : animevent_t, bp::wrapper< animevent_t > {
 struct breakablepropparams_t_wrapper : breakablepropparams_t, bp::wrapper< breakablepropparams_t > {
 
     breakablepropparams_t_wrapper(::Vector const & _origin, ::QAngle const & _angles, ::Vector const & _velocity, ::AngularImpulse const & _angularVelocity )
-    : breakablepropparams_t( boost::ref(_origin), boost::ref(_angles), boost::ref(_velocity), boost::ref(_angularVelocity) )
+    : breakablepropparams_t( _origin, _angles, _velocity, _angularVelocity )
       , bp::wrapper< breakablepropparams_t >(){
         // constructor
     
@@ -2576,7 +2576,7 @@ struct FireBulletsInfo_t_wrapper : FireBulletsInfo_t, bp::wrapper< FireBulletsIn
     }
 
     FireBulletsInfo_t_wrapper(int nShots, ::Vector const & vecSrc, ::Vector const & vecDir, ::Vector const & vecSpread, float flDistance, int nAmmoType, bool bPrimaryAttack=true )
-    : FireBulletsInfo_t( nShots, boost::ref(vecSrc), boost::ref(vecDir), boost::ref(vecSpread), flDistance, nAmmoType, bPrimaryAttack )
+    : FireBulletsInfo_t( nShots, vecSrc, vecDir, vecSpread, flDistance, nAmmoType, bPrimaryAttack )
       , bp::wrapper< FireBulletsInfo_t >(){
         // constructor
     
@@ -2941,7 +2941,7 @@ struct animevent_t_wrapper : animevent_t, bp::wrapper< animevent_t > {
 struct breakablepropparams_t_wrapper : breakablepropparams_t, bp::wrapper< breakablepropparams_t > {
 
     breakablepropparams_t_wrapper(::Vector const & _origin, ::QAngle const & _angles, ::Vector const & _velocity, ::AngularImpulse const & _angularVelocity )
-    : breakablepropparams_t( boost::ref(_origin), boost::ref(_angles), boost::ref(_velocity), boost::ref(_angularVelocity) )
+    : breakablepropparams_t( _origin, _angles, _velocity, _angularVelocity )
       , bp::wrapper< breakablepropparams_t >(){
         // constructor
     

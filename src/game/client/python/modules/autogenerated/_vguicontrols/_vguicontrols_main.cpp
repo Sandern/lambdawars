@@ -696,16 +696,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::AnimationControllerHANDLE
         typedef bp::class_< AnimationControllerHANDLE, bp::bases<PyBaseVGUIHandle> > AnimationControllerHANDLE_exposer_t;
         AnimationControllerHANDLE_exposer_t AnimationControllerHANDLE_exposer = AnimationControllerHANDLE_exposer_t( "AnimationControllerHANDLE", bp::init< >() );
-        AnimationControllerHANDLE_exposer.def( bp::init< AnimationController * >(( bp::arg("pVal") )) );
+        AnimationControllerHANDLE_exposer.def( bp::init<  AnimationController * >(( bp::arg("val") )) );
         { //::AnimationControllerHANDLE::GetAttr
-        
             typedef bp::object ( ::AnimationControllerHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             AnimationControllerHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::AnimationControllerHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -718,16 +715,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::PanelHANDLE
         typedef bp::class_< PanelHANDLE, bp::bases<PyBaseVGUIHandle> > PanelHANDLE_exposer_t;
         PanelHANDLE_exposer_t PanelHANDLE_exposer = PanelHANDLE_exposer_t( "PanelHANDLE", bp::init< >() );
-        PanelHANDLE_exposer.def( bp::init< Panel * >(( bp::arg("pVal") )) );
+        PanelHANDLE_exposer.def( bp::init<  Panel * >(( bp::arg("val") )) );
         { //::PanelHANDLE::GetAttr
-        
             typedef bp::object ( ::PanelHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             PanelHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::PanelHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -740,16 +734,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::EditablePanelHANDLE
         typedef bp::class_< EditablePanelHANDLE, bp::bases<PyBaseVGUIHandle> > EditablePanelHANDLE_exposer_t;
         EditablePanelHANDLE_exposer_t EditablePanelHANDLE_exposer = EditablePanelHANDLE_exposer_t( "EditablePanelHANDLE", bp::init< >() );
-        EditablePanelHANDLE_exposer.def( bp::init< EditablePanel * >(( bp::arg("pVal") )) );
+        EditablePanelHANDLE_exposer.def( bp::init<  EditablePanel * >(( bp::arg("val") )) );
         { //::EditablePanelHANDLE::GetAttr
-        
             typedef bp::object ( ::EditablePanelHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             EditablePanelHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::EditablePanelHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -762,16 +753,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::FrameHANDLE
         typedef bp::class_< FrameHANDLE, bp::bases<PyBaseVGUIHandle> > FrameHANDLE_exposer_t;
         FrameHANDLE_exposer_t FrameHANDLE_exposer = FrameHANDLE_exposer_t( "FrameHANDLE", bp::init< >() );
-        FrameHANDLE_exposer.def( bp::init< Frame * >(( bp::arg("pVal") )) );
+        FrameHANDLE_exposer.def( bp::init<  Frame * >(( bp::arg("val") )) );
         { //::FrameHANDLE::GetAttr
-        
             typedef bp::object ( ::FrameHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             FrameHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::FrameHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -784,16 +772,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::TextEntryHANDLE
         typedef bp::class_< TextEntryHANDLE, bp::bases<PyBaseVGUIHandle> > TextEntryHANDLE_exposer_t;
         TextEntryHANDLE_exposer_t TextEntryHANDLE_exposer = TextEntryHANDLE_exposer_t( "TextEntryHANDLE", bp::init< >() );
-        TextEntryHANDLE_exposer.def( bp::init< TextEntry * >(( bp::arg("pVal") )) );
+        TextEntryHANDLE_exposer.def( bp::init<  TextEntry * >(( bp::arg("val") )) );
         { //::TextEntryHANDLE::GetAttr
-        
             typedef bp::object ( ::TextEntryHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             TextEntryHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::TextEntryHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -806,16 +791,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::ScrollBarHANDLE
         typedef bp::class_< ScrollBarHANDLE, bp::bases<PyBaseVGUIHandle> > ScrollBarHANDLE_exposer_t;
         ScrollBarHANDLE_exposer_t ScrollBarHANDLE_exposer = ScrollBarHANDLE_exposer_t( "ScrollBarHANDLE", bp::init< >() );
-        ScrollBarHANDLE_exposer.def( bp::init< ScrollBar * >(( bp::arg("pVal") )) );
+        ScrollBarHANDLE_exposer.def( bp::init<  ScrollBar * >(( bp::arg("val") )) );
         { //::ScrollBarHANDLE::GetAttr
-        
             typedef bp::object ( ::ScrollBarHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             ScrollBarHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::ScrollBarHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -828,16 +810,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::ScrollBarSliderHANDLE
         typedef bp::class_< ScrollBarSliderHANDLE, bp::bases<PyBaseVGUIHandle> > ScrollBarSliderHANDLE_exposer_t;
         ScrollBarSliderHANDLE_exposer_t ScrollBarSliderHANDLE_exposer = ScrollBarSliderHANDLE_exposer_t( "ScrollBarSliderHANDLE", bp::init< >() );
-        ScrollBarSliderHANDLE_exposer.def( bp::init< ScrollBarSlider * >(( bp::arg("pVal") )) );
+        ScrollBarSliderHANDLE_exposer.def( bp::init<  ScrollBarSlider * >(( bp::arg("val") )) );
         { //::ScrollBarSliderHANDLE::GetAttr
-        
             typedef bp::object ( ::ScrollBarSliderHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             ScrollBarSliderHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::ScrollBarSliderHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -850,16 +829,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::RichTextHANDLE
         typedef bp::class_< RichTextHANDLE, bp::bases<PyBaseVGUIHandle> > RichTextHANDLE_exposer_t;
         RichTextHANDLE_exposer_t RichTextHANDLE_exposer = RichTextHANDLE_exposer_t( "RichTextHANDLE", bp::init< >() );
-        RichTextHANDLE_exposer.def( bp::init< RichText * >(( bp::arg("pVal") )) );
+        RichTextHANDLE_exposer.def( bp::init<  RichText * >(( bp::arg("val") )) );
         { //::RichTextHANDLE::GetAttr
-        
             typedef bp::object ( ::RichTextHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             RichTextHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::RichTextHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -872,16 +848,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::CBaseMinimapHANDLE
         typedef bp::class_< CBaseMinimapHANDLE, bp::bases<PyBaseVGUIHandle> > CBaseMinimapHANDLE_exposer_t;
         CBaseMinimapHANDLE_exposer_t CBaseMinimapHANDLE_exposer = CBaseMinimapHANDLE_exposer_t( "CBaseMinimapHANDLE", bp::init< >() );
-        CBaseMinimapHANDLE_exposer.def( bp::init< CBaseMinimap * >(( bp::arg("pVal") )) );
+        CBaseMinimapHANDLE_exposer.def( bp::init<  CBaseMinimap * >(( bp::arg("val") )) );
         { //::CBaseMinimapHANDLE::GetAttr
-        
             typedef bp::object ( ::CBaseMinimapHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             CBaseMinimapHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::CBaseMinimapHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -894,16 +867,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::VideoGeneralPanelHANDLE
         typedef bp::class_< VideoGeneralPanelHANDLE, bp::bases<PyBaseVGUIHandle> > VideoGeneralPanelHANDLE_exposer_t;
         VideoGeneralPanelHANDLE_exposer_t VideoGeneralPanelHANDLE_exposer = VideoGeneralPanelHANDLE_exposer_t( "VideoGeneralPanelHANDLE", bp::init< >() );
-        VideoGeneralPanelHANDLE_exposer.def( bp::init< VideoGeneralPanel * >(( bp::arg("pVal") )) );
+        VideoGeneralPanelHANDLE_exposer.def( bp::init<  VideoGeneralPanel * >(( bp::arg("val") )) );
         { //::VideoGeneralPanelHANDLE::GetAttr
-        
             typedef bp::object ( ::VideoGeneralPanelHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             VideoGeneralPanelHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::VideoGeneralPanelHANDLE::GetAttr )
             );
-        
         }
     }
 
@@ -916,16 +886,13 @@ BOOST_PYTHON_MODULE(_vguicontrols){
     { //::CWars_Model_PanelHANDLE
         typedef bp::class_< CWars_Model_PanelHANDLE, bp::bases<PyBaseVGUIHandle> > CWars_Model_PanelHANDLE_exposer_t;
         CWars_Model_PanelHANDLE_exposer_t CWars_Model_PanelHANDLE_exposer = CWars_Model_PanelHANDLE_exposer_t( "CWars_Model_PanelHANDLE", bp::init< >() );
-        CWars_Model_PanelHANDLE_exposer.def( bp::init< CWars_Model_Panel * >(( bp::arg("pVal") )) );
+        CWars_Model_PanelHANDLE_exposer.def( bp::init<  CWars_Model_Panel * >(( bp::arg("val") )) );
         { //::CWars_Model_PanelHANDLE::GetAttr
-        
             typedef bp::object ( ::CWars_Model_PanelHANDLE::*GetAttr_function_type )( const char * ) const;
-            
             CWars_Model_PanelHANDLE_exposer.def( 
                 "__getattr__"
                 , GetAttr_function_type( &::CWars_Model_PanelHANDLE::GetAttr )
             );
-        
         }
     }
 

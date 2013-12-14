@@ -113,7 +113,7 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     }
 
     CPyTraceFilterSimple_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CPyTraceFilterSimple( boost::python::ptr(passentity), collisionGroup )
+    : CPyTraceFilterSimple( passentity, collisionGroup )
       , bp::wrapper< CPyTraceFilterSimple >(){
         // constructor
     
@@ -150,7 +150,7 @@ struct CTraceFilterChain_wrapper : CTraceFilterChain, bp::wrapper< CTraceFilterC
     }
 
     CTraceFilterChain_wrapper(::ITraceFilter * pTraceFilter1, ::ITraceFilter * pTraceFilter2 )
-    : CTraceFilterChain( boost::python::ptr(pTraceFilter1), boost::python::ptr(pTraceFilter2) )
+    : CTraceFilterChain( pTraceFilter1, pTraceFilter2 )
       , bp::wrapper< CTraceFilterChain >(){
         // constructor
     
@@ -244,7 +244,7 @@ struct CTraceFilterIgnoreTeam_wrapper : CTraceFilterIgnoreTeam, bp::wrapper< CTr
     }
 
     CTraceFilterIgnoreTeam_wrapper(::IHandleEntity const * passentity, int collisionGroup, int ownernumber )
-    : CTraceFilterIgnoreTeam( boost::python::ptr(passentity), collisionGroup, ownernumber )
+    : CTraceFilterIgnoreTeam( passentity, collisionGroup, ownernumber )
       , bp::wrapper< CTraceFilterIgnoreTeam >(){
         // constructor
     
@@ -281,7 +281,7 @@ struct CTraceFilterSkipTwoEntities_wrapper : CTraceFilterSkipTwoEntities, bp::wr
     }
 
     CTraceFilterSkipTwoEntities_wrapper(::IHandleEntity const * passentity=0, ::IHandleEntity const * passentity2=0, int collisionGroup=int(::COLLISION_GROUP_NONE) )
-    : CTraceFilterSkipTwoEntities( boost::python::ptr(passentity), boost::python::ptr(passentity2), collisionGroup )
+    : CTraceFilterSkipTwoEntities( passentity, passentity2, collisionGroup )
       , bp::wrapper< CTraceFilterSkipTwoEntities >(){
         // constructor
     
@@ -318,7 +318,7 @@ struct CTraceFilterLOS_wrapper : CTraceFilterLOS, bp::wrapper< CTraceFilterLOS >
     }
 
     CTraceFilterLOS_wrapper(::IHandleEntity * pHandleEntity, int collisionGroup, ::IHandleEntity * pHandleEntity2=0 )
-    : CTraceFilterLOS( boost::python::ptr(pHandleEntity), collisionGroup, boost::python::ptr(pHandleEntity2) )
+    : CTraceFilterLOS( pHandleEntity, collisionGroup, pHandleEntity2 )
       , bp::wrapper< CTraceFilterLOS >(){
         // constructor
     
@@ -355,7 +355,7 @@ struct CTraceFilterNoNPCsOrPlayer_wrapper : CTraceFilterNoNPCsOrPlayer, bp::wrap
     }
 
     CTraceFilterNoNPCsOrPlayer_wrapper(::IHandleEntity const * passentity=0, int collisionGroup=int(::COLLISION_GROUP_NONE) )
-    : CTraceFilterNoNPCsOrPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterNoNPCsOrPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterNoNPCsOrPlayer >(){
         // constructor
     
@@ -392,7 +392,7 @@ struct CTraceFilterNoUnitsOrPlayer_wrapper : CTraceFilterNoUnitsOrPlayer, bp::wr
     }
 
     CTraceFilterNoUnitsOrPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterNoUnitsOrPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterNoUnitsOrPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterNoUnitsOrPlayer >(){
         // constructor
     
@@ -429,7 +429,7 @@ struct CTraceFilterOnlyNPCsAndPlayer_wrapper : CTraceFilterOnlyNPCsAndPlayer, bp
     }
 
     CTraceFilterOnlyNPCsAndPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterOnlyNPCsAndPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterOnlyNPCsAndPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterOnlyNPCsAndPlayer >(){
         // constructor
     
@@ -466,7 +466,7 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
     }
 
     CTraceFilterOnlyUnitsAndPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterOnlyUnitsAndPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterOnlyUnitsAndPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterOnlyUnitsAndPlayer >(){
         // constructor
     
@@ -496,7 +496,7 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
 struct CTraceFilterSimpleClassnameList_wrapper : CTraceFilterSimpleClassnameList, bp::wrapper< CTraceFilterSimpleClassnameList > {
 
     CTraceFilterSimpleClassnameList_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterSimpleClassnameList( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterSimpleClassnameList( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterSimpleClassnameList >(){
         // constructor
     
@@ -563,7 +563,7 @@ struct CTraceFilterSkipClassname_wrapper : CTraceFilterSkipClassname, bp::wrappe
     }
 
     CTraceFilterSkipClassname_wrapper(::IHandleEntity const * passentity, char const * pchClassname, int collisionGroup )
-    : CTraceFilterSkipClassname( boost::python::ptr(passentity), pchClassname, collisionGroup )
+    : CTraceFilterSkipClassname( passentity, pchClassname, collisionGroup )
       , bp::wrapper< CTraceFilterSkipClassname >(){
         // constructor
     
@@ -600,7 +600,7 @@ struct CTraceFilterSkipEnemies_wrapper : CTraceFilterSkipEnemies, bp::wrapper< C
     }
 
     CTraceFilterSkipEnemies_wrapper(::IHandleEntity const * passentity, int collisionGroup, ::C_UnitBase * pUnit )
-    : CTraceFilterSkipEnemies( boost::python::ptr(passentity), collisionGroup, boost::python::ptr(pUnit) )
+    : CTraceFilterSkipEnemies( passentity, collisionGroup, pUnit )
       , bp::wrapper< CTraceFilterSkipEnemies >(){
         // constructor
     
@@ -637,7 +637,7 @@ struct CTraceFilterSkipFriendly_wrapper : CTraceFilterSkipFriendly, bp::wrapper<
     }
 
     CTraceFilterSkipFriendly_wrapper(::IHandleEntity const * passentity, int collisionGroup, ::C_UnitBase * pUnit )
-    : CTraceFilterSkipFriendly( boost::python::ptr(passentity), collisionGroup, boost::python::ptr(pUnit) )
+    : CTraceFilterSkipFriendly( passentity, collisionGroup, pUnit )
       , bp::wrapper< CTraceFilterSkipFriendly >(){
         // constructor
     
@@ -674,7 +674,7 @@ struct CTraceFilterSkipTwoClassnames_wrapper : CTraceFilterSkipTwoClassnames, bp
     }
 
     CTraceFilterSkipTwoClassnames_wrapper(::IHandleEntity const * passentity, char const * pchClassname, char const * pchClassname2, int collisionGroup )
-    : CTraceFilterSkipTwoClassnames( boost::python::ptr(passentity), pchClassname, pchClassname2, collisionGroup )
+    : CTraceFilterSkipTwoClassnames( passentity, pchClassname, pchClassname2, collisionGroup )
       , bp::wrapper< CTraceFilterSkipTwoClassnames >(){
         // constructor
     
@@ -711,7 +711,7 @@ struct CTraceFilterWars_wrapper : CTraceFilterWars, bp::wrapper< CTraceFilterWar
     }
 
     CTraceFilterWars_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterWars( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterWars( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterWars >(){
         // constructor
     
@@ -2920,7 +2920,7 @@ struct CPyTraceFilterSimple_wrapper : CPyTraceFilterSimple, bp::wrapper< CPyTrac
     }
 
     CPyTraceFilterSimple_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CPyTraceFilterSimple( boost::python::ptr(passentity), collisionGroup )
+    : CPyTraceFilterSimple( passentity, collisionGroup )
       , bp::wrapper< CPyTraceFilterSimple >(){
         // constructor
     
@@ -2957,7 +2957,7 @@ struct CTraceFilterChain_wrapper : CTraceFilterChain, bp::wrapper< CTraceFilterC
     }
 
     CTraceFilterChain_wrapper(::ITraceFilter * pTraceFilter1, ::ITraceFilter * pTraceFilter2 )
-    : CTraceFilterChain( boost::python::ptr(pTraceFilter1), boost::python::ptr(pTraceFilter2) )
+    : CTraceFilterChain( pTraceFilter1, pTraceFilter2 )
       , bp::wrapper< CTraceFilterChain >(){
         // constructor
     
@@ -3051,7 +3051,7 @@ struct CTraceFilterIgnoreTeam_wrapper : CTraceFilterIgnoreTeam, bp::wrapper< CTr
     }
 
     CTraceFilterIgnoreTeam_wrapper(::IHandleEntity const * passentity, int collisionGroup, int ownernumber )
-    : CTraceFilterIgnoreTeam( boost::python::ptr(passentity), collisionGroup, ownernumber )
+    : CTraceFilterIgnoreTeam( passentity, collisionGroup, ownernumber )
       , bp::wrapper< CTraceFilterIgnoreTeam >(){
         // constructor
     
@@ -3088,7 +3088,7 @@ struct CTraceFilterSkipTwoEntities_wrapper : CTraceFilterSkipTwoEntities, bp::wr
     }
 
     CTraceFilterSkipTwoEntities_wrapper(::IHandleEntity const * passentity=0, ::IHandleEntity const * passentity2=0, int collisionGroup=int(::COLLISION_GROUP_NONE) )
-    : CTraceFilterSkipTwoEntities( boost::python::ptr(passentity), boost::python::ptr(passentity2), collisionGroup )
+    : CTraceFilterSkipTwoEntities( passentity, passentity2, collisionGroup )
       , bp::wrapper< CTraceFilterSkipTwoEntities >(){
         // constructor
     
@@ -3125,7 +3125,7 @@ struct CTraceFilterLOS_wrapper : CTraceFilterLOS, bp::wrapper< CTraceFilterLOS >
     }
 
     CTraceFilterLOS_wrapper(::IHandleEntity * pHandleEntity, int collisionGroup, ::IHandleEntity * pHandleEntity2=0 )
-    : CTraceFilterLOS( boost::python::ptr(pHandleEntity), collisionGroup, boost::python::ptr(pHandleEntity2) )
+    : CTraceFilterLOS( pHandleEntity, collisionGroup, pHandleEntity2 )
       , bp::wrapper< CTraceFilterLOS >(){
         // constructor
     
@@ -3222,7 +3222,7 @@ struct CTraceFilterNoNPCsOrPlayer_wrapper : CTraceFilterNoNPCsOrPlayer, bp::wrap
     }
 
     CTraceFilterNoNPCsOrPlayer_wrapper(::IHandleEntity const * passentity=0, int collisionGroup=int(::COLLISION_GROUP_NONE) )
-    : CTraceFilterNoNPCsOrPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterNoNPCsOrPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterNoNPCsOrPlayer >(){
         // constructor
     
@@ -3259,7 +3259,7 @@ struct CTraceFilterNoUnitsOrPlayer_wrapper : CTraceFilterNoUnitsOrPlayer, bp::wr
     }
 
     CTraceFilterNoUnitsOrPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterNoUnitsOrPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterNoUnitsOrPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterNoUnitsOrPlayer >(){
         // constructor
     
@@ -3296,7 +3296,7 @@ struct CTraceFilterOnlyNPCsAndPlayer_wrapper : CTraceFilterOnlyNPCsAndPlayer, bp
     }
 
     CTraceFilterOnlyNPCsAndPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterOnlyNPCsAndPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterOnlyNPCsAndPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterOnlyNPCsAndPlayer >(){
         // constructor
     
@@ -3333,7 +3333,7 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
     }
 
     CTraceFilterOnlyUnitsAndPlayer_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterOnlyUnitsAndPlayer( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterOnlyUnitsAndPlayer( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterOnlyUnitsAndPlayer >(){
         // constructor
     
@@ -3363,7 +3363,7 @@ struct CTraceFilterOnlyUnitsAndPlayer_wrapper : CTraceFilterOnlyUnitsAndPlayer, 
 struct CTraceFilterSimpleClassnameList_wrapper : CTraceFilterSimpleClassnameList, bp::wrapper< CTraceFilterSimpleClassnameList > {
 
     CTraceFilterSimpleClassnameList_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterSimpleClassnameList( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterSimpleClassnameList( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterSimpleClassnameList >(){
         // constructor
     
@@ -3430,7 +3430,7 @@ struct CTraceFilterSkipClassname_wrapper : CTraceFilterSkipClassname, bp::wrappe
     }
 
     CTraceFilterSkipClassname_wrapper(::IHandleEntity const * passentity, char const * pchClassname, int collisionGroup )
-    : CTraceFilterSkipClassname( boost::python::ptr(passentity), pchClassname, collisionGroup )
+    : CTraceFilterSkipClassname( passentity, pchClassname, collisionGroup )
       , bp::wrapper< CTraceFilterSkipClassname >(){
         // constructor
     
@@ -3467,7 +3467,7 @@ struct CTraceFilterSkipEnemies_wrapper : CTraceFilterSkipEnemies, bp::wrapper< C
     }
 
     CTraceFilterSkipEnemies_wrapper(::IHandleEntity const * passentity, int collisionGroup, ::CUnitBase * pUnit )
-    : CTraceFilterSkipEnemies( boost::python::ptr(passentity), collisionGroup, boost::python::ptr(pUnit) )
+    : CTraceFilterSkipEnemies( passentity, collisionGroup, pUnit )
       , bp::wrapper< CTraceFilterSkipEnemies >(){
         // constructor
     
@@ -3504,7 +3504,7 @@ struct CTraceFilterSkipFriendly_wrapper : CTraceFilterSkipFriendly, bp::wrapper<
     }
 
     CTraceFilterSkipFriendly_wrapper(::IHandleEntity const * passentity, int collisionGroup, ::CUnitBase * pUnit )
-    : CTraceFilterSkipFriendly( boost::python::ptr(passentity), collisionGroup, boost::python::ptr(pUnit) )
+    : CTraceFilterSkipFriendly( passentity, collisionGroup, pUnit )
       , bp::wrapper< CTraceFilterSkipFriendly >(){
         // constructor
     
@@ -3541,7 +3541,7 @@ struct CTraceFilterSkipTwoClassnames_wrapper : CTraceFilterSkipTwoClassnames, bp
     }
 
     CTraceFilterSkipTwoClassnames_wrapper(::IHandleEntity const * passentity, char const * pchClassname, char const * pchClassname2, int collisionGroup )
-    : CTraceFilterSkipTwoClassnames( boost::python::ptr(passentity), pchClassname, pchClassname2, collisionGroup )
+    : CTraceFilterSkipTwoClassnames( passentity, pchClassname, pchClassname2, collisionGroup )
       , bp::wrapper< CTraceFilterSkipTwoClassnames >(){
         // constructor
     
@@ -3578,7 +3578,7 @@ struct CTraceFilterWars_wrapper : CTraceFilterWars, bp::wrapper< CTraceFilterWar
     }
 
     CTraceFilterWars_wrapper(::IHandleEntity const * passentity, int collisionGroup )
-    : CTraceFilterWars( boost::python::ptr(passentity), collisionGroup )
+    : CTraceFilterWars( passentity, collisionGroup )
       , bp::wrapper< CTraceFilterWars >(){
         // constructor
     

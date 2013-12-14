@@ -274,10 +274,6 @@ BOOST_PYTHON_MODULE(_te){
             , (void ( ::CTempEnts::* )( int,int,::Vector const &,::QAngle const &,::Vector const &,int,int ) )( &::CTempEnts::PhysicsProp )
             , ( bp::arg("modelindex"), bp::arg("skin"), bp::arg("pos"), bp::arg("angles"), bp::arg("vel"), bp::arg("flags"), bp::arg("effects")=(int)(0) ) )    
         .def( 
-            "RicochetSprite"
-            , (void ( ::CTempEnts::* )( ::Vector const &,::model_t *,float,float ) )( &::CTempEnts::RicochetSprite )
-            , ( bp::arg("pos"), bp::arg("pmodel"), bp::arg("duration"), bp::arg("scale") ) )    
-        .def( 
             "RocketFlare"
             , (void ( ::CTempEnts::* )( ::Vector const & ) )( &::CTempEnts::RocketFlare )
             , ( bp::arg("pos") ) )    

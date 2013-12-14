@@ -229,8 +229,8 @@ const PyBaseVGUIHandle& PyBaseVGUIHandle::Set( IClientPanel *pPanel )
 
 #define TEST_PANEL( type, pPanel ) \
 	{							   \
-	const bp::wrapper< type > *wrapper = dynamic_cast<const bp::wrapper< type > *>( pPanel ); \
-	pObject = wrapper ? bp::detail::wrapper_base_::get_owner(*wrapper) : NULL; \
+	const boost::python::wrapper< type > *wrapper = dynamic_cast<const boost::python::wrapper< type > *>( pPanel ); \
+	pObject = wrapper ? boost::python::detail::wrapper_base_::get_owner(*wrapper) : NULL; \
 	if( pObject ) \
 		return pObject; \
 	}
@@ -315,7 +315,7 @@ void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 		return;
 	}
 
-	bp::object pyPanel(bp::handle<>(boost::python::borrowed(pPyObjPanel)));
+	boost::python::object pyPanel(boost::python::handle<>(boost::python::borrowed(pPyObjPanel)));
 
 	// Cleanup as good as possible
 	pPanel->SetVisible( false );
@@ -551,14 +551,27 @@ void CWrapSurface::DrawFilledRectArray( boost::python::list rects )
 
 boost::python::tuple CWrapSurface::GetTextSize( HFont font, boost::python::object unistr )
 {
+#if PY_VERSION_HEX < 0x03000000
 	if (!PyString_Check(unistr.ptr()))
 	{
 		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: First argument must be a string.");
 		throw boost::python::error_already_set(); 
 	}
+#else
+	if (!PyUnicode_Check(unistr.ptr()))
+	{
+		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: First argument must be a string.");
+		throw boost::python::error_already_set(); 
+	}
+#endif
 
+#if PY_VERSION_HEX < 0x03000000
 	const char* value = PyString_AsString(unistr.ptr());
 	Py_ssize_t l = PyString_Size(unistr.ptr());
+#else
+	Py_ssize_t l;
+	const char* value = PyUnicode_AsUTF8AndSize( unistr.ptr(), &l );
+#endif
 	if (value == 0) {
 		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: String allocation error."); 
 		throw boost::python::error_already_set();
@@ -573,7 +586,7 @@ boost::python::tuple CWrapSurface::GetTextSize( HFont font, boost::python::objec
 	surface()->GetTextSize(font, w, wide, tall); 
 
 	delete w;
-	return bp::make_tuple(wide, tall);
+	return boost::python::make_tuple(wide, tall);
 }
 
 //-----------------------------------------------------------------------------
@@ -629,14 +642,27 @@ void CWrapSurface::DrawTexturedPolygon( boost::python::list vertices )
 //-----------------------------------------------------------------------------
 void CWrapSurface::DrawUnicodeString( boost::python::object unistr, FontDrawType_t drawType )
 {
+#if PY_VERSION_HEX < 0x03000000
 	if (!PyString_Check(unistr.ptr()))
 	{
 		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: First argument must be a string.");
 		throw boost::python::error_already_set(); 
 	}
+#else
+	if (!PyUnicode_Check(unistr.ptr()))
+	{
+		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: First argument must be a string.");
+		throw boost::python::error_already_set(); 
+	}
+#endif
 
+#if PY_VERSION_HEX < 0x03000000
 	const char* value = PyString_AsString(unistr.ptr());
 	Py_ssize_t l = PyString_Size(unistr.ptr());
+#else
+	Py_ssize_t l;
+	const char* value = PyUnicode_AsUTF8AndSize( unistr.ptr(), &l );
+#endif
 	if (value == 0) {
 		PyErr_SetString(PyExc_ValueError, "DrawUnicodeString: String allocation error."); 
 		throw boost::python::error_already_set();
