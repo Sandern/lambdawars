@@ -150,6 +150,10 @@ public:
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 							const CefString& errorText, const CefString& failedUrl);
 
+	virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+									bool isLoading,
+									bool canGoBack,
+									bool canGoForward);
 
 	// CefRequestHandler
 	virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
@@ -363,6 +367,19 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 	if( !m_pSrcBrowser )
 		return;
 	m_pSrcBrowser->OnLoadError( frame, errorCode, errorText.c_str(), failedUrl.c_str() );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+									bool isLoading,
+									bool canGoBack,
+									bool canGoForward)
+{
+	if( !m_pSrcBrowser )
+		return;
+	m_pSrcBrowser->OnLoadingStateChange( isLoading, canGoBack, canGoForward );
 }
 
 //-----------------------------------------------------------------------------
@@ -616,7 +633,23 @@ void SrcCefBrowser::OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const
 
 	try
 	{
-		PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, errorText, failedUrl );
+		// Convert error texts to Python unicode objects
+		bp::object pyErrorText;
+		if( errorText )
+		{
+			PyObject* pPyErrorText = PyUnicode_FromWideChar( errorText, wcslen(errorText) );
+			if( pPyErrorText )
+				pyErrorText = boost::python::object( bp::handle<>( pPyErrorText ) );
+		}
+		bp::object pyFailedURL;
+		if( failedUrl )
+		{
+			PyObject* pPyFailedURL = PyUnicode_FromWideChar( failedUrl, wcslen(failedUrl) );
+			if( pPyFailedURL )
+				pyFailedURL = boost::python::object( bp::handle<>( pPyFailedURL ) );
+		}
+
+		PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, pyErrorText, pyFailedURL );
 	}
 	catch(bp::error_already_set &)
 	{

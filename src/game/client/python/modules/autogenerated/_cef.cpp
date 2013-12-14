@@ -211,6 +211,25 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::OnContextCreated( );
     }
 
+    virtual void OnLoadingStateChange( bool isLoading, bool canGoBack, bool canGoForward ) {
+        PY_OVERRIDE_CHECK( SrcCefBrowser, OnLoadingStateChange )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnLoadingStateChange )
+        bp::override func_OnLoadingStateChange = this->get_override( "OnLoadingStateChange" );
+        if( func_OnLoadingStateChange.ptr() != Py_None )
+            try {
+                func_OnLoadingStateChange( isLoading, canGoBack, canGoForward );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::OnLoadingStateChange( isLoading, canGoBack, canGoForward );
+            }
+        else
+            this->SrcCefBrowser::OnLoadingStateChange( isLoading, canGoBack, canGoForward );
+    }
+    
+    void default_OnLoadingStateChange( bool isLoading, bool canGoBack, bool canGoForward ) {
+        SrcCefBrowser::OnLoadingStateChange( isLoading, canGoBack, canGoForward );
+    }
+
     virtual void OnThink(  ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, OnThink )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnThink )
@@ -268,7 +287,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::PyOnLoadEnd( frame, httpStatusCode );
     }
 
-    virtual void PyOnLoadError( ::boost::python::object frame, int errorCode, wchar_t const * errorText, wchar_t const * failedUrl ) {
+    virtual void PyOnLoadError( ::boost::python::object frame, int errorCode, ::boost::python::object errorText, ::boost::python::object failedUrl ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadError )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadError )
         bp::override func_OnLoadError = this->get_override( "OnLoadError" );
@@ -283,7 +302,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnLoadError( frame, errorCode, errorText, failedUrl );
     }
     
-    void default_OnLoadError( ::boost::python::object frame, int errorCode, wchar_t const * errorText, wchar_t const * failedUrl ) {
+    void default_OnLoadError( ::boost::python::object frame, int errorCode, ::boost::python::object errorText, ::boost::python::object failedUrl ) {
         SrcCefBrowser::PyOnLoadError( frame, errorCode, errorText, failedUrl );
     }
 
@@ -514,6 +533,8 @@ BOOST_PYTHON_MODULE(_cef){
         bp::scope CefFrame_scope( CefFrame_exposer );
         CefFrame_exposer.def( bp::init< CefRefPtr< CefFrame > >(( bp::arg("frame") )) );
         bp::implicitly_convertible< CefRefPtr< CefFrame >, PyCefFrame >();
+        CefFrame_exposer.def( bp::self != bp::self );
+        CefFrame_exposer.def( bp::self == bp::self );
     }
 
     { //::PyJSObject
@@ -765,6 +786,18 @@ BOOST_PYTHON_MODULE(_cef){
                 , default_OnContextCreated_function_type(&SrcCefBrowser_wrapper::default_OnContextCreated) );
         
         }
+        { //::SrcCefBrowser::OnLoadingStateChange
+        
+            typedef void ( ::SrcCefBrowser::*OnLoadingStateChange_function_type )( bool,bool,bool ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadingStateChange_function_type )( bool,bool,bool ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "OnLoadingStateChange"
+                , OnLoadingStateChange_function_type(&::SrcCefBrowser::OnLoadingStateChange)
+                , default_OnLoadingStateChange_function_type(&SrcCefBrowser_wrapper::default_OnLoadingStateChange)
+                , ( bp::arg("isLoading"), bp::arg("canGoBack"), bp::arg("canGoForward") ) );
+        
+        }
         { //::SrcCefBrowser::OnThink
         
             typedef void ( ::SrcCefBrowser::*OnThink_function_type )(  ) ;
@@ -869,8 +902,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnLoadError
         
-            typedef void ( ::SrcCefBrowser::*OnLoadError_function_type )( ::boost::python::object,int,wchar_t const *,wchar_t const * ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadError_function_type )( ::boost::python::object,int,wchar_t const *,wchar_t const * ) ;
+            typedef void ( ::SrcCefBrowser::*OnLoadError_function_type )( ::boost::python::object,int,::boost::python::object,::boost::python::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadError_function_type )( ::boost::python::object,int,::boost::python::object,::boost::python::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnLoadError"

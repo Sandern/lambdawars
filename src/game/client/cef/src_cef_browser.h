@@ -75,6 +75,7 @@ public:
 	virtual void OnLoadStart( CefRefPtr<CefFrame> frame );
 	virtual void OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode );
 	virtual void OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl );
+	virtual void OnLoadingStateChange( bool isLoading, bool canGoBack, bool canGoForward ) {}
 
 	virtual void OnContextCreated() {}
 
@@ -117,7 +118,7 @@ public:
 #ifdef ENABLE_PYTHON
 	virtual void PyOnLoadStart( boost::python::object frame ) {}
 	virtual void PyOnLoadEnd( boost::python::object frame, int httpStatusCode ) {}
-	virtual void PyOnLoadError( boost::python::object frame, int errorCode, const wchar_t *errorText, const wchar_t *failedUrl ) {}
+	virtual void PyOnLoadError( boost::python::object frame, int errorCode, boost::python::object errorText, boost::python::object failedUrl ) {}
 
 	boost::python::object PyGetMainFrame();
 

@@ -46,6 +46,9 @@ class PyCefFrame
 public:
 	PyCefFrame( CefRefPtr<CefFrame> frame );
 
+	bool operator ==( const PyCefFrame &other ) const;
+	bool operator !=( const PyCefFrame &other ) const;
+
 private:
 	CefRefPtr<CefFrame> m_Frame;
 };
