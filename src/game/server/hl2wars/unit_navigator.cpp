@@ -607,22 +607,23 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 {
 	VPROF_BUDGET( "UnitBaseNavigator::RegenerateConsiderList", VPROF_BUDGETGROUP_UNITS );
 
-	int n, i, j;
+	CollectConsiderEntities( GoalStatus );
+	ComputeConsiderDensAndDirs( vPathDir, GoalStatus );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Generates a list of surrounding entities, potentially blocking
+//			the unit.
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
+{
+	int n, i;
 	float fRadius;
 	CBaseEntity *pEnt;
 	CBaseEntity *pList[CONSIDER_SIZE];
 
 	const Vector &origin = GetAbsOrigin();
 	fRadius = GetEntityBoundingRadius(m_pOuter);
-
-	// Try testing a bit further in case we are stuck
-	if( GetBlockedStatus() >= BS_MUCH )
-		fRadius *= 3.0f;
-	else if( GetBlockedStatus() >= BS_LITTLE )
-		fRadius *= 2.0f;
-
-	// Reset list information
-	m_iUsedTestDirections = 0;
 
 	// Detect nearby entities
 	m_iConsiderSize = 0;
@@ -674,13 +675,32 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 		m_ConsiderList[m_iConsiderSize].m_pEnt = pEnt;
 		m_iConsiderSize++;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Calculates the allowed move directions and densities in those directions
+//-----------------------------------------------------------------------------
+void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus )
+{
+	int i, j;
+	const Vector &origin = GetAbsOrigin();
+	float fRadius = GetEntityBoundingRadius(m_pOuter);
+
+	// Reset list information
+	m_iUsedTestDirections = 0;
+
+	// Try testing a bit further in case we are stuck
+	if( GetBlockedStatus() >= BS_MUCH )
+		fRadius *= 3.0f;
+	else if( GetBlockedStatus() >= BS_LITTLE )
+		fRadius *= 2.0f;
 
 	// Compute densities
 	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL )
 	{
 		m_pOuter->GetVectors(&m_vTestDirections[m_iUsedTestDirections], NULL, NULL); // Just use forward as start dir
 		m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
-		for( i=0; i<m_iConsiderSize; i++ )
+		for( i = 0; i < m_iConsiderSize; i++ )
 		{
 			if( !m_ConsiderList[i].m_pEnt ) 
 				continue;
@@ -694,7 +714,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 			VectorYawRotate(m_vTestDirections[m_iUsedTestDirections-1], 45.0f, m_vTestDirections[m_iUsedTestDirections]);
 			m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
 
-			for( i=0; i<m_iConsiderSize; i++ )
+			for( i = 0; i < m_iConsiderSize; i++ )
 			{
 				if( !m_ConsiderList[i].m_pEnt ) 
 					continue;
@@ -710,7 +730,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 		m_vTestDirections[m_iUsedTestDirections] = vPathDir;
 		m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
 		float fTotalDensity = 0.0f;
-		for( i=0; i<m_iConsiderSize; i++ )
+		for( i = 0; i < m_iConsiderSize; i++ )
 		{
 			if( !m_ConsiderList[i].m_pEnt ) 
 				continue;
@@ -738,7 +758,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 			VectorYawRotate(m_vTestDirections[m_iUsedTestDirections-1], fRotate, m_vTestDirections[m_iUsedTestDirections]);
 			m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
 			fTotalDensity = 0.0f;
-			for( i=0; i<m_iConsiderSize; i++ )
+			for( i = 0; i < m_iConsiderSize; i++ )
 			{
 				if( !m_ConsiderList[i].m_pEnt ) 
 					continue;
@@ -1058,7 +1078,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 	else
 	{
 		// Find best cost and use that speed + direction
-		for( i=0; i<m_iUsedTestDirections; i++ )	
+		for( i = 0; i < m_iUsedTestDirections; i++ )	
 		{
 			fCost = ComputeUnitCost( i, &vVelocity, GoalStatus, MoveCommand, vPathDir, fWaypointDist, fComputedDensity );
 			if( fCost < fBestCost )
@@ -2975,7 +2995,7 @@ void UnitBaseNavigator::DrawDebugInfo()
 	fRadius = GetEntityBoundingRadius(m_pOuter);
 
 	// Draw consider entities
-	for( i=0; i<m_iConsiderSize; i++ )
+	for( i = 0; i < m_iConsiderSize; i++ )
 	{
 		if( m_ConsiderList[i].m_pEnt )
 			NDebugOverlay::EntityBounds(m_ConsiderList[i].m_pEnt, 0, 255, 0, 50, 0 );

@@ -386,6 +386,9 @@ public:
 	virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
 	virtual bool		ShouldConsiderNavMesh( void );
 
+	virtual void		CollectConsiderEntities( CheckGoalStatus_t GoalStatus );
+	virtual void		ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+
 	float				ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity, UnitBaseMoveCommand &MoveCommand );
 	float				ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
 
@@ -539,6 +542,7 @@ private:
 
 	CHandle<CUnitBase> m_hAtGoalDependencyEnt;
 
+protected:
 	// =============================
 	// Flow variables
 	// =============================
@@ -579,6 +583,7 @@ private:
 
 	Vector m_vLastDirection;
 
+private:
 	// =============================
 	// Misc variables
 	// =============================
