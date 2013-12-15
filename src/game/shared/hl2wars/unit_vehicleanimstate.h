@@ -38,6 +38,8 @@ public:
 	int m_iVehicleRLSpin;
 	int m_iVehicleRRSpin;
 
+	float m_fWheelRadius;
+
 private:
 	QAngle m_angRender;
 };

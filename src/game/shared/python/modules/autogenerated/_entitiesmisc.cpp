@@ -1743,6 +1743,9 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (::C_BaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetWeapon )
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
+            "IsForceFriendlyFire"
+            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::IsForceFriendlyFire ) )    
+        .def( 
             "ScaleDamage"
             , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamage )
             , ( bp::arg("flScaleAmount") ) )    
@@ -1798,6 +1801,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "SetDamageType"
             , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageType )
             , ( bp::arg("bitsDamageType") ) )    
+        .def( 
+            "SetForceFriendlyFire"
+            , (void ( ::CTakeDamageInfo::* )( bool ) )( &::CTakeDamageInfo::SetForceFriendlyFire )
+            , ( bp::arg("bValue") ) )    
         .def( 
             "SetInflictor"
             , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity * ) )( &::CTakeDamageInfo::SetInflictor )
@@ -4416,6 +4423,9 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (::CBaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetWeapon )
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
+            "IsForceFriendlyFire"
+            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::IsForceFriendlyFire ) )    
+        .def( 
             "ScaleDamage"
             , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamage )
             , ( bp::arg("flScaleAmount") ) )    
@@ -4471,6 +4481,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "SetDamageType"
             , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageType )
             , ( bp::arg("bitsDamageType") ) )    
+        .def( 
+            "SetForceFriendlyFire"
+            , (void ( ::CTakeDamageInfo::* )( bool ) )( &::CTakeDamageInfo::SetForceFriendlyFire )
+            , ( bp::arg("bValue") ) )    
         .def( 
             "SetInflictor"
             , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity * ) )( &::CTakeDamageInfo::SetInflictor )

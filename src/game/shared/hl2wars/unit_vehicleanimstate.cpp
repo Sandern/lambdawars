@@ -12,6 +12,9 @@
 
 ConVar wars_vehicle_yaw_adjustment("wars_vehicle_yaw_adjustment", "90");
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 #ifdef ENABLE_PYTHON
 UnitVehicleAnimState::UnitVehicleAnimState( boost::python::object outer ) : UnitBaseAnimState( outer )
 {
@@ -20,14 +23,22 @@ UnitVehicleAnimState::UnitVehicleAnimState( boost::python::object outer ) : Unit
 	m_iVehicleFRSpin = -1;
 	m_iVehicleRLSpin = -1;
 	m_iVehicleRRSpin = -1;
+
+	m_fWheelRadius = 22.0f;
 }
 #endif // ENABLE_PYTHON
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 const QAngle& UnitVehicleAnimState::GetRenderAngles()
 {
 	return m_angRender;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitVehicleAnimState::Update( float eyeYaw, float eyePitch )
 {
 	m_angRender[YAW] = eyeYaw - wars_vehicle_yaw_adjustment.GetFloat();
@@ -38,22 +49,64 @@ void UnitVehicleAnimState::Update( float eyeYaw, float eyePitch )
 	UpdateWheels();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitVehicleAnimState::UpdateSteering()
 {
 	if( m_iVehicleSteer == -1 )
 		return;
 
-	// TODO: Calculate direction we are steering
-	SetOuterPoseParameter( m_iVehicleSteer, 0 );
+	Vector vel, forward, right;
+	GetOuter()->GetVectors( &forward, &right, NULL );
+	GetOuterAbsVelocity( vel );
+	vel.z = 0;
+
+	float fDirRad = 0; // Default to forward steering
+	float fSpeed = VectorNormalize( vel );
+	if( fSpeed > 10.0f )
+	{
+		// Calculate steering degrees
+		float fDot = DotProduct( forward, vel );
+		fDirRad = acos( fDot );
+		
+		// Calculate direction of steer
+		fDot = DotProduct( vel, right );
+		if( fDot > 0 )
+			fDirRad *= -1;
+	}
+
+	// Converge to the new steering target
+	float targetSteer = fDirRad * 2.0f;
+	float prevSteer = GetOuter()->GetPoseParameter( m_iVehicleSteer );
+	float newSteer = prevSteer;
+	if( prevSteer < targetSteer )
+		newSteer = Min( prevSteer + 5.0f * GetAnimTimeInterval(), targetSteer );
+	else
+		newSteer = Max( prevSteer - 5.0f * GetAnimTimeInterval(), targetSteer );
+
+	SetOuterPoseParameter( m_iVehicleSteer, newSteer );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitVehicleAnimState::UpdateWheels()
 {
 	// Determine ideal playback rate
-	Vector vel;
+	Vector vel, forward;
+	GetOuter()->GetVectors( &forward, NULL, NULL );
 	GetOuterAbsVelocity( vel );
+	vel.z = 0;
 
-	float wheelAdvancement = vel.Length2D() * GetAnimTimeInterval();
+	float fSpeed = VectorNormalize( vel );
+
+	float wheelAdvancement = fSpeed * (360.0f / (2 * m_fWheelRadius * M_PI)) * GetAnimTimeInterval();
+
+	// Inverse wheel advancement direction when moving backwards
+	float fDot = DotProduct( forward, vel );
+	if( fDot < 0 )
+		wheelAdvancement *= -1;
 
 	UpdateWheel( m_iVehicleFLSpin, wheelAdvancement );
 	UpdateWheel( m_iVehicleFRSpin, wheelAdvancement );
@@ -61,6 +114,9 @@ void UnitVehicleAnimState::UpdateWheels()
 	UpdateWheel( m_iVehicleRRSpin, wheelAdvancement );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitVehicleAnimState::UpdateWheel( int iParam, float wheelAdvancement )
 {
 	if( iParam == -1 )

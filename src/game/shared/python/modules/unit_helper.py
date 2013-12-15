@@ -152,6 +152,8 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_iVehicleRLSpin').rename('vehiclerlspin')
         cls.var('m_iVehicleRRSpin').rename('vehiclerrspin')
         
+        cls.var('m_fWheelRadius').rename('wheelradius')
+        
     def AddNavigator(self, mb):
         # Main class
         cls = mb.class_('UnitBaseNavigator')

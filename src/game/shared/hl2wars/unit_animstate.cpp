@@ -908,28 +908,23 @@ float UnitAnimState::GetCurrentMaxGroundSpeed()
 		if ( m_iMoveYaw < 0 )
 			return 1.0;
 
-	//	float prevX = GetBasePlayer()->GetPoseParameter( m_PoseParameterData.m_iMoveX );
 		float prevY = GetOuter()->GetPoseParameter( m_iMoveYaw );
 
-		float d = sqrt( /*prevX * prevX + */prevY * prevY );
-		float newY;//, newX;
+		float d = sqrt( prevY * prevY );
+		float newY;
 		if ( d == 0.0 )
 		{ 
-	//		newX = 1.0;
 			newY = 0.0;
 		}
 		else
 		{
-	//		newX = prevX / d;
 			newY = prevY / d;
 		}
 
-	//	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, newX );
 		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveYaw, newY );
 
 		speed = GetOuter()->GetSequenceGroundSpeed( GetOuter()->GetSequence() );
 
-	//	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, prevX );
 		GetOuter()->SetPoseParameter( pStudioHdr, m_iMoveYaw, prevY );
 	}
 	else

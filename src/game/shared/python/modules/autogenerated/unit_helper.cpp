@@ -69,6 +69,25 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
         UnitBaseAnimState::OnNewModel( );
     }
 
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
+    }
+
     virtual int SelectWeightedSequence( ::Activity activity ) {
         PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
         PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
@@ -360,6 +379,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
     
     void default_OnNewModel(  ) {
         UnitBaseAnimState::OnNewModel( );
+    }
+
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -818,6 +856,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "OnNewModel"
                 , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
                 , default_OnNewModel_function_type(&UnitBaseAnimState_wrapper::default_OnNewModel) );
+        
+        }
+        { //::UnitBaseAnimState::RestartMainSequence
+        
+            typedef void ( ::UnitBaseAnimState::*RestartMainSequence_function_type )(  ) ;
+            typedef void ( UnitBaseAnimState_wrapper::*default_RestartMainSequence_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "RestartMainSequence"
+                , RestartMainSequence_function_type(&::UnitBaseAnimState::RestartMainSequence)
+                , default_RestartMainSequence_function_type(&UnitBaseAnimState_wrapper::default_RestartMainSequence) );
         
         }
         { //::UnitBaseAnimState::SelectWeightedSequence
@@ -1820,6 +1869,7 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
         
         }
+        UnitVehicleAnimState_exposer.def_readwrite( "wheelradius", &UnitVehicleAnimState::m_fWheelRadius );
         UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
@@ -1853,6 +1903,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "OnNewModel"
                 , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
                 , default_OnNewModel_function_type(&UnitVehicleAnimState_wrapper::default_OnNewModel) );
+        
+        }
+        { //::UnitBaseAnimState::RestartMainSequence
+        
+            typedef void ( ::UnitBaseAnimState::*RestartMainSequence_function_type )(  ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_RestartMainSequence_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "RestartMainSequence"
+                , RestartMainSequence_function_type(&::UnitBaseAnimState::RestartMainSequence)
+                , default_RestartMainSequence_function_type(&UnitVehicleAnimState_wrapper::default_RestartMainSequence) );
         
         }
         { //::UnitBaseAnimState::SelectWeightedSequence
@@ -2152,6 +2213,25 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
     
     void default_OnNewModel(  ) {
         UnitBaseAnimState::OnNewModel( );
+    }
+
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -2544,6 +2624,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
     
     void default_OnNewModel(  ) {
         UnitBaseAnimState::OnNewModel( );
+    }
+
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -3532,6 +3631,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "OnNewModel"
                 , OnNewModel_function_type(&::UnitBaseAnimState::OnNewModel)
                 , default_OnNewModel_function_type(&UnitBaseAnimState_wrapper::default_OnNewModel) );
+        
+        }
+        { //::UnitBaseAnimState::RestartMainSequence
+        
+            typedef void ( ::UnitBaseAnimState::*RestartMainSequence_function_type )(  ) ;
+            typedef void ( UnitBaseAnimState_wrapper::*default_RestartMainSequence_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "RestartMainSequence"
+                , RestartMainSequence_function_type(&::UnitBaseAnimState::RestartMainSequence)
+                , default_RestartMainSequence_function_type(&UnitBaseAnimState_wrapper::default_RestartMainSequence) );
         
         }
         { //::UnitBaseAnimState::SelectWeightedSequence
@@ -5262,6 +5372,7 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
         
         }
+        UnitVehicleAnimState_exposer.def_readwrite( "wheelradius", &UnitVehicleAnimState::m_fWheelRadius );
         UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
@@ -5297,6 +5408,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , default_OnNewModel_function_type(&UnitVehicleAnimState_wrapper::default_OnNewModel) );
         
         }
+        { //::UnitBaseAnimState::RestartMainSequence
+        
+            typedef void ( ::UnitBaseAnimState::*RestartMainSequence_function_type )(  ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_RestartMainSequence_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "RestartMainSequence"
+                , RestartMainSequence_function_type(&::UnitBaseAnimState::RestartMainSequence)
+                , default_RestartMainSequence_function_type(&UnitVehicleAnimState_wrapper::default_RestartMainSequence) );
+        
+        }
         { //::UnitBaseAnimState::SelectWeightedSequence
         
             typedef int ( ::UnitBaseAnimState::*SelectWeightedSequence_function_type )( ::Activity ) ;
@@ -5326,6 +5448,16 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
         bp::implicitly_convertible< bp::object, UnitVehicleNavigator >();
+        { //::UnitVehicleNavigator::ComputeConsiderDensAndDirs
+        
+            typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            
+            UnitVehicleNavigator_exposer.def( 
+                "ComputeConsiderDensAndDirs"
+                , ComputeConsiderDensAndDirs_function_type( &::UnitVehicleNavigator::ComputeConsiderDensAndDirs )
+                , ( bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
+        
+        }
         { //::UnitVehicleNavigator::UpdateIdealAngles
         
             typedef void ( ::UnitVehicleNavigator::*UpdateIdealAngles_function_type )( ::UnitBaseMoveCommand &,::Vector * ) ;

@@ -40,6 +40,9 @@ public:
 	// Returns the unit render angles. Defaults to the AbsAngles.
 	virtual const QAngle& GetRenderAngles() { return GetOuter()->GetAbsAngles(); }
 
+	// Restart the main sequence (if applicable)
+	virtual void		RestartMainSequence() {}
+
 protected:
 	// Helpers
 	void				GetOuterAbsVelocity( Vector& vel ) const;
