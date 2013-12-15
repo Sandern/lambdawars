@@ -433,6 +433,13 @@ public:
 
 	float m_fAccuracy;
 
+	// Parameters for the navigator/pathfinding/navmesh
+	float m_fSaveDrop;
+	float m_fDeathDrop;
+	float m_fMaxClimbHeight;
+	float m_fTestRouteStartHeight;
+	float m_fMinSlope;
+
 #ifndef CLIENT_DLL
 	// SERVER VARIABLES
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_iHealth );
@@ -444,13 +451,6 @@ public:
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_vecBaseVelocity );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_vecVelocity );
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_vecViewOffset );
-
-	// Parameters for the navigator/pathfinding
-	float m_fSaveDrop;
-	float m_fDeathDrop;
-	float m_fMaxClimbHeight;
-	float m_fTestRouteStartHeight;
-	float m_fMinSlope;
 
 	// Enemy related
 	float m_fEnemyChangeToleranceSqr;

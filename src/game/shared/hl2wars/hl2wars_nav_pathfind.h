@@ -79,7 +79,6 @@ public:
 			return false;
 		}*/
 
-#ifndef CLIENT_DLL
 		// Figure out normal, calculate and check min slope
 		Vector normal;
 		area->ComputeNormal( &normal );
@@ -88,7 +87,6 @@ public:
 		{
 			return false;
 		}
-#endif // CLIENT_DLL
 
 		return true;
 	}
@@ -146,20 +144,18 @@ public:
 
 				if( heightdiff > 0 )
 				{
-#ifndef CLIENT_DLL
 					// Means we need to climb up or jump up
 					if( heightdiff > m_pUnit->m_fMaxClimbHeight )
 						return -1;
-#endif // CLIENT_DLL
+
 					cost += heightdiff * 2;
 				}
 				else
 				{
-#ifndef CLIENT_DLL
 					// Only allow save drops (so don't get any damage)
 					if( fabs(heightdiff) > m_pUnit->m_fSaveDrop )
 						return -1;
-#endif // CLIENT_DLL
+
 					cost += fabs(heightdiff) * 1.1f;
 				}
 			}

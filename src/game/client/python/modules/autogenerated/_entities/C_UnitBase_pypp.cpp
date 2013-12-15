@@ -1778,8 +1778,13 @@ void register_C_UnitBase_class(){
         C_UnitBase_exposer.def_readwrite( "neverignoreattacks", &C_UnitBase::m_bNeverIgnoreAttacks );
         C_UnitBase_exposer.def_readwrite( "updateclientanimations", &C_UnitBase::m_bUpdateClientAnimations );
         C_UnitBase_exposer.def_readwrite( "accuracy", &C_UnitBase::m_fAccuracy );
+        C_UnitBase_exposer.def_readwrite( "deathdrop", &C_UnitBase::m_fDeathDrop );
         C_UnitBase_exposer.def_readwrite( "eyepitch", &C_UnitBase::m_fEyePitch );
         C_UnitBase_exposer.def_readwrite( "eyeyaw", &C_UnitBase::m_fEyeYaw );
+        C_UnitBase_exposer.def_readwrite( "maxclimbheight", &C_UnitBase::m_fMaxClimbHeight );
+        C_UnitBase_exposer.def_readwrite( "minslope", &C_UnitBase::m_fMinSlope );
+        C_UnitBase_exposer.def_readwrite( "savedrop", &C_UnitBase::m_fSaveDrop );
+        C_UnitBase_exposer.def_readwrite( "testroutestartheight", &C_UnitBase::m_fTestRouteStartHeight );
         C_UnitBase_exposer.def_readwrite( "maxhealth", &C_UnitBase::m_iMaxHealth );
         { //::C_BaseEntity::Activate
         

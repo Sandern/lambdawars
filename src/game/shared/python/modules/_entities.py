@@ -348,7 +348,7 @@ class Entities(SemiSharedModuleGenerator):
         
         # Apply common rules to the entity class
         # Don't care about the following:
-        cls.vars(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
+        #cls.vars(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
         cls.classes(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(lambda decl: 'YouForgotToImplement' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(function=lambda decl: 'NetworkStateChanged_' in decl.name, allow_empty=True).exclude()
@@ -813,11 +813,6 @@ class Entities(SemiSharedModuleGenerator):
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(bonecache))), allow_empty=True).exclude()
             
         if self.isclient:
-            cls.vars('m_SequenceTransitioner').exclude()
-            cls.vars('m_nHitboxSet').exclude()
-            cls.vars('m_pClientsideRagdoll').exclude()
-            cls.vars('m_pRagdoll').exclude()
-            
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             
@@ -1302,7 +1297,6 @@ class Entities(SemiSharedModuleGenerator):
         # Map boundary
         cls_name = 'C_BaseFuncMapBoundary' if self.isclient else 'CBaseFuncMapBoundary'
         cls = mb.class_(cls_name)
-        cls.vars('m_pNext').exclude()
         mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
     
     def ParseHL2WarsPlayer(self, mb):
@@ -1399,6 +1393,13 @@ class Entities(SemiSharedModuleGenerator):
         
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         
+        # Pathfinding/Navmesh
+        self.IncludeVarAndRename('m_fDeathDrop', 'deathdrop')
+        self.IncludeVarAndRename('m_fSaveDrop', 'savedrop')
+        self.IncludeVarAndRename('m_fMaxClimbHeight', 'maxclimbheight')
+        self.IncludeVarAndRename('m_fTestRouteStartHeight', 'testroutestartheight')
+        self.IncludeVarAndRename('m_fMinSlope', 'minslope')
+        
         # List of overridables
         mb.mem_funs('OnUnitTypeChanged').virtuality = 'virtual'
         mb.mem_funs('UserCmd').virtuality = 'virtual'
@@ -1449,14 +1450,8 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_bUpdateClientAnimations', 'updateclientanimations')
         else:
             cls.mem_funs('GetLastTakeDamageTime').exclude()
-                 
-            cls.vars('m_fDeathDrop').rename('deathdrop')
-            cls.vars('m_fSaveDrop').rename('savedrop')
-            cls.vars('m_fMaxClimbHeight').rename('maxclimbheight')
-            cls.vars('m_fTestRouteStartHeight').rename('testroutestartheight')
-            cls.vars('m_fMinSlope').rename('minslope')
             
-            cls.vars('m_fEnemyChangeToleranceSqr').rename('enemychangetolerancesqr')
+            self.IncludeVarAndRename('m_fEnemyChangeToleranceSqr', 'enemychangetolerancesqr')
             
             cls.mem_funs('SetEnemy').exclude() 
             cls.add_property( 'enemy'
@@ -1501,8 +1496,8 @@ class Entities(SemiSharedModuleGenerator):
         cls = mb.class_(cls_name)
         cls.no_init = False
         self.ParseUnitBaseShared(mb, cls_name)
-        if self.isclient:
-            cls.vars('m_iMaxHealth').rename('maxhealth')
+        #if self.isclient:
+        #    cls.vars('m_iMaxHealth').rename('maxhealth')
             
     def ParseWarsWeapon(self, mb):
         cls = mb.class_('C_WarsWeapon' if self.isclient else 'CWarsWeapon')

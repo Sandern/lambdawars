@@ -2064,8 +2064,14 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.def_readwrite( "friendlydamage", &CUnitBase::m_bFriendlyDamage );
         CUnitBase_exposer.def_readwrite( "neverignoreattacks", &CUnitBase::m_bNeverIgnoreAttacks );
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
+        CUnitBase_exposer.def_readwrite( "deathdrop", &CUnitBase::m_fDeathDrop );
+        CUnitBase_exposer.def_readwrite( "enemychangetolerancesqr", &CUnitBase::m_fEnemyChangeToleranceSqr );
         CUnitBase_exposer.def_readwrite( "eyepitch", &CUnitBase::m_fEyePitch );
         CUnitBase_exposer.def_readwrite( "eyeyaw", &CUnitBase::m_fEyeYaw );
+        CUnitBase_exposer.def_readwrite( "maxclimbheight", &CUnitBase::m_fMaxClimbHeight );
+        CUnitBase_exposer.def_readwrite( "minslope", &CUnitBase::m_fMinSlope );
+        CUnitBase_exposer.def_readwrite( "savedrop", &CUnitBase::m_fSaveDrop );
+        CUnitBase_exposer.def_readwrite( "testroutestartheight", &CUnitBase::m_fTestRouteStartHeight );
         { //::CBaseAnimating::Activate
         
             typedef void ( ::CBaseAnimating::*Activate_function_type )(  ) ;
