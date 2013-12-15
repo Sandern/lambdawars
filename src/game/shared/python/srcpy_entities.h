@@ -86,16 +86,24 @@ int CEPyHandle<T>::Cmp( boost::python::object other )
 		}
 	}
 
-	// Must be a handle
-	CBaseHandle *pHandle = boost::python::extract<CBaseHandle *>( other );
-	if( pHandle )
+	try
 	{
-		if( pHandle->ToInt() == this->ToInt() )
-			return 0;
-		else if( pHandle->GetEntryIndex() > this->GetEntryIndex() )
-			return 1;
-		else
-			return -1;
+		// Must be a handle
+		CBaseHandle *pHandle = boost::python::extract<CBaseHandle *>( other );
+		if( pHandle )
+		{
+			if( pHandle->ToInt() == this->ToInt() )
+				return 0;
+			else if( pHandle->GetEntryIndex() > this->GetEntryIndex() )
+				return 1;
+			else
+				return -1;
+		}
+	}
+	catch( bp::error_already_set & )
+	{
+		// Not a handle, just clear error and return -1
+		PyErr_Clear();	
 	}
 
 	return -1;

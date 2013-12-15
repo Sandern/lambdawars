@@ -161,16 +161,24 @@ int PyHandle::Cmp( bp::object other )
 		}
 	}
 
-	// Must be a handle
-	CBaseHandle *pHandle = bp::extract< CBaseHandle * >( other );
-	if( pHandle )
+	try
 	{
-		if( pHandle->ToInt() == ToInt() )
-			return 0;
-		else if( pHandle->GetEntryIndex() > GetEntryIndex() )
-			return 1;
-		else
-			return -1;
+		// Must be a handle
+		CBaseHandle *pHandle = bp::extract< CBaseHandle * >( other );
+		if( pHandle )
+		{
+			if( pHandle->ToInt() == ToInt() )
+				return 0;
+			else if( pHandle->GetEntryIndex() > GetEntryIndex() )
+				return 1;
+			else
+				return -1;
+		}
+	}
+	catch( bp::error_already_set & )
+	{
+		// Not a handle, just clear error and return -1
+		PyErr_Clear();	
 	}
 
 	return -1;
