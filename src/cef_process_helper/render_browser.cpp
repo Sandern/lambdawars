@@ -62,9 +62,7 @@ void RenderBrowser::SetV8Context( CefRefPtr<CefV8Context> context )
 	m_Context = context;
 	if( !context )
 	{
-		m_Objects.clear();
-		m_GlobalObjects.clear();
-		m_Callbacks.clear();
+		Clear();
 	}
 }
 
