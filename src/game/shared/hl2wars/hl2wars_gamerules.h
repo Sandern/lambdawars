@@ -132,7 +132,7 @@ public:
 	// Functions to verify the single/multiplayer status of a game
 	//virtual bool IsDeathmatch( void ) { return BaseClass::IsDeathmatch(); } //is this a deathmatch game?
 	//virtual bool IsCoOp( void ) { return BaseClass::IsCoOp(); } // is this a coop game?
-	virtual const char *GetGameDescription( void ) { return "HL2Wars"; } 
+	virtual const char *GetGameDescription( void ) { return "Lambda Wars"; } 
 
 	// Client connection/disconnection
 	virtual bool ClientConnected( edict_t *pEntity, const char *name, const char *address, char *reject, int maxrejectlen ); // a client just connected to the server (player hasn't spawned yet)

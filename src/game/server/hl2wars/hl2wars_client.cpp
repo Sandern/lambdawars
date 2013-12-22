@@ -168,7 +168,7 @@ const char *GetGameDescription()
 	if ( g_pGameRules ) // this function may be called before the world has spawned, and the game rules initialized
 		return g_pGameRules->GetGameDescription();
 	else
-		return "Half-Life 2: Wars";
+		return "Lambda Wars";
 }
 
 
