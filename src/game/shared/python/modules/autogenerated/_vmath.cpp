@@ -190,6 +190,78 @@ struct Vector2D_wrapper : Vector2D, bp::wrapper< Vector2D > {
 
 };
 
+static boost::python::object CalcClosestPointOnLine_42de2a0ba59bcb4ee50800ba94143a8c( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB, ::Vector & vClosest ){
+    float t2;
+    ::CalcClosestPointOnLine(P, vLineA, vLineB, vClosest, &t2);
+    return bp::object( t2 );
+}
+
+static boost::python::object CalcClosestPointOnLine2D_11a05c7aee84aeb01a5665a9a562d121( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB, ::Vector2D & vClosest ){
+    float t2;
+    ::CalcClosestPointOnLine2D(P, vLineA, vLineB, vClosest, &t2);
+    return bp::object( t2 );
+}
+
+static boost::python::object CalcClosestPointOnLineSegment_bd67dbddc27595f6e75f4c722a66c9bd( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB, ::Vector & vClosest ){
+    float t2;
+    ::CalcClosestPointOnLineSegment(P, vLineA, vLineB, vClosest, &t2);
+    return bp::object( t2 );
+}
+
+static boost::python::object CalcClosestPointOnLineSegment2D_82401f5e831a0196e735ac6b8bf09e8e( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB, ::Vector2D & vClosest ){
+    float t2;
+    ::CalcClosestPointOnLineSegment2D(P, vLineA, vLineB, vClosest, &t2);
+    return bp::object( t2 );
+}
+
+static boost::python::tuple CalcDistanceSqrToLine_0457b1ebfe4b2523226fe95477d32818( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceSqrToLine(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceSqrToLine2D_2d6c124d5b3b1791578778c09c831dd9( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceSqrToLine2D(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceSqrToLineSegment_a93f7bb9917fd473877e38d28227251d( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceSqrToLineSegment(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceSqrToLineSegment2D_5a93963d10aafbced74529459933d54a( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceSqrToLineSegment2D(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceToLine_e3db48a4ce2509f2810685b9fe20525f( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceToLine(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceToLine2D_ec487f5e8bdcf4eccf63e92cc658bda5( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceToLine2D(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceToLineSegment_d48c1ba03c936bd5d148fe86e5831639( ::Vector const & P, ::Vector const & vLineA, ::Vector const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceToLineSegment(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
+static boost::python::tuple CalcDistanceToLineSegment2D_50a32beb6a8112d8454ec91cc489001a( ::Vector2D const & P, ::Vector2D const & vLineA, ::Vector2D const & vLineB ){
+    float t2;
+    float result = ::CalcDistanceToLineSegment2D(P, vLineA, vLineB, &t2);
+    return bp::make_tuple( result, t2 );
+}
+
 static boost::python::object CalcSqrDistAndClosestPointOnAABB_9f58e81483fec37787abb9035f371f46( ::Vector const & mins, ::Vector const & maxs, ::Vector const & point, ::Vector & closestOut ){
     float distSqrOut2;
     ::CalcSqrDistAndClosestPointOnAABB(mins, maxs, point, closestOut, distSqrOut2);
@@ -1580,6 +1652,94 @@ BOOST_PYTHON_MODULE(_vmath){
     
     }
 
+    { //::CalcClosestPointOnLine
+    
+        typedef boost::python::object ( *CalcClosestPointOnLine_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector & );
+        
+        bp::def( 
+            "CalcClosestPointOnLine"
+            , CalcClosestPointOnLine_function_type( &CalcClosestPointOnLine_42de2a0ba59bcb4ee50800ba94143a8c )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest") ) );
+    
+    }
+
+    { //::CalcClosestPointOnLine2D
+    
+        typedef boost::python::object ( *CalcClosestPointOnLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,::Vector2D & );
+        
+        bp::def( 
+            "CalcClosestPointOnLine2D"
+            , CalcClosestPointOnLine2D_function_type( &CalcClosestPointOnLine2D_11a05c7aee84aeb01a5665a9a562d121 )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest") ) );
+    
+    }
+
+    { //::CalcClosestPointOnLineSegment
+    
+        typedef boost::python::object ( *CalcClosestPointOnLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector & );
+        
+        bp::def( 
+            "CalcClosestPointOnLineSegment"
+            , CalcClosestPointOnLineSegment_function_type( &CalcClosestPointOnLineSegment_bd67dbddc27595f6e75f4c722a66c9bd )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest") ) );
+    
+    }
+
+    { //::CalcClosestPointOnLineSegment2D
+    
+        typedef boost::python::object ( *CalcClosestPointOnLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const &,::Vector2D & );
+        
+        bp::def( 
+            "CalcClosestPointOnLineSegment2D"
+            , CalcClosestPointOnLineSegment2D_function_type( &CalcClosestPointOnLineSegment2D_82401f5e831a0196e735ac6b8bf09e8e )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB"), bp::arg("vClosest") ) );
+    
+    }
+
+    { //::CalcDistanceSqrToLine
+    
+        typedef boost::python::tuple ( *CalcDistanceSqrToLine_function_type )( ::Vector const &,::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "CalcDistanceSqrToLine"
+            , CalcDistanceSqrToLine_function_type( &CalcDistanceSqrToLine_0457b1ebfe4b2523226fe95477d32818 )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceSqrToLine2D
+    
+        typedef boost::python::tuple ( *CalcDistanceSqrToLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const & );
+        
+        bp::def( 
+            "CalcDistanceSqrToLine2D"
+            , CalcDistanceSqrToLine2D_function_type( &CalcDistanceSqrToLine2D_2d6c124d5b3b1791578778c09c831dd9 )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceSqrToLineSegment
+    
+        typedef boost::python::tuple ( *CalcDistanceSqrToLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "CalcDistanceSqrToLineSegment"
+            , CalcDistanceSqrToLineSegment_function_type( &CalcDistanceSqrToLineSegment_a93f7bb9917fd473877e38d28227251d )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceSqrToLineSegment2D
+    
+        typedef boost::python::tuple ( *CalcDistanceSqrToLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const & );
+        
+        bp::def( 
+            "CalcDistanceSqrToLineSegment2D"
+            , CalcDistanceSqrToLineSegment2D_function_type( &CalcDistanceSqrToLineSegment2D_5a93963d10aafbced74529459933d54a )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
     { //::CalcDistanceToAABB
     
         typedef float ( *CalcDistanceToAABB_function_type )( ::Vector const &,::Vector const &,::Vector const & );
@@ -1588,6 +1748,50 @@ BOOST_PYTHON_MODULE(_vmath){
             "CalcDistanceToAABB"
             , CalcDistanceToAABB_function_type( &::CalcDistanceToAABB )
             , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("point") ) );
+    
+    }
+
+    { //::CalcDistanceToLine
+    
+        typedef boost::python::tuple ( *CalcDistanceToLine_function_type )( ::Vector const &,::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "CalcDistanceToLine"
+            , CalcDistanceToLine_function_type( &CalcDistanceToLine_e3db48a4ce2509f2810685b9fe20525f )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceToLine2D
+    
+        typedef boost::python::tuple ( *CalcDistanceToLine2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const & );
+        
+        bp::def( 
+            "CalcDistanceToLine2D"
+            , CalcDistanceToLine2D_function_type( &CalcDistanceToLine2D_ec487f5e8bdcf4eccf63e92cc658bda5 )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceToLineSegment
+    
+        typedef boost::python::tuple ( *CalcDistanceToLineSegment_function_type )( ::Vector const &,::Vector const &,::Vector const & );
+        
+        bp::def( 
+            "CalcDistanceToLineSegment"
+            , CalcDistanceToLineSegment_function_type( &CalcDistanceToLineSegment_d48c1ba03c936bd5d148fe86e5831639 )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
+    
+    }
+
+    { //::CalcDistanceToLineSegment2D
+    
+        typedef boost::python::tuple ( *CalcDistanceToLineSegment2D_function_type )( ::Vector2D const &,::Vector2D const &,::Vector2D const & );
+        
+        bp::def( 
+            "CalcDistanceToLineSegment2D"
+            , CalcDistanceToLineSegment2D_function_type( &CalcDistanceToLineSegment2D_50a32beb6a8112d8454ec91cc489001a )
+            , ( bp::arg("P"), bp::arg("vLineA"), bp::arg("vLineB") ) );
     
     }
 

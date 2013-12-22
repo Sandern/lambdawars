@@ -295,19 +295,7 @@ class VMath(SharedModuleGenerator):
         mb.free_functions('CalcSqrDistAndClosestPointOnAABB').include()
         mb.free_functions('CalcDistanceToAABB').include()
         
-        mb.free_functions('CalcClosestPointOnLine').include()
-        mb.free_functions('CalcDistanceToLine').include()
-        mb.free_functions('CalcDistanceSqrToLine').include()
-        mb.free_functions('CalcClosestPointOnLineSegment').include()
-        mb.free_functions('CalcDistanceToLineSegment').include()
-        mb.free_functions('CalcDistanceSqrToLineSegment').include()
-        mb.free_functions('CalcLineToLineIntersectionSegment').include()
-        mb.free_functions('CalcClosestPointOnLine2D').include()
-        mb.free_functions('CalcDistanceToLine2D').include()
-        mb.free_functions('CalcDistanceSqrToLine2D').include()
-        mb.free_functions('CalcClosestPointOnLineSegment2D').include()
-        mb.free_functions('CalcDistanceToLineSegment2D').include()
-        mb.free_functions('CalcDistanceSqrToLineSegment2D').include()
+        #mb.free_functions('CalcLineToLineIntersectionSegment').include() # TODO
         
         mb.free_functions('Approach').include()
         mb.free_functions('ApproachAngle').include()
@@ -442,3 +430,32 @@ class VMath(SharedModuleGenerator):
         
         # Silent warnings of generating class wrappers
         mb.classes().disable_warnings( messages.W1027 )
+        
+        # Include functions with "float *" parameter. For these functions we should transform the "float *" parameter
+        mb.free_functions('CalcClosestPointOnLine2D').include()
+        mb.free_functions('CalcClosestPointOnLine2D').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceToLine2D').include()
+        mb.free_functions('CalcDistanceToLine2D').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceSqrToLine2D').include()
+        mb.free_functions('CalcDistanceSqrToLine2D').add_transformation( FT.output('t') )
+        mb.free_functions('CalcClosestPointOnLineSegment2D').include()
+        mb.free_functions('CalcClosestPointOnLineSegment2D').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceToLineSegment2D').include()
+        mb.free_functions('CalcDistanceToLineSegment2D').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceSqrToLineSegment2D').include()
+        mb.free_functions('CalcDistanceSqrToLineSegment2D').add_transformation( FT.output('t') )
+        
+        mb.free_functions('CalcClosestPointOnLine').include()
+        mb.free_functions('CalcClosestPointOnLine').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceToLine').include()
+        mb.free_functions('CalcDistanceToLine').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceSqrToLine').include()
+        mb.free_functions('CalcDistanceSqrToLine').add_transformation( FT.output('t') )
+        
+        mb.free_functions('CalcClosestPointOnLineSegment').include()
+        mb.free_functions('CalcClosestPointOnLineSegment').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceToLineSegment').include()
+        mb.free_functions('CalcDistanceToLineSegment').add_transformation( FT.output('t') )
+        mb.free_functions('CalcDistanceSqrToLineSegment').include()
+        mb.free_functions('CalcDistanceSqrToLineSegment').add_transformation( FT.output('t') )
+        
