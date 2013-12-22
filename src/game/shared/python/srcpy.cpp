@@ -1286,7 +1286,7 @@ void CSrcPython::AddToDelayedUpdateList( EHANDLE hEnt, char *name, bp::object da
 {
 	CSrcPython::py_delayed_data_update v;
 	v.hEnt = hEnt;
-	V_snprintf(v.name, _MAX_PATH, name);
+	V_strncpy( v.name, name, MAX_PATH );
 	v.data = data;
 	v.callchanged = callchanged;
 	py_delayed_data_update_list.AddToTail( v );
