@@ -41,6 +41,7 @@ class TossGrenadeAnimEventHandler : public BaseAnimEventHandler
 public:
 	TossGrenadeAnimEventHandler( const char *pEntityName, float fSpeed );
 
+	void SetGrenadeClass( const char *pGrenadeClass );
 	virtual void HandleEvent( CUnitBase *pUnit, animevent_t *event ) {}
 
 	bool GetTossVector( CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut );

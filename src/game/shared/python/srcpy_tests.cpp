@@ -24,17 +24,6 @@ void SrcPyTest_EntityArg( CBaseEntity *pEntity )
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Silly perf test
-//-----------------------------------------------------------------------------
-void SrcPyTest_NCrossProducts( int n, Vector &a, Vector &b )
-{
-	Vector ret( 0, 0, 0 );
-	for( int i = 0; i < n; i++ )
-		ret += a.Cross(b);
-	Msg( "Result: %f %f %f\n", ret.x, ret.y, ret.z );
-}
-
 #ifdef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -47,7 +36,7 @@ CON_COMMAND_F( srctests_booloperator, "", FCVAR_CHEAT )
 	try
 	{
 		boost::python::object testvalue = boost::python::object( boost::python::exec( "def testmethod(): pass" ) );
-		if( testvalue != bp::object() )
+		if( testvalue != boost::python::object() )
 		{
 			Msg("Tested value is not None\n");
 		}

@@ -70,6 +70,25 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseGrenade::Event_Killed( info );
     }
 
+    virtual void Explode( ::trace_t * pTrace, int bitsDamageType ) {
+        PY_OVERRIDE_CHECK( CBaseGrenade, Explode )
+        PY_OVERRIDE_LOG( _entities, CBaseGrenade, Explode )
+        bp::override func_Explode = this->get_override( "Explode" );
+        if( func_Explode.ptr() != Py_None )
+            try {
+                func_Explode( boost::python::ptr(pTrace), bitsDamageType );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseGrenade::Explode( pTrace, bitsDamageType );
+            }
+        else
+            this->CBaseGrenade::Explode( pTrace, bitsDamageType );
+    }
+    
+    void default_Explode( ::trace_t * pTrace, int bitsDamageType ) {
+        CBaseGrenade::Explode( pTrace, bitsDamageType );
+    }
+
     virtual void Precache(  ) {
         PY_OVERRIDE_CHECK( CBaseGrenade, Precache )
         PY_OVERRIDE_LOG( _entities, CBaseGrenade, Precache )
@@ -955,10 +974,12 @@ void register_CBaseGrenade_class(){
         { //::CBaseGrenade::Explode
         
             typedef void ( ::CBaseGrenade::*Explode_function_type )( ::trace_t *,int ) ;
+            typedef void ( CBaseGrenade_wrapper::*default_Explode_function_type )( ::trace_t *,int ) ;
             
             CBaseGrenade_exposer.def( 
                 "Explode"
-                , Explode_function_type( &::CBaseGrenade::Explode )
+                , Explode_function_type(&::CBaseGrenade::Explode)
+                , default_Explode_function_type(&CBaseGrenade_wrapper::default_Explode)
                 , ( bp::arg("pTrace"), bp::arg("bitsDamageType") ) );
         
         }

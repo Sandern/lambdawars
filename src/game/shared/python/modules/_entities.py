@@ -1116,17 +1116,11 @@ class Entities(SemiSharedModuleGenerator):
         cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
         cls = mb.class_(cls_name)
         
-        cls.add_property( 'damage'
-                         , cls.member_function( 'GetDamage' )
-                         , cls.member_function( 'SetDamage' ) )
-        cls.add_property( 'damageradius'
-                         , cls.member_function( 'GetDamageRadius' )
-                         , cls.member_function( 'SetDamageRadius' ) )
-                         
-        cls.mem_fun('GetDamage').exclude()
-        cls.mem_fun('SetDamage').exclude()
-        cls.mem_fun('GetDamageRadius').exclude()
-        cls.mem_fun('SetDamageRadius').exclude()
+        self.SetupProperty(cls, 'damage', 'GetDamage', 'SetDamage')
+        self.SetupProperty(cls, 'damageradius', 'GetDamageRadius', 'SetDamageRadius')
+        
+        # Overrides
+        cls.mem_funs('Explode').virtuality = 'virtual'
 
         if self.isserver:
             # Not sure where to put this

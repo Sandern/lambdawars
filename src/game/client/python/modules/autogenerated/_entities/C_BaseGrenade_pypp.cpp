@@ -45,6 +45,25 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
     
     }
 
+    virtual void Explode( ::trace_t * pTrace, int bitsDamageType ) {
+        PY_OVERRIDE_CHECK( C_BaseGrenade, Explode )
+        PY_OVERRIDE_LOG( _entities, C_BaseGrenade, Explode )
+        bp::override func_Explode = this->get_override( "Explode" );
+        if( func_Explode.ptr() != Py_None )
+            try {
+                func_Explode( boost::python::ptr(pTrace), bitsDamageType );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseGrenade::Explode( pTrace, bitsDamageType );
+            }
+        else
+            this->C_BaseGrenade::Explode( pTrace, bitsDamageType );
+    }
+    
+    void default_Explode( ::trace_t * pTrace, int bitsDamageType ) {
+        C_BaseGrenade::Explode( pTrace, bitsDamageType );
+    }
+
     virtual void Precache(  ) {
         PY_OVERRIDE_CHECK( C_BaseGrenade, Precache )
         PY_OVERRIDE_LOG( _entities, C_BaseGrenade, Precache )
@@ -650,10 +669,12 @@ void register_C_BaseGrenade_class(){
         { //::C_BaseGrenade::Explode
         
             typedef void ( ::C_BaseGrenade::*Explode_function_type )( ::trace_t *,int ) ;
+            typedef void ( C_BaseGrenade_wrapper::*default_Explode_function_type )( ::trace_t *,int ) ;
             
             C_BaseGrenade_exposer.def( 
                 "Explode"
-                , Explode_function_type( &::C_BaseGrenade::Explode )
+                , Explode_function_type(&::C_BaseGrenade::Explode)
+                , default_Explode_function_type(&C_BaseGrenade_wrapper::default_Explode)
                 , ( bp::arg("pTrace"), bp::arg("bitsDamageType") ) );
         
         }

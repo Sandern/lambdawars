@@ -3205,6 +3205,10 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (void ( TossGrenadeAnimEventHandler_wrapper::* )( ::CUnitBase *,::animevent_t * ) )(&TossGrenadeAnimEventHandler_wrapper::default_HandleEvent)
             , ( bp::arg("pUnit"), bp::arg("event") ) )    
         .def( 
+            "SetGrenadeClass"
+            , (void ( ::TossGrenadeAnimEventHandler::* )( char const * ) )( &::TossGrenadeAnimEventHandler::SetGrenadeClass )
+            , ( bp::arg("pGrenadeClass") ) )    
+        .def( 
             "TossGrenade"
             , (::CBaseEntity * ( ::TossGrenadeAnimEventHandler::* )( ::CUnitBase *,::Vector &,::Vector &,int ) )( &::TossGrenadeAnimEventHandler::TossGrenade )
             , ( bp::arg("pUnit"), bp::arg("vecStartPos"), bp::arg("vecTarget"), bp::arg("iCollisionGroup") )

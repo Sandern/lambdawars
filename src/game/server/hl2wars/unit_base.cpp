@@ -121,6 +121,11 @@ TossGrenadeAnimEventHandler::TossGrenadeAnimEventHandler( const char *pEntityNam
 	m_fSpeed = fSpeed;
 }
 
+void TossGrenadeAnimEventHandler::SetGrenadeClass( const char *pGrenadeClass )
+{
+	V_strncpy( m_EntityName, pGrenadeClass, 40 );
+}
+
 bool TossGrenadeAnimEventHandler::GetTossVector( CUnitBase *pUnit, const Vector &vecStartPos, const Vector &vecTarget, int iCollisionGroup, Vector *vecOut )
 {
 	if( !pUnit || !vecOut )

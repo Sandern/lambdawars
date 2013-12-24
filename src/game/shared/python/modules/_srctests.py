@@ -14,4 +14,3 @@ class _SrcTests(SemiSharedModuleGenerator):
         mb.decls().exclude() 
 
         mb.free_function('SrcPyTest_EntityArg').include()
-        mb.free_function('SrcPyTest_NCrossProducts').include()

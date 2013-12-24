@@ -25,17 +25,6 @@ BOOST_PYTHON_MODULE(_srctests){
             , ( bp::arg("pEntity") ) );
     
     }
-
-    { //::SrcPyTest_NCrossProducts
-    
-        typedef void ( *SrcPyTest_NCrossProducts_function_type )( int,::Vector &,::Vector & );
-        
-        bp::def( 
-            "SrcPyTest_NCrossProducts"
-            , SrcPyTest_NCrossProducts_function_type( &::SrcPyTest_NCrossProducts )
-            , ( bp::arg("n"), bp::arg("a"), bp::arg("b") ) );
-    
-    }
 }
 #else
 #include "cbase.h"
@@ -59,17 +48,6 @@ BOOST_PYTHON_MODULE(_srctests){
             "SrcPyTest_EntityArg"
             , SrcPyTest_EntityArg_function_type( &::SrcPyTest_EntityArg )
             , ( bp::arg("pEntity") ) );
-    
-    }
-
-    { //::SrcPyTest_NCrossProducts
-    
-        typedef void ( *SrcPyTest_NCrossProducts_function_type )( int,::Vector &,::Vector & );
-        
-        bp::def( 
-            "SrcPyTest_NCrossProducts"
-            , SrcPyTest_NCrossProducts_function_type( &::SrcPyTest_NCrossProducts )
-            , ( bp::arg("n"), bp::arg("a"), bp::arg("b") ) );
     
     }
 }
