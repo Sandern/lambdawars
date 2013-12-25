@@ -461,47 +461,7 @@ void UnitBaseLocomotion::WalkMove( void )
 	// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
 	//VectorSubtract( mv->velocity, m_pOuter->GetBaseVelocity(), mv->velocity );
 
-#ifdef DEBUG_MOVEMENT_VELOCITY
-	static Vector vLastOrigin;
-
-	if( fmove || smove )
-	{
-		if( !bMovement )
-		{
-			bMovement = true;
-			Msg("%f Movement changed %f %f vel %f \n", gpGlobals->curtime, fmove, smove, mv->velocity.Length());
-		}
-	}
-	else
-	{
-		if( bMovement )
-		{
-			bMovement = false;
-			Msg("%f Movement changed to zero %f %f vel %f. Stop distance: %f\n", gpGlobals->curtime, fmove, smove, mv->velocity.Length(), GetStopDistance());
-			vLastOrigin = mv->origin;
-		}
-	}
-
-	if( mv->velocity.Length() > 25.0f )
-	{
-		if( !bVelocity )
-		{
-			bVelocity = true;
-			Msg("%f velocity changed %f\n", gpGlobals->curtime, mv->velocity.Length());
-		}
-	}
-	else
-	{
-		if( bVelocity )
-		{
-			bVelocity = false;
-			Msg("%f velocity changed to zero %f. Distance: %f\n", gpGlobals->curtime, mv->velocity.Length(), (mv->origin - vLastOrigin).Length());
-		}
-	}
-#endif // DEBUG_MOVEMENT_VELOCITY
-
 	mv->stopdistance = GetStopDistance();
-
 }
 
 #define MAX_FIND_BLOCKERS 48

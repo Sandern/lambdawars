@@ -23,7 +23,11 @@ public:
 	UnitVPhysicsLocomotion( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
-	virtual void		GroundMove();
+	virtual void FinishMove( UnitBaseMoveCommand &mv );
+
+	virtual void	FullWalkMove();
+	virtual void	VPhysicsMove();
+	virtual void	VPhysicsMoveStep();
 };
 
 #endif // UNIT_VPHYSICSLOCOMOTION_H
