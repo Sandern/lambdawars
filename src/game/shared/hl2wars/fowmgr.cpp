@@ -32,7 +32,7 @@
 #include "tier0/memdbgon.h"
 
 // Increment this to force rebuilding all heightmaps
-#define	 HEIGHTMAP_VERSION_NUMBER	4
+#define	 HEIGHTMAP_VERSION_NUMBER	5
 
 #ifdef CLIENT_DLL
 	#undef VPROF_BUDGETGROUP_FOGOFWAR
@@ -71,7 +71,6 @@ ConVar sv_fogofwar_tilesize( "sv_fogofwar_tilesize", "64", FCVAR_CHEAT | FCVAR_R
 	ConVar mat_fow_blur_factor("mat_fow_blur_factor", "0.2");
 
 	ConVar fow_shadowcast_debug("fow_shadowcast_debug", "0", FCVAR_CHEAT);
-	ConVar fow_debug_draw_max("fow_debug_draw_max", "-1", FCVAR_CHEAT);
 #else
 	ConVar sv_fogofwar_updaterate( "sv_fogofwar_updaterate", "0.2", FCVAR_GAMEDLL, "Rate at which the fog of war logic updates." );
 	#define FOW_UPDATERATE sv_fogofwar_updaterate.GetFloat()
@@ -263,8 +262,12 @@ void CFogOfWarMgr::LevelInitPostEntity()
 	LoadHeightMap();
 	if( !m_bHeightMapLoaded )
 	{
+#ifdef CLIENT_DLL
+		Warning("CFogOfWarMgr: Heightmap file missing!\n");
+#else
 		CalculateHeightMap();
 		SaveHeightMap();
+#endif // CLIENT_DLL
 	}
 
 	if( sv_fogofwar.GetBool() )
@@ -285,6 +288,7 @@ void CFogOfWarMgr::LevelInitPostEntity()
 	UpdateVisibility();
 }
 
+#ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -318,6 +322,13 @@ void CFogOfWarMgr::CalculateHeightMap()
 			z = Max(z, maxs.z);
 		}
 
+		Vector tileCenter;
+		Vector testCorner;
+		Vector hullMins( -2.0f, -2.0f, 0.0f );
+		Vector hullMaxs( 2.0f, 2.0f, 1.0f );
+		float fTestOffset = (m_nTileSize / 2.0f) - 3.0f;
+
+		// Sample world height
 		float tilez;
 		Vector start, end;
 		trace_t tr;
@@ -328,34 +339,87 @@ void CFogOfWarMgr::CalculateHeightMap()
 			{
 				tilez = 0.0f;
 
-				start = ComputeWorldPosition( x, y );
-				start.z = z - 16.0f;
-				end = start + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH;
-				//UTIL_TraceHull( start, end, -Vector(m_nTileSize, m_nTileSize, 8.0f), Vector(m_nTileSize, m_nTileSize, 8.0f),
-				//	MASK_SOLID_BRUSHONLY, NULL, COLLISION_GROUP_NONE, &tr );
+				tileCenter = ComputeWorldPosition( x, y );
+				tileCenter.x += m_nTileSize / 2.0f;
+				tileCenter.y += m_nTileSize / 2.0f;
+				tileCenter.z = z - 16.0f;
 
-				// Use four trace lines and average the result
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+				// Test center
+				UTIL_TraceHull( tileCenter, tileCenter + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, 
+					hullMins, hullMaxs, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+				tilez += (tr.endpos.z*3); // Weight center more
+
+				// Test "left top"
+				testCorner = tileCenter + Vector(-fTestOffset, -fTestOffset, 0.0);
+				UTIL_TraceHull( testCorner, testCorner + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, 
+					hullMins, hullMaxs, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
-				start.x += m_nTileSize;
-				end.x += m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+				// Test "right top"
+				testCorner = tileCenter + Vector(fTestOffset, -fTestOffset, 0.0);
+				UTIL_TraceHull( testCorner, testCorner + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, 
+					hullMins, hullMaxs, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
-				start.y += m_nTileSize;
-				end.y += m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+				// Test "right bottom"
+				testCorner = tileCenter + Vector(fTestOffset, fTestOffset, 0.0);
+				UTIL_TraceHull( testCorner, testCorner + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, 
+					hullMins, hullMaxs, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
-				start.x -= m_nTileSize;
-				end.x -= m_nTileSize;
-				UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+				// Test "left bottom"
+				testCorner = tileCenter + Vector(-fTestOffset, fTestOffset, 0.0);
+				UTIL_TraceHull( testCorner, testCorner + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, 
+					hullMins, hullMaxs, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
 				tilez += tr.endpos.z;
 
 				//Msg("start: %f %f %f, end: %f %f %f, x: %d, y: %d, end: %f\n", x, y, tr.endpos.z);
-				m_TileHeights[FOWINDEX(x, y)] = (int)(tilez / 4.0f);
+				m_TileHeights[FOWINDEX(x, y)] = (int)(tilez / 7.0f);
 			}
+		}
+
+		// Apply fow blockers
+		Ray_t ray;
+
+		CBaseEntity *pFoWBlocker = gEntList.FindEntityByClassname( NULL, "fow_blocker" );
+		while( pFoWBlocker )
+		{
+			// Apply bounds to heightmap
+			const Vector &origin = pFoWBlocker->GetAbsOrigin();
+			const Vector &mins = pFoWBlocker->WorldAlignMins();
+			const Vector &maxs = pFoWBlocker->WorldAlignMaxs();
+
+			int xstart, xend, ystart, yend;
+			ComputeFOWPosition( origin + mins, xstart, ystart );
+			ComputeFOWPosition( origin + maxs, xend, yend );
+
+			ICollideable *pTriggerCollideable = pFoWBlocker->GetCollideable();
+
+			for( int x = xstart; x < xend; x++ )
+			{
+				for( int y = ystart; y < yend; y++ )
+				{
+					start = ComputeWorldPosition( x, y );
+					start.z = z - 16.0f;
+					end = start + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH;
+
+					ray.Init( start, end, hullMins, hullMaxs );
+					enginetrace->ClipRayToCollideable( ray, MASK_ALL, pTriggerCollideable, &tr );
+
+					if( tr.m_pEnt != pFoWBlocker )
+						continue;
+
+					// TODO: Add different modes of applying
+					// The default will be to use the maximum height, but it's also useful to rather clip the height
+					m_TileHeights[FOWINDEX(x, y)] = Max( m_TileHeights[FOWINDEX(x, y)], (int)(tr.endpos.z) );
+				}
+			}
+
+			// Remove once done
+			UTIL_Remove( pFoWBlocker );
+
+			// Find next blocker
+			pFoWBlocker = gEntList.FindEntityByClassname( pFoWBlocker, "fow_blocker" );
 		}
 
 		Msg("CFogOfWarMgr: Generated height map in %f seconds\n", Plat_FloatTime() - fStartTime);
@@ -380,7 +444,6 @@ void CFogOfWarMgr::CalculateHeightMap()
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::SaveHeightMap()
 {
-#ifndef CLIENT_DLL
 	// Get filename
 	char szNrpFilename[MAX_PATH];
 	Q_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
@@ -431,9 +494,8 @@ void CFogOfWarMgr::SaveHeightMap()
 
 	filesystem->Write( buf.Base(), buf.TellPut(), fh );
 	filesystem->Close(fh);
-
-#endif // CLIENT_DLL
 }
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Loads height map from file. Creates and saves one if not present or changed.
@@ -649,7 +711,14 @@ void CFogOfWarMgr::AllocateFogOfWar()
 	m_TileHeights.SetCount( m_nGridSize*m_nGridSize );
 
 	if( m_bActive )
+	{
+#ifndef CLIENT_DLL
 		CalculateHeightMap();
+		//SaveHeightMap();
+#else
+		LoadHeightMap();
+#endif // CLIENT_DLL
+	}
 
 #ifdef CLIENT_DLL
 #if FOW_USE_PROCTEX
@@ -1147,6 +1216,8 @@ void CFogOfWarMgr::RenderFow( CUtlVector< CUtlVector< FowPos_t > > &DrawPoints, 
 	if( nDebug > 0 )
 	{
 		Vector vCenterPos = ComputeWorldPosition(cx, cy);
+		vCenterPos.x += m_nTileSize / 2.0f;
+		vCenterPos.y += m_nTileSize / 2.0f;
 		vCenterPos.z = s_FOWDebugHeight;
 		NDebugOverlay::Box( vCenterPos, -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 120, 0.2f );
 	}
@@ -1687,8 +1758,8 @@ void CFogOfWarMgr::ShadowCast( int cx, int cy, int row, float start, float end,
 #endif // CLIENT_DLL
 
 	new_start = start;
-	radius_squared = radius*radius;
-	for( j = row; j < radius+1; j++ )
+	radius_squared = radius * radius;
+	for( j = row; j < radius + 1; j++ )
 	{
 		dx = -j-1; dy = -j;
 		blocked = false;
@@ -1800,7 +1871,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 	// Own tile is always lit
 	int X = pEnt->m_iFOWPosX;
 	int Y = pEnt->m_iFOWPosY;
-	int iEyeZ = (int)(pEnt->EyePosition().z + 16.0f);
+	int iEyeZ = (int)(pEnt->EyePosition().z + 8.0f);
 
 #ifdef CLIENT_DLL
 	m_FogOfWar[FOWINDEX(X, Y)] = FOWCLEAR_MASK;

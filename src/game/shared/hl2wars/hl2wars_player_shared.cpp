@@ -61,7 +61,7 @@ END_DATADESC()
 
 	ConVar wars_debug_unit_mintable("wars_debug_unit_mintable", "0", FCVAR_CHEAT);
 
-	ConVar wars_debug_fow_tileheight("wars_debug_fow_tileheight", "0", FCVAR_CHEAT);
+	ConVar wars_debug_fow_tileheight("wars_debug_fow_tileheight", "0", FCVAR_CHEAT, "Draws a green 3d cross at the fog of war tileheight. A blue line is drawn to the mouse position.");
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -350,8 +350,8 @@ void CHL2WarsPlayer::UpdateMouseData( const Vector &vMouseAim )
 	{
 		float fHeight = FogOfWarMgr()->GetHeightAtPoint( m_MouseData.m_vEndPos );
 		Vector pos( m_MouseData.m_vEndPos.x, m_MouseData.m_vEndPos.y, fHeight );
-		NDebugOverlay::Cross3D( pos, 32.0, 0, 255, 0, false, 0.2f );
-		NDebugOverlay::Line( pos, m_MouseData.m_vEndPos, 0, 0, 220, false, 0.2f );
+		NDebugOverlay::Cross3D( pos, 32.0, 0, 255, 0, true, 0.2f );
+		NDebugOverlay::Line( pos, m_MouseData.m_vEndPos, 0, 0, 220, true, 0.2f );
 		if( wars_debug_fow_tileheight.GetInt() > 1 )
 		{
 			int x, y;

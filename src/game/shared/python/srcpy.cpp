@@ -420,8 +420,8 @@ bool CSrcPython::InitInterpreter( void )
 	Run( "import srcmgr" );
 
 	// Default imports
-	Run( "from srcbase import *" );
-	Run( "from vmath import *" );
+	Import( "srcbase" );
+	Import( "vmath" );
 	
 	types = Import("types");
 	steam = Import("steam");

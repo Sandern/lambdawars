@@ -1915,6 +1915,12 @@
     <ClCompile Include="..\shared\hl2wars\unit_vehicleanimstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="hl2wars\fow_blocker.cpp">
+      <Filter>Source Files\wars</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\unit_vphysicslocomotion.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3736,6 +3742,9 @@
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\hl2wars\unit_vehicleanimstate.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\hl2wars\unit_vphysicslocomotion.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>

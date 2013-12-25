@@ -194,7 +194,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 		if ( !szBspName )
 			return;
 
-		engine->ServerCommand( CFmtStr( "%s %s reserved\n",
+		engine->ServerCommand( CFmtStr( "%s %s sdk reserved\n",
 			szMapCommand,
 			szBspName ) );
 	}

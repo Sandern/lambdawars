@@ -14,7 +14,6 @@
 #include "util_shared.h"
 #include "vprof.h"
 #include "unit_component.h"
-#include "util_shared.h"
 
 float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &pDirection );
 float Unit_ClampYaw( float yawSpeedPerSec, float current, float target, float time );
@@ -166,7 +165,6 @@ private:
 class UnitBaseLocomotion : public UnitComponent
 {
 public:
-	//friend class CUnitBase;
 #ifdef ENABLE_PYTHON
 	UnitBaseLocomotion( boost::python::object outer );
 #endif // ENABLE_PYTHON
@@ -205,7 +203,7 @@ public:
 	virtual void	UpdateBlockerNoMove();
 
 	// Main ground move functions
-	void				GroundMove();
+	virtual void		GroundMove();
 	bool				CheckStep( const UnitCheckStepArgs_t &args, UnitCheckStepResult_t *pResult );
 
 	// Tracing

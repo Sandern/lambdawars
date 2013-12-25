@@ -84,9 +84,11 @@ public: // CBaseGameSystem overrides
 	int					GetTileSize() { return m_nTileSize; }
 
 	// Heightmap
+#ifndef CLIENT_DLL
 	bool				CanCalculateHeightMap();
 	void				CalculateHeightMap();
 	void				SaveHeightMap();
+#endif // CLIENT_DLL
 	void				LoadHeightMap();
 	void				ModifyHeightAtTile( int x, int y, float fHeight );
 	void				ModifyHeightAtPoint( const Vector &vPoint, float fHeight );
@@ -254,8 +256,8 @@ inline Vector CFogOfWarMgr::ComputeWorldPosition( int x, int y )
 //-----------------------------------------------------------------------------
 inline void	CFogOfWarMgr::ComputeFOWPosition( const Vector &vPos, int &x, int &y )
 {
-	x = floor( ( (vPos.x + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize ) + 0.5f );
-	y = floor( ( (vPos.y + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize ) + 0.5f );
+	x = (int)( ( (vPos.x + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize ) );
+	y = (int)( ( (vPos.y + (FOW_WORLDSIZE / 2)) / (float)m_nTileSize ) );
 }
 
 #ifndef CLIENT_DLL

@@ -12,6 +12,8 @@
 
 #include "unit_airlocomotion.h"
 
+#include "unit_vphysicslocomotion.h"
+
 #include "unit_animstate.h"
 
 #include "unit_vehicleanimstate.h"
@@ -309,6 +311,47 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
     UnitBaseAirLocomotion_wrapper(::boost::python::object outer )
     : UnitBaseAirLocomotion( outer )
       , bp::wrapper< UnitBaseAirLocomotion >(){
+        // constructor
+    
+    }
+
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
+    }
+
+    virtual void HandleJump(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
+        bp::override func_HandleJump = this->get_override( "HandleJump" );
+        if( func_HandleJump.ptr() != Py_None )
+            try {
+                func_HandleJump(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseLocomotion::HandleJump(  );
+            }
+        else
+            this->UnitBaseLocomotion::HandleJump(  );
+    }
+    
+    void default_HandleJump(  ) {
+        UnitBaseLocomotion::HandleJump( );
+    }
+
+};
+
+struct UnitVPhysicsLocomotion_wrapper : UnitVPhysicsLocomotion, bp::wrapper< UnitVPhysicsLocomotion > {
+
+    UnitVPhysicsLocomotion_wrapper(UnitVPhysicsLocomotion const & arg )
+    : UnitVPhysicsLocomotion( arg )
+      , bp::wrapper< UnitVPhysicsLocomotion >(){
+        // copy constructor
+        
+    }
+
+    UnitVPhysicsLocomotion_wrapper(::boost::python::object outer )
+    : UnitVPhysicsLocomotion( outer )
+      , bp::wrapper< UnitVPhysicsLocomotion >(){
         // constructor
     
     }
@@ -1816,6 +1859,33 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
         .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
+    { //::UnitVPhysicsLocomotion
+        typedef bp::class_< UnitVPhysicsLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitVPhysicsLocomotion_exposer_t;
+        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
+        bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitVPhysicsLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitVPhysicsLocomotion_wrapper::CheckVelocity ) );
+        
+        }
+        { //::UnitBaseLocomotion::HandleJump
+        
+            typedef void ( ::UnitBaseLocomotion::*HandleJump_function_type )(  ) ;
+            typedef void ( UnitVPhysicsLocomotion_wrapper::*default_HandleJump_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "HandleJump"
+                , HandleJump_function_type(&::UnitBaseLocomotion::HandleJump)
+                , default_HandleJump_function_type(&UnitVPhysicsLocomotion_wrapper::default_HandleJump) );
+        
+        }
+    }
+
     { //::UnitVehicleAnimState
         typedef bp::class_< UnitVehicleAnimState_wrapper, bp::bases< UnitBaseAnimState > > UnitVehicleAnimState_exposer_t;
         UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
@@ -1972,6 +2042,8 @@ BOOST_PYTHON_MODULE(unit_helper){
 #include "unit_locomotion.h"
 
 #include "unit_airlocomotion.h"
+
+#include "unit_vphysicslocomotion.h"
 
 #include "unit_animstate.h"
 
@@ -2579,6 +2651,47 @@ struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
     
     int default_SpeakRawSentence( char const * pszSentence, float delay, float volume=1.0e+0f, ::soundlevel_t soundlevel=::SNDLVL_80dB, ::CBaseEntity * pListener=0 ) {
         return CAI_Expresser::SpeakRawSentence( pszSentence, delay, volume, soundlevel, pListener );
+    }
+
+};
+
+struct UnitVPhysicsLocomotion_wrapper : UnitVPhysicsLocomotion, bp::wrapper< UnitVPhysicsLocomotion > {
+
+    UnitVPhysicsLocomotion_wrapper(UnitVPhysicsLocomotion const & arg )
+    : UnitVPhysicsLocomotion( arg )
+      , bp::wrapper< UnitVPhysicsLocomotion >(){
+        // copy constructor
+        
+    }
+
+    UnitVPhysicsLocomotion_wrapper(::boost::python::object outer )
+    : UnitVPhysicsLocomotion( outer )
+      , bp::wrapper< UnitVPhysicsLocomotion >(){
+        // constructor
+    
+    }
+
+    void CheckVelocity(  ){
+        UnitBaseLocomotion::CheckVelocity(  );
+    }
+
+    virtual void HandleJump(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseLocomotion, HandleJump )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseLocomotion, HandleJump )
+        bp::override func_HandleJump = this->get_override( "HandleJump" );
+        if( func_HandleJump.ptr() != Py_None )
+            try {
+                func_HandleJump(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseLocomotion::HandleJump(  );
+            }
+        else
+            this->UnitBaseLocomotion::HandleJump(  );
+    }
+    
+    void default_HandleJump(  ) {
+        UnitBaseLocomotion::HandleJump( );
     }
 
 };
@@ -5319,6 +5432,33 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , SpeakRawSentence_function_type(&::CAI_Expresser::SpeakRawSentence)
                 , default_SpeakRawSentence_function_type(&UnitExpresser_wrapper::default_SpeakRawSentence)
                 , ( bp::arg("pszSentence"), bp::arg("delay"), bp::arg("volume")=1.0e+0f, bp::arg("soundlevel")=::SNDLVL_80dB, bp::arg("pListener")=bp::object() ) );
+        
+        }
+    }
+
+    { //::UnitVPhysicsLocomotion
+        typedef bp::class_< UnitVPhysicsLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitVPhysicsLocomotion_exposer_t;
+        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
+        bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        { //::UnitBaseLocomotion::CheckVelocity
+        
+            typedef void ( UnitVPhysicsLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "CheckVelocity"
+                , CheckVelocity_function_type( &UnitVPhysicsLocomotion_wrapper::CheckVelocity ) );
+        
+        }
+        { //::UnitBaseLocomotion::HandleJump
+        
+            typedef void ( ::UnitBaseLocomotion::*HandleJump_function_type )(  ) ;
+            typedef void ( UnitVPhysicsLocomotion_wrapper::*default_HandleJump_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "HandleJump"
+                , HandleJump_function_type(&::UnitBaseLocomotion::HandleJump)
+                , default_HandleJump_function_type(&UnitVPhysicsLocomotion_wrapper::default_HandleJump) );
         
         }
     }

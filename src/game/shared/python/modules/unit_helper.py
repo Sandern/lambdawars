@@ -13,6 +13,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         'unit_component.h',
         'unit_locomotion.h',
         'unit_airlocomotion.h',
+        'unit_vphysicslocomotion.h',
         'unit_animstate.h',
         'unit_vehicleanimstate.h',
         #'wars_orders.h'
@@ -62,6 +63,11 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_fDesiredHeight').rename('desiredheight')
         cls.var('m_fFlyNoiseRate').rename('flynoiserate')
         cls.var('m_fFlyNoiseZ').rename('flynoisez')
+        
+        # VPhysicsLocomotion
+        cls = mb.class_('UnitVPhysicsLocomotion')
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'  
 
     def AddAnimState(self, mb):
         # Base Animation State
