@@ -47,7 +47,7 @@ enum PyType{
 // TODO: Could use some optimization probably
 void PyFillWriteElement( pywrite &w, bp::object data )
 {
-	bp::object datatype = fntype(data);
+	bp::object datatype = fntype( data );
 
 	if( datatype == builtins.attr("int") )
 	{
@@ -168,7 +168,12 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 		{
 			PyErr_Clear();
 		}
-		PyErr_SetString(PyExc_ValueError, "PyFillWriteElement: Unsupported type in message list" );
+		
+		const char *pObjectTypeStr = bp::extract<const char *>( bp::str( datatype ) );
+		const char *pObjectStr = bp::extract<const char *>( bp::str( data ) );
+		char buf[512];
+		V_snprintf( buf, 512, "PyFillWriteElement: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+		PyErr_SetString(PyExc_ValueError, buf );
 		throw boost::python::error_already_set(); 
 	}
 }

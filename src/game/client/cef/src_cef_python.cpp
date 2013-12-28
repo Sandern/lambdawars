@@ -58,44 +58,47 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
-	bp::object type = builtins.attr("type");
-
 	for( int i = 0; i < n; i++ )
 	{
 		bp::object value = l[i];
+		bp::object valuetype = fntype( value );
 
 		if( value == boost::python::object() )
 		{
 			result->SetNull( i );
 		}
-		else if( type(value) == builtins.attr("int") )
+		else if( valuetype == builtins.attr("int") )
 		{
 			result->SetInt( i, boost::python::extract<int>(value) );
 		}
-		else if( type(value) == builtins.attr("float") )
+		else if( valuetype == builtins.attr("float") )
 		{
 			result->SetDouble( i, boost::python::extract<float>(value) );
 		}
-		else if( type(value) == builtins.attr("str") )
+		else if( valuetype == builtins.attr("str") )
 		{
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( i, pStr );
 		}
-		else if( type(value) == builtins.attr("bool") )
+		else if( valuetype == builtins.attr("bool") )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
 		}
-		else if( type(value) == builtins.attr("list") )
+		else if( valuetype == builtins.attr("list") )
 		{
 			result->SetList( i, PyToCefValueList( bp::list( value ) ) );
 		}
-		else if( type(value) == builtins.attr("dict") )
+		else if( valuetype == builtins.attr("dict") )
 		{
 			result->SetDictionary( i, PyToCefDictionaryValue( bp::dict( value ) ) );
 		}
 		else
 		{
-			PyErr_SetString( PyExc_ValueError, "PyToCefValueList: Unsupported type in message list" );
+			const char *pObjectTypeStr = bp::extract<const char *>( bp::str( valuetype ) );
+			const char *pObjectStr = bp::extract<const char *>( bp::str( value ) );
+			char buf[512];
+			V_snprintf( buf, 512, "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+			PyErr_SetString( PyExc_ValueError, buf );
 			throw boost::python::error_already_set(); 
 		}
 	}
@@ -165,8 +168,6 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 {
 	CefRefPtr<CefDictionaryValue> result = CefDictionaryValue::Create();
 
-	bp::object type = builtins.attr("type");
-
 	bp::object key, value;
 	const bp::object objectKeys = d.iterkeys();
 	unsigned long ulCount = bp::len(d); 
@@ -174,6 +175,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 	{
 		key = objectKeys.attr( "next" )();
 		value = d[key];
+		bp::object valuetype = fntype( value );
 
 		CefString cefkey = bp::extract< const char * >( key );
 
@@ -181,34 +183,38 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		{
 			result->SetNull( cefkey );
 		}
-		else if( type(value) == builtins.attr("int") )
+		else if( valuetype == builtins.attr("int") )
 		{
 			result->SetInt( cefkey, boost::python::extract<int>(value) );
 		}
-		else if( type(value) == builtins.attr("float") )
+		else if( valuetype == builtins.attr("float") )
 		{
 			result->SetDouble( cefkey, boost::python::extract<float>(value) );
 		}
-		else if( type(value) == builtins.attr("str") )
+		else if( valuetype == builtins.attr("str") )
 		{
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( cefkey, pStr );
 		}
-		else if( type(value) == builtins.attr("bool") )
+		else if( valuetype == builtins.attr("bool") )
 		{
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
 		}
-		else if( type(value) == builtins.attr("list") )
+		else if( valuetype == builtins.attr("list") )
 		{
 			result->SetList( cefkey, PyToCefValueList( bp::list( value ) ) );
 		}
-		else if( type(value) == builtins.attr("dict") )
+		else if( valuetype == builtins.attr("dict") )
 		{
 			result->SetDictionary( cefkey, PyToCefDictionaryValue( bp::dict( value ) ) );
 		}
 		else
 		{
-			PyErr_SetString(PyExc_ValueError, "PyToCefDictionaryValue: Unsupported type in message list" );
+			const char *pObjectTypeStr = bp::extract<const char *>( bp::str( valuetype ) );
+			const char *pObjectStr = bp::extract<const char *>( bp::str( value ) );
+			char buf[512];
+			V_snprintf( buf, 512, "PyToCefDictionaryValue: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+			PyErr_SetString(PyExc_ValueError, buf );
 			throw boost::python::error_already_set(); 
 		}
 	}

@@ -202,9 +202,11 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	{
 		bool bSuccess = false;
 #ifdef ENABLE_PYTHON
-		try {
+		try 
+		{
 			bSuccess = bp::extract<bool>(gamemgr.attr("_ApplyGameSettings")( PyKeyValuesToDict( pKV ) ));
-		} catch( boost::python::error_already_set & ) {
+		} 
+		catch( boost::python::error_already_set & ) {
 			Warning( "ApplyGameSettings: Error occurred while letting Python apply game settings for game mode \"%s\"\n", szMode );
 			PyErr_Print();
 		}
