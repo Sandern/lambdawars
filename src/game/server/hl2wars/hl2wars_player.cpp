@@ -237,12 +237,12 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 			return true;
 	}
 
-	if( !Q_stricmp( args[0], "player_clearselection" ) )
+	if( !V_stricmp( args[0], "player_clearselection" ) )
 	{
 		ClearSelection();
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_addunit" ) )
+	else if( !V_stricmp( args[0], "player_addunit" ) )
 	{
 		for( int i = 1; i < args.ArgC(); i++ )
 		{
@@ -262,7 +262,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		}
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_removeunit" ) )
+	else if( !V_stricmp( args[0], "player_removeunit" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -289,7 +289,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		}
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "make_group" ) )
+	else if( !V_stricmp( args[0], "make_group" ) )
 	{
 		if( args.ArgC() < 3 )
 		{
@@ -299,7 +299,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		MakeCurrentSelectionGroup(atoi(args[1]), (bool)atoi(args[2]) );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "select_group" ) )
+	else if( !V_stricmp( args[0], "select_group" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -309,7 +309,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		SelectGroup(atoi(args[1]));
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_orderunits" ) )
+	else if( !V_stricmp( args[0], "player_orderunits" ) )
 	{
 		if( args.ArgC() < 7 )
 		{
@@ -333,7 +333,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "minimap_lm" ) )
+	else if( !V_stricmp( args[0], "minimap_lm" ) )
 	{
 		if( args.ArgC() < 7 )
 		{
@@ -366,7 +366,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_lmp" ) )
+	else if( !V_stricmp( args[0], "player_lmp" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -382,7 +382,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnLeftMouseButtonPressedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_lmdp" ) )
+	else if( !V_stricmp( args[0], "player_lmdp" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -398,7 +398,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnLeftMouseButtonDoublePressedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_lmr" ) )
+	else if( !V_stricmp( args[0], "player_lmr" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -414,7 +414,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnLeftMouseButtonReleasedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_rmp" ) )
+	else if( !V_stricmp( args[0], "player_rmp" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -430,7 +430,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnRightMouseButtonPressedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_rmdp" ) )
+	else if( !V_stricmp( args[0], "player_rmdp" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -446,7 +446,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnRightMouseButtonDoublePressedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_rmr" ) )
+	else if( !V_stricmp( args[0], "player_rmr" ) )
 	{
 		if( args.ArgC() < 2 )
 		{
@@ -462,22 +462,22 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		OnRightMouseButtonReleasedInternal( mousedata );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_cm" ) )
+	else if( !V_stricmp( args[0], "player_cm" ) )
 	{
 		ClearMouse();
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_camerasettings" ) )
+	else if( !V_stricmp( args[0], "player_camerasettings" ) )
 	{
 		UpdateCameraSettings();
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "player_release_control_unit" ) )
+	else if( !V_stricmp( args[0], "player_release_control_unit" ) )
 	{
 		SetControlledUnit( NULL );
 		return true;
 	}
-	else if( !Q_stricmp( args[0], "spectate" ) )
+	else if( !V_stricmp( args[0], "spectate" ) )
 	{
 		if ( GetTeamNumber() == TEAM_SPECTATOR )
 			return true;

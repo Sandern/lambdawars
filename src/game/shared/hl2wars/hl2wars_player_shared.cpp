@@ -1207,12 +1207,15 @@ void CHL2WarsPlayer::MakeCurrentSelectionGroup( int iGroup, bool bClearGroup )
 {
 	if( iGroup < 0 || iGroup >= PLAYER_MAX_GROUPS )
 		return;
-	if( bClearGroup ) ClearGroup(iGroup);
-	for( int i=0; i<m_hSelectedUnits.Count(); i++ )
+
+	if( bClearGroup ) 
+		ClearGroup(iGroup);
+
+	for( int i = 0; i < m_hSelectedUnits.Count(); i++ )
 	{
 		if( m_hSelectedUnits.Element(i) == NULL )
 			continue;
-		m_Groups[iGroup].m_Group.AddToTail(m_hSelectedUnits[i]);
+		m_Groups[iGroup].m_Group.AddToTail( m_hSelectedUnits[i] );
 	}
 
 #ifdef ENABLE_PYTHON
@@ -1236,7 +1239,7 @@ void CHL2WarsPlayer::SelectGroup( int iGroup )
 	if( (m_nButtons & IN_SPEED) == 0 )
 		ClearSelection();
 
-	for(int i=0; i<m_Groups[iGroup].m_Group.Count(); i++)
+	for( int i = 0; i < m_Groups[iGroup].m_Group.Count(); i++ )
 	{
 		if( m_Groups[iGroup].m_Group[i] )
 			m_Groups[iGroup].m_Group[i]->GetIUnit()->Select(this, false);
@@ -1247,13 +1250,13 @@ void CHL2WarsPlayer::SelectGroup( int iGroup )
 	m_fLastSelectGroupTime = gpGlobals->curtime;
 }
 
-int	CHL2WarsPlayer::GetGroupNumber(CBaseEntity *pUnit)
+int	CHL2WarsPlayer::GetGroupNumber( CBaseEntity *pUnit )
 {
 	if( !pUnit )
 		return -1;
 
 	int iGroup, idx;
-	for(iGroup=0; iGroup<PLAYER_MAX_GROUPS; iGroup++)
+	for( iGroup = 0; iGroup < PLAYER_MAX_GROUPS; iGroup++ )
 	{
 		idx = m_Groups[iGroup].m_Group.Find(pUnit);
 		if( m_Groups[iGroup].m_Group.IsValidIndex(idx) )
@@ -1286,7 +1289,7 @@ void CHL2WarsPlayer::CleanupGroups( void )
 	for( iGroup = 0; iGroup < PLAYER_MAX_GROUPS; iGroup++ )
 	{
 		bChanged = false;
-		for( i= m_Groups[iGroup].m_Group.Count()-1; i >= 0; i-- )
+		for( i = m_Groups[iGroup].m_Group.Count() - 1; i >= 0; i-- )
 		{
 			EHANDLE m_pEntity = m_Groups[iGroup].m_Group[i];
 			if( m_pEntity != NULL && m_pEntity->IsAlive() )

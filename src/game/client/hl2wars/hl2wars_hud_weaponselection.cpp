@@ -262,12 +262,13 @@ int	CHudWeaponSelection::KeyInput( int down, ButtonCode_t keynum, const char *ps
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if ( !pPlayer )
 		return CBaseHudWeaponSelection::KeyInput( down, keynum, pszCurrentBinding );
+
 	char buf[8];
 	for( int i = 0; i < 10; i++ )
 	{
-		sprintf( buf, "slot%d", i+1 );
+		V_snprintf( buf, 8, "slot%d", i+1 );
 
-		if( m_iSlotDoublePressed == i && !down && Q_strncmp( pszCurrentBinding, buf, 6 ) == 0 )
+		if( m_iSlotDoublePressed == i && !down && V_strncmp( buf, pszCurrentBinding, 6 ) == 0 )
 		{
 			pPlayer->CamFollowEntity( NULL );
 			m_iSlotDoublePressed = -1;
@@ -279,7 +280,7 @@ int	CHudWeaponSelection::KeyInput( int down, ButtonCode_t keynum, const char *ps
 
 		if( pszCurrentBinding && gpGlobals->curtime - m_flLastKeyPressedTime < cl_numkeys_doublepresstime.GetFloat() )
 		{
-			if( Q_strncmp( pszCurrentBinding, buf, 6 ) == 0 )
+			if( V_strncmp( buf, pszCurrentBinding, 6 ) == 0 )
 			{
 				m_iSlotDoublePressed = i;
 
