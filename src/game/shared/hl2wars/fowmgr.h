@@ -15,6 +15,7 @@
 
 #include "hl2wars/hl2wars_shareddefs.h"
 #include "igamesystem.h"
+#include "fow_blocker.h"
 
 // Forward declarations
 #ifdef CLIENT_DLL
@@ -52,6 +53,7 @@ extern ConVar sv_fogofwar;
 
 class CBaseEntity;
 class CBasePlayer;
+class CFoWBlocker;
 
 //-----------------------------------------------------------------------------
 // The class responsible for updating the fog of war. Runs on both client and server.
@@ -88,13 +90,19 @@ public: // CBaseGameSystem overrides
 	bool				CanCalculateHeightMap();
 	void				CalculateHeightMap();
 	void				SaveHeightMap();
+	void				RemoveStaticBlockers();
 #endif // CLIENT_DLL
 	void				LoadHeightMap();
-	void				ModifyHeightAtTile( int x, int y, float fHeight );
-	void				ModifyHeightAtPoint( const Vector &vPoint, float fHeight );
+	void				ModifyHeightAtTile( int x, int y, float fHeight, bool updateDynamic = true );
+	void				ModifyHeightAtPoint( const Vector &vPoint, float fHeight, bool updateDynamic = true );
 	void				ModifyHeightAtExtent( const Vector &vMins, const Vector &vMaxs, float fHeight );
 	float				GetHeightAtTile( int x, int y );
 	float				GetHeightAtPoint( const Vector &vPoint );
+
+	void				UpdateHeightAtTileRangeDynamic( int xstart, int ystart, int xend, int yend );
+	void				UpdateHeightAtExtentDynamic( const Vector &vMins, const Vector &vMaxs );
+
+	void				UpdateTileHeightAgainstFoWBlocker( int x, int y );
 
 	// Gets called each frame
 #ifdef CLIENT_DLL
@@ -206,6 +214,7 @@ private:
 	int			m_nTileSize;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWar;
 	CUtlVector< int > m_TileHeights;
+	CUtlVector< int > m_TileHeightsStatic;
 	
 	FOWListInfo *m_pFogUpdaterListHead;
 	CUtlVector<CBaseEntity *> m_FogEntities;

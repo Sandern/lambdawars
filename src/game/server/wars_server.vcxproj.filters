@@ -1915,10 +1915,10 @@
     <ClCompile Include="..\shared\hl2wars\unit_vehicleanimstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\fow_blocker.cpp">
-      <Filter>Source Files\wars</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared\hl2wars\unit_vphysicslocomotion.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\fow_blocker.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2393,6 +2393,9 @@
     <ClCompile Include="..\shared\hl2wars\unit_vphysicslocomotion.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\hl2wars\fow_blocker.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -4853,6 +4856,9 @@
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\hl2wars\unit_vphysicslocomotion.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\hl2wars\fow_blocker.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>

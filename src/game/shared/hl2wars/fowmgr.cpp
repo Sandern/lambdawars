@@ -74,6 +74,8 @@ ConVar sv_fogofwar_tilesize( "sv_fogofwar_tilesize", "64", FCVAR_CHEAT | FCVAR_R
 #else
 	ConVar sv_fogofwar_updaterate( "sv_fogofwar_updaterate", "0.2", FCVAR_GAMEDLL, "Rate at which the fog of war logic updates." );
 	#define FOW_UPDATERATE sv_fogofwar_updaterate.GetFloat()
+
+	ConVar fow_fowblocker_debug("fow_fowblocker_debug", "0", FCVAR_CHEAT);
 #endif
 
 #ifdef CLIENT_DLL
@@ -206,6 +208,9 @@ void CFogOfWarMgr::Shutdown()
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::LevelInitPreEntity()
 {
+	// In case tile size changed, update allocated grid
+	AllocateFogOfWar();
+
 #ifdef CLIENT_DLL
 	CPULevel_t level = GetCPULevel();
 	if( level == CPU_LEVEL_LOW )
@@ -269,6 +274,10 @@ void CFogOfWarMgr::LevelInitPostEntity()
 		SaveHeightMap();
 #endif // CLIENT_DLL
 	}
+
+#ifndef CLIENT_DLL
+	RemoveStaticBlockers(); // Added to tile heightmap, no longer needed
+#endif // CLIENT_DLL
 
 	if( sv_fogofwar.GetBool() )
 	{
@@ -384,45 +393,45 @@ void CFogOfWarMgr::CalculateHeightMap()
 		CBaseEntity *pFoWBlocker = gEntList.FindEntityByClassname( NULL, "fow_blocker" );
 		while( pFoWBlocker )
 		{
-			// Apply bounds to heightmap
-			const Vector &origin = pFoWBlocker->GetAbsOrigin();
-			const Vector &mins = pFoWBlocker->WorldAlignMins();
-			const Vector &maxs = pFoWBlocker->WorldAlignMaxs();
-
-			int xstart, xend, ystart, yend;
-			ComputeFOWPosition( origin + mins, xstart, ystart );
-			ComputeFOWPosition( origin + maxs, xend, yend );
-
-			ICollideable *pTriggerCollideable = pFoWBlocker->GetCollideable();
-
-			for( int x = xstart; x < xend; x++ )
+			if( pFoWBlocker->GetEntityName() == NULL_STRING ) 
 			{
-				for( int y = ystart; y < yend; y++ )
+				// Apply bounds to heightmap
+				const Vector &origin = pFoWBlocker->GetAbsOrigin();
+				const Vector &mins = pFoWBlocker->WorldAlignMins();
+				const Vector &maxs = pFoWBlocker->WorldAlignMaxs();
+
+				int xstart, xend, ystart, yend;
+				ComputeFOWPosition( origin + mins, xstart, ystart );
+				ComputeFOWPosition( origin + maxs, xend, yend );
+
+				ICollideable *pTriggerCollideable = pFoWBlocker->GetCollideable();
+
+				for( int x = xstart; x < xend; x++ )
 				{
-					start = ComputeWorldPosition( x, y );
-					start.z = z - 16.0f;
-					end = start + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH;
+					for( int y = ystart; y < yend; y++ )
+					{
+						start = ComputeWorldPosition( x, y );
+						start.z = z - 16.0f;
+						end = start + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH;
 
-					ray.Init( start, end, hullMins, hullMaxs );
-					enginetrace->ClipRayToCollideable( ray, MASK_ALL, pTriggerCollideable, &tr );
+						ray.Init( start, end, hullMins, hullMaxs );
+						enginetrace->ClipRayToCollideable( ray, MASK_ALL, pTriggerCollideable, &tr );
 
-					if( tr.m_pEnt != pFoWBlocker )
-						continue;
+						if( tr.m_pEnt != pFoWBlocker )
+							continue;
 
-					// TODO: Add different modes of applying
-					// The default will be to use the maximum height, but it's also useful to rather clip the height
-					m_TileHeights[FOWINDEX(x, y)] = Max( m_TileHeights[FOWINDEX(x, y)], (int)(tr.endpos.z) );
+						// TODO: Add different modes of applying
+						// The default will be to use the maximum height, but it's also useful to rather clip the height
+						m_TileHeights[FOWINDEX(x, y)] = Max( m_TileHeights[FOWINDEX(x, y)], (int)(tr.endpos.z) );
+					}
 				}
 			}
-
-			// Remove once done
-			UTIL_Remove( pFoWBlocker );
 
 			// Find next blocker
 			pFoWBlocker = gEntList.FindEntityByClassname( pFoWBlocker, "fow_blocker" );
 		}
 
-		Msg("CFogOfWarMgr: Generated height map in %f seconds\n", Plat_FloatTime() - fStartTime);
+		DevMsg("CFogOfWarMgr: Generated height map in %f seconds\n", Plat_FloatTime() - fStartTime);
 	}
 	else
 	{
@@ -435,6 +444,9 @@ void CFogOfWarMgr::CalculateHeightMap()
 			}
 		}
 	}
+
+	// Copy map to static, used for dynamically updating the heightmap based on fow_blocker entities
+	m_TileHeightsStatic.CopyArray( m_TileHeights.Base(), m_TileHeights.Count() );
 
 	m_bHeightMapLoaded = true;
 }
@@ -449,7 +461,7 @@ void CFogOfWarMgr::SaveHeightMap()
 	Q_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
 	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
 	Q_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	Msg("Saving height map to %s\n", szNrpFilename);
+	DevMsg("Saving height map to %s\n", szNrpFilename);
 
 	CUtlBuffer buf;
 
@@ -494,6 +506,26 @@ void CFogOfWarMgr::SaveHeightMap()
 
 	filesystem->Write( buf.Base(), buf.TellPut(), fh );
 	filesystem->Close(fh);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::RemoveStaticBlockers()
+{
+	CBaseEntity *pFoWBlocker = gEntList.FindEntityByClassname( NULL, "fow_blocker" );
+	while( pFoWBlocker )
+	{
+		// Consider it dynamic if it has a name
+		if( pFoWBlocker->GetEntityName() != NULL_STRING )
+			continue;
+
+		// Remove once done
+		UTIL_Remove( pFoWBlocker );
+
+		// Find next blocker
+		pFoWBlocker = gEntList.FindEntityByClassname( pFoWBlocker, "fow_blocker" );
+	}
 }
 #endif // CLIENT_DLL
 
@@ -584,6 +616,9 @@ void CFogOfWarMgr::LoadHeightMap()
 			m_TileHeights[i] = MIN_COORD_INTEGER;
 	}
 
+	// Copy map to static, used for dynamically updating the heightmap based on fow_blocker entities
+	m_TileHeightsStatic.CopyArray( m_TileHeights.Base(), m_TileHeights.Count() );
+
 	DevMsg("CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime);
 	m_bHeightMapLoaded = true;
 }
@@ -591,21 +626,28 @@ void CFogOfWarMgr::LoadHeightMap()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::ModifyHeightAtTile( int x, int y, float fHeight )
+void CFogOfWarMgr::ModifyHeightAtTile( int x, int y, float fHeight, bool updateDynamic )
 {
 	int idx = FOWINDEX(x, y);
 	if( m_TileHeights.IsValidIndex( idx ) )
+	{
 		m_TileHeights[idx] = (int)fHeight;
+
+		if( updateDynamic )
+		{
+			UpdateHeightAtTileRangeDynamic( x, y, x, y );
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::ModifyHeightAtPoint( const Vector &vPoint, float fHeight )
+void CFogOfWarMgr::ModifyHeightAtPoint( const Vector &vPoint, float fHeight, bool updateDynamic )
 {
 	int x, y;
 	ComputeFOWPosition( vPoint, x, y );
-	ModifyHeightAtTile( x, y, fHeight );
+	ModifyHeightAtTile( x, y, fHeight, updateDynamic );
 }
 
 //-----------------------------------------------------------------------------
@@ -613,17 +655,101 @@ void CFogOfWarMgr::ModifyHeightAtPoint( const Vector &vPoint, float fHeight )
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::ModifyHeightAtExtent( const Vector &vMins, const Vector &vMaxs, float fHeight )
 {
-	int x1, y1, x2, y2;
-	ComputeFOWPosition( vMins, x1, y1 );
-	ComputeFOWPosition( vMaxs, x2, y2 );
+	int x, y;
+	int xstart, ystart, xend, yend;
+	ComputeFOWPosition( vMins, xstart, ystart );
+	ComputeFOWPosition( vMaxs, xend, yend );
 
-	for( int i = x1; i < x2+1; i++ )
+	for( x = xstart; x <= xend; x++ )
 	{
-		for( int j = y1; j < y2+1; j++ )
+		for( y = ystart; y <= yend; y++ )
 		{
-			ModifyHeightAtTile( i, j, fHeight );
+			ModifyHeightAtTile( x, y, fHeight );
 		}
 	}
+
+	UpdateHeightAtTileRangeDynamic( xstart, ystart, xend, yend );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::UpdateHeightAtTileRangeDynamic( int xstart, int ystart, int xend, int yend )
+{
+	int x, y;
+
+	float z = -MAX_COORD_FLOAT;
+	for( CBaseFuncMapBoundary *pEnt = GetMapBoundaryList(); pEnt != NULL; pEnt = pEnt->m_pNext )
+	{
+		Vector mins, maxs;
+		pEnt->GetMapBoundary( mins, maxs );
+
+		z = Max(z, maxs.z);
+	}
+
+	Vector start, end;
+	Ray_t ray;
+	Vector hullMins( -2.0f, -2.0f, 0.0f );
+	Vector hullMaxs( 2.0f, 2.0f, 1.0f );
+	trace_t tr;
+
+	for( x = xstart; x <= xend; x++ )
+	{
+		for( y = ystart; y <= yend; y++ )
+		{
+			start = ComputeWorldPosition( x, y );
+			start.z = z - 16.0f;
+			end = start + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH;
+
+			ray.Init( start, end, hullMins, hullMaxs );
+
+			// Reset tileheight to static
+			m_TileHeights[FOWINDEX(x, y)] = m_TileHeightsStatic[FOWINDEX(x, y)];
+
+			// Redetermine dynamic height
+			for( CFoWBlocker *pFoWBlocker = GetFoWBlockerList(); pFoWBlocker != NULL; pFoWBlocker = pFoWBlocker->m_pNext )
+			{
+				// During deletion, this is called one more time to cleanup/restore the tile height.
+				if( pFoWBlocker->IsDisabled() )
+					continue;
+
+				ICollideable *pTriggerCollideable = pFoWBlocker->GetCollideable();
+				enginetrace->ClipRayToCollideable( ray, MASK_ALL, pTriggerCollideable, &tr );
+
+#ifndef CLIENT_DLL
+				if( fow_fowblocker_debug.GetBool() )
+					NDebugOverlay::Line( start, tr.endpos, 0, 255, 0, false, 10.0f );
+#endif // CLIENT_DLL
+				if( tr.m_pEnt != pFoWBlocker )
+					continue;
+
+				// TODO: Add different modes of applying
+				// The default will be to use the maximum height, but it's also useful to rather clip the height
+				m_TileHeights[FOWINDEX(x, y)] = Max( m_TileHeights[FOWINDEX(x, y)], (int)(tr.endpos.z) );
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::UpdateHeightAtExtentDynamic( const Vector &vMins, const Vector &vMaxs )
+{
+	int xstart, ystart, xend, yend;
+	ComputeFOWPosition( vMins, xstart, ystart );
+	ComputeFOWPosition( vMaxs, xend, yend );
+	UpdateHeightAtTileRangeDynamic( xstart, ystart, xend, yend );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::UpdateTileHeightAgainstFoWBlocker( int x, int y )
+{
+
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1459,11 +1585,13 @@ void CFogOfWarMgr::UpdateShared()
 {
 	VPROF_BUDGET( "CFogOfWarMgr::UpdateShared", VPROF_BUDGETGROUP_FOGOFWAR );
 
+#if 0 // Don't allow this mid game. Just load a new map!
 	if( sv_fogofwar_tilesize.GetInt() != m_nTileSize )
 	{
 		if( m_nTileSize != -1 ) Msg("Fog of war size changed, reallocating arrays...\n");
 		AllocateFogOfWar();
 	}
+#endif // 0
 
 	if( engine->IsPaused() )
 		return;
