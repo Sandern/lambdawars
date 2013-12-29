@@ -336,10 +336,27 @@ bool CSrcPython::InitInterpreter( void )
 
 	//DevMsg( "PYTHONHOME: %s\nPYTHONPATH: %s\n", pythonhome, pythonpath );
     
-	// Initialize an interpreter
 #ifdef OSX
 	Py_NoSiteFlag = 1;
 #endif // OSX
+
+	// Enable optimizations when not running in developer mode
+	// This removes asserts and statements with "if __debug__"
+#ifndef _DEBUG
+	if( !developer.GetBool() )
+		Py_OptimizeFlag = 1;
+#endif // _DEBUG
+
+	// Python 3 warnings
+	const bool bPy3kWarnings = CommandLine() && CommandLine()->FindParm("-py3kwarnings") != 0;
+	if( bPy3kWarnings )
+	{
+		Py_Py3kWarningFlag = 1;
+		Py_BytesWarningFlag = 1;
+		//Py_HashRandomizationFlag = 1;
+	}
+
+	// Initialize an interpreter
 	Py_InitializeEx( 0 );
 #ifdef CLIENT_DLL
 	ConColorMsg( g_PythonColor, "CLIENT: " );
