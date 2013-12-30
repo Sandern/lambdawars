@@ -28,12 +28,10 @@ UnitBaseAirNavigator::UnitBaseAirNavigator( boost::python::object outer )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void UnitBaseAirNavigator::Update( UnitBaseMoveCommand &MoveCommand )
+void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 {
-	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0, 0, MAX_TRACE_LENGTH), MASK_NPCSOLID_BRUSHONLY, 
-		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
-	m_fCurrentHeight = GetAbsOrigin().z - tr.endpos.z;
+	// Get reported height from locomotion
+	m_fCurrentHeight = MoveCommand.height;
 
 	BaseClass::Update( MoveCommand );
 
@@ -41,13 +39,14 @@ void UnitBaseAirNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	MoveCommand.upmove = 0.0f;
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->GetCurWaypoint() )
 	{
-		if( GetPath()->GetCurWaypoint()->GetPos().z + 32.0f > GetAbsOrigin().z )
+		float fTargetZ = GetPath()->GetCurWaypoint()->GetPos().z + 32.0f + (-GetOuter()->CollisionProp()->OBBMins().z);
+		if( fTargetZ > GetAbsOrigin().z )
 		{
 			// Calculate needed up movement
-			/*MoveCommand.upmove = Min(
-				GetPath()->GetCurWaypoint()->GetPos().z - GetAbsOrigin().z,
+			MoveCommand.upmove = Max( 0.0f, Min(
+				fTargetZ - GetAbsOrigin().z,
 				MoveCommand.maxspeed
-			);*/
+			) );
 
 			// Zero out other movement (so we don't bump into a cliff or wall)
 			if( m_LastGoalStatus == CHS_CLIMBDEST )

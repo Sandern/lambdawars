@@ -9,6 +9,10 @@
 #include "movevars_shared.h"
 #include "coordsize.h"
 
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -19,11 +23,18 @@
 UnitBaseAirLocomotion::UnitBaseAirLocomotion( boost::python::object outer )
 	:UnitBaseLocomotion(outer)
 {
+	m_fCurrentHeight = 0;
 	m_fDesiredHeight = 490.0f;
+	m_fMaxHeight = 0;
 	m_fFlyNoiseZ = 0.0f;
 	m_fFlyNoiseRate = 0.0f;
 	m_fFlyCurNoise = 0.0f;
 	m_bFlyNoiseUp = true;
+}
+
+boost::python::object UnitBaseAirLocomotion::CreateMoveCommand()
+{
+	return unit_helper.attr("UnitAirMoveCommand")();
 }
 #endif // ENABLE_PYTHON
 
@@ -48,21 +59,56 @@ void UnitBaseAirLocomotion::Move( float interval, UnitBaseMoveCommand &move_comm
 	CheckVelocity();
 }
 
+void UnitBaseAirLocomotion::FinishMove( UnitBaseMoveCommand &mv )
+{
+	// Hack: clamp z to max height (Strider)
+	if( m_fMaxHeight > 0 && m_fCurrentHeight >= m_fMaxHeight )
+	{
+		mv.origin.z -= (m_fCurrentHeight - m_fMaxHeight);
+	}
+
+	UnitBaseLocomotion::FinishMove( mv );
+
+	UnitAirMoveCommand *pAirMoveCommand = dynamic_cast<UnitAirMoveCommand *>( &mv );
+	if( pAirMoveCommand )
+	{
+		pAirMoveCommand->height = m_fCurrentHeight;
+	}
+	else
+	{
+		static bool s_bDidWarn = false;
+		if( !s_bDidWarn )
+		{
+			Warning("UnitBaseAirLocomotion: Air Move command not used with air locomotion.\n");
+			s_bDidWarn = true;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Default to a simple single trace, but allow overriding.
+// This is used for the strider, so it can determine the height based on the legs.
+//-----------------------------------------------------------------------------
+void UnitBaseAirLocomotion::UpdateCurrentHeight()
+{
+	trace_t pm;
+	UTIL_TraceHull( mv->origin, mv->origin-Vector(0, 0, MAX_TRACE_LENGTH), WorldAlignMins(), WorldAlignMaxs(),
+		MASK_NPCWORLDSTATIC, m_pOuter, GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &pm );
+	m_fCurrentHeight = fabs( pm.endpos.z-mv->origin.z );
+}
+
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 void UnitBaseAirLocomotion::FullAirMove()
 {
 	CategorizePosition();
+	UpdateCurrentHeight();
 
 	if( mv->upmove == 0.0f )
 	{
 		// Get Ground distance and compare to desired height. Modify up/down velocity based on it.
-		trace_t pm;
-		UTIL_TraceHull( mv->origin, mv->origin-Vector(0, 0, MAX_TRACE_LENGTH), WorldAlignMins(), WorldAlignMaxs(),
-			MASK_NPCWORLDSTATIC, m_pOuter, GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &pm );
-		float fGroundDist = fabs(pm.endpos.z-mv->origin.z);
-		float fDiff = m_fDesiredHeight - fGroundDist;
+		float fDiff = m_fDesiredHeight - m_fCurrentHeight;
 		if( fDiff < 0.0f )
 			mv->velocity.z = Max(fDiff, -mv->maxspeed); 
 		else
@@ -127,7 +173,7 @@ void UnitBaseAirLocomotion::AirAccelerate( Vector& wishdir, float wishspeed, flo
 		accelspeed = addspeed;
 
 	// Adjust pmove vel.
-	for (i=0 ; i<3 ; i++)
+	for ( i = 0 ; i < 3 ; i++)
 	{
 		mv->velocity[i] += accelspeed * wishdir[i];
 		mv->outwishvel[i] += accelspeed * wishdir[i];

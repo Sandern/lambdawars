@@ -12,7 +12,7 @@
 #endif
 
 #include "unit_navigator.h"
-
+#include "unit_airlocomotion.h"
 
 class UnitBaseAirNavigator : public UnitBaseNavigator
 {
@@ -23,7 +23,7 @@ public:
 	UnitBaseAirNavigator( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
-	virtual void		Update( UnitBaseMoveCommand &mv );
+	virtual void		Update( UnitAirMoveCommand &mv );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
 
 	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );

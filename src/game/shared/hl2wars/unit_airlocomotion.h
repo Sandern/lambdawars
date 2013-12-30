@@ -13,17 +13,27 @@
 
 #include "unit_locomotion.h"
 
+class UnitAirMoveCommand : public UnitBaseMoveCommand
+{
+public:
+	float height;
+};
 
 class UnitBaseAirLocomotion : public UnitBaseLocomotion
 {
 public:
 #ifdef ENABLE_PYTHON
 	UnitBaseAirLocomotion( boost::python::object outer );
+
+	virtual boost::python::object	CreateMoveCommand();
 #endif // ENABLE_PYTHON
 
 	virtual void	Move( float interval, UnitBaseMoveCommand &mv );
 
+	virtual void	FinishMove( UnitBaseMoveCommand &mv );
+
 	virtual void	FullAirMove();
+	virtual void	UpdateCurrentHeight();
 
 	// Acceleration
 	virtual void	AirAccelerate( Vector& wishdir, float wishspeed, float accel );
@@ -32,7 +42,9 @@ public:
 	void	Friction( void );
 
 public:
+	float m_fCurrentHeight;
 	float m_fDesiredHeight;
+	float m_fMaxHeight;
 	float m_fFlyNoiseZ;
 	float m_fFlyNoiseRate;
 

@@ -315,6 +315,25 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
     
     }
 
+    virtual void UpdateCurrentHeight(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAirLocomotion, UpdateCurrentHeight )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAirLocomotion, UpdateCurrentHeight )
+        bp::override func_UpdateCurrentHeight = this->get_override( "UpdateCurrentHeight" );
+        if( func_UpdateCurrentHeight.ptr() != Py_None )
+            try {
+                func_UpdateCurrentHeight(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAirLocomotion::UpdateCurrentHeight(  );
+            }
+        else
+            this->UnitBaseAirLocomotion::UpdateCurrentHeight(  );
+    }
+    
+    void default_UpdateCurrentHeight(  ) {
+        UnitBaseAirLocomotion::UpdateCurrentHeight( );
+    }
+
     void CheckVelocity(  ){
         UnitBaseLocomotion::CheckVelocity(  );
     }
@@ -517,6 +536,39 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
     }
+
+    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "Clear"
+            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
+        .def( 
+            "HasBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
+            , ( bp::arg("blocker") ) )    
+        .def( 
+            "HasBlockerWithOwnerEntity"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
+            , ( bp::arg("blocker") ) )    
+        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
+        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
+        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
+        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
+        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
+        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
+        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
+        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
+        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
+        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
+        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
+        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
+        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
+        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
+        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
+        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
+
+    bp::class_< UnitAirMoveCommand, bp::bases< UnitBaseMoveCommand >, boost::noncopyable >( "UnitAirMoveCommand" )    
+        .def_readwrite( "height", &UnitAirMoveCommand::height );
 
     { //::UnitAnimConfig
         typedef bp::class_< UnitAnimConfig > UnitAnimConfig_exposer_t;
@@ -1550,6 +1602,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("in"), bp::arg("normal"), bp::arg("out"), bp::arg("overbounce") ) );
         
         }
+        { //::UnitBaseLocomotion::CreateMoveCommand
+        
+            typedef ::boost::python::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "CreateMoveCommand"
+                , CreateMoveCommand_function_type( &::UnitBaseLocomotion::CreateMoveCommand ) );
+        
+        }
         { //::UnitBaseLocomotion::FinishGravity
         
             typedef void ( ::UnitBaseLocomotion::*FinishGravity_function_type )(  ) ;
@@ -1776,6 +1837,25 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("wishdir"), bp::arg("wishspeed"), bp::arg("accel") ) );
         
         }
+        { //::UnitBaseAirLocomotion::CreateMoveCommand
+        
+            typedef ::boost::python::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "CreateMoveCommand"
+                , CreateMoveCommand_function_type( &::UnitBaseAirLocomotion::CreateMoveCommand ) );
+        
+        }
+        { //::UnitBaseAirLocomotion::FinishMove
+        
+            typedef void ( ::UnitBaseAirLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "FinishMove"
+                , FinishMove_function_type( &::UnitBaseAirLocomotion::FinishMove )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //::UnitBaseAirLocomotion::Friction
         
             typedef void ( ::UnitBaseAirLocomotion::*Friction_function_type )(  ) ;
@@ -1804,9 +1884,22 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("interval"), bp::arg("mv") ) );
         
         }
+        { //::UnitBaseAirLocomotion::UpdateCurrentHeight
+        
+            typedef void ( ::UnitBaseAirLocomotion::*UpdateCurrentHeight_function_type )(  ) ;
+            typedef void ( UnitBaseAirLocomotion_wrapper::*default_UpdateCurrentHeight_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "UpdateCurrentHeight"
+                , UpdateCurrentHeight_function_type(&::UnitBaseAirLocomotion::UpdateCurrentHeight)
+                , default_UpdateCurrentHeight_function_type(&UnitBaseAirLocomotion_wrapper::default_UpdateCurrentHeight) );
+        
+        }
+        UnitBaseAirLocomotion_exposer.def_readwrite( "currentheight", &UnitBaseAirLocomotion::m_fCurrentHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "desiredheight", &UnitBaseAirLocomotion::m_fDesiredHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoiserate", &UnitBaseAirLocomotion::m_fFlyNoiseRate );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoisez", &UnitBaseAirLocomotion::m_fFlyNoiseZ );
+        UnitBaseAirLocomotion_exposer.def_readwrite( "maxheight", &UnitBaseAirLocomotion::m_fMaxHeight );
         { //::UnitBaseLocomotion::CheckVelocity
         
             typedef void ( UnitBaseAirLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
@@ -1829,41 +1922,48 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
-    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
-        .def( bp::init< >() )    
-        .def( 
-            "Clear"
-            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
-        .def( 
-            "HasBlocker"
-            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
-            , ( bp::arg("blocker") ) )    
-        .def( 
-            "HasBlockerWithOwnerEntity"
-            , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
-            , ( bp::arg("blocker") ) )    
-        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
-        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
-        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
-        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
-        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
-        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
-        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
-        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
-        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
-        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
-        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
-        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
-        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
-        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
-        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
-        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
-
     { //::UnitVPhysicsLocomotion
         typedef bp::class_< UnitVPhysicsLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitVPhysicsLocomotion_exposer_t;
         UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
         bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        { //::UnitVPhysicsLocomotion::FinishMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "FinishMove"
+                , FinishMove_function_type( &::UnitVPhysicsLocomotion::FinishMove )
+                , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::FullWalkMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*FullWalkMove_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "FullWalkMove"
+                , FullWalkMove_function_type( &::UnitVPhysicsLocomotion::FullWalkMove ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::VPhysicsMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*VPhysicsMove_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "VPhysicsMove"
+                , VPhysicsMove_function_type( &::UnitVPhysicsLocomotion::VPhysicsMove ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::VPhysicsMoveStep
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*VPhysicsMoveStep_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "VPhysicsMoveStep"
+                , VPhysicsMoveStep_function_type( &::UnitVPhysicsLocomotion::VPhysicsMoveStep ) );
+        
+        }
         { //::UnitBaseLocomotion::CheckVelocity
         
             typedef void ( UnitVPhysicsLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
@@ -2529,6 +2629,25 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
       , bp::wrapper< UnitBaseAirLocomotion >(){
         // constructor
     
+    }
+
+    virtual void UpdateCurrentHeight(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAirLocomotion, UpdateCurrentHeight )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAirLocomotion, UpdateCurrentHeight )
+        bp::override func_UpdateCurrentHeight = this->get_override( "UpdateCurrentHeight" );
+        if( func_UpdateCurrentHeight.ptr() != Py_None )
+            try {
+                func_UpdateCurrentHeight(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAirLocomotion::UpdateCurrentHeight(  );
+            }
+        else
+            this->UnitBaseAirLocomotion::UpdateCurrentHeight(  );
+    }
+    
+    void default_UpdateCurrentHeight(  ) {
+        UnitBaseAirLocomotion::UpdateCurrentHeight( );
     }
 
     void CheckVelocity(  ){
@@ -3366,6 +3485,39 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
     }
+
+    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "Clear"
+            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
+        .def( 
+            "HasBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
+            , ( bp::arg("blocker") ) )    
+        .def( 
+            "HasBlockerWithOwnerEntity"
+            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
+            , ( bp::arg("blocker") ) )    
+        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
+        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
+        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
+        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
+        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
+        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
+        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
+        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
+        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
+        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
+        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
+        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
+        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
+        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
+        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
+        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
+
+    bp::class_< UnitAirMoveCommand, bp::bases< UnitBaseMoveCommand >, boost::noncopyable >( "UnitAirMoveCommand" )    
+        .def_readwrite( "height", &UnitAirMoveCommand::height );
 
     { //::UnitAnimConfig
         typedef bp::class_< UnitAnimConfig > UnitAnimConfig_exposer_t;
@@ -4399,6 +4551,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("in"), bp::arg("normal"), bp::arg("out"), bp::arg("overbounce") ) );
         
         }
+        { //::UnitBaseLocomotion::CreateMoveCommand
+        
+            typedef ::boost::python::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "CreateMoveCommand"
+                , CreateMoveCommand_function_type( &::UnitBaseLocomotion::CreateMoveCommand ) );
+        
+        }
         { //::UnitBaseLocomotion::FinishGravity
         
             typedef void ( ::UnitBaseLocomotion::*FinishGravity_function_type )(  ) ;
@@ -4625,6 +4786,25 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("wishdir"), bp::arg("wishspeed"), bp::arg("accel") ) );
         
         }
+        { //::UnitBaseAirLocomotion::CreateMoveCommand
+        
+            typedef ::boost::python::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "CreateMoveCommand"
+                , CreateMoveCommand_function_type( &::UnitBaseAirLocomotion::CreateMoveCommand ) );
+        
+        }
+        { //::UnitBaseAirLocomotion::FinishMove
+        
+            typedef void ( ::UnitBaseAirLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "FinishMove"
+                , FinishMove_function_type( &::UnitBaseAirLocomotion::FinishMove )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //::UnitBaseAirLocomotion::Friction
         
             typedef void ( ::UnitBaseAirLocomotion::*Friction_function_type )(  ) ;
@@ -4653,9 +4833,22 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("interval"), bp::arg("mv") ) );
         
         }
+        { //::UnitBaseAirLocomotion::UpdateCurrentHeight
+        
+            typedef void ( ::UnitBaseAirLocomotion::*UpdateCurrentHeight_function_type )(  ) ;
+            typedef void ( UnitBaseAirLocomotion_wrapper::*default_UpdateCurrentHeight_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "UpdateCurrentHeight"
+                , UpdateCurrentHeight_function_type(&::UnitBaseAirLocomotion::UpdateCurrentHeight)
+                , default_UpdateCurrentHeight_function_type(&UnitBaseAirLocomotion_wrapper::default_UpdateCurrentHeight) );
+        
+        }
+        UnitBaseAirLocomotion_exposer.def_readwrite( "currentheight", &UnitBaseAirLocomotion::m_fCurrentHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "desiredheight", &UnitBaseAirLocomotion::m_fDesiredHeight );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoiserate", &UnitBaseAirLocomotion::m_fFlyNoiseRate );
         UnitBaseAirLocomotion_exposer.def_readwrite( "flynoisez", &UnitBaseAirLocomotion::m_fFlyNoiseZ );
+        UnitBaseAirLocomotion_exposer.def_readwrite( "maxheight", &UnitBaseAirLocomotion::m_fMaxHeight );
         { //::UnitBaseLocomotion::CheckVelocity
         
             typedef void ( UnitBaseAirLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;
@@ -5027,6 +5220,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("vStartPos"), bp::arg("vEndPos") ) );
         
         }
+        { //::UnitBaseAirNavigator::Update
+        
+            typedef void ( ::UnitBaseAirNavigator::*Update_function_type )( ::UnitAirMoveCommand & ) ;
+            
+            UnitBaseAirNavigator_exposer.def( 
+                "Update"
+                , Update_function_type( &::UnitBaseAirNavigator::Update )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //property "testroutemask"[fget=::UnitBaseAirNavigator::GetTestRouteMask, fset=::UnitBaseAirNavigator::SetTestRouteMask]
         
             typedef int ( ::UnitBaseAirNavigator::*fget )(  ) ;
@@ -5061,36 +5264,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
     }
-
-    bp::class_< UnitBaseMoveCommand, boost::noncopyable >( "UnitBaseMoveCommand", bp::no_init )    
-        .def( bp::init< >() )    
-        .def( 
-            "Clear"
-            , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
-        .def( 
-            "HasBlocker"
-            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
-            , ( bp::arg("blocker") ) )    
-        .def( 
-            "HasBlockerWithOwnerEntity"
-            , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlockerWithOwnerEntity )
-            , ( bp::arg("blocker") ) )    
-        .def_readwrite( "forwardmove", &UnitBaseMoveCommand::forwardmove )    
-        .def_readwrite( "idealviewangles", &UnitBaseMoveCommand::idealviewangles )    
-        .def_readwrite( "interval", &UnitBaseMoveCommand::interval )    
-        .def_readwrite( "jump", &UnitBaseMoveCommand::jump )    
-        .def_readwrite( "maxspeed", &UnitBaseMoveCommand::maxspeed )    
-        .def_readwrite( "origin", &UnitBaseMoveCommand::origin )    
-        .def_readwrite( "outstepheight", &UnitBaseMoveCommand::outstepheight )    
-        .def_readwrite( "outwishvel", &UnitBaseMoveCommand::outwishvel )    
-        .def_readwrite( "blockers", &UnitBaseMoveCommand::pyblockers )    
-        .def_readwrite( "sidemove", &UnitBaseMoveCommand::sidemove )    
-        .def_readwrite( "stopdistance", &UnitBaseMoveCommand::stopdistance )    
-        .def_readwrite( "totaldistance", &UnitBaseMoveCommand::totaldistance )    
-        .def_readwrite( "upmove", &UnitBaseMoveCommand::upmove )    
-        .def_readwrite( "velocity", &UnitBaseMoveCommand::velocity )    
-        .def_readwrite( "viewangles", &UnitBaseMoveCommand::viewangles )    
-        .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
     { //::UnitBaseSense
         typedef bp::class_< UnitBaseSense, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseSense_exposer_t;
@@ -5441,6 +5614,43 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
         bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        { //::UnitVPhysicsLocomotion::FinishMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "FinishMove"
+                , FinishMove_function_type( &::UnitVPhysicsLocomotion::FinishMove )
+                , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::FullWalkMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*FullWalkMove_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "FullWalkMove"
+                , FullWalkMove_function_type( &::UnitVPhysicsLocomotion::FullWalkMove ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::VPhysicsMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*VPhysicsMove_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "VPhysicsMove"
+                , VPhysicsMove_function_type( &::UnitVPhysicsLocomotion::VPhysicsMove ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::VPhysicsMoveStep
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*VPhysicsMoveStep_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "VPhysicsMoveStep"
+                , VPhysicsMoveStep_function_type( &::UnitVPhysicsLocomotion::VPhysicsMoveStep ) );
+        
+        }
         { //::UnitBaseLocomotion::CheckVelocity
         
             typedef void ( UnitVPhysicsLocomotion_wrapper::*CheckVelocity_function_type )(  ) ;

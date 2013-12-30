@@ -16,6 +16,10 @@
 
 #include "vphysics/object_hash.h"
 
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -104,6 +108,11 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 
 	m_pTraceListData = NULL;
 }
+
+boost::python::object UnitBaseLocomotion::CreateMoveCommand()
+{
+	return unit_helper.attr("UnitBaseMoveCommand")();
+}
 #endif // ENABLE_PYTHON
 
 #define TICK_INTERVAL			(gpGlobals->interval_per_tick)
@@ -157,6 +166,8 @@ void UnitBaseLocomotion::PerformMovementFacingOnly( UnitBaseMoveCommand &move_co
 //-----------------------------------------------------------------------------
 void UnitBaseLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 {
+	mv.blockers.RemoveAll();
+
 #ifdef CLIENT_DLL
 	mv.velocity = m_pOuter->GetAbsVelocity();
 	mv.origin = m_pOuter->GetNetworkOrigin();
@@ -283,7 +294,7 @@ void UnitBaseLocomotion::AirAccelerate( Vector& wishdir, float wishspeed, float 
 		accelspeed = addspeed;
 
 	// Adjust pmove vel.
-	for (i=0 ; i<3 ; i++)
+	for ( i = 0 ; i < 3 ; i++)
 	{
 		mv->velocity[i] += accelspeed * wishdir[i];
 		mv->outwishvel[i] += accelspeed * wishdir[i];
@@ -471,8 +482,6 @@ void UnitBaseLocomotion::WalkMove( void )
 //-----------------------------------------------------------------------------
 void UnitBaseLocomotion::UpdateBlockerNoMove()
 {
-	ClearBlockers();
-
 	float fBloat = 32.0f;
 	CBaseEntity *pList[MAX_FIND_BLOCKERS];
 	Ray_t ray;
@@ -690,9 +699,6 @@ void UnitBaseLocomotion::GroundMove()
 	Vector stepEnd;
 	float fIntervalStepSize;
 	int i;
-
-	// Clear current blocker
-	ClearBlockers();
 
 	// Calculate the max stepsize for this interval
 	// Assume we can move up/down stepsize per 48.0

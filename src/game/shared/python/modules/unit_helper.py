@@ -46,21 +46,28 @@ class UnitHelper(SemiSharedModuleGenerator):
         mb.free_function('Unit_ClampYaw').include()
     
         cls = mb.class_('UnitBaseMoveCommand')
-        cls.include() 
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual'
         cls.var('blockers').exclude()
         cls.var('pyblockers').rename('blockers')
        
         cls = mb.class_('UnitBaseLocomotion')
         cls.include()
-        cls.calldefs().virtuality = 'not virtual'  
+        cls.calldefs().virtuality = 'not virtual'
         
         cls.mem_fun('HandleJump').virtuality = 'virtual'
+        
+        cls = mb.class_('UnitAirMoveCommand')
+        cls.include() 
         
         # Air locomotion class
         cls = mb.class_('UnitBaseAirLocomotion')
         cls.include()
         cls.calldefs().virtuality = 'not virtual'  
+        cls.mem_fun('UpdateCurrentHeight').virtuality = 'virtual'
+        cls.var('m_fCurrentHeight').rename('currentheight')
         cls.var('m_fDesiredHeight').rename('desiredheight')
+        cls.var('m_fMaxHeight').rename('maxheight')
         cls.var('m_fFlyNoiseRate').rename('flynoiserate')
         cls.var('m_fFlyNoiseZ').rename('flynoisez')
         
@@ -245,7 +252,8 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs().exclude()
-        cls.mem_funs('TestRoute').include()
+        cls.mem_fun('Update').include()
+        cls.mem_fun('TestRoute').include()
         cls.add_property( 'testroutemask'
                          , cls.mem_fun('GetTestRouteMask')
                          , cls.mem_fun('SetTestRouteMask') )

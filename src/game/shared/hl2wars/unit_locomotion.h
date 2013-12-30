@@ -46,7 +46,7 @@ public:
 		Clear();
 	}
 
-	void Clear()
+	virtual void Clear()
 	{
 		forwardmove = 0.0f;
 		sidemove = 0.0f;
@@ -167,6 +167,8 @@ class UnitBaseLocomotion : public UnitComponent
 public:
 #ifdef ENABLE_PYTHON
 	UnitBaseLocomotion( boost::python::object outer );
+
+	virtual boost::python::object CreateMoveCommand();
 #endif // ENABLE_PYTHON
 
 	// Main function
