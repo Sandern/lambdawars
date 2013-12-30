@@ -112,12 +112,10 @@ cscript //nologo ..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="client_app.h" />
     <ClInclude Include="render_browser.h" />
     <ClInclude Include="render_browser_helpers.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -127,6 +125,9 @@ cscript //nologo ..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).
     <ClCompile Include="render_browser.cpp" />
     <ClCompile Include="render_browser_helpers.cpp" />
     <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wars_browser_helper.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
