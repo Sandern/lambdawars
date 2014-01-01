@@ -1035,12 +1035,12 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     { //::RegisterTickMethod
     
-        typedef void ( *RegisterTickMethod_function_type )( ::boost::python::object,float,bool );
+        typedef void ( *RegisterTickMethod_function_type )( ::boost::python::object,float,bool,bool );
         
         bp::def( 
             "RegisterTickMethod"
             , RegisterTickMethod_function_type( &::RegisterTickMethod )
-            , ( bp::arg("method"), bp::arg("ticksignal"), bp::arg("looped")=(bool)(true) ) );
+            , ( bp::arg("method"), bp::arg("ticksignal"), bp::arg("looped")=(bool)(true), bp::arg("userealtime")=(bool)(false) ) );
     
     }
 

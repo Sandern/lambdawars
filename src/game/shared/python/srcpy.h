@@ -369,10 +369,12 @@ public:
 	void CleanupDeleteList();
 	
 	// Tick and PerFrame registered methods
-	void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped=true );
+	void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped=true, bool userealtime=false );
 	void UnregisterTickMethod( boost::python::object method );
 	boost::python::list GetRegisteredTickMethods();
 	bool IsTickMethodRegistered( boost::python::object method );
+
+	void UpdateRealtimeTickMethods();
 
 	void RegisterPerFrameMethod( boost::python::object method );
 	void UnregisterPerFrameMethod( boost::python::object method );
@@ -416,6 +418,7 @@ private:
 		float m_fTickSignal;
 		float m_fNextTickTime;
 		bool m_bLooped;
+		bool m_bUseRealTime;
 		boost::python::object method;
 	} py_tick_methods;
 	CUtlVector< py_tick_methods > m_methodTickList;

@@ -130,29 +130,22 @@ public:
 	virtual void Precache( void );
 
 	// Functions to verify the single/multiplayer status of a game
-	//virtual bool IsDeathmatch( void ) { return BaseClass::IsDeathmatch(); } //is this a deathmatch game?
-	//virtual bool IsCoOp( void ) { return BaseClass::IsCoOp(); } // is this a coop game?
 	virtual const char *GetGameDescription( void ) { return "Lambda Wars"; } 
+
+	virtual void			OnServerHibernating() {}
 
 	// Client connection/disconnection
 	virtual bool ClientConnected( edict_t *pEntity, const char *name, const char *address, char *reject, int maxrejectlen ); // a client just connected to the server (player hasn't spawned yet)
 	virtual bool PyClientConnected( int clientindex, const char *name, const char *address, char *reject, int maxrejectlen ) { return true; }
-	//virtual void InitHUD( CBasePlayer *pl ) { BaseClass::InitHUD(pl); }		// the client dll is ready for updating
 	virtual void ClientDisconnected( edict_t *client ); // a client just disconnected from the server
 	virtual void PyClientDisconnected( CBasePlayer *client ) {}
 	virtual void ClientActive( CBasePlayer *client ) {}
 
 	// Client spawn/respawn control
 	virtual void PlayerSpawn( CBasePlayer *player );     // called by CBasePlayer::Spawn just before releasing player into the game
-	//virtual void PlayerThink( CBasePlayer *player ) { BaseClass::PlayerThink(player); } // called by CBasePlayer::PreThink every frame, before physics are run and after keys are accepted
-	//virtual bool FPlayerCanRespawn( CBasePlayer *player ) { return BaseClass::FPlayerCanRespawn(player); }// is this player allowed to respawn now?
-	//virtual float FlPlayerSpawnTime( CBasePlayer *player ) { return BaseClass::FlPlayerSpawnTime(player); } // When in the future will this player be able to spawn?
-	//virtual CBaseEntity *GetPlayerSpawnSpot( CBasePlayer *player ) { return BaseClass::GetPlayerSpawnSpot(player); }  // Place this player on their spawnspot and face them the proper direction.
-	//virtual bool IsSpawnPointValid( CBaseEntity *spot, CBasePlayer *player ) { return BaseClass::IsSpawnPointValid(spot, player); }
 
 	//virtual bool AllowAutoTargetCrosshair( void ) { return BaseClass::AllowAutoTargetCrosshair(); }
 	virtual bool ClientCommand( CBaseEntity *edict, const CCommand &args );  // handles the user commands;  returns TRUE if command handled properly
-	//virtual void ClientSettingsChanged( CBasePlayer *player ) { BaseClass::ClientSettingsChanged(player); }		 // the player has changed cvars
 
 	// Informs about player changes
 	virtual void PlayerChangedOwnerNumber( CBasePlayer *player, int oldownernumber, int newownernumber ) {}
@@ -170,16 +163,11 @@ public:
 	virtual boost::python::object GetNextLevelName( bool bRandom = false );
 #endif // ENABLE_PYTHON
 
-	//virtual void ChangeLevel( void ) { BaseClass::ChangeLevel(); }
-	//virtual void GoToIntermission( void ) { BaseClass::GoToIntermission(); }
-
 	float GetIntermissionEndTime() { return m_flIntermissionEndTime; }
 	void SetintermissionEndTime( float endtime ) { m_flIntermissionEndTime = endtime; }
 
 	bool GetGameOver() { return g_fGameOver; }
 	void SetGameOver( bool gameover ) { g_fGameOver = gameover; }
-
-	//virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info ) {}
 
 private:
 	void DestroyTeams();

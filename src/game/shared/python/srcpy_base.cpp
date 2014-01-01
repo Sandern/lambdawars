@@ -388,7 +388,7 @@ boost::python::object RelToAbs( const char *path )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped ) { SrcPySystem()->RegisterTickMethod(method, ticksignal, looped); }
+void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped, bool userealtime ) { SrcPySystem()->RegisterTickMethod(method, ticksignal, looped, userealtime); }
 void UnregisterTickMethod( boost::python::object method ) { SrcPySystem()->UnregisterTickMethod(method); }
 boost::python::list GetRegisteredTickMethods() { return SrcPySystem()->GetRegisteredTickMethods(); }
 bool IsTickMethodRegistered( boost::python::object method ) { return SrcPySystem()->IsTickMethodRegistered( method ); }

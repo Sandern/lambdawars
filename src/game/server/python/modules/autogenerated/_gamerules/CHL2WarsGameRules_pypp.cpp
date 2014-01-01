@@ -236,6 +236,25 @@ struct CHL2WarsGameRules_wrapper : CHL2WarsGameRules, bp::wrapper< CHL2WarsGameR
         CHL2WarsGameRules::LevelShutdown( );
     }
 
+    virtual void OnServerHibernating(  ) {
+        PY_OVERRIDE_CHECK( CHL2WarsGameRules, OnServerHibernating )
+        PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, OnServerHibernating )
+        bp::override func_OnServerHibernating = this->get_override( "OnServerHibernating" );
+        if( func_OnServerHibernating.ptr() != Py_None )
+            try {
+                func_OnServerHibernating(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CHL2WarsGameRules::OnServerHibernating(  );
+            }
+        else
+            this->CHL2WarsGameRules::OnServerHibernating(  );
+    }
+    
+    void default_OnServerHibernating(  ) {
+        CHL2WarsGameRules::OnServerHibernating( );
+    }
+
     virtual void PlayerChangedOwnerNumber( ::CBasePlayer * player, int oldownernumber, int newownernumber ) {
         PY_OVERRIDE_CHECK( CHL2WarsGameRules, PlayerChangedOwnerNumber )
         PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, PlayerChangedOwnerNumber )
@@ -2650,6 +2669,17 @@ void register_CHL2WarsGameRules_class(){
                 "LevelShutdown"
                 , LevelShutdown_function_type(&::CHL2WarsGameRules::LevelShutdown)
                 , default_LevelShutdown_function_type(&CHL2WarsGameRules_wrapper::default_LevelShutdown) );
+        
+        }
+        { //::CHL2WarsGameRules::OnServerHibernating
+        
+            typedef void ( ::CHL2WarsGameRules::*OnServerHibernating_function_type )(  ) ;
+            typedef void ( CHL2WarsGameRules_wrapper::*default_OnServerHibernating_function_type )(  ) ;
+            
+            CHL2WarsGameRules_exposer.def( 
+                "OnServerHibernating"
+                , OnServerHibernating_function_type(&::CHL2WarsGameRules::OnServerHibernating)
+                , default_OnServerHibernating_function_type(&CHL2WarsGameRules_wrapper::default_OnServerHibernating) );
         
         }
         { //::CHL2WarsGameRules::PlayerChangedOwnerNumber

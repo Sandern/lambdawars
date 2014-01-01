@@ -115,6 +115,7 @@
 #ifdef HL2WARS_DLL
 #include "matchmaking/swarm/imatchext_swarm.h"
 #include "hl2wars/unit_base_shared.h"
+#include "hl2wars/hl2wars_gamerules.h"
 #include "hl2wars/hl2wars_player.h"
 #include "hl2wars/fowmgr.h"
 #include "hl2wars/wars_plat_misc.h"
@@ -1502,6 +1503,10 @@ void CServerGameDLL::Think( bool finalTick )
 		m_fAutoSaveDangerousTime = 0.0f;
 		m_fAutoSaveDangerousMinHealthToCommit = 0.0f;
 	}
+
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->UpdateRealtimeTickMethods();
+#endif // ENABLE_PYTHON
 }
 
 void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
@@ -2136,6 +2141,13 @@ void CServerGameDLL::ServerHibernationUpdate( bool bHibernating )
 	if ( engine && engine->IsDedicatedServer() && m_bIsHibernating && ASWGameRules() )
 	{
 		ASWGameRules()->OnServerHibernating();
+	}
+#endif
+
+#ifdef HL2WARS_DLL
+	if ( engine && engine->IsDedicatedServer() && m_bIsHibernating && HL2WarsGameRules() )
+	{
+		HL2WarsGameRules()->OnServerHibernating();
 	}
 #endif
 }

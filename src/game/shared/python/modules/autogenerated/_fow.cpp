@@ -48,12 +48,12 @@ BOOST_PYTHON_MODULE(_fow){
             , ( bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("fHeight") ) )    
         .def( 
             "ModifyHeightAtPoint"
-            , (void ( ::CFogOfWarMgr::* )( ::Vector const &,float ) )( &::CFogOfWarMgr::ModifyHeightAtPoint )
-            , ( bp::arg("vPoint"), bp::arg("fHeight") ) )    
+            , (void ( ::CFogOfWarMgr::* )( ::Vector const &,float,bool ) )( &::CFogOfWarMgr::ModifyHeightAtPoint )
+            , ( bp::arg("vPoint"), bp::arg("fHeight"), bp::arg("updateDynamic")=(bool)(true) ) )    
         .def( 
             "ModifyHeightAtTile"
-            , (void ( ::CFogOfWarMgr::* )( int,int,float ) )( &::CFogOfWarMgr::ModifyHeightAtTile )
-            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight") ) )    
+            , (void ( ::CFogOfWarMgr::* )( int,int,float,bool ) )( &::CFogOfWarMgr::ModifyHeightAtTile )
+            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight"), bp::arg("updateDynamic")=(bool)(true) ) )    
         .def( 
             "ResetExplored"
             , (void ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::ResetExplored ) );
@@ -116,12 +116,12 @@ BOOST_PYTHON_MODULE(_fow){
             , ( bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("fHeight") ) )    
         .def( 
             "ModifyHeightAtPoint"
-            , (void ( ::CFogOfWarMgr::* )( ::Vector const &,float ) )( &::CFogOfWarMgr::ModifyHeightAtPoint )
-            , ( bp::arg("vPoint"), bp::arg("fHeight") ) )    
+            , (void ( ::CFogOfWarMgr::* )( ::Vector const &,float,bool ) )( &::CFogOfWarMgr::ModifyHeightAtPoint )
+            , ( bp::arg("vPoint"), bp::arg("fHeight"), bp::arg("updateDynamic")=(bool)(true) ) )    
         .def( 
             "ModifyHeightAtTile"
-            , (void ( ::CFogOfWarMgr::* )( int,int,float ) )( &::CFogOfWarMgr::ModifyHeightAtTile )
-            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight") ) )    
+            , (void ( ::CFogOfWarMgr::* )( int,int,float,bool ) )( &::CFogOfWarMgr::ModifyHeightAtTile )
+            , ( bp::arg("x"), bp::arg("y"), bp::arg("fHeight"), bp::arg("updateDynamic")=(bool)(true) ) )    
         .def( 
             "PointInFOW"
             , (bool ( ::CFogOfWarMgr::* )( ::Vector const &,int ) )( &::CFogOfWarMgr::PointInFOW )
