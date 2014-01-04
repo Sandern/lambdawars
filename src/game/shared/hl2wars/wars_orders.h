@@ -54,7 +54,7 @@ protected:
 	void Project( const Vector &point1, const Vector &point2, const Vector &toproject, Vector &projected );
 	void ProjectAndSortUnits( const Vector &unitmidpoint, const Vector &formationmidpoint, CUtlVector< UnitRatio_t > &result  );
 	void ProjectAndSortPositions( const Vector &unitmidpoint, const Vector &formationmidpoint, CUtlVector< PositionRatio_t > &result  );
-	void OrderUnit( CUnitBase *pUnit, const Vector &targetposition, const QAngle &angle, bp::list selection );
+	void OrderUnit( CUnitBase *pUnit, const Vector &targetposition, const QAngle &angle, boost::python::list selection );
 
 private:
 	CUtlVector< CUnitBase * > m_Units;

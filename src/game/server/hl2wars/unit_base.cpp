@@ -158,7 +158,7 @@ CBaseEntity *TossGrenadeAnimEventHandler::TossGrenade( CUnitBase *pUnit, Vector 
 
 	// Try and spit at our target
 	Vector	vecToss;				
-	if ( GetTossVector( pUnit, vecStartPos, vecTarget, pUnit->CalculateIgnoreOwnerCollisionGroup(), &vecToss ) == false )
+	if ( GetTossVector( pUnit, vecStartPos, vecTarget, iCollisionGroup, &vecToss ) == false )
 	{
 		return NULL;
 	}

@@ -49,10 +49,10 @@ public:
 	TranslateActivityMap() {SetDefLessFunc( m_translateActivityMap );}
 	TranslateActivityMap( TranslateActivityMap &activitymap );
 #ifdef ENABLE_PYTHON
-	TranslateActivityMap( bp::dict d );
-	TranslateActivityMap( TranslateActivityMap &activitymap, bp::dict d );
+	TranslateActivityMap( boost::python::dict d );
+	TranslateActivityMap( TranslateActivityMap &activitymap, boost::python::dict d );
 
-	void AddTranslations( bp::dict d );
+	void AddTranslations( boost::python::dict d );
 #endif // ENABLE_PYTHON
 	void AddTranslation(Activity act, Activity act_translated) { m_translateActivityMap.Insert(act, act_translated); }
 
@@ -205,7 +205,7 @@ public:
 #ifdef ENABLE_PYTHON
 	// Translate activity map
 	void SetActivityMap( boost::python::object activitymap );
-	bp::object GetActivityMap();
+	boost::python::object GetActivityMap();
 #endif // ENABLE_PYTHON
 
 	// Aim layer sequence
@@ -402,7 +402,7 @@ private:
 extern float g_flLastBodyPitch, g_flLastBodyYaw, m_flLastMoveYaw;
 
 #ifdef ENABLE_PYTHON
-inline bp::object UnitAnimState::GetActivityMap()
+inline boost::python::object UnitAnimState::GetActivityMap()
 {
 	return m_pyActivityMap;
 }

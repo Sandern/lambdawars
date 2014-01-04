@@ -344,10 +344,10 @@ CBaseEntity *UnitBaseSense::GetNearestOther()
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifdef ENABLE_PYTHON
-bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
+boost::python::list UnitBaseSense::PyGetEnemies( const char *unittype )
 {
 	CBaseEntity *pEnemy;
-	bp::list units;
+	boost::python::list units;
 	for( int i = 0; i < m_SeenEnemies.Count(); i++ )
 	{
 		pEnemy = m_SeenEnemies[i].entity;
@@ -372,10 +372,10 @@ bp::list UnitBaseSense::PyGetEnemies( const char *unittype )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list UnitBaseSense::PyGetOthers( const char *unittype )
+boost::python::list UnitBaseSense::PyGetOthers( const char *unittype )
 {
 	CBaseEntity *pOther;
-	bp::list units;
+	boost::python::list units;
 	for( int i = 0; i < m_SeenOther.Count(); i++ )
 	{
 		pOther = m_SeenOther[i].entity;

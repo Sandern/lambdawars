@@ -130,12 +130,12 @@ public:
 
 #ifdef ENABLE_PYTHON
 	// Abilities
-	void							AddActiveAbility( bp::object ability );
-	void							RemoveActiveAbility( bp::object ability );
-	bool							IsActiveAbility( bp::object ability );
+	void							AddActiveAbility( boost::python::object ability );
+	void							RemoveActiveAbility( boost::python::object ability );
+	bool							IsActiveAbility( boost::python::object ability );
 	void							ClearActiveAbilities();
-	void							SetSingleActiveAbility( bp::object ability );
-	bp::object						GetSingleActiveAbility();
+	void							SetSingleActiveAbility( boost::python::object ability );
+	boost::python::object			GetSingleActiveAbility();
 #endif // ENABLE_PYTHON
 
 	CBaseEntity *					GetControlledUnit() const;
@@ -242,7 +242,7 @@ private:
 	CNetworkHandle( C_BaseEntity, m_hControlledUnit );	
 	bool				m_bRebuildPySelection;
 #ifdef ENABLE_PYTHON
-	bp::list			m_pySelection;
+	boost::python::list			m_pySelection;
 #endif // ENABLE_PYTHON
 
 	// Selected unittype data
@@ -257,7 +257,7 @@ private:
 
 	// Ability
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> m_vecActiveAbilities;
+	CUtlVector<boost::python::object> m_vecActiveAbilities;
 #endif // ENABLE_PYTHON
 };
 

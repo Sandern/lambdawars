@@ -28,7 +28,7 @@ public:
 	float GetWide() { return m_flWidth; }
 	float GetHeight() { return m_flHeight; }
 
-	bp::object GetPanel() { return m_pyPanel; }
+	boost::python::object GetPanel() { return m_pyPanel; }
 
 	// Is the screen backfaced given a view position?
 	bool IsBackfacing( const Vector &viewOrigin );

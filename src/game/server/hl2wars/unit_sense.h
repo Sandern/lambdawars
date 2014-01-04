@@ -47,11 +47,11 @@ public:
 	CBaseEntity *GetOther( int idx );
 
 #ifdef ENABLE_PYTHON
-	bp::object PyGetEnemy( int idx );
-	bp::object PyGetOther( int idx );
+	boost::python::object PyGetEnemy( int idx );
+	boost::python::object PyGetOther( int idx );
 
-	bp::list PyGetEnemies( const char *unittype = NULL );
-	bp::list PyGetOthers( const char *unittype = NULL );
+	boost::python::list PyGetEnemies( const char *unittype = NULL );
+	boost::python::list PyGetOthers( const char *unittype = NULL );
 
 	bool AddEnemyInRangeCallback( boost::python::object callback, int range, float frequency );
 	bool RemoveEnemyInRangeCallback( boost::python::object callback, int range = -1 );
@@ -185,16 +185,16 @@ inline CBaseEntity *UnitBaseSense::GetOther( int idx )
 }
 
 #ifdef ENABLE_PYTHON
-inline bp::object UnitBaseSense::PyGetEnemy( int idx )
+inline boost::python::object UnitBaseSense::PyGetEnemy( int idx )
 {
 	CBaseEntity *pEnt = GetEnemy(idx);
-	return pEnt ? pEnt->GetPyHandle() : bp::object();
+	return pEnt ? pEnt->GetPyHandle() : boost::python::object();
 }
 
-inline bp::object UnitBaseSense::PyGetOther( int idx )
+inline boost::python::object UnitBaseSense::PyGetOther( int idx )
 {
 	CBaseEntity *pEnt = GetOther(idx);
-	return pEnt ? pEnt->GetPyHandle() : bp::object();
+	return pEnt ? pEnt->GetPyHandle() : boost::python::object();
 }
 #endif // ENABLE_PYTHON
 

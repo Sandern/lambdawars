@@ -98,10 +98,10 @@ void C_HL2WarsPlayer::Spawn()
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		// Setup dict for sending a signal
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["client"] = GetPyHandle();
-		bp::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
+		boost::python::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
@@ -159,7 +159,7 @@ bool C_HL2WarsPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 
 #ifdef ENABLE_PYTHON
 	// If we have an active ability, it overrides our mouse actions
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector< boost::python::object > activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{
@@ -255,8 +255,8 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 	{
 #ifdef ENABLE_PYTHON
 		// Setup dict for sending a signal
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
 #endif // ENABLE_PYTHON
 
@@ -281,7 +281,7 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 
 #ifdef ENABLE_PYTHON
 			kwargs["unit"] = m_hOldControlledUnit->GetPyHandle();
-			bp::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
+			boost::python::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
 			SrcPySystem()->CallSignal( signal, kwargs );
 #endif // ENABLE_PYTHON
 		}
@@ -299,7 +299,7 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 
 #ifdef ENABLE_PYTHON
 			kwargs["unit"] = m_hControlledUnit->GetPyHandle();
-			bp::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
+			boost::python::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
 			SrcPySystem()->CallSignal( signal, kwargs );
 #endif // ENABLE_PYTHON
 		}
@@ -425,9 +425,9 @@ void C_HL2WarsPlayer::PyCamFollowGroup( boost::python::list pyentities, bool for
 {
 	CUtlVector< EHANDLE > entities;
 
-	for( int i = 0; i < bp::len(pyentities); i++ )
+	for( int i = 0; i < boost::python::len(pyentities); i++ )
 	{
-		CBaseEntity *pEnt = bp::extract<CBaseEntity *>( pyentities[i] );
+		CBaseEntity *pEnt = boost::python::extract< CBaseEntity * >( pyentities[i] );
 		entities.AddToTail( pEnt );
 	}
 
@@ -710,7 +710,7 @@ void C_HL2WarsPlayer::MinimapClick( const MouseTraceData_t &mousedata )
 	m_MouseDataLeftReleased = mousedata;
 
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector< boost::python::object > activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
 	for(int i=0; i< activeAbilities.Count(); i++)
 	{

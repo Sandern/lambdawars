@@ -128,16 +128,16 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 		// Send clientactive signal
 		try 
 		{
-			bp::dict kwargs;
-			kwargs["sender"] = bp::object();
+			boost::python::dict kwargs;
+			kwargs["sender"] = boost::python::object();
 			kwargs["client"] = pPlayer->GetPyHandle();
-			bp::object signal = SrcPySystem()->Get( "clientactive", "core.signals", true );
+			boost::python::object signal = SrcPySystem()->Get( "clientactive", "core.signals", true );
 			SrcPySystem()->CallSignal( signal, kwargs );
 
 			signal = SrcPySystem()->Get( "map_clientactive", "core.signals", true )[pLevelName];
 			SrcPySystem()->CallSignal( signal, kwargs );
 		} 
-		catch( bp::error_already_set & ) 
+		catch( boost::python::error_already_set & ) 
 		{
 			Warning( "Failed to retrieve clientactive signal:\n" );
 			PyErr_Print();

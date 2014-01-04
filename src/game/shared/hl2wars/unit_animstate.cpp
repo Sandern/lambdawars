@@ -62,14 +62,14 @@ TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap )
 }
 
 #ifdef ENABLE_PYTHON
-TranslateActivityMap::TranslateActivityMap( bp::dict d)
+TranslateActivityMap::TranslateActivityMap( boost::python::dict d)
 {
 	SetDefLessFunc( m_translateActivityMap );
 
 	AddTranslations(d);
 }
 
-TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap, bp::dict d )
+TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap, boost::python::dict d )
 {
 	SetDefLessFunc( m_translateActivityMap );
 
@@ -81,20 +81,20 @@ TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap, b
 	AddTranslations(d);
 }
 
-void TranslateActivityMap::AddTranslations( bp::dict d )
+void TranslateActivityMap::AddTranslations( boost::python::dict d )
 {
 	Activity a, atrans;
-	bp::object objectKey, objectValue;
-	const bp::object objectKeys = d.iterkeys();
-	const bp::object objectValues = d.itervalues();
-	unsigned long ulCount = bp::len(d);
+	boost::python::object objectKey, objectValue;
+	const boost::python::object objectKeys = d.iterkeys();
+	const boost::python::object objectValues = d.itervalues();
+	unsigned long ulCount = boost::python::len(d);
 	for( unsigned long u = 0; u < ulCount; u++ )
 	{
 		objectKey = objectKeys.attr( "next" )();
 		objectValue = objectValues.attr( "next" )();
 
-		a = bp::extract<Activity>(objectKey);
-		atrans = bp::extract<Activity>(objectValue);
+		a = boost::python::extract<Activity>(objectKey);
+		atrans = boost::python::extract<Activity>(objectValue);
 
 		AddTranslation(a, atrans);
 	}

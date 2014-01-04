@@ -212,7 +212,7 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 
 #ifdef ENABLE_PYTHON
 	// For Python: keep list of blockers
-	mv.pyblockers = bp::list();
+	mv.pyblockers = boost::python::list();
 	for( int i = 0; i < mv.blockers.Count(); i++ )
 	{
 		if( !mv.blockers[i].blocker )

@@ -356,7 +356,7 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		m_MouseDataLeftReleased = mousedata;
 
 #ifdef ENABLE_PYTHON
-		CUtlVector<bp::object> activeAbilities;
+		CUtlVector<boost::python::object> activeAbilities;
 		activeAbilities = m_vecActiveAbilities;
 		for(int i=0; i< activeAbilities.Count(); i++)
 		{
@@ -634,8 +634,8 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 
 #ifdef ENABLE_PYTHON
 	// Setup dict for sending a signal
-	bp::dict kwargs;
-	kwargs["sender"] = bp::object();
+	boost::python::dict kwargs;
+	kwargs["sender"] = boost::python::object();
 	kwargs["player"] = GetPyHandle();
 #endif // ENABLE_PYTHON
 
@@ -649,7 +649,7 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 
 #ifdef ENABLE_PYTHON
 		kwargs["unit"] = m_hControlledUnit->GetPyHandle();
-		bp::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
+		boost::python::object signal = SrcPySystem()->Get( "playerleftcontrolunit", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
 #endif // ENABLE_PYTHON
 
@@ -696,7 +696,7 @@ void CHL2WarsPlayer::SetControlledUnit( CBaseEntity *pUnit )
 #ifdef ENABLE_PYTHON
 		// Dispatch signal
 		kwargs["unit"] = m_hControlledUnit->GetPyHandle();
-		bp::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
+		boost::python::object signal = SrcPySystem()->Get( "playercontrolunit", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
 #endif // ENABLE_PYTHON
 
