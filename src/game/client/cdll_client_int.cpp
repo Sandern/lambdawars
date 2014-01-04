@@ -1456,9 +1456,6 @@ void CHLClient::HudUpdate( bool bActive )
 	{
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, false ); 
 		IGameSystem::UpdateAllSystems( frametime );
-#ifdef ENABLE_PYTHON
-		SrcPySystem()->CleanupDeleteList(); // Might kill a GameSystem, so moved outside Update function of SrcPySystem
-#endif // ENABLE_PYTHON
 	}
 
 	// run vgui animations
@@ -2032,9 +2029,6 @@ void CHLClient::LevelShutdown( void )
 
 	// Now release/delete the entities
 	cl_entitylist->Release();
-#ifdef ENABLE_PYTHON
-	SrcPySystem()->CleanupDeleteList();
-#endif // ENABLE_PYTHON
 
 	C_BaseEntityClassList *pClassList = s_pClassLists;
 	while ( pClassList )

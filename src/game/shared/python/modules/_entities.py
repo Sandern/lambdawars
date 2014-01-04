@@ -348,7 +348,6 @@ class Entities(SemiSharedModuleGenerator):
         
         # Apply common rules to the entity class
         # Don't care about the following:
-        #cls.vars(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
         cls.classes(lambda decl: 'NetworkVar' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(lambda decl: 'YouForgotToImplement' in decl.name, allow_empty=True).exclude()
         cls.mem_funs(function=lambda decl: 'NetworkStateChanged_' in decl.name, allow_empty=True).exclude()

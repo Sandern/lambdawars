@@ -866,6 +866,11 @@ void CSrcPython::LevelShutdownPostEntity()
 	if( !IsPythonRunning() )
 		return;
 
+	// Clears references from the delete list, causing instances to cleanup if possible
+	// Note: should not contain references to AutoGameSystems, because this is called from a gamesystem function
+	//		 In this case crashes will occur.
+	CleanupDeleteList();
+
 	// srcmgr level shutdown
 	Run( Get("_LevelShutdownPostEntity", "srcmgr", true) );
 
@@ -972,6 +977,11 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 
 	CleanupDelayedUpdateList();
 #endif // CLIENT_DLL
+
+	// Clears references from the delete list, causing instances to cleanup if possible
+	// Note: should not contain references to AutoGameSystems, because this is called from a gamesystem function
+	//		 In this case crashes will occur.
+	CleanupDeleteList();
 }
 
 //-----------------------------------------------------------------------------

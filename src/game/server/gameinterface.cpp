@@ -1381,12 +1381,6 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	Physics_RunThinkFunctions( simulating );
 
-#ifdef ENABLE_PYTHON
-	// Note: Because gamesystems might be cleaned up here, we are not
-	//		 doing this in SrcPySystem.
-	SrcPySystem()->CleanupDeleteList(); 
-#endif // ENABLE_PYTHON
-
 	IGameSystem::FrameUpdatePostEntityThinkAllSystems();
 
 	// UNDONE: Make these systems IGameSystems and move these calls into FrameUpdatePostEntityThink()
@@ -1530,9 +1524,6 @@ void CServerGameDLL::LevelShutdown( void )
 	ClearDebugHistory();
 
 	gEntList.Clear();
-#ifdef ENABLE_PYTHON
-	SrcPySystem()->CleanupDeleteList();
-#endif // ENABLE_PYTHON
 
 	InvalidateQueryCache();
 
