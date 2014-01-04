@@ -180,7 +180,8 @@ void PyMeshBuilder::SetMaterial( const char *pMaterialName )
 //=============================================================================
 // Python rally line mesh builder
 //=============================================================================
-PyMeshRallyLine::PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ), m_hEnt1(NULL), m_hEnt2(NULL)
+PyMeshRallyLine::PyMeshRallyLine( const char *pMaterialName ) : PyMeshBuilder( pMaterialName, MATERIAL_QUADS ), 
+	m_hEnt1(NULL), m_hEnt2(NULL), point1(vec3_origin), point2(vec3_origin)
 {
 
 }
