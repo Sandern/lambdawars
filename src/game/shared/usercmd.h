@@ -246,7 +246,7 @@ public:
 	short skill_dest_ent;
 #endif
 
-	// HL2Wars specific variables
+	// Lambda Wars specific variables
 #if defined( HL2WARS_DLL )
 	Vector m_vMouseAim;			// The direction of the mouse
 	Vector m_vCameraOffset;		// Camera offset of the rts player. Required for correct mouse tracing

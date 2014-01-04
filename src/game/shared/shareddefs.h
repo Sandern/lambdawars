@@ -150,9 +150,10 @@ inline float FractionUnDucked( int msecs )
 #define HIDEHUD_INVEHICLE			( 1<<10 )
 #define HIDEHUD_BONUS_PROGRESS		( 1<<11 )	// Hide bonus progress display (for bonus map challenges)
 
+#ifdef HL2WARS_DLL
 #define HIDEHUD_STRATEGIC			( 1<<12 )	// Hide strategic display
 #define HIDEHUD_UNIT				( 1<<13 )	// Hide unit HUD
-
+#endif // HL2WARS_DLL
 
 #define HIDEHUD_BITCOUNT			14
 
