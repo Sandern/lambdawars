@@ -73,6 +73,7 @@ void UnitBaseAirLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 	if( pAirMoveCommand )
 	{
 		pAirMoveCommand->height = m_fCurrentHeight;
+		pAirMoveCommand->desiredheight = m_fDesiredHeight;
 	}
 	else
 	{

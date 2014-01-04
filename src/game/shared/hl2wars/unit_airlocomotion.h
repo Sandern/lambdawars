@@ -17,6 +17,7 @@ class UnitAirMoveCommand : public UnitBaseMoveCommand
 {
 public:
 	float height;
+	float desiredheight;
 };
 
 class UnitBaseAirLocomotion : public UnitBaseLocomotion

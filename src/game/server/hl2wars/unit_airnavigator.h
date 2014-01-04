@@ -43,6 +43,7 @@ public:
 
 private:
 	float m_fCurrentHeight;
+	float m_fDesiredHeight;
 	int m_iTestRouteMask;
 	bool m_bTestRouteWorldOnly;
 	bool m_bUseSimplifiedRouteBuilding;

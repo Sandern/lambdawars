@@ -32,6 +32,7 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 {
 	// Get reported height from locomotion
 	m_fCurrentHeight = MoveCommand.height;
+	m_fDesiredHeight = MoveCommand.desiredheight;
 
 	BaseClass::Update( MoveCommand );
 
@@ -39,7 +40,10 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 	MoveCommand.upmove = 0.0f;
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->GetCurWaypoint() )
 	{
-		float fTargetZ = GetPath()->GetCurWaypoint()->GetPos().z + 32.0f + (-GetOuter()->CollisionProp()->OBBMins().z);
+		float fTargetZ = GetPath()->GetCurWaypoint()->GetPos().z + (-GetOuter()->CollisionProp()->OBBMins().z);
+		if( m_LastGoalStatus == CHS_CLIMBDEST )
+			fTargetZ += m_fDesiredHeight; // Note: only when it's a climb destination
+
 		if( fTargetZ > GetAbsOrigin().z )
 		{
 			// Calculate needed up movement
@@ -51,6 +55,11 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 			// Zero out other movement (so we don't bump into a cliff or wall)
 			if( m_LastGoalStatus == CHS_CLIMBDEST )
 				MoveCommand.forwardmove = MoveCommand.sidemove = 0.0f;
+		}
+		else if( m_LastGoalStatus == CHS_CLIMBDEST )
+		{
+			// Avoid going down again
+			MoveCommand.upmove = 1.0f;
 		}
 	}
 }
@@ -76,9 +85,9 @@ CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand 
 bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
 {
 	Vector vStart = vStartPos;
-	vStart.z += m_fCurrentHeight;
+	vStart.z += m_fDesiredHeight;
 	Vector vEnd = vEndPos;
-	vEnd.z += m_fCurrentHeight;
+	vEnd.z += m_fDesiredHeight;
 
 	trace_t tr;
 
