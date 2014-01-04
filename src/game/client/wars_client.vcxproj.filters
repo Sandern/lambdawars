@@ -4861,6 +4861,9 @@
     <ClInclude Include="..\shared\hl2wars\fow_blocker.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\hl2wars\wars_vprof.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bitmap.lib">

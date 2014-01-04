@@ -125,7 +125,7 @@ public:
 class PyMatchSystem
 {
 public:
-	static bp::object CreateGameSearchManager( KeyValues *pSettings );
+	static boost::python::object CreateGameSearchManager( KeyValues *pSettings );
 };
 
 //=============================================================================

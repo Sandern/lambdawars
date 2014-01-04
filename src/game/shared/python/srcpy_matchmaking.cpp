@@ -41,13 +41,13 @@ bool PyMatchSearchResult::IsValid()
 boost::python::object PyMatchSearchResult::GetOnlineId()
 {
 	if( !IsValid() )
-		return bp::object();
+		return boost::python::object();
 
 	XUID onlineid = m_pMatchSearchResult->GetOnlineId();
 
 	PyObject *pOnlineID = PyLong_FromUnsignedLongLong( onlineid );
 	if( !pOnlineID )
-		return bp::object();
+		return boost::python::object();
 
 	boost::python::object pyonlineid = boost::python::object(
 		boost::python::handle<>(
@@ -127,17 +127,17 @@ int PySearchManager::GetNumResults()
 boost::python::object PySearchManager::GetResultByIndex( int iResultIdx )
 {
 	if( !m_pSearchManager )
-		return bp::object();
+		return boost::python::object();
 
 	IMatchSearchResult *pResult = m_pSearchManager->GetResultByIndex( iResultIdx );
 	if( !pResult )
-		return bp::object();
+		return boost::python::object();
 
-	bp::object matchresult = matchmaking.attr("MatchSearchResult")();
+	boost::python::object matchresult = matchmaking.attr("MatchSearchResult")();
 
-	PyMatchSearchResult *pPyMatchResult = bp::extract<PyMatchSearchResult *>( matchresult );
+	PyMatchSearchResult *pPyMatchResult = boost::python::extract<PyMatchSearchResult *>( matchresult );
 	if( !pPyMatchResult )
-		return bp::object();
+		return boost::python::object();
 
 	pPyMatchResult->SetMatchResultInternal( pResult, m_pyWeakRef );
 
@@ -147,19 +147,19 @@ boost::python::object PySearchManager::GetResultByIndex( int iResultIdx )
 boost::python::object PySearchManager::GetResultByOnlineId( boost::python::object pyXUIDResultOnline )
 {
 	if( !m_pSearchManager )
-		return bp::object();
+		return boost::python::object();
 
 	XUID xuidResultOnline = PyLong_AsUnsignedLongLongMask( pyXUIDResultOnline.ptr() );
 
 	IMatchSearchResult *pResult = m_pSearchManager->GetResultByOnlineId( xuidResultOnline );
 	if( !pResult )
-		return bp::object();
+		return boost::python::object();
 
-	bp::object matchresult = matchmaking.attr("MatchSearchResult")();
+	boost::python::object matchresult = matchmaking.attr("MatchSearchResult")();
 
-	PyMatchSearchResult *pPyMatchResult = bp::extract<PyMatchSearchResult *>( matchresult );
+	PyMatchSearchResult *pPyMatchResult = boost::python::extract<PyMatchSearchResult *>( matchresult );
 	if( !pPyMatchResult )
-		return bp::object();
+		return boost::python::object();
 
 	pPyMatchResult->SetMatchResultInternal( pResult, m_pyWeakRef );
 
@@ -263,20 +263,20 @@ void PyMatchSession::Command( KeyValues *pCommand )
 // MatchSystem
 //=============================================================================
 
-bp::object PyMatchSystem::CreateGameSearchManager( KeyValues *pSettings )
+boost::python::object PyMatchSystem::CreateGameSearchManager( KeyValues *pSettings )
 {
 	if( !pSettings )
-		return bp::object();
+		return boost::python::object();
 
-	bp::object pysearchmanager = matchmaking.attr("SearchManager")();
+	boost::python::object pysearchmanager = matchmaking.attr("SearchManager")();
 
-	PySearchManager *pPyPlayerManager = bp::extract<PySearchManager *>( pysearchmanager );
+	PySearchManager *pPyPlayerManager = boost::python::extract<PySearchManager *>( pysearchmanager );
 	if( !pPyPlayerManager )
-		return bp::object();
+		return boost::python::object();
 
 	ISearchManager *pSearchManager = g_pMatchFramework->GetMatchSystem()->CreateGameSearchManager( pSettings );
 	if( !pSearchManager )
-		return bp::object();
+		return boost::python::object();
 
 	pPyPlayerManager->SetSearchManagerInternal( pSearchManager, SrcPySystem()->CreateWeakRef( pysearchmanager ) );
 

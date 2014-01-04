@@ -1001,6 +1001,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\hl2wars\unit_vehicleanimstate.h" />
     <ClInclude Include="..\shared\hl2wars\unit_vphysicslocomotion.h" />
     <ClInclude Include="..\shared\hl2wars\wars_flora.h" />
+    <ClInclude Include="..\shared\hl2wars\wars_vprof.h" />
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
     <ClInclude Include="..\shared\python\srcpy_usermessage.h" />

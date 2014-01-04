@@ -593,9 +593,9 @@ void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 
 	try
 	{
-		PyOnLoadStart( bp::object( PyCefFrame( frame ) ) );
+		PyOnLoadStart( boost::python::object( PyCefFrame( frame ) ) );
 	}
-	catch(bp::error_already_set &)
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -613,9 +613,9 @@ void SrcCefBrowser::OnLoadEnd( CefRefPtr<CefFrame> frame, int httpStatusCode )
 
 	try
 	{
-		PyOnLoadEnd( bp::object( PyCefFrame( frame ) ), httpStatusCode );
+		PyOnLoadEnd( boost::python::object( PyCefFrame( frame ) ), httpStatusCode );
 	}
-	catch(bp::error_already_set &)
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -634,24 +634,24 @@ void SrcCefBrowser::OnLoadError( CefRefPtr<CefFrame> frame, int errorCode, const
 	try
 	{
 		// Convert error texts to Python unicode objects
-		bp::object pyErrorText;
+		boost::python::object pyErrorText;
 		if( errorText )
 		{
 			PyObject* pPyErrorText = PyUnicode_FromWideChar( errorText, wcslen(errorText) );
 			if( pPyErrorText )
-				pyErrorText = boost::python::object( bp::handle<>( pPyErrorText ) );
+				pyErrorText = boost::python::object( boost::python::handle<>( pPyErrorText ) );
 		}
-		bp::object pyFailedURL;
+		boost::python::object pyFailedURL;
 		if( failedUrl )
 		{
 			PyObject* pPyFailedURL = PyUnicode_FromWideChar( failedUrl, wcslen(failedUrl) );
 			if( pPyFailedURL )
-				pyFailedURL = boost::python::object( bp::handle<>( pPyFailedURL ) );
+				pyFailedURL = boost::python::object( boost::python::handle<>( pPyFailedURL ) );
 		}
 
-		PyOnLoadError( bp::object( PyCefFrame( frame ) ), errorCode, pyErrorText, pyFailedURL );
+		PyOnLoadError( boost::python::object( PyCefFrame( frame ) ), errorCode, pyErrorText, pyFailedURL );
 	}
-	catch(bp::error_already_set &)
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -1074,9 +1074,9 @@ void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> metho
 
 	try
 	{
-		PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? bp::object( *pCallbackID ) : bp::object() );
+		PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? boost::python::object( *pCallbackID ) : boost::python::object() );
 	}
-	catch(bp::error_already_set &)
+	catch(boost::python::error_already_set &)
 	{
 		PyErr_Print();
 	}
@@ -1090,13 +1090,13 @@ void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> metho
 boost::python::object SrcCefBrowser::PyGetMainFrame()
 {
 	if( !IsValid() )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<CefFrame> mainFrame = m_CefClientHandler->GetBrowser()->GetMainFrame();
 	if( !mainFrame )
-		return bp::object();
+		return boost::python::object();
 
-	return bp::object( PyCefFrame( mainFrame ) );
+	return boost::python::object( PyCefFrame( mainFrame ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1105,13 +1105,13 @@ boost::python::object SrcCefBrowser::PyGetMainFrame()
 boost::python::object SrcCefBrowser::PyCreateGlobalObject( const char *name )
 {
 	if( !IsValid() )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<JSObject> jsObject = CreateGlobalObject( name );
 	if( !jsObject )
-		return bp::object();
+		return boost::python::object();
 
-	return bp::object( PyJSObject( jsObject ) );
+	return boost::python::object( PyJSObject( jsObject ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1120,17 +1120,17 @@ boost::python::object SrcCefBrowser::PyCreateGlobalObject( const char *name )
 boost::python::object SrcCefBrowser::PyCreateFunction( const char *name, PyJSObject *pPyObject, bool hascallback )
 {
 	if( !IsValid() || !pPyObject )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<JSObject> object = pPyObject->GetJSObject();
 	if( !object )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<JSObject> jsObject = CreateFunction( name, object, hascallback );
 	if( !jsObject )
-		return bp::object();
+		return boost::python::object();
 
-	return bp::object( PyJSObject( jsObject ) );
+	return boost::python::object( PyJSObject( jsObject ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1139,13 +1139,13 @@ boost::python::object SrcCefBrowser::PyCreateFunction( const char *name, PyJSObj
 boost::python::object SrcCefBrowser::PyExecuteJavaScriptWithResult( const char *code, const char *script_url, int start_line )
 {
 	if( !IsValid() )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<JSObject> jsObject = ExecuteJavaScriptWithResult( code, script_url, start_line );
 	if( !jsObject )
-		return bp::object();
+		return boost::python::object();
 
-	return bp::object( PyJSObject( jsObject ) );
+	return boost::python::object( PyJSObject( jsObject ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1168,27 +1168,27 @@ void SrcCefBrowser::PyInvoke( PyJSObject *object, const char *methodname, boost:
 boost::python::object SrcCefBrowser::PyInvokeWithResult( PyJSObject *object, const char *methodname, boost::python::list methodargs )
 {
 	if( !IsValid() )
-		return bp::object();
+		return boost::python::object();
 
 	if( !methodname )
-		return bp::object();
+		return boost::python::object();
 
 	CefRefPtr<JSObject> jsObject = InvokeWithResult( object ? object->GetJSObject() : NULL, methodname, PyToCefValueList( methodargs ) );
 	if( !jsObject )
-		return bp::object();
+		return boost::python::object();
 
-	return bp::object( PyJSObject( jsObject ) );
+	return boost::python::object( PyJSObject( jsObject ) );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefBrowser::PySendCallback( bp::object callbackid, bp::list pymethodargs )
+void SrcCefBrowser::PySendCallback( boost::python::object callbackid, boost::python::list pymethodargs )
 {
 	if( callbackid.ptr() == Py_None )
 		return;
 
-	int iCallbackID = bp::extract<int>( callbackid );
+	int iCallbackID = boost::python::extract<int>( callbackid );
 
 	// Convert list to CefListValue
 	CefRefPtr<CefListValue> methodargs = PyToCefValueList( pymethodargs );

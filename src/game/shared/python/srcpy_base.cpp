@@ -19,62 +19,62 @@ void PyCOM_TimestampedLog( char const *fmt )
 	COM_TimestampedLog( fmt );
 }
 
-bp::dict PyKeyValuesToDict( const KeyValues *pKV )
+boost::python::dict PyKeyValuesToDict( const KeyValues *pKV )
 {
-	bp::dict d;
+	boost::python::dict d;
 
 	KeyValues *pNonConstKV = (KeyValues *)pKV;
 
 	for ( KeyValues *pKey = pNonConstKV->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
-		bp::object name(pKey->GetName());
+		boost::python::object name(pKey->GetName());
 		if( d.has_key( name ) == false )
-			d[name] = bp::list();
+			d[name] = boost::python::list();
 
-		bp::list l = bp::extract< bp::list >(d[name]);
+		boost::python::list l = boost::python::extract< boost::python::list >(d[name]);
 		l.append( PyKeyValuesToDict( pKey ) );
 	}
 	for ( KeyValues *pValue = pNonConstKV->GetFirstValue(); pValue; pValue = pValue->GetNextValue() )
 	{
-		bp::object name(pValue->GetName());
+		boost::python::object name(pValue->GetName());
 		if( d.has_key( name ) == false )
-			d[name] = bp::list();
+			d[name] = boost::python::list();
 
-		bp::list l = bp::extract< bp::list >(d[name]);
+		boost::python::list l = boost::python::extract< boost::python::list >(d[name]);
 		l.append( pValue->GetString() ); // TODO: Convert to right type
 	}
 
 	return d;
 }
 
-KeyValues *PyDictToKeyValues( bp::dict d )
+KeyValues *PyDictToKeyValues( boost::python::dict d )
 {
-	bp::object type = builtins.attr("type");
-	bp::object dicttype = types.attr("DictType");
+	boost::python::object type = builtins.attr("type");
+	boost::python::object dicttype = types.attr("DictType");
 
 	KeyValues *pKV = new KeyValues("Data");
 
-	bp::object objectKey, objectValue;
-	const bp::object objectKeys = d.iterkeys();
-	const bp::object objectValues = d.itervalues();
-	unsigned long ulCount = bp::len(d);
+	boost::python::object objectKey, objectValue;
+	const boost::python::object objectKeys = d.iterkeys();
+	const boost::python::object objectValues = d.itervalues();
+	unsigned long ulCount = boost::python::len(d);
 	for( unsigned long u = 0; u < ulCount; u++ )
 	{
 		objectKey = objectKeys.attr( "next" )();
 		objectValue = objectValues.attr( "next" )();
 
-		bp::list elements = bp::list(objectValue);
-		bp::ssize_t n = bp::len(elements);
-		for( bp::ssize_t i=0; i < n; i++ ) 
+		boost::python::list elements = boost::python::list(objectValue);
+		boost::python::ssize_t n = boost::python::len(elements);
+		for( boost::python::ssize_t i=0; i < n; i++ ) 
 		{
 			 if( type(elements[i]) == dicttype )
 			 {
-				 pKV->AddSubKey( PyDictToKeyValues(bp::dict(elements[i])) );
+				 pKV->AddSubKey( PyDictToKeyValues(boost::python::dict(elements[i])) );
 			 }
 			 else
 			 {
-				 pKV->SetString( bp::extract< const char * >( objectKey ), 
-								 bp::extract< const char * >( elements[i] ) );
+				 pKV->SetString( boost::python::extract< const char * >( objectKey ), 
+								 boost::python::extract< const char * >( elements[i] ) );
 			 }
 		}
 	}
@@ -83,33 +83,33 @@ KeyValues *PyDictToKeyValues( bp::dict d )
 }
 
 #if 0
-bp::dict PyKeyValues( bp::object name, bp::object firstKey, bp::object firstValue, bp::object secondKey, bp::object secondValue )
+boost::python::dict PyKeyValues( boost::python::object name, boost::python::object firstKey, boost::python::object firstValue, boost::python::object secondKey, boost::python::object secondValue )
 {
-	bp::object type = builtins.attr("type");
-	bp::object dicttype = types.attr("DictType");
+	boost::python::object type = builtins.attr("type");
+	boost::python::object dicttype = types.attr("DictType");
 	if( type(name) == dicttype )
 	{
-		return bp::dict(name);
+		return boost::python::dict(name);
 	}
 
-	bp::dict d;
-	d[name] = bp::dict();
-	if( firstKey != bp::object() )
+	boost::python::dict d;
+	d[name] = boost::python::dict();
+	if( firstKey != boost::python::object() )
 	{
-		bp::list l;
+		boost::python::list l;
 		l.append( firstValue );
 		d[name][firstKey] = l;
 	}
 
-	if( secondKey != bp::object() )
+	if( secondKey != boost::python::object() )
 	{
 		if( firstKey == secondKey )
 		{
-			bp::list(d[name][firstKey]).append( secondValue );
+			boost::python::list(d[name][firstKey]).append( secondValue );
 		}
 		else
 		{
-			bp::list l;
+			boost::python::list l;
 			l.append( secondValue );
 			d[name][secondKey] = l;
 		}

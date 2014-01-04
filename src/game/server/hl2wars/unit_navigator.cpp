@@ -2484,7 +2484,7 @@ bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, floa
 //-----------------------------------------------------------------------------
 boost::python::object UnitBaseNavigator::FindPathAsResult( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags, float fMinRange, float fMaxRange, CBaseEntity *pTarget, bool bAvoidEnemies )
 {
-	bp::object refPath = SrcPySystem()->RunT<boost::python::object>( SrcPySystem()->Get("UnitBasePath", unit_helper), boost::python::object() );
+	boost::python::object refPath = SrcPySystem()->RunT<boost::python::object>( SrcPySystem()->Get("UnitBasePath", unit_helper), boost::python::object() );
 	UnitBasePath *pPath = boost::python::extract<UnitBasePath *>(refPath);
 
 	FindPathInternal( pPath, goaltype, vDestination, fGoalTolerance, goalflags, fMinRange, fMaxRange, pTarget, bAvoidEnemies );

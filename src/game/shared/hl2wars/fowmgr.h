@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include "hl2wars/hl2wars_shareddefs.h"
+#include "hl2wars_shareddefs.h"
 #include "igamesystem.h"
 #include "fow_blocker.h"
 

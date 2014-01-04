@@ -352,7 +352,7 @@ void C_BaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 //			to run it's game code.
 //			All other entity thinking is done during worldspawn's think
 //-----------------------------------------------------------------------------
-void C_BaseEntity::PhysicsPyDispatchThink( bp::object thinkFunc )
+void C_BaseEntity::PhysicsPyDispatchThink( boost::python::object thinkFunc )
 {
 	float thinkLimit = think_limit.GetFloat();
 	float startTime = 0.0;

@@ -179,10 +179,16 @@ enum MoveType_t
 	MOVETYPE_LADDER,			// Used by players only when going onto a ladder
 	MOVETYPE_OBSERVER,			// Observer movement, depends on player's observer mode
 	MOVETYPE_CUSTOM,			// Allows the entity to describe its own physics
+
+#ifndef HL2WARS_DLL
+	// should always be defined as the last item in the list
+	MOVETYPE_LAST		= MOVETYPE_CUSTOM,
+#else
 	MOVETYPE_STRATEGIC,			// Move like a strategic player ( isometric view )
 
 	// should always be defined as the last item in the list
 	MOVETYPE_LAST		= MOVETYPE_STRATEGIC,
+#endif // HL2WARS_DLL
 
 	MOVETYPE_MAX_BITS	= 4
 };

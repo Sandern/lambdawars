@@ -822,7 +822,7 @@ int CBaseEntity::RegisterThinkContext( const char *szContext )
 	// Make a new think func
 	thinkfunc_t sNewFunc;
 #ifdef ENABLE_PYTHON
-	Q_memset( &sNewFunc, 0, sizeof( sNewFunc ) - sizeof( bp::object ) );	//  m_pyThink is last in struct. DON'T SET TO NULL!
+	Q_memset( &sNewFunc, 0, sizeof( sNewFunc ) - sizeof( boost::python::object ) );	//  m_pyThink is last in struct. DON'T SET TO NULL!
 #else
 	Q_memset( &sNewFunc, 0, sizeof( sNewFunc ) );
 #endif // ENABLE_PYTHON
@@ -2829,7 +2829,7 @@ void CBaseEntity::RecalculateFOWFlags()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseEntity::SetPyTouch( bp::object touch_method )
+void CBaseEntity::SetPyTouch( boost::python::object touch_method )
 {
 	// Can't set touch if m_pyInstance is None
 	if( m_pyInstance.ptr() == Py_None )
@@ -2849,7 +2849,7 @@ void CBaseEntity::SetPyTouch( bp::object touch_method )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseEntity::SetPyThink( bp::object func, float thinkTime, const char *szContext )
+void CBaseEntity::SetPyThink( boost::python::object func, float thinkTime, const char *szContext )
 {
 	// Can't think if m_pyInstance is None
 	if( m_pyInstance.ptr() == Py_None )

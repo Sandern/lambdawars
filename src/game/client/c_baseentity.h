@@ -38,14 +38,18 @@
 
 #include "vscript/ivscript.h"
 #include "vscript_shared.h"
+
+// =======================================
+// PySource Additions
+// =======================================
+#include "srcpy_client_class.h"
+// =======================================
+// END PySource Additions
+// =======================================
+
+#ifdef HL2WARS_DLL
 #include "hl2wars_shareddefs.h"
-
-#ifdef ENABLE_PYTHON
-	#include "srcpy_boostpython.h"
-
-	namespace bp = boost::python;
-#endif // ENABLE_PYTHON
-#include "srcpy_client_class.h" // Provides stubs
+#endif // HL2WARS_DLL
 
 class C_Team;
 class IPhysicsObject;
@@ -182,7 +186,7 @@ struct thinkfunc_t
 
 #ifdef ENABLE_PYTHON
 	// MUST BE LAST
-	bp::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
+	boost::python::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
 #endif // ENABLE_PYTHON
 };
 
@@ -2596,7 +2600,7 @@ inline ShouldTransmitState_t CBaseEntity::GetLastShouldTransmitState()
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
-inline bp::object CBaseEntity::GetPyInstance() const 
+inline boost::python::object CBaseEntity::GetPyInstance() const 
 { 
 	return m_pyInstance; 
 }
@@ -2607,12 +2611,12 @@ inline void CBaseEntity::SetPyInstance( boost::python::object inst )
 	m_pyInstance = inst;
 }
 
-inline bp::object CBaseEntity::GetPyHandle() const 
+inline boost::python::object CBaseEntity::GetPyHandle() const 
 { 
 	return m_pyHandle; 
 }
 
-inline bp::object CBaseEntity::GetPyThink()
+inline boost::python::object CBaseEntity::GetPyThink()
 {
 	return m_pyThink; 
 }

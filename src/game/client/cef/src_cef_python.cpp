@@ -42,10 +42,10 @@ int PyJSObject::GetIdentifier()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bp::object PyJSObject::GetName()
+boost::python::object PyJSObject::GetName()
 {
 	std::string name = m_Object->GetName().ToString();
-	return bp::object(name.c_str());
+	return boost::python::object(name.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -53,15 +53,15 @@ bp::object PyJSObject::GetName()
 //-----------------------------------------------------------------------------
 CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 {
-	int n = bp::len( l );
+	int n = boost::python::len( l );
 
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
 	for( int i = 0; i < n; i++ )
 	{
-		bp::object value = l[i];
-		bp::object valuetype = fntype( value );
+		boost::python::object value = l[i];
+		boost::python::object valuetype = fntype( value );
 
 		if( value == boost::python::object() )
 		{
@@ -86,16 +86,16 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 		}
 		else if( valuetype == builtins.attr("list") )
 		{
-			result->SetList( i, PyToCefValueList( bp::list( value ) ) );
+			result->SetList( i, PyToCefValueList( boost::python::list( value ) ) );
 		}
 		else if( valuetype == builtins.attr("dict") )
 		{
-			result->SetDictionary( i, PyToCefDictionaryValue( bp::dict( value ) ) );
+			result->SetDictionary( i, PyToCefDictionaryValue( boost::python::dict( value ) ) );
 		}
 		else
 		{
-			const char *pObjectTypeStr = bp::extract<const char *>( bp::str( valuetype ) );
-			const char *pObjectStr = bp::extract<const char *>( bp::str( value ) );
+			const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
+			const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
 			char buf[512];
 			V_snprintf( buf, 512, "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
 			PyErr_SetString( PyExc_ValueError, buf );
@@ -168,16 +168,16 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 {
 	CefRefPtr<CefDictionaryValue> result = CefDictionaryValue::Create();
 
-	bp::object key, value;
-	const bp::object objectKeys = d.iterkeys();
-	unsigned long ulCount = bp::len(d); 
+	boost::python::object key, value;
+	const boost::python::object objectKeys = d.iterkeys();
+	unsigned long ulCount = boost::python::len(d); 
 	for( unsigned long i = 0; i < ulCount; i++ )
 	{
 		key = objectKeys.attr( "next" )();
 		value = d[key];
-		bp::object valuetype = fntype( value );
+		boost::python::object valuetype = fntype( value );
 
-		CefString cefkey = bp::extract< const char * >( key );
+		CefString cefkey = boost::python::extract< const char * >( key );
 
 		if( value == boost::python::object() )
 		{
@@ -202,16 +202,16 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		}
 		else if( valuetype == builtins.attr("list") )
 		{
-			result->SetList( cefkey, PyToCefValueList( bp::list( value ) ) );
+			result->SetList( cefkey, PyToCefValueList( boost::python::list( value ) ) );
 		}
 		else if( valuetype == builtins.attr("dict") )
 		{
-			result->SetDictionary( cefkey, PyToCefDictionaryValue( bp::dict( value ) ) );
+			result->SetDictionary( cefkey, PyToCefDictionaryValue( boost::python::dict( value ) ) );
 		}
 		else
 		{
-			const char *pObjectTypeStr = bp::extract<const char *>( bp::str( valuetype ) );
-			const char *pObjectStr = bp::extract<const char *>( bp::str( value ) );
+			const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
+			const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
 			char buf[512];
 			V_snprintf( buf, 512, "PyToCefDictionaryValue: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
 			PyErr_SetString(PyExc_ValueError, buf );

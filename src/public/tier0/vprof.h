@@ -134,10 +134,6 @@
 #define VPROF_BUDGETGROUP_CLIENTLEAFSYSTEM			_T("ClientLeafSystem")
 #define VPROF_BUDGETGROUP_JOBS_COROUTINES			_T("Jobs/Coroutines")
 
-// HL2Wars budget groups
-#define VPROF_BUDGETGROUP_FOGOFWAR					_T("Fog of War")
-#define VPROF_BUDGETGROUP_UNITS						_T("ServerUnits")
-	
 #ifdef _X360
 // update flags
 #define VPROF_UPDATE_BUDGET				0x01	// send budget data every frame

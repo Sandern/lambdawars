@@ -252,9 +252,9 @@ int GetNavAreaAt( const Vector &pos, float beneathlimit )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs )
+boost::python::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs )
 {
-	bp::list l;
+	boost::python::list l;
 	CNavArea *area;
 	Extent extent;
 	Vector vAbsMins2, vAbsMaxs2;
@@ -368,7 +368,7 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SetAreasBlocked( bp::list areas, bool blocked )
+void SetAreasBlocked( boost::python::list areas, bool blocked )
 {
 #ifndef CLIENT_DLL
 	CNavArea *area;
@@ -673,9 +673,9 @@ static int HidingSpotCompare(const HidingSpotResult_t *pLeft, const HidingSpotRe
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort, const Vector *pSortPos )
+boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort, const Vector *pSortPos )
 {
-	bp::list l;
+	boost::python::list l;
 
 	if( !TheNavMesh->IsLoaded() || disable_hidingspots.GetBool() )
 		return l;
@@ -703,7 +703,7 @@ bp::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUn
 
 	// Python return result
 	for( int i = 0; i < HidingSpots.Count(); i++ )
-		l.append( bp::make_tuple( HidingSpots[i].pSpot->GetID(), HidingSpots[i].pSpot->GetPosition() ) );
+		l.append( boost::python::make_tuple( HidingSpots[i].pSpot->GetID(), HidingSpots[i].pSpot->GetPosition() ) );
 
 	return l;
 }

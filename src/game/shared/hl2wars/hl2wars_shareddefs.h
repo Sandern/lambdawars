@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#include "wars_vprof.h"
+
 #define WARS_COLLISION_SUPPORTED_UNITS 16
 enum WarsCollision_Group_t
 {

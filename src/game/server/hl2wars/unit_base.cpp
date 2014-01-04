@@ -252,10 +252,10 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 	try 
 	{
 		int event;
-		bp::object objectKey, objectValue;
-		const bp::object objectKeys = d.iterkeys();
-		const bp::object objectValues = d.itervalues();
-		unsigned long ulCount = bp::len(d); 
+		boost::python::object objectKey, objectValue;
+		const boost::python::object objectKeys = d.iterkeys();
+		const boost::python::object objectValues = d.itervalues();
+		unsigned long ulCount = boost::python::len(d); 
 		for( unsigned long u = 0; u < ulCount; u++ )
 		{
 			objectKey = objectKeys.attr( "next" )();
@@ -263,9 +263,9 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 
 			try 
 			{
-				event = bp::extract<int>(objectKey);
+				event = boost::python::extract<int>(objectKey);
 			}
-			catch( bp::error_already_set & )
+			catch( boost::python::error_already_set & )
 			{
 				PyErr_Print();
 				continue;
@@ -274,7 +274,7 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 			SetAnimEventHandler(event, objectValue);
 		}
 	}
-	catch( bp::error_already_set & )
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Print();
 	}
@@ -287,7 +287,7 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 	{
 		handler.m_pHandler = boost::python::extract<BaseAnimEventHandler *>(pyhandler);
 	}
-	catch( bp::error_already_set & )
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Clear();
 		// Not an handler object. Assume unbound method that handles the event.
@@ -1136,7 +1136,7 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 				// Assume it's an unbound method
 				try {
 					m_pAnimEventMap->m_AnimEventMap[idx].m_pyInstance(GetPyInstance(), pEvent);
-				} catch( bp::error_already_set &) {
+				} catch( boost::python::error_already_set &) {
 					PyErr_Print();
 					PyErr_Clear();
 				}

@@ -1300,29 +1300,29 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 	// Check Python init list
 	if( m_pyInstance.ptr() != Py_None )
 	{
-		bp::dict fieldinitmap;
+		boost::python::dict fieldinitmap;
 		try
 		{
-			fieldinitmap = bp::dict(m_pyInstance.attr("fieldinitmap"));
+			fieldinitmap = boost::python::dict(m_pyInstance.attr("fieldinitmap"));
 		} 
-		catch( bp::error_already_set & )
+		catch( boost::python::error_already_set & )
 		{
 			Warning("Python entity has no field init list!\n");
 			PyErr_Clear();
 		}
 
-		bp::object elem ;
-		const bp::object objectValues = fieldinitmap.itervalues();
+		boost::python::object elem ;
+		const boost::python::object objectValues = fieldinitmap.itervalues();
 
-		bp::ssize_t n = bp::len(fieldinitmap);
-		for( bp::ssize_t i=0; i < n; i++ ) 
+		boost::python::ssize_t n = boost::python::len(fieldinitmap);
+		for( boost::python::ssize_t i=0; i < n; i++ ) 
 		{
 			elem = objectValues.attr( "next" )();
 			try 
 			{
 				elem.attr("InitField")(m_pyInstance);
 			}
-			catch( bp::error_already_set & )
+			catch( boost::python::error_already_set & )
 			{
 				Warning("Failed to initialize field: \n");
 				PyErr_Print();
@@ -6695,7 +6695,7 @@ void C_BaseEntity::DestroyPyInstance()
 	// Dereferencing m_pyInstance here might result in direct deletion of the entity
 	// This will result into heap corruption.
 	SrcPySystem()->AddToDeleteList( m_pyInstance );
-	m_pyInstance = bp::object();
+	m_pyInstance = boost::python::object();
 }
 
 //------------------------------------------------------------------------------
@@ -6728,7 +6728,7 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void C_BaseEntity::PyUpdateNetworkVar( const char *pName, bp::object data, bool callchanged )
+void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged )
 {
 	// Set new var
 	try {

@@ -2120,7 +2120,7 @@ bool CBaseEntity::PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc 
 //-----------------------------------------------------------------------------
 // Purpose: Almost the same as above, but only with a reference to a python method
 //-----------------------------------------------------------------------------
-bool CBaseEntity::PhysicsPyRunSpecificThink( int nContextIndex, bp::object thinkFunc )
+bool CBaseEntity::PhysicsPyRunSpecificThink( int nContextIndex, boost::python::object thinkFunc )
 {
 	int thinktick = GetNextThinkTick( nContextIndex );
 

@@ -25,11 +25,6 @@
 #include "branchingsingleton.h"
 #include "bittools.h"
 
-#ifdef ENABLE_PYTHON
-	#include "srcpy_boostpython.h"
-
-	namespace bp = boost::python;
-#endif // ENABLE_PYTHON
 #include "srcpy_server_class.h" // Replaced by stubs if ENABLE_PYTHON
 
 #include "density_weight_map.h"
@@ -267,7 +262,7 @@ struct thinkfunc_t
 
 #ifdef ENABLE_PYTHON
 	// MUST BE LAST
-	bp::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
+	boost::python::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
 #endif // ENABLE_PYTHON
 };
 
@@ -2048,10 +2043,10 @@ private:
 	CNetworkVar( int,		m_PySendPropInt3 );
 	CNetworkVar( int,		m_PySendPropInt4 );
 
-	bp::object m_pyInstance;		// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
-	bp::object m_pyHandle;			// Holds a ref to a handle to the instance. 
-	bp::object m_pyTouchMethod;
-	bp::object m_pyThink;
+	boost::python::object m_pyInstance;		// Holds a ref to the instance. Keeps the object always alive util Remove() is called.
+	boost::python::object m_pyHandle;			// Holds a ref to a handle to the instance. 
+	boost::python::object m_pyTouchMethod;
+	boost::python::object m_pyThink;
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
@@ -3009,7 +3004,7 @@ inline boost::python::object CBaseEntity::GetPyHandle() const
 	return m_pyHandle; 
 }
 
-inline bp::object CBaseEntity::GetPyThink()
+inline boost::python::object CBaseEntity::GetPyThink()
 {
 	return m_pyThink; 
 }

@@ -1071,7 +1071,7 @@ void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
 //			to run it's game code.
 //			All other entity thinking is done during worldspawn's think
 //-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsPyDispatchThink( bp::object thinkFunc )
+void CBaseEntity::PhysicsPyDispatchThink( boost::python::object thinkFunc )
 {
 	VPROF_ENTER_SCOPE( ( !vprof_scope_entity_thinks.GetBool() ) ? 
 						"CBaseEntity::PhysicsDispatchThink" : 
