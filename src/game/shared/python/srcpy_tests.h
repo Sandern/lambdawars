@@ -17,7 +17,4 @@ class CBaseEntity;
 // Entity Converter related function tests
 void SrcPyTest_EntityArg( CBaseEntity *pEntity );
 
-// Temp test
-void SrcPyTest_NCrossProducts( int n, Vector &a, Vector &b );
-
 #endif // SRCPYTHON_TESTS_H
