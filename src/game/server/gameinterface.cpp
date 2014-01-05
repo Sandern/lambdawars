@@ -114,12 +114,12 @@
 
 #ifdef HL2WARS_DLL
 #include "matchmaking/swarm/imatchext_swarm.h"
-#include "hl2wars/unit_base_shared.h"
-#include "hl2wars/hl2wars_gamerules.h"
-#include "hl2wars/hl2wars_player.h"
-#include "hl2wars/fowmgr.h"
-#include "hl2wars/wars_plat_misc.h"
-#include "hl2wars/wars_mount_system.h"
+#include "unit_base_shared.h"
+#include "hl2wars_gamerules.h"
+#include "hl2wars_player.h"
+#include "fowmgr.h"
+#include "wars_plat_misc.h"
+#include "wars_mount_system.h"
 
 #include "INetChannel.h"
 #include "IClient.h"

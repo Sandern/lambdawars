@@ -189,6 +189,14 @@ class CBaseAnimatingOverlay : public CBaseAnimating
 {
 	DECLARE_CLASS( CBaseAnimatingOverlay, CBaseAnimating );
 
+// =======================================
+// PySource Additions
+// =======================================
+	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY );
+// =======================================
+// END PySource Additions
+// =======================================
+
 public:
 	enum 
 	{
@@ -201,7 +209,6 @@ private:
 	//int				m_nActiveBaseLayers;
 
 public:
-	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY );
 	
 	virtual CBaseAnimatingOverlay *	GetBaseAnimatingOverlay() { return this; }
 	

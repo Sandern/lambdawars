@@ -149,9 +149,9 @@
 #endif // ENABLE_PYTHON
 
 #ifdef HL2WARS_DLL
-#include "hl2wars/fowmgr.h"
-#include "hl2wars/wars_mount_system.h"
-#include "hl2wars/wars_flora.h"
+#include "fowmgr.h"
+#include "wars_mount_system.h"
+#include "wars_flora.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"

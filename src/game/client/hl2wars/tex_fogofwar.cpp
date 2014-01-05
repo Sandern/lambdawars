@@ -6,9 +6,9 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hl2wars/tex_fogofwar.h"
+#include "tex_fogofwar.h"
 #include "materialsystem/IMaterialVar.h"
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 #include "tier0/vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

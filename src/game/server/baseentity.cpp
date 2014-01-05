@@ -73,10 +73,12 @@
 #include "videocfg/videocfg.h"
 
 #ifdef HL2WARS_DLL
-#include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
 #endif // HL2WARS_DLL
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
 #include "srcpy_util.h"
@@ -84,6 +86,9 @@
 #include "srcpy_usermessage.h"
 #include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -8768,8 +8773,9 @@ void CC_Ent_Orient( const CCommand& args )
 
 static ConCommand ent_orient("ent_orient", CC_Ent_Orient, "Orient the specified entity to match the player's angles. By default, only orients target entity's YAW. Use the 'allangles' option to orient on all axis.\n\tFormat: ent_orient <entity name> <optional: allangles>", FCVAR_CHEAT);
 
+#ifdef HL2WARS_DLL
 //------------------------------------------------------------------------------
-// HL2Wars additions
+// Lambda Wars additions
 
 //------------------------------------------------------------------------------
 // Purpose: 
@@ -8872,6 +8878,7 @@ void CBaseEntity::FOWForceUpdate( int iPlayerIndex )
 		return;
 	FogOfWarMgr()->MarkEntityUnKnown( iPlayerIndex, entindex() );
 }
+#endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
 //------------------------------------------------------------------------------

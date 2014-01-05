@@ -13,14 +13,14 @@
 #include <algorithm>
 
 #if defined( CLIENT_DLL )
-	#include "hl2wars/c_hl2wars_player.h"
+	#include "c_hl2wars_player.h"
 	#include "materialsystem/ITexture.h"
 	#include "materialsystem/imaterialvar.h"
 	#include "renderparm.h"
 	#include "tex_fogofwar.h"
 	#include "videocfg/videocfg.h"
 #else
-	#include "hl2wars/hl2wars_player.h"
+	#include "hl2wars_player.h"
 #endif
 
 #include <string.h>

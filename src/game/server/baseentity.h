@@ -2361,6 +2361,7 @@ inline bool CBaseEntity::GetCheckUntouch() const
 	return IsEFlagSet( EFL_CHECK_UNTOUCH );
 }
 
+#ifdef HL2WARS_DLL
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -2396,6 +2397,7 @@ inline void CBaseEntity::SetViewDistance( float dist )
 { 
 	m_fViewDistance = dist; 
 }
+#endif // HL2WARS_DLL
 
 //-----------------------------------------------------------------------------
 // Network state optimization

@@ -50,9 +50,15 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 #include "fowmgr.h"
 #endif // HL2WARS_DLL
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
-#include "srcpy.h"
+#include "srcpy_boostpython.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -2681,6 +2687,7 @@ float CBaseEntity::HealthFraction() const
 	return flFraction;
 }
 
+#ifdef HL2WARS_DLL
 //------------------------------------------------------------------------------
 // HL2Wars additions
 void CBaseEntity::OnChangeOwnerNumberInternal( int old_owner_number )
@@ -2824,7 +2831,11 @@ void CBaseEntity::RecalculateFOWFlags()
 	DispatchUpdateTransmitState();
 }
 #endif // CLIENT_DLL
+#endif // HL2WARS_DLL
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2916,7 +2927,7 @@ void CBaseEntity::PyThink()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //----------------------------------------------------------------------------
-void CBaseEntity::PyTouch( CBaseEntity *pOther )
+void CBaseEntity::PyTouch( ::CBaseEntity *pOther )
 {
 	try	
 	{
@@ -2928,5 +2939,7 @@ void CBaseEntity::PyTouch( CBaseEntity *pOther )
 		PyErr_Clear();
 	}
 }
-
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================

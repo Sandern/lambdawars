@@ -48,7 +48,7 @@
 	#include "srcpy_usermessage.h"
 #endif // ENABLE_PYTHON
 
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

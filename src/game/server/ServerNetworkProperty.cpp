@@ -1,4 +1,4 @@
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -10,8 +10,10 @@
 #include "tier0/dbg.h"
 #include "gameinterface.h"
 
+#if HL2WARS_DLL
 #include "hl2wars_player.h"
 #include "collisionutils.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -399,7 +401,9 @@ void CServerNetworkProperty::SetUpdateInterval( float val )
 	if ( val == 0 )
 	{
 		m_TimerEvent.StopUpdates();
+#ifdef HL2WARS_DLL
 		FireEvent(); // Fire event in case changed!
+#endif // HL2WARS_DLL
 	}
 	else
 		m_TimerEvent.SetUpdateInterval( val );

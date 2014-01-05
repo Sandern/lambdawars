@@ -12,9 +12,9 @@
 #include <ienginevgui.h>
 #include <vgui/ISystem.h>
 
-#include "hl2wars/hl2wars_baseminimap.h"
-#include "hl2wars/vgui_video_general.h"
-#include "hl2wars/teamcolor_proxy.h"
+#include "hl2wars_baseminimap.h"
+#include "vgui_video_general.h"
+#include "teamcolor_proxy.h"
 #include "game_controls/basemodel_panel.h"
 
 #include "hl2wars/gameui/wars/basemodpanel.h"

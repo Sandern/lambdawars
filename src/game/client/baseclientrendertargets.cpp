@@ -14,7 +14,7 @@
 #ifdef GAMEUI_UISYSTEM2_ENABLED
 #include "gameui.h"
 #endif
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"

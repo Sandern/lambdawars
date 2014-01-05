@@ -16,7 +16,7 @@
 #include <vgui_controls/Controls.h>
 
 #include "srcpy_vgui.h"
-#include "hl2wars/teamcolor_proxy.h"
+#include "teamcolor_proxy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

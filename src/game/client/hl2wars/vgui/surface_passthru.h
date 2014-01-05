@@ -15,7 +15,7 @@
 #include <vgui/ISurface.h>
 #include "tier1/utlvector.h"
 
-#include "hl2wars/teamcolor_proxy.h"
+#include "teamcolor_proxy.h"
 
 #undef CreateFont
 

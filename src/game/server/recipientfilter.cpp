@@ -11,7 +11,7 @@
 #include "ipredictionsystem.h"
 
 #ifdef HL2WARS_DLL
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!

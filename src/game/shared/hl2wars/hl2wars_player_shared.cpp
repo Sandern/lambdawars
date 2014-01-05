@@ -9,7 +9,7 @@
 #include "debugoverlay_shared.h"
 
 #ifdef CLIENT_DLL
-	#include "hl2wars/c_hl2wars_player.h"
+	#include "c_hl2wars_player.h"
 	#include "gamestringpool.h"
 	#include "iinput.h"
 
