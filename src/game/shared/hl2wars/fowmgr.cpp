@@ -2068,7 +2068,7 @@ void CFogOfWarMgr::DoShadowCasting( CBaseEntity *pEnt, int radius, FOWSIZE_TYPE 
 void CFogOfWarMgr::UpdateVisibility( void )
 {
 	VPROF_BUDGET( "CFogOfWarMgr::UpdateVisibility", VPROF_BUDGETGROUP_FOGOFWAR );
-
+	
 	int i;
 	CBaseEntity *pEnt;
 	Vector origin;
@@ -2081,7 +2081,7 @@ void CFogOfWarMgr::UpdateVisibility( void )
 #endif // CLIENT_DLL
 
 	// Update all entities that are affected by the fog of war
-	for(i=0; i<m_FogEntities.Count(); i++)
+	for( i = 0; i < m_FogEntities.Count(); i++ )
 	{
 		pEnt = m_FogEntities[i];
 		if( !pEnt )
@@ -2165,7 +2165,7 @@ void CFogOfWarMgr::UpdateVisibility( void )
 		}
 #else
 		bool bNeedsUpdateTransmitState = false;
-		for( int j=0; j<FOWMAXPLAYERS; j++ )
+		for( int j = 0; j < FOWMAXPLAYERS; j++ )
 		{
 			infow = (m_FogOfWar[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)] & (1 << j)) == 0;
 			if( infow != pEnt->IsInFOW(j) )
@@ -2209,8 +2209,8 @@ void CFogOfWarMgr::RemoveFogUpdater( int owner, CBaseEntity *pEnt )
 	if( !pEnt ) 
 		return;
 
-	int radius;
-	radius = pEnt->GetViewDistance() / m_nTileSize;
+	//int radius;
+	//radius = pEnt->GetViewDistance() / m_nTileSize;
 
 	// NOTE: Fog of war array is always reset completely, so no need to hide the fog
 
@@ -2253,8 +2253,6 @@ bool CFogOfWarMgr::FOWShouldShow( CBaseEntity *pEnt, CBasePlayer *pPlayer )
 #else
 	return FOWShouldShow( pEnt, pPlayer->GetOwnerNumber() );
 #endif // CLIENT_DLL
-
-	
 }
 
 //-----------------------------------------------------------------------------

@@ -818,6 +818,9 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 //-----------------------------------------------------------------------------
 bool CUnitBase::HasRangeAttackLOSTarget( CBaseEntity *pTarget )
 {
+	if( !pTarget )
+		return false;
+
 	if( GetActiveWeapon() )
 	{
 		CWarsWeapon *pWeapon = dynamic_cast<CWarsWeapon *>( GetActiveWeapon() );
