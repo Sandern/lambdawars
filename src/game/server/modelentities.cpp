@@ -72,7 +72,6 @@ void CFuncBrush::Spawn( void )
 
 bool CFuncBrush::CreateVPhysics( void )
 {
-
 	// NOTE: Don't init this static.  It's pretty common for these to be constrained
 	// and dynamically parented.  Initing shadow avoids having to destroy the physics
 	// object later and lose the constraints.

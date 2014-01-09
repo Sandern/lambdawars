@@ -43,12 +43,20 @@
 #include "cellcoord.h"
 #include "gamestringpool.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
-	#include "srcpy_usermessage.h"
+#include "srcpy.h"
+#include "srcpy_usermessage.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
+#ifdef HL2WARS_DLL
 #include "fowmgr.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -6528,116 +6536,6 @@ IResponseSystem *CBaseEntity::GetResponseSystem()
 	return g_pResponseSystem;
 }
 
-void C_BaseEntity::SetOwnerNumber( int owner_number )
-{
-	if( m_iOwnerNumber == owner_number )
-		return;			// Nothing changed
-
-	int old = m_iOwnerNumber;
-	m_iOwnerNumber = owner_number; 
-	OnChangeOwnerNumberInternal(old);
-}
-
-//------------------------------------------------------------------------------
-bool C_BaseEntity::FOWShouldShow()
-{
-	return FogOfWarMgr()->FOWShouldShow( this, C_BasePlayer::GetLocalPlayer() );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetTeamColor( Vector &vTeamColor ) 
-{ 
-	m_vTeamColor = vTeamColor;
-	if( !m_bUseRelationBasedTeamColor )
-	{
-		m_vCurTeamColor = m_vTeamColor; // Directly change
-		m_vTargetTeamColor = m_vTeamColor;
-	}
-	else
-	{
-		m_bCheckTeamColor = true; // Something might have changed
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-extern Disposition_t GetPlayerRelationShip(int p1, int p2);
-ConVar cl_teamcolor_relationbased( "cl_teamcolor_relationbased", "0" );
-ConVar cl_teamcolor_converge_speed( "cl_teamcolor_converge_speed", "1.75" );
-
-Vector &CBaseEntity::GetTeamColor( bool bDirect ) 
-{ 
-	// Check if relationbase setting changed
-	bool bUseRelationBasedTeamColor = cl_teamcolor_relationbased.GetBool();
-	if( bUseRelationBasedTeamColor != m_bUseRelationBasedTeamColor )
-	{
-		m_bCheckTeamColor = true;
-		m_bUseRelationBasedTeamColor = bUseRelationBasedTeamColor;
-	}
-
-	// Detect if we changed color
-	if( m_bCheckTeamColor )
-	{
-		if( bUseRelationBasedTeamColor )
-		{
-			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-			if( !pPlayer )
-				return m_vTeamColor;
-
-			if( pPlayer->GetOwnerNumber() == GetOwnerNumber() )
-			{
-				// Our own units are green
-				m_vTargetTeamColor = Vector(0, 1, 0);
-			}
-			else
-			{
-				// Enemies are red, allies yellow and neutral grey
-				Disposition_t d = GetPlayerRelationShip( pPlayer->GetOwnerNumber(), GetOwnerNumber() );
-				switch( d )
-				{
-				case D_HT:
-					m_vTargetTeamColor = Vector(1, 0, 0);
-					break;
-				case D_LI:
-					m_vTargetTeamColor = Vector(1, 1, 0);
-					break;
-				case D_NU:
-				default:
-					m_vTargetTeamColor = Vector(0.6, 0.6, 0.6);
-					break;
-				}
-			}
-		}
-		else
-		{
-			m_vTargetTeamColor = m_vTeamColor;
-		}
-
-		m_bCheckTeamColor = false;
-	}
-
-	// For parts of code that don't update the team color actively:
-	if( bDirect )
-	{
-		if( m_bUseRelationBasedTeamColor )
-			return m_vTargetTeamColor;
-		else
-			return m_vTeamColor;
-	}
-
-	// Update current color
-	if( m_fTeamColorLastUpdateFrame != gpGlobals->frametime && m_vTargetTeamColor != m_vCurTeamColor )
-	{
-		m_vCurTeamColor = VectorLerp( m_vCurTeamColor, m_vTargetTeamColor, gpGlobals->frametime * cl_teamcolor_converge_speed.GetFloat() );
-		m_fTeamColorLastUpdateFrame = gpGlobals->frametime;
-	}
-
-	return m_vCurTeamColor; 
-}
-
 #ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -6785,6 +6683,121 @@ void C_BaseEntity::PyDeallocate(PyObject* self_, void *storage)
 	g_pMemAlloc->Free( storage );
 }	
 #endif // ENABLE_PYTHON
+
+#ifdef HL2WARS_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_BaseEntity::SetOwnerNumber( int owner_number )
+{
+	if( m_iOwnerNumber == owner_number )
+		return;			// Nothing changed
+
+	int old = m_iOwnerNumber;
+	m_iOwnerNumber = owner_number; 
+	OnChangeOwnerNumberInternal(old);
+}
+
+//------------------------------------------------------------------------------
+bool C_BaseEntity::FOWShouldShow()
+{
+	return FogOfWarMgr()->FOWShouldShow( this, C_BasePlayer::GetLocalPlayer() );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetTeamColor( Vector &vTeamColor ) 
+{ 
+	m_vTeamColor = vTeamColor;
+	if( !m_bUseRelationBasedTeamColor )
+	{
+		m_vCurTeamColor = m_vTeamColor; // Directly change
+		m_vTargetTeamColor = m_vTeamColor;
+	}
+	else
+	{
+		m_bCheckTeamColor = true; // Something might have changed
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+extern Disposition_t GetPlayerRelationShip(int p1, int p2);
+ConVar cl_teamcolor_relationbased( "cl_teamcolor_relationbased", "0" );
+ConVar cl_teamcolor_converge_speed( "cl_teamcolor_converge_speed", "1.75" );
+
+Vector &CBaseEntity::GetTeamColor( bool bDirect ) 
+{ 
+	// Check if relationbase setting changed
+	bool bUseRelationBasedTeamColor = cl_teamcolor_relationbased.GetBool();
+	if( bUseRelationBasedTeamColor != m_bUseRelationBasedTeamColor )
+	{
+		m_bCheckTeamColor = true;
+		m_bUseRelationBasedTeamColor = bUseRelationBasedTeamColor;
+	}
+
+	// Detect if we changed color
+	if( m_bCheckTeamColor )
+	{
+		if( bUseRelationBasedTeamColor )
+		{
+			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+			if( !pPlayer )
+				return m_vTeamColor;
+
+			if( pPlayer->GetOwnerNumber() == GetOwnerNumber() )
+			{
+				// Our own units are green
+				m_vTargetTeamColor = Vector(0, 1, 0);
+			}
+			else
+			{
+				// Enemies are red, allies yellow and neutral grey
+				Disposition_t d = GetPlayerRelationShip( pPlayer->GetOwnerNumber(), GetOwnerNumber() );
+				switch( d )
+				{
+				case D_HT:
+					m_vTargetTeamColor = Vector(1, 0, 0);
+					break;
+				case D_LI:
+					m_vTargetTeamColor = Vector(1, 1, 0);
+					break;
+				case D_NU:
+				default:
+					m_vTargetTeamColor = Vector(0.6, 0.6, 0.6);
+					break;
+				}
+			}
+		}
+		else
+		{
+			m_vTargetTeamColor = m_vTeamColor;
+		}
+
+		m_bCheckTeamColor = false;
+	}
+
+	// For parts of code that don't update the team color actively:
+	if( bDirect )
+	{
+		if( m_bUseRelationBasedTeamColor )
+			return m_vTargetTeamColor;
+		else
+			return m_vTeamColor;
+	}
+
+	// Update current color
+	if( m_fTeamColorLastUpdateFrame != gpGlobals->frametime && m_vTargetTeamColor != m_vCurTeamColor )
+	{
+		m_vCurTeamColor = VectorLerp( m_vCurTeamColor, m_vTargetTeamColor, gpGlobals->frametime * cl_teamcolor_converge_speed.GetFloat() );
+		m_fTeamColorLastUpdateFrame = gpGlobals->frametime;
+	}
+
+	return m_vCurTeamColor; 
+}
+#endif // HL2WARS_DLL
 
 //------------------------------------------------------------------------------
 void CC_CL_Find_Ent( const CCommand& args )

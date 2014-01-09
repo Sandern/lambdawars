@@ -16,7 +16,13 @@ class CBaseToggle : public CBaseEntity
 {
 	DECLARE_CLASS( CBaseToggle, CBaseEntity );
 	DECLARE_SERVERCLASS();
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYSERVERCLASS( CBaseToggle, PN_BASETOGGLE );
+// =======================================
+// END PySource Additions
+// =======================================
 
 public:
 	CBaseToggle();

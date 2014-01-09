@@ -24,7 +24,13 @@ class CFuncBrush : public CBaseEntity
 {
 public:
 	DECLARE_CLASS( CFuncBrush, CBaseEntity );
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLASS( CFuncBrush );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	virtual void Spawn( void );
 	bool CreateVPhysics( void );
