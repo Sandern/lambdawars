@@ -158,7 +158,7 @@ bool CCefSystem::Init()
 
 	// Get path to subprocess browser
 	char browser_subprocess_path[_MAX_PATH];
-	filesystem->RelativePathToFullPath( "bin/cef.exe", "MOD", browser_subprocess_path, _MAX_PATH );
+	filesystem->RelativePathToFullPath( "bin/lambdawars_browser.exe", "MOD", browser_subprocess_path, _MAX_PATH );
 
 	// The process sub process file should exist. Error out, because otherwise we can't display the main menu
 	if( filesystem->FileExists( browser_subprocess_path ) == false )

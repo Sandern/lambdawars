@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B96F654F-7BEF-4BB6-8D25-B26818A88099}</ProjectGuid>
+    <ProjectGuid>{7C266677-7425-4605-8C44-D410CCBF232F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>cef_process_helper</RootNamespace>
   </PropertyGroup>
@@ -43,7 +43,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>cef</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
