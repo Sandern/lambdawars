@@ -88,6 +88,8 @@ public:
 	void							SetMouseCapture( CBaseEntity *pEntity );
 	CBaseEntity *					GetMouseCapture();
 
+	virtual bool					IsMouseHoveringEntity( CBaseEntity *pEnt );
+
 	inline const char *				GetFaction();
 	virtual void					ChangeFaction( const char *faction );
 

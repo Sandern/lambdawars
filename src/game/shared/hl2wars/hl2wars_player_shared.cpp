@@ -895,6 +895,20 @@ CBaseEntity *CHL2WarsPlayer::GetMouseCapture()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Returns true if the mouse is hovering on the tested entity
+//-----------------------------------------------------------------------------
+bool CHL2WarsPlayer::IsMouseHoveringEntity( CBaseEntity *pEnt )
+{
+	if( !pEnt )
+		return false;
+
+	if( m_MouseData.m_hEnt == pEnt )
+		return true;
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
 void CHL2WarsPlayer::ChangeFaction( const char *faction )

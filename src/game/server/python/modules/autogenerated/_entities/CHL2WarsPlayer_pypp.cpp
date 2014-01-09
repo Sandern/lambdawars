@@ -1502,6 +1502,16 @@ void register_CHL2WarsPlayer_class(){
                 , IsLeftPressed_function_type( &::CHL2WarsPlayer::IsLeftPressed ) );
         
         }
+        { //::CHL2WarsPlayer::IsMouseHoveringEntity
+        
+            typedef bool ( ::CHL2WarsPlayer::*IsMouseHoveringEntity_function_type )( ::CBaseEntity * ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "IsMouseHoveringEntity"
+                , IsMouseHoveringEntity_function_type( &::CHL2WarsPlayer::IsMouseHoveringEntity )
+                , ( bp::arg("pEnt") ) );
+        
+        }
         { //::CHL2WarsPlayer::IsRightDoublePressed
         
             typedef bool ( ::CHL2WarsPlayer::*IsRightDoublePressed_function_type )(  ) ;

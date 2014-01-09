@@ -100,7 +100,7 @@ int CEPyHandle<T>::Cmp( boost::python::object other )
 				return -1;
 		}
 	}
-	catch( bp::error_already_set & )
+	catch( boost::python::error_already_set & )
 	{
 		// Not a handle, just clear error and return -1
 		PyErr_Clear();	
