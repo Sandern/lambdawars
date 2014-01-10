@@ -80,6 +80,16 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( i, pStr );
 		}
+		else if( valuetype == builtins.attr("unicode") )
+		{
+			const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
+			if( !pStr )
+			{
+				PyErr_SetString(PyExc_ValueError, "PyToCefValueList: Invalid unicode object in message list" );
+				throw boost::python::error_already_set(); 
+			}
+			result->SetString( i, pStr );
+		}
 		else if( valuetype == builtins.attr("bool") )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
@@ -194,6 +204,16 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		else if( valuetype == builtins.attr("str") )
 		{
 			const char *pStr = boost::python::extract<const char *>(value);
+			result->SetString( cefkey, pStr );
+		}
+		else if( valuetype == builtins.attr("unicode") )
+		{
+			const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
+			if( !pStr )
+			{
+				PyErr_SetString(PyExc_ValueError, "PyToCefDictionaryValue: Invalid unicode object in message list" );
+				throw boost::python::error_already_set(); 
+			}
 			result->SetString( cefkey, pStr );
 		}
 		else if( valuetype == builtins.attr("bool") )
