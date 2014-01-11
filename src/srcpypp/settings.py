@@ -60,7 +60,7 @@ modules = [
     
     ('_te', 'TE'),
     ('_fow', 'FOW'),
-    ('steam', 'Steam'),
+    ('_steam', 'Steam'),
     
     # Client
     ('_input', 'Input'),

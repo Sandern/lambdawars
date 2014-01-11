@@ -12,6 +12,8 @@
 
 #include "steam/steamclientpublic.h"
 
+#include "srcpy_steam.h"
+
 #include "vgui_avatarimage.h"
 
 #include "srcpy.h"
@@ -20,7 +22,121 @@
 
 namespace bp = boost::python;
 
-BOOST_PYTHON_MODULE(steam){
+PY_STEAM_CALLBACK_WRAPPER( LobbyMatchList, LobbyMatchList_t );
+
+struct LobbyMatchListCallback_wrapper : LobbyMatchListCallback, bp::wrapper< LobbyMatchListCallback > {
+
+    LobbyMatchListCallback_wrapper(LobbyMatchListCallback const & arg )
+    : LobbyMatchListCallback( arg )
+      , bp::wrapper< LobbyMatchListCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyMatchListCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyMatchListCallback( steamapicall )
+      , bp::wrapper< LobbyMatchListCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyMatchListCallback, OnLobbyMatchList )
+        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallback, OnLobbyMatchList )
+        bp::override func_OnLobbyMatchList = this->get_override( "OnLobbyMatchList" );
+        if( func_OnLobbyMatchList.ptr() != Py_None )
+            try {
+                func_OnLobbyMatchList( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+            }
+        else
+            this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
+        LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
+
+struct LobbyGameCreatedCallback_wrapper : LobbyGameCreatedCallback, bp::wrapper< LobbyGameCreatedCallback > {
+
+    LobbyGameCreatedCallback_wrapper(LobbyGameCreatedCallback const & arg )
+    : LobbyGameCreatedCallback( arg )
+      , bp::wrapper< LobbyGameCreatedCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyGameCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyGameCreatedCallback( steamapicall )
+      , bp::wrapper< LobbyGameCreatedCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyGameCreatedCallback, OnLobbyGameCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallback, OnLobbyGameCreated )
+        bp::override func_OnLobbyGameCreated = this->get_override( "OnLobbyGameCreated" );
+        if( func_OnLobbyGameCreated.ptr() != Py_None )
+            try {
+                func_OnLobbyGameCreated( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+            }
+        else
+            this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
+        LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyCreated, LobbyCreated_t );
+
+struct LobbyCreatedCallback_wrapper : LobbyCreatedCallback, bp::wrapper< LobbyCreatedCallback > {
+
+    LobbyCreatedCallback_wrapper(LobbyCreatedCallback const & arg )
+    : LobbyCreatedCallback( arg )
+      , bp::wrapper< LobbyCreatedCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyCreatedCallback( steamapicall )
+      , bp::wrapper< LobbyCreatedCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyCreatedCallback, OnLobbyCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallback, OnLobbyCreated )
+        bp::override func_OnLobbyCreated = this->get_override( "OnLobbyCreated" );
+        if( func_OnLobbyCreated.ptr() != Py_None )
+            try {
+                func_OnLobbyCreated( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+            }
+        else
+            this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
+        LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+    }
+};
+
+BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
     bp::enum_< EAccountType>("EAccountType")
@@ -99,6 +215,32 @@ BOOST_PYTHON_MODULE(steam){
         .value("k_EFriendRelationshipIgnoredFriend", k_EFriendRelationshipIgnoredFriend)
         .value("k_EFriendRelationshipSuggested", k_EFriendRelationshipSuggested)
         .value("k_EFriendRelationshipMax", k_EFriendRelationshipMax)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyComparison>("ELobbyComparison")
+        .value("k_ELobbyComparisonEqualToOrLessThan", k_ELobbyComparisonEqualToOrLessThan)
+        .value("k_ELobbyComparisonLessThan", k_ELobbyComparisonLessThan)
+        .value("k_ELobbyComparisonEqual", k_ELobbyComparisonEqual)
+        .value("k_ELobbyComparisonGreaterThan", k_ELobbyComparisonGreaterThan)
+        .value("k_ELobbyComparisonEqualToOrGreaterThan", k_ELobbyComparisonEqualToOrGreaterThan)
+        .value("k_ELobbyComparisonNotEqual", k_ELobbyComparisonNotEqual)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
+        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
+        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
+        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
+        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyType>("ELobbyType")
+        .value("k_ELobbyTypePrivate", k_ELobbyTypePrivate)
+        .value("k_ELobbyTypeFriendsOnly", k_ELobbyTypeFriendsOnly)
+        .value("k_ELobbyTypePublic", k_ELobbyTypePublic)
+        .value("k_ELobbyTypeInvisible", k_ELobbyTypeInvisible)
         .export_values()
         ;
 
@@ -220,6 +362,10 @@ BOOST_PYTHON_MODULE(steam){
         .def( 
             "SteamFriends"
             , (::ISteamFriends * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamFriends )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamMatchmaking"
+            , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUtils"
@@ -772,13 +918,157 @@ BOOST_PYTHON_MODULE(steam){
             , (bool ( ::ISteamFriends::* )( char const *,char const * ) )( &::ISteamFriends::SetRichPresence )
             , ( bp::arg("pchKey"), bp::arg("pchValue") ) );
 
-    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
-
-    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
-
-    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
-
-    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
+    bp::class_< ISteamMatchmaking, boost::noncopyable >( "ISteamMatchmaking", bp::no_init )    
+        .def( 
+            "AddFavoriteGame"
+            , (int ( ::ISteamMatchmaking::* )( ::AppId_t,::uint32,::uint16,::uint16,::uint32,::uint32 ) )( &::ISteamMatchmaking::AddFavoriteGame )
+            , ( bp::arg("nAppID"), bp::arg("nIP"), bp::arg("nConnPort"), bp::arg("nQueryPort"), bp::arg("unFlags"), bp::arg("rTime32LastPlayedOnServer") ) )    
+        .def( 
+            "AddRequestLobbyListCompatibleMembersFilter"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::AddRequestLobbyListCompatibleMembersFilter )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "AddRequestLobbyListDistanceFilter"
+            , (void ( ::ISteamMatchmaking::* )( ::ELobbyDistanceFilter ) )( &::ISteamMatchmaking::AddRequestLobbyListDistanceFilter )
+            , ( bp::arg("eLobbyDistanceFilter") ) )    
+        .def( 
+            "AddRequestLobbyListFilterSlotsAvailable"
+            , (void ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::AddRequestLobbyListFilterSlotsAvailable )
+            , ( bp::arg("nSlotsAvailable") ) )    
+        .def( 
+            "AddRequestLobbyListNearValueFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,int ) )( &::ISteamMatchmaking::AddRequestLobbyListNearValueFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("nValueToBeCloseTo") ) )    
+        .def( 
+            "AddRequestLobbyListNumericalFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,int,::ELobbyComparison ) )( &::ISteamMatchmaking::AddRequestLobbyListNumericalFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("nValueToMatch"), bp::arg("eComparisonType") ) )    
+        .def( 
+            "AddRequestLobbyListResultCountFilter"
+            , (void ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::AddRequestLobbyListResultCountFilter )
+            , ( bp::arg("cMaxResults") ) )    
+        .def( 
+            "AddRequestLobbyListStringFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,char const *,::ELobbyComparison ) )( &::ISteamMatchmaking::AddRequestLobbyListStringFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("pchValueToMatch"), bp::arg("eComparisonType") ) )    
+        .def( 
+            "CreateLobby"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )( ::ELobbyType,int ) )( &::ISteamMatchmaking::CreateLobby )
+            , ( bp::arg("eLobbyType"), bp::arg("cMaxMembers") ) )    
+        .def( 
+            "DeleteLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,char const * ) )( &::ISteamMatchmaking::DeleteLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetFavoriteGame"
+            , (bool ( ::ISteamMatchmaking::* )( int,::AppId_t *,::uint32 *,::uint16 *,::uint16 *,::uint32 *,::uint32 * ) )( &::ISteamMatchmaking::GetFavoriteGame )
+            , ( bp::arg("iGame"), bp::arg("pnAppID"), bp::arg("pnIP"), bp::arg("pnConnPort"), bp::arg("pnQueryPort"), bp::arg("punFlags"), bp::arg("pRTime32LastPlayedOnServer") ) )    
+        .def( 
+            "GetFavoriteGameCount"
+            , (int ( ::ISteamMatchmaking::* )(  ) )( &::ISteamMatchmaking::GetFavoriteGameCount ) )    
+        .def( 
+            "GetLobbyByIndex"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::GetLobbyByIndex )
+            , ( bp::arg("iLobby") ) )    
+        .def( 
+            "GetLobbyChatEntry"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID,int,::CSteamID *,void *,int,::EChatEntryType * ) )( &::ISteamMatchmaking::GetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser"), bp::arg("pvData"), bp::arg("cubData"), bp::arg("peChatEntryType") ) )    
+        .def( 
+            "GetLobbyData"
+            , (char const * ( ::ISteamMatchmaking::* )( ::CSteamID,char const * ) )( &::ISteamMatchmaking::GetLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetLobbyDataByIndex"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,int,char *,int,char *,int ) )( &::ISteamMatchmaking::GetLobbyDataByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData"), bp::arg("pchKey"), bp::arg("cchKeyBufferSize"), bp::arg("pchValue"), bp::arg("cchValueBufferSize") ) )    
+        .def( 
+            "GetLobbyDataCount"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyDataCount )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetLobbyGameServer"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32 *,::uint16 *,::CSteamID * ) )( &::ISteamMatchmaking::GetLobbyGameServer )
+            , ( bp::arg("steamIDLobby"), bp::arg("punGameServerIP"), bp::arg("punGameServerPort"), bp::arg("psteamIDGameServer") ) )    
+        .def( 
+            "GetLobbyMemberByIndex"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::GetLobbyMemberByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iMember") ) )    
+        .def( 
+            "GetLobbyMemberData"
+            , (char const * ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID,char const * ) )( &::ISteamMatchmaking::GetLobbyMemberData )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDUser"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetLobbyMemberLimit"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyMemberLimit )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetLobbyOwner"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyOwner )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetNumLobbyMembers"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetNumLobbyMembers )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "InviteUserToLobby"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::InviteUserToLobby )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDInvitee") ) )    
+        .def( 
+            "JoinLobby"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::JoinLobby )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "LeaveLobby"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::LeaveLobby )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "RemoveFavoriteGame"
+            , (bool ( ::ISteamMatchmaking::* )( ::AppId_t,::uint32,::uint16,::uint16,::uint32 ) )( &::ISteamMatchmaking::RemoveFavoriteGame )
+            , ( bp::arg("nAppID"), bp::arg("nIP"), bp::arg("nConnPort"), bp::arg("nQueryPort"), bp::arg("unFlags") ) )    
+        .def( 
+            "RequestLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::RequestLobbyData )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "RequestLobbyList"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )(  ) )( &::ISteamMatchmaking::RequestLobbyList ) )    
+        .def( 
+            "SendLobbyChatMsg"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,void const *,int ) )( &::ISteamMatchmaking::SendLobbyChatMsg )
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) )    
+        .def( 
+            "SetLinkedLobby"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::SetLinkedLobby )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDLobbyDependent") ) )    
+        .def( 
+            "SetLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,char const *,char const * ) )( &::ISteamMatchmaking::SetLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "SetLobbyGameServer"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32,::uint16,::CSteamID ) )( &::ISteamMatchmaking::SetLobbyGameServer )
+            , ( bp::arg("steamIDLobby"), bp::arg("unGameServerIP"), bp::arg("unGameServerPort"), bp::arg("steamIDGameServer") ) )    
+        .def( 
+            "SetLobbyJoinable"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,bool ) )( &::ISteamMatchmaking::SetLobbyJoinable )
+            , ( bp::arg("steamIDLobby"), bp::arg("bLobbyJoinable") ) )    
+        .def( 
+            "SetLobbyMemberData"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID,char const *,char const * ) )( &::ISteamMatchmaking::SetLobbyMemberData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "SetLobbyMemberLimit"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::SetLobbyMemberLimit )
+            , ( bp::arg("steamIDLobby"), bp::arg("cMaxMembers") ) )    
+        .def( 
+            "SetLobbyOwner"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::SetLobbyOwner )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDNewOwner") ) )    
+        .def( 
+            "SetLobbyType"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
+            , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
 
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
@@ -852,6 +1142,110 @@ BOOST_PYTHON_MODULE(steam){
             "ShowGamepadTextInput"
             , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
+
+    { //::LobbyCreated_t
+        typedef bp::class_< LobbyCreated_t > LobbyCreated_t_exposer_t;
+        LobbyCreated_t_exposer_t LobbyCreated_t_exposer = LobbyCreated_t_exposer_t( "LobbyCreated_t" );
+        bp::scope LobbyCreated_t_scope( LobbyCreated_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyCreated_t::k_iCallback;
+        LobbyCreated_t_exposer.def_readwrite( "result", &LobbyCreated_t::m_eResult );
+        LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
+    }
+
+    { //::LobbyGameCreated_t
+        typedef bp::class_< LobbyGameCreated_t > LobbyGameCreated_t_exposer_t;
+        LobbyGameCreated_t_exposer_t LobbyGameCreated_t_exposer = LobbyGameCreated_t_exposer_t( "LobbyGameCreated_t" );
+        bp::scope LobbyGameCreated_t_scope( LobbyGameCreated_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyGameCreated_t::k_iCallback;
+        LobbyGameCreated_t_exposer.def_readwrite( "steamidgameserver", &LobbyGameCreated_t::m_ulSteamIDGameServer );
+        LobbyGameCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyGameCreated_t::m_ulSteamIDLobby );
+        LobbyGameCreated_t_exposer.def_readwrite( "ip", &LobbyGameCreated_t::m_unIP );
+        LobbyGameCreated_t_exposer.def_readwrite( "port", &LobbyGameCreated_t::m_usPort );
+    }
+
+    { //::LobbyMatchList_t
+        typedef bp::class_< LobbyMatchList_t > LobbyMatchList_t_exposer_t;
+        LobbyMatchList_t_exposer_t LobbyMatchList_t_exposer = LobbyMatchList_t_exposer_t( "LobbyMatchList_t" );
+        bp::scope LobbyMatchList_t_scope( LobbyMatchList_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyMatchList_t::k_iCallback;
+        LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
+    }
+
+    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
+
+    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
+
+    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
+
+    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
+
+    { //::LobbyMatchListCallback
+        typedef bp::class_< LobbyMatchListCallback_wrapper > LobbyMatchListCallback_exposer_t;
+        LobbyMatchListCallback_exposer_t LobbyMatchListCallback_exposer = LobbyMatchListCallback_exposer_t( "LobbyMatchListCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyMatchListCallback_scope( LobbyMatchListCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallback >();
+        { //::LobbyMatchListCallback::OnLobbyMatchList
+        
+            typedef void ( ::LobbyMatchListCallback::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            typedef void ( LobbyMatchListCallback_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            
+            LobbyMatchListCallback_exposer.def( 
+                "OnLobbyMatchList"
+                , OnLobbyMatchList_function_type(&::LobbyMatchListCallback::OnLobbyMatchList)
+                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallback_wrapper::default_OnLobbyMatchList)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyGameCreatedCallback
+        typedef bp::class_< LobbyGameCreatedCallback_wrapper > LobbyGameCreatedCallback_exposer_t;
+        LobbyGameCreatedCallback_exposer_t LobbyGameCreatedCallback_exposer = LobbyGameCreatedCallback_exposer_t( "LobbyGameCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyGameCreatedCallback_scope( LobbyGameCreatedCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallback >();
+        { //::LobbyGameCreatedCallback::OnLobbyGameCreated
+        
+            typedef void ( ::LobbyGameCreatedCallback::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            typedef void ( LobbyGameCreatedCallback_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            
+            LobbyGameCreatedCallback_exposer.def( 
+                "OnLobbyGameCreated"
+                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallback::OnLobbyGameCreated)
+                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallback_wrapper::default_OnLobbyGameCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyCreatedCallback
+        typedef bp::class_< LobbyCreatedCallback_wrapper > LobbyCreatedCallback_exposer_t;
+        LobbyCreatedCallback_exposer_t LobbyCreatedCallback_exposer = LobbyCreatedCallback_exposer_t( "LobbyCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyCreatedCallback_scope( LobbyCreatedCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallback >();
+        { //::LobbyCreatedCallback::OnLobbyCreated
+        
+            typedef void ( ::LobbyCreatedCallback::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            typedef void ( LobbyCreatedCallback_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            
+            LobbyCreatedCallback_exposer.def( 
+                "OnLobbyCreated"
+                , OnLobbyCreated_function_type(&::LobbyCreatedCallback::OnLobbyCreated)
+                , default_OnLobbyCreated_function_type(&LobbyCreatedCallback_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::PyGetLobbyDataByIndex
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyDataByIndex_function_type )( ::CSteamID,int );
+        
+        bp::def( 
+            "PyGetLobbyDataByIndex"
+            , PyGetLobbyDataByIndex_function_type( &::PyGetLobbyDataByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData") ) );
+    
+    }
 }
 #else
 #include "cbase.h"
@@ -864,13 +1258,129 @@ BOOST_PYTHON_MODULE(steam){
 
 #include "steam/steamclientpublic.h"
 
+#include "srcpy_steam.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
 
-BOOST_PYTHON_MODULE(steam){
+PY_STEAM_CALLBACK_WRAPPER( LobbyMatchList, LobbyMatchList_t );
+
+struct LobbyMatchListCallback_wrapper : LobbyMatchListCallback, bp::wrapper< LobbyMatchListCallback > {
+
+    LobbyMatchListCallback_wrapper(LobbyMatchListCallback const & arg )
+    : LobbyMatchListCallback( arg )
+      , bp::wrapper< LobbyMatchListCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyMatchListCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyMatchListCallback( steamapicall )
+      , bp::wrapper< LobbyMatchListCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyMatchListCallback, OnLobbyMatchList )
+        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallback, OnLobbyMatchList )
+        bp::override func_OnLobbyMatchList = this->get_override( "OnLobbyMatchList" );
+        if( func_OnLobbyMatchList.ptr() != Py_None )
+            try {
+                func_OnLobbyMatchList( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+            }
+        else
+            this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
+        LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
+
+struct LobbyGameCreatedCallback_wrapper : LobbyGameCreatedCallback, bp::wrapper< LobbyGameCreatedCallback > {
+
+    LobbyGameCreatedCallback_wrapper(LobbyGameCreatedCallback const & arg )
+    : LobbyGameCreatedCallback( arg )
+      , bp::wrapper< LobbyGameCreatedCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyGameCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyGameCreatedCallback( steamapicall )
+      , bp::wrapper< LobbyGameCreatedCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyGameCreatedCallback, OnLobbyGameCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallback, OnLobbyGameCreated )
+        bp::override func_OnLobbyGameCreated = this->get_override( "OnLobbyGameCreated" );
+        if( func_OnLobbyGameCreated.ptr() != Py_None )
+            try {
+                func_OnLobbyGameCreated( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+            }
+        else
+            this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
+        LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyCreated, LobbyCreated_t );
+
+struct LobbyCreatedCallback_wrapper : LobbyCreatedCallback, bp::wrapper< LobbyCreatedCallback > {
+
+    LobbyCreatedCallback_wrapper(LobbyCreatedCallback const & arg )
+    : LobbyCreatedCallback( arg )
+      , bp::wrapper< LobbyCreatedCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyCreatedCallback( steamapicall )
+      , bp::wrapper< LobbyCreatedCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyCreatedCallback, OnLobbyCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallback, OnLobbyCreated )
+        bp::override func_OnLobbyCreated = this->get_override( "OnLobbyCreated" );
+        if( func_OnLobbyCreated.ptr() != Py_None )
+            try {
+                func_OnLobbyCreated( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+            }
+        else
+            this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
+        LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+    }
+};
+
+BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
     bp::enum_< EAccountType>("EAccountType")
@@ -936,6 +1446,57 @@ BOOST_PYTHON_MODULE(steam){
         .value("k_EDenySteamResponseTimedOut", k_EDenySteamResponseTimedOut)
         .value("k_EDenySteamValidationStalled", k_EDenySteamValidationStalled)
         .value("k_EDenySteamOwnerLeftGuestUser", k_EDenySteamOwnerLeftGuestUser)
+        .export_values()
+        ;
+
+    bp::enum_< EFriendRelationship>("EFriendRelationship")
+        .value("k_EFriendRelationshipNone", k_EFriendRelationshipNone)
+        .value("k_EFriendRelationshipBlocked", k_EFriendRelationshipBlocked)
+        .value("k_EFriendRelationshipRequestRecipient", k_EFriendRelationshipRequestRecipient)
+        .value("k_EFriendRelationshipFriend", k_EFriendRelationshipFriend)
+        .value("k_EFriendRelationshipRequestInitiator", k_EFriendRelationshipRequestInitiator)
+        .value("k_EFriendRelationshipIgnored", k_EFriendRelationshipIgnored)
+        .value("k_EFriendRelationshipIgnoredFriend", k_EFriendRelationshipIgnoredFriend)
+        .value("k_EFriendRelationshipSuggested", k_EFriendRelationshipSuggested)
+        .value("k_EFriendRelationshipMax", k_EFriendRelationshipMax)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyComparison>("ELobbyComparison")
+        .value("k_ELobbyComparisonEqualToOrLessThan", k_ELobbyComparisonEqualToOrLessThan)
+        .value("k_ELobbyComparisonLessThan", k_ELobbyComparisonLessThan)
+        .value("k_ELobbyComparisonEqual", k_ELobbyComparisonEqual)
+        .value("k_ELobbyComparisonGreaterThan", k_ELobbyComparisonGreaterThan)
+        .value("k_ELobbyComparisonEqualToOrGreaterThan", k_ELobbyComparisonEqualToOrGreaterThan)
+        .value("k_ELobbyComparisonNotEqual", k_ELobbyComparisonNotEqual)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
+        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
+        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
+        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
+        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
+        .export_values()
+        ;
+
+    bp::enum_< ELobbyType>("ELobbyType")
+        .value("k_ELobbyTypePrivate", k_ELobbyTypePrivate)
+        .value("k_ELobbyTypeFriendsOnly", k_ELobbyTypeFriendsOnly)
+        .value("k_ELobbyTypePublic", k_ELobbyTypePublic)
+        .value("k_ELobbyTypeInvisible", k_ELobbyTypeInvisible)
+        .export_values()
+        ;
+
+    bp::enum_< EPersonaState>("EPersonaState")
+        .value("k_EPersonaStateOffline", k_EPersonaStateOffline)
+        .value("k_EPersonaStateOnline", k_EPersonaStateOnline)
+        .value("k_EPersonaStateBusy", k_EPersonaStateBusy)
+        .value("k_EPersonaStateAway", k_EPersonaStateAway)
+        .value("k_EPersonaStateSnooze", k_EPersonaStateSnooze)
+        .value("k_EPersonaStateLookingToTrade", k_EPersonaStateLookingToTrade)
+        .value("k_EPersonaStateLookingToPlay", k_EPersonaStateLookingToPlay)
+        .value("k_EPersonaStateMax", k_EPersonaStateMax)
         .export_values()
         ;
 
@@ -1040,6 +1601,20 @@ BOOST_PYTHON_MODULE(steam){
         .value("k_EUniverseMax", k_EUniverseMax)
         .export_values()
         ;
+
+    bp::class_< CSteamAPIContext >( "CSteamAPIContext", bp::init< >() )    
+        .def( 
+            "SteamFriends"
+            , (::ISteamFriends * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamFriends )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamMatchmaking"
+            , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUtils"
+            , (::ISteamUtils * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUtils )
+            , bp::return_internal_reference< >() );
 
     { //::CSteamID
         typedef bp::class_< CSteamID > CSteamID_exposer_t;
@@ -1341,6 +1916,579 @@ BOOST_PYTHON_MODULE(steam){
         CSteamID_exposer.def( bp::self < bp::self );
         CSteamID_exposer.def( bp::self == bp::self );
         CSteamID_exposer.def( bp::self > bp::self );
+    }
+
+    bp::class_< ISteamFriends, boost::noncopyable >( "ISteamFriends", bp::no_init )    
+        .def( 
+            "ActivateGameOverlay"
+            , (void ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::ActivateGameOverlay )
+            , ( bp::arg("pchDialog") ) )    
+        .def( 
+            "ActivateGameOverlayInviteDialog"
+            , (void ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::ActivateGameOverlayInviteDialog )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "ActivateGameOverlayToStore"
+            , (void ( ::ISteamFriends::* )( ::AppId_t,::EOverlayToStoreFlag ) )( &::ISteamFriends::ActivateGameOverlayToStore )
+            , ( bp::arg("nAppID"), bp::arg("eFlag") ) )    
+        .def( 
+            "ActivateGameOverlayToUser"
+            , (void ( ::ISteamFriends::* )( char const *,::CSteamID ) )( &::ISteamFriends::ActivateGameOverlayToUser )
+            , ( bp::arg("pchDialog"), bp::arg("steamID") ) )    
+        .def( 
+            "ActivateGameOverlayToWebPage"
+            , (void ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::ActivateGameOverlayToWebPage )
+            , ( bp::arg("pchURL") ) )    
+        .def( 
+            "ClearRichPresence"
+            , (void ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::ClearRichPresence ) )    
+        .def( 
+            "CloseClanChatWindowInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::CloseClanChatWindowInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "DownloadClanActivityCounts"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID *,int ) )( &::ISteamFriends::DownloadClanActivityCounts )
+            , ( bp::arg("psteamIDClans"), bp::arg("cClansToRequest") ) )    
+        .def( 
+            "EnumerateFollowingList"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::uint32 ) )( &::ISteamFriends::EnumerateFollowingList )
+            , ( bp::arg("unStartIndex") ) )    
+        .def( 
+            "GetChatMemberByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetChatMemberByIndex )
+            , ( bp::arg("steamIDClan"), bp::arg("iUser") ) )    
+        .def( 
+            "GetClanActivityCounts"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,int *,int *,int * ) )( &::ISteamFriends::GetClanActivityCounts )
+            , ( bp::arg("steamIDClan"), bp::arg("pnOnline"), bp::arg("pnInGame"), bp::arg("pnChatting") ) )    
+        .def( 
+            "GetClanByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetClanByIndex )
+            , ( bp::arg("iClan") ) )    
+        .def( 
+            "GetClanChatMemberCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanChatMemberCount )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanChatMessage"
+            , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType *,::CSteamID * ) )( &::ISteamFriends::GetClanChatMessage )
+            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("arg4"), bp::arg("arg5") ) )    
+        .def( 
+            "GetClanCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetClanCount ) )    
+        .def( 
+            "GetClanName"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanName )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanOfficerByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetClanOfficerByIndex )
+            , ( bp::arg("steamIDClan"), bp::arg("iOfficer") ) )    
+        .def( 
+            "GetClanOfficerCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanOfficerCount )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanOwner"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanOwner )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetClanTag"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetClanTag )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "GetCoplayFriend"
+            , (::CSteamID ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetCoplayFriend )
+            , ( bp::arg("iCoplayFriend") ) )    
+        .def( 
+            "GetCoplayFriendCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetCoplayFriendCount ) )    
+        .def( 
+            "GetFollowerCount"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFollowerCount )
+            , ( bp::arg("steamID") ) )    
+        .def( 
+            "GetFriendByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( int,int ) )( &::ISteamFriends::GetFriendByIndex )
+            , ( bp::arg("iFriend"), bp::arg("iFriendFlags") ) )    
+        .def( 
+            "GetFriendCoplayGame"
+            , (::AppId_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendCoplayGame )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendCoplayTime"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendCoplayTime )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendCount"
+            , (int ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendCount )
+            , ( bp::arg("iFriendFlags") ) )    
+        .def( 
+            "GetFriendCountFromSource"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendCountFromSource )
+            , ( bp::arg("steamIDSource") ) )    
+        .def( 
+            "GetFriendFromSourceByIndex"
+            , (::CSteamID ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendFromSourceByIndex )
+            , ( bp::arg("steamIDSource"), bp::arg("iFriend") ) )    
+        .def( 
+            "GetFriendMessage"
+            , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType * ) )( &::ISteamFriends::GetFriendMessage )
+            , ( bp::arg("steamIDFriend"), bp::arg("iMessageID"), bp::arg("pvData"), bp::arg("cubData"), bp::arg("peChatEntryType") ) )    
+        .def( 
+            "GetFriendPersonaName"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendPersonaName )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendPersonaNameHistory"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendPersonaNameHistory )
+            , ( bp::arg("steamIDFriend"), bp::arg("iPersonaName") ) )    
+        .def( 
+            "GetFriendPersonaState"
+            , (::EPersonaState ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendPersonaState )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendRelationship"
+            , (::EFriendRelationship ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRelationship )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendRichPresence"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::GetFriendRichPresence )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetFriendRichPresenceKeyByIndex"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::GetFriendRichPresenceKeyByIndex )
+            , ( bp::arg("steamIDFriend"), bp::arg("iKey") ) )    
+        .def( 
+            "GetFriendRichPresenceKeyCount"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetLargeFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetMediumFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetMediumFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetPersonaName"
+            , (char const * ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaName ) )    
+        .def( 
+            "GetPersonaState"
+            , (::EPersonaState ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaState ) )    
+        .def( 
+            "GetSmallFriendAvatar"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetSmallFriendAvatar )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetUserRestrictions"
+            , (::uint32 ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetUserRestrictions ) )    
+        .def( 
+            "HasFriend"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,int ) )( &::ISteamFriends::HasFriend )
+            , ( bp::arg("steamIDFriend"), bp::arg("iFriendFlags") ) )    
+        .def( 
+            "InviteUserToGame"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::InviteUserToGame )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchConnectString") ) )    
+        .def( 
+            "IsClanChatAdmin"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,::CSteamID ) )( &::ISteamFriends::IsClanChatAdmin )
+            , ( bp::arg("steamIDClanChat"), bp::arg("steamIDUser") ) )    
+        .def( 
+            "IsClanChatWindowOpenInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::IsClanChatWindowOpenInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "IsFollowing"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::IsFollowing )
+            , ( bp::arg("steamID") ) )    
+        .def( 
+            "IsUserInSource"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,::CSteamID ) )( &::ISteamFriends::IsUserInSource )
+            , ( bp::arg("steamIDUser"), bp::arg("steamIDSource") ) )    
+        .def( 
+            "JoinClanChatRoom"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::JoinClanChatRoom )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "LeaveClanChatRoom"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::LeaveClanChatRoom )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "OpenClanChatWindowInSteam"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::OpenClanChatWindowInSteam )
+            , ( bp::arg("steamIDClanChat") ) )    
+        .def( 
+            "ReplyToFriendMessage"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::ReplyToFriendMessage )
+            , ( bp::arg("steamIDFriend"), bp::arg("pchMsgToSend") ) )    
+        .def( 
+            "RequestClanOfficerList"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::RequestClanOfficerList )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "RequestFriendRichPresence"
+            , (void ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::RequestFriendRichPresence )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "RequestUserInformation"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,bool ) )( &::ISteamFriends::RequestUserInformation )
+            , ( bp::arg("steamIDUser"), bp::arg("bRequireNameOnly") ) )    
+        .def( 
+            "SendClanChatMessage"
+            , (bool ( ::ISteamFriends::* )( ::CSteamID,char const * ) )( &::ISteamFriends::SendClanChatMessage )
+            , ( bp::arg("steamIDClanChat"), bp::arg("pchText") ) )    
+        .def( 
+            "SetInGameVoiceSpeaking"
+            , (void ( ::ISteamFriends::* )( ::CSteamID,bool ) )( &::ISteamFriends::SetInGameVoiceSpeaking )
+            , ( bp::arg("steamIDUser"), bp::arg("bSpeaking") ) )    
+        .def( 
+            "SetListenForFriendsMessages"
+            , (bool ( ::ISteamFriends::* )( bool ) )( &::ISteamFriends::SetListenForFriendsMessages )
+            , ( bp::arg("bInterceptEnabled") ) )    
+        .def( 
+            "SetPersonaName"
+            , (::SteamAPICall_t ( ::ISteamFriends::* )( char const * ) )( &::ISteamFriends::SetPersonaName )
+            , ( bp::arg("pchPersonaName") ) )    
+        .def( 
+            "SetPlayedWith"
+            , (void ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::SetPlayedWith )
+            , ( bp::arg("steamIDUserPlayedWith") ) )    
+        .def( 
+            "SetRichPresence"
+            , (bool ( ::ISteamFriends::* )( char const *,char const * ) )( &::ISteamFriends::SetRichPresence )
+            , ( bp::arg("pchKey"), bp::arg("pchValue") ) );
+
+    bp::class_< ISteamMatchmaking, boost::noncopyable >( "ISteamMatchmaking", bp::no_init )    
+        .def( 
+            "AddFavoriteGame"
+            , (int ( ::ISteamMatchmaking::* )( ::AppId_t,::uint32,::uint16,::uint16,::uint32,::uint32 ) )( &::ISteamMatchmaking::AddFavoriteGame )
+            , ( bp::arg("nAppID"), bp::arg("nIP"), bp::arg("nConnPort"), bp::arg("nQueryPort"), bp::arg("unFlags"), bp::arg("rTime32LastPlayedOnServer") ) )    
+        .def( 
+            "AddRequestLobbyListCompatibleMembersFilter"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::AddRequestLobbyListCompatibleMembersFilter )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "AddRequestLobbyListDistanceFilter"
+            , (void ( ::ISteamMatchmaking::* )( ::ELobbyDistanceFilter ) )( &::ISteamMatchmaking::AddRequestLobbyListDistanceFilter )
+            , ( bp::arg("eLobbyDistanceFilter") ) )    
+        .def( 
+            "AddRequestLobbyListFilterSlotsAvailable"
+            , (void ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::AddRequestLobbyListFilterSlotsAvailable )
+            , ( bp::arg("nSlotsAvailable") ) )    
+        .def( 
+            "AddRequestLobbyListNearValueFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,int ) )( &::ISteamMatchmaking::AddRequestLobbyListNearValueFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("nValueToBeCloseTo") ) )    
+        .def( 
+            "AddRequestLobbyListNumericalFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,int,::ELobbyComparison ) )( &::ISteamMatchmaking::AddRequestLobbyListNumericalFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("nValueToMatch"), bp::arg("eComparisonType") ) )    
+        .def( 
+            "AddRequestLobbyListResultCountFilter"
+            , (void ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::AddRequestLobbyListResultCountFilter )
+            , ( bp::arg("cMaxResults") ) )    
+        .def( 
+            "AddRequestLobbyListStringFilter"
+            , (void ( ::ISteamMatchmaking::* )( char const *,char const *,::ELobbyComparison ) )( &::ISteamMatchmaking::AddRequestLobbyListStringFilter )
+            , ( bp::arg("pchKeyToMatch"), bp::arg("pchValueToMatch"), bp::arg("eComparisonType") ) )    
+        .def( 
+            "CreateLobby"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )( ::ELobbyType,int ) )( &::ISteamMatchmaking::CreateLobby )
+            , ( bp::arg("eLobbyType"), bp::arg("cMaxMembers") ) )    
+        .def( 
+            "DeleteLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,char const * ) )( &::ISteamMatchmaking::DeleteLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetFavoriteGame"
+            , (bool ( ::ISteamMatchmaking::* )( int,::AppId_t *,::uint32 *,::uint16 *,::uint16 *,::uint32 *,::uint32 * ) )( &::ISteamMatchmaking::GetFavoriteGame )
+            , ( bp::arg("iGame"), bp::arg("pnAppID"), bp::arg("pnIP"), bp::arg("pnConnPort"), bp::arg("pnQueryPort"), bp::arg("punFlags"), bp::arg("pRTime32LastPlayedOnServer") ) )    
+        .def( 
+            "GetFavoriteGameCount"
+            , (int ( ::ISteamMatchmaking::* )(  ) )( &::ISteamMatchmaking::GetFavoriteGameCount ) )    
+        .def( 
+            "GetLobbyByIndex"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( int ) )( &::ISteamMatchmaking::GetLobbyByIndex )
+            , ( bp::arg("iLobby") ) )    
+        .def( 
+            "GetLobbyChatEntry"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID,int,::CSteamID *,void *,int,::EChatEntryType * ) )( &::ISteamMatchmaking::GetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser"), bp::arg("pvData"), bp::arg("cubData"), bp::arg("peChatEntryType") ) )    
+        .def( 
+            "GetLobbyData"
+            , (char const * ( ::ISteamMatchmaking::* )( ::CSteamID,char const * ) )( &::ISteamMatchmaking::GetLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetLobbyDataByIndex"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,int,char *,int,char *,int ) )( &::ISteamMatchmaking::GetLobbyDataByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData"), bp::arg("pchKey"), bp::arg("cchKeyBufferSize"), bp::arg("pchValue"), bp::arg("cchValueBufferSize") ) )    
+        .def( 
+            "GetLobbyDataCount"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyDataCount )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetLobbyGameServer"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32 *,::uint16 *,::CSteamID * ) )( &::ISteamMatchmaking::GetLobbyGameServer )
+            , ( bp::arg("steamIDLobby"), bp::arg("punGameServerIP"), bp::arg("punGameServerPort"), bp::arg("psteamIDGameServer") ) )    
+        .def( 
+            "GetLobbyMemberByIndex"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::GetLobbyMemberByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iMember") ) )    
+        .def( 
+            "GetLobbyMemberData"
+            , (char const * ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID,char const * ) )( &::ISteamMatchmaking::GetLobbyMemberData )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDUser"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetLobbyMemberLimit"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyMemberLimit )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetLobbyOwner"
+            , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetLobbyOwner )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "GetNumLobbyMembers"
+            , (int ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::GetNumLobbyMembers )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "InviteUserToLobby"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::InviteUserToLobby )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDInvitee") ) )    
+        .def( 
+            "JoinLobby"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::JoinLobby )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "LeaveLobby"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::LeaveLobby )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "RemoveFavoriteGame"
+            , (bool ( ::ISteamMatchmaking::* )( ::AppId_t,::uint32,::uint16,::uint16,::uint32 ) )( &::ISteamMatchmaking::RemoveFavoriteGame )
+            , ( bp::arg("nAppID"), bp::arg("nIP"), bp::arg("nConnPort"), bp::arg("nQueryPort"), bp::arg("unFlags") ) )    
+        .def( 
+            "RequestLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID ) )( &::ISteamMatchmaking::RequestLobbyData )
+            , ( bp::arg("steamIDLobby") ) )    
+        .def( 
+            "RequestLobbyList"
+            , (::SteamAPICall_t ( ::ISteamMatchmaking::* )(  ) )( &::ISteamMatchmaking::RequestLobbyList ) )    
+        .def( 
+            "SendLobbyChatMsg"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,void const *,int ) )( &::ISteamMatchmaking::SendLobbyChatMsg )
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) )    
+        .def( 
+            "SetLinkedLobby"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::SetLinkedLobby )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDLobbyDependent") ) )    
+        .def( 
+            "SetLobbyData"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,char const *,char const * ) )( &::ISteamMatchmaking::SetLobbyData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "SetLobbyGameServer"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32,::uint16,::CSteamID ) )( &::ISteamMatchmaking::SetLobbyGameServer )
+            , ( bp::arg("steamIDLobby"), bp::arg("unGameServerIP"), bp::arg("unGameServerPort"), bp::arg("steamIDGameServer") ) )    
+        .def( 
+            "SetLobbyJoinable"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,bool ) )( &::ISteamMatchmaking::SetLobbyJoinable )
+            , ( bp::arg("steamIDLobby"), bp::arg("bLobbyJoinable") ) )    
+        .def( 
+            "SetLobbyMemberData"
+            , (void ( ::ISteamMatchmaking::* )( ::CSteamID,char const *,char const * ) )( &::ISteamMatchmaking::SetLobbyMemberData )
+            , ( bp::arg("steamIDLobby"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "SetLobbyMemberLimit"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::SetLobbyMemberLimit )
+            , ( bp::arg("steamIDLobby"), bp::arg("cMaxMembers") ) )    
+        .def( 
+            "SetLobbyOwner"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::CSteamID ) )( &::ISteamMatchmaking::SetLobbyOwner )
+            , ( bp::arg("steamIDLobby"), bp::arg("steamIDNewOwner") ) )    
+        .def( 
+            "SetLobbyType"
+            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
+            , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
+
+    bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
+        .def( 
+            "BOverlayNeedsPresent"
+            , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::BOverlayNeedsPresent ) )    
+        .def( 
+            "CheckFileSignature"
+            , (::SteamAPICall_t ( ::ISteamUtils::* )( char const * ) )( &::ISteamUtils::CheckFileSignature )
+            , ( bp::arg("szFileName") ) )    
+        .def( 
+            "GetAPICallFailureReason"
+            , (::ESteamAPICallFailure ( ::ISteamUtils::* )( ::SteamAPICall_t ) )( &::ISteamUtils::GetAPICallFailureReason )
+            , ( bp::arg("hSteamAPICall") ) )    
+        .def( 
+            "GetAPICallResult"
+            , (bool ( ::ISteamUtils::* )( ::SteamAPICall_t,void *,int,int,bool * ) )( &::ISteamUtils::GetAPICallResult )
+            , ( bp::arg("hSteamAPICall"), bp::arg("pCallback"), bp::arg("cubCallback"), bp::arg("iCallbackExpected"), bp::arg("pbFailed") ) )    
+        .def( 
+            "GetAppID"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetAppID ) )    
+        .def( 
+            "GetCSERIPPort"
+            , (bool ( ::ISteamUtils::* )( ::uint32 *,::uint16 * ) )( &::ISteamUtils::GetCSERIPPort )
+            , ( bp::arg("unIP"), bp::arg("usPort") ) )    
+        .def( 
+            "GetConnectedUniverse"
+            , (::EUniverse ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetConnectedUniverse ) )    
+        .def( 
+            "GetCurrentBatteryPower"
+            , (::uint8 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetCurrentBatteryPower ) )    
+        .def( 
+            "GetEnteredGamepadTextInput"
+            , (bool ( ::ISteamUtils::* )( char *,::uint32 ) )( &::ISteamUtils::GetEnteredGamepadTextInput )
+            , ( bp::arg("pchText"), bp::arg("cchText") ) )    
+        .def( 
+            "GetEnteredGamepadTextLength"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetEnteredGamepadTextLength ) )    
+        .def( 
+            "GetIPCCallCount"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetIPCCallCount ) )    
+        .def( 
+            "GetIPCountry"
+            , (char const * ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetIPCountry ) )    
+        .def( 
+            "GetSecondsSinceAppActive"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetSecondsSinceAppActive ) )    
+        .def( 
+            "GetSecondsSinceComputerActive"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetSecondsSinceComputerActive ) )    
+        .def( 
+            "GetServerRealTime"
+            , (::uint32 ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetServerRealTime ) )    
+        .def( 
+            "GetSteamUILanguage"
+            , (char const * ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::GetSteamUILanguage ) )    
+        .def( 
+            "IsAPICallCompleted"
+            , (bool ( ::ISteamUtils::* )( ::SteamAPICall_t,bool * ) )( &::ISteamUtils::IsAPICallCompleted )
+            , ( bp::arg("hSteamAPICall"), bp::arg("pbFailed") ) )    
+        .def( 
+            "IsOverlayEnabled"
+            , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::IsOverlayEnabled ) )    
+        .def( 
+            "RunFrame"
+            , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
+        .def( 
+            "SetOverlayNotificationPosition"
+            , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
+            , ( bp::arg("eNotificationPosition") ) )    
+        .def( 
+            "ShowGamepadTextInput"
+            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
+            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
+
+    { //::LobbyCreated_t
+        typedef bp::class_< LobbyCreated_t > LobbyCreated_t_exposer_t;
+        LobbyCreated_t_exposer_t LobbyCreated_t_exposer = LobbyCreated_t_exposer_t( "LobbyCreated_t" );
+        bp::scope LobbyCreated_t_scope( LobbyCreated_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyCreated_t::k_iCallback;
+        LobbyCreated_t_exposer.def_readwrite( "result", &LobbyCreated_t::m_eResult );
+        LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
+    }
+
+    { //::LobbyGameCreated_t
+        typedef bp::class_< LobbyGameCreated_t > LobbyGameCreated_t_exposer_t;
+        LobbyGameCreated_t_exposer_t LobbyGameCreated_t_exposer = LobbyGameCreated_t_exposer_t( "LobbyGameCreated_t" );
+        bp::scope LobbyGameCreated_t_scope( LobbyGameCreated_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyGameCreated_t::k_iCallback;
+        LobbyGameCreated_t_exposer.def_readwrite( "steamidgameserver", &LobbyGameCreated_t::m_ulSteamIDGameServer );
+        LobbyGameCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyGameCreated_t::m_ulSteamIDLobby );
+        LobbyGameCreated_t_exposer.def_readwrite( "ip", &LobbyGameCreated_t::m_unIP );
+        LobbyGameCreated_t_exposer.def_readwrite( "port", &LobbyGameCreated_t::m_usPort );
+    }
+
+    { //::LobbyMatchList_t
+        typedef bp::class_< LobbyMatchList_t > LobbyMatchList_t_exposer_t;
+        LobbyMatchList_t_exposer_t LobbyMatchList_t_exposer = LobbyMatchList_t_exposer_t( "LobbyMatchList_t" );
+        bp::scope LobbyMatchList_t_scope( LobbyMatchList_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyMatchList_t::k_iCallback;
+        LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
+    }
+
+    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
+
+    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
+
+    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
+
+    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
+
+    { //::LobbyMatchListCallback
+        typedef bp::class_< LobbyMatchListCallback_wrapper > LobbyMatchListCallback_exposer_t;
+        LobbyMatchListCallback_exposer_t LobbyMatchListCallback_exposer = LobbyMatchListCallback_exposer_t( "LobbyMatchListCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyMatchListCallback_scope( LobbyMatchListCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallback >();
+        { //::LobbyMatchListCallback::OnLobbyMatchList
+        
+            typedef void ( ::LobbyMatchListCallback::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            typedef void ( LobbyMatchListCallback_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            
+            LobbyMatchListCallback_exposer.def( 
+                "OnLobbyMatchList"
+                , OnLobbyMatchList_function_type(&::LobbyMatchListCallback::OnLobbyMatchList)
+                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallback_wrapper::default_OnLobbyMatchList)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyGameCreatedCallback
+        typedef bp::class_< LobbyGameCreatedCallback_wrapper > LobbyGameCreatedCallback_exposer_t;
+        LobbyGameCreatedCallback_exposer_t LobbyGameCreatedCallback_exposer = LobbyGameCreatedCallback_exposer_t( "LobbyGameCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyGameCreatedCallback_scope( LobbyGameCreatedCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallback >();
+        { //::LobbyGameCreatedCallback::OnLobbyGameCreated
+        
+            typedef void ( ::LobbyGameCreatedCallback::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            typedef void ( LobbyGameCreatedCallback_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            
+            LobbyGameCreatedCallback_exposer.def( 
+                "OnLobbyGameCreated"
+                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallback::OnLobbyGameCreated)
+                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallback_wrapper::default_OnLobbyGameCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyCreatedCallback
+        typedef bp::class_< LobbyCreatedCallback_wrapper > LobbyCreatedCallback_exposer_t;
+        LobbyCreatedCallback_exposer_t LobbyCreatedCallback_exposer = LobbyCreatedCallback_exposer_t( "LobbyCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyCreatedCallback_scope( LobbyCreatedCallback_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallback >();
+        { //::LobbyCreatedCallback::OnLobbyCreated
+        
+            typedef void ( ::LobbyCreatedCallback::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            typedef void ( LobbyCreatedCallback_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            
+            LobbyCreatedCallback_exposer.def( 
+                "OnLobbyCreated"
+                , OnLobbyCreated_function_type(&::LobbyCreatedCallback::OnLobbyCreated)
+                , default_OnLobbyCreated_function_type(&LobbyCreatedCallback_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::PyGetLobbyDataByIndex
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyDataByIndex_function_type )( ::CSteamID,int );
+        
+        bp::def( 
+            "PyGetLobbyDataByIndex"
+            , PyGetLobbyDataByIndex_function_type( &::PyGetLobbyDataByIndex )
+            , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData") ) );
+    
     }
 }
 #endif

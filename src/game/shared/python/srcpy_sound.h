@@ -7,8 +7,8 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef SRCPY_SOUNDENVELOPE_H
-#define SRCPY_SOUNDENVELOPE_H
+#ifndef SRCPY_SOUND_H
+#define SRCPY_SOUND_H
 
 #ifdef _WIN32
 #pragma once
@@ -163,4 +163,4 @@ public:
 
 extern PyEngineSound *pysoundengine;
 
-#endif // SRCPY_SOUNDENVELOPE_H
+#endif // SRCPY_SOUND_H
