@@ -59,10 +59,7 @@ class MatchMaking(SemiSharedModuleGenerator):
         cls = mb.class_('PyMatchEventsSink')
         cls.include()
         cls.rename('MatchEventsSink')
-        
-        # Steam matchmaking (not everything is available in the matchmaking framework)
-        mb.enum('ELobbyDistanceFilter').include()
-        
+
         cls = mb.class_('PySteamMatchmaking')
         cls.include()
         cls.rename('steammatchmaking')
