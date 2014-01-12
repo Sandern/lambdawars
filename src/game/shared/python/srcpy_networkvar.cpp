@@ -52,7 +52,7 @@ bool CPythonSendProxyAlliesOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
 // Purpose: 
 //-----------------------------------------------------------------------------
 CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback, bp::object sendproxy )
-	: m_bChangedCallback(changedcallback)
+	: m_bChangedCallback(changedcallback), m_bInitialState(true)
 {
 	Q_snprintf(m_Name, PYNETVAR_MAX_NAME, name);
 	CBaseEntity *pEnt = NULL;
@@ -121,6 +121,7 @@ void CPythonNetworkVarBase::Remove( CBaseEntity *pEnt )
 void CPythonNetworkVarBase::NetworkStateChanged( void )
 {
 	m_PlayerUpdateBits.SetAll();
+	m_bInitialState = false;
 }
 
 //---------------------------------------------------------------------------------------
@@ -181,7 +182,7 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 
 	CRecipientFilter filter;
 	filter.MakeReliable();
-	filter.AddRecipient(iClient);
+	filter.AddRecipient( iClient + 1 );
 	if( m_bChangedCallback )
 		UserMessageBegin( filter, "PyNetworkVarCC" );
 	else
@@ -283,7 +284,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 
 	CRecipientFilter filter;
 	filter.MakeReliable();
-	filter.AddRecipient(iClient);
+	filter.AddRecipient( iClient + 1 );
 	if( m_bChangedCallback )
 		UserMessageBegin( filter, "PyNetworkArrayFullCC" );
 	else
@@ -414,7 +415,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 	// Send message
 	CRecipientFilter filter;
 	filter.MakeReliable();
-	filter.AddRecipient(iClient);
+	filter.AddRecipient( iClient + 1 );
 	UserMessageBegin( filter, m_bChangedCallback ? "PyNetworkDictFullCC" : "PyNetworkDictFull" );
 	WRITE_EHANDLE(pEnt);
 	WRITE_STRING(m_Name);
@@ -445,15 +446,15 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict )
 	if( !pEnt->m_utlPyNetworkVars.Count() )
 		return;
 
-	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get(iEdict) == false )
+	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get( iEdict ) == false )
 		return;
 
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
-		if( pEnt->m_utlPyNetworkVars.Element(i)->m_PlayerUpdateBits.Get(iEdict) == false )
+		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iEdict ) == false )
 			continue;
 
-		pEnt->m_utlPyNetworkVars.Element(i)->NetworkVarsUpdateClient(pEnt, iEdict);
+		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iEdict );
 	}
 }
 

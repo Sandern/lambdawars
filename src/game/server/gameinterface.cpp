@@ -2613,8 +2613,9 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 // =======================================
 #ifdef ENABLE_PYTHON
 				// Python networkvars: mark player as transmit
-				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( ENTINDEX(pInfo->m_pClientEnt) );
-				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), ENTINDEX(pInfo->m_pClientEnt) );
+				int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
+				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
+				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), iClientIdx );
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
@@ -2794,9 +2795,27 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				int iCurAckTickCount = pClient->GetMaxAckTickCount();
 				if( iCurAckTickCount - pPlayer->GetLastAckTickCount() > wars_reset_known_on_dropspackets.GetInt() )
 				{
+					int iClientIdx = ENTINDEX(pPlayer) - 1;
+
 					DevMsg( "Detected player %s not receiving new frames. Resetting known entities because player likely got a full update\n", pPlayer->GetPlayerName() );
+
 					// Seems this information gets lost upon receiving a full update
-					FogOfWarMgr()->ResetKnownEntitiesForPlayer( ENTINDEX(pPlayer) - 1 );
+					FogOfWarMgr()->ResetKnownEntitiesForPlayer( iClientIdx );
+
+					// All Python network vars also need to be resend...
+					CBaseEntity *pEnt = gEntList.FirstEnt();
+					while( pEnt )
+					{
+						for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
+						{
+							if( pEnt->m_utlPyNetworkVars[i]->IsInInitialState() )
+								continue;
+
+							pEnt->m_utlPyNetworkVars[i]->m_PlayerUpdateBits.Set( iClientIdx );
+						}
+
+						pEnt = gEntList.NextEnt( pEnt );
+					}
 				}
 
 				pPlayer->SetLastAckTickCount( iCurAckTickCount );

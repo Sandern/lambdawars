@@ -53,6 +53,9 @@ public:
 	void NetworkStateChanged( void );
 	virtual void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient ) {}
 
+	// For optimization purposes. Returns if the data is in the unmodified state at construction.
+	bool IsInInitialState() { return m_bInitialState; }
+
 public:
 	// This bit vector contains the players who don't have the most up to date data
 	CBitVec<ABSOLUTE_PLAYER_LIMIT> m_PlayerUpdateBits;
@@ -60,6 +63,7 @@ public:
 protected:
 	char m_Name[PYNETVAR_MAX_NAME];
 	bool m_bChangedCallback;
+	bool m_bInitialState;
 
 	bp::object m_wrefEnt;
 

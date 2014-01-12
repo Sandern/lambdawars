@@ -4255,8 +4255,9 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 
 #ifdef ENABLE_PYTHON
 	// Python networkvars: mark player as transmit
-	m_PyNetworkVarsPlayerTransmitBits.Set( ENTINDEX(pInfo->m_pClientEnt) );
-	PyNetworkVarsUpdateClient( this, ENTINDEX(pInfo->m_pClientEnt) );
+	int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
+	m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
+	PyNetworkVarsUpdateClient( this, iClientIdx );
 #endif // ENABLE_PYTHON
 
 	// HLTV/Replay need to know if this entity is culled by PVS limits
