@@ -52,14 +52,6 @@ struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEvents
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
 
-    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
-        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
-        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
-        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
-        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
-        .export_values()
-        ;
-
     bp::class_< PyMatchEventsSink_wrapper >( "MatchEventsSink" )    
         .def( 
             "OnEvent"
@@ -268,14 +260,6 @@ struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEvents
 
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
-
-    bp::enum_< ELobbyDistanceFilter>("ELobbyDistanceFilter")
-        .value("k_ELobbyDistanceFilterClose", k_ELobbyDistanceFilterClose)
-        .value("k_ELobbyDistanceFilterDefault", k_ELobbyDistanceFilterDefault)
-        .value("k_ELobbyDistanceFilterFar", k_ELobbyDistanceFilterFar)
-        .value("k_ELobbyDistanceFilterWorldwide", k_ELobbyDistanceFilterWorldwide)
-        .export_values()
-        ;
 
     bp::class_< PyMatchEventsSink_wrapper >( "MatchEventsSink" )    
         .def( 
