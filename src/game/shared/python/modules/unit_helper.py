@@ -236,6 +236,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_vStartPosition').rename('startposition')
         cls.var('m_bSuccess').rename('success')
         cls.var('m_fnCustomLOSCheck').rename('fncustomloscheck')
+        cls.var('m_pathContext').rename('pathcontext')
         
         cls.mem_fun('GetTarget').exclude()
         cls.mem_fun('SetTarget').exclude()

@@ -568,6 +568,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
     bp::class_< UnitAirMoveCommand, bp::bases< UnitBaseMoveCommand >, boost::noncopyable >( "UnitAirMoveCommand" )    
+        .def_readwrite( "desiredheight", &UnitAirMoveCommand::desiredheight )    
         .def_readwrite( "height", &UnitAirMoveCommand::height );
 
     { //::UnitAnimConfig
@@ -3517,6 +3518,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def_readwrite( "yawspeed", &UnitBaseMoveCommand::yawspeed );
 
     bp::class_< UnitAirMoveCommand, bp::bases< UnitBaseMoveCommand >, boost::noncopyable >( "UnitAirMoveCommand" )    
+        .def_readwrite( "desiredheight", &UnitAirMoveCommand::desiredheight )    
         .def_readwrite( "height", &UnitAirMoveCommand::height );
 
     { //::UnitAnimConfig
@@ -4933,6 +4935,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBasePath_exposer.def_readwrite( "fncustomloscheck", &UnitBasePath::m_fnCustomLOSCheck );
         UnitBasePath_exposer.def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags );
         UnitBasePath_exposer.def_readwrite( "goaltype", &UnitBasePath::m_iGoalType );
+        UnitBasePath_exposer.def_readwrite( "pathcontext", &UnitBasePath::m_pathContext );
         UnitBasePath_exposer.def_readwrite( "goalpos", &UnitBasePath::m_vGoalPos );
         UnitBasePath_exposer.def_readwrite( "startposition", &UnitBasePath::m_vStartPosition );
         UnitBasePath_exposer.def_readwrite( "waypointtolerance", &UnitBasePath::m_waypointTolerance );

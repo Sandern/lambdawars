@@ -345,7 +345,8 @@ public:
 	float m_fMaxMoveDist;
 	bool m_bSuccess; // Can be queried after path completion by other components
 	bool m_bIsDirectPath;
-	boost::python::object m_fnCustomLOSCheck;
+	boost::python::object m_fnCustomLOSCheck; // Allows using a custom Python based los check
+	boost::python::object m_pathContext; // Allows setting a context for this path. Could be anything.
 };
 
 #define CONSIDER_SIZE 48
