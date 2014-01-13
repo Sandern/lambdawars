@@ -32,7 +32,7 @@ namespace bp = boost::python;
 //-----------------------------------------------------------------------------
 bool CPythonSendProxyOwnerOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient );
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient + 1 );
 	if( !pPlayer )
 		return false;
 
@@ -41,7 +41,7 @@ bool CPythonSendProxyOwnerOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
 
 bool CPythonSendProxyAlliesOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
 {
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient );
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex( iClient + 1 );
 	if( !pPlayer )
 		return false;
 
@@ -441,20 +441,41 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iEdict )
+void PyNetworkVarsResetClientTransmitBits( int iClient )
+{
+	// All Python network vars also need to be resend...
+	CBaseEntity *pEnt = gEntList.FirstEnt();
+	while( pEnt )
+	{
+		for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
+		{
+			if( pEnt->m_utlPyNetworkVars[i]->IsInInitialState() )
+				continue;
+
+			pEnt->m_utlPyNetworkVars[i]->m_PlayerUpdateBits.Set( iClient );
+		}
+
+		pEnt = gEntList.NextEnt( pEnt );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
 	if( !pEnt->m_utlPyNetworkVars.Count() )
 		return;
 
-	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get( iEdict ) == false )
+	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get( iClient ) == false )
 		return;
 
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
-		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iEdict ) == false )
+		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
 			continue;
 
-		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iEdict );
+		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
 	}
 }
 

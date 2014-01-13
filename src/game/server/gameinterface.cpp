@@ -2803,19 +2803,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 					FogOfWarMgr()->ResetKnownEntitiesForPlayer( iClientIdx );
 
 					// All Python network vars also need to be resend...
-					CBaseEntity *pEnt = gEntList.FirstEnt();
-					while( pEnt )
-					{
-						for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
-						{
-							if( pEnt->m_utlPyNetworkVars[i]->IsInInitialState() )
-								continue;
-
-							pEnt->m_utlPyNetworkVars[i]->m_PlayerUpdateBits.Set( iClientIdx );
-						}
-
-						pEnt = gEntList.NextEnt( pEnt );
-					}
+					PyNetworkVarsResetClientTransmitBits( iClientIdx );
 				}
 
 				pPlayer->SetLastAckTickCount( iCurAckTickCount );
@@ -2871,6 +2859,9 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 	{
 		FullClientUpdatePyNetworkClsByEdict(pEdict);
 	}
+
+	// Make sure Python network variables are marked correctly for the new player
+	PyNetworkVarsResetClientTransmitBits( ENTINDEX(pEdict) - 1 );
 #endif // ENABLE_PYTHON
 
 #ifdef HL2WARS_DLL
