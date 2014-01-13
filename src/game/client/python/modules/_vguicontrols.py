@@ -140,15 +140,16 @@ class VGUIControls(ClientModuleGenerator):
         cls.calldefs('GetColor', calldef_withtypes([reference_t(declarated_t(int_t()))])).add_transformation(FT.output('r'), FT.output('g'), FT.output('b'), FT.output('a'))
         cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         
-        # CAvatarImage
-        cls = mb.class_('CAvatarImage')
-        cls.include()
-        cls.calldefs().virtuality = 'not virtual' 
-        cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-        cls.rename('AvatarImage')
-        cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
-        cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
-        cls.mem_funs( 'InitFromRGBA' ).exclude()
+        if self.settings.branch == 'swarm':
+            # CAvatarImage
+            cls = mb.class_('CAvatarImage')
+            cls.include()
+            cls.calldefs().virtuality = 'not virtual' 
+            cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
+            cls.rename('AvatarImage')
+            cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
+            cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
+            cls.mem_funs( 'InitFromRGBA' ).exclude()
         
         mb.enum('EAvatarSize').include()
     
@@ -533,7 +534,8 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs('HasHotkey').exclude()
 
         mb.mem_funs('GetDragData').exclude()
-        mb.mem_funs('GetDragFailCursor').exclude()
+        if self.settings.branch == 'swarm':
+            mb.mem_funs('GetDragFailCursor').exclude()
         mb.mem_funs('GetDropCursor').exclude()
         mb.mem_funs('GetDropTarget').exclude()
         mb.mem_funs('IsDroppable').exclude()
@@ -553,7 +555,9 @@ class VGUIControls(ClientModuleGenerator):
        
         # Must use return_by_value. Then the converter will be used to wrap the vgui element in a safe handle
         mb.mem_funs( 'GetChild' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-        mb.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )  
+        mb.mem_funs( 'GetBorder' ).call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
+        if self.settings.branch == 'source2007':
+            mb.mem_funs('GetBorderAtIndex').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
         mb.mem_funs( 'GetParent' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         mb.mem_funs( 'FindSiblingByName' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         mb.mem_funs( 'FindChildByName' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
@@ -594,13 +598,13 @@ class VGUIControls(ClientModuleGenerator):
             mb.mem_funs('GetSizer').exclude()
             mb.mem_funs('GetUnpackStructure').exclude()
             
-        # Tooltip class
-        cls = mb.class_('Tooltip')
-        cls.include()
-        
+        if self.settings.branch == 'swarm':
+            # Tooltip class
+            cls = mb.class_('Tooltip')
+            cls.include()
         
     def ParseEditablePanel(self, mb):
-        IncludeEmptyClass(mb, 'EditablePanel')
+        self.IncludeEmptyClass(mb, 'EditablePanel')
         mb.mem_funs('LoadControlSettings').include()
         mb.mem_funs('ActivateBuildMode').include()
         
@@ -637,9 +641,8 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs('OnCloseFrameButtonPressed').virtuality = 'virtual'
         mb.mem_funs('OnCloseFrameButtonPressed').virtuality = 'virtual'
         
-        #
         mb.mem_funs('SetDeleteSelfOnClose').exclude()
-        mb.mem_funs('GetSysMenu').exclude() # Exclude for now, add back later when we found out call policies.
+        mb.mem_funs('GetSysMenu').exclude()
         
         mb.mem_funs( 'GetDefaultScreenPosition' ).add_transformation( FT.output('x'), FT.output('y'), FT.output('wide'), FT.output('tall') ) 
         mb.mem_funs( 'GetClientArea' ).add_transformation( FT.output('x'), FT.output('y'), FT.output('wide'), FT.output('tall') ) 
@@ -655,7 +658,7 @@ class VGUIControls(ClientModuleGenerator):
     
     def ParseAnimationController(self, mb):
         # Make empty, don't care
-        #IncludeEmptyClass(mb, 'AnimationController')
+        #self.IncludeEmptyClass(mb, 'AnimationController')
         pass
         
     
@@ -681,7 +684,6 @@ class VGUIControls(ClientModuleGenerator):
             'boost::python::object GetText() {\r\n' + \
             '    const char *buf = (const char *)malloc( (GetTextLength()+1)*sizeof(char) );\r\n' + \
             '    TextEntry::GetText((char *)buf, GetTextLength()+1);\r\n' + \
-            #'    ((char *)buf)[GetTextLength()] = \'\\0\';\r\n' + \
             '    boost::python::object rv(buf);\r\n' + \
             '    delete buf;\r\n' + \
             '    return rv;\r\n' + \

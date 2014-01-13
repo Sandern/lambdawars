@@ -12,6 +12,11 @@
 #pragma once
 #endif
 
+namespace vgui
+{
+	class Panel;
+}
+
 #ifdef ENABLE_PYTHON
 
 class WarsVGUIScreen

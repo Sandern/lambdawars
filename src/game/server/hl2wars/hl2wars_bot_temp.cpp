@@ -473,8 +473,6 @@ void Bot_Think( CSDKBot *pBot )
 		// Fix up the m_fEffects flags
 		pBot->PostClientMessagesSent();
 
-		
-		
 		cmd.viewangles = pBot->GetLocalAngles();
 		cmd.upmove = 0;
 		cmd.impulse = 0;

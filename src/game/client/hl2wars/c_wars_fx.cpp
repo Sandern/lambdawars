@@ -11,6 +11,7 @@
 #include "bone_setup.h"
 #include "util_shared.h"
 #include "unit_base_shared.h"
+#include "vprof.h"
 
 #ifdef DEFERRED_ENABLED
 #include "deferred/cdeferred_manager_client.h"

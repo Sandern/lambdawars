@@ -81,7 +81,9 @@ void CFoWBlocker::Activate()
 {
 	BaseClass::Activate();
 
+#ifndef CLIENT_DLL
 	if( GetEntityName() != NULL_STRING )
+#endif // CLIENT_DLL
 	{
 		// Update tile height FOW
 		UpdateTileHeights();
