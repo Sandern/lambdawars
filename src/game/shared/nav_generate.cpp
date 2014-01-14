@@ -46,8 +46,13 @@ extern ConVar nav_area_max_size;
 ConVar nav_generate_skip_viscomp("nav_generate_skip_viscomp", "1", FCVAR_CHEAT);
 
 // Common bounding box for traces
+#ifdef HL2WARS_DLL
+Vector NavTraceMins( -8, -8, 0 );
+Vector NavTraceMaxs( 8, 8, HumanCrouchHeight );
+#else
 Vector NavTraceMins( -0.45, -0.45, 0 );
 Vector NavTraceMaxs( 0.45, 0.45, HumanCrouchHeight );
+#endif // HL2WARS_DLL
 bool FindGroundForNode( Vector *pos, Vector *normal );	// find a ground Z for pos that is clear for NavTraceMins -> NavTraceMaxs
 
 const float MaxTraversableHeight = StepHeight;		// max internal obstacle height that can occur between nav nodes and safely disregarded
@@ -4538,6 +4543,14 @@ bool CNavMesh::SampleStep( void )
 				{
 					return true;
 				}
+
+#ifdef HL2WARS_DLL
+				// Don't generate nodes on npc clips
+				if( ( result.contents & CONTENTS_MONSTERCLIP ) != 0 )
+				{
+					return true;
+				}
+#endif // HL2WARS_DLL
 
 				// If we're incrementally generating, don't overlap existing nav areas.
 				Vector testPos( to );
