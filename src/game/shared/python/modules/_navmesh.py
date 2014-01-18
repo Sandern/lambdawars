@@ -33,6 +33,7 @@ class NavMesh(SemiSharedModuleGenerator):
         mb.free_function('GetNavAreasAtBB').include()
         mb.free_function('SplitAreasAtBB').include()
         mb.free_function('SetAreasBlocked').include()
+        mb.free_function('IsAreaBlocked').include()
         mb.free_function('IsBBCoveredByNavAreas').include()
         
         mb.free_function('TryMergeSurrounding').include()

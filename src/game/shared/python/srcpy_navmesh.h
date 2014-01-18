@@ -40,6 +40,7 @@ int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );
 boost::python::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs );
 void SplitAreasAtBB( const Vector &mins, const Vector &maxs );
 void SetAreasBlocked( boost::python::list areas, bool blocked );
+bool IsAreaBlocked( int areaid );
 bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
 
 // Nav mesh testing

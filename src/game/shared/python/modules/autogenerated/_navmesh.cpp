@@ -154,6 +154,17 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::IsAreaBlocked
+    
+        typedef bool ( *IsAreaBlocked_function_type )( int );
+        
+        bp::def( 
+            "IsAreaBlocked"
+            , IsAreaBlocked_function_type( &::IsAreaBlocked )
+            , ( bp::arg("areaid") ) );
+    
+    }
+
     { //::IsBBCoveredByNavAreas
     
         typedef bool ( *IsBBCoveredByNavAreas_function_type )( ::Vector const &,::Vector const &,float,bool,float );
@@ -413,6 +424,17 @@ BOOST_PYTHON_MODULE(_navmesh){
             "GetNavAreasAtBB"
             , GetNavAreasAtBB_function_type( &::GetNavAreasAtBB )
             , ( bp::arg("mins"), bp::arg("maxs") ) );
+    
+    }
+
+    { //::IsAreaBlocked
+    
+        typedef bool ( *IsAreaBlocked_function_type )( int );
+        
+        bp::def( 
+            "IsAreaBlocked"
+            , IsAreaBlocked_function_type( &::IsAreaBlocked )
+            , ( bp::arg("areaid") ) );
     
     }
 

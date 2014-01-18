@@ -389,6 +389,21 @@ void SetAreasBlocked( boost::python::list areas, bool blocked )
 #endif // CLIENT_DLL
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool IsAreaBlocked( int areaid )
+{
+	CNavArea *area = TheNavMesh->GetNavAreaByID( areaid );
+	if( area )
+	{
+		return (area->GetAttributes() & NAV_MESH_NAV_BLOCKER) != 0;
+	}
+
+	PyErr_SetString(PyExc_Exception, "Could not find area for given id" );
+	throw boost::python::error_already_set();
+}
+
 #ifndef CLIENT_DLL
 static ConVar g_debug_coveredbynavareas("g_debug_coveredbynavareas", "0", FCVAR_CHEAT);
 #endif // CLIENT_DLL
