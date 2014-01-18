@@ -702,7 +702,7 @@ void UnitBaseLocomotion::GroundMove()
 
 	// Calculate the max stepsize for this interval
 	// Assume we can move up/down stepsize per 48.0
-	fIntervalStepSize = Min<float>( stepsize, (stepsize * ( mv->interval * mv->maxspeed / 48.0f ) ) );
+	fIntervalStepSize = Max<float>( stepsize, (stepsize * ( mv->interval * mv->maxspeed / 48.0f ) ) );
 
 	// Raise ourself stepsize
 	// Combine with testing the start position.
