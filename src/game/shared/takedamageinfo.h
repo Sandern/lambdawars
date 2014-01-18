@@ -14,6 +14,12 @@
 
 #include "networkvar.h" // todo: change this when DECLARE_CLASS is moved into a better location.
 
+#ifdef HL2WARS_DLL
+#ifdef ENABLE_PYTHON
+#include "srcpy_boostpython.h"
+#endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
+
 // Used to initialize m_flBaseDamage to something that we know pretty much for sure
 // hasn't been modified by a user. 
 #define BASEDAMAGE_NOT_SPECIFIED	FLT_MAX
@@ -93,6 +99,13 @@ public:
 	void			AdjustPlayerDamageInflictedForSkillLevel();
 	void			AdjustPlayerDamageTakenForSkillLevel();
 
+#ifdef HL2WARS_DLL
+#ifdef ENABLE_PYTHON
+	boost::python::object GetAttributes() { return m_Attributes; }
+	void SetAttributes( boost::python::object attributes ) { m_Attributes = attributes; }
+#endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
+
 	// Given a damage type (composed of the #defines above), fill out a string with the appropriate text.
 	// For designer debug output.
 	static void		DebugGetDamageTypeString(unsigned int DamageType, char *outbuf, int outbuflength );
@@ -119,6 +132,12 @@ protected:
 	int				m_iAmmoType;			// AmmoType of the weapon used to cause this damage, if any
 	float			m_flRadius;
 	bool			m_bForceFriendlyFire;	// Ideally this would be a dmg type, but we can't add more
+
+#ifdef HL2WARS_DLL
+#ifdef ENABLE_PYTHON
+	boost::python::object m_Attributes;
+#endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
 
 	DECLARE_SIMPLE_DATADESC();
 };

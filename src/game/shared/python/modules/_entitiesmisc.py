@@ -339,16 +339,20 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             mb.class_('MouseTraceData_t').vars('m_iY').rename('y')  
             
         # CTakeDamageInfo
-        mb.class_('CTakeDamageInfo').include()
-        mb.class_('CTakeDamageInfo').calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
+        cls = mb.class_('CTakeDamageInfo')
+        cls.include()
+        cls.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
-        mb.mem_funs('GetInflictor').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.mem_funs('GetWeapon').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.mem_funs('GetAttacker').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetInflictor').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetWeapon').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('GetAttacker').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
-        mb.class_('CMultiDamage').include()
-        mb.class_('CMultiDamage').calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-        mb.mem_funs('GetTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        self.SetupProperty(cls, 'attributes', 'GetAttributes', 'SetAttributes')
+        
+        cls = mb.class_('CMultiDamage')
+        cls.include()
+        cls.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
+        cls.mem_funs('GetTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         mb.free_functions('ClearMultiDamage').include()
         mb.free_functions('ApplyMultiDamage').include()
@@ -358,6 +362,8 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_functions('CalculateBulletDamageForce').include()
         mb.free_functions('CalculateMeleeDamageForce').include()
         mb.free_functions('GuessDamageForce').include()
+        
+        
         
         # //--------------------------------------------------------------------------------------------------------------------------------
         # FireBulletsInfo_t

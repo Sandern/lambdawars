@@ -1665,171 +1665,450 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         CClientEntityList_exposer.def_readwrite( "m_entityListeners", &CClientEntityList::m_entityListeners );
     }
 
-    bp::class_< CTakeDamageInfo >( "CTakeDamageInfo", bp::init< >() )    
-        .def( bp::init< C_BaseEntity *, C_BaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) )    
-        .def( bp::init< C_BaseEntity *, C_BaseEntity *, C_BaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) )    
-        .def( bp::init< C_BaseEntity *, C_BaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) )    
-        .def( bp::init< C_BaseEntity *, C_BaseEntity *, C_BaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) )    
-        .def( 
-            "AddDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::AddDamage )
-            , ( bp::arg("flAddAmount") ) )    
-        .def( 
-            "AddDamageType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::AddDamageType )
-            , ( bp::arg("bitsDamageType") ) )    
-        .def( 
-            "AdjustPlayerDamageInflictedForSkillLevel"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel ) )    
-        .def( 
-            "AdjustPlayerDamageTakenForSkillLevel"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel ) )    
-        .def( 
-            "BaseDamageIsValid"
-            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::BaseDamageIsValid ) )    
-        .def( 
-            "CopyDamageToBaseDamage"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::CopyDamageToBaseDamage ) )    
-        .def( 
-            "DebugGetDamageTypeString"
-            , (void (*)( unsigned int,char *,int ))( &::CTakeDamageInfo::DebugGetDamageTypeString )
-            , ( bp::arg("DamageType"), bp::arg("outbuf"), bp::arg("outbuflength") ) )    
-        .def( 
-            "GetAmmoName"
-            , (char const * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAmmoName ) )    
-        .def( 
-            "GetAmmoType"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAmmoType ) )    
-        .def( 
-            "GetAttacker"
-            , (::C_BaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAttacker )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetBaseDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetBaseDamage ) )    
-        .def( 
-            "GetDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamage ) )    
-        .def( 
-            "GetDamageCustom"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageCustom ) )    
-        .def( 
-            "GetDamageForce"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageForce ) )    
-        .def( 
-            "GetDamagePosition"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamagePosition ) )    
-        .def( 
-            "GetDamageStats"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageStats ) )    
-        .def( 
-            "GetDamageType"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageType ) )    
-        .def( 
-            "GetInflictor"
-            , (::C_BaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetInflictor )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetMaxDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetMaxDamage ) )    
-        .def( 
-            "GetRadius"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetRadius ) )    
-        .def( 
-            "GetReportedPosition"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetReportedPosition ) )    
-        .def( 
-            "GetWeapon"
-            , (::C_BaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetWeapon )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "IsForceFriendlyFire"
-            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::IsForceFriendlyFire ) )    
-        .def( 
-            "ScaleDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamage )
-            , ( bp::arg("flScaleAmount") ) )    
-        .def( 
-            "ScaleDamageForce"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamageForce )
-            , ( bp::arg("flScaleAmount") ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity *,::C_BaseEntity *,float,int,int ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity *,::C_BaseEntity *,::C_BaseEntity *,float,int,int ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity *,::C_BaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity *,::C_BaseEntity *,::C_BaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) )    
-        .def( 
-            "SetAmmoType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetAmmoType )
-            , ( bp::arg("iAmmoType") ) )    
-        .def( 
-            "SetAttacker"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity * ) )( &::CTakeDamageInfo::SetAttacker )
-            , ( bp::arg("pAttacker") ) )    
-        .def( 
-            "SetDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetDamage )
-            , ( bp::arg("flDamage") ) )    
-        .def( 
-            "SetDamageCustom"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageCustom )
-            , ( bp::arg("iDamageCustom") ) )    
-        .def( 
-            "SetDamageForce"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetDamageForce )
-            , ( bp::arg("damageForce") ) )    
-        .def( 
-            "SetDamagePosition"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetDamagePosition )
-            , ( bp::arg("damagePosition") ) )    
-        .def( 
-            "SetDamageStats"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageStats )
-            , ( bp::arg("iDamageCustom") ) )    
-        .def( 
-            "SetDamageType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageType )
-            , ( bp::arg("bitsDamageType") ) )    
-        .def( 
-            "SetForceFriendlyFire"
-            , (void ( ::CTakeDamageInfo::* )( bool ) )( &::CTakeDamageInfo::SetForceFriendlyFire )
-            , ( bp::arg("bValue") ) )    
-        .def( 
-            "SetInflictor"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity * ) )( &::CTakeDamageInfo::SetInflictor )
-            , ( bp::arg("pInflictor") ) )    
-        .def( 
-            "SetMaxDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetMaxDamage )
-            , ( bp::arg("flMaxDamage") ) )    
-        .def( 
-            "SetRadius"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetRadius )
-            , ( bp::arg("flRadius") ) )    
-        .def( 
-            "SetReportedPosition"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetReportedPosition )
-            , ( bp::arg("reportedPosition") ) )    
-        .def( 
-            "SetWeapon"
-            , (void ( ::CTakeDamageInfo::* )( ::C_BaseEntity * ) )( &::CTakeDamageInfo::SetWeapon )
-            , ( bp::arg("pWeapon") ) )    
-        .def( 
-            "SubtractDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SubtractDamage )
-            , ( bp::arg("flSubtractAmount") ) )    
-        .staticmethod( "DebugGetDamageTypeString" );
+    { //::CTakeDamageInfo
+        typedef bp::class_< CTakeDamageInfo > CTakeDamageInfo_exposer_t;
+        CTakeDamageInfo_exposer_t CTakeDamageInfo_exposer = CTakeDamageInfo_exposer_t( "CTakeDamageInfo", bp::init< >() );
+        bp::scope CTakeDamageInfo_scope( CTakeDamageInfo_exposer );
+        CTakeDamageInfo_exposer.def( bp::init< C_BaseEntity *, C_BaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) );
+        CTakeDamageInfo_exposer.def( bp::init< C_BaseEntity *, C_BaseEntity *, C_BaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) );
+        CTakeDamageInfo_exposer.def( bp::init< C_BaseEntity *, C_BaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) );
+        CTakeDamageInfo_exposer.def( bp::init< C_BaseEntity *, C_BaseEntity *, C_BaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) );
+        { //::CTakeDamageInfo::AddDamage
+        
+            typedef void ( ::CTakeDamageInfo::*AddDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AddDamage"
+                , AddDamage_function_type( &::CTakeDamageInfo::AddDamage )
+                , ( bp::arg("flAddAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::AddDamageType
+        
+            typedef void ( ::CTakeDamageInfo::*AddDamageType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AddDamageType"
+                , AddDamageType_function_type( &::CTakeDamageInfo::AddDamageType )
+                , ( bp::arg("bitsDamageType") ) );
+        
+        }
+        { //::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel
+        
+            typedef void ( ::CTakeDamageInfo::*AdjustPlayerDamageInflictedForSkillLevel_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AdjustPlayerDamageInflictedForSkillLevel"
+                , AdjustPlayerDamageInflictedForSkillLevel_function_type( &::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel ) );
+        
+        }
+        { //::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel
+        
+            typedef void ( ::CTakeDamageInfo::*AdjustPlayerDamageTakenForSkillLevel_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AdjustPlayerDamageTakenForSkillLevel"
+                , AdjustPlayerDamageTakenForSkillLevel_function_type( &::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel ) );
+        
+        }
+        { //::CTakeDamageInfo::BaseDamageIsValid
+        
+            typedef bool ( ::CTakeDamageInfo::*BaseDamageIsValid_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "BaseDamageIsValid"
+                , BaseDamageIsValid_function_type( &::CTakeDamageInfo::BaseDamageIsValid ) );
+        
+        }
+        { //::CTakeDamageInfo::CopyDamageToBaseDamage
+        
+            typedef void ( ::CTakeDamageInfo::*CopyDamageToBaseDamage_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "CopyDamageToBaseDamage"
+                , CopyDamageToBaseDamage_function_type( &::CTakeDamageInfo::CopyDamageToBaseDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::DebugGetDamageTypeString
+        
+            typedef void ( *DebugGetDamageTypeString_function_type )( unsigned int,char *,int );
+            
+            CTakeDamageInfo_exposer.def( 
+                "DebugGetDamageTypeString"
+                , DebugGetDamageTypeString_function_type( &::CTakeDamageInfo::DebugGetDamageTypeString )
+                , ( bp::arg("DamageType"), bp::arg("outbuf"), bp::arg("outbuflength") ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAmmoName
+        
+            typedef char const * ( ::CTakeDamageInfo::*GetAmmoName_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAmmoName"
+                , GetAmmoName_function_type( &::CTakeDamageInfo::GetAmmoName ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAmmoType
+        
+            typedef int ( ::CTakeDamageInfo::*GetAmmoType_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAmmoType"
+                , GetAmmoType_function_type( &::CTakeDamageInfo::GetAmmoType ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAttacker
+        
+            typedef ::C_BaseEntity * ( ::CTakeDamageInfo::*GetAttacker_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAttacker"
+                , GetAttacker_function_type( &::CTakeDamageInfo::GetAttacker )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::GetBaseDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetBaseDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetBaseDamage"
+                , GetBaseDamage_function_type( &::CTakeDamageInfo::GetBaseDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamage"
+                , GetDamage_function_type( &::CTakeDamageInfo::GetDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageCustom
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageCustom_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageCustom"
+                , GetDamageCustom_function_type( &::CTakeDamageInfo::GetDamageCustom ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageForce
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetDamageForce_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageForce"
+                , GetDamageForce_function_type( &::CTakeDamageInfo::GetDamageForce ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamagePosition
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetDamagePosition_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamagePosition"
+                , GetDamagePosition_function_type( &::CTakeDamageInfo::GetDamagePosition ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageStats
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageStats_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageStats"
+                , GetDamageStats_function_type( &::CTakeDamageInfo::GetDamageStats ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageType
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageType_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageType"
+                , GetDamageType_function_type( &::CTakeDamageInfo::GetDamageType ) );
+        
+        }
+        { //::CTakeDamageInfo::GetInflictor
+        
+            typedef ::C_BaseEntity * ( ::CTakeDamageInfo::*GetInflictor_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetInflictor"
+                , GetInflictor_function_type( &::CTakeDamageInfo::GetInflictor )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::GetMaxDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetMaxDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetMaxDamage"
+                , GetMaxDamage_function_type( &::CTakeDamageInfo::GetMaxDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetRadius
+        
+            typedef float ( ::CTakeDamageInfo::*GetRadius_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetRadius"
+                , GetRadius_function_type( &::CTakeDamageInfo::GetRadius ) );
+        
+        }
+        { //::CTakeDamageInfo::GetReportedPosition
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetReportedPosition_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetReportedPosition"
+                , GetReportedPosition_function_type( &::CTakeDamageInfo::GetReportedPosition ) );
+        
+        }
+        { //::CTakeDamageInfo::GetWeapon
+        
+            typedef ::C_BaseEntity * ( ::CTakeDamageInfo::*GetWeapon_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetWeapon"
+                , GetWeapon_function_type( &::CTakeDamageInfo::GetWeapon )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::IsForceFriendlyFire
+        
+            typedef bool ( ::CTakeDamageInfo::*IsForceFriendlyFire_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "IsForceFriendlyFire"
+                , IsForceFriendlyFire_function_type( &::CTakeDamageInfo::IsForceFriendlyFire ) );
+        
+        }
+        { //::CTakeDamageInfo::ScaleDamage
+        
+            typedef void ( ::CTakeDamageInfo::*ScaleDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "ScaleDamage"
+                , ScaleDamage_function_type( &::CTakeDamageInfo::ScaleDamage )
+                , ( bp::arg("flScaleAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::ScaleDamageForce
+        
+            typedef void ( ::CTakeDamageInfo::*ScaleDamageForce_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "ScaleDamageForce"
+                , ScaleDamageForce_function_type( &::CTakeDamageInfo::ScaleDamageForce )
+                , ( bp::arg("flScaleAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::C_BaseEntity *,::C_BaseEntity *,float,int,int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::C_BaseEntity *,::C_BaseEntity *,::C_BaseEntity *,float,int,int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::C_BaseEntity *,::C_BaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::C_BaseEntity *,::C_BaseEntity *,::C_BaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) );
+        
+        }
+        { //::CTakeDamageInfo::SetAmmoType
+        
+            typedef void ( ::CTakeDamageInfo::*SetAmmoType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetAmmoType"
+                , SetAmmoType_function_type( &::CTakeDamageInfo::SetAmmoType )
+                , ( bp::arg("iAmmoType") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetAttacker
+        
+            typedef void ( ::CTakeDamageInfo::*SetAttacker_function_type )( ::C_BaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetAttacker"
+                , SetAttacker_function_type( &::CTakeDamageInfo::SetAttacker )
+                , ( bp::arg("pAttacker") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamage"
+                , SetDamage_function_type( &::CTakeDamageInfo::SetDamage )
+                , ( bp::arg("flDamage") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageCustom
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageCustom_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageCustom"
+                , SetDamageCustom_function_type( &::CTakeDamageInfo::SetDamageCustom )
+                , ( bp::arg("iDamageCustom") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageForce
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageForce_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageForce"
+                , SetDamageForce_function_type( &::CTakeDamageInfo::SetDamageForce )
+                , ( bp::arg("damageForce") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamagePosition
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamagePosition_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamagePosition"
+                , SetDamagePosition_function_type( &::CTakeDamageInfo::SetDamagePosition )
+                , ( bp::arg("damagePosition") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageStats
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageStats_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageStats"
+                , SetDamageStats_function_type( &::CTakeDamageInfo::SetDamageStats )
+                , ( bp::arg("iDamageCustom") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageType
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageType"
+                , SetDamageType_function_type( &::CTakeDamageInfo::SetDamageType )
+                , ( bp::arg("bitsDamageType") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetForceFriendlyFire
+        
+            typedef void ( ::CTakeDamageInfo::*SetForceFriendlyFire_function_type )( bool ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetForceFriendlyFire"
+                , SetForceFriendlyFire_function_type( &::CTakeDamageInfo::SetForceFriendlyFire )
+                , ( bp::arg("bValue") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetInflictor
+        
+            typedef void ( ::CTakeDamageInfo::*SetInflictor_function_type )( ::C_BaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetInflictor"
+                , SetInflictor_function_type( &::CTakeDamageInfo::SetInflictor )
+                , ( bp::arg("pInflictor") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetMaxDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SetMaxDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetMaxDamage"
+                , SetMaxDamage_function_type( &::CTakeDamageInfo::SetMaxDamage )
+                , ( bp::arg("flMaxDamage") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetRadius
+        
+            typedef void ( ::CTakeDamageInfo::*SetRadius_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetRadius"
+                , SetRadius_function_type( &::CTakeDamageInfo::SetRadius )
+                , ( bp::arg("flRadius") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetReportedPosition
+        
+            typedef void ( ::CTakeDamageInfo::*SetReportedPosition_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetReportedPosition"
+                , SetReportedPosition_function_type( &::CTakeDamageInfo::SetReportedPosition )
+                , ( bp::arg("reportedPosition") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetWeapon
+        
+            typedef void ( ::CTakeDamageInfo::*SetWeapon_function_type )( ::C_BaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetWeapon"
+                , SetWeapon_function_type( &::CTakeDamageInfo::SetWeapon )
+                , ( bp::arg("pWeapon") ) );
+        
+        }
+        { //::CTakeDamageInfo::SubtractDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SubtractDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SubtractDamage"
+                , SubtractDamage_function_type( &::CTakeDamageInfo::SubtractDamage )
+                , ( bp::arg("flSubtractAmount") ) );
+        
+        }
+        CTakeDamageInfo_exposer.staticmethod( "DebugGetDamageTypeString" );
+        { //property "attributes"[fget=::CTakeDamageInfo::GetAttributes, fset=::CTakeDamageInfo::SetAttributes]
+        
+            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) ;
+            typedef void ( ::CTakeDamageInfo::*fset )( ::boost::python::object ) ;
+            
+            CTakeDamageInfo_exposer.add_property( 
+                "attributes"
+                , fget( &::CTakeDamageInfo::GetAttributes )
+                , fset( &::CTakeDamageInfo::SetAttributes ) );
+        
+        }
+    }
 
     bp::class_< CMultiDamage, bp::bases< CTakeDamageInfo > >( "CMultiDamage", bp::init< >() )    
         .def( 
@@ -4345,171 +4624,450 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "ResetDeleteList"
             , (int ( ::CGlobalEntityList::* )(  ) )( &::CGlobalEntityList::ResetDeleteList ) );
 
-    bp::class_< CTakeDamageInfo >( "CTakeDamageInfo", bp::init< >() )    
-        .def( bp::init< CBaseEntity *, CBaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) )    
-        .def( bp::init< CBaseEntity *, CBaseEntity *, CBaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) )    
-        .def( bp::init< CBaseEntity *, CBaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) )    
-        .def( bp::init< CBaseEntity *, CBaseEntity *, CBaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) )    
-        .def( 
-            "AddDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::AddDamage )
-            , ( bp::arg("flAddAmount") ) )    
-        .def( 
-            "AddDamageType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::AddDamageType )
-            , ( bp::arg("bitsDamageType") ) )    
-        .def( 
-            "AdjustPlayerDamageInflictedForSkillLevel"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel ) )    
-        .def( 
-            "AdjustPlayerDamageTakenForSkillLevel"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel ) )    
-        .def( 
-            "BaseDamageIsValid"
-            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::BaseDamageIsValid ) )    
-        .def( 
-            "CopyDamageToBaseDamage"
-            , (void ( ::CTakeDamageInfo::* )(  ) )( &::CTakeDamageInfo::CopyDamageToBaseDamage ) )    
-        .def( 
-            "DebugGetDamageTypeString"
-            , (void (*)( unsigned int,char *,int ))( &::CTakeDamageInfo::DebugGetDamageTypeString )
-            , ( bp::arg("DamageType"), bp::arg("outbuf"), bp::arg("outbuflength") ) )    
-        .def( 
-            "GetAmmoName"
-            , (char const * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAmmoName ) )    
-        .def( 
-            "GetAmmoType"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAmmoType ) )    
-        .def( 
-            "GetAttacker"
-            , (::CBaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetAttacker )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetBaseDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetBaseDamage ) )    
-        .def( 
-            "GetDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamage ) )    
-        .def( 
-            "GetDamageCustom"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageCustom ) )    
-        .def( 
-            "GetDamageForce"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageForce ) )    
-        .def( 
-            "GetDamagePosition"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamagePosition ) )    
-        .def( 
-            "GetDamageStats"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageStats ) )    
-        .def( 
-            "GetDamageType"
-            , (int ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetDamageType ) )    
-        .def( 
-            "GetInflictor"
-            , (::CBaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetInflictor )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetMaxDamage"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetMaxDamage ) )    
-        .def( 
-            "GetRadius"
-            , (float ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetRadius ) )    
-        .def( 
-            "GetReportedPosition"
-            , (::Vector ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetReportedPosition ) )    
-        .def( 
-            "GetWeapon"
-            , (::CBaseEntity * ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::GetWeapon )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "IsForceFriendlyFire"
-            , (bool ( ::CTakeDamageInfo::* )(  ) const)( &::CTakeDamageInfo::IsForceFriendlyFire ) )    
-        .def( 
-            "ScaleDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamage )
-            , ( bp::arg("flScaleAmount") ) )    
-        .def( 
-            "ScaleDamageForce"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::ScaleDamageForce )
-            , ( bp::arg("flScaleAmount") ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity *,::CBaseEntity *,float,int,int ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity *,::CBaseEntity *,::CBaseEntity *,float,int,int ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity *,::CBaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) )    
-        .def( 
-            "Set"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity *,::CBaseEntity *,::CBaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) )( &::CTakeDamageInfo::Set )
-            , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) )    
-        .def( 
-            "SetAmmoType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetAmmoType )
-            , ( bp::arg("iAmmoType") ) )    
-        .def( 
-            "SetAttacker"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity * ) )( &::CTakeDamageInfo::SetAttacker )
-            , ( bp::arg("pAttacker") ) )    
-        .def( 
-            "SetDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetDamage )
-            , ( bp::arg("flDamage") ) )    
-        .def( 
-            "SetDamageCustom"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageCustom )
-            , ( bp::arg("iDamageCustom") ) )    
-        .def( 
-            "SetDamageForce"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetDamageForce )
-            , ( bp::arg("damageForce") ) )    
-        .def( 
-            "SetDamagePosition"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetDamagePosition )
-            , ( bp::arg("damagePosition") ) )    
-        .def( 
-            "SetDamageStats"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageStats )
-            , ( bp::arg("iDamageCustom") ) )    
-        .def( 
-            "SetDamageType"
-            , (void ( ::CTakeDamageInfo::* )( int ) )( &::CTakeDamageInfo::SetDamageType )
-            , ( bp::arg("bitsDamageType") ) )    
-        .def( 
-            "SetForceFriendlyFire"
-            , (void ( ::CTakeDamageInfo::* )( bool ) )( &::CTakeDamageInfo::SetForceFriendlyFire )
-            , ( bp::arg("bValue") ) )    
-        .def( 
-            "SetInflictor"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity * ) )( &::CTakeDamageInfo::SetInflictor )
-            , ( bp::arg("pInflictor") ) )    
-        .def( 
-            "SetMaxDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetMaxDamage )
-            , ( bp::arg("flMaxDamage") ) )    
-        .def( 
-            "SetRadius"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SetRadius )
-            , ( bp::arg("flRadius") ) )    
-        .def( 
-            "SetReportedPosition"
-            , (void ( ::CTakeDamageInfo::* )( ::Vector const & ) )( &::CTakeDamageInfo::SetReportedPosition )
-            , ( bp::arg("reportedPosition") ) )    
-        .def( 
-            "SetWeapon"
-            , (void ( ::CTakeDamageInfo::* )( ::CBaseEntity * ) )( &::CTakeDamageInfo::SetWeapon )
-            , ( bp::arg("pWeapon") ) )    
-        .def( 
-            "SubtractDamage"
-            , (void ( ::CTakeDamageInfo::* )( float ) )( &::CTakeDamageInfo::SubtractDamage )
-            , ( bp::arg("flSubtractAmount") ) )    
-        .staticmethod( "DebugGetDamageTypeString" );
+    { //::CTakeDamageInfo
+        typedef bp::class_< CTakeDamageInfo > CTakeDamageInfo_exposer_t;
+        CTakeDamageInfo_exposer_t CTakeDamageInfo_exposer = CTakeDamageInfo_exposer_t( "CTakeDamageInfo", bp::init< >() );
+        bp::scope CTakeDamageInfo_scope( CTakeDamageInfo_exposer );
+        CTakeDamageInfo_exposer.def( bp::init< CBaseEntity *, CBaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) );
+        CTakeDamageInfo_exposer.def( bp::init< CBaseEntity *, CBaseEntity *, CBaseEntity *, float, int, bp::optional< int > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) )) );
+        CTakeDamageInfo_exposer.def( bp::init< CBaseEntity *, CBaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) );
+        CTakeDamageInfo_exposer.def( bp::init< CBaseEntity *, CBaseEntity *, CBaseEntity *, Vector const &, Vector const &, float, int, bp::optional< int, Vector * > >(( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() )) );
+        { //::CTakeDamageInfo::AddDamage
+        
+            typedef void ( ::CTakeDamageInfo::*AddDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AddDamage"
+                , AddDamage_function_type( &::CTakeDamageInfo::AddDamage )
+                , ( bp::arg("flAddAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::AddDamageType
+        
+            typedef void ( ::CTakeDamageInfo::*AddDamageType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AddDamageType"
+                , AddDamageType_function_type( &::CTakeDamageInfo::AddDamageType )
+                , ( bp::arg("bitsDamageType") ) );
+        
+        }
+        { //::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel
+        
+            typedef void ( ::CTakeDamageInfo::*AdjustPlayerDamageInflictedForSkillLevel_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AdjustPlayerDamageInflictedForSkillLevel"
+                , AdjustPlayerDamageInflictedForSkillLevel_function_type( &::CTakeDamageInfo::AdjustPlayerDamageInflictedForSkillLevel ) );
+        
+        }
+        { //::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel
+        
+            typedef void ( ::CTakeDamageInfo::*AdjustPlayerDamageTakenForSkillLevel_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "AdjustPlayerDamageTakenForSkillLevel"
+                , AdjustPlayerDamageTakenForSkillLevel_function_type( &::CTakeDamageInfo::AdjustPlayerDamageTakenForSkillLevel ) );
+        
+        }
+        { //::CTakeDamageInfo::BaseDamageIsValid
+        
+            typedef bool ( ::CTakeDamageInfo::*BaseDamageIsValid_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "BaseDamageIsValid"
+                , BaseDamageIsValid_function_type( &::CTakeDamageInfo::BaseDamageIsValid ) );
+        
+        }
+        { //::CTakeDamageInfo::CopyDamageToBaseDamage
+        
+            typedef void ( ::CTakeDamageInfo::*CopyDamageToBaseDamage_function_type )(  ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "CopyDamageToBaseDamage"
+                , CopyDamageToBaseDamage_function_type( &::CTakeDamageInfo::CopyDamageToBaseDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::DebugGetDamageTypeString
+        
+            typedef void ( *DebugGetDamageTypeString_function_type )( unsigned int,char *,int );
+            
+            CTakeDamageInfo_exposer.def( 
+                "DebugGetDamageTypeString"
+                , DebugGetDamageTypeString_function_type( &::CTakeDamageInfo::DebugGetDamageTypeString )
+                , ( bp::arg("DamageType"), bp::arg("outbuf"), bp::arg("outbuflength") ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAmmoName
+        
+            typedef char const * ( ::CTakeDamageInfo::*GetAmmoName_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAmmoName"
+                , GetAmmoName_function_type( &::CTakeDamageInfo::GetAmmoName ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAmmoType
+        
+            typedef int ( ::CTakeDamageInfo::*GetAmmoType_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAmmoType"
+                , GetAmmoType_function_type( &::CTakeDamageInfo::GetAmmoType ) );
+        
+        }
+        { //::CTakeDamageInfo::GetAttacker
+        
+            typedef ::CBaseEntity * ( ::CTakeDamageInfo::*GetAttacker_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetAttacker"
+                , GetAttacker_function_type( &::CTakeDamageInfo::GetAttacker )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::GetBaseDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetBaseDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetBaseDamage"
+                , GetBaseDamage_function_type( &::CTakeDamageInfo::GetBaseDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamage"
+                , GetDamage_function_type( &::CTakeDamageInfo::GetDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageCustom
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageCustom_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageCustom"
+                , GetDamageCustom_function_type( &::CTakeDamageInfo::GetDamageCustom ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageForce
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetDamageForce_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageForce"
+                , GetDamageForce_function_type( &::CTakeDamageInfo::GetDamageForce ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamagePosition
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetDamagePosition_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamagePosition"
+                , GetDamagePosition_function_type( &::CTakeDamageInfo::GetDamagePosition ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageStats
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageStats_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageStats"
+                , GetDamageStats_function_type( &::CTakeDamageInfo::GetDamageStats ) );
+        
+        }
+        { //::CTakeDamageInfo::GetDamageType
+        
+            typedef int ( ::CTakeDamageInfo::*GetDamageType_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetDamageType"
+                , GetDamageType_function_type( &::CTakeDamageInfo::GetDamageType ) );
+        
+        }
+        { //::CTakeDamageInfo::GetInflictor
+        
+            typedef ::CBaseEntity * ( ::CTakeDamageInfo::*GetInflictor_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetInflictor"
+                , GetInflictor_function_type( &::CTakeDamageInfo::GetInflictor )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::GetMaxDamage
+        
+            typedef float ( ::CTakeDamageInfo::*GetMaxDamage_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetMaxDamage"
+                , GetMaxDamage_function_type( &::CTakeDamageInfo::GetMaxDamage ) );
+        
+        }
+        { //::CTakeDamageInfo::GetRadius
+        
+            typedef float ( ::CTakeDamageInfo::*GetRadius_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetRadius"
+                , GetRadius_function_type( &::CTakeDamageInfo::GetRadius ) );
+        
+        }
+        { //::CTakeDamageInfo::GetReportedPosition
+        
+            typedef ::Vector ( ::CTakeDamageInfo::*GetReportedPosition_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetReportedPosition"
+                , GetReportedPosition_function_type( &::CTakeDamageInfo::GetReportedPosition ) );
+        
+        }
+        { //::CTakeDamageInfo::GetWeapon
+        
+            typedef ::CBaseEntity * ( ::CTakeDamageInfo::*GetWeapon_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "GetWeapon"
+                , GetWeapon_function_type( &::CTakeDamageInfo::GetWeapon )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CTakeDamageInfo::IsForceFriendlyFire
+        
+            typedef bool ( ::CTakeDamageInfo::*IsForceFriendlyFire_function_type )(  ) const;
+            
+            CTakeDamageInfo_exposer.def( 
+                "IsForceFriendlyFire"
+                , IsForceFriendlyFire_function_type( &::CTakeDamageInfo::IsForceFriendlyFire ) );
+        
+        }
+        { //::CTakeDamageInfo::ScaleDamage
+        
+            typedef void ( ::CTakeDamageInfo::*ScaleDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "ScaleDamage"
+                , ScaleDamage_function_type( &::CTakeDamageInfo::ScaleDamage )
+                , ( bp::arg("flScaleAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::ScaleDamageForce
+        
+            typedef void ( ::CTakeDamageInfo::*ScaleDamageForce_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "ScaleDamageForce"
+                , ScaleDamageForce_function_type( &::CTakeDamageInfo::ScaleDamageForce )
+                , ( bp::arg("flScaleAmount") ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::CBaseEntity *,::CBaseEntity *,float,int,int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::CBaseEntity *,::CBaseEntity *,::CBaseEntity *,float,int,int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0) ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::CBaseEntity *,::CBaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) );
+        
+        }
+        { //::CTakeDamageInfo::Set
+        
+            typedef void ( ::CTakeDamageInfo::*Set_function_type )( ::CBaseEntity *,::CBaseEntity *,::CBaseEntity *,::Vector const &,::Vector const &,float,int,int,::Vector * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "Set"
+                , Set_function_type( &::CTakeDamageInfo::Set )
+                , ( bp::arg("pInflictor"), bp::arg("pAttacker"), bp::arg("pWeapon"), bp::arg("damageForce"), bp::arg("damagePosition"), bp::arg("flDamage"), bp::arg("bitsDamageType"), bp::arg("iKillType")=(int)(0), bp::arg("reportedPosition")=bp::object() ) );
+        
+        }
+        { //::CTakeDamageInfo::SetAmmoType
+        
+            typedef void ( ::CTakeDamageInfo::*SetAmmoType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetAmmoType"
+                , SetAmmoType_function_type( &::CTakeDamageInfo::SetAmmoType )
+                , ( bp::arg("iAmmoType") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetAttacker
+        
+            typedef void ( ::CTakeDamageInfo::*SetAttacker_function_type )( ::CBaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetAttacker"
+                , SetAttacker_function_type( &::CTakeDamageInfo::SetAttacker )
+                , ( bp::arg("pAttacker") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamage"
+                , SetDamage_function_type( &::CTakeDamageInfo::SetDamage )
+                , ( bp::arg("flDamage") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageCustom
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageCustom_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageCustom"
+                , SetDamageCustom_function_type( &::CTakeDamageInfo::SetDamageCustom )
+                , ( bp::arg("iDamageCustom") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageForce
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageForce_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageForce"
+                , SetDamageForce_function_type( &::CTakeDamageInfo::SetDamageForce )
+                , ( bp::arg("damageForce") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamagePosition
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamagePosition_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamagePosition"
+                , SetDamagePosition_function_type( &::CTakeDamageInfo::SetDamagePosition )
+                , ( bp::arg("damagePosition") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageStats
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageStats_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageStats"
+                , SetDamageStats_function_type( &::CTakeDamageInfo::SetDamageStats )
+                , ( bp::arg("iDamageCustom") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetDamageType
+        
+            typedef void ( ::CTakeDamageInfo::*SetDamageType_function_type )( int ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetDamageType"
+                , SetDamageType_function_type( &::CTakeDamageInfo::SetDamageType )
+                , ( bp::arg("bitsDamageType") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetForceFriendlyFire
+        
+            typedef void ( ::CTakeDamageInfo::*SetForceFriendlyFire_function_type )( bool ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetForceFriendlyFire"
+                , SetForceFriendlyFire_function_type( &::CTakeDamageInfo::SetForceFriendlyFire )
+                , ( bp::arg("bValue") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetInflictor
+        
+            typedef void ( ::CTakeDamageInfo::*SetInflictor_function_type )( ::CBaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetInflictor"
+                , SetInflictor_function_type( &::CTakeDamageInfo::SetInflictor )
+                , ( bp::arg("pInflictor") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetMaxDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SetMaxDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetMaxDamage"
+                , SetMaxDamage_function_type( &::CTakeDamageInfo::SetMaxDamage )
+                , ( bp::arg("flMaxDamage") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetRadius
+        
+            typedef void ( ::CTakeDamageInfo::*SetRadius_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetRadius"
+                , SetRadius_function_type( &::CTakeDamageInfo::SetRadius )
+                , ( bp::arg("flRadius") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetReportedPosition
+        
+            typedef void ( ::CTakeDamageInfo::*SetReportedPosition_function_type )( ::Vector const & ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetReportedPosition"
+                , SetReportedPosition_function_type( &::CTakeDamageInfo::SetReportedPosition )
+                , ( bp::arg("reportedPosition") ) );
+        
+        }
+        { //::CTakeDamageInfo::SetWeapon
+        
+            typedef void ( ::CTakeDamageInfo::*SetWeapon_function_type )( ::CBaseEntity * ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SetWeapon"
+                , SetWeapon_function_type( &::CTakeDamageInfo::SetWeapon )
+                , ( bp::arg("pWeapon") ) );
+        
+        }
+        { //::CTakeDamageInfo::SubtractDamage
+        
+            typedef void ( ::CTakeDamageInfo::*SubtractDamage_function_type )( float ) ;
+            
+            CTakeDamageInfo_exposer.def( 
+                "SubtractDamage"
+                , SubtractDamage_function_type( &::CTakeDamageInfo::SubtractDamage )
+                , ( bp::arg("flSubtractAmount") ) );
+        
+        }
+        CTakeDamageInfo_exposer.staticmethod( "DebugGetDamageTypeString" );
+        { //property "attributes"[fget=::CTakeDamageInfo::GetAttributes, fset=::CTakeDamageInfo::SetAttributes]
+        
+            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) ;
+            typedef void ( ::CTakeDamageInfo::*fset )( ::boost::python::object ) ;
+            
+            CTakeDamageInfo_exposer.add_property( 
+                "attributes"
+                , fget( &::CTakeDamageInfo::GetAttributes )
+                , fset( &::CTakeDamageInfo::SetAttributes ) );
+        
+        }
+    }
 
     bp::class_< CMultiDamage, bp::bases< CTakeDamageInfo > >( "CMultiDamage", bp::init< >() )    
         .def( 
