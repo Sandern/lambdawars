@@ -45,6 +45,10 @@ extern ConVar nav_area_max_size;
 
 ConVar nav_generate_skip_viscomp("nav_generate_skip_viscomp", "1", FCVAR_CHEAT);
 
+#ifdef HL2WARS_DLL
+ConVar nav_npcclip_no_areas("nav_npcclip_no_areas", "1", FCVAR_CHEAT);
+#endif // HL2WARS_DLL
+
 // Common bounding box for traces
 #ifdef HL2WARS_DLL
 Vector NavTraceMins( -8, -8, 0 );
@@ -4546,7 +4550,7 @@ bool CNavMesh::SampleStep( void )
 
 #ifdef HL2WARS_DLL
 				// Don't generate nodes on npc clips
-				if( ( result.contents & CONTENTS_MONSTERCLIP ) != 0 )
+				if( nav_npcclip_no_areas.GetBool() && ( result.contents & CONTENTS_MONSTERCLIP ) != 0 )
 				{
 					return true;
 				}
