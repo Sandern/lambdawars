@@ -1482,7 +1482,7 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 			EntityText( offset, tempstr, 0 );
 			offset++;
 
-			Q_snprintf( tempstr, sizeof(tempstr), "cell: (%d, %d, %d)\n", m_cellX, m_cellY, m_cellZ );
+			Q_snprintf( tempstr, sizeof(tempstr), "cell: (%d, %d, %d)\n", m_cellX.Get(), m_cellY.Get(), m_cellZ.Get() );
 			EntityText( offset, tempstr, 0 );
 			offset++;
 

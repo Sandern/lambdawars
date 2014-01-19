@@ -12,7 +12,7 @@ static CCommandBufferBuilder< CFixedCommandStorageBuffer< 512 > > tmpBuf;
 void InitParmsGBuffer( const defParms_gBuffer &info, CBaseVSShader *pShader, IMaterialVar **params )
 {
 	if ( PARM_NO_DEFAULT( info.iAlphatestRef ) ||
-		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
+		(PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f) )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
 	PARM_INIT_FLOAT( info.iPhongExp, DEFAULT_PHONG_EXP );

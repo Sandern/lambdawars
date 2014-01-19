@@ -191,15 +191,13 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 		// always force clientside entitis placed in maps
 		CWarsFlora *pEntity = new CWarsFlora();
 
-		if ( pEntity )
-		{	// Set up keyvalues.
-			pEntity->ParseMapData(&entData);
+		// Set up keyvalues.
+		pEntity->ParseMapData(&entData);
 			
-			if ( !pEntity->Initialize() )
-				pEntity->Release();
+		if ( !pEntity->Initialize() )
+			pEntity->Release();
 		
-			return entData.CurrentBufferPosition();
-		}
+		return entData.CurrentBufferPosition();
 	}
 
 	// Just skip past all the keys.

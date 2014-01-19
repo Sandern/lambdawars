@@ -1232,8 +1232,8 @@ static int GetSourceRadBufferIndex( const int index )
 	Assert( index == 0 || index == 1 );
 
 	const bool bFar = index == 1;
-	const int iNumSteps = bFar ? deferred_radiosity_propagate_count_far.GetInt() : deferred_radiosity_propagate_count.GetInt()
-		+ bFar ? deferred_radiosity_blur_count_far.GetInt() : deferred_radiosity_blur_count.GetInt();
+	const int iNumSteps = (bFar ? deferred_radiosity_propagate_count_far.GetInt() : deferred_radiosity_propagate_count.GetInt())
+		+ (bFar ? deferred_radiosity_blur_count_far.GetInt() : deferred_radiosity_blur_count.GetInt());
 	return ( iNumSteps % 2 == 0 ) ? 0 : 1;
 }
 
@@ -2583,7 +2583,7 @@ static void DrawOpaqueRenderables_DrawStaticProps( int nCount, CClientRenderable
 	{
 		CClientRenderablesList::CEntry *itEntity = ppEntities[i];
 		if ( itEntity->m_pRenderable )
-			NULL;
+			;
 		else
 			continue;
 
@@ -4005,7 +4005,6 @@ void CBaseWaterDeferredView::CSoftwareIntersectionView::Setup( bool bAboveWater 
 {
 	BaseClass::Setup( *GetOuter() );
 
-	m_DrawFlags = 0;
 	m_DrawFlags = ( bAboveWater ) ? DF_RENDER_UNDERWATER : DF_RENDER_ABOVEWATER;
 }
 

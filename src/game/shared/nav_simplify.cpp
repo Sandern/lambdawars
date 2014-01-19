@@ -60,7 +60,7 @@ static bool ReduceToComponentAreas( CNavArea *area, bool addToSelectedSet )
 		if ( didSplit )
 		{
 			didSplit = first->SplitEdit( splitAlongX, splitEdge, &third, &fourth );
-			didSplit = second->SplitEdit( splitAlongX, splitEdge, &first, &second );
+			didSplit = second->SplitEdit( splitAlongX, splitEdge, &first, &second ) || didSplit;
 		}
 		else
 		{

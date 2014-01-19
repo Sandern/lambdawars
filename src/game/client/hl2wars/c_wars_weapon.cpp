@@ -272,7 +272,7 @@ CBaseEntity * CWarsWeapon::GetMuzzleAttachEntity()
 	else if( pUnit && pUnit->GetCommander() )
 		player = pUnit->GetCommander();
 
-	if ( player && IsActiveByLocalPlayer() && player && !player->ShouldDrawLocalPlayer() )
+	if ( player && IsActiveByLocalPlayer() && !player->ShouldDrawLocalPlayer() )
 	{
 		C_BaseViewModel *vm = player ? player->GetViewModel( 0 ) : NULL;
 		if ( vm )

@@ -14,7 +14,7 @@ ConVar building_cubemaps( "building_cubemaps", "0" );
 void InitParmsComposite( const defParms_composite &info, CBaseVSShader *pShader, IMaterialVar **params )
 {
 	if ( PARM_NO_DEFAULT( info.iAlphatestRef ) ||
-		PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f )
+		(PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f) )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
 
 	PARM_INIT_FLOAT( info.iPhongScale, DEFAULT_PHONG_SCALE );

@@ -2323,11 +2323,12 @@ void CNavMesh::FixConnections( void )
 
 				CNavNode *node = area->FindClosestNode( pos, (NavDirType)dir );
 				CNavNode *adjNode = adjArea->FindClosestNode( adjPos, OppositeDirection( (NavDirType)dir ) );
-				pos = *node->GetPosition();
-				adjPos = *adjNode->GetPosition();
 
 				if ( !node || !adjNode )
 					continue;
+
+				pos = *node->GetPosition();
+				adjPos = *adjNode->GetPosition();
 
 				NavCornerType adjCornerType[2];
 				GetCornerTypesInDirection( OppositeDirection((NavDirType)dir), &adjCornerType[0], &adjCornerType[1] );

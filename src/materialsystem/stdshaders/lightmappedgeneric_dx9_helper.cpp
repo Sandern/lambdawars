@@ -251,11 +251,6 @@ void InitLightmappedGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, 
 		pShader->LoadTexture( info.m_nBaseTexture2 );
 	}
 
-	if (params[info.m_nBaseTexture2]->IsDefined() )
-	{
-		pShader->LoadTexture( info.m_nBaseTexture2 );
-	}
-
 	if ((info.m_nBlendModulateTexture != -1) &&
 		(params[info.m_nBlendModulateTexture]->IsDefined()) )
 	{

@@ -1892,9 +1892,6 @@
     <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionssticks.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcustomcampaigns.cpp">
-      <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
-    </ClCompile>
     <ClCompile Include="hl2wars\gameui\wars\vdownloadcampaign.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
@@ -1946,9 +1943,6 @@
     <ClCompile Include="hl2wars\gameui\wars\vhybridbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamechapterselect.cpp">
-      <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
-    </ClCompile>
     <ClCompile Include="hl2wars\gameui\wars\vingamedifficultyselect.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
@@ -1965,9 +1959,6 @@
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
     <ClCompile Include="hl2wars\gameui\wars\vkeyboardmouse.cpp">
-      <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
-    </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vleaderboard.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
     <ClCompile Include="hl2wars\gameui\wars\vloadingprogress.cpp">
