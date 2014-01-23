@@ -10,6 +10,7 @@
 #include <vgui/ISurface.h>
 #include "c_hl2wars_player.h"
 #include "hl2wars_util_shared.h"
+#include "teamcolor_proxy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -19,8 +20,10 @@ using namespace vgui;
 // an overview map is 1024x1024 pixels
 int CBaseMinimap::OVERVIEW_MAP_SIZE = 1024;
 
-ConVar minimap_outline_alpha("minimap_outline_alpha", "220");
-ConVar minimap_flash_scale("minimap_flash_scale", "16");
+ConVar minimap_outline_alpha( "minimap_outline_alpha", "220" );
+ConVar minimap_flash_scale( "minimap_flash_scale", "16" );
+ConVar minimap_debug( "minimap_debug", "0", FCVAR_CHEAT );
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -235,6 +238,11 @@ void CBaseMinimap::DrawEntityObjects()
 		pos2d = MapToPanel( WorldToMap( pEnt->GetAbsOrigin() ) );
 		if( eo.m_pIcon )
 		{
+			/*if( flash )
+				SetUITeamColor( Vector( 1, 1, 1 ) );
+			else
+				SetUITeamColor( pEnt->GetTeamColor() );*/
+
 			if( eo.m_iHalfWide == 0 )
 			{
 				eo.m_pIcon->DrawSelf( pos2d.x - int(eo.m_pIcon->Width() / 2.0), pos2d.y - int(eo.m_pIcon->Height() / 2.0), color );
@@ -258,6 +266,39 @@ void CBaseMinimap::DrawEntityObjects()
 			);
 		}
 
+	}
+
+	if( minimap_debug.GetBool() )
+	{
+		int iIcons = 0;
+		int iPixelUnits = 0;
+		int iDoubles = 0;
+
+		count = m_EntityObjects.Count();
+		for( i = count - 1; i >= 0; i-- )
+		{
+			EntityObject &eo = m_EntityObjects.Element(i);
+
+			if( eo.m_pIcon )
+				iIcons += 1;
+			else
+				iPixelUnits += 1;
+
+			int count2 = m_EntityObjects.Count();
+			for( int j = count2 - 1; j >= 0; j-- )
+			{
+				if( j == i )
+					continue;
+
+				EntityObject &eo2 = m_EntityObjects.Element(j);
+				if( eo.m_hEntity == eo2.m_hEntity )
+					iDoubles += 1;
+			}
+		}
+
+		engine->Con_NPrintf( 1, "Icons: %d", iIcons );
+		engine->Con_NPrintf( 2, "Pixel Units: %d", iPixelUnits );
+		engine->Con_NPrintf( 3, "Doubles: %d", iDoubles );
 	}
 }
 
