@@ -47,6 +47,7 @@ class SrcBuiltins(SharedModuleGenerator):
         mb.add_registration_code( "wchar_t_to_python_str();" )
         mb.add_registration_code( "ptr_wchar_t_to_python_str();" )
         mb.add_registration_code( "python_str_to_wchar_t();" )
+        mb.add_registration_code( "python_unicode_to_ptr_const_wchar_t();" )
         
     def AddAdditionalCode(self, mb):
         header = code_creators.include_t( 'srcpy_srcbuiltins_converters.h' )

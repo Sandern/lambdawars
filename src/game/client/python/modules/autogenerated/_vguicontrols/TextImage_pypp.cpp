@@ -498,6 +498,16 @@ void register_TextImage_class(){
                 , ( bp::arg("text") ) );
         
         }
+        { //::vgui::TextImage::SetText
+        
+            typedef void ( ::vgui::TextImage::*SetText_function_type )( wchar_t const *,bool ) ;
+            
+            TextImage_exposer.def( 
+                "SetText"
+                , SetText_function_type( &::vgui::TextImage::SetText )
+                , ( bp::arg("text"), bp::arg("bClearUnlocalizedSymbol")=(bool)(false) ) );
+        
+        }
         { //::vgui::TextImage::SetUseFallbackFont
         
             typedef void ( ::vgui::TextImage::*SetUseFallbackFont_function_type )( bool,::vgui::HFont ) ;

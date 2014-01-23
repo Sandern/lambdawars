@@ -209,4 +209,27 @@ struct python_str_to_wchar_t
 	}
 };
 
+#if PY_VERSION_HEX < 0x03000000
+struct python_unicode_to_ptr_const_wchar_t
+{
+	python_unicode_to_ptr_const_wchar_t()
+	{
+		boost::python::converter::registry::insert(
+			&convert_to_wcstring, 
+			boost::python::type_id<wchar_t>(),
+			&boost::python::converter::wrap_pytype<&PyString_Type>::get_pytype
+		);
+	}
+
+	static void *convert_to_wcstring(PyObject* obj)
+	{
+		if( PyUnicode_Check( obj ) )
+		{
+			return PyUnicode_AsUnicode(obj);
+		}
+		return 0;
+	}
+};
+#endif
+
 #endif // SRCPYTHON_CONVERTERS_H

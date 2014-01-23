@@ -112,7 +112,7 @@ class VGUIControls(ClientModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-        cls.calldefs('SetText', calldef_withtypes([pointer_t(const_t(declarated_t(wchar_t())))])).exclude()
+        #cls.calldefs('SetText', calldef_withtypes([pointer_t(const_t(declarated_t(wchar_t())))])).exclude()
         cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         cls.mem_funs( 'GetDrawWidth' ).add_transformation( FT.output('width') )
         cls.mem_funs( 'SizeText' ).exclude()     # DECLARATION ONLY

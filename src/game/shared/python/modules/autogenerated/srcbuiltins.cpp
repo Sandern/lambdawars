@@ -287,6 +287,8 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     python_str_to_wchar_t();
 
+    python_unicode_to_ptr_const_wchar_t();
+
     { //::SrcPyWarning
     
         typedef void ( *PrintWarning_function_type )( ::boost::python::object );

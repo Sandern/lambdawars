@@ -961,8 +961,9 @@ void register_EditablePanel_class(){
 
     { //::vgui::EditablePanel
         typedef bp::class_< EditablePanel_wrapper, bp::bases< vgui::Panel >, boost::noncopyable > EditablePanel_exposer_t;
-        EditablePanel_exposer_t EditablePanel_exposer = EditablePanel_exposer_t( "EditablePanel", bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("panelName") )) );
+        EditablePanel_exposer_t EditablePanel_exposer = EditablePanel_exposer_t( "EditablePanel", bp::no_init );
         bp::scope EditablePanel_scope( EditablePanel_exposer );
+        EditablePanel_exposer.def( bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("panelName") )) );
         EditablePanel_exposer.def( bp::init< vgui::Panel *, char const *, vgui::HScheme >(( bp::arg("parent"), bp::arg("panelName"), bp::arg("hScheme") )) );
         { //::vgui::EditablePanel::ActivateBuildMode
         

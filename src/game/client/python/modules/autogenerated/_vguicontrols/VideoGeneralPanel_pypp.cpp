@@ -112,6 +112,25 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         vgui::Panel::InternalInitDefaultValues( map );
     }
 
+    virtual void OnChildAdded( ::vgui::VPANEL child ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnChildAdded )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnChildAdded )
+        bp::override func_OnChildAdded = this->get_override( "OnChildAdded" );
+        if( func_OnChildAdded.ptr() != Py_None )
+            try {
+                func_OnChildAdded( child );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnChildAdded( child );
+            }
+        else
+            this->vgui::Panel::OnChildAdded( child );
+    }
+    
+    void default_OnChildAdded( ::vgui::VPANEL child ) {
+        vgui::Panel::OnChildAdded( child );
+    }
+
     virtual void OnCommand( char const * command ) {
         PY_OVERRIDE_CHECK( vgui::Panel, OnCommand )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCommand )
@@ -232,6 +251,25 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     
     void default_OnKeyCodeReleased( ::vgui::KeyCode code ) {
         vgui::Panel::OnKeyCodeReleased( code );
+    }
+
+    virtual void OnKeyCodeTyped( ::vgui::KeyCode code ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyCodeTyped )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyCodeTyped )
+        bp::override func_OnKeyCodeTyped = this->get_override( "OnKeyCodeTyped" );
+        if( func_OnKeyCodeTyped.ptr() != Py_None )
+            try {
+                func_OnKeyCodeTyped( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnKeyCodeTyped( code );
+            }
+        else
+            this->vgui::Panel::OnKeyCodeTyped( code );
+    }
+    
+    void default_OnKeyCodeTyped( ::vgui::KeyCode code ) {
+        vgui::Panel::OnKeyCodeTyped( code );
     }
 
     virtual void OnKeyFocusTicked(  ) {
@@ -405,6 +443,25 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         vgui::Panel::OnMouseWheeled( delta );
     }
 
+    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
+        PY_OVERRIDE_CHECK( vgui::Panel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnRequestFocus )
+        bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
+        if( func_OnRequestFocus.ptr() != Py_None )
+            try {
+                func_OnRequestFocus( subFocus, defaultPanel );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+            }
+        else
+            this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    }
+    
+    virtual void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
+        vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    }
+
     virtual void OnScreenSizeChanged( int oldwide, int oldtall ){
         PY_OVERRIDE_CHECK( vgui::Panel, OnScreenSizeChanged )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnScreenSizeChanged )
@@ -422,6 +479,44 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     
     virtual void default_OnScreenSizeChanged( int oldwide, int oldtall ){
         vgui::Panel::OnScreenSizeChanged( oldwide, oldtall );
+    }
+
+    virtual void OnSetFocus(  ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSetFocus )
+        bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
+        if( func_OnSetFocus.ptr() != Py_None )
+            try {
+                func_OnSetFocus(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnSetFocus(  );
+            }
+        else
+            this->vgui::Panel::OnSetFocus(  );
+    }
+    
+    void default_OnSetFocus(  ) {
+        vgui::Panel::OnSetFocus( );
+    }
+
+    virtual void OnSizeChanged( int newWide, int newTall ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSizeChanged )
+        bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
+        if( func_OnSizeChanged.ptr() != Py_None )
+            try {
+                func_OnSizeChanged( newWide, newTall );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnSizeChanged( newWide, newTall );
+            }
+        else
+            this->vgui::Panel::OnSizeChanged( newWide, newTall );
+    }
+    
+    void default_OnSizeChanged( int newWide, int newTall ) {
+        vgui::Panel::OnSizeChanged( newWide, newTall );
     }
 
     void OnStartDragging(  ){
@@ -487,6 +582,25 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
 
     void PaintTraverse( bool Repaint, bool allowForce=true ){
         vgui::Panel::PaintTraverse( Repaint, allowForce );
+    }
+
+    virtual void PerformLayout(  ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, PerformLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, PerformLayout )
+        bp::override func_PerformLayout = this->get_override( "PerformLayout" );
+        if( func_PerformLayout.ptr() != Py_None )
+            try {
+                func_PerformLayout(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::PerformLayout(  );
+            }
+        else
+            this->vgui::Panel::PerformLayout(  );
+    }
+    
+    void default_PerformLayout(  ) {
+        vgui::Panel::PerformLayout( );
     }
 
     virtual void PostChildPaint(  ) {
@@ -1143,6 +1257,18 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("map") ) );
         
         }
+        { //::vgui::Panel::OnChildAdded
+        
+            typedef void ( ::vgui::Panel::*OnChildAdded_function_type )( ::vgui::VPANEL ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_OnChildAdded_function_type )( ::vgui::VPANEL ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnChildAdded"
+                , OnChildAdded_function_type(&::vgui::Panel::OnChildAdded)
+                , default_OnChildAdded_function_type(&VideoGeneralPanel_wrapper::default_OnChildAdded)
+                , ( bp::arg("child") ) );
+        
+        }
         { //::vgui::Panel::OnCommand
         
             typedef void ( ::vgui::Panel::*OnCommand_function_type )( char const * ) ;
@@ -1229,6 +1355,18 @@ void register_VideoGeneralPanel_class(){
                 "OnKeyCodeReleased"
                 , OnKeyCodeReleased_function_type(&::vgui::Panel::OnKeyCodeReleased)
                 , default_OnKeyCodeReleased_function_type(&VideoGeneralPanel_wrapper::default_OnKeyCodeReleased)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::vgui::Panel::OnKeyCodeTyped
+        
+            typedef void ( ::vgui::Panel::*OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnKeyCodeTyped"
+                , OnKeyCodeTyped_function_type(&::vgui::Panel::OnKeyCodeTyped)
+                , default_OnKeyCodeTyped_function_type(&VideoGeneralPanel_wrapper::default_OnKeyCodeTyped)
                 , ( bp::arg("code") ) );
         
         }
@@ -1336,6 +1474,16 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("delta") ) );
         
         }
+        { //::vgui::Panel::OnRequestFocus
+        
+            typedef void ( VideoGeneralPanel_wrapper::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnRequestFocus"
+                , OnRequestFocus_function_type( &VideoGeneralPanel_wrapper::default_OnRequestFocus )
+                , ( bp::arg("subFocus"), bp::arg("defaultPanel") ) );
+        
+        }
         { //::vgui::Panel::OnScreenSizeChanged
         
             typedef void ( VideoGeneralPanel_wrapper::*OnScreenSizeChanged_function_type )( int,int ) ;
@@ -1344,6 +1492,29 @@ void register_VideoGeneralPanel_class(){
                 "OnScreenSizeChanged"
                 , OnScreenSizeChanged_function_type( &VideoGeneralPanel_wrapper::default_OnScreenSizeChanged )
                 , ( bp::arg("oldwide"), bp::arg("oldtall") ) );
+        
+        }
+        { //::vgui::Panel::OnSetFocus
+        
+            typedef void ( ::vgui::Panel::*OnSetFocus_function_type )(  ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_OnSetFocus_function_type )(  ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnSetFocus"
+                , OnSetFocus_function_type(&::vgui::Panel::OnSetFocus)
+                , default_OnSetFocus_function_type(&VideoGeneralPanel_wrapper::default_OnSetFocus) );
+        
+        }
+        { //::vgui::Panel::OnSizeChanged
+        
+            typedef void ( ::vgui::Panel::*OnSizeChanged_function_type )( int,int ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_OnSizeChanged_function_type )( int,int ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnSizeChanged"
+                , OnSizeChanged_function_type(&::vgui::Panel::OnSizeChanged)
+                , default_OnSizeChanged_function_type(&VideoGeneralPanel_wrapper::default_OnSizeChanged)
+                , ( bp::arg("newWide"), bp::arg("newTall") ) );
         
         }
         { //::vgui::Panel::OnStartDragging
@@ -1396,6 +1567,17 @@ void register_VideoGeneralPanel_class(){
                 "PaintTraverse"
                 , PaintTraverse_function_type( &VideoGeneralPanel_wrapper::PaintTraverse )
                 , ( bp::arg("Repaint"), bp::arg("allowForce")=(bool)(true) ) );
+        
+        }
+        { //::vgui::Panel::PerformLayout
+        
+            typedef void ( ::vgui::Panel::*PerformLayout_function_type )(  ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_PerformLayout_function_type )(  ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "PerformLayout"
+                , PerformLayout_function_type(&::vgui::Panel::PerformLayout)
+                , default_PerformLayout_function_type(&VideoGeneralPanel_wrapper::default_PerformLayout) );
         
         }
         { //::vgui::Panel::PostChildPaint

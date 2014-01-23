@@ -990,6 +990,63 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
         vgui::Panel::OnMouseWheeled( delta );
     }
 
+    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
+        PY_OVERRIDE_CHECK( vgui::Panel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnRequestFocus )
+        bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
+        if( func_OnRequestFocus.ptr() != Py_None )
+            try {
+                func_OnRequestFocus( subFocus, defaultPanel );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+            }
+        else
+            this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    }
+    
+    virtual void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
+        vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    }
+
+    virtual void OnSetFocus(  ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSetFocus )
+        bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
+        if( func_OnSetFocus.ptr() != Py_None )
+            try {
+                func_OnSetFocus(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnSetFocus(  );
+            }
+        else
+            this->vgui::Panel::OnSetFocus(  );
+    }
+    
+    void default_OnSetFocus(  ) {
+        vgui::Panel::OnSetFocus( );
+    }
+
+    virtual void OnSizeChanged( int newWide, int newTall ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSizeChanged )
+        bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
+        if( func_OnSizeChanged.ptr() != Py_None )
+            try {
+                func_OnSizeChanged( newWide, newTall );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::OnSizeChanged( newWide, newTall );
+            }
+        else
+            this->vgui::Panel::OnSizeChanged( newWide, newTall );
+    }
+    
+    void default_OnSizeChanged( int newWide, int newTall ) {
+        vgui::Panel::OnSizeChanged( newWide, newTall );
+    }
+
     void OnStartDragging(  ){
         vgui::Panel::OnStartDragging(  );
     }
@@ -2411,6 +2468,39 @@ void register_Frame_class(){
                 , OnMouseWheeled_function_type(&::vgui::Panel::OnMouseWheeled)
                 , default_OnMouseWheeled_function_type(&Frame_wrapper::default_OnMouseWheeled)
                 , ( bp::arg("delta") ) );
+        
+        }
+        { //::vgui::Panel::OnRequestFocus
+        
+            typedef void ( Frame_wrapper::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            
+            Frame_exposer.def( 
+                "OnRequestFocus"
+                , OnRequestFocus_function_type( &Frame_wrapper::default_OnRequestFocus )
+                , ( bp::arg("subFocus"), bp::arg("defaultPanel") ) );
+        
+        }
+        { //::vgui::Panel::OnSetFocus
+        
+            typedef void ( ::vgui::Panel::*OnSetFocus_function_type )(  ) ;
+            typedef void ( Frame_wrapper::*default_OnSetFocus_function_type )(  ) ;
+            
+            Frame_exposer.def( 
+                "OnSetFocus"
+                , OnSetFocus_function_type(&::vgui::Panel::OnSetFocus)
+                , default_OnSetFocus_function_type(&Frame_wrapper::default_OnSetFocus) );
+        
+        }
+        { //::vgui::Panel::OnSizeChanged
+        
+            typedef void ( ::vgui::Panel::*OnSizeChanged_function_type )( int,int ) ;
+            typedef void ( Frame_wrapper::*default_OnSizeChanged_function_type )( int,int ) ;
+            
+            Frame_exposer.def( 
+                "OnSizeChanged"
+                , OnSizeChanged_function_type(&::vgui::Panel::OnSizeChanged)
+                , default_OnSizeChanged_function_type(&Frame_wrapper::default_OnSizeChanged)
+                , ( bp::arg("newWide"), bp::arg("newTall") ) );
         
         }
         { //::vgui::Panel::OnStartDragging
