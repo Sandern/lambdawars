@@ -18,7 +18,7 @@
 
 #include "glow_outline_effect.h"
 
-#include "hl2wars/teamcolor_proxy.h"
+#include "teamcolor_proxy.h"
 
 #include "srcpy.h"
 

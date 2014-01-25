@@ -49,7 +49,7 @@
 #if defined( SWARM_DLL )
 #include "swarm/gameui/swarm/basemodpanel.h"
 #elif defined( HL2WARS_DLL )
-#include "hl2wars/gameui/wars/basemodpanel.h"
+#include "gameui/wars/basemodpanel.h"
 #elif defined( SDK_CLIENT_DLL )
 #include "sdk/gameui/sdk/basemodpanel.h"
 #else

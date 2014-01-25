@@ -35,10 +35,10 @@ class VGUIControls(ClientModuleGenerator):
         'vgui_avatarimage.h',
         
         'srcpy_vgui.h',
-        'hl2wars/hl2wars_baseminimap.h',
-        'hl2wars/vgui_video_general.h',
+        'hl2wars_baseminimap.h',
+        'vgui_video_general.h',
         
-        'hl2wars/vgui/wars_model_panel.h',
+        'vgui/wars_model_panel.h',
     ]
     
     panel_cls_list = [  'AnimationController', 

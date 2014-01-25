@@ -17,8 +17,8 @@
 #include "teamcolor_proxy.h"
 #include "game_controls/basemodel_panel.h"
 
-#include "hl2wars/gameui/wars/basemodpanel.h"
-#include "hl2wars/gameui/wars/basemodframe.h"
+#include "gameui/wars/basemodpanel.h"
+#include "gameui/wars/basemodframe.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

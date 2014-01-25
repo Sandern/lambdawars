@@ -18,7 +18,7 @@
 #ifdef CLIENT_DLL
 	#include "networkstringtable_clientdll.h"
 	#include "srcpy_materials.h"
-	#include "hl2wars/gameui/wars/basemodpanel.h"
+	#include "gameui/wars/basemodpanel.h"
 #else
 	#include "networkstringtable_gamedll.h"
 #endif // CLIENT_DLL

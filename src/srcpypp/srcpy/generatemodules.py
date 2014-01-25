@@ -64,7 +64,7 @@ baseincludes = [
     '../../public/tier1',
     '../../game/shared',
     '../../game/shared/python',
-    '../../game/shared/hl2wars',
+    '../../game/shared/lambdawars',
     
     # Python/Boost folders
     '../../python/Include',
@@ -83,7 +83,7 @@ serversymbols = basesymbols + [
 serverincludes = baseincludes + [
     '../../game/server', 
     '../../game/server/python',
-    '../../game/server/hl2wars', 
+    '../../game/server/lambdawars', 
 ]
 
 clientsymbols = basesymbols + [
@@ -92,7 +92,7 @@ clientsymbols = basesymbols + [
 clientincludes = baseincludes + [
     '../../game/client', 
     '../../game/client/python',
-    '../../game/client/hl2wars', 
+    '../../game/client/lambdawars', 
     '../../game/client/cef',
     '../../cef',
 ]

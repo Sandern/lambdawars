@@ -16,7 +16,7 @@ class Materials(SemiSharedModuleGenerator):
         '$viewpostprocess.h',
         '$glow_outline_effect.h',
         
-        '$hl2wars/teamcolor_proxy.h',
+        '$teamcolor_proxy.h',
     ]
 
     def Parse(self, mb):
@@ -48,7 +48,7 @@ class Materials(SemiSharedModuleGenerator):
             # Material lights
             cls = mb.class_('LightDesc_t')
             cls.include()
-			
+            
             # Wars
             mb.free_function('SetUITeamColor').include()
 

@@ -63,7 +63,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\hl2;.\hl2wars;.\hl2wars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\hl2wars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\hl2wars\gameui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\hl2;.\lambdawars;.\lambdawars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\lambdawars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\hl2wars\gameui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;USE_DETAIL_SHAPES;HL2WARS_DLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;ENABLE_CEF;ENABLE_PYTHON;CHROMIUM_BUILD;USING_CEF_SHARED;USE_SKIA;ENABLE_GPU=1;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -151,7 +151,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>.\hl2;.\hl2wars;.\hl2wars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\hl2wars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\hl2wars\gameui;..\..\game\client\hl2wars\vgui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\hl2;.\lambdawars;.\lambdawars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\lambdawars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\lambdawars\gameui;..\..\game\client\lambdawars\vgui;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;HL2WARS_DLL;USE_DETAIL_SHAPES;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_NO_PY_SIGNATURES;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_ENABLE_SHARED;Py_BUILD_CORE;ENABLE_CEF;ENABLE_PYTHON;CHROMIUM_BUILD;USING_CEF_SHARED;USE_SKIA;ENABLE_GPU=1;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -235,10 +235,10 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\deferred\CDefLightContainer.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLightGlobal.cpp" />
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp" />
-    <ClCompile Include="..\shared\hl2wars\fow_blocker.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_vehicleanimstate.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_vphysicslocomotion.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_flora.cpp" />
+    <ClCompile Include="..\shared\lambdawars\fow_blocker.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_vehicleanimstate.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_vphysicslocomotion.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_flora.cpp" />
     <ClCompile Include="..\shared\python\modules\autogenerated\matchmaking.cpp" />
     <ClCompile Include="..\shared\python\modules\autogenerated\materials.cpp" />
     <ClCompile Include="..\shared\python\modules\autogenerated\unit_helper.cpp" />
@@ -283,8 +283,8 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="deferred\vgui\vgui_particles.cpp" />
     <ClCompile Include="deferred\vgui\vgui_projectable.cpp" />
     <ClCompile Include="deferred\viewrender_deferred.cpp" />
-    <ClCompile Include="hl2wars\vgui\wars_model_panel.cpp" />
-    <ClCompile Include="hl2wars\wars_particle_ops.cpp" />
+    <ClCompile Include="lambdawars\vgui\wars_model_panel.cpp" />
+    <ClCompile Include="lambdawars\wars_particle_ops.cpp" />
     <ClCompile Include="python\modules\autogenerated\_cef.cpp" />
     <ClCompile Include="python\modules\autogenerated\_entities\CBaseHandle_pypp.cpp" />
     <ClCompile Include="python\modules\autogenerated\_entities\C_BaseAnimatingOverlay_pypp.cpp" />
@@ -372,8 +372,8 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\keeper\tilebase.cpp" />
     <ClCompile Include="..\shared\nav_edit.cpp" />
     <ClCompile Include="cef\src_cef_js.cpp" />
-    <ClCompile Include="hl2wars\coreorigin_proxy.cpp" />
-    <ClCompile Include="hl2wars\c_strider_fx.cpp" />
+    <ClCompile Include="lambdawars\coreorigin_proxy.cpp" />
+    <ClCompile Include="lambdawars\c_strider_fx.cpp" />
     <ClCompile Include="hl2\c_te_concussiveexplosion.cpp" />
     <ClCompile Include="cef\src_cef.cpp" />
     <ClCompile Include="cef\src_cef_browser.cpp" />
@@ -381,434 +381,434 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="cef\src_cef_python.cpp" />
     <ClCompile Include="cef\src_cef_texgen.cpp" />
     <ClCompile Include="cef\src_cef_vgui_panel.cpp" />
-    <ClCompile Include="hl2wars\gameui\backgroundmenubutton.cpp">
+    <ClCompile Include="lambdawars\gameui\backgroundmenubutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\basesavegamedialog.cpp">
+    <ClCompile Include="lambdawars\gameui\basesavegamedialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\bitmapimagepanel.cpp">
+    <ClCompile Include="lambdawars\gameui\bitmapimagepanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\commandcheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\commandcheckbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\contentcontroldialog.cpp">
+    <ClCompile Include="lambdawars\gameui\contentcontroldialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamebotpage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamebotpage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamedialog.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamedialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamegameplaypage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamegameplaypage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergameserverpage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergameserverpage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\customtabexplanationdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\customtabexplanationdialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvarnegatecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\cvarnegatecheckbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvarslider.cpp">
+    <ClCompile Include="lambdawars\gameui\cvarslider.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvartextentry.cpp">
+    <ClCompile Include="lambdawars\gameui\cvartextentry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvartogglecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\cvartogglecheckbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameconsole.cpp">
+    <ClCompile Include="lambdawars\gameui\gameconsole.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameconsoledialog.cpp">
+    <ClCompile Include="lambdawars\gameui\gameconsoledialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameui_interface.cpp">
+    <ClCompile Include="lambdawars\gameui\gameui_interface.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameui_util.cpp">
+    <ClCompile Include="lambdawars\gameui\gameui_util.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\keytogglecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\keytogglecheckbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\labeledcommandcombobox.cpp">
+    <ClCompile Include="lambdawars\gameui\labeledcommandcombobox.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\loadingdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\loadingdialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\loadingtippanel.cpp">
+    <ClCompile Include="lambdawars\gameui\loadingtippanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\logofile.cpp">
+    <ClCompile Include="lambdawars\gameui\logofile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\modinfo.cpp">
+    <ClCompile Include="lambdawars\gameui\modinfo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\mousemessageforwardingpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\mousemessageforwardingpanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\multiplayeradvanceddialog.cpp">
+    <ClCompile Include="lambdawars\gameui\multiplayeradvanceddialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionsdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\optionsdialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubaudio.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubaudio.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubdifficulty.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubdifficulty.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubgame.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubgame.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubkeyboard.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubkeyboard.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubmouse.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubmouse.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubmultiplayer.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubmultiplayer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubportal.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubportal.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubvideo.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubvideo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubvoice.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubvoice.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\panellistpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\panellistpanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\playerlistdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\playerlistdialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\rungameengine.cpp">
+    <ClCompile Include="lambdawars\gameui\rungameengine.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\scriptobject.cpp">
+    <ClCompile Include="lambdawars\gameui\scriptobject.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\sys_utils.cpp">
+    <ClCompile Include="lambdawars\gameui\sys_utils.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\textentrybox.cpp">
+    <ClCompile Include="lambdawars\gameui\textentrybox.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\urlbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\urlbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\vcontrolslistpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\vcontrolslistpanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\vguisystemmoduleloader.cpp">
+    <ClCompile Include="lambdawars\gameui\vguisystemmoduleloader.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\basemodframe.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\basemodframe.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\basemodpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\basemodpanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\gamemodes.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\gamemodes.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uiavatarimage.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uiavatarimage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata_invite.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata_invite.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata_storage.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata_storage.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vachievements.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vachievements.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaddonassociation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaddonassociation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaddons.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaddons.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vattractscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vattractscreen.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaudio.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaudio.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaudiovideo.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaudiovideo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcloud.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcloud.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptions.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptionsbuttons.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionssticks.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptionssticks.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdownloadcampaign.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdownloadcampaign.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdownloads.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdownloads.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdropdownmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdropdownmenu.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vflyoutmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vflyoutmenu.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfooterpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfooterpanel.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundgames.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundgroupgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundgroupgames.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundpublicgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundpublicgames.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamelobby.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamelobby.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamelobbychat.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamelobbychat.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgameoptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgameoptions.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamesettings.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamesettings.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericconfirmation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericconfirmation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericpanellist.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericpanellist.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericwaitscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericwaitscreen.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgetlegacydata.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgetlegacydata.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vhybridbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vhybridbutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamedifficultyselect.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamedifficultyselect.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamekickplayerlist.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamekickplayerlist.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamemainmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamemainmenu.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vjukebox.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vjukebox.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vkeyboard.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vkeyboard.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vkeyboardmouse.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vkeyboardmouse.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vloadingprogress.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vloadingprogress.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmainmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmainmenu.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmenubackground.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmenubackground.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmultiplayer.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmultiplayer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\voptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\voptions.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vpasswordentry.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vpasswordentry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vquickjoin.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vquickjoin.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vquickjoingroups.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vquickjoingroups.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vsignindialog.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vsignindialog.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vslidercontrol.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vslidercontrol.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vspinnercontrol.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vspinnercontrol.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vsteamcloudconfirmation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vsteamcloudconfirmation.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vtransitionscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vtransitionscreen.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vvideo.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vvideo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vvoteoptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vvoteoptions.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="python\modules\autogenerated\src_append_client.cpp" />
     <ClCompile Include="..\shared\python\modules\autogenerated\src_append_shared.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_plat_misc_win32.cpp" />
-    <ClCompile Include="hl2wars\videocfgext.cpp" />
-    <ClCompile Include="hl2wars\c_wars_fx.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_plat_misc_win32.cpp" />
+    <ClCompile Include="lambdawars\videocfgext.cpp" />
+    <ClCompile Include="lambdawars\c_wars_fx.cpp" />
     <ClCompile Include="..\..\common\language.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\density_weight_map.cpp" />
-    <ClCompile Include="..\shared\hl2wars\fowmgr.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_gamemovement.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_gamerules.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_player_shared.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_shareddefs.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_usermessages.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_util_shared.cpp" />
-    <ClCompile Include="..\shared\hl2wars\hl2wars_weapon_parse.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_airlocomotion.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_animstate.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_baseanimstate.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_base_shared.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_component.cpp" />
-    <ClCompile Include="..\shared\hl2wars\unit_locomotion.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_func_unit.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_mapboundary.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_mount_system.cpp" />
-    <ClCompile Include="..\shared\hl2wars\wars_weapon_shared.cpp" />
+    <ClCompile Include="..\shared\lambdawars\density_weight_map.cpp" />
+    <ClCompile Include="..\shared\lambdawars\fowmgr.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_gamemovement.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_gamerules.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_player_shared.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_shareddefs.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_usermessages.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_util_shared.cpp" />
+    <ClCompile Include="..\shared\lambdawars\hl2wars_weapon_parse.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_airlocomotion.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_animstate.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_baseanimstate.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_base_shared.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_component.cpp" />
+    <ClCompile Include="..\shared\lambdawars\unit_locomotion.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_func_unit.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_mapboundary.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_mount_system.cpp" />
+    <ClCompile Include="..\shared\lambdawars\wars_weapon_shared.cpp" />
     <ClCompile Include="..\shared\nav_area.cpp" />
     <ClCompile Include="..\shared\nav_colors.cpp" />
     <ClCompile Include="..\shared\nav_file.cpp" />
@@ -885,40 +885,40 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="c_func_conveyor.cpp" />
     <ClCompile Include="c_func_dust.cpp" />
     <ClCompile Include="c_func_lod.cpp" />
-    <ClCompile Include="hl2wars\clientmode_wars.cpp" />
-    <ClCompile Include="hl2wars\c_asw_fx_proxy.cpp" />
-    <ClCompile Include="hl2wars\c_env_dklight.cpp" />
-    <ClCompile Include="hl2wars\c_hl2wars_player.cpp" />
-    <ClCompile Include="hl2wars\c_hl2wars_team.cpp" />
-    <ClCompile Include="hl2wars\c_unit_base.cpp" />
-    <ClCompile Include="hl2wars\c_wars_jukebox.cpp" />
-    <ClCompile Include="hl2wars\c_wars_lesson.cpp" />
-    <ClCompile Include="hl2wars\c_wars_weapon.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_backgroundpanel.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_baseminimap.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_fx_impacts.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_fx_tracers.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_hud_chat.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_hud_weaponselection.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_in_camera.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_in_main.cpp" />
-    <ClCompile Include="hl2wars\hl2wars_prediction.cpp" />
-    <ClCompile Include="hl2wars\projected_texture_unlit.cpp" />
-    <ClCompile Include="hl2wars\teamcolor_proxy.cpp" />
-    <ClCompile Include="hl2wars\tex_fogofwar.cpp" />
-    <ClCompile Include="hl2wars\tf2_proxy.cpp" />
-    <ClCompile Include="hl2wars\vgui\hl2warsviewport.cpp" />
-    <ClCompile Include="hl2wars\vgui\nb_button.cpp" />
-    <ClCompile Include="hl2wars\vgui\nb_header_footer.cpp" />
-    <ClCompile Include="hl2wars\vgui\nb_horiz_list.cpp" />
-    <ClCompile Include="hl2wars\vgui\nb_select_level_entry.cpp" />
-    <ClCompile Include="hl2wars\vgui\nb_select_level_panel.cpp" />
-    <ClCompile Include="hl2wars\vgui\wars_loading_panel.cpp" />
-    <ClCompile Include="hl2wars\vgui\wars_logo_panel.cpp" />
-    <ClCompile Include="hl2wars\vgui\wars_vgui_music_importer.cpp" />
-    <ClCompile Include="hl2wars\vgui_rootpanel_wars.cpp" />
-    <ClCompile Include="hl2wars\vgui_video_general.cpp" />
-    <ClCompile Include="hl2wars\wars_vgui_screen.cpp" />
+    <ClCompile Include="lambdawars\clientmode_wars.cpp" />
+    <ClCompile Include="lambdawars\c_asw_fx_proxy.cpp" />
+    <ClCompile Include="lambdawars\c_env_dklight.cpp" />
+    <ClCompile Include="lambdawars\c_hl2wars_player.cpp" />
+    <ClCompile Include="lambdawars\c_hl2wars_team.cpp" />
+    <ClCompile Include="lambdawars\c_unit_base.cpp" />
+    <ClCompile Include="lambdawars\c_wars_jukebox.cpp" />
+    <ClCompile Include="lambdawars\c_wars_lesson.cpp" />
+    <ClCompile Include="lambdawars\c_wars_weapon.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_backgroundpanel.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_baseminimap.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_fx_impacts.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_fx_tracers.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_hud_chat.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_hud_weaponselection.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_in_camera.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_in_main.cpp" />
+    <ClCompile Include="lambdawars\hl2wars_prediction.cpp" />
+    <ClCompile Include="lambdawars\projected_texture_unlit.cpp" />
+    <ClCompile Include="lambdawars\teamcolor_proxy.cpp" />
+    <ClCompile Include="lambdawars\tex_fogofwar.cpp" />
+    <ClCompile Include="lambdawars\tf2_proxy.cpp" />
+    <ClCompile Include="lambdawars\vgui\hl2warsviewport.cpp" />
+    <ClCompile Include="lambdawars\vgui\nb_button.cpp" />
+    <ClCompile Include="lambdawars\vgui\nb_header_footer.cpp" />
+    <ClCompile Include="lambdawars\vgui\nb_horiz_list.cpp" />
+    <ClCompile Include="lambdawars\vgui\nb_select_level_entry.cpp" />
+    <ClCompile Include="lambdawars\vgui\nb_select_level_panel.cpp" />
+    <ClCompile Include="lambdawars\vgui\wars_loading_panel.cpp" />
+    <ClCompile Include="lambdawars\vgui\wars_logo_panel.cpp" />
+    <ClCompile Include="lambdawars\vgui\wars_vgui_music_importer.cpp" />
+    <ClCompile Include="lambdawars\vgui_rootpanel_wars.cpp" />
+    <ClCompile Include="lambdawars\vgui_video_general.cpp" />
+    <ClCompile Include="lambdawars\wars_vgui_screen.cpp" />
     <ClCompile Include="hl2\C_Func_Monitor.cpp" />
     <ClCompile Include="c_func_movelinear.cpp" />
     <ClCompile Include="c_func_occluder.cpp" />
@@ -1460,11 +1460,11 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\deferred\CDefLightGlobal.h" />
     <ClInclude Include="..\shared\deferred\deferred_shared_common.h" />
     <ClInclude Include="..\shared\deferred\ssemath_ext.h" />
-    <ClInclude Include="..\shared\hl2wars\fow_blocker.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_vehicleanimstate.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_vphysicslocomotion.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_flora.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_vprof.h" />
+    <ClInclude Include="..\shared\lambdawars\fow_blocker.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_vehicleanimstate.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_vphysicslocomotion.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_flora.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_vprof.h" />
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h" />
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
@@ -1488,7 +1488,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="deferred\vgui\vgui_particles.h" />
     <ClInclude Include="deferred\vgui\vgui_projectable.h" />
     <ClInclude Include="deferred\viewrender_deferred.h" />
-    <ClInclude Include="hl2wars\vgui\wars_model_panel.h" />
+    <ClInclude Include="lambdawars\vgui\wars_model_panel.h" />
     <ClInclude Include="python\modules\autogenerated\_gamerules\CAmmoDef_pypp.hpp" />
     <ClInclude Include="python\modules\autogenerated\_gamerules\CGameRules_pypp.hpp" />
     <ClInclude Include="python\modules\autogenerated\_gamerules\CHL2WarsGameRules_pypp.hpp" />
@@ -1519,7 +1519,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_class_shared.h" />
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_plat_misc.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_plat_misc.h" />
     <ClInclude Include="..\shared\keeper\tilebase.h" />
     <ClInclude Include="cef\src_cef.h" />
     <ClInclude Include="cef\src_cef_browser.h" />
@@ -1528,131 +1528,131 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="cef\src_cef_python.h" />
     <ClInclude Include="cef\src_cef_texgen.h" />
     <ClInclude Include="cef\src_cef_vgui_panel.h" />
-    <ClInclude Include="hl2wars\c_strider_fx.h" />
-    <ClInclude Include="hl2wars\gameui\backgroundmenubutton.h" />
-    <ClInclude Include="hl2wars\gameui\basepanel.h" />
-    <ClInclude Include="hl2wars\gameui\basesavegamedialog.h" />
-    <ClInclude Include="hl2wars\gameui\bitmapimagepanel.h" />
-    <ClInclude Include="hl2wars\gameui\cdkeyentrydialog.h" />
-    <ClInclude Include="hl2wars\gameui\commandcheckbutton.h" />
-    <ClInclude Include="hl2wars\gameui\contentcontroldialog.h" />
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamebotpage.h" />
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamedialog.h" />
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamegameplaypage.h" />
-    <ClInclude Include="hl2wars\gameui\createmultiplayergameserverpage.h" />
-    <ClInclude Include="hl2wars\gameui\customtabexplanationdialog.h" />
-    <ClInclude Include="hl2wars\gameui\cvarnegatecheckbutton.h" />
-    <ClInclude Include="hl2wars\gameui\cvarslider.h" />
-    <ClInclude Include="hl2wars\gameui\cvartextentry.h" />
-    <ClInclude Include="hl2wars\gameui\cvartogglecheckbutton.h" />
-    <ClInclude Include="hl2wars\gameui\engineinterface.h" />
-    <ClInclude Include="hl2wars\gameui\gameconsole.h" />
-    <ClInclude Include="hl2wars\gameui\gameconsoledialog.h" />
-    <ClInclude Include="hl2wars\gameui\gameui_interface.h" />
-    <ClInclude Include="hl2wars\gameui\gameui_util.h" />
-    <ClInclude Include="hl2wars\gameui\keytogglecheckbutton.h" />
-    <ClInclude Include="hl2wars\gameui\labeledcommandcombobox.h" />
-    <ClInclude Include="hl2wars\gameui\loadingdialog.h" />
-    <ClInclude Include="hl2wars\gameui\loadingtippanel.h" />
-    <ClInclude Include="hl2wars\gameui\modinfo.h" />
-    <ClInclude Include="hl2wars\gameui\mousemessageforwardingpanel.h" />
-    <ClInclude Include="hl2wars\gameui\multiplayeradvanceddialog.h" />
-    <ClInclude Include="hl2wars\gameui\optionsdialog.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubaudio.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubdifficulty.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubgame.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubkeyboard.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubmouse.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubmultiplayer.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubportal.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubvideo.h" />
-    <ClInclude Include="hl2wars\gameui\optionssubvoice.h" />
-    <ClInclude Include="hl2wars\gameui\panellistpanel.h" />
-    <ClInclude Include="hl2wars\gameui\playerlistdialog.h" />
-    <ClInclude Include="hl2wars\gameui\rungameengine.h" />
-    <ClInclude Include="hl2wars\gameui\scriptobject.h" />
-    <ClInclude Include="hl2wars\gameui\sys_utils.h" />
-    <ClInclude Include="hl2wars\gameui\textentrybox.h" />
-    <ClInclude Include="hl2wars\gameui\urlbutton.h" />
-    <ClInclude Include="hl2wars\gameui\vcontrolslistpanel.h" />
-    <ClInclude Include="hl2wars\gameui\vguisystemmoduleloader.h" />
-    <ClInclude Include="hl2wars\gameui\wars\basemodframe.h" />
-    <ClInclude Include="hl2wars\gameui\wars\basemodpanel.h" />
-    <ClInclude Include="hl2wars\gameui\wars\basemodui.h" />
-    <ClInclude Include="hl2wars\gameui\wars\gamemodes.h" />
-    <ClInclude Include="hl2wars\gameui\wars\uiavatarimage.h" />
-    <ClInclude Include="hl2wars\gameui\wars\uigamedata.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vachievements.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vaddonassociation.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vaddons.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vattractscreen.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vaudio.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vaudiovideo.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vcloud.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptions.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionssticks.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vcustomcampaigns.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vdownloadcampaign.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vdownloads.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vdropdownmenu.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vflyoutmenu.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vfooterpanel.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vfoundgames.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vfoundgroupgames.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vfoundpublicgames.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgamelobby.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgamelobbychat.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgameoptions.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgamesettings.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgenericconfirmation.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgenericpanellist.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgenericwaitscreen.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vgetlegacydata.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vhybridbutton.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vingamechapterselect.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vingamedifficultyselect.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vingamekickplayerlist.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vingamemainmenu.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vjukebox.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vkeyboard.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vkeyboardmouse.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vleaderboard.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vloadingprogress.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vmainmenu.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vmultiplayer.h" />
-    <ClInclude Include="hl2wars\gameui\wars\voptions.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vpasswordentry.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vquickjoin.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vquickjoingroups.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vsignindialog.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vslidercontrol.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vspinnercontrol.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vsteamcloudconfirmation.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vtransitionscreen.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vvideo.h" />
-    <ClInclude Include="hl2wars\gameui\wars\vvoteoptions.h" />
-    <ClInclude Include="hl2wars\hl2wars_in_main.h" />
-    <ClInclude Include="hl2wars\vgui\surface_passthru.h" />
-    <ClInclude Include="hl2wars\videocfgext.h" />
-    <ClInclude Include="..\shared\hl2wars\density_weight_map.h" />
-    <ClInclude Include="..\shared\hl2wars\fowmgr.h" />
-    <ClInclude Include="..\shared\hl2wars\hl2wars_gamerules.h" />
-    <ClInclude Include="..\shared\hl2wars\hl2wars_player_shared.h" />
-    <ClInclude Include="..\shared\hl2wars\hl2wars_shareddefs.h" />
-    <ClInclude Include="..\shared\hl2wars\hl2wars_util_shared.h" />
-    <ClInclude Include="..\shared\hl2wars\imouse.h" />
-    <ClInclude Include="..\shared\hl2wars\iunit.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_airlocomotion.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_animstate.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_baseanimstate.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_base_shared.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_component.h" />
-    <ClInclude Include="..\shared\hl2wars\unit_locomotion.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_func_unit.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_mapboundary.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_mount_system.h" />
-    <ClInclude Include="..\shared\hl2wars\wars_weapon_shared.h" />
+    <ClInclude Include="lambdawars\c_strider_fx.h" />
+    <ClInclude Include="lambdawars\gameui\backgroundmenubutton.h" />
+    <ClInclude Include="lambdawars\gameui\basepanel.h" />
+    <ClInclude Include="lambdawars\gameui\basesavegamedialog.h" />
+    <ClInclude Include="lambdawars\gameui\bitmapimagepanel.h" />
+    <ClInclude Include="lambdawars\gameui\cdkeyentrydialog.h" />
+    <ClInclude Include="lambdawars\gameui\commandcheckbutton.h" />
+    <ClInclude Include="lambdawars\gameui\contentcontroldialog.h" />
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamebotpage.h" />
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamedialog.h" />
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamegameplaypage.h" />
+    <ClInclude Include="lambdawars\gameui\createmultiplayergameserverpage.h" />
+    <ClInclude Include="lambdawars\gameui\customtabexplanationdialog.h" />
+    <ClInclude Include="lambdawars\gameui\cvarnegatecheckbutton.h" />
+    <ClInclude Include="lambdawars\gameui\cvarslider.h" />
+    <ClInclude Include="lambdawars\gameui\cvartextentry.h" />
+    <ClInclude Include="lambdawars\gameui\cvartogglecheckbutton.h" />
+    <ClInclude Include="lambdawars\gameui\engineinterface.h" />
+    <ClInclude Include="lambdawars\gameui\gameconsole.h" />
+    <ClInclude Include="lambdawars\gameui\gameconsoledialog.h" />
+    <ClInclude Include="lambdawars\gameui\gameui_interface.h" />
+    <ClInclude Include="lambdawars\gameui\gameui_util.h" />
+    <ClInclude Include="lambdawars\gameui\keytogglecheckbutton.h" />
+    <ClInclude Include="lambdawars\gameui\labeledcommandcombobox.h" />
+    <ClInclude Include="lambdawars\gameui\loadingdialog.h" />
+    <ClInclude Include="lambdawars\gameui\loadingtippanel.h" />
+    <ClInclude Include="lambdawars\gameui\modinfo.h" />
+    <ClInclude Include="lambdawars\gameui\mousemessageforwardingpanel.h" />
+    <ClInclude Include="lambdawars\gameui\multiplayeradvanceddialog.h" />
+    <ClInclude Include="lambdawars\gameui\optionsdialog.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubaudio.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubdifficulty.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubgame.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubkeyboard.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubmouse.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubmultiplayer.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubportal.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubvideo.h" />
+    <ClInclude Include="lambdawars\gameui\optionssubvoice.h" />
+    <ClInclude Include="lambdawars\gameui\panellistpanel.h" />
+    <ClInclude Include="lambdawars\gameui\playerlistdialog.h" />
+    <ClInclude Include="lambdawars\gameui\rungameengine.h" />
+    <ClInclude Include="lambdawars\gameui\scriptobject.h" />
+    <ClInclude Include="lambdawars\gameui\sys_utils.h" />
+    <ClInclude Include="lambdawars\gameui\textentrybox.h" />
+    <ClInclude Include="lambdawars\gameui\urlbutton.h" />
+    <ClInclude Include="lambdawars\gameui\vcontrolslistpanel.h" />
+    <ClInclude Include="lambdawars\gameui\vguisystemmoduleloader.h" />
+    <ClInclude Include="lambdawars\gameui\wars\basemodframe.h" />
+    <ClInclude Include="lambdawars\gameui\wars\basemodpanel.h" />
+    <ClInclude Include="lambdawars\gameui\wars\basemodui.h" />
+    <ClInclude Include="lambdawars\gameui\wars\gamemodes.h" />
+    <ClInclude Include="lambdawars\gameui\wars\uiavatarimage.h" />
+    <ClInclude Include="lambdawars\gameui\wars\uigamedata.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vachievements.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vaddonassociation.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vaddons.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vattractscreen.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vaudio.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vaudiovideo.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vcloud.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptions.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptionsbuttons.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptionssticks.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vcustomcampaigns.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vdownloadcampaign.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vdownloads.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vdropdownmenu.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vflyoutmenu.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vfooterpanel.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vfoundgames.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vfoundgroupgames.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vfoundpublicgames.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgamelobby.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgamelobbychat.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgameoptions.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgamesettings.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgenericconfirmation.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgenericpanellist.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgenericwaitscreen.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vgetlegacydata.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vhybridbutton.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vingamechapterselect.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vingamedifficultyselect.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vingamekickplayerlist.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vingamemainmenu.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vjukebox.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vkeyboard.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vkeyboardmouse.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vleaderboard.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vloadingprogress.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vmainmenu.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vmultiplayer.h" />
+    <ClInclude Include="lambdawars\gameui\wars\voptions.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vpasswordentry.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vquickjoin.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vquickjoingroups.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vsignindialog.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vslidercontrol.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vspinnercontrol.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vsteamcloudconfirmation.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vtransitionscreen.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vvideo.h" />
+    <ClInclude Include="lambdawars\gameui\wars\vvoteoptions.h" />
+    <ClInclude Include="lambdawars\hl2wars_in_main.h" />
+    <ClInclude Include="lambdawars\vgui\surface_passthru.h" />
+    <ClInclude Include="lambdawars\videocfgext.h" />
+    <ClInclude Include="..\shared\lambdawars\density_weight_map.h" />
+    <ClInclude Include="..\shared\lambdawars\fowmgr.h" />
+    <ClInclude Include="..\shared\lambdawars\hl2wars_gamerules.h" />
+    <ClInclude Include="..\shared\lambdawars\hl2wars_player_shared.h" />
+    <ClInclude Include="..\shared\lambdawars\hl2wars_shareddefs.h" />
+    <ClInclude Include="..\shared\lambdawars\hl2wars_util_shared.h" />
+    <ClInclude Include="..\shared\lambdawars\imouse.h" />
+    <ClInclude Include="..\shared\lambdawars\iunit.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_airlocomotion.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_animstate.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_baseanimstate.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_base_shared.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_component.h" />
+    <ClInclude Include="..\shared\lambdawars\unit_locomotion.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_func_unit.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_mapboundary.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_mount_system.h" />
+    <ClInclude Include="..\shared\lambdawars\wars_weapon_shared.h" />
     <ClInclude Include="..\shared\nav.h" />
     <ClInclude Include="..\shared\nav_area.h" />
     <ClInclude Include="..\shared\nav_colors.h" />
@@ -1684,30 +1684,30 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="commentary_modelviewer.h" />
     <ClInclude Include="foundryhelpers_client.h" />
     <ClInclude Include="..\shared\game_timescale_shared.h" />
-    <ClInclude Include="hl2wars\clientmode_wars.h" />
-    <ClInclude Include="hl2wars\c_hl2wars_player.h" />
-    <ClInclude Include="hl2wars\c_hl2wars_team.h" />
-    <ClInclude Include="hl2wars\c_unit_base.h" />
-    <ClInclude Include="hl2wars\c_wars_jukebox.h" />
-    <ClInclude Include="hl2wars\c_wars_weapon.h" />
-    <ClInclude Include="hl2wars\hl2wars_backgroundpanel.h" />
-    <ClInclude Include="hl2wars\hl2wars_baseminimap.h" />
-    <ClInclude Include="hl2wars\hl2wars_hud_chat.h" />
-    <ClInclude Include="hl2wars\playerandunitenumerator.h" />
-    <ClInclude Include="hl2wars\projected_texture_unlit.h" />
-    <ClInclude Include="hl2wars\teamcolor_proxy.h" />
-    <ClInclude Include="hl2wars\tex_fogofwar.h" />
-    <ClInclude Include="hl2wars\vgui\hl2warsviewport.h" />
-    <ClInclude Include="hl2wars\vgui\nb_button.h" />
-    <ClInclude Include="hl2wars\vgui\nb_header_footer.h" />
-    <ClInclude Include="hl2wars\vgui\nb_horiz_list.h" />
-    <ClInclude Include="hl2wars\vgui\nb_select_level_entry.h" />
-    <ClInclude Include="hl2wars\vgui\nb_select_level_panel.h" />
-    <ClInclude Include="hl2wars\vgui\wars_loading_panel.h" />
-    <ClInclude Include="hl2wars\vgui\wars_logo_panel.h" />
-    <ClInclude Include="hl2wars\vgui\wars_vgui_music_importer.h" />
-    <ClInclude Include="hl2wars\vgui_video_general.h" />
-    <ClInclude Include="hl2wars\wars_vgui_screen.h" />
+    <ClInclude Include="lambdawars\clientmode_wars.h" />
+    <ClInclude Include="lambdawars\c_hl2wars_player.h" />
+    <ClInclude Include="lambdawars\c_hl2wars_team.h" />
+    <ClInclude Include="lambdawars\c_unit_base.h" />
+    <ClInclude Include="lambdawars\c_wars_jukebox.h" />
+    <ClInclude Include="lambdawars\c_wars_weapon.h" />
+    <ClInclude Include="lambdawars\hl2wars_backgroundpanel.h" />
+    <ClInclude Include="lambdawars\hl2wars_baseminimap.h" />
+    <ClInclude Include="lambdawars\hl2wars_hud_chat.h" />
+    <ClInclude Include="lambdawars\playerandunitenumerator.h" />
+    <ClInclude Include="lambdawars\projected_texture_unlit.h" />
+    <ClInclude Include="lambdawars\teamcolor_proxy.h" />
+    <ClInclude Include="lambdawars\tex_fogofwar.h" />
+    <ClInclude Include="lambdawars\vgui\hl2warsviewport.h" />
+    <ClInclude Include="lambdawars\vgui\nb_button.h" />
+    <ClInclude Include="lambdawars\vgui\nb_header_footer.h" />
+    <ClInclude Include="lambdawars\vgui\nb_horiz_list.h" />
+    <ClInclude Include="lambdawars\vgui\nb_select_level_entry.h" />
+    <ClInclude Include="lambdawars\vgui\nb_select_level_panel.h" />
+    <ClInclude Include="lambdawars\vgui\wars_loading_panel.h" />
+    <ClInclude Include="lambdawars\vgui\wars_logo_panel.h" />
+    <ClInclude Include="lambdawars\vgui\wars_vgui_music_importer.h" />
+    <ClInclude Include="lambdawars\vgui_video_general.h" />
+    <ClInclude Include="lambdawars\wars_vgui_screen.h" />
     <ClInclude Include="hud_locator_target.h" />
     <ClInclude Include="..\..\engine\iblackbox.h" />
     <ClInclude Include="modelrendersystem.h" />

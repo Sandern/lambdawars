@@ -4,7 +4,7 @@
 #ifdef CLIENT_DLL
 #include "cbase.h"
 
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 
 #include "srcpy.h"
 
@@ -72,7 +72,7 @@ BOOST_PYTHON_MODULE(_fow){
 #else
 #include "cbase.h"
 
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 
 #include "srcpy.h"
 

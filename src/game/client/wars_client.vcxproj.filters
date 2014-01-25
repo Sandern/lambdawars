@@ -1508,133 +1508,133 @@
     <ClCompile Include="hud_crosshair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_hl2wars_player.cpp">
+    <ClCompile Include="lambdawars\c_hl2wars_player.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_hl2wars_team.cpp">
+    <ClCompile Include="lambdawars\c_hl2wars_team.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_unit_base.cpp">
+    <ClCompile Include="lambdawars\c_unit_base.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_wars_weapon.cpp">
+    <ClCompile Include="lambdawars\c_wars_weapon.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_backgroundpanel.cpp">
+    <ClCompile Include="lambdawars\hl2wars_backgroundpanel.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_baseminimap.cpp">
+    <ClCompile Include="lambdawars\hl2wars_baseminimap.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_in_main.cpp">
+    <ClCompile Include="lambdawars\hl2wars_in_main.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_prediction.cpp">
+    <ClCompile Include="lambdawars\hl2wars_prediction.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\teamcolor_proxy.cpp">
+    <ClCompile Include="lambdawars\teamcolor_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\tex_fogofwar.cpp">
+    <ClCompile Include="lambdawars\tex_fogofwar.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\tf2_proxy.cpp">
+    <ClCompile Include="lambdawars\tf2_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_wars_lesson.cpp">
+    <ClCompile Include="lambdawars\c_wars_lesson.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\nb_button.cpp">
+    <ClCompile Include="lambdawars\vgui\nb_button.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\nb_header_footer.cpp">
+    <ClCompile Include="lambdawars\vgui\nb_header_footer.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\clientmode_wars.cpp">
+    <ClCompile Include="lambdawars\clientmode_wars.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\fowmgr.cpp">
+    <ClCompile Include="..\shared\lambdawars\fowmgr.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_gamemovement.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_gamemovement.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_gamerules.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_gamerules.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_player_shared.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_player_shared.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_shareddefs.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_shareddefs.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_usermessages.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_usermessages.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_util_shared.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_util_shared.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\hl2wars_weapon_parse.cpp">
+    <ClCompile Include="..\shared\lambdawars\hl2wars_weapon_parse.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_animstate.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_animstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_base_shared.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_base_shared.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_component.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_component.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_locomotion.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_locomotion.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_func_unit.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_func_unit.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_weapon_shared.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_weapon_shared.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\hl2warsviewport.cpp">
+    <ClCompile Include="lambdawars\vgui\hl2warsviewport.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\projected_texture_unlit.cpp">
+    <ClCompile Include="lambdawars\projected_texture_unlit.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_mount_system.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_mount_system.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_airlocomotion.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_airlocomotion.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_fx_impacts.cpp">
+    <ClCompile Include="lambdawars\hl2wars_fx_impacts.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_fx_tracers.cpp">
+    <ClCompile Include="lambdawars\hl2wars_fx_tracers.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_hud_chat.cpp">
+    <ClCompile Include="lambdawars\hl2wars_hud_chat.cpp">
       <Filter>Source Files\wars\HUD Elements</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\wars_vgui_music_importer.cpp">
+    <ClCompile Include="lambdawars\vgui\wars_vgui_music_importer.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_wars_jukebox.cpp">
+    <ClCompile Include="lambdawars\c_wars_jukebox.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\wars_loading_panel.cpp">
+    <ClCompile Include="lambdawars\vgui\wars_loading_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\wars_logo_panel.cpp">
+    <ClCompile Include="lambdawars\vgui\wars_logo_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\wars_vgui_screen.cpp">
+    <ClCompile Include="lambdawars\wars_vgui_screen.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_baseanimstate.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_baseanimstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_hud_weaponselection.cpp">
+    <ClCompile Include="lambdawars\hl2wars_hud_weaponselection.cpp">
       <Filter>Source Files\wars\HUD Elements</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\nav_area.cpp">
@@ -1664,346 +1664,346 @@
     <ClCompile Include="hud_weapon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\density_weight_map.cpp">
+    <ClCompile Include="..\shared\lambdawars\density_weight_map.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\hl2wars_in_camera.cpp">
+    <ClCompile Include="lambdawars\hl2wars_in_camera.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\predicted_viewmodel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_env_dklight.cpp">
+    <ClCompile Include="lambdawars\c_env_dklight.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\nb_horiz_list.cpp">
+    <ClCompile Include="lambdawars\vgui\nb_horiz_list.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\nb_select_level_entry.cpp">
+    <ClCompile Include="lambdawars\vgui\nb_select_level_entry.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\nb_select_level_panel.cpp">
+    <ClCompile Include="lambdawars\vgui\nb_select_level_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_asw_fx_proxy.cpp">
+    <ClCompile Include="lambdawars\c_asw_fx_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_mapboundary.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_mapboundary.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_wars_fx.cpp">
+    <ClCompile Include="lambdawars\c_wars_fx.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\videocfgext.cpp">
+    <ClCompile Include="lambdawars\videocfgext.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
     <ClCompile Include="python\SurfaceBuffer.cpp">
       <Filter>Source Files\Python</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_plat_misc_win32.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_plat_misc_win32.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\backgroundmenubutton.cpp">
+    <ClCompile Include="lambdawars\gameui\backgroundmenubutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\basesavegamedialog.cpp">
+    <ClCompile Include="lambdawars\gameui\basesavegamedialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\bitmapimagepanel.cpp">
+    <ClCompile Include="lambdawars\gameui\bitmapimagepanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\commandcheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\commandcheckbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\contentcontroldialog.cpp">
+    <ClCompile Include="lambdawars\gameui\contentcontroldialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamebotpage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamebotpage.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamedialog.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamedialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergamegameplaypage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergamegameplaypage.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\createmultiplayergameserverpage.cpp">
+    <ClCompile Include="lambdawars\gameui\createmultiplayergameserverpage.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\customtabexplanationdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\customtabexplanationdialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvarnegatecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\cvarnegatecheckbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvarslider.cpp">
+    <ClCompile Include="lambdawars\gameui\cvarslider.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvartextentry.cpp">
+    <ClCompile Include="lambdawars\gameui\cvartextentry.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\cvartogglecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\cvartogglecheckbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameconsole.cpp">
+    <ClCompile Include="lambdawars\gameui\gameconsole.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameconsoledialog.cpp">
+    <ClCompile Include="lambdawars\gameui\gameconsoledialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameui_interface.cpp">
+    <ClCompile Include="lambdawars\gameui\gameui_interface.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\gameui_util.cpp">
+    <ClCompile Include="lambdawars\gameui\gameui_util.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\keytogglecheckbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\keytogglecheckbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\labeledcommandcombobox.cpp">
+    <ClCompile Include="lambdawars\gameui\labeledcommandcombobox.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\loadingdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\loadingdialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\loadingtippanel.cpp">
+    <ClCompile Include="lambdawars\gameui\loadingtippanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\logofile.cpp">
+    <ClCompile Include="lambdawars\gameui\logofile.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\modinfo.cpp">
+    <ClCompile Include="lambdawars\gameui\modinfo.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\mousemessageforwardingpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\mousemessageforwardingpanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\multiplayeradvanceddialog.cpp">
+    <ClCompile Include="lambdawars\gameui\multiplayeradvanceddialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionsdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\optionsdialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubaudio.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubaudio.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubdifficulty.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubdifficulty.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubgame.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubgame.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubkeyboard.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubkeyboard.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubmouse.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubmouse.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubmultiplayer.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubmultiplayer.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubportal.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubportal.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubvideo.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubvideo.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\optionssubvoice.cpp">
+    <ClCompile Include="lambdawars\gameui\optionssubvoice.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\panellistpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\panellistpanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\playerlistdialog.cpp">
+    <ClCompile Include="lambdawars\gameui\playerlistdialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\rungameengine.cpp">
+    <ClCompile Include="lambdawars\gameui\rungameengine.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\scriptobject.cpp">
+    <ClCompile Include="lambdawars\gameui\scriptobject.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\sys_utils.cpp">
+    <ClCompile Include="lambdawars\gameui\sys_utils.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\textentrybox.cpp">
+    <ClCompile Include="lambdawars\gameui\textentrybox.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\urlbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\urlbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\vcontrolslistpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\vcontrolslistpanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\vguisystemmoduleloader.cpp">
+    <ClCompile Include="lambdawars\gameui\vguisystemmoduleloader.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\language.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\External Stuff</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\basemodframe.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\basemodframe.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\basemodpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\basemodpanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\gamemodes.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\gamemodes.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uiavatarimage.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uiavatarimage.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata_invite.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata_invite.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\uigamedata_storage.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\uigamedata_storage.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vachievements.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vachievements.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaddonassociation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaddonassociation.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaddons.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaddons.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vattractscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vattractscreen.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaudio.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaudio.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vaudiovideo.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vaudiovideo.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcloud.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcloud.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptions.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptionsbuttons.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vcontrolleroptionssticks.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vcontrolleroptionssticks.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdownloadcampaign.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdownloadcampaign.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdownloads.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdownloads.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vdropdownmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vdropdownmenu.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vflyoutmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vflyoutmenu.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfooterpanel.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfooterpanel.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundgames.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundgroupgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundgroupgames.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vfoundpublicgames.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vfoundpublicgames.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamelobby.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamelobby.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamelobbychat.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamelobbychat.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgameoptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgameoptions.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgamesettings.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgamesettings.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericconfirmation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericconfirmation.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericpanellist.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericpanellist.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgenericwaitscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgenericwaitscreen.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vgetlegacydata.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vgetlegacydata.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vhybridbutton.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vhybridbutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamedifficultyselect.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamedifficultyselect.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamekickplayerlist.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamekickplayerlist.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vingamemainmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vingamemainmenu.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vjukebox.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vjukebox.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vkeyboard.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vkeyboard.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vkeyboardmouse.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vkeyboardmouse.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vloadingprogress.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vloadingprogress.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmainmenu.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmainmenu.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmenubackground.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmenubackground.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vmultiplayer.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vmultiplayer.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\voptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\voptions.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vpasswordentry.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vpasswordentry.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vquickjoin.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vquickjoin.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vquickjoingroups.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vquickjoingroups.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vsignindialog.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vsignindialog.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vslidercontrol.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vslidercontrol.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vspinnercontrol.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vspinnercontrol.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vsteamcloudconfirmation.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vsteamcloudconfirmation.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vtransitionscreen.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vtransitionscreen.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vvideo.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vvideo.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\gameui\wars\vvoteoptions.cpp">
+    <ClCompile Include="lambdawars\gameui\wars\vvoteoptions.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
     <ClCompile Include="cef\src_cef.cpp">
@@ -2027,19 +2027,19 @@
     <ClCompile Include="cef\src_cef_js.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\c_strider_fx.cpp">
+    <ClCompile Include="lambdawars\c_strider_fx.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\coreorigin_proxy.cpp">
+    <ClCompile Include="lambdawars\coreorigin_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
     <ClCompile Include="hl2\c_te_concussiveexplosion.cpp">
       <Filter>Source Files\From HL2</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui_rootpanel_wars.cpp">
+    <ClCompile Include="lambdawars\vgui_rootpanel_wars.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui_video_general.cpp">
+    <ClCompile Include="lambdawars\vgui_video_general.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\nav_edit.cpp">
@@ -2048,7 +2048,7 @@
     <ClCompile Include="..\shared\keeper\tilebase.cpp">
       <Filter>Source Files\keeper</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\vgui\wars_model_panel.cpp">
+    <ClCompile Include="lambdawars\vgui\wars_model_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\deferred\CDefLight.cpp">
@@ -2330,7 +2330,7 @@
     <ClCompile Include="..\shared\python\modules\autogenerated\vprof.cpp">
       <Filter>Source Files\Python\Modules\autogenerated</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\wars_flora.cpp">
+    <ClCompile Include="..\shared\lambdawars\wars_flora.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
     <ClCompile Include="python\modules\autogenerated\_entities\IClientEntity_pypp.cpp">
@@ -2345,7 +2345,7 @@
     <ClCompile Include="python\modules\autogenerated\_entities\IHandleEntity_pypp.cpp">
       <Filter>Source Files\Python\Modules\autogenerated\_entities</Filter>
     </ClCompile>
-    <ClCompile Include="hl2wars\wars_particle_ops.cpp">
+    <ClCompile Include="lambdawars\wars_particle_ops.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\python\modules\autogenerated\_srcbase.cpp">
@@ -2375,13 +2375,13 @@
     <ClCompile Include="python\modules\autogenerated\_gamerules\CTeamplayRules_pypp.cpp">
       <Filter>Source Files\Python\Modules\autogenerated\_gamerules</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_vehicleanimstate.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_vehicleanimstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\unit_vphysicslocomotion.cpp">
+    <ClCompile Include="..\shared\lambdawars\unit_vphysicslocomotion.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\hl2wars\fow_blocker.cpp">
+    <ClCompile Include="..\shared\lambdawars\fow_blocker.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
     <ClCompile Include="..\shared\python\srcpy_steam.cpp">
@@ -4243,112 +4243,112 @@
     <ClInclude Include="game_controls\vguitextwindow.h">
       <Filter>game_controls Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_hl2wars_player.h">
+    <ClInclude Include="lambdawars\c_hl2wars_player.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_hl2wars_team.h">
+    <ClInclude Include="lambdawars\c_hl2wars_team.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_unit_base.h">
+    <ClInclude Include="lambdawars\c_unit_base.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_wars_weapon.h">
+    <ClInclude Include="lambdawars\c_wars_weapon.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\hl2wars_backgroundpanel.h">
+    <ClInclude Include="lambdawars\hl2wars_backgroundpanel.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\hl2wars_baseminimap.h">
+    <ClInclude Include="lambdawars\hl2wars_baseminimap.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\playerandunitenumerator.h">
+    <ClInclude Include="lambdawars\playerandunitenumerator.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\teamcolor_proxy.h">
+    <ClInclude Include="lambdawars\teamcolor_proxy.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\tex_fogofwar.h">
+    <ClInclude Include="lambdawars\tex_fogofwar.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\nb_button.h">
+    <ClInclude Include="lambdawars\vgui\nb_button.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\nb_header_footer.h">
+    <ClInclude Include="lambdawars\vgui\nb_header_footer.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\clientmode_wars.h">
+    <ClInclude Include="lambdawars\clientmode_wars.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\fowmgr.h">
+    <ClInclude Include="..\shared\lambdawars\fowmgr.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\hl2wars_gamerules.h">
+    <ClInclude Include="..\shared\lambdawars\hl2wars_gamerules.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\hl2wars_player_shared.h">
+    <ClInclude Include="..\shared\lambdawars\hl2wars_player_shared.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\hl2wars_shareddefs.h">
+    <ClInclude Include="..\shared\lambdawars\hl2wars_shareddefs.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\hl2wars_util_shared.h">
+    <ClInclude Include="..\shared\lambdawars\hl2wars_util_shared.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\imouse.h">
+    <ClInclude Include="..\shared\lambdawars\imouse.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\iunit.h">
+    <ClInclude Include="..\shared\lambdawars\iunit.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_animstate.h">
+    <ClInclude Include="..\shared\lambdawars\unit_animstate.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_base_shared.h">
+    <ClInclude Include="..\shared\lambdawars\unit_base_shared.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_component.h">
+    <ClInclude Include="..\shared\lambdawars\unit_component.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_locomotion.h">
+    <ClInclude Include="..\shared\lambdawars\unit_locomotion.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_func_unit.h">
+    <ClInclude Include="..\shared\lambdawars\wars_func_unit.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_weapon_shared.h">
+    <ClInclude Include="..\shared\lambdawars\wars_weapon_shared.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\hl2warsviewport.h">
+    <ClInclude Include="lambdawars\vgui\hl2warsviewport.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\projected_texture_unlit.h">
+    <ClInclude Include="lambdawars\projected_texture_unlit.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_mount_system.h">
+    <ClInclude Include="..\shared\lambdawars\wars_mount_system.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_airlocomotion.h">
+    <ClInclude Include="..\shared\lambdawars\unit_airlocomotion.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\hl2wars_hud_chat.h">
+    <ClInclude Include="lambdawars\hl2wars_hud_chat.h">
       <Filter>Source Files\wars\HUD Elements</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\wars_vgui_music_importer.h">
+    <ClInclude Include="lambdawars\vgui\wars_vgui_music_importer.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_wars_jukebox.h">
+    <ClInclude Include="lambdawars\c_wars_jukebox.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\wars_loading_panel.h">
+    <ClInclude Include="lambdawars\vgui\wars_loading_panel.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\wars_logo_panel.h">
+    <ClInclude Include="lambdawars\vgui\wars_logo_panel.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\wars_vgui_screen.h">
+    <ClInclude Include="lambdawars\wars_vgui_screen.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_baseanimstate.h">
+    <ClInclude Include="..\shared\lambdawars\unit_baseanimstate.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\nav.h">
@@ -4372,343 +4372,343 @@
     <ClInclude Include="..\shared\nav_pathfind.h">
       <Filter>Source Files\Nav Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\density_weight_map.h">
+    <ClInclude Include="..\shared\lambdawars\density_weight_map.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\predicted_viewmodel.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\nb_horiz_list.h">
+    <ClInclude Include="lambdawars\vgui\nb_horiz_list.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\nb_select_level_entry.h">
+    <ClInclude Include="lambdawars\vgui\nb_select_level_entry.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\nb_select_level_panel.h">
+    <ClInclude Include="lambdawars\vgui\nb_select_level_panel.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_mapboundary.h">
+    <ClInclude Include="..\shared\lambdawars\wars_mapboundary.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\videocfgext.h">
+    <ClInclude Include="lambdawars\videocfgext.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="python\SurfaceBuffer.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_plat_misc.h">
+    <ClInclude Include="..\shared\lambdawars\wars_plat_misc.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\backgroundmenubutton.h">
+    <ClInclude Include="lambdawars\gameui\backgroundmenubutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\basepanel.h">
+    <ClInclude Include="lambdawars\gameui\basepanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\basesavegamedialog.h">
+    <ClInclude Include="lambdawars\gameui\basesavegamedialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\bitmapimagepanel.h">
+    <ClInclude Include="lambdawars\gameui\bitmapimagepanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\cdkeyentrydialog.h">
+    <ClInclude Include="lambdawars\gameui\cdkeyentrydialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\commandcheckbutton.h">
+    <ClInclude Include="lambdawars\gameui\commandcheckbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\contentcontroldialog.h">
+    <ClInclude Include="lambdawars\gameui\contentcontroldialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamebotpage.h">
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamebotpage.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamedialog.h">
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamedialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\createmultiplayergamegameplaypage.h">
+    <ClInclude Include="lambdawars\gameui\createmultiplayergamegameplaypage.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\createmultiplayergameserverpage.h">
+    <ClInclude Include="lambdawars\gameui\createmultiplayergameserverpage.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\customtabexplanationdialog.h">
+    <ClInclude Include="lambdawars\gameui\customtabexplanationdialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\cvarnegatecheckbutton.h">
+    <ClInclude Include="lambdawars\gameui\cvarnegatecheckbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\cvarslider.h">
+    <ClInclude Include="lambdawars\gameui\cvarslider.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\cvartextentry.h">
+    <ClInclude Include="lambdawars\gameui\cvartextentry.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\cvartogglecheckbutton.h">
+    <ClInclude Include="lambdawars\gameui\cvartogglecheckbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\engineinterface.h">
+    <ClInclude Include="lambdawars\gameui\engineinterface.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\gameconsole.h">
+    <ClInclude Include="lambdawars\gameui\gameconsole.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\gameconsoledialog.h">
+    <ClInclude Include="lambdawars\gameui\gameconsoledialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\gameui_interface.h">
+    <ClInclude Include="lambdawars\gameui\gameui_interface.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\gameui_util.h">
+    <ClInclude Include="lambdawars\gameui\gameui_util.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\keytogglecheckbutton.h">
+    <ClInclude Include="lambdawars\gameui\keytogglecheckbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\labeledcommandcombobox.h">
+    <ClInclude Include="lambdawars\gameui\labeledcommandcombobox.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\loadingdialog.h">
+    <ClInclude Include="lambdawars\gameui\loadingdialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\loadingtippanel.h">
+    <ClInclude Include="lambdawars\gameui\loadingtippanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\modinfo.h">
+    <ClInclude Include="lambdawars\gameui\modinfo.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\mousemessageforwardingpanel.h">
+    <ClInclude Include="lambdawars\gameui\mousemessageforwardingpanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\multiplayeradvanceddialog.h">
+    <ClInclude Include="lambdawars\gameui\multiplayeradvanceddialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionsdialog.h">
+    <ClInclude Include="lambdawars\gameui\optionsdialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubaudio.h">
+    <ClInclude Include="lambdawars\gameui\optionssubaudio.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubdifficulty.h">
+    <ClInclude Include="lambdawars\gameui\optionssubdifficulty.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubgame.h">
+    <ClInclude Include="lambdawars\gameui\optionssubgame.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubkeyboard.h">
+    <ClInclude Include="lambdawars\gameui\optionssubkeyboard.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubmouse.h">
+    <ClInclude Include="lambdawars\gameui\optionssubmouse.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubmultiplayer.h">
+    <ClInclude Include="lambdawars\gameui\optionssubmultiplayer.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubportal.h">
+    <ClInclude Include="lambdawars\gameui\optionssubportal.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubvideo.h">
+    <ClInclude Include="lambdawars\gameui\optionssubvideo.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\optionssubvoice.h">
+    <ClInclude Include="lambdawars\gameui\optionssubvoice.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\panellistpanel.h">
+    <ClInclude Include="lambdawars\gameui\panellistpanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\playerlistdialog.h">
+    <ClInclude Include="lambdawars\gameui\playerlistdialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\rungameengine.h">
+    <ClInclude Include="lambdawars\gameui\rungameengine.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\scriptobject.h">
+    <ClInclude Include="lambdawars\gameui\scriptobject.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\sys_utils.h">
+    <ClInclude Include="lambdawars\gameui\sys_utils.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\textentrybox.h">
+    <ClInclude Include="lambdawars\gameui\textentrybox.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\urlbutton.h">
+    <ClInclude Include="lambdawars\gameui\urlbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\vcontrolslistpanel.h">
+    <ClInclude Include="lambdawars\gameui\vcontrolslistpanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\vguisystemmoduleloader.h">
+    <ClInclude Include="lambdawars\gameui\vguisystemmoduleloader.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\basemodframe.h">
+    <ClInclude Include="lambdawars\gameui\wars\basemodframe.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\basemodpanel.h">
+    <ClInclude Include="lambdawars\gameui\wars\basemodpanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\basemodui.h">
+    <ClInclude Include="lambdawars\gameui\wars\basemodui.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\gamemodes.h">
+    <ClInclude Include="lambdawars\gameui\wars\gamemodes.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\uiavatarimage.h">
+    <ClInclude Include="lambdawars\gameui\wars\uiavatarimage.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\uigamedata.h">
+    <ClInclude Include="lambdawars\gameui\wars\uigamedata.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vachievements.h">
+    <ClInclude Include="lambdawars\gameui\wars\vachievements.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vaddonassociation.h">
+    <ClInclude Include="lambdawars\gameui\wars\vaddonassociation.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vaddons.h">
+    <ClInclude Include="lambdawars\gameui\wars\vaddons.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vattractscreen.h">
+    <ClInclude Include="lambdawars\gameui\wars\vattractscreen.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vaudio.h">
+    <ClInclude Include="lambdawars\gameui\wars\vaudio.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vaudiovideo.h">
+    <ClInclude Include="lambdawars\gameui\wars\vaudiovideo.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vcloud.h">
+    <ClInclude Include="lambdawars\gameui\wars\vcloud.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptions.h">
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptions.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionsbuttons.h">
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptionsbuttons.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vcontrolleroptionssticks.h">
+    <ClInclude Include="lambdawars\gameui\wars\vcontrolleroptionssticks.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vcustomcampaigns.h">
+    <ClInclude Include="lambdawars\gameui\wars\vcustomcampaigns.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vdownloadcampaign.h">
+    <ClInclude Include="lambdawars\gameui\wars\vdownloadcampaign.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vdownloads.h">
+    <ClInclude Include="lambdawars\gameui\wars\vdownloads.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vdropdownmenu.h">
+    <ClInclude Include="lambdawars\gameui\wars\vdropdownmenu.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vflyoutmenu.h">
+    <ClInclude Include="lambdawars\gameui\wars\vflyoutmenu.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vfooterpanel.h">
+    <ClInclude Include="lambdawars\gameui\wars\vfooterpanel.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vfoundgames.h">
+    <ClInclude Include="lambdawars\gameui\wars\vfoundgames.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vfoundgroupgames.h">
+    <ClInclude Include="lambdawars\gameui\wars\vfoundgroupgames.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vfoundpublicgames.h">
+    <ClInclude Include="lambdawars\gameui\wars\vfoundpublicgames.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgamelobby.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgamelobby.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgamelobbychat.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgamelobbychat.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgameoptions.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgameoptions.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgamesettings.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgamesettings.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgenericconfirmation.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgenericconfirmation.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgenericpanellist.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgenericpanellist.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgenericwaitscreen.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgenericwaitscreen.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vgetlegacydata.h">
+    <ClInclude Include="lambdawars\gameui\wars\vgetlegacydata.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vhybridbutton.h">
+    <ClInclude Include="lambdawars\gameui\wars\vhybridbutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vingamechapterselect.h">
+    <ClInclude Include="lambdawars\gameui\wars\vingamechapterselect.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vingamedifficultyselect.h">
+    <ClInclude Include="lambdawars\gameui\wars\vingamedifficultyselect.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vingamekickplayerlist.h">
+    <ClInclude Include="lambdawars\gameui\wars\vingamekickplayerlist.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vingamemainmenu.h">
+    <ClInclude Include="lambdawars\gameui\wars\vingamemainmenu.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vjukebox.h">
+    <ClInclude Include="lambdawars\gameui\wars\vjukebox.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vkeyboard.h">
+    <ClInclude Include="lambdawars\gameui\wars\vkeyboard.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vkeyboardmouse.h">
+    <ClInclude Include="lambdawars\gameui\wars\vkeyboardmouse.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vleaderboard.h">
+    <ClInclude Include="lambdawars\gameui\wars\vleaderboard.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vloadingprogress.h">
+    <ClInclude Include="lambdawars\gameui\wars\vloadingprogress.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vmainmenu.h">
+    <ClInclude Include="lambdawars\gameui\wars\vmainmenu.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vmultiplayer.h">
+    <ClInclude Include="lambdawars\gameui\wars\vmultiplayer.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\voptions.h">
+    <ClInclude Include="lambdawars\gameui\wars\voptions.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vpasswordentry.h">
+    <ClInclude Include="lambdawars\gameui\wars\vpasswordentry.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vquickjoin.h">
+    <ClInclude Include="lambdawars\gameui\wars\vquickjoin.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vquickjoingroups.h">
+    <ClInclude Include="lambdawars\gameui\wars\vquickjoingroups.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vsignindialog.h">
+    <ClInclude Include="lambdawars\gameui\wars\vsignindialog.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vslidercontrol.h">
+    <ClInclude Include="lambdawars\gameui\wars\vslidercontrol.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vspinnercontrol.h">
+    <ClInclude Include="lambdawars\gameui\wars\vspinnercontrol.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vsteamcloudconfirmation.h">
+    <ClInclude Include="lambdawars\gameui\wars\vsteamcloudconfirmation.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vtransitionscreen.h">
+    <ClInclude Include="lambdawars\gameui\wars\vtransitionscreen.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vvideo.h">
+    <ClInclude Include="lambdawars\gameui\wars\vvideo.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\gameui\wars\vvoteoptions.h">
+    <ClInclude Include="lambdawars\gameui\wars\vvoteoptions.h">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\hl2wars_in_main.h">
+    <ClInclude Include="lambdawars\hl2wars_in_main.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="cef\src_cef.h">
@@ -4732,19 +4732,19 @@
     <ClInclude Include="cef\src_cef_js.h">
       <Filter>Source Files\cef</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\c_strider_fx.h">
+    <ClInclude Include="lambdawars\c_strider_fx.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui_video_general.h">
+    <ClInclude Include="lambdawars\vgui_video_general.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\keeper\tilebase.h">
       <Filter>Source Files\keeper</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\surface_passthru.h">
+    <ClInclude Include="lambdawars\vgui\surface_passthru.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="hl2wars\vgui\wars_model_panel.h">
+    <ClInclude Include="lambdawars\vgui\wars_model_panel.h">
       <Filter>Source Files\wars\vgui</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\deferred\CDefLight.h">
@@ -4819,7 +4819,7 @@
     <ClInclude Include="deferred\vgui\vgui_projectable.h">
       <Filter>Source Files\deferred\vgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_flora.h">
+    <ClInclude Include="..\shared\lambdawars\wars_flora.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h">
@@ -4846,16 +4846,16 @@
     <ClInclude Include="python\modules\autogenerated\_gamerules\CTeamplayRules_pypp.hpp">
       <Filter>Source Files\Python\Modules\autogenerated\_gamerules</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_vehicleanimstate.h">
+    <ClInclude Include="..\shared\lambdawars\unit_vehicleanimstate.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\unit_vphysicslocomotion.h">
+    <ClInclude Include="..\shared\lambdawars\unit_vphysicslocomotion.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\fow_blocker.h">
+    <ClInclude Include="..\shared\lambdawars\fow_blocker.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\hl2wars\wars_vprof.h">
+    <ClInclude Include="..\shared\lambdawars\wars_vprof.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\python\srcpy_steam.h">

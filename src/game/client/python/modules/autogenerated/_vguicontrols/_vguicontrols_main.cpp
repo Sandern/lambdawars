@@ -46,11 +46,11 @@
 
 #include "srcpy_vgui.h"
 
-#include "hl2wars/hl2wars_baseminimap.h"
+#include "hl2wars_baseminimap.h"
 
-#include "hl2wars/vgui_video_general.h"
+#include "vgui_video_general.h"
 
-#include "hl2wars/vgui/wars_model_panel.h"
+#include "vgui/wars_model_panel.h"
 
 #include "srcpy.h"
 

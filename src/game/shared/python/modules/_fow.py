@@ -6,7 +6,7 @@ class FOW(SemiSharedModuleGenerator):
     
     files = [
         'cbase.h',
-        'hl2wars/fowmgr.h',
+        'fowmgr.h',
     ]
         
     def Parse(self, mb):
