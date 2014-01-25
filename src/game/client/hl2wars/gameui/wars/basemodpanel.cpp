@@ -48,7 +48,7 @@
 #include "vgetlegacydata.h"
 #include "VInGameDifficultySelect.h"
 #include "VInGameMainMenu.h"
-#include "VInGameChapterSelect.h"
+//#include "VInGameChapterSelect.h"
 #include "VInGameKickPlayerList.h"
 #include "VKeyboardMouse.h"
 #include "vkeyboard.h"
@@ -62,10 +62,10 @@
 #include "VPasswordEntry.h"
 #include "VVideo.h"
 #include "VSteamCloudConfirmation.h"
-#include "vcustomcampaigns.h"
+//#include "vcustomcampaigns.h"
 #include "vdownloadcampaign.h"
 #include "vjukebox.h"
-#include "vleaderboard.h"
+//#include "vleaderboard.h"
 #include "gameconsole.h"
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
@@ -379,7 +379,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_INGAMECHAPTERSELECT:
-			m_Frames[wt] = new InGameChapterSelect(this, "InGameChapterSelect");
+			//m_Frames[wt] = new InGameChapterSelect(this, "InGameChapterSelect");
 			break;
 
 		case WT_INGAMEKICKPLAYERLIST:
@@ -472,7 +472,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			Assert( 0 );
 			break;
 #else
-			m_Frames[ wt ] = new CustomCampaigns( this, "CustomCampaigns" );
+			//m_Frames[ wt ] = new CustomCampaigns( this, "CustomCampaigns" );
 #endif
 			break;
 
@@ -487,7 +487,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_LEADERBOARD:
-			m_Frames[ wt ] = new Leaderboard( this );
+			//m_Frames[ wt ] = new Leaderboard( this );
 			break;
 
 		case WT_ADDONS:
@@ -1217,18 +1217,6 @@ void CBaseModPanel::OnLevelLoadingStarted( char const *levelName, bool bShowProg
 				pGameSettings->SetString( "game/mode", r_mp_gamemode.GetString() );
 			}
 		}
-		
-#if 0
-		KeyValues::AutoDelete autodelete_pGameSettings( pGameSettings );
-		if ( pGameSettings )
-		{
-			// It is critical to get map info by the actual levelname that is being loaded, because
-			// for level transitions the server is still in the old map and the game settings returned
-			// will reflect the old state of the server.
-			pChapterInfo = g_pMatchExtSwarm->GetMapInfoByBspName( pGameSettings, levelName, &pMissionInfo );
-			Q_strncpy( chGameMode, pGameSettings->GetString( "game/mode", "" ), ARRAYSIZE( chGameMode ) );
-		}
-#endif // 0
 	}
 	
 	IMatchSession *pSession = g_pMatchFramework->GetMatchSession();

@@ -184,6 +184,7 @@ void InGameMainMenu::OnCommand( const char *command )
 	}
 	else if ( char const *szLeaderboards = StringAfterPrefix( command, "Leaderboards_" ) )
 	{
+#if 0
 		if ( CheckAndDisplayErrorIfNotLoggedIn() ||
 			CUIGameData::Get()->CheckAndDisplayErrorIfOffline( this,
 			"#L4D360UI_MainMenu_SurvivalLeaderboards_Tip_Disabled" ) )
@@ -212,6 +213,7 @@ void InGameMainMenu::OnCommand( const char *command )
 		
 		m_ActiveControl->NavigateFrom( );
 		CBaseModPanel::GetSingleton().OpenWindow( WT_LEADERBOARD, this, true, pSettings );
+#endif // 0
 	}
 	else if (!Q_strcmp(command, "AudioVideo"))
 	{
