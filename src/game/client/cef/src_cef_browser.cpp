@@ -457,7 +457,8 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
-	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL)
+	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
+	m_bInitializePingSuccessful(false)
 {
 	m_Name = name ? name : "UnknownCefBrowser";
 
@@ -569,17 +570,26 @@ void SrcCefBrowser::Think( void )
 		m_bPerformLayout = false;
 	}
 
-	if( !m_CefClientHandler->IsInitialized() || m_CefClientHandler->GetLastPingTime() == -1 )
+	if( !m_bInitializePingSuccessful )
 	{
-		float fLifeTime = Plat_FloatTime() - m_fBrowserCreateTime;
-		if( fLifeTime > 5.0f )
+		if( !m_CefClientHandler->IsInitialized() || m_CefClientHandler->GetLastPingTime() == -1 )
 		{
-			Error( "Could not launch browser helper process. \n\n"
-					"This is usually caused by security software blocking the process from launching. "
-					"Please check your security software and unblock \"lambdawars_browser.exe\". \n\n"
-					"Your security software might also temporary block the process for scanning. "
-					"In this case just relaunch the game. "
-			);
+			float fLifeTime = Plat_FloatTime() - m_fBrowserCreateTime;
+			if( fLifeTime > 15.0f )
+			{
+				Error( "Could not launch browser helper process. \n\n"
+						"This is usually caused by security software blocking the process from launching. "
+						"Please check your security software and unblock \"lambdawars_browser.exe\". \n\n"
+						"Your security software might also temporary block the process for scanning. "
+						"In this case just relaunch the game. "
+				);
+			}
+		}
+		else
+		{
+			m_bInitializePingSuccessful = true;
+			if( g_debug_cef.GetBool() )
+				DevMsg( "#%d %s: Browser creation time: %f\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str(), Plat_FloatTime() - m_fBrowserCreateTime );
 		}
 	}
 

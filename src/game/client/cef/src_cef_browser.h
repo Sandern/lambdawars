@@ -162,6 +162,7 @@ private:
 	NavigationType m_navigationBehavior;
 
 	float m_fBrowserCreateTime;
+	bool m_bInitializePingSuccessful;
 };
 
 inline void SrcCefBrowser::SetGameInputEnabled( bool state )
