@@ -29,6 +29,7 @@ WNDPROC RealWndProc;
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 ConVar g_debug_cef("g_debug_cef", "0");
+extern ConVar developer;
 
 #ifdef WIN32
 //-----------------------------------------------------------------------------
@@ -156,6 +157,10 @@ bool CCefSystem::Init()
 		return true;
 	}
 
+	const bool bDebugCef = CommandLine() && CommandLine()->FindParm("-debugcef") != 0;
+	if( bDebugCef )
+		g_debug_cef.SetValue( CommandLine()->ParmValue( "-debugcef", 1 ) );
+
 	// Get path to subprocess browser
 	char browser_subprocess_path[_MAX_PATH];
 	filesystem->RelativePathToFullPath( "bin/lambdawars_browser.exe", "MOD", browser_subprocess_path, _MAX_PATH );
@@ -163,7 +168,7 @@ bool CCefSystem::Init()
 	// The process sub process file should exist. Error out, because otherwise we can't display the main menu
 	if( filesystem->FileExists( browser_subprocess_path ) == false )
 	{
-		Error( "Could not locate %s\n", browser_subprocess_path );
+		Error( "Could not locate \"%s\". Please check your installation.\n", browser_subprocess_path );
 		return false;
 	}
 
@@ -176,8 +181,6 @@ bool CCefSystem::Init()
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	CefMainArgs main_args( hinst );
 	g_pClientApp = new ClientApp;
-
-	ConVarRef developer("developer");
 
 	// Settings
 	CefSettings settings;

@@ -22,7 +22,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 			CefProcessMessage::Create("pong");
 		browser->SendProcessMessage(PID_BROWSER, retmessage);
 
-		SendMsg( browser, "Pong from render browser %d\n", browser->GetIdentifier() );
+		//SendMsg( browser, "Pong from render browser %d\n", browser->GetIdentifier() );
 		return true;
 	}
 	else if( msgname == "createglobalobject" ) 

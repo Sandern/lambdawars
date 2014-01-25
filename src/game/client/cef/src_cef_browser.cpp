@@ -172,6 +172,10 @@ public:
 	}
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler() { return m_OSRHandler; }
 
+	// Misc
+	bool IsInitialized() { return m_bInitialized; }
+	float GetLastPingTime() { return m_fLastPingTime; }
+
 private:
 	// The child browser window
 	CefRefPtr<CefBrowser> m_Browser;
@@ -179,6 +183,11 @@ private:
 
 	// The child browser id
 	int m_BrowserId;
+
+	// Tests if "OnAfterCreated" is called. This means the browser/webview is "initialized"
+	bool m_bInitialized;
+	// Last time we received a pong from the browser process
+	float m_fLastPingTime;
 
 	// Internal
 	HWND m_hostWindow;
@@ -190,7 +199,8 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser ), m_OSRHandler( NULL )
+CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser ), 
+	m_OSRHandler( NULL ), m_bInitialized(false), m_fLastPingTime(-1)
 {
 }
 
@@ -220,7 +230,9 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 
 	if( message->GetName() == "pong" ) 
 	{
-		Msg("Received PONG from render process!\n");
+		if( g_debug_cef.GetBool() )
+			DevMsg( "Received PONG from render process of browser %d!\n", browser->GetIdentifier() );
+		m_fLastPingTime = Plat_FloatTime();
 		return true;
 	}
 	else if( message->GetName() == "methodcall" )
@@ -252,13 +264,13 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "msg" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		Msg("Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		Msg( "Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
 		return true;
 	}
 	else if( message->GetName() == "warning" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		Warning("Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
+		Warning( "Browser %d Render Process: %ls", browser->GetIdentifier(), args->GetString( 0 ).c_str() );
 		return true;
 	}
 
@@ -316,6 +328,8 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		m_BrowserId = browser->GetIdentifier();
 	}
 
+	m_bInitialized = true;
+	m_pSrcBrowser->Ping();
 	m_pSrcBrowser->OnAfterCreated();
 }
 
@@ -476,9 +490,11 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	if( g_debug_cef.GetBool() )
 		DevMsg( "%s: CefBrowserHost::CreateBrowser\n", m_Name.c_str() );
 	
+	m_fBrowserCreateTime = Plat_FloatTime();
 	if( !CefBrowserHost::CreateBrowser( info, m_CefClientHandler, m_URL, settings, NULL ) )
 	{
 		Warning(" Failed to create CEF browser %s\n", name );
+		return;
 	}
 }
 
@@ -551,6 +567,20 @@ void SrcCefBrowser::Think( void )
 		m_CefClientHandler->GetBrowser()->GetHost()->WasResized();
 
 		m_bPerformLayout = false;
+	}
+
+	if( !m_CefClientHandler->IsInitialized() || m_CefClientHandler->GetLastPingTime() == -1 )
+	{
+		float fLifeTime = Plat_FloatTime() - m_fBrowserCreateTime;
+		if( fLifeTime > 5.0f )
+		{
+			Error( "Could not launch browser helper process. \n\n"
+					"This is usually caused by security software blocking the process from launching. "
+					"Please check your security software and unblock \"lambdawars_browser.exe\". \n\n"
+					"Your security software might also temporary block the process for scanning. "
+					"In this case just relaunch the game. "
+			);
+		}
 	}
 
 	vgui::VPANEL focus = vgui::input()->GetFocus();

@@ -160,6 +160,8 @@ private:
 
 	bool m_bHasFocus;
 	NavigationType m_navigationBehavior;
+
+	float m_fBrowserCreateTime;
 };
 
 inline void SrcCefBrowser::SetGameInputEnabled( bool state )
