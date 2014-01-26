@@ -379,12 +379,13 @@ void CHL2WarsGameRules::Precache( void )
 	PrecacheEffect( "cball_explode" );
 	PrecacheEffect( "bloodspray" );
 
-	// Sparks
+	// TODO: Move followning precache calls to python
 	PrecacheEffect( "ManhackSparks" );
 
-	PrecacheEffect( "StriderMuzzleFlash" ); // TODO: Move to python
-	PrecacheEffect( "VortDispel" ); // TODO: Move to python
-	PrecacheEffect( "HelicopterMegaBomb" ); // TODO: Move to python
+	PrecacheEffect( "StriderMuzzleFlash" ); 
+	PrecacheEffect( "VortDispel" );
+	PrecacheEffect( "HelicopterMegaBomb" );
+	PrecacheEffect( "BoltImpact" );
 
 	BaseClass::Precache(); 
 }
