@@ -1,3 +1,4 @@
+
 //============ Copyright (c) Valve Corporation, All rights reserved. ============
 //
 // Functionality to render a glowing outline around client renderable objects.
@@ -42,7 +43,7 @@ public:
 			m_nFirstFreeSlot = m_GlowObjectDefinitions[nIndex].m_nNextFreeSlot;
 		}
 		
-		m_GlowObjectDefinitions[nIndex].m_pEntity = pEntity;
+		m_GlowObjectDefinitions[nIndex].m_hEntity = pEntity;
 		m_GlowObjectDefinitions[nIndex].m_vGlowColor = vGlowColor;
 		m_GlowObjectDefinitions[nIndex].m_flGlowAlpha = flGlowAlpha;
 		m_GlowObjectDefinitions[nIndex].m_bRenderWhenOccluded = bRenderWhenOccluded;
@@ -60,14 +61,14 @@ public:
 		Assert( !m_GlowObjectDefinitions[nGlowObjectHandle].IsUnused() );
 
 		m_GlowObjectDefinitions[nGlowObjectHandle].m_nNextFreeSlot = m_nFirstFreeSlot;
-		m_GlowObjectDefinitions[nGlowObjectHandle].m_pEntity = NULL;
+		m_GlowObjectDefinitions[nGlowObjectHandle].m_hEntity = NULL;
 		m_nFirstFreeSlot = nGlowObjectHandle;
 	}
 
 	void SetEntity( int nGlowObjectHandle, C_BaseEntity *pEntity )
 	{
 		Assert( !m_GlowObjectDefinitions[nGlowObjectHandle].IsUnused() );
-		m_GlowObjectDefinitions[nGlowObjectHandle].m_pEntity = pEntity;
+		m_GlowObjectDefinitions[nGlowObjectHandle].m_hEntity = pEntity;
 	}
 
 	void SetColor( int nGlowObjectHandle, const Vector &vGlowColor ) 
@@ -108,6 +109,19 @@ public:
 		return m_GlowObjectDefinitions[nGlowObjectHandle].m_bRenderWhenUnoccluded;
 	}
 
+	bool HasGlowEffect( C_BaseEntity *pEntity ) const
+	{
+		for ( int i = 0; i < m_GlowObjectDefinitions.Count(); ++ i )
+		{
+			if ( !m_GlowObjectDefinitions[i].IsUnused() && m_GlowObjectDefinitions[i].m_hEntity.Get() == pEntity )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void RenderGlowEffects( const CViewSetup *pSetup, int nSplitScreenSlot );
 
 	bool IsRenderingGlowEffects() { return m_bRenderingGlowEffects; }
@@ -119,11 +133,19 @@ private:
 
 	struct GlowObjectDefinition_t
 	{
-		bool ShouldDraw( int nSlot ) const { return m_pEntity && ( m_nSplitScreenSlot == GLOW_FOR_ALL_SPLIT_SCREEN_SLOTS || m_nSplitScreenSlot == nSlot ) && ( m_bRenderWhenOccluded || m_bRenderWhenUnoccluded ) && m_pEntity->ShouldDraw(); }
+		bool ShouldDraw( int nSlot ) const
+		{
+			return m_hEntity.Get() && 
+				   ( m_nSplitScreenSlot == GLOW_FOR_ALL_SPLIT_SCREEN_SLOTS || m_nSplitScreenSlot == nSlot ) && 
+				   ( m_bRenderWhenOccluded || m_bRenderWhenUnoccluded ) && 
+				   m_hEntity->ShouldDraw() && 
+				   !m_hEntity->IsDormant();
+		}
+
 		bool IsUnused() const { return m_nNextFreeSlot != GlowObjectDefinition_t::ENTRY_IN_USE; }
 		void DrawModel();
 
-		EHANDLE m_pEntity;
+		EHANDLE m_hEntity;
 		Vector m_vGlowColor;
 		float m_flGlowAlpha;
 

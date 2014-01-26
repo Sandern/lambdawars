@@ -5,9 +5,9 @@
 //===========================================================================//
 
 #include "BaseVSShader.h"
-#include "blurfilter_vs20.inc"
-#include "blurfilter_ps20.inc"
-#include "blurfilter_ps20b.inc"
+#include "BlurFilter_vs20.inc"
+#include "BlurFilter_ps20.inc"
+#include "BlurFilter_ps20b.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -15,7 +15,6 @@
 BEGIN_VS_SHADER_FLAGS( BlurFilterY, "Help for BlurFilterY", SHADER_NOT_EDITABLE )
 	BEGIN_SHADER_PARAMS
         SHADER_PARAM( BLOOMAMOUNT, SHADER_PARAM_TYPE_FLOAT, "1.0", "" )
-		SHADER_PARAM( FRAMETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "_rt_SmallHDR0", "" )
 		SHADER_PARAM( KERNEL, SHADER_PARAM_TYPE_INTEGER, "0", "Kernel type" )
 		SHADER_PARAM( ENABLECLEARCOLOR, SHADER_PARAM_TYPE_BOOL, "0", "clear RGB channels to a solid color" )
 		SHADER_PARAM( CLEARCOLOR, SHADER_PARAM_TYPE_VEC3, "[0 0 0]", "clear color" )
@@ -135,8 +134,8 @@ BEGIN_VS_SHADER_FLAGS( BlurFilterY, "Help for BlurFilterY", SHADER_NOT_EDITABLE 
 			v[3] = 0.0f;
 			pShaderAPI->SetPixelShaderConstant( 5, v, 1 );
 
-			DECLARE_DYNAMIC_VERTEX_SHADER( blurfilter_ps20 );
-			SET_DYNAMIC_VERTEX_SHADER( blurfilter_ps20 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( blurfilter_vs20 );
+			SET_DYNAMIC_VERTEX_SHADER( blurfilter_vs20 );
 
 			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
 			{

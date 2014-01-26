@@ -1,4 +1,4 @@
-//============ Copyright (c) Valve Corporation, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Functionality to render a glowing outline around client renderable objects.
 //
@@ -15,6 +15,9 @@
 
 ConVar glow_outline_effect_enable( "glow_outline_effect_enable", "1", FCVAR_CHEAT, "Enable entity outline glow effects." );
 ConVar glow_outline_effect_width( "glow_outline_width", "6.0f", FCVAR_CHEAT, "Width of glow outline effect in screen space." );
+
+ConVar glow_outline_effect_dim( "glow_outline_dim", "1.0f", FCVAR_CHEAT, "" );
+ConVar glow_outline_effect_luminance( "glow_outline_luminance", "0.8f", FCVAR_CHEAT, "" );
 
 CGlowObjectManager g_GlowObjectManager;
 
@@ -379,8 +382,11 @@ void CGlowObjectManager::ApplyEntityGlowEffects( const CViewSetup *pSetup, int n
 
 		// Do not fade the glows out at all (weight = 1.0)
 		IMaterialVar *pDimVar = pMatHaloAddToScreen->FindVar( "$C0_X", NULL );
-		pDimVar->SetFloatValue( 1.0f );
+		pDimVar->SetFloatValue( glow_outline_effect_dim.GetFloat() );
+		IMaterialVar *pLumVar = pMatHaloAddToScreen->FindVar( "$C1_X", NULL );
+		pLumVar->SetFloatValue( glow_outline_effect_luminance.GetFloat() );
 
+		// Set stencil state
 		ShaderStencilState_t stencilState;
 		stencilState.m_bEnable = true;
 		stencilState.m_nWriteMask = 0x0; // We're not changing stencil
@@ -409,18 +415,22 @@ void CGlowObjectManager::ApplyEntityGlowEffects( const CViewSetup *pSetup, int n
 
 void CGlowObjectManager::GlowObjectDefinition_t::DrawModel()
 {
-	RenderableInstance_t instance;
-	instance.m_nAlpha = (uint8)( m_flGlowAlpha * 255.0f );
-
-	m_pEntity->DrawModel( STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS, instance );
-	C_BaseEntity *pAttachment = m_pEntity->FirstMoveChild();
-
-	while ( pAttachment != NULL )
+	if ( m_hEntity.Get() )
 	{
-		if ( pAttachment->ShouldDraw() )
+		RenderableInstance_t instance;
+		instance.m_nAlpha = (uint8)( m_flGlowAlpha * 255.0f );
+
+		m_hEntity->DrawModel( STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS, instance );
+
+		C_BaseEntity *pAttachment = m_hEntity->FirstMoveChild();
+
+		while ( pAttachment != NULL )
 		{
-			pAttachment->DrawModel( STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS, instance );
+			if ( !g_GlowObjectManager.HasGlowEffect( pAttachment ) && pAttachment->ShouldDraw() )
+			{
+				pAttachment->DrawModel( STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS, instance );
+			}
+			pAttachment = pAttachment->NextMovePeer();
 		}
-		pAttachment = pAttachment->NextMovePeer();
 	}
 }
