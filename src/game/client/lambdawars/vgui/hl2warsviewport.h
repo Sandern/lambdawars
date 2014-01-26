@@ -68,8 +68,6 @@ public:
 
 public:
 	int					m_nMouseButtons;
-	int					m_iMouseMoveX;
-	int					m_iMouseMoveY;
 
 private:
 	bool m_bMiddleMouseActive;

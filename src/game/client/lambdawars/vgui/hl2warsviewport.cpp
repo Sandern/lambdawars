@@ -329,6 +329,9 @@ void HL2WarsViewport::Paint()
 extern ConVar g_cef_draw;
 extern ConVar cl_drawhud;
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::PostChildPaint()
 {
 	BaseClass::PostChildPaint();
@@ -340,18 +343,15 @@ void HL2WarsViewport::PostChildPaint()
 	if( pBrowser && pBrowser->GetPanel() )
 	{
 		SrcCefVGUIPanel *pPanel = pBrowser->GetPanel();
-		int iTextureID = pPanel->GetTextureID();
-		pPanel->SetDoNotDraw( true ); // we draw it here
-		if( iTextureID != -1 )
-		{
-			vgui::surface()->DrawSetColor( 255, 255, 255, 255 );
-			vgui::surface()->DrawSetTexture( iTextureID );
-			vgui::surface()->DrawTexturedSubRect( 0, 0, pPanel->GetWide(), pPanel->GetTall(), 0, 0, pPanel->GetTexS1(), pPanel->GetTexT1() );
-		}
+		pPanel->SetDoNotDraw( true ); // we draw it here and not in Paint
+		pPanel->DrawWebview();
 	}
 }
 #endif // ENABLE_CEF
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 extern ConVar cl_mouse_selectionbox_threshold;
 void HL2WarsViewport::DrawSelectBox()
 {
@@ -388,6 +388,9 @@ void HL2WarsViewport::DrawSelectBox()
 	UpdateSelectionBox( xmin, ymin, xmax, ymax );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::UpdateSelectionBox( int iXMin, int iYMin, int iXMax, int iYMax )
 {
 	int i;
@@ -421,6 +424,9 @@ void HL2WarsViewport::UpdateSelectionBox( int iXMin, int iYMin, int iXMax, int i
 	m_bDrawingSelectBox = true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::ClearSelectionBox()
 {
 	if( !m_bDrawingSelectBox )
@@ -440,6 +446,9 @@ void HL2WarsViewport::ClearSelectionBox()
 	m_bDrawingSelectBox = false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::UpdateCursor()
 {
 	if( m_bMiddleMouseActive )
@@ -473,17 +482,23 @@ void HL2WarsViewport::UpdateCursor()
 	SetCursor( m_iDefaultMouseCursor );
 }
 
-// mouse listeners for the panel
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::OnCursorMoved(int x, int y)
 {
-	m_iMouseMoveX = x;
-	m_iMouseMoveY = y;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::OnCursorEntered()
 {
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::OnCursorExited()
 {
 }

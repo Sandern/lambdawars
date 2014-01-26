@@ -45,6 +45,7 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController,
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
 
 	SetPaintBackgroundEnabled( false );
+	SetScheme( "SourceScheme" );
 
 	SetParent( pParent ? pParent : GetClientMode()->GetViewport() );
 
@@ -204,6 +205,16 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::ApplySchemeSettings(vgui::IScheme *pScheme)
+{
+	BaseClass::ApplySchemeSettings( pScheme );
+
+	m_hLoadingFont = pScheme->GetFont( "HUDNumber" );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnThink()
 {
 	BaseClass::OnThink();
@@ -294,25 +305,53 @@ void SrcCefVGUIPanel::Paint()
 	// Must have a valid texture and the texture regenerator should be valid
 	if( !m_bDontDraw )
 	{
-		if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
+		DrawWebview();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::DrawWebview()
+{
+	int iWide, iTall;
+	GetSize( iWide, iTall );
+
+	if( m_iTextureID != -1 && m_pTextureRegen->IsDirty() == false && g_cef_draw.GetBool() )
+	{
+		vgui::surface()->DrawSetColor( m_Color );
+		vgui::surface()->DrawSetTexture( m_iTextureID );
+		vgui::surface()->DrawTexturedSubRect( 0, 0, iWide, iTall, 0, 0, m_fTexS1, m_fTexT1 );
+	}
+	else
+	{
+		// Show loading text
+		wchar_t buf[256];
+		mbstowcs( buf, m_pBrowser->GetName(), sizeof(buf) );
+
+		wchar_t text[256];
+		V_snwprintf( text, sizeof( text ) / sizeof(wchar_t), L"Loading %ls...", buf );
+
+		int iTextWide, iTextTall;
+		surface()->GetTextSize( m_hLoadingFont, text, iTextWide, iTextTall );
+
+		vgui::surface()->DrawSetTextFont( m_hLoadingFont );
+		vgui::surface()->DrawSetTextColor( m_Color );
+		vgui::surface()->DrawSetTextPos( (iWide / 2) - (iTextWide / 2), (iTall / 2) - (iTextTall / 2) );
+
+		vgui::surface()->DrawUnicodeString( text );
+
+		// Debug reason
+		if( g_cef_debug_texture.GetBool() )
 		{
-			vgui::surface()->DrawSetColor( m_Color );
-			vgui::surface()->DrawSetTexture( m_iTextureID );
-			vgui::surface()->DrawTexturedSubRect( 0, 0, iWide, iTall, 0, 0, m_fTexS1, m_fTexT1 );
-		}
-		else
-		{
-			if( g_cef_debug_texture.GetBool() )
-			{
-				DevMsg("CEF: not drawing");
-				if( m_iTextureID == -1 )
-					DevMsg(", texture does not exists");
-				if( m_pTextureRegen->IsDirty() )
-					DevMsg(", texture is dirty");
-				if( !g_cef_draw.GetBool() )
-					DevMsg(", g_cef_draw is 0");
-				DevMsg("\n");
-			}
+			DevMsg("CEF: not drawing");
+			if( m_iTextureID == -1 )
+				DevMsg(", texture does not exists");
+			if( m_pTextureRegen->IsDirty() )
+				DevMsg(", texture is dirty");
+			if( !g_cef_draw.GetBool() )
+				DevMsg(", g_cef_draw is 0");
+			DevMsg("\n");
 		}
 	}
 }

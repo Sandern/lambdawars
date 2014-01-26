@@ -30,10 +30,13 @@ public:
 	virtual bool ResizeTexture( int width, int height );
 	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend );
 
+	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void OnThink();
 	virtual void Paint();
 	virtual void OnSizeChanged(int newWide, int newTall);
 	virtual void PerformLayout();
+
+	virtual void DrawWebview();
 
 	int	GetEventFlags();
 
@@ -83,6 +86,8 @@ private:
 	CMaterialReference m_MatRef;
 	char m_MatWebViewName[MAX_PATH];
 	char m_TextureWebViewName[MAX_PATH];
+
+	vgui::HFont m_hLoadingFont;
 
 	int m_iTextureID;
 	int m_iWVWide, m_iWVTall;
