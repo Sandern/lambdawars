@@ -220,6 +220,7 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 {
 	if( pSaveCurConfigTo )
 	{
+		engine->ExecuteClientCmd( "host_writeconfig\n" );
 		filesystem->AsyncFinishAllWrites(); // Ensure we have the right config, because host_writeconfig uses async write
 		CUtlBuffer buf;
 		GetBindings( "config.cfg", buf );
@@ -244,6 +245,8 @@ void CHL2WarsInput::SwitchConfig(const char *pSaveCurConfigTo,
 		engine->ExecuteClientCmd( VarArgs( "exec %s\n", pSwitchToConfig ) );
 		engine->ExecuteClientCmd( "host_writeconfig\n" ); // Writes it into config.cfg
 		
+		// Reset movement buttons to ensure they are not in a stuck state
+		engine->ExecuteClientCmd( "-forward;-back;-moveleft;-moveright;-left;-right;\n" );
 	}
 }
 

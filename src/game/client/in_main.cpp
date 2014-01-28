@@ -143,8 +143,8 @@ kbutton_t	in_attack2;
 kbutton_t	in_zoom;
 
 static	kbutton_t	in_klook;
-static	kbutton_t	in_left;
-static	kbutton_t	in_right;
+kbutton_t	in_left;
+kbutton_t	in_right;
 static	kbutton_t	in_lookup;
 static	kbutton_t	in_lookdown;
 static	kbutton_t	in_use;
