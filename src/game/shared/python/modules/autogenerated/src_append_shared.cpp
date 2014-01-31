@@ -14,6 +14,7 @@ using namespace boost::python;
 extern "C" __declspec(dllexport) void initsrcbuiltins();
 extern "C" __declspec(dllexport) void init_srcbase();
 extern "C" __declspec(dllexport) void init_vmath();
+extern "C" __declspec(dllexport) void init_filesystem();
 extern "C" __declspec(dllexport) void init_animation();
 extern "C" __declspec(dllexport) void init_entities();
 extern "C" __declspec(dllexport) void init_entitiesmisc();
@@ -37,6 +38,7 @@ extern "C" __declspec(dllexport) void initmatchmaking();
 extern "C"  void initsrcbuiltins();
 extern "C"  void init_srcbase();
 extern "C"  void init_vmath();
+extern "C"  void init_filesystem();
 extern "C"  void init_animation();
 extern "C"  void init_entities();
 extern "C"  void init_entitiesmisc();
@@ -64,6 +66,7 @@ void AppendSharedModules()
 	APPEND_MODULE(srcbuiltins)
 	APPEND_MODULE(_srcbase)
 	APPEND_MODULE(_vmath)
+	APPEND_MODULE(_filesystem)
 	APPEND_MODULE(_animation)
 	APPEND_MODULE(_entities)
 	APPEND_MODULE(_entitiesmisc)

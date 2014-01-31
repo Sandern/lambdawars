@@ -359,30 +359,10 @@ int SrcPyGetFullPath( const char *pAssumedRelativePath, char *pFullPath, int siz
 // Purpose: Used by the python library
 //-----------------------------------------------------------------------------
 extern  "C" {
-int getmoddir( const char *path, int len )
-{
-	return g_pFullFileSystem->GetSearchPath("MOD", false, (char *)path, len);
-}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-boost::python::object AbsToRel( const char *path )
-{
-	char temp[_MAX_PATH];
-	filesystem->FullPathToRelativePath(path, temp, _MAX_PATH);
-	return boost::python::object(temp);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-boost::python::object RelToAbs( const char *path )
-{
-	char temp[_MAX_PATH];
-	SrcPyGetFullPathSilent( path, temp, _MAX_PATH );
-	return boost::python::object(temp);
+	int getmoddir( const char *path, int len )
+	{
+		return g_pFullFileSystem->GetSearchPath("MOD", false, (char *)path, len);
+	}
 }
 
 //-----------------------------------------------------------------------------

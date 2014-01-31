@@ -25,10 +25,6 @@ class SrcBase(SharedModuleGenerator):
         mb.free_function('PyCOM_TimestampedLog').include()
         mb.free_function('PyCOM_TimestampedLog').rename('COM_TimestampedLog')
         
-        # AbsToRel converter
-        mb.free_function('AbsToRel').include()
-        mb.free_function('RelToAbs').include()
-        
         # Tick and per frame method register functions
         mb.free_function('RegisterTickMethod').include()
         mb.free_function('UnregisterTickMethod').include()

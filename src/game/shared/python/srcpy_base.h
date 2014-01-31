@@ -214,8 +214,6 @@ private:
 extern  "C" {
 	int SrcPyPathIsInGameFolder( const char *pPath );
 }
-boost::python::object AbsToRel( const char *path );
-boost::python::object RelToAbs( const char *path );
 
 //-----------------------------------------------------------------------------
 // Purpose: 

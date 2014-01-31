@@ -936,17 +936,6 @@ BOOST_PYTHON_MODULE(_srcbase){
         .def_readwrite( "g", &color32_s::g )    
         .def_readwrite( "r", &color32_s::r );
 
-    { //::AbsToRel
-    
-        typedef ::boost::python::object ( *AbsToRel_function_type )( char const * );
-        
-        bp::def( 
-            "AbsToRel"
-            , AbsToRel_function_type( &::AbsToRel )
-            , ( bp::arg("path") ) );
-    
-    }
-
     { //::GetRegisteredPerFrameMethods
     
         typedef ::boost::python::list ( *GetRegisteredPerFrameMethods_function_type )(  );
@@ -1041,17 +1030,6 @@ BOOST_PYTHON_MODULE(_srcbase){
             "RegisterTickMethod"
             , RegisterTickMethod_function_type( &::RegisterTickMethod )
             , ( bp::arg("method"), bp::arg("ticksignal"), bp::arg("looped")=(bool)(true), bp::arg("userealtime")=(bool)(false) ) );
-    
-    }
-
-    { //::RelToAbs
-    
-        typedef ::boost::python::object ( *RelToAbs_function_type )( char const * );
-        
-        bp::def( 
-            "RelToAbs"
-            , RelToAbs_function_type( &::RelToAbs )
-            , ( bp::arg("path") ) );
     
     }
 
