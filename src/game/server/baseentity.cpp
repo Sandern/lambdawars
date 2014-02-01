@@ -8845,6 +8845,7 @@ bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 		return true;
 
 	// Entities that are not hidden should be transmitted at least once to the client
+	// Note: this transmits the data at the point of sending, which might be undesired
 	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 /*&& (GetFOWFlags() & FOWFLAG_INITTRANSMIT)*/ )
 	{
 		int iPlayerIndex = pPlayer->entindex() - 1;

@@ -1895,7 +1895,8 @@ public:
 		return s_bAbsQueriesValid;
 	}
 
-	// Lambda 
+	// Lambda Wars
+#ifdef HL2WARS_DLL
 public:
 	friend class PyEntityFactory;
 	friend class CFogOfWarMgr;
@@ -1956,6 +1957,7 @@ private:
 	CNetworkVar( float,		m_fViewDistance );
 	int m_iFOWOldPosX, m_iFOWOldPosY;
 	int m_iFOWPosX, m_iFOWPosY;
+#endif // HL2WARS_DLL
 
 // =======================================
 // PySource Additions
