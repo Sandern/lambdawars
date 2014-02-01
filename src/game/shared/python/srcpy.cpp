@@ -509,6 +509,10 @@ bool CSrcPython::ShutdownInterpreter( void )
 	m_methodTickList.Purge();
 	m_methodPerFrameList.Purge();
 
+#ifdef CLIENT_DLL
+	py_delayed_data_update_list.Purge();
+#endif // CLIENT_DLL
+
 	// Disconnect redirecting stdout/stderr
 	sys.attr("stdout") = bp::object();
 	sys.attr("stderr") = bp::object();
@@ -536,7 +540,6 @@ bool CSrcPython::ShutdownInterpreter( void )
 #ifdef CLIENT_DLL
 	_vguicontrols = bp::object();
 #endif // CLIENT_DLL
-
 
 	fntype = bp::object();
 
