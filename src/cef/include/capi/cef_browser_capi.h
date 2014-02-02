@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2014 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -43,7 +43,12 @@ extern "C" {
 #endif
 
 #include "include/capi/cef_base_capi.h"
+#include "include/capi/cef_frame_capi.h"
+#include "include/capi/cef_process_message_capi.h"
+#include "include/capi/cef_request_context_capi.h"
 
+struct _cef_browser_host_t;
+struct _cef_client_t;
 
 ///
 // Structure used to represent a browser window. When used in the browser
@@ -172,7 +177,7 @@ typedef struct _cef_browser_t {
   // message was sent successfully.
   ///
   int (CEF_CALLBACK *send_process_message)(struct _cef_browser_t* self,
-      enum cef_process_id_t target_process,
+      cef_process_id_t target_process,
       struct _cef_process_message_t* message);
 } cef_browser_t;
 
@@ -271,18 +276,6 @@ typedef struct _cef_browser_host_t {
       struct _cef_browser_host_t* self);
 
   ///
-  // Returns the DevTools URL for this browser. If |http_scheme| is true (1) the
-  // returned URL will use the http scheme instead of the chrome-devtools
-  // scheme. Remote debugging can be enabled by specifying the "remote-
-  // debugging-port" command-line flag or by setting the
-  // CefSettings.remote_debugging_port value. If remote debugging is not enabled
-  // this function will return an NULL string.
-  ///
-  // The resulting string must be freed by calling cef_string_userfree_free().
-  cef_string_userfree_t (CEF_CALLBACK *get_dev_tools_url)(
-      struct _cef_browser_host_t* self, int http_scheme);
-
-  ///
   // Get the current zoom level. The default zoom level is 0.0. This function
   // can only be called on the UI thread.
   ///
@@ -309,7 +302,7 @@ typedef struct _cef_browser_host_t {
   // the UI thread.
   ///
   void (CEF_CALLBACK *run_file_dialog)(struct _cef_browser_host_t* self,
-      enum cef_file_dialog_mode_t mode, const cef_string_t* title,
+      cef_file_dialog_mode_t mode, const cef_string_t* title,
       const cef_string_t* default_file_name, cef_string_list_t accept_types,
       struct _cef_run_file_dialog_callback_t* callback);
 
@@ -340,6 +333,20 @@ typedef struct _cef_browser_host_t {
   ///
   void (CEF_CALLBACK *stop_finding)(struct _cef_browser_host_t* self,
       int clearSelection);
+
+  ///
+  // Open developer tools in its own window.
+  ///
+  void (CEF_CALLBACK *show_dev_tools)(struct _cef_browser_host_t* self,
+      const struct _cef_window_info_t* windowInfo,
+      struct _cef_client_t* client,
+      const struct _cef_browser_settings_t* settings);
+
+  ///
+  // Explicitly close the developer tools window if one exists for this browser
+  // instance.
+  ///
+  void (CEF_CALLBACK *close_dev_tools)(struct _cef_browser_host_t* self);
 
   ///
   // Set whether mouse cursor change is disabled.
@@ -391,7 +398,7 @@ typedef struct _cef_browser_host_t {
   // function is only used when window rendering is disabled.
   ///
   void (CEF_CALLBACK *invalidate)(struct _cef_browser_host_t* self,
-      const cef_rect_t* dirtyRect, enum cef_paint_element_type_t type);
+      const cef_rect_t* dirtyRect, cef_paint_element_type_t type);
 
   ///
   // Send a key event to the browser.
@@ -404,8 +411,8 @@ typedef struct _cef_browser_host_t {
   // relative to the upper-left corner of the view.
   ///
   void (CEF_CALLBACK *send_mouse_click_event)(struct _cef_browser_host_t* self,
-      const struct _cef_mouse_event_t* event,
-      enum cef_mouse_button_type_t type, int mouseUp, int clickCount);
+      const struct _cef_mouse_event_t* event, cef_mouse_button_type_t type,
+      int mouseUp, int clickCount);
 
   ///
   // Send a mouse move event to the browser. The |x| and |y| coordinates are

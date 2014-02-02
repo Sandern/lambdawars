@@ -1,4 +1,4 @@
-// Copyright (c) 2013 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2014 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -49,7 +49,7 @@ extern "C" {
 // Retrieve the path associated with the specified |key|. Returns true (1) on
 // success. Can be called on any thread in the browser process.
 ///
-CEF_EXPORT int cef_get_path(enum cef_path_key_t key, cef_string_t* path);
+CEF_EXPORT int cef_get_path(cef_path_key_t key, cef_string_t* path);
 
 #ifdef __cplusplus
 }

@@ -195,7 +195,8 @@ bool CCefSystem::Init()
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
 	// Initialize CEF.
-	CefInitialize( main_args, settings, g_pClientApp.get() );
+	void* sandbox_info = NULL;
+	CefInitialize( main_args, settings, g_pClientApp.get(), sandbox_info );
 
 	DevMsg("Initialized CEF\n");
 

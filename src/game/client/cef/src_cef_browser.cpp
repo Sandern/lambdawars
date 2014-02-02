@@ -413,9 +413,10 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 	// Always allow sub frames to navigate to anything
 	if( frame->IsMain() )
 	{
-		// Always allow the dev tools url
-		std::string devtools_url = GetBrowser()->GetHost()->GetDevToolsURL( true );
-		if( request->GetURL() != devtools_url  )
+		// Always allow dev tools urls
+		std::string url = request->GetURL().ToString();
+		std::string chromedevtoolspro( "chrome-devtools://");
+		if( url.compare( 0, chromedevtoolspro.size(), chromedevtoolspro ) != 0 )
 		{
 			if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
 			{
@@ -426,8 +427,8 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 			else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
 			{
 				// This mode only allows navigating to urls starting with the file protocol
-				std::string url = request->GetURL().ToString();
 				std::string filepro( "file://");
+
 				if( url.compare( 0, filepro.size(), filepro ) )
 					bDenyNavigation = true;
 			}
@@ -1259,17 +1260,12 @@ void SrcCefBrowser::Ping()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::ShowDevTools( ) 
 {
-	std::string devtools_url = GetBrowser()->GetHost()->GetDevToolsURL(true);
-	if( !devtools_url.empty() ) 
-	{
-		// Open DevTools in a browser (only works in Chrome)
-		//OpenURL( devtools_url.c_str() );
-		// Open new Window
-		GetBrowser()->GetMainFrame()->ExecuteJavaScript(
-			"window.open('" +  devtools_url + "');", "about:blank", 0);
-	}
-	else
-	{
-		Warning("SrcCefBrowser::ShowDevTools failed: No remote debugging port specified?\n");
-	}
+	CefWindowInfo windowInfo;
+	CefBrowserSettings settings;
+
+#if defined(WIN32)
+	windowInfo.SetAsPopup( GetBrowser()->GetHost()->GetWindowHandle(), "Lambda Wars Chromium DevTools" );
+#endif
+
+	GetBrowser()->GetHost()->ShowDevTools(windowInfo, m_CefClientHandler, settings);
 }

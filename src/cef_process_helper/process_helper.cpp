@@ -23,5 +23,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	CefRefPtr<CefApp> app(new ClientApp);
 
 	// Execute the secondary process.
-	return CefExecuteProcess(main_args, app);
+	void* sandbox_info = NULL;
+	return CefExecuteProcess(main_args, app, sandbox_info);
 }
