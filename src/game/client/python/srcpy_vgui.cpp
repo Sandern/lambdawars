@@ -249,9 +249,6 @@ PyObject *GetPyPanel( const Panel *pPanel )
 	TEST_PANEL( RichText, pPanel );
 	TEST_PANEL( CBaseMinimap, pPanel );
 	TEST_PANEL( VideoGeneralPanel, pPanel );
-	TEST_PANEL( CPotteryWheelPanel, pPanel );
-	TEST_PANEL( CMDLPanel, pPanel );
-	TEST_PANEL( CBaseModelPanel, pPanel );
 
 	return NULL;
 }
