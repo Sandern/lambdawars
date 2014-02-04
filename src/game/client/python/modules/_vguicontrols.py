@@ -181,6 +181,7 @@ class VGUIControls(ClientModuleGenerator):
 
             # Include everything by default
             cls.include()
+            cls.no_init = False
             
             # Be selective about we need to override
             cls.mem_funs().virtuality = 'not virtual' 
@@ -604,9 +605,19 @@ class VGUIControls(ClientModuleGenerator):
             cls.include()
         
     def ParseEditablePanel(self, mb):
-        self.IncludeEmptyClass(mb, 'EditablePanel')
-        mb.mem_funs('LoadControlSettings').include()
-        mb.mem_funs('ActivateBuildMode').include()
+        focusnavgroup = mb.class_('FocusNavGroup')
+        buildgroup = mb.class_('BuildGroup')
+        excludetypes = [
+            pointer_t(const_t(declarated_t(focusnavgroup))),
+            pointer_t(declarated_t(focusnavgroup)),
+            reference_t(declarated_t(focusnavgroup)),
+            pointer_t(const_t(declarated_t(buildgroup))),
+            pointer_t(declarated_t(buildgroup)),
+            reference_t(declarated_t(buildgroup)),
+        ]
+        mb.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
+        
+        mb.mem_funs( 'GetDialogVariables' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
     def ParseFrame(self, mb):
         # List of overridables

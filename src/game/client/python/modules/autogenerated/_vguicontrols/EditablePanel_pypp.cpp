@@ -45,6 +45,159 @@ struct EditablePanel_wrapper : PyPanel, vgui::EditablePanel, bp::wrapper< vgui::
     	g_PythonPanelCount++;
     }
 
+    void ApplyUserConfigSettings( ::KeyValues * userConfig ){
+        vgui::EditablePanel::ApplyUserConfigSettings( userConfig );
+    }
+
+    void GetUserConfigSettings( ::KeyValues * userConfig ){
+        vgui::EditablePanel::GetUserConfigSettings( userConfig );
+    }
+
+    virtual void OnChildAdded( ::vgui::VPANEL child ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnChildAdded )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnChildAdded )
+        bp::override func_OnChildAdded = this->get_override( "OnChildAdded" );
+        if( func_OnChildAdded.ptr() != Py_None )
+            try {
+                func_OnChildAdded( child );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnChildAdded( child );
+            }
+        else
+            this->vgui::EditablePanel::OnChildAdded( child );
+    }
+    
+    virtual void default_OnChildAdded( ::vgui::VPANEL child ){
+        vgui::EditablePanel::OnChildAdded( child );
+    }
+
+    virtual void OnClose(  ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnClose )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnClose )
+        bp::override func_OnClose = this->get_override( "OnClose" );
+        if( func_OnClose.ptr() != Py_None )
+            try {
+                func_OnClose(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnClose(  );
+            }
+        else
+            this->vgui::EditablePanel::OnClose(  );
+    }
+    
+    virtual void default_OnClose(  ){
+        vgui::EditablePanel::OnClose( );
+    }
+
+    void OnCurrentDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnCurrentDefaultButtonSet( button );
+    }
+
+    void OnDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnDefaultButtonSet( button );
+    }
+
+    void OnFindDefaultButton(  ){
+        vgui::EditablePanel::OnFindDefaultButton(  );
+    }
+
+    virtual void OnKeyCodeTyped( ::vgui::KeyCode code ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnKeyCodeTyped )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnKeyCodeTyped )
+        bp::override func_OnKeyCodeTyped = this->get_override( "OnKeyCodeTyped" );
+        if( func_OnKeyCodeTyped.ptr() != Py_None )
+            try {
+                func_OnKeyCodeTyped( code );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnKeyCodeTyped( code );
+            }
+        else
+            this->vgui::EditablePanel::OnKeyCodeTyped( code );
+    }
+    
+    void default_OnKeyCodeTyped( ::vgui::KeyCode code ) {
+        vgui::EditablePanel::OnKeyCodeTyped( code );
+    }
+
+    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnRequestFocus )
+        bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
+        if( func_OnRequestFocus.ptr() != Py_None )
+            try {
+                func_OnRequestFocus( subFocus, defaultPanel );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
+            }
+        else
+            this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
+    }
+    
+    void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
+    }
+
+    virtual void OnSetFocus(  ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSetFocus )
+        bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
+        if( func_OnSetFocus.ptr() != Py_None )
+            try {
+                func_OnSetFocus(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnSetFocus(  );
+            }
+        else
+            this->vgui::EditablePanel::OnSetFocus(  );
+    }
+    
+    void default_OnSetFocus(  ) {
+        vgui::EditablePanel::OnSetFocus( );
+    }
+
+    virtual void OnSizeChanged( int wide, int tall ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSizeChanged )
+        bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
+        if( func_OnSizeChanged.ptr() != Py_None )
+            try {
+                func_OnSizeChanged( wide, tall );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnSizeChanged( wide, tall );
+            }
+        else
+            this->vgui::EditablePanel::OnSizeChanged( wide, tall );
+    }
+    
+    virtual void default_OnSizeChanged( int wide, int tall ){
+        vgui::EditablePanel::OnSizeChanged( wide, tall );
+    }
+
+    virtual void PerformLayout(  ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, PerformLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, PerformLayout )
+        bp::override func_PerformLayout = this->get_override( "PerformLayout" );
+        if( func_PerformLayout.ptr() != Py_None )
+            try {
+                func_PerformLayout(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::PerformLayout(  );
+            }
+        else
+            this->vgui::EditablePanel::PerformLayout(  );
+    }
+    
+    void default_PerformLayout(  ) {
+        vgui::EditablePanel::PerformLayout( );
+    }
+
     void AddToOverridableColors( ::Color * pColor, char const * scriptname ){
         vgui::Panel::AddToOverridableColors( pColor, scriptname );
     }
@@ -961,9 +1114,8 @@ void register_EditablePanel_class(){
 
     { //::vgui::EditablePanel
         typedef bp::class_< EditablePanel_wrapper, bp::bases< vgui::Panel >, boost::noncopyable > EditablePanel_exposer_t;
-        EditablePanel_exposer_t EditablePanel_exposer = EditablePanel_exposer_t( "EditablePanel", bp::no_init );
+        EditablePanel_exposer_t EditablePanel_exposer = EditablePanel_exposer_t( "EditablePanel", bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("panelName") )) );
         bp::scope EditablePanel_scope( EditablePanel_exposer );
-        EditablePanel_exposer.def( bp::init< vgui::Panel *, char const * >(( bp::arg("parent"), bp::arg("panelName") )) );
         EditablePanel_exposer.def( bp::init< vgui::Panel *, char const *, vgui::HScheme >(( bp::arg("parent"), bp::arg("panelName"), bp::arg("hScheme") )) );
         { //::vgui::EditablePanel::ActivateBuildMode
         
@@ -972,6 +1124,103 @@ void register_EditablePanel_class(){
             EditablePanel_exposer.def( 
                 "ActivateBuildMode"
                 , ActivateBuildMode_function_type( &::vgui::EditablePanel::ActivateBuildMode ) );
+        
+        }
+        { //::vgui::EditablePanel::ApplySettings
+        
+            typedef void ( ::vgui::EditablePanel::*ApplySettings_function_type )( ::KeyValues * ) ;
+            
+            EditablePanel_exposer.def( 
+                "ApplySettings"
+                , ApplySettings_function_type( &::vgui::EditablePanel::ApplySettings )
+                , ( bp::arg("inResourceData") ) );
+        
+        }
+        { //::vgui::EditablePanel::ApplyUserConfigSettings
+        
+            typedef void ( EditablePanel_wrapper::*ApplyUserConfigSettings_function_type )( ::KeyValues * ) ;
+            
+            EditablePanel_exposer.def( 
+                "ApplyUserConfigSettings"
+                , ApplyUserConfigSettings_function_type( &EditablePanel_wrapper::ApplyUserConfigSettings )
+                , ( bp::arg("userConfig") ) );
+        
+        }
+        { //::vgui::EditablePanel::GetControlInt
+        
+            typedef int ( ::vgui::EditablePanel::*GetControlInt_function_type )( char const *,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetControlInt"
+                , GetControlInt_function_type( &::vgui::EditablePanel::GetControlInt )
+                , ( bp::arg("controlName"), bp::arg("defaultState") ) );
+        
+        }
+        { //::vgui::EditablePanel::GetControlString
+        
+            typedef char const * ( ::vgui::EditablePanel::*GetControlString_function_type )( char const *,char const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetControlString"
+                , GetControlString_function_type( &::vgui::EditablePanel::GetControlString )
+                , ( bp::arg("controlName"), bp::arg("defaultString")="" ) );
+        
+        }
+        { //::vgui::EditablePanel::GetControlString
+        
+            typedef void ( ::vgui::EditablePanel::*GetControlString_function_type )( char const *,char *,int,char const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetControlString"
+                , GetControlString_function_type( &::vgui::EditablePanel::GetControlString )
+                , ( bp::arg("controlName"), bp::arg("buf"), bp::arg("bufSize"), bp::arg("defaultString")="" ) );
+        
+        }
+        { //::vgui::EditablePanel::GetCurrentKeyFocus
+        
+            typedef ::vgui::VPANEL ( ::vgui::EditablePanel::*GetCurrentKeyFocus_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetCurrentKeyFocus"
+                , GetCurrentKeyFocus_function_type( &::vgui::EditablePanel::GetCurrentKeyFocus ) );
+        
+        }
+        { //::vgui::EditablePanel::GetDialogVariables
+        
+            typedef ::KeyValues * ( ::vgui::EditablePanel::*GetDialogVariables_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetDialogVariables"
+                , GetDialogVariables_function_type( &::vgui::EditablePanel::GetDialogVariables )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::vgui::EditablePanel::GetPanelBaseClassName
+        
+            typedef char const * ( *GetPanelBaseClassName_function_type )(  );
+            
+            EditablePanel_exposer.def( 
+                "GetPanelBaseClassName"
+                , GetPanelBaseClassName_function_type( &::vgui::EditablePanel::GetPanelBaseClassName ) );
+        
+        }
+        { //::vgui::EditablePanel::GetPanelClassName
+        
+            typedef char const * ( *GetPanelClassName_function_type )(  );
+            
+            EditablePanel_exposer.def( 
+                "GetPanelClassName"
+                , GetPanelClassName_function_type( &::vgui::EditablePanel::GetPanelClassName ) );
+        
+        }
+        { //::vgui::EditablePanel::GetUserConfigSettings
+        
+            typedef void ( EditablePanel_wrapper::*GetUserConfigSettings_function_type )( ::KeyValues * ) ;
+            
+            EditablePanel_exposer.def( 
+                "GetUserConfigSettings"
+                , GetUserConfigSettings_function_type( &EditablePanel_wrapper::GetUserConfigSettings )
+                , ( bp::arg("userConfig") ) );
         
         }
         { //::vgui::EditablePanel::LoadControlSettings
@@ -984,6 +1233,189 @@ void register_EditablePanel_class(){
                 , ( bp::arg("dialogResourceName"), bp::arg("pathID")=bp::object(), bp::arg("pPreloadedKeyValues")=bp::object(), bp::arg("pConditions")=bp::object() ) );
         
         }
+        { //::vgui::EditablePanel::LoadControlSettingsAndUserConfig
+        
+            typedef void ( ::vgui::EditablePanel::*LoadControlSettingsAndUserConfig_function_type )( char const *,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "LoadControlSettingsAndUserConfig"
+                , LoadControlSettingsAndUserConfig_function_type( &::vgui::EditablePanel::LoadControlSettingsAndUserConfig )
+                , ( bp::arg("dialogResourceName"), bp::arg("dialogID")=(int)(0) ) );
+        
+        }
+        { //::vgui::EditablePanel::LoadUserConfig
+        
+            typedef void ( ::vgui::EditablePanel::*LoadUserConfig_function_type )( char const *,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "LoadUserConfig"
+                , LoadUserConfig_function_type( &::vgui::EditablePanel::LoadUserConfig )
+                , ( bp::arg("configName"), bp::arg("dialogID")=(int)(0) ) );
+        
+        }
+        { //::vgui::EditablePanel::OnChildAdded
+        
+            typedef void ( EditablePanel_wrapper::*OnChildAdded_function_type )( ::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnChildAdded"
+                , OnChildAdded_function_type( &EditablePanel_wrapper::default_OnChildAdded )
+                , ( bp::arg("child") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnClose
+        
+            typedef void ( EditablePanel_wrapper::*OnClose_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnClose"
+                , OnClose_function_type( &EditablePanel_wrapper::default_OnClose ) );
+        
+        }
+        { //::vgui::EditablePanel::OnCurrentDefaultButtonSet
+        
+            typedef void ( EditablePanel_wrapper::*OnCurrentDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnCurrentDefaultButtonSet"
+                , OnCurrentDefaultButtonSet_function_type( &EditablePanel_wrapper::OnCurrentDefaultButtonSet )
+                , ( bp::arg("button") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnDefaultButtonSet
+        
+            typedef void ( EditablePanel_wrapper::*OnDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnDefaultButtonSet"
+                , OnDefaultButtonSet_function_type( &EditablePanel_wrapper::OnDefaultButtonSet )
+                , ( bp::arg("button") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnFindDefaultButton
+        
+            typedef void ( EditablePanel_wrapper::*OnFindDefaultButton_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnFindDefaultButton"
+                , OnFindDefaultButton_function_type( &EditablePanel_wrapper::OnFindDefaultButton ) );
+        
+        }
+        { //::vgui::EditablePanel::OnKeyCodeTyped
+        
+            typedef void ( ::vgui::EditablePanel::*OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( EditablePanel_wrapper::*default_OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnKeyCodeTyped"
+                , OnKeyCodeTyped_function_type(&::vgui::EditablePanel::OnKeyCodeTyped)
+                , default_OnKeyCodeTyped_function_type(&EditablePanel_wrapper::default_OnKeyCodeTyped)
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnRequestFocus
+        
+            typedef void ( ::vgui::EditablePanel::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            typedef void ( EditablePanel_wrapper::*default_OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnRequestFocus"
+                , OnRequestFocus_function_type(&::vgui::EditablePanel::OnRequestFocus)
+                , default_OnRequestFocus_function_type(&EditablePanel_wrapper::default_OnRequestFocus)
+                , ( bp::arg("subFocus"), bp::arg("defaultPanel") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnSetFocus
+        
+            typedef void ( ::vgui::EditablePanel::*OnSetFocus_function_type )(  ) ;
+            typedef void ( EditablePanel_wrapper::*default_OnSetFocus_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnSetFocus"
+                , OnSetFocus_function_type(&::vgui::EditablePanel::OnSetFocus)
+                , default_OnSetFocus_function_type(&EditablePanel_wrapper::default_OnSetFocus) );
+        
+        }
+        { //::vgui::EditablePanel::OnSizeChanged
+        
+            typedef void ( EditablePanel_wrapper::*OnSizeChanged_function_type )( int,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "OnSizeChanged"
+                , OnSizeChanged_function_type( &EditablePanel_wrapper::default_OnSizeChanged )
+                , ( bp::arg("wide"), bp::arg("tall") ) );
+        
+        }
+        { //::vgui::EditablePanel::PerformLayout
+        
+            typedef void ( ::vgui::EditablePanel::*PerformLayout_function_type )(  ) ;
+            typedef void ( EditablePanel_wrapper::*default_PerformLayout_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "PerformLayout"
+                , PerformLayout_function_type(&::vgui::EditablePanel::PerformLayout)
+                , default_PerformLayout_function_type(&EditablePanel_wrapper::default_PerformLayout) );
+        
+        }
+        { //::vgui::EditablePanel::RegisterControlSettingsFile
+        
+            typedef void ( ::vgui::EditablePanel::*RegisterControlSettingsFile_function_type )( char const *,char const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "RegisterControlSettingsFile"
+                , RegisterControlSettingsFile_function_type( &::vgui::EditablePanel::RegisterControlSettingsFile )
+                , ( bp::arg("dialogResourceName"), bp::arg("pathID")=bp::object() ) );
+        
+        }
+        { //::vgui::EditablePanel::RequestFocus
+        
+            typedef void ( ::vgui::EditablePanel::*RequestFocus_function_type )( int ) ;
+            
+            EditablePanel_exposer.def( 
+                "RequestFocus"
+                , RequestFocus_function_type( &::vgui::EditablePanel::RequestFocus )
+                , ( bp::arg("direction")=(int)(0) ) );
+        
+        }
+        { //::vgui::EditablePanel::RequestFocusNext
+        
+            typedef bool ( ::vgui::EditablePanel::*RequestFocusNext_function_type )( ::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "RequestFocusNext"
+                , RequestFocusNext_function_type( &::vgui::EditablePanel::RequestFocusNext )
+                , ( bp::arg("panel") ) );
+        
+        }
+        { //::vgui::EditablePanel::RequestFocusPrev
+        
+            typedef bool ( ::vgui::EditablePanel::*RequestFocusPrev_function_type )( ::vgui::VPANEL ) ;
+            
+            EditablePanel_exposer.def( 
+                "RequestFocusPrev"
+                , RequestFocusPrev_function_type( &::vgui::EditablePanel::RequestFocusPrev )
+                , ( bp::arg("panel") ) );
+        
+        }
+        { //::vgui::EditablePanel::RequestInfo
+        
+            typedef bool ( ::vgui::EditablePanel::*RequestInfo_function_type )( ::KeyValues * ) ;
+            
+            EditablePanel_exposer.def( 
+                "RequestInfo"
+                , RequestInfo_function_type( &::vgui::EditablePanel::RequestInfo )
+                , ( bp::arg("data") ) );
+        
+        }
+        { //::vgui::EditablePanel::SaveUserConfig
+        
+            typedef void ( ::vgui::EditablePanel::*SaveUserConfig_function_type )(  ) ;
+            
+            EditablePanel_exposer.def( 
+                "SaveUserConfig"
+                , SaveUserConfig_function_type( &::vgui::EditablePanel::SaveUserConfig ) );
+        
+        }
         { //::vgui::EditablePanel::SetControlEnabled
         
             typedef void ( ::vgui::EditablePanel::*SetControlEnabled_function_type )( char const *,bool ) ;
@@ -992,6 +1424,86 @@ void register_EditablePanel_class(){
                 "SetControlEnabled"
                 , SetControlEnabled_function_type( &::vgui::EditablePanel::SetControlEnabled )
                 , ( bp::arg("controlName"), bp::arg("enabled") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetControlInt
+        
+            typedef void ( ::vgui::EditablePanel::*SetControlInt_function_type )( char const *,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetControlInt"
+                , SetControlInt_function_type( &::vgui::EditablePanel::SetControlInt )
+                , ( bp::arg("controlName"), bp::arg("state") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetControlString
+        
+            typedef void ( ::vgui::EditablePanel::*SetControlString_function_type )( char const *,char const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetControlString"
+                , SetControlString_function_type( &::vgui::EditablePanel::SetControlString )
+                , ( bp::arg("controlName"), bp::arg("string") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetControlString
+        
+            typedef void ( ::vgui::EditablePanel::*SetControlString_function_type )( char const *,wchar_t const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetControlString"
+                , SetControlString_function_type( &::vgui::EditablePanel::SetControlString )
+                , ( bp::arg("controlName"), bp::arg("string") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetControlVisible
+        
+            typedef void ( ::vgui::EditablePanel::*SetControlVisible_function_type )( char const *,bool ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetControlVisible"
+                , SetControlVisible_function_type( &::vgui::EditablePanel::SetControlVisible )
+                , ( bp::arg("controlName"), bp::arg("visible") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetDialogVariable
+        
+            typedef void ( ::vgui::EditablePanel::*SetDialogVariable_function_type )( char const *,char const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetDialogVariable"
+                , SetDialogVariable_function_type( &::vgui::EditablePanel::SetDialogVariable )
+                , ( bp::arg("varName"), bp::arg("value") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetDialogVariable
+        
+            typedef void ( ::vgui::EditablePanel::*SetDialogVariable_function_type )( char const *,wchar_t const * ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetDialogVariable"
+                , SetDialogVariable_function_type( &::vgui::EditablePanel::SetDialogVariable )
+                , ( bp::arg("varName"), bp::arg("value") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetDialogVariable
+        
+            typedef void ( ::vgui::EditablePanel::*SetDialogVariable_function_type )( char const *,int ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetDialogVariable"
+                , SetDialogVariable_function_type( &::vgui::EditablePanel::SetDialogVariable )
+                , ( bp::arg("varName"), bp::arg("value") ) );
+        
+        }
+        { //::vgui::EditablePanel::SetDialogVariable
+        
+            typedef void ( ::vgui::EditablePanel::*SetDialogVariable_function_type )( char const *,float ) ;
+            
+            EditablePanel_exposer.def( 
+                "SetDialogVariable"
+                , SetDialogVariable_function_type( &::vgui::EditablePanel::SetDialogVariable )
+                , ( bp::arg("varName"), bp::arg("value") ) );
         
         }
         { //::vgui::Panel::AddToOverridableColors
@@ -1650,6 +2162,8 @@ void register_EditablePanel_class(){
                 , ( bp::arg("state") ) );
         
         }
+        EditablePanel_exposer.staticmethod( "GetPanelBaseClassName" );
+        EditablePanel_exposer.staticmethod( "GetPanelClassName" );
         { //::vgui::EditablePanel::Paint
 
         typedef void ( ::vgui::Panel::*Paint_function_type )(  ) ;

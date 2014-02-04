@@ -777,6 +777,10 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
         vgui::Panel::OnContinueDragging(  );
     }
 
+    void OnCurrentDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnCurrentDefaultButtonSet( button );
+    }
+
     virtual void OnCursorEntered(  ) {
         PY_OVERRIDE_CHECK( vgui::Panel, OnCursorEntered )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnCursorEntered )
@@ -832,6 +836,14 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
     
     void default_OnCursorMoved( int x, int y ) {
         vgui::Panel::OnCursorMoved( x, y );
+    }
+
+    void OnDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnDefaultButtonSet( button );
+    }
+
+    void OnFindDefaultButton(  ){
+        vgui::EditablePanel::OnFindDefaultButton(  );
     }
 
     void OnFinishDragging( bool mousereleased, ::vgui::MouseCode code, bool aborted=false ){
@@ -990,61 +1002,61 @@ struct Frame_wrapper : PyPanel, vgui::Frame, bp::wrapper< vgui::Frame > {
         vgui::Panel::OnMouseWheeled( delta );
     }
 
-    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
-        PY_OVERRIDE_CHECK( vgui::Panel, OnRequestFocus )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnRequestFocus )
+    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnRequestFocus )
         bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
         if( func_OnRequestFocus.ptr() != Py_None )
             try {
                 func_OnRequestFocus( subFocus, defaultPanel );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+                this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
             }
         else
-            this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+            this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
     }
     
-    virtual void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
-        vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
     }
 
     virtual void OnSetFocus(  ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnSetFocus )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSetFocus )
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSetFocus )
         bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
         if( func_OnSetFocus.ptr() != Py_None )
             try {
                 func_OnSetFocus(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnSetFocus(  );
+                this->vgui::EditablePanel::OnSetFocus(  );
             }
         else
-            this->vgui::Panel::OnSetFocus(  );
+            this->vgui::EditablePanel::OnSetFocus(  );
     }
     
     void default_OnSetFocus(  ) {
-        vgui::Panel::OnSetFocus( );
+        vgui::EditablePanel::OnSetFocus( );
     }
 
-    virtual void OnSizeChanged( int newWide, int newTall ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnSizeChanged )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSizeChanged )
+    virtual void OnSizeChanged( int wide, int tall ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSizeChanged )
         bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
         if( func_OnSizeChanged.ptr() != Py_None )
             try {
-                func_OnSizeChanged( newWide, newTall );
+                func_OnSizeChanged( wide, tall );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnSizeChanged( newWide, newTall );
+                this->vgui::EditablePanel::OnSizeChanged( wide, tall );
             }
         else
-            this->vgui::Panel::OnSizeChanged( newWide, newTall );
+            this->vgui::EditablePanel::OnSizeChanged( wide, tall );
     }
     
-    void default_OnSizeChanged( int newWide, int newTall ) {
-        vgui::Panel::OnSizeChanged( newWide, newTall );
+    virtual void default_OnSizeChanged( int wide, int tall ){
+        vgui::EditablePanel::OnSizeChanged( wide, tall );
     }
 
     void OnStartDragging(  ){
@@ -2333,6 +2345,16 @@ void register_Frame_class(){
                 , OnContinueDragging_function_type( &Frame_wrapper::OnContinueDragging ) );
         
         }
+        { //::vgui::EditablePanel::OnCurrentDefaultButtonSet
+        
+            typedef void ( Frame_wrapper::*OnCurrentDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            Frame_exposer.def( 
+                "OnCurrentDefaultButtonSet"
+                , OnCurrentDefaultButtonSet_function_type( &Frame_wrapper::OnCurrentDefaultButtonSet )
+                , ( bp::arg("button") ) );
+        
+        }
         { //::vgui::Panel::OnCursorEntered
         
             typedef void ( ::vgui::Panel::*OnCursorEntered_function_type )(  ) ;
@@ -2365,6 +2387,25 @@ void register_Frame_class(){
                 , OnCursorMoved_function_type(&::vgui::Panel::OnCursorMoved)
                 , default_OnCursorMoved_function_type(&Frame_wrapper::default_OnCursorMoved)
                 , ( bp::arg("x"), bp::arg("y") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnDefaultButtonSet
+        
+            typedef void ( Frame_wrapper::*OnDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            Frame_exposer.def( 
+                "OnDefaultButtonSet"
+                , OnDefaultButtonSet_function_type( &Frame_wrapper::OnDefaultButtonSet )
+                , ( bp::arg("button") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnFindDefaultButton
+        
+            typedef void ( Frame_wrapper::*OnFindDefaultButton_function_type )(  ) ;
+            
+            Frame_exposer.def( 
+                "OnFindDefaultButton"
+                , OnFindDefaultButton_function_type( &Frame_wrapper::OnFindDefaultButton ) );
         
         }
         { //::vgui::Panel::OnFinishDragging
@@ -2470,37 +2511,37 @@ void register_Frame_class(){
                 , ( bp::arg("delta") ) );
         
         }
-        { //::vgui::Panel::OnRequestFocus
+        { //::vgui::EditablePanel::OnRequestFocus
         
-            typedef void ( Frame_wrapper::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            typedef void ( ::vgui::EditablePanel::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            typedef void ( Frame_wrapper::*default_OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
             
             Frame_exposer.def( 
                 "OnRequestFocus"
-                , OnRequestFocus_function_type( &Frame_wrapper::default_OnRequestFocus )
+                , OnRequestFocus_function_type(&::vgui::EditablePanel::OnRequestFocus)
+                , default_OnRequestFocus_function_type(&Frame_wrapper::default_OnRequestFocus)
                 , ( bp::arg("subFocus"), bp::arg("defaultPanel") ) );
         
         }
-        { //::vgui::Panel::OnSetFocus
+        { //::vgui::EditablePanel::OnSetFocus
         
-            typedef void ( ::vgui::Panel::*OnSetFocus_function_type )(  ) ;
+            typedef void ( ::vgui::EditablePanel::*OnSetFocus_function_type )(  ) ;
             typedef void ( Frame_wrapper::*default_OnSetFocus_function_type )(  ) ;
             
             Frame_exposer.def( 
                 "OnSetFocus"
-                , OnSetFocus_function_type(&::vgui::Panel::OnSetFocus)
+                , OnSetFocus_function_type(&::vgui::EditablePanel::OnSetFocus)
                 , default_OnSetFocus_function_type(&Frame_wrapper::default_OnSetFocus) );
         
         }
-        { //::vgui::Panel::OnSizeChanged
+        { //::vgui::EditablePanel::OnSizeChanged
         
-            typedef void ( ::vgui::Panel::*OnSizeChanged_function_type )( int,int ) ;
-            typedef void ( Frame_wrapper::*default_OnSizeChanged_function_type )( int,int ) ;
+            typedef void ( Frame_wrapper::*OnSizeChanged_function_type )( int,int ) ;
             
             Frame_exposer.def( 
                 "OnSizeChanged"
-                , OnSizeChanged_function_type(&::vgui::Panel::OnSizeChanged)
-                , default_OnSizeChanged_function_type(&Frame_wrapper::default_OnSizeChanged)
-                , ( bp::arg("newWide"), bp::arg("newTall") ) );
+                , OnSizeChanged_function_type( &Frame_wrapper::default_OnSizeChanged )
+                , ( bp::arg("wide"), bp::arg("tall") ) );
         
         }
         { //::vgui::Panel::OnStartDragging

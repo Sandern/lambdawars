@@ -84,6 +84,10 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         vgui::Panel::ApplySchemeSettings( pScheme );
     }
 
+    void ApplyUserConfigSettings( ::KeyValues * userConfig ){
+        vgui::EditablePanel::ApplyUserConfigSettings( userConfig );
+    }
+
     void CreateDragData(  ){
         vgui::Panel::CreateDragData(  );
     }
@@ -108,27 +112,50 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         return vgui::Panel::GetNavUpPanel(  );
     }
 
+    void GetUserConfigSettings( ::KeyValues * userConfig ){
+        vgui::EditablePanel::GetUserConfigSettings( userConfig );
+    }
+
     void InternalInitDefaultValues( ::PanelAnimationMap * map ){
         vgui::Panel::InternalInitDefaultValues( map );
     }
 
-    virtual void OnChildAdded( ::vgui::VPANEL child ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnChildAdded )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnChildAdded )
+    virtual void OnChildAdded( ::vgui::VPANEL child ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnChildAdded )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnChildAdded )
         bp::override func_OnChildAdded = this->get_override( "OnChildAdded" );
         if( func_OnChildAdded.ptr() != Py_None )
             try {
                 func_OnChildAdded( child );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnChildAdded( child );
+                this->vgui::EditablePanel::OnChildAdded( child );
             }
         else
-            this->vgui::Panel::OnChildAdded( child );
+            this->vgui::EditablePanel::OnChildAdded( child );
     }
     
-    void default_OnChildAdded( ::vgui::VPANEL child ) {
-        vgui::Panel::OnChildAdded( child );
+    virtual void default_OnChildAdded( ::vgui::VPANEL child ){
+        vgui::EditablePanel::OnChildAdded( child );
+    }
+
+    virtual void OnClose(  ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnClose )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnClose )
+        bp::override func_OnClose = this->get_override( "OnClose" );
+        if( func_OnClose.ptr() != Py_None )
+            try {
+                func_OnClose(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::EditablePanel::OnClose(  );
+            }
+        else
+            this->vgui::EditablePanel::OnClose(  );
+    }
+    
+    virtual void default_OnClose(  ){
+        vgui::EditablePanel::OnClose( );
     }
 
     virtual void OnCommand( char const * command ) {
@@ -152,6 +179,10 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
 
     void OnContinueDragging(  ){
         vgui::Panel::OnContinueDragging(  );
+    }
+
+    void OnCurrentDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnCurrentDefaultButtonSet( button );
     }
 
     virtual void OnCursorEntered(  ) {
@@ -211,6 +242,14 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         vgui::Panel::OnCursorMoved( x, y );
     }
 
+    void OnDefaultButtonSet( ::vgui::VPANEL button ){
+        vgui::EditablePanel::OnDefaultButtonSet( button );
+    }
+
+    void OnFindDefaultButton(  ){
+        vgui::EditablePanel::OnFindDefaultButton(  );
+    }
+
     void OnFinishDragging( bool mousereleased, ::vgui::MouseCode code, bool aborted=false ){
         vgui::Panel::OnFinishDragging( mousereleased, code, aborted );
     }
@@ -254,22 +293,22 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     virtual void OnKeyCodeTyped( ::vgui::KeyCode code ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnKeyCodeTyped )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnKeyCodeTyped )
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnKeyCodeTyped )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnKeyCodeTyped )
         bp::override func_OnKeyCodeTyped = this->get_override( "OnKeyCodeTyped" );
         if( func_OnKeyCodeTyped.ptr() != Py_None )
             try {
                 func_OnKeyCodeTyped( code );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnKeyCodeTyped( code );
+                this->vgui::EditablePanel::OnKeyCodeTyped( code );
             }
         else
-            this->vgui::Panel::OnKeyCodeTyped( code );
+            this->vgui::EditablePanel::OnKeyCodeTyped( code );
     }
     
     void default_OnKeyCodeTyped( ::vgui::KeyCode code ) {
-        vgui::Panel::OnKeyCodeTyped( code );
+        vgui::EditablePanel::OnKeyCodeTyped( code );
     }
 
     virtual void OnKeyFocusTicked(  ) {
@@ -443,23 +482,23 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
         vgui::Panel::OnMouseWheeled( delta );
     }
 
-    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
-        PY_OVERRIDE_CHECK( vgui::Panel, OnRequestFocus )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnRequestFocus )
+    virtual void OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnRequestFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnRequestFocus )
         bp::override func_OnRequestFocus = this->get_override( "OnRequestFocus" );
         if( func_OnRequestFocus.ptr() != Py_None )
             try {
                 func_OnRequestFocus( subFocus, defaultPanel );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+                this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
             }
         else
-            this->vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+            this->vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
     }
     
-    virtual void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ){
-        vgui::Panel::OnRequestFocus( subFocus, defaultPanel );
+    void default_OnRequestFocus( ::vgui::VPANEL subFocus, ::vgui::VPANEL defaultPanel ) {
+        vgui::EditablePanel::OnRequestFocus( subFocus, defaultPanel );
     }
 
     virtual void OnScreenSizeChanged( int oldwide, int oldtall ){
@@ -482,41 +521,41 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     virtual void OnSetFocus(  ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnSetFocus )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSetFocus )
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSetFocus )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSetFocus )
         bp::override func_OnSetFocus = this->get_override( "OnSetFocus" );
         if( func_OnSetFocus.ptr() != Py_None )
             try {
                 func_OnSetFocus(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnSetFocus(  );
+                this->vgui::EditablePanel::OnSetFocus(  );
             }
         else
-            this->vgui::Panel::OnSetFocus(  );
+            this->vgui::EditablePanel::OnSetFocus(  );
     }
     
     void default_OnSetFocus(  ) {
-        vgui::Panel::OnSetFocus( );
+        vgui::EditablePanel::OnSetFocus( );
     }
 
-    virtual void OnSizeChanged( int newWide, int newTall ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, OnSizeChanged )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, OnSizeChanged )
+    virtual void OnSizeChanged( int wide, int tall ){
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, OnSizeChanged )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, OnSizeChanged )
         bp::override func_OnSizeChanged = this->get_override( "OnSizeChanged" );
         if( func_OnSizeChanged.ptr() != Py_None )
             try {
-                func_OnSizeChanged( newWide, newTall );
+                func_OnSizeChanged( wide, tall );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::OnSizeChanged( newWide, newTall );
+                this->vgui::EditablePanel::OnSizeChanged( wide, tall );
             }
         else
-            this->vgui::Panel::OnSizeChanged( newWide, newTall );
+            this->vgui::EditablePanel::OnSizeChanged( wide, tall );
     }
     
-    void default_OnSizeChanged( int newWide, int newTall ) {
-        vgui::Panel::OnSizeChanged( newWide, newTall );
+    virtual void default_OnSizeChanged( int wide, int tall ){
+        vgui::EditablePanel::OnSizeChanged( wide, tall );
     }
 
     void OnStartDragging(  ){
@@ -585,22 +624,22 @@ struct VideoGeneralPanel_wrapper : PyPanel, VideoGeneralPanel, bp::wrapper< Vide
     }
 
     virtual void PerformLayout(  ) {
-        PY_OVERRIDE_CHECK( vgui::Panel, PerformLayout )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, PerformLayout )
+        PY_OVERRIDE_CHECK( vgui::EditablePanel, PerformLayout )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::EditablePanel, PerformLayout )
         bp::override func_PerformLayout = this->get_override( "PerformLayout" );
         if( func_PerformLayout.ptr() != Py_None )
             try {
                 func_PerformLayout(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->vgui::Panel::PerformLayout(  );
+                this->vgui::EditablePanel::PerformLayout(  );
             }
         else
-            this->vgui::Panel::PerformLayout(  );
+            this->vgui::EditablePanel::PerformLayout(  );
     }
     
     void default_PerformLayout(  ) {
-        vgui::Panel::PerformLayout( );
+        vgui::EditablePanel::PerformLayout( );
     }
 
     virtual void PostChildPaint(  ) {
@@ -1189,6 +1228,16 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("pScheme") ) );
         
         }
+        { //::vgui::EditablePanel::ApplyUserConfigSettings
+        
+            typedef void ( VideoGeneralPanel_wrapper::*ApplyUserConfigSettings_function_type )( ::KeyValues * ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "ApplyUserConfigSettings"
+                , ApplyUserConfigSettings_function_type( &VideoGeneralPanel_wrapper::ApplyUserConfigSettings )
+                , ( bp::arg("userConfig") ) );
+        
+        }
         { //::vgui::Panel::CreateDragData
         
             typedef void ( VideoGeneralPanel_wrapper::*CreateDragData_function_type )(  ) ;
@@ -1247,6 +1296,16 @@ void register_VideoGeneralPanel_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::vgui::EditablePanel::GetUserConfigSettings
+        
+            typedef void ( VideoGeneralPanel_wrapper::*GetUserConfigSettings_function_type )( ::KeyValues * ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "GetUserConfigSettings"
+                , GetUserConfigSettings_function_type( &VideoGeneralPanel_wrapper::GetUserConfigSettings )
+                , ( bp::arg("userConfig") ) );
+        
+        }
         { //::vgui::Panel::InternalInitDefaultValues
         
             typedef void ( VideoGeneralPanel_wrapper::*InternalInitDefaultValues_function_type )( ::PanelAnimationMap * ) ;
@@ -1257,16 +1316,23 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("map") ) );
         
         }
-        { //::vgui::Panel::OnChildAdded
+        { //::vgui::EditablePanel::OnChildAdded
         
-            typedef void ( ::vgui::Panel::*OnChildAdded_function_type )( ::vgui::VPANEL ) ;
-            typedef void ( VideoGeneralPanel_wrapper::*default_OnChildAdded_function_type )( ::vgui::VPANEL ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*OnChildAdded_function_type )( ::vgui::VPANEL ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "OnChildAdded"
-                , OnChildAdded_function_type(&::vgui::Panel::OnChildAdded)
-                , default_OnChildAdded_function_type(&VideoGeneralPanel_wrapper::default_OnChildAdded)
+                , OnChildAdded_function_type( &VideoGeneralPanel_wrapper::default_OnChildAdded )
                 , ( bp::arg("child") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnClose
+        
+            typedef void ( VideoGeneralPanel_wrapper::*OnClose_function_type )(  ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnClose"
+                , OnClose_function_type( &VideoGeneralPanel_wrapper::default_OnClose ) );
         
         }
         { //::vgui::Panel::OnCommand
@@ -1288,6 +1354,16 @@ void register_VideoGeneralPanel_class(){
             VideoGeneralPanel_exposer.def( 
                 "OnContinueDragging"
                 , OnContinueDragging_function_type( &VideoGeneralPanel_wrapper::OnContinueDragging ) );
+        
+        }
+        { //::vgui::EditablePanel::OnCurrentDefaultButtonSet
+        
+            typedef void ( VideoGeneralPanel_wrapper::*OnCurrentDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnCurrentDefaultButtonSet"
+                , OnCurrentDefaultButtonSet_function_type( &VideoGeneralPanel_wrapper::OnCurrentDefaultButtonSet )
+                , ( bp::arg("button") ) );
         
         }
         { //::vgui::Panel::OnCursorEntered
@@ -1324,6 +1400,25 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("x"), bp::arg("y") ) );
         
         }
+        { //::vgui::EditablePanel::OnDefaultButtonSet
+        
+            typedef void ( VideoGeneralPanel_wrapper::*OnDefaultButtonSet_function_type )( ::vgui::VPANEL ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnDefaultButtonSet"
+                , OnDefaultButtonSet_function_type( &VideoGeneralPanel_wrapper::OnDefaultButtonSet )
+                , ( bp::arg("button") ) );
+        
+        }
+        { //::vgui::EditablePanel::OnFindDefaultButton
+        
+            typedef void ( VideoGeneralPanel_wrapper::*OnFindDefaultButton_function_type )(  ) ;
+            
+            VideoGeneralPanel_exposer.def( 
+                "OnFindDefaultButton"
+                , OnFindDefaultButton_function_type( &VideoGeneralPanel_wrapper::OnFindDefaultButton ) );
+        
+        }
         { //::vgui::Panel::OnFinishDragging
         
             typedef void ( VideoGeneralPanel_wrapper::*OnFinishDragging_function_type )( bool,::vgui::MouseCode,bool ) ;
@@ -1358,14 +1453,14 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("code") ) );
         
         }
-        { //::vgui::Panel::OnKeyCodeTyped
+        { //::vgui::EditablePanel::OnKeyCodeTyped
         
-            typedef void ( ::vgui::Panel::*OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
+            typedef void ( ::vgui::EditablePanel::*OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
             typedef void ( VideoGeneralPanel_wrapper::*default_OnKeyCodeTyped_function_type )( ::vgui::KeyCode ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "OnKeyCodeTyped"
-                , OnKeyCodeTyped_function_type(&::vgui::Panel::OnKeyCodeTyped)
+                , OnKeyCodeTyped_function_type(&::vgui::EditablePanel::OnKeyCodeTyped)
                 , default_OnKeyCodeTyped_function_type(&VideoGeneralPanel_wrapper::default_OnKeyCodeTyped)
                 , ( bp::arg("code") ) );
         
@@ -1474,13 +1569,15 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("delta") ) );
         
         }
-        { //::vgui::Panel::OnRequestFocus
+        { //::vgui::EditablePanel::OnRequestFocus
         
-            typedef void ( VideoGeneralPanel_wrapper::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            typedef void ( ::vgui::EditablePanel::*OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*default_OnRequestFocus_function_type )( ::vgui::VPANEL,::vgui::VPANEL ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "OnRequestFocus"
-                , OnRequestFocus_function_type( &VideoGeneralPanel_wrapper::default_OnRequestFocus )
+                , OnRequestFocus_function_type(&::vgui::EditablePanel::OnRequestFocus)
+                , default_OnRequestFocus_function_type(&VideoGeneralPanel_wrapper::default_OnRequestFocus)
                 , ( bp::arg("subFocus"), bp::arg("defaultPanel") ) );
         
         }
@@ -1494,27 +1591,25 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("oldwide"), bp::arg("oldtall") ) );
         
         }
-        { //::vgui::Panel::OnSetFocus
+        { //::vgui::EditablePanel::OnSetFocus
         
-            typedef void ( ::vgui::Panel::*OnSetFocus_function_type )(  ) ;
+            typedef void ( ::vgui::EditablePanel::*OnSetFocus_function_type )(  ) ;
             typedef void ( VideoGeneralPanel_wrapper::*default_OnSetFocus_function_type )(  ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "OnSetFocus"
-                , OnSetFocus_function_type(&::vgui::Panel::OnSetFocus)
+                , OnSetFocus_function_type(&::vgui::EditablePanel::OnSetFocus)
                 , default_OnSetFocus_function_type(&VideoGeneralPanel_wrapper::default_OnSetFocus) );
         
         }
-        { //::vgui::Panel::OnSizeChanged
+        { //::vgui::EditablePanel::OnSizeChanged
         
-            typedef void ( ::vgui::Panel::*OnSizeChanged_function_type )( int,int ) ;
-            typedef void ( VideoGeneralPanel_wrapper::*default_OnSizeChanged_function_type )( int,int ) ;
+            typedef void ( VideoGeneralPanel_wrapper::*OnSizeChanged_function_type )( int,int ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "OnSizeChanged"
-                , OnSizeChanged_function_type(&::vgui::Panel::OnSizeChanged)
-                , default_OnSizeChanged_function_type(&VideoGeneralPanel_wrapper::default_OnSizeChanged)
-                , ( bp::arg("newWide"), bp::arg("newTall") ) );
+                , OnSizeChanged_function_type( &VideoGeneralPanel_wrapper::default_OnSizeChanged )
+                , ( bp::arg("wide"), bp::arg("tall") ) );
         
         }
         { //::vgui::Panel::OnStartDragging
@@ -1569,14 +1664,14 @@ void register_VideoGeneralPanel_class(){
                 , ( bp::arg("Repaint"), bp::arg("allowForce")=(bool)(true) ) );
         
         }
-        { //::vgui::Panel::PerformLayout
+        { //::vgui::EditablePanel::PerformLayout
         
-            typedef void ( ::vgui::Panel::*PerformLayout_function_type )(  ) ;
+            typedef void ( ::vgui::EditablePanel::*PerformLayout_function_type )(  ) ;
             typedef void ( VideoGeneralPanel_wrapper::*default_PerformLayout_function_type )(  ) ;
             
             VideoGeneralPanel_exposer.def( 
                 "PerformLayout"
-                , PerformLayout_function_type(&::vgui::Panel::PerformLayout)
+                , PerformLayout_function_type(&::vgui::EditablePanel::PerformLayout)
                 , default_PerformLayout_function_type(&VideoGeneralPanel_wrapper::default_PerformLayout) );
         
         }
