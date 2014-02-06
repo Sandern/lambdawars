@@ -37,6 +37,21 @@ struct MouseTraceData_t
 #endif 
 	}
 
+	void Clear()
+	{
+		m_vStartPos = vec3_origin;
+		m_vEndPos = vec3_origin;
+		m_vNormal = vec3_origin;
+		m_nHitBox = 0;
+
+		m_vWorldOnlyEndPos = vec3_origin;
+		m_vWorldOnlyNormal = vec3_origin;
+
+#ifdef CLIENT_DLL
+		m_iX = m_iY = 0;
+#endif 
+	}
+
 	void SetEnt( CBaseEntity *pEnt ) 
 	{ 
 		m_hEnt = pEnt;

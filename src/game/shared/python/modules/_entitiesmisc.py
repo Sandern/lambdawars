@@ -319,24 +319,26 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             mb.free_function('GetCurrentSkyCamera').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # Mouse trace data (HL2Wars player)
-        mb.class_('MouseTraceData_t').include()
-        mb.class_('MouseTraceData_t').rename('MouseTraceData')
-        mb.class_('MouseTraceData_t').vars('m_vStartPos').rename('startpos')
-        mb.class_('MouseTraceData_t').vars('m_vEndPos').rename('endpos')
-        mb.class_('MouseTraceData_t').vars('m_vNormal').rename('normal')
-        mb.class_('MouseTraceData_t').vars('m_hEnt').exclude()
-        mb.class_('MouseTraceData_t').mem_funs().exclude()
-        mb.class_('MouseTraceData_t').mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.class_('MouseTraceData_t').vars('m_vWorldOnlyEndPos').rename('groundendpos')
-        mb.class_('MouseTraceData_t').vars('m_vWorldOnlyNormal').rename('groundnormal')    
+        cls = mb.class_('MouseTraceData_t')
+        cls.include()
+        cls.rename('MouseTraceData')
+        cls.vars('m_vStartPos').rename('startpos')
+        cls.vars('m_vEndPos').rename('endpos')
+        cls.vars('m_vNormal').rename('normal')
+        cls.vars('m_hEnt').exclude()
+        cls.mem_funs().exclude()
+        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_fun('Clear').include()
+        cls.vars('m_vWorldOnlyEndPos').rename('groundendpos')
+        cls.vars('m_vWorldOnlyNormal').rename('groundnormal')    
         
-        mb.class_('MouseTraceData_t').add_property( 'ent'
+        cls.add_property( 'ent'
                          , mb.class_('MouseTraceData_t').member_function( 'GetEnt' )
                          , mb.class_('MouseTraceData_t').member_function( 'SetEnt' ) )
                          
         if self.isclient:
-            mb.class_('MouseTraceData_t').vars('m_iX').rename('x')
-            mb.class_('MouseTraceData_t').vars('m_iY').rename('y')  
+            cls.vars('m_iX').rename('x')
+            cls.vars('m_iY').rename('y')  
             
         # CTakeDamageInfo
         cls = mb.class_('CTakeDamageInfo')

@@ -2286,6 +2286,15 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         typedef bp::class_< MouseTraceData_t > MouseTraceData_exposer_t;
         MouseTraceData_exposer_t MouseTraceData_exposer = MouseTraceData_exposer_t( "MouseTraceData", bp::init< >() );
         bp::scope MouseTraceData_scope( MouseTraceData_exposer );
+        { //::MouseTraceData_t::Clear
+        
+            typedef void ( ::MouseTraceData_t::*Clear_function_type )(  ) ;
+            
+            MouseTraceData_exposer.def( 
+                "Clear"
+                , Clear_function_type( &::MouseTraceData_t::Clear ) );
+        
+        }
         MouseTraceData_exposer.def_readwrite( "x", &MouseTraceData_t::m_iX );
         MouseTraceData_exposer.def_readwrite( "y", &MouseTraceData_t::m_iY );
         MouseTraceData_exposer.def_readwrite( "m_nHitBox", &MouseTraceData_t::m_nHitBox );
@@ -5294,6 +5303,15 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         typedef bp::class_< MouseTraceData_t > MouseTraceData_exposer_t;
         MouseTraceData_exposer_t MouseTraceData_exposer = MouseTraceData_exposer_t( "MouseTraceData", bp::init< >() );
         bp::scope MouseTraceData_scope( MouseTraceData_exposer );
+        { //::MouseTraceData_t::Clear
+        
+            typedef void ( ::MouseTraceData_t::*Clear_function_type )(  ) ;
+            
+            MouseTraceData_exposer.def( 
+                "Clear"
+                , Clear_function_type( &::MouseTraceData_t::Clear ) );
+        
+        }
         MouseTraceData_exposer.def_readwrite( "m_nHitBox", &MouseTraceData_t::m_nHitBox );
         MouseTraceData_exposer.def_readwrite( "endpos", &MouseTraceData_t::m_vEndPos );
         MouseTraceData_exposer.def_readwrite( "normal", &MouseTraceData_t::m_vNormal );
