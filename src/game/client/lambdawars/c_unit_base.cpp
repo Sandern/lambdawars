@@ -135,11 +135,8 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 	RecvPropFloat		( RECVINFO(m_vecViewOffset[2]) ),
 END_RECV_TABLE()
 
-#if 1
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_MinimalTable )
-	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 END_RECV_TABLE()
-#endif // 0
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
@@ -150,7 +147,6 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropInt		(RECVINFO( m_iMaxHealth )),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
 
-	RecvPropInt		(RECVINFO( m_fFlags )),
 	RecvPropInt		(RECVINFO( m_takedamage )),
 	RecvPropInt		(RECVINFO( m_lifeState )),
 
@@ -179,6 +175,7 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
 	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
+	RecvPropInt		(RECVINFO( m_fFlags )),
 
 	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),
@@ -275,6 +272,7 @@ void CUnitBase::OnDataChanged( DataUpdateType_t updateType )
 	if( m_hOldCommander != m_hCommander )
 	{
 		UpdateVisibility();
+		AddFlag( FL_ONGROUND ); // Should usually be on the ground after leaving control
 		m_hOldCommander = m_hCommander;
 	}
 
