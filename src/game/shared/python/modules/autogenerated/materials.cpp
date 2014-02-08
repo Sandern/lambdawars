@@ -99,6 +99,10 @@ BOOST_PYTHON_MODULE(materials){
     bp::class_< CGlowObjectManager, boost::noncopyable >( "CGlowObjectManager", bp::no_init )    
         .def( bp::init< >() )    
         .def( 
+            "HasGlowEffect"
+            , (bool ( ::CGlowObjectManager::* )( ::C_BaseEntity * ) const)( &::CGlowObjectManager::HasGlowEffect )
+            , ( bp::arg("pEntity") ) )    
+        .def( 
             "IsRenderingGlowEffects"
             , (bool ( ::CGlowObjectManager::* )(  ) )( &::CGlowObjectManager::IsRenderingGlowEffects ) )    
         .def( 
