@@ -52,7 +52,7 @@ unsigned int CNavArea::m_masterMarker = 1;
 CNavArea *CNavArea::m_openList = NULL;
 CNavArea *CNavArea::m_openListTail = NULL;
 
-CUtlSymbol CNavArea::m_LastCachedPathID("");
+CUtlSymbol CNavArea::m_LastCachedPathID( UTL_INVAL_SYMBOL );
 int CNavArea::m_iLastStartAreaID = -1;
 int CNavArea::m_iLastGoalAreaID = -1;
 int CNavArea::m_iLastClosestAreaID = -1;
@@ -1002,7 +1002,7 @@ void CNavArea::FinishMergeOnTheFly( CNavArea *adjArea )
 #endif // CLIENT_DLL
 	TheNavMesh->DestroyArea( adjArea );
 
-	CNavArea::SetCachedPath( CUtlSymbol(""), -1, -1, -1); 
+	CNavArea::ClearCachedPath(); 
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -3703,12 +3703,10 @@ void CNavArea::ClearSearchLists( void )
 	m_openList = NULL;
 	m_openListTail = NULL;
 
-	m_LastCachedPathID = "";
-	m_iLastStartAreaID = -1;
-	m_iLastGoalAreaID = -1;
-	m_iLastClosestAreaID = -1;
+	ClearCachedPath();
 }
 
+//--------------------------------------------------------------------------------------------------------------
 CNavArea *CNavArea::GetCachedClosestArea()
 {
 	 return TheNavMesh->GetNavAreaByID( m_iLastClosestAreaID );

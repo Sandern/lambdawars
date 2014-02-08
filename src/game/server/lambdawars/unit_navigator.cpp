@@ -1914,110 +1914,6 @@ bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
 bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::TestRoute", VPROF_BUDGETGROUP_UNITS );
-
-#if 0
-	Vector vDir, vDirCross, vPrevPos, vPos;
-	float fDist, fCur, fRadius, teststepsize;
-	CNavArea *pCur, *pTo;
-	
-	float flTestOffset = m_pOuter->m_fTestRouteStartHeight+GetOuter()->GetDefaultEyeOffset().z;
-
-	teststepsize = unit_testroute_stepsize.GetFloat();
-
-	fRadius = m_pOuter->CollisionProp()->BoundingRadius2D() * unit_testroute_bloatscale.GetFloat();
-	//fRadius = WorldAlignSize().x/2.0f;
-
-	vDir = vEndPos - vStartPos;
-	vDir.z = 0.0f;
-	fDist = VectorNormalize(vDir);
-	fCur = 16.0f;
-	vPos = vStartPos;
-	vPos.z += 16.0f;
-
-	vDirCross = vDir.Cross( Vector(0,0,1) );
-
-	UnitShortestPathCost costFunc( m_pOuter, true );
-
-	// Test initial position
-	pCur = TheNavMesh->GetNavArea(vPos, flTestOffset);
-	if( !pCur || pCur->IsBlocked() )	
-	{
-#ifdef DEBUG_TESTROUTE
-		NDebugOverlay::Cross3D(vPos, -Vector(32.0f, 32.0f, 32.0f), Vector(32.0f, 32.0f, 32.0f), 255, 0, 0, false, 0.5f);
-		NDebugOverlay::Text(vPos, "DEBUG_TESTROUTE: no nav area\n", false, 4.0f);
-#endif // DEBUG_TESTROUTE
-		return false;
-	}
-	if( !TheNavMesh->GetNavArea(vPos+vDirCross*fRadius, flTestOffset) || !TheNavMesh->GetNavArea(vPos-vDirCross*fRadius, flTestOffset) )
-	{
-#ifdef DEBUG_TESTROUTE
-		NDebugOverlay::Text(vPos, "DEBUG_TESTROUTE: no enough room\n", false, 4.0f);
-#endif // DEBUG_TESTROUTE
-		return false;
-	}
-	
-	// Now keep testing in steps of 16 units in the direction of the next waypoint.
-	vPos.z = pCur->GetZ(vPos);
-	vPrevPos = vPos;
-
-	vPos += vDir * teststepsize;
-	vPos.z += 16.0f;
-	while( fCur < fDist )
-	{
-		pTo = TheNavMesh->GetNavArea(vPos, TEST_BENEATH_LIMIT);
-
-		if( !pTo || pTo->IsBlocked() ) {
-#ifdef DEBUG_TESTROUTE
-			NDebugOverlay::Cross3D(vPos, -Vector(32.0f, 32.0f, 32.0f), Vector(32.0f, 32.0f, 32.0f), 255, 0, 0, false, 0.5f);
-			NDebugOverlay::Text(vPos, "DEBUG_TESTROUTE: no nav area\n", false, 4.0f);
-#endif // DEBUG_TESTROUTE
-			return false;
-		}
-#ifdef DEBUG_TESTROUTE
-		NDebugOverlay::Cross3D(vPos, -Vector(32.0f, 32.0f, 32.0f), Vector(32.0f, 32.0f, 32.0f), 0, 255, 0, false, 0.5f);
-
-		// Test considering our bounding radius
-		NDebugOverlay::Cross3D(vPos+vDirCross*fRadius, -Vector(32.0f, 32.0f, 32.0f), Vector(32.0f, 32.0f, 32.0f), 0, 0, 255, false, 0.5f);
-		NDebugOverlay::Cross3D(vPos-vDirCross*fRadius, -Vector(32.0f, 32.0f, 32.0f), Vector(32.0f, 32.0f, 32.0f), 0, 255, 255, false, 0.5f);
-#endif // DEBUG_TESTROUTE
-		
-		if( !TheNavMesh->GetNavArea(vPos+vDirCross*fRadius, TEST_BENEATH_LIMIT) || !TheNavMesh->GetNavArea(vPos-vDirCross*fRadius, TEST_BENEATH_LIMIT) )
-		{
-#ifdef DEBUG_TESTROUTE
-			NDebugOverlay::Text(vPos, "DEBUG_TESTROUTE: no enough room\n", false, 4.0f);
-#endif // DEBUG_TESTROUTE
-			return false;
-		}
-
-		// Test if possible to traverse
-		vPos.z = pTo->GetZ(vPos);
-		if( pCur != pTo )
-		{
-#if 1
-			// Test using the unit cost function
-			if( costFunc(pTo, pCur, NULL, NULL, -1.0f ) < 0 )
-			{
-#ifdef DEBUG_TESTROUTE
-				NDebugOverlay::Text(vPos, "DEBUG_TESTROUTE: cost function says no\n", false, 4.0f);
-#endif // DEBUG_TESTROUTE
-				return false;
-			}
-#else
-			// Above might be too expensive, but at least require the areas to be connected
-			// in case of thin walls
-			if( !pCur->IsConnected( pTo, NUM_DIRECTIONS ) )
-				return false;
-#endif // 0
-		}
-
-		pCur = pTo;
-		fCur += 16.0f;
-		vPrevPos = vPos;
-		vPos += vDir * teststepsize;
-		vPos.z += 16.0f;
-	}
-	return true;
-#else
 	Vector vNewStart( vStartPos );
 	vNewStart.z += 16.0f;
 	Vector nNewEnd( vEndPos );
@@ -2069,10 +1965,11 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 		fCur += teststepsize;
 	} while( fCur < fDist );
 
-	//NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
+#ifdef DEBUG_TESTROUTE
+	NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
+#endif // DEBUG_TESTROUTE
 
 	return true;
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -2766,72 +2663,83 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	// on distance.
 	const Vector &vStart = GetAbsOrigin(); 
 
-	startArea = TheNavMesh->GetNavArea( vStart );
-	if( !startArea || startArea->IsBlocked() )startArea = TheNavMesh->GetNearestNavArea( vStart );
-	goalArea = TheNavMesh->GetNavArea( vGoalPos );
-	if( !goalArea || goalArea->IsBlocked() ) goalArea = TheNavMesh->GetNearestNavArea( vGoalPos );
+	startArea = TheNavMesh->GetNavArea( vStart, 120.0f, true /* checkBlocked */ );
+	if( !startArea )
+		startArea = TheNavMesh->GetNearestNavArea( vStart );
+	goalArea = TheNavMesh->GetNavArea( vGoalPos, 120.0f, true /* checkBlocked */ );
 
 	if( unit_navigator_debug.GetInt() == 2 )
 	{
 		NDebugOverlay::Box( vStart, -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, true, 5.0f );
 		NDebugOverlay::Box( vGoalPos, -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, true, 5.0f );
 
-		if( startArea ) NDebugOverlay::Box( startArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 255, true, 5.0f );
-		if( goalArea ) NDebugOverlay::Box( goalArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 128, 200, 0, true, 5.0f );
+		if( startArea ) 
+			NDebugOverlay::Box( startArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 255, true, 5.0f );
+		if( goalArea ) 
+			NDebugOverlay::Box( goalArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 128, 200, 0, true, 5.0f );
 	}
 
 	// Only build route if we have both a start and goal area, otherwise too expensive
 	if( !startArea )
 	{
-		NavDbgMsg("#%d BuildNavAreaPath: No navigation area found for start position\n", GetOuter()->entindex());
+		NavDbgMsg( "#%d BuildNavAreaPath: No navigation area found for start position\n", GetOuter()->entindex() );
 		if( unit_route_requirearea.GetBool() ) 
-			return new UnitBaseWaypoint(vGoalPos);
-	}
-	if( !goalArea )
-	{
-		NavDbgMsg("#%d BuildNavAreaPath: No navigation area found for goal position\n", GetOuter()->entindex());
-		if( unit_route_requirearea.GetBool() )
 			return new UnitBaseWaypoint(vGoalPos);
 	}
 
 	// If the startArea is the goalArea we are done.
-	if( startArea == goalArea )
+	if( goalArea && startArea == goalArea )
 	{
-		NavDbgMsg("#%d BuildNavAreaPath: Start area is goal area, going direct\n", GetOuter()->entindex());
+		NavDbgMsg( "#%d BuildNavAreaPath: Start area is goal area, going direct\n", GetOuter()->entindex() );
 		return new UnitBaseWaypoint(vGoalPos);
 	}
 
 	// Build route from navigation mesh
+	bool bUsingCachedPath = false;
 	CUtlSymbol unittype( GetOuter()->GetUnitType() );
 	if( unit_allow_cached_paths.GetBool() && startArea && goalArea && CNavArea::IsPathCached( unittype, startArea->GetID(), goalArea->GetID() ) )
 	{
-		NavDbgMsg("#%d BuildNavAreaPath: Using cached path\n", GetOuter()->entindex());
+		NavDbgMsg( "#%d BuildNavAreaPath: Using cached path for start area %d and goal area %d\n", 
+			GetOuter()->entindex(), startArea->GetID(), goalArea->GetID() );
 		closestArea = CNavArea::GetCachedClosestArea();
+		bUsingCachedPath = true;
 	}
 	else
 	{
-		UnitShortestPathCost costFunc(m_pOuter);
-		NavAreaBuildPath<UnitShortestPathCost>(startArea, goalArea, &vGoalPos, costFunc, &closestArea);
+		// TODO: Maybe consider the max range in the path finding?
+		//float fMaxRange = pPath->m_fMaxRange;
+		//if( pPath->m_hTarget )
+		//	fMaxRange += pPath->m_hTarget->CollisionProp()->BoundingRadius2D();
+
+		UnitShortestPathCost costFunc( m_pOuter );
+		UnitNavAreaBuildPath<UnitShortestPathCost>( startArea, goalArea, &vGoalPos, costFunc, &closestArea );
 	}
 
-	if (closestArea)
+	if( closestArea )
 	{
-		if( closestArea != goalArea )
+		if( !goalArea || closestArea != goalArea )
 		{
-			NavDbgMsg("#%d BuildNavAreaPath: Found end area is not the goal area. Going to closest area instead.\n", GetOuter()->entindex());
+			NavDbgMsg( "#%d BuildNavAreaPath: Found end area is not the goal area. Going to closest area instead.\n", GetOuter()->entindex() );
 			if( unit_navigator_debug.GetInt() == 2 )
 				NDebugOverlay::Box( closestArea->GetCenter(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, true, 5.0f );
 		}
-		CNavArea::SetCachedPath( unittype, startArea->GetID(), goalArea->GetID(), closestArea->GetID() );
-		UnitBaseWaypoint *pEnd = new UnitBaseWaypoint(vGoalPos);
+		
+		if( !bUsingCachedPath && goalArea )
+		{
+			NavDbgMsg( "#%d BuildNavAreaPath: Caching path from area %d to %d with closest area %d.\n", GetOuter()->entindex(),
+				startArea->GetID(), goalArea->GetID(), closestArea->GetID() );
+			CNavArea::SetCachedPath( unittype, startArea->GetID(), goalArea->GetID(), closestArea->GetID() );
+		}
+
+		UnitBaseWaypoint *pEnd = new UnitBaseWaypoint( vGoalPos );
 		pEnd->flToleranceX = pPath->m_waypointTolerance + 1.0f;
 		pEnd->flToleranceY = pPath->m_waypointTolerance + 1.0f;
 		return BuildWayPointsFromRoute( pPath, closestArea, pEnd );
 	}
 
 	// Fall back
-	Warning("#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex());
-	return new UnitBaseWaypoint(vGoalPos);
+	Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
+	return new UnitBaseWaypoint( vGoalPos );
 }
 
 //-----------------------------------------------------------------------------
@@ -2860,7 +2768,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 
 		NavDbgMsg("#%d BuildNavAreaPath: Building route to target enter point\n", GetOuter()->entindex());
 
-		// Expensive: use nav mesh
+		// "Expensive": use nav mesh
 		waypoints = BuildNavAreaPath( pPath, vEnterPoint );
 		
 		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( pPath->m_vGoalPos );

@@ -635,6 +635,8 @@ public:
 			return;
 		}
 
+		CNavArea::ClearCachedPath();
+
 		static unsigned int searchMarker = RandomInt( 0, 1024*1024 );
 		if ( ++searchMarker == 0 )
 		{
@@ -688,6 +690,8 @@ public:
 	template < typename Functor >
 	bool ForAllAreasInRadius( Functor &func, const Vector &pos, float radius )
 	{
+		CNavArea::ClearCachedPath();
+
 		// use a unique marker for this method, so it can be used within a SearchSurroundingArea() call
 		static unsigned int searchMarker = RandomInt(0, 1024*1024 );
 

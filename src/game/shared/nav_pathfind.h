@@ -115,6 +115,7 @@ bool NavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector *go
 	if (startArea == NULL)
 		return false;
 
+	CNavArea::ClearCachedPath();
 	startArea->SetParent( NULL );
 
 	if (goalArea != NULL && goalArea->IsBlocked( teamID, ignoreNavBlockers ))

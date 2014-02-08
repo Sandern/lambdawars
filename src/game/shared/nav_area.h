@@ -648,6 +648,19 @@ public:
 		return true;
 	}
 
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Clears cached path
+	 */
+	static void ClearCachedPath()
+	{
+		SetCachedPath( UTL_INVAL_SYMBOL, -1, -1, -1 );
+	}
+
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Caches a path
+	 */
 	static void SetCachedPath( CUtlSymbol id, int iStartAreaID, int iGoalAreaID, int iClosestAreaID )
 	{
 		m_LastCachedPathID = id;
@@ -656,13 +669,21 @@ public:
 		m_iLastClosestAreaID = iClosestAreaID;
 	}
 
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Checks if a path is cached by the last search
+	 */
 	static bool IsPathCached( CUtlSymbol id, int iStartAreaID, int iGoalAreaID )
 	{
-		if( m_LastCachedPathID && m_LastCachedPathID == id && m_iLastStartAreaID == iStartAreaID && m_iLastGoalAreaID == iGoalAreaID )
+		if( m_LastCachedPathID.IsValid() && m_LastCachedPathID == id && m_iLastStartAreaID == iStartAreaID && m_iLastGoalAreaID == iGoalAreaID )
 			return true;
 		return false;
 	}
 
+	//-------------------------------------------------------------------------------------
+	/**
+	 * Returns the closest area for the last cached path
+	 */
 	static CNavArea *GetCachedClosestArea();
 
 
