@@ -72,10 +72,6 @@
 #include "sendprop_priorities.h"
 #include "videocfg/videocfg.h"
 
-#ifdef HL2WARS_DLL
-#include "fowmgr.h"
-#endif // HL2WARS_DLL
-
 // =======================================
 // PySource Additions
 // =======================================
@@ -89,6 +85,10 @@
 // =======================================
 // END PySource Additions
 // =======================================
+
+#ifdef HL2WARS_DLL
+#include "fowmgr.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -8846,7 +8846,7 @@ bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 
 	// Entities that are not hidden should be transmitted at least once to the client
 	// Note: this transmits the data at the point of sending, which might be undesired
-	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 /*&& (GetFOWFlags() & FOWFLAG_INITTRANSMIT)*/ )
+	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
 	{
 		int iPlayerIndex = pPlayer->entindex() - 1;
 		if( FogOfWarMgr()->IsEntityKnownUpdatePending( iPlayerIndex, entindex() ) )
@@ -8855,15 +8855,13 @@ bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 			return true;
 		}
 
-		//const CBitVec<MAX_EDICTS>* pKnownEntities = engine->GetEntityTransmitBitsForClient( iPlayerIndex );
-
-		//if( pKnownEntities && !pKnownEntities->IsBitSet( entindex() ) )
 		if( !FogOfWarMgr()->IsEntityKnown( iPlayerIndex, entindex() ) )
 		{
-			// TODO: Shouldn't mark until I'm sure it pushes an update!
-			//FogOfWarMgr()->MarkEntityKnown( iPlayerIndex, entindex() );
+			// Shouldn't mark until I'm sure it pushed an update!
 			FogOfWarMgr()->SetEntityKnownUpdatePending( iPlayerIndex, entindex() );
 			gEntList.AddPostClientMessageEntity( this );
+			// Force update, otherwise unit updates might be delayed when in low update rate mode
+			NetworkProp()->NetworkStateForceUpdate();
 			return true;
 		}
 	}
