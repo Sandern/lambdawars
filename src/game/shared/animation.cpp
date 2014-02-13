@@ -160,6 +160,23 @@ void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
 		
 		if ( iActivityIndex == -1 )
 		{
+#ifdef HL2WARS_DLL
+#ifndef CLIENT_DLL
+			seqdesc.activity = ActivityList_RegisterPrivateActivity( pszActivityName );
+#else
+			if( engine->IsClientLocalToActiveServer() ) 
+			{
+				// HACK: the client and server don't share the private activity list so registering it on the client would hose the server
+				seqdesc.flags &= ~STUDIO_ACTIVITY;
+			}
+			else
+			{
+				// When the client is not the server, then we must register the activity
+				seqdesc.activity = ActivityList_RegisterPrivateActivity( pszActivityName );
+			}
+#endif // CLIENT_DLL
+
+#else
 			// Allow this now.  Animators can create custom activities that are referenced only on the client or by scripts, etc.
 			//Warning( "***\nModel %s tried to reference unregistered activity: %s \n***\n", pstudiohdr->name, pszActivityName );
 			//Assert(0);
@@ -169,6 +186,7 @@ void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
 #else
 			seqdesc.activity = ActivityList_RegisterPrivateActivity( pszActivityName );
 #endif
+#endif // HL2WARS_DLL
 		}
 		else
 		{
