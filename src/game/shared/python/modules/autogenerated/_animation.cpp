@@ -2,6 +2,8 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
+#include "__array_1.pypp.hpp"
+
 #include "bone_setup.h"
 
 #include "eventlist.h"
@@ -21,6 +23,91 @@
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
+
+struct CStudioHdr_wrapper : CStudioHdr, bp::wrapper< CStudioHdr > {
+
+    struct CActivityToSequenceMapping_wrapper : CStudioHdr::CActivityToSequenceMapping, bp::wrapper< CStudioHdr::CActivityToSequenceMapping > {
+    
+        struct SequenceTuple_wrapper : CStudioHdr::CActivityToSequenceMapping::SequenceTuple, bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple > {
+        
+            SequenceTuple_wrapper(CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & arg )
+            : CStudioHdr::CActivityToSequenceMapping::SequenceTuple( arg )
+              , bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple >(){
+                // copy constructor
+                
+            }
+        
+            SequenceTuple_wrapper()
+            : CStudioHdr::CActivityToSequenceMapping::SequenceTuple()
+              , bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple >(){
+                // null constructor
+                
+            }
+        
+            static ::CUtlSymbol * get_pActivityModifiers(CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & inst ){
+                return inst.pActivityModifiers;
+            }
+            
+            static void set_pActivityModifiers( CStudioHdr::CActivityToSequenceMapping::SequenceTuple & inst, ::CUtlSymbol * new_value ){ 
+                inst.pActivityModifiers = new_value;
+            }
+        
+        };
+    
+        CActivityToSequenceMapping_wrapper( )
+        : CStudioHdr::CActivityToSequenceMapping( )
+          , bp::wrapper< CStudioHdr::CActivityToSequenceMapping >(){
+            // null constructor
+        
+        }
+    
+    };
+
+    static ::CStudioHdr::CActivityToSequenceMapping * get_m_pActivityToSequence(CStudioHdr const & inst ){
+        return inst.m_pActivityToSequence;
+    }
+    
+    static void set_m_pActivityToSequence( CStudioHdr & inst, ::CStudioHdr::CActivityToSequenceMapping * new_value ){ 
+        inst.m_pActivityToSequence = new_value;
+    }
+
+};
+
+struct mstudioseqdesc_t_wrapper : mstudioseqdesc_t, bp::wrapper< mstudioseqdesc_t > {
+
+    mstudioseqdesc_t_wrapper( )
+    : mstudioseqdesc_t( )
+      , bp::wrapper< mstudioseqdesc_t >(){
+        // null constructor
+    
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 2>
+    pyplusplus_groupsize_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 2>( inst.groupsize );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< float, 2>
+    pyplusplus_paramend_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< float, 2>( inst.paramend );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 2>
+    pyplusplus_paramindex_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 2>( inst.paramindex );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< float, 2>
+    pyplusplus_paramstart_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< float, 2>( inst.paramstart );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 5>
+    pyplusplus_unused_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 5>( inst.unused );
+    }
+
+};
 
 BOOST_PYTHON_MODULE(_animation){
     bp::docstring_options doc_options( true, true, false );
@@ -92,6 +179,914 @@ BOOST_PYTHON_MODULE(_animation){
         .value("LAST_SHARED_ANIMEVENT", LAST_SHARED_ANIMEVENT)
         .export_values()
         ;
+
+    { //::CStudioHdr
+        typedef bp::class_< CStudioHdr_wrapper, boost::noncopyable > CStudioHdr_exposer_t;
+        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr", bp::no_init );
+        bp::scope CStudioHdr_scope( CStudioHdr_exposer );
+        { //::CStudioHdr::CActivityToSequenceMapping
+            typedef bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper, boost::noncopyable > CActivityToSequenceMapping_exposer_t;
+            CActivityToSequenceMapping_exposer_t CActivityToSequenceMapping_exposer = CActivityToSequenceMapping_exposer_t( "CActivityToSequenceMapping", bp::no_init );
+            bp::scope CActivityToSequenceMapping_scope( CActivityToSequenceMapping_exposer );
+            { //::CStudioHdr::CActivityToSequenceMapping::HashValueType
+                typedef bp::class_< CStudioHdr::CActivityToSequenceMapping::HashValueType > HashValueType_exposer_t;
+                HashValueType_exposer_t HashValueType_exposer = HashValueType_exposer_t( "HashValueType", bp::init< int, int, int, int >(( bp::arg("_actIdx"), bp::arg("_stIdx"), bp::arg("_ct"), bp::arg("_tW") )) );
+                bp::scope HashValueType_scope( HashValueType_exposer );
+                { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs
+                    typedef bp::class_< CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs > HashFuncs_exposer_t;
+                    HashFuncs_exposer_t HashFuncs_exposer = HashFuncs_exposer_t( "HashFuncs", bp::init< int >(( bp::arg("arg0") )) );
+                    bp::scope HashFuncs_scope( HashFuncs_exposer );
+                    bp::implicitly_convertible< int, CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs >();
+                    { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator()
+                    
+                        typedef bool ( ::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::*__call___function_type )( ::CStudioHdr::CActivityToSequenceMapping::HashValueType const &,::CStudioHdr::CActivityToSequenceMapping::HashValueType const & ) const;
+                        
+                        HashFuncs_exposer.def( 
+                            "__call__"
+                            , __call___function_type( &::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator() )
+                            , ( bp::arg("lhs"), bp::arg("rhs") ) );
+                    
+                    }
+                    { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator()
+                    
+                        typedef unsigned int ( ::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::*__call___function_type )( ::CStudioHdr::CActivityToSequenceMapping::HashValueType const & ) const;
+                        
+                        HashFuncs_exposer.def( 
+                            "__call__"
+                            , __call___function_type( &::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator() )
+                            , ( bp::arg("item") ) );
+                    
+                    }
+                }
+                HashValueType_exposer.def( bp::init< >() );
+                HashValueType_exposer.def_readwrite( "activityIdx", &CStudioHdr::CActivityToSequenceMapping::HashValueType::activityIdx );
+                HashValueType_exposer.def_readwrite( "count", &CStudioHdr::CActivityToSequenceMapping::HashValueType::count );
+                HashValueType_exposer.def_readwrite( "startingIdx", &CStudioHdr::CActivityToSequenceMapping::HashValueType::startingIdx );
+                HashValueType_exposer.def_readwrite( "totalWeight", &CStudioHdr::CActivityToSequenceMapping::HashValueType::totalWeight );
+            }
+            bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper >( "SequenceTuple" )    
+                .def_readwrite( "iNumActivityModifiers", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::iNumActivityModifiers )    
+                .add_property( "pActivityModifiers"
+                            , bp::make_function( (::CUtlSymbol * (*)( ::CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & ))(&CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper::get_pActivityModifiers), bp::return_internal_reference< >() )
+                            , bp::make_function( (void (*)( ::CStudioHdr::CActivityToSequenceMapping::SequenceTuple &,::CUtlSymbol * ))(&CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper::set_pActivityModifiers), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
+                .def_readwrite( "seqnum", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::seqnum )    
+                .def_readwrite( "weight", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::weight );
+            CActivityToSequenceMapping_exposer.def( bp::init< >() );
+            { //::CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity
+            
+                typedef int ( ::CStudioHdr::CActivityToSequenceMapping::*NumSequencesForActivity_function_type )( int ) ;
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "NumSequencesForActivity"
+                    , NumSequencesForActivity_function_type( &::CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity )
+                    , ( bp::arg("forActivity") ) );
+            
+            }
+            { //::CStudioHdr::CActivityToSequenceMapping::ReleaseMapping
+            
+                typedef void ( *ReleaseMapping_function_type )( ::CStudioHdr::CActivityToSequenceMapping * );
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "ReleaseMapping"
+                    , ReleaseMapping_function_type( &::CStudioHdr::CActivityToSequenceMapping::ReleaseMapping )
+                    , ( bp::arg("pMap") ) );
+            
+            }
+            { //::CStudioHdr::CActivityToSequenceMapping::ResetMappings
+            
+                typedef void ( *ResetMappings_function_type )(  );
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "ResetMappings"
+                    , ResetMappings_function_type( &::CStudioHdr::CActivityToSequenceMapping::ResetMappings ) );
+            
+            }
+            CActivityToSequenceMapping_exposer.staticmethod( "ReleaseMapping" );
+            CActivityToSequenceMapping_exposer.staticmethod( "ResetMappings" );
+        }
+        { //::CStudioHdr::BoneFlexDriverCount
+        
+            typedef int ( ::CStudioHdr::*BoneFlexDriverCount_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "BoneFlexDriverCount"
+                , BoneFlexDriverCount_function_type( &::CStudioHdr::BoneFlexDriverCount ) );
+        
+        }
+        { //::CStudioHdr::ClearPerfCounters
+        
+            typedef void ( ::CStudioHdr::*ClearPerfCounters_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ClearPerfCounters"
+                , ClearPerfCounters_function_type( &::CStudioHdr::ClearPerfCounters ) );
+        
+        }
+        { //::CStudioHdr::CopyAutoplaySequences
+        
+            typedef int ( ::CStudioHdr::*CopyAutoplaySequences_function_type )( short unsigned int *,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "CopyAutoplaySequences"
+                , CopyAutoplaySequences_function_type( &::CStudioHdr::CopyAutoplaySequences )
+                , ( bp::arg("pOut"), bp::arg("outCount") ) );
+        
+        }
+        { //::CStudioHdr::CountAutoplaySequences
+        
+            typedef int ( ::CStudioHdr::*CountAutoplaySequences_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "CountAutoplaySequences"
+                , CountAutoplaySequences_function_type( &::CStudioHdr::CountAutoplaySequences ) );
+        
+        }
+        { //::CStudioHdr::EntryNode
+        
+            typedef int ( ::CStudioHdr::*EntryNode_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "EntryNode"
+                , EntryNode_function_type( &::CStudioHdr::EntryNode )
+                , ( bp::arg("iSequence") ) );
+        
+        }
+        { //::CStudioHdr::ExitNode
+        
+            typedef int ( ::CStudioHdr::*ExitNode_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ExitNode"
+                , ExitNode_function_type( &::CStudioHdr::ExitNode )
+                , ( bp::arg("iSequence") ) );
+        
+        }
+        { //::CStudioHdr::GetActivityListVersion
+        
+            typedef int ( ::CStudioHdr::*GetActivityListVersion_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetActivityListVersion"
+                , GetActivityListVersion_function_type( &::CStudioHdr::GetActivityListVersion ) );
+        
+        }
+        { //::CStudioHdr::GetAttachmentBone
+        
+            typedef int ( ::CStudioHdr::*GetAttachmentBone_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetAttachmentBone"
+                , GetAttachmentBone_function_type( &::CStudioHdr::GetAttachmentBone )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::CStudioHdr::GetAutoplayList
+        
+            typedef int ( ::CStudioHdr::*GetAutoplayList_function_type )( short unsigned int * * ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetAutoplayList"
+                , GetAutoplayList_function_type( &::CStudioHdr::GetAutoplayList )
+                , ( bp::arg("pOut") ) );
+        
+        }
+        { //::CStudioHdr::GetEventListVersion
+        
+            typedef int ( ::CStudioHdr::*GetEventListVersion_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetEventListVersion"
+                , GetEventListVersion_function_type( &::CStudioHdr::GetEventListVersion ) );
+        
+        }
+        { //::CStudioHdr::GetNumAttachments
+        
+            typedef int ( ::CStudioHdr::*GetNumAttachments_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumAttachments"
+                , GetNumAttachments_function_type( &::CStudioHdr::GetNumAttachments ) );
+        
+        }
+        { //::CStudioHdr::GetNumBoneControllers
+        
+            typedef int ( ::CStudioHdr::*GetNumBoneControllers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumBoneControllers"
+                , GetNumBoneControllers_function_type( &::CStudioHdr::GetNumBoneControllers ) );
+        
+        }
+        { //::CStudioHdr::GetNumIKAutoplayLocks
+        
+            typedef int ( ::CStudioHdr::*GetNumIKAutoplayLocks_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumIKAutoplayLocks"
+                , GetNumIKAutoplayLocks_function_type( &::CStudioHdr::GetNumIKAutoplayLocks ) );
+        
+        }
+        { //::CStudioHdr::GetNumIKChains
+        
+            typedef int ( ::CStudioHdr::*GetNumIKChains_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumIKChains"
+                , GetNumIKChains_function_type( &::CStudioHdr::GetNumIKChains ) );
+        
+        }
+        { //::CStudioHdr::GetNumPoseParameters
+        
+            typedef int ( ::CStudioHdr::*GetNumPoseParameters_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumPoseParameters"
+                , GetNumPoseParameters_function_type( &::CStudioHdr::GetNumPoseParameters ) );
+        
+        }
+        { //::CStudioHdr::GetNumSeq
+        
+            typedef int ( ::CStudioHdr::*GetNumSeq_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumSeq"
+                , GetNumSeq_function_type( &::CStudioHdr::GetNumSeq ) );
+        
+        }
+        { //::CStudioHdr::GetSharedPoseParameter
+        
+            typedef int ( ::CStudioHdr::*GetSharedPoseParameter_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetSharedPoseParameter"
+                , GetSharedPoseParameter_function_type( &::CStudioHdr::GetSharedPoseParameter )
+                , ( bp::arg("iSequence"), bp::arg("iLocalPose") ) );
+        
+        }
+        { //::CStudioHdr::GetSurfaceProp
+        
+            typedef int ( ::CStudioHdr::*GetSurfaceProp_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetSurfaceProp"
+                , GetSurfaceProp_function_type( &::CStudioHdr::GetSurfaceProp ) );
+        
+        }
+        { //::CStudioHdr::GetTransition
+        
+            typedef int ( ::CStudioHdr::*GetTransition_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetTransition"
+                , GetTransition_function_type( &::CStudioHdr::GetTransition )
+                , ( bp::arg("iFrom"), bp::arg("iTo") ) );
+        
+        }
+        { //::CStudioHdr::HaveSequenceForActivity
+        
+            typedef bool ( ::CStudioHdr::*HaveSequenceForActivity_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "HaveSequenceForActivity"
+                , HaveSequenceForActivity_function_type( &::CStudioHdr::HaveSequenceForActivity )
+                , ( bp::arg("activity") ) );
+        
+        }
+        { //::CStudioHdr::IllumPositionAttachmentIndex
+        
+            typedef int ( ::CStudioHdr::*IllumPositionAttachmentIndex_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "IllumPositionAttachmentIndex"
+                , IllumPositionAttachmentIndex_function_type( &::CStudioHdr::IllumPositionAttachmentIndex ) );
+        
+        }
+        { //::CStudioHdr::Init
+        
+            typedef void ( ::CStudioHdr::*Init_function_type )( ::studiohdr_t const *,::IMDLCache * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Init"
+                , Init_function_type( &::CStudioHdr::Init )
+                , ( bp::arg("pStudioHdr"), bp::arg("mdlcache")=bp::object() ) );
+        
+        }
+        { //::CStudioHdr::InitActivityToSequence
+        
+            typedef void ( ::CStudioHdr::*InitActivityToSequence_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "InitActivityToSequence"
+                , InitActivityToSequence_function_type( &::CStudioHdr::InitActivityToSequence ) );
+        
+        }
+        { //::CStudioHdr::IsReadyForAccess
+        
+            typedef bool ( ::CStudioHdr::*IsReadyForAccess_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "IsReadyForAccess"
+                , IsReadyForAccess_function_type( &::CStudioHdr::IsReadyForAccess ) );
+        
+        }
+        { //::CStudioHdr::IsValid
+        
+            typedef bool ( ::CStudioHdr::*IsValid_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "IsValid"
+                , IsValid_function_type( &::CStudioHdr::IsValid ) );
+        
+        }
+        { //::CStudioHdr::IsVirtual
+        
+            typedef bool ( ::CStudioHdr::*IsVirtual_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "IsVirtual"
+                , IsVirtual_function_type( &::CStudioHdr::IsVirtual ) );
+        
+        }
+        { //::CStudioHdr::MaxEyeDeflection
+        
+            typedef float ( ::CStudioHdr::*MaxEyeDeflection_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "MaxEyeDeflection"
+                , MaxEyeDeflection_function_type( &::CStudioHdr::MaxEyeDeflection ) );
+        
+        }
+        { //::CStudioHdr::ReinitializeSequenceMapping
+        
+            typedef void ( ::CStudioHdr::*ReinitializeSequenceMapping_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ReinitializeSequenceMapping"
+                , ReinitializeSequenceMapping_function_type( &::CStudioHdr::ReinitializeSequenceMapping ) );
+        
+        }
+        { //::CStudioHdr::RemapAnimBone
+        
+            typedef int ( ::CStudioHdr::*RemapAnimBone_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "RemapAnimBone"
+                , RemapAnimBone_function_type( &::CStudioHdr::RemapAnimBone )
+                , ( bp::arg("iAnim"), bp::arg("iLocalBone") ) );
+        
+        }
+        { //::CStudioHdr::RemapSeqBone
+        
+            typedef int ( ::CStudioHdr::*RemapSeqBone_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "RemapSeqBone"
+                , RemapSeqBone_function_type( &::CStudioHdr::RemapSeqBone )
+                , ( bp::arg("iSequence"), bp::arg("iLocalBone") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRules
+        
+            typedef void ( ::CStudioHdr::*RunFlexRules_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRules"
+                , RunFlexRules_function_type( &::CStudioHdr::RunFlexRules )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRulesNew
+        
+            typedef void ( ::CStudioHdr::*RunFlexRulesNew_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRulesNew"
+                , RunFlexRulesNew_function_type( &::CStudioHdr::RunFlexRulesNew )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRulesOld
+        
+            typedef void ( ::CStudioHdr::*RunFlexRulesOld_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRulesOld"
+                , RunFlexRulesOld_function_type( &::CStudioHdr::RunFlexRulesOld )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::SelectWeightedSequence
+        
+            typedef int ( ::CStudioHdr::*SelectWeightedSequence_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type( &::CStudioHdr::SelectWeightedSequence )
+                , ( bp::arg("activity"), bp::arg("curSequence") ) );
+        
+        }
+        { //::CStudioHdr::SelectWeightedSequenceFromModifiers
+        
+            typedef int ( ::CStudioHdr::*SelectWeightedSequenceFromModifiers_function_type )( int,::CUtlSymbol *,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SelectWeightedSequenceFromModifiers"
+                , SelectWeightedSequenceFromModifiers_function_type( &::CStudioHdr::SelectWeightedSequenceFromModifiers )
+                , ( bp::arg("activity"), bp::arg("pActivityModifiers"), bp::arg("iModifierCount") ) );
+        
+        }
+        { //::CStudioHdr::SequencesAvailable
+        
+            typedef bool ( ::CStudioHdr::*SequencesAvailable_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "SequencesAvailable"
+                , SequencesAvailable_function_type( &::CStudioHdr::SequencesAvailable ) );
+        
+        }
+        { //::CStudioHdr::SetActivityListVersion
+        
+            typedef void ( ::CStudioHdr::*SetActivityListVersion_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetActivityListVersion"
+                , SetActivityListVersion_function_type( &::CStudioHdr::SetActivityListVersion )
+                , ( bp::arg("version") ) );
+        
+        }
+        { //::CStudioHdr::SetAttachmentBone
+        
+            typedef void ( ::CStudioHdr::*SetAttachmentBone_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetAttachmentBone"
+                , SetAttachmentBone_function_type( &::CStudioHdr::SetAttachmentBone )
+                , ( bp::arg("iAttachment"), bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::SetEventListVersion
+        
+            typedef void ( ::CStudioHdr::*SetEventListVersion_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetEventListVersion"
+                , SetEventListVersion_function_type( &::CStudioHdr::SetEventListVersion )
+                , ( bp::arg("version") ) );
+        
+        }
+        { //::CStudioHdr::Term
+        
+            typedef void ( ::CStudioHdr::*Term_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Term"
+                , Term_function_type( &::CStudioHdr::Term ) );
+        
+        }
+        { //::CStudioHdr::boneFlags
+        
+            typedef int ( ::CStudioHdr::*boneFlags_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "boneFlags"
+                , boneFlags_function_type( &::CStudioHdr::boneFlags )
+                , ( bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::boneParent
+        
+            typedef int ( ::CStudioHdr::*boneParent_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "boneParent"
+                , boneParent_function_type( &::CStudioHdr::boneParent )
+                , ( bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::clearBoneFlags
+        
+            typedef void ( ::CStudioHdr::*clearBoneFlags_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "clearBoneFlags"
+                , clearBoneFlags_function_type( &::CStudioHdr::clearBoneFlags )
+                , ( bp::arg("iBone"), bp::arg("flags") ) );
+        
+        }
+        { //::CStudioHdr::contents
+        
+            typedef int ( ::CStudioHdr::*contents_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "contents"
+                , contents_function_type( &::CStudioHdr::contents ) );
+        
+        }
+        { //::CStudioHdr::eyeposition
+        
+            typedef ::Vector ( ::CStudioHdr::*eyeposition_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "eyeposition"
+                , eyeposition_function_type( &::CStudioHdr::eyeposition ) );
+        
+        }
+        { //::CStudioHdr::flags
+        
+            typedef int ( ::CStudioHdr::*flags_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "flags"
+                , flags_function_type( &::CStudioHdr::flags ) );
+        
+        }
+        { //::CStudioHdr::hull_max
+        
+            typedef ::Vector ( ::CStudioHdr::*hull_max_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "hull_max"
+                , hull_max_function_type( &::CStudioHdr::hull_max ) );
+        
+        }
+        { //::CStudioHdr::hull_min
+        
+            typedef ::Vector ( ::CStudioHdr::*hull_min_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "hull_min"
+                , hull_min_function_type( &::CStudioHdr::hull_min ) );
+        
+        }
+        { //::CStudioHdr::iHitboxCount
+        
+            typedef int ( ::CStudioHdr::*iHitboxCount_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iHitboxCount"
+                , iHitboxCount_function_type( &::CStudioHdr::iHitboxCount )
+                , ( bp::arg("set") ) );
+        
+        }
+        { //::CStudioHdr::iRelativeAnim
+        
+            typedef int ( ::CStudioHdr::*iRelativeAnim_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iRelativeAnim"
+                , iRelativeAnim_function_type( &::CStudioHdr::iRelativeAnim )
+                , ( bp::arg("baseseq"), bp::arg("relanim") ) );
+        
+        }
+        { //::CStudioHdr::iRelativeSeq
+        
+            typedef int ( ::CStudioHdr::*iRelativeSeq_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iRelativeSeq"
+                , iRelativeSeq_function_type( &::CStudioHdr::iRelativeSeq )
+                , ( bp::arg("baseseq"), bp::arg("relseq") ) );
+        
+        }
+        { //::CStudioHdr::illumposition
+        
+            typedef ::Vector ( ::CStudioHdr::*illumposition_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "illumposition"
+                , illumposition_function_type( &::CStudioHdr::illumposition ) );
+        
+        }
+        { //::CStudioHdr::mass
+        
+            typedef float ( ::CStudioHdr::*mass_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "mass"
+                , mass_function_type( &::CStudioHdr::mass ) );
+        
+        }
+        { //::CStudioHdr::name
+        
+            typedef char const * ( ::CStudioHdr::*name_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "name"
+                , name_function_type( &::CStudioHdr::name ) );
+        
+        }
+        { //::CStudioHdr::numbodyparts
+        
+            typedef int ( ::CStudioHdr::*numbodyparts_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbodyparts"
+                , numbodyparts_function_type( &::CStudioHdr::numbodyparts ) );
+        
+        }
+        { //::CStudioHdr::numbonecontrollers
+        
+            typedef int ( ::CStudioHdr::*numbonecontrollers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbonecontrollers"
+                , numbonecontrollers_function_type( &::CStudioHdr::numbonecontrollers ) );
+        
+        }
+        { //::CStudioHdr::numbones
+        
+            typedef int ( ::CStudioHdr::*numbones_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbones"
+                , numbones_function_type( &::CStudioHdr::numbones ) );
+        
+        }
+        { //::CStudioHdr::numflexcontrollers
+        
+            typedef ::LocalFlexController_t ( ::CStudioHdr::*numflexcontrollers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexcontrollers"
+                , numflexcontrollers_function_type( &::CStudioHdr::numflexcontrollers ) );
+        
+        }
+        { //::CStudioHdr::numflexcontrollerui
+        
+            typedef int ( ::CStudioHdr::*numflexcontrollerui_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexcontrollerui"
+                , numflexcontrollerui_function_type( &::CStudioHdr::numflexcontrollerui ) );
+        
+        }
+        { //::CStudioHdr::numflexdesc
+        
+            typedef int ( ::CStudioHdr::*numflexdesc_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexdesc"
+                , numflexdesc_function_type( &::CStudioHdr::numflexdesc ) );
+        
+        }
+        { //::CStudioHdr::numflexrules
+        
+            typedef int ( ::CStudioHdr::*numflexrules_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexrules"
+                , numflexrules_function_type( &::CStudioHdr::numflexrules ) );
+        
+        }
+        { //::CStudioHdr::numhitboxsets
+        
+            typedef int ( ::CStudioHdr::*numhitboxsets_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numhitboxsets"
+                , numhitboxsets_function_type( &::CStudioHdr::numhitboxsets ) );
+        
+        }
+        { //::CStudioHdr::numikchains
+        
+            typedef int ( ::CStudioHdr::*numikchains_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numikchains"
+                , numikchains_function_type( &::CStudioHdr::numikchains ) );
+        
+        }
+        { //::CStudioHdr::numskinfamilies
+        
+            typedef int ( ::CStudioHdr::*numskinfamilies_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numskinfamilies"
+                , numskinfamilies_function_type( &::CStudioHdr::numskinfamilies ) );
+        
+        }
+        { //::CStudioHdr::numtextures
+        
+            typedef int ( ::CStudioHdr::*numtextures_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numtextures"
+                , numtextures_function_type( &::CStudioHdr::numtextures ) );
+        
+        }
+        { //::CStudioHdr::pAttachment
+        
+            typedef ::mstudioattachment_t const & ( ::CStudioHdr::*pAttachment_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pAttachment"
+                , pAttachment_function_type( &::CStudioHdr::pAttachment )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pIKAutoplayLock
+        
+            typedef ::mstudioiklock_t const & ( ::CStudioHdr::*pIKAutoplayLock_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pIKAutoplayLock"
+                , pIKAutoplayLock_function_type( &::CStudioHdr::pIKAutoplayLock )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pPoseParameter
+        
+            typedef ::mstudioposeparamdesc_t const & ( ::CStudioHdr::*pPoseParameter_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pPoseParameter"
+                , pPoseParameter_function_type( &::CStudioHdr::pPoseParameter )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pSeqdesc
+        
+            typedef ::mstudioseqdesc_t & ( ::CStudioHdr::*Seqdesc_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Seqdesc"
+                , Seqdesc_function_type( &::CStudioHdr::pSeqdesc )
+                , ( bp::arg("iSequence") )
+                , bp::return_value_policy< bp::reference_existing_object >() );
+        
+        }
+        { //::CStudioHdr::pszName
+        
+            typedef char const * ( ::CStudioHdr::*name_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "name"
+                , name_function_type( &::CStudioHdr::pszName ) );
+        
+        }
+        { //::CStudioHdr::setBoneFlags
+        
+            typedef void ( ::CStudioHdr::*setBoneFlags_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "setBoneFlags"
+                , setBoneFlags_function_type( &::CStudioHdr::setBoneFlags )
+                , ( bp::arg("iBone"), bp::arg("flags") ) );
+        
+        }
+        { //::CStudioHdr::view_bbmax
+        
+            typedef ::Vector ( ::CStudioHdr::*view_bbmax_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "view_bbmax"
+                , view_bbmax_function_type( &::CStudioHdr::view_bbmax ) );
+        
+        }
+        { //::CStudioHdr::view_bbmin
+        
+            typedef ::Vector ( ::CStudioHdr::*view_bbmin_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "view_bbmin"
+                , view_bbmin_function_type( &::CStudioHdr::view_bbmin ) );
+        
+        }
+        CStudioHdr_exposer.def_readwrite( "m_nPerfAnimatedBones", &CStudioHdr::m_nPerfAnimatedBones );
+        CStudioHdr_exposer.def_readwrite( "m_nPerfAnimationLayers", &CStudioHdr::m_nPerfAnimationLayers );
+        CStudioHdr_exposer.def_readwrite( "m_nPerfUsedBones", &CStudioHdr::m_nPerfUsedBones );
+        CStudioHdr_exposer.add_property( "m_pActivityToSequence"
+                    , bp::make_function( (::CStudioHdr::CActivityToSequenceMapping * (*)( ::CStudioHdr const & ))(&CStudioHdr_wrapper::get_m_pActivityToSequence), bp::return_internal_reference< >() )
+                    , bp::make_function( (void (*)( ::CStudioHdr &,::CStudioHdr::CActivityToSequenceMapping * ))(&CStudioHdr_wrapper::set_m_pActivityToSequence), bp::with_custodian_and_ward_postcall< 1, 2 >() ) );
+    }
+
+    { //::mstudioseqdesc_t
+        typedef bp::class_< mstudioseqdesc_t_wrapper, boost::noncopyable > mstudioseqdesc_t_exposer_t;
+        mstudioseqdesc_t_exposer_t mstudioseqdesc_t_exposer = mstudioseqdesc_t_exposer_t( "mstudioseqdesc_t", bp::no_init );
+        bp::scope mstudioseqdesc_t_scope( mstudioseqdesc_t_exposer );
+        mstudioseqdesc_t_exposer.def( bp::init< >() );
+        { //::mstudioseqdesc_t::KeyValueText
+        
+            typedef char const * ( ::mstudioseqdesc_t::*KeyValueText_function_type )(  ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "KeyValueText"
+                , KeyValueText_function_type( &::mstudioseqdesc_t::KeyValueText ) );
+        
+        }
+        { //::mstudioseqdesc_t::anim
+        
+            typedef int ( ::mstudioseqdesc_t::*anim_function_type )( int,int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "anim"
+                , anim_function_type( &::mstudioseqdesc_t::anim )
+                , ( bp::arg("x"), bp::arg("y") ) );
+        
+        }
+        { //::mstudioseqdesc_t::poseKey
+        
+            typedef float ( ::mstudioseqdesc_t::*poseKey_function_type )( int,int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "poseKey"
+                , poseKey_function_type( &::mstudioseqdesc_t::poseKey )
+                , ( bp::arg("iParam"), bp::arg("iAnim") ) );
+        
+        }
+        { //::mstudioseqdesc_t::weight
+        
+            typedef float ( ::mstudioseqdesc_t::*weight_function_type )( int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "weight"
+                , weight_function_type( &::mstudioseqdesc_t::weight )
+                , ( bp::arg("i") ) );
+        
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "activity", &mstudioseqdesc_t::activity );
+        mstudioseqdesc_t_exposer.def_readwrite( "activitymodifierindex", &mstudioseqdesc_t::activitymodifierindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "actweight", &mstudioseqdesc_t::actweight );
+        mstudioseqdesc_t_exposer.def_readwrite( "animindexindex", &mstudioseqdesc_t::animindexindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "autolayerindex", &mstudioseqdesc_t::autolayerindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "baseptr", &mstudioseqdesc_t::baseptr );
+        mstudioseqdesc_t_exposer.def_readwrite( "bbmax", &mstudioseqdesc_t::bbmax );
+        mstudioseqdesc_t_exposer.def_readwrite( "bbmin", &mstudioseqdesc_t::bbmin );
+        mstudioseqdesc_t_exposer.def_readwrite( "cycleposeindex", &mstudioseqdesc_t::cycleposeindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "entryphase", &mstudioseqdesc_t::entryphase );
+        mstudioseqdesc_t_exposer.def_readwrite( "eventindex", &mstudioseqdesc_t::eventindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "exitphase", &mstudioseqdesc_t::exitphase );
+        mstudioseqdesc_t_exposer.def_readwrite( "fadeintime", &mstudioseqdesc_t::fadeintime );
+        mstudioseqdesc_t_exposer.def_readwrite( "fadeouttime", &mstudioseqdesc_t::fadeouttime );
+        mstudioseqdesc_t_exposer.def_readwrite( "flags", &mstudioseqdesc_t::flags );
+        pyplusplus::containers::static_sized::register_array_1< int, 2 >( "__array_1_int_2" );
+        { //mstudioseqdesc_t::groupsize [variable], type=int[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "groupsize"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_groupsize_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "iklockindex", &mstudioseqdesc_t::iklockindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "keyvalueindex", &mstudioseqdesc_t::keyvalueindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "keyvaluesize", &mstudioseqdesc_t::keyvaluesize );
+        mstudioseqdesc_t_exposer.def_readwrite( "lastframe", &mstudioseqdesc_t::lastframe );
+        mstudioseqdesc_t_exposer.def_readwrite( "localentrynode", &mstudioseqdesc_t::localentrynode );
+        mstudioseqdesc_t_exposer.def_readwrite( "localexitnode", &mstudioseqdesc_t::localexitnode );
+        mstudioseqdesc_t_exposer.def_readwrite( "movementindex", &mstudioseqdesc_t::movementindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "nextseq", &mstudioseqdesc_t::nextseq );
+        mstudioseqdesc_t_exposer.def_readwrite( "nodeflags", &mstudioseqdesc_t::nodeflags );
+        mstudioseqdesc_t_exposer.def_readwrite( "numactivitymodifiers", &mstudioseqdesc_t::numactivitymodifiers );
+        mstudioseqdesc_t_exposer.def_readwrite( "numautolayers", &mstudioseqdesc_t::numautolayers );
+        mstudioseqdesc_t_exposer.def_readwrite( "numblends", &mstudioseqdesc_t::numblends );
+        mstudioseqdesc_t_exposer.def_readwrite( "numevents", &mstudioseqdesc_t::numevents );
+        mstudioseqdesc_t_exposer.def_readwrite( "numiklocks", &mstudioseqdesc_t::numiklocks );
+        mstudioseqdesc_t_exposer.def_readwrite( "numikrules", &mstudioseqdesc_t::numikrules );
+        pyplusplus::containers::static_sized::register_array_1< float, 2 >( "__array_1_float_2" );
+        { //mstudioseqdesc_t::paramend [variable], type=float[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< float, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramend"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramend_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        { //mstudioseqdesc_t::paramindex [variable], type=int[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramindex"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramindex_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "paramparent", &mstudioseqdesc_t::paramparent );
+        { //mstudioseqdesc_t::paramstart [variable], type=float[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< float, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramstart"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramstart_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "pose", &mstudioseqdesc_t::pose );
+        mstudioseqdesc_t_exposer.def_readwrite( "posekeyindex", &mstudioseqdesc_t::posekeyindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "szactivitynameindex", &mstudioseqdesc_t::szactivitynameindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "szlabelindex", &mstudioseqdesc_t::szlabelindex );
+        pyplusplus::containers::static_sized::register_array_1< int, 5 >( "__array_1_int_5" );
+        { //mstudioseqdesc_t::unused [variable], type=int[5]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 5> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "unused"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_unused_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "weightlistindex", &mstudioseqdesc_t::weightlistindex );
+    }
 
     { //::ActivityList_IndexForName
     
@@ -255,6 +1250,28 @@ BOOST_PYTHON_MODULE(_animation){
             "LookupSequence"
             , LookupSequence_function_type( &::LookupSequence )
             , ( bp::arg("pstudiohdr"), bp::arg("label") ) );
+    
+    }
+
+    { //::Py_GetSeqdescActivityName
+    
+        typedef ::boost::python::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
+        
+        bp::def( 
+            "GetSeqdescActivityName"
+            , GetSeqdescActivityName_function_type( &::Py_GetSeqdescActivityName )
+            , ( bp::arg("pstudiohdr") ) );
+    
+    }
+
+    { //::Py_GetSeqdescLabel
+    
+        typedef ::boost::python::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
+        
+        bp::def( 
+            "GetSeqdescLabel"
+            , GetSeqdescLabel_function_type( &::Py_GetSeqdescLabel )
+            , ( bp::arg("pstudiohdr") ) );
     
     }
 
@@ -303,6 +1320,8 @@ BOOST_PYTHON_MODULE(_animation){
     }
 }
 #else
+#include "__array_1.pypp.hpp"
+
 #include "bone_setup.h"
 
 #include "eventlist.h"
@@ -322,6 +1341,91 @@ BOOST_PYTHON_MODULE(_animation){
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
+
+struct CStudioHdr_wrapper : CStudioHdr, bp::wrapper< CStudioHdr > {
+
+    struct CActivityToSequenceMapping_wrapper : CStudioHdr::CActivityToSequenceMapping, bp::wrapper< CStudioHdr::CActivityToSequenceMapping > {
+    
+        struct SequenceTuple_wrapper : CStudioHdr::CActivityToSequenceMapping::SequenceTuple, bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple > {
+        
+            SequenceTuple_wrapper(CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & arg )
+            : CStudioHdr::CActivityToSequenceMapping::SequenceTuple( arg )
+              , bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple >(){
+                // copy constructor
+                
+            }
+        
+            SequenceTuple_wrapper()
+            : CStudioHdr::CActivityToSequenceMapping::SequenceTuple()
+              , bp::wrapper< CStudioHdr::CActivityToSequenceMapping::SequenceTuple >(){
+                // null constructor
+                
+            }
+        
+            static ::CUtlSymbol * get_pActivityModifiers(CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & inst ){
+                return inst.pActivityModifiers;
+            }
+            
+            static void set_pActivityModifiers( CStudioHdr::CActivityToSequenceMapping::SequenceTuple & inst, ::CUtlSymbol * new_value ){ 
+                inst.pActivityModifiers = new_value;
+            }
+        
+        };
+    
+        CActivityToSequenceMapping_wrapper( )
+        : CStudioHdr::CActivityToSequenceMapping( )
+          , bp::wrapper< CStudioHdr::CActivityToSequenceMapping >(){
+            // null constructor
+        
+        }
+    
+    };
+
+    static ::CStudioHdr::CActivityToSequenceMapping * get_m_pActivityToSequence(CStudioHdr const & inst ){
+        return inst.m_pActivityToSequence;
+    }
+    
+    static void set_m_pActivityToSequence( CStudioHdr & inst, ::CStudioHdr::CActivityToSequenceMapping * new_value ){ 
+        inst.m_pActivityToSequence = new_value;
+    }
+
+};
+
+struct mstudioseqdesc_t_wrapper : mstudioseqdesc_t, bp::wrapper< mstudioseqdesc_t > {
+
+    mstudioseqdesc_t_wrapper( )
+    : mstudioseqdesc_t( )
+      , bp::wrapper< mstudioseqdesc_t >(){
+        // null constructor
+    
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 2>
+    pyplusplus_groupsize_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 2>( inst.groupsize );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< float, 2>
+    pyplusplus_paramend_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< float, 2>( inst.paramend );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 2>
+    pyplusplus_paramindex_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 2>( inst.paramindex );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< float, 2>
+    pyplusplus_paramstart_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< float, 2>( inst.paramstart );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< int, 5>
+    pyplusplus_unused_wrapper( ::mstudioseqdesc_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< int, 5>( inst.unused );
+    }
+
+};
 
 BOOST_PYTHON_MODULE(_animation){
     bp::docstring_options doc_options( true, true, false );
@@ -393,6 +1497,914 @@ BOOST_PYTHON_MODULE(_animation){
         .value("LAST_SHARED_ANIMEVENT", LAST_SHARED_ANIMEVENT)
         .export_values()
         ;
+
+    { //::CStudioHdr
+        typedef bp::class_< CStudioHdr_wrapper, boost::noncopyable > CStudioHdr_exposer_t;
+        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr", bp::no_init );
+        bp::scope CStudioHdr_scope( CStudioHdr_exposer );
+        { //::CStudioHdr::CActivityToSequenceMapping
+            typedef bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper, boost::noncopyable > CActivityToSequenceMapping_exposer_t;
+            CActivityToSequenceMapping_exposer_t CActivityToSequenceMapping_exposer = CActivityToSequenceMapping_exposer_t( "CActivityToSequenceMapping", bp::no_init );
+            bp::scope CActivityToSequenceMapping_scope( CActivityToSequenceMapping_exposer );
+            { //::CStudioHdr::CActivityToSequenceMapping::HashValueType
+                typedef bp::class_< CStudioHdr::CActivityToSequenceMapping::HashValueType > HashValueType_exposer_t;
+                HashValueType_exposer_t HashValueType_exposer = HashValueType_exposer_t( "HashValueType", bp::init< int, int, int, int >(( bp::arg("_actIdx"), bp::arg("_stIdx"), bp::arg("_ct"), bp::arg("_tW") )) );
+                bp::scope HashValueType_scope( HashValueType_exposer );
+                { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs
+                    typedef bp::class_< CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs > HashFuncs_exposer_t;
+                    HashFuncs_exposer_t HashFuncs_exposer = HashFuncs_exposer_t( "HashFuncs", bp::init< int >(( bp::arg("arg0") )) );
+                    bp::scope HashFuncs_scope( HashFuncs_exposer );
+                    bp::implicitly_convertible< int, CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs >();
+                    { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator()
+                    
+                        typedef bool ( ::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::*__call___function_type )( ::CStudioHdr::CActivityToSequenceMapping::HashValueType const &,::CStudioHdr::CActivityToSequenceMapping::HashValueType const & ) const;
+                        
+                        HashFuncs_exposer.def( 
+                            "__call__"
+                            , __call___function_type( &::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator() )
+                            , ( bp::arg("lhs"), bp::arg("rhs") ) );
+                    
+                    }
+                    { //::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator()
+                    
+                        typedef unsigned int ( ::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::*__call___function_type )( ::CStudioHdr::CActivityToSequenceMapping::HashValueType const & ) const;
+                        
+                        HashFuncs_exposer.def( 
+                            "__call__"
+                            , __call___function_type( &::CStudioHdr::CActivityToSequenceMapping::HashValueType::HashFuncs::operator() )
+                            , ( bp::arg("item") ) );
+                    
+                    }
+                }
+                HashValueType_exposer.def( bp::init< >() );
+                HashValueType_exposer.def_readwrite( "activityIdx", &CStudioHdr::CActivityToSequenceMapping::HashValueType::activityIdx );
+                HashValueType_exposer.def_readwrite( "count", &CStudioHdr::CActivityToSequenceMapping::HashValueType::count );
+                HashValueType_exposer.def_readwrite( "startingIdx", &CStudioHdr::CActivityToSequenceMapping::HashValueType::startingIdx );
+                HashValueType_exposer.def_readwrite( "totalWeight", &CStudioHdr::CActivityToSequenceMapping::HashValueType::totalWeight );
+            }
+            bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper >( "SequenceTuple" )    
+                .def_readwrite( "iNumActivityModifiers", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::iNumActivityModifiers )    
+                .add_property( "pActivityModifiers"
+                            , bp::make_function( (::CUtlSymbol * (*)( ::CStudioHdr::CActivityToSequenceMapping::SequenceTuple const & ))(&CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper::get_pActivityModifiers), bp::return_internal_reference< >() )
+                            , bp::make_function( (void (*)( ::CStudioHdr::CActivityToSequenceMapping::SequenceTuple &,::CUtlSymbol * ))(&CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper::SequenceTuple_wrapper::set_pActivityModifiers), bp::with_custodian_and_ward_postcall< 1, 2 >() ) )    
+                .def_readwrite( "seqnum", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::seqnum )    
+                .def_readwrite( "weight", &CStudioHdr::CActivityToSequenceMapping::SequenceTuple::weight );
+            CActivityToSequenceMapping_exposer.def( bp::init< >() );
+            { //::CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity
+            
+                typedef int ( ::CStudioHdr::CActivityToSequenceMapping::*NumSequencesForActivity_function_type )( int ) ;
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "NumSequencesForActivity"
+                    , NumSequencesForActivity_function_type( &::CStudioHdr::CActivityToSequenceMapping::NumSequencesForActivity )
+                    , ( bp::arg("forActivity") ) );
+            
+            }
+            { //::CStudioHdr::CActivityToSequenceMapping::ReleaseMapping
+            
+                typedef void ( *ReleaseMapping_function_type )( ::CStudioHdr::CActivityToSequenceMapping * );
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "ReleaseMapping"
+                    , ReleaseMapping_function_type( &::CStudioHdr::CActivityToSequenceMapping::ReleaseMapping )
+                    , ( bp::arg("pMap") ) );
+            
+            }
+            { //::CStudioHdr::CActivityToSequenceMapping::ResetMappings
+            
+                typedef void ( *ResetMappings_function_type )(  );
+                
+                CActivityToSequenceMapping_exposer.def( 
+                    "ResetMappings"
+                    , ResetMappings_function_type( &::CStudioHdr::CActivityToSequenceMapping::ResetMappings ) );
+            
+            }
+            CActivityToSequenceMapping_exposer.staticmethod( "ReleaseMapping" );
+            CActivityToSequenceMapping_exposer.staticmethod( "ResetMappings" );
+        }
+        { //::CStudioHdr::BoneFlexDriverCount
+        
+            typedef int ( ::CStudioHdr::*BoneFlexDriverCount_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "BoneFlexDriverCount"
+                , BoneFlexDriverCount_function_type( &::CStudioHdr::BoneFlexDriverCount ) );
+        
+        }
+        { //::CStudioHdr::ClearPerfCounters
+        
+            typedef void ( ::CStudioHdr::*ClearPerfCounters_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ClearPerfCounters"
+                , ClearPerfCounters_function_type( &::CStudioHdr::ClearPerfCounters ) );
+        
+        }
+        { //::CStudioHdr::CopyAutoplaySequences
+        
+            typedef int ( ::CStudioHdr::*CopyAutoplaySequences_function_type )( short unsigned int *,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "CopyAutoplaySequences"
+                , CopyAutoplaySequences_function_type( &::CStudioHdr::CopyAutoplaySequences )
+                , ( bp::arg("pOut"), bp::arg("outCount") ) );
+        
+        }
+        { //::CStudioHdr::CountAutoplaySequences
+        
+            typedef int ( ::CStudioHdr::*CountAutoplaySequences_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "CountAutoplaySequences"
+                , CountAutoplaySequences_function_type( &::CStudioHdr::CountAutoplaySequences ) );
+        
+        }
+        { //::CStudioHdr::EntryNode
+        
+            typedef int ( ::CStudioHdr::*EntryNode_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "EntryNode"
+                , EntryNode_function_type( &::CStudioHdr::EntryNode )
+                , ( bp::arg("iSequence") ) );
+        
+        }
+        { //::CStudioHdr::ExitNode
+        
+            typedef int ( ::CStudioHdr::*ExitNode_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ExitNode"
+                , ExitNode_function_type( &::CStudioHdr::ExitNode )
+                , ( bp::arg("iSequence") ) );
+        
+        }
+        { //::CStudioHdr::GetActivityListVersion
+        
+            typedef int ( ::CStudioHdr::*GetActivityListVersion_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetActivityListVersion"
+                , GetActivityListVersion_function_type( &::CStudioHdr::GetActivityListVersion ) );
+        
+        }
+        { //::CStudioHdr::GetAttachmentBone
+        
+            typedef int ( ::CStudioHdr::*GetAttachmentBone_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetAttachmentBone"
+                , GetAttachmentBone_function_type( &::CStudioHdr::GetAttachmentBone )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::CStudioHdr::GetAutoplayList
+        
+            typedef int ( ::CStudioHdr::*GetAutoplayList_function_type )( short unsigned int * * ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetAutoplayList"
+                , GetAutoplayList_function_type( &::CStudioHdr::GetAutoplayList )
+                , ( bp::arg("pOut") ) );
+        
+        }
+        { //::CStudioHdr::GetEventListVersion
+        
+            typedef int ( ::CStudioHdr::*GetEventListVersion_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "GetEventListVersion"
+                , GetEventListVersion_function_type( &::CStudioHdr::GetEventListVersion ) );
+        
+        }
+        { //::CStudioHdr::GetNumAttachments
+        
+            typedef int ( ::CStudioHdr::*GetNumAttachments_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumAttachments"
+                , GetNumAttachments_function_type( &::CStudioHdr::GetNumAttachments ) );
+        
+        }
+        { //::CStudioHdr::GetNumBoneControllers
+        
+            typedef int ( ::CStudioHdr::*GetNumBoneControllers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumBoneControllers"
+                , GetNumBoneControllers_function_type( &::CStudioHdr::GetNumBoneControllers ) );
+        
+        }
+        { //::CStudioHdr::GetNumIKAutoplayLocks
+        
+            typedef int ( ::CStudioHdr::*GetNumIKAutoplayLocks_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumIKAutoplayLocks"
+                , GetNumIKAutoplayLocks_function_type( &::CStudioHdr::GetNumIKAutoplayLocks ) );
+        
+        }
+        { //::CStudioHdr::GetNumIKChains
+        
+            typedef int ( ::CStudioHdr::*GetNumIKChains_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumIKChains"
+                , GetNumIKChains_function_type( &::CStudioHdr::GetNumIKChains ) );
+        
+        }
+        { //::CStudioHdr::GetNumPoseParameters
+        
+            typedef int ( ::CStudioHdr::*GetNumPoseParameters_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumPoseParameters"
+                , GetNumPoseParameters_function_type( &::CStudioHdr::GetNumPoseParameters ) );
+        
+        }
+        { //::CStudioHdr::GetNumSeq
+        
+            typedef int ( ::CStudioHdr::*GetNumSeq_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetNumSeq"
+                , GetNumSeq_function_type( &::CStudioHdr::GetNumSeq ) );
+        
+        }
+        { //::CStudioHdr::GetSharedPoseParameter
+        
+            typedef int ( ::CStudioHdr::*GetSharedPoseParameter_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetSharedPoseParameter"
+                , GetSharedPoseParameter_function_type( &::CStudioHdr::GetSharedPoseParameter )
+                , ( bp::arg("iSequence"), bp::arg("iLocalPose") ) );
+        
+        }
+        { //::CStudioHdr::GetSurfaceProp
+        
+            typedef int ( ::CStudioHdr::*GetSurfaceProp_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetSurfaceProp"
+                , GetSurfaceProp_function_type( &::CStudioHdr::GetSurfaceProp ) );
+        
+        }
+        { //::CStudioHdr::GetTransition
+        
+            typedef int ( ::CStudioHdr::*GetTransition_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "GetTransition"
+                , GetTransition_function_type( &::CStudioHdr::GetTransition )
+                , ( bp::arg("iFrom"), bp::arg("iTo") ) );
+        
+        }
+        { //::CStudioHdr::HaveSequenceForActivity
+        
+            typedef bool ( ::CStudioHdr::*HaveSequenceForActivity_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "HaveSequenceForActivity"
+                , HaveSequenceForActivity_function_type( &::CStudioHdr::HaveSequenceForActivity )
+                , ( bp::arg("activity") ) );
+        
+        }
+        { //::CStudioHdr::IllumPositionAttachmentIndex
+        
+            typedef int ( ::CStudioHdr::*IllumPositionAttachmentIndex_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "IllumPositionAttachmentIndex"
+                , IllumPositionAttachmentIndex_function_type( &::CStudioHdr::IllumPositionAttachmentIndex ) );
+        
+        }
+        { //::CStudioHdr::Init
+        
+            typedef void ( ::CStudioHdr::*Init_function_type )( ::studiohdr_t const *,::IMDLCache * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Init"
+                , Init_function_type( &::CStudioHdr::Init )
+                , ( bp::arg("pStudioHdr"), bp::arg("mdlcache")=bp::object() ) );
+        
+        }
+        { //::CStudioHdr::InitActivityToSequence
+        
+            typedef void ( ::CStudioHdr::*InitActivityToSequence_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "InitActivityToSequence"
+                , InitActivityToSequence_function_type( &::CStudioHdr::InitActivityToSequence ) );
+        
+        }
+        { //::CStudioHdr::IsReadyForAccess
+        
+            typedef bool ( ::CStudioHdr::*IsReadyForAccess_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "IsReadyForAccess"
+                , IsReadyForAccess_function_type( &::CStudioHdr::IsReadyForAccess ) );
+        
+        }
+        { //::CStudioHdr::IsValid
+        
+            typedef bool ( ::CStudioHdr::*IsValid_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "IsValid"
+                , IsValid_function_type( &::CStudioHdr::IsValid ) );
+        
+        }
+        { //::CStudioHdr::IsVirtual
+        
+            typedef bool ( ::CStudioHdr::*IsVirtual_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "IsVirtual"
+                , IsVirtual_function_type( &::CStudioHdr::IsVirtual ) );
+        
+        }
+        { //::CStudioHdr::MaxEyeDeflection
+        
+            typedef float ( ::CStudioHdr::*MaxEyeDeflection_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "MaxEyeDeflection"
+                , MaxEyeDeflection_function_type( &::CStudioHdr::MaxEyeDeflection ) );
+        
+        }
+        { //::CStudioHdr::ReinitializeSequenceMapping
+        
+            typedef void ( ::CStudioHdr::*ReinitializeSequenceMapping_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "ReinitializeSequenceMapping"
+                , ReinitializeSequenceMapping_function_type( &::CStudioHdr::ReinitializeSequenceMapping ) );
+        
+        }
+        { //::CStudioHdr::RemapAnimBone
+        
+            typedef int ( ::CStudioHdr::*RemapAnimBone_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "RemapAnimBone"
+                , RemapAnimBone_function_type( &::CStudioHdr::RemapAnimBone )
+                , ( bp::arg("iAnim"), bp::arg("iLocalBone") ) );
+        
+        }
+        { //::CStudioHdr::RemapSeqBone
+        
+            typedef int ( ::CStudioHdr::*RemapSeqBone_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "RemapSeqBone"
+                , RemapSeqBone_function_type( &::CStudioHdr::RemapSeqBone )
+                , ( bp::arg("iSequence"), bp::arg("iLocalBone") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRules
+        
+            typedef void ( ::CStudioHdr::*RunFlexRules_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRules"
+                , RunFlexRules_function_type( &::CStudioHdr::RunFlexRules )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRulesNew
+        
+            typedef void ( ::CStudioHdr::*RunFlexRulesNew_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRulesNew"
+                , RunFlexRulesNew_function_type( &::CStudioHdr::RunFlexRulesNew )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::RunFlexRulesOld
+        
+            typedef void ( ::CStudioHdr::*RunFlexRulesOld_function_type )( float const *,float * ) ;
+            
+            CStudioHdr_exposer.def( 
+                "RunFlexRulesOld"
+                , RunFlexRulesOld_function_type( &::CStudioHdr::RunFlexRulesOld )
+                , ( bp::arg("src"), bp::arg("dest") ) );
+        
+        }
+        { //::CStudioHdr::SelectWeightedSequence
+        
+            typedef int ( ::CStudioHdr::*SelectWeightedSequence_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SelectWeightedSequence"
+                , SelectWeightedSequence_function_type( &::CStudioHdr::SelectWeightedSequence )
+                , ( bp::arg("activity"), bp::arg("curSequence") ) );
+        
+        }
+        { //::CStudioHdr::SelectWeightedSequenceFromModifiers
+        
+            typedef int ( ::CStudioHdr::*SelectWeightedSequenceFromModifiers_function_type )( int,::CUtlSymbol *,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SelectWeightedSequenceFromModifiers"
+                , SelectWeightedSequenceFromModifiers_function_type( &::CStudioHdr::SelectWeightedSequenceFromModifiers )
+                , ( bp::arg("activity"), bp::arg("pActivityModifiers"), bp::arg("iModifierCount") ) );
+        
+        }
+        { //::CStudioHdr::SequencesAvailable
+        
+            typedef bool ( ::CStudioHdr::*SequencesAvailable_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "SequencesAvailable"
+                , SequencesAvailable_function_type( &::CStudioHdr::SequencesAvailable ) );
+        
+        }
+        { //::CStudioHdr::SetActivityListVersion
+        
+            typedef void ( ::CStudioHdr::*SetActivityListVersion_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetActivityListVersion"
+                , SetActivityListVersion_function_type( &::CStudioHdr::SetActivityListVersion )
+                , ( bp::arg("version") ) );
+        
+        }
+        { //::CStudioHdr::SetAttachmentBone
+        
+            typedef void ( ::CStudioHdr::*SetAttachmentBone_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetAttachmentBone"
+                , SetAttachmentBone_function_type( &::CStudioHdr::SetAttachmentBone )
+                , ( bp::arg("iAttachment"), bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::SetEventListVersion
+        
+            typedef void ( ::CStudioHdr::*SetEventListVersion_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "SetEventListVersion"
+                , SetEventListVersion_function_type( &::CStudioHdr::SetEventListVersion )
+                , ( bp::arg("version") ) );
+        
+        }
+        { //::CStudioHdr::Term
+        
+            typedef void ( ::CStudioHdr::*Term_function_type )(  ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Term"
+                , Term_function_type( &::CStudioHdr::Term ) );
+        
+        }
+        { //::CStudioHdr::boneFlags
+        
+            typedef int ( ::CStudioHdr::*boneFlags_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "boneFlags"
+                , boneFlags_function_type( &::CStudioHdr::boneFlags )
+                , ( bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::boneParent
+        
+            typedef int ( ::CStudioHdr::*boneParent_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "boneParent"
+                , boneParent_function_type( &::CStudioHdr::boneParent )
+                , ( bp::arg("iBone") ) );
+        
+        }
+        { //::CStudioHdr::clearBoneFlags
+        
+            typedef void ( ::CStudioHdr::*clearBoneFlags_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "clearBoneFlags"
+                , clearBoneFlags_function_type( &::CStudioHdr::clearBoneFlags )
+                , ( bp::arg("iBone"), bp::arg("flags") ) );
+        
+        }
+        { //::CStudioHdr::contents
+        
+            typedef int ( ::CStudioHdr::*contents_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "contents"
+                , contents_function_type( &::CStudioHdr::contents ) );
+        
+        }
+        { //::CStudioHdr::eyeposition
+        
+            typedef ::Vector ( ::CStudioHdr::*eyeposition_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "eyeposition"
+                , eyeposition_function_type( &::CStudioHdr::eyeposition ) );
+        
+        }
+        { //::CStudioHdr::flags
+        
+            typedef int ( ::CStudioHdr::*flags_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "flags"
+                , flags_function_type( &::CStudioHdr::flags ) );
+        
+        }
+        { //::CStudioHdr::hull_max
+        
+            typedef ::Vector ( ::CStudioHdr::*hull_max_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "hull_max"
+                , hull_max_function_type( &::CStudioHdr::hull_max ) );
+        
+        }
+        { //::CStudioHdr::hull_min
+        
+            typedef ::Vector ( ::CStudioHdr::*hull_min_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "hull_min"
+                , hull_min_function_type( &::CStudioHdr::hull_min ) );
+        
+        }
+        { //::CStudioHdr::iHitboxCount
+        
+            typedef int ( ::CStudioHdr::*iHitboxCount_function_type )( int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iHitboxCount"
+                , iHitboxCount_function_type( &::CStudioHdr::iHitboxCount )
+                , ( bp::arg("set") ) );
+        
+        }
+        { //::CStudioHdr::iRelativeAnim
+        
+            typedef int ( ::CStudioHdr::*iRelativeAnim_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iRelativeAnim"
+                , iRelativeAnim_function_type( &::CStudioHdr::iRelativeAnim )
+                , ( bp::arg("baseseq"), bp::arg("relanim") ) );
+        
+        }
+        { //::CStudioHdr::iRelativeSeq
+        
+            typedef int ( ::CStudioHdr::*iRelativeSeq_function_type )( int,int ) const;
+            
+            CStudioHdr_exposer.def( 
+                "iRelativeSeq"
+                , iRelativeSeq_function_type( &::CStudioHdr::iRelativeSeq )
+                , ( bp::arg("baseseq"), bp::arg("relseq") ) );
+        
+        }
+        { //::CStudioHdr::illumposition
+        
+            typedef ::Vector ( ::CStudioHdr::*illumposition_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "illumposition"
+                , illumposition_function_type( &::CStudioHdr::illumposition ) );
+        
+        }
+        { //::CStudioHdr::mass
+        
+            typedef float ( ::CStudioHdr::*mass_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "mass"
+                , mass_function_type( &::CStudioHdr::mass ) );
+        
+        }
+        { //::CStudioHdr::name
+        
+            typedef char const * ( ::CStudioHdr::*name_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "name"
+                , name_function_type( &::CStudioHdr::name ) );
+        
+        }
+        { //::CStudioHdr::numbodyparts
+        
+            typedef int ( ::CStudioHdr::*numbodyparts_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbodyparts"
+                , numbodyparts_function_type( &::CStudioHdr::numbodyparts ) );
+        
+        }
+        { //::CStudioHdr::numbonecontrollers
+        
+            typedef int ( ::CStudioHdr::*numbonecontrollers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbonecontrollers"
+                , numbonecontrollers_function_type( &::CStudioHdr::numbonecontrollers ) );
+        
+        }
+        { //::CStudioHdr::numbones
+        
+            typedef int ( ::CStudioHdr::*numbones_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numbones"
+                , numbones_function_type( &::CStudioHdr::numbones ) );
+        
+        }
+        { //::CStudioHdr::numflexcontrollers
+        
+            typedef ::LocalFlexController_t ( ::CStudioHdr::*numflexcontrollers_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexcontrollers"
+                , numflexcontrollers_function_type( &::CStudioHdr::numflexcontrollers ) );
+        
+        }
+        { //::CStudioHdr::numflexcontrollerui
+        
+            typedef int ( ::CStudioHdr::*numflexcontrollerui_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexcontrollerui"
+                , numflexcontrollerui_function_type( &::CStudioHdr::numflexcontrollerui ) );
+        
+        }
+        { //::CStudioHdr::numflexdesc
+        
+            typedef int ( ::CStudioHdr::*numflexdesc_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexdesc"
+                , numflexdesc_function_type( &::CStudioHdr::numflexdesc ) );
+        
+        }
+        { //::CStudioHdr::numflexrules
+        
+            typedef int ( ::CStudioHdr::*numflexrules_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numflexrules"
+                , numflexrules_function_type( &::CStudioHdr::numflexrules ) );
+        
+        }
+        { //::CStudioHdr::numhitboxsets
+        
+            typedef int ( ::CStudioHdr::*numhitboxsets_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numhitboxsets"
+                , numhitboxsets_function_type( &::CStudioHdr::numhitboxsets ) );
+        
+        }
+        { //::CStudioHdr::numikchains
+        
+            typedef int ( ::CStudioHdr::*numikchains_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numikchains"
+                , numikchains_function_type( &::CStudioHdr::numikchains ) );
+        
+        }
+        { //::CStudioHdr::numskinfamilies
+        
+            typedef int ( ::CStudioHdr::*numskinfamilies_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numskinfamilies"
+                , numskinfamilies_function_type( &::CStudioHdr::numskinfamilies ) );
+        
+        }
+        { //::CStudioHdr::numtextures
+        
+            typedef int ( ::CStudioHdr::*numtextures_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "numtextures"
+                , numtextures_function_type( &::CStudioHdr::numtextures ) );
+        
+        }
+        { //::CStudioHdr::pAttachment
+        
+            typedef ::mstudioattachment_t const & ( ::CStudioHdr::*pAttachment_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pAttachment"
+                , pAttachment_function_type( &::CStudioHdr::pAttachment )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pIKAutoplayLock
+        
+            typedef ::mstudioiklock_t const & ( ::CStudioHdr::*pIKAutoplayLock_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pIKAutoplayLock"
+                , pIKAutoplayLock_function_type( &::CStudioHdr::pIKAutoplayLock )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pPoseParameter
+        
+            typedef ::mstudioposeparamdesc_t const & ( ::CStudioHdr::*pPoseParameter_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "pPoseParameter"
+                , pPoseParameter_function_type( &::CStudioHdr::pPoseParameter )
+                , ( bp::arg("i") )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CStudioHdr::pSeqdesc
+        
+            typedef ::mstudioseqdesc_t & ( ::CStudioHdr::*Seqdesc_function_type )( int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "Seqdesc"
+                , Seqdesc_function_type( &::CStudioHdr::pSeqdesc )
+                , ( bp::arg("iSequence") )
+                , bp::return_value_policy< bp::reference_existing_object >() );
+        
+        }
+        { //::CStudioHdr::pszName
+        
+            typedef char const * ( ::CStudioHdr::*name_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "name"
+                , name_function_type( &::CStudioHdr::pszName ) );
+        
+        }
+        { //::CStudioHdr::setBoneFlags
+        
+            typedef void ( ::CStudioHdr::*setBoneFlags_function_type )( int,int ) ;
+            
+            CStudioHdr_exposer.def( 
+                "setBoneFlags"
+                , setBoneFlags_function_type( &::CStudioHdr::setBoneFlags )
+                , ( bp::arg("iBone"), bp::arg("flags") ) );
+        
+        }
+        { //::CStudioHdr::view_bbmax
+        
+            typedef ::Vector ( ::CStudioHdr::*view_bbmax_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "view_bbmax"
+                , view_bbmax_function_type( &::CStudioHdr::view_bbmax ) );
+        
+        }
+        { //::CStudioHdr::view_bbmin
+        
+            typedef ::Vector ( ::CStudioHdr::*view_bbmin_function_type )(  ) const;
+            
+            CStudioHdr_exposer.def( 
+                "view_bbmin"
+                , view_bbmin_function_type( &::CStudioHdr::view_bbmin ) );
+        
+        }
+        CStudioHdr_exposer.def_readwrite( "m_nPerfAnimatedBones", &CStudioHdr::m_nPerfAnimatedBones );
+        CStudioHdr_exposer.def_readwrite( "m_nPerfAnimationLayers", &CStudioHdr::m_nPerfAnimationLayers );
+        CStudioHdr_exposer.def_readwrite( "m_nPerfUsedBones", &CStudioHdr::m_nPerfUsedBones );
+        CStudioHdr_exposer.add_property( "m_pActivityToSequence"
+                    , bp::make_function( (::CStudioHdr::CActivityToSequenceMapping * (*)( ::CStudioHdr const & ))(&CStudioHdr_wrapper::get_m_pActivityToSequence), bp::return_internal_reference< >() )
+                    , bp::make_function( (void (*)( ::CStudioHdr &,::CStudioHdr::CActivityToSequenceMapping * ))(&CStudioHdr_wrapper::set_m_pActivityToSequence), bp::with_custodian_and_ward_postcall< 1, 2 >() ) );
+    }
+
+    { //::mstudioseqdesc_t
+        typedef bp::class_< mstudioseqdesc_t_wrapper, boost::noncopyable > mstudioseqdesc_t_exposer_t;
+        mstudioseqdesc_t_exposer_t mstudioseqdesc_t_exposer = mstudioseqdesc_t_exposer_t( "mstudioseqdesc_t", bp::no_init );
+        bp::scope mstudioseqdesc_t_scope( mstudioseqdesc_t_exposer );
+        mstudioseqdesc_t_exposer.def( bp::init< >() );
+        { //::mstudioseqdesc_t::KeyValueText
+        
+            typedef char const * ( ::mstudioseqdesc_t::*KeyValueText_function_type )(  ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "KeyValueText"
+                , KeyValueText_function_type( &::mstudioseqdesc_t::KeyValueText ) );
+        
+        }
+        { //::mstudioseqdesc_t::anim
+        
+            typedef int ( ::mstudioseqdesc_t::*anim_function_type )( int,int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "anim"
+                , anim_function_type( &::mstudioseqdesc_t::anim )
+                , ( bp::arg("x"), bp::arg("y") ) );
+        
+        }
+        { //::mstudioseqdesc_t::poseKey
+        
+            typedef float ( ::mstudioseqdesc_t::*poseKey_function_type )( int,int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "poseKey"
+                , poseKey_function_type( &::mstudioseqdesc_t::poseKey )
+                , ( bp::arg("iParam"), bp::arg("iAnim") ) );
+        
+        }
+        { //::mstudioseqdesc_t::weight
+        
+            typedef float ( ::mstudioseqdesc_t::*weight_function_type )( int ) const;
+            
+            mstudioseqdesc_t_exposer.def( 
+                "weight"
+                , weight_function_type( &::mstudioseqdesc_t::weight )
+                , ( bp::arg("i") ) );
+        
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "activity", &mstudioseqdesc_t::activity );
+        mstudioseqdesc_t_exposer.def_readwrite( "activitymodifierindex", &mstudioseqdesc_t::activitymodifierindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "actweight", &mstudioseqdesc_t::actweight );
+        mstudioseqdesc_t_exposer.def_readwrite( "animindexindex", &mstudioseqdesc_t::animindexindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "autolayerindex", &mstudioseqdesc_t::autolayerindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "baseptr", &mstudioseqdesc_t::baseptr );
+        mstudioseqdesc_t_exposer.def_readwrite( "bbmax", &mstudioseqdesc_t::bbmax );
+        mstudioseqdesc_t_exposer.def_readwrite( "bbmin", &mstudioseqdesc_t::bbmin );
+        mstudioseqdesc_t_exposer.def_readwrite( "cycleposeindex", &mstudioseqdesc_t::cycleposeindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "entryphase", &mstudioseqdesc_t::entryphase );
+        mstudioseqdesc_t_exposer.def_readwrite( "eventindex", &mstudioseqdesc_t::eventindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "exitphase", &mstudioseqdesc_t::exitphase );
+        mstudioseqdesc_t_exposer.def_readwrite( "fadeintime", &mstudioseqdesc_t::fadeintime );
+        mstudioseqdesc_t_exposer.def_readwrite( "fadeouttime", &mstudioseqdesc_t::fadeouttime );
+        mstudioseqdesc_t_exposer.def_readwrite( "flags", &mstudioseqdesc_t::flags );
+        pyplusplus::containers::static_sized::register_array_1< int, 2 >( "__array_1_int_2" );
+        { //mstudioseqdesc_t::groupsize [variable], type=int[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "groupsize"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_groupsize_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "iklockindex", &mstudioseqdesc_t::iklockindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "keyvalueindex", &mstudioseqdesc_t::keyvalueindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "keyvaluesize", &mstudioseqdesc_t::keyvaluesize );
+        mstudioseqdesc_t_exposer.def_readwrite( "lastframe", &mstudioseqdesc_t::lastframe );
+        mstudioseqdesc_t_exposer.def_readwrite( "localentrynode", &mstudioseqdesc_t::localentrynode );
+        mstudioseqdesc_t_exposer.def_readwrite( "localexitnode", &mstudioseqdesc_t::localexitnode );
+        mstudioseqdesc_t_exposer.def_readwrite( "movementindex", &mstudioseqdesc_t::movementindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "nextseq", &mstudioseqdesc_t::nextseq );
+        mstudioseqdesc_t_exposer.def_readwrite( "nodeflags", &mstudioseqdesc_t::nodeflags );
+        mstudioseqdesc_t_exposer.def_readwrite( "numactivitymodifiers", &mstudioseqdesc_t::numactivitymodifiers );
+        mstudioseqdesc_t_exposer.def_readwrite( "numautolayers", &mstudioseqdesc_t::numautolayers );
+        mstudioseqdesc_t_exposer.def_readwrite( "numblends", &mstudioseqdesc_t::numblends );
+        mstudioseqdesc_t_exposer.def_readwrite( "numevents", &mstudioseqdesc_t::numevents );
+        mstudioseqdesc_t_exposer.def_readwrite( "numiklocks", &mstudioseqdesc_t::numiklocks );
+        mstudioseqdesc_t_exposer.def_readwrite( "numikrules", &mstudioseqdesc_t::numikrules );
+        pyplusplus::containers::static_sized::register_array_1< float, 2 >( "__array_1_float_2" );
+        { //mstudioseqdesc_t::paramend [variable], type=float[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< float, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramend"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramend_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        { //mstudioseqdesc_t::paramindex [variable], type=int[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramindex"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramindex_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "paramparent", &mstudioseqdesc_t::paramparent );
+        { //mstudioseqdesc_t::paramstart [variable], type=float[2]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< float, 2> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "paramstart"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_paramstart_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "pose", &mstudioseqdesc_t::pose );
+        mstudioseqdesc_t_exposer.def_readwrite( "posekeyindex", &mstudioseqdesc_t::posekeyindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "szactivitynameindex", &mstudioseqdesc_t::szactivitynameindex );
+        mstudioseqdesc_t_exposer.def_readwrite( "szlabelindex", &mstudioseqdesc_t::szlabelindex );
+        pyplusplus::containers::static_sized::register_array_1< int, 5 >( "__array_1_int_5" );
+        { //mstudioseqdesc_t::unused [variable], type=int[5]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< int, 5> ( *array_wrapper_creator )( ::mstudioseqdesc_t & );
+            
+            mstudioseqdesc_t_exposer.add_property( "unused"
+                , bp::make_function( array_wrapper_creator(&mstudioseqdesc_t_wrapper::pyplusplus_unused_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        mstudioseqdesc_t_exposer.def_readwrite( "weightlistindex", &mstudioseqdesc_t::weightlistindex );
+    }
 
     { //::ActivityList_IndexForName
     
@@ -556,6 +2568,28 @@ BOOST_PYTHON_MODULE(_animation){
             "LookupSequence"
             , LookupSequence_function_type( &::LookupSequence )
             , ( bp::arg("pstudiohdr"), bp::arg("label") ) );
+    
+    }
+
+    { //::Py_GetSeqdescActivityName
+    
+        typedef ::boost::python::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
+        
+        bp::def( 
+            "GetSeqdescActivityName"
+            , GetSeqdescActivityName_function_type( &::Py_GetSeqdescActivityName )
+            , ( bp::arg("pstudiohdr") ) );
+    
+    }
+
+    { //::Py_GetSeqdescLabel
+    
+        typedef ::boost::python::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
+        
+        bp::def( 
+            "GetSeqdescLabel"
+            , GetSeqdescLabel_function_type( &::Py_GetSeqdescLabel )
+            , ( bp::arg("pstudiohdr") ) );
     
     }
 

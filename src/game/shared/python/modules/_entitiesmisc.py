@@ -427,14 +427,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
 
         mb.add_registration_code( "ptr_imouse_to_py_imouse();" )
         
-        # Model
-        cls = mb.class_('CStudioHdr')
-        self.IncludeEmptyClass(mb, 'CStudioHdr')
-        cls.calldefs('CStudioHdr').exclude()
-        cls.no_init = True
-        cls.mem_funs('pszName').include()
-        cls.mem_funs('pszName').rename('name')
-        
         # Shared Props
         mb.class_('breakablepropparams_t').include()
         mb.free_functions('GetMassEquivalent').include()

@@ -11,6 +11,13 @@
 #pragma once
 #endif
 
+#include "studio.h"
+
+#include "srcpy_boostpython.h"
+
+boost::python::object Py_GetSeqdescActivityName( const mstudioseqdesc_t &pstudiohdr );
+boost::python::object Py_GetSeqdescLabel( const mstudioseqdesc_t &pstudiohdr );
+
 float Py_Studio_GetMass( CStudioHdr *pstudiohdr );
 
 

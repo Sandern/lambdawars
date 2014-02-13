@@ -2206,11 +2206,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         }
     }
 
-    bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
-        .def( 
-            "name"
-            , (char const * ( ::CStudioHdr::* )(  ) const)( &::CStudioHdr::pszName ) );
-
     bp::class_< ClientClass >( "ClientClass", bp::no_init )    
         .def( 
             "GetName"
@@ -5233,11 +5228,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         
         }
     }
-
-    bp::class_< CStudioHdr, boost::noncopyable >( "CStudioHdr", bp::no_init )    
-        .def( 
-            "name"
-            , (char const * ( ::CStudioHdr::* )(  ) const)( &::CStudioHdr::pszName ) );
 
     bp::class_< FireBulletsInfo_t_wrapper >( "FireBulletsInfo_t", bp::init< >() )    
         .def( bp::init< int, Vector const &, Vector const &, Vector const &, float, int, bp::optional< bool > >(( bp::arg("nShots"), bp::arg("vecSrc"), bp::arg("vecDir"), bp::arg("vecSpread"), bp::arg("flDistance"), bp::arg("nAmmoType"), bp::arg("bPrimaryAttack")=(bool)(true) )) )    
