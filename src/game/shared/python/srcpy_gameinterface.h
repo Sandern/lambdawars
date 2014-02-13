@@ -442,6 +442,20 @@ public:
 	inline bool			IsLowViolence() { return engine->IsLowViolence(); }
 	inline const char		*GetMostRecentSaveGame( void ) { return engine->GetMostRecentSaveGame(); }
 	inline void			SetMostRecentSaveGame( const char *lpszFilename )  { engine->SetMostRecentSaveGame(lpszFilename); }
+
+	inline bool IsActiveApp() { return engine->GetMostRecentSaveGame(); }
+
+	// is this client running inside the same process as an active server?
+	inline bool IsClientLocalToActiveServer() { return engine->IsClientLocalToActiveServer(); }
+
+	// Callback for LevelInit to tick the progress bar during time consuming operations
+	inline void TickProgressBar() { engine->TickProgressBar(); }
+
+	// Returns the requested input context
+	//inline InputContextHandle_t GetInputContext( EngineInputContextId_t id ) = 0;
+
+	// let client lock mouse to the window bounds
+	inline void SetMouseWindowLock( bool bLockToWindow ) { engine->SetMouseWindowLock( bLockToWindow ); }
 };
 
 extern PyVEngineClient *pyengine;

@@ -2419,6 +2419,9 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , (void ( ::PyVEngineClient::* )( int,int,int,int ) )( &::PyVEngineClient::GrabPreColorCorrectedFrame )
             , ( bp::arg("x"), bp::arg("y"), bp::arg("width"), bp::arg("height") ) )    
         .def( 
+            "IsActiveApp"
+            , (bool ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::IsActiveApp ) )    
+        .def( 
             "IsBoxInViewCluster"
             , (int ( ::PyVEngineClient::* )( ::Vector const &,::Vector const & ) )( &::PyVEngineClient::IsBoxInViewCluster )
             , ( bp::arg("mins"), bp::arg("maxs") ) )    
@@ -2426,6 +2429,9 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "IsBoxVisible"
             , (int ( ::PyVEngineClient::* )( ::Vector const &,::Vector const & ) )( &::PyVEngineClient::IsBoxVisible )
             , ( bp::arg("mins"), bp::arg("maxs") ) )    
+        .def( 
+            "IsClientLocalToActiveServer"
+            , (bool ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::IsClientLocalToActiveServer ) )    
         .def( 
             "IsConnected"
             , (bool ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::IsConnected ) )    
@@ -2505,6 +2511,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , (void ( ::PyVEngineClient::* )( char const * ) )( &::PyVEngineClient::SetMostRecentSaveGame )
             , ( bp::arg("lpszFilename") ) )    
         .def( 
+            "SetMouseWindowLock"
+            , (void ( ::PyVEngineClient::* )( bool ) )( &::PyVEngineClient::SetMouseWindowLock )
+            , ( bp::arg("bLockToWindow") ) )    
+        .def( 
             "SetRestrictClientCommands"
             , (void ( ::PyVEngineClient::* )( bool ) )( &::PyVEngineClient::SetRestrictClientCommands )
             , ( bp::arg("bRestrict") ) )    
@@ -2525,6 +2535,9 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "SupportsHDR"
             , (bool ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::SupportsHDR ) )    
+        .def( 
+            "TickProgressBar"
+            , (void ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::TickProgressBar ) )    
         .def( 
             "WorldToScreenMatrix"
             , (::VMatrix const & ( ::PyVEngineClient::* )(  ) )( &::PyVEngineClient::WorldToScreenMatrix )
