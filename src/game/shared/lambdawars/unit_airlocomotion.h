@@ -40,7 +40,10 @@ public:
 	virtual void	AirAccelerate( Vector& wishdir, float wishspeed, float accel );
 
 	// Friction
-	void	Friction( void );
+	void			Friction( void );
+
+	// If I were to stop moving, how much distance would I walk before I'm halted?
+	virtual float	GetStopDistance();
 
 public:
 	float m_fCurrentHeight;

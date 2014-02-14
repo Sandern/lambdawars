@@ -1875,6 +1875,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , FullAirMove_function_type( &::UnitBaseAirLocomotion::FullAirMove ) );
         
         }
+        { //::UnitBaseAirLocomotion::GetStopDistance
+        
+            typedef float ( ::UnitBaseAirLocomotion::*GetStopDistance_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "GetStopDistance"
+                , GetStopDistance_function_type( &::UnitBaseAirLocomotion::GetStopDistance ) );
+        
+        }
         { //::UnitBaseAirLocomotion::Move
         
             typedef void ( ::UnitBaseAirLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
@@ -4823,6 +4832,15 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitBaseAirLocomotion_exposer.def( 
                 "FullAirMove"
                 , FullAirMove_function_type( &::UnitBaseAirLocomotion::FullAirMove ) );
+        
+        }
+        { //::UnitBaseAirLocomotion::GetStopDistance
+        
+            typedef float ( ::UnitBaseAirLocomotion::*GetStopDistance_function_type )(  ) ;
+            
+            UnitBaseAirLocomotion_exposer.def( 
+                "GetStopDistance"
+                , GetStopDistance_function_type( &::UnitBaseAirLocomotion::GetStopDistance ) );
         
         }
         { //::UnitBaseAirLocomotion::Move

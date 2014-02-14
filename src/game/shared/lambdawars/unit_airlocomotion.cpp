@@ -59,6 +59,9 @@ void UnitBaseAirLocomotion::Move( float interval, UnitBaseMoveCommand &move_comm
 	CheckVelocity();
 }
 
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
 void UnitBaseAirLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 {
 	// Hack: clamp z to max height (Strider)
@@ -140,6 +143,8 @@ void UnitBaseAirLocomotion::FullAirMove()
 	// Always air move
 	AirMove();
 
+	mv->stopdistance = GetStopDistance();
+
 	// If we are on ground, no downward velocity.
 	if( GetGroundEntity() != NULL)
 		mv->velocity.z = 0.0f;
@@ -182,6 +187,56 @@ void UnitBaseAirLocomotion::AirAccelerate( Vector& wishdir, float wishspeed, flo
 }
 
 //-----------------------------------------------------------------------------
+// If I were to stop moving, how much distance would I walk before I'm halted?
+//-----------------------------------------------------------------------------
+float UnitBaseAirLocomotion::GetStopDistance()
+{
+
+	float	speed, newspeed, control;
+	float	friction;
+	float	drop;
+	float	distance;
+	int		i;
+	
+	// Calculate speed
+	if( mv->velocity.IsValid() )
+		speed = VectorLength( mv->velocity );
+	else
+		speed = 0.0f;
+
+	distance = 0.0f;
+
+	for( i = 0; i < 1000; i++ )
+	{
+		drop = 0;
+
+		// apply friction
+		friction = sv_friction.GetFloat() * surfacefriction;
+
+		// Bleed off some speed, but if we have less than the bleed
+		//  threshold, bleed the threshold amount.
+		control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
+
+		// Add the amount to the drop amount.
+		drop += control * friction * mv->interval;
+
+		// scale the velocity
+		newspeed = speed - drop;
+		if (newspeed < 0)
+			newspeed = 0;
+
+		distance += newspeed * mv->interval;
+
+		speed = newspeed;
+
+		if( speed <= 0.1f )
+			break;
+	}
+
+	return distance;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void UnitBaseAirLocomotion::Friction( void )
@@ -206,17 +261,14 @@ void UnitBaseAirLocomotion::Friction( void )
 	drop = 0;
 
 	// Air units always encounter friction
-	//if (m_pOuter->GetGroundEntity() != NULL)  // On an entity that is the ground
-	{
-		friction = sv_friction.GetFloat() * surfacefriction;
+	friction = sv_friction.GetFloat() * surfacefriction;
 
-		// Bleed off some speed, but if we have less than the bleed
-		//  threshold, bleed the threshold amount.
-		control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
+	// Bleed off some speed, but if we have less than the bleed
+	//  threshold, bleed the threshold amount.
+	control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
 
-		// Add the amount to the drop amount.
-		drop += control*friction*mv->interval;
-	}
+	// Add the amount to the drop amount.
+	drop += control * friction * mv->interval;
 
 	// scale the velocity
 	newspeed = speed - drop;

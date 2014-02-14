@@ -132,8 +132,6 @@ void UnitVPhysicsLocomotion::VPhysicsMove( void )
 
 	// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
 	//VectorSubtract( mv->velocity, m_pOuter->GetBaseVelocity(), mv->velocity );
-
-	mv->stopdistance = GetStopDistance();
 }
 
 //-----------------------------------------------------------------------------

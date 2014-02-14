@@ -358,7 +358,7 @@ float UnitBaseLocomotion::GetStopDistance()
 			control = (speed < stopspeed) ? stopspeed : speed;
 
 			// Add the amount to the drop amount.
-			drop += control*friction*mv->interval;
+			drop += control * friction * mv->interval;
 		}
 
 		// scale the velocity
@@ -373,8 +373,6 @@ float UnitBaseLocomotion::GetStopDistance()
 		if( speed <= 0.1f )
 			break;
 	}
-
- 	//mv->outwishvel -= (1.f-newspeed) * mv->velocity;
 
 	return distance;
 }
@@ -471,8 +469,6 @@ void UnitBaseLocomotion::WalkMove( void )
 
 	// Now pull the base velocity back out.   Base velocity is set if you are on a moving object, like a conveyor (or maybe another monster?)
 	//VectorSubtract( mv->velocity, m_pOuter->GetBaseVelocity(), mv->velocity );
-
-	mv->stopdistance = GetStopDistance();
 }
 
 #define MAX_FIND_BLOCKERS 48
@@ -608,6 +604,8 @@ void UnitBaseLocomotion::FullWalkMove( )
 	{
 		WalkMove();
 	}
+
+	mv->stopdistance = GetStopDistance();
 
 	FinishGravity();
 
@@ -965,7 +963,7 @@ void UnitBaseLocomotion::Friction( void )
 		control = (speed < stopspeed) ? stopspeed : speed;
 
 		// Add the amount to the drop amount.
-		drop += control*friction*mv->interval;
+		drop += control * friction * mv->interval;
 	}
 
 	// scale the velocity
