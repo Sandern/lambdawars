@@ -631,7 +631,7 @@ void CFogOfWarMgr::ModifyHeightAtTile( int x, int y, float fHeight, bool updateD
 	int idx = FOWINDEX(x, y);
 	if( m_TileHeights.IsValidIndex( idx ) )
 	{
-		m_TileHeights[idx] = (int)fHeight;
+		m_TileHeightsStatic[idx] = (int)fHeight;
 
 		if( updateDynamic )
 		{
@@ -664,7 +664,7 @@ void CFogOfWarMgr::ModifyHeightAtExtent( const Vector &vMins, const Vector &vMax
 	{
 		for( y = ystart; y <= yend; y++ )
 		{
-			ModifyHeightAtTile( x, y, fHeight );
+			ModifyHeightAtTile( x, y, fHeight, false );
 		}
 	}
 
