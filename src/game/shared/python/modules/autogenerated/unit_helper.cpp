@@ -52,6 +52,25 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
         return UnitBaseAnimState::GetOuterXYSpeed(  );
     }
 
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
+    }
+
     virtual void OnNewModel(  ) {
         PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
         PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
@@ -422,6 +441,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
 
     float GetOuterXYSpeed(  ) const {
         return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
     }
 
     virtual void OnNewModel(  ) {
@@ -943,6 +981,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("actDesired") ) );
         
         }
+        { //::UnitBaseAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitBaseAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            typedef bool ( UnitBaseAnimState_wrapper::*default_HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type(&::UnitBaseAnimState::HasAimPoseParameters)
+                , default_HasAimPoseParameters_function_type(&UnitBaseAnimState_wrapper::default_HasAimPoseParameters) );
+        
+        }
         { //::UnitBaseAnimState::OnNewModel
         
             typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
@@ -1262,6 +1311,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "HasActivity"
                 , HasActivity_function_type( &::UnitAnimState::HasActivity )
                 , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type( &::UnitAnimState::HasAimPoseParameters ) );
         
         }
         { //::UnitAnimState::OnEndSpecificActivity
@@ -2074,6 +2132,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetOuterXYSpeed_function_type( &UnitVehicleAnimState_wrapper::GetOuterXYSpeed ) );
         
         }
+        { //::UnitBaseAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitBaseAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            typedef bool ( UnitVehicleAnimState_wrapper::*default_HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type(&::UnitBaseAnimState::HasAimPoseParameters)
+                , default_HasAimPoseParameters_function_type(&UnitVehicleAnimState_wrapper::default_HasAimPoseParameters) );
+        
+        }
         { //::UnitBaseAnimState::OnNewModel
         
             typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
@@ -2376,6 +2445,25 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
 
     float GetOuterXYSpeed(  ) const {
         return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
     }
 
     virtual void OnNewModel(  ) {
@@ -2847,6 +2935,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
 
     float GetOuterXYSpeed(  ) const {
         return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
     }
 
     virtual void OnNewModel(  ) {
@@ -3902,6 +4009,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("actDesired") ) );
         
         }
+        { //::UnitBaseAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitBaseAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            typedef bool ( UnitBaseAnimState_wrapper::*default_HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitBaseAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type(&::UnitBaseAnimState::HasAimPoseParameters)
+                , default_HasAimPoseParameters_function_type(&UnitBaseAnimState_wrapper::default_HasAimPoseParameters) );
+        
+        }
         { //::UnitBaseAnimState::OnNewModel
         
             typedef void ( ::UnitBaseAnimState::*OnNewModel_function_type )(  ) ;
@@ -4221,6 +4339,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "HasActivity"
                 , HasActivity_function_type( &::UnitAnimState::HasActivity )
                 , ( bp::arg("actDesired") ) );
+        
+        }
+        { //::UnitAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type( &::UnitAnimState::HasAimPoseParameters ) );
         
         }
         { //::UnitAnimState::OnEndSpecificActivity
@@ -5770,6 +5897,17 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitVehicleAnimState_exposer.def( 
                 "GetOuterXYSpeed"
                 , GetOuterXYSpeed_function_type( &UnitVehicleAnimState_wrapper::GetOuterXYSpeed ) );
+        
+        }
+        { //::UnitBaseAnimState::HasAimPoseParameters
+        
+            typedef bool ( ::UnitBaseAnimState::*HasAimPoseParameters_function_type )(  ) ;
+            typedef bool ( UnitVehicleAnimState_wrapper::*default_HasAimPoseParameters_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "HasAimPoseParameters"
+                , HasAimPoseParameters_function_type(&::UnitBaseAnimState::HasAimPoseParameters)
+                , default_HasAimPoseParameters_function_type(&UnitVehicleAnimState_wrapper::default_HasAimPoseParameters) );
         
         }
         { //::UnitBaseAnimState::OnNewModel

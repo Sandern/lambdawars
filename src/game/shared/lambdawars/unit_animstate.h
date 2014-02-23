@@ -129,6 +129,9 @@ public:
 	// it will change his body_yaw pose parameter before changing his rendered angle).
 	virtual const QAngle& GetRenderAngles();
 
+	// Tests if this animation state has aim pose parameters defined
+	virtual bool HasAimPoseParameters();
+
 // Overrideables.
 public:
 

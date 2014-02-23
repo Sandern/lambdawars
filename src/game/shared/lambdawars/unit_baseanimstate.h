@@ -43,6 +43,9 @@ public:
 	// Restart the main sequence (if applicable)
 	virtual void		RestartMainSequence() {}
 
+	// Tests if this animation state has aim pose parameters defined
+	virtual bool		HasAimPoseParameters() { return false; }
+
 protected:
 	// Helpers
 	void				GetOuterAbsVelocity( Vector& vel ) const;

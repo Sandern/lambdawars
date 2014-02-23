@@ -403,7 +403,7 @@ void CUnitBase::UpdateClientSideAnimation()
 		// Yaw and Pitch are updated in UserCmd if the unit has a commander
 		if( !GetCommander() )
 		{
-			if( GetActiveWeapon() )
+			if( m_pAnimState && m_pAnimState->HasAimPoseParameters() )
 			{
 				AimGun();
 			}

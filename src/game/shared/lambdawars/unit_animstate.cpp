@@ -274,6 +274,11 @@ int UnitAnimState::CalcAimLayerSequence( float *flCycle, float *flAimSequenceWei
 	return GetOuter()->LookupSequence( STRING(m_sAimLayerSequence) );
 }
 
+bool UnitAnimState::HasAimPoseParameters()
+{
+	return (m_iBodyYaw != -1) || (m_iBodyPitch != -1);
+}
+
 // does misc gestures if we're not firing
 void UnitAnimState::ComputeMiscSequence()
 {

@@ -696,7 +696,7 @@ void CUnitBase::UpdateServerAnimation( void )
 	if( m_fNextServerAnimStateTime > gpGlobals->curtime )
 		return;
 
-	if( GetActiveWeapon() )
+	if( GetAnimState()->HasAimPoseParameters() )
 	{
 		if( !GetCommander() )
 			AimGun();
