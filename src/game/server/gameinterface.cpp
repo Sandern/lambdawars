@@ -779,24 +779,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// Mount any game that is available to us
 	MountExtraContent();
 
-#ifndef SWARMKEEPER_DLL
-	if ( !CommandLine()->CheckParm( "-noep2check" ) && !engine->IsDedicatedServer() )
-	{
-		if( !steamapicontext || !steamapicontext->SteamApps() )
-		{
-			Error( "Could not get steam api. Is Steam running?" );
-			return false;
-		}
-
-		if( steamapicontext->SteamApps()->BIsSubscribedApp( 420 ) == false )
-		{
-			SrcShellExecute( "steam://store/420" );
-			Error( "This mod requires Half-Life 2: Episode Two." );
-			return false;
-		}
-	}
-#endif // SWARMKEEPER_DLL
-
 	if ( CommandLine()->FindParm( "-headtracking" ) )
 		g_bHeadTrackingEnabled = true;
 
