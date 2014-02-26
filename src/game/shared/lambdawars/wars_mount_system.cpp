@@ -24,6 +24,10 @@
 #define VPKBIN "../../common/left 4 dead 2/bin/vpk.exe"
 
 AppStatus g_AppStatus[NUM_APPS];
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool HasApp( MountApps app )
 {
 	if( app < 0 || app >= NUM_APPS )
@@ -31,6 +35,9 @@ bool HasApp( MountApps app )
 	return g_AppStatus[app] == AS_AVAILABLE;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 AppStatus GetAppStatus( MountApps app )
 {
 	if( app < 0 || app >= NUM_APPS )
@@ -45,6 +52,9 @@ AppStatus GetAppStatus( MountApps app )
 if( CBaseEntity::IsServer() ) \
 	Msg( __VA_ARGS__  );
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static void AddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_t addType = PATH_ADD_TO_TAIL )
 {
 #ifndef CLIENT_DLL
@@ -52,7 +62,9 @@ static void AddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_
 #endif // CLIENT_DLL
 }
 
-// Check functions
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool VerifyHaveAddonVPK( const char *pFileList[], int iArraySize, const char *pMountID, KeyValues *pMountList = NULL )
 {
 	char buf[_MAX_PATH];
@@ -82,15 +94,17 @@ bool VerifyHaveAddonVPK( const char *pFileList[], int iArraySize, const char *pM
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Tries to add a VPK path to the mount list
+//-----------------------------------------------------------------------------
 bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *pMountID, KeyValues *pMountList = NULL )
 {
-	MountMsg("Adding %s to search path...", pName);
-
 	if( pMountList && pMountList->GetInt( pMountID, 0 ) == 0 )
 	{
-		MountMsg("failed (disabled in mount list)\n");
 		return false;
 	}
+
+	MountMsg("Adding %s to search path...", pName);
 
 	// Dedicated servers always succeed for now...
 #ifdef GAME_DLL
@@ -116,6 +130,9 @@ bool TryMountVPKGame( const char *pName, const char *pPath, int id, const char *
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void MountExtraContent()
 {
 	memset(g_AppStatus, 0, sizeof(g_AppStatus));
@@ -290,38 +307,4 @@ void PostProcessDota2( const char *pPath )
 void PostProcessDota2( const char *pPath )
 {
 }
-#endif // 0
-
-#ifndef CLIENT_DLL
-#if 0
-CON_COMMAND_F( test_open_file, "", FCVAR_CHEAT)
-{
-	char path[_MAX_PATH];
-	V_FixupPathName(path, _MAX_PATH, args.ArgS());
-	FileHandle_t f = filesystem->Open(path, "rb");
-	if( f == FILESYSTEM_INVALID_HANDLE ) 
-	{
-		Warning("No such file %s\n", path);
-		return;
-	}
-
-	Msg("FIle opened %s\n", path);
-	filesystem->Close(f);
-}
-#endif // 0
-#endif // CLIENT_DLL
-
-#if 0
-#ifdef CLIENT_DLL
-CON_COMMAND_F( test_subscribed, "", FCVAR_CHEAT)
-{
-	bool bSubscribed = steamapicontext->SteamApps()->BIsSubscribedApp(420);
-	bool bSubscribed2 = steamapicontext->SteamApps()->BIsSubscribedApp(1300);
-	bool bSubscribed3 = steamapicontext->SteamApps()->BIsSubscribedApp(320);
-	bool bSubscribed4 = steamapicontext->SteamApps()->BIsSubscribedApp(400);
-
-	Msg("Subscribed to 420: %d, subscribed to 1300: %d, subscribed to 320: %d, subscribed to 400: %d, logged on: %d, cur app id: %d\n", 
-		bSubscribed, bSubscribed2, bSubscribed3, bSubscribed4, steamapicontext->SteamUser()->BLoggedOn(), steamapicontext->SteamUtils()->GetAppID() );
-}
-#endif // CLIENT_DLL
 #endif // 0
