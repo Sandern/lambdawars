@@ -22,8 +22,6 @@
 
 class CBasePlayer;
 
-void PyCOM_TimestampedLog( char const *fmt );
-
 //-----------------------------------------------------------------------------
 // Purpose: Safe KeyValues version for Python
 //-----------------------------------------------------------------------------
@@ -214,19 +212,6 @@ private:
 extern  "C" {
 	int SrcPyPathIsInGameFolder( const char *pPath );
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped = true, bool userealtime = false );
-void UnregisterTickMethod( boost::python::object method );
-boost::python::list GetRegisteredTickMethods();
-bool IsTickMethodRegistered( boost::python::object method );
-
-void RegisterPerFrameMethod( boost::python::object method );
-void UnregisterPerFrameMethod( boost::python::object method );
-boost::python::list GetRegisteredPerFrameMethods();
-bool IsPerFrameMethodRegistered( boost::python::object method );
 
 //-----------------------------------------------------------------------------
 // Purpose: PyUtlRBTree

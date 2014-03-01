@@ -127,4 +127,40 @@ inline void SrcPyDevMsg( int level, boost::python::object msg )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+inline void PyCOM_TimestampedLog( boost::python::object msg )
+{
+	if( PyUnicode_Check( msg.ptr() ) )
+	{
+		const wchar_t *pUniMsg = PyUnicode_AS_UNICODE( msg.ptr() );
+		if( pUniMsg )
+		{
+			COM_TimestampedLog( "%ls", pUniMsg );
+		}
+	}
+	else
+	{
+		char* pMsg = PyString_AsString( msg.ptr() );
+		if( pMsg )
+		{
+			COM_TimestampedLog( "%s", pMsg );
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void RegisterTickMethod( boost::python::object method, float ticksignal, bool looped = true, bool userealtime = false );
+void UnregisterTickMethod( boost::python::object method );
+boost::python::list GetRegisteredTickMethods();
+bool IsTickMethodRegistered( boost::python::object method );
+
+void RegisterPerFrameMethod( boost::python::object method );
+void UnregisterPerFrameMethod( boost::python::object method );
+boost::python::list GetRegisteredPerFrameMethods();
+bool IsPerFrameMethodRegistered( boost::python::object method );
+
 #endif // SRCPY_SRCBUILTINS_H

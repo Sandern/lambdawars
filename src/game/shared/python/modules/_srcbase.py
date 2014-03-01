@@ -21,21 +21,6 @@ class SrcBase(SharedModuleGenerator):
         # Exclude everything by default
         mb.decls().exclude()      
         
-        # Debug
-        mb.free_function('PyCOM_TimestampedLog').include()
-        mb.free_function('PyCOM_TimestampedLog').rename('COM_TimestampedLog')
-        
-        # Tick and per frame method register functions
-        mb.free_function('RegisterTickMethod').include()
-        mb.free_function('UnregisterTickMethod').include()
-        mb.free_function('GetRegisteredTickMethods').include()
-        mb.free_function('IsTickMethodRegistered').include()
-        
-        mb.free_function('RegisterPerFrameMethod').include()
-        mb.free_function('UnregisterPerFrameMethod').include()
-        mb.free_function('GetRegisteredPerFrameMethods').include()
-        mb.free_function('IsPerFrameMethodRegistered').include()
-        
         # Linux model_t fix ( correct? )
         mb.add_declaration_code( '#ifdef _LINUX\r\n' + \
                              'typedef struct model_t {};\r\n' + \
@@ -47,7 +32,7 @@ class SrcBase(SharedModuleGenerator):
         cls.include()
         cls.mem_funs().exclude()
         
-        # Usefull free functions
+        # Useful free functions
         mb.free_function('IsSolid').include()
         
         # RBTree

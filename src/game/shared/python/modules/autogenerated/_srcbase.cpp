@@ -936,37 +936,6 @@ BOOST_PYTHON_MODULE(_srcbase){
         .def_readwrite( "g", &color32_s::g )    
         .def_readwrite( "r", &color32_s::r );
 
-    { //::GetRegisteredPerFrameMethods
-    
-        typedef ::boost::python::list ( *GetRegisteredPerFrameMethods_function_type )(  );
-        
-        bp::def( 
-            "GetRegisteredPerFrameMethods"
-            , GetRegisteredPerFrameMethods_function_type( &::GetRegisteredPerFrameMethods ) );
-    
-    }
-
-    { //::GetRegisteredTickMethods
-    
-        typedef ::boost::python::list ( *GetRegisteredTickMethods_function_type )(  );
-        
-        bp::def( 
-            "GetRegisteredTickMethods"
-            , GetRegisteredTickMethods_function_type( &::GetRegisteredTickMethods ) );
-    
-    }
-
-    { //::IsPerFrameMethodRegistered
-    
-        typedef bool ( *IsPerFrameMethodRegistered_function_type )( ::boost::python::object );
-        
-        bp::def( 
-            "IsPerFrameMethodRegistered"
-            , IsPerFrameMethodRegistered_function_type( &::IsPerFrameMethodRegistered )
-            , ( bp::arg("method") ) );
-    
-    }
-
     { //::IsSolid
     
         typedef bool ( *IsSolid_function_type )( ::SolidType_t,int );
@@ -975,72 +944,6 @@ BOOST_PYTHON_MODULE(_srcbase){
             "IsSolid"
             , IsSolid_function_type( &::IsSolid )
             , ( bp::arg("solidType"), bp::arg("nSolidFlags") ) );
-    
-    }
-
-    { //::IsTickMethodRegistered
-    
-        typedef bool ( *IsTickMethodRegistered_function_type )( ::boost::python::object );
-        
-        bp::def( 
-            "IsTickMethodRegistered"
-            , IsTickMethodRegistered_function_type( &::IsTickMethodRegistered )
-            , ( bp::arg("method") ) );
-    
-    }
-
-    { //::KeyValuesDumpAsDevMsg
-    
-        typedef bool ( *KeyValuesDumpAsDevMsg_function_type )( ::KeyValues *,int,int );
-        
-        bp::def( 
-            "KeyValuesDumpAsDevMsg"
-            , KeyValuesDumpAsDevMsg_function_type( &::KeyValuesDumpAsDevMsg )
-            , ( bp::arg("pKeyValues"), bp::arg("nIndentLevel")=(int)(0), bp::arg("nDeveloperLevel")=(int)(1) ) );
-    
-    }
-
-    { //::PyCOM_TimestampedLog
-    
-        typedef void ( *COM_TimestampedLog_function_type )( char const * );
-        
-        bp::def( 
-            "COM_TimestampedLog"
-            , COM_TimestampedLog_function_type( &::PyCOM_TimestampedLog )
-            , ( bp::arg("fmt") ) );
-    
-    }
-
-    { //::RegisterPerFrameMethod
-    
-        typedef void ( *RegisterPerFrameMethod_function_type )( ::boost::python::object );
-        
-        bp::def( 
-            "RegisterPerFrameMethod"
-            , RegisterPerFrameMethod_function_type( &::RegisterPerFrameMethod )
-            , ( bp::arg("method") ) );
-    
-    }
-
-    { //::RegisterTickMethod
-    
-        typedef void ( *RegisterTickMethod_function_type )( ::boost::python::object,float,bool,bool );
-        
-        bp::def( 
-            "RegisterTickMethod"
-            , RegisterTickMethod_function_type( &::RegisterTickMethod )
-            , ( bp::arg("method"), bp::arg("ticksignal"), bp::arg("looped")=(bool)(true), bp::arg("userealtime")=(bool)(false) ) );
-    
-    }
-
-    { //::UnregisterPerFrameMethod
-    
-        typedef void ( *UnregisterPerFrameMethod_function_type )( ::boost::python::object );
-        
-        bp::def( 
-            "UnregisterPerFrameMethod"
-            , UnregisterPerFrameMethod_function_type( &::UnregisterPerFrameMethod )
-            , ( bp::arg("method") ) );
     
     }
 
@@ -1508,14 +1411,14 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     bp::scope().attr( "HIDEHUD_BITCOUNT" ) = (int)HIDEHUD_BITCOUNT;
 
-    { //::UnregisterTickMethod
+    { //::KeyValuesDumpAsDevMsg
     
-        typedef void ( *UnregisterTickMethod_function_type )( ::boost::python::object );
+        typedef bool ( *KeyValuesDumpAsDevMsg_function_type )( ::KeyValues *,int,int );
         
         bp::def( 
-            "UnregisterTickMethod"
-            , UnregisterTickMethod_function_type( &::UnregisterTickMethod )
-            , ( bp::arg("method") ) );
+            "KeyValuesDumpAsDevMsg"
+            , KeyValuesDumpAsDevMsg_function_type( &::KeyValuesDumpAsDevMsg )
+            , ( bp::arg("pKeyValues"), bp::arg("nIndentLevel")=(int)(0), bp::arg("nDeveloperLevel")=(int)(1) ) );
     
     }
 }
