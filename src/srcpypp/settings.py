@@ -61,7 +61,6 @@ modules = [
     
     ('_te', 'TE'),
     ('_fow', 'FOW'),
-    ('_steam', 'Steam'),
     
     # Client
     ('_input', 'Input'),
@@ -73,6 +72,7 @@ modules = [
     ('unit_helper', 'UnitHelper'),
     
     # Misc
+    ('_steam', 'Steam'),
     ('_navmesh', 'NavMesh'),
     ('_ndebugoverlay', 'NDebugOverlay'),
     ('vprof', 'VProf'),
