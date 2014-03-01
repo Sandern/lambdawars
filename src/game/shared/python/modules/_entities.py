@@ -1010,7 +1010,7 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_fun('GetSurfaceData').exclude()
         
         if self.isclient:
-            # Exclude for now
+            # Client excludes
             cls.mem_fun('GetFogParams').exclude()
             cls.mem_fun('OverrideView').exclude()
             cls.mem_fun('GetFootstepSurface').exclude()

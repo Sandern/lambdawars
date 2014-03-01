@@ -427,11 +427,6 @@ void PyGameEventListener::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 // Purpose: Commands
 //-----------------------------------------------------------------------------
-FilesystemMountRetval_t PyMountSteamContent(int nExtraAppId)
-{
-	return filesystem->MountSteamContent(nExtraAppId);
-}
-
 void PyAddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_t addType )
 {
 	filesystem->AddSearchPath(pPath, pathID, addType);

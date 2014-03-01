@@ -38,15 +38,15 @@
 
 #include "ienginevgui.h"
 
+#include "hud.h"
+
+#include "hudelement.h"
+
 #include "srcpy_vgui.h"
 
 #include "wars_vgui_screen.h"
 
 #include "srcpy_hud.h"
-
-#include "hud.h"
-
-#include "hudelement.h"
 
 #include "srcpy.h"
 

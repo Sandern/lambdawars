@@ -18,7 +18,6 @@ class Animation(SemiSharedModuleGenerator):
         # Exclude everything by default
         mb.decls().exclude()
         
-        
         # CStudioHdr
         cls = mb.class_('CStudioHdr')
         cls.include()

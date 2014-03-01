@@ -2752,17 +2752,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
-    { //::PyMountSteamContent
-    
-        typedef ::FilesystemMountRetval_t ( *MountSteamContent_function_type )( int );
-        
-        bp::def( 
-            "MountSteamContent"
-            , MountSteamContent_function_type( &::PyMountSteamContent )
-            , ( bp::arg("nExtraAppId")=(int)(-0x000000001) ) );
-    
-    }
-
     { //::PyRemoveSearchPath
     
         typedef bool ( *RemoveSearchPath_function_type )( char const *,char const * );
@@ -5612,17 +5601,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             "MapEntity_ParseAllEntities"
             , MapEntity_ParseAllEntities_function_type( &::PyMapEntity_ParseAllEntities )
             , ( bp::arg("mapdata"), bp::arg("filter"), bp::arg("activateentities") ) );
-    
-    }
-
-    { //::PyMountSteamContent
-    
-        typedef ::FilesystemMountRetval_t ( *MountSteamContent_function_type )( int );
-        
-        bp::def( 
-            "MountSteamContent"
-            , MountSteamContent_function_type( &::PyMountSteamContent )
-            , ( bp::arg("nExtraAppId")=(int)(-0x000000001) ) );
     
     }
 

@@ -365,8 +365,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_functions('CalculateMeleeDamageForce').include()
         mb.free_functions('GuessDamageForce').include()
         
-        
-        
         # //--------------------------------------------------------------------------------------------------------------------------------
         # FireBulletsInfo_t
         cls = mb.class_('FireBulletsInfo_t')

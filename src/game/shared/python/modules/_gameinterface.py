@@ -231,8 +231,6 @@ class GameInterface(SemiSharedModuleGenerator):
         mb.vars('m_DataMap').exclude()
         
         # Content mounting
-        mb.free_function('PyMountSteamContent').include()
-        mb.free_function('PyMountSteamContent').rename('MountSteamContent')
         mb.free_function('PyAddSearchPath').include()
         mb.free_function('PyAddSearchPath').rename('AddSearchPath')
         mb.free_function('PyRemoveSearchPath').include()

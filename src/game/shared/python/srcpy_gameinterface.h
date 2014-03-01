@@ -209,7 +209,6 @@ typedef struct py_player_info_s
 	unsigned char	filesDownloaded;
 } py_player_info_t;
 
-FilesystemMountRetval_t PyMountSteamContent(int nExtraAppId = -1);
 void PyAddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_t addType = PATH_ADD_TO_TAIL );
 bool PyRemoveSearchPath( const char *pPath, const char *pathID = 0 );
 boost::python::object PyGetSearchPath( const char *pPathID, bool bGetPackFiles );
