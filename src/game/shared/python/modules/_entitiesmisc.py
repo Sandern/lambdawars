@@ -1,7 +1,6 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers
-from src_helper import *
 from pyplusplus import code_creators
 
 class EntitiesMisc(SemiSharedModuleGenerator):
@@ -217,6 +216,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             cls.mem_funs('FindEntityByOutputTarget').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
 
         mb.vars('gEntList').include()
+        mb.vars('gEntList').rename('entlist')
         
         # Respawning the player using a python entity class
         mb.free_function('PyRespawnPlayer').include()
@@ -300,17 +300,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
                                 '   return inst.pEntities[index] ? inst.pEntities[index]->GetPyHandle() : bp::object();\r\n' + \
                                 '}\r\n' )
         cls.add_registration_code( 'def("GetEnt", &::gamevcollisionevent_t_wrapper::GetEnt)')
-
-        # Speech
-        if self.settings.branch != 'swarm':
-            cls = mb.class_('CAI_Expresser')
-            cls.include()
-            cls.calldefs().virtuality = 'not virtual'  
-            cls.mem_funs('GetOuter').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-            cls.mem_funs('GetMySpeechSemaphore').exclude()
-            cls.mem_funs('GetSink').exclude()
-            cls.mem_funs('SpeakFindResponse').exclude() # Allocates new response, but does not guarantee it gets cleaned up.
-        
             
     def ParseMisc(self, mb):
         if self.isserver:
@@ -382,7 +371,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.var('m_pAdditionalIgnoreEnt').rename('additionalignoreent')
         cls.var('m_bPrimaryAttack').rename('primaryattack')
         cls.var('m_flDamage').rename('damage')
-        cls.var('m_flPlayerDamage').rename('playerdamage')
+        cls.var('m_iPlayerDamage' if self.settings.branch == 'source2013' else 'm_flPlayerDamage').rename('playerdamage')
         
         # CShotManipulator
         cls = mb.class_('CShotManipulator')
@@ -405,9 +394,11 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             # Ragdoll stuff
             mb.free_function('CreateServerRagdoll').include()
             mb.free_function('CreateServerRagdoll').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-            mb.free_function('PyCreateServerRagdollAttached').include()
-            mb.free_function('PyCreateServerRagdollAttached').rename('CreateServerRagdollAttached')
-            mb.free_function('PyCreateServerRagdollAttached').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+
+            if self.settings.branch == 'swarm':
+                mb.free_function('PyCreateServerRagdollAttached').include()
+                mb.free_function('PyCreateServerRagdollAttached').rename('CreateServerRagdollAttached')
+                mb.free_function('PyCreateServerRagdollAttached').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
             mb.free_function('DetachAttachedRagdoll').include()
             mb.free_function('DetachAttachedRagdollsForEntity').include()
             
@@ -418,11 +409,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.class_('IMouse').mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.class_('PyMouse').include()
         mb.class_('PyMouse').rename('IMouse')
-        mb.class_('PyMouse').mem_funs( lambda decl: 'OnClick' in decl.name ).exclude()
-        mb.class_('PyMouse').mem_funs( lambda decl: 'OnCursor' in decl.name ).exclude()
-        AddWrapRegs( mb, 'PyMouse', mb.class_('PyMouse').mem_funs( lambda decl: 'OnClick' in decl.name ), [CreateEntityArg('player')] )
-        AddWrapRegs( mb, 'PyMouse', mb.class_('PyMouse').mem_funs( lambda decl: 'OnCursor' in decl.name ), [CreateEntityArg('player')] )
-
         mb.add_registration_code( "ptr_imouse_to_py_imouse();" )
         
         # Shared Props
@@ -433,6 +419,15 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_functions('PrecacheGibsForModel').include()
     
         # Enums
+        mb.enums('MoveType_t').include()
+        mb.enums('MoveCollide_t').include()
+        mb.enums('SolidType_t').include()
+        mb.enums('SolidFlags_t').include()
+        mb.enums('Collision_Group_t').include()
+        mb.enums('WarsCollision_Group_t').include()
+        mb.enums('RenderMode_t').include()
+        mb.enums('RenderFx_t').include()
+        
         if self.isclient:
             mb.enums('ShadowType_t').include()
             mb.enums('RenderGroup_t').include()
@@ -532,6 +527,9 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         else:
             self.ParseServerEntityRelated(mb)
         self.ParseMisc(mb)
+        
+        # Finally apply common rules to all includes functions and classes, etc.
+        self.ApplyCommonRules(mb)
         
     def AddAdditionalCode(self, mb):
         header = code_creators.include_t( 'srcpy_converters_ents.h' )

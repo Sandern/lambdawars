@@ -172,7 +172,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
         try {
-            func_OnClickLeftDoublePressed( boost::python::ptr(player) );
+            func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -181,7 +181,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftPressed( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
         try {
-            func_OnClickLeftPressed( boost::python::ptr(player) );
+            func_OnClickLeftPressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -190,7 +190,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftReleased( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
         try {
-            func_OnClickLeftReleased( boost::python::ptr(player) );
+            func_OnClickLeftReleased( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -199,7 +199,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
         try {
-            func_OnClickRightDoublePressed( boost::python::ptr(player) );
+            func_OnClickRightDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -208,7 +208,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightPressed( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
         try {
-            func_OnClickRightPressed( boost::python::ptr(player) );
+            func_OnClickRightPressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -217,7 +217,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightReleased( ::C_HL2WarsPlayer * player ){
         bp::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
         try {
-            func_OnClickRightReleased( boost::python::ptr(player) );
+            func_OnClickRightReleased( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -226,7 +226,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnCursorEntered( ::C_HL2WarsPlayer * player ){
         bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
         try {
-            func_OnCursorEntered( boost::python::ptr(player) );
+            func_OnCursorEntered( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -235,7 +235,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnCursorExited( ::C_HL2WarsPlayer * player ){
         bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
         try {
-            func_OnCursorExited( boost::python::ptr(player) );
+            func_OnCursorExited( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -287,6 +287,158 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
         return PyMouse::GetCursor( );
     }
 
+    virtual void OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftDoublePressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftDoublePressed )
+        bp::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
+        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftDoublePressed( player );
+            }
+        else
+            this->PyMouse::OnClickLeftDoublePressed( player );
+    }
+    
+    void default_OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftDoublePressed( player );
+    }
+
+    virtual void OnClickLeftPressed( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftPressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftPressed )
+        bp::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
+        if( func_OnClickLeftPressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftPressed( player );
+            }
+        else
+            this->PyMouse::OnClickLeftPressed( player );
+    }
+    
+    void default_OnClickLeftPressed( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftPressed( player );
+    }
+
+    virtual void OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftReleased )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftReleased )
+        bp::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
+        if( func_OnClickLeftReleased.ptr() != Py_None )
+            try {
+                func_OnClickLeftReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftReleased( player );
+            }
+        else
+            this->PyMouse::OnClickLeftReleased( player );
+    }
+    
+    void default_OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftReleased( player );
+    }
+
+    virtual void OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightDoublePressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightDoublePressed )
+        bp::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
+        if( func_OnClickRightDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightDoublePressed( player );
+            }
+        else
+            this->PyMouse::OnClickRightDoublePressed( player );
+    }
+    
+    void default_OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickRightDoublePressed( player );
+    }
+
+    virtual void OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightPressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightPressed )
+        bp::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
+        if( func_OnClickRightPressed.ptr() != Py_None )
+            try {
+                func_OnClickRightPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightPressed( player );
+            }
+        else
+            this->PyMouse::OnClickRightPressed( player );
+    }
+    
+    void default_OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickRightPressed( player );
+    }
+
+    virtual void OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightReleased )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightReleased )
+        bp::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
+        if( func_OnClickRightReleased.ptr() != Py_None )
+            try {
+                func_OnClickRightReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightReleased( player );
+            }
+        else
+            this->PyMouse::OnClickRightReleased( player );
+    }
+    
+    void default_OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnClickRightReleased( player );
+    }
+
+    virtual void OnCursorEntered( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnCursorEntered )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnCursorEntered )
+        bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
+        if( func_OnCursorEntered.ptr() != Py_None )
+            try {
+                func_OnCursorEntered( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnCursorEntered( player );
+            }
+        else
+            this->PyMouse::OnCursorEntered( player );
+    }
+    
+    void default_OnCursorEntered( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnCursorEntered( player );
+    }
+
+    virtual void OnCursorExited( ::C_HL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnCursorExited )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnCursorExited )
+        bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
+        if( func_OnCursorExited.ptr() != Py_None )
+            try {
+                func_OnCursorExited( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnCursorExited( player );
+            }
+        else
+            this->PyMouse::OnCursorExited( player );
+    }
+    
+    void default_OnCursorExited( ::C_HL2WarsPlayer * player ) {
+        PyMouse::OnCursorExited( player );
+    }
+
     virtual void OnHoverPaint(  ) {
         PY_OVERRIDE_CHECK( PyMouse, OnHoverPaint )
         PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnHoverPaint )
@@ -323,142 +475,6 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     
     ::IMouse * default_GetIMouse(  ) {
         return IMouse::GetIMouse( );
-    }
-
-    virtual void OnClickLeftPressed( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
-        if( func_OnClickLeftPressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftPressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftPressed( player );
-    }
-
-    virtual void OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
-        if( func_OnClickRightPressed.ptr() != Py_None )
-            try {
-                func_OnClickRightPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightPressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightPressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightPressed( player );
-    }
-
-    virtual void OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
-        if( func_OnClickLeftReleased.ptr() != Py_None )
-            try {
-                func_OnClickLeftReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftReleased( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftReleased( player );
-    }
-
-    virtual void OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
-        if( func_OnClickRightReleased.ptr() != Py_None )
-            try {
-                func_OnClickRightReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightReleased( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightReleased( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightReleased( player );
-    }
-
-    virtual void OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
-        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftDoublePressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftDoublePressed( player );
-    }
-
-    virtual void OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
-        if( func_OnClickRightDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightDoublePressed( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnClickRightDoublePressed( player );
-    }
-
-    virtual void OnCursorEntered( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
-        if( func_OnCursorEntered.ptr() != Py_None )
-            try {
-                func_OnCursorEntered( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnCursorEntered( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnCursorEntered( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorEntered( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnCursorEntered( player );
-    }
-
-    virtual void OnCursorExited( ::C_HL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorExited = this->get_override( "OnCursorExited" );
-        if( func_OnCursorExited.ptr() != Py_None )
-            try {
-                func_OnCursorExited( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnCursorExited( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnCursorExited( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorExited( ::C_HL2WarsPlayer * player ) {
-        PyMouse::OnCursorExited( player );
     }
 
 };
@@ -1475,9 +1491,65 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .export_values()
         ;
 
+    bp::enum_< Collision_Group_t>("Collision_Group_t")
+        .value("COLLISION_GROUP_NONE", COLLISION_GROUP_NONE)
+        .value("COLLISION_GROUP_DEBRIS", COLLISION_GROUP_DEBRIS)
+        .value("COLLISION_GROUP_DEBRIS_TRIGGER", COLLISION_GROUP_DEBRIS_TRIGGER)
+        .value("COLLISION_GROUP_INTERACTIVE_DEBRIS", COLLISION_GROUP_INTERACTIVE_DEBRIS)
+        .value("COLLISION_GROUP_INTERACTIVE", COLLISION_GROUP_INTERACTIVE)
+        .value("COLLISION_GROUP_PLAYER", COLLISION_GROUP_PLAYER)
+        .value("COLLISION_GROUP_BREAKABLE_GLASS", COLLISION_GROUP_BREAKABLE_GLASS)
+        .value("COLLISION_GROUP_VEHICLE", COLLISION_GROUP_VEHICLE)
+        .value("COLLISION_GROUP_PLAYER_MOVEMENT", COLLISION_GROUP_PLAYER_MOVEMENT)
+        .value("COLLISION_GROUP_NPC", COLLISION_GROUP_NPC)
+        .value("COLLISION_GROUP_IN_VEHICLE", COLLISION_GROUP_IN_VEHICLE)
+        .value("COLLISION_GROUP_WEAPON", COLLISION_GROUP_WEAPON)
+        .value("COLLISION_GROUP_VEHICLE_CLIP", COLLISION_GROUP_VEHICLE_CLIP)
+        .value("COLLISION_GROUP_PROJECTILE", COLLISION_GROUP_PROJECTILE)
+        .value("COLLISION_GROUP_DOOR_BLOCKER", COLLISION_GROUP_DOOR_BLOCKER)
+        .value("COLLISION_GROUP_PASSABLE_DOOR", COLLISION_GROUP_PASSABLE_DOOR)
+        .value("COLLISION_GROUP_DISSOLVING", COLLISION_GROUP_DISSOLVING)
+        .value("COLLISION_GROUP_PUSHAWAY", COLLISION_GROUP_PUSHAWAY)
+        .value("COLLISION_GROUP_NPC_ACTOR", COLLISION_GROUP_NPC_ACTOR)
+        .value("COLLISION_GROUP_NPC_SCRIPTED", COLLISION_GROUP_NPC_SCRIPTED)
+        .value("COLLISION_GROUP_PZ_CLIP", COLLISION_GROUP_PZ_CLIP)
+        .value("COLLISION_GROUP_DEBRIS_BLOCK_PROJECTILE", COLLISION_GROUP_DEBRIS_BLOCK_PROJECTILE)
+        .value("LAST_SHARED_COLLISION_GROUP", LAST_SHARED_COLLISION_GROUP)
+        .export_values()
+        ;
+
     bp::enum_< DataUpdateType_t>("DataUpdateType_t")
         .value("DATA_UPDATE_CREATED", DATA_UPDATE_CREATED)
         .value("DATA_UPDATE_DATATABLE_CHANGED", DATA_UPDATE_DATATABLE_CHANGED)
+        .export_values()
+        ;
+
+    bp::enum_< MoveCollide_t>("MoveCollide_t")
+        .value("MOVECOLLIDE_DEFAULT", MOVECOLLIDE_DEFAULT)
+        .value("MOVECOLLIDE_FLY_BOUNCE", MOVECOLLIDE_FLY_BOUNCE)
+        .value("MOVECOLLIDE_FLY_CUSTOM", MOVECOLLIDE_FLY_CUSTOM)
+        .value("MOVECOLLIDE_FLY_SLIDE", MOVECOLLIDE_FLY_SLIDE)
+        .value("MOVECOLLIDE_COUNT", MOVECOLLIDE_COUNT)
+        .value("MOVECOLLIDE_MAX_BITS", MOVECOLLIDE_MAX_BITS)
+        .export_values()
+        ;
+
+    bp::enum_< MoveType_t>("MoveType_t")
+        .value("MOVETYPE_NONE", MOVETYPE_NONE)
+        .value("MOVETYPE_ISOMETRIC", MOVETYPE_ISOMETRIC)
+        .value("MOVETYPE_WALK", MOVETYPE_WALK)
+        .value("MOVETYPE_STEP", MOVETYPE_STEP)
+        .value("MOVETYPE_FLY", MOVETYPE_FLY)
+        .value("MOVETYPE_FLYGRAVITY", MOVETYPE_FLYGRAVITY)
+        .value("MOVETYPE_VPHYSICS", MOVETYPE_VPHYSICS)
+        .value("MOVETYPE_PUSH", MOVETYPE_PUSH)
+        .value("MOVETYPE_NOCLIP", MOVETYPE_NOCLIP)
+        .value("MOVETYPE_LADDER", MOVETYPE_LADDER)
+        .value("MOVETYPE_OBSERVER", MOVETYPE_OBSERVER)
+        .value("MOVETYPE_CUSTOM", MOVETYPE_CUSTOM)
+        .value("MOVETYPE_STRATEGIC", MOVETYPE_STRATEGIC)
+        .value("MOVETYPE_LAST", MOVETYPE_LAST)
+        .value("MOVETYPE_MAX_BITS", MOVETYPE_MAX_BITS)
         .export_values()
         ;
 
@@ -1488,11 +1560,51 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .export_values()
         ;
 
+    bp::enum_< RenderFx_t>("RenderFx_t")
+        .value("kRenderFxNone", kRenderFxNone)
+        .value("kRenderFxPulseSlow", kRenderFxPulseSlow)
+        .value("kRenderFxPulseFast", kRenderFxPulseFast)
+        .value("kRenderFxPulseSlowWide", kRenderFxPulseSlowWide)
+        .value("kRenderFxPulseFastWide", kRenderFxPulseFastWide)
+        .value("kRenderFxFadeSlow", kRenderFxFadeSlow)
+        .value("kRenderFxFadeFast", kRenderFxFadeFast)
+        .value("kRenderFxSolidSlow", kRenderFxSolidSlow)
+        .value("kRenderFxSolidFast", kRenderFxSolidFast)
+        .value("kRenderFxStrobeSlow", kRenderFxStrobeSlow)
+        .value("kRenderFxStrobeFast", kRenderFxStrobeFast)
+        .value("kRenderFxStrobeFaster", kRenderFxStrobeFaster)
+        .value("kRenderFxFlickerSlow", kRenderFxFlickerSlow)
+        .value("kRenderFxFlickerFast", kRenderFxFlickerFast)
+        .value("kRenderFxNoDissipation", kRenderFxNoDissipation)
+        .value("kRenderFxFadeOut", kRenderFxFadeOut)
+        .value("kRenderFxFadeIn", kRenderFxFadeIn)
+        .value("kRenderFxPulseFastWider", kRenderFxPulseFastWider)
+        .value("kRenderFxGlowShell", kRenderFxGlowShell)
+        .value("kRenderFxMax", kRenderFxMax)
+        .export_values()
+        ;
+
     bp::enum_< RenderGroup_t>("RenderGroup_t")
         .value("RENDER_GROUP_OPAQUE", RENDER_GROUP_OPAQUE)
         .value("RENDER_GROUP_TRANSLUCENT", RENDER_GROUP_TRANSLUCENT)
         .value("RENDER_GROUP_TRANSLUCENT_IGNOREZ", RENDER_GROUP_TRANSLUCENT_IGNOREZ)
         .value("RENDER_GROUP_COUNT", RENDER_GROUP_COUNT)
+        .export_values()
+        ;
+
+    bp::enum_< RenderMode_t>("RenderMode_t")
+        .value("kRenderNormal", kRenderNormal)
+        .value("kRenderTransColor", kRenderTransColor)
+        .value("kRenderTransTexture", kRenderTransTexture)
+        .value("kRenderGlow", kRenderGlow)
+        .value("kRenderTransAlpha", kRenderTransAlpha)
+        .value("kRenderTransAdd", kRenderTransAdd)
+        .value("kRenderEnvironmental", kRenderEnvironmental)
+        .value("kRenderTransAddFrameBlend", kRenderTransAddFrameBlend)
+        .value("kRenderTransAlphaAdd", kRenderTransAlphaAdd)
+        .value("kRenderWorldGlow", kRenderWorldGlow)
+        .value("kRenderNone", kRenderNone)
+        .value("kRenderModeCount", kRenderModeCount)
         .export_values()
         ;
 
@@ -1512,11 +1624,51 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .export_values()
         ;
 
+    bp::enum_< SolidFlags_t>("SolidFlags_t")
+        .value("FSOLID_CUSTOMRAYTEST", FSOLID_CUSTOMRAYTEST)
+        .value("FSOLID_CUSTOMBOXTEST", FSOLID_CUSTOMBOXTEST)
+        .value("FSOLID_NOT_SOLID", FSOLID_NOT_SOLID)
+        .value("FSOLID_TRIGGER", FSOLID_TRIGGER)
+        .value("FSOLID_NOT_STANDABLE", FSOLID_NOT_STANDABLE)
+        .value("FSOLID_VOLUME_CONTENTS", FSOLID_VOLUME_CONTENTS)
+        .value("FSOLID_FORCE_WORLD_ALIGNED", FSOLID_FORCE_WORLD_ALIGNED)
+        .value("FSOLID_USE_TRIGGER_BOUNDS", FSOLID_USE_TRIGGER_BOUNDS)
+        .value("FSOLID_ROOT_PARENT_ALIGNED", FSOLID_ROOT_PARENT_ALIGNED)
+        .value("FSOLID_TRIGGER_TOUCH_DEBRIS", FSOLID_TRIGGER_TOUCH_DEBRIS)
+        .value("FSOLID_TRIGGER_TOUCH_PLAYER", FSOLID_TRIGGER_TOUCH_PLAYER)
+        .value("FSOLID_NOT_MOVEABLE", FSOLID_NOT_MOVEABLE)
+        .value("FSOLID_MAX_BITS", FSOLID_MAX_BITS)
+        .export_values()
+        ;
+
+    bp::enum_< SolidType_t>("SolidType_t")
+        .value("SOLID_NONE", SOLID_NONE)
+        .value("SOLID_BSP", SOLID_BSP)
+        .value("SOLID_BBOX", SOLID_BBOX)
+        .value("SOLID_OBB", SOLID_OBB)
+        .value("SOLID_OBB_YAW", SOLID_OBB_YAW)
+        .value("SOLID_CUSTOM", SOLID_CUSTOM)
+        .value("SOLID_VPHYSICS", SOLID_VPHYSICS)
+        .value("SOLID_LAST", SOLID_LAST)
+        .export_values()
+        ;
+
     bp::enum_< USE_TYPE>("USE_TYPE")
         .value("USE_OFF", USE_OFF)
         .value("USE_ON", USE_ON)
         .value("USE_SET", USE_SET)
         .value("USE_TOGGLE", USE_TOGGLE)
+        .export_values()
+        ;
+
+    bp::enum_< WarsCollision_Group_t>("WarsCollision_Group_t")
+        .value("WARS_COLLISION_GROUP_IGNORE_UNIT_START", WARS_COLLISION_GROUP_IGNORE_UNIT_START)
+        .value("WARS_COLLISION_GROUP_IGNORE_UNIT_END", WARS_COLLISION_GROUP_IGNORE_UNIT_END)
+        .value("WARS_COLLISION_GROUP_UNIT_START", WARS_COLLISION_GROUP_UNIT_START)
+        .value("WARS_COLLISION_GROUP_UNIT_END", WARS_COLLISION_GROUP_UNIT_END)
+        .value("WARS_COLLISION_GROUP_IGNORE_ALL_UNITS", WARS_COLLISION_GROUP_IGNORE_ALL_UNITS)
+        .value("WARS_COLLISION_GROUP_BUILDING", WARS_COLLISION_GROUP_BUILDING)
+        .value("WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD", WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD)
         .export_values()
         ;
 
@@ -2329,6 +2481,46 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (long unsigned int ( ::PyMouse::* )(  ) )(&::PyMouse::GetCursor)
             , (long unsigned int ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_GetCursor) )    
         .def( 
+            "OnClickLeftDoublePressed"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftDoublePressed)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftDoublePressed)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickLeftPressed"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftPressed)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftPressed)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickLeftReleased"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftReleased)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftReleased)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickRightDoublePressed"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightDoublePressed)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightDoublePressed)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickRightPressed"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightPressed)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightPressed)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickRightReleased"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightReleased)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightReleased)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnCursorEntered"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnCursorEntered)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorEntered)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnCursorExited"
+            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnCursorExited)
+            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorExited)
+            , ( bp::arg("player") ) )    
+        .def( 
             "OnHoverPaint"
             , (void ( ::PyMouse::* )(  ) )(&::PyMouse::OnHoverPaint)
             , (void ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_OnHoverPaint) )    
@@ -2336,47 +2528,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "GetIMouse"
             , (::IMouse * ( ::IMouse::* )(  ) )(&::IMouse::GetIMouse)
             , (::IMouse * ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_GetIMouse)
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "OnClickLeftPressed"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftPressed)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftPressed)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickRightPressed"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightPressed)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightPressed)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickLeftReleased"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftReleased)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftReleased)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickRightReleased"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightReleased)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightReleased)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickLeftDoublePressed"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickLeftDoublePressed)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftDoublePressed)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickRightDoublePressed"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnClickRightDoublePressed)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightDoublePressed)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnCursorEntered"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnCursorEntered)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorEntered)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnCursorExited"
-            , (void ( ::PyMouse::* )( ::C_HL2WarsPlayer * ) )(&::PyMouse::OnCursorExited)
-            , (void ( PyMouse_wrapper::* )( ::C_HL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorExited)
-            , ( boost::python::arg("player") ) );
+            , bp::return_value_policy< bp::return_by_value >() );
 
     { //::SpatializationInfo_t
         typedef bp::class_< SpatializationInfo_t > SpatializationInfo_t_exposer_t;
@@ -2755,7 +2907,7 @@ struct IEntityFindFilter_wrapper : IEntityFindFilter, bp::wrapper< IEntityFindFi
     virtual bool ShouldFindEntity( ::CBaseEntity * pEntity ){
         bp::override func_ShouldFindEntity = this->get_override( "ShouldFindEntity" );
         try {
-            return func_ShouldFindEntity( boost::python::ptr(pEntity) );
+            return func_ShouldFindEntity( pEntity ? pEntity->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2834,7 +2986,7 @@ struct CPythonSendProxyBase_wrapper : CPythonSendProxyBase, bp::wrapper< CPython
         bp::override func_ShouldSend = this->get_override( "ShouldSend" );
         if( func_ShouldSend.ptr() != Py_None )
             try {
-                return func_ShouldSend( boost::python::ptr(pEnt), iClient );
+                return func_ShouldSend( pEnt ? pEnt->GetPyHandle() : boost::python::object(), iClient );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
                 return this->CPythonSendProxyBase::ShouldSend( pEnt, iClient );
@@ -2921,7 +3073,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
         try {
-            func_OnClickLeftDoublePressed( boost::python::ptr(player) );
+            func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2930,7 +3082,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftPressed( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
         try {
-            func_OnClickLeftPressed( boost::python::ptr(player) );
+            func_OnClickLeftPressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2939,7 +3091,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
         try {
-            func_OnClickLeftReleased( boost::python::ptr(player) );
+            func_OnClickLeftReleased( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2948,7 +3100,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
         try {
-            func_OnClickRightDoublePressed( boost::python::ptr(player) );
+            func_OnClickRightDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2957,7 +3109,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
         try {
-            func_OnClickRightPressed( boost::python::ptr(player) );
+            func_OnClickRightPressed( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2966,7 +3118,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ){
         bp::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
         try {
-            func_OnClickRightReleased( boost::python::ptr(player) );
+            func_OnClickRightReleased( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2975,7 +3127,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnCursorEntered( ::CHL2WarsPlayer * player ){
         bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
         try {
-            func_OnCursorEntered( boost::python::ptr(player) );
+            func_OnCursorEntered( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -2984,7 +3136,7 @@ struct IMouse_wrapper : IMouse, bp::wrapper< IMouse > {
     virtual void OnCursorExited( ::CHL2WarsPlayer * player ){
         bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
         try {
-            func_OnCursorExited( boost::python::ptr(player) );
+            func_OnCursorExited( player ? player->GetPyHandle() : boost::python::object() );
         } catch(bp::error_already_set &) {
             throw boost::python::error_already_set();
         }
@@ -3041,6 +3193,158 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
         
     }
 
+    virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftDoublePressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftDoublePressed )
+        bp::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
+        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftDoublePressed( player );
+            }
+        else
+            this->PyMouse::OnClickLeftDoublePressed( player );
+    }
+    
+    void default_OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftDoublePressed( player );
+    }
+
+    virtual void OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftPressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftPressed )
+        bp::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
+        if( func_OnClickLeftPressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftPressed( player );
+            }
+        else
+            this->PyMouse::OnClickLeftPressed( player );
+    }
+    
+    void default_OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftPressed( player );
+    }
+
+    virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickLeftReleased )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickLeftReleased )
+        bp::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
+        if( func_OnClickLeftReleased.ptr() != Py_None )
+            try {
+                func_OnClickLeftReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickLeftReleased( player );
+            }
+        else
+            this->PyMouse::OnClickLeftReleased( player );
+    }
+    
+    void default_OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickLeftReleased( player );
+    }
+
+    virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightDoublePressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightDoublePressed )
+        bp::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
+        if( func_OnClickRightDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightDoublePressed( player );
+            }
+        else
+            this->PyMouse::OnClickRightDoublePressed( player );
+    }
+    
+    void default_OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickRightDoublePressed( player );
+    }
+
+    virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightPressed )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightPressed )
+        bp::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
+        if( func_OnClickRightPressed.ptr() != Py_None )
+            try {
+                func_OnClickRightPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightPressed( player );
+            }
+        else
+            this->PyMouse::OnClickRightPressed( player );
+    }
+    
+    void default_OnClickRightPressed( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickRightPressed( player );
+    }
+
+    virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnClickRightReleased )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnClickRightReleased )
+        bp::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
+        if( func_OnClickRightReleased.ptr() != Py_None )
+            try {
+                func_OnClickRightReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnClickRightReleased( player );
+            }
+        else
+            this->PyMouse::OnClickRightReleased( player );
+    }
+    
+    void default_OnClickRightReleased( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnClickRightReleased( player );
+    }
+
+    virtual void OnCursorEntered( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnCursorEntered )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnCursorEntered )
+        bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
+        if( func_OnCursorEntered.ptr() != Py_None )
+            try {
+                func_OnCursorEntered( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnCursorEntered( player );
+            }
+        else
+            this->PyMouse::OnCursorEntered( player );
+    }
+    
+    void default_OnCursorEntered( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnCursorEntered( player );
+    }
+
+    virtual void OnCursorExited( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( PyMouse, OnCursorExited )
+        PY_OVERRIDE_LOG( _entitiesmisc, PyMouse, OnCursorExited )
+        bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
+        if( func_OnCursorExited.ptr() != Py_None )
+            try {
+                func_OnCursorExited( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PyMouse::OnCursorExited( player );
+            }
+        else
+            this->PyMouse::OnCursorExited( player );
+    }
+    
+    void default_OnCursorExited( ::CHL2WarsPlayer * player ) {
+        PyMouse::OnCursorExited( player );
+    }
+
     virtual ::IMouse * GetIMouse(  ) {
         PY_OVERRIDE_CHECK( IMouse, GetIMouse )
         PY_OVERRIDE_LOG( _entitiesmisc, IMouse, GetIMouse )
@@ -3058,142 +3362,6 @@ struct PyMouse_wrapper : PyMouse, bp::wrapper< PyMouse > {
     
     ::IMouse * default_GetIMouse(  ) {
         return IMouse::GetIMouse( );
-    }
-
-    virtual void OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
-        if( func_OnClickLeftPressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftPressed( player );
-    }
-
-    virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
-        if( func_OnClickRightPressed.ptr() != Py_None )
-            try {
-                func_OnClickRightPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightPressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightPressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightPressed( player );
-    }
-
-    virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
-        if( func_OnClickLeftReleased.ptr() != Py_None )
-            try {
-                func_OnClickLeftReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftReleased( player );
-    }
-
-    virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
-        if( func_OnClickRightReleased.ptr() != Py_None )
-            try {
-                func_OnClickRightReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightReleased( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightReleased( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightReleased( player );
-    }
-
-    virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
-        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickLeftDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickLeftDoublePressed( player );
-    }
-
-    virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
-        if( func_OnClickRightDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnClickRightDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnClickRightDoublePressed( player );
-    }
-
-    virtual void OnCursorEntered( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
-        if( func_OnCursorEntered.ptr() != Py_None )
-            try {
-                func_OnCursorEntered( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnCursorEntered( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnCursorEntered( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorEntered( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnCursorEntered( player );
-    }
-
-    virtual void OnCursorExited( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorExited = this->get_override( "OnCursorExited" );
-        if( func_OnCursorExited.ptr() != Py_None )
-            try {
-                func_OnCursorExited( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->PyMouse::OnCursorExited( boost::python::ptr(player) );
-            }
-        else
-            this->PyMouse::OnCursorExited( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorExited( ::CHL2WarsPlayer * player ) {
-        PyMouse::OnCursorExited( player );
     }
 
 };
@@ -4341,10 +4509,135 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .export_values()
         ;
 
+    bp::enum_< Collision_Group_t>("Collision_Group_t")
+        .value("COLLISION_GROUP_NONE", COLLISION_GROUP_NONE)
+        .value("COLLISION_GROUP_DEBRIS", COLLISION_GROUP_DEBRIS)
+        .value("COLLISION_GROUP_DEBRIS_TRIGGER", COLLISION_GROUP_DEBRIS_TRIGGER)
+        .value("COLLISION_GROUP_INTERACTIVE_DEBRIS", COLLISION_GROUP_INTERACTIVE_DEBRIS)
+        .value("COLLISION_GROUP_INTERACTIVE", COLLISION_GROUP_INTERACTIVE)
+        .value("COLLISION_GROUP_PLAYER", COLLISION_GROUP_PLAYER)
+        .value("COLLISION_GROUP_BREAKABLE_GLASS", COLLISION_GROUP_BREAKABLE_GLASS)
+        .value("COLLISION_GROUP_VEHICLE", COLLISION_GROUP_VEHICLE)
+        .value("COLLISION_GROUP_PLAYER_MOVEMENT", COLLISION_GROUP_PLAYER_MOVEMENT)
+        .value("COLLISION_GROUP_NPC", COLLISION_GROUP_NPC)
+        .value("COLLISION_GROUP_IN_VEHICLE", COLLISION_GROUP_IN_VEHICLE)
+        .value("COLLISION_GROUP_WEAPON", COLLISION_GROUP_WEAPON)
+        .value("COLLISION_GROUP_VEHICLE_CLIP", COLLISION_GROUP_VEHICLE_CLIP)
+        .value("COLLISION_GROUP_PROJECTILE", COLLISION_GROUP_PROJECTILE)
+        .value("COLLISION_GROUP_DOOR_BLOCKER", COLLISION_GROUP_DOOR_BLOCKER)
+        .value("COLLISION_GROUP_PASSABLE_DOOR", COLLISION_GROUP_PASSABLE_DOOR)
+        .value("COLLISION_GROUP_DISSOLVING", COLLISION_GROUP_DISSOLVING)
+        .value("COLLISION_GROUP_PUSHAWAY", COLLISION_GROUP_PUSHAWAY)
+        .value("COLLISION_GROUP_NPC_ACTOR", COLLISION_GROUP_NPC_ACTOR)
+        .value("COLLISION_GROUP_NPC_SCRIPTED", COLLISION_GROUP_NPC_SCRIPTED)
+        .value("COLLISION_GROUP_PZ_CLIP", COLLISION_GROUP_PZ_CLIP)
+        .value("COLLISION_GROUP_DEBRIS_BLOCK_PROJECTILE", COLLISION_GROUP_DEBRIS_BLOCK_PROJECTILE)
+        .value("LAST_SHARED_COLLISION_GROUP", LAST_SHARED_COLLISION_GROUP)
+        .export_values()
+        ;
+
     bp::enum_< EntityEvent_t>("EntityEvent_t")
         .value("ENTITY_EVENT_WATER_TOUCH", ENTITY_EVENT_WATER_TOUCH)
         .value("ENTITY_EVENT_WATER_UNTOUCH", ENTITY_EVENT_WATER_UNTOUCH)
         .value("ENTITY_EVENT_PARENT_CHANGED", ENTITY_EVENT_PARENT_CHANGED)
+        .export_values()
+        ;
+
+    bp::enum_< MoveCollide_t>("MoveCollide_t")
+        .value("MOVECOLLIDE_DEFAULT", MOVECOLLIDE_DEFAULT)
+        .value("MOVECOLLIDE_FLY_BOUNCE", MOVECOLLIDE_FLY_BOUNCE)
+        .value("MOVECOLLIDE_FLY_CUSTOM", MOVECOLLIDE_FLY_CUSTOM)
+        .value("MOVECOLLIDE_FLY_SLIDE", MOVECOLLIDE_FLY_SLIDE)
+        .value("MOVECOLLIDE_COUNT", MOVECOLLIDE_COUNT)
+        .value("MOVECOLLIDE_MAX_BITS", MOVECOLLIDE_MAX_BITS)
+        .export_values()
+        ;
+
+    bp::enum_< MoveType_t>("MoveType_t")
+        .value("MOVETYPE_NONE", MOVETYPE_NONE)
+        .value("MOVETYPE_ISOMETRIC", MOVETYPE_ISOMETRIC)
+        .value("MOVETYPE_WALK", MOVETYPE_WALK)
+        .value("MOVETYPE_STEP", MOVETYPE_STEP)
+        .value("MOVETYPE_FLY", MOVETYPE_FLY)
+        .value("MOVETYPE_FLYGRAVITY", MOVETYPE_FLYGRAVITY)
+        .value("MOVETYPE_VPHYSICS", MOVETYPE_VPHYSICS)
+        .value("MOVETYPE_PUSH", MOVETYPE_PUSH)
+        .value("MOVETYPE_NOCLIP", MOVETYPE_NOCLIP)
+        .value("MOVETYPE_LADDER", MOVETYPE_LADDER)
+        .value("MOVETYPE_OBSERVER", MOVETYPE_OBSERVER)
+        .value("MOVETYPE_CUSTOM", MOVETYPE_CUSTOM)
+        .value("MOVETYPE_STRATEGIC", MOVETYPE_STRATEGIC)
+        .value("MOVETYPE_LAST", MOVETYPE_LAST)
+        .value("MOVETYPE_MAX_BITS", MOVETYPE_MAX_BITS)
+        .export_values()
+        ;
+
+    bp::enum_< RenderFx_t>("RenderFx_t")
+        .value("kRenderFxNone", kRenderFxNone)
+        .value("kRenderFxPulseSlow", kRenderFxPulseSlow)
+        .value("kRenderFxPulseFast", kRenderFxPulseFast)
+        .value("kRenderFxPulseSlowWide", kRenderFxPulseSlowWide)
+        .value("kRenderFxPulseFastWide", kRenderFxPulseFastWide)
+        .value("kRenderFxFadeSlow", kRenderFxFadeSlow)
+        .value("kRenderFxFadeFast", kRenderFxFadeFast)
+        .value("kRenderFxSolidSlow", kRenderFxSolidSlow)
+        .value("kRenderFxSolidFast", kRenderFxSolidFast)
+        .value("kRenderFxStrobeSlow", kRenderFxStrobeSlow)
+        .value("kRenderFxStrobeFast", kRenderFxStrobeFast)
+        .value("kRenderFxStrobeFaster", kRenderFxStrobeFaster)
+        .value("kRenderFxFlickerSlow", kRenderFxFlickerSlow)
+        .value("kRenderFxFlickerFast", kRenderFxFlickerFast)
+        .value("kRenderFxNoDissipation", kRenderFxNoDissipation)
+        .value("kRenderFxFadeOut", kRenderFxFadeOut)
+        .value("kRenderFxFadeIn", kRenderFxFadeIn)
+        .value("kRenderFxPulseFastWider", kRenderFxPulseFastWider)
+        .value("kRenderFxGlowShell", kRenderFxGlowShell)
+        .value("kRenderFxMax", kRenderFxMax)
+        .export_values()
+        ;
+
+    bp::enum_< RenderMode_t>("RenderMode_t")
+        .value("kRenderNormal", kRenderNormal)
+        .value("kRenderTransColor", kRenderTransColor)
+        .value("kRenderTransTexture", kRenderTransTexture)
+        .value("kRenderGlow", kRenderGlow)
+        .value("kRenderTransAlpha", kRenderTransAlpha)
+        .value("kRenderTransAdd", kRenderTransAdd)
+        .value("kRenderEnvironmental", kRenderEnvironmental)
+        .value("kRenderTransAddFrameBlend", kRenderTransAddFrameBlend)
+        .value("kRenderTransAlphaAdd", kRenderTransAlphaAdd)
+        .value("kRenderWorldGlow", kRenderWorldGlow)
+        .value("kRenderNone", kRenderNone)
+        .value("kRenderModeCount", kRenderModeCount)
+        .export_values()
+        ;
+
+    bp::enum_< SolidFlags_t>("SolidFlags_t")
+        .value("FSOLID_CUSTOMRAYTEST", FSOLID_CUSTOMRAYTEST)
+        .value("FSOLID_CUSTOMBOXTEST", FSOLID_CUSTOMBOXTEST)
+        .value("FSOLID_NOT_SOLID", FSOLID_NOT_SOLID)
+        .value("FSOLID_TRIGGER", FSOLID_TRIGGER)
+        .value("FSOLID_NOT_STANDABLE", FSOLID_NOT_STANDABLE)
+        .value("FSOLID_VOLUME_CONTENTS", FSOLID_VOLUME_CONTENTS)
+        .value("FSOLID_FORCE_WORLD_ALIGNED", FSOLID_FORCE_WORLD_ALIGNED)
+        .value("FSOLID_USE_TRIGGER_BOUNDS", FSOLID_USE_TRIGGER_BOUNDS)
+        .value("FSOLID_ROOT_PARENT_ALIGNED", FSOLID_ROOT_PARENT_ALIGNED)
+        .value("FSOLID_TRIGGER_TOUCH_DEBRIS", FSOLID_TRIGGER_TOUCH_DEBRIS)
+        .value("FSOLID_TRIGGER_TOUCH_PLAYER", FSOLID_TRIGGER_TOUCH_PLAYER)
+        .value("FSOLID_NOT_MOVEABLE", FSOLID_NOT_MOVEABLE)
+        .value("FSOLID_MAX_BITS", FSOLID_MAX_BITS)
+        .export_values()
+        ;
+
+    bp::enum_< SolidType_t>("SolidType_t")
+        .value("SOLID_NONE", SOLID_NONE)
+        .value("SOLID_BSP", SOLID_BSP)
+        .value("SOLID_BBOX", SOLID_BBOX)
+        .value("SOLID_OBB", SOLID_OBB)
+        .value("SOLID_OBB_YAW", SOLID_OBB_YAW)
+        .value("SOLID_CUSTOM", SOLID_CUSTOM)
+        .value("SOLID_VPHYSICS", SOLID_VPHYSICS)
+        .value("SOLID_LAST", SOLID_LAST)
         .export_values()
         ;
 
@@ -4353,6 +4646,17 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .value("USE_ON", USE_ON)
         .value("USE_SET", USE_SET)
         .value("USE_TOGGLE", USE_TOGGLE)
+        .export_values()
+        ;
+
+    bp::enum_< WarsCollision_Group_t>("WarsCollision_Group_t")
+        .value("WARS_COLLISION_GROUP_IGNORE_UNIT_START", WARS_COLLISION_GROUP_IGNORE_UNIT_START)
+        .value("WARS_COLLISION_GROUP_IGNORE_UNIT_END", WARS_COLLISION_GROUP_IGNORE_UNIT_END)
+        .value("WARS_COLLISION_GROUP_UNIT_START", WARS_COLLISION_GROUP_UNIT_START)
+        .value("WARS_COLLISION_GROUP_UNIT_END", WARS_COLLISION_GROUP_UNIT_END)
+        .value("WARS_COLLISION_GROUP_IGNORE_ALL_UNITS", WARS_COLLISION_GROUP_IGNORE_ALL_UNITS)
+        .value("WARS_COLLISION_GROUP_BUILDING", WARS_COLLISION_GROUP_BUILDING)
+        .value("WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD", WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD)
         .export_values()
         ;
 
@@ -5397,50 +5701,50 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::class_< PyMouse_wrapper, bp::bases< IMouse > >( "IMouse" )    
         .def( 
-            "GetIMouse"
-            , (::IMouse * ( ::IMouse::* )(  ) )(&::IMouse::GetIMouse)
-            , (::IMouse * ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_GetIMouse)
-            , bp::return_value_policy< bp::return_by_value >() )    
+            "OnClickLeftDoublePressed"
+            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickLeftDoublePressed)
+            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftDoublePressed)
+            , ( bp::arg("player") ) )    
         .def( 
             "OnClickLeftPressed"
             , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickLeftPressed)
             , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftPressed)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickRightPressed"
-            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickRightPressed)
-            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightPressed)
-            , ( boost::python::arg("player") ) )    
+            , ( bp::arg("player") ) )    
         .def( 
             "OnClickLeftReleased"
             , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickLeftReleased)
             , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftReleased)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickRightReleased"
-            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickRightReleased)
-            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightReleased)
-            , ( boost::python::arg("player") ) )    
-        .def( 
-            "OnClickLeftDoublePressed"
-            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickLeftDoublePressed)
-            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickLeftDoublePressed)
-            , ( boost::python::arg("player") ) )    
+            , ( bp::arg("player") ) )    
         .def( 
             "OnClickRightDoublePressed"
             , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickRightDoublePressed)
             , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightDoublePressed)
-            , ( boost::python::arg("player") ) )    
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickRightPressed"
+            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickRightPressed)
+            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightPressed)
+            , ( bp::arg("player") ) )    
+        .def( 
+            "OnClickRightReleased"
+            , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnClickRightReleased)
+            , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnClickRightReleased)
+            , ( bp::arg("player") ) )    
         .def( 
             "OnCursorEntered"
             , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnCursorEntered)
             , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorEntered)
-            , ( boost::python::arg("player") ) )    
+            , ( bp::arg("player") ) )    
         .def( 
             "OnCursorExited"
             , (void ( ::PyMouse::* )( ::CHL2WarsPlayer * ) )(&::PyMouse::OnCursorExited)
             , (void ( PyMouse_wrapper::* )( ::CHL2WarsPlayer * ) )(&PyMouse_wrapper::default_OnCursorExited)
-            , ( boost::python::arg("player") ) );
+            , ( bp::arg("player") ) )    
+        .def( 
+            "GetIMouse"
+            , (::IMouse * ( ::IMouse::* )(  ) )(&::IMouse::GetIMouse)
+            , (::IMouse * ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_GetIMouse)
+            , bp::return_value_policy< bp::return_by_value >() );
 
     bp::class_< PyOutputEvent, bp::bases< CBaseEntityOutput >, boost::noncopyable >( "COutputEvent", bp::init< >() )    
         .def( 
@@ -5909,7 +6213,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
     
     }
 
-    bp::scope().attr("gEntList") = bp::object( boost::ref( gEntList ) );
+    bp::scope().attr("entlist") = bp::object( boost::ref( gEntList ) );
 
     bp::scope().attr( "g_vecAttackDir" ) = boost::ref(g_vecAttackDir);
 

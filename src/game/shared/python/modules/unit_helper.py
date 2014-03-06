@@ -1,6 +1,4 @@
 from srcpy.module_generators import SemiSharedModuleGenerator
-from src_helper import AddWrapReg, CreateEntityArg
-
 from pyplusplus.module_builder import call_policies
 
 class UnitHelper(SemiSharedModuleGenerator):

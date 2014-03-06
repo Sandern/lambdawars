@@ -890,6 +890,25 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
         vgui::Panel::SetPaintEnabled( state );
     }
 
+    virtual void SetParent( ::vgui::Panel * newParent ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
+        bp::override func_SetParent = this->get_override( "SetParent" );
+        if( func_SetParent.ptr() != Py_None )
+            try {
+                func_SetParent( boost::python::object(*newParent) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::SetParent( newParent );
+            }
+        else
+            this->vgui::Panel::SetParent( newParent );
+    }
+    
+    void default_SetParent( ::vgui::Panel * newParent ) {
+        vgui::Panel::SetParent( newParent );
+    }
+
     virtual void SetParent( ::vgui::VPANEL newParent ) {
         PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
@@ -1083,23 +1102,6 @@ struct CWars_Model_Panel_wrapper : PyPanel, CWars_Model_Panel, bp::wrapper< CWar
     virtual void FlushSBuffer() { PyPanel::FlushSBuffer(); }
 
     virtual void SetFlushedByParent( bool bEnabled ) { PyPanel::SetFlushedByParent( bEnabled ); }
-
-    virtual void SetParent( ::vgui::Panel * newParent ) {
-        boost::python::override func_SetParent = this->get_override( "SetParent" );
-        if( func_SetParent.ptr() != Py_None )
-            try {
-                func_SetParent( *newParent );
-            } catch(...) {
-                PyErr_Print();
-                this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-            }
-        else
-            this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-    }
-
-    void default_SetParent( ::vgui::Panel * newParent ) {
-        vgui::Panel::SetParent( newParent );
-    }
 
 };
 
@@ -1861,6 +1863,18 @@ void register_CWars_Model_Panel_class(){
         }
         { //::vgui::Panel::SetParent
         
+            typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::Panel * ) ;
+            typedef void ( CWars_Model_Panel_wrapper::*default_SetParent_function_type )( ::vgui::Panel * ) ;
+            
+            CWars_Model_Panel_exposer.def( 
+                "SetParent"
+                , SetParent_function_type(&::vgui::Panel::SetParent)
+                , default_SetParent_function_type(&CWars_Model_Panel_wrapper::default_SetParent)
+                , ( bp::arg("newParent") ) );
+        
+        }
+        { //::vgui::Panel::SetParent
+        
             typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::VPANEL ) ;
             typedef void ( CWars_Model_Panel_wrapper::*default_SetParent_function_type )( ::vgui::VPANEL ) ;
             
@@ -1949,11 +1963,6 @@ void register_CWars_Model_Panel_class(){
         CWars_Model_Panel_exposer.def( "IsSBufferEnabled", &CWars_Model_Panel_wrapper::IsSBufferEnabled );
         CWars_Model_Panel_exposer.def( "FlushSBuffer", &CWars_Model_Panel_wrapper::FlushSBuffer );
         CWars_Model_Panel_exposer.def( "SetFlushedByParent", &CWars_Model_Panel_wrapper::SetFlushedByParent, bp::arg("bEnabled") );
-        CWars_Model_Panel_exposer.def( 
-            "SetParent"
-            , (void ( ::vgui::Panel::* )( ::vgui::Panel * ) )(&::vgui::Panel::SetParent)
-            , (void ( CWars_Model_Panel_wrapper::* )( ::vgui::Panel * ) )(&CWars_Model_Panel_wrapper::default_SetParent)
-            , ( boost::python::arg("newParent") ) );
     }
 
 }

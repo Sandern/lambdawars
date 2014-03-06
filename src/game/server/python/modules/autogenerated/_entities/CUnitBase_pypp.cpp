@@ -51,6 +51,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     }
 
+    virtual bool CanUserControl( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, CanUserControl )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, CanUserControl )
+        bp::override func_CanUserControl = this->get_override( "CanUserControl" );
+        if( func_CanUserControl.ptr() != Py_None )
+            try {
+                return func_CanUserControl( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::CanUserControl( pPlayer );
+            }
+        else
+            return this->CUnitBase::CanUserControl( pPlayer );
+    }
+    
+    bool default_CanUserControl( ::CHL2WarsPlayer * pPlayer ) {
+        return CUnitBase::CanUserControl( pPlayer );
+    }
+
     virtual bool CustomCanBeSeen( ::CUnitBase * pUnit=0 ) {
         PY_OVERRIDE_CHECK( CUnitBase, CustomCanBeSeen )
         PY_OVERRIDE_LOG( _entities, CUnitBase, CustomCanBeSeen )
@@ -127,6 +146,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::GetTracerType( );
     }
 
+    virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+        PY_OVERRIDE_CHECK( CUnitBase, IsSelectableByPlayer )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, IsSelectableByPlayer )
+        bp::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
+        if( func_IsSelectableByPlayer.ptr() != Py_None )
+            try {
+                return func_IsSelectableByPlayer( pPlayer ? pPlayer->GetPyHandle() : boost::python::object(), target_selection );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
+            }
+        else
+            return this->CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
+    }
+    
+    bool default_IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+        return CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
+    }
+
     virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
         PY_OVERRIDE_CHECK( CUnitBase, KeyValue )
         PY_OVERRIDE_LOG( _entities, CUnitBase, KeyValue )
@@ -182,6 +220,177 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     void default_OnButtonsChanged( int buttonsMask, int buttonsChanged ) {
         CUnitBase::OnButtonsChanged( buttonsMask, buttonsChanged );
+    }
+
+    virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickLeftDoublePressed )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickLeftDoublePressed )
+        bp::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
+        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickLeftDoublePressed( player );
+            }
+        else
+            this->CUnitBase::OnClickLeftDoublePressed( player );
+    }
+    
+    void default_OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickLeftDoublePressed( player );
+    }
+
+    virtual void OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickLeftPressed )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickLeftPressed )
+        bp::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
+        if( func_OnClickLeftPressed.ptr() != Py_None )
+            try {
+                func_OnClickLeftPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickLeftPressed( player );
+            }
+        else
+            this->CUnitBase::OnClickLeftPressed( player );
+    }
+    
+    void default_OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickLeftPressed( player );
+    }
+
+    virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickLeftReleased )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickLeftReleased )
+        bp::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
+        if( func_OnClickLeftReleased.ptr() != Py_None )
+            try {
+                func_OnClickLeftReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickLeftReleased( player );
+            }
+        else
+            this->CUnitBase::OnClickLeftReleased( player );
+    }
+    
+    void default_OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickLeftReleased( player );
+    }
+
+    virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickRightDoublePressed )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickRightDoublePressed )
+        bp::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
+        if( func_OnClickRightDoublePressed.ptr() != Py_None )
+            try {
+                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickRightDoublePressed( player );
+            }
+        else
+            this->CUnitBase::OnClickRightDoublePressed( player );
+    }
+    
+    void default_OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickRightDoublePressed( player );
+    }
+
+    virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickRightPressed )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickRightPressed )
+        bp::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
+        if( func_OnClickRightPressed.ptr() != Py_None )
+            try {
+                func_OnClickRightPressed( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickRightPressed( player );
+            }
+        else
+            this->CUnitBase::OnClickRightPressed( player );
+    }
+    
+    void default_OnClickRightPressed( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickRightPressed( player );
+    }
+
+    virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnClickRightReleased )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnClickRightReleased )
+        bp::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
+        if( func_OnClickRightReleased.ptr() != Py_None )
+            try {
+                func_OnClickRightReleased( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnClickRightReleased( player );
+            }
+        else
+            this->CUnitBase::OnClickRightReleased( player );
+    }
+    
+    void default_OnClickRightReleased( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnClickRightReleased( player );
+    }
+
+    virtual void OnCursorEntered( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnCursorEntered )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnCursorEntered )
+        bp::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
+        if( func_OnCursorEntered.ptr() != Py_None )
+            try {
+                func_OnCursorEntered( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnCursorEntered( player );
+            }
+        else
+            this->CUnitBase::OnCursorEntered( player );
+    }
+    
+    void default_OnCursorEntered( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnCursorEntered( player );
+    }
+
+    virtual void OnCursorExited( ::CHL2WarsPlayer * player ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnCursorExited )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnCursorExited )
+        bp::override func_OnCursorExited = this->get_override( "OnCursorExited" );
+        if( func_OnCursorExited.ptr() != Py_None )
+            try {
+                func_OnCursorExited( player ? player->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnCursorExited( player );
+            }
+        else
+            this->CUnitBase::OnCursorExited( player );
+    }
+    
+    void default_OnCursorExited( ::CHL2WarsPlayer * player ) {
+        CUnitBase::OnCursorExited( player );
+    }
+
+    virtual void OnDeSelected( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnDeSelected )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnDeSelected )
+        bp::override func_OnDeSelected = this->get_override( "OnDeSelected" );
+        if( func_OnDeSelected.ptr() != Py_None )
+            try {
+                func_OnDeSelected( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnDeSelected( pPlayer );
+            }
+        else
+            this->CUnitBase::OnDeSelected( pPlayer );
+    }
+    
+    void default_OnDeSelected( ::CHL2WarsPlayer * pPlayer ) {
+        CUnitBase::OnDeSelected( pPlayer );
     }
 
     virtual void OnFullHealth(  ) {
@@ -241,6 +450,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CUnitBase::OnRestore( );
     }
 
+    virtual void OnSelected( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnSelected )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnSelected )
+        bp::override func_OnSelected = this->get_override( "OnSelected" );
+        if( func_OnSelected.ptr() != Py_None )
+            try {
+                func_OnSelected( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnSelected( pPlayer );
+            }
+        else
+            this->CUnitBase::OnSelected( pPlayer );
+    }
+    
+    void default_OnSelected( ::CHL2WarsPlayer * pPlayer ) {
+        CUnitBase::OnSelected( pPlayer );
+    }
+
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CUnitBase, OnTakeDamage )
         PY_OVERRIDE_LOG( _entities, CUnitBase, OnTakeDamage )
@@ -298,6 +526,63 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CUnitBase::OnUnitTypeChanged( old_unit_type );
     }
 
+    virtual void OnUserControl( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnUserControl )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnUserControl )
+        bp::override func_OnUserControl = this->get_override( "OnUserControl" );
+        if( func_OnUserControl.ptr() != Py_None )
+            try {
+                func_OnUserControl( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnUserControl( pPlayer );
+            }
+        else
+            this->CUnitBase::OnUserControl( pPlayer );
+    }
+    
+    void default_OnUserControl( ::CHL2WarsPlayer * pPlayer ) {
+        CUnitBase::OnUserControl( pPlayer );
+    }
+
+    virtual void OnUserLeftControl( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, OnUserLeftControl )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, OnUserLeftControl )
+        bp::override func_OnUserLeftControl = this->get_override( "OnUserLeftControl" );
+        if( func_OnUserLeftControl.ptr() != Py_None )
+            try {
+                func_OnUserLeftControl( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::OnUserLeftControl( pPlayer );
+            }
+        else
+            this->CUnitBase::OnUserLeftControl( pPlayer );
+    }
+    
+    void default_OnUserLeftControl( ::CHL2WarsPlayer * pPlayer ) {
+        CUnitBase::OnUserLeftControl( pPlayer );
+    }
+
+    virtual void Order( ::CHL2WarsPlayer * pPlayer ) {
+        PY_OVERRIDE_CHECK( CUnitBase, Order )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, Order )
+        bp::override func_Order = this->get_override( "Order" );
+        if( func_Order.ptr() != Py_None )
+            try {
+                func_Order( pPlayer ? pPlayer->GetPyHandle() : boost::python::object() );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::Order( pPlayer );
+            }
+        else
+            this->CUnitBase::Order( pPlayer );
+    }
+    
+    void default_Order( ::CHL2WarsPlayer * pPlayer ) {
+        CUnitBase::Order( pPlayer );
+    }
+
     virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CUnitBase, PassesDamageFilter )
         PY_OVERRIDE_LOG( _entities, CUnitBase, PassesDamageFilter )
@@ -315,6 +600,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     bool default_PassesDamageFilter( ::CTakeDamageInfo const & info ) {
         return CUnitBase::PassesDamageFilter( info );
+    }
+
+    virtual void Select( ::CHL2WarsPlayer * pPlayer, bool bTriggerOnSel=true ) {
+        PY_OVERRIDE_CHECK( CUnitBase, Select )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, Select )
+        bp::override func_Select = this->get_override( "Select" );
+        if( func_Select.ptr() != Py_None )
+            try {
+                func_Select( pPlayer ? pPlayer->GetPyHandle() : boost::python::object(), bTriggerOnSel );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CUnitBase::Select( pPlayer, bTriggerOnSel );
+            }
+        else
+            this->CUnitBase::Select( pPlayer, bTriggerOnSel );
+    }
+    
+    void default_Select( ::CHL2WarsPlayer * pPlayer, bool bTriggerOnSel=true ) {
+        CUnitBase::Select( pPlayer, bTriggerOnSel );
     }
 
     virtual void Spawn(  ) {
@@ -986,278 +1290,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
 
     static void m_nSkin_Set( CUnitBase & inst, int val ) { inst.m_nSkin.Set( val ); }
 
-    virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
-        boost::python::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
-        if( func_IsSelectableByPlayer.ptr() != Py_None )
-            try {
-                return func_IsSelectableByPlayer( pPlayer ? pPlayer->GetPyHandle() : bp::object(), target_selection );
-            } catch(...) {
-                PyErr_Print();
-                return this->CUnitBase::IsSelectableByPlayer( boost::python::ptr(pPlayer), target_selection );
-            }
-        else
-            return this->CUnitBase::IsSelectableByPlayer( boost::python::ptr(pPlayer), target_selection );
-    }
-
-    bool default_IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
-        return CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
-    }
-
-    virtual void Select( ::CHL2WarsPlayer * pPlayer, bool bTriggerOnSel=true ) {
-        boost::python::override func_Select = this->get_override( "Select" );
-        if( func_Select.ptr() != Py_None )
-            try {
-                func_Select( pPlayer ? pPlayer->GetPyHandle() : bp::object(), bTriggerOnSel );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::Select( boost::python::ptr(pPlayer), bTriggerOnSel );
-            }
-        else
-            this->CUnitBase::Select( boost::python::ptr(pPlayer), bTriggerOnSel );
-    }
-
-    void default_Select( ::CHL2WarsPlayer * pPlayer, bool bTriggerOnSel=true ) {
-        CUnitBase::Select( pPlayer, bTriggerOnSel );
-    }
-
-    virtual void OnSelected( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_OnSelected = this->get_override( "OnSelected" );
-        if( func_OnSelected.ptr() != Py_None )
-            try {
-                func_OnSelected( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnSelected( boost::python::ptr(pPlayer) );
-            }
-        else
-            this->CUnitBase::OnSelected( boost::python::ptr(pPlayer) );
-    }
-
-    void default_OnSelected( ::CHL2WarsPlayer * pPlayer ) {
-        CUnitBase::OnSelected( pPlayer );
-    }
-
-    virtual void OnDeSelected( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_OnDeSelected = this->get_override( "OnDeSelected" );
-        if( func_OnDeSelected.ptr() != Py_None )
-            try {
-                func_OnDeSelected( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnDeSelected( boost::python::ptr(pPlayer) );
-            }
-        else
-            this->CUnitBase::OnDeSelected( boost::python::ptr(pPlayer) );
-    }
-
-    void default_OnDeSelected( ::CHL2WarsPlayer * pPlayer ) {
-        CUnitBase::OnDeSelected( pPlayer );
-    }
-
-    virtual void Order( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_Order = this->get_override( "Order" );
-        if( func_Order.ptr() != Py_None )
-            try {
-                func_Order( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::Order( boost::python::ptr(pPlayer) );
-            }
-        else
-            this->CUnitBase::Order( boost::python::ptr(pPlayer) );
-    }
-
-    void default_Order( ::CHL2WarsPlayer * pPlayer ) {
-        CUnitBase::Order( pPlayer );
-    }
-
-    virtual void OnUserControl( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_OnUserControl = this->get_override( "OnUserControl" );
-        if( func_OnUserControl.ptr() != Py_None )
-            try {
-                func_OnUserControl( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnUserControl( boost::python::ptr(pPlayer) );
-            }
-        else
-            this->CUnitBase::OnUserControl( boost::python::ptr(pPlayer) );
-    }
-
-    void default_OnUserControl( ::CHL2WarsPlayer * pPlayer ) {
-        CUnitBase::OnUserControl( pPlayer );
-    }
-
-    virtual void OnUserLeftControl( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_OnUserLeftControl = this->get_override( "OnUserLeftControl" );
-        if( func_OnUserLeftControl.ptr() != Py_None )
-            try {
-                func_OnUserLeftControl( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnUserLeftControl( boost::python::ptr(pPlayer) );
-            }
-        else
-            this->CUnitBase::OnUserLeftControl( boost::python::ptr(pPlayer) );
-    }
-
-    void default_OnUserLeftControl( ::CHL2WarsPlayer * pPlayer ) {
-        CUnitBase::OnUserLeftControl( pPlayer );
-    }
-
-    virtual bool CanUserControl( ::CHL2WarsPlayer * pPlayer ) {
-        boost::python::override func_CanUserControl = this->get_override( "CanUserControl" );
-        if( func_CanUserControl.ptr() != Py_None )
-            try {
-                return func_CanUserControl( pPlayer ? pPlayer->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                return this->CUnitBase::CanUserControl( boost::python::ptr(pPlayer) );
-            }
-        else
-            return this->CUnitBase::CanUserControl( boost::python::ptr(pPlayer) );
-    }
-
-    bool default_CanUserControl( ::CHL2WarsPlayer * pPlayer ) {
-        return CUnitBase::CanUserControl( pPlayer );
-    }
-
-    virtual void OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftPressed = this->get_override( "OnClickLeftPressed" );
-        if( func_OnClickLeftPressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickLeftPressed( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickLeftPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftPressed( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickLeftPressed( player );
-    }
-
-    virtual void OnClickRightPressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightPressed = this->get_override( "OnClickRightPressed" );
-        if( func_OnClickRightPressed.ptr() != Py_None )
-            try {
-                func_OnClickRightPressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickRightPressed( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickRightPressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightPressed( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickRightPressed( player );
-    }
-
-    virtual void OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftReleased = this->get_override( "OnClickLeftReleased" );
-        if( func_OnClickLeftReleased.ptr() != Py_None )
-            try {
-                func_OnClickLeftReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickLeftReleased( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickLeftReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftReleased( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickLeftReleased( player );
-    }
-
-    virtual void OnClickRightReleased( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightReleased = this->get_override( "OnClickRightReleased" );
-        if( func_OnClickRightReleased.ptr() != Py_None )
-            try {
-                func_OnClickRightReleased( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickRightReleased( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickRightReleased( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightReleased( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickRightReleased( player );
-    }
-
-    virtual void OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickLeftDoublePressed = this->get_override( "OnClickLeftDoublePressed" );
-        if( func_OnClickLeftDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickLeftDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickLeftDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickLeftDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickLeftDoublePressed( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickLeftDoublePressed( player );
-    }
-
-    virtual void OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnClickRightDoublePressed = this->get_override( "OnClickRightDoublePressed" );
-        if( func_OnClickRightDoublePressed.ptr() != Py_None )
-            try {
-                func_OnClickRightDoublePressed( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnClickRightDoublePressed( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnClickRightDoublePressed( boost::python::ptr(player) );
-    }
-
-    void default_OnClickRightDoublePressed( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnClickRightDoublePressed( player );
-    }
-
-    virtual void OnCursorEntered( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorEntered = this->get_override( "OnCursorEntered" );
-        if( func_OnCursorEntered.ptr() != Py_None )
-            try {
-                func_OnCursorEntered( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnCursorEntered( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnCursorEntered( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorEntered( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnCursorEntered( player );
-    }
-
-    virtual void OnCursorExited( ::CHL2WarsPlayer * player ) {
-        boost::python::override func_OnCursorExited = this->get_override( "OnCursorExited" );
-        if( func_OnCursorExited.ptr() != Py_None )
-            try {
-                func_OnCursorExited( player ? player->GetPyHandle() : bp::object() );
-            } catch(...) {
-                PyErr_Print();
-                this->CUnitBase::OnCursorExited( boost::python::ptr(player) );
-            }
-        else
-            this->CUnitBase::OnCursorExited( boost::python::ptr(player) );
-    }
-
-    void default_OnCursorExited( ::CHL2WarsPlayer * player ) {
-        CUnitBase::OnCursorExited( player );
-    }
-
 };
 
 void register_CUnitBase_class(){
@@ -1323,6 +1355,18 @@ void register_CUnitBase_class(){
                 "CanBeSeen"
                 , CanBeSeen_function_type( &::CUnitBase::CanBeSeen )
                 , ( bp::arg("pUnit")=bp::object() ) );
+        
+        }
+        { //::CUnitBase::CanUserControl
+        
+            typedef bool ( ::CUnitBase::*CanUserControl_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef bool ( CUnitBase_wrapper::*default_CanUserControl_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "CanUserControl"
+                , CanUserControl_function_type(&::CUnitBase::CanUserControl)
+                , default_CanUserControl_function_type(&CUnitBase_wrapper::default_CanUserControl)
+                , ( bp::arg("pPlayer") ) );
         
         }
         { //::CUnitBase::CheckEnemyAlive
@@ -1651,6 +1695,18 @@ void register_CUnitBase_class(){
                 , IsCrouching_function_type( &::CUnitBase::IsCrouching ) );
         
         }
+        { //::CUnitBase::IsSelectableByPlayer
+        
+            typedef bool ( ::CUnitBase::*IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::object ) ;
+            typedef bool ( CUnitBase_wrapper::*default_IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::object ) ;
+            
+            CUnitBase_exposer.def( 
+                "IsSelectableByPlayer"
+                , IsSelectableByPlayer_function_type(&::CUnitBase::IsSelectableByPlayer)
+                , default_IsSelectableByPlayer_function_type(&CUnitBase_wrapper::default_IsSelectableByPlayer)
+                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::object() ) );
+        
+        }
         { //::CUnitBase::IsSelectedByPlayer
         
             typedef bool ( ::CUnitBase::*IsSelectedByPlayer_function_type )( int ) ;
@@ -1706,6 +1762,114 @@ void register_CUnitBase_class(){
                 , ( bp::arg("buttonsMask"), bp::arg("buttonsChanged") ) );
         
         }
+        { //::CUnitBase::OnClickLeftDoublePressed
+        
+            typedef void ( ::CUnitBase::*OnClickLeftDoublePressed_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickLeftDoublePressed_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickLeftDoublePressed"
+                , OnClickLeftDoublePressed_function_type(&::CUnitBase::OnClickLeftDoublePressed)
+                , default_OnClickLeftDoublePressed_function_type(&CUnitBase_wrapper::default_OnClickLeftDoublePressed)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnClickLeftPressed
+        
+            typedef void ( ::CUnitBase::*OnClickLeftPressed_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickLeftPressed_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickLeftPressed"
+                , OnClickLeftPressed_function_type(&::CUnitBase::OnClickLeftPressed)
+                , default_OnClickLeftPressed_function_type(&CUnitBase_wrapper::default_OnClickLeftPressed)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnClickLeftReleased
+        
+            typedef void ( ::CUnitBase::*OnClickLeftReleased_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickLeftReleased_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickLeftReleased"
+                , OnClickLeftReleased_function_type(&::CUnitBase::OnClickLeftReleased)
+                , default_OnClickLeftReleased_function_type(&CUnitBase_wrapper::default_OnClickLeftReleased)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnClickRightDoublePressed
+        
+            typedef void ( ::CUnitBase::*OnClickRightDoublePressed_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickRightDoublePressed_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickRightDoublePressed"
+                , OnClickRightDoublePressed_function_type(&::CUnitBase::OnClickRightDoublePressed)
+                , default_OnClickRightDoublePressed_function_type(&CUnitBase_wrapper::default_OnClickRightDoublePressed)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnClickRightPressed
+        
+            typedef void ( ::CUnitBase::*OnClickRightPressed_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickRightPressed_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickRightPressed"
+                , OnClickRightPressed_function_type(&::CUnitBase::OnClickRightPressed)
+                , default_OnClickRightPressed_function_type(&CUnitBase_wrapper::default_OnClickRightPressed)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnClickRightReleased
+        
+            typedef void ( ::CUnitBase::*OnClickRightReleased_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnClickRightReleased_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnClickRightReleased"
+                , OnClickRightReleased_function_type(&::CUnitBase::OnClickRightReleased)
+                , default_OnClickRightReleased_function_type(&CUnitBase_wrapper::default_OnClickRightReleased)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnCursorEntered
+        
+            typedef void ( ::CUnitBase::*OnCursorEntered_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnCursorEntered_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnCursorEntered"
+                , OnCursorEntered_function_type(&::CUnitBase::OnCursorEntered)
+                , default_OnCursorEntered_function_type(&CUnitBase_wrapper::default_OnCursorEntered)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnCursorExited
+        
+            typedef void ( ::CUnitBase::*OnCursorExited_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnCursorExited_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnCursorExited"
+                , OnCursorExited_function_type(&::CUnitBase::OnCursorExited)
+                , default_OnCursorExited_function_type(&CUnitBase_wrapper::default_OnCursorExited)
+                , ( bp::arg("player") ) );
+        
+        }
+        { //::CUnitBase::OnDeSelected
+        
+            typedef void ( ::CUnitBase::*OnDeSelected_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnDeSelected_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnDeSelected"
+                , OnDeSelected_function_type(&::CUnitBase::OnDeSelected)
+                , default_OnDeSelected_function_type(&CUnitBase_wrapper::default_OnDeSelected)
+                , ( bp::arg("pPlayer") ) );
+        
+        }
         { //::CUnitBase::OnFullHealth
         
             typedef void ( ::CUnitBase::*OnFullHealth_function_type )(  ) ;
@@ -1737,6 +1901,18 @@ void register_CUnitBase_class(){
                 "OnRestore"
                 , OnRestore_function_type(&::CUnitBase::OnRestore)
                 , default_OnRestore_function_type(&CUnitBase_wrapper::default_OnRestore) );
+        
+        }
+        { //::CUnitBase::OnSelected
+        
+            typedef void ( ::CUnitBase::*OnSelected_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnSelected_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnSelected"
+                , OnSelected_function_type(&::CUnitBase::OnSelected)
+                , default_OnSelected_function_type(&CUnitBase_wrapper::default_OnSelected)
+                , ( bp::arg("pPlayer") ) );
         
         }
         { //::CUnitBase::OnTakeDamage
@@ -1773,6 +1949,42 @@ void register_CUnitBase_class(){
                 , OnUnitTypeChanged_function_type(&::CUnitBase::OnUnitTypeChanged)
                 , default_OnUnitTypeChanged_function_type(&CUnitBase_wrapper::default_OnUnitTypeChanged)
                 , ( bp::arg("old_unit_type") ) );
+        
+        }
+        { //::CUnitBase::OnUserControl
+        
+            typedef void ( ::CUnitBase::*OnUserControl_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnUserControl_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnUserControl"
+                , OnUserControl_function_type(&::CUnitBase::OnUserControl)
+                , default_OnUserControl_function_type(&CUnitBase_wrapper::default_OnUserControl)
+                , ( bp::arg("pPlayer") ) );
+        
+        }
+        { //::CUnitBase::OnUserLeftControl
+        
+            typedef void ( ::CUnitBase::*OnUserLeftControl_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_OnUserLeftControl_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "OnUserLeftControl"
+                , OnUserLeftControl_function_type(&::CUnitBase::OnUserLeftControl)
+                , default_OnUserLeftControl_function_type(&CUnitBase_wrapper::default_OnUserLeftControl)
+                , ( bp::arg("pPlayer") ) );
+        
+        }
+        { //::CUnitBase::Order
+        
+            typedef void ( ::CUnitBase::*Order_function_type )( ::CHL2WarsPlayer * ) ;
+            typedef void ( CUnitBase_wrapper::*default_Order_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CUnitBase_exposer.def( 
+                "Order"
+                , Order_function_type(&::CUnitBase::Order)
+                , default_Order_function_type(&CUnitBase_wrapper::default_Order)
+                , ( bp::arg("pPlayer") ) );
         
         }
         { //::CUnitBase::PassesDamageFilter
@@ -1822,6 +2034,18 @@ void register_CUnitBase_class(){
                 "RemoveEntityRelationship"
                 , RemoveEntityRelationship_function_type( &::CUnitBase::RemoveEntityRelationship )
                 , ( bp::arg("pEntity") ) );
+        
+        }
+        { //::CUnitBase::Select
+        
+            typedef void ( ::CUnitBase::*Select_function_type )( ::CHL2WarsPlayer *,bool ) ;
+            typedef void ( CUnitBase_wrapper::*default_Select_function_type )( ::CHL2WarsPlayer *,bool ) ;
+            
+            CUnitBase_exposer.def( 
+                "Select"
+                , Select_function_type(&::CUnitBase::Select)
+                , default_Select_function_type(&CUnitBase_wrapper::default_Select)
+                , ( bp::arg("pPlayer"), bp::arg("bTriggerOnSel")=(bool)(true) ) );
         
         }
         { //::CUnitBase::SetAim
@@ -2536,86 +2760,6 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.add_property( "lifestate", &CUnitBase_wrapper::m_lifeState_Get, &CUnitBase_wrapper::m_lifeState_Set );
         CUnitBase_exposer.add_property( "takedamage", &CUnitBase_wrapper::m_takedamage_Get, &CUnitBase_wrapper::m_takedamage_Set );
         CUnitBase_exposer.add_property( "skin", &CUnitBase_wrapper::m_nSkin_Get, &CUnitBase_wrapper::m_nSkin_Set );
-        CUnitBase_exposer.def( 
-            "IsSelectableByPlayer"
-            , (bool ( ::CUnitBase::* )( ::CHL2WarsPlayer *,::boost::python::object ) )(&::CUnitBase::IsSelectableByPlayer)
-            , (bool ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer *,::boost::python::object ) )(&CUnitBase_wrapper::default_IsSelectableByPlayer)
-            , ( boost::python::arg("pPlayer"), boost::python::arg("target_selection")=boost::python::object() ) );
-        CUnitBase_exposer.def( 
-            "Select"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer *,bool ) )(&::CUnitBase::Select)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer *,bool ) )(&CUnitBase_wrapper::default_Select)
-            , ( boost::python::arg("pPlayer"), boost::python::arg("bTriggerOnSel")=(bool)(true) ) );
-        CUnitBase_exposer.def( 
-            "OnSelected"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnSelected)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnSelected)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "OnDeSelected"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnDeSelected)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnDeSelected)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "Order"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::Order)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_Order)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "OnUserControl"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnUserControl)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnUserControl)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "OnUserLeftControl"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnUserLeftControl)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnUserLeftControl)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "CanUserControl"
-            , (bool ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::CanUserControl)
-            , (bool ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_CanUserControl)
-            , ( boost::python::arg("pPlayer") ) );
-        CUnitBase_exposer.def( 
-            "OnClickLeftPressed"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickLeftPressed)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickLeftPressed)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnClickRightPressed"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickRightPressed)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickRightPressed)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnClickLeftReleased"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickLeftReleased)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickLeftReleased)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnClickRightReleased"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickRightReleased)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickRightReleased)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnClickLeftDoublePressed"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickLeftDoublePressed)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickLeftDoublePressed)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnClickRightDoublePressed"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnClickRightDoublePressed)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnClickRightDoublePressed)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnCursorEntered"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnCursorEntered)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnCursorEntered)
-            , ( boost::python::arg("player") ) );
-        CUnitBase_exposer.def( 
-            "OnCursorExited"
-            , (void ( ::CUnitBase::* )( ::CHL2WarsPlayer * ) )(&::CUnitBase::OnCursorExited)
-            , (void ( CUnitBase_wrapper::* )( ::CHL2WarsPlayer * ) )(&CUnitBase_wrapper::default_OnCursorExited)
-            , ( boost::python::arg("player") ) );
     }
 
 }

@@ -888,6 +888,25 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
         vgui::Panel::SetPaintBackgroundType( type );
     }
 
+    virtual void SetParent( ::vgui::Panel * newParent ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
+        bp::override func_SetParent = this->get_override( "SetParent" );
+        if( func_SetParent.ptr() != Py_None )
+            try {
+                func_SetParent( boost::python::object(*newParent) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::SetParent( newParent );
+            }
+        else
+            this->vgui::Panel::SetParent( newParent );
+    }
+    
+    void default_SetParent( ::vgui::Panel * newParent ) {
+        vgui::Panel::SetParent( newParent );
+    }
+
     virtual void SetParent( ::vgui::VPANEL newParent ) {
         PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
@@ -1081,23 +1100,6 @@ struct ScrollBar_wrapper : PyPanel, vgui::ScrollBar, bp::wrapper< vgui::ScrollBa
     virtual void FlushSBuffer() { PyPanel::FlushSBuffer(); }
 
     virtual void SetFlushedByParent( bool bEnabled ) { PyPanel::SetFlushedByParent( bEnabled ); }
-
-    virtual void SetParent( ::vgui::Panel * newParent ) {
-        boost::python::override func_SetParent = this->get_override( "SetParent" );
-        if( func_SetParent.ptr() != Py_None )
-            try {
-                func_SetParent( *newParent );
-            } catch(...) {
-                PyErr_Print();
-                this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-            }
-        else
-            this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-    }
-
-    void default_SetParent( ::vgui::Panel * newParent ) {
-        vgui::Panel::SetParent( newParent );
-    }
 
 };
 
@@ -2031,6 +2033,18 @@ void register_ScrollBar_class(){
         }
         { //::vgui::Panel::SetParent
         
+            typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::Panel * ) ;
+            typedef void ( ScrollBar_wrapper::*default_SetParent_function_type )( ::vgui::Panel * ) ;
+            
+            ScrollBar_exposer.def( 
+                "SetParent"
+                , SetParent_function_type(&::vgui::Panel::SetParent)
+                , default_SetParent_function_type(&ScrollBar_wrapper::default_SetParent)
+                , ( bp::arg("newParent") ) );
+        
+        }
+        { //::vgui::Panel::SetParent
+        
             typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::VPANEL ) ;
             typedef void ( ScrollBar_wrapper::*default_SetParent_function_type )( ::vgui::VPANEL ) ;
             
@@ -2119,11 +2133,6 @@ void register_ScrollBar_class(){
         ScrollBar_exposer.def( "IsSBufferEnabled", &ScrollBar_wrapper::IsSBufferEnabled );
         ScrollBar_exposer.def( "FlushSBuffer", &ScrollBar_wrapper::FlushSBuffer );
         ScrollBar_exposer.def( "SetFlushedByParent", &ScrollBar_wrapper::SetFlushedByParent, bp::arg("bEnabled") );
-        ScrollBar_exposer.def( 
-            "SetParent"
-            , (void ( ::vgui::Panel::* )( ::vgui::Panel * ) )(&::vgui::Panel::SetParent)
-            , (void ( ScrollBar_wrapper::* )( ::vgui::Panel * ) )(&ScrollBar_wrapper::default_SetParent)
-            , ( boost::python::arg("newParent") ) );
     }
 
 }

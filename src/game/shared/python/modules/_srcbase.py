@@ -3,8 +3,6 @@ from pyplusplus import code_creators
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
 
-from src_helper import HasArgType
-
 class SrcBase(SharedModuleGenerator):
     module_name = '_srcbase'
     
@@ -86,10 +84,6 @@ class SrcBase(SharedModuleGenerator):
         #mb.free_function('PyKeyValues').include()
         #mb.free_function('PyKeyValues').rename('KeyValues')
         mb.free_function('KeyValuesDumpAsDevMsg').include()
-        
-        # Exclude these for now
-        mb.mem_funs( lambda decl: HasArgType(decl, 'CUtlBuffer') ).exclude()
-        mb.mem_funs( lambda decl: HasArgType(decl, 'IBaseFileSystem') ).exclude()
         
         # Exclude vars we don't need
         mb.vars('m_sValue').exclude()
@@ -389,16 +383,6 @@ class SrcBase(SharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"HIDEHUD_STRATEGIC\" ) = (int)HIDEHUD_STRATEGIC;" )
         mb.add_registration_code( "bp::scope().attr( \"HIDEHUD_UNIT\" ) = (int)HIDEHUD_UNIT;" )
         mb.add_registration_code( "bp::scope().attr( \"HIDEHUD_BITCOUNT\" ) = (int)HIDEHUD_BITCOUNT;" )
-        
-        # Enums
-        mb.enums('Collision_Group_t').include()
-        mb.enums('WarsCollision_Group_t').include()
-        mb.enums('SolidType_t').include()
-        mb.enums('SolidFlags_t').include()
-        mb.enums('RenderMode_t').include()
-        mb.enums('RenderFx_t').include()
-        mb.enums('MoveType_t').include()
-        mb.enums('MoveCollide_t').include()
         
     # Adds precompiled header + other default includes
     def AddAdditionalCode(self, mb):

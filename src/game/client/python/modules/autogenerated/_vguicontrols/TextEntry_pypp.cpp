@@ -1063,6 +1063,25 @@ struct TextEntry_wrapper : PyPanel, vgui::TextEntry, bp::wrapper< vgui::TextEntr
         vgui::Panel::SetPaintEnabled( state );
     }
 
+    virtual void SetParent( ::vgui::Panel * newParent ) {
+        PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
+        PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
+        bp::override func_SetParent = this->get_override( "SetParent" );
+        if( func_SetParent.ptr() != Py_None )
+            try {
+                func_SetParent( boost::python::object(*newParent) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->vgui::Panel::SetParent( newParent );
+            }
+        else
+            this->vgui::Panel::SetParent( newParent );
+    }
+    
+    void default_SetParent( ::vgui::Panel * newParent ) {
+        vgui::Panel::SetParent( newParent );
+    }
+
     virtual void SetParent( ::vgui::VPANEL newParent ) {
         PY_OVERRIDE_CHECK( vgui::Panel, SetParent )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::Panel, SetParent )
@@ -1256,23 +1275,6 @@ struct TextEntry_wrapper : PyPanel, vgui::TextEntry, bp::wrapper< vgui::TextEntr
     virtual void FlushSBuffer() { PyPanel::FlushSBuffer(); }
 
     virtual void SetFlushedByParent( bool bEnabled ) { PyPanel::SetFlushedByParent( bEnabled ); }
-
-    virtual void SetParent( ::vgui::Panel * newParent ) {
-        boost::python::override func_SetParent = this->get_override( "SetParent" );
-        if( func_SetParent.ptr() != Py_None )
-            try {
-                func_SetParent( *newParent );
-            } catch(...) {
-                PyErr_Print();
-                this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-            }
-        else
-            this->vgui::Panel::SetParent( boost::python::ptr(newParent) );
-    }
-
-    void default_SetParent( ::vgui::Panel * newParent ) {
-        vgui::Panel::SetParent( newParent );
-    }
 
     boost::python::object GetText() {
         const char *buf = (const char *)malloc( (GetTextLength()+1)*sizeof(char) );
@@ -2967,6 +2969,18 @@ void register_TextEntry_class(){
         }
         { //::vgui::Panel::SetParent
         
+            typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::Panel * ) ;
+            typedef void ( TextEntry_wrapper::*default_SetParent_function_type )( ::vgui::Panel * ) ;
+            
+            TextEntry_exposer.def( 
+                "SetParent"
+                , SetParent_function_type(&::vgui::Panel::SetParent)
+                , default_SetParent_function_type(&TextEntry_wrapper::default_SetParent)
+                , ( bp::arg("newParent") ) );
+        
+        }
+        { //::vgui::Panel::SetParent
+        
             typedef void ( ::vgui::Panel::*SetParent_function_type )( ::vgui::VPANEL ) ;
             typedef void ( TextEntry_wrapper::*default_SetParent_function_type )( ::vgui::VPANEL ) ;
             
@@ -3055,11 +3069,6 @@ void register_TextEntry_class(){
         TextEntry_exposer.def( "IsSBufferEnabled", &TextEntry_wrapper::IsSBufferEnabled );
         TextEntry_exposer.def( "FlushSBuffer", &TextEntry_wrapper::FlushSBuffer );
         TextEntry_exposer.def( "SetFlushedByParent", &TextEntry_wrapper::SetFlushedByParent, bp::arg("bEnabled") );
-        TextEntry_exposer.def( 
-            "SetParent"
-            , (void ( ::vgui::Panel::* )( ::vgui::Panel * ) )(&::vgui::Panel::SetParent)
-            , (void ( TextEntry_wrapper::* )( ::vgui::Panel * ) )(&TextEntry_wrapper::default_SetParent)
-            , ( boost::python::arg("newParent") ) );
         TextEntry_exposer.def( 
             "GetText"
             , (boost::python::object ( TextEntry_wrapper::* )())( &TextEntry_wrapper::GetText ) );

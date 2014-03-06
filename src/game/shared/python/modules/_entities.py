@@ -8,8 +8,6 @@ from pyplusplus import messages
 from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t
 from pyplusplus import code_creators
 
-from src_helper import HasArgType, AddWrapReg, AddWrapRegs, CreateEntityArg
-
 # Templates for client and server class
 tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
@@ -839,8 +837,9 @@ class Entities(SemiSharedModuleGenerator):
                 mb.mem_funs('GetBoneCache').exclude()
                 mb.mem_funs('InputIgniteNumHitboxFires').exclude()
                 mb.mem_funs('InputIgniteHitboxFireScale').exclude()
-                mb.mem_funs( name='GetBonePosition', function=lambda decl: HasArgType(decl, 'char') ).exclude() 
-                
+                excludetypes = [pointer_t(const_t(declarated_t(char_t())))]
+                mb.calldefs(name='GetBonePosition', function=calldef_withtypes(excludetypes)).exclude()
+        
             # Rename vars
             self.IncludeVarAndRename('m_OnIgnite', 'onignite')
             self.IncludeVarAndRename('m_flGroundSpeed', 'groundspeed')
@@ -871,7 +870,8 @@ class Entities(SemiSharedModuleGenerator):
         if self.isserver:
             mb.mem_funs('FlexSettingLessFunc').exclude()
             cls.class_('FS_LocalToGlobal_t').exclude()
-            mb.mem_funs( lambda decl: HasArgType(decl, 'AI_Response') ).exclude() 
+            excludetypes = [pointer_t(declarated_t(mb.typedef('AI_Response')))]
+            mb.calldefs(function=calldef_withtypes(excludetypes)).exclude()
             if self.settings.branch == 'swarm':
                 mb.mem_funs('ScriptGetOldestScene').exclude()
                 mb.mem_funs('ScriptGetSceneByIndex').exclude()
@@ -1330,20 +1330,18 @@ class Entities(SemiSharedModuleGenerator):
         
     def ParseUnitBaseShared(self, mb, cls_name):
         cls = mb.class_(cls_name)
-        AddWrapReg( mb, cls_name, cls.mem_fun('IsSelectableByPlayer'), [CreateEntityArg('pPlayer'), 'target_selection'] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('Select'), [CreateEntityArg('pPlayer'), 'bTriggerOnSel'] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnSelected'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnDeSelected'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('Order'), [CreateEntityArg('pPlayer')] )
-        #AddWrapReg( mb, cls_name, cls.mem_fun('UserCmd'), ['*pMoveData'] )   
         cls.mem_funs('UserCmd').include()
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserControl'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('OnUserLeftControl'), [CreateEntityArg('pPlayer')] )
-        AddWrapReg( mb, cls_name, cls.mem_fun('CanUserControl'), [CreateEntityArg('pPlayer')] )
-        cls.mem_funs( lambda decl: 'OnClick' in decl.name ).exclude()
-        cls.mem_funs( lambda decl: 'OnCursor' in decl.name ).exclude()
-        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnClick' in decl.name ), [CreateEntityArg('player')] )
-        AddWrapRegs( mb, cls_name, cls.mem_funs( lambda decl: 'OnCursor' in decl.name ), [CreateEntityArg('player')] )
+        cls.mem_funs('IsSelectableByPlayer').virtuality = 'virtual'
+        cls.mem_funs('Select').virtuality = 'virtual'
+        cls.mem_funs('OnSelected').virtuality = 'virtual'
+        cls.mem_funs('OnDeSelected').virtuality = 'virtual'
+        cls.mem_funs('Order').virtuality = 'virtual'
+        cls.mem_funs('UserCmd').virtuality = 'virtual'
+        cls.mem_funs('OnUserControl').virtuality = 'virtual'
+        cls.mem_funs('OnUserLeftControl').virtuality = 'virtual'
+        cls.mem_funs('CanUserControl').virtuality = 'virtual'
+        cls.mem_funs(lambda decl: 'OnClick' in decl.name).virtuality = 'virtual'
+        cls.mem_funs(lambda decl: 'OnCursor' in decl.name).virtuality = 'virtual'
         
         if self.isclient:
             cls.mem_funs('OnInSelectionBox').virtuality = 'virtual'
@@ -1402,22 +1400,6 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('OnHoverPaint').virtuality = 'virtual'
             mb.mem_funs('GetCursor').virtuality = 'virtual'
 
-        mb.mem_funs('OnClickLeftPressed').exclude()
-        mb.mem_funs('OnClickRightPressed').exclude()
-        mb.mem_funs('OnClickLeftReleased').exclude()
-        mb.mem_funs('OnClickRightReleased').exclude()
-        mb.mem_funs('OnClickLeftDoublePressed').exclude()
-        mb.mem_funs('OnClickRightDoublePressed').exclude()
-        mb.mem_funs('IsSelectableByPlayer').exclude()
-        mb.mem_funs('Select').exclude()
-        mb.mem_funs('OnSelected').exclude()
-        mb.mem_funs('OnDeSelected').exclude()
-        mb.mem_funs('Order').exclude()
-        #mb.mem_funs('UserCmd').exclude()
-        mb.mem_funs('OnUserControl').exclude()
-        mb.mem_funs('OnUserLeftControl').exclude()
-        mb.mem_funs('CanUserControl').exclude() 
-        
         mb.free_function('MapUnits').include()
         
         self.ParseUnitBaseShared(mb, cls_name)

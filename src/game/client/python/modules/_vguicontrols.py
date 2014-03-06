@@ -1,11 +1,103 @@
 from srcpy.module_generators import ClientModuleGenerator
 from srcpy.matchers import calldef_withtypes, MatcherTestInheritClass
-from src_helper import *
 
+from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t, int_t, wchar_t
 from pyplusplus.code_creators import calldef
 from pyplusplus import function_transformers as FT
-from pygccxml.declarations import matcher, matchers, pointer_t, const_t, reference_t, declarated_t, char_t, int_t, wchar_t
 from pyplusplus.module_builder import call_policies
+
+# Convert templates for without vgui lib
+ptr_convert_to_py_name_template_novguilib = '''struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
+{
+    static PyObject* convert( %(clsname)s *s )
+    {
+        if( s ) 
+        {
+            PyObject *pObject = GetPyPanel( s );
+            if( pObject )
+                return bp::incref( pObject );
+            else
+                return bp::incref( bp::object( %(handlename)s(s) ).ptr() );
+        }
+        else
+        {
+            return bp::incref( Py_None );
+        }
+    }
+};'''
+
+convert_to_py_name_template_novguilib = '''struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s_to_handle>
+{
+    static PyObject* convert( const %(clsname)s &s )
+    {
+        PyObject *pObject = GetPyPanel( &s );
+        if( pObject )
+            return bp::incref( pObject );
+        else
+            return bp::incref( bp::object( %(handlename)s( &s ) ).ptr() );
+    }
+};'''
+
+# Converters when having the vgui lib
+ptr_convert_to_py_name_template = '''struct %(ptr_convert_to_py_name)s : bp::to_python_converter<%(clsname)s *, ptr_%(clsname)s_to_handle>
+{
+    static PyObject* convert(%(clsname)s *s)
+    {
+        if( s )
+        {
+            if( s->GetPySelf() != NULL )
+                return bp::incref( s->GetPySelf() ); 
+            else
+                return bp::incref( bp::object( %(handlename)s( s ) ).ptr() );
+        }
+        else
+        {
+            return bp::incref(Py_None);
+        }
+    }
+};'''
+
+convert_to_py_name_template = '''struct %(convert_to_py_name)s : bp::to_python_converter<%(clsname)s, %(clsname)s_to_handle>
+{
+    static PyObject* convert(const %(clsname)s &s)
+    {
+        if( s.GetPySelf() != NULL )
+            return bp::incref( s.GetPySelf() );
+        else
+            return bp::incref( bp::object( %(handlename)s( (%(clsname)s *)&s) ).ptr() );
+    }
+};'''
+
+convert_from_py_name_template = '''struct %(convert_from_py_name)s
+{
+    handle_to_%(clsname)s()
+    {
+        bp::converter::registry::insert(
+            &extract_%(clsname)s,
+            bp::type_id< %(clsname)s >()
+            );
+    }
+    
+    static void* extract_%(clsname)s(PyObject* op)
+    {
+        PyBaseVGUIHandle &h = bp::extract< PyBaseVGUIHandle & >(op);
+        return h.Get();
+    }
+};'''
+
+vguihandle_template = '''{ //::%(handlename)s
+        typedef bp::class_< %(handlename)s, bp::bases<PyBaseVGUIHandle> > %(handlename)s_exposer_t;
+        %(handlename)s_exposer_t %(handlename)s_exposer = %(handlename)s_exposer_t( "%(handlename)s", bp::init< >() );
+        %(handlename)s_exposer.def( bp::init<  %(clsname)s * >(( bp::arg("val") )) );
+        { //::%(handlename)s::GetAttr
+            typedef bp::object ( ::%(handlename)s::*GetAttr_function_type )( const char * ) const;
+            %(handlename)s_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::%(handlename)s::GetAttr )
+            );
+        }
+    }
+'''
 
 class VGUIControls(ClientModuleGenerator):
     module_name = '_vguicontrols'
@@ -41,18 +133,82 @@ class VGUIControls(ClientModuleGenerator):
         'vgui/wars_model_panel.h',
     ]
     
-    panel_cls_list = [  'AnimationController', 
-                        'Panel', 
-                        'EditablePanel', 
-                        'Frame', 
-                        'TextEntry', 
-                        'ScrollBar', 
-                        'ScrollBarSlider',
-                        'RichText',
-                        'CBaseMinimap',
-                        'VideoGeneralPanel',
-                        'CWars_Model_Panel',
+    panel_cls_list = [  
+        'AnimationController', 
+        'Panel', 
+        'EditablePanel', 
+        'Frame', 
+        'TextEntry', 
+        'ScrollBar', 
+        'ScrollBarSlider',
+        'RichText',
+        'CBaseMinimap',
+        'VideoGeneralPanel',
+        'CWars_Model_Panel',
     ]
+
+    # Almost the same as above, maybe make a shared function?   
+    def AddVGUIConverter(self, mb, clsname, novguilib, containsabstract=False):
+        cls = mb.class_(clsname)
+        
+        handlename = clsname+'HANDLE'
+        
+        ptr_convert_to_py_name = 'ptr_%(clsname)s_to_handle' % {'clsname' : clsname}
+        convert_to_py_name = '%(clsname)s_to_handle' % {'clsname' : clsname}
+        convert_from_py_name = 'handle_to_%(clsname)s' % {'clsname' : clsname}
+        
+        # Arguments for templates
+        strargs = {
+            'clsname' : clsname,
+            'handlename' : handlename,
+            'ptr_convert_to_py_name' : ptr_convert_to_py_name,
+            'convert_to_py_name' : convert_to_py_name,
+            'convert_from_py_name' : convert_from_py_name,
+        }
+        
+        # Add GetPySelf method
+        cls.add_wrapper_code(
+            'virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }'
+        )
+        cls.add_wrapper_code(
+            'virtual bool IsPythonManaged() { return true; }'
+        )
+        
+        constructors = cls.constructors(name=clsname)
+        constructors.body = '\tg_PythonPanelCount++;'  
+            
+        cls.add_wrapper_code( '~%(clsname)s_wrapper( void ) { g_PythonPanelCount--; /*::PyDeletePanel( this, this );*/ }' % strargs ) 
+        
+        if novguilib:
+            cls.add_wrapper_code( 'void DeletePanel( void ) { ::PyDeletePanel( this, this ); }' )
+        
+        # Add handle typedef
+        mb.add_declaration_code( 'typedef PyVGUIHandle<%(clsname)s> %(handlename)s;\r\n' % strargs )
+        
+        # Expose handle code
+        mb.add_registration_code(vguihandle_template % {'clsname' : clsname, 'handlename' : handlename}, True)
+        
+        # Add to python converters
+        if novguilib:
+            mb.add_declaration_code(ptr_convert_to_py_name_template_novguilib % strargs)
+            
+            if not containsabstract:
+                mb.add_declaration_code(convert_to_py_name_template_novguilib % strargs)
+        else:
+            mb.add_declaration_code(ptr_convert_to_py_name_template % strargs)
+            
+            if not containsabstract:
+                mb.add_declaration_code(convert_to_py_name_template % strargs)
+
+        # Add from python converter
+        mb.add_declaration_code(convert_from_py_name_template % strargs)
+        
+        # Add registration code
+        mb.add_registration_code( ptr_convert_to_py_name+"();" )
+        if not containsabstract:
+            mb.add_registration_code( convert_to_py_name+"();" )
+        mb.add_registration_code( convert_from_py_name+"();" )
+        
     
     def ParseImageClasses(self, mb):
         # IBorder
@@ -135,6 +291,8 @@ class VGUIControls(ClientModuleGenerator):
         cls = mb.class_('BitmapImage')
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
+        if self.settings.branch == 'source2013':
+            cls.mem_fun('SetBitmap').exclude()
         #cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
         cls.calldefs('GetColor', calldef_withtypes([reference_t(declarated_t(int_t()))])).add_transformation(FT.output('r'), FT.output('g'), FT.output('b'), FT.output('a'))
@@ -151,7 +309,7 @@ class VGUIControls(ClientModuleGenerator):
             cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
             cls.mem_funs( 'InitFromRGBA' ).exclude()
         
-        mb.enum('EAvatarSize').include()
+            mb.enum('EAvatarSize').include()
     
     def ParsePanelHandles(self, mb):
         # Base handle for Panels
@@ -185,10 +343,7 @@ class VGUIControls(ClientModuleGenerator):
             
             # Be selective about we need to override
             cls.mem_funs().virtuality = 'not virtual' 
-            
-            #if cls_name not in ['AnimationController', 'Frame', 'ScrollBar', 'CBaseMinimap']:
-            #    cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-            
+
             cls.add_fake_base('PyPanel')
             
             wrapperpaint = self.GetWrapper( cls, 'Paint' )
@@ -319,17 +474,8 @@ class VGUIControls(ClientModuleGenerator):
             # By default exclude any subclass. These classes are likely controlled intern by the panel
             if cls.classes(allow_empty=True):
                 cls.classes().exclude()
-        
-            # SetPythonManaged(true) prevents deletes of panels in the c++ side. Otherwise crash.
-            if not self.novguilib: # FIXME/TODO
-                pass
-            #    constructors = cls.constructors(name=cls_name)
-            #    constructors.body = '\tPyInit();'    
-            else:
-                pass
-                #constructors = cls.constructors(name=cls_name)
-                #constructors.body = '\tSetAutoDelete(false);'
-            AddVGUIConverter(mb, cls_name, self.novguilib, containsabstract=(cls_name == 'CPotteryWheelPanel'))
+                
+            self.AddVGUIConverter(mb, cls_name, self.novguilib, containsabstract=False)
             
             # # Add custom wrappers for functions who take keyvalues as input
             if self.novguilib:
@@ -369,23 +515,13 @@ class VGUIControls(ClientModuleGenerator):
                 cls.add_registration_code('def( "FlushSBuffer", &%(cls_name)s_wrapper::FlushSBuffer )' % {'cls_name' : cls_name})
                 cls.add_wrapper_code('virtual void SetFlushedByParent( bool bEnabled ) { PyPanel::SetFlushedByParent( bEnabled ); }')
                 cls.add_registration_code('def( "SetFlushedByParent", &%(cls_name)s_wrapper::SetFlushedByParent, bp::arg("bEnabled") )' % {'cls_name' : cls_name})
-                
-            AddWrapReg( mb, cls_name, mb.class_('Panel').mem_fun('SetParent', lambda decl: HasArgType(decl, 'Panel') ), ['*newParent'] )
-            #AddWrapReg( mb, cls_name, mb.class_('Panel').mem_fun('AddActionSignalTarget', lambda decl: HasArgType(decl, 'Panel')), ['*messageTarget'] )
-            #AddWrapReg( mb, cls_name, mb.class_('Panel').mem_fun('RemoveActionSignalTarget', lambda decl: HasArgType(decl, 'Panel')), ['*oldTarget'] )
-            #AddWrapReg( mb, cls_name, mb.class_('Panel').mem_fun('PostMessage', lambda decl: HasArgType(decl, 'Panel')), ['*target', '*message', 'delaySeconds'] )
-            # AddWrapReg( mb, cls_name, GetTopDeclaration( mb, cls_name, 'SetParent', ['Panel'] ), ['*newParent'] )
-            # AddWrapReg( mb, cls_name, GetTopDeclaration( mb, cls_name, 'AddActionSignalTarget', ['Panel'] ), ['*messageTarget'] )
-            # AddWrapReg( mb, cls_name, GetTopDeclaration( mb, cls_name, 'RemoveActionSignalTarget', ['Panel'] ), ['*oldTarget'] )
-            # AddWrapReg( mb, cls_name, GetTopDeclaration( mb, cls_name, 'PostMessage', ['Panel', 'KeyValues'] ), ['*target', '*message', 'delaySeconds'] )
     
         # Tweak Panels
         # Used by converters + special method added in the wrapper
         # Don't include here
-        if not self.novguilib: # FIXME/TODO
-            mb.mem_funs('GetPySelf').exclude()  
-            #mb.mem_funs('PyInit').exclude()  
-            #mb.mem_funs('SetPythonManaged').exclude()
+        if not self.novguilib:
+            mb.mem_funs('GetPySelf').exclude()
+            mb.mem_funs('PyDestroyPanel').exclude()
             
         # Exclude message stuff. Maybe look into wrapping this in a nice way
         mb.mem_funs( 'AddToMap' ).exclude()
@@ -419,12 +555,6 @@ class VGUIControls(ClientModuleGenerator):
         mb.calldefs(calldef_withtypes(excludetypes), allow_empty=True).exclude()
         
     def ParsePanel(self, mb):
-        #all_classes = mb.classes(self.panel_cls_list)
-    
-        if not self.novguilib: # FIXME/TODO
-            mb.mem_funs('PyDeletePanel').rename('DeletePanel')
-            mb.mem_fun('PyOnMessage').rename( 'OnMessage' )
-
         # List of functions that should be overridable
         mb.mem_funs('SetVisible').virtuality = 'virtual'
         mb.mem_funs('SetParent').virtuality = 'virtual'
@@ -500,10 +630,6 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs( 'GetCornerTextureSize' ).add_transformation( FT.output('w'), FT.output('h') )    
         
         # Exclude list
-        mb.mem_funs('SetParent', lambda decl: HasArgType(decl, 'Panel')).exclude() # Custom wrapper
-        if not self.novguilib: # FIXME/TODO
-            mb.mem_funs('PyOnMessage').exclude() # Custom wrapper
-            
         mb.mem_funs('QueryInterface').exclude()
         
         # Custom implemented
@@ -520,8 +646,6 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs('IsBuildModeActive').exclude()
         #mb.mem_funs('SetAutoDelete').exclude()
         #mb.mem_funs('IsAutoDeleteSet').exclude()
-        if not self.novguilib: # Overriden in alien swarm to prevent delete. Instead a friendly Python cleanup is done.
-            mb.mem_funs('DeletePanel').exclude()
         mb.mem_funs('OnDelete').exclude()
         mb.mem_funs('MarkForDeletion').exclude()
         mb.mem_funs('SetBuildGroup').exclude()
@@ -553,6 +677,8 @@ class VGUIControls(ClientModuleGenerator):
         mb.vars('m_PanelMap').exclude()
         mb.vars('m_MessageMap').exclude()
         mb.mem_funs('GetPanelMap').exclude()
+        if self.settings.branch == 'source2013':
+            mb.mem_funs('GetChildren').exclude()
        
         # Must use return_by_value. Then the converter will be used to wrap the vgui element in a safe handle
         mb.mem_funs( 'GetChild' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value)
@@ -726,6 +852,14 @@ class VGUIControls(ClientModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"BIK_PRELOAD\" ) = BIK_PRELOAD;" )
         mb.add_registration_code( "bp::scope().attr( \"BIK_NO_AUDIO\" ) = BIK_NO_AUDIO;" )
         
+    def TestBasePanel(self, cls):
+        basepanelcls = self.basepanelcls
+        recursive_bases = cls.recursive_bases
+        for testcls in recursive_bases:
+            if basepanelcls == testcls.related_class:
+                return True
+        return cls == basepanelcls
+        
     def Parse(self, mb):
         self.novguilib = (self.settings.branch == 'swarm')
         
@@ -751,8 +885,18 @@ class VGUIControls(ClientModuleGenerator):
         decls = mb.calldefs(matchers.custom_matcher_t(testinherit))
         decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
+        # All CBaseEntity related classes should have a custom call trait
+        self.basepanelcls = mb.class_('Panel')
+        def panel_call_trait(type_):
+            return 'boost::python::object(*%(arg)s)'
+        panelclasses = mb.classes(self.TestBasePanel)
+        for panelclass in panelclasses:
+            panelclass.custom_call_trait = panel_call_trait
+        
         # Remove any protected function
         #mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
         
         self.ParseImageClasses(mb)
+        
+        self.ApplyCommonRules(mb)
         

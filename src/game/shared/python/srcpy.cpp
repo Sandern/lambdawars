@@ -433,13 +433,13 @@ bool CSrcPython::InitInterpreter( void )
 	SysAppendPath("maps");
 	SysAppendPath("python//srclib");
 
+	// Default imports
+	Import( "vmath" );
+
 	srcmgr = Import("srcmgr");
 	Run( "import srcmgr" );
 
-	// Default imports
 	Import( "srcbase" );
-	Import( "vmath" );
-	
 	types = Import("types");
 	steam = Import("steam");
 	Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
