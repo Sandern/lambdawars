@@ -745,16 +745,6 @@ void CFogOfWarMgr::UpdateHeightAtExtentDynamic( const Vector &vMins, const Vecto
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CFogOfWarMgr::UpdateTileHeightAgainstFoWBlocker( int x, int y )
-{
-
-
-
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 float CFogOfWarMgr::GetHeightAtTile( int x, int y )
 {
 	int idx = FOWINDEX(x, y);

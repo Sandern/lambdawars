@@ -102,8 +102,6 @@ public: // CBaseGameSystem overrides
 	void				UpdateHeightAtTileRangeDynamic( int xstart, int ystart, int xend, int yend );
 	void				UpdateHeightAtExtentDynamic( const Vector &vMins, const Vector &vMaxs );
 
-	void				UpdateTileHeightAgainstFoWBlocker( int x, int y );
-
 	// Gets called each frame
 #ifdef CLIENT_DLL
 	int					CalculateRenderTargetSize( void );
