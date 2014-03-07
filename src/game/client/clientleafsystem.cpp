@@ -152,8 +152,6 @@ public:
 	//Assuming the renderable would be in a properly built render list, generate a render list entry
 	virtual RenderGroup_t GenerateRenderListEntry( IClientRenderable *pRenderable, CClientRenderablesList::CEntry &entryOut );
 
-	void TestFunc();
-
 	// methods of ISpatialLeafEnumerator
 public:
 
@@ -2481,6 +2479,7 @@ void CClientLeafSystem::ComputeBounds( int nCount, RenderableInfo_t **ppRenderab
 	}
 }
 
+
 //-----------------------------------------------------------------------------
 // Culls renderables based on view frustum + areaportals
 //-----------------------------------------------------------------------------
@@ -2490,7 +2489,6 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 
 	// FIXME: sort by area and inline cull. Should make it a bunch faster
 	int nUniqueCount = 0;
-
 	if ( bPortalTestEnts )
 	{
 		Frustum_t *list[MAX_MAP_AREAS];
@@ -2499,11 +2497,9 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 		{
 			RenderableInfo_t *pInfo = ppRenderables[i];
 			BuildRenderListInfo_t &rlInfo = pRLInfo[i];
-
 			if ( !IsLeafMarker( pInfo ) )
 			{
 				int frustumIndex = rlInfo.m_nArea + 1;
-
 				if ( list[frustumIndex]->CullBox( rlInfo.m_vecMins, rlInfo.m_vecMaxs ) )
 				{
 					// Necessary for dependent models to be grabbed
@@ -2523,7 +2519,6 @@ int CClientLeafSystem::ExtractCulledRenderables( int nCount, RenderableInfo_t **
 	{
 		RenderableInfo_t *pInfo = ppRenderables[i];
 		BuildRenderListInfo_t &rlInfo = pRLInfo[i];
-
 		if ( !IsLeafMarker( pInfo ) )
 		{
 			// cull with main frustum

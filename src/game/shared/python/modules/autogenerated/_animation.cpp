@@ -461,16 +461,6 @@ BOOST_PYTHON_MODULE(_animation){
                 , IllumPositionAttachmentIndex_function_type( &::CStudioHdr::IllumPositionAttachmentIndex ) );
         
         }
-        { //::CStudioHdr::Init
-        
-            typedef void ( ::CStudioHdr::*Init_function_type )( ::studiohdr_t const *,::IMDLCache * ) ;
-            
-            CStudioHdr_exposer.def( 
-                "Init"
-                , Init_function_type( &::CStudioHdr::Init )
-                , ( bp::arg("pStudioHdr"), bp::arg("mdlcache")=bp::object() ) );
-        
-        }
         { //::CStudioHdr::InitActivityToSequence
         
             typedef void ( ::CStudioHdr::*InitActivityToSequence_function_type )(  ) ;
@@ -1777,16 +1767,6 @@ BOOST_PYTHON_MODULE(_animation){
             CStudioHdr_exposer.def( 
                 "IllumPositionAttachmentIndex"
                 , IllumPositionAttachmentIndex_function_type( &::CStudioHdr::IllumPositionAttachmentIndex ) );
-        
-        }
-        { //::CStudioHdr::Init
-        
-            typedef void ( ::CStudioHdr::*Init_function_type )( ::studiohdr_t const *,::IMDLCache * ) ;
-            
-            CStudioHdr_exposer.def( 
-                "Init"
-                , Init_function_type( &::CStudioHdr::Init )
-                , ( bp::arg("pStudioHdr"), bp::arg("mdlcache")=bp::object() ) );
         
         }
         { //::CStudioHdr::InitActivityToSequence

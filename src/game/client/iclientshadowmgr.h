@@ -35,30 +35,6 @@ enum ShadowReceiver_t
 	SHADOW_RECEIVER_STUDIO_MODEL,
 };
 
-//-----------------------------------------------------------------------------
-// A struct to keep info about the project texture unlit for hl2wars
-// Allocate the shadow texture somewhere static
-//-----------------------------------------------------------------------------
-struct ProjectTextureUnlitInfo_t
-{
-	ProjectTextureUnlitInfo_t::ProjectTextureUnlitInfo_t() : m_UnlitShadow()
-	{
-		m_vUnlitMaxs = Vector( 32.0f, 32.0f, 32.0f);
-		m_vUnlitMins = Vector( -32.0f, -32.0f, 0.0f);
-		m_fShadowDistance = 50.0f;
-		m_vOrigin = Vector(0, 0, 0);
-		m_Angle = QAngle(0, 0, 0);
-		m_fR = m_fG = m_fB = m_fA = 1.0f;
-	}
-
-	CMaterialReference m_UnlitShadow;
-	Vector m_vUnlitMaxs;
-	Vector m_vUnlitMins;
-	Vector m_vOrigin;
-	QAngle m_Angle;
-	float m_fShadowDistance;
-	int m_fR, m_fG, m_fB, m_fA;
-};
 
 //-----------------------------------------------------------------------------
 // The class responsible for dealing with shadows on the client side
@@ -80,12 +56,6 @@ public:
 	virtual ClientShadowHandle_t CreateProjection( const FlashlightState_t &lightState ) = 0;
 	virtual void UpdateProjectionState( ClientShadowHandle_t shadowHandle, const FlashlightState_t &lightState ) = 0;
 	virtual void DestroyProjection( ClientShadowHandle_t handle ) = 0;
-
-	// Create Projected Texture Unlit
-	virtual ClientShadowHandle_t CreatePTUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int flags ) = 0;
-	virtual void UpdatePTUnlitState( ClientShadowHandle_t shadowHandle, const ProjectTextureUnlitInfo_t &info, bool force = false ) = 0;
-	virtual void DestroyPTUnlit( ClientShadowHandle_t handle ) = 0;
-	virtual void GetShadowColor( ClientShadowHandle_t handle, float &r, float &g, float &b, float &a ) = 0;
 
 	// Indicate that the shadow should be recomputed due to a change in
 	// the client entity

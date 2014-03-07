@@ -827,12 +827,6 @@ public:
 	virtual void UpdateProjectionState( ClientShadowHandle_t shadowHandle, const FlashlightState_t &lightState );
 	virtual void DestroyProjection( ClientShadowHandle_t shadowHandle );
 
-	// Create Projected Texture Unlit
-	virtual ClientShadowHandle_t CreatePTUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int flags );
-	virtual void UpdatePTUnlitState( ClientShadowHandle_t handle, const ProjectTextureUnlitInfo_t &info, bool force = false );
-	virtual void DestroyPTUnlit( ClientShadowHandle_t handle );
-	virtual void GetShadowColor( ClientShadowHandle_t handle, float &r, float &g, float &b, float &a );
-
 	// Update a shadow
 	virtual void UpdateProjectedTexture( ClientShadowHandle_t handle, bool force );
 
@@ -959,14 +953,6 @@ private:
 		VMatrix					m_WorldToTexture;
 
 		int						m_nSplitscreenOwner;
-
-		// hl2wars additions, for ptunlit
-		Vector					m_vUnlitMaxs;
-		Vector					m_vUnlitMins;
-		float					m_fShadowDistance;
-		Vector					m_vOrigin;
-		QAngle					m_Angle;
-		float					m_fR, m_fG, m_fB, m_fA;
 	};
 
 private:
@@ -1024,9 +1010,6 @@ private:
 
 	// Build a projected-texture flashlight
 	void BuildFlashlight( ClientShadowHandle_t handle );
-
-	// Build a projected-texture flashlight
-	void BuildPTUnlit( ClientShadowHandle_t handle );
 
 	// Does all the lovely stuff we need to do to have render-to-texture shadows
 	void SetupRenderToTextureShadow( ClientShadowHandle_t h );
@@ -1097,7 +1080,6 @@ private:
 	}
 
 	ClientShadowHandle_t CreateProjectedTexture( ClientEntityHandle_t entity, int nEntIndex, int flags, CBitVec< MAX_SPLITSCREEN_PLAYERS > *pSplitScreenBits );
-	ClientShadowHandle_t CreateProjectedTextureUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int nEntIndex, int flags, CBitVec< MAX_SPLITSCREEN_PLAYERS > *pSplitScreenBits );
 
 	// Lock down the usage of a shadow depth texture...must be unlocked use on subsequent views / frames
 	bool	LockShadowDepthTexture( CTextureReference *shadowDepthTexture, int nStartTexture );
@@ -1294,7 +1276,7 @@ void CVisibleShadowList::EnumShadow( unsigned short clientShadowHandle )
 		return;
 
 	// Don't bother with flashlights
-	if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION | SHADOW_FLAGS_PROJECTTEXTUREUNLIT )) != 0 )
+	if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION )) != 0 )
 		return;
 
 	// We don't need to bother with it if it's not render-to-texture
@@ -2002,7 +1984,7 @@ void CClientShadowMgr::UpdateAllShadows()
 		ClientShadow_t& shadow = m_Shadows[i];
 
 		// Don't bother with flashlights
-		if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION | SHADOW_FLAGS_PROJECTTEXTUREUNLIT ) ) != 0 )
+		if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) ) != 0 )
 			continue;
 
 		IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle( shadow.m_Entity );
@@ -2021,7 +2003,7 @@ void CClientShadowMgr::RemoveAllShadowDecals()
 		ClientShadow_t& shadow = m_Shadows[i];
 
 		// Don't bother with flashlights
-		if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION | SHADOW_FLAGS_PROJECTTEXTUREUNLIT ) ) != 0 )
+		if ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) ) != 0 )
 			continue;
 
 		shadowmgr->RemoveAllDecalsFromShadow( shadow.m_ShadowHandle );
@@ -2410,99 +2392,6 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 	return h;
 }
 
-
-//-----------------------------------------------------------------------------
-// Create/destroy a shadow
-//-----------------------------------------------------------------------------
-ClientShadowHandle_t CClientShadowMgr::CreateProjectedTextureUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int nEntIndex, int flags, CBitVec< MAX_SPLITSCREEN_PLAYERS > *pSplitScreenBits )
-{
-	ClientShadowHandle_t h = m_Shadows.AddToTail();
-	ClientShadow_t& shadow = m_Shadows[h];
-	shadow.m_Entity = entity;
-	shadow.m_ClientLeafShadowHandle = ClientLeafSystem()->AddShadow( h, flags );
-	shadow.m_Flags = flags;
-	shadow.m_nRenderFrame = -1;
-	shadow.m_ShadowDir = GetShadowDirection();
-	shadow.m_LastOrigin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	shadow.m_LastAngles.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	shadow.m_CurrentLightPos.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	shadow.m_TargetLightPos.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	shadow.m_LightPosLerp = FLT_MAX;
-	Assert( ( ( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) ) == 0 ) != 
-			( ( shadow.m_Flags & SHADOW_FLAGS_SHADOW ) == 0 ) );
-
-	shadow.m_nLastUpdateFrame = 0;
-
-	shadow.m_nSplitscreenOwner = -1; // No one owns this texture
-	if ( ( flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) ) || ( flags & SHADOW_FLAGS_USE_DEPTH_TEXTURE ) )
-	{
-		// The local player isn't always resolvable if this projected texture isn't the player's flashlight, so
-		// if the local player isn't resolvable, leave the splitscreen owner set to -1 so all splitscreen players render it
-		if ( engine->IsLocalPlayerResolvable() )
-		{
-			// Set ownership to this player
-			shadow.m_nSplitscreenOwner = GET_ACTIVE_SPLITSCREEN_SLOT();
-		}
-	}
-	// Set up the flags....
-	IMaterial* pShadowMaterial = m_SimpleShadow;
-	IMaterial* pShadowModelMaterial = m_SimpleShadow;
-	void* pShadowProxyData = (void*)CLIENTSHADOW_INVALID_HANDLE;
-
-	// add min max (bounds) for ptunlit
-	shadow.m_vUnlitMins = info.m_vUnlitMins;
-	shadow.m_vUnlitMaxs = info.m_vUnlitMaxs;
-	shadow.m_fShadowDistance = info.m_fShadowDistance;
-	shadow.m_Angle = info.m_Angle;
-	shadow.m_vOrigin = info.m_vOrigin;
-	shadow.m_fR = info.m_fR;
-	shadow.m_fG = info.m_fG;
-	shadow.m_fB = info.m_fB;
-	shadow.m_fA = info.m_fA;
-	
-	// set color material
-	float fr = (float)shadow.m_fR / 255.0f;
-	float fg = (float)shadow.m_fG / 255.0f;
-	float fb = (float)shadow.m_fB / 255.0f;
-	float fa = (float)shadow.m_fA / 255.0f;
-
-	((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow->ColorModulate(fr, fg, fb);
-	((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow->AlphaModulate(fa);
-
-	if ( m_RenderToTextureActive && (flags & SHADOW_FLAGS_USE_RENDER_TO_TEXTURE) )
-	{
-		SetupRenderToTextureShadow(h);
-
-		pShadowMaterial = m_RenderShadow;
-		pShadowModelMaterial = m_RenderModelShadow;
-		pShadowProxyData = (void*)h;
-	}
-
-	if( flags & SHADOW_FLAGS_USE_DEPTH_TEXTURE )
-	{
-		pShadowMaterial = m_RenderShadow;
-		pShadowModelMaterial = m_RenderModelShadow;
-		pShadowProxyData = (void*)h;
-	}
-
-	if( flags & SHADOW_FLAGS_PROJECTTEXTUREUNLIT )
-	{
-		pShadowMaterial = ((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow;
-		pShadowModelMaterial = ((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow;
-		pShadowProxyData = (void*)h;
-	}
-
-	//int createShadowFlags = SHADOW_SIMPLE_PROJECTION;
-	int createShadowFlags = SHADOW_CACHE_VERTS;
-	shadow.m_ShadowHandle = shadowmgr->CreateShadowEx( pShadowMaterial, pShadowModelMaterial, pShadowProxyData, createShadowFlags, nEntIndex );
-	shadow.m_bUseSplitScreenBits = pSplitScreenBits ? true : false;
-	if ( pSplitScreenBits )
-	{
-		shadow.m_SplitScreenBits.Copy( *pSplitScreenBits );
-	}
-	return h;
-}
-
 ClientShadowHandle_t CClientShadowMgr::CreateFlashlight( const FlashlightState_t &lightState )
 {
 	// We don't really need a model entity handle for a projective light source, so use an invalid one.
@@ -2627,84 +2516,6 @@ void CClientShadowMgr::DestroyProjection( ClientShadowHandle_t shadowHandle )
 	DestroyShadow( shadowHandle );
 }
 
-
-//-----------------------------------------------------------------------------
-// Creates a new projected texture.
-//-----------------------------------------------------------------------------
-ClientShadowHandle_t CClientShadowMgr::CreatePTUnlit( const ProjectTextureUnlitInfo_t &info, ClientEntityHandle_t entity, int flags )
-{
-	flags &= ~SHADOW_FLAGS_PROJECTED_TEXTURE_TYPE_MASK;
-	flags |= SHADOW_FLAGS_PROJECTTEXTUREUNLIT | SHADOW_FLAGS_SHADOW | SHADOW_FLAGS_TEXTURE_DIRTY;
-	ClientShadowHandle_t shadowHandle = CreateProjectedTextureUnlit( info, entity, -1, flags, NULL );
-
-	// NOTE: We *have* to call the version that takes a shadow handle
-	// even if we have an entity because this entity hasn't set its shadow handle yet
-	AddToDirtyShadowList( shadowHandle, true );
-	return shadowHandle;
-}
-
-//-----------------------------------------------------------------------------
-// Updates info about the projected texture and adds it to the dirty list if not already.
-//-----------------------------------------------------------------------------
-void CClientShadowMgr::UpdatePTUnlitState( ClientShadowHandle_t handle, const ProjectTextureUnlitInfo_t &info, bool force )
-{
-	ClientShadow_t& shadow = m_Shadows[handle];
-
-	// add min max (bounds) for ptunlit
-	shadow.m_vUnlitMins = info.m_vUnlitMins;
-	shadow.m_vUnlitMaxs = info.m_vUnlitMaxs;
-	shadow.m_fShadowDistance = info.m_fShadowDistance;
-	shadow.m_vOrigin = info.m_vOrigin;
-	shadow.m_Angle = info.m_Angle;
-	shadow.m_fR = info.m_fR;
-	shadow.m_fG = info.m_fG;
-	shadow.m_fB = info.m_fB;
-	shadow.m_fA = info.m_fA;
-
-	float fr = (float)shadow.m_fR / 255.0f;
-	float fg = (float)shadow.m_fG / 255.0f;
-	float fb = (float)shadow.m_fB / 255.0f;
-	float fa = (float)shadow.m_fA / 255.0f;
-
-	((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow->ColorModulate(fr, fg, fb);
-	((ProjectTextureUnlitInfo_t &)info).m_UnlitShadow->AlphaModulate(fa);
-
-	// add to dirty list, if not already
-	if( m_DirtyShadows.Find( handle ) == m_DirtyShadows.InvalidIndex() )
-		AddToDirtyShadowList( handle, force );
-}
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-void CClientShadowMgr::DestroyPTUnlit( ClientShadowHandle_t handle )
-{
-	// Python might release the projectedtexture class after the shadows are closed
-	// This would could cause a crash here if we don't check
-	// Maybe keep a linked list of projectedtexture classes and clean them up?
-	if( m_Shadows.IsValidIndex(handle) == false )
-	{
-		DevMsg("DestroyPTUnlit: Invalid shadow handle!\n");
-		return;
-	}
-	RemoveShadowFromDirtyList( handle );
-	shadowmgr->DestroyShadow( m_Shadows[handle].m_ShadowHandle );
-	ClientLeafSystem()->RemoveShadow( m_Shadows[handle].m_ClientLeafShadowHandle );
-	CleanUpRenderToTextureShadow( handle );
-	m_Shadows.Remove(handle);
-}
-
-//-----------------------------------------------------------------------------
-// Retrieve the color settings of a shadow ( for shadow color proxy )
-//-----------------------------------------------------------------------------
-void CClientShadowMgr::GetShadowColor( ClientShadowHandle_t handle, float &r, float &g, float &b, float &a )
-{
-	ClientShadow_t& shadow = m_Shadows[handle];
-	r = shadow.m_fR;
-	g = shadow.m_fG;
-	b = shadow.m_fB;
-	a = shadow.m_fA;
-}
 
 //-----------------------------------------------------------------------------
 // Remove a shadow from the dirty list
@@ -4220,122 +4031,6 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 }
 
 
-// Build a projected-texture flashlight
-void CClientShadowMgr::BuildPTUnlit( ClientShadowHandle_t handle )
-{
-	ClientShadow_t& shadow = m_Shadows[handle];
-	// get the min and max
-	Vector mins = shadow.m_vUnlitMins;
-	Vector maxs = shadow.m_vUnlitMaxs;
-
-	// Get the object's basis
-	Vector vec[3];
-	AngleVectors( shadow.m_Angle, &vec[0], &vec[1], &vec[2] );
-	vec[1] *= -1.0f;
-
-	Vector vecShadowDir = Vector( 0, 0, -1 );	// straight down for now
-
-	// Project the shadow casting direction into the space of the object
-	Vector localShadowDir;
-	localShadowDir[0] = DotProduct( vec[0], vecShadowDir );
-	localShadowDir[1] = DotProduct( vec[1], vecShadowDir );
-	localShadowDir[2] = DotProduct( vec[2], vecShadowDir );
-
-	// Figure out which vector has the largest component perpendicular
-	// to the shadow handle...
-	// Sort by how perpendicular it is
-	int vecIdx[3];
-	SortAbsVectorComponents( localShadowDir, vecIdx );
-
-	// Here's our shadow basis vectors; namely the ones that are
-	// most perpendicular to the shadow casting direction
-	Vector xvec = vec[vecIdx[0]];
-	Vector yvec = vec[vecIdx[1]];
-
-	// Project them into a plane perpendicular to the shadow direction
-	xvec -= vecShadowDir * DotProduct( vecShadowDir, xvec );
-	yvec -= vecShadowDir * DotProduct( vecShadowDir, yvec );
-	VectorNormalize( xvec );
-	VectorNormalize( yvec );
-
-	// Compute the box size
-	Vector boxSize;
-	VectorSubtract( maxs, mins, boxSize );
-
-	// We project the two longest sides into the vectors perpendicular
-	// to the projection direction, then add in the projection of the perp direction
-	Vector2D size( boxSize[vecIdx[0]], boxSize[vecIdx[1]] );
-	size.x *= fabs( DotProduct( vec[vecIdx[0]], xvec ) );
-	size.y *= fabs( DotProduct( vec[vecIdx[1]], yvec ) );
-
-	// Add the third component into x and y
-	size.x += boxSize[vecIdx[2]] * fabs( DotProduct( vec[vecIdx[2]], xvec ) );
-	size.y += boxSize[vecIdx[2]] * fabs( DotProduct( vec[vecIdx[2]], yvec ) );
-
-	// Bloat a bit, since the shadow wants to extend outside the model a bit
-	size.x += 10.0f;
-	size.y += 10.0f;
-
-	// Clamp the minimum size
-	Vector2DMax( size, Vector2D(10.0f, 10.0f), size );
-
-	// Place the origin at the point with min dot product with shadow dir
-	Vector org;
-	float falloffStart = ComputeLocalShadowOrigin( NULL, mins, maxs, localShadowDir, 2.0f, org );
-
-	// Transform the local origin into world coordinates
-	Vector worldOrigin = shadow.m_vOrigin;
-	worldOrigin.z += 64.0f;
-	VectorMA( worldOrigin, org.x, vec[0], worldOrigin );
-	VectorMA( worldOrigin, org.y, vec[1], worldOrigin );
-	VectorMA( worldOrigin, org.z, vec[2], worldOrigin );
-
-	// FUNKY: A trick to reduce annoying texelization artifacts!?
-	float dx = 1.0f / TEXEL_SIZE_PER_CASTER_SIZE;
-	worldOrigin.x = (int)(worldOrigin.x / dx) * dx;
-	worldOrigin.y = (int)(worldOrigin.y / dx) * dx;
-	worldOrigin.z = (int)(worldOrigin.z / dx) * dx;
-
-	// NOTE: We gotta use the general matrix because xvec and yvec aren't perp
-	VMatrix matWorldToShadow, matWorldToTexture;
-	// negate xvec so that the matrix will have the same handedness as for an RTT shadow
-	BuildGeneralWorldToShadowMatrix( m_Shadows[handle].m_WorldToShadow, worldOrigin, vecShadowDir, -xvec, yvec );
-	BuildWorldToTextureMatrix( m_Shadows[handle].m_WorldToShadow, size, matWorldToTexture );
-	Vector2DCopy( size, m_Shadows[handle].m_WorldSize );
-
-	MatrixCopy( matWorldToTexture, m_Shadows[handle].m_WorldToTexture );
-
-	// Compute the falloff attenuation
-	// Area computation isn't exact since xvec is not perp to yvec, but close enough
-	//	float shadowArea = size.x * size.y;	
-
-	// The entity may be overriding our shadow cast distance
-	float flShadowCastDistance = shadow.m_fShadowDistance;
-	float maxHeight = flShadowCastDistance + falloffStart; //3.0f * sqrt( shadowArea );
-
-	CShadowLeafEnum leafList;
-	BuildShadowLeafList( &leafList, worldOrigin, vecShadowDir, size, maxHeight );
-	int nCount = leafList.m_LeafList.Count();
-	const int *pLeafList = leafList.m_LeafList.Base();
-	if ( !r_shadow_deferred.GetBool() )
-	{
-	shadowmgr->ProjectShadow( m_Shadows[handle].m_ShadowHandle, worldOrigin,
-		vecShadowDir, matWorldToTexture, size, nCount, pLeafList, maxHeight, falloffStart, MAX_FALLOFF_AMOUNT, shadow.m_vOrigin );
-	}
-	
-	m_Shadows[handle].m_MaxDist = maxHeight;
-	m_Shadows[handle].m_FalloffStart = falloffStart;
-
-
-	// Compute extra clip planes to prevent poke-thru
-// FIXME!!!!!!!!!!!!!!  Removing this for now since it seems to mess up the blobby shadows.
-//	ComputeExtraClipPlanes( pEnt, handle, vec, mins, maxs, localShadowDir );
-
-	// Add the shadow to the client leaf system so it correctly marks 
-	// leafs as being affected by a particular shadow
-	ClientLeafSystem()->ProjectFlashlight( m_Shadows[handle].m_ClientLeafShadowHandle, nCount, pLeafList );
-}
-
 //-----------------------------------------------------------------------------
 // Adds the child bounds to the bounding box
 //-----------------------------------------------------------------------------
@@ -4698,10 +4393,7 @@ void CClientShadowMgr::UpdateDirtyShadowsHalfRate()
 void CClientShadowMgr::UpdateDirtyShadow( ClientShadowHandle_t handle )
 {
 	Assert( m_Shadows.IsValidIndex( handle ) );
-
-	CClientShadowMgr::ClientShadow_t& shadow = s_ClientShadowMgr.m_Shadows[handle];
-
-	if ( IsShadowingFromWorldLights() && (shadow.m_Flags & ( SHADOW_FLAGS_PROJECTTEXTUREUNLIT)) == 0 )
+	if ( IsShadowingFromWorldLights() )
 	{
 		UpdateShadowDirectionFromLocalLightSource( handle );
 	}
@@ -4987,33 +4679,6 @@ void CClientShadowMgr::UpdateProjectedTextureInternal( ClientShadowHandle_t hand
 		// FIXME: What's the difference between brush and model shadows for light projectors? Answer: nothing.
 		UpdateBrushShadow( NULL, handle );
 	}
-	else if( shadow.m_Flags & SHADOW_FLAGS_PROJECTTEXTUREUNLIT )
-	{
-		ClientShadow_t& shadow = m_Shadows[handle];
-
-		shadowmgr->EnableShadow( shadow.m_ShadowHandle, true );
-
-		// Figure out if the shadow moved...
-		// Even though we have dirty bits, some entities
-		// never clear those dirty bits
-		const Vector& origin = shadow.m_vOrigin;
-		const QAngle& angles = shadow.m_Angle;
-
-		if (force || (origin != shadow.m_LastOrigin) || (angles != shadow.m_LastAngles))
-		{
-			// Store off the new pos/orientation
-			VectorCopy( origin, shadow.m_LastOrigin );
-			VectorCopy( angles, shadow.m_LastAngles );
-
-			CMatRenderContextPtr pRenderContext( materials );
-			MaterialFogMode_t fogMode = pRenderContext->GetFogMode();
-			pRenderContext->FogMode( MATERIAL_FOG_NONE );
-
-			BuildPTUnlit(handle);
-
-			pRenderContext->FogMode( fogMode );	
-		}
-	}
 	else
 	{
 		Assert( shadow.m_Flags & SHADOW_FLAGS_SHADOW );
@@ -5125,11 +4790,8 @@ bool CClientShadowMgr::ComputeSeparatingPlane( IClientRenderable* pRend1, IClien
 bool CClientShadowMgr::CullReceiver( ClientShadowHandle_t handle, IClientRenderable* pRenderable,
 									IClientRenderable* pSourceRenderable )
 {
-	if( m_Shadows[handle].m_Flags & SHADOW_FLAGS_PROJECTTEXTUREUNLIT ) // Don't cull for now
-		return false;
-
 	// check flags here instead and assert !pSourceRenderable
-	if( m_Shadows[handle].m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION /*| SHADOW_FLAGS_PROJECTTEXTUREUNLIT*/ ) )
+	if( m_Shadows[handle].m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) )
 	{
 		VPROF_BUDGET( "CClientShadowMgr::CullReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -5292,7 +4954,7 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 	{
 	case SHADOW_RECEIVER_BRUSH_MODEL:
 
-		if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION /*| SHADOW_FLAGS_PROJECTTEXTUREUNLIT*/ ) )
+		if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) )
 		{
 			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -5330,7 +4992,7 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 				}
 			}
 		}
-		else if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION /*| SHADOW_FLAGS_PROJECTTEXTUREUNLIT*/ ) )
+		else if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) )
 		{
 			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -5339,15 +5001,10 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 				staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
 			}
 		}
-		else if( shadow.m_Flags & SHADOW_FLAGS_PROJECTTEXTUREUNLIT )
-		{
-			staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
-		}
 		break;
 
 	case SHADOW_RECEIVER_STUDIO_MODEL:
-		
-		if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION /*| SHADOW_FLAGS_PROJECTTEXTUREUNLIT*/ ) )
+		if( shadow.m_Flags & ( SHADOW_FLAGS_FLASHLIGHT | SHADOW_FLAGS_SIMPLE_PROJECTION ) )
 		{
 			VPROF_BUDGET( "CClientShadowMgr::AddShadowToReceiver", VPROF_BUDGETGROUP_SHADOW_DEPTH_TEXTURING );
 
@@ -5357,13 +5014,8 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 				shadowmgr->AddShadowToModel( shadow.m_ShadowHandle, pRenderable->GetModelInstance() );
 			}
 		}
-		else if( shadow.m_Flags & SHADOW_FLAGS_PROJECTTEXTUREUNLIT )
-		{
-			pRenderable->CreateModelInstance();
-			shadowmgr->AddShadowToModel( shadow.m_ShadowHandle, pRenderable->GetModelInstance() );
-		}
 		break;
-	//default:
+//	default:
 	}
 }
 

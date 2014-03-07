@@ -73,8 +73,9 @@ class Physics(SemiSharedModuleGenerator):
         mb.free_function('PyPhysModelCreateBox').rename('PhysModelCreateBox')
         mb.free_function('PyPhysModelCreateOBB').include()
         mb.free_function('PyPhysModelCreateOBB').rename('PhysModelCreateOBB')
-        mb.free_function('PyPhysModelCreateSphere').include()
-        mb.free_function('PyPhysModelCreateSphere').rename('PhysModelCreateSphere')
+        if self.settings.branch == 'swarm':
+            mb.free_function('PyPhysModelCreateSphere').include()
+            mb.free_function('PyPhysModelCreateSphere').rename('PhysModelCreateSphere')
         mb.free_function('PyPhysDestroyObject').include()
         mb.free_function('PyPhysDestroyObject').rename('PhysDestroyObject')
         

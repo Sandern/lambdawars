@@ -29,7 +29,9 @@ class Animation(SemiSharedModuleGenerator):
         cls.mem_fun('pSeqdesc').rename('Seqdesc')
         
         # Excludes
-        cls.mem_fun('FindMapping').exclude()
+        cls.mem_fun('Init').exclude()
+        if self.settings.branch == 'swarm':
+            cls.mem_fun('FindMapping').exclude()
         cls.mem_fun('GetSequences').exclude()
         cls.mem_fun('BoneFlexDriver').exclude()
         cls.mem_fun('GetBoneTableSortedByName').exclude()
@@ -65,7 +67,8 @@ class Animation(SemiSharedModuleGenerator):
         # Excludes
         cls.mem_fun('GetBaseMap').exclude()
         cls.var('m_DataMap').exclude()
-        cls.mem_fun('pActivityModifier').exclude()
+        if self.settings.branch == 'swarm':
+            cls.mem_fun('pActivityModifier').exclude()
         cls.mem_fun('pAutolayer').exclude()
         cls.mem_fun('pBoneweight').exclude()
         cls.mem_fun('pEvent').exclude()

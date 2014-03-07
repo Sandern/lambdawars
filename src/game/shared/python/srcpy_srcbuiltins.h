@@ -12,8 +12,12 @@
 #endif
 
 #include <tier0/dbg.h>
-#include "srcpy_boostpython.h"
 
+#if PY_VERSION_HEX < 0x03000000
+#include "srcpy_boostpython.h"
+#endif // PY_VERSION_HEX
+
+#if PY_VERSION_HEX < 0x03000000
 // These classes redirect input to Msg and Warning respectively
 class SrcPyStdOut 
 {
@@ -149,6 +153,27 @@ inline void PyCOM_TimestampedLog( boost::python::object msg )
 		}
 	}
 }
+#else
+// These classes redirect input to Msg and Warning respectively
+class SrcPyStdOut 
+{
+public:
+	void write( const char *msg ) { Msg( "%s", msg ); }
+	void flush() {}
+};
+
+class SrcPyStdErr 
+{
+public:
+	void write( const char *msg ) { Warning( "%s", msg ); }
+	void flush() {}
+};
+
+// Wrappers for Msg, Warning and DevMsg (Python does not use VarArgs)
+inline void SrcPyMsg( const char *msg ) { Msg( "%s", msg ); }
+inline void SrcPyWarning( const char *msg ) { Warning( "%s", msg ); }
+inline void SrcPyDevMsg( int level, const char *msg ) { DevMsg( level, "%s", msg ); }
+#endif // 0x03000000
 
 //-----------------------------------------------------------------------------
 // Purpose: 

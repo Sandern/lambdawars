@@ -1598,9 +1598,6 @@
     <ClCompile Include="lambdawars\vgui\hl2warsviewport.cpp">
       <Filter>Source Files\wars\vgui</Filter>
     </ClCompile>
-    <ClCompile Include="lambdawars\projected_texture_unlit.cpp">
-      <Filter>Source Files\wars</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared\lambdawars\wars_mount_system.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
@@ -4326,9 +4323,6 @@
     </ClInclude>
     <ClInclude Include="lambdawars\vgui\hl2warsviewport.h">
       <Filter>Source Files\wars\vgui</Filter>
-    </ClInclude>
-    <ClInclude Include="lambdawars\projected_texture_unlit.h">
-      <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_mount_system.h">
       <Filter>Source Files\wars\Shared</Filter>

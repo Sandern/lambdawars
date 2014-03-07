@@ -27,7 +27,6 @@ class Utils(SemiSharedModuleGenerator):
         '$viewrender.h',
         '$view.h',
         
-        '$projected_texture_unlit.h',
         'hl2wars_util_shared.h',
     ]
 
@@ -110,9 +109,6 @@ class Utils(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"SF_ENVEXPLOSION_GENERIC_DAMAGE\" ) = SF_ENVEXPLOSION_GENERIC_DAMAGE;" )
 
     def ParseClient(self, mb):
-        # A simple class for python to use projected textures
-        mb.class_('ProjectedTexture').include()
-        
         # Free functions that don't start with 'UTIL_'
         mb.free_functions('ScreenHeight').include()
         mb.free_functions('ScreenWidth').include()

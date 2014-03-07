@@ -24,8 +24,6 @@
 
 #include "view.h"
 
-#include "projected_texture_unlit.h"
-
 #include "hl2wars_util_shared.h"
 
 #include "srcpy.h"
@@ -1156,115 +1154,6 @@ BOOST_PYTHON_MODULE(_utils){
             , (bool ( ::CTraceFilterWorldOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
             , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
-
-    { //::ProjectedTexture
-        typedef bp::class_< ProjectedTexture, boost::noncopyable > ProjectedTexture_exposer_t;
-        ProjectedTexture_exposer_t ProjectedTexture_exposer = ProjectedTexture_exposer_t( "ProjectedTexture", bp::init< >() );
-        bp::scope ProjectedTexture_scope( ProjectedTexture_exposer );
-        ProjectedTexture_exposer.def( bp::init< char const *, bp::optional< Vector, Vector, Vector, QAngle, int, int, int, int > >(( bp::arg("pMaterial"), bp::arg("vMin")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vMax")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) )) );
-        bp::implicitly_convertible< char const *, ProjectedTexture >();
-        ProjectedTexture_exposer.def( bp::init< char const *, char const *, bp::optional< Vector, Vector, Vector, QAngle, int, int, int, int > >(( bp::arg("pMaterial"), bp::arg("pTextureGroupName"), bp::arg("vMin")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vMax")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) )) );
-        ProjectedTexture_exposer.def( bp::init< CMaterialReference &, bp::optional< Vector, Vector, Vector, QAngle, int, int, int, int > >(( bp::arg("ref"), bp::arg("vMin")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vMax")=::Vector( 0.0, 0.0, 0.0 ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) )) );
-        bp::implicitly_convertible< CMaterialReference &, ProjectedTexture >();
-        { //::ProjectedTexture::Init
-        
-            typedef void ( ::ProjectedTexture::*Init_function_type )( char const *,char const *,::Vector,::Vector,::Vector,::QAngle,int,int,int,int ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "Init"
-                , Init_function_type( &::ProjectedTexture::Init )
-                , ( bp::arg("pMaterial"), bp::arg("pTextureGroupName")=bp::object(), bp::arg("vMin")=::Vector( ), bp::arg("vMax")=::Vector( ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) ) );
-        
-        }
-        { //::ProjectedTexture::Init
-        
-            typedef void ( ::ProjectedTexture::*Init_function_type )( ::CMaterialReference &,::Vector,::Vector,::Vector,::QAngle,int,int,int,int ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "Init"
-                , Init_function_type( &::ProjectedTexture::Init )
-                , ( bp::arg("ref"), bp::arg("vMin")=::Vector( ), bp::arg("vMax")=::Vector( ), bp::arg("vOrigin")=::Vector( ), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ), bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) ) );
-        
-        }
-        { //::ProjectedTexture::SetColor
-        
-            typedef void ( ::ProjectedTexture::*SetColor_function_type )( int,int,int,int ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "SetColor"
-                , SetColor_function_type( &::ProjectedTexture::SetColor )
-                , ( bp::arg("r")=(int)(255), bp::arg("g")=(int)(255), bp::arg("b")=(int)(255), bp::arg("a")=(int)(255) ) );
-        
-        }
-        { //::ProjectedTexture::SetMaterial
-        
-            typedef void ( ::ProjectedTexture::*SetMaterial_function_type )( char const *,char const * ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "SetMaterial"
-                , SetMaterial_function_type( &::ProjectedTexture::SetMaterial )
-                , ( bp::arg("pMaterial"), bp::arg("pTextureGroupName")=bp::object() ) );
-        
-        }
-        { //::ProjectedTexture::SetMaterial
-        
-            typedef void ( ::ProjectedTexture::*SetMaterial_function_type )( ::CMaterialReference & ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "SetMaterial"
-                , SetMaterial_function_type( &::ProjectedTexture::SetMaterial )
-                , ( bp::arg("ref") ) );
-        
-        }
-        { //::ProjectedTexture::SetMinMax
-        
-            typedef void ( ::ProjectedTexture::*SetMinMax_function_type )( ::Vector &,::Vector ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "SetMinMax"
-                , SetMinMax_function_type( &::ProjectedTexture::SetMinMax )
-                , ( bp::arg("vMin"), bp::arg("vMax") ) );
-        
-        }
-        { //::ProjectedTexture::SetProjectionDistance
-        
-            typedef void ( ::ProjectedTexture::*SetProjectionDistance_function_type )( float ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "SetProjectionDistance"
-                , SetProjectionDistance_function_type( &::ProjectedTexture::SetProjectionDistance )
-                , ( bp::arg("dist") ) );
-        
-        }
-        { //::ProjectedTexture::Shutdown
-        
-            typedef void ( ::ProjectedTexture::*Shutdown_function_type )(  ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "Shutdown"
-                , Shutdown_function_type( &::ProjectedTexture::Shutdown ) );
-        
-        }
-        { //::ProjectedTexture::Update
-        
-            typedef void ( ::ProjectedTexture::*Update_function_type )( ::Vector,::QAngle ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "Update"
-                , Update_function_type( &::ProjectedTexture::Update )
-                , ( bp::arg("vOrigin"), bp::arg("qAngle")=::QAngle( 0.0, 0.0, 0.0 ) ) );
-        
-        }
-        { //::ProjectedTexture::UpdateShadow
-        
-            typedef void ( ::ProjectedTexture::*UpdateShadow_function_type )(  ) ;
-            
-            ProjectedTexture_exposer.def( 
-                "UpdateShadow"
-                , UpdateShadow_function_type( &::ProjectedTexture::UpdateShadow ) );
-        
-        }
-    }
 
     { //::PyRay_t
         typedef bp::class_< PyRay_t > Ray_t_exposer_t;

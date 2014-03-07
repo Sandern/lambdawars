@@ -19,6 +19,8 @@
 
 namespace bp = boost::python;
 
+extern ConVar g_debug_pynetworkvar;
+
 #ifndef CLIENT_DLL
 
 // Python Send proxies
