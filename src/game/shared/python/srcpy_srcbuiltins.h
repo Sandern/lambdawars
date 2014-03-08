@@ -173,6 +173,11 @@ public:
 inline void SrcPyMsg( const char *msg ) { Msg( "%s", msg ); }
 inline void SrcPyWarning( const char *msg ) { Warning( "%s", msg ); }
 inline void SrcPyDevMsg( int level, const char *msg ) { DevMsg( level, "%s", msg ); }
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+inline void PyCOM_TimestampedLog( const char *msg ) { COM_TimestampedLog( "%s", msg ); }
 #endif // 0x03000000
 
 //-----------------------------------------------------------------------------

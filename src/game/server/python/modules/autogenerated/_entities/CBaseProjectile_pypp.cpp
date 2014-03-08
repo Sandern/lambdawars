@@ -39,93 +39,55 @@
 #include "wars_weapon.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "CEntityFlame_pypp.hpp"
+#include "CBaseProjectile_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
+struct CBaseProjectile_wrapper : CBaseProjectile, bp::wrapper< CBaseProjectile > {
 
-    CEntityFlame_wrapper( )
-    : CEntityFlame( )
-      , bp::wrapper< CEntityFlame >(){
+    CBaseProjectile_wrapper( )
+    : CBaseProjectile( )
+      , bp::wrapper< CBaseProjectile >(){
         // null constructor
     
     }
 
     virtual void Activate(  ) {
-        PY_OVERRIDE_CHECK( CEntityFlame, Activate )
-        PY_OVERRIDE_LOG( _entities, CEntityFlame, Activate )
+        PY_OVERRIDE_CHECK( CBaseAnimating, Activate )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Activate )
         bp::override func_Activate = this->get_override( "Activate" );
         if( func_Activate.ptr() != Py_None )
             try {
                 func_Activate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CEntityFlame::Activate(  );
+                this->CBaseAnimating::Activate(  );
             }
         else
-            this->CEntityFlame::Activate(  );
+            this->CBaseAnimating::Activate(  );
     }
     
     void default_Activate(  ) {
-        CEntityFlame::Activate( );
+        CBaseAnimating::Activate( );
     }
 
-    virtual void Precache(  ) {
-        PY_OVERRIDE_CHECK( CEntityFlame, Precache )
-        PY_OVERRIDE_LOG( _entities, CEntityFlame, Precache )
-        bp::override func_Precache = this->get_override( "Precache" );
-        if( func_Precache.ptr() != Py_None )
+    virtual bool CanBecomeRagdoll(  ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, CanBecomeRagdoll )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, CanBecomeRagdoll )
+        bp::override func_CanBecomeRagdoll = this->get_override( "CanBecomeRagdoll" );
+        if( func_CanBecomeRagdoll.ptr() != Py_None )
             try {
-                func_Precache(  );
+                return func_CanBecomeRagdoll(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CEntityFlame::Precache(  );
+                return this->CBaseAnimating::CanBecomeRagdoll(  );
             }
         else
-            this->CEntityFlame::Precache(  );
+            return this->CBaseAnimating::CanBecomeRagdoll(  );
     }
     
-    void default_Precache(  ) {
-        CEntityFlame::Precache( );
-    }
-
-    virtual void Spawn(  ) {
-        PY_OVERRIDE_CHECK( CEntityFlame, Spawn )
-        PY_OVERRIDE_LOG( _entities, CEntityFlame, Spawn )
-        bp::override func_Spawn = this->get_override( "Spawn" );
-        if( func_Spawn.ptr() != Py_None )
-            try {
-                func_Spawn(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEntityFlame::Spawn(  );
-            }
-        else
-            this->CEntityFlame::Spawn(  );
-    }
-    
-    void default_Spawn(  ) {
-        CEntityFlame::Spawn( );
-    }
-
-    virtual void UpdateOnRemove(  ) {
-        PY_OVERRIDE_CHECK( CEntityFlame, UpdateOnRemove )
-        PY_OVERRIDE_LOG( _entities, CEntityFlame, UpdateOnRemove )
-        bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
-        if( func_UpdateOnRemove.ptr() != Py_None )
-            try {
-                func_UpdateOnRemove(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEntityFlame::UpdateOnRemove(  );
-            }
-        else
-            this->CEntityFlame::UpdateOnRemove(  );
-    }
-    
-    void default_UpdateOnRemove(  ) {
-        CEntityFlame::UpdateOnRemove( );
+    bool default_CanBecomeRagdoll(  ) {
+        return CBaseAnimating::CanBecomeRagdoll( );
     }
 
     virtual void ComputeWorldSpaceSurroundingBox( ::Vector * pWorldMins, ::Vector * pWorldMaxs ) {
@@ -224,22 +186,22 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
     }
 
     virtual int DrawDebugTextOverlays(  ) {
-        PY_OVERRIDE_CHECK( CBaseEntity, DrawDebugTextOverlays )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, DrawDebugTextOverlays )
+        PY_OVERRIDE_CHECK( CBaseAnimating, DrawDebugTextOverlays )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, DrawDebugTextOverlays )
         bp::override func_DrawDebugTextOverlays = this->get_override( "DrawDebugTextOverlays" );
         if( func_DrawDebugTextOverlays.ptr() != Py_None )
             try {
                 return func_DrawDebugTextOverlays(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseEntity::DrawDebugTextOverlays(  );
+                return this->CBaseAnimating::DrawDebugTextOverlays(  );
             }
         else
-            return this->CBaseEntity::DrawDebugTextOverlays(  );
+            return this->CBaseAnimating::DrawDebugTextOverlays(  );
     }
     
     int default_DrawDebugTextOverlays(  ) {
-        return CBaseEntity::DrawDebugTextOverlays( );
+        return CBaseAnimating::DrawDebugTextOverlays( );
     }
 
     virtual void EndTouch( ::CBaseEntity * pOther ) {
@@ -433,22 +395,22 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
     }
 
     virtual void ModifyOrAppendCriteria( ::ResponseRules::CriteriaSet & set ) {
-        PY_OVERRIDE_CHECK( CBaseEntity, ModifyOrAppendCriteria )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, ModifyOrAppendCriteria )
+        PY_OVERRIDE_CHECK( CBaseAnimating, ModifyOrAppendCriteria )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, ModifyOrAppendCriteria )
         bp::override func_ModifyOrAppendCriteria = this->get_override( "ModifyOrAppendCriteria" );
         if( func_ModifyOrAppendCriteria.ptr() != Py_None )
             try {
                 func_ModifyOrAppendCriteria( boost::ref(set) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::ModifyOrAppendCriteria( set );
+                this->CBaseAnimating::ModifyOrAppendCriteria( set );
             }
         else
-            this->CBaseEntity::ModifyOrAppendCriteria( set );
+            this->CBaseAnimating::ModifyOrAppendCriteria( set );
     }
     
     void default_ModifyOrAppendCriteria( ::ResponseRules::CriteriaSet & set ) {
-        CBaseEntity::ModifyOrAppendCriteria( set );
+        CBaseAnimating::ModifyOrAppendCriteria( set );
     }
 
     virtual void OnChangeOwnerNumber( int old_owner_number ) {
@@ -471,22 +433,41 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
     }
 
     virtual void OnRestore(  ) {
-        PY_OVERRIDE_CHECK( CBaseEntity, OnRestore )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, OnRestore )
+        PY_OVERRIDE_CHECK( CBaseAnimating, OnRestore )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, OnRestore )
         bp::override func_OnRestore = this->get_override( "OnRestore" );
         if( func_OnRestore.ptr() != Py_None )
             try {
                 func_OnRestore(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseEntity::OnRestore(  );
+                this->CBaseAnimating::OnRestore(  );
             }
         else
-            this->CBaseEntity::OnRestore(  );
+            this->CBaseAnimating::OnRestore(  );
     }
     
     void default_OnRestore(  ) {
-        CBaseEntity::OnRestore( );
+        CBaseAnimating::OnRestore( );
+    }
+
+    virtual void OnSequenceSet( int nOldSequence ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, OnSequenceSet )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, OnSequenceSet )
+        bp::override func_OnSequenceSet = this->get_override( "OnSequenceSet" );
+        if( func_OnSequenceSet.ptr() != Py_None )
+            try {
+                func_OnSequenceSet( nOldSequence );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::OnSequenceSet( nOldSequence );
+            }
+        else
+            this->CBaseAnimating::OnSequenceSet( nOldSequence );
+    }
+    
+    void default_OnSequenceSet( int nOldSequence ) {
+        CBaseAnimating::OnSequenceSet( nOldSequence );
     }
 
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
@@ -565,6 +546,63 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
         CBaseEntity::PostConstructor( szClassname );
     }
 
+    virtual void Precache(  ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, Precache )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Precache )
+        bp::override func_Precache = this->get_override( "Precache" );
+        if( func_Precache.ptr() != Py_None )
+            try {
+                func_Precache(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::Precache(  );
+            }
+        else
+            this->CBaseAnimating::Precache(  );
+    }
+    
+    void default_Precache(  ) {
+        CBaseAnimating::Precache( );
+    }
+
+    virtual void PyOnNewModel(  ){
+        PY_OVERRIDE_CHECK( CBaseAnimating, PyOnNewModel )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, PyOnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::PyOnNewModel(  );
+            }
+        else
+            this->CBaseAnimating::PyOnNewModel(  );
+    }
+    
+    virtual void default_OnNewModel(  ){
+        CBaseAnimating::PyOnNewModel( );
+    }
+
+    virtual void Spawn(  ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, Spawn )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Spawn )
+        bp::override func_Spawn = this->get_override( "Spawn" );
+        if( func_Spawn.ptr() != Py_None )
+            try {
+                func_Spawn(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::Spawn(  );
+            }
+        else
+            this->CBaseAnimating::Spawn(  );
+    }
+    
+    void default_Spawn(  ) {
+        CBaseAnimating::Spawn( );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -605,6 +643,25 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
 
     void TraceAttack( ::CTakeDamageInfo const & info, ::Vector const & vecDir, ::trace_t * ptr ){
         CBaseEntity::TraceAttack( info, vecDir, ptr );
+    }
+
+    virtual void UpdateOnRemove(  ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, UpdateOnRemove )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, UpdateOnRemove )
+        bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
+        if( func_UpdateOnRemove.ptr() != Py_None )
+            try {
+                func_UpdateOnRemove(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseEntity::UpdateOnRemove(  );
+            }
+        else
+            this->CBaseEntity::UpdateOnRemove(  );
+    }
+    
+    void default_UpdateOnRemove(  ) {
+        CBaseEntity::UpdateOnRemove( );
     }
 
     virtual int UpdateTransmitState(  ) {
@@ -648,224 +705,210 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( CBaseProjectile, GetServerClass )
+        PY_OVERRIDE_LOG( _entities, CBaseProjectile, GetServerClass )
         ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
-        return CBaseEntity::GetServerClass();
+        return CBaseProjectile::GetServerClass();
     }
 
-    static int m_lifeState_Get( CEntityFlame const & inst ) { return inst.m_lifeState.Get(); }
+    static int m_lifeState_Get( CBaseProjectile const & inst ) { return inst.m_lifeState.Get(); }
 
-    static void m_lifeState_Set( CEntityFlame & inst, int val ) { inst.m_lifeState.Set( val ); }
+    static void m_lifeState_Set( CBaseProjectile & inst, int val ) { inst.m_lifeState.Set( val ); }
 
-    static int m_takedamage_Get( CEntityFlame const & inst ) { return inst.m_takedamage.Get(); }
+    static int m_takedamage_Get( CBaseProjectile const & inst ) { return inst.m_takedamage.Get(); }
 
-    static void m_takedamage_Set( CEntityFlame & inst, int val ) { inst.m_takedamage.Set( val ); }
+    static void m_takedamage_Set( CBaseProjectile & inst, int val ) { inst.m_takedamage.Set( val ); }
+
+    static int m_nSkin_Get( CBaseProjectile const & inst ) { return inst.m_nSkin.Get(); }
+
+    static void m_nSkin_Set( CBaseProjectile & inst, int val ) { inst.m_nSkin.Set( val ); }
 
 };
 
-void register_CEntityFlame_class(){
+void register_CBaseProjectile_class(){
 
-    bp::class_< CEntityFlame_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CEntityFlame", bp::no_init )    
-        .def( bp::init< >() )    
+    bp::class_< CBaseProjectile_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CBaseProjectile", bp::init< >() )    
+        .def( 
+            "Destroy"
+            , (void ( ::CBaseProjectile::* )( bool,bool ) )( &::CBaseProjectile::Destroy )
+            , ( bp::arg("bBlinkOut")=(bool)(true), bp::arg("bBreakRocket")=(bool)(false) ) )    
+        .def( 
+            "GetDestroyableHitCount"
+            , (int ( ::CBaseProjectile::* )(  ) const)( &::CBaseProjectile::GetDestroyableHitCount ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CBaseProjectile::GetPyNetworkType ) )    
+        .def( 
+            "IncrementDestroyableHitCount"
+            , (void ( ::CBaseProjectile::* )(  ) )( &::CBaseProjectile::IncrementDestroyableHitCount ) )    
+        .def( 
+            "IsDestroyable"
+            , (bool ( ::CBaseProjectile::* )(  ) )( &::CBaseProjectile::IsDestroyable ) )    
         .def( 
             "Activate"
-            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Activate)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Activate) )    
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_Activate) )    
         .def( 
-            "AttachToEntity"
-            , (void ( ::CEntityFlame::* )( ::CBaseEntity * ) )( &::CEntityFlame::AttachToEntity )
-            , ( bp::arg("pTarget") ) )    
-        .def( 
-            "Create"
-            , (::CEntityFlame * (*)( ::CBaseEntity *,float,float,bool ))( &::CEntityFlame::Create )
-            , ( bp::arg("pTarget"), bp::arg("flLifetime"), bp::arg("flSize")=0.0f, bp::arg("bUseHitboxes")=(bool)(true) )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetAttacker"
-            , (::CBaseEntity * ( ::CEntityFlame::* )(  ) const)( &::CEntityFlame::GetAttacker )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetFlameDamagePerSecond"
-            , (float ( ::CEntityFlame::* )(  ) )( &::CEntityFlame::GetFlameDamagePerSecond ) )    
-        .def( 
-            "GetFlameRadiusDamagePerSecond"
-            , (float ( ::CEntityFlame::* )(  ) )( &::CEntityFlame::GetFlameRadiusDamagePerSecond ) )    
-        .def( 
-            "GetRemainingLife"
-            , (float ( ::CEntityFlame::* )(  ) const)( &::CEntityFlame::GetRemainingLife ) )    
-        .def( 
-            "Precache"
-            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Precache)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Precache) )    
-        .def( 
-            "SetAttacker"
-            , (void ( ::CEntityFlame::* )( ::CBaseEntity * ) )( &::CEntityFlame::SetAttacker )
-            , ( bp::arg("pAttacker") ) )    
-        .def( 
-            "SetFlameDamagePerSecond"
-            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetFlameDamagePerSecond )
-            , ( bp::arg("fDamage") ) )    
-        .def( 
-            "SetFlameRadiusDamagePerSecond"
-            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetFlameRadiusDamagePerSecond )
-            , ( bp::arg("fDamage") ) )    
-        .def( 
-            "SetLifetime"
-            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetLifetime )
-            , ( bp::arg("lifetime") ) )    
-        .def( 
-            "SetSize"
-            , (void ( ::CEntityFlame::* )( float ) )( &::CEntityFlame::SetSize )
-            , ( bp::arg("size") ) )    
-        .def( 
-            "Spawn"
-            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::Spawn)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_Spawn) )    
-        .def( 
-            "UpdateOnRemove"
-            , (void ( ::CEntityFlame::* )(  ) )(&::CEntityFlame::UpdateOnRemove)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_UpdateOnRemove) )    
-        .def( 
-            "UseCheapEffect"
-            , (void ( ::CEntityFlame::* )( bool ) )( &::CEntityFlame::UseCheapEffect )
-            , ( bp::arg("bCheap") ) )    
+            "CanBecomeRagdoll"
+            , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
+            , (bool ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_CanBecomeRagdoll) )    
         .def( 
             "ComputeWorldSpaceSurroundingBox"
             , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-            , (void ( CEntityFlame_wrapper::* )( ::Vector *,::Vector * ) )(&CEntityFlame_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , (void ( CBaseProjectile_wrapper::* )( ::Vector *,::Vector * ) )(&CBaseProjectile_wrapper::default_ComputeWorldSpaceSurroundingBox)
             , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
         .def( 
             "CreateVPhysics"
             , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
-            , (bool ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_CreateVPhysics) )    
+            , (bool ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_CreateVPhysics) )    
         .def( 
             "DeathNotice"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
-            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_DeathNotice)
+            , (void ( CBaseProjectile_wrapper::* )( ::CBaseEntity * ) )(&CBaseProjectile_wrapper::default_DeathNotice)
             , ( bp::arg("pVictim") ) )    
         .def( 
             "DoImpactEffect"
             , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
-            , (void ( CEntityFlame_wrapper::* )( ::trace_t &,int ) )(&CEntityFlame_wrapper::default_DoImpactEffect)
+            , (void ( CBaseProjectile_wrapper::* )( ::trace_t &,int ) )(&CBaseProjectile_wrapper::default_DoImpactEffect)
             , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
         .def( 
             "DrawDebugGeometryOverlays"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_DrawDebugGeometryOverlays) )    
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_DrawDebugGeometryOverlays) )    
         .def( 
             "DrawDebugTextOverlays"
-            , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugTextOverlays)
-            , (int ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_DrawDebugTextOverlays) )    
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_DrawDebugTextOverlays) )    
         .def( 
             "EndTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
-            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_EndTouch)
+            , (void ( CBaseProjectile_wrapper::* )( ::CBaseEntity * ) )(&CBaseProjectile_wrapper::default_EndTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "Event_Killed"
             , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
-            , (void ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_Event_Killed)
+            , (void ( CBaseProjectile_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProjectile_wrapper::default_Event_Killed)
             , ( bp::arg("info") ) )    
         .def( 
             "Event_KilledOther"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
-            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_Event_KilledOther)
+            , (void ( CBaseProjectile_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CBaseProjectile_wrapper::default_Event_KilledOther)
             , ( bp::arg("pVictim"), bp::arg("info") ) )    
         .def( 
             "GetIMouse"
             , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
-            , (::IMouse * ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_GetIMouse)
+            , (::IMouse * ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetTracerType"
             , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
-            , (char const * ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_GetTracerType) )    
+            , (char const * ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_GetTracerType) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CEntityFlame_wrapper::* )( char const *,char const * ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , (bool ( CBaseProjectile_wrapper::* )( char const *,char const * ) )(&CBaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CEntityFlame_wrapper::* )( char const *,float ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , (bool ( CBaseProjectile_wrapper::* )( char const *,float ) )(&CBaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CEntityFlame_wrapper::* )( char const *,int ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , (bool ( CBaseProjectile_wrapper::* )( char const *,int ) )(&CBaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CEntityFlame_wrapper::* )( char const *,::Vector const & ) )(&CEntityFlame_wrapper::default_KeyValue)
+            , (bool ( CBaseProjectile_wrapper::* )( char const *,::Vector const & ) )(&CBaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
         .def( 
             "MakeTracer"
             , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
-            , (void ( CEntityFlame_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CEntityFlame_wrapper::default_MakeTracer)
+            , (void ( CBaseProjectile_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CBaseProjectile_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
             "ModifyOrAppendCriteria"
-            , (void ( ::CBaseEntity::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseEntity::ModifyOrAppendCriteria)
-            , (void ( CEntityFlame_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CEntityFlame_wrapper::default_ModifyOrAppendCriteria)
+            , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
+            , (void ( CBaseProjectile_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CBaseProjectile_wrapper::default_ModifyOrAppendCriteria)
             , ( bp::arg("set") ) )    
         .def( 
             "OnChangeOwnerNumber"
             , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
-            , (void ( CEntityFlame_wrapper::* )( int ) )(&CEntityFlame_wrapper::default_OnChangeOwnerNumber)
+            , (void ( CBaseProjectile_wrapper::* )( int ) )(&CBaseProjectile_wrapper::default_OnChangeOwnerNumber)
             , ( bp::arg("old_owner_number") ) )    
         .def( 
             "OnRestore"
-            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::OnRestore)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_OnRestore) )    
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_OnRestore) )    
+        .def( 
+            "OnSequenceSet"
+            , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
+            , (void ( CBaseProjectile_wrapper::* )( int ) )(&CBaseProjectile_wrapper::default_OnSequenceSet)
+            , ( bp::arg("nOldSequence") ) )    
         .def( 
             "OnTakeDamage"
             , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
-            , (int ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_OnTakeDamage)
+            , (int ( CBaseProjectile_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProjectile_wrapper::default_OnTakeDamage)
             , ( bp::arg("info") ) )    
         .def( 
             "PassesDamageFilter"
             , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
-            , (bool ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const & ) )(&CEntityFlame_wrapper::default_PassesDamageFilter)
+            , (bool ( CBaseProjectile_wrapper::* )( ::CTakeDamageInfo const & ) )(&CBaseProjectile_wrapper::default_PassesDamageFilter)
             , ( bp::arg("info") ) )    
         .def( 
             "PostClientActive"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_PostClientActive) )    
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_PostClientActive) )    
         .def( 
             "PostConstructor"
             , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
-            , (void ( CEntityFlame_wrapper::* )( char const * ) )(&CEntityFlame_wrapper::default_PostConstructor)
+            , (void ( CBaseProjectile_wrapper::* )( char const * ) )(&CBaseProjectile_wrapper::default_PostConstructor)
             , ( bp::arg("szClassname") ) )    
+        .def( 
+            "Precache"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Precache)
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_Precache) )    
+        .def( 
+            "OnNewModel"
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_OnNewModel) )    
+        .def( 
+            "Spawn"
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Spawn)
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_Spawn) )    
         .def( 
             "StartTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
-            , (void ( CEntityFlame_wrapper::* )( ::CBaseEntity * ) )(&CEntityFlame_wrapper::default_StartTouch)
+            , (void ( CBaseProjectile_wrapper::* )( ::CBaseEntity * ) )(&CBaseProjectile_wrapper::default_StartTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "StopLoopingSounds"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
-            , (void ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_StopLoopingSounds) )    
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_StopLoopingSounds) )    
         .def( 
             "TraceAttack"
-            , (void ( CEntityFlame_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CEntityFlame_wrapper::TraceAttack)
+            , (void ( CBaseProjectile_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseProjectile_wrapper::TraceAttack)
             , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_UpdateOnRemove) )    
         .def( 
             "UpdateTransmitState"
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
-            , (int ( CEntityFlame_wrapper::* )(  ) )(&CEntityFlame_wrapper::default_UpdateTransmitState) )    
+            , (int ( CBaseProjectile_wrapper::* )(  ) )(&CBaseProjectile_wrapper::default_UpdateTransmitState) )    
         .def( 
             "VPhysicsCollision"
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
-            , (void ( CEntityFlame_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CEntityFlame_wrapper::default_VPhysicsCollision)
+            , (void ( CBaseProjectile_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseProjectile_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "Create" )    
-        .add_property( "lifestate", &CEntityFlame_wrapper::m_lifeState_Get, &CEntityFlame_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CEntityFlame_wrapper::m_takedamage_Get, &CEntityFlame_wrapper::m_takedamage_Set );
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &CBaseProjectile_wrapper::m_lifeState_Get, &CBaseProjectile_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CBaseProjectile_wrapper::m_takedamage_Get, &CBaseProjectile_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CBaseProjectile_wrapper::m_nSkin_Get, &CBaseProjectile_wrapper::m_nSkin_Set );
 
 }
 

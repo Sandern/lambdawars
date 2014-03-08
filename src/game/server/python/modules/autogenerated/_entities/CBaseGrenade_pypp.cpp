@@ -7,6 +7,7 @@
 #include "npcevent.h"
 #include "srcpy_entities.h"
 #include "bone_setup.h"
+#include "baseprojectile.h"
 #include "basegrenade_shared.h"
 #include "SkyCamera.h"
 #include "ai_basenpc.h"
@@ -127,25 +128,6 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseAnimating::Activate( );
     }
 
-    virtual bool BecomeRagdoll( ::CTakeDamageInfo const & info, ::Vector const & forceVector ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, BecomeRagdoll )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, BecomeRagdoll )
-        bp::override func_BecomeRagdoll = this->get_override( "BecomeRagdoll" );
-        if( func_BecomeRagdoll.ptr() != Py_None )
-            try {
-                return func_BecomeRagdoll( boost::ref(info), boost::ref(forceVector) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::BecomeRagdoll( info, forceVector );
-            }
-        else
-            return this->CBaseCombatCharacter::BecomeRagdoll( info, forceVector );
-    }
-    
-    bool default_BecomeRagdoll( ::CTakeDamageInfo const & info, ::Vector const & forceVector ) {
-        return CBaseCombatCharacter::BecomeRagdoll( info, forceVector );
-    }
-
     virtual bool CanBecomeRagdoll(  ) {
         PY_OVERRIDE_CHECK( CBaseAnimating, CanBecomeRagdoll )
         PY_OVERRIDE_LOG( _entities, CBaseAnimating, CanBecomeRagdoll )
@@ -182,25 +164,6 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
     
     void default_ComputeWorldSpaceSurroundingBox( ::Vector * pWorldMins, ::Vector * pWorldMaxs ) {
         CBaseEntity::ComputeWorldSpaceSurroundingBox( pWorldMins, pWorldMaxs );
-    }
-
-    virtual bool CorpseGib( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, CorpseGib )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, CorpseGib )
-        bp::override func_CorpseGib = this->get_override( "CorpseGib" );
-        if( func_CorpseGib.ptr() != Py_None )
-            try {
-                return func_CorpseGib( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::CorpseGib( info );
-            }
-        else
-            return this->CBaseCombatCharacter::CorpseGib( info );
-    }
-    
-    bool default_CorpseGib( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::CorpseGib( info );
     }
 
     virtual bool CreateVPhysics(  ) {
@@ -315,25 +278,6 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
     
     void default_EndTouch( ::CBaseEntity * pOther ) {
         CBaseEntity::EndTouch( pOther );
-    }
-
-    virtual bool Event_Gibbed( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Event_Gibbed )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Event_Gibbed )
-        bp::override func_Event_Gibbed = this->get_override( "Event_Gibbed" );
-        if( func_Event_Gibbed.ptr() != Py_None )
-            try {
-                return func_Event_Gibbed( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::Event_Gibbed( info );
-            }
-        else
-            return this->CBaseCombatCharacter::Event_Gibbed( info );
-    }
-    
-    bool default_Event_Gibbed( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::Event_Gibbed( info );
     }
 
     virtual void Event_KilledOther( ::CBaseEntity * pVictim, ::CTakeDamageInfo const & info ) {
@@ -527,22 +471,22 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
     }
 
     virtual void OnRestore(  ) {
-        PY_OVERRIDE_CHECK( CBaseAnimatingOverlay, OnRestore )
-        PY_OVERRIDE_LOG( _entities, CBaseAnimatingOverlay, OnRestore )
+        PY_OVERRIDE_CHECK( CBaseAnimating, OnRestore )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, OnRestore )
         bp::override func_OnRestore = this->get_override( "OnRestore" );
         if( func_OnRestore.ptr() != Py_None )
             try {
                 func_OnRestore(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseAnimatingOverlay::OnRestore(  );
+                this->CBaseAnimating::OnRestore(  );
             }
         else
-            this->CBaseAnimatingOverlay::OnRestore(  );
+            this->CBaseAnimating::OnRestore(  );
     }
     
     void default_OnRestore(  ) {
-        CBaseAnimatingOverlay::OnRestore( );
+        CBaseAnimating::OnRestore( );
     }
 
     virtual void OnSequenceSet( int nOldSequence ) {
@@ -565,41 +509,22 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
     }
 
     virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, OnTakeDamage )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, OnTakeDamage )
+        PY_OVERRIDE_CHECK( CBaseEntity, OnTakeDamage )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, OnTakeDamage )
         bp::override func_OnTakeDamage = this->get_override( "OnTakeDamage" );
         if( func_OnTakeDamage.ptr() != Py_None )
             try {
                 return func_OnTakeDamage( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CBaseCombatCharacter::OnTakeDamage( info );
+                return this->CBaseEntity::OnTakeDamage( info );
             }
         else
-            return this->CBaseCombatCharacter::OnTakeDamage( info );
+            return this->CBaseEntity::OnTakeDamage( info );
     }
     
     int default_OnTakeDamage( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::OnTakeDamage( info );
-    }
-
-    virtual int OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, OnTakeDamage_Alive )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, OnTakeDamage_Alive )
-        bp::override func_OnTakeDamage_Alive = this->get_override( "OnTakeDamage_Alive" );
-        if( func_OnTakeDamage_Alive.ptr() != Py_None )
-            try {
-                return func_OnTakeDamage_Alive( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::OnTakeDamage_Alive( info );
-            }
-        else
-            return this->CBaseCombatCharacter::OnTakeDamage_Alive( info );
-    }
-    
-    int default_OnTakeDamage_Alive( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::OnTakeDamage_Alive( info );
+        return CBaseEntity::OnTakeDamage( info );
     }
 
     virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
@@ -678,42 +603,23 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseAnimating::PyOnNewModel( );
     }
 
-    virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, ShouldGib )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, ShouldGib )
-        bp::override func_ShouldGib = this->get_override( "ShouldGib" );
-        if( func_ShouldGib.ptr() != Py_None )
-            try {
-                return func_ShouldGib( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::ShouldGib( info );
-            }
-        else
-            return this->CBaseCombatCharacter::ShouldGib( info );
-    }
-    
-    bool default_ShouldGib( ::CTakeDamageInfo const & info ) {
-        return CBaseCombatCharacter::ShouldGib( info );
-    }
-
     virtual void Spawn(  ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Spawn )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Spawn )
+        PY_OVERRIDE_CHECK( CBaseAnimating, Spawn )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Spawn )
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
             try {
                 func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseCombatCharacter::Spawn(  );
+                this->CBaseAnimating::Spawn(  );
             }
         else
-            this->CBaseCombatCharacter::Spawn(  );
+            this->CBaseAnimating::Spawn(  );
     }
     
     void default_Spawn(  ) {
-        CBaseCombatCharacter::Spawn( );
+        CBaseAnimating::Spawn( );
     }
 
     virtual void StartTouch( ::CBaseEntity * pOther ) {
@@ -759,22 +665,22 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
     }
 
     virtual void UpdateOnRemove(  ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, UpdateOnRemove )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, UpdateOnRemove )
+        PY_OVERRIDE_CHECK( CBaseEntity, UpdateOnRemove )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, UpdateOnRemove )
         bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
         if( func_UpdateOnRemove.ptr() != Py_None )
             try {
                 func_UpdateOnRemove(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseCombatCharacter::UpdateOnRemove(  );
+                this->CBaseEntity::UpdateOnRemove(  );
             }
         else
-            this->CBaseCombatCharacter::UpdateOnRemove(  );
+            this->CBaseEntity::UpdateOnRemove(  );
     }
     
     void default_UpdateOnRemove(  ) {
-        CBaseCombatCharacter::UpdateOnRemove( );
+        CBaseEntity::UpdateOnRemove( );
     }
 
     virtual int UpdateTransmitState(  ) {
@@ -815,63 +721,6 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseEntity::VPhysicsCollision( index, pEvent );
     }
 
-    virtual void Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget=0, ::Vector const * pVelocity=0 ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Weapon_Drop )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Weapon_Drop )
-        bp::override func_Weapon_Drop = this->get_override( "Weapon_Drop" );
-        if( func_Weapon_Drop.ptr() != Py_None )
-            try {
-                func_Weapon_Drop( pWeapon ? pWeapon->GetPyHandle() : boost::python::object(), boost::python::ptr(pvecTarget), boost::python::ptr(pVelocity) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseCombatCharacter::Weapon_Drop( pWeapon, pvecTarget, pVelocity );
-            }
-        else
-            this->CBaseCombatCharacter::Weapon_Drop( pWeapon, pvecTarget, pVelocity );
-    }
-    
-    void default_Weapon_Drop( ::CBaseCombatWeapon * pWeapon, ::Vector const * pvecTarget=0, ::Vector const * pVelocity=0 ) {
-        CBaseCombatCharacter::Weapon_Drop( pWeapon, pvecTarget, pVelocity );
-    }
-
-    virtual void Weapon_Equip( ::CBaseCombatWeapon * pWeapon ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Weapon_Equip )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Weapon_Equip )
-        bp::override func_Weapon_Equip = this->get_override( "Weapon_Equip" );
-        if( func_Weapon_Equip.ptr() != Py_None )
-            try {
-                func_Weapon_Equip( pWeapon ? pWeapon->GetPyHandle() : boost::python::object() );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseCombatCharacter::Weapon_Equip( pWeapon );
-            }
-        else
-            this->CBaseCombatCharacter::Weapon_Equip( pWeapon );
-    }
-    
-    void default_Weapon_Equip( ::CBaseCombatWeapon * pWeapon ) {
-        CBaseCombatCharacter::Weapon_Equip( pWeapon );
-    }
-
-    virtual bool Weapon_Switch( ::CBaseCombatWeapon * pWeapon, int viewmodelindex=0 ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Weapon_Switch )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Weapon_Switch )
-        bp::override func_Weapon_Switch = this->get_override( "Weapon_Switch" );
-        if( func_Weapon_Switch.ptr() != Py_None )
-            try {
-                return func_Weapon_Switch( pWeapon ? pWeapon->GetPyHandle() : boost::python::object(), viewmodelindex );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::Weapon_Switch( pWeapon, viewmodelindex );
-            }
-        else
-            return this->CBaseCombatCharacter::Weapon_Switch( pWeapon, viewmodelindex );
-    }
-    
-    bool default_Weapon_Switch( ::CBaseCombatWeapon * pWeapon, int viewmodelindex=0 ) {
-        return CBaseCombatCharacter::Weapon_Switch( pWeapon, viewmodelindex );
-    }
-
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
@@ -900,7 +749,7 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
 void register_CBaseGrenade_class(){
 
     { //::CBaseGrenade
-        typedef bp::class_< CBaseGrenade_wrapper, bp::bases< CBaseCombatCharacter >, boost::noncopyable > CBaseGrenade_exposer_t;
+        typedef bp::class_< CBaseGrenade_wrapper, bp::bases< CBaseProjectile >, boost::noncopyable > CBaseGrenade_exposer_t;
         CBaseGrenade_exposer_t CBaseGrenade_exposer = CBaseGrenade_exposer_t( "CBaseGrenade", bp::init< >() );
         bp::scope CBaseGrenade_scope( CBaseGrenade_exposer );
         { //::CBaseGrenade::BloodColor
@@ -1147,18 +996,6 @@ void register_CBaseGrenade_class(){
                 , default_Activate_function_type(&CBaseGrenade_wrapper::default_Activate) );
         
         }
-        { //::CBaseCombatCharacter::BecomeRagdoll
-        
-            typedef bool ( ::CBaseCombatCharacter::*BecomeRagdoll_function_type )( ::CTakeDamageInfo const &,::Vector const & ) ;
-            typedef bool ( CBaseGrenade_wrapper::*default_BecomeRagdoll_function_type )( ::CTakeDamageInfo const &,::Vector const & ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "BecomeRagdoll"
-                , BecomeRagdoll_function_type(&::CBaseCombatCharacter::BecomeRagdoll)
-                , default_BecomeRagdoll_function_type(&CBaseGrenade_wrapper::default_BecomeRagdoll)
-                , ( bp::arg("info"), bp::arg("forceVector") ) );
-        
-        }
         { //::CBaseAnimating::CanBecomeRagdoll
         
             typedef bool ( ::CBaseAnimating::*CanBecomeRagdoll_function_type )(  ) ;
@@ -1180,18 +1017,6 @@ void register_CBaseGrenade_class(){
                 , ComputeWorldSpaceSurroundingBox_function_type(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
                 , default_ComputeWorldSpaceSurroundingBox_function_type(&CBaseGrenade_wrapper::default_ComputeWorldSpaceSurroundingBox)
                 , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) );
-        
-        }
-        { //::CBaseCombatCharacter::CorpseGib
-        
-            typedef bool ( ::CBaseCombatCharacter::*CorpseGib_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseGrenade_wrapper::*default_CorpseGib_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "CorpseGib"
-                , CorpseGib_function_type(&::CBaseCombatCharacter::CorpseGib)
-                , default_CorpseGib_function_type(&CBaseGrenade_wrapper::default_CorpseGib)
-                , ( bp::arg("info") ) );
         
         }
         { //::CBaseEntity::CreateVPhysics
@@ -1261,18 +1086,6 @@ void register_CBaseGrenade_class(){
                 , EndTouch_function_type(&::CBaseEntity::EndTouch)
                 , default_EndTouch_function_type(&CBaseGrenade_wrapper::default_EndTouch)
                 , ( bp::arg("pOther") ) );
-        
-        }
-        { //::CBaseCombatCharacter::Event_Gibbed
-        
-            typedef bool ( ::CBaseCombatCharacter::*Event_Gibbed_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseGrenade_wrapper::*default_Event_Gibbed_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "Event_Gibbed"
-                , Event_Gibbed_function_type(&::CBaseCombatCharacter::Event_Gibbed)
-                , default_Event_Gibbed_function_type(&CBaseGrenade_wrapper::default_Event_Gibbed)
-                , ( bp::arg("info") ) );
         
         }
         { //::CBaseEntity::Event_KilledOther
@@ -1394,14 +1207,14 @@ void register_CBaseGrenade_class(){
                 , ( bp::arg("old_owner_number") ) );
         
         }
-        { //::CBaseAnimatingOverlay::OnRestore
+        { //::CBaseAnimating::OnRestore
         
-            typedef void ( ::CBaseAnimatingOverlay::*OnRestore_function_type )(  ) ;
+            typedef void ( ::CBaseAnimating::*OnRestore_function_type )(  ) ;
             typedef void ( CBaseGrenade_wrapper::*default_OnRestore_function_type )(  ) ;
             
             CBaseGrenade_exposer.def( 
                 "OnRestore"
-                , OnRestore_function_type(&::CBaseAnimatingOverlay::OnRestore)
+                , OnRestore_function_type(&::CBaseAnimating::OnRestore)
                 , default_OnRestore_function_type(&CBaseGrenade_wrapper::default_OnRestore) );
         
         }
@@ -1417,27 +1230,15 @@ void register_CBaseGrenade_class(){
                 , ( bp::arg("nOldSequence") ) );
         
         }
-        { //::CBaseCombatCharacter::OnTakeDamage
+        { //::CBaseEntity::OnTakeDamage
         
-            typedef int ( ::CBaseCombatCharacter::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
+            typedef int ( ::CBaseEntity::*OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
             typedef int ( CBaseGrenade_wrapper::*default_OnTakeDamage_function_type )( ::CTakeDamageInfo const & ) ;
             
             CBaseGrenade_exposer.def( 
                 "OnTakeDamage"
-                , OnTakeDamage_function_type(&::CBaseCombatCharacter::OnTakeDamage)
+                , OnTakeDamage_function_type(&::CBaseEntity::OnTakeDamage)
                 , default_OnTakeDamage_function_type(&CBaseGrenade_wrapper::default_OnTakeDamage)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseCombatCharacter::OnTakeDamage_Alive
-        
-            typedef int ( ::CBaseCombatCharacter::*OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef int ( CBaseGrenade_wrapper::*default_OnTakeDamage_Alive_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "OnTakeDamage_Alive"
-                , OnTakeDamage_Alive_function_type(&::CBaseCombatCharacter::OnTakeDamage_Alive)
-                , default_OnTakeDamage_Alive_function_type(&CBaseGrenade_wrapper::default_OnTakeDamage_Alive)
                 , ( bp::arg("info") ) );
         
         }
@@ -1485,26 +1286,14 @@ void register_CBaseGrenade_class(){
                 , OnNewModel_function_type( &CBaseGrenade_wrapper::default_OnNewModel ) );
         
         }
-        { //::CBaseCombatCharacter::ShouldGib
+        { //::CBaseAnimating::Spawn
         
-            typedef bool ( ::CBaseCombatCharacter::*ShouldGib_function_type )( ::CTakeDamageInfo const & ) ;
-            typedef bool ( CBaseGrenade_wrapper::*default_ShouldGib_function_type )( ::CTakeDamageInfo const & ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "ShouldGib"
-                , ShouldGib_function_type(&::CBaseCombatCharacter::ShouldGib)
-                , default_ShouldGib_function_type(&CBaseGrenade_wrapper::default_ShouldGib)
-                , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseCombatCharacter::Spawn
-        
-            typedef void ( ::CBaseCombatCharacter::*Spawn_function_type )(  ) ;
+            typedef void ( ::CBaseAnimating::*Spawn_function_type )(  ) ;
             typedef void ( CBaseGrenade_wrapper::*default_Spawn_function_type )(  ) ;
             
             CBaseGrenade_exposer.def( 
                 "Spawn"
-                , Spawn_function_type(&::CBaseCombatCharacter::Spawn)
+                , Spawn_function_type(&::CBaseAnimating::Spawn)
                 , default_Spawn_function_type(&CBaseGrenade_wrapper::default_Spawn) );
         
         }
@@ -1541,14 +1330,14 @@ void register_CBaseGrenade_class(){
                 , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) );
         
         }
-        { //::CBaseCombatCharacter::UpdateOnRemove
+        { //::CBaseEntity::UpdateOnRemove
         
-            typedef void ( ::CBaseCombatCharacter::*UpdateOnRemove_function_type )(  ) ;
+            typedef void ( ::CBaseEntity::*UpdateOnRemove_function_type )(  ) ;
             typedef void ( CBaseGrenade_wrapper::*default_UpdateOnRemove_function_type )(  ) ;
             
             CBaseGrenade_exposer.def( 
                 "UpdateOnRemove"
-                , UpdateOnRemove_function_type(&::CBaseCombatCharacter::UpdateOnRemove)
+                , UpdateOnRemove_function_type(&::CBaseEntity::UpdateOnRemove)
                 , default_UpdateOnRemove_function_type(&CBaseGrenade_wrapper::default_UpdateOnRemove) );
         
         }
@@ -1573,42 +1362,6 @@ void register_CBaseGrenade_class(){
                 , VPhysicsCollision_function_type(&::CBaseEntity::VPhysicsCollision)
                 , default_VPhysicsCollision_function_type(&CBaseGrenade_wrapper::default_VPhysicsCollision)
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
-        
-        }
-        { //::CBaseCombatCharacter::Weapon_Drop
-        
-            typedef void ( ::CBaseCombatCharacter::*Weapon_Drop_function_type )( ::CBaseCombatWeapon *,::Vector const *,::Vector const * ) ;
-            typedef void ( CBaseGrenade_wrapper::*default_Weapon_Drop_function_type )( ::CBaseCombatWeapon *,::Vector const *,::Vector const * ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "Weapon_Drop"
-                , Weapon_Drop_function_type(&::CBaseCombatCharacter::Weapon_Drop)
-                , default_Weapon_Drop_function_type(&CBaseGrenade_wrapper::default_Weapon_Drop)
-                , ( bp::arg("pWeapon"), bp::arg("pvecTarget")=bp::object(), bp::arg("pVelocity")=bp::object() ) );
-        
-        }
-        { //::CBaseCombatCharacter::Weapon_Equip
-        
-            typedef void ( ::CBaseCombatCharacter::*Weapon_Equip_function_type )( ::CBaseCombatWeapon * ) ;
-            typedef void ( CBaseGrenade_wrapper::*default_Weapon_Equip_function_type )( ::CBaseCombatWeapon * ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "Weapon_Equip"
-                , Weapon_Equip_function_type(&::CBaseCombatCharacter::Weapon_Equip)
-                , default_Weapon_Equip_function_type(&CBaseGrenade_wrapper::default_Weapon_Equip)
-                , ( bp::arg("pWeapon") ) );
-        
-        }
-        { //::CBaseCombatCharacter::Weapon_Switch
-        
-            typedef bool ( ::CBaseCombatCharacter::*Weapon_Switch_function_type )( ::CBaseCombatWeapon *,int ) ;
-            typedef bool ( CBaseGrenade_wrapper::*default_Weapon_Switch_function_type )( ::CBaseCombatWeapon *,int ) ;
-            
-            CBaseGrenade_exposer.def( 
-                "Weapon_Switch"
-                , Weapon_Switch_function_type(&::CBaseCombatCharacter::Weapon_Switch)
-                , default_Weapon_Switch_function_type(&CBaseGrenade_wrapper::default_Weapon_Switch)
-                , ( bp::arg("pWeapon"), bp::arg("viewmodelindex")=(int)(0) ) );
         
         }
         CBaseGrenade_exposer.staticmethod( "GetPyNetworkType" );

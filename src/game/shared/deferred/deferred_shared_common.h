@@ -87,8 +87,6 @@ inline void normalizeAngles( QAngle &ang )
 	ang[ 2 ] = AngleNormalize( ang[ 2 ] );
 }
 
-void UTIL_StringToIntArray( int *pVector, int count, const char *pString );
-
 #define DEFLIGHTCONTAINER_MAXLIGHT_BITS 7
 #define DEFLIGHTCONTAINER_MAXLIGHTS 113
 

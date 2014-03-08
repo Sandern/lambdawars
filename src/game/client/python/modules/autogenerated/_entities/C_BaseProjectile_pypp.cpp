@@ -33,55 +33,36 @@
 #include "c_wars_weapon.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "C_SmokeTrail_pypp.hpp"
+#include "C_BaseProjectile_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
+struct C_BaseProjectile_wrapper : C_BaseProjectile, bp::wrapper< C_BaseProjectile > {
 
-    C_SmokeTrail_wrapper( )
-    : C_SmokeTrail( )
-      , bp::wrapper< C_SmokeTrail >(){
+    C_BaseProjectile_wrapper( )
+    : C_BaseProjectile( )
+      , bp::wrapper< C_BaseProjectile >(){
         // null constructor
     
     }
 
-    virtual void OnDataChanged( ::DataUpdateType_t updateType ) {
-        PY_OVERRIDE_CHECK( C_SmokeTrail, OnDataChanged )
-        PY_OVERRIDE_LOG( _entities, C_SmokeTrail, OnDataChanged )
-        bp::override func_OnDataChanged = this->get_override( "OnDataChanged" );
-        if( func_OnDataChanged.ptr() != Py_None )
-            try {
-                func_OnDataChanged( updateType );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->C_SmokeTrail::OnDataChanged( updateType );
-            }
-        else
-            this->C_SmokeTrail::OnDataChanged( updateType );
-    }
-    
-    void default_OnDataChanged( ::DataUpdateType_t updateType ) {
-        C_SmokeTrail::OnDataChanged( updateType );
-    }
-
     virtual void Activate(  ) {
-        PY_OVERRIDE_CHECK( C_BaseParticleEntity, Activate )
-        PY_OVERRIDE_LOG( _entities, C_BaseParticleEntity, Activate )
+        PY_OVERRIDE_CHECK( C_BaseEntity, Activate )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Activate )
         bp::override func_Activate = this->get_override( "Activate" );
         if( func_Activate.ptr() != Py_None )
             try {
                 func_Activate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseParticleEntity::Activate(  );
+                this->C_BaseEntity::Activate(  );
             }
         else
-            this->C_BaseParticleEntity::Activate(  );
+            this->C_BaseEntity::Activate(  );
     }
     
     void default_Activate(  ) {
-        C_BaseParticleEntity::Activate( );
+        C_BaseEntity::Activate( );
     }
 
     void AddToEntityList( ::entity_list_ids_t listId ){
@@ -184,22 +165,22 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     }
 
     virtual ::CollideType_t GetCollideType(  ) {
-        PY_OVERRIDE_CHECK( C_BaseEntity, GetCollideType )
-        PY_OVERRIDE_LOG( _entities, C_BaseEntity, GetCollideType )
+        PY_OVERRIDE_CHECK( C_BaseAnimating, GetCollideType )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, GetCollideType )
         bp::override func_GetCollideType = this->get_override( "GetCollideType" );
         if( func_GetCollideType.ptr() != Py_None )
             try {
                 return func_GetCollideType(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseEntity::GetCollideType(  );
+                return this->C_BaseAnimating::GetCollideType(  );
             }
         else
-            return this->C_BaseEntity::GetCollideType(  );
+            return this->C_BaseAnimating::GetCollideType(  );
     }
     
     ::CollideType_t default_GetCollideType(  ) {
-        return C_BaseEntity::GetCollideType( );
+        return C_BaseAnimating::GetCollideType( );
     }
 
     virtual ::IMouse * GetIMouse(  ) {
@@ -336,22 +317,22 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     }
 
     virtual void NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        PY_OVERRIDE_CHECK( C_BaseEntity, NotifyShouldTransmit )
-        PY_OVERRIDE_LOG( _entities, C_BaseEntity, NotifyShouldTransmit )
+        PY_OVERRIDE_CHECK( C_BaseAnimating, NotifyShouldTransmit )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, NotifyShouldTransmit )
         bp::override func_NotifyShouldTransmit = this->get_override( "NotifyShouldTransmit" );
         if( func_NotifyShouldTransmit.ptr() != Py_None )
             try {
                 func_NotifyShouldTransmit( state );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseEntity::NotifyShouldTransmit( state );
+                this->C_BaseAnimating::NotifyShouldTransmit( state );
             }
         else
-            this->C_BaseEntity::NotifyShouldTransmit( state );
+            this->C_BaseAnimating::NotifyShouldTransmit( state );
     }
     
     void default_NotifyShouldTransmit( ::ShouldTransmitState_t state ) {
-        C_BaseEntity::NotifyShouldTransmit( state );
+        C_BaseAnimating::NotifyShouldTransmit( state );
     }
 
     virtual void OnChangeOwnerNumber( int old_owner_number ) {
@@ -371,6 +352,25 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     
     void default_OnChangeOwnerNumber( int old_owner_number ) {
         C_BaseEntity::OnChangeOwnerNumber( old_owner_number );
+    }
+
+    virtual void OnDataChanged( ::DataUpdateType_t updateType ) {
+        PY_OVERRIDE_CHECK( C_BaseAnimating, OnDataChanged )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, OnDataChanged )
+        bp::override func_OnDataChanged = this->get_override( "OnDataChanged" );
+        if( func_OnDataChanged.ptr() != Py_None )
+            try {
+                func_OnDataChanged( updateType );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseAnimating::OnDataChanged( updateType );
+            }
+        else
+            this->C_BaseAnimating::OnDataChanged( updateType );
+    }
+    
+    void default_OnDataChanged( ::DataUpdateType_t updateType ) {
+        C_BaseAnimating::OnDataChanged( updateType );
     }
 
     virtual void OnRestore(  ) {
@@ -411,6 +411,25 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
         C_BaseEntity::Precache( );
     }
 
+    virtual void PyOnNewModel(  ) {
+        PY_OVERRIDE_CHECK( C_BaseAnimating, PyOnNewModel )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, PyOnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseAnimating::PyOnNewModel(  );
+            }
+        else
+            this->C_BaseAnimating::PyOnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        C_BaseAnimating::PyOnNewModel( );
+    }
+
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
         PY_OVERRIDE_CHECK( C_BaseEntity, PyReceiveMessage )
         PY_OVERRIDE_LOG( _entities, C_BaseEntity, PyReceiveMessage )
@@ -435,41 +454,41 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     }
 
     virtual bool ShouldDraw(  ) {
-        PY_OVERRIDE_CHECK( C_BaseParticleEntity, ShouldDraw )
-        PY_OVERRIDE_LOG( _entities, C_BaseParticleEntity, ShouldDraw )
+        PY_OVERRIDE_CHECK( C_BaseEntity, ShouldDraw )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, ShouldDraw )
         bp::override func_ShouldDraw = this->get_override( "ShouldDraw" );
         if( func_ShouldDraw.ptr() != Py_None )
             try {
                 return func_ShouldDraw(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseParticleEntity::ShouldDraw(  );
+                return this->C_BaseEntity::ShouldDraw(  );
             }
         else
-            return this->C_BaseParticleEntity::ShouldDraw(  );
+            return this->C_BaseEntity::ShouldDraw(  );
     }
     
     bool default_ShouldDraw(  ) {
-        return C_BaseParticleEntity::ShouldDraw( );
+        return C_BaseEntity::ShouldDraw( );
     }
 
     virtual bool Simulate(  ) {
-        PY_OVERRIDE_CHECK( C_BaseEntity, Simulate )
-        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Simulate )
+        PY_OVERRIDE_CHECK( C_BaseAnimating, Simulate )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, Simulate )
         bp::override func_Simulate = this->get_override( "Simulate" );
         if( func_Simulate.ptr() != Py_None )
             try {
                 return func_Simulate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->C_BaseEntity::Simulate(  );
+                return this->C_BaseAnimating::Simulate(  );
             }
         else
-            return this->C_BaseEntity::Simulate(  );
+            return this->C_BaseAnimating::Simulate(  );
     }
     
     bool default_Simulate(  ) {
-        return C_BaseEntity::Simulate( );
+        return C_BaseAnimating::Simulate( );
     }
 
     virtual void Spawn(  ) {
@@ -534,184 +553,172 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseEntity::GetClientClass();
+            return C_BaseProjectile::GetClientClass();
 #endif // _WIN32
-        PY_OVERRIDE_LOG( _entities, C_BaseEntity, GetClientClass )
+        PY_OVERRIDE_LOG( _entities, C_BaseProjectile, GetClientClass )
         ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
         if( pClientClass )
             return pClientClass;
-        return C_BaseEntity::GetClientClass();
+        return C_BaseProjectile::GetClientClass();
     }
 
-    static int m_lifeState_Get( C_SmokeTrail const & inst ) { return inst.m_lifeState; }
+    static int m_lifeState_Get( C_BaseProjectile const & inst ) { return inst.m_lifeState; }
 
-    static void m_lifeState_Set( C_SmokeTrail & inst, int val ) { inst.m_lifeState = val; }
+    static void m_lifeState_Set( C_BaseProjectile & inst, int val ) { inst.m_lifeState = val; }
 
-    static int m_takedamage_Get( C_SmokeTrail const & inst ) { return inst.m_takedamage; }
+    static int m_takedamage_Get( C_BaseProjectile const & inst ) { return inst.m_takedamage; }
 
-    static void m_takedamage_Set( C_SmokeTrail & inst, int val ) { inst.m_takedamage = val; }
+    static void m_takedamage_Set( C_BaseProjectile & inst, int val ) { inst.m_takedamage = val; }
+
+    static int m_nSkin_Get( C_BaseProjectile const & inst ) { return inst.m_nSkin; }
+
+    static void m_nSkin_Set( C_BaseProjectile & inst, int val ) { inst.m_nSkin = val; }
 
 };
 
-void register_C_SmokeTrail_class(){
+void register_C_BaseProjectile_class(){
 
-    bp::class_< C_SmokeTrail_wrapper, bp::bases< C_BaseParticleEntity >, boost::noncopyable >( "C_SmokeTrail", bp::init< >() )    
+    bp::class_< C_BaseProjectile_wrapper, bp::bases< C_BaseAnimating >, boost::noncopyable >( "C_BaseProjectile", bp::init< >() )    
         .def( 
-            "CleanupToolRecordingState"
-            , (void ( ::C_SmokeTrail::* )( ::KeyValues * ) )( &::C_SmokeTrail::CleanupToolRecordingState )
-            , ( bp::arg("msg") ) )    
+            "Destroy"
+            , (void ( ::C_BaseProjectile::* )( bool,bool ) )( &::C_BaseProjectile::Destroy )
+            , ( bp::arg("bBlinkOut")=(bool)(true), bp::arg("bBreakRocket")=(bool)(false) ) )    
         .def( 
-            "GetAimEntOrigin"
-            , (void ( ::C_SmokeTrail::* )( ::IClientEntity *,::Vector *,::QAngle * ) )( &::C_SmokeTrail::GetAimEntOrigin )
-            , ( bp::arg("pAttachedTo"), bp::arg("pAbsOrigin"), bp::arg("pAbsAngles") ) )    
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::C_BaseProjectile::GetPyNetworkType ) )    
         .def( 
-            "OnDataChanged"
-            , (void ( ::C_SmokeTrail::* )( ::DataUpdateType_t ) )(&::C_SmokeTrail::OnDataChanged)
-            , (void ( C_SmokeTrail_wrapper::* )( ::DataUpdateType_t ) )(&C_SmokeTrail_wrapper::default_OnDataChanged)
-            , ( bp::arg("updateType") ) )    
-        .def( 
-            "RenderParticles"
-            , (void ( ::C_SmokeTrail::* )( ::CParticleRenderIterator * ) )( &::C_SmokeTrail::RenderParticles )
-            , ( bp::arg("pIterator") ) )    
-        .def( 
-            "SetEmit"
-            , (void ( ::C_SmokeTrail::* )( bool ) )( &::C_SmokeTrail::SetEmit )
-            , ( bp::arg("bEmit") ) )    
-        .def( 
-            "SetSpawnRate"
-            , (void ( ::C_SmokeTrail::* )( float ) )( &::C_SmokeTrail::SetSpawnRate )
-            , ( bp::arg("rate") ) )    
-        .def( 
-            "SimulateParticles"
-            , (void ( ::C_SmokeTrail::* )( ::CParticleSimulateIterator * ) )( &::C_SmokeTrail::SimulateParticles )
-            , ( bp::arg("pIterator") ) )    
-        .def( 
-            "Start"
-            , (void ( ::C_SmokeTrail::* )( ::CParticleMgr *,::IPrototypeArgAccess * ) )( &::C_SmokeTrail::Start )
-            , ( bp::arg("pParticleMgr"), bp::arg("pArgs") ) )    
-        .def( 
-            "Update"
-            , (void ( ::C_SmokeTrail::* )( float ) )( &::C_SmokeTrail::Update )
-            , ( bp::arg("fTimeDelta") ) )    
+            "IsDestroyable"
+            , (bool ( ::C_BaseProjectile::* )(  ) )( &::C_BaseProjectile::IsDestroyable ) )    
         .def( 
             "Activate"
-            , (void ( ::C_BaseParticleEntity::* )(  ) )(&::C_BaseParticleEntity::Activate)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Activate) )    
+            , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Activate)
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_Activate) )    
         .def( 
             "AddToEntityList"
-            , (void ( C_SmokeTrail_wrapper::* )( ::entity_list_ids_t ) )(&C_SmokeTrail_wrapper::AddToEntityList)
+            , (void ( C_BaseProjectile_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseProjectile_wrapper::AddToEntityList)
             , ( bp::arg("listId") ) )    
         .def( 
             "ClientThink"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ClientThink)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_ClientThink) )    
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_ClientThink) )    
         .def( 
             "ComputeWorldSpaceSurroundingBox"
             , (void ( ::C_BaseEntity::* )( ::Vector *,::Vector * ) )(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
-            , (void ( C_SmokeTrail_wrapper::* )( ::Vector *,::Vector * ) )(&C_SmokeTrail_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , (void ( C_BaseProjectile_wrapper::* )( ::Vector *,::Vector * ) )(&C_BaseProjectile_wrapper::default_ComputeWorldSpaceSurroundingBox)
             , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
         .def( 
             "CreateVPhysics"
             , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::CreateVPhysics)
-            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_CreateVPhysics) )    
+            , (bool ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_CreateVPhysics) )    
         .def( 
             "DoImpactEffect"
             , (void ( ::C_BaseEntity::* )( ::trace_t &,int ) )(&::C_BaseEntity::DoImpactEffect)
-            , (void ( C_SmokeTrail_wrapper::* )( ::trace_t &,int ) )(&C_SmokeTrail_wrapper::default_DoImpactEffect)
+            , (void ( C_BaseProjectile_wrapper::* )( ::trace_t &,int ) )(&C_BaseProjectile_wrapper::default_DoImpactEffect)
             , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
         .def( 
             "EndTouch"
             , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::EndTouch)
-            , (void ( C_SmokeTrail_wrapper::* )( ::C_BaseEntity * ) )(&C_SmokeTrail_wrapper::default_EndTouch)
+            , (void ( C_BaseProjectile_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseProjectile_wrapper::default_EndTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "GetCollideType"
-            , (::CollideType_t ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetCollideType)
-            , (::CollideType_t ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetCollideType) )    
+            , (::CollideType_t ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::GetCollideType)
+            , (::CollideType_t ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_GetCollideType) )    
         .def( 
             "GetIMouse"
             , (::IMouse * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetIMouse)
-            , (::IMouse * ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetIMouse)
+            , (::IMouse * ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetTracerType"
             , (char const * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetTracerType)
-            , (char const * ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_GetTracerType) )    
+            , (char const * ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_GetTracerType) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,char const * ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_SmokeTrail_wrapper::* )( char const *,char const * ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , (bool ( C_BaseProjectile_wrapper::* )( char const *,char const * ) )(&C_BaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,float ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_SmokeTrail_wrapper::* )( char const *,float ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , (bool ( C_BaseProjectile_wrapper::* )( char const *,float ) )(&C_BaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,int ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_SmokeTrail_wrapper::* )( char const *,int ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , (bool ( C_BaseProjectile_wrapper::* )( char const *,int ) )(&C_BaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,::Vector const & ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_SmokeTrail_wrapper::* )( char const *,::Vector const & ) )(&C_SmokeTrail_wrapper::default_KeyValue)
+            , (bool ( C_BaseProjectile_wrapper::* )( char const *,::Vector const & ) )(&C_BaseProjectile_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
         .def( 
             "MakeTracer"
             , (void ( ::C_BaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::C_BaseEntity::MakeTracer)
-            , (void ( C_SmokeTrail_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_SmokeTrail_wrapper::default_MakeTracer)
+            , (void ( C_BaseProjectile_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_BaseProjectile_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
             "NotifyShouldTransmit"
-            , (void ( ::C_BaseEntity::* )( ::ShouldTransmitState_t ) )(&::C_BaseEntity::NotifyShouldTransmit)
-            , (void ( C_SmokeTrail_wrapper::* )( ::ShouldTransmitState_t ) )(&C_SmokeTrail_wrapper::default_NotifyShouldTransmit)
+            , (void ( ::C_BaseAnimating::* )( ::ShouldTransmitState_t ) )(&::C_BaseAnimating::NotifyShouldTransmit)
+            , (void ( C_BaseProjectile_wrapper::* )( ::ShouldTransmitState_t ) )(&C_BaseProjectile_wrapper::default_NotifyShouldTransmit)
             , ( bp::arg("state") ) )    
         .def( 
             "OnChangeOwnerNumber"
             , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
-            , (void ( C_SmokeTrail_wrapper::* )( int ) )(&C_SmokeTrail_wrapper::default_OnChangeOwnerNumber)
+            , (void ( C_BaseProjectile_wrapper::* )( int ) )(&C_BaseProjectile_wrapper::default_OnChangeOwnerNumber)
             , ( bp::arg("old_owner_number") ) )    
+        .def( 
+            "OnDataChanged"
+            , (void ( ::C_BaseAnimating::* )( ::DataUpdateType_t ) )(&::C_BaseAnimating::OnDataChanged)
+            , (void ( C_BaseProjectile_wrapper::* )( ::DataUpdateType_t ) )(&C_BaseProjectile_wrapper::default_OnDataChanged)
+            , ( bp::arg("updateType") ) )    
         .def( 
             "OnRestore"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::OnRestore)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_OnRestore) )    
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_OnRestore) )    
         .def( 
             "Precache"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Precache)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Precache) )    
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_Precache) )    
+        .def( 
+            "OnNewModel"
+            , (void ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::PyOnNewModel)
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_OnNewModel) )    
         .def( 
             "ReceiveMessage"
             , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)
-            , (void ( C_SmokeTrail_wrapper::* )( ::boost::python::list ) )(&C_SmokeTrail_wrapper::default_ReceiveMessage)
+            , (void ( C_BaseProjectile_wrapper::* )( ::boost::python::list ) )(&C_BaseProjectile_wrapper::default_ReceiveMessage)
             , ( bp::arg("msg") ) )    
         .def( 
             "RemoveFromEntityList"
-            , (void ( C_SmokeTrail_wrapper::* )( ::entity_list_ids_t ) )(&C_SmokeTrail_wrapper::RemoveFromEntityList)
+            , (void ( C_BaseProjectile_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseProjectile_wrapper::RemoveFromEntityList)
             , ( bp::arg("listId") ) )    
         .def( 
             "ShouldDraw"
-            , (bool ( ::C_BaseParticleEntity::* )(  ) )(&::C_BaseParticleEntity::ShouldDraw)
-            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_ShouldDraw) )    
+            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ShouldDraw)
+            , (bool ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_ShouldDraw) )    
         .def( 
             "Simulate"
-            , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Simulate)
-            , (bool ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Simulate) )    
+            , (bool ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::Simulate)
+            , (bool ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_Simulate) )    
         .def( 
             "Spawn"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Spawn)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_Spawn) )    
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_Spawn) )    
         .def( 
             "StartTouch"
             , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::StartTouch)
-            , (void ( C_SmokeTrail_wrapper::* )( ::C_BaseEntity * ) )(&C_SmokeTrail_wrapper::default_StartTouch)
+            , (void ( C_BaseProjectile_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseProjectile_wrapper::default_StartTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
-            , (void ( C_SmokeTrail_wrapper::* )(  ) )(&C_SmokeTrail_wrapper::default_UpdateOnRemove) )    
-        .add_property( "lifestate", &C_SmokeTrail_wrapper::m_lifeState_Get, &C_SmokeTrail_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &C_SmokeTrail_wrapper::m_takedamage_Get, &C_SmokeTrail_wrapper::m_takedamage_Set );
+            , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_UpdateOnRemove) )    
+        .staticmethod( "GetPyNetworkType" )    
+        .add_property( "lifestate", &C_BaseProjectile_wrapper::m_lifeState_Get, &C_BaseProjectile_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &C_BaseProjectile_wrapper::m_takedamage_Get, &C_BaseProjectile_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &C_BaseProjectile_wrapper::m_nSkin_Get, &C_BaseProjectile_wrapper::m_nSkin_Set );
 
 }
 

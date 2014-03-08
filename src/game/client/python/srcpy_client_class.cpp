@@ -47,6 +47,7 @@ EXTERN_RECV_TABLE( DT_BaseAnimatingOverlay );
 EXTERN_RECV_TABLE( DT_BaseFlex );
 EXTERN_RECV_TABLE( DT_BaseCombatCharacter );
 EXTERN_RECV_TABLE( DT_BasePlayer );
+EXTERN_RECV_TABLE( DT_BaseProjectile );
 EXTERN_RECV_TABLE( DT_BaseGrenade );
 EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
 EXTERN_RECV_TABLE( DT_PlayerResource );
@@ -85,6 +86,7 @@ IMPLEMENT_FALLBACK_FACTORY(C_BaseAnimatingOverlay)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseFlex)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatCharacter)
 IMPLEMENT_FALLBACK_FACTORY(C_BasePlayer)
+IMPLEMENT_FALLBACK_FACTORY(C_BaseProjectile)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseGrenade)
 IMPLEMENT_FALLBACK_FACTORY(C_Sprite)
 IMPLEMENT_FALLBACK_FACTORY(C_SmokeTrail)
@@ -124,6 +126,9 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 		break;
 	case PN_BASEPLAYER:
 		p->m_pRecvTable = &(DT_BasePlayer::g_RecvTable);
+		break;
+	case PN_BASEPROJECTILE:
+		p->m_pRecvTable = &(DT_BaseProjectile::g_RecvTable);
 		break;
 	case PN_BASEGRENADE:
 		p->m_pRecvTable = &(DT_BaseGrenade::g_RecvTable);
@@ -238,6 +243,9 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 			break;
 		case PN_BASEPLAYER:
 			pResult = CALL_FALLBACK_FACTORY( C_BasePlayer, entnum, serialNum );
+			break;
+		case PN_BASEPROJECTILE:
+			pResult = CALL_FALLBACK_FACTORY( C_BaseProjectile, entnum, serialNum );
 			break;
 		case PN_BASEGRENADE:
 			pResult = CALL_FALLBACK_FACTORY( C_BaseGrenade, entnum, serialNum );

@@ -22,6 +22,7 @@ EXTERN_SEND_TABLE( DT_BaseAnimatingOverlay );
 EXTERN_SEND_TABLE( DT_BaseFlex );
 EXTERN_SEND_TABLE( DT_BaseCombatCharacter );
 EXTERN_SEND_TABLE( DT_BasePlayer );
+EXTERN_SEND_TABLE( DT_BaseProjectile );
 EXTERN_SEND_TABLE( DT_BaseGrenade );
 EXTERN_SEND_TABLE( DT_BaseCombatWeapon );
 EXTERN_SEND_TABLE( DT_PlayerResource );
@@ -79,6 +80,9 @@ void PyServerClass::SetupServerClass( int iType )
 		break;
 	case PN_BASEPLAYER:
 		m_pTable = &(DT_BasePlayer::g_SendTable);
+		break;
+	case PN_BASEPROJECTILE:
+		m_pTable = &(DT_BaseProjectile::g_SendTable);
 		break;
 	case PN_BASEGRENADE:
 		m_pTable = &(DT_BaseGrenade::g_SendTable);

@@ -7,6 +7,7 @@
 #include "npcevent.h"
 #include "srcpy_entities.h"
 #include "bone_setup.h"
+#include "baseprojectile.h"
 #include "basegrenade_shared.h"
 #include "takedamageinfo.h"
 #include "c_ai_basenpc.h"
@@ -510,22 +511,22 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
     }
 
     virtual void Spawn(  ) {
-        PY_OVERRIDE_CHECK( C_BaseFlex, Spawn )
-        PY_OVERRIDE_LOG( _entities, C_BaseFlex, Spawn )
+        PY_OVERRIDE_CHECK( C_BaseEntity, Spawn )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Spawn )
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
             try {
                 func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseFlex::Spawn(  );
+                this->C_BaseEntity::Spawn(  );
             }
         else
-            this->C_BaseFlex::Spawn(  );
+            this->C_BaseEntity::Spawn(  );
     }
     
     void default_Spawn(  ) {
-        C_BaseFlex::Spawn( );
+        C_BaseEntity::Spawn( );
     }
 
     virtual void StartTouch( ::C_BaseEntity * pOther ) {
@@ -597,7 +598,7 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
 void register_C_BaseGrenade_class(){
 
     { //::C_BaseGrenade
-        typedef bp::class_< C_BaseGrenade_wrapper, bp::bases< C_BaseCombatCharacter >, boost::noncopyable > C_BaseGrenade_exposer_t;
+        typedef bp::class_< C_BaseGrenade_wrapper, bp::bases< C_BaseProjectile >, boost::noncopyable > C_BaseGrenade_exposer_t;
         C_BaseGrenade_exposer_t C_BaseGrenade_exposer = C_BaseGrenade_exposer_t( "C_BaseGrenade", bp::init< >() );
         bp::scope C_BaseGrenade_scope( C_BaseGrenade_exposer );
         { //::C_BaseGrenade::BloodColor
@@ -1087,14 +1088,14 @@ void register_C_BaseGrenade_class(){
                 , default_Simulate_function_type(&C_BaseGrenade_wrapper::default_Simulate) );
         
         }
-        { //::C_BaseFlex::Spawn
+        { //::C_BaseEntity::Spawn
         
-            typedef void ( ::C_BaseFlex::*Spawn_function_type )(  ) ;
+            typedef void ( ::C_BaseEntity::*Spawn_function_type )(  ) ;
             typedef void ( C_BaseGrenade_wrapper::*default_Spawn_function_type )(  ) ;
             
             C_BaseGrenade_exposer.def( 
                 "Spawn"
-                , Spawn_function_type(&::C_BaseFlex::Spawn)
+                , Spawn_function_type(&::C_BaseEntity::Spawn)
                 , default_Spawn_function_type(&C_BaseGrenade_wrapper::default_Spawn) );
         
         }

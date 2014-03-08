@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "baseprojectile.h"
+
 #if defined( CLIENT_DLL )
 
 #define CBaseGrenade C_BaseGrenade
@@ -29,12 +31,12 @@
 class CTakeDamageInfo;
 
 #if !defined( CLIENT_DLL )
-class CBaseGrenade : public CBaseCombatCharacter, public CDefaultPlayerPickupVPhysics
+class CBaseGrenade : public CBaseProjectile, public CDefaultPlayerPickupVPhysics
 #else
-class CBaseGrenade : public CBaseCombatCharacter
+class CBaseGrenade : public CBaseProjectile
 #endif
 {
-	DECLARE_CLASS( CBaseGrenade, CBaseCombatCharacter );
+	DECLARE_CLASS( CBaseGrenade, CBaseProjectile );
 public:
 
 	CBaseGrenade(void);
@@ -42,15 +44,23 @@ public:
 
 	DECLARE_PREDICTABLE();
 	DECLARE_NETWORKCLASS();
+
+
+#if !defined( CLIENT_DLL )
+	DECLARE_DATADESC();
+#endif
+
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef CLIENT_DLL
 	DECLARE_PYCLIENTCLASS( CBaseGrenade, PN_BASEGRENADE );
 #else
 	DECLARE_PYSERVERCLASS( CBaseGrenade, PN_BASEGRENADE );
 #endif // CLIENT_DLL
-
-#if !defined( CLIENT_DLL )
-	DECLARE_DATADESC();
-#endif
+// =======================================
+// END PySource Additions
+// =======================================
 
 	virtual void		Precache( void );
 
@@ -124,6 +134,7 @@ public:
 	bool				m_bHasWarnedAI;				// whether or not this grenade has issued its DANGER sound to the world sound list yet.
 	CNetworkVar( bool, m_bIsLive );					// Is this grenade live, or can it be picked up?
 	CNetworkVar( float, m_DmgRadius );				// How far do I do damage?
+	CNetworkVar( float, m_flNextAttack );
 	float				m_flDetonateTime;			// Time at which to detonate.
 	float				m_flWarnAITime;				// Time at which to warn the AI
 

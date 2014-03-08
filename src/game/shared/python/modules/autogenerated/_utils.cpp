@@ -2150,28 +2150,6 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
-    { //::UTIL_GetModuleIndex
-    
-        typedef int ( *UTIL_GetModuleIndex_function_type )( char const * );
-        
-        bp::def( 
-            "UTIL_GetModuleIndex"
-            , UTIL_GetModuleIndex_function_type( &::UTIL_GetModuleIndex )
-            , ( bp::arg("module") ) );
-    
-    }
-
-    { //::UTIL_GetModuleNameFromIndex
-    
-        typedef char const * ( *UTIL_GetModuleNameFromIndex_function_type )( int );
-        
-        bp::def( 
-            "UTIL_GetModuleNameFromIndex"
-            , UTIL_GetModuleNameFromIndex_function_type( &::UTIL_GetModuleNameFromIndex )
-            , ( bp::arg("index") ) );
-    
-    }
-
     { //::UTIL_GetMouseAim
     
         typedef ::Vector ( *UTIL_GetMouseAim_function_type )( ::C_HL2WarsPlayer *,int,int );
@@ -2525,6 +2503,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_StringToColor32
+    
+        typedef void ( *UTIL_StringToColor32_function_type )( ::color32 *,char const * );
+        
+        bp::def( 
+            "UTIL_StringToColor32"
+            , UTIL_StringToColor32_function_type( &::UTIL_StringToColor32 )
+            , ( bp::arg("color"), bp::arg("pString") ) );
+    
+    }
+
     { //::UTIL_StringToFloatArray
     
         typedef void ( *UTIL_StringToFloatArray_function_type )( float *,int,char const * );
@@ -2532,6 +2521,17 @@ BOOST_PYTHON_MODULE(_utils){
         bp::def( 
             "UTIL_StringToFloatArray"
             , UTIL_StringToFloatArray_function_type( &::UTIL_StringToFloatArray )
+            , ( bp::arg("pVector"), bp::arg("count"), bp::arg("pString") ) );
+    
+    }
+
+    { //::UTIL_StringToIntArray
+    
+        typedef void ( *UTIL_StringToIntArray_function_type )( int *,int,char const * );
+        
+        bp::def( 
+            "UTIL_StringToIntArray"
+            , UTIL_StringToIntArray_function_type( &::UTIL_StringToIntArray )
             , ( bp::arg("pVector"), bp::arg("count"), bp::arg("pString") ) );
     
     }
@@ -5269,28 +5269,6 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
-    { //::UTIL_GetModuleIndex
-    
-        typedef int ( *UTIL_GetModuleIndex_function_type )( char const * );
-        
-        bp::def( 
-            "UTIL_GetModuleIndex"
-            , UTIL_GetModuleIndex_function_type( &::UTIL_GetModuleIndex )
-            , ( bp::arg("module") ) );
-    
-    }
-
-    { //::UTIL_GetModuleNameFromIndex
-    
-        typedef char const * ( *UTIL_GetModuleNameFromIndex_function_type )( int );
-        
-        bp::def( 
-            "UTIL_GetModuleNameFromIndex"
-            , UTIL_GetModuleNameFromIndex_function_type( &::UTIL_GetModuleNameFromIndex )
-            , ( bp::arg("index") ) );
-    
-    }
-
     { //::UTIL_GetPlayerConnectionInfo
     
         typedef void ( *UTIL_GetPlayerConnectionInfo_function_type )( int,int &,int & );
@@ -6036,6 +6014,17 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
+    { //::UTIL_StringToColor32
+    
+        typedef void ( *UTIL_StringToColor32_function_type )( ::color32 *,char const * );
+        
+        bp::def( 
+            "UTIL_StringToColor32"
+            , UTIL_StringToColor32_function_type( &::UTIL_StringToColor32 )
+            , ( bp::arg("color"), bp::arg("pString") ) );
+    
+    }
+
     { //::UTIL_StringToFloatArray
     
         typedef void ( *UTIL_StringToFloatArray_function_type )( float *,int,char const * );
@@ -6043,6 +6032,17 @@ BOOST_PYTHON_MODULE(_utils){
         bp::def( 
             "UTIL_StringToFloatArray"
             , UTIL_StringToFloatArray_function_type( &::UTIL_StringToFloatArray )
+            , ( bp::arg("pVector"), bp::arg("count"), bp::arg("pString") ) );
+    
+    }
+
+    { //::UTIL_StringToIntArray
+    
+        typedef void ( *UTIL_StringToIntArray_function_type )( int *,int,char const * );
+        
+        bp::def( 
+            "UTIL_StringToIntArray"
+            , UTIL_StringToIntArray_function_type( &::UTIL_StringToIntArray )
             , ( bp::arg("pVector"), bp::arg("count"), bp::arg("pString") ) );
     
     }
