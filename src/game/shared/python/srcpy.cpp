@@ -60,8 +60,6 @@ extern "C"
 // For debugging
 ConVar g_debug_python( "g_debug_python", "0", FCVAR_REPLICATED );
 
-extern ConVar g_debug_pynetworkvar;
-
 const Color g_PythonColor( 0, 255, 0, 255 );
 
 // The thread ID in which python is initialized
@@ -582,6 +580,14 @@ void CSrcPython::PostInit()
 	HookPyNetworkVar();
 #endif // CLIENT_DLL
 
+	PostInterpreterInit();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::PostInterpreterInit( void )
+{
 	// Gamemgr manages all game packages
 	Run( "import gamemgr" );
 	gamemgr = Import("gamemgr");
@@ -623,6 +629,8 @@ bool CSrcPython::CheckVSPTInterpreter()
 	Msg("\n\n=======================================\n");
 	Msg("Running in PySource Interpreter mode...\n");
 	Msg("=======================================\n");
+
+	Msg( "Pre-modified Command: %s\n", CommandLine()->GetCmdLine() );
 
 	// "-insecure" is added at the back. Remove it, so we can just take the remainder
 	// after "-interpreter" argument.
@@ -1572,6 +1580,7 @@ CON_COMMAND_F( cl_py_restart, "Restarts the Python interpreter on the Client", F
 #endif // CLIENT_DLL
 	g_SrcPythonSystem.ShutdownInterpreter();
 	g_SrcPythonSystem.InitInterpreter();
+	g_SrcPythonSystem.PostInterpreterInit();
 }
 
 //-----------------------------------------------------------------------------
