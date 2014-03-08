@@ -262,9 +262,6 @@ public:
 	void					SysAppendPath( const char* path, bool inclsubdirs = false );
 	boost::python::object	CreateWeakRef( boost::python::object obj_ref );
 
-	int						GetModuleIndex( const char *pModule );
-	const char *			GetModuleNameFromIndex( int nModuleIndex );
-
 	void					CallSignalNoArgs( boost::python::object signal );
 	void					CallSignal( boost::python::object signal, boost::python::dict kwargs );
 

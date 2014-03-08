@@ -269,7 +269,6 @@ INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableExtraParticleFiles = NULL;
 
 #ifdef HL2WARS_DLL
-INetworkStringTable *g_pStringTablePyModules = NULL;
 INetworkStringTable *g_pStringTableGameDBNames = NULL;
 #endif // HL2WARS_DLL
 
@@ -1550,7 +1549,6 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableClientSideChoreoScenes = networkstringtable->CreateStringTable( "Scenes", MAX_CHOREO_SCENES_STRINGS, 0, 0, NSF_DICTIONARY_ENABLED );
 
 #ifdef HL2WARS_DLL
-	g_pStringTablePyModules = networkstringtable->CreateStringTable( "PyModules", MAX_CHOREO_SCENES_STRINGS );
 	g_pStringTableGameDBNames = networkstringtable->CreateStringTable( "GameDBNames", MAX_CHOREO_SCENES_STRINGS );
 #endif // HL2WARS_DLL
 
@@ -1569,9 +1567,7 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 			);
 
 #ifdef HL2WARS_DLL
-	Assert( g_pStringTablePyModules &&
-			g_pStringTableGameDBNames 
-			);
+	Assert( g_pStringTableGameDBNames );
 #endif // HL2WARS_DLL
 
 #ifdef DEFERRED_ENABLED

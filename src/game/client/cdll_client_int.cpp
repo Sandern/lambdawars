@@ -263,7 +263,6 @@ INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 
 #ifdef HL2WARS_DLL
-INetworkStringTable *g_pStringTablePyModules = NULL;
 INetworkStringTable *g_pStringTableGameDBNames = NULL;
 #endif // HL2WARS_DLL
 
@@ -1988,7 +1987,6 @@ void CHLClient::ResetStringTablePointers()
 	g_pStringTableClientSideChoreoScenes = NULL;
 
 #ifdef HL2WARS_DLL
-	g_pStringTablePyModules = NULL;
 	g_pStringTableGameDBNames = NULL;
 #endif // HL2WARS_DLL
 
@@ -2269,10 +2267,6 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 		g_pStringTableExtraParticleFiles->SetStringChangedCallback( NULL, OnPrecacheParticleFile );
 	}
 #ifdef HL2WARS_DLL
-	else if ( !Q_strcasecmp( tableName, "PyModules" ) )
-	{
-		g_pStringTablePyModules = networkstringtable->FindTable( tableName );
-	}
 	else if ( !Q_strcasecmp( tableName, "GameDBNames" ) )
 	{
 		g_pStringTableGameDBNames = networkstringtable->FindTable( tableName );

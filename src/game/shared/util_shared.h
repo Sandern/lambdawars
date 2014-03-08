@@ -479,7 +479,9 @@ bool		UTIL_IsSpaceEmpty( CBaseEntity *pMainEnt, const Vector &vMin, const Vector
 bool		UTIL_IsSpaceEmpty( CBaseEntity *pMainEnt, const Vector &vMin, const Vector &vMax, unsigned int mask, ITraceFilter *pFilter );
 
 void		UTIL_StringToVector( float *pVector, const char *pString );
+void		UTIL_StringToIntArray( int *pVector, int count, const char *pString );
 void		UTIL_StringToFloatArray( float *pVector, int count, const char *pString );
+void		UTIL_StringToColor32( color32 *color, const char *pString );
 
 CBasePlayer *UTIL_PlayerByIndex( int entindex );
 

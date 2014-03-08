@@ -24,7 +24,6 @@ extern INetworkStringTable *g_pStringTableInfoPanel;
 extern INetworkStringTable *g_pStringTableClientSideChoreoScenes;
 
 #ifdef HL2WARS_DLL
-extern INetworkStringTable *g_pStringTablePyModules;
 extern INetworkStringTable *g_pStringTableGameDBNames;
 #endif // HL2WARS_DLL
 

@@ -85,18 +85,7 @@ void UTIL_PySetModel( CBaseEntity *pEntity, const char *pModelName )
 		pAnimating->m_nForceBone = 0;
 	}
 }
-
 #endif // CLIENT_DLL
-
-int UTIL_GetModuleIndex( const char *module )
-{
-	return SrcPySystem()->GetModuleIndex(module);
-}
-
-const char *UTIL_GetModuleNameFromIndex( int index )
-{
-	return SrcPySystem()->GetModuleNameFromIndex(index);
-}
 
 boost::python::list UTIL_ListDir( const char *pPath, const char *pPathID, const char *pWildCard )
 {

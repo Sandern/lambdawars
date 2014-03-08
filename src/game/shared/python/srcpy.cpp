@@ -1280,34 +1280,6 @@ void CSrcPython::ExecuteAllScriptsInPath( const char *pPath )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Identifier between server and client
-//-----------------------------------------------------------------------------
-int CSrcPython::GetModuleIndex( const char *pModule )
-{
-	if ( pModule )
-	{
-		int nIndex = g_pStringTablePyModules->FindStringIndex( pModule );
-		if (nIndex != INVALID_STRING_INDEX ) 
-			return nIndex;
-
-		return g_pStringTablePyModules->AddString( CBaseEntity::IsServer(), pModule );
-	}
-
-	// This is the invalid string index
-	return INVALID_STRING_INDEX;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-const char * CSrcPython::GetModuleNameFromIndex( int nModuleIndex )
-{
-	if ( nModuleIndex >= 0 && nModuleIndex < g_pStringTablePyModules->GetMaxStrings() )
-		return g_pStringTablePyModules->GetString( nModuleIndex );
-	return "error";
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CSrcPython::CallSignalNoArgs( bp::object signal )

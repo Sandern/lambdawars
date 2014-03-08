@@ -41,7 +41,6 @@ extern INetworkStringTable *g_pStringTableClientSideChoreoScenes;
 #define MAX_GAMEDBNAMES_STRINGS				( 1 << MAX_GAMEDBNAMES_STRING_BITS )
 #define GAMEDBNAMES_INVALID_STRING			( MAX_GAMEDBNAMES_STRINGS - 1 )
 
-extern INetworkStringTable *g_pStringTablePyModules;
 extern INetworkStringTable *g_pStringTableGameDBNames;
 #endif // HL2WARS_DLL
 
