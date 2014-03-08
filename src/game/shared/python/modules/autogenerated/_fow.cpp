@@ -97,6 +97,10 @@ BOOST_PYTHON_MODULE(_fow){
             "DebugPrintEntities"
             , (void ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::DebugPrintEntities ) )    
         .def( 
+            "ForceTransmitUpdateEntity"
+            , (void ( ::CFogOfWarMgr::* )( ::CBaseEntity *,int ) )( &::CFogOfWarMgr::ForceTransmitUpdateEntity )
+            , ( bp::arg("pEntity"), bp::arg("owner") ) )    
+        .def( 
             "GetGridSize"
             , (int ( ::CFogOfWarMgr::* )(  ) )( &::CFogOfWarMgr::GetGridSize ) )    
         .def( 

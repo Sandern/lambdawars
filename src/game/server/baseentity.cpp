@@ -8844,26 +8844,23 @@ bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 	if( (GetFOWFlags() & FOWFLAG_NOTRANSMIT) == 0 )
 		return true;
 
-	// Entities that are not hidden should be transmitted at least once to the client
+	// Entities marked as "Unknown" are transmitted once to a player
 	// Note: this transmits the data at the point of sending, which might be undesired
-	if( (GetFOWFlags() & FOWFLAG_HIDDEN) == 0 )
+	int iPlayerIndex = pPlayer->entindex() - 1;
+	if( FogOfWarMgr()->IsEntityKnownUpdatePending( iPlayerIndex, entindex() ) )
 	{
-		int iPlayerIndex = pPlayer->entindex() - 1;
-		if( FogOfWarMgr()->IsEntityKnownUpdatePending( iPlayerIndex, entindex() ) )
-		{
-			gEntList.AddPostClientMessageEntity( this ); // Still going
-			return true;
-		}
+		gEntList.AddPostClientMessageEntity( this ); // Still going
+		return true;
+	}
 
-		if( !FogOfWarMgr()->IsEntityKnown( iPlayerIndex, entindex() ) )
-		{
-			// Shouldn't mark until I'm sure it pushed an update!
-			FogOfWarMgr()->SetEntityKnownUpdatePending( iPlayerIndex, entindex() );
-			gEntList.AddPostClientMessageEntity( this );
-			// Force update, otherwise unit updates might be delayed when in low update rate mode
-			NetworkProp()->NetworkStateForceUpdate();
-			return true;
-		}
+	if( !FogOfWarMgr()->IsEntityKnown( iPlayerIndex, entindex() ) )
+	{
+		// Shouldn't mark until I'm sure it pushed an update!
+		FogOfWarMgr()->SetEntityKnownUpdatePending( iPlayerIndex, entindex() );
+		gEntList.AddPostClientMessageEntity( this );
+		// Force update, otherwise unit updates might be delayed when in low update rate mode
+		NetworkProp()->NetworkStateForceUpdate();
+		return true;
 	}
 
 	return !m_bInFOW[pPlayer->GetOwnerNumber()];

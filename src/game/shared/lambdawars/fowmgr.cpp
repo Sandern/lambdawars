@@ -2305,6 +2305,25 @@ void CFogOfWarMgr::ResetKnownEntitiesForPlayer( int iPlayerIndex )
 		pEnt = gEntList.NextEnt( pEnt );
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Force a transmission update of an entity for an owner and allies
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::ForceTransmitUpdateEntity( CBaseEntity *pEntity, int owner )
+{
+	// Collect players and mark entity to be updated
+	for( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if( !pPlayer || !pPlayer->IsConnected() )
+			continue;
+		
+		if( g_playerrelationships[owner][pPlayer->GetOwnerNumber()] == D_LI )
+		{
+			pEntity->FOWForceUpdate( i - 1 );
+		}
+	}
+}
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------

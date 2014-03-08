@@ -34,6 +34,7 @@ class FOW(SemiSharedModuleGenerator):
         
         if self.isserver:
             cls.mem_fun('PointInFOW').include()
+            cls.mem_fun('ForceTransmitUpdateEntity').include()
         if self.isclient:
             cls.mem_fun('ResetExplored').include()
                 

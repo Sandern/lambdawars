@@ -196,6 +196,9 @@ public:
 	// This is more of a hack around a problem with full network updates
 	void				ResetKnownEntitiesForPlayer( int iPlayerIndex );
 
+	// Force a transmission update of an entity for an owner and allies
+	void				ForceTransmitUpdateEntity( CBaseEntity *pEntity, int owner );
+
 #endif // CLIENT_DLL
 
 	// Debug
