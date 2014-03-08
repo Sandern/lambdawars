@@ -1304,7 +1304,9 @@ void CSrcPython::CallSignal( bp::object signal, bp::dict kwargs )
 {
 	try 
 	{
-		srcmgr.attr("_CallSignal")( bp::object(signal.attr("send_robust")), kwargs );
+		srcmgr.attr("_CallSignal")( 
+			bp::object(signal.attr("send_robust")), kwargs 
+		);
 	} 
 	catch( bp::error_already_set & ) 
 	{

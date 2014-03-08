@@ -108,11 +108,20 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	}
 #endif // CLIENT_DLL
 
-	SrcPySystem()->Run( SrcPySystem()->Get("_PreInitGamerules", "core.gamerules.info") );
+	// Notify signals the new gamerules is about to be initialized
+	boost::python::dict kwargs;
+	kwargs["sender"] = bp::object();
+	kwargs["gamerules"] = g_pyGameRules;
+	boost::python::object signal = SrcPySystem()->Get( "preinitgamerules", "core.signals", true );
+	SrcPySystem()->CallSignal( signal, kwargs );
 
 	// Tell new rules it may initialize
 	if( g_pyGameRules.ptr() != Py_None )
 		pRules->InitGamerules();
+
+	// Notify signals the gamerules has been initialized
+	signal = SrcPySystem()->Get( "postinitgamerules", "core.signals", true );
+	SrcPySystem()->CallSignal( signal, kwargs );
 }
 
 void PyInstallGameRules( boost::python::object gamerules )
