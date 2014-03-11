@@ -459,7 +459,7 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
-	m_bInitializePingSuccessful(false)
+	m_bInitializePingSuccessful(false), m_bWasHidden(false)
 {
 	m_Name = name ? name : "UnknownCefBrowser";
 
@@ -569,6 +569,19 @@ void SrcCefBrowser::Think( void )
 		m_CefClientHandler->GetBrowser()->GetHost()->WasResized();
 
 		m_bPerformLayout = false;
+	}
+
+	// Tell CEF not to paint if panel is hidden
+	bool bFullyVisible = GetPanel()->IsFullyVisible();
+	if( bFullyVisible && m_bWasHidden )
+	{
+		WasHidden( false );
+		m_bWasHidden = false;
+	}
+	else if( !bFullyVisible && !m_bWasHidden )
+	{
+		WasHidden( true );
+		m_bWasHidden = true;
 	}
 
 	if( !m_bInitializePingSuccessful )
@@ -948,6 +961,17 @@ void SrcCefBrowser::LoadURL( const char *url )
 		return;
 
 	mainFrame->LoadURL( CefString( url ) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::WasHidden( bool hidden )
+{
+	if( !IsValid() )
+		return;
+
+	m_CefClientHandler->GetBrowser()->GetHost()->WasHidden( hidden );
 }
 
 //-----------------------------------------------------------------------------

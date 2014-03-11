@@ -512,7 +512,7 @@ CCefSystem &CEFSystem()
 }
 
 
-CON_COMMAND_F( cef_debug_markfulldirty, "", FCVAR_CHEAT )
+CON_COMMAND_F( cef_debug_markfulldirty, "Invalidates render textures of each webview", FCVAR_CHEAT )
 {
 	CUtlVector< SrcCefBrowser * > &browsers = CEFSystem().GetBrowsers();
 
@@ -529,6 +529,20 @@ CON_COMMAND_F( cef_debug_markfulldirty, "", FCVAR_CHEAT )
 			dirtyh = browsers[i]->GetOSRHandler()->GetHeight();
 
 			browsers[i]->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyw, dirtyh );
+		}
+	}
+}
+
+CON_COMMAND_F( cef_debug_printwebviews, "Shows debug information for each webview", FCVAR_CHEAT )
+{
+	CUtlVector< SrcCefBrowser * > &browsers = CEFSystem().GetBrowsers();
+
+	for( int i = browsers.Count() - 1; i >= 0; i-- )
+	{
+		if( browsers[i]->IsValid() )
+		{
+			Msg( "#%d %s:\n", browsers[i]->GetBrowser()->GetIdentifier(), browsers[i]->GetName() );
+			Msg( "\tVisible: %d, FullyVisible: %d\n", browsers[i]->GetPanel()->IsVisible(), browsers[i]->GetPanel()->IsFullyVisible() );
 		}
 	}
 }

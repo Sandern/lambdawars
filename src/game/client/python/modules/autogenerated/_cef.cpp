@@ -515,6 +515,25 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::Unfocus( );
     }
 
+    virtual void WasHidden( bool hidden ) {
+        PY_OVERRIDE_CHECK( SrcCefBrowser, WasHidden )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, WasHidden )
+        bp::override func_WasHidden = this->get_override( "WasHidden" );
+        if( func_WasHidden.ptr() != Py_None )
+            try {
+                func_WasHidden( hidden );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::WasHidden( hidden );
+            }
+        else
+            this->SrcCefBrowser::WasHidden( hidden );
+    }
+    
+    void default_WasHidden( bool hidden ) {
+        SrcCefBrowser::WasHidden( hidden );
+    }
+
 };
 
 BOOST_PYTHON_MODULE(_cef){
@@ -1117,6 +1136,18 @@ BOOST_PYTHON_MODULE(_cef){
                 "Unfocus"
                 , Unfocus_function_type(&::SrcCefBrowser::Unfocus)
                 , default_Unfocus_function_type(&SrcCefBrowser_wrapper::default_Unfocus) );
+        
+        }
+        { //::SrcCefBrowser::WasHidden
+        
+            typedef void ( ::SrcCefBrowser::*WasHidden_function_type )( bool ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_WasHidden_function_type )( bool ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "WasHidden"
+                , WasHidden_function_type(&::SrcCefBrowser::WasHidden)
+                , default_WasHidden_function_type(&SrcCefBrowser_wrapper::default_WasHidden)
+                , ( bp::arg("hidden") ) );
         
         }
     }

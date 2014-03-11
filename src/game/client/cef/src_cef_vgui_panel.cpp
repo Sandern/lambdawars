@@ -39,7 +39,8 @@ static int nexthigher( int k )
 // Purpose: 
 //-----------------------------------------------------------------------------
 SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent ) 
-	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bSizeChanged(false), m_pTextureRegen(NULL)
+	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bSizeChanged(false), 
+		m_pTextureRegen(NULL)
 {
 	// WarsSplitscreen: only one player
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );

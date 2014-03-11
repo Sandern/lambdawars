@@ -89,8 +89,9 @@ public:
 
 	virtual void LoadURL( const char *url );
 
+	virtual void WasHidden( bool hidden );
+
 	// Navigation behavior
-	// Keep in sync with RenderBrowser!
 	enum NavigationType
 	{
 		NT_DEFAULT = 0, // All navigation is allowed
@@ -153,6 +154,7 @@ private:
 	std::string m_URL;
 
 	bool m_bVisible;
+	bool m_bWasHidden;
 	bool m_bPerformLayout;
 	bool m_bPassMouseTruIfAlphaZero;
 	bool m_bUseMouseCapture;
