@@ -73,6 +73,7 @@ class Steam(SemiSharedModuleGenerator):
             'steam/steam_api.h',
             'steam/isteamfriends.h',
             'steam/isteamutils.h',
+            'steam/isteamuser.h',
             'steam/steamclientpublic.h',
             
             'srcpy_steam.h',
@@ -154,7 +155,6 @@ class Steam(SemiSharedModuleGenerator):
         cls.include()
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
-        cls.mem_fun('SteamUser').exclude()
         cls.mem_fun('SteamUserStats').exclude()
         cls.mem_fun('SteamApps').exclude()
         cls.mem_fun('SteamMatchmakingServers').exclude()
@@ -169,6 +169,7 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference() 
         cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference() 
         cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference() 
+        cls.mem_funs('SteamUser').call_policies = call_policies.return_internal_reference()
         
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_NOT_INITIALIZED\" ) = (int)QUERY_PORT_NOT_INITIALIZED;" )
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_ERROR\" ) = (int)QUERY_PORT_ERROR;" )
@@ -182,6 +183,11 @@ class Steam(SemiSharedModuleGenerator):
         mb.enum('EFriendRelationship').include()
         mb.enum('EPersonaState').include()
         mb.add_registration_code( "bp::scope().attr( \"k_cchPersonaNameMax\" ) = (int)k_cchPersonaNameMax;" )
+        
+        # User
+        cls = mb.class_('ISteamUser')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
         
         # Utils
         cls = mb.class_('ISteamUtils')

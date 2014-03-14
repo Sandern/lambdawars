@@ -10,6 +10,8 @@
 
 #include "steam/isteamutils.h"
 
+#include "steam/isteamuser.h"
+
 #include "steam/steamclientpublic.h"
 
 #include "srcpy_steam.h"
@@ -368,6 +370,10 @@ BOOST_PYTHON_MODULE(_steam){
             , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
             , bp::return_internal_reference< >() )    
         .def( 
+            "SteamUser"
+            , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
             "SteamUtils"
             , (::ISteamUtils * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUtils )
             , bp::return_internal_reference< >() );
@@ -1070,6 +1076,89 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
             , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
 
+    bp::class_< ISteamUser, boost::noncopyable >( "ISteamUser", bp::no_init )    
+        .def( 
+            "AdvertiseGame"
+            , (void ( ::ISteamUser::* )( ::CSteamID,::uint32,::uint16 ) )( &::ISteamUser::AdvertiseGame )
+            , ( bp::arg("steamIDGameServer"), bp::arg("unIPServer"), bp::arg("usPortServer") ) )    
+        .def( 
+            "BIsBehindNAT"
+            , (bool ( ::ISteamUser::* )(  ) )( &::ISteamUser::BIsBehindNAT ) )    
+        .def( 
+            "BLoggedOn"
+            , (bool ( ::ISteamUser::* )(  ) )( &::ISteamUser::BLoggedOn ) )    
+        .def( 
+            "BeginAuthSession"
+            , (::EBeginAuthSessionResult ( ::ISteamUser::* )( void const *,int,::CSteamID ) )( &::ISteamUser::BeginAuthSession )
+            , ( bp::arg("pAuthTicket"), bp::arg("cbAuthTicket"), bp::arg("steamID") ) )    
+        .def( 
+            "CancelAuthTicket"
+            , (void ( ::ISteamUser::* )( ::HAuthTicket ) )( &::ISteamUser::CancelAuthTicket )
+            , ( bp::arg("hAuthTicket") ) )    
+        .def( 
+            "DecompressVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( void const *,::uint32,void *,::uint32,::uint32 *,::uint32 ) )( &::ISteamUser::DecompressVoice )
+            , ( bp::arg("pCompressed"), bp::arg("cbCompressed"), bp::arg("pDestBuffer"), bp::arg("cbDestBufferSize"), bp::arg("nBytesWritten"), bp::arg("nDesiredSampleRate") ) )    
+        .def( 
+            "EndAuthSession"
+            , (void ( ::ISteamUser::* )( ::CSteamID ) )( &::ISteamUser::EndAuthSession )
+            , ( bp::arg("steamID") ) )    
+        .def( 
+            "GetAuthSessionTicket"
+            , (::HAuthTicket ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetAuthSessionTicket )
+            , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
+        .def( 
+            "GetAvailableVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( ::uint32 *,::uint32 *,::uint32 ) )( &::ISteamUser::GetAvailableVoice )
+            , ( bp::arg("pcbCompressed"), bp::arg("pcbUncompressed"), bp::arg("nUncompressedVoiceDesiredSampleRate") ) )    
+        .def( 
+            "GetEncryptedAppTicket"
+            , (bool ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetEncryptedAppTicket )
+            , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
+        .def( 
+            "GetHSteamUser"
+            , (::HSteamUser ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetHSteamUser ) )    
+        .def( 
+            "GetSteamID"
+            , (::CSteamID ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetSteamID ) )    
+        .def( 
+            "GetUserDataFolder"
+            , (bool ( ::ISteamUser::* )( char *,int ) )( &::ISteamUser::GetUserDataFolder )
+            , ( bp::arg("pchBuffer"), bp::arg("cubBuffer") ) )    
+        .def( 
+            "GetVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( bool,void *,::uint32,::uint32 *,bool,void *,::uint32,::uint32 *,::uint32 ) )( &::ISteamUser::GetVoice )
+            , ( bp::arg("bWantCompressed"), bp::arg("pDestBuffer"), bp::arg("cbDestBufferSize"), bp::arg("nBytesWritten"), bp::arg("bWantUncompressed"), bp::arg("pUncompressedDestBuffer"), bp::arg("cbUncompressedDestBufferSize"), bp::arg("nUncompressBytesWritten"), bp::arg("nUncompressedVoiceDesiredSampleRate") ) )    
+        .def( 
+            "GetVoiceOptimalSampleRate"
+            , (::uint32 ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetVoiceOptimalSampleRate ) )    
+        .def( 
+            "InitiateGameConnection"
+            , (int ( ::ISteamUser::* )( void *,int,::CSteamID,::uint32,::uint16,bool ) )( &::ISteamUser::InitiateGameConnection )
+            , ( bp::arg("pAuthBlob"), bp::arg("cbMaxAuthBlob"), bp::arg("steamIDGameServer"), bp::arg("unIPServer"), bp::arg("usPortServer"), bp::arg("bSecure") ) )    
+        .def( 
+            "RequestEncryptedAppTicket"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
+            , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
+        .def( 
+            "StartVoiceRecording"
+            , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
+        .def( 
+            "StopVoiceRecording"
+            , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StopVoiceRecording ) )    
+        .def( 
+            "TerminateGameConnection"
+            , (void ( ::ISteamUser::* )( ::uint32,::uint16 ) )( &::ISteamUser::TerminateGameConnection )
+            , ( bp::arg("unIPServer"), bp::arg("usPortServer") ) )    
+        .def( 
+            "TrackAppUsageEvent"
+            , (void ( ::ISteamUser::* )( ::CGameID,int,char const * ) )( &::ISteamUser::TrackAppUsageEvent )
+            , ( bp::arg("gameID"), bp::arg("eAppUsageEvent"), bp::arg("pchExtraInfo")="" ) )    
+        .def( 
+            "UserHasLicenseForApp"
+            , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
+            , ( bp::arg("steamID"), bp::arg("appID") ) );
+
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
             "BOverlayNeedsPresent"
@@ -1255,6 +1344,8 @@ BOOST_PYTHON_MODULE(_steam){
 #include "steam/isteamfriends.h"
 
 #include "steam/isteamutils.h"
+
+#include "steam/isteamuser.h"
 
 #include "steam/steamclientpublic.h"
 
@@ -1612,6 +1703,10 @@ BOOST_PYTHON_MODULE(_steam){
             , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
             , bp::return_internal_reference< >() )    
         .def( 
+            "SteamUser"
+            , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
             "SteamUtils"
             , (::ISteamUtils * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUtils )
             , bp::return_internal_reference< >() );
@@ -2313,6 +2408,89 @@ BOOST_PYTHON_MODULE(_steam){
             "SetLobbyType"
             , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
             , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
+
+    bp::class_< ISteamUser, boost::noncopyable >( "ISteamUser", bp::no_init )    
+        .def( 
+            "AdvertiseGame"
+            , (void ( ::ISteamUser::* )( ::CSteamID,::uint32,::uint16 ) )( &::ISteamUser::AdvertiseGame )
+            , ( bp::arg("steamIDGameServer"), bp::arg("unIPServer"), bp::arg("usPortServer") ) )    
+        .def( 
+            "BIsBehindNAT"
+            , (bool ( ::ISteamUser::* )(  ) )( &::ISteamUser::BIsBehindNAT ) )    
+        .def( 
+            "BLoggedOn"
+            , (bool ( ::ISteamUser::* )(  ) )( &::ISteamUser::BLoggedOn ) )    
+        .def( 
+            "BeginAuthSession"
+            , (::EBeginAuthSessionResult ( ::ISteamUser::* )( void const *,int,::CSteamID ) )( &::ISteamUser::BeginAuthSession )
+            , ( bp::arg("pAuthTicket"), bp::arg("cbAuthTicket"), bp::arg("steamID") ) )    
+        .def( 
+            "CancelAuthTicket"
+            , (void ( ::ISteamUser::* )( ::HAuthTicket ) )( &::ISteamUser::CancelAuthTicket )
+            , ( bp::arg("hAuthTicket") ) )    
+        .def( 
+            "DecompressVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( void const *,::uint32,void *,::uint32,::uint32 *,::uint32 ) )( &::ISteamUser::DecompressVoice )
+            , ( bp::arg("pCompressed"), bp::arg("cbCompressed"), bp::arg("pDestBuffer"), bp::arg("cbDestBufferSize"), bp::arg("nBytesWritten"), bp::arg("nDesiredSampleRate") ) )    
+        .def( 
+            "EndAuthSession"
+            , (void ( ::ISteamUser::* )( ::CSteamID ) )( &::ISteamUser::EndAuthSession )
+            , ( bp::arg("steamID") ) )    
+        .def( 
+            "GetAuthSessionTicket"
+            , (::HAuthTicket ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetAuthSessionTicket )
+            , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
+        .def( 
+            "GetAvailableVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( ::uint32 *,::uint32 *,::uint32 ) )( &::ISteamUser::GetAvailableVoice )
+            , ( bp::arg("pcbCompressed"), bp::arg("pcbUncompressed"), bp::arg("nUncompressedVoiceDesiredSampleRate") ) )    
+        .def( 
+            "GetEncryptedAppTicket"
+            , (bool ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetEncryptedAppTicket )
+            , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
+        .def( 
+            "GetHSteamUser"
+            , (::HSteamUser ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetHSteamUser ) )    
+        .def( 
+            "GetSteamID"
+            , (::CSteamID ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetSteamID ) )    
+        .def( 
+            "GetUserDataFolder"
+            , (bool ( ::ISteamUser::* )( char *,int ) )( &::ISteamUser::GetUserDataFolder )
+            , ( bp::arg("pchBuffer"), bp::arg("cubBuffer") ) )    
+        .def( 
+            "GetVoice"
+            , (::EVoiceResult ( ::ISteamUser::* )( bool,void *,::uint32,::uint32 *,bool,void *,::uint32,::uint32 *,::uint32 ) )( &::ISteamUser::GetVoice )
+            , ( bp::arg("bWantCompressed"), bp::arg("pDestBuffer"), bp::arg("cbDestBufferSize"), bp::arg("nBytesWritten"), bp::arg("bWantUncompressed"), bp::arg("pUncompressedDestBuffer"), bp::arg("cbUncompressedDestBufferSize"), bp::arg("nUncompressBytesWritten"), bp::arg("nUncompressedVoiceDesiredSampleRate") ) )    
+        .def( 
+            "GetVoiceOptimalSampleRate"
+            , (::uint32 ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetVoiceOptimalSampleRate ) )    
+        .def( 
+            "InitiateGameConnection"
+            , (int ( ::ISteamUser::* )( void *,int,::CSteamID,::uint32,::uint16,bool ) )( &::ISteamUser::InitiateGameConnection )
+            , ( bp::arg("pAuthBlob"), bp::arg("cbMaxAuthBlob"), bp::arg("steamIDGameServer"), bp::arg("unIPServer"), bp::arg("usPortServer"), bp::arg("bSecure") ) )    
+        .def( 
+            "RequestEncryptedAppTicket"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
+            , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
+        .def( 
+            "StartVoiceRecording"
+            , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
+        .def( 
+            "StopVoiceRecording"
+            , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StopVoiceRecording ) )    
+        .def( 
+            "TerminateGameConnection"
+            , (void ( ::ISteamUser::* )( ::uint32,::uint16 ) )( &::ISteamUser::TerminateGameConnection )
+            , ( bp::arg("unIPServer"), bp::arg("usPortServer") ) )    
+        .def( 
+            "TrackAppUsageEvent"
+            , (void ( ::ISteamUser::* )( ::CGameID,int,char const * ) )( &::ISteamUser::TrackAppUsageEvent )
+            , ( bp::arg("gameID"), bp::arg("eAppUsageEvent"), bp::arg("pchExtraInfo")="" ) )    
+        .def( 
+            "UserHasLicenseForApp"
+            , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
+            , ( bp::arg("steamID"), bp::arg("appID") ) );
 
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
