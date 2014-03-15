@@ -8,6 +8,7 @@
 #include "src_cef.h"
 #include "src_cef_browser.h"
 #include "src_cef_osrenderer.h"
+#include "src_cef_avatar_handler.h"
 #include <filesystem.h>
 
 #include <vgui/IInput.h>
@@ -93,6 +94,8 @@ private:
 
 	virtual void OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line );
 
+	virtual void OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar);
+
 private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
 
@@ -112,13 +115,9 @@ ClientApp::ClientApp()
 //-----------------------------------------------------------------------------
 void ClientApp::OnContextInitialized()
 {
-#if 0
-	char buf[MAX_PATH];
-	filesystem->RelativePathToFullPath( "bin/PepperFlash/pepflashplayer.dll", "MOD", buf, MAX_PATH );
-	V_FixSlashes( buf );
-	CefAddWebPluginPath( CefString( buf ) );
-	CefRefreshWebPlugins();
-#endif // 0
+	CefRegisterSchemeHandlerFactory( "steam", "avatarsmall", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeSmall ) );
+	CefRegisterSchemeHandlerFactory( "steam", "avatarmedium", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeMedium ) );
+	CefRegisterSchemeHandlerFactory( "steam", "avatarlarge", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeLarge ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -129,12 +128,17 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
-	//command_line->AppendSwitch( CefString( "disable-extensions" ) );
 
-	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
-	//command_line->AppendSwitch( CefString( "disable-application-cache" ) );
+	if( g_debug_cef.GetBool() )
+		DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
+}
 
-	DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
+{
+	registrar->AddCustomScheme("steam", true, false, false);
 }
 
 //-----------------------------------------------------------------------------

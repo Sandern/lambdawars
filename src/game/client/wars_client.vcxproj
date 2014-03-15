@@ -267,6 +267,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_usermessage.cpp" />
     <ClCompile Include="..\shared\python\srcpy_gamerules.cpp" />
     <ClCompile Include="..\shared\python\srcpy_te.cpp" />
+    <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="deferred\cascade_t.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_client.cpp" />
     <ClCompile Include="deferred\clight_editor.cpp" />
@@ -1474,6 +1475,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
+    <ClInclude Include="cef\src_cef_avatar_handler.h" />
     <ClInclude Include="deferred\cascade_t.h" />
     <ClInclude Include="deferred\cdeferred_manager_client.h" />
     <ClInclude Include="deferred\clight_editor.h" />
