@@ -53,6 +53,7 @@
 #endif // ENABLE_CEF
 
 extern ConVar cl_leveloverviewmarker;
+extern ConVar cl_strategic_cam_mmouse_dragmode;
 
 #if 0
 CON_COMMAND_F( spec_help, "Show spectator help screen", FCVAR_CLIENTCMD_CAN_EXECUTE)
@@ -451,7 +452,7 @@ void HL2WarsViewport::ClearSelectionBox()
 //-----------------------------------------------------------------------------
 void HL2WarsViewport::UpdateCursor()
 {
-	if( m_bMiddleMouseActive )
+	if( m_bMiddleMouseActive && cl_strategic_cam_mmouse_dragmode.GetInt() == 0 )
 	{
 		SetCursor( dc_blank );
 		return;

@@ -67,6 +67,9 @@ ConVar cl_strategic_cam_friction( "cl_strategic_cam_friction", "6.0", FCVAR_ARCH
 ConVar cl_strategic_cam_scrolltimeout( "cl_strategic_cam_scrolltimeout", "0.1", FCVAR_ARCHIVE, "The amount of time scrolling keeps going on." );
 ConVar cl_strategic_cam_scrolldelta( "cl_strategic_cam_scrolldelta", "250", FCVAR_ARCHIVE );
 
+ConVar cl_strategic_cam_mmouse_dragmode( "cl_strategic_cam_mmouse_dragmode", "1", 0 /*FCVAR_ARCHIVE*/ );
+ConVar cl_strategic_cam_mmouse_dragspeed( "cl_strategic_cam_mmouse_dragspeed", "1024", 0 /*FCVAR_ARCHIVE*/ );
+
 ConVar cl_strategic_height_tol( "cl_strategic_cam_height_tol", "48.0", FCVAR_ARCHIVE, "Height tolerance" );
 ConVar cl_strategic_height_adjustspeed( "cl_strategic_height_adjustspeed", "4000.0", FCVAR_ARCHIVE, "Speed at which the camera adjusts to the terrain height." );
 
@@ -163,6 +166,7 @@ void CHL2WarsInput::LevelInit( void )
 	m_fLastOriginZ = -1;
 	m_fScrollTimeOut = 0.0f;
 	m_bScrolling = false;
+	m_bWasMiddleMousePressed = false;
 
 	// Get minimum camera distance
 	char buf[MAX_PATH];
@@ -818,13 +822,56 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 
 	if( !pViewPort->IsSelecting() )
 	{
-		if( pViewPort->IsMiddleMouseButtonPressed() )
+		bool bMiddleMousePressed = pViewPort->IsMiddleMouseButtonPressed();
+		if( m_bWasMiddleMousePressed != bMiddleMousePressed ) 
 		{
-			cmd ->forwardmove -= cl_mouse_edgespeed.GetFloat() * m_iDeltaY;
-			cmd ->sidemove += cl_mouse_edgespeed.GetFloat() * m_iDeltaX;
+			if( bMiddleMousePressed ) 
+			{
+				m_vMiddleMouseStartPoint = pPlayer->GetMouseData().m_vWorldOnlyEndPos;
+				m_vMiddleMousePlayerStartPoint = pPlayer->GetAbsOrigin();
+				m_vMiddleMousePlayerDragSmoothed = pPlayer->GetAbsOrigin();
+				m_vMiddleMouseStartOffset = pPlayer->GetMouseData().m_vWorldOnlyEndPos - m_vMiddleMousePlayerDragSmoothed;
+			}
+			else
+			{
+				cmd->directmove = false;
+			}
+			m_bWasMiddleMousePressed = bMiddleMousePressed;
+		}
 
-			// Reset mouse to last mouse position
-			SetMousePos( m_iLastPosX, m_iLastPosY );
+		if( bMiddleMousePressed )
+		{
+			if( cl_strategic_cam_mmouse_dragmode.GetInt() == 1 )
+			{
+				const Vector& vOrigin = pPlayer->GetAbsOrigin();
+				Vector vTargetPos = pPlayer->GetMouseData().m_vWorldOnlyEndPos - m_vMiddleMouseStartOffset;
+				NDebugOverlay::Box( vOrigin, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, gpGlobals->frametime );
+				NDebugOverlay::Box( vTargetPos, -Vector(16, 16, 16), Vector(16, 16, 16), 
+					0, 255, 0, 255, gpGlobals->frametime );
+				
+				if( vTargetPos.DistToSqr( vOrigin ) > 32.0f*32.0f ) 
+				{
+					Vector vDir = (vTargetPos - m_vMiddleMousePlayerDragSmoothed);
+					float fDistance = VectorNormalize( vDir );
+					Vector vOffsetChange = vDir * Min(fDistance, gpGlobals->frametime * cl_strategic_cam_mmouse_dragspeed.GetFloat());
+					m_vMiddleMousePlayerDragSmoothed += vOffsetChange;
+					m_vMiddleMouseStartOffset += vOffsetChange;
+					cmd->vecmovetoposition = m_vMiddleMousePlayerDragSmoothed;
+					cmd->directmove = true;
+				}
+				else
+				{
+					cmd->directmove = false;
+				}
+			}
+			else
+			{
+				cmd ->forwardmove -= cl_mouse_edgespeed.GetFloat() * m_iDeltaY;
+				cmd ->sidemove += cl_mouse_edgespeed.GetFloat() * m_iDeltaX;
+
+				// Reset mouse to last mouse position
+				SetMousePos( m_iLastPosX, m_iLastPosY );
+			}
 		}
 		else if( m_bMouseRotationActive )
 		{

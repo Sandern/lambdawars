@@ -97,6 +97,13 @@ private:
 	int						m_iDeltaX;
 	int						m_iDeltaY;
 
+	// Middle mouse dragging
+	bool					m_bWasMiddleMousePressed;
+	Vector					m_vMiddleMouseStartPoint;
+	Vector					m_vMiddleMousePlayerStartPoint;
+	Vector					m_vMiddleMousePlayerDragSmoothed;
+	Vector					m_vMiddleMouseStartOffset;
+
 	// Scrolling
 	bool				m_bScrollForward;
 	float				m_fScrollTimeOut;
