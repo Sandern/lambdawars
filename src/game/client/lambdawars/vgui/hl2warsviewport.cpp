@@ -596,7 +596,11 @@ void HL2WarsViewport::OnMouseWheeled( int delta )
 	BaseClass::OnMouseWheeled(delta);
 
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-	if(!pPlayer)
+	if( !pPlayer )
+		return;
+
+	// Don't zoom while panning/dragging with middle mouse
+	if( m_bMiddleMouseActive )
 		return;
 
 	pPlayer->SetScrollTimeOut(delta < 0);

@@ -67,8 +67,8 @@ ConVar cl_strategic_cam_friction( "cl_strategic_cam_friction", "6.0", FCVAR_ARCH
 ConVar cl_strategic_cam_scrolltimeout( "cl_strategic_cam_scrolltimeout", "0.1", FCVAR_ARCHIVE, "The amount of time scrolling keeps going on." );
 ConVar cl_strategic_cam_scrolldelta( "cl_strategic_cam_scrolldelta", "250", FCVAR_ARCHIVE );
 
-ConVar cl_strategic_cam_mmouse_dragmode( "cl_strategic_cam_mmouse_dragmode", "1", 0 /*FCVAR_ARCHIVE*/ );
-ConVar cl_strategic_cam_mmouse_dragspeed( "cl_strategic_cam_mmouse_dragspeed", "1024", 0 /*FCVAR_ARCHIVE*/ );
+ConVar cl_strategic_cam_mmouse_dragmode( "cl_strategic_cam_mmouse_dragmode", "1", FCVAR_ARCHIVE );
+ConVar cl_strategic_cam_mmouse_dragspeed( "cl_strategic_cam_mmouse_dragspeed", "2048", FCVAR_ARCHIVE );
 
 ConVar cl_strategic_height_tol( "cl_strategic_cam_height_tol", "48.0", FCVAR_ARCHIVE, "Height tolerance" );
 ConVar cl_strategic_height_adjustspeed( "cl_strategic_height_adjustspeed", "4000.0", FCVAR_ARCHIVE, "Speed at which the camera adjusts to the terrain height." );
@@ -79,15 +79,6 @@ void CameraLimitsChanged( IConVar *var, const char *pOldValue, float flOldValue 
 {
 	if( cl_strategic_cam_limits_debug.GetBool() )	
 		DevMsg("Camera Limits Changed to %s\n", ((ConVar *)var)->GetString());
-
-#if 0
-	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-	if( !pPlayer )
-		return;
-
-	DevMsg("Camera Limits Changed to %s\n", ((ConVar *)var)->GetString());
-	engine->ExecuteClientCmd("player_camerasettings");
-#endif // 0
 }
 
 ConVar cl_strategic_cam_limits( "cl_strategic_cam_limits", "", FCVAR_USERINFO|FCVAR_HIDDEN, "", CameraLimitsChanged );
@@ -827,10 +818,14 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 		{
 			if( bMiddleMousePressed ) 
 			{
-				m_vMiddleMouseStartPoint = pPlayer->GetMouseData().m_vWorldOnlyEndPos;
-				m_vMiddleMousePlayerStartPoint = pPlayer->GetAbsOrigin();
-				m_vMiddleMousePlayerDragSmoothed = pPlayer->GetAbsOrigin();
-				m_vMiddleMouseStartOffset = pPlayer->GetMouseData().m_vWorldOnlyEndPos - m_vMiddleMousePlayerDragSmoothed;
+				const Vector& vOrigin = pPlayer->GetAbsOrigin();
+				Vector vDir = pPlayer->GetMouseData().m_vWorldOnlyEndPos - vOrigin;
+				float fDistance = VectorNormalize( vDir );
+				Vector vTargetMousePos = vOrigin + (-vDir * fDistance);
+
+				m_vMiddleMouseStartPoint = vTargetMousePos;
+				m_vMiddleMousePlayerStartPoint = vOrigin;
+				m_vMiddleMousePlayerDragSmoothed = vOrigin;
 			}
 			else
 			{
@@ -844,10 +839,15 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 			if( cl_strategic_cam_mmouse_dragmode.GetInt() == 1 )
 			{
 				const Vector& vOrigin = pPlayer->GetAbsOrigin();
-				Vector vTargetPos = pPlayer->GetMouseData().m_vWorldOnlyEndPos - m_vMiddleMouseStartOffset;
-				NDebugOverlay::Box( vOrigin, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, gpGlobals->frametime );
-				NDebugOverlay::Box( vTargetPos, -Vector(16, 16, 16), Vector(16, 16, 16), 
-					0, 255, 0, 255, gpGlobals->frametime );
+
+				Vector vDir = pPlayer->GetMouseData().m_vWorldOnlyEndPos - vOrigin;
+				float fDistance = VectorNormalize( vDir );
+				Vector vTargetMousePos = vOrigin + (-vDir * fDistance);
+
+				Vector vTargetPos = m_vMiddleMousePlayerStartPoint + (vTargetMousePos - m_vMiddleMouseStartPoint);
+				//NDebugOverlay::Box( vOrigin, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, gpGlobals->frametime );
+				//NDebugOverlay::Box( vTargetPos, -Vector(16, 16, 16), Vector(16, 16, 16), 
+				//	0, 255, 0, 255, gpGlobals->frametime );
 				
 				if( vTargetPos.DistToSqr( vOrigin ) > 32.0f*32.0f ) 
 				{
@@ -855,7 +855,10 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 					float fDistance = VectorNormalize( vDir );
 					Vector vOffsetChange = vDir * Min(fDistance, gpGlobals->frametime * cl_strategic_cam_mmouse_dragspeed.GetFloat());
 					m_vMiddleMousePlayerDragSmoothed += vOffsetChange;
-					m_vMiddleMouseStartOffset += vOffsetChange;
+					m_vMiddleMouseStartPoint += vOffsetChange;
+
+					CBaseFuncMapBoundary::SnapToNearestBoundary( m_vMiddleMousePlayerDragSmoothed, pPlayer->GetPlayerMins(), pPlayer->GetPlayerMaxs(), false );
+
 					cmd->vecmovetoposition = m_vMiddleMousePlayerDragSmoothed;
 					cmd->directmove = true;
 				}

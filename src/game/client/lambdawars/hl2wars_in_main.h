@@ -102,7 +102,6 @@ private:
 	Vector					m_vMiddleMouseStartPoint;
 	Vector					m_vMiddleMousePlayerStartPoint;
 	Vector					m_vMiddleMousePlayerDragSmoothed;
-	Vector					m_vMiddleMouseStartOffset;
 
 	// Scrolling
 	bool				m_bScrollForward;
