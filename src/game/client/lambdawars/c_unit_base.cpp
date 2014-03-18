@@ -142,8 +142,6 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
 
-	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
-
 	RecvPropInt		(RECVINFO( m_iMaxHealth )),
 	RecvPropInt		(RECVINFO(m_iMaxEnergy)),
 
@@ -176,6 +174,7 @@ BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
 	RecvPropInt		(RECVINFO( m_fFlags )),
+	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
 
 	RecvPropDataTable( "minimaldata", 0, 0, &REFERENCE_RECV_TABLE(DT_MinimalTable) ),
 	RecvPropDataTable( "fulldata", 0, 0, &REFERENCE_RECV_TABLE(DT_FullTable) ),

@@ -472,8 +472,6 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
 	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-
-	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
 	
 	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED ),
@@ -512,6 +510,8 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
 	// The only flag used right now is FL_ONGROUND, so just send one bit..
 	SendPropInt		(SENDINFO( m_fFlags ), 1, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
+
+	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
 
 	// Data that only gets sent to the player controlling this unit
 	SendPropDataTable( "commanderdata", 0, &REFERENCE_SEND_TABLE(DT_CommanderExclusive), SendProxy_SendCommanderDataTable ),
