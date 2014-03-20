@@ -260,17 +260,25 @@ bool UnitNavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector
 
 		if( area->GetParent() )
 		{
-			if( area->GetOwner() == NULL || area->GetParent()->GetOwner() != area->GetOwner() ) 
+			bool curAreaBlocked = area->GetParent()->IsBlocked( teamID, ignoreNavBlockers );
+			bool newAreaBlocked = area->IsBlocked( teamID, ignoreNavBlockers );
+			if( newAreaBlocked && area->GetOwner() == NULL )
 			{
-				// don't consider blocked areas
-				if( area->IsBlocked( teamID, ignoreNavBlockers ) ) 
-					continue;
+				// When moving into a blocked area, the area should be owned by something (might be goal)
+				continue;
 			}
-			else 
+			if( curAreaBlocked && newAreaBlocked )
 			{
-				// Don't consider moving from a blocked area to a non blocked area
-				if( area->GetParent()->IsBlocked( teamID, ignoreNavBlockers ) && !area->IsBlocked( teamID, ignoreNavBlockers ) )
+				// This is only allowed if both areas are owned by the same
+				if( area->GetOwner() != area->GetParent()->GetOwner() )
 					continue;
+
+			}
+			else if( curAreaBlocked && !newAreaBlocked )
+			{
+				// Don't consider area if current area is blocked a new area is not blocked
+				// This allows us to go into blocked areas, but pass them onto a route to something else
+				continue;
 			}
 		}
 
@@ -445,18 +453,25 @@ bool UnitNavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector
 			if ( newArea == area ) // self neighbor?
 				continue;
 
-			if( area->GetOwner() == NULL || area->GetOwner() != newArea->GetOwner() )
+			bool curAreaBlocked = area->IsBlocked( teamID, ignoreNavBlockers );
+			bool newAreaBlocked = newArea->IsBlocked( teamID, ignoreNavBlockers );
+			if( newAreaBlocked && newArea->GetOwner() == NULL )
 			{
-				// don't consider blocked areas
-				if( area->IsBlocked( teamID, ignoreNavBlockers ) )
-					continue;
+				// When moving into a blocked area, the area should be owned by something (might be goal)
+				continue;
 			}
-			else
+			if( curAreaBlocked && newAreaBlocked )
+			{
+				// This is only allowed if both areas are owned by the same
+				if( newArea->GetOwner() != area->GetOwner() )
+					continue;
+
+			}
+			else if( curAreaBlocked && !newAreaBlocked )
 			{
 				// Don't consider area if current area is blocked a new area is not blocked
 				// This allows us to go into blocked areas, but pass them onto a route to something else
-				if( area->IsBlocked( teamID, ignoreNavBlockers ) && !newArea->IsBlocked( teamID, ignoreNavBlockers ) )
-					continue;
+				continue;
 			}
 
 			float newCostSoFar = costFunc( newArea, area, ladder, elevator, how, length );
