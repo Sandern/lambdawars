@@ -687,6 +687,11 @@ public:
 	static CNavArea *GetCachedClosestArea();
 
 
+#ifdef HL2WARS_DLL
+	CBaseEntity *GetOwner() { return m_hOwner; }
+	void SetOwner( CBaseEntity *pOwner ) { m_hOwner = pOwner; }
+#endif // HL2WARS_DLL
+
 protected:
 	void UnblockArea( void );
 
@@ -810,6 +815,10 @@ private:
 	static uint32 s_nCurrVisTestCounter;
 
 	CUtlVector< CHandle< CFuncNavCost > > m_funcNavCostVector;	// active, overlapping cost entities
+
+#ifdef HL2WARS_DLL
+	EHANDLE m_hOwner;
+#endif // HL2WARS_DLL
 };
 
 typedef CUtlVector< CNavArea * > NavAreaVector;

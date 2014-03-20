@@ -257,6 +257,10 @@ CNavArea::CNavArea( void )
 	m_isInheritedFrom = false;
 
 	m_funcNavCostVector.RemoveAll();
+
+#ifdef HL2WARS_DLL
+	m_hOwner = NULL;
+#endif // HL2WARS_DLL
 }
 
 //--------------------------------------------------------------------------------------------------------------

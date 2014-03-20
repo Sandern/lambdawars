@@ -368,7 +368,7 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SetAreasBlocked( boost::python::list areas, bool blocked )
+void SetAreasBlocked( boost::python::list areas, bool blocked, CBaseEntity *pOwner )
 {
 #ifndef CLIENT_DLL
 	CNavArea *area;
@@ -380,10 +380,15 @@ void SetAreasBlocked( boost::python::list areas, bool blocked )
 		area = TheNavMesh->GetNavAreaByID( id );
 		if( area )
 		{
-			if( blocked )
+			if( blocked ) 
+			{
 				area->SetAttributes( area->GetAttributes()|NAV_MESH_NAV_BLOCKER );
+			}
 			else
+			{
 				area->SetAttributes( area->GetAttributes()&(~NAV_MESH_NAV_BLOCKER) );
+			}
+			area->SetOwner( pOwner );
 		}
 	}
 #endif // CLIENT_DLL

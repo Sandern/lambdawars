@@ -243,12 +243,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::SetAreasBlocked
     
-        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool );
+        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool,::C_BaseEntity * );
         
         bp::def( 
             "SetAreasBlocked"
             , SetAreasBlocked_function_type( &::SetAreasBlocked )
-            , ( bp::arg("areas"), bp::arg("blocked") ) );
+            , ( bp::arg("areas"), bp::arg("blocked"), bp::arg("pOwner")=bp::object() ) );
     
     }
 
@@ -516,12 +516,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::SetAreasBlocked
     
-        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool );
+        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool,::CBaseEntity * );
         
         bp::def( 
             "SetAreasBlocked"
             , SetAreasBlocked_function_type( &::SetAreasBlocked )
-            , ( bp::arg("areas"), bp::arg("blocked") ) );
+            , ( bp::arg("areas"), bp::arg("blocked"), bp::arg("pOwner")=bp::object() ) );
     
     }
 

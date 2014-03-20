@@ -260,12 +260,19 @@ bool UnitNavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector
 
 		if( area->GetParent() )
 		{
-			if( area->GetParent()->IsBlocked( teamID, ignoreNavBlockers ) && !area->IsBlocked( teamID, ignoreNavBlockers ) )
-				continue;
+			if( area->GetOwner() == NULL || area->GetParent()->GetOwner() != area->GetOwner() ) 
+			{
+				// don't consider blocked areas
+				if( area->IsBlocked( teamID, ignoreNavBlockers ) ) 
+					continue;
+			}
+			else 
+			{
+				// Don't consider moving from a blocked area to a non blocked area
+				if( area->GetParent()->IsBlocked( teamID, ignoreNavBlockers ) && !area->IsBlocked( teamID, ignoreNavBlockers ) )
+					continue;
+			}
 		}
-		// don't consider blocked areas
-		//if ( area->IsBlocked( teamID, ignoreNavBlockers ) )
-		//	continue;
 
 		// check if we have found the goal area or position
 		if (area == goalArea || (goalArea == NULL && goalPos && area->Contains( *goalPos )))
@@ -438,14 +445,19 @@ bool UnitNavAreaBuildPath( CNavArea *startArea, CNavArea *goalArea, const Vector
 			if ( newArea == area ) // self neighbor?
 				continue;
 
-			// Don't consider area if current area is blocked a new area is not blocked
-			// This allows us to go into blocked areas, but pass them onto a route to something else
-			if( area->IsBlocked( teamID, ignoreNavBlockers ) && !newArea->IsBlocked( teamID, ignoreNavBlockers ) )
-				continue;
-
-			// don't consider blocked areas
-			//if ( newArea->IsBlocked( teamID, ignoreNavBlockers ) )
-			//	continue;
+			if( area->GetOwner() == NULL || area->GetOwner() != newArea->GetOwner() )
+			{
+				// don't consider blocked areas
+				if( area->IsBlocked( teamID, ignoreNavBlockers ) )
+					continue;
+			}
+			else
+			{
+				// Don't consider area if current area is blocked a new area is not blocked
+				// This allows us to go into blocked areas, but pass them onto a route to something else
+				if( area->IsBlocked( teamID, ignoreNavBlockers ) && !newArea->IsBlocked( teamID, ignoreNavBlockers ) )
+					continue;
+			}
 
 			float newCostSoFar = costFunc( newArea, area, ladder, elevator, how, length );
 			
