@@ -4,7 +4,6 @@
 
 from pyplusplus import module_builder
 from pygccxml import parser
-import settings
 
 import platform
 import os

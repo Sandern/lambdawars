@@ -19,12 +19,12 @@ extern "C" __declspec(dllexport) void init_animation();
 extern "C" __declspec(dllexport) void init_entities();
 extern "C" __declspec(dllexport) void init_entitiesmisc();
 extern "C" __declspec(dllexport) void init_gameinterface();
+extern "C" __declspec(dllexport) void init_gamerules();
 extern "C" __declspec(dllexport) void init_utils();
 extern "C" __declspec(dllexport) void init_physics();
 extern "C" __declspec(dllexport) void init_sound();
 extern "C" __declspec(dllexport) void init_particles();
 extern "C" __declspec(dllexport) void initmaterials();
-extern "C" __declspec(dllexport) void init_gamerules();
 extern "C" __declspec(dllexport) void init_te();
 extern "C" __declspec(dllexport) void init_fow();
 extern "C" __declspec(dllexport) void initunit_helper();
@@ -43,12 +43,12 @@ extern "C"  void init_animation();
 extern "C"  void init_entities();
 extern "C"  void init_entitiesmisc();
 extern "C"  void init_gameinterface();
+extern "C"  void init_gamerules();
 extern "C"  void init_utils();
 extern "C"  void init_physics();
 extern "C"  void init_sound();
 extern "C"  void init_particles();
 extern "C"  void initmaterials();
-extern "C"  void init_gamerules();
 extern "C"  void init_te();
 extern "C"  void init_fow();
 extern "C"  void initunit_helper();
@@ -71,12 +71,12 @@ void AppendSharedModules()
 	APPEND_MODULE(_entities)
 	APPEND_MODULE(_entitiesmisc)
 	APPEND_MODULE(_gameinterface)
+	APPEND_MODULE(_gamerules)
 	APPEND_MODULE(_utils)
 	APPEND_MODULE(_physics)
 	APPEND_MODULE(_sound)
 	APPEND_MODULE(_particles)
 	APPEND_MODULE(materials)
-	APPEND_MODULE(_gamerules)
 	APPEND_MODULE(_te)
 	APPEND_MODULE(_fow)
 	APPEND_MODULE(unit_helper)

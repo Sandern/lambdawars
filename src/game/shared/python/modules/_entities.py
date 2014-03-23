@@ -1293,7 +1293,11 @@ class Entities(SemiSharedModuleGenerator):
         # Map boundary
         cls_name = 'C_BaseFuncMapBoundary' if self.isclient else 'CBaseFuncMapBoundary'
         cls = mb.class_(cls_name)
-        mb.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('IsWithinAnyMapBoundary').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_funs('GetNext').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        
+        mb.free_function('GetMapBoundaryList').include()
+        mb.free_function('GetMapBoundaryList').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
     
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')

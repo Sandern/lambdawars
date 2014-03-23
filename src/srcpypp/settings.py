@@ -52,13 +52,12 @@ modules = [
     ('_entities', 'Entities'),
     ('_entitiesmisc', 'EntitiesMisc'),
     ('_gameinterface', 'GameInterface'),
+    ('_gamerules', 'GameRules'),
     ('_utils', 'Utils'),
     ('_physics', 'Physics'),
     ('_sound', 'Sound'),
     ('_particles', 'Particles'),
     ('materials', 'Materials'),
-    ('_gamerules', 'GameRules'),
-    
     ('_te', 'TE'),
     ('_fow', 'FOW'),
     

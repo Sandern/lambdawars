@@ -681,6 +681,10 @@ void register_CBaseFuncMapBoundary_class(){
             , (void ( ::CBaseFuncMapBoundary::* )( ::Vector &,::Vector & ) )( &::CBaseFuncMapBoundary::GetMapBoundary )
             , ( bp::arg("mins"), bp::arg("maxs") ) )    
         .def( 
+            "GetNext"
+            , (::CBaseFuncMapBoundary * ( ::CBaseFuncMapBoundary::* )(  ) )( &::CBaseFuncMapBoundary::GetNext )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
             "GetPyNetworkType"
             , (int (*)(  ))( &::CBaseFuncMapBoundary::GetPyNetworkType ) )    
         .def( 

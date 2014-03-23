@@ -49,6 +49,7 @@ public:
 
 public:
 	CBaseFuncMapBoundary			*m_pNext;
+	CBaseFuncMapBoundary			*GetNext() { return m_pNext; } // For python
 
 private:
 	float m_fBloat;

@@ -6217,8 +6217,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::scope().attr( "g_vecAttackDir" ) = boost::ref(g_vecAttackDir);
 
-    ptr_imouse_to_py_imouse();
-
     bp::scope().attr( "SOUND_NONE" ) = (int)SOUND_NONE;
 
     bp::scope().attr( "SOUND_COMBAT" ) = (int)SOUND_COMBAT;
@@ -6318,6 +6316,8 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
     bp::scope().attr( "FL_EDICT_DIRTY_PVS_INFORMATION" ) = (int)FL_EDICT_DIRTY_PVS_INFORMATION;
 
     bp::scope().attr( "FL_FULL_EDICT_CHANGED" ) = (int)FL_FULL_EDICT_CHANGED;
+
+    ptr_imouse_to_py_imouse();
 
     bp::scope().attr("g_EventQueue") = bp::object( boost::ref( g_EventQueue ) );
 }

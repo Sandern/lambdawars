@@ -144,16 +144,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.rename('SendProxyBase') 
         cls.include()
         
-        cls = mb.class_('CPythonSendProxyOwnerOnly')
-        cls.rename('SendProxyOwnerOnly') 
-        cls.include()
-        cls.calldefs().virtuality = 'not virtual'
-        
-        cls = mb.class_('CPythonSendProxyAlliesOnly')
-        cls.rename('SendProxyAlliesOnly') 
-        cls.include()
-        cls.calldefs().virtuality = 'not virtual'
-        
         # Ugly globals
         mb.add_registration_code( "bp::scope().attr( \"g_vecAttackDir\" ) = boost::ref(g_vecAttackDir);" )
     
@@ -307,28 +297,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             mb.free_function('GetCurrentSkyCamera').include()
             mb.free_function('GetCurrentSkyCamera').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
-        # Mouse trace data (HL2Wars player)
-        cls = mb.class_('MouseTraceData_t')
-        cls.include()
-        cls.rename('MouseTraceData')
-        cls.vars('m_vStartPos').rename('startpos')
-        cls.vars('m_vEndPos').rename('endpos')
-        cls.vars('m_vNormal').rename('normal')
-        cls.vars('m_hEnt').exclude()
-        cls.mem_funs().exclude()
-        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
-        cls.mem_fun('Clear').include()
-        cls.vars('m_vWorldOnlyEndPos').rename('groundendpos')
-        cls.vars('m_vWorldOnlyNormal').rename('groundnormal')    
-        
-        cls.add_property( 'ent'
-                         , mb.class_('MouseTraceData_t').member_function( 'GetEnt' )
-                         , mb.class_('MouseTraceData_t').member_function( 'SetEnt' ) )
-                         
-        if self.isclient:
-            cls.vars('m_iX').rename('x')
-            cls.vars('m_iY').rename('y')  
-            
         # CTakeDamageInfo
         cls = mb.class_('CTakeDamageInfo')
         cls.include()
@@ -354,7 +322,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_functions('CalculateMeleeDamageForce').include()
         mb.free_functions('GuessDamageForce').include()
         
-        # //--------------------------------------------------------------------------------------------------------------------------------
         # FireBulletsInfo_t
         cls = mb.class_('FireBulletsInfo_t')
         cls.include()
@@ -378,7 +345,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.include()
         
         if self.isserver:
-            # //--------------------------------------------------------------------------------------------------------------------------------
             # Bone follower
             cls = mb.class_('pyphysfollower_t')
             cls.include()
@@ -390,8 +356,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             
             mb.free_function('GetAttachmentPositionInSpaceOfBone').include()
             
-            # //--------------------------------------------------------------------------------------------------------------------------------
-            # Ragdoll stuff
+            # Ragdoll functions
             mb.free_function('CreateServerRagdoll').include()
             mb.free_function('CreateServerRagdoll').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
 
@@ -401,15 +366,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
                 mb.free_function('PyCreateServerRagdollAttached').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
             mb.free_function('DetachAttachedRagdoll').include()
             mb.free_function('DetachAttachedRagdollsForEntity').include()
-            
-        # //--------------------------------------------------------------------------------------------------------------------------------
-        # IMouse 
-        mb.class_('IMouse').include()
-        mb.class_('IMouse').rename('IMouseDoNotUse')
-        mb.class_('IMouse').mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        mb.class_('PyMouse').include()
-        mb.class_('PyMouse').rename('IMouse')
-        mb.add_registration_code( "ptr_imouse_to_py_imouse();" )
         
         # Shared Props
         mb.class_('breakablepropparams_t').include()
@@ -424,7 +380,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.enums('SolidType_t').include()
         mb.enums('SolidFlags_t').include()
         mb.enums('Collision_Group_t').include()
-        mb.enums('WarsCollision_Group_t').include()
         mb.enums('RenderMode_t').include()
         mb.enums('RenderFx_t').include()
         
@@ -517,7 +472,51 @@ class EntitiesMisc(SemiSharedModuleGenerator):
             mb.add_registration_code( "bp::scope().attr( \"FL_EDICT_PENDING_DORMANT_CHECK\" ) = (int)FL_EDICT_PENDING_DORMANT_CHECK;" )
             mb.add_registration_code( "bp::scope().attr( \"FL_EDICT_DIRTY_PVS_INFORMATION\" ) = (int)FL_EDICT_DIRTY_PVS_INFORMATION;" )
             mb.add_registration_code( "bp::scope().attr( \"FL_FULL_EDICT_CHANGED\" ) = (int)FL_FULL_EDICT_CHANGED;" )
-                    
+    
+    def ParseWars(self, mb):
+        if self.isserver:
+            # Send proxies
+            cls = mb.class_('CPythonSendProxyOwnerOnly')
+            cls.rename('SendProxyOwnerOnly') 
+            cls.include()
+            cls.calldefs().virtuality = 'not virtual'
+            
+            cls = mb.class_('CPythonSendProxyAlliesOnly')
+            cls.rename('SendProxyAlliesOnly') 
+            cls.include()
+            cls.calldefs().virtuality = 'not virtual'
+        
+        # Enums
+        mb.enums('WarsCollision_Group_t').include()
+    
+        # Mouse trace data (HL2Wars player)
+        cls = mb.class_('MouseTraceData_t')
+        cls.include()
+        cls.rename('MouseTraceData')
+        cls.vars('m_vStartPos').rename('startpos')
+        cls.vars('m_vEndPos').rename('endpos')
+        cls.vars('m_vNormal').rename('normal')
+        cls.vars('m_hEnt').exclude()
+        cls.mem_funs().exclude()
+        cls.mem_funs('GetEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_fun('Clear').include()
+        cls.vars('m_vWorldOnlyEndPos').rename('groundendpos')
+        cls.vars('m_vWorldOnlyNormal').rename('groundnormal')    
+        
+        self.SetupProperty(cls, 'ent', 'GetEnt', 'SetEnt')
+                         
+        if self.isclient:
+            cls.vars('m_iX').rename('x')
+            cls.vars('m_iY').rename('y')  
+            
+        # IMouse 
+        mb.class_('IMouse').include()
+        mb.class_('IMouse').rename('IMouseDoNotUse')
+        mb.class_('IMouse').mem_funs('GetIMouse').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        mb.class_('PyMouse').include()
+        mb.class_('PyMouse').rename('IMouse')
+        mb.add_registration_code( "ptr_imouse_to_py_imouse();" )
+    
     def Parse(self, mb):
         # Exclude everything by default
         mb.decls().exclude()        
@@ -527,6 +526,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         else:
             self.ParseServerEntityRelated(mb)
         self.ParseMisc(mb)
+        self.ParseWars(mb)
         
         # Finally apply common rules to all includes functions and classes, etc.
         self.ApplyCommonRules(mb)

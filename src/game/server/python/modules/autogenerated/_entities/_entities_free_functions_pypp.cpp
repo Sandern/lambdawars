@@ -91,6 +91,17 @@ void _entities_register_free_functions(){
     
     }
 
+    { //::GetMapBoundaryList
+    
+        typedef ::CBaseFuncMapBoundary * ( *GetMapBoundaryList_function_type )(  );
+        
+        bp::def( 
+            "GetMapBoundaryList"
+            , GetMapBoundaryList_function_type( &::GetMapBoundaryList )
+            , bp::return_value_policy< bp::return_by_value >() );
+    
+    }
+
     { //::GetPlayerRelationShip
     
         typedef ::Disposition_t ( *GetPlayerRelationShip_function_type )( int,int );
