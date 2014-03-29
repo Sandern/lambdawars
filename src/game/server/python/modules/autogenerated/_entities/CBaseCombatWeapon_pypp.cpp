@@ -14,18 +14,18 @@
 #include "modelentities.h"
 #include "basetoggle.h"
 #include "triggers.h"
-#include "nav_area.h"
 #include "AI_Criteria.h"
 #include "saverestore.h"
 #include "vcollide_parse.h"
 #include "iservervehicle.h"
 #include "gib.h"
 #include "spark.h"
-#include "physics_prop_ragdoll.h"
 #include "filters.h"
 #include "EntityFlame.h"
 #include "player_resource.h"
 #include "props.h"
+#include "physics_prop_ragdoll.h"
+#include "nav_area.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"
 #include "smoke_trail.h"
@@ -1037,6 +1037,10 @@ void register_CBaseCombatWeapon_class(){
         .def( 
             "GetSubType"
             , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetSubType ) )    
+        .def( 
+            "GetViewModel"
+            , (char const * ( ::CBaseCombatWeapon::* )( int ) const)( &::CBaseCombatWeapon::GetViewModel )
+            , ( bp::arg("viewmodelindex")=(int)(0) ) )    
         .def( 
             "GetViewModelSequenceDuration"
             , (float ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetViewModelSequenceDuration ) )    

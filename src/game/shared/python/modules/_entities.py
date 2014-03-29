@@ -1,4 +1,3 @@
-# Module still needs a lot of cleaning up
 from srcpy.module_generators import SemiSharedModuleGenerator
 from srcpy.matchers import calldef_withtypes
 
@@ -145,68 +144,69 @@ class Entities(SemiSharedModuleGenerator):
     module_name = '_entities'
     split = True
     
-    # Includes
-    files = [
-        'cbase.h',
-        'npcevent.h',
-        'srcpy_entities.h',
-        'bone_setup.h',
-        'baseprojectile.h',
-        'basegrenade_shared.h',
-        '$takedamageinfo.h',
-        '$c_ai_basenpc.h',
-        '#SkyCamera.h',
-        '#ai_basenpc.h',
-        '#modelentities.h',
-        '$c_basetoggle.h',
-        '#basetoggle.h',
-        '$c_triggers.h',
-        '#triggers.h',
-        '$soundinfo.h',
-        '#nav_area.h',
-        '#AI_Criteria.h',
-        'saverestore.h',
-        'vcollide_parse.h', # solid_t
-        '#iservervehicle.h',
-        '$iclientvehicle.h',
-        '%choreoscene.h',
-        '%choreoactor.h',
-        '$steam/steamclientpublic.h', # CSteamID
-        '$view_shared.h', # CViewSetup
-        '#gib.h',
-        '#spark.h',
-        '#physics_prop_ragdoll.h',
-        '#filters.h',
-        '#EntityFlame.h',
-        '$c_playerresource.h',
-        '#player_resource.h',
-        '#props.h',
-        
-        # For parsing only (used to exclude functions based on return value)
-        '$%baseviewmodel_shared.h',
-        '#%team.h',
-        '$%c_team.h',
-        '%mapentities_shared.h',
-        '%ai_responsesystem.h',
-        
-        # Effects. Would be nice to remove these since they can be achieved using the particle system.
-        'Sprite.h',
-        'SpriteTrail.h',
-        '$c_smoke_trail.h',
-        '#smoke_trail.h',
-        'beam_shared.h',
-        
-        # HL2Wars
-        '$c_hl2wars_player.h',
-        '#hl2wars_player.h',
-        'unit_base_shared.h',
-        'wars_func_unit.h',
-        'hl2wars_player_shared.h',
-        'wars_mapboundary.h',
-        'srcpy_util.h', # for PyRay_t
-        '$c_wars_weapon.h',
-        '#wars_weapon.h',
-    ]
+    @property
+    def files(self):
+        return filter(None, [
+            'cbase.h',
+            'npcevent.h',
+            'srcpy_entities.h',
+            'bone_setup.h',
+            'baseprojectile.h',
+            'basegrenade_shared.h',
+            '$takedamageinfo.h',
+            '$c_ai_basenpc.h',
+            '#SkyCamera.h',
+            '#ai_basenpc.h',
+            '#modelentities.h',
+            '$c_basetoggle.h' if self.settings.branch == 'swarm' else '',
+            '#basetoggle.h',
+            '$c_triggers.h' if self.settings.branch == 'swarm' else '',
+            '#triggers.h',
+            '$soundinfo.h',
+            '#AI_Criteria.h',
+            'saverestore.h',
+            'vcollide_parse.h', # solid_t
+            '#iservervehicle.h',
+            '$iclientvehicle.h',
+            '%choreoscene.h',
+            '%choreoactor.h',
+            '$steam/steamclientpublic.h', # CSteamID
+            '$view_shared.h', # CViewSetup
+            '#gib.h',
+            '#spark.h',
+            '#filters.h',
+            '#EntityFlame.h',
+            '$c_playerresource.h',
+            '#player_resource.h',
+            '#props.h',
+            '#physics_prop_ragdoll.h',
+            'nav_area.h',
+            
+            # For parsing only (used to exclude functions based on return value)
+            '$%baseviewmodel_shared.h',
+            '#%team.h',
+            '$%c_team.h',
+            '%mapentities_shared.h',
+            '%ai_responsesystem.h' if self.settings.branch == 'swarm' else '%#ai_responsesystem.h',
+            
+            # Effects. Would be nice to remove these since they can be achieved using the particle system.
+            'Sprite.h',
+            'SpriteTrail.h',
+            '$c_smoke_trail.h',
+            '#smoke_trail.h',
+            'beam_shared.h',
+            
+            # Lambda Wars
+            '$c_hl2wars_player.h',
+            '#hl2wars_player.h',
+            'unit_base_shared.h',
+            'wars_func_unit.h',
+            'hl2wars_player_shared.h',
+            'wars_mapboundary.h',
+            'srcpy_util.h', # for PyRay_t
+            '$c_wars_weapon.h',
+            '#wars_weapon.h',
+        ])
         
     # List of entity classes want to have exposed
     cliententities = [ 
@@ -383,6 +383,8 @@ class Entities(SemiSharedModuleGenerator):
             reference_t(declarated_t(bf_read)),
             reference_t(const_t(declarated_t(ray))),
             pointer_t(declarated_t(mb.class_('ICollideable'))),
+            pointer_t(declarated_t(mb.class_('CNavArea'))),
+            pointer_t(const_t(declarated_t(mb.class_('CNavArea')))),
         ]
         if self.settings.branch == 'swarm':
             # In source2013, this only exists on the server
@@ -830,18 +832,20 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('PyOnNewModel').include()
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
-            mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
+            if self.settings.branch == 'swarm':
+                mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
             
-            # excludes
-            mb.mem_funs('GetPoseParameterArray').exclude()
-            mb.mem_funs('GetEncodedControllerArray').exclude()
+            # Server excludes
+            cls.mem_fun('GetEncodedControllerArray').exclude()
+            cls.mem_fun('GetPoseParameterArray').exclude()
 
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetBoneCache').exclude()
                 mb.mem_funs('InputIgniteNumHitboxFires').exclude()
                 mb.mem_funs('InputIgniteHitboxFireScale').exclude()
-                excludetypes = [pointer_t(const_t(declarated_t(char_t())))]
-                mb.calldefs(name='GetBonePosition', function=calldef_withtypes(excludetypes)).exclude()
+                
+            excludetypes = [pointer_t(const_t(declarated_t(char_t())))]
+            mb.calldefs(name='GetBonePosition', function=calldef_withtypes(excludetypes)).exclude()
         
             # Rename vars
             self.IncludeVarAndRename('m_OnIgnite', 'onignite')
@@ -873,7 +877,9 @@ class Entities(SemiSharedModuleGenerator):
         if self.isserver:
             mb.mem_funs('FlexSettingLessFunc').exclude()
             cls.class_('FS_LocalToGlobal_t').exclude()
-            excludetypes = [pointer_t(declarated_t(mb.typedef('AI_Response')))]
+            
+            cls_ai_response = mb.typedef('AI_Response') if self.settings.branch == 'swarm' else mb.class_('AI_Response')
+            excludetypes = [pointer_t(declarated_t(cls_ai_response))]
             mb.calldefs(function=calldef_withtypes(excludetypes)).exclude()
             if self.settings.branch == 'swarm':
                 mb.mem_funs('ScriptGetOldestScene').exclude()
@@ -961,32 +967,18 @@ class Entities(SemiSharedModuleGenerator):
         
         self.IncludeVarAndRename('m_HackedGunPos', 'hackedgunpos')
         
-        mb.mem_funs('GetLastKnownArea').exclude()
-        mb.mem_funs('IsAreaTraversable').exclude()
-        mb.mem_funs('ClearLastKnownArea').exclude()
-        mb.mem_funs('UpdateLastKnownArea').exclude()
-        mb.mem_funs('OnNavAreaChanged').exclude()
-        mb.mem_funs('OnNavAreaRemoved').exclude()
-        
-        if self.isclient:
-            self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon')
-                             
-            # LIST OF CLIENT FUNCTIONS TO OVERRIDE
-            mb.mem_funs('OnActiveWeaponChanged').virtuality = 'virtual'
-        else:
+        if self.isserver:
             cls.member_function('SetActiveWeapon').exclude()
             self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon', 'SetActiveWeapon')
         
-            # Exclude
-            mb.mem_funs('RemoveWeapon').exclude() # Declaration only
-            mb.mem_funs('CauseDeath').exclude()
-            #mb.mem_funs('FInViewCone').exclude()
-            mb.mem_funs('OnPursuedBy').exclude()
-
+            # Server excludes
+            cls.mem_fun('RemoveWeapon').exclude() # No definition
+            cls.mem_fun('CauseDeath').exclude() # No definition
+            cls.mem_fun('OnPursuedBy').exclude() # No INextBot definition
             if self.settings.branch == 'swarm':
-                mb.mem_funs('GetEntitiesInFaction').exclude()
-            mb.mem_funs('GetFogTrigger').exclude()
-            mb.mem_funs('PlayFootstepSound').exclude()
+                cls.mem_fun('GetEntitiesInFaction').exclude()
+                cls.mem_fun('GetFogTrigger').exclude()
+                cls.mem_fun('PlayFootstepSound').exclude()
             
             mb.free_function('RadiusDamage').include()
 
@@ -998,6 +990,27 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('Weapon_Switch').virtuality = 'virtual'
             mb.mem_funs('Weapon_Drop').virtuality = 'virtual'
             mb.mem_funs('Event_KilledOther').virtuality = 'virtual'
+        else:
+            if self.settings.branch == 'source2013':
+                # When GLOWS_ENABLE define is added:
+                if 'GLOWS_ENABLE' in self.symbols:
+                    mb.mem_funs('GetGlowObject', allow_empty=True).exclude()
+                    mb.mem_funs('GetGlowEffectColor', allow_empty=True).add_transformation( FT.output('r'), FT.output('g'), FT.output('b'))
+            
+            self.SetupProperty(cls, 'activeweapon', 'GetActiveWeapon')
+                             
+            # LIST OF CLIENT FUNCTIONS TO OVERRIDE
+            mb.mem_funs('OnActiveWeaponChanged').virtuality = 'virtual'
+            
+    def ParseBaseGrenade(self, mb):
+        cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
+        cls = mb.class_(cls_name)
+        
+        self.SetupProperty(cls, 'damage', 'GetDamage', 'SetDamage')
+        self.SetupProperty(cls, 'damageradius', 'GetDamageRadius', 'SetDamageRadius')
+        
+        # Overrides
+        cls.mem_funs('Explode').virtuality = 'virtual'
             
     def ParseBasePlayer(self, mb):
         cls = mb.class_('C_BasePlayer') if self.isclient else mb.class_('CBasePlayer')
@@ -1033,23 +1046,20 @@ class Entities(SemiSharedModuleGenerator):
 
             mb.mem_funs('CalcView').add_transformation(FT.output('zNear'), FT.output('zFar'), FT.output('fov'))
         else:
-            # NO DECLARATION
-            mb.mem_funs('SetWeaponAnimType').exclude()
-            mb.mem_funs('SetTargetInfo').exclude()
-            mb.mem_funs('SendAmmoUpdate').exclude()
-            mb.mem_funs('DeathMessage').exclude()
-            
-            # Excludes
-            mb.mem_funs('GetPlayerInfo').exclude()
-            mb.mem_funs('GetBotController').exclude()
-            mb.mem_funs('GetViewModel').exclude()
-            mb.mem_funs('PlayerData').exclude()
-            mb.mem_funs('GetLastKnownArea').exclude()
-            mb.mem_funs('GetPhysicsController').exclude()
-            mb.mem_funs('GetGroundVPhysics').exclude()
-            mb.mem_funs('GetExpresser').exclude()
-            mb.mem_funs('GetAudioParams').exclude()
-            mb.mem_funs('SetupVPhysicsShadow').exclude()
+            # Server excludes
+            cls.mem_fun('GetExpresser').exclude()
+            cls.mem_fun('GetBotController').exclude()
+            cls.mem_fun('GetPlayerInfo').exclude()
+            cls.mem_fun('GetPhysicsController').exclude()
+            cls.mem_fun('PlayerData').exclude()
+            cls.mem_fun('GetAudioParams').exclude()
+            cls.mem_fun('SetWeaponAnimType').exclude() # No definition
+            cls.mem_fun('SetTargetInfo').exclude() # No definition
+            cls.mem_fun('SendAmmoUpdate').exclude() # No definition
+            cls.mem_fun('DeathMessage').exclude() # No definition
+            cls.mem_fun('GetViewModel').exclude()
+            cls.mem_fun('GetGroundVPhysics').exclude()
+            cls.mem_fun('SetupVPhysicsShadow').exclude() # Requires CPhysCollide, would need manually wrapping
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('ActivePlayerCombatCharacter').exclude()
@@ -1070,15 +1080,16 @@ class Entities(SemiSharedModuleGenerator):
         cls = mb.class_(cls_name)
         cls.no_init = False
         
-        if self.isserver:
-            cls.mem_funs('GetTouchingEntities').exclude()
-            cls.mem_funs('GetClientSidePredicted').exclude() 
-            cls.mem_funs('SetClientSidePredicted').exclude() 
-            cls.add_property( 'clientsidepredicted'
-                             , cls.mem_fun('GetClientSidePredicted')
-                             , cls.mem_fun('SetClientSidePredicted') )
-        else:
-            self.IncludeVarAndRename('m_bClientSidePredicted', 'clientsidepredicted')
+        if self.settings.branch == 'swarm':
+            if self.isserver:
+                cls.mem_funs('GetTouchingEntities').exclude()
+                cls.mem_funs('GetClientSidePredicted').exclude() 
+                cls.mem_funs('SetClientSidePredicted').exclude() 
+                cls.add_property( 'clientsidepredicted'
+                                 , cls.mem_fun('GetClientSidePredicted')
+                                 , cls.mem_fun('SetClientSidePredicted') )
+            else:
+                self.IncludeVarAndRename('m_bClientSidePredicted', 'clientsidepredicted')
 
         # CTriggerMultiple
         if self.isserver:
@@ -1110,20 +1121,32 @@ class Entities(SemiSharedModuleGenerator):
             cls = mb.class_('CPhysicsProp')
                 
             cls = mb.class_('CRagdollProp')
-            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        
+            cls.mem_funs('GetRagdoll').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            
+            # Props
+            mb.free_functions('PropBreakablePrecacheAll').include()
+            
+    def ParseFuncBrush(self, mb):
+        if self.isserver:
+            # CFuncBrush  
+            mb.class_('CFuncBrush').vars('m_iSolidity').rename('solidity')
+            mb.class_('CFuncBrush').vars('m_iDisabled').rename('disabled')
+            mb.class_('CFuncBrush').vars('m_bSolidBsp').rename('solidbsp')
+            mb.class_('CFuncBrush').vars('m_iszExcludedClass').rename('excludedclass')
+            mb.class_('CFuncBrush').vars('m_bInvertExclusion').rename('invertexclusion')
 
+            mb.add_registration_code( "bp::scope().attr( \"SF_WALL_START_OFF\" ) = (int)SF_WALL_START_OFF;" )
+            mb.add_registration_code( "bp::scope().attr( \"SF_IGNORE_PLAYERUSE\" ) = (int)SF_IGNORE_PLAYERUSE;" )
+            
+    def ParseFilters(self, mb):
+        if self.isserver:
+            # Base filter
+            cls = mb.class_('CBaseFilter')
+            cls.no_init = False
+            cls.mem_funs('PassesFilterImpl').virtuality = 'virtual' 
+            cls.mem_funs('PassesDamageFilterImpl').virtuality = 'virtual' 
+        
     def ParseRemainingEntities(self, mb):
-        # CBaseGrenade
-        cls_name = 'C_BaseGrenade' if self.isclient else 'CBaseGrenade'
-        cls = mb.class_(cls_name)
-        
-        self.SetupProperty(cls, 'damage', 'GetDamage', 'SetDamage')
-        self.SetupProperty(cls, 'damageradius', 'GetDamageRadius', 'SetDamageRadius')
-        
-        # Overrides
-        cls.mem_funs('Explode').virtuality = 'virtual'
-
         if self.isserver:
             # Not sure where to put this
             mb.free_function('DoSpark').include()
@@ -1135,7 +1158,13 @@ class Entities(SemiSharedModuleGenerator):
             # CGib
             mb.free_functions('CreateRagGib').include()
             mb.enum('GibType_e').include()
+        else:
+            # C_PlayerResource
+            mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
+            mb.add_registration_code( 'bp::def( "PlayerResource", wrap_PlayerResource, bp::return_value_policy< bp::return_by_value >() );' )   
             
+    def ParseEffects(self, mb):
+        if self.isserver:
             # CSprite
             mb.free_functions('SpawnBlood').include()
 
@@ -1230,35 +1259,10 @@ class Entities(SemiSharedModuleGenerator):
             cls.add_wrapper_code('Vector GetStartColor() { return m_StartColor.Get(); }')
             cls.add_wrapper_code('void SetStartColor(Vector &startcolor) { m_StartColor = startcolor; }')
             
-            # Props
-            mb.free_functions('PropBreakablePrecacheAll').include()
-          
-            # CFuncBrush  
-            mb.class_('CFuncBrush').vars('m_iSolidity').rename('solidity')
-            mb.class_('CFuncBrush').vars('m_iDisabled').rename('disabled')
-            mb.class_('CFuncBrush').vars('m_bSolidBsp').rename('solidbsp')
-            mb.class_('CFuncBrush').vars('m_iszExcludedClass').rename('excludedclass')
-            mb.class_('CFuncBrush').vars('m_bInvertExclusion').rename('invertexclusion')
-
-            mb.add_registration_code( "bp::scope().attr( \"SF_WALL_START_OFF\" ) = (int)SF_WALL_START_OFF;" )
-            mb.add_registration_code( "bp::scope().attr( \"SF_IGNORE_PLAYERUSE\" ) = (int)SF_IGNORE_PLAYERUSE;" )
-            
-            # Base filter
-            cls = mb.class_('CBaseFilter')
-            cls.no_init = False
-            cls.mem_funs('PassesFilterImpl').virtuality = 'virtual' 
-            cls.mem_funs('PassesDamageFilterImpl').virtuality = 'virtual' 
-            
-            # CEntityFlame
-            cls = mb.class_('CEntityFlame')
         else:
-            # C_PlayerResource
-            mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
-            mb.add_registration_code( 'bp::def( "PlayerResource", wrap_PlayerResource, bp::return_value_policy< bp::return_by_value >() );' )   
-           
             # C_Sprite
             mb.mem_funs('GlowBlend').exclude()
-
+            
     # Wars Entity Parsing
     def ParseWars(self, mb):
         ''' Parsing wars additions for base entity classes. '''
@@ -1529,10 +1533,14 @@ class Entities(SemiSharedModuleGenerator):
         self.ParseBaseFlex(mb)
         self.ParseBaseCombatWeapon(mb)
         self.ParseBaseCombatCharacter(mb)
+        self.ParseBaseGrenade(mb)
         self.ParseBasePlayer(mb)
         self.ParseTriggers(mb)
         self.ParseProps(mb)
+        self.ParseFuncBrush(mb)
+        self.ParseFilters(mb)
         self.ParseRemainingEntities(mb)
+        self.ParseEffects(mb)
         
         self.ParseWars(mb)
         self.ParseHL2WarsPlayer(mb)

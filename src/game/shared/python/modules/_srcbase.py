@@ -77,7 +77,7 @@ class SrcBase(SharedModuleGenerator):
         mb.mem_funs('GetNextTrueSubKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         mb.mem_funs('GetFirstValue').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         mb.mem_funs('CreateKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetNextValue').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        mb.mem_funs('GetNextValue').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
         if self.settings.branch == 'swarm':
             mb.mem_funs('FromString').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         

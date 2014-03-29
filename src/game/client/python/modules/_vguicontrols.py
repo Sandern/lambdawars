@@ -298,18 +298,17 @@ class VGUIControls(ClientModuleGenerator):
         cls.calldefs('GetColor', calldef_withtypes([reference_t(declarated_t(int_t()))])).add_transformation(FT.output('r'), FT.output('g'), FT.output('b'), FT.output('a'))
         cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
         
-        if self.settings.branch == 'swarm':
-            # CAvatarImage
-            cls = mb.class_('CAvatarImage')
-            cls.include()
-            cls.calldefs().virtuality = 'not virtual' 
-            cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
-            cls.rename('AvatarImage')
-            cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
-            cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
-            cls.mem_funs( 'InitFromRGBA' ).exclude()
+        # CAvatarImage
+        cls = mb.class_('CAvatarImage')
+        cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
+        cls.mem_funs( matchers.access_type_matcher_t( 'protected' ) ).exclude()
+        cls.rename('AvatarImage')
+        cls.mem_funs( 'GetSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
+        cls.mem_funs( 'GetContentSize' ).add_transformation( FT.output('wide'), FT.output('tall') )
+        cls.mem_funs( 'InitFromRGBA' ).exclude()
         
-            mb.enum('EAvatarSize').include()
+        mb.enum('EAvatarSize').include()
     
     def ParsePanelHandles(self, mb):
         # Base handle for Panels

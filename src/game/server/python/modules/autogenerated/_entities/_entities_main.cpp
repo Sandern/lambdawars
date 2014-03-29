@@ -29,8 +29,6 @@
 
 #include "triggers.h"
 
-#include "nav_area.h"
-
 #include "AI_Criteria.h"
 
 #include "saverestore.h"
@@ -43,8 +41,6 @@
 
 #include "spark.h"
 
-#include "physics_prop_ragdoll.h"
-
 #include "filters.h"
 
 #include "EntityFlame.h"
@@ -52,6 +48,10 @@
 #include "player_resource.h"
 
 #include "props.h"
+
+#include "physics_prop_ragdoll.h"
+
+#include "nav_area.h"
 
 #include "Sprite.h"
 

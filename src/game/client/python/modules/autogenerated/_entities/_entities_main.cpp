@@ -41,6 +41,8 @@
 
 #include "c_playerresource.h"
 
+#include "nav_area.h"
+
 #include "Sprite.h"
 
 #include "SpriteTrail.h"
