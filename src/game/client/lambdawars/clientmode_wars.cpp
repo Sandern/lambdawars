@@ -265,9 +265,9 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------
-static ClientModeSDKFullscreen g_FullscreenClientMode;
 IClientMode *GetFullscreenClientMode( void )
 {
+	static ClientModeSDKFullscreen g_FullscreenClientMode;
 	return &g_FullscreenClientMode;
 }
 

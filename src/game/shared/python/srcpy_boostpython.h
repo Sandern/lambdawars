@@ -13,6 +13,13 @@
 
 #include <boost/python.hpp>
 
+// Common defines
+#if PY_VERSION_HEX >= 0x03000000
+#define PY_NEXT_METHODNAME "__next__"
+#else
+#define PY_NEXT_METHODNAME "next"
+#endif
+
 #ifdef _DEBUG
 	// boost redefines _DEBUG to an empty define
 	// This will result in a compile error when doing "#if _DEBUG"

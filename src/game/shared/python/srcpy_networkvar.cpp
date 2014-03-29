@@ -20,12 +20,6 @@ ConVar g_debug_pynetworkvar("g_debug_pynetworkvar", "0", FCVAR_CHEAT|FCVAR_REPLI
 
 namespace bp = boost::python;
 
-#if PY_VERSION_HEX >= 0x03000000
-#define PY_NEXT_METHODNAME "__next__"
-#else
-#define PY_NEXT_METHODNAME "next"
-#endif
-
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Send proxies

@@ -49,16 +49,15 @@ KeyValues *PyDictToKeyValues( boost::python::dict d )
 
 	KeyValues *pKV = new KeyValues("Data");
 
-	boost::python::object objectKey, objectValue;
-	const boost::python::object objectKeys = d.iterkeys();
-	const boost::python::object objectValues = d.itervalues();
-	unsigned long ulCount = boost::python::len(d);
-	for( unsigned long u = 0; u < ulCount; u++ )
-	{
-		objectKey = objectKeys.attr( "next" )();
-		objectValue = objectValues.attr( "next" )();
+	boost::python::object items = d.attr("items")();
+	boost::python::object iterator = items.attr("__iter__")();
+	unsigned long length = boost::python::len(items); 
 
-		boost::python::list elements = boost::python::list(objectValue);
+	for( unsigned long u = 0; u < length; u++ )
+	{
+		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
+
+		boost::python::list elements = boost::python::list(item[1]);
 		boost::python::ssize_t n = boost::python::len(elements);
 		for( boost::python::ssize_t i=0; i < n; i++ ) 
 		{
@@ -68,7 +67,7 @@ KeyValues *PyDictToKeyValues( boost::python::dict d )
 			 }
 			 else
 			 {
-				 pKV->SetString( boost::python::extract< const char * >( objectKey ), 
+				 pKV->SetString( boost::python::extract< const char * >( item[0] ), 
 								 boost::python::extract< const char * >( elements[i] ) );
 			 }
 		}

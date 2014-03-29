@@ -37,12 +37,6 @@ enum PyType{
 	PYTYPE_SET,
 };
 
-#if PY_VERSION_HEX >= 0x03000000
-#define PY_NEXT_METHODNAME "__next__"
-#else
-#define PY_NEXT_METHODNAME "next"
-#endif
-
 #ifndef CLIENT_DLL
 // TODO: Could use some optimization probably
 void PyFillWriteElement( pywrite &w, bp::object data )
