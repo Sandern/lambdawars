@@ -16,10 +16,16 @@
 
 namespace boost { namespace python { namespace objects {
 
+#define ENUM_SUPPORTED_DIGITS 3
+
 struct enum_object
 {
 #if PY_VERSION_HEX >= 0x03000000
     PyLongObject base_object;
+	// PyLongObject is dynamically sized based on the number of needed digits.
+	// Add number of digits to ensure name is not overwritten for most enum values, 
+	// but there should be a better solution.
+	digit _enumdigits[ENUM_SUPPORTED_DIGITS]; 
 #else
     PyIntObject base_object;
 #endif
@@ -207,6 +213,15 @@ void enum_base::add_value(char const* name_, long value)
 
     // Create a new enum instance by calling the class with a value
     object x = (*this)(value);
+
+#if PY_VERSION_HEX >= 0x03000000
+	// ob_size is the number of digits for Long types
+	if (Py_SIZE(x.ptr()) > ENUM_SUPPORTED_DIGITS + 1)
+	{
+        PyErr_SetString(PyExc_OverflowError, "enum value too large");
+		throw_error_already_set();
+	}
+#endif
 
     // Store the object in the enum class
     (*this).attr(name_) = x;
