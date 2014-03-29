@@ -28,6 +28,7 @@ extern "C" __declspec(dllexport) void initmaterials();
 extern "C" __declspec(dllexport) void init_te();
 extern "C" __declspec(dllexport) void init_fow();
 extern "C" __declspec(dllexport) void initunit_helper();
+extern "C" __declspec(dllexport) void init_editorsystem();
 extern "C" __declspec(dllexport) void init_steam();
 extern "C" __declspec(dllexport) void init_navmesh();
 extern "C" __declspec(dllexport) void init_ndebugoverlay();
@@ -52,6 +53,7 @@ extern "C"  void initmaterials();
 extern "C"  void init_te();
 extern "C"  void init_fow();
 extern "C"  void initunit_helper();
+extern "C"  void init_editorsystem();
 extern "C"  void init_steam();
 extern "C"  void init_navmesh();
 extern "C"  void init_ndebugoverlay();
@@ -80,6 +82,7 @@ void AppendSharedModules()
 	APPEND_MODULE(_te)
 	APPEND_MODULE(_fow)
 	APPEND_MODULE(unit_helper)
+	APPEND_MODULE(_editorsystem)
 	APPEND_MODULE(_steam)
 	APPEND_MODULE(_navmesh)
 	APPEND_MODULE(_ndebugoverlay)

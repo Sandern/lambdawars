@@ -20,6 +20,7 @@
 class CWarsFlora : public CBaseAnimating
 {
 	DECLARE_CLASS( CWarsFlora, CBaseAnimating );
+	DECLARE_DATADESC();
 
 public:
 	CWarsFlora();
@@ -40,6 +41,8 @@ public:
 	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
 
+	bool			IsEditorManaged();
+
 private:
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;
@@ -50,6 +53,13 @@ private:
 	int				m_iSqueezeDownSequence;
 	int				m_iSqueezeUpSequence;
 	int				m_iDestructSequence;
+
+	bool			m_bEditorManaged;
 };
+
+inline bool CWarsFlora::IsEditorManaged()
+{
+	return m_bEditorManaged;
+}
 
 #endif // WARS_FLORA_H

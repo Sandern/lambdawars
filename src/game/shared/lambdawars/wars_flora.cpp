@@ -23,6 +23,10 @@
 
 LINK_ENTITY_TO_CLASS( wars_flora, CWarsFlora );
 
+BEGIN_DATADESC( CWarsFlora )
+	DEFINE_KEYFIELD( m_bEditorManaged,		FIELD_BOOLEAN,	"editormanaged" ),
+END_DATADESC()
+
 CWarsFlora::CWarsFlora()
 {
 #ifndef CLIENT_DLL
@@ -95,11 +99,11 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if ( FStrEq(szKeyName, "health") )
 	{
-		m_iHealth = Q_atoi(szValue);
+		m_iHealth = V_atoi(szValue);
 	}
 	else if (FStrEq(szKeyName, "spawnflags"))
 	{
-		m_spawnflags = Q_atoi(szValue);
+		m_spawnflags = V_atoi(szValue);
 	}
 	else if (FStrEq(szKeyName, "model"))
 	{
@@ -107,21 +111,21 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "fademaxdist"))
 	{
-		float flFadeMaxDist = Q_atof(szValue);
+		float flFadeMaxDist = V_atof(szValue);
 		SetDistanceFade( GetMinFadeDist(), flFadeMaxDist );
 	}
 	else if (FStrEq(szKeyName, "fademindist"))
 	{
-		float flFadeMinDist = Q_atof(szValue);
+		float flFadeMinDist = V_atof(szValue);
 		SetDistanceFade( flFadeMinDist, GetMaxFadeDist() );
 	}
 	else if (FStrEq(szKeyName, "fadescale"))
 	{
-		SetGlobalFadeScale( Q_atof(szValue) );
+		SetGlobalFadeScale( V_atof(szValue) );
 	}
 	else if (FStrEq(szKeyName, "skin"))
 	{
-		SetSkin( Q_atoi(szValue) );
+		SetSkin( V_atoi(szValue) );
 	}
 	else if (FStrEq(szKeyName, "idleanimation"))
 	{
@@ -139,7 +143,6 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		m_iszDestructionAnimationName = AllocPooledString( szValue );
 	}
-
 	else
 	{
 		if ( !BaseClass::KeyValue( szKeyName, szValue ) )
@@ -186,7 +189,7 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 		Error( "classname missing from entity!\n" );
 	}
 
-	if ( !Q_strcmp( className, "wars_flora" ) )
+	if ( !V_strcmp( className, "wars_flora" ) )
 	{
 		// always force clientside entitis placed in maps
 		CWarsFlora *pEntity = new CWarsFlora();
@@ -274,7 +277,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 {
 	if( args.ArgC() < 2 )
 	{
-		Warning("wars_flora_spawn: Not enough arguments\n");
+		Warning("wars_flora_spawn: Not enough arguments.\n Example usage: wars_flora_spawn <modelname> <editormanaged:1|0>");
 		return;
 	}
 	
@@ -290,6 +293,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 
 	// Collect arguments
 	const char *pModelName = args[1];
+	bool bEditorManaged = args.ArgC() > 2 ? atoi(args[2]) : false;
 
 #ifndef CLIENT_DLL
 	CBaseEntity::PrecacheModel( pModelName );
@@ -335,6 +339,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	pEntity->KeyValue( "model", pModelName );
 	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", angles.x, angles.y, angles.z ) );
 	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", info.m_vPosition.x, info.m_vPosition.y, info.m_vPosition.z ) );
+	pEntity->KeyValue( "editormanaged", bEditorManaged ? "1" : "0" );
 
 #ifdef CLIENT_DLL
 	// Initialize

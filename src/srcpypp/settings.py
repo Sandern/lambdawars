@@ -69,6 +69,7 @@ modules = [
     
     # Wars
     ('unit_helper', 'UnitHelper'),
+    ('_editorsystem', 'EditorSystem'),
     
     # Misc
     ('_steam', 'Steam'),

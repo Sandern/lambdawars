@@ -519,7 +519,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
     
     def Parse(self, mb):
         # Exclude everything by default
-        mb.decls().exclude()        
+        mb.decls().exclude()
 
         if self.isclient:
             self.ParseClientEntityRelated(mb)
