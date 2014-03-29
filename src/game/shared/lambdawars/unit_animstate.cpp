@@ -29,7 +29,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
 // Below this many degrees, slow down turning rate linearly
 #define FADE_TURN_DEGREES	45.0f
 
@@ -84,17 +83,17 @@ TranslateActivityMap::TranslateActivityMap( TranslateActivityMap &activitymap, b
 void TranslateActivityMap::AddTranslations( boost::python::dict d )
 {
 	Activity a, atrans;
-	boost::python::object objectKey, objectValue;
-	const boost::python::object objectKeys = d.iterkeys();
-	const boost::python::object objectValues = d.itervalues();
-	unsigned long ulCount = boost::python::len(d);
-	for( unsigned long u = 0; u < ulCount; u++ )
-	{
-		objectKey = objectKeys.attr( "next" )();
-		objectValue = objectValues.attr( "next" )();
 
-		a = boost::python::extract<Activity>(objectKey);
-		atrans = boost::python::extract<Activity>(objectValue);
+	boost::python::object items = d.attr("items")();
+	boost::python::object iterator = items.attr("__iter__")();
+	unsigned long length = boost::python::len(items); 
+
+	for( unsigned long u = 0; u < length; u++ )
+	{
+		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
+
+		a = boost::python::extract<Activity>(item[0]);
+		atrans = boost::python::extract<Activity>(item[1]);
 
 		AddTranslation(a, atrans);
 	}
