@@ -17,6 +17,8 @@ class EditorSystem(SemiSharedModuleGenerator):
         
         cls = mb.class_('CEditorSystem')
         cls.include()
+        #cls.no_init = True
+        cls.noncopyable = True
         
         mb.free_function('EditorSystem').include()
         mb.free_function('EditorSystem').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)

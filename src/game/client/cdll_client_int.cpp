@@ -152,6 +152,7 @@
 #include "fowmgr.h"
 #include "wars_mount_system.h"
 #include "wars_flora.h"
+#include "editor/editorsystem.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -996,7 +997,9 @@ bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 
 #ifdef HL2WARS_DLL
 	IGameSystem::Add( FogOfWarMgr() );
+	IGameSystem::Add( EditorSystem() );
 #endif // HL2WARS_DLL
+
 #ifdef ENABLE_PYTHON
 	IGameSystem::Add( SrcPySystem() );
 #endif // ENABLE_PYTHON

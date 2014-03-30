@@ -793,13 +793,6 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
     }
 
-    bp::class_< color32_s >( "color32_s" )    
-        .def( bp::self != bp::self )    
-        .def_readwrite( "a", &color32_s::a )    
-        .def_readwrite( "b", &color32_s::b )    
-        .def_readwrite( "g", &color32_s::g )    
-        .def_readwrite( "r", &color32_s::r );
-
     { //::IsSolid
     
         typedef bool ( *IsSolid_function_type )( ::SolidType_t,int );

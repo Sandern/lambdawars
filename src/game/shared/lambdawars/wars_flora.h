@@ -43,6 +43,10 @@ public:
 
 	bool			IsEditorManaged();
 
+#ifndef CLIENT_DLL
+	bool			FillKeyValues( KeyValues *pEntityKey );
+#endif // CLIENT_DLL
+
 private:
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;

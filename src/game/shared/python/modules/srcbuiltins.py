@@ -7,10 +7,12 @@ class SrcBuiltins(SharedModuleGenerator):
     module_name = 'srcbuiltins'
     
     files = [
+        'cbase.h',
         'srcpy_srcbuiltins.h',
-        'Color.h',
-        'globalvars_base.h',
-        'edict.h',
+        #'Color.h',
+        #'globalvars_base.h',
+        #'edict.h',
+        #'tier0\basetypes.h',
     ]
     
     def Parse(self, mb):
@@ -45,11 +47,21 @@ class SrcBuiltins(SharedModuleGenerator):
         mb.free_function('GetRegisteredPerFrameMethods').include()
         mb.free_function('IsPerFrameMethodRegistered').include()
         
-        # Color class
+        # Color classes
         cls = mb.class_('Color')
         cls.include()
         cls.mem_funs('GetColor').add_transformation( FT.output('_r'), FT.output('_g'), FT.output('_b'), FT.output('_a') )
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
+        
+        cls = mb.class_('color32_s')
+        cls.include()
+        cls.rename('color32')
+        cls.mem_funs().exclude()
+        
+        if self.settings.branch == 'swarm':
+            # Used by GetRenderColor in Swarm branch
+            cls = mb.class_('color24')
+            cls.include()
         
         # Global Vars Class
         mb.class_('CGlobalVarsBase').include()

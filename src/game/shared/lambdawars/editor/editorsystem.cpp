@@ -6,10 +6,18 @@
 
 #include "cbase.h"
 #include "editorsystem.h"
-
 #include <filesystem.h>
-
 #include "wars_flora.h"
+
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
+#ifdef WIN32
+#undef INVALID_HANDLE_VALUE
+#include <windows.h>
+#undef CopyFile
+#endif // WIN32
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -18,11 +26,37 @@
 	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 
+#define VBSP_PATH "..\\..\\Alien Swarm\\bin\\vbsp.exe"
+
 static CEditorSystem g_EditorSystem;
 
 CEditorSystem *EditorSystem()
 {
 	return &g_EditorSystem;
+}
+
+bool CEditorSystem::Init()
+{
+#ifndef CLIENT_DLL
+	gEntList.AddListenerEntity( this );
+#endif // CLIENT_DLL
+
+	return true;
+}
+
+void CEditorSystem::Shutdown()
+{
+#ifndef CLIENT_DLL
+	gEntList.RemoveListenerEntity( this );
+#endif // CLIENT_DLL
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorSystem::LevelShutdownPreEntity() 
+{
+	ClearLoadedMap();
 }
 
 //-----------------------------------------------------------------------------
@@ -70,6 +104,21 @@ void CEditorSystem::KeyValuesToVmf( KeyValues *pKV, CUtlBuffer &vmf )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CEditorSystem::ClearLoadedMap()
+{
+	if( m_pKVVmf == NULL ) 
+		return;
+
+	*m_szCurrentVmf = 0;
+	m_pKVVmf->deleteThis();
+	m_pKVVmf = NULL;
+
+	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::LoadVmf( const char *pszVmf )
 {
 	V_snprintf( m_szCurrentVmf, sizeof( m_szCurrentVmf ), "%s", pszVmf );
@@ -78,11 +127,15 @@ void CEditorSystem::LoadVmf( const char *pszVmf )
 
 	if ( !pKV )
 	{
-		*m_szCurrentVmf = 0;
+		ClearLoadedMap();
 		return;
 	}
 
-	ParseVmfFile( pKV );
+	if( ParseVmfFile( pKV ) )
+	{
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
+	}
+
 	pKV->deleteThis();
 }
 
@@ -91,6 +144,8 @@ void CEditorSystem::LoadVmf( const char *pszVmf )
 //-----------------------------------------------------------------------------
 void CEditorSystem::LoadCurrentVmf()
 {
+	ClearLoadedMap();
+
 	char tmp[MAX_PATH*4];
 	BuildCurrentVmfPath( tmp, sizeof(tmp) );
 
@@ -117,12 +172,60 @@ void CEditorSystem::SaveCurrentVmf()
 		return;
 	}
 
+	// Save VMF
 	ApplyChangesToVmfFile();
 
 	CUtlBuffer buffer;
 	KeyValuesToVmf( m_pKVVmf, buffer );
 
 	g_pFullFileSystem->WriteFile( m_szCurrentVmf, NULL, buffer );
+
+	// Save BSP
+#ifdef WIN32
+	char vbspPath[MAX_PATH];
+	char gameDir[MAX_PATH];
+
+	g_pFullFileSystem->RelativePathToFullPath( VBSP_PATH, NULL, vbspPath, sizeof(vbspPath) );
+	g_pFullFileSystem->RelativePathToFullPath( ".", "MOD", gameDir, sizeof(gameDir) );
+
+	DevMsg("VBSP: %s\n", vbspPath );
+	DevMsg("GameDir: %s\n", gameDir );
+
+	if ( !g_pFullFileSystem->FileExists( vbspPath ) )
+	{
+		Warning( "Could not find \"%s\". Unable to update BSP.\n", vbspPath );
+		return;
+	}
+
+	char parameters[MAX_PATH];
+	V_snprintf( parameters, MAX_PATH, "-onlyents -game \"%s\" \"%s\"", gameDir, m_szCurrentVmf );
+	DevMsg("VBSP Parameters: %s\n", parameters );
+
+    SHELLEXECUTEINFO shExecInfo;
+
+    shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+    shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS|SEE_MASK_NO_CONSOLE;
+    shExecInfo.hwnd = NULL;
+    shExecInfo.lpVerb = NULL;
+    shExecInfo.lpFile = vbspPath;
+    shExecInfo.lpParameters = parameters;
+    shExecInfo.lpDirectory = NULL;
+    shExecInfo.nShow = SW_FORCEMINIMIZE;
+    shExecInfo.hInstApp = NULL;
+
+    ShellExecuteEx(&shExecInfo);
+	WaitForSingleObject(shExecInfo.hProcess,INFINITE);
+
+	// Copy to Maps directory
+	char srcPath[MAX_PATH];
+	char destPath[MAX_PATH];
+	const char *pszLevelname = STRING(gpGlobals->mapname);
+	V_snprintf( srcPath, sizeof(srcPath), "mapsrc\\%s.bsp", pszLevelname );
+	V_snprintf( destPath, sizeof(destPath), "maps\\%s.bsp", pszLevelname );
+	DevMsg("Copy %s to %s\n", srcPath, destPath );
+	engine->CopyFile( srcPath, destPath );
+#endif // WIN32
 }
 #endif // CLIENT_DLL
 
@@ -142,7 +245,7 @@ bool CEditorSystem::IsMapLoaded()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorSystem::ParseVmfFile( KeyValues *pKeyValues )
+bool CEditorSystem::ParseVmfFile( KeyValues *pKeyValues )
 {
 	Assert( pKeyValues );
 
@@ -154,53 +257,76 @@ void CEditorSystem::ParseVmfFile( KeyValues *pKeyValues )
 	KeyValues *pVersionKey = m_pKVVmf->FindKey( "versioninfo" );
 	if( !pVersionKey )
 	{
+		ClearLoadedMap();
 		Warning( "Could not parse VMF. versioninfo key missing!\n" );
-		return;
+		return false;
 	}
 
 #ifndef CLIENT_DLL
 	const int iMapVersion = pVersionKey->GetInt( "mapversion", -1 );
 	if( iMapVersion != gpGlobals->mapversion )
 	{
+		ClearLoadedMap();
 		Warning( "Could not parse VMF. Map version does not match! (%d != %d)\n", iMapVersion, gpGlobals->mapversion );
-		return;
+		return false;
 	}
 #endif // CLIENT_DLL
 
-	for ( KeyValues *pKey = m_pKVVmf->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
-	{
-		if ( V_strcmp( pKey->GetName(), "entity" ) )
-			continue;
-
-		const bool bLightEntity = !V_stricmp( pKey->GetString( "classname" ), "light_deferred" ) || !V_stricmp( pKey->GetString( "classname" ), "env_deferred_light" );
-		//const bool bGlobalLightEntity = !V_stricmp( pKey->GetString( "classname" ), "light_deferred_global" );
-
-		if ( !bLightEntity )
-			continue;
-
-#if 0
-		const char *pszDefault = "";
-		const char *pszTarget = pKey->GetString( "targetname", pszDefault );
-		const char *pszParent = pKey->GetString( "parentname", pszDefault );
-
-		if ( pszTarget != pszDefault && *pszTarget ||
-			pszParent != pszDefault && *pszParent )
-			continue;
-
-		def_light_editor_t *pLight = new def_light_editor_t();
-
-		if ( !pLight )
-			continue;
-
-		pLight->ApplyKeyValueProperties( pKey );
-		pLight->iEditorId = pKey->GetInt( "id" );
-
-		AddEditorLight( pLight );
-#endif // 0
-	}
+	return true;
 }
 
 #ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorSystem::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, int iTargetID, int iHammerID )
+{
+#if 0
+	char szValue[256];
+
+	// Try extract fields
+	// TODO: a lot of fields are not extracted correctly
+	for ( datamap_t *dmap = pEnt->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
+	{
+		int iNumFields = dmap->dataNumFields;
+		typedescription_t 	*pField;
+		typedescription_t *pFields = dmap->dataDesc;
+		for ( int i = 0; i < iNumFields; i++ )
+		{
+			pField = &pFields[i];
+			if( !(pField->flags & FTYPEDESC_KEY) )
+				continue;
+
+			if( pEntityKey->IsEmpty( pField->externalName ) )
+			{
+				szValue[0] = 0;
+				if ( ::ExtractKeyvalue( pEnt, pFields, iNumFields, pField->externalName, szValue, 256 ) )
+				{
+					pEntityKey->SetString( pField->externalName, szValue );
+				}
+			}
+		}
+	}
+#endif // 0
+
+	// Write essential fields
+	pEntityKey->SetName( "entity" );
+	pEntityKey->SetInt( "id", iTargetID );
+	pEntityKey->SetInt( "hammerid", iHammerID );
+	pEntityKey->SetString( "classname", pEnt->GetClassname() );
+
+	// Write Common fields
+	pEntityKey->SetString( "model", STRING( pEnt->GetModelName() ) );
+	pEntityKey->SetString( "origin", UTIL_VarArgs( "%.2f %.2f %.2f", XYZ( pEnt->GetAbsOrigin() ) ) );
+	pEntityKey->SetString( "angles", UTIL_VarArgs( "%.2f %.2f %.2f", XYZ( pEnt->GetAbsAngles() ) ) );
+
+	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEnt );
+	if( pFloraEnt )
+	{
+		pFloraEnt->FillKeyValues( pEntityKey );
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -233,61 +359,34 @@ void CEditorSystem::ApplyChangesToVmfFile()
 		int idx = updatedEntities.Find( iHammerID );
 		if ( idx != updatedEntities.InvalidIndex() )
 		{
+			pKey->Clear();
+			CBaseEntity *pEnt = updatedEntities[idx];
+			FillEntityEntry( pKey, pEnt, iTargetID, iHammerID );
 
+			// Updated, so remove from list
+			updatedEntities.RemoveAt( idx );
+		}
+		else if( m_DeletedHammerIDs.HasElement( iHammerID ) )
+		{
+			// Deleted Editor managed entity
+			listToRemove.AddToTail( pKey );
 		}
 	}
 
+	// Remove deleted entities
+	FOR_EACH_VEC( listToRemove, i )
+		m_pKVVmf->RemoveSubKey( listToRemove[i] );
+
 	// Add new entities
-	char szValue[256];
 	FOR_EACH_VEC( newEntities, entIdx )
 	{
 		CBaseEntity *pNewEnt = newEntities[entIdx];
 
 		KeyValues *pKVNew = new KeyValues("data");
-
-		// Try extract fields
-		for ( datamap_t *dmap = pNewEnt->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
-		{
-			int iNumFields = dmap->dataNumFields;
-			typedescription_t 	*pField;
-			typedescription_t *pFields = dmap->dataDesc;
-			for ( int i = 0; i < iNumFields; i++ )
-			{
-				pField = &pFields[i];
-				if( !(pField->flags & FTYPEDESC_KEY) )
-					continue;
-
-				if( pKVNew->IsEmpty( pField->externalName ) )
-				{
-					szValue[0] = 0;
-					if ( ::ExtractKeyvalue( pNewEnt, pFields, iNumFields, pField->externalName, szValue, 256 ) )
-					{
-						pKVNew->SetString( pField->externalName, szValue );
-					}
-				}
-			}
-		}
-
-		// Write essential fields
-		pKVNew->SetName( "entity" );
-		pKVNew->SetInt( "id", iHighestId );
-		pKVNew->SetInt( "hammerid", iHighestHammerId );
-		pKVNew->SetString( "classname", pNewEnt->GetClassname() );
-
-		// Write Common fields
-		pKVNew->SetString( "model", STRING( pNewEnt->GetModelName() ) );
-		pKVNew->SetString( "origin", UTIL_VarArgs( "%.2f %.2f %.2f", XYZ( pNewEnt->GetAbsOrigin() ) ) );
-		pKVNew->SetString( "angles", UTIL_VarArgs( "%.2f %.2f %.2f", XYZ( pNewEnt->GetAbsAngles() ) ) );
+		FillEntityEntry( pKVNew, pNewEnt, iHighestId++, iHighestHammerId++ );
 
 		m_pKVVmf->AddSubKey( pKVNew );
-
-		iHighestId++;
-		iHighestHammerId++;
 	}
-
-	// Delete
-	FOR_EACH_VEC( listToRemove, i )
-		m_pKVVmf->RemoveSubKey( listToRemove[i] );
 }
 
 //-----------------------------------------------------------------------------
@@ -319,106 +418,28 @@ void CEditorSystem::CollectNewAndUpdatedEntities( CUtlMap< int, CBaseEntity * > 
 		pEnt = gEntList.NextEnt( pEnt );
 	}
 }
-#endif // CLIENT_DLL
 
-#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorSystem::ApplyLightsToCurrentVmfFile()
+void CEditorSystem::OnEntityDeleted( CBaseEntity *pEntity )
 {
-	CUtlVector< KeyValues* > listKeyValues;
-	CUtlVector< KeyValues* > listToRemove;
-	//GetKVFromAll( listKeyValues );
+	// Remember which editor managed entities got deleted
+	//Msg("Entity %s deleted\n", pEntity->GetClassname());
+	if( !m_pKVVmf )
+		return;
 
-	int nextId = 0;
-
-	for ( KeyValues *pKey = m_pKVVmf->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEntity );
+	if( pFloraEnt && pFloraEnt->IsEditorManaged() )
 	{
-		if ( V_strcmp( pKey->GetName(), "entity" ) )
-			continue;
-
-		const int iTargetID = pKey->GetInt( "id", -1 );
-		const int iHammerID = pKey->GetInt( "hammerid", -1 );
-
-		if ( iTargetID < 0 || iHammerID < 0 )
-			continue;
-
-		nextId = MAX( nextId, iTargetID );
-
-		KeyValues *pSrcKey = NULL;
-
-		FOR_EACH_VEC( listKeyValues, iKeys )
+		int iHammerId = pEntity->GetHammerID();
+		if( iHammerId != 0 )
 		{
-			const int iSourceID = listKeyValues[iKeys]->GetInt( "id", -1 );
-			if ( iSourceID < 0 )
-				continue;
-
-			if ( iSourceID != iTargetID )
-				continue;
-
-			pSrcKey = listKeyValues[iKeys];
-			break;
-		}
-
-		bool bIsDeferredLight = !V_stricmp( pKey->GetString( "classname" ), "light_deferred" ) || !V_stricmp( pKey->GetString( "classname" ), "env_deferred_light" );
-
-		const char *pszDefault = "";
-		const char *pszTarget = pKey->GetString( "targetname", pszDefault );
-		const char *pszParent = pKey->GetString( "parentname", pszDefault );
-
-		if ( pSrcKey == NULL )
-		{
-			if ( bIsDeferredLight &&
-				(pszTarget == pszDefault || !*pszTarget) &&
-				(pszParent == pszDefault || !*pszParent) )
-				listToRemove.AddToTail( pKey );
-			continue;
-		}
-
-		Assert( bIsDeferredLight );
-		Assert( (pszTarget == NULL || !*pszTarget) && (pszParent == NULL || !*pszParent) );
-
-		for ( KeyValues *pValue = pSrcKey->GetFirstValue(); pValue;
-			pValue = pValue->GetNextValue() )
-		{
-			const char *pszKeyName = pValue->GetName();
-			const char *pszKeyValue = pValue->GetString();
-
-			pKey->SetString( pszKeyName, pszKeyValue );
+			m_DeletedHammerIDs.AddToTail( iHammerId );
 		}
 	}
-
-	nextId++;
-
-#if 0
-	FOR_EACH_VEC( m_hEditorLights, iLight )
-	{
-		def_light_editor_t *pLight = assert_cast< def_light_editor_t* >( m_hEditorLights[ iLight ] );
-
-		if ( pLight->iEditorId != -1 )
-			continue;
-
-		pLight->iEditorId = nextId;
-
-		KeyValues *pKVNew = GetKVFromLight( pLight );
-		pKVNew->SetName( "entity" );
-		pKVNew->SetString( "classname", "light_deferred" );
-		m_pKVVmf->AddSubKey( pKVNew );
-
-		nextId++;
-	}
-#endif // 0
-	//FOR_EACH_VEC( listToRemove, i )
-	//	m_pKVVmf->RemoveSubKey( listToRemove[i] );
-
-	//if ( GetKVGlobalLight() != NULL )
-	//	ApplyLightStateToKV( m_EditorGlobalState );
-
-	//FOR_EACH_VEC( listKeyValues, i )
-	//	listKeyValues[ i ]->deleteThis();
 }
-#endif // 0
+#endif // CLIENT_DLL
 
 extern const char *COM_GetModDirectory( void );
 

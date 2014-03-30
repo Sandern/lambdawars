@@ -25,6 +25,10 @@ LINK_ENTITY_TO_CLASS( wars_flora, CWarsFlora );
 
 BEGIN_DATADESC( CWarsFlora )
 	DEFINE_KEYFIELD( m_bEditorManaged,		FIELD_BOOLEAN,	"editormanaged" ),
+	DEFINE_KEYFIELD( m_iszIdleAnimationName,		FIELD_STRING,	"idleanimation" ),
+	DEFINE_KEYFIELD( m_iszSqueezeDownAnimationName,		FIELD_STRING,	"squeezedownanimation" ),
+	DEFINE_KEYFIELD( m_iszSqueezeUpAnimationName,		FIELD_STRING,	"squeezeupanimation" ),
+	DEFINE_KEYFIELD( m_iszDestructionAnimationName,		FIELD_STRING,	"destructionanimation" ),
 END_DATADESC()
 
 CWarsFlora::CWarsFlora()
@@ -92,6 +96,26 @@ void CWarsFlora::FloraTouch( CBaseEntity *pOther )
 {
 
 }
+
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
+{
+	pEntityKey->SetInt( "editormanaged", m_bEditorManaged );
+	pEntityKey->SetString( "idleanimation", STRING( m_iszIdleAnimationName ) );
+	pEntityKey->SetString( "squeezedownanimation", STRING( m_iszSqueezeDownAnimationName ) );
+	pEntityKey->SetString( "squeezeupanimation", STRING( m_iszSqueezeUpAnimationName ) );
+	pEntityKey->SetString( "destructionanimation", STRING( m_iszDestructionAnimationName ) );
+
+	pEntityKey->SetString( "rendercolor", UTIL_VarArgs("%d %d %d", GetRenderColor().r, GetRenderColor().g, GetRenderColor().b ) );
+	pEntityKey->SetInt( "spawnflags", GetSpawnFlags() );
+	pEntityKey->SetInt( "skin", GetSkin() );
+
+	return true;
+}
+#endif // CLIENT_DLL
 
 // Client Spawning Code
 #ifdef CLIENT_DLL

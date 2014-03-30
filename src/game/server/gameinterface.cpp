@@ -118,8 +118,8 @@
 #include "hl2wars_gamerules.h"
 #include "hl2wars_player.h"
 #include "fowmgr.h"
-#include "wars_plat_misc.h"
 #include "wars_mount_system.h"
+#include "editor/editorsystem.h"
 
 #include "INetChannel.h"
 #include "IClient.h"
@@ -618,8 +618,13 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 	IGameSystem::Add( SrcPySystem() );
 #endif // ENABLE_PYTHON
 
+#ifdef HL2WARS_DLL
 	// Init the fog of war system
 	IGameSystem::Add( FogOfWarMgr() );
+
+	// Add Wars Editor System
+	IGameSystem::Add( EditorSystem() );
+#endif // HL2WARS_DLL
 
 #ifdef SERVER_USES_VGUI
 	// Startup vgui

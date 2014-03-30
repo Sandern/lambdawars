@@ -25,11 +25,6 @@ class SrcBase(SharedModuleGenerator):
                              '#endif // _LINUX\r\n'
                            )
         
-        # Color
-        cls = mb.class_('color32_s')
-        cls.include()
-        cls.mem_funs(allow_empty=True).exclude()
-        
         # Useful free functions
         mb.free_function('IsSolid').include()
         

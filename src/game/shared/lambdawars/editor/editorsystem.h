@@ -10,10 +10,20 @@
 #pragma once
 #endif
 
+#ifndef CLIENT_DLL
+class CEditorSystem : public CBaseGameSystem, public IEntityListener
+#else
 class CEditorSystem : public CBaseGameSystem
+#endif // CLIENT_DLL
 {
 public:
+	virtual bool Init();
+	virtual void Shutdown();
+
+	virtual void LevelShutdownPreEntity();
+
 	// VMF managing
+	void ClearLoadedMap();
 	void LoadCurrentVmf();
 #ifndef CLIENT_DLL
 	void SaveCurrentVmf();
@@ -25,20 +35,21 @@ public:
 	void KeyValuesToVmf( KeyValues *pKV, CUtlBuffer &vmf );
 
 	void LoadVmf( const char *pszVmf );
-	
-	
+
+#ifndef CLIENT_DLL
+	void OnEntityDeleted( CBaseEntity *pEntity );
+#endif // CLIENT_DLL
 
 private:
-	void ParseVmfFile( KeyValues *pKeyValues );
+	bool ParseVmfFile( KeyValues *pKeyValues );
 	
-	//void ApplyLightsToCurrentVmfFile();
-
 	void BuildVmfPath( char *pszOut, int maxlen, bool bMakeRelative = true );
 	bool BuildCurrentVmfPath( char *pszOut, int maxlen );
 
 #ifndef CLIENT_DLL
 	void CollectNewAndUpdatedEntities( CUtlMap< int, CBaseEntity * > &updatedEntities, CUtlVector< CBaseEntity * > &newEntities );
 	void ApplyChangesToVmfFile();
+	void FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, int iTargetID, int iHammerID );
 #endif // CLIENT_DLL
 
 private:
@@ -46,6 +57,8 @@ private:
 	char m_szCurrentVmf[MAX_PATH];
 	// Data of VMF map file being edited
 	KeyValues *m_pKVVmf;
+	// Deleted Hammer Ids
+	CUtlVector<int> m_DeletedHammerIDs;
 };
 
 CEditorSystem *EditorSystem();
