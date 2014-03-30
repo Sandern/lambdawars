@@ -47,6 +47,10 @@ public:
 	bool			FillKeyValues( KeyValues *pEntityKey );
 #endif // CLIENT_DLL
 
+#ifdef CLIENT_DLL
+	virtual CollideType_t			GetCollideType( void ) { return ENTITY_SHOULD_COLLIDE; }
+#endif // CLIENT_DLL
+
 private:
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;

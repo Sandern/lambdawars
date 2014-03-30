@@ -10,10 +10,16 @@
 #pragma once
 #endif
 
-#ifndef CLIENT_DLL
-class CEditorSystem : public CBaseGameSystem, public IEntityListener
+#ifdef CLIENT_DLL
+#include "c_hl2wars_player.h"
 #else
-class CEditorSystem : public CBaseGameSystem
+#include "hl2wars_player.h"
+#endif // CLIENT_DLL
+
+#ifndef CLIENT_DLL
+class CEditorSystem : public CBaseGameSystemPerFrame, public IEntityListener
+#else
+class CEditorSystem : public CBaseGameSystemPerFrame
 #endif // CLIENT_DLL
 {
 public:
@@ -40,6 +46,8 @@ public:
 	void OnEntityDeleted( CBaseEntity *pEntity );
 #endif // CLIENT_DLL
 
+	void DoSelect( CHL2WarsPlayer *pPlayer );
+
 private:
 	bool ParseVmfFile( KeyValues *pKeyValues );
 	
@@ -52,6 +60,17 @@ private:
 	void FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, int iTargetID, int iHammerID );
 #endif // CLIENT_DLL
 
+	// Selection
+	bool IsSelected( CBaseEntity *pEntity );
+	void Deselect( CBaseEntity *pEntity );
+	void Select( CBaseEntity *pEntity );
+
+#ifdef CLIENT_DLL
+	void RenderSelection();
+
+	virtual void PostRender();
+#endif // CLIENT_DLL
+
 private:
 	// Path to current VMF map file being edited
 	char m_szCurrentVmf[MAX_PATH];
@@ -59,7 +78,30 @@ private:
 	KeyValues *m_pKVVmf;
 	// Deleted Hammer Ids
 	CUtlVector<int> m_DeletedHammerIDs;
+
+	// Selection
+	CUtlVector<EHANDLE> m_hSelectedEntities;
+
+#ifdef CLIENT_DLL
+	CMaterialReference m_matSelect;
+#endif // CLIENT_DLL
 };
+
+inline bool CEditorSystem::IsSelected( CBaseEntity *pEntity )
+{
+	return m_hSelectedEntities.HasElement( pEntity );
+}
+
+inline void CEditorSystem::Deselect( CBaseEntity *pEntity )
+{
+	m_hSelectedEntities.FindAndRemove( pEntity );
+}
+
+inline void CEditorSystem::Select( CBaseEntity *pEntity )
+{
+	if( !m_hSelectedEntities.HasElement( pEntity ) )
+		m_hSelectedEntities.AddToTail( pEntity );
+}
 
 CEditorSystem *EditorSystem();
 

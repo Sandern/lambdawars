@@ -75,7 +75,7 @@ void CWarsFlora::Spawn()
 
 	SetSolid( SOLID_NONE );
 	//SetSolid( SOLID_BBOX );
-	//AddSolidFlags( FSOLID_TRIGGER );
+	//AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 
 	Vector vecMins = CollisionProp()->OBBMins();
 	Vector vecMaxs = CollisionProp()->OBBMaxs();
@@ -94,7 +94,7 @@ void CWarsFlora::Spawn()
 //-----------------------------------------------------------------------------
 void CWarsFlora::FloraTouch( CBaseEntity *pOther )
 {
-
+	Msg("FloraTouch\n");
 }
 
 #ifndef CLIENT_DLL
@@ -187,6 +187,11 @@ bool CWarsFlora::Initialize()
 	}
 
 	Spawn();
+
+	Vector mins, maxs;
+	//const model_t *model = modelinfo->FindOrLoadModel(STRING(GetModelName()));
+	modelinfo->GetModelBounds(GetModel(), mins, maxs);
+	SetSize(mins, maxs);
 
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 

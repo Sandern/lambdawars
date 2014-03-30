@@ -81,6 +81,10 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "ClearLoadedMap"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
         .def( 
+            "DoSelect"
+            , (void ( ::CEditorSystem::* )( ::C_HL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
+            , ( bp::arg("pPlayer") ) )    
+        .def( 
             "GetCurrentVmfPath"
             , (char const * ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::GetCurrentVmfPath ) )    
         .def( 
@@ -224,6 +228,10 @@ BOOST_PYTHON_MODULE(_editorsystem){
         .def( 
             "ClearLoadedMap"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
+        .def( 
+            "DoSelect"
+            , (void ( ::CEditorSystem::* )( ::CHL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
+            , ( bp::arg("pPlayer") ) )    
         .def( 
             "GetCurrentVmfPath"
             , (char const * ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::GetCurrentVmfPath ) )    
