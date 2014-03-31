@@ -52,6 +52,25 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
     
     }
 
+    virtual bool ClientCommand( ::CCommand const & args ) {
+        PY_OVERRIDE_CHECK( CHL2WarsPlayer, ClientCommand )
+        PY_OVERRIDE_LOG( _entities, CHL2WarsPlayer, ClientCommand )
+        bp::override func_ClientCommand = this->get_override( "ClientCommand" );
+        if( func_ClientCommand.ptr() != Py_None )
+            try {
+                return func_ClientCommand( boost::ref(args) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CHL2WarsPlayer::ClientCommand( args );
+            }
+        else
+            return this->CHL2WarsPlayer::ClientCommand( args );
+    }
+    
+    bool default_ClientCommand( ::CCommand const & args ) {
+        return CHL2WarsPlayer::ClientCommand( args );
+    }
+
     virtual void OnChangeOwnerNumber( int old_owner_number ) {
         PY_OVERRIDE_CHECK( CHL2WarsPlayer, OnChangeOwnerNumber )
         PY_OVERRIDE_LOG( _entities, CHL2WarsPlayer, OnChangeOwnerNumber )
@@ -1120,10 +1139,12 @@ void register_CHL2WarsPlayer_class(){
         { //::CHL2WarsPlayer::ClientCommand
         
             typedef bool ( ::CHL2WarsPlayer::*ClientCommand_function_type )( ::CCommand const & ) ;
+            typedef bool ( CHL2WarsPlayer_wrapper::*default_ClientCommand_function_type )( ::CCommand const & ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "ClientCommand"
-                , ClientCommand_function_type( &::CHL2WarsPlayer::ClientCommand )
+                , ClientCommand_function_type(&::CHL2WarsPlayer::ClientCommand)
+                , default_ClientCommand_function_type(&CHL2WarsPlayer_wrapper::default_ClientCommand)
                 , ( bp::arg("args") ) );
         
         }

@@ -71,6 +71,25 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
         CBasePlayer::Activate( );
     }
 
+    virtual bool ClientCommand( ::CCommand const & args ) {
+        PY_OVERRIDE_CHECK( CBasePlayer, ClientCommand )
+        PY_OVERRIDE_LOG( _entities, CBasePlayer, ClientCommand )
+        bp::override func_ClientCommand = this->get_override( "ClientCommand" );
+        if( func_ClientCommand.ptr() != Py_None )
+            try {
+                return func_ClientCommand( boost::ref(args) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBasePlayer::ClientCommand( args );
+            }
+        else
+            return this->CBasePlayer::ClientCommand( args );
+    }
+    
+    bool default_ClientCommand( ::CCommand const & args ) {
+        return CBasePlayer::ClientCommand( args );
+    }
+
     virtual void DoImpactEffect( ::trace_t & tr, int nDamageType ) {
         PY_OVERRIDE_CHECK( CBasePlayer, DoImpactEffect )
         PY_OVERRIDE_LOG( _entities, CBasePlayer, DoImpactEffect )
@@ -1014,7 +1033,8 @@ void register_CBasePlayer_class(){
             , (void ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::ClearZoomOwner ) )    
         .def( 
             "ClientCommand"
-            , (bool ( ::CBasePlayer::* )( ::CCommand const & ) )( &::CBasePlayer::ClientCommand )
+            , (bool ( ::CBasePlayer::* )( ::CCommand const & ) )(&::CBasePlayer::ClientCommand)
+            , (bool ( CBasePlayer_wrapper::* )( ::CCommand const & ) )(&CBasePlayer_wrapper::default_ClientCommand)
             , ( bp::arg("args") ) )    
         .def( 
             "CommitSuicide"

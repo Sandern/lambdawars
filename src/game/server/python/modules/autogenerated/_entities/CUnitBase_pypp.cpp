@@ -71,6 +71,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::CanUserControl( pPlayer );
     }
 
+    virtual bool ClientCommand( ::CCommand const & args ) {
+        PY_OVERRIDE_CHECK( CUnitBase, ClientCommand )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, ClientCommand )
+        bp::override func_ClientCommand = this->get_override( "ClientCommand" );
+        if( func_ClientCommand.ptr() != Py_None )
+            try {
+                return func_ClientCommand( boost::ref(args) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::ClientCommand( args );
+            }
+        else
+            return this->CUnitBase::ClientCommand( args );
+    }
+    
+    bool default_ClientCommand( ::CCommand const & args ) {
+        return CUnitBase::ClientCommand( args );
+    }
+
     virtual bool CustomCanBeSeen( ::CUnitBase * pUnit=0 ) {
         PY_OVERRIDE_CHECK( CUnitBase, CustomCanBeSeen )
         PY_OVERRIDE_LOG( _entities, CUnitBase, CustomCanBeSeen )
@@ -1391,10 +1410,12 @@ void register_CUnitBase_class(){
         { //::CUnitBase::ClientCommand
         
             typedef bool ( ::CUnitBase::*ClientCommand_function_type )( ::CCommand const & ) ;
+            typedef bool ( CUnitBase_wrapper::*default_ClientCommand_function_type )( ::CCommand const & ) ;
             
             CUnitBase_exposer.def( 
                 "ClientCommand"
-                , ClientCommand_function_type( &::CUnitBase::ClientCommand )
+                , ClientCommand_function_type(&::CUnitBase::ClientCommand)
+                , default_ClientCommand_function_type(&CUnitBase_wrapper::default_ClientCommand)
                 , ( bp::arg("args") ) );
         
         }

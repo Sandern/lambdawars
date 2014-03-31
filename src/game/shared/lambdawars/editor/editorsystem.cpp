@@ -452,21 +452,9 @@ extern const char *COM_GetModDirectory( void );
 //-----------------------------------------------------------------------------
 void CEditorSystem::BuildVmfPath( char *pszOut, int maxlen, bool bMakeRelative )
 {
-	//char tmp[MAX_PATH*4];
-	char tmp2[MAX_PATH*4];
-
-	/*if( Q_strcmp( deferred_lighteditor_defaultvmfpath.GetString(), "" ) != 0 &&
-		g_pFullFileSystem->IsDirectory( deferred_lighteditor_defaultvmfpath.GetString() ) )
-	{
-		Q_strcpy( tmp, deferred_lighteditor_defaultvmfpath.GetString() );
-	}
-	else
-	{
-		V_snprintf( tmp, sizeof(tmp), "%s/mapsrc", COM_GetModDirectory() );
-		V_FixSlashes( tmp );
-	}*/
-	char tmp[MAX_PATH*4];
-	V_strncpy( tmp, "mapsrc", MAX_PATH*4 );
+	char tmp2[MAX_PATH];
+	char tmp[MAX_PATH];
+	V_strncpy( tmp, "mapsrc", sizeof(tmp) );
 
 	if ( bMakeRelative && g_pFullFileSystem->FullPathToRelativePath( tmp, tmp2, sizeof(tmp2) ) )
 		V_strcpy( tmp, tmp2 );
@@ -490,8 +478,8 @@ bool CEditorSystem::BuildCurrentVmfPath( char *pszOut, int maxlen )
 	if ( !pszLevelname || !*pszLevelname )
 		return false;
 
-	char tmp[MAX_PATH*4];
-	char tmp2[MAX_PATH*4];
+	char tmp[MAX_PATH];
+	char tmp2[MAX_PATH];
 
 	BuildVmfPath( tmp2, sizeof(tmp2) );
 	V_snprintf( tmp, sizeof(tmp), "%s/%s.vmf", tmp2, pszLevelname );
@@ -518,13 +506,10 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 
 	trace_t tr;
 	Vector vStartPos, vEndPos;
-
-	// Note: Filter player "controlled unit" rather than the player. 
-	//		 The player is already not traceable. When activating mouse in direct control we need to ignore the unit.
 	vStartPos = vPos + vCamOffset;
 	vEndPos = vStartPos + (vMouseAim *  MAX_TRACE_LENGTH);
 
-	NDebugOverlay::Line( vStartPos, vEndPos, 0, 255, 0, true, 4.0f );
+	//NDebugOverlay::Line( vStartPos, vEndPos, 0, 255, 0, true, 4.0f );
 
 	Ray_t pickerRay;
 	pickerRay.Init( vStartPos, vEndPos, EDITOR_MOUSE_TRACE_BOX_MINS, EDITOR_MOUSE_TRACE_BOX_MAXS );
@@ -572,7 +557,18 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorSystem::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
+{
+	CWarsFlora::RemoveFloraInRadius( vPosition, fRadius );
+}
+
 #ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::RenderSelection()
 {
 	CMatRenderContextPtr pRenderContext( materials );
@@ -594,22 +590,10 @@ void CEditorSystem::RenderSelection()
 			continue;
 
 		Vector position = l->GetAbsOrigin();
-		float flSize = l->CollisionProp()->BoundingRadius();
 		Vector color( 0.5f, 1.0f, 0.25f );
 
 		const Vector &mins = l->CollisionProp()->OBBMins();
 		const Vector &maxs = l->CollisionProp()->OBBMaxs();
-
-		/*Vector points[8] = {
-			Vector( flSize, flSize, flSize ),
-			Vector( -flSize, flSize, flSize ),
-			Vector( flSize, -flSize, flSize ),
-			Vector( flSize, flSize, -flSize ),
-			Vector( -flSize, -flSize, flSize ),
-			Vector( flSize, -flSize, -flSize ),
-			Vector( -flSize, flSize, -flSize ),
-			Vector( -flSize, -flSize, -flSize ),
-		};*/
 
 		Vector points[8] = {
 			Vector( maxs.x, maxs.y, maxs.z ),

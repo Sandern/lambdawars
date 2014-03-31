@@ -81,6 +81,9 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "ClearLoadedMap"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
         .def( 
+            "ClearSelection"
+            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearSelection ) )    
+        .def( 
             "DoSelect"
             , (void ( ::CEditorSystem::* )( ::C_HL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
             , ( bp::arg("pPlayer") ) )    
@@ -109,6 +112,10 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "LoadVmf"
             , (void ( ::CEditorSystem::* )( char const * ) )( &::CEditorSystem::LoadVmf )
             , ( bp::arg("pszVmf") ) )    
+        .def( 
+            "RemoveFloraInRadius"
+            , (void ( ::CEditorSystem::* )( ::Vector const &,float ) )( &::CEditorSystem::RemoveFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
             "Shutdown"
             , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Shutdown)
@@ -229,6 +236,9 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "ClearLoadedMap"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
         .def( 
+            "ClearSelection"
+            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearSelection ) )    
+        .def( 
             "DoSelect"
             , (void ( ::CEditorSystem::* )( ::CHL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
             , ( bp::arg("pPlayer") ) )    
@@ -262,6 +272,10 @@ BOOST_PYTHON_MODULE(_editorsystem){
             , (void ( ::CEditorSystem::* )( ::CBaseEntity * ) )(&::CEditorSystem::OnEntityDeleted)
             , (void ( CEditorSystem_wrapper::* )( ::CBaseEntity * ) )(&CEditorSystem_wrapper::default_OnEntityDeleted)
             , ( bp::arg("pEntity") ) )    
+        .def( 
+            "RemoveFloraInRadius"
+            , (void ( ::CEditorSystem::* )( ::Vector const &,float ) )( &::CEditorSystem::RemoveFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
             "SaveCurrentVmf"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::SaveCurrentVmf ) )    

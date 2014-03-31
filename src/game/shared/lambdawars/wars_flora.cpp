@@ -74,14 +74,15 @@ void CWarsFlora::Spawn()
 #endif // CLIENT_DLL
 
 	SetSolid( SOLID_NONE );
-	//SetSolid( SOLID_BBOX );
-	//AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-
+#ifdef CLIENT_DLL
+	SetSolid( SOLID_BBOX );
+	AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+#endif // CLIENT_DLL
 	Vector vecMins = CollisionProp()->OBBMins();
 	Vector vecMaxs = CollisionProp()->OBBMaxs();
 	SetSize( vecMins, vecMaxs );
 
-	//SetTouch( &CWarsFlora::FloraTouch );
+	SetTouch( &CWarsFlora::FloraTouch );
 
 	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
 	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
@@ -297,6 +298,29 @@ void CWarsFlora::SpawnMapFlora()
 
 #endif // CLIENT_DLL
 
+void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
+{
+	CUtlVector<CWarsFlora *> removeFlora;
+	float fRadiusSqr = fRadius * fRadius;
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
+		{
+			removeFlora.AddToTail( pFlora );
+		}
+	}
+
+	FOR_EACH_VEC( removeFlora, idx )
+	{
+		removeFlora[idx]->Remove();
+	}
+}
+
 #ifdef CLIENT_DLL
 CON_COMMAND_F( cl_wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
 #else
@@ -306,7 +330,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 {
 	if( args.ArgC() < 2 )
 	{
-		Warning("wars_flora_spawn: Not enough arguments.\n Example usage: wars_flora_spawn <modelname> <editormanaged:1|0>");
+		Warning("wars_flora_spawn: Not enough arguments.\n Example usage: wars_flora_spawn <modelname> <randomradius> <editormanaged:1|0>");
 		return;
 	}
 	
@@ -322,7 +346,8 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 
 	// Collect arguments
 	const char *pModelName = args[1];
-	bool bEditorManaged = args.ArgC() > 2 ? atoi(args[2]) : false;
+	float fRandomMaxRadius = args.ArgC() > 2 ? atof(args[2]) : 0;
+	bool bEditorManaged = args.ArgC() > 3 ? atoi(args[3]) : false;
 
 #ifndef CLIENT_DLL
 	CBaseEntity::PrecacheModel( pModelName );
@@ -346,7 +371,11 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	float radiusstep = 0.0f;
 	CBaseEntity *ignore = NULL;
 
-	positioninfo_t info( data.m_vEndPos, mins, maxs, startradius, maxradius, radiusgrow, radiusstep, ignore );
+	float fRandomDegree = random->RandomFloat() * 2 * M_PI;
+	float fRandomRadius = random->RandomFloat(0.0f, fRandomMaxRadius);
+	Vector vRandomPosOffset( cos(fRandomDegree) * fRandomRadius, sin(fRandomDegree) * fRandomRadius, 0.0f );
+
+	positioninfo_t info( data.m_vEndPos + vRandomPosOffset, mins, maxs, startradius, maxradius, radiusgrow, radiusstep, ignore );
 	UTIL_FindPosition( info );
 
 	if( !info.m_bSuccess )
@@ -380,6 +409,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	}
 #else
 	DispatchSpawn( pEntity );
+	pEntity->Activate();
 
 	for( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{

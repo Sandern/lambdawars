@@ -41,14 +41,12 @@ public:
 	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
 
+	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
+
 	bool			IsEditorManaged();
 
 #ifndef CLIENT_DLL
 	bool			FillKeyValues( KeyValues *pEntityKey );
-#endif // CLIENT_DLL
-
-#ifdef CLIENT_DLL
-	virtual CollideType_t			GetCollideType( void ) { return ENTITY_SHOULD_COLLIDE; }
 #endif // CLIENT_DLL
 
 private:

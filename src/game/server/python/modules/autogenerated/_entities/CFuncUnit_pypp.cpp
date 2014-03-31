@@ -71,6 +71,25 @@ struct CFuncUnit_wrapper : CFuncUnit, bp::wrapper< CFuncUnit > {
         return CFuncUnit::CanUserControl( pPlayer );
     }
 
+    virtual bool ClientCommand( ::CCommand const & args ) {
+        PY_OVERRIDE_CHECK( CFuncUnit, ClientCommand )
+        PY_OVERRIDE_LOG( _entities, CFuncUnit, ClientCommand )
+        bp::override func_ClientCommand = this->get_override( "ClientCommand" );
+        if( func_ClientCommand.ptr() != Py_None )
+            try {
+                return func_ClientCommand( boost::ref(args) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CFuncUnit::ClientCommand( args );
+            }
+        else
+            return this->CFuncUnit::ClientCommand( args );
+    }
+    
+    bool default_ClientCommand( ::CCommand const & args ) {
+        return CFuncUnit::ClientCommand( args );
+    }
+
     virtual ::IMouse * GetIMouse(  ) {
         PY_OVERRIDE_CHECK( CFuncUnit, GetIMouse )
         PY_OVERRIDE_LOG( _entities, CFuncUnit, GetIMouse )
@@ -1068,10 +1087,12 @@ void register_CFuncUnit_class(){
         { //::CFuncUnit::ClientCommand
         
             typedef bool ( ::CFuncUnit::*ClientCommand_function_type )( ::CCommand const & ) ;
+            typedef bool ( CFuncUnit_wrapper::*default_ClientCommand_function_type )( ::CCommand const & ) ;
             
             CFuncUnit_exposer.def( 
                 "ClientCommand"
-                , ClientCommand_function_type( &::CFuncUnit::ClientCommand )
+                , ClientCommand_function_type(&::CFuncUnit::ClientCommand)
+                , default_ClientCommand_function_type(&CFuncUnit_wrapper::default_ClientCommand)
                 , ( bp::arg("args") ) );
         
         }

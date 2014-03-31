@@ -46,7 +46,11 @@ public:
 	void OnEntityDeleted( CBaseEntity *pEntity );
 #endif // CLIENT_DLL
 
+	void ClearSelection();
 	void DoSelect( CHL2WarsPlayer *pPlayer );
+
+	// Flora
+	void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
 
 private:
 	bool ParseVmfFile( KeyValues *pKeyValues );
@@ -86,6 +90,11 @@ private:
 	CMaterialReference m_matSelect;
 #endif // CLIENT_DLL
 };
+
+inline void CEditorSystem::ClearSelection()
+{
+	m_hSelectedEntities.Purge();
+}
 
 inline bool CEditorSystem::IsSelected( CBaseEntity *pEntity )
 {

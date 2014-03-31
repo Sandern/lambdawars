@@ -1019,7 +1019,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_afButtonLast', 'buttonslast')
         self.IncludeVarAndRename('m_afButtonPressed', 'buttonspressed')
         self.IncludeVarAndRename('m_afButtonReleased', 'buttonsreleased')
- 
+        
         cls.mem_fun('GetLadderSurface').exclude()
         cls.mem_fun('Hints').exclude()
         if self.settings.branch == 'source2013' or self.isserver:
@@ -1046,6 +1046,9 @@ class Entities(SemiSharedModuleGenerator):
 
             mb.mem_funs('CalcView').add_transformation(FT.output('zNear'), FT.output('zFar'), FT.output('fov'))
         else:
+            # Overridable server functions
+            mb.mem_funs('ClientCommand').virtuality = 'virtual'
+        
             # Server excludes
             cls.mem_fun('GetExpresser').exclude()
             cls.mem_fun('GetBotController').exclude()
