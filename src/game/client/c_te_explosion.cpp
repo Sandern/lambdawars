@@ -14,6 +14,10 @@
 #include "tier1/keyvalues.h"
 #include "toolframework_client.h"
 
+#ifdef HL2WARS_DLL
+#include "wars_flora.h"
+#endif // HL2WARS_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -277,6 +281,10 @@ void C_TEExplosion::PostDataUpdate( DataUpdateType_t updateType )
 	}
 
 	BaseExplosionEffect().Create( m_vecOrigin, m_nMagnitude, m_fScale, m_nFlags );
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::DestructFloraInRadius( m_vecOrigin, m_nRadius );
+#endif // HL2WARS_DLL
 }
 
 void C_TEExplosion::RenderParticles( CParticleRenderIterator *pIterator )

@@ -32,6 +32,8 @@ public:
 
 	virtual void FloraTouch( CBaseEntity *pOther );
 
+	virtual void PlayDestructionAnimation();
+
 #ifdef CLIENT_DLL
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	bool Initialize();
@@ -42,6 +44,7 @@ public:
 #endif // CLIENT_DLL 
 
 	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
+	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
 
 	bool			IsEditorManaged();
 
@@ -52,11 +55,13 @@ public:
 private:
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;
+	string_t		m_iszSqueezeDownIdleAnimationName;
 	string_t		m_iszSqueezeUpAnimationName;
 	string_t		m_iszDestructionAnimationName;
 
 	int				m_iIdleSequence;
 	int				m_iSqueezeDownSequence;
+	int				m_iSqueezeDownIdleSequence;
 	int				m_iSqueezeUpSequence;
 	int				m_iDestructSequence;
 

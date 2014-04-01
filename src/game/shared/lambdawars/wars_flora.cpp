@@ -27,17 +27,25 @@ BEGIN_DATADESC( CWarsFlora )
 	DEFINE_KEYFIELD( m_bEditorManaged,		FIELD_BOOLEAN,	"editormanaged" ),
 	DEFINE_KEYFIELD( m_iszIdleAnimationName,		FIELD_STRING,	"idleanimation" ),
 	DEFINE_KEYFIELD( m_iszSqueezeDownAnimationName,		FIELD_STRING,	"squeezedownanimation" ),
+	DEFINE_KEYFIELD( m_iszSqueezeDownIdleAnimationName,	FIELD_STRING,	"squeezedownidleanimation" ),
 	DEFINE_KEYFIELD( m_iszSqueezeUpAnimationName,		FIELD_STRING,	"squeezeupanimation" ),
 	DEFINE_KEYFIELD( m_iszDestructionAnimationName,		FIELD_STRING,	"destructionanimation" ),
 END_DATADESC()
 
 CWarsFlora::CWarsFlora()
 {
+	UseClientSideAnimation();
 #ifndef CLIENT_DLL
-	//UseClientSideAnimation();
-
 	AddEFlags( EFL_SERVER_ONLY );
+#else
+	AddToClientSideAnimationList();
 #endif // CLIENT_DLL
+
+	m_iszIdleAnimationName = MAKE_STRING( "idle" );
+	m_iszSqueezeDownAnimationName = MAKE_STRING( "down" );
+	m_iszSqueezeDownIdleAnimationName = MAKE_STRING( "downidle" );
+	m_iszSqueezeUpAnimationName = MAKE_STRING( "up" );
+	m_iszDestructionAnimationName = MAKE_STRING( "kill" );
 }
 
 #ifndef CLIENT_DLL
@@ -74,10 +82,6 @@ void CWarsFlora::Spawn()
 #endif // CLIENT_DLL
 
 	SetSolid( SOLID_NONE );
-#ifdef CLIENT_DLL
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-#endif // CLIENT_DLL
 	Vector vecMins = CollisionProp()->OBBMins();
 	Vector vecMaxs = CollisionProp()->OBBMaxs();
 	SetSize( vecMins, vecMaxs );
@@ -86,6 +90,7 @@ void CWarsFlora::Spawn()
 
 	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
 	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
+	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
 	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
 	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
 }
@@ -98,6 +103,18 @@ void CWarsFlora::FloraTouch( CBaseEntity *pOther )
 	Msg("FloraTouch\n");
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::PlayDestructionAnimation()
+{
+	if( m_iDestructSequence == -1 )
+		return;
+
+	SetSequence( m_iDestructSequence );
+	ResetSequenceInfo();
+}
+
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -107,6 +124,7 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 	pEntityKey->SetInt( "editormanaged", m_bEditorManaged );
 	pEntityKey->SetString( "idleanimation", STRING( m_iszIdleAnimationName ) );
 	pEntityKey->SetString( "squeezedownanimation", STRING( m_iszSqueezeDownAnimationName ) );
+	pEntityKey->SetString( "squeezedownidleanimation", STRING( m_iszSqueezeDownIdleAnimationName ) );
 	pEntityKey->SetString( "squeezeupanimation", STRING( m_iszSqueezeUpAnimationName ) );
 	pEntityKey->SetString( "destructionanimation", STRING( m_iszDestructionAnimationName ) );
 
@@ -160,6 +178,10 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		m_iszSqueezeDownAnimationName = AllocPooledString( szValue );
 	}
+	else if (FStrEq(szKeyName, "squeezedownidleanimation"))
+	{
+		m_iszSqueezeDownIdleAnimationName = AllocPooledString( szValue );
+	}
 	else if (FStrEq(szKeyName, "squeezeupanimation"))
 	{
 		m_iszSqueezeUpAnimationName = AllocPooledString( szValue );
@@ -180,6 +202,9 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CWarsFlora::Initialize()
 {
 	if ( InitializeAsClientEntity( STRING(GetModelName()), false ) == false )
@@ -207,6 +232,9 @@ bool CWarsFlora::Initialize()
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 const char *CWarsFlora::ParseEntity( const char *pEntData )
 {
 	CEntityMapData entData( (char*)pEntData );
@@ -250,6 +278,9 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 	return entData.CurrentBufferPosition();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::SpawnMapFlora()
 {
 	const char *pMapData = engine->GetMapEntitiesString();
@@ -298,6 +329,40 @@ void CWarsFlora::SpawnMapFlora()
 
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: Apply the functor to all flora in radius.
+//-----------------------------------------------------------------------------
+template < typename Functor >
+bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius )
+{
+	CUtlVector<CWarsFlora *> foundFlora;
+	float fRadiusSqr = fRadius * fRadius;
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
+		{
+			foundFlora.AddToTail( pFlora );
+		}
+	}
+
+	FOR_EACH_VEC( foundFlora, idx )
+	{
+		CWarsFlora *pFlora = foundFlora[idx];
+		if( func( pFlora ) == false )
+			return false;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
 {
 	CUtlVector<CWarsFlora *> removeFlora;
@@ -319,6 +384,25 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
 	{
 		removeFlora[idx]->Remove();
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+class WarsFloraDestructAnimation
+{
+public:
+	bool operator()( CWarsFlora *flora )
+	{
+		flora->PlayDestructionAnimation();
+		return true;
+	}
+};
+
+void CWarsFlora::DestructFloraInRadius( const Vector &vPosition, float fRadius )
+{
+	WarsFloraDestructAnimation functor;
+	ForAllFloraInRadius<WarsFloraDestructAnimation>( functor, vPosition, fRadius );
 }
 
 #ifdef CLIENT_DLL
