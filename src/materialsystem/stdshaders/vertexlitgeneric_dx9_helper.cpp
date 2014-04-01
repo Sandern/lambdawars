@@ -254,6 +254,9 @@ void InitParamsVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** para
 
 	if( bSetFowIfNot )
 		SET_PARAM_STRING_IF_NOT_DEFINED( info.m_nFoW, "_rt_fog_of_war" );
+
+	InitIntParam( info.m_nNoDeferredLight, params, 0 );
+	InitIntParam( info.m_nModelGlobalNormal, params, 0 );
 }
 
 
@@ -855,7 +858,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				SET_STATIC_VERTEX_SHADER_COMBO( STATICLIGHT3, bStaticLight3Streams );
 				SET_STATIC_VERTEX_SHADER_COMBO( LIGHTING_PREVIEW, nLightingPreviewMode );
 				SET_STATIC_VERTEX_SHADER_COMBO( FOW, bHasFoW );
-				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, bTreeSway ? nTreeSwayMode : 0 );					
+				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, bTreeSway ? nTreeSwayMode : 0 );		
+				SET_STATIC_VERTEX_SHADER_COMBO( MODELGLOBALNORMAL, GetIntParam( info.m_nModelGlobalNormal, params, 0 ) ? 1 : 0 );
 				SET_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 
 				if( bDeferredActive )
@@ -1313,6 +1317,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_11, flParams );
 			}
 
+			//pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_14, flParams );
+
 			if ( bDesaturateWithBaseAlpha )
 			{
 				pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant_W( 4, info.m_nDesaturateWithBaseAlpha, fBlendFactor );
@@ -1439,8 +1445,16 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 		if( bDeferredActive )
 		{
-			pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum() );
-			pShader->BindTexture( SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum2() ) ;
+			if( GetIntParam( info.m_nNoDeferredLight, params, 0 ) )
+			{
+				pShaderAPI->BindStandardTexture( SHADER_SAMPLER13, TEXTURE_WHITE );
+				pShaderAPI->BindStandardTexture( SHADER_SAMPLER14, TEXTURE_BLACK );
+			}
+			else
+			{
+				pShader->BindTexture( SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum() );
+				pShader->BindTexture( SHADER_SAMPLER14, GetDeferredExt()->GetTexture_LightAccum2() ) ;
+			}
 
 			//DynamicCmdsOut.BindTexture( pShader, SHADER_SAMPLER13, GetDeferredExt()->GetTexture_LightAccum(), 0 );
 			int x, y, w, t;
@@ -1450,6 +1464,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			//DynamicCmdsOut.SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
 			pShaderAPI->SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
 		}
+
+		CommitGlobalLightForward( pShaderAPI, VERTEX_SHADER_SHADER_SPECIFIC_CONST_14 );
 
 		if ( bHasBump || bHasDiffuseWarp )
 		{

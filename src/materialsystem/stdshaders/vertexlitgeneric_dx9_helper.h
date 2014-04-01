@@ -168,6 +168,9 @@ struct VertexLitGeneric_DX9_Vars_t
 
 	int m_nTeamColorTexture;
 	int m_nTeamColor;
+
+	int m_nNoDeferredLight;
+	int m_nModelGlobalNormal;
 };
 
 void InitParamsVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, bool bVertexLitGeneric, VertexLitGeneric_DX9_Vars_t &info, bool bSetFowIfNot );

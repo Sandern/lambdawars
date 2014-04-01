@@ -174,6 +174,8 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 		// Deferred
 		SHADER_PARAM( NOSHADOWPASS, SHADER_PARAM_TYPE_BOOL, "0", "Allows turning off the shadow pass of this material" )
+		SHADER_PARAM( NODEFERREDLIGHT, SHADER_PARAM_TYPE_BOOL, "0", "No deferred light input" )
+		SHADER_PARAM( MODELGLOBALNORMAL, SHADER_PARAM_TYPE_BOOL, "0", "Use global light direction as normal for all model vertices" )
 	END_SHADER_PARAMS
 
 	void SetupVars( VertexLitGeneric_DX9_Vars_t& info )
@@ -286,6 +288,9 @@ BEGIN_VS_SHADER( VertexLitGeneric, "Help for VertexLitGeneric" )
 
 		info.m_nTeamColor = TEAMCOLOR;
 		info.m_nTeamColorTexture = TEAMCOLORMAP;
+
+		info.m_nNoDeferredLight = NODEFERREDLIGHT;
+		info.m_nModelGlobalNormal = MODELGLOBALNORMAL;
 	}
 
 	// Cloak Pass

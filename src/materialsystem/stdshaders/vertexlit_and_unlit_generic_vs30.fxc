@@ -13,6 +13,7 @@
 // STATIC: "LIGHTING_PREVIEW"		"0..0" [XBOX]
 // STATIC: "FOW"					"0..1"
 // STATIC: "TREESWAY"               "0..2"
+// STATIC: "MODELGLOBALNORMAL"		"0..1"
 
 // DYNAMIC: "COMPRESSED_VERTS"		"0..1"
 // DYNAMIC: "DYNAMIC_LIGHT"			"0..1"
@@ -109,6 +110,8 @@ const float4 g_vMiscParams4					: register( SHADER_SPECIFIC_CONST_11 );
 	#define cMorphSubrect g_vMiscParams4
 	sampler2D morphSampler						: register( D3DVERTEXTEXTURESAMPLER0, s0 );
 #endif
+
+const float4 g_vecLightVec_Forward				: register( SHADER_SPECIFIC_CONST_14 );
 
 #if TESSELLATION
 
@@ -296,7 +299,12 @@ VS_OUTPUT main( const VS_INPUT v )
 			}
 			#else
 			{
+#if (MODELGLOBALNORMAL)
+				o.color.xyz = DoLighting( worldPos, normalize(g_vecLightVec_Forward.xyz), v.vStaticLight, bStaticLight, bDynamicLight, g_bHalfLambert );
+#else
 				o.color.xyz = DoLighting( worldPos, o.worldNormal, v.vStaticLight, bStaticLight, bDynamicLight, g_bHalfLambert );
+#endif // MODELGLOBALNORMAL
+				
 			}
 			#endif
 		}

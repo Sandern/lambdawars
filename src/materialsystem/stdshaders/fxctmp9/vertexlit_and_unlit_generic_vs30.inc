@@ -265,6 +265,27 @@ public:
 #endif
 	}
 private:
+	int m_nMODELGLOBALNORMAL;
+#ifdef _DEBUG
+	bool m_bMODELGLOBALNORMAL;
+#endif
+public:
+	void SetMODELGLOBALNORMAL( int i )
+	{
+		Assert( i >= 0 && i <= 1 );
+		m_nMODELGLOBALNORMAL = i;
+#ifdef _DEBUG
+		m_bMODELGLOBALNORMAL = true;
+#endif
+	}
+	void SetMODELGLOBALNORMAL( bool i )
+	{
+		m_nMODELGLOBALNORMAL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bMODELGLOBALNORMAL = true;
+#endif
+	}
+private:
 	int m_nDOPIXELFOG;
 #ifdef _DEBUG
 	bool m_bDOPIXELFOG;
@@ -359,6 +380,10 @@ public:
 #endif // _DEBUG
 		m_nTREESWAY = 0;
 #ifdef _DEBUG
+		m_bMODELGLOBALNORMAL = false;
+#endif // _DEBUG
+		m_nMODELGLOBALNORMAL = 0;
+#ifdef _DEBUG
 		m_bDOPIXELFOG = true;
 #endif // _DEBUG
 		m_nDOPIXELFOG = ( g_pHardwareConfig->SupportsPixelShaders_2_b() && !IS_FLAG_SET( MATERIAL_VAR_VERTEXFOG ) ) ? 1 : 0 ;
@@ -372,13 +397,13 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bVERTEXCOLOR && m_bCUBEMAP && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bSEAMLESS_BASE && m_bSEAMLESS_DETAIL && m_bSEPARATE_DETAIL_UVS && m_bDECAL && m_bSTATICLIGHT3 && m_bLIGHTING_PREVIEW && m_bFOW && m_bTREESWAY && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
+		bool bAllStaticVarsDefined = m_bVERTEXCOLOR && m_bCUBEMAP && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bSEAMLESS_BASE && m_bSEAMLESS_DETAIL && m_bSEPARATE_DETAIL_UVS && m_bDECAL && m_bSTATICLIGHT3 && m_bLIGHTING_PREVIEW && m_bFOW && m_bTREESWAY && m_bMODELGLOBALNORMAL && m_bDOPIXELFOG && m_bHARDWAREFOGBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 96 * m_nVERTEXCOLOR ) + ( 192 * m_nCUBEMAP ) + ( 384 * m_nHALFLAMBERT ) + ( 768 * m_nFLASHLIGHT ) + ( 1536 * m_nSEAMLESS_BASE ) + ( 3072 * m_nSEAMLESS_DETAIL ) + ( 6144 * m_nSEPARATE_DETAIL_UVS ) + ( 12288 * m_nDECAL ) + ( 24576 * m_nSTATICLIGHT3 ) + ( 24576 * m_nLIGHTING_PREVIEW ) + ( 98304 * m_nFOW ) + ( 196608 * m_nTREESWAY ) + ( 589824 * m_nDOPIXELFOG ) + ( 1179648 * m_nHARDWAREFOGBLEND ) + 0;
+		return ( 96 * m_nVERTEXCOLOR ) + ( 192 * m_nCUBEMAP ) + ( 384 * m_nHALFLAMBERT ) + ( 768 * m_nFLASHLIGHT ) + ( 1536 * m_nSEAMLESS_BASE ) + ( 3072 * m_nSEAMLESS_DETAIL ) + ( 6144 * m_nSEPARATE_DETAIL_UVS ) + ( 12288 * m_nDECAL ) + ( 24576 * m_nSTATICLIGHT3 ) + ( 24576 * m_nLIGHTING_PREVIEW ) + ( 98304 * m_nFOW ) + ( 196608 * m_nTREESWAY ) + ( 589824 * m_nMODELGLOBALNORMAL ) + ( 1179648 * m_nDOPIXELFOG ) + ( 2359296 * m_nHARDWAREFOGBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_vertexlit_and_unlit_generic_vs30 vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_CUBEMAP + vsh_forgot_to_set_static_HALFLAMBERT + vsh_forgot_to_set_static_FLASHLIGHT + vsh_forgot_to_set_static_SEAMLESS_BASE + vsh_forgot_to_set_static_SEAMLESS_DETAIL + vsh_forgot_to_set_static_SEPARATE_DETAIL_UVS + vsh_forgot_to_set_static_DECAL + vsh_forgot_to_set_static_STATICLIGHT3 + vsh_forgot_to_set_static_LIGHTING_PREVIEW + vsh_forgot_to_set_static_FOW + vsh_forgot_to_set_static_TREESWAY + 0
+#define shaderStaticTest_vertexlit_and_unlit_generic_vs30 vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_CUBEMAP + vsh_forgot_to_set_static_HALFLAMBERT + vsh_forgot_to_set_static_FLASHLIGHT + vsh_forgot_to_set_static_SEAMLESS_BASE + vsh_forgot_to_set_static_SEAMLESS_DETAIL + vsh_forgot_to_set_static_SEPARATE_DETAIL_UVS + vsh_forgot_to_set_static_DECAL + vsh_forgot_to_set_static_STATICLIGHT3 + vsh_forgot_to_set_static_LIGHTING_PREVIEW + vsh_forgot_to_set_static_FOW + vsh_forgot_to_set_static_TREESWAY + vsh_forgot_to_set_static_MODELGLOBALNORMAL + 0
 class vertexlit_and_unlit_generic_vs30_Dynamic_Index
 {
 private:
