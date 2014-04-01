@@ -2237,17 +2237,6 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
-    { //::UTIL_ListDir
-    
-        typedef ::boost::python::list ( *UTIL_ListDir_function_type )( char const *,char const *,char const * );
-        
-        bp::def( 
-            "UTIL_ListDir"
-            , UTIL_ListDir_function_type( &::UTIL_ListDir )
-            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
-    
-    }
-
     { //::UTIL_ListPlayersForOwnerNumber
     
         typedef void ( *UTIL_ListPlayersForOwnerNumber_function_type )( int,::CUtlVector< C_HL2WarsPlayer*, CUtlMemory< C_HL2WarsPlayer*, int > > & );
@@ -5428,17 +5417,6 @@ BOOST_PYTHON_MODULE(_utils){
             "UTIL_IsValidEntity"
             , UTIL_IsValidEntity_function_type( &::UTIL_IsValidEntity )
             , ( bp::arg("pEnt") ) );
-    
-    }
-
-    { //::UTIL_ListDir
-    
-        typedef ::boost::python::list ( *UTIL_ListDir_function_type )( char const *,char const *,char const * );
-        
-        bp::def( 
-            "UTIL_ListDir"
-            , UTIL_ListDir_function_type( &::UTIL_ListDir )
-            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
     
     }
 

@@ -87,29 +87,6 @@ void UTIL_PySetModel( CBaseEntity *pEntity, const char *pModelName )
 }
 #endif // CLIENT_DLL
 
-boost::python::list UTIL_ListDir( const char *pPath, const char *pPathID, const char *pWildCard )
-{
-	if( !pPath || !pWildCard )
-		return boost::python::list();
-
-	const char *pFileName;
-	char wildcard[MAX_PATH];
-	FileFindHandle_t fh;
-	boost::python::list result;
-
-	// TODO: Do we need to add a slash in case there is no slash?
-	Q_snprintf(wildcard, MAX_PATH, "%s%s", pPath, pWildCard);
-
-	pFileName = filesystem->FindFirstEx(wildcard, pPathID, &fh);
-	while( pFileName )
-	{
-		result.append( boost::python::object( pFileName ) );
-		pFileName = filesystem->FindNext(fh);
-	}
-	filesystem->FindClose(fh);
-	return result;
-}
-
 // Python fixed up versions
 //-----------------------------------------------------------------------------
 // Purpose: 

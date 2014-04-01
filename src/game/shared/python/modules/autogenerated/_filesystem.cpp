@@ -39,6 +39,28 @@ BOOST_PYTHON_MODULE(_filesystem){
     
     }
 
+    { //::PyFS_IsDirectory
+    
+        typedef bool ( *IsDirectory_function_type )( char const *,char const * );
+        
+        bp::def( 
+            "IsDirectory"
+            , IsDirectory_function_type( &::PyFS_IsDirectory )
+            , ( bp::arg("pFileName"), bp::arg("pathID")=bp::object() ) );
+    
+    }
+
+    { //::PyFS_ListDir
+    
+        typedef ::boost::python::list ( *ListDir_function_type )( char const *,char const *,char const * );
+        
+        bp::def( 
+            "ListDir"
+            , ListDir_function_type( &::PyFS_ListDir )
+            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
+    
+    }
+
     { //::PyFS_ReadFile
     
         typedef ::boost::python::object ( *ReadFile_function_type )( char const *,char const *,bool,int,int );

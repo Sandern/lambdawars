@@ -112,8 +112,6 @@ void UTIL_PySetSize( CBaseEntity *ent, const Vector &vecmin, const Vector &vecma
 void UTIL_PySetModel( CBaseEntity *entity, const char *modelname );
 #endif // CLIENT_DLL
 
-boost::python::list UTIL_ListDir( const char *path, const char *pathid=NULL, const char *wildcard="*" );
-
 // Wrappers
 #ifdef CLIENT_DLL
 	#define DEFAULT_PARTITION_MASK PARTITION_CLIENT_NON_STATIC_EDICTS

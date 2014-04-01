@@ -20,4 +20,7 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 boost::python::object PyFS_FullPathToRelativePath( const char *path, const char *pathid = 0 );
 boost::python::object PyFS_RelativePathToFullPath( const char *path, const char *pathid = 0 );
 
+boost::python::list PyFS_ListDir( const char *path, const char *pathid=NULL, const char *wildcard="*" );
+bool PyFS_IsDirectory( const char *pFileName, const char *pathID = 0 );
+
 #endif // SRCPY_FILESYSTEM_H
