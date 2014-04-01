@@ -460,7 +460,8 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 							message == WM_SYSKEYDOWN ||
 							message == WM_SYSKEYUP;
 
-	keyevent.modifiers = getKeyModifiers( wParam, lParam );
+	m_iKeyModifiers = getKeyModifiers( wParam, lParam );
+	keyevent.modifiers = m_iKeyModifiers;
 
 #if 0
 	if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)

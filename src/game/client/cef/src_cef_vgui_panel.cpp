@@ -407,9 +407,7 @@ void SrcCefVGUIPanel::PerformLayout()
 //-----------------------------------------------------------------------------
 int	SrcCefVGUIPanel::GetEventFlags()
 {
-	int modifiers = m_iEventFlags;
-
-	return modifiers;
+	return m_iEventFlags | CEFSystem().GetKeyModifiers();
 }
 
 //-----------------------------------------------------------------------------

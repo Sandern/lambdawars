@@ -65,6 +65,7 @@ public:
 	const CefKeyEvent &GetLastKeyDownEvent();
 	const CefKeyEvent &GetLastKeyCharEvent();
 #endif // PYPP_GENERATION
+	int GetKeyModifiers();
 
 	void SetFocus( bool focus );
 
@@ -91,6 +92,7 @@ public:
 
 private:
 	bool m_bIsRunning;
+	int m_iKeyModifiers;
 
 #ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 	CefKeyEvent m_LastKeyUpEvent;
@@ -153,6 +155,14 @@ inline const CefKeyEvent &CCefSystem::GetLastKeyCharEvent()
 	return m_LastKeyCharEvent;
 }
 #endif // PYPP_GENERATION
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline int CCefSystem::GetKeyModifiers()
+{
+	return m_iKeyModifiers;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
