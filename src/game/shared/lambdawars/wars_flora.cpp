@@ -462,7 +462,7 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	positioninfo_t info( data.m_vEndPos + vRandomPosOffset, mins, maxs, startradius, maxradius, radiusgrow, radiusstep, ignore );
 	UTIL_FindPosition( info );
 
-	if( !info.m_bSuccess )
+	if( !info.m_bSuccess || info.m_vPosition == vec3_origin )
 	{
 		Warning("wars_flora_spawn: Could not find a valid position\n");
 		return;
