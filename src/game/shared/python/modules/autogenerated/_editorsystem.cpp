@@ -98,10 +98,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "IsMapLoaded"
             , (bool ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::IsMapLoaded ) )    
         .def( 
-            "KeyValuesToVmf"
-            , (void ( ::CEditorSystem::* )( ::KeyValues *,::CUtlBuffer & ) )( &::CEditorSystem::KeyValuesToVmf )
-            , ( bp::arg("pKV"), bp::arg("vmf") ) )    
-        .def( 
             "LevelShutdownPreEntity"
             , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::LevelShutdownPreEntity)
             , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_LevelShutdownPreEntity) )    
@@ -109,22 +105,13 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "LoadCurrentVmf"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::LoadCurrentVmf ) )    
         .def( 
-            "LoadVmf"
-            , (void ( ::CEditorSystem::* )( char const * ) )( &::CEditorSystem::LoadVmf )
-            , ( bp::arg("pszVmf") ) )    
-        .def( 
             "RemoveFloraInRadius"
             , (void ( ::CEditorSystem::* )( ::Vector const &,float ) )( &::CEditorSystem::RemoveFloraInRadius )
             , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
             "Shutdown"
             , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Shutdown)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) )    
-        .def( 
-            "VmfToKeyValues"
-            , (::KeyValues * ( ::CEditorSystem::* )( char const * ) )( &::CEditorSystem::VmfToKeyValues )
-            , ( bp::arg("pszVmf") )
-            , bp::return_value_policy< bp::return_by_value >() );
+            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) );
 
     { //::EditorSystem
     
@@ -253,20 +240,12 @@ BOOST_PYTHON_MODULE(_editorsystem){
             "IsMapLoaded"
             , (bool ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::IsMapLoaded ) )    
         .def( 
-            "KeyValuesToVmf"
-            , (void ( ::CEditorSystem::* )( ::KeyValues *,::CUtlBuffer & ) )( &::CEditorSystem::KeyValuesToVmf )
-            , ( bp::arg("pKV"), bp::arg("vmf") ) )    
-        .def( 
             "LevelShutdownPreEntity"
             , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::LevelShutdownPreEntity)
             , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_LevelShutdownPreEntity) )    
         .def( 
             "LoadCurrentVmf"
             , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::LoadCurrentVmf ) )    
-        .def( 
-            "LoadVmf"
-            , (void ( ::CEditorSystem::* )( char const * ) )( &::CEditorSystem::LoadVmf )
-            , ( bp::arg("pszVmf") ) )    
         .def( 
             "OnEntityDeleted"
             , (void ( ::CEditorSystem::* )( ::CBaseEntity * ) )(&::CEditorSystem::OnEntityDeleted)
@@ -282,12 +261,7 @@ BOOST_PYTHON_MODULE(_editorsystem){
         .def( 
             "Shutdown"
             , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Shutdown)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) )    
-        .def( 
-            "VmfToKeyValues"
-            , (::KeyValues * ( ::CEditorSystem::* )( char const * ) )( &::CEditorSystem::VmfToKeyValues )
-            , ( bp::arg("pszVmf") )
-            , bp::return_value_policy< bp::return_by_value >() );
+            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) );
 
     { //::EditorSystem
     
