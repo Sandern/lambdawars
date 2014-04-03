@@ -95,7 +95,18 @@ bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 bool UnitBaseSense::TestUnit( CUnitBase *pUnit )
 {
-	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->FOWShouldShow( m_pOuter->GetOwnerNumber() ) || !pUnit->IsSolid() )
+	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->IsSolid() || !pUnit->FOWShouldShow( m_pOuter->GetOwnerNumber() ) )
+		return false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool UnitBaseSense::TestFuncUnit( CFuncUnit *pUnit )
+{
+	if( !pUnit->CanBeSeen( m_pOuter ) || !pUnit->IsSolid() || !pUnit->FOWShouldShow( m_pOuter->GetOwnerNumber() ) )
 		return false;
 
 	return true;
@@ -190,7 +201,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	{
 		pFuncOther = g_FuncUnitList[i];
 
-		if( !TestEntity( pFuncOther ) )
+		if( !TestEntity( pFuncOther ) || !TestFuncUnit( pFuncOther ) )
 			continue;
 
 		otherDist = origin.AsVector2D().DistToSqr(pFuncOther->GetAbsOrigin().AsVector2D());

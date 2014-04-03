@@ -13,6 +13,8 @@
 
 #include "unit_component.h"
 
+class CFuncUnit;
+
 // Sensing class
 class UnitBaseSense : public UnitComponent
 {
@@ -33,6 +35,7 @@ public:
 
 	bool TestEntity( CBaseEntity *pEntity );
 	bool TestUnit( CUnitBase *pUnit );
+	bool TestFuncUnit( CFuncUnit *pUnit );
 
 	void SetUseLimitedViewCone( bool bUseCone );
 	void SetViewCone( float fCone );
