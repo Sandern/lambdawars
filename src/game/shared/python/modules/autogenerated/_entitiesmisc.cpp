@@ -2251,7 +2251,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         CTakeDamageInfo_exposer.staticmethod( "DebugGetDamageTypeString" );
         { //property "attributes"[fget=::CTakeDamageInfo::GetAttributes, fset=::CTakeDamageInfo::SetAttributes]
         
-            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) ;
+            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) const;
             typedef void ( ::CTakeDamageInfo::*fset )( ::boost::python::object ) ;
             
             CTakeDamageInfo_exposer.add_property( 
@@ -5366,7 +5366,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         CTakeDamageInfo_exposer.staticmethod( "DebugGetDamageTypeString" );
         { //property "attributes"[fget=::CTakeDamageInfo::GetAttributes, fset=::CTakeDamageInfo::SetAttributes]
         
-            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) ;
+            typedef ::boost::python::object ( ::CTakeDamageInfo::*fget )(  ) const;
             typedef void ( ::CTakeDamageInfo::*fset )( ::boost::python::object ) ;
             
             CTakeDamageInfo_exposer.add_property( 

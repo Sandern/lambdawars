@@ -194,6 +194,9 @@ void CMultiDamage::Init( CBaseEntity *pTarget, CBaseEntity *pInflictor, CBaseEnt
 void ClearMultiDamage( void )
 {
 	g_MultiDamage.Init( NULL, NULL, NULL, NULL, vec3_origin, vec3_origin, vec3_origin, 0, 0, 0 );
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+	g_MultiDamage.SetAttributes( boost::python::object() );
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -244,6 +247,9 @@ void AddMultiDamage( const CTakeDamageInfo &info, CBaseEntity *pEntity )
 	g_MultiDamage.SetReportedPosition( info.GetReportedPosition() );
 	g_MultiDamage.SetMaxDamage( MAX( g_MultiDamage.GetMaxDamage(), info.GetMaxDamage() ) );
 	g_MultiDamage.SetAmmoType( info.GetAmmoType() );
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+	g_MultiDamage.SetAttributes( info.GetAttributes() );
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 
 	bool bHasPhysicsForceDamage = !g_pGameRules->Damage_NoPhysicsForce( info.GetDamageType() );
 	if ( bHasPhysicsForceDamage && g_MultiDamage.GetDamageType() != DMG_GENERIC )

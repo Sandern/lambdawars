@@ -99,12 +99,10 @@ public:
 	void			AdjustPlayerDamageInflictedForSkillLevel();
 	void			AdjustPlayerDamageTakenForSkillLevel();
 
-#ifdef HL2WARS_DLL
-#ifdef ENABLE_PYTHON
-	boost::python::object GetAttributes() { return m_Attributes; }
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+	boost::python::object GetAttributes() const { return m_Attributes; }
 	void SetAttributes( boost::python::object attributes ) { m_Attributes = attributes; }
-#endif // ENABLE_PYTHON
-#endif // HL2WARS_DLL
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 
 	// Given a damage type (composed of the #defines above), fill out a string with the appropriate text.
 	// For designer debug output.
@@ -133,11 +131,9 @@ protected:
 	float			m_flRadius;
 	bool			m_bForceFriendlyFire;	// Ideally this would be a dmg type, but we can't add more
 
-#ifdef HL2WARS_DLL
-#ifdef ENABLE_PYTHON
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
 	boost::python::object m_Attributes;
-#endif // ENABLE_PYTHON
-#endif // HL2WARS_DLL
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 
 	DECLARE_SIMPLE_DATADESC();
 };
