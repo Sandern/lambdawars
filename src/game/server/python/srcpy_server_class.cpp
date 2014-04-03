@@ -26,9 +26,10 @@ EXTERN_SEND_TABLE( DT_BaseProjectile );
 EXTERN_SEND_TABLE( DT_BaseGrenade );
 EXTERN_SEND_TABLE( DT_BaseCombatWeapon );
 EXTERN_SEND_TABLE( DT_PlayerResource );
-
 EXTERN_SEND_TABLE( DT_BaseToggle );
 EXTERN_SEND_TABLE( DT_BaseTrigger );
+EXTERN_SEND_TABLE( DT_BreakableProp );
+
 EXTERN_SEND_TABLE( DT_Beam );
 EXTERN_SEND_TABLE( DT_Sprite );
 EXTERN_SEND_TABLE( DT_SmokeTrail );
@@ -98,6 +99,9 @@ void PyServerClass::SetupServerClass( int iType )
 		break;
 	case PN_BASETRIGGER:
 		m_pTable = &(DT_BaseTrigger::g_SendTable);
+		break;
+	case PN_BREAKABLEPROP:
+		m_pTable = &(DT_BreakableProp::g_SendTable);
 		break;
 	case PN_SPRITE:
 		m_pTable = &(DT_Sprite::g_SendTable);

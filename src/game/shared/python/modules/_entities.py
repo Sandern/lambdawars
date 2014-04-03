@@ -179,6 +179,7 @@ class Entities(SemiSharedModuleGenerator):
             '$c_playerresource.h',
             '#player_resource.h',
             '#props.h',
+            '$c_breakableprop.h',
             '#physics_prop_ragdoll.h',
             'nav_area.h',
             
@@ -223,6 +224,7 @@ class Entities(SemiSharedModuleGenerator):
         'C_BaseToggle',
         'C_BaseTrigger',
         'C_FuncBrush',
+        'C_BreakableProp',
         
         # Effects
         'C_Sprite',

@@ -705,12 +705,12 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseAnimating, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseAnimating, GetServerClass )
+        PY_OVERRIDE_CHECK( CBreakableProp, GetServerClass )
+        PY_OVERRIDE_LOG( _entities, CBreakableProp, GetServerClass )
         ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
-        return CBaseAnimating::GetServerClass();
+        return CBreakableProp::GetServerClass();
     }
 
     static int m_lifeState_Get( CPhysicsProp const & inst ) { return inst.m_lifeState.Get(); }

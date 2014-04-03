@@ -20,6 +20,7 @@
 #include "steam/steamclientpublic.h"
 #include "view_shared.h"
 #include "c_playerresource.h"
+#include "c_breakableprop.h"
 #include "nav_area.h"
 #include "Sprite.h"
 #include "SpriteTrail.h"

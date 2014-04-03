@@ -705,12 +705,12 @@ struct CBreakableProp_wrapper : CBreakableProp, bp::wrapper< CBreakableProp > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseAnimating, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseAnimating, GetServerClass )
+        PY_OVERRIDE_CHECK( CBreakableProp, GetServerClass )
+        PY_OVERRIDE_LOG( _entities, CBreakableProp, GetServerClass )
         ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
-        return CBaseAnimating::GetServerClass();
+        return CBreakableProp::GetServerClass();
     }
 
     static int m_lifeState_Get( CBreakableProp const & inst ) { return inst.m_lifeState.Get(); }
@@ -805,6 +805,9 @@ void register_CBreakableProp_class(){
         .def( 
             "GetPhysicsMode"
             , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetPhysicsMode ) )    
+        .def( 
+            "GetPyNetworkType"
+            , (int (*)(  ))( &::CBreakableProp::GetPyNetworkType ) )    
         .def( 
             "HandleFirstCollisionInteractions"
             , (void ( ::CBreakableProp::* )( int,::gamevcollisionevent_t * ) )( &::CBreakableProp::HandleFirstCollisionInteractions )
@@ -1110,6 +1113,7 @@ void register_CBreakableProp_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBreakableProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBreakableProp_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &CBreakableProp_wrapper::m_lifeState_Get, &CBreakableProp_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBreakableProp_wrapper::m_takedamage_Get, &CBreakableProp_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBreakableProp_wrapper::m_nSkin_Get, &CBreakableProp_wrapper::m_nSkin_Set );
