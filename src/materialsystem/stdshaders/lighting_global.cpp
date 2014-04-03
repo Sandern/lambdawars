@@ -46,6 +46,11 @@ BEGIN_VS_SHADER( LIGHTING_GLOBAL, "" )
 
 			DECLARE_STATIC_PIXEL_SHADER( lightingpass_global_ps30 );
 			SET_STATIC_PIXEL_SHADER( lightingpass_global_ps30 );
+
+			// Per-instance state
+			/*PI_BeginCommandBuffer();
+			PI_SetPixelShaderAmbientLightCube( 20 );
+			PI_EndCommandBuffer();*/
 		}
 		DYNAMIC_STATE
 		{

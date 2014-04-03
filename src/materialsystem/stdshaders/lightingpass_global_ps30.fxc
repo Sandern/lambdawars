@@ -27,6 +27,8 @@ const float3 g_light_ambient_low_half		: register( c18 );
 
 const float3 g_light_shadow_threshold		: register( c19 );
 
+//const float3 cAmbientCube[6]				: register( c20 );
+
 struct PS_INPUT
 {
 	float2 vTexCoord				: TEXCOORD0;
@@ -38,6 +40,23 @@ struct PS_OUTPUT
 {
 	float4 vColor_0				:	COLOR0;
 };
+
+// Better suited to Pixel shader models, 11 instructions in pixel shader
+/*float3 PixelShaderAmbientLight( const float3 worldNormal, const float3 cAmbientCube[6] )
+{
+	float3 linearColor, nSquared = worldNormal * worldNormal;
+	float3 isNegative = ( worldNormal < 0.0 );
+	float3 isPositive = 1-isNegative;
+
+	isNegative *= nSquared;
+	isPositive *= nSquared;
+
+	linearColor = isPositive.x * cAmbientCube[0] + isNegative.x * cAmbientCube[1] +
+				  isPositive.y * cAmbientCube[2] + isNegative.y * cAmbientCube[3] +
+				  isPositive.z * cAmbientCube[4] + isNegative.z * cAmbientCube[5];
+
+	return linearColor;
+}*/
 
 PS_OUTPUT main( const PS_INPUT In )
 {
@@ -63,9 +82,11 @@ PS_OUTPUT main( const PS_INPUT In )
 	float litDot = lerp( viewFwdDot, viewFwdDot * 0.5f + 0.5f, half_lambert );
 
 	float3 diffuse = g_light_diffuse;
+	// Match color from vrad, makes shadows look sharper (better transition), however does not really look nice
+	//float3 diffuse = PixelShaderAmbientLight( normalize(g_vecLightVec_Forward.xyz), cAmbientCube ); 
 	float lightAmount = saturate( litDot );
 	float3 ambient = lerp( g_light_ambient_low_half, g_light_ambient_high, viewFwdDot );
-
+	
 #if HAS_SHADOW
 	if ( flDepth < DEPTH_RECONSTRUCTION_LIMIT )
 	{
