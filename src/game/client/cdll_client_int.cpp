@@ -138,7 +138,6 @@
 
 #ifdef INFESTED_DLL
 #include "missionchooser/iasw_mission_chooser.h"
-
 #endif
 
 #include "tier1/UtlDict.h"
@@ -153,6 +152,8 @@
 #include "wars_mount_system.h"
 #include "wars_flora.h"
 #include "editor/editorsystem.h"
+
+//#include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -210,6 +211,10 @@ IASW_Mission_Chooser *missionchooser = NULL;
 #if defined( REPLAY_ENABLED )
 IReplayHistoryManager *g_pReplayHistoryManager = NULL;
 #endif
+
+#ifdef HL2WARS_DLL
+IWarsEditorStorage *warseditorstorage = NULL;
+#endif // HL2WARS_DLL
 
 IScriptManager *scriptmanager = NULL;
 
@@ -553,6 +558,9 @@ public:
 #ifdef INFESTED_DLL
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
+#ifdef HL2WARS_DLL
+		//AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+#endif // HL2WARS_DLL
 	}
 
 	virtual int	Count()
@@ -1217,6 +1225,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 		return false;
 #endif
 
+#ifdef HL2WARS_DLL
+	//if ( (warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL)) == NULL )
+	//	return false;
+#endif // HL2WARS_DLL
+
 	if ( !CommandLine()->CheckParm( "-noscripting") )
 	{
 		scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL );
@@ -1292,6 +1305,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	// create the Navigation Mesh interface
 	TheNavMesh = new CNavMesh;
 #endif
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::InitFloraGrid();
+#endif // HL2WARS_DLL
 
 	COM_TimestampedLog( "ClientDLL Init - Finish" );
 	return true;
@@ -1398,6 +1415,10 @@ void CHLClient::Shutdown( void )
 		TheNavMesh = NULL;
 	}
 #endif
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::DestroyFloraGrid();
+#endif // HL2WARS_DLL
 	
 	DisconnectTier3Libraries( );
 	DisconnectTier2Libraries( );

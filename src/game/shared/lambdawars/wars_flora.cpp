@@ -8,18 +8,29 @@
 #include "wars_flora.h"
 #include "mapentities_shared.h"
 #include "gamestringpool.h"
-
+#include "worldsize.h"
 #include "hl2wars_util_shared.h"
 
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
 #include "cdll_util.h"
+#include "playerandunitenumerator.h"
 #else
 #include "hl2wars_player.h"
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+#define FLORA_TILESIZE 256
+#define FLORA_GRIDSIZE (COORD_EXTENT/FLORA_TILESIZE)
+#define FLORA_KEYSINGLE( x ) (int)((MAX_COORD_INTEGER+x) / FLORA_TILESIZE)
+#define FLORA_KEY( position ) (int)((MAX_COORD_INTEGER+position.x) / FLORA_TILESIZE) + ((int)((MAX_COORD_INTEGER+position.y) / FLORA_TILESIZE) * FLORA_GRIDSIZE)
+
+//CWarsFlora *s_FloraGrid[FLORA_GRIDSIZE*FLORA_GRIDSIZE];
+//CWarsFlora *CWarsFlora::m_pFloraGrid = NULL;
+typedef CUtlVector< CWarsFlora * > FloraVector;
+CUtlVector< FloraVector > s_FloraGrid;
 
 LINK_ENTITY_TO_CLASS( wars_flora, CWarsFlora );
 
@@ -32,7 +43,10 @@ BEGIN_DATADESC( CWarsFlora )
 	DEFINE_KEYFIELD( m_iszDestructionAnimationName,		FIELD_STRING,	"destructionanimation" ),
 END_DATADESC()
 
-CWarsFlora::CWarsFlora()
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CWarsFlora::CWarsFlora() : m_iKey(-1)
 {
 	UseClientSideAnimation();
 #ifndef CLIENT_DLL
@@ -46,6 +60,14 @@ CWarsFlora::CWarsFlora()
 	m_iszSqueezeDownIdleAnimationName = MAKE_STRING( "downidle" );
 	m_iszSqueezeUpAnimationName = MAKE_STRING( "up" );
 	m_iszDestructionAnimationName = MAKE_STRING( "kill" );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CWarsFlora::~CWarsFlora()
+{
+	RemoveFromFloraGrid();
 }
 
 #ifndef CLIENT_DLL
@@ -71,6 +93,8 @@ void CWarsFlora::Precache( void )
 //-----------------------------------------------------------------------------
 void CWarsFlora::Spawn()
 {
+	InsertInFloraGrid();
+
 #ifndef CLIENT_DLL
 	Precache();
 #endif // CLIENT_DLL
@@ -138,6 +162,59 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 
 // Client Spawning Code
 #ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::UpdateUnitAvoid()
+{
+	if( m_iSqueezeDownSequence == -1 )
+		return;
+
+	float flRadius = CollisionProp()->BoundingRadius();
+	CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
+	partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
+
+	// Okay, decide how to avoid if there's anything close by
+	int c = avoid.GetObjectCount();
+	if( c > 0 )
+	{
+		int iSequence = GetSequence();
+		if( iSequence != m_iSqueezeDownSequence && iSequence != m_iSqueezeDownIdleSequence  )
+		{
+			SetSequence( m_iSqueezeDownSequence );
+		}
+		else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() )
+		{
+			SetSequence( m_iSqueezeDownIdleSequence );
+		}
+
+		m_fAvoidTimeOut = gpGlobals->curtime + 0.1f;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::UpdateClientSideAnimation()
+{
+	BaseClass::UpdateClientSideAnimation();
+
+	UpdateUnitAvoid();
+
+	if( m_fAvoidTimeOut < gpGlobals->curtime )
+	{
+		int iSequence = GetSequence();
+		if( iSequence == m_iSqueezeDownSequence || iSequence == m_iSqueezeDownIdleSequence )
+		{
+			SetSequence( m_iSqueezeUpSequence );
+		}
+		else if( iSequence == m_iSqueezeUpSequence && IsSequenceFinished() )
+		{
+			SetSequence( m_iIdleSequence );
+		}
+	}
+}
+
 bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if ( FStrEq(szKeyName, "health") )
@@ -330,6 +407,41 @@ void CWarsFlora::SpawnMapFlora()
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::InitFloraGrid()
+{
+	//m_pFloraGrid = malloc( FLORA_TILESIZE * FLORA_TILESIZE * sizeof( CWarsFlora * ) );
+	s_FloraGrid.SetCount( FLORA_TILESIZE * FLORA_TILESIZE );
+}
+
+void CWarsFlora::DestroyFloraGrid()
+{
+	s_FloraGrid.RemoveAll();
+}
+
+void CWarsFlora::InsertInFloraGrid()
+{
+	m_iKey = FLORA_KEY( GetAbsOrigin() );
+	if( m_iKey < 0 || m_iKey > s_FloraGrid.Count() )
+	{
+		Warning("InsertInFloraGrid: Could not insert flora entity with key %d\n", m_iKey );
+		m_iKey = -1;
+		return;
+	}
+	s_FloraGrid[m_iKey].AddToTail( this );
+}
+
+void CWarsFlora::RemoveFromFloraGrid()
+{
+	if( m_iKey == -1 )
+		return;
+
+	s_FloraGrid[m_iKey].FindAndRemove( this );
+	m_iKey = -1;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Apply the functor to all flora in radius.
 //-----------------------------------------------------------------------------
 template < typename Functor >
@@ -337,16 +449,30 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 {
 	CUtlVector<CWarsFlora *> foundFlora;
 	float fRadiusSqr = fRadius * fRadius;
-#ifdef CLIENT_DLL
-	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
-#else
-	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
-#endif // CLIENT_DLL
+
+	int originX = FLORA_KEYSINGLE( vPosition.x );
+	int originY = FLORA_KEYSINGLE( vPosition.y );
+	int shiftLimit = ceil( fRadius / FLORA_TILESIZE );
+
+	for( int x = originX - shiftLimit; x <= originX + shiftLimit; ++x )
 	{
-		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
-		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
+		if ( x < 0 || x >= FLORA_GRIDSIZE )
+			continue;
+
+		for( int y = originY - shiftLimit; y <= originY + shiftLimit; ++y )
 		{
-			foundFlora.AddToTail( pFlora );
+			if ( y < 0 || y >= FLORA_GRIDSIZE )
+				continue;
+
+			const FloraVector &floraVector = s_FloraGrid[x + (y * FLORA_GRIDSIZE)];
+			for( int i = 0; i < floraVector.Count(); i++ )
+			{
+				CWarsFlora *pFlora = floraVector[i];
+				if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
+				{
+					foundFlora.AddToTail( pFlora );
+				}
+			}
 		}
 	}
 
@@ -403,6 +529,25 @@ void CWarsFlora::DestructFloraInRadius( const Vector &vPosition, float fRadius )
 {
 	WarsFloraDestructAnimation functor;
 	ForAllFloraInRadius<WarsFloraDestructAnimation>( functor, vPosition, fRadius );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Put flora on fire!
+//-----------------------------------------------------------------------------
+class WarsFloraIgnite
+{
+public:
+	bool operator()( CWarsFlora *flora )
+	{
+		// TODO: Need CEntityFlame on client
+		//flora->IgniteLifetime( 30.0f );
+		return true;
+	}
+};
+static void IgniteFloraInRadius( const Vector &vPosition, float fRadius )
+{
+	WarsFloraIgnite functor;
+	ForAllFloraInRadius<WarsFloraIgnite>( functor, vPosition, fRadius );
 }
 
 #ifdef CLIENT_DLL
@@ -503,4 +648,25 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 		engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
 	}
 #endif // CLIENT_DLL
+}
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_grid_mouse, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( wars_flora_grid_mouse, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+#ifdef CLIENT_DLL
+	CHL2WarsPlayer *pPlayer = CHL2WarsPlayer::GetLocalHL2WarsPlayer(); 
+#else
+	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( UTIL_GetCommandClientIndex() ) );
+#endif // CLIENT_DLL
+	if( !pPlayer )
+		return;
+
+	const MouseTraceData_t &data = pPlayer->GetMouseData();
+
+	int iKey = FLORA_KEY( data.m_vWorldOnlyEndPos );
+
+	Msg( "%d Flora at mouse position\n", s_FloraGrid[iKey].Count() );
 }

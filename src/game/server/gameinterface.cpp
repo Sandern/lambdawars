@@ -120,9 +120,12 @@
 #include "fowmgr.h"
 #include "wars_mount_system.h"
 #include "editor/editorsystem.h"
+#include "wars_flora.h"
 
 #include "INetChannel.h"
 #include "IClient.h"
+
+//#include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
@@ -210,6 +213,10 @@ IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #else
 IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #endif
+
+#ifdef HL2WARS_DLL
+//IWarsEditorStorage *warseditorstorage = NULL;
+#endif // HL2WARS_DLL
 
 IGameSystem *SoundEmitterSystem();
 void SoundSystemPreloadSounds( void );
@@ -657,6 +664,10 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 	// create the Navigation Mesh interface
 	TheNavMesh = NavMeshFactory();
 
+#ifdef HL2WARS_DLL
+	CWarsFlora::InitFloraGrid();
+#endif // HL2WARS_DLL
+
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 
@@ -765,6 +776,11 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( (g_pMatchExtSwarm = (IMatchExtSwarm *)appSystemFactory(IMATCHEXT_SWARM_INTERFACE, NULL)) == NULL )
 		return false;
 #endif
+
+#ifdef HL2WARS_DLL
+	//if ( (warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL)) == NULL )
+	//	return false;
+#endif // HL2WARS_DLL
 
 	if ( !g_pMatchFramework )
 		return false;
@@ -951,6 +967,10 @@ void CServerGameDLL::DLLShutdown( void )
 		delete TheNavMesh;
 		TheNavMesh = NULL;
 	}
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::DestroyFloraGrid();
+#endif // HL2WARS_DLL
 
 #if !defined(NO_STEAM)
 	s_SteamAPIContext.Clear(); // Steam API context shutdown
@@ -3640,6 +3660,9 @@ public:
 #ifdef INFESTED_DLL
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
+#ifdef HL2WARS_DLL
+		//AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+#endif // HL2WARS_DLL
 	}
 
 	virtual int	Count()

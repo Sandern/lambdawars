@@ -101,6 +101,11 @@ extern IASW_Mission_Chooser *missionchooser;
 extern IReplayHistoryManager *g_pReplayHistoryManager;
 #endif
 
+#ifdef HL2WARS_DLL
+class IWarsEditorStorage;
+extern IWarsEditorStorage *warseditorstorage;
+#endif
+
 // Returns the CPU/GPU level
 CPULevel_t GetCPULevel();
 // Returns the actual value of the CPU level convar, even on the 360

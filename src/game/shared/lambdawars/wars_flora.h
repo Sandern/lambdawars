@@ -24,6 +24,7 @@ class CWarsFlora : public CBaseAnimating
 
 public:
 	CWarsFlora();
+	~CWarsFlora();
 	
 #ifndef CLIENT_DLL
 	virtual void Precache( void );
@@ -35,6 +36,9 @@ public:
 	virtual void PlayDestructionAnimation();
 
 #ifdef CLIENT_DLL
+	void UpdateUnitAvoid();
+	virtual void UpdateClientSideAnimation();
+
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	bool Initialize();
 
@@ -43,8 +47,14 @@ public:
 	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
 
+	static void InitFloraGrid();
+	static void DestroyFloraGrid();
+	void		InsertInFloraGrid();
+	void		RemoveFromFloraGrid();
+
 	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
 	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
+	static void IgniteFloraInRadius( const Vector &vPosition, float fRadius );
 
 	bool			IsEditorManaged();
 
@@ -53,6 +63,10 @@ public:
 #endif // CLIENT_DLL
 
 private:
+	static CWarsFlora *m_pFloraGrid;
+	int				m_iKey;
+	CWarsFlora		*m_pNext;
+
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;
 	string_t		m_iszSqueezeDownIdleAnimationName;
@@ -64,6 +78,10 @@ private:
 	int				m_iSqueezeDownIdleSequence;
 	int				m_iSqueezeUpSequence;
 	int				m_iDestructSequence;
+
+#ifdef CLIENT_DLL
+	float			m_fAvoidTimeOut;
+#endif // CLIENT_DLL
 
 	bool			m_bEditorManaged;
 };
