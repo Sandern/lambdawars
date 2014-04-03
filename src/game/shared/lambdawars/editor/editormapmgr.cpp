@@ -130,10 +130,11 @@ void CEditorMapMgr::LoadCurrentVmf()
 
 	if( !g_pFullFileSystem->FileExists( tmp ) )
 	{
-		Warning( "Expected file unavailable (moved, deleted).\n" );
+		Warning( "Expected file unavailable (moved, deleted): %s\n", tmp );
 		return;
 	}
 
+	Msg( "Loading \"%s\"\n", tmp );
 	LoadVmf( tmp );
 }
 
@@ -286,7 +287,7 @@ bool CEditorMapMgr::ParseVmfFile( KeyValues *pKeyValues )
 	if( iMapVersion != iBspMapVersion )
 	{
 		ClearLoadedMap();
-		Warning( "Could not parse VMF. Map version does not match! (%d != %d)\n", iMapVersion, iBspMapVersion );
+		Warning( "Could not parse VMF. Map version does not match! (vmf %d != bsp %d)\n", iMapVersion, iBspMapVersion );
 		return false;
 	}
 
@@ -446,23 +447,6 @@ extern const char *COM_GetModDirectory( void );
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorMapMgr::BuildVmfPath( char *pszOut, int maxlen, bool bMakeRelative )
-{
-	char tmp2[MAX_PATH];
-	char tmp[MAX_PATH];
-	V_strncpy( tmp, "mapsrc", sizeof(tmp) );
-
-	if ( bMakeRelative && g_pFullFileSystem->FullPathToRelativePath( tmp, tmp2, sizeof(tmp2) ) )
-		V_strcpy( tmp, tmp2 );
-	else if ( !bMakeRelative && g_pFullFileSystem->RelativePathToFullPath( tmp, "MOD", tmp2, sizeof(tmp2) ) )
-		V_strcpy( tmp, tmp2 );
-
-	V_snprintf( pszOut, maxlen, "%s", tmp );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 bool CEditorMapMgr::BuildCurrentVmfPath( char *pszOut, int maxlen )
 {
 #ifdef CLIENT_DLL
@@ -474,16 +458,24 @@ bool CEditorMapMgr::BuildCurrentVmfPath( char *pszOut, int maxlen )
 	if ( !pszLevelname || !*pszLevelname )
 		return false;
 
-	char tmp[MAX_PATH];
-	char tmp2[MAX_PATH];
+	char instancePath[MAX_PATH];
+	char vmfPath[MAX_PATH];
+	char vmfFullPath[MAX_PATH];
 
-	BuildVmfPath( tmp2, sizeof(tmp2) );
-	V_snprintf( tmp, sizeof(tmp), "%s/%s.vmf", tmp2, pszLevelname );
-	V_FixSlashes( tmp );
+	V_snprintf( instancePath, sizeof(instancePath), "mapsrc/%s", pszLevelname );
+	if( filesystem->FileExists( instancePath ) && filesystem->IsDirectory( instancePath ) )
+	{
+		V_snprintf( vmfPath, sizeof(vmfPath), "mapsrc/%s/%s_instance.vmf", pszLevelname, pszLevelname );
+	}
+	else
+	{
+		V_snprintf( vmfPath, sizeof(vmfPath), "mapsrc/%s.vmf", pszLevelname );
+		
+	}
+	V_FixSlashes( vmfPath );
+	if ( g_pFullFileSystem->FullPathToRelativePath( vmfPath, vmfFullPath, sizeof(vmfFullPath) ) )
+		V_strcpy( vmfPath, vmfFullPath );
 
-	if ( g_pFullFileSystem->FullPathToRelativePath( tmp, tmp2, sizeof(tmp2) ) )
-		V_strcpy( tmp, tmp2 );
-
-	V_snprintf( pszOut, maxlen, "%s", tmp );
+	V_snprintf( pszOut, maxlen, "%s", vmfPath );
 	return true;
 }

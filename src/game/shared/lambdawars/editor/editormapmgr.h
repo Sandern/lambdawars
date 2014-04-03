@@ -34,7 +34,6 @@ public:
 private:
 	bool ParseVmfFile( KeyValues *pKeyValues );
 	
-	void BuildVmfPath( char *pszOut, int maxlen, bool bMakeRelative = true );
 	bool BuildCurrentVmfPath( char *pszOut, int maxlen );
 
 #ifndef CLIENT_DLL
