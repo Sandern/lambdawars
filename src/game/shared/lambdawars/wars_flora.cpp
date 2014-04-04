@@ -184,6 +184,9 @@ void CWarsFlora::InitFloraData()
 	static int keyDestruct = KeyValuesSystem()->GetSymbolForString( "destructsequence" );
 	static int keyIgnite = KeyValuesSystem()->GetSymbolForString( "ignite" );
 
+	static int keyMinDist = KeyValuesSystem()->GetSymbolForString( "fademindist" );
+	static int keyMaxDist = KeyValuesSystem()->GetSymbolForString( "fademaxdist" );
+
 	// Find our section. No section? nothing to apply!
 #ifdef CLIENT_DLL
 	const char *pModelName = modelinfo->GetModelName( GetModel() );
@@ -219,6 +222,13 @@ void CWarsFlora::InitFloraData()
 	const char *pDestructAnimationName = pSection->GetString( keyDestruct, NULL );
 	if( pDestructAnimationName )
 		m_iszDestructionAnimationName = AllocPooledString( pDestructAnimationName );
+
+#ifdef CLIENT_DLL
+	// Fade distance
+	float fademindist = pSection->GetFloat( keyMinDist, GetMinFadeDist() );
+	float fademaxdist = pSection->GetFloat( keyMaxDist, GetMaxFadeDist() );
+	SetDistanceFade( fademindist, fademaxdist );
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------

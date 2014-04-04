@@ -747,6 +747,12 @@ void register_CWarsFlora_class(){
             , (void (*)( ::Vector const &,float,float ))( &::CWarsFlora::IgniteFloraInRadius )
             , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("fLifetime")=3.0e+1f ) )    
         .def( 
+            "InitFloraData"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InitFloraData ) )    
+        .def( 
+            "InitFloraDataKeyValues"
+            , (void (*)(  ))( &::CWarsFlora::InitFloraDataKeyValues ) )    
+        .def( 
             "InitFloraGrid"
             , (void (*)(  ))( &::CWarsFlora::InitFloraGrid ) )    
         .def( 
@@ -927,6 +933,7 @@ void register_CWarsFlora_class(){
         .staticmethod( "DestroyFloraGrid" )    
         .staticmethod( "DestructFloraInRadius" )    
         .staticmethod( "IgniteFloraInRadius" )    
+        .staticmethod( "InitFloraDataKeyValues" )    
         .staticmethod( "InitFloraGrid" )    
         .staticmethod( "RemoveFloraInRadius" )    
         .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    

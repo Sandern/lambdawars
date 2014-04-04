@@ -602,6 +602,12 @@ void register_CWarsFlora_class(){
             , (void ( ::CWarsFlora::* )( float ) )( &::CWarsFlora::IgniteLifetime )
             , ( bp::arg("flFlameLifetime") ) )    
         .def( 
+            "InitFloraData"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InitFloraData ) )    
+        .def( 
+            "InitFloraDataKeyValues"
+            , (void (*)(  ))( &::CWarsFlora::InitFloraDataKeyValues ) )    
+        .def( 
             "InitFloraGrid"
             , (void (*)(  ))( &::CWarsFlora::InitFloraGrid ) )    
         .def( 
@@ -765,6 +771,7 @@ void register_CWarsFlora_class(){
         .staticmethod( "DestroyFloraGrid" )    
         .staticmethod( "DestructFloraInRadius" )    
         .staticmethod( "IgniteFloraInRadius" )    
+        .staticmethod( "InitFloraDataKeyValues" )    
         .staticmethod( "InitFloraGrid" )    
         .staticmethod( "ParseEntity" )    
         .staticmethod( "RemoveFloraInRadius" )    
