@@ -207,6 +207,7 @@ class Entities(SemiSharedModuleGenerator):
             'srcpy_util.h', # for PyRay_t
             '$c_wars_weapon.h',
             '#wars_weapon.h',
+            'wars_flora.h',
         ])
         
     # List of entity classes want to have exposed
@@ -240,6 +241,7 @@ class Entities(SemiSharedModuleGenerator):
         'C_FuncUnit',
         'C_WarsWeapon',
         'C_BaseFuncMapBoundary',
+        'CWarsFlora',
     ]
     
     serverentities = [ 
@@ -283,6 +285,7 @@ class Entities(SemiSharedModuleGenerator):
         'CFuncUnit',
         'CWarsWeapon',
         'CBaseFuncMapBoundary',
+        'CWarsFlora',
     ]
     
     def AddEntityConverter(self, mb, clsname, pyhandletoptronly=False):

@@ -42,6 +42,45 @@ C_EntityFlame::~C_EntityFlame( void )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Creates a flame client side and attaches it to a target entity.
+// Input  : pTarget - 
+//-----------------------------------------------------------------------------
+C_EntityFlame *C_EntityFlame::Create( CBaseEntity *pTarget, float flLifetime, float flSize /*= 0.0f*/ )
+{
+	C_EntityFlame *pFlame = new C_EntityFlame();
+	if( !pFlame->InitializeAsClientEntity( NULL, false ) )
+		return NULL;
+
+	if ( flSize <= 0.0f )
+	{
+		float xSize = pTarget->CollisionProp()->OBBMaxs().x - pTarget->CollisionProp()->OBBMins().x;
+		float ySize = pTarget->CollisionProp()->OBBMaxs().y - pTarget->CollisionProp()->OBBMins().y;
+		flSize = ( xSize + ySize ) * 0.5f;
+		if ( flSize < 16.0f )
+		{
+			flSize = 16.0f;
+		}
+	}
+
+	if ( flLifetime <= 0.0f )
+	{
+		flLifetime = 2.0f;
+	}
+
+	pFlame->m_flSize = flSize;
+	pFlame->Spawn();
+	UTIL_SetOrigin( pFlame, pTarget->GetAbsOrigin() );
+	pFlame->AttachToEntity( pTarget );
+	pFlame->SetLifetime( flLifetime );
+	pFlame->Activate();
+
+	pFlame->CreateEffect();
+
+	return pFlame;
+}
+
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_EntityFlame::StopEffect( void )

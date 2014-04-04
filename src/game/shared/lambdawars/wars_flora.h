@@ -21,6 +21,7 @@ class CWarsFlora : public CBaseAnimating
 {
 	DECLARE_CLASS( CWarsFlora, CBaseAnimating );
 	DECLARE_DATADESC();
+	DECLARE_PYCLASS( CWarsFlora ); 
 
 public:
 	CWarsFlora();
@@ -31,13 +32,14 @@ public:
 #endif // CLIENT_DLL
 	virtual void Spawn();
 
-	virtual void FloraTouch( CBaseEntity *pOther );
-
 	virtual void PlayDestructionAnimation();
 
 #ifdef CLIENT_DLL
 	void UpdateUnitAvoid();
 	virtual void UpdateClientSideAnimation();
+
+	void Ignite( float flFlameLifetime, float flSize );
+	void IgniteLifetime( float flFlameLifetime );
 
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	bool Initialize();
@@ -54,7 +56,7 @@ public:
 
 	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
 	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
-	static void IgniteFloraInRadius( const Vector &vPosition, float fRadius );
+	static void IgniteFloraInRadius( const Vector &vPosition, float fRadius, float fLifetime = 30.0f );
 
 	bool			IsEditorManaged();
 

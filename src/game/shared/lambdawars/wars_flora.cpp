@@ -15,6 +15,10 @@
 #include "c_hl2wars_player.h"
 #include "cdll_util.h"
 #include "playerandunitenumerator.h"
+#include "c_entityflame.h"
+#include "c_basetempentity.h"
+#define CBaseTempEntity C_BaseTempEntity
+#define CTEIgniteFlora C_TEIgniteFlora
 #else
 #include "hl2wars_player.h"
 #endif // CLIENT_DLL
@@ -22,13 +26,58 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+//-----------------------------------------------------------------------------
+// Purpose: Flame/Ignite event
+//-----------------------------------------------------------------------------
+class CTEIgniteFlora : public CBaseTempEntity
+{
+public:
+	
+	DECLARE_CLASS( CTEIgniteFlora, CBaseTempEntity );
+	DECLARE_NETWORKCLASS();
+
+#ifndef CLIENT_DLL
+	CTEIgniteFlora( const char *name )  : CBaseTempEntity( name ) {}
+#else
+	virtual void PostDataUpdate( DataUpdateType_t updateType );
+#endif // CLIENT_DLL
+
+	CNetworkVector( m_vecOrigin );
+	CNetworkVar( float, m_fRadius );
+	CNetworkVar( float, m_fLifetime );
+};
+
+#ifdef CLIENT_DLL
+IMPLEMENT_CLIENTCLASS_EVENT( C_TEIgniteFlora, DT_TEIgniteFlora, CTEIgniteFlora );
+
+BEGIN_RECV_TABLE_NOBASE( C_TEIgniteFlora, DT_TEIgniteFlora )
+	RecvPropVector(RECVINFO( m_vecOrigin )),
+	RecvPropFloat( RECVINFO( m_fRadius ) ),
+	RecvPropFloat( RECVINFO( m_fLifetime ) ),
+END_RECV_TABLE()
+
+void CTEIgniteFlora::PostDataUpdate( DataUpdateType_t updateType )
+{
+	CWarsFlora::IgniteFloraInRadius( m_vecOrigin, m_fRadius, m_fLifetime );
+}
+#else
+IMPLEMENT_SERVERCLASS_ST_NOBASE( CTEIgniteFlora, DT_TEIgniteFlora )
+	SendPropVector( SENDINFO( m_vecOrigin ) ),
+	SendPropFloat( SENDINFO( m_fRadius ) ),
+	SendPropFloat( SENDINFO( m_fLifetime ) ),
+END_SEND_TABLE()
+
+static CTEIgniteFlora g_TEIgniteFloraEvent( "IgniteFloraEvent" );
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Purpose: Flora Grid
+//-----------------------------------------------------------------------------
 #define FLORA_TILESIZE 256
 #define FLORA_GRIDSIZE (COORD_EXTENT/FLORA_TILESIZE)
 #define FLORA_KEYSINGLE( x ) (int)((MAX_COORD_INTEGER+x) / FLORA_TILESIZE)
 #define FLORA_KEY( position ) (int)((MAX_COORD_INTEGER+position.x) / FLORA_TILESIZE) + ((int)((MAX_COORD_INTEGER+position.y) / FLORA_TILESIZE) * FLORA_GRIDSIZE)
 
-//CWarsFlora *s_FloraGrid[FLORA_GRIDSIZE*FLORA_GRIDSIZE];
-//CWarsFlora *CWarsFlora::m_pFloraGrid = NULL;
 typedef CUtlVector< CWarsFlora * > FloraVector;
 CUtlVector< FloraVector > s_FloraGrid;
 
@@ -110,21 +159,11 @@ void CWarsFlora::Spawn()
 	Vector vecMaxs = CollisionProp()->OBBMaxs();
 	SetSize( vecMins, vecMaxs );
 
-	SetTouch( &CWarsFlora::FloraTouch );
-
 	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
 	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
 	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
 	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
 	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CWarsFlora::FloraTouch( CBaseEntity *pOther )
-{
-	Msg("FloraTouch\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -213,6 +252,35 @@ void CWarsFlora::UpdateClientSideAnimation()
 			SetSequence( m_iIdleSequence );
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CWarsFlora::Ignite( float flFlameLifetime, float flSize )
+{
+	// Crash on trying attach particle flames to hitboxes if they don't exist...
+	if( GetHitboxSetCount() == 0 )
+		return;
+
+	if( IsOnFire() )
+		return;
+
+	C_EntityFlame *pFlame = C_EntityFlame::Create( this, flFlameLifetime, flSize );
+	AddFlag( FL_ONFIRE );
+	SetEffectEntity( pFlame );
+}
+
+void CWarsFlora::IgniteLifetime( float flFlameLifetime )
+{
+	if( !IsOnFire() )
+		Ignite( 30, 0.0f );
+
+	C_EntityFlame *pFlame = dynamic_cast<C_EntityFlame*>( GetEffectEntity() );
+
+	if ( !pFlame )
+		return;
+
+	pFlame->SetLifetime( flFlameLifetime );
 }
 
 bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
@@ -537,17 +605,29 @@ void CWarsFlora::DestructFloraInRadius( const Vector &vPosition, float fRadius )
 class WarsFloraIgnite
 {
 public:
+	WarsFloraIgnite( float fLifetime ) : m_fLifetime(fLifetime) {}
+
 	bool operator()( CWarsFlora *flora )
 	{
-		// TODO: Need CEntityFlame on client
-		//flora->IgniteLifetime( 30.0f );
+		flora->IgniteLifetime( m_fLifetime );
 		return true;
 	}
+
+private:
+	float m_fLifetime;
 };
-static void IgniteFloraInRadius( const Vector &vPosition, float fRadius )
+void CWarsFlora::IgniteFloraInRadius( const Vector &vPosition, float fRadius, float fLifetime )
 {
-	WarsFloraIgnite functor;
+#ifdef CLIENT_DLL
+	WarsFloraIgnite functor( fLifetime );
 	ForAllFloraInRadius<WarsFloraIgnite>( functor, vPosition, fRadius );
+#else
+	CPVSFilter filter( vPosition );
+	g_TEIgniteFloraEvent.m_vecOrigin = vPosition;
+	g_TEIgniteFloraEvent.m_fRadius = fRadius;
+	g_TEIgniteFloraEvent.m_fLifetime = fLifetime;
+	g_TEIgniteFloraEvent.Create( filter, 0.0f );
+#endif // CLIENT_DLL
 }
 
 #ifdef CLIENT_DLL
@@ -669,4 +749,23 @@ CON_COMMAND_F( wars_flora_grid_mouse, "", FCVAR_CHEAT )
 	int iKey = FLORA_KEY( data.m_vWorldOnlyEndPos );
 
 	Msg( "%d Flora at mouse position\n", s_FloraGrid[iKey].Count() );
+}
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_ignite, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( wars_flora_ignite, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+#ifdef CLIENT_DLL
+	CHL2WarsPlayer *pPlayer = CHL2WarsPlayer::GetLocalHL2WarsPlayer(); 
+#else
+	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( UTIL_GetCommandClientIndex() ) );
+#endif // CLIENT_DLL
+	if( !pPlayer )
+		return;
+
+	const MouseTraceData_t &data = pPlayer->GetMouseData();
+
+	CWarsFlora::IgniteFloraInRadius( data.m_vWorldOnlyEndPos, args.ArgC() > 1 ? atof( args[1] ) : 128.0f );
 }

@@ -40,150 +40,74 @@
 #include "wars_flora.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "CPhysicsProp_pypp.hpp"
+#include "CWarsFlora_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
+struct CWarsFlora_wrapper : CWarsFlora, bp::wrapper< CWarsFlora > {
 
-    CPhysicsProp_wrapper( )
-    : CPhysicsProp( )
-      , bp::wrapper< CPhysicsProp >(){
+    CWarsFlora_wrapper( )
+    : CWarsFlora( )
+      , bp::wrapper< CWarsFlora >(){
         // null constructor
     
     }
 
-    virtual bool CreateVPhysics(  ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, CreateVPhysics )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, CreateVPhysics )
-        bp::override func_CreateVPhysics = this->get_override( "CreateVPhysics" );
-        if( func_CreateVPhysics.ptr() != Py_None )
-            try {
-                return func_CreateVPhysics(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CPhysicsProp::CreateVPhysics(  );
-            }
-        else
-            return this->CPhysicsProp::CreateVPhysics(  );
-    }
-    
-    bool default_CreateVPhysics(  ) {
-        return CPhysicsProp::CreateVPhysics( );
-    }
-
-    virtual int DrawDebugTextOverlays(  ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, DrawDebugTextOverlays )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, DrawDebugTextOverlays )
-        bp::override func_DrawDebugTextOverlays = this->get_override( "DrawDebugTextOverlays" );
-        if( func_DrawDebugTextOverlays.ptr() != Py_None )
-            try {
-                return func_DrawDebugTextOverlays(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CPhysicsProp::DrawDebugTextOverlays(  );
-            }
-        else
-            return this->CPhysicsProp::DrawDebugTextOverlays(  );
-    }
-    
-    int default_DrawDebugTextOverlays(  ) {
-        return CPhysicsProp::DrawDebugTextOverlays( );
-    }
-
-    virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, OnTakeDamage )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, OnTakeDamage )
-        bp::override func_OnTakeDamage = this->get_override( "OnTakeDamage" );
-        if( func_OnTakeDamage.ptr() != Py_None )
-            try {
-                return func_OnTakeDamage( boost::ref(info) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CPhysicsProp::OnTakeDamage( info );
-            }
-        else
-            return this->CPhysicsProp::OnTakeDamage( info );
-    }
-    
-    int default_OnTakeDamage( ::CTakeDamageInfo const & info ) {
-        return CPhysicsProp::OnTakeDamage( info );
-    }
-
     virtual void Precache(  ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, Precache )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, Precache )
+        PY_OVERRIDE_CHECK( CWarsFlora, Precache )
+        PY_OVERRIDE_LOG( _entities, CWarsFlora, Precache )
         bp::override func_Precache = this->get_override( "Precache" );
         if( func_Precache.ptr() != Py_None )
             try {
                 func_Precache(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CPhysicsProp::Precache(  );
+                this->CWarsFlora::Precache(  );
             }
         else
-            this->CPhysicsProp::Precache(  );
+            this->CWarsFlora::Precache(  );
     }
     
     void default_Precache(  ) {
-        CPhysicsProp::Precache( );
+        CWarsFlora::Precache( );
     }
 
     virtual void Spawn(  ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, Spawn )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, Spawn )
+        PY_OVERRIDE_CHECK( CWarsFlora, Spawn )
+        PY_OVERRIDE_LOG( _entities, CWarsFlora, Spawn )
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
             try {
                 func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CPhysicsProp::Spawn(  );
+                this->CWarsFlora::Spawn(  );
             }
         else
-            this->CPhysicsProp::Spawn(  );
+            this->CWarsFlora::Spawn(  );
     }
     
     void default_Spawn(  ) {
-        CPhysicsProp::Spawn( );
-    }
-
-    virtual void VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
-        PY_OVERRIDE_CHECK( CPhysicsProp, VPhysicsCollision )
-        PY_OVERRIDE_LOG( _entities, CPhysicsProp, VPhysicsCollision )
-        bp::override func_VPhysicsCollision = this->get_override( "VPhysicsCollision" );
-        if( func_VPhysicsCollision.ptr() != Py_None )
-            try {
-                func_VPhysicsCollision( index, boost::python::ptr(pEvent) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CPhysicsProp::VPhysicsCollision( index, pEvent );
-            }
-        else
-            this->CPhysicsProp::VPhysicsCollision( index, pEvent );
-    }
-    
-    void default_VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
-        CPhysicsProp::VPhysicsCollision( index, pEvent );
+        CWarsFlora::Spawn( );
     }
 
     virtual void Activate(  ) {
-        PY_OVERRIDE_CHECK( CBaseProp, Activate )
-        PY_OVERRIDE_LOG( _entities, CBaseProp, Activate )
+        PY_OVERRIDE_CHECK( CBaseAnimating, Activate )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Activate )
         bp::override func_Activate = this->get_override( "Activate" );
         if( func_Activate.ptr() != Py_None )
             try {
                 func_Activate(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseProp::Activate(  );
+                this->CBaseAnimating::Activate(  );
             }
         else
-            this->CBaseProp::Activate(  );
+            this->CBaseAnimating::Activate(  );
     }
     
     void default_Activate(  ) {
-        CBaseProp::Activate( );
+        CBaseAnimating::Activate( );
     }
 
     virtual bool CanBecomeRagdoll(  ) {
@@ -222,6 +146,25 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     
     void default_ComputeWorldSpaceSurroundingBox( ::Vector * pWorldMins, ::Vector * pWorldMaxs ) {
         CBaseEntity::ComputeWorldSpaceSurroundingBox( pWorldMins, pWorldMaxs );
+    }
+
+    virtual bool CreateVPhysics(  ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, CreateVPhysics )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, CreateVPhysics )
+        bp::override func_CreateVPhysics = this->get_override( "CreateVPhysics" );
+        if( func_CreateVPhysics.ptr() != Py_None )
+            try {
+                return func_CreateVPhysics(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::CreateVPhysics(  );
+            }
+        else
+            return this->CBaseEntity::CreateVPhysics(  );
+    }
+    
+    bool default_CreateVPhysics(  ) {
+        return CBaseEntity::CreateVPhysics( );
     }
 
     virtual void DeathNotice( ::CBaseEntity * pVictim ) {
@@ -263,22 +206,41 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     }
 
     virtual void DrawDebugGeometryOverlays(  ) {
-        PY_OVERRIDE_CHECK( CBaseProp, DrawDebugGeometryOverlays )
-        PY_OVERRIDE_LOG( _entities, CBaseProp, DrawDebugGeometryOverlays )
+        PY_OVERRIDE_CHECK( CBaseEntity, DrawDebugGeometryOverlays )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, DrawDebugGeometryOverlays )
         bp::override func_DrawDebugGeometryOverlays = this->get_override( "DrawDebugGeometryOverlays" );
         if( func_DrawDebugGeometryOverlays.ptr() != Py_None )
             try {
                 func_DrawDebugGeometryOverlays(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBaseProp::DrawDebugGeometryOverlays(  );
+                this->CBaseEntity::DrawDebugGeometryOverlays(  );
             }
         else
-            this->CBaseProp::DrawDebugGeometryOverlays(  );
+            this->CBaseEntity::DrawDebugGeometryOverlays(  );
     }
     
     void default_DrawDebugGeometryOverlays(  ) {
-        CBaseProp::DrawDebugGeometryOverlays( );
+        CBaseEntity::DrawDebugGeometryOverlays( );
+    }
+
+    virtual int DrawDebugTextOverlays(  ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, DrawDebugTextOverlays )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, DrawDebugTextOverlays )
+        bp::override func_DrawDebugTextOverlays = this->get_override( "DrawDebugTextOverlays" );
+        if( func_DrawDebugTextOverlays.ptr() != Py_None )
+            try {
+                return func_DrawDebugTextOverlays(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseAnimating::DrawDebugTextOverlays(  );
+            }
+        else
+            return this->CBaseAnimating::DrawDebugTextOverlays(  );
+    }
+    
+    int default_DrawDebugTextOverlays(  ) {
+        return CBaseAnimating::DrawDebugTextOverlays( );
     }
 
     virtual void EndTouch( ::CBaseEntity * pOther ) {
@@ -301,22 +263,22 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     }
 
     virtual void Event_Killed( ::CTakeDamageInfo const & info ) {
-        PY_OVERRIDE_CHECK( CBreakableProp, Event_Killed )
-        PY_OVERRIDE_LOG( _entities, CBreakableProp, Event_Killed )
+        PY_OVERRIDE_CHECK( CBaseEntity, Event_Killed )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Event_Killed )
         bp::override func_Event_Killed = this->get_override( "Event_Killed" );
         if( func_Event_Killed.ptr() != Py_None )
             try {
                 func_Event_Killed( boost::ref(info) );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBreakableProp::Event_Killed( info );
+                this->CBaseEntity::Event_Killed( info );
             }
         else
-            this->CBreakableProp::Event_Killed( info );
+            this->CBaseEntity::Event_Killed( info );
     }
     
     void default_Event_Killed( ::CTakeDamageInfo const & info ) {
-        CBreakableProp::Event_Killed( info );
+        CBaseEntity::Event_Killed( info );
     }
 
     virtual void Event_KilledOther( ::CBaseEntity * pVictim, ::CTakeDamageInfo const & info ) {
@@ -376,6 +338,25 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
         return CBaseEntity::GetTracerType( );
     }
 
+    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, KeyValue )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, KeyValue )
+        bp::override func_KeyValue = this->get_override( "KeyValue" );
+        if( func_KeyValue.ptr() != Py_None )
+            try {
+                return func_KeyValue( szKeyName, szValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::KeyValue( szKeyName, szValue );
+            }
+        else
+            return this->CBaseEntity::KeyValue( szKeyName, szValue );
+    }
+    
+    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
+        return CBaseEntity::KeyValue( szKeyName, szValue );
+    }
+
     virtual bool KeyValue( char const * szKeyName, float flValue ) {
         PY_OVERRIDE_CHECK( CBaseEntity, KeyValue )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, KeyValue )
@@ -431,25 +412,6 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     
     bool default_KeyValue( char const * szKeyName, ::Vector const & vecValue ) {
         return CBaseEntity::KeyValue( szKeyName, vecValue );
-    }
-
-    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
-        PY_OVERRIDE_CHECK( CBaseProp, KeyValue )
-        PY_OVERRIDE_LOG( _entities, CBaseProp, KeyValue )
-        bp::override func_KeyValue = this->get_override( "KeyValue" );
-        if( func_KeyValue.ptr() != Py_None )
-            try {
-                return func_KeyValue( szKeyName, szValue );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseProp::KeyValue( szKeyName, szValue );
-            }
-        else
-            return this->CBaseProp::KeyValue( szKeyName, szValue );
-    }
-    
-    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
-        return CBaseProp::KeyValue( szKeyName, szValue );
     }
 
     virtual void MakeTracer( ::Vector const & vecTracerSrc, ::trace_t const & tr, int iTracerType ) {
@@ -545,6 +507,25 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     
     void default_OnSequenceSet( int nOldSequence ) {
         CBaseAnimating::OnSequenceSet( nOldSequence );
+    }
+
+    virtual int OnTakeDamage( ::CTakeDamageInfo const & info ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, OnTakeDamage )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, OnTakeDamage )
+        bp::override func_OnTakeDamage = this->get_override( "OnTakeDamage" );
+        if( func_OnTakeDamage.ptr() != Py_None )
+            try {
+                return func_OnTakeDamage( boost::ref(info) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::OnTakeDamage( info );
+            }
+        else
+            return this->CBaseEntity::OnTakeDamage( info );
+    }
+    
+    int default_OnTakeDamage( ::CTakeDamageInfo const & info ) {
+        return CBaseEntity::OnTakeDamage( info );
     }
 
     virtual bool PassesDamageFilter( ::CTakeDamageInfo const & info ) {
@@ -666,22 +647,22 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     }
 
     virtual void UpdateOnRemove(  ) {
-        PY_OVERRIDE_CHECK( CBreakableProp, UpdateOnRemove )
-        PY_OVERRIDE_LOG( _entities, CBreakableProp, UpdateOnRemove )
+        PY_OVERRIDE_CHECK( CBaseEntity, UpdateOnRemove )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, UpdateOnRemove )
         bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
         if( func_UpdateOnRemove.ptr() != Py_None )
             try {
                 func_UpdateOnRemove(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->CBreakableProp::UpdateOnRemove(  );
+                this->CBaseEntity::UpdateOnRemove(  );
             }
         else
-            this->CBreakableProp::UpdateOnRemove(  );
+            this->CBaseEntity::UpdateOnRemove(  );
     }
     
     void default_UpdateOnRemove(  ) {
-        CBreakableProp::UpdateOnRemove( );
+        CBaseEntity::UpdateOnRemove( );
     }
 
     virtual int UpdateTransmitState(  ) {
@@ -703,294 +684,254 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
         return CBaseEntity::UpdateTransmitState( );
     }
 
+    virtual void VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, VPhysicsCollision )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, VPhysicsCollision )
+        bp::override func_VPhysicsCollision = this->get_override( "VPhysicsCollision" );
+        if( func_VPhysicsCollision.ptr() != Py_None )
+            try {
+                func_VPhysicsCollision( index, boost::python::ptr(pEvent) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseEntity::VPhysicsCollision( index, pEvent );
+            }
+        else
+            this->CBaseEntity::VPhysicsCollision( index, pEvent );
+    }
+    
+    void default_VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
+        CBaseEntity::VPhysicsCollision( index, pEvent );
+    }
+
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBreakableProp, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBreakableProp, GetServerClass )
+        PY_OVERRIDE_CHECK( CBaseAnimating, GetServerClass )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, GetServerClass )
         ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
         if( pServerClass )
             return pServerClass;
-        return CBreakableProp::GetServerClass();
+        return CBaseAnimating::GetServerClass();
     }
 
-    static int m_lifeState_Get( CPhysicsProp const & inst ) { return inst.m_lifeState.Get(); }
+    static int m_lifeState_Get( CWarsFlora const & inst ) { return inst.m_lifeState.Get(); }
 
-    static void m_lifeState_Set( CPhysicsProp & inst, int val ) { inst.m_lifeState.Set( val ); }
+    static void m_lifeState_Set( CWarsFlora & inst, int val ) { inst.m_lifeState.Set( val ); }
 
-    static int m_takedamage_Get( CPhysicsProp const & inst ) { return inst.m_takedamage.Get(); }
+    static int m_takedamage_Get( CWarsFlora const & inst ) { return inst.m_takedamage.Get(); }
 
-    static void m_takedamage_Set( CPhysicsProp & inst, int val ) { inst.m_takedamage.Set( val ); }
+    static void m_takedamage_Set( CWarsFlora & inst, int val ) { inst.m_takedamage.Set( val ); }
 
-    static int m_nSkin_Get( CPhysicsProp const & inst ) { return inst.m_nSkin.Get(); }
+    static int m_nSkin_Get( CWarsFlora const & inst ) { return inst.m_nSkin.Get(); }
 
-    static void m_nSkin_Set( CPhysicsProp & inst, int val ) { inst.m_nSkin.Set( val ); }
+    static void m_nSkin_Set( CWarsFlora & inst, int val ) { inst.m_nSkin.Set( val ); }
 
 };
 
-void register_CPhysicsProp_class(){
+void register_CWarsFlora_class(){
 
-    bp::class_< CPhysicsProp_wrapper, bp::bases< CBreakableProp >, boost::noncopyable >( "CPhysicsProp", bp::no_init )    
-        .def( bp::init< >() )    
+    bp::class_< CWarsFlora_wrapper, bp::bases< CBaseAnimating >, boost::noncopyable >( "CWarsFlora", bp::init< >() )    
         .def( 
-            "CanBePickedUpByPhyscannon"
-            , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::CanBePickedUpByPhyscannon ) )    
+            "DestroyFloraGrid"
+            , (void (*)(  ))( &::CWarsFlora::DestroyFloraGrid ) )    
         .def( 
-            "CanObstructNavAreas"
-            , (bool ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::CanObstructNavAreas ) )    
+            "DestructFloraInRadius"
+            , (void (*)( ::Vector const &,float ))( &::CWarsFlora::DestructFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
-            "ClearFlagsThink"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::ClearFlagsThink ) )    
+            "FillKeyValues"
+            , (bool ( ::CWarsFlora::* )( ::KeyValues * ) )( &::CWarsFlora::FillKeyValues )
+            , ( bp::arg("pEntityKey") ) )    
         .def( 
-            "CreateVPhysics"
-            , (bool ( ::CPhysicsProp::* )(  ) )(&::CPhysicsProp::CreateVPhysics)
-            , (bool ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_CreateVPhysics) )    
+            "IgniteFloraInRadius"
+            , (void (*)( ::Vector const &,float,float ))( &::CWarsFlora::IgniteFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("fLifetime")=3.0e+1f ) )    
         .def( 
-            "DrawDebugTextOverlays"
-            , (int ( ::CPhysicsProp::* )(  ) )(&::CPhysicsProp::DrawDebugTextOverlays)
-            , (int ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_DrawDebugTextOverlays) )    
+            "InitFloraGrid"
+            , (void (*)(  ))( &::CWarsFlora::InitFloraGrid ) )    
         .def( 
-            "EnableMotion"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::EnableMotion ) )    
+            "InsertInFloraGrid"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InsertInFloraGrid ) )    
         .def( 
-            "ExploitableByPlayer"
-            , (int ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::ExploitableByPlayer ) )    
+            "IsEditorManaged"
+            , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::IsEditorManaged ) )    
         .def( 
-            "GetCarryDistanceOffset"
-            , (float ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::GetCarryDistanceOffset ) )    
-        .def( 
-            "GetMass"
-            , (float ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::GetMass ) )    
-        .def( 
-            "GetMassCenter"
-            , (void ( ::CPhysicsProp::* )( ::Vector * ) )( &::CPhysicsProp::GetMassCenter )
-            , ( bp::arg("pMassCenter") ) )    
-        .def( 
-            "GetNavObstructionHeight"
-            , (float ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::GetNavObstructionHeight ) )    
-        .def( 
-            "GetObstructingEntity"
-            , (::CBaseEntity * ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::GetObstructingEntity )
-            , bp::return_value_policy< bp::return_by_value >() )    
-        .def( 
-            "GetPropDataAngles"
-            , (bool ( ::CPhysicsProp::* )( char const *,::QAngle & ) )( &::CPhysicsProp::GetPropDataAngles )
-            , ( bp::arg("pKeyName"), bp::arg("vecAngles") ) )    
-        .def( 
-            "HandleAnyCollisionInteractions"
-            , (void ( ::CPhysicsProp::* )( int,::gamevcollisionevent_t * ) )( &::CPhysicsProp::HandleAnyCollisionInteractions )
-            , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .def( 
-            "InputDisableFloating"
-            , (void ( ::CPhysicsProp::* )( ::inputdata_t & ) )( &::CPhysicsProp::InputDisableFloating )
-            , ( bp::arg("inputdata") ) )    
-        .def( 
-            "InputDisableMotion"
-            , (void ( ::CPhysicsProp::* )( ::inputdata_t & ) )( &::CPhysicsProp::InputDisableMotion )
-            , ( bp::arg("inputdata") ) )    
-        .def( 
-            "InputEnableMotion"
-            , (void ( ::CPhysicsProp::* )( ::inputdata_t & ) )( &::CPhysicsProp::InputEnableMotion )
-            , ( bp::arg("inputdata") ) )    
-        .def( 
-            "InputSleep"
-            , (void ( ::CPhysicsProp::* )( ::inputdata_t & ) )( &::CPhysicsProp::InputSleep )
-            , ( bp::arg("inputdata") ) )    
-        .def( 
-            "InputWake"
-            , (void ( ::CPhysicsProp::* )( ::inputdata_t & ) )( &::CPhysicsProp::InputWake )
-            , ( bp::arg("inputdata") ) )    
-        .def( 
-            "IsGib"
-            , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::IsGib ) )    
-        .def( 
-            "IsPotentiallyAbleToObstructNavAreas"
-            , (bool ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::IsPotentiallyAbleToObstructNavAreas ) )    
-        .def( 
-            "NavThink"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::NavThink ) )    
-        .def( 
-            "ObjectCaps"
-            , (int ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::ObjectCaps ) )    
-        .def( 
-            "OnNavMeshLoaded"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::OnNavMeshLoaded ) )    
-        .def( 
-            "OnPhysGunDrop"
-            , (void ( ::CPhysicsProp::* )( ::CBasePlayer *,::PhysGunDrop_t ) )( &::CPhysicsProp::OnPhysGunDrop )
-            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
-        .def( 
-            "OnPhysGunPickup"
-            , (void ( ::CPhysicsProp::* )( ::CBasePlayer *,::PhysGunPickup_t ) )( &::CPhysicsProp::OnPhysGunPickup )
-            , ( bp::arg("pPhysGunUser"), bp::arg("reason") ) )    
-        .def( 
-            "OnTakeDamage"
-            , (int ( ::CPhysicsProp::* )( ::CTakeDamageInfo const & ) )(&::CPhysicsProp::OnTakeDamage)
-            , (int ( CPhysicsProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPhysicsProp_wrapper::default_OnTakeDamage)
-            , ( bp::arg("info") ) )    
-        .def( 
-            "OverridePropdata"
-            , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::OverridePropdata ) )    
+            "PlayDestructionAnimation"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::PlayDestructionAnimation ) )    
         .def( 
             "Precache"
-            , (void ( ::CPhysicsProp::* )(  ) )(&::CPhysicsProp::Precache)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_Precache) )    
+            , (void ( ::CWarsFlora::* )(  ) )(&::CWarsFlora::Precache)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Precache) )    
         .def( 
-            "ShouldDisableMotionOnFreeze"
-            , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::ShouldDisableMotionOnFreeze ) )    
+            "RemoveFloraInRadius"
+            , (void (*)( ::Vector const &,float ))( &::CWarsFlora::RemoveFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
+        .def( 
+            "RemoveFromFloraGrid"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::RemoveFromFloraGrid ) )    
         .def( 
             "Spawn"
-            , (void ( ::CPhysicsProp::* )(  ) )(&::CPhysicsProp::Spawn)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_Spawn) )    
-        .def( 
-            "Use"
-            , (void ( ::CPhysicsProp::* )( ::CBaseEntity *,::CBaseEntity *,::USE_TYPE,float ) )( &::CPhysicsProp::Use )
-            , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) )    
-        .def( 
-            "VPhysicsCollision"
-            , (void ( ::CPhysicsProp::* )( int,::gamevcollisionevent_t * ) )(&::CPhysicsProp::VPhysicsCollision)
-            , (void ( CPhysicsProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CPhysicsProp_wrapper::default_VPhysicsCollision)
-            , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .def( 
-            "VPhysicsUpdate"
-            , (void ( ::CPhysicsProp::* )( ::IPhysicsObject * ) )( &::CPhysicsProp::VPhysicsUpdate )
-            , ( bp::arg("pPhysics") ) )    
+            , (void ( ::CWarsFlora::* )(  ) )(&::CWarsFlora::Spawn)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
         .def( 
             "Activate"
-            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Activate)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_Activate) )    
+            , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Activate) )    
         .def( 
             "CanBecomeRagdoll"
             , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
-            , (bool ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_CanBecomeRagdoll) )    
+            , (bool ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_CanBecomeRagdoll) )    
         .def( 
             "ComputeWorldSpaceSurroundingBox"
             , (void ( ::CBaseEntity::* )( ::Vector *,::Vector * ) )(&::CBaseEntity::ComputeWorldSpaceSurroundingBox)
-            , (void ( CPhysicsProp_wrapper::* )( ::Vector *,::Vector * ) )(&CPhysicsProp_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , (void ( CWarsFlora_wrapper::* )( ::Vector *,::Vector * ) )(&CWarsFlora_wrapper::default_ComputeWorldSpaceSurroundingBox)
             , ( bp::arg("pWorldMins"), bp::arg("pWorldMaxs") ) )    
+        .def( 
+            "CreateVPhysics"
+            , (bool ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::CreateVPhysics)
+            , (bool ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_CreateVPhysics) )    
         .def( 
             "DeathNotice"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::DeathNotice)
-            , (void ( CPhysicsProp_wrapper::* )( ::CBaseEntity * ) )(&CPhysicsProp_wrapper::default_DeathNotice)
+            , (void ( CWarsFlora_wrapper::* )( ::CBaseEntity * ) )(&CWarsFlora_wrapper::default_DeathNotice)
             , ( bp::arg("pVictim") ) )    
         .def( 
             "DoImpactEffect"
             , (void ( ::CBaseEntity::* )( ::trace_t &,int ) )(&::CBaseEntity::DoImpactEffect)
-            , (void ( CPhysicsProp_wrapper::* )( ::trace_t &,int ) )(&CPhysicsProp_wrapper::default_DoImpactEffect)
+            , (void ( CWarsFlora_wrapper::* )( ::trace_t &,int ) )(&CWarsFlora_wrapper::default_DoImpactEffect)
             , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
         .def( 
             "DrawDebugGeometryOverlays"
-            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::DrawDebugGeometryOverlays)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_DrawDebugGeometryOverlays) )    
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::DrawDebugGeometryOverlays)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_DrawDebugGeometryOverlays) )    
+        .def( 
+            "DrawDebugTextOverlays"
+            , (int ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::DrawDebugTextOverlays)
+            , (int ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_DrawDebugTextOverlays) )    
         .def( 
             "EndTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::EndTouch)
-            , (void ( CPhysicsProp_wrapper::* )( ::CBaseEntity * ) )(&CPhysicsProp_wrapper::default_EndTouch)
+            , (void ( CWarsFlora_wrapper::* )( ::CBaseEntity * ) )(&CWarsFlora_wrapper::default_EndTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "Event_Killed"
-            , (void ( ::CBreakableProp::* )( ::CTakeDamageInfo const & ) )(&::CBreakableProp::Event_Killed)
-            , (void ( CPhysicsProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPhysicsProp_wrapper::default_Event_Killed)
+            , (void ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_Killed)
+            , (void ( CWarsFlora_wrapper::* )( ::CTakeDamageInfo const & ) )(&CWarsFlora_wrapper::default_Event_Killed)
             , ( bp::arg("info") ) )    
         .def( 
             "Event_KilledOther"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&::CBaseEntity::Event_KilledOther)
-            , (void ( CPhysicsProp_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CPhysicsProp_wrapper::default_Event_KilledOther)
+            , (void ( CWarsFlora_wrapper::* )( ::CBaseEntity *,::CTakeDamageInfo const & ) )(&CWarsFlora_wrapper::default_Event_KilledOther)
             , ( bp::arg("pVictim"), bp::arg("info") ) )    
         .def( 
             "GetIMouse"
             , (::IMouse * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetIMouse)
-            , (::IMouse * ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_GetIMouse)
+            , (::IMouse * ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetTracerType"
             , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
-            , (char const * ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_GetTracerType) )    
+            , (char const * ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetTracerType) )    
+        .def( 
+            "KeyValue"
+            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,char const * ) )(&CWarsFlora_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CPhysicsProp_wrapper::* )( char const *,float ) )(&CPhysicsProp_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,float ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,int ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CPhysicsProp_wrapper::* )( char const *,int ) )(&CPhysicsProp_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,int ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,::Vector const & ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CPhysicsProp_wrapper::* )( char const *,::Vector const & ) )(&CPhysicsProp_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,::Vector const & ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
-        .def( 
-            "KeyValue"
-            , (bool ( ::CBaseProp::* )( char const *,char const * ) )(&::CBaseProp::KeyValue)
-            , (bool ( CPhysicsProp_wrapper::* )( char const *,char const * ) )(&CPhysicsProp_wrapper::default_KeyValue)
-            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "MakeTracer"
             , (void ( ::CBaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::CBaseEntity::MakeTracer)
-            , (void ( CPhysicsProp_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CPhysicsProp_wrapper::default_MakeTracer)
+            , (void ( CWarsFlora_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CWarsFlora_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
             "ModifyOrAppendCriteria"
             , (void ( ::CBaseAnimating::* )( ::ResponseRules::CriteriaSet & ) )(&::CBaseAnimating::ModifyOrAppendCriteria)
-            , (void ( CPhysicsProp_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CPhysicsProp_wrapper::default_ModifyOrAppendCriteria)
+            , (void ( CWarsFlora_wrapper::* )( ::ResponseRules::CriteriaSet & ) )(&CWarsFlora_wrapper::default_ModifyOrAppendCriteria)
             , ( bp::arg("set") ) )    
         .def( 
             "OnChangeOwnerNumber"
             , (void ( ::CBaseEntity::* )( int ) )(&::CBaseEntity::OnChangeOwnerNumber)
-            , (void ( CPhysicsProp_wrapper::* )( int ) )(&CPhysicsProp_wrapper::default_OnChangeOwnerNumber)
+            , (void ( CWarsFlora_wrapper::* )( int ) )(&CWarsFlora_wrapper::default_OnChangeOwnerNumber)
             , ( bp::arg("old_owner_number") ) )    
         .def( 
             "OnRestore"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::OnRestore)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_OnRestore) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_OnRestore) )    
         .def( 
             "OnSequenceSet"
             , (void ( ::CBaseAnimating::* )( int ) )(&::CBaseAnimating::OnSequenceSet)
-            , (void ( CPhysicsProp_wrapper::* )( int ) )(&CPhysicsProp_wrapper::default_OnSequenceSet)
+            , (void ( CWarsFlora_wrapper::* )( int ) )(&CWarsFlora_wrapper::default_OnSequenceSet)
             , ( bp::arg("nOldSequence") ) )    
+        .def( 
+            "OnTakeDamage"
+            , (int ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::OnTakeDamage)
+            , (int ( CWarsFlora_wrapper::* )( ::CTakeDamageInfo const & ) )(&CWarsFlora_wrapper::default_OnTakeDamage)
+            , ( bp::arg("info") ) )    
         .def( 
             "PassesDamageFilter"
             , (bool ( ::CBaseEntity::* )( ::CTakeDamageInfo const & ) )(&::CBaseEntity::PassesDamageFilter)
-            , (bool ( CPhysicsProp_wrapper::* )( ::CTakeDamageInfo const & ) )(&CPhysicsProp_wrapper::default_PassesDamageFilter)
+            , (bool ( CWarsFlora_wrapper::* )( ::CTakeDamageInfo const & ) )(&CWarsFlora_wrapper::default_PassesDamageFilter)
             , ( bp::arg("info") ) )    
         .def( 
             "PostClientActive"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::PostClientActive)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_PostClientActive) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_PostClientActive) )    
         .def( 
             "PostConstructor"
             , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
-            , (void ( CPhysicsProp_wrapper::* )( char const * ) )(&CPhysicsProp_wrapper::default_PostConstructor)
+            , (void ( CWarsFlora_wrapper::* )( char const * ) )(&CWarsFlora_wrapper::default_PostConstructor)
             , ( bp::arg("szClassname") ) )    
         .def( 
             "OnNewModel"
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_OnNewModel) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_OnNewModel) )    
         .def( 
             "StartTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)
-            , (void ( CPhysicsProp_wrapper::* )( ::CBaseEntity * ) )(&CPhysicsProp_wrapper::default_StartTouch)
+            , (void ( CWarsFlora_wrapper::* )( ::CBaseEntity * ) )(&CWarsFlora_wrapper::default_StartTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "StopLoopingSounds"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::StopLoopingSounds)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_StopLoopingSounds) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_StopLoopingSounds) )    
         .def( 
             "TraceAttack"
-            , (void ( CPhysicsProp_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CPhysicsProp_wrapper::TraceAttack)
+            , (void ( CWarsFlora_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CWarsFlora_wrapper::TraceAttack)
             , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
         .def( 
             "UpdateOnRemove"
-            , (void ( ::CBreakableProp::* )(  ) )(&::CBreakableProp::UpdateOnRemove)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_UpdateOnRemove) )    
+            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_UpdateOnRemove) )    
         .def( 
             "UpdateTransmitState"
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)
-            , (int ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_UpdateTransmitState) )    
-        .add_property( "lifestate", &CPhysicsProp_wrapper::m_lifeState_Get, &CPhysicsProp_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &CPhysicsProp_wrapper::m_takedamage_Get, &CPhysicsProp_wrapper::m_takedamage_Set )    
-        .add_property( "skin", &CPhysicsProp_wrapper::m_nSkin_Get, &CPhysicsProp_wrapper::m_nSkin_Set );
+            , (int ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_UpdateTransmitState) )    
+        .def( 
+            "VPhysicsCollision"
+            , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
+            , (void ( CWarsFlora_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CWarsFlora_wrapper::default_VPhysicsCollision)
+            , ( bp::arg("index"), bp::arg("pEvent") ) )    
+        .staticmethod( "DestroyFloraGrid" )    
+        .staticmethod( "DestructFloraInRadius" )    
+        .staticmethod( "IgniteFloraInRadius" )    
+        .staticmethod( "InitFloraGrid" )    
+        .staticmethod( "RemoveFloraInRadius" )    
+        .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CWarsFlora_wrapper::m_takedamage_Get, &CWarsFlora_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CWarsFlora_wrapper::m_nSkin_Get, &CWarsFlora_wrapper::m_nSkin_Set );
 
 }
 

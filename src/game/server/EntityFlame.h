@@ -73,12 +73,14 @@ protected:
 	CNetworkHandle( CBaseEntity, m_hEntAttached );		// The entity that we are burning (attached to).
 	CNetworkVar( bool, m_bCheapEffect );
 
-	CNetworkVar( float, m_flSize );
+	//CNetworkVar( float, m_flSize );
+	float m_flSize;
 	CNetworkVar( bool, m_bUseHitboxes );
 	CNetworkVar( int, m_iNumHitboxFires );
 	CNetworkVar( float, m_flHitboxFireScale );
 
-	CNetworkVar( float, m_flLifetime );
+	//CNetworkVar( float, m_flLifetime );
+	float m_flLifetime;
 	string_t	m_iszPlayingSound;	// Track the sound so we can StopSound later
 
 	EHANDLE m_hAttacker;

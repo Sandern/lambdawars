@@ -36,36 +36,55 @@
 #include "wars_flora.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
-#include "C_BaseFlex_pypp.hpp"
+#include "CWarsFlora_pypp.hpp"
 
 namespace bp = boost::python;
 
-struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
+struct CWarsFlora_wrapper : CWarsFlora, bp::wrapper< CWarsFlora > {
 
-    C_BaseFlex_wrapper( )
-    : C_BaseFlex( )
-      , bp::wrapper< C_BaseFlex >(){
+    CWarsFlora_wrapper( )
+    : CWarsFlora( )
+      , bp::wrapper< CWarsFlora >(){
         // null constructor
     
     }
 
+    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
+        PY_OVERRIDE_CHECK( CWarsFlora, KeyValue )
+        PY_OVERRIDE_LOG( _entities, CWarsFlora, KeyValue )
+        bp::override func_KeyValue = this->get_override( "KeyValue" );
+        if( func_KeyValue.ptr() != Py_None )
+            try {
+                return func_KeyValue( szKeyName, szValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CWarsFlora::KeyValue( szKeyName, szValue );
+            }
+        else
+            return this->CWarsFlora::KeyValue( szKeyName, szValue );
+    }
+    
+    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
+        return CWarsFlora::KeyValue( szKeyName, szValue );
+    }
+
     virtual void Spawn(  ) {
-        PY_OVERRIDE_CHECK( C_BaseFlex, Spawn )
-        PY_OVERRIDE_LOG( _entities, C_BaseFlex, Spawn )
+        PY_OVERRIDE_CHECK( CWarsFlora, Spawn )
+        PY_OVERRIDE_LOG( _entities, CWarsFlora, Spawn )
         bp::override func_Spawn = this->get_override( "Spawn" );
         if( func_Spawn.ptr() != Py_None )
             try {
                 func_Spawn(  );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->C_BaseFlex::Spawn(  );
+                this->CWarsFlora::Spawn(  );
             }
         else
-            this->C_BaseFlex::Spawn(  );
+            this->CWarsFlora::Spawn(  );
     }
     
     void default_Spawn(  ) {
-        C_BaseFlex::Spawn( );
+        CWarsFlora::Spawn( );
     }
 
     virtual void Activate(  ) {
@@ -241,25 +260,6 @@ struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
     
     char const * default_GetTracerType(  ) {
         return C_BaseEntity::GetTracerType( );
-    }
-
-    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
-        PY_OVERRIDE_CHECK( C_BaseEntity, KeyValue )
-        PY_OVERRIDE_LOG( _entities, C_BaseEntity, KeyValue )
-        bp::override func_KeyValue = this->get_override( "KeyValue" );
-        if( func_KeyValue.ptr() != Py_None )
-            try {
-                return func_KeyValue( szKeyName, szValue );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->C_BaseEntity::KeyValue( szKeyName, szValue );
-            }
-        else
-            return this->C_BaseEntity::KeyValue( szKeyName, szValue );
-    }
-    
-    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
-        return C_BaseEntity::KeyValue( szKeyName, szValue );
     }
 
     virtual bool KeyValue( char const * szKeyName, float flValue ) {
@@ -556,244 +556,222 @@ struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseFlex::GetClientClass();
+            return C_BaseAnimating::GetClientClass();
 #endif // _WIN32
-        PY_OVERRIDE_LOG( _entities, C_BaseFlex, GetClientClass )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, GetClientClass )
         ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
         if( pClientClass )
             return pClientClass;
-        return C_BaseFlex::GetClientClass();
+        return C_BaseAnimating::GetClientClass();
     }
 
-    static int m_lifeState_Get( C_BaseFlex const & inst ) { return inst.m_lifeState; }
+    static int m_lifeState_Get( CWarsFlora const & inst ) { return inst.m_lifeState; }
 
-    static void m_lifeState_Set( C_BaseFlex & inst, int val ) { inst.m_lifeState = val; }
+    static void m_lifeState_Set( CWarsFlora & inst, int val ) { inst.m_lifeState = val; }
 
-    static int m_takedamage_Get( C_BaseFlex const & inst ) { return inst.m_takedamage; }
+    static int m_takedamage_Get( CWarsFlora const & inst ) { return inst.m_takedamage; }
 
-    static void m_takedamage_Set( C_BaseFlex & inst, int val ) { inst.m_takedamage = val; }
+    static void m_takedamage_Set( CWarsFlora & inst, int val ) { inst.m_takedamage = val; }
 
-    static int m_nSkin_Get( C_BaseFlex const & inst ) { return inst.m_nSkin; }
+    static int m_nSkin_Get( CWarsFlora const & inst ) { return inst.m_nSkin; }
 
-    static void m_nSkin_Set( C_BaseFlex & inst, int val ) { inst.m_nSkin = val; }
+    static void m_nSkin_Set( CWarsFlora & inst, int val ) { inst.m_nSkin = val; }
 
 };
 
-void register_C_BaseFlex_class(){
+void register_CWarsFlora_class(){
 
-    bp::class_< C_BaseFlex_wrapper, bp::bases< C_BaseAnimatingOverlay >, boost::noncopyable >( "C_BaseFlex", bp::no_init )    
-        .def( bp::init< >() )    
+    bp::class_< CWarsFlora_wrapper, bp::bases< C_BaseAnimating >, boost::noncopyable >( "CWarsFlora", bp::init< >() )    
         .def( 
-            "AddFlexAnimation"
-            , (void ( ::C_BaseFlex::* )( ::CSceneEventInfo * ) )( &::C_BaseFlex::AddFlexAnimation )
-            , ( bp::arg("info") ) )    
+            "DestroyFloraGrid"
+            , (void (*)(  ))( &::CWarsFlora::DestroyFloraGrid ) )    
         .def( 
-            "AddGlobalFlexController"
-            , (int (*)( char * ))( &::C_BaseFlex::AddGlobalFlexController )
-            , ( bp::arg("szName") ) )    
+            "DestructFloraInRadius"
+            , (void (*)( ::Vector const &,float ))( &::CWarsFlora::DestructFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
-            "BuildTransformations"
-            , (void ( ::C_BaseFlex::* )( ::CStudioHdr *,::Vector *,::Quaternion *,::matrix3x4_t const &,int,::CBoneBitList & ) )( &::C_BaseFlex::BuildTransformations )
-            , ( bp::arg("pStudioHdr"), bp::arg("pos"), bp::arg("q"), bp::arg("cameraTransform"), bp::arg("boneMask"), bp::arg("boneComputed") ) )    
+            "Ignite"
+            , (void ( ::CWarsFlora::* )( float,float ) )( &::CWarsFlora::Ignite )
+            , ( bp::arg("flFlameLifetime"), bp::arg("flSize") ) )    
         .def( 
-            "ClearSceneEvent"
-            , (bool ( ::C_BaseFlex::* )( ::CSceneEventInfo *,bool,bool ) )( &::C_BaseFlex::ClearSceneEvent )
-            , ( bp::arg("info"), bp::arg("fastKill"), bp::arg("canceled") ) )    
+            "IgniteFloraInRadius"
+            , (void (*)( ::Vector const &,float,float ))( &::CWarsFlora::IgniteFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("fLifetime")=3.0e+1f ) )    
         .def( 
-            "EnsureTranslations"
-            , (void ( ::C_BaseFlex::* )( ::flexsettinghdr_t const * ) )( &::C_BaseFlex::EnsureTranslations )
-            , ( bp::arg("pSettinghdr") ) )    
+            "IgniteLifetime"
+            , (void ( ::CWarsFlora::* )( float ) )( &::CWarsFlora::IgniteLifetime )
+            , ( bp::arg("flFlameLifetime") ) )    
         .def( 
-            "FindFlexController"
-            , (::LocalFlexController_t ( ::C_BaseFlex::* )( char const * ) )( &::C_BaseFlex::FindFlexController )
-            , ( bp::arg("szName") ) )    
+            "InitFloraGrid"
+            , (void (*)(  ))( &::CWarsFlora::InitFloraGrid ) )    
         .def( 
-            "FlexControllerLocalToGlobal"
-            , (int ( ::C_BaseFlex::* )( ::flexsettinghdr_t const *,int ) )( &::C_BaseFlex::FlexControllerLocalToGlobal )
-            , ( bp::arg("pSettinghdr"), bp::arg("key") ) )    
+            "Initialize"
+            , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::Initialize ) )    
         .def( 
-            "GetFlexWeight"
-            , (float ( ::C_BaseFlex::* )( ::LocalFlexController_t ) )( &::C_BaseFlex::GetFlexWeight )
-            , ( bp::arg("index") ) )    
+            "InsertInFloraGrid"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InsertInFloraGrid ) )    
         .def( 
-            "GetGlobalFlexControllerName"
-            , (char const * (*)( int ))( &::C_BaseFlex::GetGlobalFlexControllerName )
-            , ( bp::arg("idx") ) )    
+            "IsEditorManaged"
+            , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::IsEditorManaged ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseFlex::GetPyNetworkType ) )    
+            "KeyValue"
+            , (bool ( ::CWarsFlora::* )( char const *,char const * ) )(&::CWarsFlora::KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,char const * ) )(&CWarsFlora_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
-            "GetSoundSpatialization"
-            , (bool ( ::C_BaseFlex::* )( ::SpatializationInfo_t & ) )( &::C_BaseFlex::GetSoundSpatialization )
-            , ( bp::arg("info") ) )    
+            "ParseEntity"
+            , (char const * (*)( char const * ))( &::CWarsFlora::ParseEntity )
+            , ( bp::arg("pEntData") ) )    
         .def( 
-            "GetToolRecordingState"
-            , (void ( ::C_BaseFlex::* )( ::KeyValues * ) )( &::C_BaseFlex::GetToolRecordingState )
-            , ( bp::arg("msg") ) )    
+            "PlayDestructionAnimation"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::PlayDestructionAnimation ) )    
         .def( 
-            "InitPhonemeMappings"
-            , (void ( ::C_BaseFlex::* )(  ) )( &::C_BaseFlex::InitPhonemeMappings ) )    
+            "RemoveFloraInRadius"
+            , (void (*)( ::Vector const &,float ))( &::CWarsFlora::RemoveFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
         .def( 
-            "InvalidateFlexCaches"
-            , (void (*)(  ))( &::C_BaseFlex::InvalidateFlexCaches ) )    
-        .def( 
-            "IsFlexCacheValid"
-            , (bool ( ::C_BaseFlex::* )(  ) const)( &::C_BaseFlex::IsFlexCacheValid ) )    
-        .def( 
-            "OnThreadedDrawSetup"
-            , (void ( ::C_BaseFlex::* )(  ) )( &::C_BaseFlex::OnThreadedDrawSetup ) )    
-        .def( 
-            "SetFlexWeight"
-            , (void ( ::C_BaseFlex::* )( ::LocalFlexController_t,float ) )( &::C_BaseFlex::SetFlexWeight )
-            , ( bp::arg("index"), bp::arg("value") ) )    
-        .def( 
-            "SetupMappings"
-            , (void ( ::C_BaseFlex::* )( char const * ) )( &::C_BaseFlex::SetupMappings )
-            , ( bp::arg("pchFileRoot") ) )    
-        .def( 
-            "SetupWeights"
-            , (void ( ::C_BaseFlex::* )( ::matrix3x4_t const *,int,float *,float * ) )( &::C_BaseFlex::SetupWeights )
-            , ( bp::arg("pBoneToWorld"), bp::arg("nFlexWeightCount"), bp::arg("pFlexWeights"), bp::arg("pFlexDelayedWeights") ) )    
+            "RemoveFromFloraGrid"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::RemoveFromFloraGrid ) )    
         .def( 
             "Spawn"
-            , (void ( ::C_BaseFlex::* )(  ) )(&::C_BaseFlex::Spawn)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_Spawn) )    
+            , (void ( ::CWarsFlora::* )(  ) )(&::CWarsFlora::Spawn)
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
         .def( 
-            "StandardBlendingRules"
-            , (void ( ::C_BaseFlex::* )( ::CStudioHdr *,::Vector *,::QuaternionAligned *,float,int ) )( &::C_BaseFlex::StandardBlendingRules )
-            , ( bp::arg("hdr"), bp::arg("pos"), bp::arg("q"), bp::arg("currentTime"), bp::arg("boneMask") ) )    
+            "SpawnMapFlora"
+            , (void (*)(  ))( &::CWarsFlora::SpawnMapFlora ) )    
         .def( 
-            "UsesFlexDelayedWeights"
-            , (bool ( ::C_BaseFlex::* )(  ) )( &::C_BaseFlex::UsesFlexDelayedWeights ) )    
+            "UpdateClientSideAnimation"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::UpdateClientSideAnimation ) )    
+        .def( 
+            "UpdateUnitAvoid"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::UpdateUnitAvoid ) )    
         .def( 
             "Activate"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Activate)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_Activate) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Activate) )    
         .def( 
             "AddToEntityList"
-            , (void ( C_BaseFlex_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseFlex_wrapper::AddToEntityList)
+            , (void ( CWarsFlora_wrapper::* )( ::entity_list_ids_t ) )(&CWarsFlora_wrapper::AddToEntityList)
             , ( bp::arg("listId") ) )    
         .def( 
             "ClientThink"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ClientThink)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_ClientThink) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_ClientThink) )    
         .def( 
             "ComputeWorldSpaceSurroundingBox"
             , (void ( ::C_BaseEntity::* )( ::Vector *,::Vector * ) )(&::C_BaseEntity::ComputeWorldSpaceSurroundingBox)
-            , (void ( C_BaseFlex_wrapper::* )( ::Vector *,::Vector * ) )(&C_BaseFlex_wrapper::default_ComputeWorldSpaceSurroundingBox)
+            , (void ( CWarsFlora_wrapper::* )( ::Vector *,::Vector * ) )(&CWarsFlora_wrapper::default_ComputeWorldSpaceSurroundingBox)
             , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) )    
         .def( 
             "CreateVPhysics"
             , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::CreateVPhysics)
-            , (bool ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_CreateVPhysics) )    
+            , (bool ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_CreateVPhysics) )    
         .def( 
             "DoImpactEffect"
             , (void ( ::C_BaseEntity::* )( ::trace_t &,int ) )(&::C_BaseEntity::DoImpactEffect)
-            , (void ( C_BaseFlex_wrapper::* )( ::trace_t &,int ) )(&C_BaseFlex_wrapper::default_DoImpactEffect)
+            , (void ( CWarsFlora_wrapper::* )( ::trace_t &,int ) )(&CWarsFlora_wrapper::default_DoImpactEffect)
             , ( bp::arg("tr"), bp::arg("nDamageType") ) )    
         .def( 
             "EndTouch"
             , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::EndTouch)
-            , (void ( C_BaseFlex_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseFlex_wrapper::default_EndTouch)
+            , (void ( CWarsFlora_wrapper::* )( ::C_BaseEntity * ) )(&CWarsFlora_wrapper::default_EndTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "GetCollideType"
             , (::CollideType_t ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::GetCollideType)
-            , (::CollideType_t ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_GetCollideType) )    
+            , (::CollideType_t ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetCollideType) )    
         .def( 
             "GetIMouse"
             , (::IMouse * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetIMouse)
-            , (::IMouse * ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_GetIMouse)
+            , (::IMouse * ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetTracerType"
             , (char const * ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::GetTracerType)
-            , (char const * ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_GetTracerType) )    
-        .def( 
-            "KeyValue"
-            , (bool ( ::C_BaseEntity::* )( char const *,char const * ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_BaseFlex_wrapper::* )( char const *,char const * ) )(&C_BaseFlex_wrapper::default_KeyValue)
-            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+            , (char const * ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetTracerType) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,float ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_BaseFlex_wrapper::* )( char const *,float ) )(&C_BaseFlex_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,float ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("flValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,int ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_BaseFlex_wrapper::* )( char const *,int ) )(&C_BaseFlex_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,int ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("nValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::C_BaseEntity::* )( char const *,::Vector const & ) )(&::C_BaseEntity::KeyValue)
-            , (bool ( C_BaseFlex_wrapper::* )( char const *,::Vector const & ) )(&C_BaseFlex_wrapper::default_KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,::Vector const & ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("vecValue") ) )    
         .def( 
             "MakeTracer"
             , (void ( ::C_BaseEntity::* )( ::Vector const &,::trace_t const &,int ) )(&::C_BaseEntity::MakeTracer)
-            , (void ( C_BaseFlex_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&C_BaseFlex_wrapper::default_MakeTracer)
+            , (void ( CWarsFlora_wrapper::* )( ::Vector const &,::trace_t const &,int ) )(&CWarsFlora_wrapper::default_MakeTracer)
             , ( bp::arg("vecTracerSrc"), bp::arg("tr"), bp::arg("iTracerType") ) )    
         .def( 
             "NotifyShouldTransmit"
             , (void ( ::C_BaseAnimating::* )( ::ShouldTransmitState_t ) )(&::C_BaseAnimating::NotifyShouldTransmit)
-            , (void ( C_BaseFlex_wrapper::* )( ::ShouldTransmitState_t ) )(&C_BaseFlex_wrapper::default_NotifyShouldTransmit)
+            , (void ( CWarsFlora_wrapper::* )( ::ShouldTransmitState_t ) )(&CWarsFlora_wrapper::default_NotifyShouldTransmit)
             , ( bp::arg("state") ) )    
         .def( 
             "OnChangeOwnerNumber"
             , (void ( ::C_BaseEntity::* )( int ) )(&::C_BaseEntity::OnChangeOwnerNumber)
-            , (void ( C_BaseFlex_wrapper::* )( int ) )(&C_BaseFlex_wrapper::default_OnChangeOwnerNumber)
+            , (void ( CWarsFlora_wrapper::* )( int ) )(&CWarsFlora_wrapper::default_OnChangeOwnerNumber)
             , ( bp::arg("old_owner_number") ) )    
         .def( 
             "OnDataChanged"
             , (void ( ::C_BaseAnimating::* )( ::DataUpdateType_t ) )(&::C_BaseAnimating::OnDataChanged)
-            , (void ( C_BaseFlex_wrapper::* )( ::DataUpdateType_t ) )(&C_BaseFlex_wrapper::default_OnDataChanged)
+            , (void ( CWarsFlora_wrapper::* )( ::DataUpdateType_t ) )(&CWarsFlora_wrapper::default_OnDataChanged)
             , ( bp::arg("updateType") ) )    
         .def( 
             "OnRestore"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::OnRestore)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_OnRestore) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_OnRestore) )    
         .def( 
             "Precache"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Precache)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_Precache) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Precache) )    
         .def( 
             "OnNewModel"
             , (void ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::PyOnNewModel)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_OnNewModel) )    
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_OnNewModel) )    
         .def( 
             "ReceiveMessage"
             , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)
-            , (void ( C_BaseFlex_wrapper::* )( ::boost::python::list ) )(&C_BaseFlex_wrapper::default_ReceiveMessage)
+            , (void ( CWarsFlora_wrapper::* )( ::boost::python::list ) )(&CWarsFlora_wrapper::default_ReceiveMessage)
             , ( bp::arg("msg") ) )    
         .def( 
             "RemoveFromEntityList"
-            , (void ( C_BaseFlex_wrapper::* )( ::entity_list_ids_t ) )(&C_BaseFlex_wrapper::RemoveFromEntityList)
+            , (void ( CWarsFlora_wrapper::* )( ::entity_list_ids_t ) )(&CWarsFlora_wrapper::RemoveFromEntityList)
             , ( bp::arg("listId") ) )    
         .def( 
             "ShouldDraw"
             , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ShouldDraw)
-            , (bool ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_ShouldDraw) )    
+            , (bool ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_ShouldDraw) )    
         .def( 
             "Simulate"
             , (bool ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::Simulate)
-            , (bool ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_Simulate) )    
+            , (bool ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Simulate) )    
         .def( 
             "StartTouch"
             , (void ( ::C_BaseEntity::* )( ::C_BaseEntity * ) )(&::C_BaseEntity::StartTouch)
-            , (void ( C_BaseFlex_wrapper::* )( ::C_BaseEntity * ) )(&C_BaseFlex_wrapper::default_StartTouch)
+            , (void ( CWarsFlora_wrapper::* )( ::C_BaseEntity * ) )(&CWarsFlora_wrapper::default_StartTouch)
             , ( bp::arg("pOther") ) )    
         .def( 
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
-            , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "AddGlobalFlexController" )    
-        .staticmethod( "GetGlobalFlexControllerName" )    
-        .staticmethod( "GetPyNetworkType" )    
-        .staticmethod( "InvalidateFlexCaches" )    
-        .add_property( "lifestate", &C_BaseFlex_wrapper::m_lifeState_Get, &C_BaseFlex_wrapper::m_lifeState_Set )    
-        .add_property( "takedamage", &C_BaseFlex_wrapper::m_takedamage_Get, &C_BaseFlex_wrapper::m_takedamage_Set )    
-        .add_property( "skin", &C_BaseFlex_wrapper::m_nSkin_Get, &C_BaseFlex_wrapper::m_nSkin_Set );
+            , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_UpdateOnRemove) )    
+        .staticmethod( "DestroyFloraGrid" )    
+        .staticmethod( "DestructFloraInRadius" )    
+        .staticmethod( "IgniteFloraInRadius" )    
+        .staticmethod( "InitFloraGrid" )    
+        .staticmethod( "ParseEntity" )    
+        .staticmethod( "RemoveFloraInRadius" )    
+        .staticmethod( "SpawnMapFlora" )    
+        .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    
+        .add_property( "takedamage", &CWarsFlora_wrapper::m_takedamage_Get, &CWarsFlora_wrapper::m_takedamage_Set )    
+        .add_property( "skin", &CWarsFlora_wrapper::m_nSkin_Get, &CWarsFlora_wrapper::m_nSkin_Set );
 
 }
 

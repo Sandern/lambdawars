@@ -312,7 +312,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 					int nEffectsHitboxSet = FindHitboxSetByName( pAnimating->GetModelPtr(), "effects" );
 					mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( nEffectsHitboxSet != -1 ? nEffectsHitboxSet : pAnimating->GetHitboxSet() );
 					
-					if ( set )
+					if ( set && set->numhitboxes != 0 )
 					{
 						bSucesss = true;
 						
