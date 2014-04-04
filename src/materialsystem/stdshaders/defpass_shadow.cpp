@@ -13,6 +13,22 @@ void InitParmsShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, I
 	if ( PARM_NO_DEFAULT( info.iAlphatestRef ) ||
 		(PARM_VALID( info.iAlphatestRef ) && PARM_FLOAT( info.iAlphatestRef ) == 0.0f) )
 		params[ info.iAlphatestRef ]->SetFloatValue( DEFAULT_ALPHATESTREF );
+
+	InitIntParam( info.m_nTreeSway, params, 0 );
+	InitFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
+	InitFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
+	InitFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
+	InitFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
+	InitFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedHighWindMultiplier, params, 2.0f );
+	InitFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 5.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
+	InitFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
+	InitFloatParam( info.m_nTreeSwayFalloffExp, params, 1.5f );
+	InitFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
+	InitFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
 }
 
 void InitPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IMaterialVar **params )
