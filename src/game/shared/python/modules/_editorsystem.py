@@ -17,6 +17,7 @@ class EditorSystem(SemiSharedModuleGenerator):
         
         cls = mb.class_('CEditorSystem')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
         #cls.no_init = True
         cls.noncopyable = True
         

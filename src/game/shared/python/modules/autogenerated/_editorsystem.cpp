@@ -12,106 +12,125 @@
 
 namespace bp = boost::python;
 
-struct CEditorSystem_wrapper : CEditorSystem, bp::wrapper< CEditorSystem > {
-
-    virtual bool Init(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, Init )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, Init )
-        bp::override func_Init = this->get_override( "Init" );
-        if( func_Init.ptr() != Py_None )
-            try {
-                return func_Init(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CEditorSystem::Init(  );
-            }
-        else
-            return this->CEditorSystem::Init(  );
-    }
-    
-    bool default_Init(  ) {
-        return CEditorSystem::Init( );
-    }
-
-    virtual void LevelShutdownPreEntity(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, LevelShutdownPreEntity )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, LevelShutdownPreEntity )
-        bp::override func_LevelShutdownPreEntity = this->get_override( "LevelShutdownPreEntity" );
-        if( func_LevelShutdownPreEntity.ptr() != Py_None )
-            try {
-                func_LevelShutdownPreEntity(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEditorSystem::LevelShutdownPreEntity(  );
-            }
-        else
-            this->CEditorSystem::LevelShutdownPreEntity(  );
-    }
-    
-    void default_LevelShutdownPreEntity(  ) {
-        CEditorSystem::LevelShutdownPreEntity( );
-    }
-
-    virtual void Shutdown(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, Shutdown )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, Shutdown )
-        bp::override func_Shutdown = this->get_override( "Shutdown" );
-        if( func_Shutdown.ptr() != Py_None )
-            try {
-                func_Shutdown(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEditorSystem::Shutdown(  );
-            }
-        else
-            this->CEditorSystem::Shutdown(  );
-    }
-    
-    void default_Shutdown(  ) {
-        CEditorSystem::Shutdown( );
-    }
-
-};
-
 BOOST_PYTHON_MODULE(_editorsystem){
     bp::docstring_options doc_options( true, true, false );
 
-    bp::class_< CEditorSystem_wrapper, boost::noncopyable >( "CEditorSystem", bp::no_init )    
-        .def( 
-            "ClearLoadedMap"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
-        .def( 
-            "ClearSelection"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearSelection ) )    
-        .def( 
-            "DoSelect"
-            , (void ( ::CEditorSystem::* )( ::C_HL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
-            , ( bp::arg("pPlayer") ) )    
-        .def( 
-            "GetCurrentVmfPath"
-            , (char const * ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::GetCurrentVmfPath ) )    
-        .def( 
-            "Init"
-            , (bool ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Init)
-            , (bool ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Init) )    
-        .def( 
-            "IsMapLoaded"
-            , (bool ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::IsMapLoaded ) )    
-        .def( 
-            "LevelShutdownPreEntity"
-            , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::LevelShutdownPreEntity)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_LevelShutdownPreEntity) )    
-        .def( 
-            "LoadCurrentVmf"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::LoadCurrentVmf ) )    
-        .def( 
-            "RemoveFloraInRadius"
-            , (void ( ::CEditorSystem::* )( ::Vector const &,float ) )( &::CEditorSystem::RemoveFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
-        .def( 
-            "Shutdown"
-            , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Shutdown)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) );
+    { //::CEditorSystem
+        typedef bp::class_< CEditorSystem, boost::noncopyable > CEditorSystem_exposer_t;
+        CEditorSystem_exposer_t CEditorSystem_exposer = CEditorSystem_exposer_t( "CEditorSystem", bp::no_init );
+        bp::scope CEditorSystem_scope( CEditorSystem_exposer );
+        bp::enum_< CEditorSystem::EditorInteractionMode_t>("EditorInteractionMode_t")
+            .value("EDITORINTERACTION_NONE", CEditorSystem::EDITORINTERACTION_NONE)
+            .value("EDITORINTERACTION_SELECT", CEditorSystem::EDITORINTERACTION_SELECT)
+            .value("EDITORINTERACTION_ADD", CEditorSystem::EDITORINTERACTION_ADD)
+            .value("EDITORINTERACTION_TRANSLATE", CEditorSystem::EDITORINTERACTION_TRANSLATE)
+            .value("EDITORINTERACTION_ROTATE", CEditorSystem::EDITORINTERACTION_ROTATE)
+            .value("EDITORINTERACTION_COUNT", CEditorSystem::EDITORINTERACTION_COUNT)
+            .export_values()
+            ;
+        { //::CEditorSystem::ClearLoadedMap
+        
+            typedef void ( ::CEditorSystem::*ClearLoadedMap_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ClearLoadedMap"
+                , ClearLoadedMap_function_type( &::CEditorSystem::ClearLoadedMap ) );
+        
+        }
+        { //::CEditorSystem::ClearSelection
+        
+            typedef void ( ::CEditorSystem::*ClearSelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ClearSelection"
+                , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
+        
+        }
+        { //::CEditorSystem::DoSelect
+        
+            typedef void ( ::CEditorSystem::*DoSelect_function_type )( ::C_HL2WarsPlayer * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "DoSelect"
+                , DoSelect_function_type( &::CEditorSystem::DoSelect )
+                , ( bp::arg("pPlayer") ) );
+        
+        }
+        { //::CEditorSystem::GetCurrentVmfPath
+        
+            typedef char const * ( ::CEditorSystem::*GetCurrentVmfPath_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetCurrentVmfPath"
+                , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
+        
+        }
+        { //::CEditorSystem::Init
+        
+            typedef bool ( ::CEditorSystem::*Init_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "Init"
+                , Init_function_type( &::CEditorSystem::Init ) );
+        
+        }
+        { //::CEditorSystem::IsMapLoaded
+        
+            typedef bool ( ::CEditorSystem::*IsMapLoaded_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsMapLoaded"
+                , IsMapLoaded_function_type( &::CEditorSystem::IsMapLoaded ) );
+        
+        }
+        { //::CEditorSystem::LevelShutdownPreEntity
+        
+            typedef void ( ::CEditorSystem::*LevelShutdownPreEntity_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "LevelShutdownPreEntity"
+                , LevelShutdownPreEntity_function_type( &::CEditorSystem::LevelShutdownPreEntity ) );
+        
+        }
+        { //::CEditorSystem::LoadCurrentVmf
+        
+            typedef void ( ::CEditorSystem::*LoadCurrentVmf_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "LoadCurrentVmf"
+                , LoadCurrentVmf_function_type( &::CEditorSystem::LoadCurrentVmf ) );
+        
+        }
+        { //::CEditorSystem::RemoveFloraInRadius
+        
+            typedef void ( ::CEditorSystem::*RemoveFloraInRadius_function_type )( ::Vector const &,float ) ;
+            
+            CEditorSystem_exposer.def( 
+                "RemoveFloraInRadius"
+                , RemoveFloraInRadius_function_type( &::CEditorSystem::RemoveFloraInRadius )
+                , ( bp::arg("vPosition"), bp::arg("fRadius") ) );
+        
+        }
+        { //::CEditorSystem::SetEditorMode
+        
+            typedef void ( ::CEditorSystem::*SetEditorMode_function_type )( ::CEditorSystem::EditorInteractionMode_t ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetEditorMode"
+                , SetEditorMode_function_type( &::CEditorSystem::SetEditorMode )
+                , ( bp::arg("mode") ) );
+        
+        }
+        { //::CEditorSystem::Shutdown
+        
+            typedef void ( ::CEditorSystem::*Shutdown_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "Shutdown"
+                , Shutdown_function_type( &::CEditorSystem::Shutdown ) );
+        
+        }
+    }
 
     { //::EditorSystem
     
@@ -135,133 +154,144 @@ BOOST_PYTHON_MODULE(_editorsystem){
 
 namespace bp = boost::python;
 
-struct CEditorSystem_wrapper : CEditorSystem, bp::wrapper< CEditorSystem > {
-
-    virtual bool Init(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, Init )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, Init )
-        bp::override func_Init = this->get_override( "Init" );
-        if( func_Init.ptr() != Py_None )
-            try {
-                return func_Init(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CEditorSystem::Init(  );
-            }
-        else
-            return this->CEditorSystem::Init(  );
-    }
-    
-    bool default_Init(  ) {
-        return CEditorSystem::Init( );
-    }
-
-    virtual void LevelShutdownPreEntity(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, LevelShutdownPreEntity )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, LevelShutdownPreEntity )
-        bp::override func_LevelShutdownPreEntity = this->get_override( "LevelShutdownPreEntity" );
-        if( func_LevelShutdownPreEntity.ptr() != Py_None )
-            try {
-                func_LevelShutdownPreEntity(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEditorSystem::LevelShutdownPreEntity(  );
-            }
-        else
-            this->CEditorSystem::LevelShutdownPreEntity(  );
-    }
-    
-    void default_LevelShutdownPreEntity(  ) {
-        CEditorSystem::LevelShutdownPreEntity( );
-    }
-
-    virtual void OnEntityDeleted( ::CBaseEntity * pEntity ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, OnEntityDeleted )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, OnEntityDeleted )
-        bp::override func_OnEntityDeleted = this->get_override( "OnEntityDeleted" );
-        if( func_OnEntityDeleted.ptr() != Py_None )
-            try {
-                func_OnEntityDeleted( pEntity ? pEntity->GetPyHandle() : boost::python::object() );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEditorSystem::OnEntityDeleted( pEntity );
-            }
-        else
-            this->CEditorSystem::OnEntityDeleted( pEntity );
-    }
-    
-    void default_OnEntityDeleted( ::CBaseEntity * pEntity ) {
-        CEditorSystem::OnEntityDeleted( pEntity );
-    }
-
-    virtual void Shutdown(  ) {
-        PY_OVERRIDE_CHECK( CEditorSystem, Shutdown )
-        PY_OVERRIDE_LOG( _editorsystem, CEditorSystem, Shutdown )
-        bp::override func_Shutdown = this->get_override( "Shutdown" );
-        if( func_Shutdown.ptr() != Py_None )
-            try {
-                func_Shutdown(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CEditorSystem::Shutdown(  );
-            }
-        else
-            this->CEditorSystem::Shutdown(  );
-    }
-    
-    void default_Shutdown(  ) {
-        CEditorSystem::Shutdown( );
-    }
-
-};
-
 BOOST_PYTHON_MODULE(_editorsystem){
     bp::docstring_options doc_options( true, true, false );
 
-    bp::class_< CEditorSystem_wrapper, boost::noncopyable >( "CEditorSystem", bp::no_init )    
-        .def( 
-            "ClearLoadedMap"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearLoadedMap ) )    
-        .def( 
-            "ClearSelection"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::ClearSelection ) )    
-        .def( 
-            "DoSelect"
-            , (void ( ::CEditorSystem::* )( ::CHL2WarsPlayer * ) )( &::CEditorSystem::DoSelect )
-            , ( bp::arg("pPlayer") ) )    
-        .def( 
-            "GetCurrentVmfPath"
-            , (char const * ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::GetCurrentVmfPath ) )    
-        .def( 
-            "Init"
-            , (bool ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Init)
-            , (bool ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Init) )    
-        .def( 
-            "IsMapLoaded"
-            , (bool ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::IsMapLoaded ) )    
-        .def( 
-            "LevelShutdownPreEntity"
-            , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::LevelShutdownPreEntity)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_LevelShutdownPreEntity) )    
-        .def( 
-            "LoadCurrentVmf"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::LoadCurrentVmf ) )    
-        .def( 
-            "OnEntityDeleted"
-            , (void ( ::CEditorSystem::* )( ::CBaseEntity * ) )(&::CEditorSystem::OnEntityDeleted)
-            , (void ( CEditorSystem_wrapper::* )( ::CBaseEntity * ) )(&CEditorSystem_wrapper::default_OnEntityDeleted)
-            , ( bp::arg("pEntity") ) )    
-        .def( 
-            "RemoveFloraInRadius"
-            , (void ( ::CEditorSystem::* )( ::Vector const &,float ) )( &::CEditorSystem::RemoveFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
-        .def( 
-            "SaveCurrentVmf"
-            , (void ( ::CEditorSystem::* )(  ) )( &::CEditorSystem::SaveCurrentVmf ) )    
-        .def( 
-            "Shutdown"
-            , (void ( ::CEditorSystem::* )(  ) )(&::CEditorSystem::Shutdown)
-            , (void ( CEditorSystem_wrapper::* )(  ) )(&CEditorSystem_wrapper::default_Shutdown) );
+    { //::CEditorSystem
+        typedef bp::class_< CEditorSystem, boost::noncopyable > CEditorSystem_exposer_t;
+        CEditorSystem_exposer_t CEditorSystem_exposer = CEditorSystem_exposer_t( "CEditorSystem", bp::no_init );
+        bp::scope CEditorSystem_scope( CEditorSystem_exposer );
+        bp::enum_< CEditorSystem::EditorInteractionMode_t>("EditorInteractionMode_t")
+            .value("EDITORINTERACTION_NONE", CEditorSystem::EDITORINTERACTION_NONE)
+            .value("EDITORINTERACTION_SELECT", CEditorSystem::EDITORINTERACTION_SELECT)
+            .value("EDITORINTERACTION_ADD", CEditorSystem::EDITORINTERACTION_ADD)
+            .value("EDITORINTERACTION_TRANSLATE", CEditorSystem::EDITORINTERACTION_TRANSLATE)
+            .value("EDITORINTERACTION_ROTATE", CEditorSystem::EDITORINTERACTION_ROTATE)
+            .value("EDITORINTERACTION_COUNT", CEditorSystem::EDITORINTERACTION_COUNT)
+            .export_values()
+            ;
+        { //::CEditorSystem::ClearLoadedMap
+        
+            typedef void ( ::CEditorSystem::*ClearLoadedMap_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ClearLoadedMap"
+                , ClearLoadedMap_function_type( &::CEditorSystem::ClearLoadedMap ) );
+        
+        }
+        { //::CEditorSystem::ClearSelection
+        
+            typedef void ( ::CEditorSystem::*ClearSelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ClearSelection"
+                , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
+        
+        }
+        { //::CEditorSystem::DoSelect
+        
+            typedef void ( ::CEditorSystem::*DoSelect_function_type )( ::CHL2WarsPlayer * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "DoSelect"
+                , DoSelect_function_type( &::CEditorSystem::DoSelect )
+                , ( bp::arg("pPlayer") ) );
+        
+        }
+        { //::CEditorSystem::GetCurrentVmfPath
+        
+            typedef char const * ( ::CEditorSystem::*GetCurrentVmfPath_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetCurrentVmfPath"
+                , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
+        
+        }
+        { //::CEditorSystem::Init
+        
+            typedef bool ( ::CEditorSystem::*Init_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "Init"
+                , Init_function_type( &::CEditorSystem::Init ) );
+        
+        }
+        { //::CEditorSystem::IsMapLoaded
+        
+            typedef bool ( ::CEditorSystem::*IsMapLoaded_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsMapLoaded"
+                , IsMapLoaded_function_type( &::CEditorSystem::IsMapLoaded ) );
+        
+        }
+        { //::CEditorSystem::LevelShutdownPreEntity
+        
+            typedef void ( ::CEditorSystem::*LevelShutdownPreEntity_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "LevelShutdownPreEntity"
+                , LevelShutdownPreEntity_function_type( &::CEditorSystem::LevelShutdownPreEntity ) );
+        
+        }
+        { //::CEditorSystem::LoadCurrentVmf
+        
+            typedef void ( ::CEditorSystem::*LoadCurrentVmf_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "LoadCurrentVmf"
+                , LoadCurrentVmf_function_type( &::CEditorSystem::LoadCurrentVmf ) );
+        
+        }
+        { //::CEditorSystem::OnEntityDeleted
+        
+            typedef void ( ::CEditorSystem::*OnEntityDeleted_function_type )( ::CBaseEntity * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "OnEntityDeleted"
+                , OnEntityDeleted_function_type( &::CEditorSystem::OnEntityDeleted )
+                , ( bp::arg("pEntity") ) );
+        
+        }
+        { //::CEditorSystem::RemoveFloraInRadius
+        
+            typedef void ( ::CEditorSystem::*RemoveFloraInRadius_function_type )( ::Vector const &,float ) ;
+            
+            CEditorSystem_exposer.def( 
+                "RemoveFloraInRadius"
+                , RemoveFloraInRadius_function_type( &::CEditorSystem::RemoveFloraInRadius )
+                , ( bp::arg("vPosition"), bp::arg("fRadius") ) );
+        
+        }
+        { //::CEditorSystem::SaveCurrentVmf
+        
+            typedef void ( ::CEditorSystem::*SaveCurrentVmf_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SaveCurrentVmf"
+                , SaveCurrentVmf_function_type( &::CEditorSystem::SaveCurrentVmf ) );
+        
+        }
+        { //::CEditorSystem::SetEditorMode
+        
+            typedef void ( ::CEditorSystem::*SetEditorMode_function_type )( ::CEditorSystem::EditorInteractionMode_t ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetEditorMode"
+                , SetEditorMode_function_type( &::CEditorSystem::SetEditorMode )
+                , ( bp::arg("mode") ) );
+        
+        }
+        { //::CEditorSystem::Shutdown
+        
+            typedef void ( ::CEditorSystem::*Shutdown_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "Shutdown"
+                , Shutdown_function_type( &::CEditorSystem::Shutdown ) );
+        
+        }
+    }
 
     { //::EditorSystem
     

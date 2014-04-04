@@ -12,6 +12,36 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// Deferred helper
+static void CalcBoundaries( Vector *list, const int &num, Vector &min, Vector &max )
+{
+	Assert( num > 0 );
+
+	min = *list;
+	max = *list;
+
+	for ( int i = 1; i < num; i++ )
+	{
+		for ( int x = 0; x < 3; x++ )
+		{
+			min[ x ] = MIN( min[ x ], list[ i ][ x ] );
+			max[ x ] = MAX( max[ x ], list[ i ][ x ] );
+		}
+	}
+}
+
+// Selection helper defines
+#define LIGHT_BOX_SIZE 8.0f
+#define LIGHT_BOX_VEC Vector( LIGHT_BOX_SIZE, LIGHT_BOX_SIZE, LIGHT_BOX_SIZE )
+
+#define HELPER_COLOR_MAX 0.8f
+#define HELPER_COLOR_MIN 0.1f
+#define HELPER_COLOR_LOW 0.4f
+#define SELECTED_AXIS_COLOR Vector( HELPER_COLOR_MAX, HELPER_COLOR_MAX, HELPER_COLOR_MIN )
+
+#define SELECTION_PICKER_SIZE 2.0f
+#define SELECTION_PICKER_VEC Vector( SELECTION_PICKER_SIZE, SELECTION_PICKER_SIZE, SELECTION_PICKER_SIZE )
+
 static CEditorSystem g_EditorSystem;
 
 CEditorSystem *EditorSystem()
@@ -26,6 +56,9 @@ bool CEditorSystem::Init()
 #else
 	m_matSelect.Init( "deferred/editor_select", TEXTURE_GROUP_OTHER );
 	Assert( m_matSelect.IsValid() );
+
+	m_matHelper.Init( "deferred/editor_helper", TEXTURE_GROUP_OTHER );
+	Assert( m_matHelper.IsValid() );
 #endif // CLIENT_DLL
 
 	return true;
@@ -142,6 +175,74 @@ void CEditorSystem::RemoveFloraInRadius( const Vector &vPosition, float fRadius 
 	CWarsFlora::RemoveFloraInRadius( vPosition, fRadius );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CEditorSystem::GetNumSelected()
+{
+	return m_hSelectedEntities.Count();
+}
+
+bool CEditorSystem::IsAnythingSelected()
+{
+	return GetNumSelected() > 0;
+}
+
+Vector CEditorSystem::GetSelectionCenter()
+{
+	if ( !IsAnythingSelected() )
+	{
+		Assert( 0 );
+		return vec3_origin;
+	}
+
+	// TODO
+	//if ( m_bSelectionCenterLocked )
+	//	return m_vecSelectionCenterCache;
+
+	CUtlVector< Vector > positions;
+
+	FOR_EACH_VEC( m_hSelectedEntities, i )
+	{
+		positions.AddToTail( m_hSelectedEntities[ i ]->GetAbsOrigin() );
+	}
+
+#if 1 // median
+	Vector min, max;
+
+	CalcBoundaries( positions.Base(), positions.Count(), min, max );
+
+	return min + ( max - min ) * 0.5f;
+#else // arth mean
+	Vector center = vec3_origin;
+
+	FOR_EACH_VEC( positions, i )
+		center += positions[ i ];
+
+	return center / positions.Count();
+#endif
+}
+
+QAngle CEditorSystem::GetSelectionOrientation()
+{
+	if ( !IsAnythingSelected() )
+	{
+		Assert( 0 );
+		return vec3_angle;
+	}
+
+	if ( GetNumSelected() > 1 )
+	{
+		return vec3_angle;
+	}
+	else
+	{
+		Assert( m_hSelectedEntities.Count() == 1 );
+
+		return m_hSelectedEntities[ 0 ]->GetAbsAngles();
+	}
+}
+
 #ifdef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -150,10 +251,6 @@ void CEditorSystem::RenderSelection()
 {
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Bind( m_matSelect );
-
-	//CUtlVector< def_light_t* > hSelectedLights;
-	//hSelectedLights.AddVectorToTail( m_hSelectedLights );
-	//hSelectedLights.Sort( DefLightSort );
 
 	IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, m_matSelect );
 
@@ -202,9 +299,6 @@ void CEditorSystem::RenderSelection()
 			Vector2D( 0, 1 ),
 		};
 
-		//if ( !GetLightingManager()->IsLightRendered( l ) )
-		//	color.Init( 1.0f, 0.5f, 0.25f );
-
 		for ( int p = 0; p < 6; p++ )
 		{
 			for ( int v = 0; v < 4; v++ )
@@ -221,8 +315,335 @@ void CEditorSystem::RenderSelection()
 	pMesh->Draw();
 }
 
+void CEditorSystem::RenderHelpers()
+{
+	if ( !m_hSelectedEntities.Count() )
+		return;
+
+	switch ( m_EditorMode )
+	{
+	case EDITORINTERACTION_TRANSLATE:
+			RenderTranslate();
+		break;
+	case EDITORINTERACTION_ROTATE:
+			RenderRotate();
+		break;
+	}
+}
+
+
+void CEditorSystem::RenderTranslate()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->Bind( m_matHelper );
+
+	const bool bMultiSelected = (GetNumSelected() > 1);
+
+	const int iSubDiv = 16;
+	const float flLengthBase = 16.0f + ( bMultiSelected ? LIGHT_BOX_SIZE : 0 );
+	const float flLengthTip = 8.0f;
+	const float flRadiusBase = 1.2f;
+	const float flRadiusTip = 4.0f;
+	const float flAngleStep = 360.0f / iSubDiv;
+	const float flOffset = bMultiSelected ? 0 : LIGHT_BOX_SIZE;
+
+	Vector directions[] = {
+		Vector( 1, 0, 0 ),
+		Vector( 0, 1, 0 ),
+		Vector( 0, 0, 1 ),
+	};
+
+	Vector colors[] = {
+		Vector( HELPER_COLOR_MAX, HELPER_COLOR_MIN, HELPER_COLOR_MIN ),
+		Vector( HELPER_COLOR_MIN, HELPER_COLOR_MAX, HELPER_COLOR_MIN ),
+		Vector( HELPER_COLOR_MIN, HELPER_COLOR_MIN, HELPER_COLOR_MAX ),
+	};
+
+	const float flColorLowScale = HELPER_COLOR_LOW;
+
+	Vector center = GetSelectionCenter();
+
+	for ( int iDir = 0; iDir < 3; iDir++ )
+	{
+		Vector fwd = directions[ iDir ];
+		QAngle ang;
+
+		VectorAngles( fwd, ang );
+
+		IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, m_matHelper );
+
+		CMeshBuilder mB;
+		mB.Begin( pMesh, MATERIAL_TRIANGLES, 5 * iSubDiv );
+
+		Vector cUp, nUp;
+		Vector pos, tmp0, tmp1, tmp2;
+
+		Vector colHigh = colors[ iDir ];
+
+		if ( GetCurrentSelectedAxis() == EDITORAXIS_FIRST + iDir )
+			colHigh = SELECTED_AXIS_COLOR;
+
+		Vector colLow = colHigh * flColorLowScale;
+
+		for ( int iStep = 0; iStep < iSubDiv; iStep++ )
+		{
+			QAngle angNext( ang );
+			angNext.z += flAngleStep;
+
+			AngleVectors( ang, NULL, NULL, &cUp );
+			AngleVectors( angNext, NULL, NULL, &nUp );
+
+			// disc end
+			pos = center + fwd * flOffset;
+			mB.Position3fv( pos.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			tmp0 = pos + cUp * flRadiusBase;
+			mB.Position3fv( tmp0.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			tmp1 = pos + nUp * flRadiusBase;
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			// base cylinder
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			mB.Position3fv( tmp0.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			tmp2 = tmp0 + fwd * flLengthBase;
+			mB.Position3fv( tmp2.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			mB.Position3fv( tmp2.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			tmp1 += fwd * flLengthBase;
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			// disc mid
+			pos += fwd * flLengthBase;
+			mB.Position3fv( pos.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			tmp0 = pos + cUp * flRadiusTip;
+			mB.Position3fv( tmp0.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			tmp1 = pos + nUp * flRadiusTip;
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colLow.Base() );
+			mB.AdvanceVertex();
+
+			// tip
+			mB.Position3fv( tmp1.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			mB.Position3fv( tmp0.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			pos += fwd * flLengthTip;
+			mB.Position3fv( pos.Base() );
+			mB.TexCoord2f( 0, 0, 0 );
+			mB.Color3fv( colHigh.Base() );
+			mB.AdvanceVertex();
+
+			ang = angNext;
+		}
+
+		mB.End();
+		pMesh->Draw();
+
+		if ( GetCurrentSelectedAxis() == EDITORAXIS_FIRST_PLANE + iDir )
+		{
+			const int index = GetCurrentSelectedAxis() - EDITORAXIS_FIRST_PLANE;
+			const float flPlaneSize = LIGHT_BOX_SIZE + 12.0f;
+
+			int orient[3][2] = {
+				{ 0, 1 },
+				{ 2, 0 },
+				{ 1, 2 },
+			};
+
+			int axis_0 = orient[ index ][ 0 ];
+			int axis_1 = orient[ index ][ 1 ];
+
+			Vector points[4];
+			points[0] = center;
+			points[1] = center;
+			points[2] = center;
+			points[3] = center;
+
+			points[1][axis_0] += flPlaneSize;
+			points[2][axis_0] += flPlaneSize;
+			points[2][axis_1] += flPlaneSize;
+			points[3][axis_1] += flPlaneSize;
+
+			Vector col = SELECTED_AXIS_COLOR;
+
+			mB.Begin( pMesh, MATERIAL_QUADS, 2 );
+
+			for ( int i = 3; i >= 0; i-- )
+			{
+				mB.Position3fv( points[i].Base() );
+				mB.Color3fv( col.Base() );
+				mB.TexCoord2f( 0, 0, 0 );
+				mB.AdvanceVertex();
+			}
+
+			col *= HELPER_COLOR_LOW;
+
+			for ( int i = 0; i < 4; i++ )
+			{
+				mB.Position3fv( points[i].Base() );
+				mB.Color3fv( col.Base() );
+				mB.TexCoord2f( 0, 0, 0 );
+				mB.AdvanceVertex();
+			}
+
+			mB.End();
+			pMesh->Draw();
+		}
+	}
+}
+
+void CEditorSystem::RenderRotate()
+{
+	CMatRenderContextPtr pRenderContext( materials );
+	pRenderContext->Bind( m_matHelper );
+
+	const int iSubDiv = 64.0f;
+	const float flRadius = 32.0f;
+	const float flThickness = 4.0f;
+	const float flRotationStep = 360.0f / iSubDiv;
+
+	Vector center = GetSelectionCenter();
+	QAngle orientation = GetSelectionOrientation();
+
+	Vector colors[] = {
+		Vector( HELPER_COLOR_MAX, HELPER_COLOR_MIN, HELPER_COLOR_MIN ),
+		Vector( HELPER_COLOR_MIN, HELPER_COLOR_MAX, HELPER_COLOR_MIN ),
+		Vector( HELPER_COLOR_MIN, HELPER_COLOR_MIN, HELPER_COLOR_MAX ),
+	};
+	const float flColorLowScale = HELPER_COLOR_LOW;
+
+	Vector colHigh, colLow;
+	Vector tmp[4];
+
+	Vector reinterpretRoll[3];
+
+	AngleVectors( orientation,
+		&reinterpretRoll[0], &reinterpretRoll[1], &reinterpretRoll[2] );
+
+	QAngle angCur, angNext;
+
+	int iLookup[3][2] = {
+		{ 1, 2 },
+		{ 2, 1 },
+		{ 0, 2 },
+	};
+
+	for ( int iDir = 0; iDir < 3; iDir++ )
+	{
+		colHigh = colors[ iDir ];
+
+		if ( iDir == GetCurrentSelectedAxis() - EDITORAXIS_FIRST )
+			colHigh = SELECTED_AXIS_COLOR;
+
+		colLow = colHigh * flColorLowScale;
+
+		IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, m_matHelper );
+
+		CMeshBuilder mB;
+		mB.Begin( pMesh, MATERIAL_QUADS, 2 * iSubDiv );
+
+		VectorAngles( reinterpretRoll[ iLookup[iDir][0] ],
+			reinterpretRoll[ iLookup[iDir][1] ],
+			angCur );
+		angNext = angCur;
+
+		float flCurrentRadius = flRadius - iDir * 0.275f;
+
+		for ( int iStep = 0; iStep < iSubDiv; iStep++ )
+		{
+			angNext.z += flRotationStep;
+
+			Vector cUp, nUp, cFwd;
+
+			AngleVectors( angCur, &cFwd, NULL, &cUp );
+			AngleVectors( angNext, NULL, NULL, &nUp );
+
+			tmp[0] = center
+				+ cUp * flCurrentRadius
+				+ cFwd * flThickness;
+
+			tmp[1] = center
+				+ nUp * flCurrentRadius
+				+ cFwd * flThickness;
+
+			tmp[2] = tmp[1] - cFwd * flThickness * 2;
+			tmp[3] = tmp[0] - cFwd * flThickness * 2;
+
+			for ( int iPoint = 0; iPoint < 4; iPoint++ )
+			{
+				mB.Position3fv( tmp[ iPoint ].Base() );
+				mB.Color3fv( colHigh.Base() );
+				mB.TexCoord2f( 0, 0, 0 );
+				mB.AdvanceVertex();
+			}
+
+			for ( int iPoint = 3; iPoint >= 0; iPoint-- )
+			{
+				mB.Position3fv( tmp[ iPoint ].Base() );
+				mB.Color3fv( colLow.Base() );
+				mB.TexCoord2f( 0, 0, 0 );
+				mB.AdvanceVertex();
+			}
+
+			angCur = angNext;
+		}
+
+		mB.End();
+		pMesh->Draw();
+	}
+}
+
 void CEditorSystem::PostRender()
 {
 	RenderSelection();
+	RenderHelpers();
 }
 #endif // CLIENT_DLL
