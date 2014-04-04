@@ -1662,12 +1662,12 @@ void register_CUnitBase_class(){
         }
         { //::CUnitBase::HasRangeAttackLOS
         
-            typedef bool ( ::CUnitBase::*HasRangeAttackLOS_function_type )( ::Vector const & ) ;
+            typedef bool ( ::CUnitBase::*HasRangeAttackLOS_function_type )( ::Vector const &,::CBaseEntity * ) ;
             
             CUnitBase_exposer.def( 
                 "HasRangeAttackLOS"
                 , HasRangeAttackLOS_function_type( &::CUnitBase::HasRangeAttackLOS )
-                , ( bp::arg("vTargetPos") ) );
+                , ( bp::arg("vTargetPos"), bp::arg("pTarget")=bp::object() ) );
         
         }
         { //::CUnitBase::HasRangeAttackLOSTarget

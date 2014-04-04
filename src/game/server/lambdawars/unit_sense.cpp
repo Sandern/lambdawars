@@ -66,7 +66,7 @@ void UnitBaseSense::Look( int iDistance )
 //-----------------------------------------------------------------------------
 bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 {
-	// Skip myself and skip not alive if an unit
+	// Skip myself and skip if it's a unit, but not alive
 	if( pOther == m_pOuter || (pOther->IsUnit() && !pOther->IsAlive()) )
 		return false;
 
@@ -83,7 +83,7 @@ bool UnitBaseSense::TestEntity( CBaseEntity *pOther )
 
 	if( m_bTestLOS )
 	{
-		if( !m_pOuter->HasRangeAttackLOS(pOther->WorldSpaceCenter()) )
+		if( !m_pOuter->HasRangeAttackLOS( pOther->WorldSpaceCenter(), pOther ) )
 			return false;
 	}
 

@@ -319,7 +319,7 @@ public:
 	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
 
 	// Enemy/attack related
-	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos );
+	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos, CBaseEntity *pTarget = NULL );
 	virtual bool		HasRangeAttackLOSTarget( CBaseEntity *pTarget );
 	float				EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit=true );
 	virtual float		TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool bConsiderSizeUnit=true );

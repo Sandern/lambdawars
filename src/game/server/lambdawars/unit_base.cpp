@@ -793,7 +793,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
+bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos, CBaseEntity *pTarget )
 {
 	if( GetActiveWeapon() )
 	{
@@ -801,20 +801,15 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos )
 	}
 	else
 	{
-		CBaseEntity *pEnemy = GetEnemy();
-		if( !pEnemy || !pEnemy->IsSolid() )
-		{
-			m_bHasRangeAttackLOS = false;
-		}
-		else
-		{
-			trace_t result;
-			CUnitLOSFilter traceFilter( this, GetEnemy(), GetCollisionGroup() );
-			UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &traceFilter, &result );
-			if( g_debug_rangeattacklos.GetBool() )
-				NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );
-			m_bHasRangeAttackLOS = (result.fraction == 1.0f);
-		}
+		if( !pTarget )
+			pTarget = GetEnemy();
+
+		trace_t result;
+		CUnitLOSFilter traceFilter( this, pTarget, GetCollisionGroup() );
+		UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &traceFilter, &result );
+		if( g_debug_rangeattacklos.GetBool() )
+			NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );
+		m_bHasRangeAttackLOS = (result.fraction == 1.0f);
 	}
 	m_fLastRangeAttackLOSTime = gpGlobals->curtime;
 	return m_bHasRangeAttackLOS;
