@@ -31,6 +31,7 @@ public:
 	virtual void Precache( void );
 #endif // CLIENT_DLL
 	virtual void Spawn();
+	virtual void InitFloraData();
 
 	virtual void PlayDestructionAnimation();
 
@@ -53,6 +54,7 @@ public:
 	static void DestroyFloraGrid();
 	void		InsertInFloraGrid();
 	void		RemoveFromFloraGrid();
+	static void InitFloraDataKeyValues();
 
 	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
 	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
@@ -65,9 +67,11 @@ public:
 #endif // CLIENT_DLL
 
 private:
-	static CWarsFlora *m_pFloraGrid;
 	int				m_iKey;
-	CWarsFlora		*m_pNext;
+
+	static KeyValues *m_pKVFloraData;
+
+	bool			m_bCanBeIgnited;
 
 	string_t		m_iszIdleAnimationName;
 	string_t		m_iszSqueezeDownAnimationName;

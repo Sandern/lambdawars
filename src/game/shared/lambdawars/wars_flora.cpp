@@ -10,6 +10,8 @@
 #include "gamestringpool.h"
 #include "worldsize.h"
 #include "hl2wars_util_shared.h"
+#include <filesystem.h>
+#include "vstdlib/ikeyvaluessystem.h"
 
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
@@ -80,6 +82,8 @@ static CTEIgniteFlora g_TEIgniteFloraEvent( "IgniteFloraEvent" );
 
 typedef CUtlVector< CWarsFlora * > FloraVector;
 CUtlVector< FloraVector > s_FloraGrid;
+
+KeyValues *CWarsFlora::m_pKVFloraData = NULL;
 
 LINK_ENTITY_TO_CLASS( wars_flora, CWarsFlora );
 
@@ -154,6 +158,8 @@ void CWarsFlora::Spawn()
 	SetModel( STRING( GetModelName() ) );
 #endif // CLIENT_DLL
 
+	InitFloraData();
+
 	SetSolid( SOLID_NONE );
 	Vector vecMins = CollisionProp()->OBBMins();
 	Vector vecMaxs = CollisionProp()->OBBMaxs();
@@ -164,6 +170,55 @@ void CWarsFlora::Spawn()
 	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
 	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
 	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::InitFloraData()
+{
+	static int keyIdle = KeyValuesSystem()->GetSymbolForString( "idlesequence" );
+	static int keySqueezeDown = KeyValuesSystem()->GetSymbolForString( "squeezedownsequence" );
+	static int keySqueezeDownIdle = KeyValuesSystem()->GetSymbolForString( "squeezedownidlesequence" );
+	static int keySqueezeUp = KeyValuesSystem()->GetSymbolForString( "squeezeupsequence" );
+	static int keyDestruct = KeyValuesSystem()->GetSymbolForString( "destructsequence" );
+	static int keyIgnite = KeyValuesSystem()->GetSymbolForString( "ignite" );
+
+	// Find our section. No section? nothing to apply!
+#ifdef CLIENT_DLL
+	const char *pModelName = modelinfo->GetModelName( GetModel() );
+#else
+	const char *pModelName = STRING( GetModelName() );
+#endif // CLIENT_DLL
+	KeyValues *pSection = m_pKVFloraData->FindKey( pModelName );
+	if ( !pSection )
+	{
+		return;
+	}
+
+	// Can be put on fire?
+	m_bCanBeIgnited = pSection->GetBool( keyIgnite, false );
+
+	// Sequence label names
+	const char *pIdleAnimationName = pSection->GetString( keyIdle, NULL );
+	if( pIdleAnimationName )
+		m_iszIdleAnimationName = AllocPooledString( pIdleAnimationName );
+
+	const char *pDownAnimationName = pSection->GetString( keySqueezeDown, NULL );
+	if( pDownAnimationName )
+		m_iszSqueezeDownAnimationName = AllocPooledString( pDownAnimationName );
+
+	const char *pDownIdleAnimationName = pSection->GetString( keySqueezeDownIdle, NULL );
+	if( pDownIdleAnimationName )
+		m_iszSqueezeDownIdleAnimationName = AllocPooledString( pDownIdleAnimationName );
+
+	const char *pUpAnimationName = pSection->GetString( keySqueezeUp, NULL );
+	if( pUpAnimationName )
+		m_iszSqueezeUpAnimationName = AllocPooledString( pUpAnimationName );
+
+	const char *pDestructAnimationName = pSection->GetString( keyDestruct, NULL );
+	if( pDestructAnimationName )
+		m_iszDestructionAnimationName = AllocPooledString( pDestructAnimationName );
 }
 
 //-----------------------------------------------------------------------------
@@ -221,10 +276,12 @@ void CWarsFlora::UpdateUnitAvoid()
 		if( iSequence != m_iSqueezeDownSequence && iSequence != m_iSqueezeDownIdleSequence  )
 		{
 			SetSequence( m_iSqueezeDownSequence );
+			ResetSequenceInfo();
 		}
 		else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() )
 		{
 			SetSequence( m_iSqueezeDownIdleSequence );
+			ResetSequenceInfo();
 		}
 
 		m_fAvoidTimeOut = gpGlobals->curtime + 0.1f;
@@ -246,10 +303,12 @@ void CWarsFlora::UpdateClientSideAnimation()
 		if( iSequence == m_iSqueezeDownSequence || iSequence == m_iSqueezeDownIdleSequence )
 		{
 			SetSequence( m_iSqueezeUpSequence );
+			ResetSequenceInfo();
 		}
 		else if( iSequence == m_iSqueezeUpSequence && IsSequenceFinished() )
 		{
 			SetSequence( m_iIdleSequence );
+			ResetSequenceInfo();
 		}
 	}
 }
@@ -258,6 +317,9 @@ void CWarsFlora::UpdateClientSideAnimation()
 //-----------------------------------------------------------------------------
 void CWarsFlora::Ignite( float flFlameLifetime, float flSize )
 {
+	if( !m_bCanBeIgnited )
+		return;
+
 	// Crash on trying attach particle flames to hitboxes if they don't exist...
 	if( GetHitboxSetCount() == 0 )
 		return;
@@ -272,6 +334,9 @@ void CWarsFlora::Ignite( float flFlameLifetime, float flSize )
 
 void CWarsFlora::IgniteLifetime( float flFlameLifetime )
 {
+	if( !m_bCanBeIgnited )
+		return;
+
 	if( !IsOnFire() )
 		Ignite( 30, 0.0f );
 
@@ -479,8 +544,9 @@ void CWarsFlora::SpawnMapFlora()
 //-----------------------------------------------------------------------------
 void CWarsFlora::InitFloraGrid()
 {
-	//m_pFloraGrid = malloc( FLORA_TILESIZE * FLORA_TILESIZE * sizeof( CWarsFlora * ) );
 	s_FloraGrid.SetCount( FLORA_TILESIZE * FLORA_TILESIZE );
+
+	InitFloraDataKeyValues();
 }
 
 void CWarsFlora::DestroyFloraGrid()
@@ -507,6 +573,54 @@ void CWarsFlora::RemoveFromFloraGrid()
 
 	s_FloraGrid[m_iKey].FindAndRemove( this );
 	m_iKey = -1;
+}
+
+void CWarsFlora::InitFloraDataKeyValues()
+{
+	if( m_pKVFloraData )
+	{
+		m_pKVFloraData->deleteThis();
+		m_pKVFloraData = NULL;
+	}
+
+	FileFindHandle_t findHandle;
+	const char *floraFilename = filesystem->FindFirstEx( "scripts/flora/*.txt", NULL, &findHandle );
+	while ( floraFilename )
+	{
+		char floraPath[MAX_PATH];
+		V_snprintf( floraPath, sizeof(floraPath), "scripts/flora/%s", floraFilename );
+		Msg("Flora data: %s\n", floraPath);
+
+		if( !m_pKVFloraData )
+		{
+			m_pKVFloraData = new KeyValues( "FloraDataFile" );
+			if ( !m_pKVFloraData->LoadFromFile( filesystem, floraPath ) )
+			{
+				Warning( "InitFlora: Could not load flora data file %s\n", floraPath );
+				m_pKVFloraData->deleteThis();
+				m_pKVFloraData = NULL;
+				return;
+			}
+		}
+		else
+		{
+			KeyValues *pToMergeKV = new KeyValues( "FloraDataFile" );
+			if ( pToMergeKV->LoadFromFile( filesystem, floraPath ) )
+			{
+				m_pKVFloraData->MergeFrom( pToMergeKV );
+				return;
+			}
+			else
+			{
+				Warning( "InitFlora: Could not load flora data file %s\n", floraPath );
+			}
+			pToMergeKV->deleteThis();
+			pToMergeKV = NULL;
+		}
+
+		floraFilename = filesystem->FindNext( findHandle );
+	}
+	filesystem->FindClose( findHandle );
 }
 
 //-----------------------------------------------------------------------------
@@ -768,4 +882,14 @@ CON_COMMAND_F( wars_flora_ignite, "", FCVAR_CHEAT )
 	const MouseTraceData_t &data = pPlayer->GetMouseData();
 
 	CWarsFlora::IgniteFloraInRadius( data.m_vWorldOnlyEndPos, args.ArgC() > 1 ? atof( args[1] ) : 128.0f );
+}
+
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_data_reload, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( wars_flora_data_reload, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+	CWarsFlora::InitFloraDataKeyValues();
 }
