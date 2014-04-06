@@ -140,23 +140,42 @@ BEGIN_VS_SHADER_FLAGS( screenspace_general_dx9, "Help for screenspace_general", 
 			if (params[BASETEXTURE]->IsDefined())
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER0, true );
-				pShaderShadow->EnableSRGBRead(SHADER_SAMPLER0, !params[LINEARREAD_BASETEXTURE]->IsDefined() || !params[LINEARREAD_BASETEXTURE]->GetIntValue() );
+				ITexture *txtr=params[BASETEXTURE]->GetTextureValue();
+				ImageFormat fmt=txtr->GetImageFormat();
+				if ((fmt==IMAGE_FORMAT_RGBA16161616F) || (fmt==IMAGE_FORMAT_RGBA16161616))
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER0,false);
+				else
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER0, !params[LINEARREAD_BASETEXTURE]->IsDefined() || !params[LINEARREAD_BASETEXTURE]->GetIntValue() );
 			}				
 			if (params[TEXTURE1]->IsDefined())
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER1, true );
-				pShaderShadow->EnableSRGBRead(SHADER_SAMPLER1, !params[LINEARREAD_TEXTURE1]->IsDefined() || !params[LINEARREAD_TEXTURE1]->GetIntValue() );
+				ITexture *txtr=params[TEXTURE1]->GetTextureValue();
+				ImageFormat fmt=txtr->GetImageFormat();
+				if ((fmt==IMAGE_FORMAT_RGBA16161616F) || (fmt==IMAGE_FORMAT_RGBA16161616))
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER1,false);
+				else
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER1, !params[LINEARREAD_TEXTURE1]->IsDefined() || !params[LINEARREAD_TEXTURE1]->GetIntValue() );
 			}				
 			if (params[TEXTURE2]->IsDefined())
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER2, true );
-				pShaderShadow->EnableSRGBRead(SHADER_SAMPLER2, !params[LINEARREAD_TEXTURE2]->IsDefined() || !params[LINEARREAD_TEXTURE2]->GetIntValue() );
+				ITexture *txtr=params[TEXTURE2]->GetTextureValue();
+				ImageFormat fmt=txtr->GetImageFormat();
+				if ((fmt==IMAGE_FORMAT_RGBA16161616F) || (fmt==IMAGE_FORMAT_RGBA16161616))
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER2,false);
+				else
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER2, !params[LINEARREAD_TEXTURE2]->IsDefined() || !params[LINEARREAD_TEXTURE2]->GetIntValue() );
 			}				
 			if (params[TEXTURE3]->IsDefined())
 			{
 				pShaderShadow->EnableTexture( SHADER_SAMPLER3, true );
-				pShaderShadow->EnableSRGBRead(SHADER_SAMPLER3,false);
-				pShaderShadow->EnableSRGBRead(SHADER_SAMPLER3, !params[LINEARREAD_TEXTURE3]->IsDefined() || !params[LINEARREAD_TEXTURE3]->GetIntValue() );
+				ITexture *txtr=params[TEXTURE3]->GetTextureValue();
+				ImageFormat fmt=txtr->GetImageFormat();
+				if ((fmt==IMAGE_FORMAT_RGBA16161616F) || (fmt==IMAGE_FORMAT_RGBA16161616))
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER3,false);
+				else
+					pShaderShadow->EnableSRGBRead(SHADER_SAMPLER3, !params[LINEARREAD_TEXTURE3]->IsDefined() || !params[LINEARREAD_TEXTURE3]->GetIntValue() );
 			}				
 			int fmt = VERTEX_POSITION;
 

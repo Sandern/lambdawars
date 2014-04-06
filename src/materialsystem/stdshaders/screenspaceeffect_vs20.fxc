@@ -2,7 +2,6 @@
 // STATIC: "VERTEXCOLOR" "0..1" [=0]
 // STATIC: "TRANSFORMVERTS" "0..1" [=0]
 
-
 #include "common_vs_fxc.h"
 
 struct VS_INPUT
@@ -19,9 +18,11 @@ struct VS_OUTPUT
 {
     float4 projPos					: POSITION;	
 	float2 baseTexCoord				: TEXCOORD0;
-
+	float2 ZeroTexCoord				: TEXCOORD1;
+	float2 bloomTexCoord            : TEXCOORD2;
+	
 	#if VERTEXCOLOR
-		float4 vColor				: TEXCOORD1;
+		float4 vColor				: TEXCOORD3;
 	#endif
 };
 
@@ -37,7 +38,10 @@ VS_OUTPUT main( const VS_INPUT v )
 		o.projPos = float4( v.vPos, 1.0f );
 
 	o.baseTexCoord = v.vBaseTexCoord;
-
+	o.ZeroTexCoord=float2(0,0);
+	o.bloomTexCoord.x=v.vBaseTexCoord.x+Texel_Sizes.z;
+	o.bloomTexCoord.y=v.vBaseTexCoord.y+Texel_Sizes.w;
+	
 	#if ( VERTEXCOLOR )
 		o.vColor.rgba = v.vColor.rgba;
 	#endif

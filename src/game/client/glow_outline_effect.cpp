@@ -88,6 +88,16 @@ void CGlowObjectManager::RenderGlowModels( const CViewSetup *pSetup, int nSplitS
 	pMatGlowColor = materials->FindMaterial( "dev/glow_color", TEXTURE_GROUP_OTHER, true );
 	g_pStudioRender->ForcedMaterialOverride( pMatGlowColor );
 	
+	ShaderStencilState_t stencilState;
+	stencilState.m_bEnable = false;
+	stencilState.m_nReferenceValue = 0;
+	stencilState.m_nTestMask = 0xFF;
+	stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
+	stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
+	stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
+	stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
+
+	pRenderContext->SetStencilState( stencilState );
 	//==================//
 	// Draw the objects //
 	//==================//
