@@ -48,9 +48,7 @@ public:
 	// Selection
 	void ClearSelection();
 	void DoSelect( CHL2WarsPlayer *pPlayer );
-
-	// Flora
-	void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
+	void DeleteSelection();
 
 	// Editor modes
 	enum EditorInteractionMode_t

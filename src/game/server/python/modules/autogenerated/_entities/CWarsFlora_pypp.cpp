@@ -737,15 +737,24 @@ void register_CWarsFlora_class(){
         .def( 
             "DestructFloraInRadius"
             , (void (*)( ::Vector const &,float ))( &::CWarsFlora::DestructFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
+            , ( bp::arg("position"), bp::arg("radius") ) )    
         .def( 
             "FillKeyValues"
             , (bool ( ::CWarsFlora::* )( ::KeyValues * ) )( &::CWarsFlora::FillKeyValues )
             , ( bp::arg("pEntityKey") ) )    
         .def( 
+            "GenerateFloraUUID"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GenerateFloraUUID ) )    
+        .def( 
+            "GetFloraUUID"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetFloraUUID ) )    
+        .def( 
+            "HasFloraUUID"
+            , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::HasFloraUUID ) )    
+        .def( 
             "IgniteFloraInRadius"
             , (void (*)( ::Vector const &,float,float ))( &::CWarsFlora::IgniteFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("fLifetime")=3.0e+1f ) )    
+            , ( bp::arg("position"), bp::arg("radius"), bp::arg("lifetime")=3.0e+1f ) )    
         .def( 
             "InitFloraData"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InitFloraData ) )    
@@ -771,11 +780,15 @@ void register_CWarsFlora_class(){
         .def( 
             "CountFloraInRadius"
             , (int (*)( ::Vector const &,float,::boost::python::list ))( &::CWarsFlora::PyCountFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("restrictModels") ) )    
+            , ( bp::arg("position"), bp::arg("radius"), bp::arg("restrictmodels")=boost::python::list() ) )    
+        .def( 
+            "RemoveFloraByUUID"
+            , (void (*)( char const * ))( &::CWarsFlora::RemoveFloraByUUID )
+            , ( bp::arg("pUUID") ) )    
         .def( 
             "RemoveFloraInRadius"
             , (void (*)( ::Vector const &,float,int ))( &::CWarsFlora::RemoveFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("nMax")=(int)(-0x000000001) ) )    
+            , ( bp::arg("position"), bp::arg("radius"), bp::arg("max")=(int)(-0x000000001) ) )    
         .def( 
             "RemoveFromFloraGrid"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::RemoveFromFloraGrid ) )    
@@ -786,7 +799,7 @@ void register_CWarsFlora_class(){
         .def( 
             "SpawnFlora"
             , (bool (*)( char const *,::Vector const &,::QAngle const & ))( &::CWarsFlora::SpawnFlora )
-            , ( bp::arg("pModelname"), bp::arg("vPosition"), bp::arg("vAngle") ) )    
+            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle") ) )    
         .def( 
             "Activate"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
@@ -944,6 +957,7 @@ void register_CWarsFlora_class(){
         .staticmethod( "InitFloraDataKeyValues" )    
         .staticmethod( "InitFloraGrid" )    
         .staticmethod( "CountFloraInRadius" )    
+        .staticmethod( "RemoveFloraByUUID" )    
         .staticmethod( "RemoveFloraInRadius" )    
         .staticmethod( "SpawnFlora" )    
         .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    

@@ -293,7 +293,6 @@ bool CEditorMapMgr::ParseVmfFile( KeyValues *pKeyValues )
 		return false;
 	}
 
-
 	return true;
 }
 
@@ -345,6 +344,13 @@ void CEditorMapMgr::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, i
 	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEnt );
 	if( pFloraEnt )
 	{
+		// Generate UUID if we don't have one yet. Hammer doesn't knows about this and this is specific
+		// to our ingame flora editor.
+		if( !pFloraEnt->HasFloraUUID() )
+		{
+			pFloraEnt->GenerateFloraUUID();
+		}
+
 		pFloraEnt->FillKeyValues( pEntityKey );
 	}
 }

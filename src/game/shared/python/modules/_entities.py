@@ -1314,7 +1314,7 @@ class Entities(SemiSharedModuleGenerator):
         # Flora
         cls = mb.class_('CWarsFlora')
         cls.mem_fun('PyCountFloraInRadius').rename('CountFloraInRadius')
-        cls.mem_fun('CountFloraInRadius').exclude()
+        cls.mem_funs('CountFloraInRadius').exclude()
     
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')

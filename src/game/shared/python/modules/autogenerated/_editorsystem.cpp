@@ -46,6 +46,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
         
         }
+        { //::CEditorSystem::DeleteSelection
+        
+            typedef void ( ::CEditorSystem::*DeleteSelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "DeleteSelection"
+                , DeleteSelection_function_type( &::CEditorSystem::DeleteSelection ) );
+        
+        }
         { //::CEditorSystem::DoSelect
         
             typedef void ( ::CEditorSystem::*DoSelect_function_type )( ::C_HL2WarsPlayer * ) ;
@@ -74,6 +83,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , Init_function_type( &::CEditorSystem::Init ) );
         
         }
+        { //::CEditorSystem::IsActive
+        
+            typedef bool ( ::CEditorSystem::*IsActive_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsActive"
+                , IsActive_function_type( &::CEditorSystem::IsActive ) );
+        
+        }
         { //::CEditorSystem::IsMapLoaded
         
             typedef bool ( ::CEditorSystem::*IsMapLoaded_function_type )(  ) ;
@@ -99,16 +117,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "LoadCurrentVmf"
                 , LoadCurrentVmf_function_type( &::CEditorSystem::LoadCurrentVmf ) );
-        
-        }
-        { //::CEditorSystem::RemoveFloraInRadius
-        
-            typedef void ( ::CEditorSystem::*RemoveFloraInRadius_function_type )( ::Vector const &,float ) ;
-            
-            CEditorSystem_exposer.def( 
-                "RemoveFloraInRadius"
-                , RemoveFloraInRadius_function_type( &::CEditorSystem::RemoveFloraInRadius )
-                , ( bp::arg("vPosition"), bp::arg("fRadius") ) );
         
         }
         { //::CEditorSystem::SetEditorMode
@@ -188,6 +196,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
         
         }
+        { //::CEditorSystem::DeleteSelection
+        
+            typedef void ( ::CEditorSystem::*DeleteSelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "DeleteSelection"
+                , DeleteSelection_function_type( &::CEditorSystem::DeleteSelection ) );
+        
+        }
         { //::CEditorSystem::DoSelect
         
             typedef void ( ::CEditorSystem::*DoSelect_function_type )( ::CHL2WarsPlayer * ) ;
@@ -214,6 +231,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "Init"
                 , Init_function_type( &::CEditorSystem::Init ) );
+        
+        }
+        { //::CEditorSystem::IsActive
+        
+            typedef bool ( ::CEditorSystem::*IsActive_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsActive"
+                , IsActive_function_type( &::CEditorSystem::IsActive ) );
         
         }
         { //::CEditorSystem::IsMapLoaded
@@ -251,16 +277,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 "OnEntityDeleted"
                 , OnEntityDeleted_function_type( &::CEditorSystem::OnEntityDeleted )
                 , ( bp::arg("pEntity") ) );
-        
-        }
-        { //::CEditorSystem::RemoveFloraInRadius
-        
-            typedef void ( ::CEditorSystem::*RemoveFloraInRadius_function_type )( ::Vector const &,float ) ;
-            
-            CEditorSystem_exposer.def( 
-                "RemoveFloraInRadius"
-                , RemoveFloraInRadius_function_type( &::CEditorSystem::RemoveFloraInRadius )
-                , ( bp::arg("vPosition"), bp::arg("fRadius") ) );
         
         }
         { //::CEditorSystem::SaveCurrentVmf

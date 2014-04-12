@@ -170,11 +170,35 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Delete selected entities/props. 
 //-----------------------------------------------------------------------------
-void CEditorSystem::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
+void CEditorSystem::DeleteSelection()
 {
-	CWarsFlora::RemoveFloraInRadius( vPosition, fRadius );
+	if( !IsAnythingSelected() )
+		return;
+
+	KeyValues *pOperation = new KeyValues( "data" );
+	pOperation->SetString("operation", "deleteflora");
+
+	for( int i = 0; i < m_hSelectedEntities.Count(); i++ )
+	{
+		if( !m_hSelectedEntities[i] )
+			continue;
+
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( m_hSelectedEntities[i].Get() );
+		if( pFlora )
+		{
+			pOperation->AddSubKey( new KeyValues( "flora", "uuid", pFlora->GetFloraUUID() ) );
+			pFlora->Remove();
+		}
+		else
+		{
+			m_hSelectedEntities[i]->Remove();
+		}
+	}
+
+	m_hSelectedEntities.Purge();
+	warseditorstorage->AddEntityToQueue( pOperation );
 }
 
 //-----------------------------------------------------------------------------
@@ -185,11 +209,17 @@ int CEditorSystem::GetNumSelected()
 	return m_hSelectedEntities.Count();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CEditorSystem::IsAnythingSelected()
 {
 	return GetNumSelected() > 0;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 Vector CEditorSystem::GetSelectionCenter()
 {
 	if ( !IsAnythingSelected() )
@@ -299,6 +329,20 @@ void CEditorSystem::Update( float frametime )
 						Warning( "CEditorSystem: Failed to initialize entity on client with model %s\n", pEntityValues->GetString("model", "models/error.mdl") );
 					}
 				}
+			}
+		}
+		else if( V_strcmp( pOperation, "deleteflora" ) == 0 )
+		{
+			for ( KeyValues *pKey = pEntity->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+			{
+				if ( V_strcmp( pKey->GetName(), "flora" ) )
+					continue;
+
+				const char *uuid = pKey->GetString("uuid", NULL);
+				if( !uuid )
+					continue;
+
+				CWarsFlora::RemoveFloraByUUID( uuid );
 			}
 		}
 

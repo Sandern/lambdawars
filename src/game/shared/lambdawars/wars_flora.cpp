@@ -29,6 +29,15 @@
 #include "editor/editorsystem.h"
 #include "warseditor/iwars_editor_storage.h"
 
+extern "C"
+{
+#ifdef WIN32
+#include <Rpc.h>
+#else
+#include <uuid/uuid.h>
+#endif
+}
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -102,6 +111,7 @@ BEGIN_DATADESC( CWarsFlora )
 	DEFINE_KEYFIELD( m_iszSqueezeDownIdleAnimationName,	FIELD_STRING,	"squeezedownidleanimation" ),
 	DEFINE_KEYFIELD( m_iszSqueezeUpAnimationName,		FIELD_STRING,	"squeezeupanimation" ),
 	DEFINE_KEYFIELD( m_iszDestructionAnimationName,		FIELD_STRING,	"destructionanimation" ),
+	DEFINE_KEYFIELD( m_iszFloraUUID,		FIELD_STRING,	"florauuid" ),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -242,6 +252,47 @@ void CWarsFlora::InitFloraData()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CWarsFlora::HasFloraUUID()
+{
+	return m_iszFloraUUID != NULL_STRING;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsFlora::GenerateFloraUUID()
+{
+#ifdef WIN32
+    UUID uuid;
+    UuidCreate ( &uuid );
+
+    unsigned char * str;
+    UuidToStringA ( &uuid, &str );
+
+	m_iszFloraUUID = AllocPooledString( ( char* ) str );
+
+    RpcStringFreeA ( &str );
+#else
+    uuid_t uuid;
+    uuid_generate_random ( uuid );
+    char s[37];
+    uuid_unparse ( uuid, s );
+	m_iszFloraUUID = AllocPooledString( s );
+#endif
+	DevMsg("Generated GUID: %s\n", STRING(m_iszFloraUUID));
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+const char *CWarsFlora::GetFloraUUID()
+{
+	return STRING( m_iszFloraUUID );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::PlayDestructionAnimation()
 {
 	if( m_iDestructSequence == -1 )
@@ -267,6 +318,8 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 	pEntityKey->SetString( "rendercolor", UTIL_VarArgs("%d %d %d", GetRenderColor().r, GetRenderColor().g, GetRenderColor().b ) );
 	pEntityKey->SetInt( "spawnflags", GetSpawnFlags() );
 	pEntityKey->SetInt( "skin", GetSkin() );
+
+	pEntityKey->SetString( "florauuid", GetFloraUUID() );
 
 	return true;
 }
@@ -417,6 +470,10 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	else if (FStrEq(szKeyName, "destructionanimation"))
 	{
 		m_iszDestructionAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "florauuid"))
+	{
+		m_iszFloraUUID = AllocPooledString( szValue );
 	}
 	else
 	{
@@ -723,6 +780,8 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
 	pEntity->KeyValue( "editormanaged", bEditorManaged ? "1" : "0" );
 
+	pEntity->GenerateFloraUUID();
+
 #ifdef CLIENT_DLL
 	// Initialize
 	if ( !pEntity->Initialize() )
@@ -757,11 +816,39 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Removes flora in a radius. In Editor mode, this gets synced from
-//		    server to client for the editing player.
+// Purpose: Removes flora by UUID
+//-----------------------------------------------------------------------------
+void CWarsFlora::RemoveFloraByUUID( const char *pUUID )
+{
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && pFlora->HasFloraUUID() && V_strcmp( pFlora->GetFloraUUID(), pUUID ) == 0 )
+		{
+			pFlora->Remove();
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Removes flora in a radius. In Editor mode on server, this gets synced from
+//		    server to client for the editing player (so should not be called by client)
 //-----------------------------------------------------------------------------
 void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, int nMax )
 {
+#ifdef CLIENT_DLL
+	if( EditorSystem()->IsActive() )
+	{
+		Warning("CWarsFlora::RemoveFloraInRadius: Incorrect usage in editing mode.\n");
+		return;
+	}
+#endif // CLIENT_DLL
+
 	int iCount = 0;
 	CUtlVector<CWarsFlora *> removeFlora;
 	float fRadiusSqr = fRadius * fRadius;
@@ -774,6 +861,20 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
 		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
 		{
+			if( EditorSystem()->IsActive() )
+			{
+				// TODO: Restrict to editor managed flora?
+				//if( !pFlora->IsEditorManaged() )
+				//	continue;
+
+				if( !pFlora->HasFloraUUID() )
+				{
+					Warning("Flora at %f %f %f has no UUID! Please save and reload map\n", pFlora->GetAbsOrigin().x, pFlora->GetAbsOrigin().y, pFlora->GetAbsOrigin().z);
+					continue;
+				}
+			}
+
+
 			removeFlora.AddToTail( pFlora );
 			iCount++;
 			if( nMax != -1 && iCount >= nMax )
@@ -782,30 +883,25 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 		
 	}
 
+#ifndef CLIENT_DLL
+	if( EditorSystem()->IsActive() )
+	{
+		// Tell editing player to sync deleted flora
+		KeyValues *pOperation = new KeyValues( "data" );
+		pOperation->SetString("operation", "deleteflora");
+		
+		FOR_EACH_VEC( removeFlora, idx )
+		{
+			pOperation->AddSubKey( new KeyValues( "flora", "uuid", removeFlora[idx]->GetFloraUUID() ) );
+		}
+		warseditorstorage->AddEntityToQueue( pOperation );
+	}
+#endif // CLIENT_DLL
+
 	FOR_EACH_VEC( removeFlora, idx )
 	{
 		removeFlora[idx]->Remove();
 	}
-
-#ifndef CLIENT_DLL
-	if( EditorSystem()->IsActive() )
-	{
-		KeyValues *pOperation = new KeyValues( "data" );
-		pOperation->SetString("operation", "delete");
-		pOperation->SetString("classname", "wars_flora");
-
-		// TODO: Specify IDs for flora to be deleted
-		/*KeyValues *pEntValues = new KeyValues( "keyvalues" );
-		pEntity->FillKeyValues( pEntValues );
-		pEntValues->SetString( "model", pModelname );
-		pEntValues->SetString( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
-		pEntValues->SetString( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
-
-		pOperation->AddSubKey( pEntValues );*/
-
-		warseditorstorage->AddEntityToQueue( pOperation );
-	}
-#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -992,6 +1088,10 @@ CON_COMMAND_F( wars_flora_grid_mouse, "", FCVAR_CHEAT )
 	int iKey = FLORA_KEY( data.m_vWorldOnlyEndPos );
 
 	Msg( "%d Flora at mouse position\n", s_FloraGrid[iKey].Count() );
+	for( int i = 0; i < s_FloraGrid[iKey].Count(); i++ )
+	{
+		Msg("%d: uuid: %s (%d)\n", i, s_FloraGrid[iKey][i]->GetFloraUUID(), s_FloraGrid[iKey][i]->HasFloraUUID() );
+	}
 }
 
 #ifdef CLIENT_DLL

@@ -33,6 +33,11 @@ public:
 	virtual void Spawn();
 	virtual void InitFloraData();
 
+	// For managing flora in ingame prop editor
+	bool HasFloraUUID();
+	void GenerateFloraUUID();
+	const char *GetFloraUUID();
+
 	virtual void PlayDestructionAnimation();
 
 #ifdef CLIENT_DLL
@@ -50,20 +55,21 @@ public:
 	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
 
-	static void InitFloraGrid();
-	static void DestroyFloraGrid();
-	void		InsertInFloraGrid();
-	void		RemoveFromFloraGrid();
-	static void InitFloraDataKeyValues();
+	static void		InitFloraGrid();
+	static void		DestroyFloraGrid();
+	void			InsertInFloraGrid();
+	void			RemoveFromFloraGrid();
+	static void		InitFloraDataKeyValues();
 
-	static bool SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle );
+	static bool		SpawnFlora( const char *modelname, const Vector &position, const QAngle &angle );
 
-	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius, int nMax = -1 );
-	static int CountFloraInRadius( const Vector &vPosition, float fRadius );
-	static int CountFloraInRadius( const Vector &vPosition, float fRadius, CUtlVector<int> &restrictModels );
-	static int PyCountFloraInRadius( const Vector &vPosition, float fRadius, boost::python::list restrictModels = boost::python::list() );
-	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
-	static void IgniteFloraInRadius( const Vector &vPosition, float fRadius, float fLifetime = 30.0f );
+	static void		RemoveFloraByUUID( const char *pUUID );
+	static void		RemoveFloraInRadius( const Vector &position, float radius, int max = -1 );
+	static int		CountFloraInRadius( const Vector &position, float radius );
+	static int		CountFloraInRadius( const Vector &position, float radius, CUtlVector<int> &restrictmodels );
+	static int		PyCountFloraInRadius( const Vector &position, float radius, boost::python::list restrictmodels = boost::python::list() );
+	static void		DestructFloraInRadius( const Vector &position, float radius );
+	static void		IgniteFloraInRadius( const Vector &position, float radius, float lifetime = 30.0f );
 
 	bool			IsEditorManaged();
 
@@ -95,6 +101,7 @@ private:
 #endif // CLIENT_DLL
 
 	bool			m_bEditorManaged;
+	string_t		m_iszFloraUUID;
 };
 
 inline bool CWarsFlora::IsEditorManaged()
