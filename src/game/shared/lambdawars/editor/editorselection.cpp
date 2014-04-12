@@ -40,7 +40,7 @@
 #define SELECTION_PICKER_VEC Vector( SELECTION_PICKER_SIZE, SELECTION_PICKER_SIZE, SELECTION_PICKER_SIZE )
 
 #ifdef CLIENT_DLL
-ConVar cl_wars_editor_interactiondebug("cl_wars_editor_interactiondebug", "0", FCVAR_CHEATS);
+ConVar cl_wars_editor_interactiondebug("cl_wars_editor_interactiondebug", "0", FCVAR_CHEAT);
 
 extern void ScreenToWorld( int mousex, int mousey, float fov,
 					const Vector& vecRenderOrigin,
@@ -256,13 +256,11 @@ void CEditorSystem::UpdateEditorInteraction()
 	int delta_x = ( x - m_iLastMouse_x );
 	int delta_y = ( y - m_iLastMouse_y );
 
-	if( delta_x == 0 || delta_y == 0 )
+	if( delta_x == 0 && delta_y == 0 )
 		return;
 
 	m_iLastMouse_x = x;
 	m_iLastMouse_y = y;
-
-	UpdateCurrentSelectedAxis( x, y );
 
 	// Drag
 	bool bShouldReset = false;
