@@ -1,7 +1,9 @@
 //====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
 // Purpose: Responsible for loading the vmf files and writing changes back
-//			to both VMF and BSP.
+//			to both VMF and BSP. The server is always responsible for writing
+//			changes back to VMF, due the lack of certain info on the client,
+//			like the entity Hammer ID.
 //
 //=============================================================================//
 

@@ -56,7 +56,12 @@ public:
 	void		RemoveFromFloraGrid();
 	static void InitFloraDataKeyValues();
 
-	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius );
+	static bool SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle );
+
+	static void RemoveFloraInRadius( const Vector &vPosition, float fRadius, int nMax = -1 );
+	static int CountFloraInRadius( const Vector &vPosition, float fRadius );
+	static int CountFloraInRadius( const Vector &vPosition, float fRadius, CUtlVector<int> &restrictModels );
+	static int PyCountFloraInRadius( const Vector &vPosition, float fRadius, boost::python::list restrictModels = boost::python::list() );
 	static void DestructFloraInRadius( const Vector &vPosition, float fRadius );
 	static void IgniteFloraInRadius( const Vector &vPosition, float fRadius, float fLifetime = 30.0f );
 

@@ -2588,6 +2588,15 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("info") ) );
         
         }
+        { //::C_BaseEntity::GetSpawnFlags
+        
+            typedef int ( ::C_BaseEntity::*GetSpawnFlags_function_type )(  ) const;
+            
+            C_BaseEntity_exposer.def( 
+                "GetSpawnFlags"
+                , GetSpawnFlags_function_type( &::C_BaseEntity::GetSpawnFlags ) );
+        
+        }
         { //::C_BaseEntity::GetSplitUserPlayerPredictionSlot
         
             typedef int ( ::C_BaseEntity::*GetSplitUserPlayerPredictionSlot_function_type )(  ) ;

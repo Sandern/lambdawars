@@ -29,6 +29,8 @@ public:
 
 	virtual void LevelShutdownPreEntity();
 
+	bool IsActive();
+
 	// Map managing
 	void ClearLoadedMap();
 	void LoadCurrentVmf();
@@ -100,6 +102,7 @@ private:
 	void RenderTranslate();
 	void RenderRotate();
 
+	virtual void Update( float frametime );
 	virtual void PostRender();
 #endif // CLIENT_DLL
 
@@ -117,6 +120,12 @@ private:
 	EditorInteractionMode_t m_EditorMode;
 	EditiorSelectedAxis_t m_iCurrentSelectedAxis;
 };
+
+
+inline bool CEditorSystem::IsActive()
+{
+	return IsMapLoaded();
+}
 
 // Map managing
 inline void CEditorSystem::ClearLoadedMap()

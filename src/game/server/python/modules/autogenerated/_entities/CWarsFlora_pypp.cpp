@@ -769,9 +769,13 @@ void register_CWarsFlora_class(){
             , (void ( ::CWarsFlora::* )(  ) )(&::CWarsFlora::Precache)
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Precache) )    
         .def( 
+            "CountFloraInRadius"
+            , (int (*)( ::Vector const &,float,::boost::python::list ))( &::CWarsFlora::PyCountFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("restrictModels") ) )    
+        .def( 
             "RemoveFloraInRadius"
-            , (void (*)( ::Vector const &,float ))( &::CWarsFlora::RemoveFloraInRadius )
-            , ( bp::arg("vPosition"), bp::arg("fRadius") ) )    
+            , (void (*)( ::Vector const &,float,int ))( &::CWarsFlora::RemoveFloraInRadius )
+            , ( bp::arg("vPosition"), bp::arg("fRadius"), bp::arg("nMax")=(int)(-0x000000001) ) )    
         .def( 
             "RemoveFromFloraGrid"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::RemoveFromFloraGrid ) )    
@@ -779,6 +783,10 @@ void register_CWarsFlora_class(){
             "Spawn"
             , (void ( ::CWarsFlora::* )(  ) )(&::CWarsFlora::Spawn)
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
+        .def( 
+            "SpawnFlora"
+            , (bool (*)( char const *,::Vector const &,::QAngle const & ))( &::CWarsFlora::SpawnFlora )
+            , ( bp::arg("pModelname"), bp::arg("vPosition"), bp::arg("vAngle") ) )    
         .def( 
             "Activate"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
@@ -935,7 +943,9 @@ void register_CWarsFlora_class(){
         .staticmethod( "IgniteFloraInRadius" )    
         .staticmethod( "InitFloraDataKeyValues" )    
         .staticmethod( "InitFloraGrid" )    
+        .staticmethod( "CountFloraInRadius" )    
         .staticmethod( "RemoveFloraInRadius" )    
+        .staticmethod( "SpawnFlora" )    
         .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CWarsFlora_wrapper::m_takedamage_Get, &CWarsFlora_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CWarsFlora_wrapper::m_nSkin_Get, &CWarsFlora_wrapper::m_nSkin_Set );

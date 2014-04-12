@@ -125,7 +125,7 @@
 #include "INetChannel.h"
 #include "IClient.h"
 
-//#include "warseditor/iwars_editor_storage.h"
+#include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON
@@ -215,7 +215,7 @@ IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #endif
 
 #ifdef HL2WARS_DLL
-//IWarsEditorStorage *warseditorstorage = NULL;
+IWarsEditorStorage *warseditorstorage = NULL;
 #endif // HL2WARS_DLL
 
 IGameSystem *SoundEmitterSystem();
@@ -778,8 +778,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #endif
 
 #ifdef HL2WARS_DLL
-	//if ( (warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL)) == NULL )
-	//	return false;
+	warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
 #endif // HL2WARS_DLL
 
 	if ( !g_pMatchFramework )
@@ -3661,7 +3660,7 @@ public:
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
 #ifdef HL2WARS_DLL
-		//AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+		AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
 #endif // HL2WARS_DLL
 	}
 

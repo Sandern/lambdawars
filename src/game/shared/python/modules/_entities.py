@@ -1310,6 +1310,11 @@ class Entities(SemiSharedModuleGenerator):
         
         mb.free_function('GetMapBoundaryList').include()
         mb.free_function('GetMapBoundaryList').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        
+        # Flora
+        cls = mb.class_('CWarsFlora')
+        cls.mem_fun('PyCountFloraInRadius').rename('CountFloraInRadius')
+        cls.mem_fun('CountFloraInRadius').exclude()
     
     def ParseHL2WarsPlayer(self, mb):
         cls = mb.class_('C_HL2WarsPlayer') if self.isclient else mb.class_('CHL2WarsPlayer')

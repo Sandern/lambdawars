@@ -9,6 +9,8 @@
 #include "wars_flora.h"
 #include "collisionutils.h"
 
+#include "warseditor/iwars_editor_storage.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -247,6 +249,66 @@ QAngle CEditorSystem::GetSelectionOrientation()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CEditorSystem::Update( float frametime )
+{
+	if( !warseditorstorage )
+		return;
+
+	KeyValues *pEntity = NULL;
+	while( (pEntity = warseditorstorage->PopEntityFromQueue()) != NULL )
+	{
+		const char *pOperation = pEntity->GetString("operation", "");
+
+		if( V_strcmp( pOperation, "create" ) == 0 )
+		{
+			const char *pClassname = pEntity->GetString("classname", "");
+			KeyValues *pEntityValues = pEntity->FindKey("keyvalues");
+			if( pClassname && pEntityValues )
+			{
+				const char *pModelname = pEntityValues->GetString("model", NULL);
+				if( pModelname && modelinfo->GetModelIndex( pModelname ) < 0 )
+				{
+					//modelinfo->FindOrLoadModel( pModelname );
+					warseditorstorage->AddEntityToQueue( pEntity );
+					break; // Not loaded yet
+				}
+
+				CBaseEntity *pEnt = CreateEntityByName( pClassname );
+				if( pEnt )
+				{
+					FOR_EACH_VALUE( pEntityValues, pValue )
+					{
+						pEnt->KeyValue( pValue->GetName(), pValue->GetString() );
+					}
+
+					//KeyValuesDumpAsDevMsg( pEntityValues );
+
+					CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEnt );
+					if( pFlora )
+					{
+						if( !pFlora->Initialize() )
+						{
+							pFlora->Release();
+							Warning( "CEditorSystem: Failed to initialize flora entity on client with model %s\n", pEntityValues->GetString("model", "models/error.mdl") );
+						}
+					}
+					else if( !pEnt->InitializeAsClientEntity( pEntityValues->GetString("model", "models/error.mdl"), false ) )
+					{
+						if( pEnt->GetBaseAnimating() )
+							pEnt->GetBaseAnimating()->Release();
+						Warning( "CEditorSystem: Failed to initialize entity on client with model %s\n", pEntityValues->GetString("model", "models/error.mdl") );
+					}
+				}
+			}
+		}
+
+		pEntity->deleteThis();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::RenderSelection()
 {
 	CMatRenderContextPtr pRenderContext( materials );
@@ -315,6 +377,9 @@ void CEditorSystem::RenderSelection()
 	pMesh->Draw();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::RenderHelpers()
 {
 	if ( !m_hSelectedEntities.Count() )
@@ -331,7 +396,9 @@ void CEditorSystem::RenderHelpers()
 	}
 }
 
-
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::RenderTranslate()
 {
 	CMatRenderContextPtr pRenderContext( materials );
@@ -540,6 +607,9 @@ void CEditorSystem::RenderTranslate()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::RenderRotate()
 {
 	CMatRenderContextPtr pRenderContext( materials );
@@ -641,6 +711,9 @@ void CEditorSystem::RenderRotate()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::PostRender()
 {
 	RenderSelection();

@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaderlib", "materialsystem
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stdshader_dx9", "materialsystem\stdshaders\stdshader_dx9_sdk.vcxproj", "{C8D2DC83-E117-7576-7B43-10C844264C51}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WarsEditorStorage", "game\editorstorage\wars_editor_storage.vcxproj", "{F943FE32-078E-414B-8BE8-C2565B767C24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -43,6 +45,10 @@ Global
 		{C8D2DC83-E117-7576-7B43-10C844264C51}.Debug|Win32.Build.0 = Debug|Win32
 		{C8D2DC83-E117-7576-7B43-10C844264C51}.Release|Win32.ActiveCfg = Release|Win32
 		{C8D2DC83-E117-7576-7B43-10C844264C51}.Release|Win32.Build.0 = Release|Win32
+		{F943FE32-078E-414B-8BE8-C2565B767C24}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F943FE32-078E-414B-8BE8-C2565B767C24}.Debug|Win32.Build.0 = Debug|Win32
+		{F943FE32-078E-414B-8BE8-C2565B767C24}.Release|Win32.ActiveCfg = Release|Win32
+		{F943FE32-078E-414B-8BE8-C2565B767C24}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

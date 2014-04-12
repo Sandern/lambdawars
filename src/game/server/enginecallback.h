@@ -61,6 +61,11 @@ class IASW_Mission_Chooser;
 extern IASW_Mission_Chooser *missionchooser;
 #endif
 
+#ifdef HL2WARS_DLL
+class IWarsEditorStorage;
+extern IWarsEditorStorage *warseditorstorage;
+#endif // HL2WARS_DLL
+
 
 //-----------------------------------------------------------------------------
 // Precaches a material

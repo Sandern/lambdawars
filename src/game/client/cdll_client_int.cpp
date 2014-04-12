@@ -153,7 +153,7 @@
 #include "wars_flora.h"
 #include "editor/editorsystem.h"
 
-//#include "warseditor/iwars_editor_storage.h"
+#include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -559,7 +559,7 @@ public:
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
 #ifdef HL2WARS_DLL
-		//AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+		AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
 #endif // HL2WARS_DLL
 	}
 
@@ -1226,8 +1226,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 #endif
 
 #ifdef HL2WARS_DLL
-	//if ( (warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL)) == NULL )
-	//	return false;
+	warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
 #endif // HL2WARS_DLL
 
 	if ( !CommandLine()->CheckParm( "-noscripting") )

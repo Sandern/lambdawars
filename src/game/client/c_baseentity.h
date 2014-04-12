@@ -1204,6 +1204,7 @@ public:
 
 	void				SetRemovalFlag( bool bRemove );
 
+	int					GetSpawnFlags( void ) const;
 	bool				HasSpawnFlags( int nFlags ) const;
 
 	// Effects...
@@ -2695,6 +2696,11 @@ inline bool C_BaseEntity::IsVisible() const
 inline bool C_BaseEntity::IsVisibleToAnyPlayer() const
 {
 	return !m_VisibilityBits.IsAllClear();
+}
+
+inline int CBaseEntity::GetSpawnFlags( void ) const
+{ 
+	return m_spawnflags; 
 }
 
 inline bool C_BaseEntity::HasSpawnFlags( int nFlags ) const

@@ -12,6 +12,7 @@
 #include "hl2wars_util_shared.h"
 #include <filesystem.h>
 #include "vstdlib/ikeyvaluessystem.h"
+#include "srcpy.h"
 
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
@@ -25,8 +26,15 @@
 #include "hl2wars_player.h"
 #endif // CLIENT_DLL
 
+#include "editor/editorsystem.h"
+#include "warseditor/iwars_editor_storage.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+#ifndef CLIENT_DLL
+#define VarArgs UTIL_VarArgs
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Flame/Ignite event
@@ -434,10 +442,13 @@ bool CWarsFlora::Initialize()
 
 	Spawn();
 
-	Vector mins, maxs;
-	//const model_t *model = modelinfo->FindOrLoadModel(STRING(GetModelName()));
-	modelinfo->GetModelBounds(GetModel(), mins, maxs);
-	SetSize(mins, maxs);
+	const model_t *model = GetModel();
+	if( model )
+	{
+		Vector mins, maxs;
+		modelinfo->GetModelBounds(GetModel(), mins, maxs);
+		SetSize(mins, maxs);
+	}
 
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
@@ -559,11 +570,17 @@ void CWarsFlora::InitFloraGrid()
 	InitFloraDataKeyValues();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::DestroyFloraGrid()
 {
 	s_FloraGrid.RemoveAll();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::InsertInFloraGrid()
 {
 	m_iKey = FLORA_KEY( GetAbsOrigin() );
@@ -576,6 +593,9 @@ void CWarsFlora::InsertInFloraGrid()
 	s_FloraGrid[m_iKey].AddToTail( this );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::RemoveFromFloraGrid()
 {
 	if( m_iKey == -1 )
@@ -585,6 +605,9 @@ void CWarsFlora::RemoveFromFloraGrid()
 	m_iKey = -1;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsFlora::InitFloraDataKeyValues()
 {
 	if( m_pKVFloraData )
@@ -599,7 +622,7 @@ void CWarsFlora::InitFloraDataKeyValues()
 	{
 		char floraPath[MAX_PATH];
 		V_snprintf( floraPath, sizeof(floraPath), "scripts/flora/%s", floraFilename );
-		Msg("Flora data: %s\n", floraPath);
+		//DevMsg("Found Flora data file: %s\n", floraPath);
 
 		if( !m_pKVFloraData )
 		{
@@ -679,10 +702,67 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Spawn function mainly intended for editor or ingame testing
+//			The editor mode, the flora entity gets synced to the editing client
 //-----------------------------------------------------------------------------
-void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
+bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle )
 {
+	bool bEditorManaged = EditorSystem()->IsActive();
+
+	// Create flora entity
+	CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName("wars_flora"); //new CWarsFlora();
+	if ( !pEntity )
+	{	
+		Warning("wars_flora_spawn: Failed to create entity\n");
+		return false;
+	}
+
+	// Apply data
+	pEntity->KeyValue( "model", pModelname );
+	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
+	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
+	pEntity->KeyValue( "editormanaged", bEditorManaged ? "1" : "0" );
+
+#ifdef CLIENT_DLL
+	// Initialize
+	if ( !pEntity->Initialize() )
+	{	
+		pEntity->Release();
+		Warning("CWarsFlora::SpawnFlora: Failed to initialize entity\n");
+		return false;
+	}
+#else
+	DispatchSpawn( pEntity );
+	pEntity->Activate();
+
+	if( bEditorManaged )
+	{
+		KeyValues *pOperation = new KeyValues( "data" );
+		pOperation->SetString("operation", "create");
+		pOperation->SetString("classname", "wars_flora");
+
+		KeyValues *pEntValues = new KeyValues( "keyvalues" );
+		pEntity->FillKeyValues( pEntValues );
+		pEntValues->SetString( "model", pModelname );
+		pEntValues->SetString( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
+		pEntValues->SetString( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
+
+		pOperation->AddSubKey( pEntValues );
+
+		warseditorstorage->AddEntityToQueue( pOperation );
+	}
+#endif // CLIENT_DLL
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Removes flora in a radius. In Editor mode, this gets synced from
+//		    server to client for the editing player.
+//-----------------------------------------------------------------------------
+void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, int nMax )
+{
+	int iCount = 0;
 	CUtlVector<CWarsFlora *> removeFlora;
 	float fRadiusSqr = fRadius * fRadius;
 #ifdef CLIENT_DLL
@@ -695,13 +775,74 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius )
 		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr )
 		{
 			removeFlora.AddToTail( pFlora );
+			iCount++;
+			if( nMax != -1 && iCount >= nMax )
+				break;
 		}
+		
 	}
 
 	FOR_EACH_VEC( removeFlora, idx )
 	{
 		removeFlora[idx]->Remove();
 	}
+
+#ifndef CLIENT_DLL
+	if( EditorSystem()->IsActive() )
+	{
+		KeyValues *pOperation = new KeyValues( "data" );
+		pOperation->SetString("operation", "delete");
+		pOperation->SetString("classname", "wars_flora");
+
+		// TODO: Specify IDs for flora to be deleted
+		/*KeyValues *pEntValues = new KeyValues( "keyvalues" );
+		pEntity->FillKeyValues( pEntValues );
+		pEntValues->SetString( "model", pModelname );
+		pEntValues->SetString( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
+		pEntValues->SetString( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
+
+		pOperation->AddSubKey( pEntValues );*/
+
+		warseditorstorage->AddEntityToQueue( pOperation );
+	}
+#endif // CLIENT_DLL
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CWarsFlora::CountFloraInRadius( const Vector &vPosition, float fRadius )
+{
+	CUtlVector<int> restrictModels; // Empty for no restriction
+	return CountFloraInRadius( vPosition, fRadius, restrictModels );
+}
+
+int CWarsFlora::CountFloraInRadius( const Vector &vPosition, float fRadius, CUtlVector<int> &restrictModels )
+{
+	int iCount = 0;
+	float fRadiusSqr = fRadius * fRadius;
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && pFlora->GetAbsOrigin().DistToSqr( vPosition ) < fRadiusSqr && (!restrictModels.Count() || restrictModels.Find(pFlora->GetModelIndex()) != -1) )
+		{
+			iCount++;
+		}
+		
+	}
+
+	return iCount;
+}
+
+int CWarsFlora::PyCountFloraInRadius( const Vector &vPosition, float fRadius, boost::python::list pyRestrictModels )
+{
+	CUtlVector<int> restrictModels;
+	ListToUtlVectorByValue<int>( pyRestrictModels, restrictModels );
+	return CountFloraInRadius( vPosition, fRadius, restrictModels );
 }
 
 //-----------------------------------------------------------------------------
@@ -758,12 +899,11 @@ void CWarsFlora::IgniteFloraInRadius( const Vector &vPosition, float fRadius, fl
 CON_COMMAND_F( cl_wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
 #else
 CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT )
-#define VarArgs UTIL_VarArgs
 #endif // CLIENT_DLL
 {
 	if( args.ArgC() < 2 )
 	{
-		Warning("wars_flora_spawn: Not enough arguments.\n Example usage: wars_flora_spawn <modelname> <randomradius> <editormanaged:1|0>");
+		Warning("wars_flora_spawn: Not enough arguments.\n Example usage: wars_flora_spawn <modelname> <randomradius>");
 		return;
 	}
 	
@@ -780,7 +920,6 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 	// Collect arguments
 	const char *pModelName = args[1];
 	float fRandomMaxRadius = args.ArgC() > 2 ? atof(args[2]) : 0;
-	bool bEditorManaged = args.ArgC() > 3 ? atoi(args[3]) : false;
 
 #ifndef CLIENT_DLL
 	CBaseEntity::PrecacheModel( pModelName );
@@ -817,39 +956,19 @@ CON_COMMAND_F( wars_flora_spawn, "Spawns the specified flora model", FCVAR_CHEAT
 		return;
 	}
 
-	// Create flora entity
-	CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName("wars_flora"); //new CWarsFlora();
-	if ( !pEntity )
-	{	
-		Warning("wars_flora_spawn: Failed to create entity\n");
-		return;
-	}
-
-	// Apply data
 	QAngle angles(0, random->RandomFloat(0, 360), 0);
-	pEntity->KeyValue( "model", pModelName );
-	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", angles.x, angles.y, angles.z ) );
-	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", info.m_vPosition.x, info.m_vPosition.y, info.m_vPosition.z ) );
-	pEntity->KeyValue( "editormanaged", bEditorManaged ? "1" : "0" );
+	CWarsFlora::SpawnFlora( pModelName, info.m_vPosition, angles );
 
-#ifdef CLIENT_DLL
-	// Initialize
-	if ( !pEntity->Initialize() )
-	{	
-		pEntity->Release();
-		Warning("wars_flora_spawn: Failed to initialize entity\n");
-		return;
-	}
-#else
-	DispatchSpawn( pEntity );
-	pEntity->Activate();
-
-	for( int i = 1; i <= gpGlobals->maxClients; i++ )
+#ifndef CLIENT_DLL
+	if( !EditorSystem()->IsActive() )
 	{
-		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
-		if( !pPlayer || !pPlayer->IsConnected() )
-			continue;
-		engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
+		for( int i = 1; i <= gpGlobals->maxClients; i++ )
+		{
+			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+			if( !pPlayer || !pPlayer->IsConnected() )
+				continue;
+			engine->ClientCommand( pPlayer->edict(), VarArgs( "cl_wars_flora_spawn %s", args.ArgS() ) );
+		}
 	}
 #endif // CLIENT_DLL
 }
