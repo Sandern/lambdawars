@@ -907,6 +907,26 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+CWarsFlora *CWarsFlora::FindFloraByUUID( const char *pUUID )
+{
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && pFlora->HasFloraUUID() && V_strcmp( pFlora->GetFloraUUID(), pUUID ) == 0 )
+		{
+			return pFlora;
+		}
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 int CWarsFlora::CountFloraInRadius( const Vector &vPosition, float fRadius )
 {
 	CUtlVector<int> restrictModels; // Empty for no restriction

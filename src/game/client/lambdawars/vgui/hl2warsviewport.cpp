@@ -43,6 +43,7 @@
 #include "hl2wars_shareddefs.h"
 #include "wars_mapboundary.h"
 #include "iunit.h"
+#include "editor/editorsystem.h"
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -509,6 +510,11 @@ void HL2WarsViewport::OnCursorExited()
 //-----------------------------------------------------------------------------
 void HL2WarsViewport::OnMousePressed( MouseCode code )
 {
+	if( EditorSystem()->IsActive() )
+	{
+		EditorSystem()->OnMousePressed( code );
+	}
+
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if( !pPlayer )
 		return;
@@ -565,6 +571,11 @@ void HL2WarsViewport::OnMouseTriplePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 void HL2WarsViewport::OnMouseReleased(MouseCode code)
 {
+	if( EditorSystem()->IsActive() )
+	{
+		EditorSystem()->OnMouseReleased( code );
+	}
+
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 	if( !pPlayer )
 		return;

@@ -65,6 +65,7 @@ public:
 
 	static void		RemoveFloraByUUID( const char *pUUID );
 	static void		RemoveFloraInRadius( const Vector &position, float radius, int max = -1 );
+	static CWarsFlora *FindFloraByUUID( const char *pUUID );
 	static int		CountFloraInRadius( const Vector &position, float radius );
 	static int		CountFloraInRadius( const Vector &position, float radius, CUtlVector<int> &restrictmodels );
 	static int		PyCountFloraInRadius( const Vector &position, float radius, boost::python::list restrictmodels = boost::python::list() );
