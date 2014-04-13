@@ -89,8 +89,8 @@ KeyValues *CWarsEditorStorage::PopEntityFromQueue()
 	if( m_hQueuedEntities.Count() == 0 )
 		return NULL;
 
-	KeyValues *pEntity = m_hQueuedEntities.Tail();
-	m_hQueuedEntities.Remove( m_hQueuedEntities.Count() - 1 );
+	KeyValues *pEntity = m_hQueuedEntities.Head();
+	m_hQueuedEntities.Remove( 0 );
 	return pEntity;
 }
 

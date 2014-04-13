@@ -590,6 +590,10 @@ void register_CWarsFlora_class(){
             , (void (*)( ::Vector const &,float ))( &::CWarsFlora::DestructFloraInRadius )
             , ( bp::arg("position"), bp::arg("radius") ) )    
         .def( 
+            "FillKeyValues"
+            , (bool ( ::CWarsFlora::* )( ::KeyValues * ) )( &::CWarsFlora::FillKeyValues )
+            , ( bp::arg("pEntityKey") ) )    
+        .def( 
             "FindFloraByUUID"
             , (::CWarsFlora * (*)( char const * ))( &::CWarsFlora::FindFloraByUUID )
             , ( bp::arg("pUUID") )

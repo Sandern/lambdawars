@@ -18,6 +18,8 @@
 #include "hl2wars_player.h"
 #endif // CLIENT_DLL
 
+class CWarsFlora;
+
 #ifndef CLIENT_DLL
 class CEditorSystem : public CBaseGameSystemPerFrame, public IEntityListener
 #else
@@ -52,6 +54,12 @@ public:
 	void DeleteSelection();
 	void SetSelectionCenterLocked( bool locked );
 
+#ifndef CLIENT_DLL
+	void ClearCopyCommands();
+	void CopySelection();
+	void PasteSelection();
+#endif // CLIENT_DLL
+
 	// Editor modes
 	enum EditorInteractionMode_t
 	{
@@ -70,6 +78,14 @@ public:
 	void OnMousePressed( vgui::MouseCode code );
 	void OnMouseReleased( vgui::MouseCode code );
 #endif // CLIENT_DLL
+
+	// Commands processor
+	bool ProcessCommand( KeyValues *pCommand );
+	bool ProcessCreateCommand( KeyValues *pCommand );
+	bool ProcessDeleteFloraCommand( KeyValues *pCommand );
+
+	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
+	KeyValues *CreateClearSelectionCommand();
 
 private:
 	// Selection
@@ -136,6 +152,8 @@ private:
 	CUtlVector<EHANDLE> m_hSelectedEntities;
 	bool m_bSelectionCenterLocked;
 	Vector m_vecSelectionCenterCache;
+
+	CUtlVector<KeyValues *> m_SelectionCopyCommands;
 
 #ifdef CLIENT_DLL
 	CMaterialReference m_matSelect;

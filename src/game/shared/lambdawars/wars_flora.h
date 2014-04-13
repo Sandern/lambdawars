@@ -74,9 +74,7 @@ public:
 
 	bool			IsEditorManaged();
 
-#ifndef CLIENT_DLL
 	bool			FillKeyValues( KeyValues *pEntityKey );
-#endif // CLIENT_DLL
 
 private:
 	int				m_iKey;

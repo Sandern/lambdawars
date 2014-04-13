@@ -231,6 +231,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\deferred\CDefLightGlobal.cpp" />
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp" />
     <ClCompile Include="..\shared\lambdawars\dota.cpp" />
+    <ClCompile Include="..\shared\lambdawars\editor\editorcommandproc.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editormapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorselection.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorsystem.cpp" />

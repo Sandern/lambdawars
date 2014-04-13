@@ -2423,6 +2423,9 @@
     <ClCompile Include="..\shared\lambdawars\editor\editorselection.cpp">
       <Filter>Source Files\wars\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\editor\editorcommandproc.cpp">
+      <Filter>Source Files\wars\Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">

@@ -46,6 +46,27 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
         
         }
+        { //::CEditorSystem::CreateClearSelectionCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateClearSelectionCommand_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateClearSelectionCommand"
+                , CreateClearSelectionCommand_function_type( &::CEditorSystem::CreateClearSelectionCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateFloraCreateCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateFloraCreateCommand_function_type )( ::CWarsFlora *,::Vector const * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateFloraCreateCommand"
+                , CreateFloraCreateCommand_function_type( &::CEditorSystem::CreateFloraCreateCommand )
+                , ( bp::arg("pFlora"), bp::arg("vOffset")=bp::object() )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CEditorSystem::DeleteSelection
         
             typedef void ( ::CEditorSystem::*DeleteSelection_function_type )(  ) ;
@@ -72,6 +93,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "GetCurrentVmfPath"
                 , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
+        
+        }
+        { //::CEditorSystem::GetEditorMode
+        
+            typedef ::CEditorSystem::EditorInteractionMode_t ( ::CEditorSystem::*GetEditorMode_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetEditorMode"
+                , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
         
         }
         { //::CEditorSystem::Init
@@ -119,6 +149,56 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , LoadCurrentVmf_function_type( &::CEditorSystem::LoadCurrentVmf ) );
         
         }
+        { //::CEditorSystem::OnMousePressed
+        
+            typedef void ( ::CEditorSystem::*OnMousePressed_function_type )( ::vgui::MouseCode ) ;
+            
+            CEditorSystem_exposer.def( 
+                "OnMousePressed"
+                , OnMousePressed_function_type( &::CEditorSystem::OnMousePressed )
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CEditorSystem::OnMouseReleased
+        
+            typedef void ( ::CEditorSystem::*OnMouseReleased_function_type )( ::vgui::MouseCode ) ;
+            
+            CEditorSystem_exposer.def( 
+                "OnMouseReleased"
+                , OnMouseReleased_function_type( &::CEditorSystem::OnMouseReleased )
+                , ( bp::arg("code") ) );
+        
+        }
+        { //::CEditorSystem::ProcessCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCommand"
+                , ProcessCommand_function_type( &::CEditorSystem::ProcessCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessCreateCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCreateCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCreateCommand"
+                , ProcessCreateCommand_function_type( &::CEditorSystem::ProcessCreateCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessDeleteFloraCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessDeleteFloraCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessDeleteFloraCommand"
+                , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::SetEditorMode
         
             typedef void ( ::CEditorSystem::*SetEditorMode_function_type )( ::CEditorSystem::EditorInteractionMode_t ) ;
@@ -127,6 +207,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 "SetEditorMode"
                 , SetEditorMode_function_type( &::CEditorSystem::SetEditorMode )
                 , ( bp::arg("mode") ) );
+        
+        }
+        { //::CEditorSystem::SetSelectionCenterLocked
+        
+            typedef void ( ::CEditorSystem::*SetSelectionCenterLocked_function_type )( bool ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetSelectionCenterLocked"
+                , SetSelectionCenterLocked_function_type( &::CEditorSystem::SetSelectionCenterLocked )
+                , ( bp::arg("locked") ) );
         
         }
         { //::CEditorSystem::Shutdown
@@ -178,6 +268,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             .value("EDITORINTERACTION_COUNT", CEditorSystem::EDITORINTERACTION_COUNT)
             .export_values()
             ;
+        { //::CEditorSystem::ClearCopyCommands
+        
+            typedef void ( ::CEditorSystem::*ClearCopyCommands_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ClearCopyCommands"
+                , ClearCopyCommands_function_type( &::CEditorSystem::ClearCopyCommands ) );
+        
+        }
         { //::CEditorSystem::ClearLoadedMap
         
             typedef void ( ::CEditorSystem::*ClearLoadedMap_function_type )(  ) ;
@@ -194,6 +293,36 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "ClearSelection"
                 , ClearSelection_function_type( &::CEditorSystem::ClearSelection ) );
+        
+        }
+        { //::CEditorSystem::CopySelection
+        
+            typedef void ( ::CEditorSystem::*CopySelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CopySelection"
+                , CopySelection_function_type( &::CEditorSystem::CopySelection ) );
+        
+        }
+        { //::CEditorSystem::CreateClearSelectionCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateClearSelectionCommand_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateClearSelectionCommand"
+                , CreateClearSelectionCommand_function_type( &::CEditorSystem::CreateClearSelectionCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateFloraCreateCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateFloraCreateCommand_function_type )( ::CWarsFlora *,::Vector const * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateFloraCreateCommand"
+                , CreateFloraCreateCommand_function_type( &::CEditorSystem::CreateFloraCreateCommand )
+                , ( bp::arg("pFlora"), bp::arg("vOffset")=bp::object() )
+                , bp::return_value_policy< bp::return_by_value >() );
         
         }
         { //::CEditorSystem::DeleteSelection
@@ -222,6 +351,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "GetCurrentVmfPath"
                 , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
+        
+        }
+        { //::CEditorSystem::GetEditorMode
+        
+            typedef ::CEditorSystem::EditorInteractionMode_t ( ::CEditorSystem::*GetEditorMode_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetEditorMode"
+                , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
         
         }
         { //::CEditorSystem::Init
@@ -279,6 +417,45 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pEntity") ) );
         
         }
+        { //::CEditorSystem::PasteSelection
+        
+            typedef void ( ::CEditorSystem::*PasteSelection_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "PasteSelection"
+                , PasteSelection_function_type( &::CEditorSystem::PasteSelection ) );
+        
+        }
+        { //::CEditorSystem::ProcessCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCommand"
+                , ProcessCommand_function_type( &::CEditorSystem::ProcessCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessCreateCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCreateCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCreateCommand"
+                , ProcessCreateCommand_function_type( &::CEditorSystem::ProcessCreateCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessDeleteFloraCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessDeleteFloraCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessDeleteFloraCommand"
+                , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::SaveCurrentVmf
         
             typedef void ( ::CEditorSystem::*SaveCurrentVmf_function_type )(  ) ;
@@ -296,6 +473,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 "SetEditorMode"
                 , SetEditorMode_function_type( &::CEditorSystem::SetEditorMode )
                 , ( bp::arg("mode") ) );
+        
+        }
+        { //::CEditorSystem::SetSelectionCenterLocked
+        
+            typedef void ( ::CEditorSystem::*SetSelectionCenterLocked_function_type )( bool ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetSelectionCenterLocked"
+                , SetSelectionCenterLocked_function_type( &::CEditorSystem::SetSelectionCenterLocked )
+                , ( bp::arg("locked") ) );
         
         }
         { //::CEditorSystem::Shutdown

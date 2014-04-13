@@ -302,7 +302,6 @@ void CWarsFlora::PlayDestructionAnimation()
 	ResetSequenceInfo();
 }
 
-#ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -323,7 +322,6 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 
 	return true;
 }
-#endif // CLIENT_DLL
 
 // Client Spawning Code
 #ifdef CLIENT_DLL

@@ -200,6 +200,72 @@ void CEditorSystem::DeleteSelection()
 	warseditorstorage->AddEntityToQueue( pOperation );
 }
 
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::ClearCopyCommands()
+{
+	for( int i = 0; i < m_SelectionCopyCommands.Count(); i++ )
+	{
+		m_SelectionCopyCommands[i]->deleteThis();
+	}
+	m_SelectionCopyCommands.Purge();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::CopySelection()
+{
+	ClearCopyCommands();
+
+	if( !IsAnythingSelected() )
+		return;
+
+	Vector vCopyOffset(64.0f, 64.0f, 0.0f );
+	for( int i = 0; i < m_hSelectedEntities.Count(); i++ )
+	{
+		if( !m_hSelectedEntities[i] )
+			continue;
+
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( m_hSelectedEntities[i].Get() );
+		if( pFlora )
+		{
+			KeyValues *pOperation = CreateFloraCreateCommand( pFlora, &vCopyOffset );
+			pOperation->SetBool( "select", true );
+			m_SelectionCopyCommands.AddToTail( pOperation );
+		}
+		else
+		{
+			Warning( "CEditorSystem::CopySelection: Trying to copy an unsupported entity\n" );
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::PasteSelection()
+{
+	if( m_SelectionCopyCommands.Count() == 0 )
+		return;
+
+	// Clear selection, will select copy!
+	KeyValues *pClearSelection = CreateClearSelectionCommand();
+	ProcessCommand( pClearSelection );
+	warseditorstorage->AddEntityToQueue( pClearSelection );
+
+	for( int i = 0; i < m_SelectionCopyCommands.Count(); i++ )
+	{
+		ProcessCommand( m_SelectionCopyCommands[i] );
+		warseditorstorage->AddEntityToQueue( m_SelectionCopyCommands[i] );
+	}
+
+	m_SelectionCopyCommands.Purge();
+}
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -301,69 +367,14 @@ void CEditorSystem::Update( float frametime )
 		return;
 
 	// Process commands from server
-	KeyValues *pEntity = NULL;
-	while( (pEntity = warseditorstorage->PopEntityFromQueue()) != NULL )
+	KeyValues *pCommand = NULL;
+	while( (pCommand = warseditorstorage->PopEntityFromQueue()) != NULL )
 	{
-		const char *pOperation = pEntity->GetString("operation", "");
+		if( !ProcessCommand( pCommand ) )
+			break; // Assume the command was readded, so no need for cleanup. TODO: refine this.
 
-		if( V_strcmp( pOperation, "create" ) == 0 )
-		{
-			const char *pClassname = pEntity->GetString("classname", "");
-			KeyValues *pEntityValues = pEntity->FindKey("keyvalues");
-			if( pClassname && pEntityValues )
-			{
-				const char *pModelname = pEntityValues->GetString("model", NULL);
-				if( pModelname && modelinfo->GetModelIndex( pModelname ) < 0 )
-				{
-					//modelinfo->FindOrLoadModel( pModelname );
-					warseditorstorage->AddEntityToQueue( pEntity );
-					break; // Not loaded yet
-				}
-
-				CBaseEntity *pEnt = CreateEntityByName( pClassname );
-				if( pEnt )
-				{
-					FOR_EACH_VALUE( pEntityValues, pValue )
-					{
-						pEnt->KeyValue( pValue->GetName(), pValue->GetString() );
-					}
-
-					//KeyValuesDumpAsDevMsg( pEntityValues );
-
-					CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEnt );
-					if( pFlora )
-					{
-						if( !pFlora->Initialize() )
-						{
-							pFlora->Release();
-							Warning( "CEditorSystem: Failed to initialize flora entity on client with model %s\n", pEntityValues->GetString("model", "models/error.mdl") );
-						}
-					}
-					else if( !pEnt->InitializeAsClientEntity( pEntityValues->GetString("model", "models/error.mdl"), false ) )
-					{
-						if( pEnt->GetBaseAnimating() )
-							pEnt->GetBaseAnimating()->Release();
-						Warning( "CEditorSystem: Failed to initialize entity on client with model %s\n", pEntityValues->GetString("model", "models/error.mdl") );
-					}
-				}
-			}
-		}
-		else if( V_strcmp( pOperation, "deleteflora" ) == 0 )
-		{
-			for ( KeyValues *pKey = pEntity->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
-			{
-				if ( V_strcmp( pKey->GetName(), "flora" ) )
-					continue;
-
-				const char *uuid = pKey->GetString("uuid", NULL);
-				if( !uuid )
-					continue;
-
-				CWarsFlora::RemoveFloraByUUID( uuid );
-			}
-		}
-
-		pEntity->deleteThis();
+		// Clean up keyvalues after processing
+		pCommand->deleteThis();
 	}
 }
 
