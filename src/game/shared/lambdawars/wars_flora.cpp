@@ -279,7 +279,7 @@ void CWarsFlora::GenerateFloraUUID()
     uuid_unparse ( uuid, s );
 	m_iszFloraUUID = AllocPooledString( s );
 #endif
-	DevMsg("Generated GUID: %s\n", STRING(m_iszFloraUUID));
+	//DevMsg("Generated GUID: %s\n", STRING(m_iszFloraUUID));
 }
 
 //-----------------------------------------------------------------------------

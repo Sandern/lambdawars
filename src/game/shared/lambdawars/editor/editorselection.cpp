@@ -594,6 +594,47 @@ void CEditorSystem::StopDrag()
 	//if ( vgui::input()->GetMouseCapture() == GetVPanel() )
 	//	vgui::input()->SetMouseCapture( 0 );
 
+	// Update flora on server
+	switch( m_iDragMode )
+	{
+	case EDITORDRAG_TRANSLATE:
+		{
+			FOR_EACH_VEC( m_hSelectedEntities, i )
+			{
+				CBaseEntity *pEnt = m_hSelectedEntities[ i ];
+				if( !pEnt )
+					continue;
+
+				CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEnt );
+				if( pFlora )
+				{
+					engine->ServerCmd( VarArgs("wars_editor_translateflora %s %f %f %f\n", 
+						pFlora->GetFloraUUID(), pFlora->GetAbsOrigin().x, pFlora->GetAbsOrigin().y, pFlora->GetAbsOrigin().z ) );
+				}
+			}
+		}
+		break;
+	case EDITORDRAG_ROTATE:
+		{
+			FOR_EACH_VEC( m_hSelectedEntities, i )
+			{
+				CBaseEntity *pEnt = m_hSelectedEntities[ i ];
+				if( !pEnt )
+					continue;
+
+				CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEnt );
+				if( pFlora )
+				{
+					engine->ServerCmd( VarArgs("wars_editor_rotateflora %s %f %f %f\n", 
+						pFlora->GetFloraUUID(), pFlora->GetAbsAngles().x, pFlora->GetAbsAngles().y, pFlora->GetAbsAngles().z ) );
+				}
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
 	m_iDragMode = EDITORDRAG_NONE;
 
 	if ( bView )
@@ -1068,4 +1109,30 @@ void CEditorSystem::RenderRotate()
 		pMesh->Draw();
 	}
 }
+
+#else
+CON_COMMAND_F( wars_editor_translateflora, "", FCVAR_CHEAT|FCVAR_HIDDEN )
+{
+	if( args.ArgC() < 5 )
+		return;
+
+	CWarsFlora *pFlora = CWarsFlora::FindFloraByUUID( args[1] );
+	if( !pFlora )
+		return;
+
+	pFlora->SetAbsOrigin( Vector( atof(args[2] ), atof(args[3] ), atof(args[4] ) ) );
+}
+
+CON_COMMAND_F( wars_editor_rotateflora, "", FCVAR_CHEAT|FCVAR_HIDDEN )
+{
+	if( args.ArgC() < 5 )
+		return;
+
+	CWarsFlora *pFlora = CWarsFlora::FindFloraByUUID( args[1] );
+	if( !pFlora )
+		return;
+
+	pFlora->SetAbsAngles( QAngle( atof(args[2] ), atof(args[3] ), atof(args[4] ) ) );
+}
+
 #endif // CLIENT_DLL

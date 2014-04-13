@@ -77,6 +77,7 @@ void CEditorSystem::Shutdown()
 void CEditorSystem::LevelShutdownPreEntity() 
 {
 	ClearLoadedMap();
+	m_hSelectedEntities.Purge();
 }
 
 #ifndef CLIENT_DLL
@@ -237,14 +238,15 @@ Vector CEditorSystem::GetSelectionCenter()
 		return vec3_origin;
 	}
 
-	// TODO
-	//if ( m_bSelectionCenterLocked )
-	//	return m_vecSelectionCenterCache;
+	if ( m_bSelectionCenterLocked )
+		return m_vecSelectionCenterCache;
 
 	CUtlVector< Vector > positions;
 
 	FOR_EACH_VEC( m_hSelectedEntities, i )
 	{
+		if( !m_hSelectedEntities[ i ] )
+			continue;
 		positions.AddToTail( m_hSelectedEntities[ i ]->GetAbsOrigin() );
 	}
 

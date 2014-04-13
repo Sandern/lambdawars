@@ -590,6 +590,11 @@ void register_CWarsFlora_class(){
             , (void (*)( ::Vector const &,float ))( &::CWarsFlora::DestructFloraInRadius )
             , ( bp::arg("position"), bp::arg("radius") ) )    
         .def( 
+            "FindFloraByUUID"
+            , (::CWarsFlora * (*)( char const * ))( &::CWarsFlora::FindFloraByUUID )
+            , ( bp::arg("pUUID") )
+            , bp::return_value_policy< bp::return_by_value >() )    
+        .def( 
             "GenerateFloraUUID"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GenerateFloraUUID ) )    
         .def( 
@@ -791,6 +796,7 @@ void register_CWarsFlora_class(){
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_UpdateOnRemove) )    
         .staticmethod( "DestroyFloraGrid" )    
         .staticmethod( "DestructFloraInRadius" )    
+        .staticmethod( "FindFloraByUUID" )    
         .staticmethod( "IgniteFloraInRadius" )    
         .staticmethod( "InitFloraDataKeyValues" )    
         .staticmethod( "InitFloraGrid" )    
