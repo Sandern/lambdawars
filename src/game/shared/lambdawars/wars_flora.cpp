@@ -33,6 +33,7 @@ extern "C"
 {
 #ifdef WIN32
 #include <Rpc.h>
+#undef GetObject
 #else
 #include <uuid/uuid.h>
 #endif
@@ -178,16 +179,30 @@ void CWarsFlora::Spawn()
 
 	InitFloraData();
 
-	SetSolid( SOLID_NONE );
-	Vector vecMins = CollisionProp()->OBBMins();
-	Vector vecMaxs = CollisionProp()->OBBMaxs();
-	SetSize( vecMins, vecMaxs );
-
 	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
 	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
 	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
 	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
 	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
+
+	m_iPoseX = LookupPoseParameter( "x" );
+	m_iPoseY = LookupPoseParameter( "y" );
+	m_iPoseZ = LookupPoseParameter( "z" );
+
+	if( m_iIdleSequence != -1 )
+		SetSequence( m_iIdleSequence );
+
+	SetSolid( SOLID_NONE );
+	Vector vecMins = CollisionProp()->OBBMins();
+	Vector vecMaxs = CollisionProp()->OBBMaxs();
+	SetSize( vecMins, vecMaxs );
+
+	if( m_iPoseX != -1 )
+		SetPoseParameter( m_iPoseX, 0.0f );
+	if( m_iPoseY != -1 )
+		SetPoseParameter( m_iPoseY, 0.0f );
+	if( m_iPoseZ != -1 )
+		SetPoseParameter( m_iPoseZ, 0.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -330,30 +345,65 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 //-----------------------------------------------------------------------------
 void CWarsFlora::UpdateUnitAvoid()
 {
-	if( m_iSqueezeDownSequence == -1 )
-		return;
-
-	float flRadius = CollisionProp()->BoundingRadius();
-	CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
-	partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
-
-	// Okay, decide how to avoid if there's anything close by
-	int c = avoid.GetObjectCount();
-	if( c > 0 )
+	if( m_iPoseX != -1 && m_iPoseY != -1 && m_iPoseZ != -1 )
 	{
-		int iSequence = GetSequence();
-		if( iSequence != m_iSqueezeDownSequence && iSequence != m_iSqueezeDownIdleSequence  )
-		{
-			SetSequence( m_iSqueezeDownSequence );
-			ResetSequenceInfo();
-		}
-		else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() )
-		{
-			SetSequence( m_iSqueezeDownIdleSequence );
-			ResetSequenceInfo();
-		}
+		float flRadius = CollisionProp()->BoundingRadius();
+		CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
+		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
 
-		m_fAvoidTimeOut = gpGlobals->curtime + 0.1f;
+		Vector vecAvoid;
+
+		int c = avoid.GetObjectCount();
+		if( c > 0 ) 
+		{
+			Vector vecAvoidAvg( 0, 0, 0 );
+			for ( int i = 0; i < c; i++ )
+			{
+				CBaseEntity *pEnt = avoid.GetObject( i );
+		
+				vecAvoid = GetAbsOrigin() - pEnt->GetAbsOrigin();
+				vecAvoid.z = 0;
+				float flDist = VectorNormalize( vecAvoid );
+				vecAvoid.z = 1.0f - Min( Max( flDist / flRadius, 0.0f ), 1.0f );
+				vecAvoidAvg += vecAvoid;
+			}
+
+			vecAvoidAvg /= c;
+			SetPoseParameter( m_iPoseX, vecAvoidAvg.x );
+			SetPoseParameter( m_iPoseY, vecAvoidAvg.y );
+			SetPoseParameter( m_iPoseZ, vecAvoidAvg.z );
+		}
+		else
+		{
+			SetPoseParameter( m_iPoseX, 0.0f );
+			SetPoseParameter( m_iPoseY, 0.0f );
+			SetPoseParameter( m_iPoseZ, 0.0f );
+		}
+	}
+	else if( m_iSqueezeDownSequence == -1 )
+	{
+		float flRadius = CollisionProp()->BoundingRadius();
+		CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
+		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
+
+		// Okay, decide how to avoid if there's anything close by
+		int c = avoid.GetObjectCount();
+		if( c > 0 )
+		{
+			int iSequence = GetSequence();
+			if( iSequence != m_iSqueezeDownSequence && iSequence != m_iSqueezeDownIdleSequence  )
+			{
+				SetSequence( m_iSqueezeDownSequence );
+				ResetSequenceInfo();
+			}
+			else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() )
+			{
+				SetSequence( m_iSqueezeDownIdleSequence );
+				ResetSequenceInfo();
+			}
+
+			m_fAvoidTimeOut = gpGlobals->curtime + 0.1f;
+		}
 	}
 }
 
@@ -501,8 +551,8 @@ bool CWarsFlora::Initialize()
 	if( model )
 	{
 		Vector mins, maxs;
-		modelinfo->GetModelBounds(GetModel(), mins, maxs);
-		SetSize(mins, maxs);
+		ExtractBbox( GetSequence(), mins, maxs );
+		SetSize( mins, maxs );
 	}
 
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );

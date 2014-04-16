@@ -95,6 +95,10 @@ private:
 	int				m_iSqueezeUpSequence;
 	int				m_iDestructSequence;
 
+	int				m_iPoseX;
+	int				m_iPoseY;
+	int				m_iPoseZ;
+
 #ifdef CLIENT_DLL
 	float			m_fAvoidTimeOut;
 #endif // CLIENT_DLL
