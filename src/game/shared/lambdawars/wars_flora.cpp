@@ -44,6 +44,10 @@ extern "C"
 
 #ifndef CLIENT_DLL
 #define VarArgs UTIL_VarArgs
+#else
+ConVar cl_flora_animate( "cl_flora_animate", "1", FCVAR_ARCHIVE );
+ConVar cl_flora_avoid_units( "cl_flora_avoid_units", "1", FCVAR_ARCHIVE );
+ConVar cl_flora_sway_speed( "cl_flora_sway_speed", "10" );
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -345,23 +349,29 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 //-----------------------------------------------------------------------------
 void CWarsFlora::UpdateUnitAvoid()
 {
+	if( !cl_flora_avoid_units.GetBool() )
+		return;
+
+	const Vector &vOrigin = GetAbsOrigin();
+
 	if( m_iPoseX != -1 && m_iPoseY != -1 && m_iPoseZ != -1 )
 	{
 		float flRadius = CollisionProp()->BoundingRadius();
-		CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
-		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
+		CUnitEnumerator avoid( flRadius, vOrigin );
+		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, vOrigin, flRadius, false, &avoid );
 
-		Vector vecAvoid;
+		int i;
+		Vector vecAvoidAvg( 0, 0, 0 );
 
 		int c = avoid.GetObjectCount();
 		if( c > 0 ) 
 		{
-			Vector vecAvoidAvg( 0, 0, 0 );
-			for ( int i = 0; i < c; i++ )
+			Vector vecAvoid;
+			for ( i = 0; i < c; i++ )
 			{
 				CBaseEntity *pEnt = avoid.GetObject( i );
 		
-				vecAvoid = GetAbsOrigin() - pEnt->GetAbsOrigin();
+				vecAvoid = vOrigin - pEnt->GetAbsOrigin();
 				vecAvoid.z = 0;
 				float flDist = VectorNormalize( vecAvoid );
 				vecAvoid.z = 1.0f - Min( Max( flDist / flRadius, 0.0f ), 1.0f );
@@ -369,22 +379,25 @@ void CWarsFlora::UpdateUnitAvoid()
 			}
 
 			vecAvoidAvg /= c;
-			SetPoseParameter( m_iPoseX, vecAvoidAvg.x );
-			SetPoseParameter( m_iPoseY, vecAvoidAvg.y );
-			SetPoseParameter( m_iPoseZ, vecAvoidAvg.z );
+
+			VectorYawRotate( vecAvoidAvg, -GetAbsAngles()[YAW], vecAvoidAvg );
 		}
-		else
+
+		float frac = gpGlobals->frametime * cl_flora_sway_speed.GetFloat();
+		for ( i = 0; i < 3; i++ )
 		{
-			SetPoseParameter( m_iPoseX, 0.0f );
-			SetPoseParameter( m_iPoseY, 0.0f );
-			SetPoseParameter( m_iPoseZ, 0.0f );
+			m_vCurrentSway[ i ] = m_vCurrentSway[ i ] + frac * ( vecAvoidAvg[ i] - m_vCurrentSway[ i ] );
 		}
+
+		SetPoseParameter( m_iPoseX, m_vCurrentSway.x );
+		SetPoseParameter( m_iPoseY, m_vCurrentSway.y );
+		SetPoseParameter( m_iPoseZ, m_vCurrentSway.z );
 	}
 	else if( m_iSqueezeDownSequence == -1 )
 	{
 		float flRadius = CollisionProp()->BoundingRadius();
-		CUnitEnumerator avoid( flRadius, GetAbsOrigin() );
-		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), flRadius, false, &avoid );
+		CUnitEnumerator avoid( flRadius, vOrigin );
+		partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, vOrigin, flRadius, false, &avoid );
 
 		// Okay, decide how to avoid if there's anything close by
 		int c = avoid.GetObjectCount();
@@ -412,6 +425,16 @@ void CWarsFlora::UpdateUnitAvoid()
 //-----------------------------------------------------------------------------
 void CWarsFlora::UpdateClientSideAnimation()
 {
+	if( !cl_flora_animate.GetBool() )
+		return;
+
+	const Vector &vOrigin = GetAbsOrigin();
+
+	int iX, iY;
+	bool bInScreen = GetVectorInScreenSpace( vOrigin, iX, iY );
+	if( !bInScreen )
+		return;
+
 	BaseClass::UpdateClientSideAnimation();
 
 	UpdateUnitAvoid();

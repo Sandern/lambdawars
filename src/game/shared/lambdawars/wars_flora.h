@@ -100,6 +100,7 @@ private:
 	int				m_iPoseZ;
 
 #ifdef CLIENT_DLL
+	Vector			m_vCurrentSway;
 	float			m_fAvoidTimeOut;
 #endif // CLIENT_DLL
 
