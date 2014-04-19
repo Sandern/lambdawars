@@ -182,11 +182,11 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 
 		if( g_pHardwareConfig->GetHDRType() == HDR_TYPE_NONE )
 		{
-			pShader->SetPixelShaderConstant( 27, info.m_nRefractTint );
+			pShader->SetPixelShaderConstant( PSREG_SHADER_CONTROLS, info.m_nRefractTint );
 		}
 		else
 		{
-			pShader->SetPixelShaderConstantGammaToLinear( 27, info.m_nRefractTint );
+			pShader->SetPixelShaderConstantGammaToLinear( PSREG_SHADER_CONTROLS, info.m_nRefractTint );
 		}
 
 		pShaderAPI->SetPixelShaderFogParams( PSREG_FOG_PARAMS );

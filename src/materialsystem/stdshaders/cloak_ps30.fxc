@@ -29,6 +29,7 @@ const float4 g_RimBoost				: register( PSREG_FLASHLIGHT_POSITION_RIM_BOOST );
 const float4 g_FresnelSpecParams	: register( PSREG_FRESNEL_SPEC_PARAMS );		// xyz are fresnel, w is specular boost
 const float4 g_SpecularRimParams	: register( PSREG_SPEC_RIM_PARAMS );			// xyz are specular tint color, w is rim power
 PixelShaderLightInfo cLightInfo[3]	: register( PSREG_LIGHT_INFO_ARRAY );			// 2 registers each - 6 registers total
+const float4 g_RefractTint			: register( c27 );			// xyz are refract tint color
 
 #define	g_fRimBoost						g_RimBoost.w
 #define g_FresnelRanges					g_FresnelSpecParams.xyz
@@ -165,6 +166,7 @@ float4 main( PS_INPUT i ) : COLOR
 	diffuseLerpFactor = smoothstep( 0.4f, 0.425f, diffuseLerpFactor );
 
 	float3 fDiffuse = lerp( vRefract, albedo * diffuseLighting, diffuseLerpFactor );
+	fDiffuse *= g_RefractTint.rgb; // Tint it
 	float3 result =  fDiffuse + vSpecular;
 
 	float alpha = 1.0f;
