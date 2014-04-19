@@ -45,9 +45,9 @@ extern "C"
 #ifndef CLIENT_DLL
 #define VarArgs UTIL_VarArgs
 #else
-ConVar cl_flora_animate( "cl_flora_animate", "1", FCVAR_ARCHIVE );
-ConVar cl_flora_avoid_units( "cl_flora_avoid_units", "1", FCVAR_ARCHIVE );
-ConVar cl_flora_sway_speed( "cl_flora_sway_speed", "10" );
+ConVar cl_flora_animate( "cl_wars_flora_animate", "1", FCVAR_ARCHIVE );
+ConVar cl_flora_avoid_units( "cl_wars_flora_avoid_units", "1", FCVAR_ARCHIVE );
+ConVar cl_flora_sway_speed( "cl_wars_flora_sway_speed", "10" );
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -428,11 +428,12 @@ void CWarsFlora::UpdateClientSideAnimation()
 	if( !cl_flora_animate.GetBool() )
 		return;
 
+	// Don't update any flora not in screen
 	const Vector &vOrigin = GetAbsOrigin();
 
 	int iX, iY;
 	bool bInScreen = GetVectorInScreenSpace( vOrigin, iX, iY );
-	if( !bInScreen )
+	if( !bInScreen|| iX < 0 || iX > ScreenWidth() || iY < 0 || iY > ScreenHeight() )
 		return;
 
 	BaseClass::UpdateClientSideAnimation();
@@ -1213,3 +1214,31 @@ CON_COMMAND_F( wars_flora_data_reload, "", FCVAR_CHEAT )
 {
 	CWarsFlora::InitFloraDataKeyValues();
 }
+
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_debug_list_animated, "", FCVAR_CHEAT )
+{
+	int iTotalCount = 0;
+	int iAnimatedCount = 0;
+
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora )
+		{
+			iTotalCount += 1;
+			const Vector &vOrigin = pFlora->GetAbsOrigin();
+
+			int iX, iY;
+			bool bInScreen = GetVectorInScreenSpace( vOrigin, iX, iY );
+			if( !bInScreen || iX < 0 || iX > ScreenWidth() || iY < 0 || iY > ScreenHeight() )
+				continue;
+
+			 iAnimatedCount += 1;
+		}
+	}
+
+	Msg( "Animating %d out %d flora\n", iAnimatedCount, iTotalCount );
+}
+#endif // CLIENT_DLL
