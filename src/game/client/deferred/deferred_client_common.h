@@ -53,7 +53,6 @@ extern ConVar deferred_radiosity_debug;
 #include "deferred/viewrender_deferred.h"
 
 #include "deferred/flashlighteffect_deferred.h"
-#include "deferred/materialsystem_passthru.h"
 
 void OnCookieTableChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, void const *newData );
 
