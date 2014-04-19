@@ -15,29 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\vpc_scripts\loadaddress.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="missionchooser_swarm.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-    <None Include="..\..\vpc_scripts\version.vpc">
-      <Filter>VPC Scripts</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="chunkfile.h">
-      <Filter>Public Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\public\tier1\interface.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>

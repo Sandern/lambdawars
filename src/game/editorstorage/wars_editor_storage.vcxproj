@@ -224,20 +224,11 @@ cscript //nologo ..\..\dllcopy_editor.wsf "$(TargetDir)/$(TargetName).pdb" "$(Ta
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\..\vpc_scripts\loadaddress.vpc" />
-    <None Include="missionchooser_swarm.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_base.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_debug.vpc" />
-    <None Include="..\..\vpc_scripts\source_dll_win32_release.vpc" />
-    <None Include="..\..\vpc_scripts\version.vpc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="wars_editor_storage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\public\warseditor\iwars_editor_storage.h" />
     <ClInclude Include="wars_editor_storage.h" />
-    <ClInclude Include="chunkfile.h" />
     <ClInclude Include="..\..\public\tier1\interface.h" />
   </ItemGroup>
   <ItemGroup>
