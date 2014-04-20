@@ -233,6 +233,13 @@ void CWarsFlora::InitFloraData()
 	KeyValues *pSection = m_pKVFloraData->FindKey( pModelName );
 	if ( !pSection )
 	{
+#ifdef CLIENT_DLL
+		// Make sure it's not set to render everywhere
+		SetDistanceFade( 
+			GetMinFadeDist() < 1.0f ? 2200.0f : GetMinFadeDist(), 
+			GetMaxFadeDist() < 1.0f ? 2500.0f : GetMaxFadeDist() 
+		);
+#endif // CLIENT_DLL
 		return;
 	}
 
@@ -262,8 +269,8 @@ void CWarsFlora::InitFloraData()
 
 #ifdef CLIENT_DLL
 	// Fade distance
-	float fademindist = pSection->GetFloat( keyMinDist, GetMinFadeDist() );
-	float fademaxdist = pSection->GetFloat( keyMaxDist, GetMaxFadeDist() );
+	float fademindist = pSection->GetFloat( keyMinDist, GetMinFadeDist() < 1.0f ? 2200.0f : GetMinFadeDist() );
+	float fademaxdist = pSection->GetFloat( keyMaxDist, GetMaxFadeDist() < 1.0f ? 2500.0f : GetMaxFadeDist() );
 	SetDistanceFade( fademindist, fademaxdist );
 #endif // CLIENT_DLL
 }
@@ -393,7 +400,7 @@ void CWarsFlora::UpdateUnitAvoid()
 		SetPoseParameter( m_iPoseY, m_vCurrentSway.y );
 		SetPoseParameter( m_iPoseZ, m_vCurrentSway.z );
 	}
-	else if( m_iSqueezeDownSequence == -1 )
+	else if( m_iSqueezeDownSequence != -1 )
 	{
 		float flRadius = CollisionProp()->BoundingRadius();
 		CUnitEnumerator avoid( flRadius, vOrigin );
@@ -409,7 +416,7 @@ void CWarsFlora::UpdateUnitAvoid()
 				SetSequence( m_iSqueezeDownSequence );
 				ResetSequenceInfo();
 			}
-			else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() )
+			else if( iSequence == m_iSqueezeDownSequence && IsSequenceFinished() && m_iSqueezeDownIdleSequence != -1 )
 			{
 				SetSequence( m_iSqueezeDownIdleSequence );
 				ResetSequenceInfo();
@@ -1242,3 +1249,32 @@ CON_COMMAND_F( cl_wars_flora_debug_list_animated, "", FCVAR_CHEAT )
 	Msg( "Animating %d out %d flora\n", iAnimatedCount, iTotalCount );
 }
 #endif // CLIENT_DLL
+
+#ifdef CLIENT_DLL
+CON_COMMAND_F( cl_wars_flora_removeall, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( wars_flora_removeall, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+	const char *pModelName = args.ArgC() > 1 ? args[1] : NULL;
+
+	CUtlVector< CWarsFlora * > flora;
+#ifdef CLIENT_DLL
+	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
+#else
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+#endif // CLIENT_DLL
+	{
+		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
+		if( pFlora && ( !pModelName || V_strcmp( pModelName, STRING(pFlora->GetModelName()) ) == 0 ) )
+		{
+			flora.AddToTail( pFlora );
+		}
+	}
+
+	Msg( "Removed %d flora!\n", flora.Count() );
+	FOR_EACH_VEC( flora, idx )
+	{
+		flora[idx]->Remove();
+	}
+}
