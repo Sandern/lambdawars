@@ -11,6 +11,7 @@
 #include "editormapmgr.h"
 #include <filesystem.h>
 #include "wars_flora.h"
+#include "checksum_md5.h"
 
 #ifdef WIN32
 #undef INVALID_HANDLE_VALUE
@@ -159,16 +160,27 @@ void CEditorMapMgr::SaveCurrentVmf()
 		return;
 	}
 
-	// Save VMF
+	// Collect and update VMF Keyvalues
 	if( !ApplyChangesToVmfFile() )
 	{
 		return;
 	}
 
+	// Store original file size
+	unsigned int iOriFileSize = g_pFullFileSystem->Size( m_szCurrentVmf );
+
+	// Write changes to file
 	CUtlBuffer buffer;
 	KeyValuesToVmf( m_pKVVmf, buffer );
 
 	g_pFullFileSystem->WriteFile( m_szCurrentVmf, NULL, buffer );
+
+	// Check if changed by filesize. TODO: Better check?
+	if( iOriFileSize == g_pFullFileSystem->Size( m_szCurrentVmf ) )
+	{
+		Msg( "SaveCurrentVmf: VMF \"%s\" did not changed. Not updating BSP\n", m_szCurrentVmf );
+		return;
+	}
 
 	// Save BSP
 #ifdef WIN32
