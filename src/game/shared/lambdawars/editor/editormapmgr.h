@@ -23,6 +23,7 @@ public:
 #endif // CLIENT_DLL
 	const char *GetCurrentVmfPath();
 	bool IsMapLoaded();
+	const char *GetLastMapError();
 
 	KeyValues *VmfToKeyValues( const char *pszVmf );
 	void KeyValuesToVmf( KeyValues *pKV, CUtlBuffer &vmf );
@@ -36,6 +37,8 @@ private:
 	
 	bool BuildCurrentVmfPath( char *pszOut, int maxlen );
 
+	void LogError( const char *pErrorMsg );
+
 #ifndef CLIENT_DLL
 	void CollectNewAndUpdatedEntities( CUtlMap< int, CBaseEntity * > &updatedEntities, CUtlVector< CBaseEntity * > &newEntities );
 	bool ApplyChangesToVmfFile();
@@ -45,11 +48,18 @@ private:
 private:
 	// Path to current VMF map file being edited
 	char m_szCurrentVmf[MAX_PATH];
+	// Last error message during a map operation
+	char m_szMapError[1024];
 	// Data of VMF map file being edited
 	KeyValues *m_pKVVmf;
 	// Deleted Hammer Ids
 	CUtlVector<int> m_DeletedHammerIDs;
 };
+
+inline const char *CEditorMapMgr::GetLastMapError()
+{
+	return m_szMapError;
+}
 
 inline void CEditorMapMgr::AddDeletedHammerID( int iHammerID )
 {

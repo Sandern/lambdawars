@@ -29,6 +29,10 @@
 	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 
+#ifndef CLIENT_DLL
+#define VarArgs UTIL_VarArgs
+#endif // CLIENT_DLL
+
 #define VBSP_PATH "..\\..\\Alien Swarm\\bin\\vbsp.exe"
 
 //-----------------------------------------------------------------------------
@@ -37,6 +41,7 @@
 CEditorMapMgr::CEditorMapMgr() : m_pKVVmf(NULL)
 {
 	m_szCurrentVmf[0] = 0;
+	m_szMapError[0] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +137,7 @@ void CEditorMapMgr::LoadCurrentVmf()
 
 	if( !g_pFullFileSystem->FileExists( tmp ) )
 	{
-		Warning( "Expected file unavailable (moved, deleted): %s\n", tmp );
+		LogError( VarArgs( "Expected file unavailable (moved, deleted): %s", tmp ) );
 		return;
 	}
 
@@ -150,7 +155,7 @@ void CEditorMapMgr::SaveCurrentVmf()
 
 	if ( !g_pFullFileSystem->FileExists( m_szCurrentVmf ) )
 	{
-		Warning( "Expected file unavailable (moved, deleted).\n" );
+		LogError( "Expected file unavailable (moved, deleted)." );
 		return;
 	}
 
@@ -178,7 +183,7 @@ void CEditorMapMgr::SaveCurrentVmf()
 
 	if ( !g_pFullFileSystem->FileExists( vbspPath ) )
 	{
-		Warning( "Could not find \"%s\". Unable to update BSP.\n", vbspPath );
+		LogError( VarArgs( "Could not find \"%s\". Unable to update BSP.", vbspPath ) );
 		return;
 	}
 
@@ -240,13 +245,13 @@ static int GetMapVersion( const char *pszLevelname )
 
 	FileHandle_t f = filesystem->Open(destPath, "rb");
 	if ( f == FILESYSTEM_INVALID_HANDLE ) {
-		Warning("GetMapVersion: could not open \"%s\"\n", destPath );
+		Warning( "GetMapVersion: could not open \"%s\"\n", destPath );
 		return -1;
 	}
 	unsigned int fileSize = filesystem->Size( f );
 	if( fileSize < sizeof(BSPHeader_t) )
 	{
-		Warning("GetMapVersion: file at \"%s\" does not contain a valid bsp header\n", destPath );
+		Warning( "GetMapVersion: file at \"%s\" does not contain a valid bsp header\n", destPath );
 		filesystem->Close(f);
 		return -1;
 	}
@@ -255,7 +260,7 @@ static int GetMapVersion( const char *pszLevelname )
 	filesystem->Close(f);
 	if( header.m_nVersion < MINBSPVERSION)
 	{
-		Warning("GetMapVersion: file at \"%s\" does not fullfill minimum required bsp version %d (instead found %d)\n", destPath, MINBSPVERSION, header.m_nVersion );
+		Warning( "GetMapVersion: file at \"%s\" does not fullfill minimum required bsp version %d (instead found %d)\n", destPath, MINBSPVERSION, header.m_nVersion );
 		return -1;
 	}
 
@@ -278,8 +283,8 @@ bool CEditorMapMgr::ParseVmfFile( KeyValues *pKeyValues )
 	KeyValues *pVersionKey = m_pKVVmf->FindKey( "versioninfo" );
 	if( !pVersionKey )
 	{
+		LogError( VarArgs( "%s: Could not parse VMF. versioninfo key missing!", m_szCurrentVmf ) );
 		ClearLoadedMap();
-		Warning( "Could not parse VMF. versioninfo key missing!\n" );
 		return false;
 	}
 
@@ -291,8 +296,8 @@ bool CEditorMapMgr::ParseVmfFile( KeyValues *pKeyValues )
 	const int iMapVersion = pVersionKey->GetInt( "mapversion", -1 );
 	if( iMapVersion != iBspMapVersion )
 	{
+		LogError(  VarArgs("%s: Could not parse VMF. Map version does not match! (vmf %d != bsp %d)", m_szCurrentVmf, iMapVersion, iBspMapVersion) );
 		ClearLoadedMap();
-		Warning( "Could not parse VMF. Map version does not match! (vmf %d != bsp %d)\n", iMapVersion, iBspMapVersion );
 		return false;
 	}
 
@@ -395,7 +400,8 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 			const char *pClassname = pKey->GetString( "classname", NULL );
 			if( !pClassname || V_strcmp( pEnt->GetClassname(), pClassname ) != 0 ) 
 			{
-				Warning("CEditorMapMgr::ApplyChangesToVmfFile: Failed to apply changes to VMF file\n");
+				LogError( VarArgs( "%s: Failed to apply changes to VMF file. Class names do not match: %s != %s for updating entity with hammerid %d", 
+					m_szCurrentVmf, pEnt->GetClassname(), pClassname, iHammerID ) );
 				return false;
 			}
 
@@ -411,6 +417,10 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 			listToRemove.AddToTail( pKey );
 		}
 	}
+
+	// Start new id range
+	iHighestId++;
+	iHighestHammerId++;
 
 	// Remove deleted entities
 	FOR_EACH_VEC( listToRemove, i )
@@ -499,4 +509,13 @@ bool CEditorMapMgr::BuildCurrentVmfPath( char *pszOut, int maxlen )
 
 	V_snprintf( pszOut, maxlen, "%s", vmfPath );
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorMapMgr::LogError( const char *pErrorMsg )
+{
+	Warning("CEditorMapMgr: %s\n", pErrorMsg );
+	V_strncpy( m_szMapError, pErrorMsg, sizeof(m_szMapError) );
 }

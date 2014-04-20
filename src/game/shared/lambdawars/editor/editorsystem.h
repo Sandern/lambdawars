@@ -42,6 +42,7 @@ public:
 #endif // CLIENT_DLL
 	const char *GetCurrentVmfPath();
 	bool IsMapLoaded();
+	const char *GetLastMapError();
 
 	// Listener
 #ifndef CLIENT_DLL
@@ -210,6 +211,10 @@ inline const char *CEditorSystem::GetCurrentVmfPath()
 inline bool CEditorSystem::IsMapLoaded()
 {
 	return m_MapManager.IsMapLoaded();
+}
+inline const char *CEditorSystem::GetLastMapError()
+{
+	return m_MapManager.GetLastMapError();
 }
 // Selection
 inline void CEditorSystem::ClearSelection()

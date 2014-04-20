@@ -104,6 +104,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
         
         }
+        { //::CEditorSystem::GetLastMapError
+        
+            typedef char const * ( ::CEditorSystem::*GetLastMapError_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetLastMapError"
+                , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
+        
+        }
         { //::CEditorSystem::Init
         
             typedef bool ( ::CEditorSystem::*Init_function_type )(  ) ;
@@ -360,6 +369,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "GetEditorMode"
                 , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
+        
+        }
+        { //::CEditorSystem::GetLastMapError
+        
+            typedef char const * ( ::CEditorSystem::*GetLastMapError_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetLastMapError"
+                , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
         
         }
         { //::CEditorSystem::Init
