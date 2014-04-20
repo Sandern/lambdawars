@@ -826,7 +826,7 @@ float UnitAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 		*bIsMoving = true;
 	}
 	
-	return flReturnValue * m_fGroundSpeedModifier;
+	return flReturnValue * m_fMainPlaybackRate;
 }
 
 void UnitAnimState::SetCustomSpecificActPlaybackRate( float playbackrate )
