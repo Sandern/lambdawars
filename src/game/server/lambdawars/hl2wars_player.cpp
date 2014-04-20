@@ -159,6 +159,19 @@ void CHL2WarsPlayer::Spawn( void )
 
 	m_Local.m_iHideHUD |= HIDEHUD_UNIT;
 	SetStrategicMode( true );
+
+	// Hook spawn to a signal
+#ifdef ENABLE_PYTHON
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		// Setup dict for sending a signal
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
+		kwargs["player"] = GetPyHandle();
+		boost::python::object signal = SrcPySystem()->Get( "playerspawned", "core.signals", true );
+		SrcPySystem()->CallSignal( signal, kwargs );
+	}
+#endif // ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------

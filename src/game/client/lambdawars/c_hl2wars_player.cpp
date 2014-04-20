@@ -100,8 +100,8 @@ void C_HL2WarsPlayer::Spawn()
 		// Setup dict for sending a signal
 		boost::python::dict kwargs;
 		kwargs["sender"] = boost::python::object();
-		kwargs["client"] = GetPyHandle();
-		boost::python::object signal = SrcPySystem()->Get( "clientspawned", "core.signals", true );
+		kwargs["player"] = GetPyHandle();
+		boost::python::object signal = SrcPySystem()->Get( "playerspawned", "core.signals", true );
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
