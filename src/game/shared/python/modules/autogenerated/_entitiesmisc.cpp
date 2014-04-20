@@ -2924,41 +2924,11 @@ struct CGlobalEntityList_wrapper : CGlobalEntityList, bp::wrapper< CGlobalEntity
     
     }
 
-    virtual void OnAddEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
-        PY_OVERRIDE_CHECK( CGlobalEntityList, OnAddEntity )
-        PY_OVERRIDE_LOG( _entitiesmisc, CGlobalEntityList, OnAddEntity )
-        bp::override func_OnAddEntity = this->get_override( "OnAddEntity" );
-        if( func_OnAddEntity.ptr() != Py_None )
-            try {
-                func_OnAddEntity( boost::python::ptr(pEnt), handle );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CGlobalEntityList::OnAddEntity( pEnt, handle );
-            }
-        else
-            this->CGlobalEntityList::OnAddEntity( pEnt, handle );
-    }
-    
-    virtual void default_OnAddEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
+    void OnAddEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
         CGlobalEntityList::OnAddEntity( pEnt, handle );
     }
 
-    virtual void OnRemoveEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
-        PY_OVERRIDE_CHECK( CGlobalEntityList, OnRemoveEntity )
-        PY_OVERRIDE_LOG( _entitiesmisc, CGlobalEntityList, OnRemoveEntity )
-        bp::override func_OnRemoveEntity = this->get_override( "OnRemoveEntity" );
-        if( func_OnRemoveEntity.ptr() != Py_None )
-            try {
-                func_OnRemoveEntity( boost::python::ptr(pEnt), handle );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CGlobalEntityList::OnRemoveEntity( pEnt, handle );
-            }
-        else
-            this->CGlobalEntityList::OnRemoveEntity( pEnt, handle );
-    }
-    
-    virtual void default_OnRemoveEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
+    void OnRemoveEntity( ::IHandleEntity * pEnt, ::CBaseHandle handle ){
         CGlobalEntityList::OnRemoveEntity( pEnt, handle );
     }
 
@@ -4915,11 +4885,11 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (int ( ::CGlobalEntityList::* )(  ) )( &::CGlobalEntityList::NumberOfEntities ) )    
         .def( 
             "OnAddEntity"
-            , (void ( CGlobalEntityList_wrapper::* )( ::IHandleEntity *,::CBaseHandle ) )(&CGlobalEntityList_wrapper::default_OnAddEntity)
+            , (void ( CGlobalEntityList_wrapper::* )( ::IHandleEntity *,::CBaseHandle ) )(&CGlobalEntityList_wrapper::OnAddEntity)
             , ( bp::arg("pEnt"), bp::arg("handle") ) )    
         .def( 
             "OnRemoveEntity"
-            , (void ( CGlobalEntityList_wrapper::* )( ::IHandleEntity *,::CBaseHandle ) )(&CGlobalEntityList_wrapper::default_OnRemoveEntity)
+            , (void ( CGlobalEntityList_wrapper::* )( ::IHandleEntity *,::CBaseHandle ) )(&CGlobalEntityList_wrapper::OnRemoveEntity)
             , ( bp::arg("pEnt"), bp::arg("handle") ) )    
         .def( 
             "PostClientMessagesSent"

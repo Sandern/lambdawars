@@ -62,7 +62,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         # Client Entity List
         cls = mb.class_('CClientEntityList')
         cls.include()
-        cls.calldefs().virtuality = 'not virtual'   
+        cls.calldefs().virtuality = 'not virtual'
         cls.no_init = True
 
         cls.mem_funs().exclude()
@@ -164,6 +164,8 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         
         cls = mb.class_('CGlobalEntityList')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual'
+        cls.no_init = True
         cls.mem_funs('GetServerNetworkable').exclude()
         cls.mem_funs('GetBaseNetworkable').exclude()
         cls.mem_funs('GetBaseEntity').exclude()

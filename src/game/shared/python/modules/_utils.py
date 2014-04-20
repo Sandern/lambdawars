@@ -307,4 +307,6 @@ class Utils(SemiSharedModuleGenerator):
         else:
             self.ParseClient(mb)
       
+        # Finally apply common rules to all includes functions and classes, etc.
+        self.ApplyCommonRules(mb)
         

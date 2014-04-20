@@ -68,6 +68,15 @@ extern unsigned int g_hPythonThreadID;
 #endif
 
 //-----------------------------------------------------------------------------
+// Helper for converting IHandleEntity arguments to bp objects
+//-----------------------------------------------------------------------------
+inline boost::python::object PyEntityFromEntityHandle( IHandleEntity *pHandleEntity )
+{
+	CBaseEntity *pEnt = EntityFromEntityHandle( pHandleEntity );
+	return pEnt ? pEnt->GetPyHandle() : boost::python::object();
+}
+
+//-----------------------------------------------------------------------------
 // Global variables to some commonly used modules. This way you don't need to import
 // these modules, which saves time
 //-----------------------------------------------------------------------------

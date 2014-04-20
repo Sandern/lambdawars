@@ -145,9 +145,11 @@ class SourceModuleGenerator(ModuleGenerator):
         # Common function added for getting the "PyObject" of an entity
         mb.mem_funs('GetPySelf').exclude()
         
+        ihandleentity = mb.class_('IHandleEntity')
+        
         # All return values derived from IHandleEntity entity will be returned by value.
         # This ensures the converter is called
-        testinherit = MatcherTestInheritClass(mb.class_('IHandleEntity'))
+        testinherit = MatcherTestInheritClass(ihandleentity)
         decls = mb.calldefs(matchers.custom_matcher_t(testinherit))
         decls.call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
@@ -158,6 +160,11 @@ class SourceModuleGenerator(ModuleGenerator):
         entclasses = mb.classes(self.TestCBaseEntity)
         for entcls in entclasses:
             entcls.custom_call_trait = ent_call_trait
+            
+        # All functions receiving an IHandleEntity argument should be converted
+        def ihandleentity_call_trait(type_):
+            return 'PyEntityFromEntityHandle( %(arg)s )'
+        ihandleentity.custom_call_trait = ihandleentity_call_trait
         
         # Anything returning KeyValues should be returned by value so it calls the converter
         keyvalues = mb.class_('KeyValues')
