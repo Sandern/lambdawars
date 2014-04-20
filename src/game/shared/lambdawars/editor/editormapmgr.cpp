@@ -155,7 +155,10 @@ void CEditorMapMgr::SaveCurrentVmf()
 	}
 
 	// Save VMF
-	ApplyChangesToVmfFile();
+	if( !ApplyChangesToVmfFile() )
+	{
+		return;
+	}
 
 	CUtlBuffer buffer;
 	KeyValuesToVmf( m_pKVVmf, buffer );
@@ -358,7 +361,7 @@ void CEditorMapMgr::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, i
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorMapMgr::ApplyChangesToVmfFile()
+bool CEditorMapMgr::ApplyChangesToVmfFile()
 {
 	CUtlVector< KeyValues* > listToRemove;
 
@@ -387,8 +390,16 @@ void CEditorMapMgr::ApplyChangesToVmfFile()
 		int idx = updatedEntities.Find( iHammerID );
 		if ( idx != updatedEntities.InvalidIndex() )
 		{
-			pKey->Clear();
 			CBaseEntity *pEnt = updatedEntities[idx];
+
+			const char *pClassname = pKey->GetString( "classname", NULL );
+			if( !pClassname || V_strcmp( pEnt->GetClassname(), pClassname ) != 0 ) 
+			{
+				Warning("CEditorMapMgr::ApplyChangesToVmfFile: Failed to apply changes to VMF file\n");
+				return false;
+			}
+
+			pKey->Clear();
 			FillEntityEntry( pKey, pEnt, iTargetID, iHammerID );
 
 			// Updated, so remove from list
@@ -415,6 +426,8 @@ void CEditorMapMgr::ApplyChangesToVmfFile()
 
 		m_pKVVmf->AddSubKey( pKVNew );
 	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------

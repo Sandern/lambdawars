@@ -38,7 +38,7 @@ private:
 
 #ifndef CLIENT_DLL
 	void CollectNewAndUpdatedEntities( CUtlMap< int, CBaseEntity * > &updatedEntities, CUtlVector< CBaseEntity * > &newEntities );
-	void ApplyChangesToVmfFile();
+	bool ApplyChangesToVmfFile();
 	void FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, int iTargetID, int iHammerID );
 #endif // CLIENT_DLL
 
