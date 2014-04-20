@@ -146,6 +146,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 	m_flLastAnimationStateClearTime = 0.0f;
 
 	m_bPlayFallActInAir = true;
+	m_fMainPlaybackRate = 1.0f;
 
 	m_iMoveX = -1;
 	m_iMoveY = -1;
@@ -825,7 +826,7 @@ float UnitAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 		*bIsMoving = true;
 	}
 	
-	return flReturnValue;
+	return flReturnValue * m_fGroundSpeedModifier;
 }
 
 void UnitAnimState::SetCustomSpecificActPlaybackRate( float playbackrate )
@@ -985,7 +986,7 @@ void UnitAnimState::ComputePlaybackRate()
 	else
 	{
 		// Default to 1
-		GetOuter()->SetPlaybackRate( 1 );
+		GetOuter()->SetPlaybackRate( m_fMainPlaybackRate );
 	}
 }
 

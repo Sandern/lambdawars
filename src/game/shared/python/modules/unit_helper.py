@@ -120,6 +120,7 @@ class UnitHelper(SemiSharedModuleGenerator):
                          , cls.mem_fun('SetCustomSpecificActPlaybackRate') )
         
         cls.var('m_bPlayFallActInAir').rename('playfallactinair')
+        cls.var('m_fMainPlaybackRate').rename('mainplaybackrate')
         cls.var('m_iMoveYaw').rename('moveyaw')
         cls.var('m_iMoveX').rename('movex')
         cls.var('m_iMoveY').rename('movey')

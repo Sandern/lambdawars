@@ -1469,6 +1469,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "playermisc", &UnitAnimState::m_bPlayingMisc );
         UnitAnimState_exposer.def_readwrite( "usecombatstate", &UnitAnimState::m_bUseCombatState );
         UnitAnimState_exposer.def_readwrite( "combatstatetime", &UnitAnimState::m_fCombatStateTime );
+        UnitAnimState_exposer.def_readwrite( "mainplaybackrate", &UnitAnimState::m_fMainPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "miscplaybackrate", &UnitAnimState::m_fMiscPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "facefronttime", &UnitAnimState::m_flFaceFrontTime );
         UnitAnimState_exposer.def_readwrite( "feetyawrate", &UnitAnimState::m_flFeetYawRate );
@@ -4497,6 +4498,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "playermisc", &UnitAnimState::m_bPlayingMisc );
         UnitAnimState_exposer.def_readwrite( "usecombatstate", &UnitAnimState::m_bUseCombatState );
         UnitAnimState_exposer.def_readwrite( "combatstatetime", &UnitAnimState::m_fCombatStateTime );
+        UnitAnimState_exposer.def_readwrite( "mainplaybackrate", &UnitAnimState::m_fMainPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "miscplaybackrate", &UnitAnimState::m_fMiscPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "facefronttime", &UnitAnimState::m_flFaceFrontTime );
         UnitAnimState_exposer.def_readwrite( "feetyawrate", &UnitAnimState::m_flFeetYawRate );
@@ -5648,6 +5650,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "TestEntity"
                 , TestEntity_function_type( &::UnitBaseSense::TestEntity )
                 , ( bp::arg("pEntity") ) );
+        
+        }
+        { //::UnitBaseSense::TestFuncUnit
+        
+            typedef bool ( ::UnitBaseSense::*TestFuncUnit_function_type )( ::CFuncUnit * ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "TestFuncUnit"
+                , TestFuncUnit_function_type( &::UnitBaseSense::TestFuncUnit )
+                , ( bp::arg("pUnit") ) );
         
         }
         { //::UnitBaseSense::TestUnit

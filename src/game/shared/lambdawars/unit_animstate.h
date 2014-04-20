@@ -264,6 +264,7 @@ protected:
 
 public:
 	bool m_bPlayFallActInAir;
+	float m_fMainPlaybackRate;
 
 	// List of pose parameters
 	// These are set in the OnNewModel function
