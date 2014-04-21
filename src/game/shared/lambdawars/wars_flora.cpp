@@ -588,9 +588,8 @@ bool CWarsFlora::Initialize()
 
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
-	UpdatePartitionListEntry();
-
-	CollisionProp()->UpdatePartition();
+	//UpdatePartitionListEntry();
+	//CollisionProp()->UpdatePartition();
 
 	UpdateVisibility();
 
@@ -841,7 +840,7 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 // Purpose: Spawn function mainly intended for editor or ingame testing
 //			The editor mode, the flora entity gets synced to the editing client
 //-----------------------------------------------------------------------------
-bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle )
+bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV )
 {
 	bool bEditorManaged = EditorSystem()->IsActive();
 
@@ -858,6 +857,14 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 	pEntity->KeyValue( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
 	pEntity->KeyValue( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
 	pEntity->KeyValue( "editormanaged", bEditorManaged ? "1" : "0" );
+
+	if( pExtraKV )
+	{
+		FOR_EACH_VALUE( pExtraKV, pValue )
+		{
+			pEntity->KeyValue( pValue->GetName(), pValue->GetString() );
+		}
+	}
 
 	pEntity->GenerateFloraUUID();
 

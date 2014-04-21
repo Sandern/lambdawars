@@ -803,8 +803,8 @@ void register_CWarsFlora_class(){
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
         .def( 
             "SpawnFlora"
-            , (bool (*)( char const *,::Vector const &,::QAngle const & ))( &::CWarsFlora::SpawnFlora )
-            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle") ) )    
+            , (bool (*)( char const *,::Vector const &,::QAngle const &,::KeyValues * ))( &::CWarsFlora::SpawnFlora )
+            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle"), bp::arg("pExtraKV")=bp::object() ) )    
         .def( 
             "Activate"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
