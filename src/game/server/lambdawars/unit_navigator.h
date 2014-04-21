@@ -582,7 +582,9 @@ protected:
 	};
 	CUtlVector<seed_entry_t> m_Seeds;
 
-	Vector m_vLastDirection;
+	Vector m_vBlockingDirection;
+	int m_iBlockResolveDirection;
+	float m_fNextChooseDirection;
 
 private:
 	// =============================

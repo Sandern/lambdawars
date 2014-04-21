@@ -19,26 +19,18 @@ void OnDensityConVarChanged( IConVar *var, const char *pOldValue, float flOldVal
 	CBaseEntity *pEnt = gEntList.FirstEnt();
 	while( pEnt )
 	{
-		const Vector& vMins = pEnt->CollisionProp()->OBBMins();
-		const Vector& vMaxs = pEnt->CollisionProp()->OBBMaxs();
-		pEnt->DensityMap()->RecalculateWeights(vMins, vMaxs);
+		pEnt->DensityMap()->Clear();
+		pEnt->DensityMap()->OnCollisionSizeChanged();
 
-		//pEnt->DensityMap()->OnCollisionSizeChanged();
 		pEnt = gEntList.NextEnt( pEnt );
 	}
 }
 #endif // CLIENT_DLL
 
 #ifndef CLIENT_DLL
-	ConVar unit_density_tile_res("unit_density_tile_res", "8", FCVAR_REPLICATED, "Change density tile res", OnDensityConVarChanged);
-
-	ConVar unit_density_eclipse_tile_res("unit_density_eclipse_tile_res", "32", FCVAR_REPLICATED, "Change eclipse density tile res", OnDensityConVarChanged);
 	ConVar unit_density_eclipse_inside_scale("unit_density_eclipse_inside_scale", "5", FCVAR_REPLICATED, "Change sigma", OnDensityConVarChanged);
 	ConVar unit_density_eclipse_sigma_scale("unit_density_eclipse_sigma_scale", "0.3", FCVAR_REPLICATED, "Change sigma", OnDensityConVarChanged);
 #else
-	ConVar unit_density_tile_res("unit_density_tile_res", "8", FCVAR_REPLICATED, "Change density tile res");
-
-	ConVar unit_density_eclipse_tile_res("unit_density_eclipse_tile_res", "32", FCVAR_REPLICATED, "Change eclipse density tile res");
 	ConVar unit_density_eclipse_inside_scale("unit_density_eclipse_inside_scale", "5", FCVAR_REPLICATED, "Change sigma");
 	ConVar unit_density_eclipse_sigma_scale("unit_density_eclipse_sigma_scale", "0.3", FCVAR_REPLICATED, "Change sigma");
 #endif // CLIENT_DLL
@@ -126,24 +118,32 @@ float DensityWeightsMap::Get( const Vector &vPos )
 			return 0.0f;
 		}
 		break;
+	case DENSITY_GAUSSIANECLIPSE:
+		{
+			vTranslated = vPos - m_pOuter->GetAbsOrigin();
+			VectorYawRotate(vTranslated, -m_pOuter->GetAbsAngles()[YAW], vTranslated);
+			x =  ((vTranslated.x + m_fXOffset) / MAP_TILE_SIZE) + m_iHalfSizeX;
+			y =  ((vTranslated.y + m_fYOffset) / MAP_TILE_SIZE) + m_iHalfSizeY;	
+		}
+		break;
 	case DENSITY_GAUSSIAN:
 	default:
 		{
-			x =  ((vPos.x - m_pOuter->GetAbsOrigin().x)/MAP_TILE_SIZE) + m_iHalfSizeX;
-			y =  ((vPos.y - m_pOuter->GetAbsOrigin().y)/MAP_TILE_SIZE) + m_iHalfSizeY;
+			x =  ((vPos.x - m_pOuter->GetAbsOrigin().x) / MAP_TILE_SIZE) + m_iHalfSizeX;
+			y =  ((vPos.y - m_pOuter->GetAbsOrigin().y) / MAP_TILE_SIZE) + m_iHalfSizeY;
 		}
 		break;
 	};
 
-	xlow = floor(x);
-	xhigh = ceil(x);
-	ylow = floor(y);
-	yhigh = ceil(y);
+	xlow = floor( x );
+	xhigh = ceil( x );
+	ylow = floor( y );
+	yhigh = ceil( y );
 
 	if( xlow < 0 || ylow < 0 || xhigh >= m_iSizeX || yhigh >= m_iSizeY )
 		return 0.0f;
 
-	return Lerp<float>(sqrt(pow(x - xlow, 2) + pow(y - ylow, 2)), m_pWeights[xlow][ylow], m_pWeights[xhigh][yhigh]);
+	return Lerp<float>( sqrt(pow(x - xlow, 2) + pow(y - ylow, 2)), m_pWeights[xlow][ylow], m_pWeights[xhigh][yhigh]) ;
 #else
 	// Read out density for the given position
 	// If outside our field, return zero (too far away).
@@ -159,8 +159,8 @@ float DensityWeightsMap::Get( const Vector &vPos )
 		{
 			vTranslated = vPos - m_pOuter->GetAbsOrigin();
 			VectorYawRotate(vTranslated, -m_pOuter->GetAbsAngles()[YAW], vTranslated);
-			x =  (int)floor(((vTranslated.x + m_fXOffset)/unit_density_eclipse_tile_res.GetFloat()) + m_iHalfSizeX + 0.5f);
-			y =  (int)floor(((vTranslated.y + m_fYOffset)/unit_density_eclipse_tile_res.GetFloat()) + m_iHalfSizeY + 0.5f);	
+			x =  (int)floor(((vTranslated.x + m_fXOffset)/MAP_TILE_SIZE) + m_iHalfSizeX + 0.5f);
+			y =  (int)floor(((vTranslated.y + m_fYOffset)/MAP_TILE_SIZE) + m_iHalfSizeY + 0.5f);	
 		}
 		break;
 	case DENSITY_GAUSSIAN:
@@ -228,23 +228,23 @@ void DensityWeightsMap::FillGaussian()
 
 	Assert( m_iSizeX > 0 && m_iSizeY > 0 && m_iSizeX < MAX_COORD_INTEGER && m_iSizeY < MAX_COORD_INTEGER );
 
-	//Msg("Mins: %f %f %f, Maxs: %f %f %f\n", m_vMins.x, m_vMins.y, m_vMins.z, m_vMaxs.x, m_vMaxs.y, m_vMaxs.z);
-	//Msg("%s Radius: %f, Sigma: %f, halfsize: %d %d, size: %d %d\n", m_pOuter->GetClassname(), m_pOuter->CollisionProp()->BoundingRadius2D(), fSigma, m_iHalfSizeX, m_iHalfSizeY, m_iSizeX, m_iSizeY);
+	//DevMsg("Mins: %f %f %f, Maxs: %f %f %f\n", m_vMins.x, m_vMins.y, m_vMins.z, m_vMaxs.x, m_vMaxs.y, m_vMaxs.z);
+	//DevMsg("%s Radius: %f, Sigma: %f, halfsize: %d %d, size: %d %d\n", m_pOuter->GetClassname(), m_pOuter->CollisionProp()->BoundingRadius2D(), fSigma, m_iHalfSizeX, m_iHalfSizeY, m_iSizeX, m_iSizeY);
 
 	// Allocate the grid
-	m_pWeights = (float **)malloc(m_iSizeX*sizeof(float*));
+	m_pWeights = (float **)malloc( m_iSizeX*sizeof(float*) );
 	for(i=0; i<m_iSizeX; i++)
 	{
-		m_pWeights[i] = (float *)malloc(m_iSizeY*sizeof(float));
+		m_pWeights[i] = (float *)malloc( m_iSizeY*sizeof(float) );
 	}
 
 	// Calculate the weights
-	for(i=0; i<m_iSizeX; i++)
+	for( i = 0; i < m_iSizeX; i++ )
 	{
-		for(j=0; j<m_iSizeY; j++)
+		for( j = 0; j < m_iSizeY; j++ )
 		{
-			x = (i-m_iHalfSizeX)*MAP_TILE_SIZE;
-			y = (j-m_iHalfSizeY)*MAP_TILE_SIZE;
+			x = ( i-m_iHalfSizeX ) * MAP_TILE_SIZE;
+			y = ( j-m_iHalfSizeY ) * MAP_TILE_SIZE;
 			m_pWeights[i][j] = exp( -(((x*x) + (y*y))/(2.0f*(fSigma*fSigma))) );
 		}
 	}
@@ -253,11 +253,11 @@ void DensityWeightsMap::FillGaussian()
 float gaussian2d_ellipse(float x, float y, float theta, float sigmax, float sigmay)
 {
 	float xm, ym, u;
-	theta = (theta/180.0f)/M_PI;
-	xm = x*cos(theta) - y*sin(theta);
-	ym = x*sin(theta) - y*cos(theta);
-	u = pow(xm/sigmax, 2) + pow(ym/sigmay, 2);
-	return exp(-u/2);
+	theta = ( theta / 180.0f ) / M_PI;
+	xm = x * cos( theta ) - y * sin( theta );
+	ym = x * sin( theta ) - y * cos( theta );
+	u = pow( xm/sigmax, 2 ) + pow( ym/sigmay, 2 );
+	return exp( -u/2 );
 }
 
 //-----------------------------------------------------------------------------
@@ -272,42 +272,42 @@ void DensityWeightsMap::FillGaussianEclipse()
 	float xoffset, yoffset;
 
 	// Calculate parameters
-	xhsize = (m_vMaxs.x - m_vMins.x)/2.0f;
-	yhsize = (m_vMaxs.y - m_vMins.y)/2.0f;
+	xhsize = (m_vMaxs.x - m_vMins.x) / 2.0f;
+	yhsize = (m_vMaxs.y - m_vMins.y) / 2.0f;
 	xoffset = m_vMins.x + xhsize;
 	yoffset = m_vMins.y + yhsize;
 	m_fXOffset = xoffset;
 	m_fYOffset = yoffset;
 
-	sigmax = xhsize*unit_density_eclipse_sigma_scale.GetFloat();//0.37f;
-	sigmay = yhsize*unit_density_eclipse_sigma_scale.GetFloat();//0.37f;
+	sigmax = xhsize*unit_density_eclipse_sigma_scale.GetFloat();
+	sigmay = yhsize*unit_density_eclipse_sigma_scale.GetFloat();
 
 	// Allocate
-	float fMultiple = 32.0/unit_density_eclipse_tile_res.GetFloat();
+	float fMultiple = 32.0/MAP_TILE_SIZE;
 	m_iHalfSizeX = (int)(xhsize*fMultiple);
 	m_iHalfSizeY = (int)(yhsize*fMultiple);
 	m_iSizeX = m_iHalfSizeX*2+1;
 	m_iSizeY = m_iHalfSizeY*2+1;
 
-	//Msg("Mins: %f %f %f, Maxs: %f %f %f\n", m_vMins.x, m_vMins.y, m_vMins.z, m_vMaxs.x, m_vMaxs.y, m_vMaxs.z);
-	//Msg("halfsize: %d %d, size: %d %d. Sigmax: %f, Sigmay: %f, xoffset: %f, yoffset: %f\n", m_iHalfSizeX, m_iHalfSizeY, m_iSizeX, m_iSizeY, sigmax, sigmay, xoffset, yoffset);
+	//DevMsg("Mins: %f %f %f, Maxs: %f %f %f\n", m_vMins.x, m_vMins.y, m_vMins.z, m_vMaxs.x, m_vMaxs.y, m_vMaxs.z);
+	//DevMsg("halfsize: %d %d, size: %d %d. Sigmax: %f, Sigmay: %f, xoffset: %f, yoffset: %f\n", m_iHalfSizeX, m_iHalfSizeY, m_iSizeX, m_iSizeY, sigmax, sigmay, xoffset, yoffset);
 
-	m_pWeights = (float **)malloc(m_iSizeX*sizeof(float*));
-	for(i=0; i<m_iSizeX; i++)
+	m_pWeights = (float **)malloc( m_iSizeX*sizeof(float*) );
+	for( i = 0; i < m_iSizeX; i++)
 	{
-		m_pWeights[i] = (float *)malloc(m_iSizeY*sizeof(float));
+		m_pWeights[i] = (float *)malloc( m_iSizeY*sizeof(float) );
 	}
 
 	// Fill
-	for(i=0; i<m_iSizeX; i++)
+	for( i = 0; i < m_iSizeX; i++ )
 	{
-		for(j=0; j<m_iSizeY; j++)
+		for( j = 0; j < m_iSizeY; j++ )
 		{
-			x = (i-m_iHalfSizeX)*unit_density_eclipse_tile_res.GetFloat() - xoffset;
-			y = (j-m_iHalfSizeY)*unit_density_eclipse_tile_res.GetFloat() - yoffset;
+			x = ( i - m_iHalfSizeX ) * MAP_TILE_SIZE - xoffset;
+			y = ( j - m_iHalfSizeY ) * MAP_TILE_SIZE - yoffset;
 
 			#define BLOAT -2.0f
-			if( x-BLOAT > m_vMins.x && x+BLOAT < m_vMaxs.x && y-BLOAT > m_vMins.y && y+BLOAT < m_vMaxs.y )
+			if( x - BLOAT > m_vMins.x && x + BLOAT < m_vMaxs.x && y - BLOAT > m_vMins.y && y + BLOAT < m_vMaxs.y )
 				m_pWeights[i][j]= 1.0f - (fabs(x)/(xhsize*unit_density_eclipse_inside_scale.GetFloat())) - 
 				(fabs(y)/(yhsize*unit_density_eclipse_inside_scale.GetFloat()));
 			else

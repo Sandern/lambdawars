@@ -76,7 +76,7 @@ ConVar unit_dens_all_nomove("unit_dens_all_nomove", "0.5");
 
 ConVar unit_cost_distweight("unit_cost_distweight", "1.0");
 ConVar unit_cost_timeweight("unit_cost_timeweight", "1.0");
-ConVar unit_cost_lastdirweight("unit_cost_lastdirweight", "24.0");
+ConVar unit_cost_blockdirweight("unit_cost_blockdirweight", "75.0");
 ConVar unit_cost_discomfortweight_start("unit_cost_discomfortweight_start", "1.0");
 ConVar unit_cost_discomfortweight_growthreshold("unit_cost_discomfortweight_growthreshold", "0.05");
 ConVar unit_cost_discomfortweight_growrate("unit_cost_discomfortweight_growrate", "500.0");
@@ -211,7 +211,6 @@ void UnitBaseNavigator::Reset()
 	m_bNoPathVelocity = false;
 	m_fIgnoreNavMeshTime = 0.0f;
 	m_bNoNavAreasNearby = true; // Reset, so we ignore nav meshes until we found a valid area again
-	m_vLastDirection = vec3_origin;
 
 	m_vLastWishVelocity.Init(0, 0, 0);
 
@@ -225,6 +224,9 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastBestDensity = 0.0f;
 	m_fDiscomfortWeight = unit_cost_discomfortweight_start.GetFloat();
+
+	m_iBlockResolveDirection = 1;
+	m_fNextChooseDirection = 0;
 
 	m_hAtGoalDependencyEnt = NULL;
 }
@@ -623,7 +625,7 @@ void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
 	CBaseEntity *pList[CONSIDER_SIZE];
 
 	const Vector &origin = GetAbsOrigin();
-	fRadius = GetEntityBoundingRadius(m_pOuter);
+	fRadius = GetEntityBoundingRadius( m_pOuter );
 
 	// Detect nearby entities
 	m_iConsiderSize = 0;
@@ -634,8 +636,10 @@ void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
 	//n = UTIL_EntitiesAlongRay( pList, CONSIDER_SIZE, ray, 0 );
 	n = UTIL_EntitiesInSphere( pList, CONSIDER_SIZE, origin, fBoxHalf, 0 );
 
+	m_vBlockingDirection = vec3_origin;
+
 	// Generate list of entities we want to consider
-	for( i=0; i<n; i++ )
+	for( i = 0; i < n; i++ )
 	{
 		pEnt = pList[i];
 
@@ -674,6 +678,16 @@ void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
 		// Store general info
 		m_ConsiderList[m_iConsiderSize].m_pEnt = pEnt;
 		m_iConsiderSize++;
+
+		Vector vBlockDir = pEnt->GetAbsOrigin() - GetAbsOrigin();
+		m_vBlockingDirection += (1/vBlockDir.Length2D()) * vBlockDir;
+	}
+
+	if( m_iConsiderSize > 0 )
+	{
+		m_vBlockingDirection /= m_iConsiderSize;
+		VectorNormalize( m_vBlockingDirection );
+		m_vBlockingDirection = m_vBlockingDirection.Cross( Vector(0, 0, 1) );
 	}
 }
 
@@ -1009,13 +1023,21 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// Return weighted cost based on the following parameters:
 	// 1. The new distance to the next waypoint when going in this direction
 	// 2. The disconform the unit feels due the density in the tested direction
-	// 3. The change in direction from the last direction we went. We slightly prefer to keep going in 
-	//	  the same direction as the last time (otherwise we might ping pong back and forth between two spots)
-	//	  Only if blocked a little.
+	// 3. The "free" non blocked directions
 	float cost = ( unit_cost_distweight.GetFloat() * fDist ) + 
 			 ( m_fDiscomfortWeight * fDensity );
-	if( GetBlockedStatus() >= BS_LITTLE )
-		cost += (vFinalVelocity.Normalized() - m_vLastDirection).Length2D() * unit_cost_lastdirweight.GetFloat();
+	if( m_vBlockingDirection != vec3_origin )
+	{
+		if( m_fNextChooseDirection < gpGlobals->curtime )
+		{
+			//float fDist1 = (vFinalVelocity.Normalized() - m_vBlockingDirection).Length2D();
+			//float fDist2  = (vFinalVelocity.Normalized() + m_vBlockingDirection).Length2D();
+			m_iBlockResolveDirection = random->RandomInt(0, 1) > 0 ? 1 : -1;
+			m_fNextChooseDirection = gpGlobals->curtime + 5.0f;
+		}
+
+		cost += (vFinalVelocity.Normalized() - (m_vBlockingDirection * m_iBlockResolveDirection)).Length2D() * unit_cost_blockdirweight.GetFloat();
+	}
 	return cost;
 }
 
@@ -1100,12 +1122,12 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		if( m_fLastBestDensity > unit_cost_discomfortweight_growthreshold.GetFloat() )
 		{
 			m_fDiscomfortWeight = Min( m_fDiscomfortWeight+MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
-									   unit_cost_discomfortweight_max.GetFloat() );
+										unit_cost_discomfortweight_max.GetFloat() );
 		}
 		else
 		{
 			m_fDiscomfortWeight = Max( m_fDiscomfortWeight-MoveCommand.interval * unit_cost_discomfortweight_growrate.GetFloat(),
-									   unit_cost_discomfortweight_start.GetFloat() );
+										unit_cost_discomfortweight_start.GetFloat() );
 		}
 	}
 
@@ -1115,8 +1137,6 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 		m_fDebugLastBestCost = fBestCost;
 		m_DebugLastMoveCommand = MoveCommand;
 	}
-
-	m_vLastDirection = vBestVel.Normalized();
 
 	return vBestVel;
 }
@@ -1337,7 +1357,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(1.0f, 2.0f);
 			}
 
-			if( GetBlockedStatus() > BS_LITTLE )
+			if( GetBlockedStatus() >= BS_LITTLE )
 			{
 				// Apparently we are stuck, so try to add a seed that serves as density point
 				for( int i = 0; i < MoveCommand.blockers.Count(); i++ )
@@ -2953,6 +2973,12 @@ void UnitBaseNavigator::DrawDebugInfo()
 	// Draw velocities
 	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vDebugVelocity, 
 						4.0f, 0, 0, 255, 200, true, 0);
+
+	// Draw out blocking direction
+	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vBlockingDirection * 64.0, 
+						4.0f, 0, 255, 0, 200, true, 0);
+	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + -m_vBlockingDirection * 64.0, 
+						4.0f, 0, 255, 0, 200, true, 0);
 
 	m_pOuter->EntityText( 0, UTIL_VarArgs("BestCost: %f\n", m_fDebugLastBestCost), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 1, UTIL_VarArgs("FinalVel: %f %f %f ( %f )\n", m_vDebugVelocity.x, m_vDebugVelocity.y, m_vDebugVelocity.z, m_vDebugVelocity.Length2D()), 0, 255, 0, 0, 255 );

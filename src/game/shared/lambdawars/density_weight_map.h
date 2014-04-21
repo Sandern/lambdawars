@@ -24,6 +24,7 @@ public:
 
 	void Init( CBaseEntity *pOuter );
 	void Destroy();
+	void Clear();
 	void SetType( int iType );
 	int GetType();
 	void OnCollisionSizeChanged();
@@ -47,6 +48,12 @@ private:
 	int m_iHalfSizeX, m_iHalfSizeY;
 	float m_fXOffset, m_fYOffset;
 };
+
+inline void DensityWeightsMap::Clear()
+{
+	m_vMins = vec3_origin;
+	m_vMaxs = vec3_origin;
+}
 
 inline int DensityWeightsMap::GetType()
 {
