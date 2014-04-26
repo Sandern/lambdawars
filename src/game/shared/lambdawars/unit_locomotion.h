@@ -84,9 +84,18 @@ public:
 	float yawspeed;
 
 	// Helper functions for testing blockers
+	bool HasAnyBlocker();
 	bool HasBlocker( CBaseEntity *blocker );
 	bool HasBlockerWithOwnerEntity( CBaseEntity *blocker );
 };
+
+//-----------------------------------------------------------------------------
+// Purpose: Tests if the unit has any blockers
+//-----------------------------------------------------------------------------
+inline bool UnitBaseMoveCommand::HasAnyBlocker()
+{
+	return blockers.Count() > 0;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Tests if the blockers list contains the tested entity

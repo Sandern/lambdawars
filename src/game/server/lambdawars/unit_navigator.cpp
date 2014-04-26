@@ -347,7 +347,7 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		vPathDir = m_vForceGoalVelocity;
 		fWaypointDist = VectorNormalize( vPathDir ) + 1000.0f;
 		GoalStatus = CHS_HASGOAL;
-		RegenerateConsiderList( vPathDir, GoalStatus );
+		RegenerateConsiderList( MoveCommand, vPathDir, GoalStatus );
 	}
 	else
 	{
@@ -605,11 +605,11 @@ float UnitBaseNavigator::GetDensityMultiplier()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatus_t GoalStatus  )
+void UnitBaseNavigator::RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus  )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::RegenerateConsiderList", VPROF_BUDGETGROUP_UNITS );
 
-	CollectConsiderEntities( GoalStatus );
+	CollectConsiderEntities( MoveCommand, GoalStatus );
 	ComputeConsiderDensAndDirs( vPathDir, GoalStatus );
 }
 
@@ -617,7 +617,7 @@ void UnitBaseNavigator::RegenerateConsiderList( Vector &vPathDir, CheckGoalStatu
 // Purpose: Generates a list of surrounding entities, potentially blocking
 //			the unit.
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
+void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus )
 {
 	int n, i;
 	float fRadius;
@@ -679,11 +679,14 @@ void UnitBaseNavigator::CollectConsiderEntities( CheckGoalStatus_t GoalStatus )
 		m_ConsiderList[m_iConsiderSize].m_pEnt = pEnt;
 		m_iConsiderSize++;
 
-		Vector vBlockDir = pEnt->GetAbsOrigin() - GetAbsOrigin();
-		m_vBlockingDirection += (1/vBlockDir.Length2D()) * vBlockDir;
+		if( MoveCommand.HasBlocker( pEnt ) )
+		{
+			Vector vBlockDir = pEnt->GetAbsOrigin() - GetAbsOrigin();
+			m_vBlockingDirection += (1/vBlockDir.Length2D()) * vBlockDir;
+		}
 	}
 
-	if( m_iConsiderSize > 0 )
+	if( MoveCommand.HasAnyBlocker() )
 	{
 		m_vBlockingDirection /= m_iConsiderSize;
 		VectorNormalize( m_vBlockingDirection );
@@ -1271,7 +1274,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		{
 			if( m_fGoalDistance < GetPath()->m_fAtGoalTolerance )
 			{
-				RegenerateConsiderList( vPathDir, CHS_ATGOAL );
+				RegenerateConsiderList( MoveCommand, vPathDir, CHS_ATGOAL );
 				return CHS_ATGOAL;
 			}
 		}
@@ -1374,7 +1377,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 	// Generate a list of entities surrounding us
 	// Do this right after updating our path, so we use the correct waypoints
-	RegenerateConsiderList( vPathDir, GoalStatus );
+	RegenerateConsiderList( MoveCommand, vPathDir, GoalStatus );
 
 	if( GoalStatus != CHS_NOGOAL )
 	{
@@ -1640,10 +1643,16 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		// Use full tolerance when blocked a bit and we have a blocker unit
 		// Otherwise use waypoint tolerance (so we get as close as possible)
 		float tolerance;
-		if( GetBlockedStatus() > BS_NONE && MoveCommand.blockers.Count() > 0 && MoveCommand.blockers[0].blocker && MoveCommand.blockers[0].blocker->IsUnit() && MoveCommand.blockers[0].blocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
+		if( GetBlockedStatus() > BS_LITTLE && MoveCommand.blockers.Count() > 0 && 
+				MoveCommand.blockers[0].blocker && MoveCommand.blockers[0].blocker->IsUnit() && 
+				MoveCommand.blockers[0].blocker->GetAbsVelocity().LengthSqr() < 16.0f * 16.0f )
+		{
 			tolerance = Max( GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance );
+		}
 		else
+		{
 			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
+		}
 
 		if( waypointDist <= Min(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
 		{
