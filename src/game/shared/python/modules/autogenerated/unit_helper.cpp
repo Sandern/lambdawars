@@ -581,6 +581,9 @@ BOOST_PYTHON_MODULE(unit_helper){
             "Clear"
             , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
         .def( 
+            "HasAnyBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::HasAnyBlocker ) )    
+        .def( 
             "HasBlocker"
             , (bool ( ::UnitBaseMoveCommand::* )( ::C_BaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
             , ( bp::arg("blocker") ) )    
@@ -3610,6 +3613,9 @@ BOOST_PYTHON_MODULE(unit_helper){
             "Clear"
             , (void ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::Clear ) )    
         .def( 
+            "HasAnyBlocker"
+            , (bool ( ::UnitBaseMoveCommand::* )(  ) )( &::UnitBaseMoveCommand::HasAnyBlocker ) )    
+        .def( 
             "HasBlocker"
             , (bool ( ::UnitBaseMoveCommand::* )( ::CBaseEntity * ) )( &::UnitBaseMoveCommand::HasBlocker )
             , ( bp::arg("blocker") ) )    
@@ -5174,12 +5180,12 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseNavigator::RegenerateConsiderList
         
-            typedef void ( ::UnitBaseNavigator::*RegenerateConsiderList_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            typedef void ( ::UnitBaseNavigator::*RegenerateConsiderList_function_type )( ::UnitBaseMoveCommand &,::Vector &,::CheckGoalStatus_t ) ;
             
             UnitBaseNavigator_exposer.def( 
                 "RegenerateConsiderList"
                 , RegenerateConsiderList_function_type( &::UnitBaseNavigator::RegenerateConsiderList )
-                , ( bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
+                , ( bp::arg("MoveCommand"), bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
         
         }
         { //::UnitBaseNavigator::Reset

@@ -9,10 +9,6 @@ class SrcBuiltins(SharedModuleGenerator):
     files = [
         'cbase.h',
         'srcpy_srcbuiltins.h',
-        #'Color.h',
-        #'globalvars_base.h',
-        #'edict.h',
-        #'tier0\basetypes.h',
     ]
     
     def Parse(self, mb):
@@ -56,7 +52,7 @@ class SrcBuiltins(SharedModuleGenerator):
         cls = mb.class_('color32_s')
         cls.include()
         cls.rename('color32')
-        cls.mem_funs().exclude()
+        cls.mem_funs(allow_empty=True).exclude()
         
         if self.settings.branch == 'swarm':
             # Used by GetRenderColor in Swarm branch

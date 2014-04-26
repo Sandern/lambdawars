@@ -23,9 +23,9 @@
 #include "beam_shared.h"
 #include "basecombatweapon_shared.h"
 #include "c_playerresource.h"
+#include "c_breakableprop.h"
 #include "c_basetoggle.h"
 #include "c_triggers.h"
-#include "c_breakableprop.h"
 
 #ifdef HL2WARS_DLL
 #include "c_hl2wars_player.h"
@@ -52,9 +52,9 @@ EXTERN_RECV_TABLE( DT_BaseProjectile );
 EXTERN_RECV_TABLE( DT_BaseGrenade );
 EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
 EXTERN_RECV_TABLE( DT_PlayerResource );
+EXTERN_RECV_TABLE( DT_BreakableProp );
 EXTERN_RECV_TABLE( DT_BaseToggle );
 EXTERN_RECV_TABLE( DT_BaseTrigger );
-EXTERN_RECV_TABLE( DT_BreakableProp );
 EXTERN_RECV_TABLE( DT_Sprite );
 EXTERN_RECV_TABLE( DT_SmokeTrail );
 EXTERN_RECV_TABLE( DT_Beam );
@@ -92,9 +92,9 @@ IMPLEMENT_FALLBACK_FACTORY(C_BaseProjectile)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseGrenade)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatWeapon)
 IMPLEMENT_FALLBACK_FACTORY(C_PlayerResource)
+IMPLEMENT_FALLBACK_FACTORY(C_BreakableProp)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseToggle)
 IMPLEMENT_FALLBACK_FACTORY(C_BaseTrigger)
-IMPLEMENT_FALLBACK_FACTORY(C_BreakableProp)
 IMPLEMENT_FALLBACK_FACTORY(C_Sprite)
 IMPLEMENT_FALLBACK_FACTORY(C_SmokeTrail)
 IMPLEMENT_FALLBACK_FACTORY(C_Beam)
@@ -142,14 +142,14 @@ void SetupClientClassRecv( PyClientClassBase *p, int iType  )
 	case PN_PLAYERRESOURCE:
 		p->m_pRecvTable = &(DT_PlayerResource::g_RecvTable);
 		break;
+	case PN_BREAKABLEPROP:
+		p->m_pRecvTable = &(DT_BreakableProp::g_RecvTable);
+		break;
 	case PN_BASETOGGLE:
 		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
 		break;
 	case PN_BASETRIGGER:
 		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
-		break;
-	case PN_BREAKABLEPROP:
-		p->m_pRecvTable = &(DT_BreakableProp::g_RecvTable);
 		break;
 	case PN_SPRITE:
 		p->m_pRecvTable = &(DT_Sprite::g_RecvTable);
@@ -259,14 +259,14 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 		case PN_BASECOMBATWEAPON:
 			pResult = CALL_FALLBACK_FACTORY( C_BaseCombatWeapon, entnum, serialNum );
 			break;
+		case PN_BREAKABLEPROP:
+			pResult = CALL_FALLBACK_FACTORY( C_BreakableProp, entnum, serialNum );
+			break;
 		case PN_BASETOGGLE:
 			pResult = CALL_FALLBACK_FACTORY( C_BaseToggle, entnum, serialNum );
 			break;
 		case PN_BASETRIGGER:
 			pResult = CALL_FALLBACK_FACTORY( C_BaseTrigger, entnum, serialNum );
-			break;
-		case PN_BREAKABLEPROP:
-			pResult = CALL_FALLBACK_FACTORY( C_BreakableProp, entnum, serialNum );
 			break;
 		case PN_UNITBASE:
 			pResult = CALL_FALLBACK_FACTORY( C_UnitBase, entnum, serialNum );

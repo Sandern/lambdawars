@@ -222,10 +222,10 @@ class Entities(SemiSharedModuleGenerator):
         'C_BaseGrenade',
         'C_BasePlayer',
         'C_PlayerResource',
+        'C_BreakableProp',
         'C_BaseToggle',
         'C_BaseTrigger',
         'C_FuncBrush',
-        'C_BreakableProp',
         
         # Effects
         'C_Sprite',

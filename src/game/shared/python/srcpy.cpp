@@ -345,6 +345,7 @@ bool CSrcPython::InitInterpreter( void )
 		Py_OptimizeFlag = 1;
 #endif // _DEBUG
 
+#if PY_VERSION_HEX < 0x03000000
 	// Python 3 warnings
 	const bool bPy3kWarnings = CommandLine() && CommandLine()->FindParm("-py3kwarnings") != 0;
 	if( bPy3kWarnings )
@@ -353,6 +354,7 @@ bool CSrcPython::InitInterpreter( void )
 		Py_BytesWarningFlag = 1;
 		//Py_HashRandomizationFlag = 1;
 	}
+#endif 
 
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
