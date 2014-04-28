@@ -637,6 +637,7 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 	n = UTIL_EntitiesInSphere( pList, CONSIDER_SIZE, origin, fBoxHalf, 0 );
 
 	m_vBlockingDirection = vec3_origin;
+	int iNumBlockers = 0;
 
 	// Generate list of entities we want to consider
 	for( i = 0; i < n; i++ )
@@ -682,13 +683,15 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 		if( MoveCommand.HasBlocker( pEnt ) )
 		{
 			Vector vBlockDir = pEnt->GetAbsOrigin() - GetAbsOrigin();
+			vBlockDir.z = 0;
 			m_vBlockingDirection += (1/vBlockDir.Length2D()) * vBlockDir;
+			iNumBlockers += 1;
 		}
 	}
 
-	if( MoveCommand.HasAnyBlocker() )
+	if( iNumBlockers > 0 )
 	{
-		m_vBlockingDirection /= m_iConsiderSize;
+		m_vBlockingDirection /= iNumBlockers;
 		VectorNormalize( m_vBlockingDirection );
 		m_vBlockingDirection = m_vBlockingDirection.Cross( Vector(0, 0, 1) );
 	}
@@ -2989,12 +2992,16 @@ void UnitBaseNavigator::DrawDebugInfo()
 	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + -m_vBlockingDirection * 64.0, 
 						4.0f, 0, 255, 0, 200, true, 0);
 
-	m_pOuter->EntityText( 0, UTIL_VarArgs("BestCost: %f\n", m_fDebugLastBestCost), 0, 255, 0, 0, 255 );
-	m_pOuter->EntityText( 1, UTIL_VarArgs("FinalVel: %f %f %f ( %f )\n", m_vDebugVelocity.x, m_vDebugVelocity.y, m_vDebugVelocity.z, m_vDebugVelocity.Length2D()), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 0, UTIL_VarArgs("BestCost: %.2f\n", m_fDebugLastBestCost), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 1, UTIL_VarArgs("FinalVel: %.2f %.2f %.2f ( %.2f )\n", 
+		m_vDebugVelocity.x, m_vDebugVelocity.y, m_vDebugVelocity.z, m_vDebugVelocity.Length2D()), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 2, UTIL_VarArgs("Density: %f\n", m_fLastBestDensity), 0, 255, 0, 0, 255 );
-	m_pOuter->EntityText( 3, UTIL_VarArgs("BoundingRadius: %f\n", GetEntityBoundingRadius(m_pOuter)), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 3, UTIL_VarArgs("BoundingRadius: %.2f\n", GetEntityBoundingRadius(m_pOuter)), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 4, UTIL_VarArgs("Threshold: %f\n", THRESHOLD), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 5, UTIL_VarArgs("DiscomfortWeight: %f\n", m_fDiscomfortWeight), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 6, UTIL_VarArgs("m_BlockedStatus: %d\n", m_BlockedStatus), 0, 255, 0, 0, 255 );
 	m_pOuter->EntityText( 7, UTIL_VarArgs("m_GoalStatus: %d\n", m_LastGoalStatus), 0, 255, 0, 0, 255 );
+	m_pOuter->EntityText( 7, UTIL_VarArgs("m_vBlockingDirection: %.2f %.2f %.2f (%.2f)\n", 
+		m_vBlockingDirection.x, m_vBlockingDirection.y, m_vBlockingDirection.z, m_vBlockingDirection.Length()), 0, 255, 0, 0, 255 );
+	
 }
