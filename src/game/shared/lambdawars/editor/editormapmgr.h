@@ -54,6 +54,8 @@ private:
 	KeyValues *m_pKVVmf;
 	// Deleted Hammer Ids
 	CUtlVector<int> m_DeletedHammerIDs;
+	// Visgroup flora
+	int m_iFloraVisGroupId;
 };
 
 inline const char *CEditorMapMgr::GetLastMapError()

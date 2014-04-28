@@ -591,8 +591,8 @@ void register_CWarsFlora_class(){
             , ( bp::arg("position"), bp::arg("radius") ) )    
         .def( 
             "FillKeyValues"
-            , (bool ( ::CWarsFlora::* )( ::KeyValues * ) )( &::CWarsFlora::FillKeyValues )
-            , ( bp::arg("pEntityKey") ) )    
+            , (bool ( ::CWarsFlora::* )( ::KeyValues *,int ) )( &::CWarsFlora::FillKeyValues )
+            , ( bp::arg("pEntityKey"), bp::arg("iVisGroupId")=(int)(-0x000000001) ) )    
         .def( 
             "FindFloraByUUID"
             , (::CWarsFlora * (*)( char const * ))( &::CWarsFlora::FindFloraByUUID )

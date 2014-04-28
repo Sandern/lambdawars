@@ -331,7 +331,7 @@ void CWarsFlora::PlayDestructionAnimation()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
+bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey, int iVisGroupId )
 {
 	pEntityKey->SetInt( "editormanaged", m_bEditorManaged );
 	pEntityKey->SetString( "idleanimation", STRING( m_iszIdleAnimationName ) );
@@ -345,6 +345,17 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey )
 	pEntityKey->SetInt( "skin", GetSkin() );
 
 	pEntityKey->SetString( "florauuid", GetFloraUUID() );
+
+	if( iVisGroupId != -1 )
+	{
+		KeyValues *pKVEditorGroup = new KeyValues("editor");
+		pKVEditorGroup->SetString( "color", "0 255 0" );
+		pKVEditorGroup->SetInt( "visgroupid", iVisGroupId );
+		pKVEditorGroup->SetInt( "visgroupshown", 1 );
+		pKVEditorGroup->SetInt( "visgroupautoshown", 1 );
+		pKVEditorGroup->SetString( "logicalpos", "[0 0]" );
+		pEntityKey->AddSubKey( pKVEditorGroup );
+	}
 
 	return true;
 }

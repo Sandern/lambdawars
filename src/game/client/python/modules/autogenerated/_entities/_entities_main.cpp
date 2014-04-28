@@ -521,6 +521,42 @@ struct handle_to_C_PlayerResource
     }
 };
 
+typedef CEPyHandle< C_BreakableProp > C_BreakablePropHANDLE;
+
+struct ptr_C_BreakableProp_to_handle : bp::to_python_converter<C_BreakableProp *, ptr_C_BreakableProp_to_handle>
+{
+    static PyObject* convert(C_BreakableProp *s)
+    {
+        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
+    }
+};
+
+struct C_BreakableProp_to_handle : bp::to_python_converter<C_BreakableProp, C_BreakableProp_to_handle>
+{
+    static PyObject* convert(const C_BreakableProp &s)
+    {
+        return bp::incref(s.GetPyHandle().ptr());
+    }
+};
+
+struct handle_to_C_BreakableProp
+{
+    handle_to_C_BreakableProp()
+    {
+        bp::converter::registry::insert(
+            &extract_C_BreakableProp, 
+            bp::type_id<C_BreakableProp>()
+            );
+    }
+
+    static void* extract_C_BreakableProp(PyObject* op){
+       CBaseHandle h = bp::extract<CBaseHandle>(op);
+       if( h.Get() == NULL )
+           return Py_None;
+       return h.Get();
+    }
+};
+
 typedef CEPyHandle< C_BaseToggle > C_BaseToggleHANDLE;
 
 struct ptr_C_BaseToggle_to_handle : bp::to_python_converter<C_BaseToggle *, ptr_C_BaseToggle_to_handle>
@@ -622,42 +658,6 @@ struct handle_to_C_FuncBrush
     }
 
     static void* extract_C_FuncBrush(PyObject* op){
-       CBaseHandle h = bp::extract<CBaseHandle>(op);
-       if( h.Get() == NULL )
-           return Py_None;
-       return h.Get();
-    }
-};
-
-typedef CEPyHandle< C_BreakableProp > C_BreakablePropHANDLE;
-
-struct ptr_C_BreakableProp_to_handle : bp::to_python_converter<C_BreakableProp *, ptr_C_BreakableProp_to_handle>
-{
-    static PyObject* convert(C_BreakableProp *s)
-    {
-        return s ? bp::incref(s->GetPyHandle().ptr()) : bp::incref(Py_None);
-    }
-};
-
-struct C_BreakableProp_to_handle : bp::to_python_converter<C_BreakableProp, C_BreakableProp_to_handle>
-{
-    static PyObject* convert(const C_BreakableProp &s)
-    {
-        return bp::incref(s.GetPyHandle().ptr());
-    }
-};
-
-struct handle_to_C_BreakableProp
-{
-    handle_to_C_BreakableProp()
-    {
-        bp::converter::registry::insert(
-            &extract_C_BreakableProp, 
-            bp::type_id<C_BreakableProp>()
-            );
-    }
-
-    static void* extract_C_BreakableProp(PyObject* op){
        CBaseHandle h = bp::extract<CBaseHandle>(op);
        if( h.Get() == NULL )
            return Py_None;
@@ -1923,6 +1923,81 @@ BOOST_PYTHON_MODULE(_entities){
 
     handle_to_C_PlayerResource();
 
+    { //::C_BreakablePropHANDLE
+        typedef bp::class_< C_BreakablePropHANDLE, bp::bases< CBaseHandle > > C_BreakablePropHANDLE_exposer_t;
+        C_BreakablePropHANDLE_exposer_t C_BreakablePropHANDLE_exposer = C_BreakablePropHANDLE_exposer_t( "C_BreakablePropHANDLE", bp::init< >() );
+        C_BreakablePropHANDLE_exposer.def( bp::init< C_BreakableProp * >(( bp::arg("pVal") )) );
+        C_BreakablePropHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::C_BreakablePropHANDLE::GetAttr
+        
+            typedef bp::object ( ::C_BreakablePropHANDLE::*GetAttr_function_type )( const char * ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "__getattr__"
+                , GetAttr_function_type( &::C_BreakablePropHANDLE::GetAttr )
+            );
+        
+        }
+        { //::C_BreakablePropHANDLE::Cmp
+        
+            typedef bool ( ::C_BreakablePropHANDLE::*Cmp_function_type )( bp::object ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "__cmp__"
+                , Cmp_function_type( &::C_BreakablePropHANDLE::Cmp )
+            );
+        
+        }
+        { //::C_BreakablePropHANDLE::NonZero
+        
+            typedef bool ( ::C_BreakablePropHANDLE::*NonZero_function_type )( ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "__nonzero__"
+                , NonZero_function_type( &::C_BreakablePropHANDLE::NonZero )
+            );
+        
+        }
+        { //::C_BreakablePropHANDLE::Set
+        
+            typedef void ( ::C_BreakablePropHANDLE::*Set_function_type )( C_BreakableProp * ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "Set"
+                , Set_function_type( &::C_BreakablePropHANDLE::Set )
+            );
+        
+        }
+        { //::C_BreakablePropHANDLE::GetSerialNumber
+        
+            typedef int ( ::C_BreakablePropHANDLE::*GetSerialNumber_function_type )( ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "GetSerialNumber"
+                , GetSerialNumber_function_type( &::C_BreakablePropHANDLE::GetSerialNumber )
+            );
+        
+        }
+        { //::C_BreakablePropHANDLE::GetEntryIndex
+        
+            typedef int ( ::C_BreakablePropHANDLE::*GetEntryIndex_function_type )(  ) const;
+            
+            C_BreakablePropHANDLE_exposer.def( 
+                "GetEntryIndex"
+                , GetEntryIndex_function_type( &::C_BreakablePropHANDLE::GetEntryIndex )
+            );
+        
+        }
+        C_BreakablePropHANDLE_exposer.def( bp::self != bp::self );
+        C_BreakablePropHANDLE_exposer.def( bp::self == bp::self );
+    }
+
+    ptr_C_BreakableProp_to_handle();
+
+    C_BreakableProp_to_handle();
+
+    handle_to_C_BreakableProp();
+
     { //::C_BaseToggleHANDLE
         typedef bp::class_< C_BaseToggleHANDLE, bp::bases< CBaseHandle > > C_BaseToggleHANDLE_exposer_t;
         C_BaseToggleHANDLE_exposer_t C_BaseToggleHANDLE_exposer = C_BaseToggleHANDLE_exposer_t( "C_BaseToggleHANDLE", bp::init< >() );
@@ -2147,81 +2222,6 @@ BOOST_PYTHON_MODULE(_entities){
     C_FuncBrush_to_handle();
 
     handle_to_C_FuncBrush();
-
-    { //::C_BreakablePropHANDLE
-        typedef bp::class_< C_BreakablePropHANDLE, bp::bases< CBaseHandle > > C_BreakablePropHANDLE_exposer_t;
-        C_BreakablePropHANDLE_exposer_t C_BreakablePropHANDLE_exposer = C_BreakablePropHANDLE_exposer_t( "C_BreakablePropHANDLE", bp::init< >() );
-        C_BreakablePropHANDLE_exposer.def( bp::init< C_BreakableProp * >(( bp::arg("pVal") )) );
-        C_BreakablePropHANDLE_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
-        { //::C_BreakablePropHANDLE::GetAttr
-        
-            typedef bp::object ( ::C_BreakablePropHANDLE::*GetAttr_function_type )( const char * ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "__getattr__"
-                , GetAttr_function_type( &::C_BreakablePropHANDLE::GetAttr )
-            );
-        
-        }
-        { //::C_BreakablePropHANDLE::Cmp
-        
-            typedef bool ( ::C_BreakablePropHANDLE::*Cmp_function_type )( bp::object ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "__cmp__"
-                , Cmp_function_type( &::C_BreakablePropHANDLE::Cmp )
-            );
-        
-        }
-        { //::C_BreakablePropHANDLE::NonZero
-        
-            typedef bool ( ::C_BreakablePropHANDLE::*NonZero_function_type )( ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "__nonzero__"
-                , NonZero_function_type( &::C_BreakablePropHANDLE::NonZero )
-            );
-        
-        }
-        { //::C_BreakablePropHANDLE::Set
-        
-            typedef void ( ::C_BreakablePropHANDLE::*Set_function_type )( C_BreakableProp * ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "Set"
-                , Set_function_type( &::C_BreakablePropHANDLE::Set )
-            );
-        
-        }
-        { //::C_BreakablePropHANDLE::GetSerialNumber
-        
-            typedef int ( ::C_BreakablePropHANDLE::*GetSerialNumber_function_type )( ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "GetSerialNumber"
-                , GetSerialNumber_function_type( &::C_BreakablePropHANDLE::GetSerialNumber )
-            );
-        
-        }
-        { //::C_BreakablePropHANDLE::GetEntryIndex
-        
-            typedef int ( ::C_BreakablePropHANDLE::*GetEntryIndex_function_type )(  ) const;
-            
-            C_BreakablePropHANDLE_exposer.def( 
-                "GetEntryIndex"
-                , GetEntryIndex_function_type( &::C_BreakablePropHANDLE::GetEntryIndex )
-            );
-        
-        }
-        C_BreakablePropHANDLE_exposer.def( bp::self != bp::self );
-        C_BreakablePropHANDLE_exposer.def( bp::self == bp::self );
-    }
-
-    ptr_C_BreakableProp_to_handle();
-
-    C_BreakableProp_to_handle();
-
-    handle_to_C_BreakableProp();
 
     { //::C_SpriteHANDLE
         typedef bp::class_< C_SpriteHANDLE, bp::bases< CBaseHandle > > C_SpriteHANDLE_exposer_t;

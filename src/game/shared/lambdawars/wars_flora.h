@@ -74,7 +74,7 @@ public:
 
 	bool			IsEditorManaged();
 
-	bool			FillKeyValues( KeyValues *pEntityKey );
+	bool			FillKeyValues( KeyValues *pEntityKey, int iVisGroupId = -1 );
 
 private:
 	int				m_iKey;

@@ -51,6 +51,7 @@ CEditorMapMgr::CEditorMapMgr() : m_pKVVmf(NULL)
 void CEditorMapMgr::ClearLoadedMap()
 {
 	*m_szCurrentVmf = 0;
+	m_iFloraVisGroupId = -1;
 
 	if( m_pKVVmf == NULL ) 
 		return;
@@ -371,7 +372,7 @@ void CEditorMapMgr::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, i
 			pFloraEnt->GenerateFloraUUID();
 		}
 
-		pFloraEnt->FillKeyValues( pEntityKey );
+		pFloraEnt->FillKeyValues( pEntityKey, m_iFloraVisGroupId );
 	}
 }
 
@@ -388,6 +389,35 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 
 	int iHighestId = 0;
 	int iHighestHammerId = 0;
+
+	// Find or create the Wars Flora visgroup
+	m_iFloraVisGroupId = -1;
+	int iHighestVisGroupId = 0;
+	KeyValues *pVisGroupsKey = m_pKVVmf->FindKey( "visgroups" );
+	if( pVisGroupsKey )
+	{
+		FOR_EACH_TRUE_SUBKEY( pVisGroupsKey, pVisGroup )
+		{
+			if( V_strcmp( pVisGroup->GetString( "name", "None"), "Wars Flora" ) == 0 )
+			{
+				m_iFloraVisGroupId = pVisGroup->GetInt( "visgroupid", -1 );
+				break;
+			}
+
+			iHighestVisGroupId = Max( iHighestVisGroupId, pVisGroup->GetInt( "visgroupid", -1 ) );
+		}
+
+		if( m_iFloraVisGroupId == -1 )
+		{
+			m_iFloraVisGroupId = iHighestVisGroupId + 1;
+
+			KeyValues *pKVNewVisGroup = new KeyValues("visgroup");
+			pKVNewVisGroup->SetString( "name", "Wars Flora" );
+			pKVNewVisGroup->SetInt( "visgroupid", m_iFloraVisGroupId );
+			pKVNewVisGroup->SetString( "color", "0 255 0" );
+			pVisGroupsKey->AddSubKey( pKVNewVisGroup );
+		}
+	}
 
 	// Update existing entities and determine removed entities
 	for ( KeyValues *pKey = m_pKVVmf->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
