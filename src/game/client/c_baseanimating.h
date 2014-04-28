@@ -99,7 +99,14 @@ public:
 	DECLARE_INTERPOLATION();
 	DECLARE_FRIEND_DATADESC_ACCESS();
 	DECLARE_ENT_SCRIPTDESC();
+
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLIENTCLASS( C_BaseAnimating, PN_BASEANIMATING );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	enum
 	{

@@ -128,10 +128,16 @@
 #include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
-	#include "srcpy_networkvar.h"
+#include "srcpy.h"
+#include "srcpy_networkvar.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 #ifdef DEFERRED_ENABLED
 // @Deferred - Biohazard

@@ -143,9 +143,15 @@
 #include "tier1/UtlDict.h"
 #include "keybindinglistener.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
+#include "srcpy.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 #ifdef HL2WARS_DLL
 #include "fowmgr.h"

@@ -32,6 +32,14 @@ class CBaseAnimating : public CBaseEntity
 public:
 	DECLARE_CLASS( CBaseAnimating, CBaseEntity );
 
+// =======================================
+// PySource Additions
+// =======================================
+	DECLARE_PYSERVERCLASS( CBaseAnimating, PN_BASEANIMATING );
+// =======================================
+// END PySource Additions
+// =======================================
+
 	CBaseAnimating();
 	~CBaseAnimating();
 #ifdef ENABLE_PYTHON
@@ -49,7 +57,6 @@ public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
 	DECLARE_ENT_SCRIPTDESC();
-	DECLARE_PYSERVERCLASS( CBaseAnimating, PN_BASEANIMATING );
 
 	virtual void SetModel( const char *szModelName );
 	virtual void Activate();
