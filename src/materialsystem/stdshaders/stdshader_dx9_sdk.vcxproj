@@ -1381,6 +1381,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="floatcombine_autoexpose.cpp" />
     <ClCompile Include="floattoscreen.cpp" />
     <ClCompile Include="floattoscreen_vanilla.cpp" />
+    <ClCompile Include="flora.cpp" />
     <ClCompile Include="fogofwar.cpp" />
     <ClCompile Include="fogofwar_cpe.cpp" />
     <ClCompile Include="fogofwar_im.cpp" />

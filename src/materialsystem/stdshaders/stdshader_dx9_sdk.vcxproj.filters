@@ -428,8 +428,11 @@
     <ClCompile Include="radiosity_propagate.cpp">
       <Filter>Source Files\deferred</Filter>
     </ClCompile>
+    <ClCompile Include="flora.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="GlobalLitGeneric.cpp">
-      <Filter>Source Files\deferred</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
