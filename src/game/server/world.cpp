@@ -890,21 +890,22 @@ void CWorld::Precache( void )
 	COM_TimestampedLog( "InitInteractionSystem" );
 	CBaseCombatCharacter::InitInteractionSystem();
 
-	COM_TimestampedLog( "g_pGameRules->Precache" );
-	// Call the gamerules precache after the AI precache so that games can precache NPCs that are always loaded
-	g_pGameRules->Precache();
-
 // =======================================
 // PySource Additions
 // =======================================
 #ifdef ENABLE_PYTHON
 	// Python classes init
+	COM_TimestampedLog( "InitPythonEntities" );
 	g_bDoNotInitPythonClasses = false;
 	InitAllPythonEntities();
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
 // =======================================
+
+	COM_TimestampedLog( "g_pGameRules->Precache" );
+	// Call the gamerules precache after the AI precache so that games can precache NPCs that are always loaded
+	g_pGameRules->Precache();
 
 	if ( m_iszChapterTitle != NULL_STRING )
 	{
