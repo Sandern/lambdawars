@@ -316,6 +316,11 @@ Vector CEditorSystem::GetSelectionCenter()
 		positions.AddToTail( m_hSelectedEntities[ i ]->GetAbsOrigin() );
 	}
 
+	if( positions.Count() == 0 )
+	{
+		return m_vecSelectionCenterCache;
+	}
+
 #if 1 // median
 	Vector min, max;
 
