@@ -11,15 +11,15 @@ using namespace boost::python;
 
 // The init method is in one of the generated files declared
 #ifdef _WIN32
-extern "C" __declspec(dllexport) void init_input();
-extern "C" __declspec(dllexport) void init_vgui();
-extern "C" __declspec(dllexport) void init_vguicontrols();
-extern "C" __declspec(dllexport) void init_cef();
+extern "C" __declspec(dllexport) PYINIT_DECL(_input)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_vgui)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_vguicontrols)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_cef)();
 #else
-extern "C"  void init_input();
-extern "C"  void init_vgui();
-extern "C"  void init_vguicontrols();
-extern "C"  void init_cef();
+extern "C" PYINIT_DECL(_input)();
+extern "C" PYINIT_DECL(_vgui)();
+extern "C" PYINIT_DECL(_vguicontrols)();
+extern "C" PYINIT_DECL(_cef)();
 #endif // _WIN32
 
 // The append function

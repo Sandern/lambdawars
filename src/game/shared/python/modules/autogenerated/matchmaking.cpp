@@ -94,7 +94,7 @@ BOOST_PYTHON_MODULE(matchmaking){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetOnlineId"
-            , (::boost::python::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
+            , (::boost::python::api::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
         .def( 
             "IsJoinable"
             , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsJoinable ) )    
@@ -106,7 +106,7 @@ BOOST_PYTHON_MODULE(matchmaking){
             , (void ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::Join ) )    
         .def( 
             "SetMatchResultInternal"
-            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
+            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::api::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
             , ( bp::arg("pMatchResult"), bp::arg("weakref") ) );
 
     bp::class_< PyMatchSession >( "matchsession" )    
@@ -134,7 +134,7 @@ BOOST_PYTHON_MODULE(matchmaking){
     bp::class_< PyMatchSystem >( "matchsystem" )    
         .def( 
             "CreateGameSearchManager"
-            , (::boost::python::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
+            , (::boost::python::api::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
             , ( bp::arg("pSettings") ) )    
         .staticmethod( "CreateGameSearchManager" );
 
@@ -151,11 +151,11 @@ BOOST_PYTHON_MODULE(matchmaking){
             , (int ( ::PySearchManager::* )(  ) )( &::PySearchManager::GetNumResults ) )    
         .def( 
             "GetResultByIndex"
-            , (::boost::python::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
+            , (::boost::python::api::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
             , ( bp::arg("iResultIdx") ) )    
         .def( 
             "GetResultByOnlineId"
-            , (::boost::python::object ( ::PySearchManager::* )( ::boost::python::object ) )( &::PySearchManager::GetResultByOnlineId )
+            , (::boost::python::api::object ( ::PySearchManager::* )( ::boost::python::api::object ) )( &::PySearchManager::GetResultByOnlineId )
             , ( bp::arg("xuidResultOnline") ) )    
         .def( 
             "IsValid"
@@ -303,7 +303,7 @@ BOOST_PYTHON_MODULE(matchmaking){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetOnlineId"
-            , (::boost::python::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
+            , (::boost::python::api::object ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::GetOnlineId ) )    
         .def( 
             "IsJoinable"
             , (bool ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::IsJoinable ) )    
@@ -315,7 +315,7 @@ BOOST_PYTHON_MODULE(matchmaking){
             , (void ( ::PyMatchSearchResult::* )(  ) )( &::PyMatchSearchResult::Join ) )    
         .def( 
             "SetMatchResultInternal"
-            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
+            , (void ( ::PyMatchSearchResult::* )( ::IMatchSearchResult *,::boost::python::api::object ) )( &::PyMatchSearchResult::SetMatchResultInternal )
             , ( bp::arg("pMatchResult"), bp::arg("weakref") ) );
 
     bp::class_< PyMatchSession >( "matchsession" )    
@@ -343,7 +343,7 @@ BOOST_PYTHON_MODULE(matchmaking){
     bp::class_< PyMatchSystem >( "matchsystem" )    
         .def( 
             "CreateGameSearchManager"
-            , (::boost::python::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
+            , (::boost::python::api::object (*)( ::KeyValues * ))( &::PyMatchSystem::CreateGameSearchManager )
             , ( bp::arg("pSettings") ) )    
         .staticmethod( "CreateGameSearchManager" );
 
@@ -360,11 +360,11 @@ BOOST_PYTHON_MODULE(matchmaking){
             , (int ( ::PySearchManager::* )(  ) )( &::PySearchManager::GetNumResults ) )    
         .def( 
             "GetResultByIndex"
-            , (::boost::python::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
+            , (::boost::python::api::object ( ::PySearchManager::* )( int ) )( &::PySearchManager::GetResultByIndex )
             , ( bp::arg("iResultIdx") ) )    
         .def( 
             "GetResultByOnlineId"
-            , (::boost::python::object ( ::PySearchManager::* )( ::boost::python::object ) )( &::PySearchManager::GetResultByOnlineId )
+            , (::boost::python::api::object ( ::PySearchManager::* )( ::boost::python::api::object ) )( &::PySearchManager::GetResultByOnlineId )
             , ( bp::arg("xuidResultOnline") ) )    
         .def( 
             "IsValid"

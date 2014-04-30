@@ -78,7 +78,7 @@ void _entities_register_free_functions(){
 
     { //::MapUnits
     
-        typedef void ( *MapUnits_function_type )( ::boost::python::object );
+        typedef void ( *MapUnits_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "MapUnits"

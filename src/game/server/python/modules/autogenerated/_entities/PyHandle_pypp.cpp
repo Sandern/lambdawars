@@ -53,7 +53,7 @@ struct PyHandle_wrapper : PyHandle, bp::wrapper< PyHandle > {
         
     }
 
-    PyHandle_wrapper(::boost::python::object ent )
+    PyHandle_wrapper(::boost::python::api::object ent )
     : PyHandle( ent )
       , bp::wrapper< PyHandle >(){
         // constructor
@@ -75,13 +75,13 @@ void register_PyHandle_class(){
 
     { //::PyHandle
         typedef bp::class_< PyHandle_wrapper, bp::bases< CBaseHandle > > PyHandle_exposer_t;
-        PyHandle_exposer_t PyHandle_exposer = PyHandle_exposer_t( "PyHandle", bp::init< bp::object >(( bp::arg("ent") )) );
+        PyHandle_exposer_t PyHandle_exposer = PyHandle_exposer_t( "PyHandle", bp::init< bp::api::object >(( bp::arg("ent") )) );
         bp::scope PyHandle_scope( PyHandle_exposer );
-        bp::implicitly_convertible< bp::object, PyHandle >();
+        bp::implicitly_convertible< bp::api::object, PyHandle >();
         PyHandle_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
         { //::PyHandle::Cmp
         
-            typedef int ( ::PyHandle::*__cmp___function_type )( ::boost::python::object ) ;
+            typedef int ( ::PyHandle::*__cmp___function_type )( ::boost::python::api::object ) ;
             
             PyHandle_exposer.def( 
                 "__cmp__"
@@ -91,7 +91,7 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::GetAttr
         
-            typedef ::boost::python::object ( ::PyHandle::*__getattr___function_type )( char const * ) ;
+            typedef ::boost::python::api::object ( ::PyHandle::*__getattr___function_type )( char const * ) ;
             
             PyHandle_exposer.def( 
                 "__getattr__"
@@ -101,7 +101,7 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::GetAttribute
         
-            typedef ::boost::python::object ( ::PyHandle::*__getattribute___function_type )( char const * ) ;
+            typedef ::boost::python::api::object ( ::PyHandle::*__getattribute___function_type )( char const * ) ;
             
             PyHandle_exposer.def( 
                 "__getattribute__"
@@ -120,7 +120,7 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::PyGet
         
-            typedef ::boost::python::object ( ::PyHandle::*Get_function_type )(  ) const;
+            typedef ::boost::python::api::object ( ::PyHandle::*Get_function_type )(  ) const;
             
             PyHandle_exposer.def( 
                 "Get"
@@ -129,7 +129,7 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::Set
         
-            typedef void ( ::PyHandle::*Set_function_type )( ::boost::python::object ) ;
+            typedef void ( ::PyHandle::*Set_function_type )( ::boost::python::api::object ) ;
             
             PyHandle_exposer.def( 
                 "Set"
@@ -139,7 +139,7 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::SetAttr
         
-            typedef void ( ::PyHandle::*__setattr___function_type )( char const *,::boost::python::object ) ;
+            typedef void ( ::PyHandle::*__setattr___function_type )( char const *,::boost::python::api::object ) ;
             
             PyHandle_exposer.def( 
                 "__setattr__"
@@ -149,18 +149,18 @@ void register_PyHandle_class(){
         }
         { //::PyHandle::Str
         
-            typedef ::boost::python::object ( ::PyHandle::*__str___function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::PyHandle::*__str___function_type )(  ) ;
             
             PyHandle_exposer.def( 
                 "__str__"
                 , __str___function_type( &::PyHandle::Str ) );
         
         }
-        PyHandle_exposer.def( bp::self != bp::other< bp::object >() );
+        PyHandle_exposer.def( bp::self != bp::other< bp::api::object >() );
         PyHandle_exposer.def( bp::self != bp::self );
         { //::PyHandle::operator=
         
-            typedef ::PyHandle const & ( ::PyHandle::*assign_function_type )( ::boost::python::object ) ;
+            typedef ::PyHandle const & ( ::PyHandle::*assign_function_type )( ::boost::python::api::object ) ;
             
             PyHandle_exposer.def( 
                 "assign"
@@ -169,7 +169,7 @@ void register_PyHandle_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        PyHandle_exposer.def( bp::self == bp::other< bp::object >() );
+        PyHandle_exposer.def( bp::self == bp::other< bp::api::object >() );
         PyHandle_exposer.def( bp::self == bp::self );
     }
 

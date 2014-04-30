@@ -554,11 +554,11 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     { //::PyUtlRBTree
         typedef bp::class_< PyUtlRBTree > UtlRBTree_exposer_t;
-        UtlRBTree_exposer_t UtlRBTree_exposer = UtlRBTree_exposer_t( "UtlRBTree", bp::init< bp::optional< int, int, bp::object > >(( bp::arg("growSize")=(int)(0), bp::arg("initSize")=(int)(0), bp::arg("lessfunc")=boost::python::object() )) );
+        UtlRBTree_exposer_t UtlRBTree_exposer = UtlRBTree_exposer_t( "UtlRBTree", bp::init< bp::optional< int, int, bp::api::object > >(( bp::arg("growSize")=(int)(0), bp::arg("initSize")=(int)(0), bp::arg("lessfunc")=boost::python::api::object() )) );
         bp::scope UtlRBTree_scope( UtlRBTree_exposer );
         bp::implicitly_convertible< int, PyUtlRBTree >();
-        UtlRBTree_exposer.def( bp::init< bp::object >(( bp::arg("lessfunc") )) );
-        bp::implicitly_convertible< bp::object, PyUtlRBTree >();
+        UtlRBTree_exposer.def( bp::init< bp::api::object >(( bp::arg("lessfunc") )) );
+        bp::implicitly_convertible< bp::api::object, PyUtlRBTree >();
         UtlRBTree_exposer.def( bp::init< PyUtlRBTree const & >(( bp::arg("tree") )) );
         { //::PyUtlRBTree::Count
         
@@ -571,7 +571,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::Element
         
-            typedef ::boost::python::object ( ::PyUtlRBTree::*Element_function_type )( int ) ;
+            typedef ::boost::python::api::object ( ::PyUtlRBTree::*Element_function_type )( int ) ;
             
             UtlRBTree_exposer.def( 
                 "Element"
@@ -581,7 +581,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::Find
         
-            typedef int ( ::PyUtlRBTree::*Find_function_type )( ::boost::python::object ) const;
+            typedef int ( ::PyUtlRBTree::*Find_function_type )( ::boost::python::api::object ) const;
             
             UtlRBTree_exposer.def( 
                 "Find"
@@ -591,7 +591,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::FindInsertionPosition
         
-            typedef void ( ::PyUtlRBTree::*FindInsertionPosition_function_type )( ::boost::python::object const &,int &,bool & ) ;
+            typedef void ( ::PyUtlRBTree::*FindInsertionPosition_function_type )( ::boost::python::api::object const &,int &,bool & ) ;
             
             UtlRBTree_exposer.def( 
                 "FindInsertionPosition"
@@ -628,7 +628,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::Insert
         
-            typedef int ( ::PyUtlRBTree::*Insert_function_type )( ::boost::python::object ) ;
+            typedef int ( ::PyUtlRBTree::*Insert_function_type )( ::boost::python::api::object ) ;
             
             UtlRBTree_exposer.def( 
                 "Insert"
@@ -648,7 +648,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::InsertIfNotFound
         
-            typedef int ( ::PyUtlRBTree::*InsertIfNotFound_function_type )( ::boost::python::object ) ;
+            typedef int ( ::PyUtlRBTree::*InsertIfNotFound_function_type )( ::boost::python::api::object ) ;
             
             UtlRBTree_exposer.def( 
                 "InsertIfNotFound"
@@ -735,7 +735,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::Remove
         
-            typedef bool ( ::PyUtlRBTree::*Remove_function_type )( ::boost::python::object ) ;
+            typedef bool ( ::PyUtlRBTree::*Remove_function_type )( ::boost::python::api::object ) ;
             
             UtlRBTree_exposer.def( 
                 "Remove"
@@ -773,7 +773,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::SetLessFunc
         
-            typedef void ( ::PyUtlRBTree::*SetLessFunc_function_type )( ::boost::python::object ) ;
+            typedef void ( ::PyUtlRBTree::*SetLessFunc_function_type )( ::boost::python::api::object ) ;
             
             UtlRBTree_exposer.def( 
                 "SetLessFunc"
@@ -783,7 +783,7 @@ BOOST_PYTHON_MODULE(_srcbase){
         }
         { //::PyUtlRBTree::operator[]
         
-            typedef ::boost::python::object ( ::PyUtlRBTree::*__getitem___function_type )( int ) ;
+            typedef ::boost::python::api::object ( ::PyUtlRBTree::*__getitem___function_type )( int ) ;
             
             UtlRBTree_exposer.def( 
                 "__getitem__"

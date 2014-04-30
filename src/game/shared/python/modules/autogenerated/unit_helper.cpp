@@ -37,7 +37,7 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
         
     }
 
-    UnitBaseAnimState_wrapper(::boost::python::object outer )
+    UnitBaseAnimState_wrapper(::boost::python::api::object outer )
     : UnitBaseAnimState( outer )
       , bp::wrapper< UnitBaseAnimState >(){
         // constructor
@@ -155,7 +155,7 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
 
 struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
-    UnitAnimState_wrapper(::boost::python::object outer, ::UnitAnimConfig & animconfig )
+    UnitAnimState_wrapper(::boost::python::api::object outer, ::UnitAnimConfig & animconfig )
     : UnitAnimState( outer, animconfig )
       , bp::wrapper< UnitAnimState >(){
         // constructor
@@ -286,7 +286,7 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
         
     }
 
-    UnitBaseLocomotion_wrapper(::boost::python::object outer )
+    UnitBaseLocomotion_wrapper(::boost::python::api::object outer )
     : UnitBaseLocomotion( outer )
       , bp::wrapper< UnitBaseLocomotion >(){
         // constructor
@@ -327,7 +327,7 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
         
     }
 
-    UnitBaseAirLocomotion_wrapper(::boost::python::object outer )
+    UnitBaseAirLocomotion_wrapper(::boost::python::api::object outer )
     : UnitBaseAirLocomotion( outer )
       , bp::wrapper< UnitBaseAirLocomotion >(){
         // constructor
@@ -387,7 +387,7 @@ struct UnitVPhysicsLocomotion_wrapper : UnitVPhysicsLocomotion, bp::wrapper< Uni
         
     }
 
-    UnitVPhysicsLocomotion_wrapper(::boost::python::object outer )
+    UnitVPhysicsLocomotion_wrapper(::boost::python::api::object outer )
     : UnitVPhysicsLocomotion( outer )
       , bp::wrapper< UnitVPhysicsLocomotion >(){
         // constructor
@@ -428,7 +428,7 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
         
     }
 
-    UnitVehicleAnimState_wrapper(::boost::python::object outer )
+    UnitVehicleAnimState_wrapper(::boost::python::api::object outer )
     : UnitVehicleAnimState( outer )
       , bp::wrapper< UnitVehicleAnimState >(){
         // constructor
@@ -627,9 +627,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitComponent
         typedef bp::class_< UnitComponent > UnitComponent_exposer_t;
-        UnitComponent_exposer_t UnitComponent_exposer = UnitComponent_exposer_t( "UnitComponent", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitComponent_exposer_t UnitComponent_exposer = UnitComponent_exposer_t( "UnitComponent", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitComponent_scope( UnitComponent_exposer );
-        bp::implicitly_convertible< bp::object, UnitComponent >();
+        bp::implicitly_convertible< bp::api::object, UnitComponent >();
         { //::UnitComponent::GetAbsAngles
         
             typedef ::QAngle const & ( ::UnitComponent::*GetAbsAngles_function_type )(  ) const;
@@ -922,7 +922,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //property "outer"[fget=::UnitComponent::GetPyOuter]
         
-            typedef ::boost::python::object ( ::UnitComponent::*fget )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitComponent::*fget )(  ) ;
             
             UnitComponent_exposer.add_property( 
                 "outer"
@@ -933,9 +933,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseAnimState
         typedef bp::class_< UnitBaseAnimState_wrapper, bp::bases< UnitComponent > > UnitBaseAnimState_exposer_t;
-        UnitBaseAnimState_exposer_t UnitBaseAnimState_exposer = UnitBaseAnimState_exposer_t( "UnitBaseAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseAnimState_exposer_t UnitBaseAnimState_exposer = UnitBaseAnimState_exposer_t( "UnitBaseAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAnimState_scope( UnitBaseAnimState_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseAnimState >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseAnimState >();
         { //::UnitBaseAnimState::GetAnimTimeInterval
         
             typedef float ( ::UnitBaseAnimState::*GetAnimTimeInterval_function_type )(  ) const;
@@ -1055,7 +1055,7 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitAnimState
         typedef bp::class_< UnitAnimState_wrapper, bp::bases< UnitBaseAnimState >, boost::noncopyable > UnitAnimState_exposer_t;
-        UnitAnimState_exposer_t UnitAnimState_exposer = UnitAnimState_exposer_t( "UnitAnimState", bp::init< bp::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) );
+        UnitAnimState_exposer_t UnitAnimState_exposer = UnitAnimState_exposer_t( "UnitAnimState", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) );
         bp::scope UnitAnimState_scope( UnitAnimState_exposer );
         bp::scope().attr("TURN_NONE") = (int)UnitAnimState::TURN_NONE;
         bp::scope().attr("TURN_LEFT") = (int)UnitAnimState::TURN_LEFT;
@@ -1214,7 +1214,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitAnimState::GetActivityMap
         
-            typedef ::boost::python::object ( ::UnitAnimState::*GetActivityMap_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitAnimState::*GetActivityMap_function_type )(  ) ;
             
             UnitAnimState_exposer.def( 
                 "GetActivityMap"
@@ -1357,7 +1357,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitAnimState::SetActivityMap
         
-            typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::object ) ;
+            typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::api::object ) ;
             
             UnitAnimState_exposer.def( 
                 "SetActivityMap"
@@ -1567,9 +1567,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseLocomotion
         typedef bp::class_< UnitBaseLocomotion_wrapper, bp::bases< UnitComponent > > UnitBaseLocomotion_exposer_t;
-        UnitBaseLocomotion_exposer_t UnitBaseLocomotion_exposer = UnitBaseLocomotion_exposer_t( "UnitBaseLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseLocomotion_exposer_t UnitBaseLocomotion_exposer = UnitBaseLocomotion_exposer_t( "UnitBaseLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseLocomotion_scope( UnitBaseLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseLocomotion >();
         { //::UnitBaseLocomotion::Accelerate
         
             typedef void ( ::UnitBaseLocomotion::*Accelerate_function_type )( ::Vector &,float,float ) ;
@@ -1667,7 +1667,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseLocomotion::CreateMoveCommand
         
-            typedef ::boost::python::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
             
             UnitBaseLocomotion_exposer.def( 
                 "CreateMoveCommand"
@@ -1887,9 +1887,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseAirLocomotion
         typedef bp::class_< UnitBaseAirLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitBaseAirLocomotion_exposer_t;
-        UnitBaseAirLocomotion_exposer_t UnitBaseAirLocomotion_exposer = UnitBaseAirLocomotion_exposer_t( "UnitBaseAirLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseAirLocomotion_exposer_t UnitBaseAirLocomotion_exposer = UnitBaseAirLocomotion_exposer_t( "UnitBaseAirLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAirLocomotion_scope( UnitBaseAirLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseAirLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseAirLocomotion >();
         { //::UnitBaseAirLocomotion::AirAccelerate
         
             typedef void ( ::UnitBaseAirLocomotion::*AirAccelerate_function_type )( ::Vector &,float,float ) ;
@@ -1902,7 +1902,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseAirLocomotion::CreateMoveCommand
         
-            typedef ::boost::python::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
             
             UnitBaseAirLocomotion_exposer.def( 
                 "CreateMoveCommand"
@@ -1996,9 +1996,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitVPhysicsLocomotion
         typedef bp::class_< UnitVPhysicsLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitVPhysicsLocomotion_exposer_t;
-        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitVPhysicsLocomotion >();
         { //::UnitVPhysicsLocomotion::FinishMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -2060,9 +2060,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitVehicleAnimState
         typedef bp::class_< UnitVehicleAnimState_wrapper, bp::bases< UnitBaseAnimState > > UnitVehicleAnimState_exposer_t;
-        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
-        bp::implicitly_convertible< bp::object, UnitVehicleAnimState >();
+        bp::implicitly_convertible< bp::api::object, UnitVehicleAnimState >();
         { //::UnitVehicleAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -2436,7 +2436,7 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
         
     }
 
-    UnitBaseAnimState_wrapper(::boost::python::object outer )
+    UnitBaseAnimState_wrapper(::boost::python::api::object outer )
     : UnitBaseAnimState( outer )
       , bp::wrapper< UnitBaseAnimState >(){
         // constructor
@@ -2554,7 +2554,7 @@ struct UnitBaseAnimState_wrapper : UnitBaseAnimState, bp::wrapper< UnitBaseAnimS
 
 struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
-    UnitAnimState_wrapper(::boost::python::object outer, ::UnitAnimConfig & animconfig )
+    UnitAnimState_wrapper(::boost::python::api::object outer, ::UnitAnimConfig & animconfig )
     : UnitAnimState( outer, animconfig )
       , bp::wrapper< UnitAnimState >(){
         // constructor
@@ -2685,7 +2685,7 @@ struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLoc
         
     }
 
-    UnitBaseLocomotion_wrapper(::boost::python::object outer )
+    UnitBaseLocomotion_wrapper(::boost::python::api::object outer )
     : UnitBaseLocomotion( outer )
       , bp::wrapper< UnitBaseLocomotion >(){
         // constructor
@@ -2726,7 +2726,7 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
         
     }
 
-    UnitBaseAirLocomotion_wrapper(::boost::python::object outer )
+    UnitBaseAirLocomotion_wrapper(::boost::python::api::object outer )
     : UnitBaseAirLocomotion( outer )
       , bp::wrapper< UnitBaseAirLocomotion >(){
         // constructor
@@ -2779,7 +2779,7 @@ struct UnitBaseAirLocomotion_wrapper : UnitBaseAirLocomotion, bp::wrapper< UnitB
 
 struct UnitExpresser_wrapper : UnitExpresser, bp::wrapper< UnitExpresser > {
 
-    UnitExpresser_wrapper(::boost::python::object outer )
+    UnitExpresser_wrapper(::boost::python::api::object outer )
     : UnitExpresser( outer )
       , bp::wrapper< UnitExpresser >(){
         // constructor
@@ -2885,7 +2885,7 @@ struct UnitVPhysicsLocomotion_wrapper : UnitVPhysicsLocomotion, bp::wrapper< Uni
         
     }
 
-    UnitVPhysicsLocomotion_wrapper(::boost::python::object outer )
+    UnitVPhysicsLocomotion_wrapper(::boost::python::api::object outer )
     : UnitVPhysicsLocomotion( outer )
       , bp::wrapper< UnitVPhysicsLocomotion >(){
         // constructor
@@ -2926,7 +2926,7 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
         
     }
 
-    UnitVehicleAnimState_wrapper(::boost::python::object outer )
+    UnitVehicleAnimState_wrapper(::boost::python::api::object outer )
     : UnitVehicleAnimState( outer )
       , bp::wrapper< UnitVehicleAnimState >(){
         // constructor
@@ -3076,7 +3076,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::AnimEventMap::SetAnimEventHandler
         
-            typedef void ( ::AnimEventMap::*SetAnimEventHandler_function_type )( int,::boost::python::object ) ;
+            typedef void ( ::AnimEventMap::*SetAnimEventHandler_function_type )( int,::boost::python::api::object ) ;
             
             AnimEventMap_exposer.def( 
                 "SetAnimEventHandler"
@@ -3659,9 +3659,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitComponent
         typedef bp::class_< UnitComponent > UnitComponent_exposer_t;
-        UnitComponent_exposer_t UnitComponent_exposer = UnitComponent_exposer_t( "UnitComponent", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitComponent_exposer_t UnitComponent_exposer = UnitComponent_exposer_t( "UnitComponent", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitComponent_scope( UnitComponent_exposer );
-        bp::implicitly_convertible< bp::object, UnitComponent >();
+        bp::implicitly_convertible< bp::api::object, UnitComponent >();
         { //::UnitComponent::GetAbsAngles
         
             typedef ::QAngle const & ( ::UnitComponent::*GetAbsAngles_function_type )(  ) const;
@@ -3954,7 +3954,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //property "outer"[fget=::UnitComponent::GetPyOuter]
         
-            typedef ::boost::python::object ( ::UnitComponent::*fget )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitComponent::*fget )(  ) ;
             
             UnitComponent_exposer.add_property( 
                 "outer"
@@ -3965,9 +3965,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseAnimState
         typedef bp::class_< UnitBaseAnimState_wrapper, bp::bases< UnitComponent > > UnitBaseAnimState_exposer_t;
-        UnitBaseAnimState_exposer_t UnitBaseAnimState_exposer = UnitBaseAnimState_exposer_t( "UnitBaseAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseAnimState_exposer_t UnitBaseAnimState_exposer = UnitBaseAnimState_exposer_t( "UnitBaseAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAnimState_scope( UnitBaseAnimState_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseAnimState >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseAnimState >();
         { //::UnitBaseAnimState::GetAnimTimeInterval
         
             typedef float ( ::UnitBaseAnimState::*GetAnimTimeInterval_function_type )(  ) const;
@@ -4087,7 +4087,7 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitAnimState
         typedef bp::class_< UnitAnimState_wrapper, bp::bases< UnitBaseAnimState >, boost::noncopyable > UnitAnimState_exposer_t;
-        UnitAnimState_exposer_t UnitAnimState_exposer = UnitAnimState_exposer_t( "UnitAnimState", bp::init< bp::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) );
+        UnitAnimState_exposer_t UnitAnimState_exposer = UnitAnimState_exposer_t( "UnitAnimState", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) );
         bp::scope UnitAnimState_scope( UnitAnimState_exposer );
         bp::scope().attr("TURN_NONE") = (int)UnitAnimState::TURN_NONE;
         bp::scope().attr("TURN_LEFT") = (int)UnitAnimState::TURN_LEFT;
@@ -4246,7 +4246,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitAnimState::GetActivityMap
         
-            typedef ::boost::python::object ( ::UnitAnimState::*GetActivityMap_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitAnimState::*GetActivityMap_function_type )(  ) ;
             
             UnitAnimState_exposer.def( 
                 "GetActivityMap"
@@ -4389,7 +4389,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitAnimState::SetActivityMap
         
-            typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::object ) ;
+            typedef void ( ::UnitAnimState::*SetActivityMap_function_type )( ::boost::python::api::object ) ;
             
             UnitAnimState_exposer.def( 
                 "SetActivityMap"
@@ -4599,9 +4599,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseLocomotion
         typedef bp::class_< UnitBaseLocomotion_wrapper, bp::bases< UnitComponent > > UnitBaseLocomotion_exposer_t;
-        UnitBaseLocomotion_exposer_t UnitBaseLocomotion_exposer = UnitBaseLocomotion_exposer_t( "UnitBaseLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseLocomotion_exposer_t UnitBaseLocomotion_exposer = UnitBaseLocomotion_exposer_t( "UnitBaseLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseLocomotion_scope( UnitBaseLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseLocomotion >();
         { //::UnitBaseLocomotion::Accelerate
         
             typedef void ( ::UnitBaseLocomotion::*Accelerate_function_type )( ::Vector &,float,float ) ;
@@ -4699,7 +4699,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseLocomotion::CreateMoveCommand
         
-            typedef ::boost::python::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseLocomotion::*CreateMoveCommand_function_type )(  ) ;
             
             UnitBaseLocomotion_exposer.def( 
                 "CreateMoveCommand"
@@ -4919,9 +4919,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseAirLocomotion
         typedef bp::class_< UnitBaseAirLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitBaseAirLocomotion_exposer_t;
-        UnitBaseAirLocomotion_exposer_t UnitBaseAirLocomotion_exposer = UnitBaseAirLocomotion_exposer_t( "UnitBaseAirLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseAirLocomotion_exposer_t UnitBaseAirLocomotion_exposer = UnitBaseAirLocomotion_exposer_t( "UnitBaseAirLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAirLocomotion_scope( UnitBaseAirLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseAirLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseAirLocomotion >();
         { //::UnitBaseAirLocomotion::AirAccelerate
         
             typedef void ( ::UnitBaseAirLocomotion::*AirAccelerate_function_type )( ::Vector &,float,float ) ;
@@ -4934,7 +4934,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseAirLocomotion::CreateMoveCommand
         
-            typedef ::boost::python::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseAirLocomotion::*CreateMoveCommand_function_type )(  ) ;
             
             UnitBaseAirLocomotion_exposer.def( 
                 "CreateMoveCommand"
@@ -5109,9 +5109,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseNavigator
         typedef bp::class_< UnitBaseNavigator, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseNavigator_exposer_t;
-        UnitBaseNavigator_exposer_t UnitBaseNavigator_exposer = UnitBaseNavigator_exposer_t( "UnitBaseNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseNavigator_exposer_t UnitBaseNavigator_exposer = UnitBaseNavigator_exposer_t( "UnitBaseNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseNavigator_scope( UnitBaseNavigator_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseNavigator >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseNavigator >();
         { //::UnitBaseNavigator::CalcMove
         
             typedef void ( ::UnitBaseNavigator::*CalcMove_function_type )( ::UnitBaseMoveCommand &,::QAngle,float ) ;
@@ -5151,7 +5151,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseNavigator::FindPathAsResult
         
-            typedef ::boost::python::object ( ::UnitBaseNavigator::*FindPathAsResult_function_type )( int,::Vector const &,float,int,float,float,::CBaseEntity *,bool ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseNavigator::*FindPathAsResult_function_type )( int,::Vector const &,float,int,float,float,::CBaseEntity *,bool ) ;
             
             UnitBaseNavigator_exposer.def( 
                 "FindPathAsResult"
@@ -5313,8 +5313,8 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseNavigator_exposer.def_readwrite( "forcegoalvelocity", &UnitBaseNavigator::m_vForceGoalVelocity );
         { //property "path"[fget=::UnitBaseNavigator::PyGetPath, fset=::UnitBaseNavigator::SetPath]
         
-            typedef ::boost::python::object ( ::UnitBaseNavigator::*fget )(  ) ;
-            typedef void ( ::UnitBaseNavigator::*fset )( ::boost::python::object ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseNavigator::*fget )(  ) ;
+            typedef void ( ::UnitBaseNavigator::*fset )( ::boost::python::api::object ) ;
             
             UnitBaseNavigator_exposer.add_property( 
                 "path"
@@ -5363,9 +5363,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseAirNavigator
         typedef bp::class_< UnitBaseAirNavigator, bp::bases< UnitBaseNavigator >, boost::noncopyable > UnitBaseAirNavigator_exposer_t;
-        UnitBaseAirNavigator_exposer_t UnitBaseAirNavigator_exposer = UnitBaseAirNavigator_exposer_t( "UnitBaseAirNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseAirNavigator_exposer_t UnitBaseAirNavigator_exposer = UnitBaseAirNavigator_exposer_t( "UnitBaseAirNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAirNavigator_scope( UnitBaseAirNavigator_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseAirNavigator >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseAirNavigator >();
         { //::UnitBaseAirNavigator::TestRoute
         
             typedef bool ( ::UnitBaseAirNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
@@ -5423,12 +5423,12 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitBaseSense
         typedef bp::class_< UnitBaseSense, bp::bases< UnitComponent >, boost::noncopyable > UnitBaseSense_exposer_t;
-        UnitBaseSense_exposer_t UnitBaseSense_exposer = UnitBaseSense_exposer_t( "UnitBaseSense", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitBaseSense_exposer_t UnitBaseSense_exposer = UnitBaseSense_exposer_t( "UnitBaseSense", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseSense_scope( UnitBaseSense_exposer );
-        bp::implicitly_convertible< bp::object, UnitBaseSense >();
+        bp::implicitly_convertible< bp::api::object, UnitBaseSense >();
         { //::UnitBaseSense::AddEnemyInRangeCallback
         
-            typedef bool ( ::UnitBaseSense::*AddEnemyInRangeCallback_function_type )( ::boost::python::object,int,float ) ;
+            typedef bool ( ::UnitBaseSense::*AddEnemyInRangeCallback_function_type )( ::boost::python::api::object,int,float ) ;
             
             UnitBaseSense_exposer.def( 
                 "AddEnemyInRangeCallback"
@@ -5590,7 +5590,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseSense::PyGetEnemy
         
-            typedef ::boost::python::object ( ::UnitBaseSense::*GetEnemy_function_type )( int ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseSense::*GetEnemy_function_type )( int ) ;
             
             UnitBaseSense_exposer.def( 
                 "GetEnemy"
@@ -5600,7 +5600,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseSense::PyGetOther
         
-            typedef ::boost::python::object ( ::UnitBaseSense::*GetOther_function_type )( int ) ;
+            typedef ::boost::python::api::object ( ::UnitBaseSense::*GetOther_function_type )( int ) ;
             
             UnitBaseSense_exposer.def( 
                 "GetOther"
@@ -5620,7 +5620,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         { //::UnitBaseSense::RemoveEnemyInRangeCallback
         
-            typedef bool ( ::UnitBaseSense::*RemoveEnemyInRangeCallback_function_type )( ::boost::python::object,int ) ;
+            typedef bool ( ::UnitBaseSense::*RemoveEnemyInRangeCallback_function_type )( ::boost::python::api::object,int ) ;
             
             UnitBaseSense_exposer.def( 
                 "RemoveEnemyInRangeCallback"
@@ -5695,9 +5695,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitExpresser
         typedef bp::class_< UnitExpresser_wrapper, bp::bases< UnitComponent, CAI_Expresser >, boost::noncopyable > UnitExpresser_exposer_t;
-        UnitExpresser_exposer_t UnitExpresser_exposer = UnitExpresser_exposer_t( "UnitExpresser", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitExpresser_exposer_t UnitExpresser_exposer = UnitExpresser_exposer_t( "UnitExpresser", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitExpresser_scope( UnitExpresser_exposer );
-        bp::implicitly_convertible< bp::object, UnitExpresser >();
+        bp::implicitly_convertible< bp::api::object, UnitExpresser >();
         { //::CAI_Expresser::DumpHistories
         
             typedef void ( UnitExpresser_wrapper::*DumpHistories_function_type )(  ) ;
@@ -5777,9 +5777,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitVPhysicsLocomotion
         typedef bp::class_< UnitVPhysicsLocomotion_wrapper, bp::bases< UnitBaseLocomotion > > UnitVPhysicsLocomotion_exposer_t;
-        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
-        bp::implicitly_convertible< bp::object, UnitVPhysicsLocomotion >();
+        bp::implicitly_convertible< bp::api::object, UnitVPhysicsLocomotion >();
         { //::UnitVPhysicsLocomotion::FinishMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -5841,9 +5841,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitVehicleAnimState
         typedef bp::class_< UnitVehicleAnimState_wrapper, bp::bases< UnitBaseAnimState > > UnitVehicleAnimState_exposer_t;
-        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
-        bp::implicitly_convertible< bp::object, UnitVehicleAnimState >();
+        bp::implicitly_convertible< bp::api::object, UnitVehicleAnimState >();
         { //::UnitVehicleAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -5976,9 +5976,9 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     { //::UnitVehicleNavigator
         typedef bp::class_< UnitVehicleNavigator, bp::bases< UnitBaseNavigator >, boost::noncopyable > UnitVehicleNavigator_exposer_t;
-        UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::object >(( bp::arg("outer") )) );
+        UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
-        bp::implicitly_convertible< bp::object, UnitVehicleNavigator >();
+        bp::implicitly_convertible< bp::api::object, UnitVehicleNavigator >();
         { //::UnitVehicleNavigator::ComputeConsiderDensAndDirs
         
             typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::Vector &,::CheckGoalStatus_t ) ;

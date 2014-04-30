@@ -141,7 +141,7 @@ struct CHL2WarsGameRules_wrapper : CHL2WarsGameRules, bp::wrapper< CHL2WarsGameR
         return CHL2WarsGameRules::GetGameDescription( );
     }
 
-    virtual ::boost::python::object GetNextLevelName( bool bRandom=false ) {
+    virtual ::boost::python::api::object GetNextLevelName( bool bRandom=false ) {
         PY_OVERRIDE_CHECK( CHL2WarsGameRules, GetNextLevelName )
         PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, GetNextLevelName )
         bp::override func_GetNextLevelName = this->get_override( "GetNextLevelName" );
@@ -156,7 +156,7 @@ struct CHL2WarsGameRules_wrapper : CHL2WarsGameRules, bp::wrapper< CHL2WarsGameR
             return this->CHL2WarsGameRules::GetNextLevelName( bRandom );
     }
     
-    ::boost::python::object default_GetNextLevelName( bool bRandom=false ) {
+    ::boost::python::api::object default_GetNextLevelName( bool bRandom=false ) {
         return CHL2WarsGameRules::GetNextLevelName( bRandom );
     }
 
@@ -2608,8 +2608,8 @@ void register_CHL2WarsGameRules_class(){
         }
         { //::CHL2WarsGameRules::GetNextLevelName
         
-            typedef ::boost::python::object ( ::CHL2WarsGameRules::*GetNextLevelName_function_type )( bool ) ;
-            typedef ::boost::python::object ( CHL2WarsGameRules_wrapper::*default_GetNextLevelName_function_type )( bool ) ;
+            typedef ::boost::python::api::object ( ::CHL2WarsGameRules::*GetNextLevelName_function_type )( bool ) ;
+            typedef ::boost::python::api::object ( CHL2WarsGameRules_wrapper::*default_GetNextLevelName_function_type )( bool ) ;
             
             CHL2WarsGameRules_exposer.def( 
                 "GetNextLevelName"

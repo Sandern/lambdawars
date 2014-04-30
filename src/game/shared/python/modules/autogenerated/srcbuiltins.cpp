@@ -237,7 +237,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
             , (void ( ::SrcPyStdErr::* )(  ) )( &::SrcPyStdErr::flush ) )    
         .def( 
             "write"
-            , (void ( ::SrcPyStdErr::* )( ::boost::python::object ) )( &::SrcPyStdErr::write )
+            , (void ( ::SrcPyStdErr::* )( char const * ) )( &::SrcPyStdErr::write )
             , ( bp::arg("msg") ) );
 
     bp::class_< SrcPyStdOut >( "SrcPyStdOut" )    
@@ -246,7 +246,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
             , (void ( ::SrcPyStdOut::* )(  ) )( &::SrcPyStdOut::flush ) )    
         .def( 
             "write"
-            , (void ( ::SrcPyStdOut::* )( ::boost::python::object ) )( &::SrcPyStdOut::write )
+            , (void ( ::SrcPyStdOut::* )( char const * ) )( &::SrcPyStdOut::write )
             , ( bp::arg("msg") ) );
 
     bp::class_< color24 >( "color24" )    
@@ -283,7 +283,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::IsPerFrameMethodRegistered
     
-        typedef bool ( *IsPerFrameMethodRegistered_function_type )( ::boost::python::object );
+        typedef bool ( *IsPerFrameMethodRegistered_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "IsPerFrameMethodRegistered"
@@ -294,7 +294,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::IsTickMethodRegistered
     
-        typedef bool ( *IsTickMethodRegistered_function_type )( ::boost::python::object );
+        typedef bool ( *IsTickMethodRegistered_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "IsTickMethodRegistered"
@@ -305,7 +305,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::PyCOM_TimestampedLog
     
-        typedef void ( *COM_TimestampedLog_function_type )( ::boost::python::object );
+        typedef void ( *COM_TimestampedLog_function_type )( char const * );
         
         bp::def( 
             "COM_TimestampedLog"
@@ -316,7 +316,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::RegisterPerFrameMethod
     
-        typedef void ( *RegisterPerFrameMethod_function_type )( ::boost::python::object );
+        typedef void ( *RegisterPerFrameMethod_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "RegisterPerFrameMethod"
@@ -327,7 +327,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::RegisterTickMethod
     
-        typedef void ( *RegisterTickMethod_function_type )( ::boost::python::object,float,bool,bool );
+        typedef void ( *RegisterTickMethod_function_type )( ::boost::python::api::object,float,bool,bool );
         
         bp::def( 
             "RegisterTickMethod"
@@ -338,7 +338,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyDevMsg
     
-        typedef void ( *DevMsg_function_type )( int,::boost::python::object );
+        typedef void ( *DevMsg_function_type )( int,char const * );
         
         bp::def( 
             "DevMsg"
@@ -349,7 +349,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyMsg
     
-        typedef void ( *Msg_function_type )( ::boost::python::object );
+        typedef void ( *Msg_function_type )( char const * );
         
         bp::def( 
             "Msg"
@@ -360,7 +360,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyWarning
     
-        typedef void ( *PrintWarning_function_type )( ::boost::python::object );
+        typedef void ( *PrintWarning_function_type )( char const * );
         
         bp::def( 
             "PrintWarning"
@@ -371,7 +371,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::UnregisterPerFrameMethod
     
-        typedef void ( *UnregisterPerFrameMethod_function_type )( ::boost::python::object );
+        typedef void ( *UnregisterPerFrameMethod_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "UnregisterPerFrameMethod"
@@ -398,7 +398,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::UnregisterTickMethod
     
-        typedef void ( *UnregisterTickMethod_function_type )( ::boost::python::object );
+        typedef void ( *UnregisterTickMethod_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "UnregisterTickMethod"

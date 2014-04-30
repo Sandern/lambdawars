@@ -33,7 +33,7 @@ void _gamerules_register_free_functions(){
 
     { //::PyGameRules
     
-        typedef ::boost::python::object ( *GameRules_function_type )(  );
+        typedef ::boost::python::api::object ( *GameRules_function_type )(  );
         
         bp::def( 
             "GameRules"
@@ -43,7 +43,7 @@ void _gamerules_register_free_functions(){
 
     { //::PyInstallGameRules
     
-        typedef void ( *InstallGameRules_function_type )( ::boost::python::object );
+        typedef void ( *InstallGameRules_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "InstallGameRules"

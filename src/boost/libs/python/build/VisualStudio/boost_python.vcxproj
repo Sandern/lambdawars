@@ -60,7 +60,7 @@
     <ClCompile>
       <AdditionalOptions>/Zm800 /Zm800 /Zm800 /Zm800 /Zm800 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\python;..\..\..\..\..\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\thirdparty\python;..\..\..\..\..\thirdparty\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -106,7 +106,7 @@
       <AdditionalOptions>/Zm800 /Zm800 /Zm800 /Zm800  %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\python\PC;..\..\..\..\..\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\thirdparty\python\PC;..\..\..\..\..\thirdparty\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;WIN32;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_PYTHON_NO_PY_SIGNATURES;BOOST_SERIALIZATION_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
