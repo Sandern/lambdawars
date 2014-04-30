@@ -67,13 +67,10 @@ baseincludes = [
     '../../game/shared/lambdawars',
     
     # Python/Boost folders
-    '../../python/Include',
-    '../../python',
+    '../../thirdparty/python/Include',
+    '../../thirdparty/python',
     
-    # Too much work to fix things to let boost python be parsed correctly
-    # We only need to know the object class one anyway
-    #'../boost',
-    '../../srcpypp/boost_stubs',
+	'../../boost',
 ]
 
 serversymbols = basesymbols + [
@@ -130,14 +127,10 @@ def GenerateAppendCode(f, modulenames, dllname):
     unixdecls = []
     appendlist = []
     for name in modulenames:
-        # Py3
-        #win32decls.append('extern "C" __declspec(dllexport) PyObject* PyInit_%s();' % (name))
-        #unixdecls.append('extern "C"  PyObject* PyInit_%s();' % (name))
-        # Py2
-        win32decls.append('extern "C" __declspec(dllexport) void init%s();' % (name))
-        unixdecls.append('extern "C"  void init%s();' % (name))
+        # PYINIT macro either evaluates to PyInit_ (py3) or init_ (py2)
+        win32decls.append('extern "C" __declspec(dllexport) PYINIT_DECL(%s)();' % (name))
+        unixdecls.append('extern "C" PYINIT_DECL(%s)();' % (name))
         appendlist.append('\tAPPEND_MODULE(%s)' % (name))
-        
         
     f.write(appendtemplate % {
         'win32decls' : '\n'.join(win32decls),

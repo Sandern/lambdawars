@@ -111,8 +111,10 @@ extern boost::python::object fntype;
 
 #if PY_VERSION_HEX < 0x03000000
 #define PYINIT(x) init##x
+#define PYINIT_DECL(x) void init##x
 #else
 #define PYINIT(x) PyInit_##x
+#define PYINIT_DECL(x) PyObject* PyInit_##x
 #endif // 0x03000000
 
 #define APPEND_MODULE( x )											\
