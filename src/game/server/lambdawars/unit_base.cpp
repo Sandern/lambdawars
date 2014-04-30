@@ -252,18 +252,16 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 	try 
 	{
 		int event;
-		boost::python::object objectKey, objectValue;
-		const boost::python::object objectKeys = d.iterkeys();
-		const boost::python::object objectValues = d.itervalues();
-		unsigned long ulCount = boost::python::len(d); 
-		for( unsigned long u = 0; u < ulCount; u++ )
+		boost::python::object items = d.attr("items")();
+		boost::python::object iterator = items.attr("__iter__")();
+		boost::python::ssize_t length = boost::python::len(items); 
+		for( boost::python::ssize_t u = 0; u < length; u++ )
 		{
-			objectKey = objectKeys.attr( "next" )();
-			objectValue = objectValues.attr( "next" )();
+			boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
 
 			try 
 			{
-				event = boost::python::extract<int>(objectKey);
+				event = boost::python::extract<int>( item[0] );
 			}
 			catch( boost::python::error_already_set & )
 			{
@@ -271,7 +269,7 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 				continue;
 			}
 
-			SetAnimEventHandler(event, objectValue);
+			SetAnimEventHandler( event, item[1] );
 		}
 	}
 	catch( boost::python::error_already_set & )

@@ -1301,6 +1301,9 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	m_hScriptInstance = NULL;
 	
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
@@ -1319,13 +1322,13 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 			PyErr_Clear();
 		}
 
-		boost::python::object elem ;
-		const boost::python::object objectValues = fieldinitmap.itervalues();
+		boost::python::object elem;
+		boost::python::list objectValues = fieldinitmap.values();
 
 		boost::python::ssize_t n = boost::python::len(fieldinitmap);
-		for( boost::python::ssize_t i=0; i < n; i++ ) 
+		for( boost::python::ssize_t i = 0; i < n; i++ ) 
 		{
-			elem = objectValues.attr( "next" )();
+			elem = objectValues[i];
 			try 
 			{
 				elem.attr("InitField")(m_pyInstance);
@@ -1338,6 +1341,9 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	return true;
 }
