@@ -59,7 +59,6 @@ float4 main( PS_INPUT i ) : COLOR
 	float4 result = tex2Dsrgb( BaseSampler1, i.vBaseTexCoord.xy );
 
 	float3 diffuseLighting = i.color.rgb;
-	//diffuseLighting *= g_DiffuseModulation.rgb;
 	diffuseLighting *= lerp( float3( 1.0f, 1.0f, 1.0f ), g_DiffuseModulation.rgb, saturate( result.a + g_fInverseBlendTintByBaseAlpha ) );
 
 	result.rgb *= diffuseLighting; //i.color.rgb;

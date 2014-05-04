@@ -13,6 +13,7 @@
 
 const float4 g_vecLightVec_Forward				: register( SHADER_SPECIFIC_CONST_0 );
 const float4 g_vecLightVec_Diffuse				: register( SHADER_SPECIFIC_CONST_2 );
+const float4 g_vecLightVec_Ambient				: register( SHADER_SPECIFIC_CONST_3 );
 
 const float4 g_vFoWWorldSize						: register( SHADER_SPECIFIC_CONST_1 );
 
@@ -137,12 +138,17 @@ VS_OUTPUT main( const VS_INPUT v )
 	//o.color.xyz = g_vecLightVec_Forward.xyz;
 
 	// Just do one diffuse color for flora
-	cLightInfo[0].color = float4( normalize(g_vecLightVec_Diffuse.xyz), 1 ); //float4( 0.94, 0.725, 0.50, 1 ); // {xyz} is color	w is light type code (see comment below)
-	cLightInfo[0].dir = float4( normalize(g_vecLightVec_Forward.xyz), 1 ); //float4( 0, 0, -1, 1 ); // {xyz} is dir		w is light type code
-	cLightInfo[0].pos = float4( 0, 0, 0, 0 );
+	/*cLightInfo[0].color = float4( g_vecLightVec_Diffuse.xyz, 0 ); //float4( 0.94, 0.725, 0.50, 1 ); // {xyz} is color	w is light type code (see comment below)
+	cLightInfo[0].dir = float4( normalize(-g_vecLightVec_Forward.xyz), 0 ); //float4( 0, 0, -1, 1 ); // {xyz} is dir		w is light type code
+	cLightInfo[0].pos = float4( 0, 0, 0, 1 );
 	cLightInfo[0].spotParams = float4( 0, 0, 0, 0 );
 	cLightInfo[0].atten = float4( 1, 0, 0, 0 );
 	o.color.xyz = DoLightInternal( vWorldPos, float3(0, 0, 1), 0, false );
+	o.color.a = 0;
+
+	o.color.xyz += g_vecLightVec_Ambient.xyz;*/
+
+	o.color.xyz = g_vecLightVec_Diffuse.xyz;
 	o.color.a = 0;
 #endif // VERTEXCOLOR
 

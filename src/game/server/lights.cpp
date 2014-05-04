@@ -313,13 +313,14 @@ void CEnvLight::Activate( void )
 			float ash = deferred_autoenvlight_ambient_intensity_high.GetFloat();
 
 			const QAngle &vecAngles = GetAbsAngles();
+			pGlobalLight->KeyValue( "origin", UTIL_VarArgs("%f %f %f", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ) );
 			pGlobalLight->KeyValue( "diffuse", UTIL_VarArgs("%f %f %f %f", m_vecLight[0], m_vecLight[1], m_vecLight[2], m_vecLight[3] * ds ) );
 			pGlobalLight->KeyValue( "ambient_high", UTIL_VarArgs("%f %f %f %f", m_vecAmbientLight[0], m_vecAmbientLight[1], m_vecAmbientLight[2], m_vecAmbientLight[3] * ash ) );
 			pGlobalLight->KeyValue( "ambient_low", UTIL_VarArgs("%f %f %f %f", m_vecAmbientLight[0], m_vecAmbientLight[1], m_vecAmbientLight[2], m_vecAmbientLight[3] * asl ) );
 			pGlobalLight->KeyValue( "spawnflags", DEFLIGHTGLOBAL_ENABLED | DEFLIGHTGLOBAL_SHADOW_ENABLED );
 			pGlobalLight->KeyValue( "angles", UTIL_VarArgs("%f %f %f", -m_fLightPitch, vecAngles.y, vecAngles.z ) );
 			DispatchSpawn( pGlobalLight );
-			//pGlobalLight->Activate(); // Should not be activated. This will be called before the level activates all entities.
+			//pGlobalLight->Activate(); // Should not be activated here: the global light is created before the level activates all entities.
 		}
 	}
 

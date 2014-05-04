@@ -321,8 +321,9 @@ BEGIN_VS_SHADER( Flora, "Help for Flora" )
 
 			const lightData_Global_t &data = GetDeferredExt()->GetLightData_Global();
 			//Vector4D vecLight( 0, 0, 1, 0 );
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, (-data.vecLight).Base() );
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, (data.vecLight).Base() );
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, data.diff.Base() );
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, MakeHalfAmbient( data.ambl, data.ambh ).Base() );
 
 			pShaderAPI->SetPixelShaderFogParams( 21 );
 
