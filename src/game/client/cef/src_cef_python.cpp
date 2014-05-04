@@ -80,6 +80,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( i, pStr );
 		}
+#if PY_VERSION_HEX < 0x03000000
 		else if( valuetype == builtins.attr("unicode") )
 		{
 			const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
@@ -90,6 +91,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 			}
 			result->SetString( i, pStr );
 		}
+#endif // PY_VERSION_HEX < 0x03000000
 		else if( valuetype == builtins.attr("bool") )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
@@ -206,6 +208,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 			const char *pStr = boost::python::extract<const char *>(value);
 			result->SetString( cefkey, pStr );
 		}
+#if PY_VERSION_HEX < 0x03000000
 		else if( valuetype == builtins.attr("unicode") )
 		{
 			const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
@@ -216,6 +219,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 			}
 			result->SetString( cefkey, pStr );
 		}
+#endif // PY_VERSION_HEX < 0x03000000
 		else if( valuetype == builtins.attr("bool") )
 		{
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
