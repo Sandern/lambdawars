@@ -391,12 +391,12 @@ void CWarsFlora::UpdateUnitAvoid()
 		
 				vecAvoid = vOrigin - pEnt->GetAbsOrigin();
 				vecAvoid.z = 0;
-				float flDist = VectorNormalize( vecAvoid );
-				vecAvoid.z = 1.0f - Min( Max( flDist / flRadius, 0.0f ), 1.0f );
+				vecAvoid.z = 1.0f - Min( Max( vecAvoid.Length() / flRadius, 0.0f ), 1.0f );
 				vecAvoidAvg += vecAvoid;
 			}
 
 			vecAvoidAvg /= c;
+			VectorNormalize( vecAvoidAvg );
 
 			VectorYawRotate( vecAvoidAvg, -GetAbsAngles()[YAW], vecAvoidAvg );
 		}
