@@ -1465,7 +1465,9 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			pShaderAPI->SetPixelShaderConstant( PSREG_UBERLIGHT_SMOOTH_EDGE_0, fl1 );
 		}
 
-		CommitGlobalLightForward( pShaderAPI, VERTEX_SHADER_SHADER_SPECIFIC_CONST_14 );
+		Vector4D vecLight = GetDeferredExt()->GetLightData_Global().vecLight;
+		//Vector4D vecLight( 0, 0, 1, 0 );
+		//pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_14, vecLight.Base() );
 
 		if ( bHasBump || bHasDiffuseWarp )
 		{
