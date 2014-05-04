@@ -107,9 +107,8 @@ lightData_Global_t CDeferredLightGlobal::GetState()
 	Vector normal(0, 0, 1);
 	engine->ComputeLighting( GetAbsOrigin(), &normal, false, diff );
 
-	//Vector diff = engine->GetLightForPoint( GetAbsOrigin(), false );
 	data.diff.Init( diff );
-	//data.diff.Init( GetColor_Diffuse() );
+	//data.diff.Init( GetColor_Diffuse() ); // Original
 	data.ambh.Init( GetColor_Ambient_High() );
 	data.ambl.Init( GetColor_Ambient_Low() );
 

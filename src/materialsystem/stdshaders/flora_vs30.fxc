@@ -4,16 +4,15 @@
 // STATIC: "TREESWAY"					"0..2"
 
 // DYNAMIC:		"SKINNING"				"0..1"
-// DYNAMIC:		"DYNAMIC_LIGHT"			"0..1"
 // DYNAMIC:		"COMPRESSED_VERTS"		"0..1"
 
 #include "common_vs_fxc.h"
 #include "fow_vs_fxc.h"
 #include "common_fog_vs_supportsvertexfog_fxc.h"
 
-const float4 g_vecLightVec_Forward				: register( SHADER_SPECIFIC_CONST_0 );
+//const float4 g_vecLightVec_Forward				: register( SHADER_SPECIFIC_CONST_0 );
 const float4 g_vecLightVec_Diffuse				: register( SHADER_SPECIFIC_CONST_2 );
-const float4 g_vecLightVec_Ambient				: register( SHADER_SPECIFIC_CONST_3 );
+//const float4 g_vecLightVec_Ambient				: register( SHADER_SPECIFIC_CONST_3 );
 
 const float4 g_vFoWWorldSize						: register( SHADER_SPECIFIC_CONST_1 );
 
@@ -95,9 +94,6 @@ VS_OUTPUT main( const VS_INPUT v )
 
 	float4 vPosition = v.vPos;
 
-	bool bDynamicLight = DYNAMIC_LIGHT ? true : false;
-	bool bStaticLight = false;
-
 	float3 vObjNormal;
 	DecompressVertex_Normal( v.vNormal, vObjNormal );
 
@@ -148,6 +144,7 @@ VS_OUTPUT main( const VS_INPUT v )
 
 	o.color.xyz += g_vecLightVec_Ambient.xyz;*/
 
+	// Directly set one time computed lighting value. Good enough for flora.
 	o.color.xyz = g_vecLightVec_Diffuse.xyz;
 	o.color.a = 0;
 #endif // VERTEXCOLOR

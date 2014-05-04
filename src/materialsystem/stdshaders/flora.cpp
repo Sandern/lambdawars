@@ -13,6 +13,10 @@
 #include "flora_vs30.inc"
 #include "flora_ps30.inc"
 
+static CCommandBufferBuilder< CFixedCommandStorageBuffer< 512 > > tmpBuf;
+
+extern ConVar building_cubemaps;
+
 BEGIN_VS_SHADER( Flora, "Help for Flora" )
 
 	BEGIN_SHADER_PARAMS
@@ -198,7 +202,7 @@ BEGIN_VS_SHADER( Flora, "Help for Flora" )
 	}
 
 	inline void DrawFlora( IMaterialVar **params, IShaderShadow* pShaderShadow,
-		IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CBasePerMaterialContextData *pContextDataPtr ) 
+		IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, CDeferredPerMaterialContextData *pDeferredContext  ) 
 	{
 		const bool bIsAlphaTested = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) != 0;
 		const bool bHasVertexColor = IS_FLAG_SET( MATERIAL_VAR_VERTEXCOLOR );
@@ -289,8 +293,55 @@ BEGIN_VS_SHADER( Flora, "Help for Flora" )
 		}
 		DYNAMIC_STATE
 		{
-			LightState_t lightState = {0, false, false};
-			pShaderAPI->GetDX9LightState( &lightState );
+			Assert( pDeferredContext != NULL );
+
+			if ( pDeferredContext->m_bMaterialVarsChanged || !pDeferredContext->HasCommands( CDeferredPerMaterialContextData::DEFSTAGE_COMPOSITE )
+				|| building_cubemaps.GetBool() )
+			{
+				tmpBuf.Reset();
+
+				float fWriteDepthToAlpha = /*bWriteDepthToAlpha && IsPC() ? 1.0f :*/ 0.0f;
+				float fWriteWaterFogToDestAlpha = /*bWriteWaterFogToAlpha ? 1.0f :*/ 0.0f;
+				float fVertexAlpha = /*bHasVertexAlpha ? 1.0f :*/ 0.0f;
+				float fBlendTintByBaseAlpha = /*IsBoolSet( info.m_nBlendTintByBaseAlpha, params ) ? 1.0f :*/ 0.0f;
+
+				// Controls for lerp-style paths through shader code (used by bump and non-bump)
+				float vShaderControls[4] = { 1.0f - fBlendTintByBaseAlpha, fWriteDepthToAlpha, fWriteWaterFogToDestAlpha, fVertexAlpha };
+				tmpBuf.SetPixelShaderConstant( 12, vShaderControls, 1 );
+				float flEyeW = TextureIsTranslucent( BASETEXTURE, true ) ? 1.0f : 0.0f;
+				tmpBuf.StoreEyePosInPixelShaderConstant( 20, flEyeW );
+
+				// Mostly fixed treesway parameters
+				if ( bTreeSway )
+				{
+					float flParams[4];
+					flParams[0] = GetFloatParam( TREESWAYSPEEDHIGHWINDMULTIPLIER, params, 2.0f );
+					flParams[1] = GetFloatParam( TREESWAYSCRUMBLEFALLOFFEXP, params, 1.0f );
+					flParams[2] = GetFloatParam( TREESWAYFALLOFFEXP, params, 1.0f );
+					flParams[3] = GetFloatParam( TREESWAYSCRUMBLESPEED, params, 3.0f );
+					tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, flParams );
+
+					flParams[0] = GetFloatParam( TREESWAYSPEEDLERPSTART, params, 3.0f );
+					flParams[1] = GetFloatParam( TREESWAYSPEEDLERPEND, params, 6.0f );
+					tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, flParams );
+
+					flParams[0] = GetFloatParam( TREESWAYHEIGHT, params, 1000.0f );
+					flParams[1] = GetFloatParam( TREESWAYSTARTHEIGHT, params, 0.1f );
+					flParams[2] = GetFloatParam( TREESWAYRADIUS, params, 300.0f );
+					flParams[3] = GetFloatParam( TREESWAYSTARTRADIUS, params, 0.2f );
+					tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, flParams );
+
+					flParams[0] = GetFloatParam( TREESWAYSPEED, params, 1.0f );
+					flParams[1] = GetFloatParam( TREESWAYSTRENGTH, params, 10.0f );
+					flParams[2] = GetFloatParam( TREESWAYSCRUMBLEFREQUENCY, params, 12.0f );
+					flParams[3] = GetFloatParam( TREESWAYSCRUMBLESTRENGTH, params, 10.0f );
+					tmpBuf.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, flParams );
+				}
+
+				tmpBuf.End();
+
+				pDeferredContext->SetCommands( CDeferredPerMaterialContextData::DEFSTAGE_COMPOSITE, tmpBuf.Copy() );
+			}
 
 			// Reset render state
 			pShaderAPI->SetDefaultState();
@@ -321,15 +372,14 @@ BEGIN_VS_SHADER( Flora, "Help for Flora" )
 
 			const lightData_Global_t &data = GetDeferredExt()->GetLightData_Global();
 			//Vector4D vecLight( 0, 0, 1, 0 );
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, (data.vecLight).Base() );
+			//pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, (data.vecLight).Base() );
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, data.diff.Base() );
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, MakeHalfAmbient( data.ambl, data.ambh ).Base() );
+			//pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, MakeHalfAmbient( data.ambl, data.ambh ).Base() );
 
 			pShaderAPI->SetPixelShaderFogParams( 21 );
 
 			// Set Vertex Shader Combos
 			DECLARE_DYNAMIC_VERTEX_SHADER( flora_vs30 );
-			SET_DYNAMIC_VERTEX_SHADER_COMBO( DYNAMIC_LIGHT, lightState.HasDynamicLight() );
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING, (bModel && pShaderAPI->GetCurrentNumBones() > 0) ? 1 : 0 );
 			SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
 			SET_DYNAMIC_VERTEX_SHADER( flora_vs30 );
@@ -338,54 +388,18 @@ BEGIN_VS_SHADER( Flora, "Help for Flora" )
 			DECLARE_DYNAMIC_PIXEL_SHADER( flora_ps30 );
 			SET_DYNAMIC_PIXEL_SHADER( flora_ps30 );
 
-			CCommandBufferBuilder< CFixedCommandStorageBuffer< 1000 > > DynamicCmdsOut;
-			//DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, vecLight.Base() );
-
-			float fWriteDepthToAlpha = /*bWriteDepthToAlpha && IsPC() ? 1.0f :*/ 0.0f;
-			float fWriteWaterFogToDestAlpha = /*bWriteWaterFogToAlpha ? 1.0f :*/ 0.0f;
-			float fVertexAlpha = /*bHasVertexAlpha ? 1.0f :*/ 0.0f;
-			float fBlendTintByBaseAlpha = /*IsBoolSet( info.m_nBlendTintByBaseAlpha, params ) ? 1.0f :*/ 0.0f;
-
-			// Controls for lerp-style paths through shader code (used by bump and non-bump)
-			float vShaderControls[4] = { 1.0f - fBlendTintByBaseAlpha, fWriteDepthToAlpha, fWriteWaterFogToDestAlpha, fVertexAlpha };
-			DynamicCmdsOut.SetPixelShaderConstant( 12, vShaderControls, 1 );
-			float flEyeW = TextureIsTranslucent( BASETEXTURE, true ) ? 1.0f : 0.0f;
-			DynamicCmdsOut.StoreEyePosInPixelShaderConstant( 20, flEyeW );
-
+			// Treesway: Time and wind direction parameters (changes all the time)
 			if ( bTreeSway )
 			{
 				float flParams[4];
-				flParams[0] = GetFloatParam( TREESWAYSPEEDHIGHWINDMULTIPLIER, params, 2.0f );
-				flParams[1] = GetFloatParam( TREESWAYSCRUMBLEFALLOFFEXP, params, 1.0f );
-				flParams[2] = GetFloatParam( TREESWAYFALLOFFEXP, params, 1.0f );
-				flParams[3] = GetFloatParam( TREESWAYSCRUMBLESPEED, params, 3.0f );
-				DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, flParams );
-
-				flParams[0] = GetFloatParam( TREESWAYSPEEDLERPSTART, params, 3.0f );
-				flParams[1] = GetFloatParam( TREESWAYSPEEDLERPEND, params, 6.0f );
-				DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_5, flParams );
-
-				flParams[0] = GetFloatParam( TREESWAYHEIGHT, params, 1000.0f );
-				flParams[1] = GetFloatParam( TREESWAYSTARTHEIGHT, params, 0.1f );
-				flParams[2] = GetFloatParam( TREESWAYRADIUS, params, 300.0f );
-				flParams[3] = GetFloatParam( TREESWAYSTARTRADIUS, params, 0.2f );
-				DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_6, flParams );
-
-				flParams[0] = GetFloatParam( TREESWAYSPEED, params, 1.0f );
-				flParams[1] = GetFloatParam( TREESWAYSTRENGTH, params, 10.0f );
-				flParams[2] = GetFloatParam( TREESWAYSCRUMBLEFREQUENCY, params, 12.0f );
-				flParams[3] = GetFloatParam( TREESWAYSCRUMBLESTRENGTH, params, 10.0f );
-				DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_7, flParams );
-
 				flParams[1] = pShaderAPI->CurrentTime();
 				Vector windDir = pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_WIND_DIRECTION );
 				flParams[2] = windDir.x;
 				flParams[3] = windDir.y;
-				DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, flParams );
+				pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_8, flParams );
 			}
 
-			DynamicCmdsOut.End();
-			pShaderAPI->ExecuteCommandBuffer( DynamicCmdsOut.Base() );
+			pShaderAPI->ExecuteCommandBuffer( pDeferredContext->GetCommands( CDeferredPerMaterialContextData::DEFSTAGE_COMPOSITE ) );
 		}
 		Draw();
 	}
