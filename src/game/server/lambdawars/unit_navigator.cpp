@@ -766,7 +766,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalS
 		//		- Not blocked
 		float fRotate = 45.0f;
 		j = 0;
-		int jmax = GetBlockedStatus() == BS_STUCK ? 7 : 4; // Do full scan in case we are stuck
+		int jmax = GetBlockedStatus() >= BS_LITTLE ? 7 : 4; // Do full scan in case we are stuck
 		if( m_bLimitPositionActive )
 			jmax = 1;
 
