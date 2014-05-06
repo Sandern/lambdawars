@@ -565,7 +565,7 @@ public:
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
 #ifdef HL2WARS_DLL
-		AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+		//AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
 #endif // HL2WARS_DLL
 	}
 
@@ -1232,7 +1232,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 #endif
 
 #ifdef HL2WARS_DLL
-	warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
+	//warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
 #endif // HL2WARS_DLL
 
 	if ( !CommandLine()->CheckParm( "-noscripting") )
