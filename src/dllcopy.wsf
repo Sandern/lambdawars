@@ -12,13 +12,10 @@
   <!-- Script Constants: -->
   <object id="fsObject" progid="Scripting.FileSystemObject" />
   <object id="wshShell" progid="WScript.Shell" />
-  <resource id="mod directory">SteamApps\common\Lambda Wars\lambdawars</resource>
+  <resource id="mod directory">lambdawarsdev</resource>
   <resource id="subdirectory">bin</resource>
-  <!-- For Games: -->
-  <resource id="reg value">HKCU\Software\Valve\Steam\SteamPath</resource>
-  <!-- For Source mods:
+  <!-- For Source mods: -->
   <resource id="reg value">HKCU\Software\Valve\Steam\SourceModInstallPath</resource>
-   -->
   <!-- For GoldSrc mods:
   <resource id="reg value">HKCU\Software\Valve\Steam\ModInstallPath</resource>
   -->
