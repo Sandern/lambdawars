@@ -41,9 +41,8 @@ void UnitVehicleNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, 
 //			In case of a vehicle, the only possible directions are forward and backward
 //			TODO: Allow some turning directions when moving?
 //-----------------------------------------------------------------------------
-void UnitVehicleNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus )
+void UnitVehicleNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus )
 {
-	int i;
 	//float fSpeed = GetWishVelocity().Length2D();
 
 	// Reset list information
@@ -61,22 +60,12 @@ void UnitVehicleNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGo
 	// Calculate forward and backward direction
 	m_pOuter->GetVectors(&m_vTestDirections[m_iUsedTestDirections], NULL, NULL); // Just use forward as start dir
 	m_vTestPositions[m_iUsedTestDirections] = origin + (m_vTestDirections[m_iUsedTestDirections] * fRadius);
-	for( i = 0; i < m_iConsiderSize; i++ )
-	{
-		if( !m_ConsiderList[i].m_pEnt ) 
-			continue;
-		m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-	}	
+	ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
 	m_iUsedTestDirections += 1;
 
 	m_vTestDirections[m_iUsedTestDirections] = -m_vTestDirections[m_iUsedTestDirections-1];
 	m_vTestPositions[m_iUsedTestDirections] = origin + (m_vTestDirections[m_iUsedTestDirections] * fRadius);
-	for( i = 0; i < m_iConsiderSize; i++ )
-	{
-		if( !m_ConsiderList[i].m_pEnt ) 
-			continue;
-		m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-	}	
+	ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
 	m_iUsedTestDirections += 1;
 
 	// Calculate turning direction in case we are moving
