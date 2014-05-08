@@ -67,10 +67,10 @@ baseincludes = [
     '../../game/shared/lambdawars',
     
     # Python/Boost folders
-    '../../thirdparty/python/Include',
-    '../../thirdparty/python',
+    '../../python/Include',
+    '../../python',
     
-	'../../boost',
+    '../../boost',
 ]
 
 serversymbols = basesymbols + [
