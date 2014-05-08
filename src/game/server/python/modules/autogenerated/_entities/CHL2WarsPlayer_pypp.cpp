@@ -1022,7 +1022,7 @@ void register_CHL2WarsPlayer_class(){
         CHL2WarsPlayer_exposer.def( bp::init< >() );
         { //::CHL2WarsPlayer::AddActiveAbility
         
-            typedef void ( ::CHL2WarsPlayer::*AddActiveAbility_function_type )( ::boost::python::object ) ;
+            typedef void ( ::CHL2WarsPlayer::*AddActiveAbility_function_type )( ::boost::python::api::object ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "AddActiveAbility"
@@ -1460,7 +1460,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::GetSingleActiveAbility
         
-            typedef ::boost::python::object ( ::CHL2WarsPlayer::*GetSingleActiveAbility_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::CHL2WarsPlayer::*GetSingleActiveAbility_function_type )(  ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "GetSingleActiveAbility"
@@ -1490,7 +1490,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::IsActiveAbility
         
-            typedef bool ( ::CHL2WarsPlayer::*IsActiveAbility_function_type )( ::boost::python::object ) ;
+            typedef bool ( ::CHL2WarsPlayer::*IsActiveAbility_function_type )( ::boost::python::api::object ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "IsActiveAbility"
@@ -1715,7 +1715,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::RemoveActiveAbility
         
-            typedef void ( ::CHL2WarsPlayer::*RemoveActiveAbility_function_type )( ::boost::python::object ) ;
+            typedef void ( ::CHL2WarsPlayer::*RemoveActiveAbility_function_type )( ::boost::python::api::object ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "RemoveActiveAbility"
@@ -1834,7 +1834,7 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::SetSingleActiveAbility
         
-            typedef void ( ::CHL2WarsPlayer::*SetSingleActiveAbility_function_type )( ::boost::python::object ) ;
+            typedef void ( ::CHL2WarsPlayer::*SetSingleActiveAbility_function_type )( ::boost::python::api::object ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "SetSingleActiveAbility"

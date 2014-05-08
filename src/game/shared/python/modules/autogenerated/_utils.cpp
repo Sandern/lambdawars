@@ -2329,7 +2329,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesAlongRay
     
-        typedef ::boost::python::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesAlongRay"
@@ -2340,7 +2340,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesInBox
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesInBox"
@@ -2351,7 +2351,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesInSphere
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int,int );
         
         bp::def( 
             "UTIL_EntitiesInSphere"
@@ -5645,7 +5645,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesAlongRay
     
-        typedef ::boost::python::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesAlongRay_function_type )( int,::PyRay_t const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesAlongRay"
@@ -5656,7 +5656,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesInBox
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesInBox_function_type )( int,::Vector const &,::Vector const &,int,int );
         
         bp::def( 
             "UTIL_EntitiesInBox"
@@ -5667,7 +5667,7 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_PyEntitiesInSphere
     
-        typedef ::boost::python::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int,int );
+        typedef ::boost::python::api::object ( *UTIL_EntitiesInSphere_function_type )( int,::Vector const &,float,int,int );
         
         bp::def( 
             "UTIL_EntitiesInSphere"

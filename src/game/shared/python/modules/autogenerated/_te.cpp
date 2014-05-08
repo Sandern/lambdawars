@@ -554,7 +554,7 @@ BOOST_PYTHON_MODULE(_te){
             , (void ( ::ITempEntsSystem::* )( ::IRecipientFilter &,float,::Vector const *,int ) )( &::ITempEntsSystem::WorldDecal )
             , ( bp::arg("filer"), bp::arg("delay"), bp::arg("pos"), bp::arg("index") ) );
 
-    bp::class_< PyClientEffectRegistration >( "ClientEffectRegistration", bp::init< char const *, bp::object >(( bp::arg("pEffectName"), bp::arg("method") )) );
+    bp::class_< PyClientEffectRegistration >( "ClientEffectRegistration", bp::init< char const *, bp::api::object >(( bp::arg("pEffectName"), bp::arg("method") )) );
 
     { //::PyClientSideEffect
         typedef bp::class_< PyClientSideEffect_wrapper, boost::noncopyable > ClientSideEffect_exposer_t;
@@ -563,7 +563,7 @@ BOOST_PYTHON_MODULE(_te){
         bp::implicitly_convertible< char const *, PyClientSideEffect >();
         { //::PyClientSideEffect::AddMeshBuilder
         
-            typedef void ( ::PyClientSideEffect::*AddMeshBuilder_function_type )( ::boost::python::object ) ;
+            typedef void ( ::PyClientSideEffect::*AddMeshBuilder_function_type )( ::boost::python::api::object ) ;
             
             ClientSideEffect_exposer.def( 
                 "AddMeshBuilder"
@@ -612,7 +612,7 @@ BOOST_PYTHON_MODULE(_te){
         }
         { //::PyClientSideEffect::RemoveMeshBuilder
         
-            typedef void ( ::PyClientSideEffect::*RemoveMeshBuilder_function_type )( ::boost::python::object ) ;
+            typedef void ( ::PyClientSideEffect::*RemoveMeshBuilder_function_type )( ::boost::python::api::object ) ;
             
             ClientSideEffect_exposer.def( 
                 "RemoveMeshBuilder"
@@ -776,7 +776,7 @@ BOOST_PYTHON_MODULE(_te){
 
     { //::AddToClientEffectList
     
-        typedef void ( *AddToClientEffectList_function_type )( ::boost::python::object );
+        typedef void ( *AddToClientEffectList_function_type )( ::boost::python::api::object );
         
         bp::def( 
             "AddToClientEffectList"

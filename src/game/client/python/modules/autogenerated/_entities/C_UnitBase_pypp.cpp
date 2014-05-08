@@ -163,7 +163,7 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
         return C_UnitBase::GetTracerType( );
     }
 
-    virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         PY_OVERRIDE_CHECK( C_UnitBase, IsSelectableByPlayer )
         PY_OVERRIDE_LOG( _entities, C_UnitBase, IsSelectableByPlayer )
         bp::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
@@ -178,7 +178,7 @@ struct C_UnitBase_wrapper : C_UnitBase, bp::wrapper< C_UnitBase > {
             return this->C_UnitBase::IsSelectableByPlayer( pPlayer, target_selection );
     }
     
-    bool default_IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    bool default_IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         return C_UnitBase::IsSelectableByPlayer( pPlayer, target_selection );
     }
 
@@ -1461,14 +1461,14 @@ void register_C_UnitBase_class(){
         }
         { //::C_UnitBase::IsSelectableByPlayer
         
-            typedef bool ( ::C_UnitBase::*IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::object ) ;
-            typedef bool ( C_UnitBase_wrapper::*default_IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::object ) ;
+            typedef bool ( ::C_UnitBase::*IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::api::object ) ;
+            typedef bool ( C_UnitBase_wrapper::*default_IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::api::object ) ;
             
             C_UnitBase_exposer.def( 
                 "IsSelectableByPlayer"
                 , IsSelectableByPlayer_function_type(&::C_UnitBase::IsSelectableByPlayer)
                 , default_IsSelectableByPlayer_function_type(&C_UnitBase_wrapper::default_IsSelectableByPlayer)
-                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::object() ) );
+                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::api::object() ) );
         
         }
         { //::C_UnitBase::IsSelectedByPlayer
@@ -2285,8 +2285,8 @@ void register_C_UnitBase_class(){
         }
         { //property "animstate"[fget=::C_UnitBase::PyGetAnimState, fset=::C_UnitBase::SetAnimState]
         
-            typedef ::boost::python::object ( ::C_UnitBase::*fget )(  ) ;
-            typedef void ( ::C_UnitBase::*fset )( ::boost::python::object ) ;
+            typedef ::boost::python::api::object ( ::C_UnitBase::*fget )(  ) ;
+            typedef void ( ::C_UnitBase::*fset )( ::boost::python::api::object ) ;
             
             C_UnitBase_exposer.add_property( 
                 "animstate"

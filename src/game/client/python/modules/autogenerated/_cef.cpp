@@ -268,7 +268,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::PerformLayout( );
     }
 
-    virtual void PyOnLoadEnd( ::boost::python::object frame, int httpStatusCode ) {
+    virtual void PyOnLoadEnd( ::boost::python::api::object frame, int httpStatusCode ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadEnd )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadEnd )
         bp::override func_OnLoadEnd = this->get_override( "OnLoadEnd" );
@@ -283,11 +283,11 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnLoadEnd( frame, httpStatusCode );
     }
     
-    void default_OnLoadEnd( ::boost::python::object frame, int httpStatusCode ) {
+    void default_OnLoadEnd( ::boost::python::api::object frame, int httpStatusCode ) {
         SrcCefBrowser::PyOnLoadEnd( frame, httpStatusCode );
     }
 
-    virtual void PyOnLoadError( ::boost::python::object frame, int errorCode, ::boost::python::object errorText, ::boost::python::object failedUrl ) {
+    virtual void PyOnLoadError( ::boost::python::api::object frame, int errorCode, ::boost::python::api::object errorText, ::boost::python::api::object failedUrl ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadError )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadError )
         bp::override func_OnLoadError = this->get_override( "OnLoadError" );
@@ -302,11 +302,11 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnLoadError( frame, errorCode, errorText, failedUrl );
     }
     
-    void default_OnLoadError( ::boost::python::object frame, int errorCode, ::boost::python::object errorText, ::boost::python::object failedUrl ) {
+    void default_OnLoadError( ::boost::python::api::object frame, int errorCode, ::boost::python::api::object errorText, ::boost::python::api::object failedUrl ) {
         SrcCefBrowser::PyOnLoadError( frame, errorCode, errorText, failedUrl );
     }
 
-    virtual void PyOnLoadStart( ::boost::python::object frame ) {
+    virtual void PyOnLoadStart( ::boost::python::api::object frame ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnLoadStart )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnLoadStart )
         bp::override func_OnLoadStart = this->get_override( "OnLoadStart" );
@@ -321,11 +321,11 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnLoadStart( frame );
     }
     
-    void default_OnLoadStart( ::boost::python::object frame ) {
+    void default_OnLoadStart( ::boost::python::api::object frame ) {
         SrcCefBrowser::PyOnLoadStart( frame );
     }
 
-    virtual void PyOnMethodCall( int identifier, ::boost::python::object methodargs, ::boost::python::object callbackid ) {
+    virtual void PyOnMethodCall( int identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnMethodCall )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnMethodCall )
         bp::override func_OnMethodCall = this->get_override( "OnMethodCall" );
@@ -340,7 +340,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
     
-    void default_OnMethodCall( int identifier, ::boost::python::object methodargs, ::boost::python::object callbackid ) {
+    void default_OnMethodCall( int identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
         SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
 
@@ -573,7 +573,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //property "name"[fget=::PyJSObject::GetName]
         
-            typedef ::boost::python::object ( ::PyJSObject::*fget )(  ) ;
+            typedef ::boost::python::api::object ( ::PyJSObject::*fget )(  ) ;
             
             JSObject_exposer.add_property( 
                 "name"
@@ -850,7 +850,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyCreateFunction
         
-            typedef ::boost::python::object ( ::SrcCefBrowser::*CreateFunction_function_type )( char const *,::PyJSObject *,bool ) ;
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*CreateFunction_function_type )( char const *,::PyJSObject *,bool ) ;
             
             SrcCefBrowser_exposer.def( 
                 "CreateFunction"
@@ -860,7 +860,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyCreateGlobalObject
         
-            typedef ::boost::python::object ( ::SrcCefBrowser::*CreateGlobalObject_function_type )( char const * ) ;
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*CreateGlobalObject_function_type )( char const * ) ;
             
             SrcCefBrowser_exposer.def( 
                 "CreateGlobalObject"
@@ -870,7 +870,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyExecuteJavaScriptWithResult
         
-            typedef ::boost::python::object ( ::SrcCefBrowser::*ExecuteJavaScriptWithResult_function_type )( char const *,char const *,int ) ;
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*ExecuteJavaScriptWithResult_function_type )( char const *,char const *,int ) ;
             
             SrcCefBrowser_exposer.def( 
                 "ExecuteJavaScriptWithResult"
@@ -880,7 +880,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyGetMainFrame
         
-            typedef ::boost::python::object ( ::SrcCefBrowser::*GetMainFrame_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*GetMainFrame_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "GetMainFrame"
@@ -899,7 +899,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyInvokeWithResult
         
-            typedef ::boost::python::object ( ::SrcCefBrowser::*InvokeWithResult_function_type )( ::PyJSObject *,char const *,::boost::python::list ) ;
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*InvokeWithResult_function_type )( ::PyJSObject *,char const *,::boost::python::list ) ;
             
             SrcCefBrowser_exposer.def( 
                 "InvokeWithResult"
@@ -909,8 +909,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnLoadEnd
         
-            typedef void ( ::SrcCefBrowser::*OnLoadEnd_function_type )( ::boost::python::object,int ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadEnd_function_type )( ::boost::python::object,int ) ;
+            typedef void ( ::SrcCefBrowser::*OnLoadEnd_function_type )( ::boost::python::api::object,int ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadEnd_function_type )( ::boost::python::api::object,int ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnLoadEnd"
@@ -921,8 +921,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnLoadError
         
-            typedef void ( ::SrcCefBrowser::*OnLoadError_function_type )( ::boost::python::object,int,::boost::python::object,::boost::python::object ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadError_function_type )( ::boost::python::object,int,::boost::python::object,::boost::python::object ) ;
+            typedef void ( ::SrcCefBrowser::*OnLoadError_function_type )( ::boost::python::api::object,int,::boost::python::api::object,::boost::python::api::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadError_function_type )( ::boost::python::api::object,int,::boost::python::api::object,::boost::python::api::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnLoadError"
@@ -933,8 +933,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnLoadStart
         
-            typedef void ( ::SrcCefBrowser::*OnLoadStart_function_type )( ::boost::python::object ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadStart_function_type )( ::boost::python::object ) ;
+            typedef void ( ::SrcCefBrowser::*OnLoadStart_function_type )( ::boost::python::api::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnLoadStart_function_type )( ::boost::python::api::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnLoadStart"
@@ -945,8 +945,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnMethodCall
         
-            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( int,::boost::python::object,::boost::python::object ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( int,::boost::python::object,::boost::python::object ) ;
+            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( int,::boost::python::api::object,::boost::python::api::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( int,::boost::python::api::object,::boost::python::api::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnMethodCall"
@@ -957,7 +957,7 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PySendCallback
         
-            typedef void ( ::SrcCefBrowser::*SendCallback_function_type )( ::boost::python::object,::boost::python::list ) ;
+            typedef void ( ::SrcCefBrowser::*SendCallback_function_type )( ::boost::python::api::object,::boost::python::list ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SendCallback"

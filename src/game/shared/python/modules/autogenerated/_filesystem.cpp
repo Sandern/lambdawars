@@ -30,7 +30,7 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_FullPathToRelativePath
     
-        typedef ::boost::python::object ( *FullPathToRelativePath_function_type )( char const *,char const * );
+        typedef ::boost::python::api::object ( *FullPathToRelativePath_function_type )( char const *,char const * );
         
         bp::def( 
             "FullPathToRelativePath"
@@ -63,7 +63,7 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_ReadFile
     
-        typedef ::boost::python::object ( *ReadFile_function_type )( char const *,char const *,bool,int,int );
+        typedef ::boost::python::api::object ( *ReadFile_function_type )( char const *,char const *,bool,int,int );
         
         bp::def( 
             "ReadFile"
@@ -74,7 +74,7 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_RelativePathToFullPath
     
-        typedef ::boost::python::object ( *RelativePathToFullPath_function_type )( char const *,char const * );
+        typedef ::boost::python::api::object ( *RelativePathToFullPath_function_type )( char const *,char const * );
         
         bp::def( 
             "RelativePathToFullPath"

@@ -414,7 +414,7 @@ BOOST_PYTHON_MODULE(_physics){
         }
         { //::PyPhysicsObject::Cmp
         
-            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::object ) ;
+            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::api::object ) ;
             
             PhysicsObject_exposer.def( 
                 "__cmp__"
@@ -1062,9 +1062,9 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysicsShadowController
         typedef bp::class_< PyPhysicsShadowController > PhysicsShadowController_exposer_t;
-        PhysicsShadowController_exposer_t PhysicsShadowController_exposer = PhysicsShadowController_exposer_t( "PhysicsShadowController", bp::init< bp::object >(( bp::arg("refPyPhysObj") )) );
+        PhysicsShadowController_exposer_t PhysicsShadowController_exposer = PhysicsShadowController_exposer_t( "PhysicsShadowController", bp::init< bp::api::object >(( bp::arg("refPyPhysObj") )) );
         bp::scope PhysicsShadowController_scope( PhysicsShadowController_exposer );
-        bp::implicitly_convertible< bp::object, PyPhysicsShadowController >();
+        bp::implicitly_convertible< bp::api::object, PyPhysicsShadowController >();
         { //::PyPhysicsShadowController::AllowsRotation
         
             typedef bool ( ::PyPhysicsShadowController::*AllowsRotation_function_type )(  ) ;
@@ -1085,7 +1085,7 @@ BOOST_PYTHON_MODULE(_physics){
         }
         { //::PyPhysicsShadowController::Cmp
         
-            typedef bool ( ::PyPhysicsShadowController::*__cmp___function_type )( ::boost::python::object ) ;
+            typedef bool ( ::PyPhysicsShadowController::*__cmp___function_type )( ::boost::python::api::object ) ;
             
             PhysicsShadowController_exposer.def( 
                 "__cmp__"
@@ -1333,7 +1333,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateBox
     
-        typedef ::boost::python::object ( *PhysModelCreateBox_function_type )( ::C_BaseEntity *,::Vector const &,::Vector const &,::Vector const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateBox_function_type )( ::C_BaseEntity *,::Vector const &,::Vector const &,::Vector const &,bool );
         
         bp::def( 
             "PhysModelCreateBox"
@@ -1344,7 +1344,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateOBB
     
-        typedef ::boost::python::object ( *PhysModelCreateOBB_function_type )( ::C_BaseEntity *,::Vector const &,::Vector const &,::Vector const &,::QAngle const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateOBB_function_type )( ::C_BaseEntity *,::Vector const &,::Vector const &,::Vector const &,::QAngle const &,bool );
         
         bp::def( 
             "PhysModelCreateOBB"
@@ -1365,7 +1365,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateSphere
     
-        typedef ::boost::python::object ( *PhysModelCreateSphere_function_type )( ::C_BaseEntity *,float,::Vector const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateSphere_function_type )( ::C_BaseEntity *,float,::Vector const &,bool );
         
         bp::def( 
             "PhysModelCreateSphere"
@@ -1789,7 +1789,7 @@ BOOST_PYTHON_MODULE(_physics){
         }
         { //::PyPhysicsObject::Cmp
         
-            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::object ) ;
+            typedef bool ( ::PyPhysicsObject::*__cmp___function_type )( ::boost::python::api::object ) ;
             
             PhysicsObject_exposer.def( 
                 "__cmp__"
@@ -2437,9 +2437,9 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysicsShadowController
         typedef bp::class_< PyPhysicsShadowController > PhysicsShadowController_exposer_t;
-        PhysicsShadowController_exposer_t PhysicsShadowController_exposer = PhysicsShadowController_exposer_t( "PhysicsShadowController", bp::init< bp::object >(( bp::arg("refPyPhysObj") )) );
+        PhysicsShadowController_exposer_t PhysicsShadowController_exposer = PhysicsShadowController_exposer_t( "PhysicsShadowController", bp::init< bp::api::object >(( bp::arg("refPyPhysObj") )) );
         bp::scope PhysicsShadowController_scope( PhysicsShadowController_exposer );
-        bp::implicitly_convertible< bp::object, PyPhysicsShadowController >();
+        bp::implicitly_convertible< bp::api::object, PyPhysicsShadowController >();
         { //::PyPhysicsShadowController::AllowsRotation
         
             typedef bool ( ::PyPhysicsShadowController::*AllowsRotation_function_type )(  ) ;
@@ -2460,7 +2460,7 @@ BOOST_PYTHON_MODULE(_physics){
         }
         { //::PyPhysicsShadowController::Cmp
         
-            typedef bool ( ::PyPhysicsShadowController::*__cmp___function_type )( ::boost::python::object ) ;
+            typedef bool ( ::PyPhysicsShadowController::*__cmp___function_type )( ::boost::python::api::object ) ;
             
             PhysicsShadowController_exposer.def( 
                 "__cmp__"
@@ -2795,7 +2795,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateBox
     
-        typedef ::boost::python::object ( *PhysModelCreateBox_function_type )( ::CBaseEntity *,::Vector const &,::Vector const &,::Vector const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateBox_function_type )( ::CBaseEntity *,::Vector const &,::Vector const &,::Vector const &,bool );
         
         bp::def( 
             "PhysModelCreateBox"
@@ -2806,7 +2806,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateOBB
     
-        typedef ::boost::python::object ( *PhysModelCreateOBB_function_type )( ::CBaseEntity *,::Vector const &,::Vector const &,::Vector const &,::QAngle const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateOBB_function_type )( ::CBaseEntity *,::Vector const &,::Vector const &,::Vector const &,::QAngle const &,bool );
         
         bp::def( 
             "PhysModelCreateOBB"
@@ -2827,7 +2827,7 @@ BOOST_PYTHON_MODULE(_physics){
 
     { //::PyPhysModelCreateSphere
     
-        typedef ::boost::python::object ( *PhysModelCreateSphere_function_type )( ::CBaseEntity *,float,::Vector const &,bool );
+        typedef ::boost::python::api::object ( *PhysModelCreateSphere_function_type )( ::CBaseEntity *,float,::Vector const &,bool );
         
         bp::def( 
             "PhysModelCreateSphere"
