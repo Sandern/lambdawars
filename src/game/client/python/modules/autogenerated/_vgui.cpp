@@ -1741,12 +1741,12 @@ BOOST_PYTHON_MODULE(_vgui){
 
     { //::CPyHudElementHelper
         typedef bp::class_< CPyHudElementHelper > CHudElementHelper_exposer_t;
-        CHudElementHelper_exposer_t CHudElementHelper_exposer = CHudElementHelper_exposer_t( "CHudElementHelper", bp::init< bp::object >(( bp::arg("hud") )) );
+        CHudElementHelper_exposer_t CHudElementHelper_exposer = CHudElementHelper_exposer_t( "CHudElementHelper", bp::init< bp::api::object >(( bp::arg("hud") )) );
         bp::scope CHudElementHelper_scope( CHudElementHelper_exposer );
-        bp::implicitly_convertible< bp::object, CPyHudElementHelper >();
+        bp::implicitly_convertible< bp::api::object, CPyHudElementHelper >();
         { //::CPyHudElementHelper::Get
         
-            typedef ::boost::python::object ( ::CPyHudElementHelper::*Get_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::CPyHudElementHelper::*Get_function_type )(  ) ;
             
             CHudElementHelper_exposer.def( 
                 "Get"
@@ -2486,7 +2486,7 @@ BOOST_PYTHON_MODULE(_vgui){
         }
         { //::CWrapSurface::DrawUnicodeString
         
-            typedef void ( ::CWrapSurface::*DrawUnicodeString_function_type )( ::boost::python::object,::FontDrawType_t ) ;
+            typedef void ( ::CWrapSurface::*DrawUnicodeString_function_type )( ::boost::python::api::object,::FontDrawType_t ) ;
             
             ISurface_exposer.def( 
                 "DrawUnicodeString"
@@ -2712,7 +2712,7 @@ BOOST_PYTHON_MODULE(_vgui){
         }
         { //::CWrapSurface::GetTextSize
         
-            typedef ::boost::python::tuple ( ::CWrapSurface::*GetTextSize_function_type )( ::FontHandle_t,::boost::python::object ) ;
+            typedef ::boost::python::tuple ( ::CWrapSurface::*GetTextSize_function_type )( ::FontHandle_t,::boost::python::api::object ) ;
             
             ISurface_exposer.def( 
                 "GetTextSize"
@@ -3507,11 +3507,11 @@ BOOST_PYTHON_MODULE(_vgui){
             , ( bp::arg("tokenName"), bp::arg("unicodeString"), bp::arg("fileName") ) )    
         .def( 
             "ConstructString"
-            , (::boost::python::object ( ::PyLocalize::* )( char const *,::KeyValues * ) )( &::PyLocalize::ConstructString )
+            , (::boost::python::api::object ( ::PyLocalize::* )( char const *,::KeyValues * ) )( &::PyLocalize::ConstructString )
             , ( bp::arg("tokenName"), bp::arg("localizationVariables") ) )    
         .def( 
             "ConstructString"
-            , (::boost::python::object ( ::PyLocalize::* )( ::vgui::StringIndex_t,::KeyValues * ) )( &::PyLocalize::ConstructString )
+            , (::boost::python::api::object ( ::PyLocalize::* )( ::vgui::StringIndex_t,::KeyValues * ) )( &::PyLocalize::ConstructString )
             , ( bp::arg("unlocalizedTextSymbol"), bp::arg("localizationVariables") ) )    
         .def( 
             "ConvertANSIToUnicode"
@@ -3583,7 +3583,7 @@ BOOST_PYTHON_MODULE(_vgui){
             , (float ( ::WarsVGUIScreen::* )(  ) )( &::WarsVGUIScreen::GetHeight ) )    
         .def( 
             "GetPanel"
-            , (::boost::python::object ( ::WarsVGUIScreen::* )(  ) )( &::WarsVGUIScreen::GetPanel ) )    
+            , (::boost::python::api::object ( ::WarsVGUIScreen::* )(  ) )( &::WarsVGUIScreen::GetPanel ) )    
         .def( 
             "GetWide"
             , (float ( ::WarsVGUIScreen::* )(  ) )( &::WarsVGUIScreen::GetWide ) )    
@@ -3605,7 +3605,7 @@ BOOST_PYTHON_MODULE(_vgui){
             , ( bp::arg("vOrigin") ) )    
         .def( 
             "SetPanel"
-            , (void ( ::WarsVGUIScreen::* )( ::boost::python::object ) )( &::WarsVGUIScreen::SetPanel )
+            , (void ( ::WarsVGUIScreen::* )( ::boost::python::api::object ) )( &::WarsVGUIScreen::SetPanel )
             , ( bp::arg("panel") ) )    
         .def( 
             "SetWorldSize"

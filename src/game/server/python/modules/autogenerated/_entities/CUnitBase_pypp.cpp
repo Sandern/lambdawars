@@ -167,7 +167,7 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::GetTracerType( );
     }
 
-    virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    virtual bool IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         PY_OVERRIDE_CHECK( CUnitBase, IsSelectableByPlayer )
         PY_OVERRIDE_LOG( _entities, CUnitBase, IsSelectableByPlayer )
         bp::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
@@ -182,7 +182,7 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
             return this->CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
     }
     
-    bool default_IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    bool default_IsSelectableByPlayer( ::CHL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         return CUnitBase::IsSelectableByPlayer( pPlayer, target_selection );
     }
 
@@ -1720,14 +1720,14 @@ void register_CUnitBase_class(){
         }
         { //::CUnitBase::IsSelectableByPlayer
         
-            typedef bool ( ::CUnitBase::*IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::object ) ;
-            typedef bool ( CUnitBase_wrapper::*default_IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::object ) ;
+            typedef bool ( ::CUnitBase::*IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::api::object ) ;
+            typedef bool ( CUnitBase_wrapper::*default_IsSelectableByPlayer_function_type )( ::CHL2WarsPlayer *,::boost::python::api::object ) ;
             
             CUnitBase_exposer.def( 
                 "IsSelectableByPlayer"
                 , IsSelectableByPlayer_function_type(&::CUnitBase::IsSelectableByPlayer)
                 , default_IsSelectableByPlayer_function_type(&CUnitBase_wrapper::default_IsSelectableByPlayer)
-                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::object() ) );
+                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::api::object() ) );
         
         }
         { //::CUnitBase::IsSelectedByPlayer
@@ -2093,7 +2093,7 @@ void register_CUnitBase_class(){
         }
         { //::CUnitBase::SetAnimEventMap
         
-            typedef void ( ::CUnitBase::*SetAnimEventMap_function_type )( ::boost::python::object ) ;
+            typedef void ( ::CUnitBase::*SetAnimEventMap_function_type )( ::boost::python::api::object ) ;
             
             CUnitBase_exposer.def( 
                 "SetAnimEventMap"
@@ -2714,8 +2714,8 @@ void register_CUnitBase_class(){
         }
         { //property "animstate"[fget=::CUnitBase::PyGetAnimState, fset=::CUnitBase::SetAnimState]
         
-            typedef ::boost::python::object ( ::CUnitBase::*fget )(  ) ;
-            typedef void ( ::CUnitBase::*fset )( ::boost::python::object ) ;
+            typedef ::boost::python::api::object ( ::CUnitBase::*fget )(  ) ;
+            typedef void ( ::CUnitBase::*fset )( ::boost::python::api::object ) ;
             
             CUnitBase_exposer.add_property( 
                 "animstate"
@@ -2760,8 +2760,8 @@ void register_CUnitBase_class(){
         }
         { //property "navigator"[fget=::CUnitBase::PyGetNavigator, fset=::CUnitBase::SetNavigator]
         
-            typedef ::boost::python::object ( ::CUnitBase::*fget )(  ) ;
-            typedef void ( ::CUnitBase::*fset )( ::boost::python::object ) ;
+            typedef ::boost::python::api::object ( ::CUnitBase::*fget )(  ) ;
+            typedef void ( ::CUnitBase::*fset )( ::boost::python::api::object ) ;
             
             CUnitBase_exposer.add_property( 
                 "navigator"

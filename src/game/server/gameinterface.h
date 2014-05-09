@@ -155,6 +155,13 @@ private:
 	// with the entity list.
 	void LevelInit_ParseAllEntities( const char *pMapEntities );
 	void LoadMessageOfTheDay();
+
+	bool m_bWasPaused;
+	float m_fPauseTime;
+	int m_nPauseTick;
+
+public:
+	bool m_bPaused; // HACK for dumb Alien Swarm engine bug
 };
 
 

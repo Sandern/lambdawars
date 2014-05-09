@@ -901,6 +901,8 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 
+	m_bPaused = false;
+	m_bWasPaused = false;
 
 	return true;
 }
@@ -1326,6 +1328,19 @@ ConVar  trace_report( "trace_report", "0" );
 void CServerGameDLL::GameFrame( bool simulating )
 {
 	VPROF( "CServerGameDLL::GameFrame" );
+
+	// Ugly HACK! to prevent the game time from changing when paused
+	if( m_bWasPaused != m_bPaused )
+	{
+		m_fPauseTime = gpGlobals->curtime;
+		m_nPauseTick = gpGlobals->tickcount;
+		m_bWasPaused = m_bPaused;
+	}
+	if( m_bPaused )
+	{
+		gpGlobals->curtime = m_fPauseTime;
+		gpGlobals->tickcount = m_nPauseTick;
+	}
 
 	// Don't run frames until fully restored
 	if ( g_InRestore )
@@ -3235,6 +3250,8 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int numcmds, int totalcmds,
 	int dropped_packets, bool ignore, bool paused )
 {
+	g_ServerGameDLL.m_bPaused = paused;
+
 	int				i;
 	CUserCmd		*from, *to;
 

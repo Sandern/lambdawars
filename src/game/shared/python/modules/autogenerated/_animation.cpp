@@ -1245,7 +1245,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::Py_GetSeqdescActivityName
     
-        typedef ::boost::python::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
+        typedef ::boost::python::api::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
         
         bp::def( 
             "GetSeqdescActivityName"
@@ -1256,7 +1256,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::Py_GetSeqdescLabel
     
-        typedef ::boost::python::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
+        typedef ::boost::python::api::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
         
         bp::def( 
             "GetSeqdescLabel"
@@ -2553,7 +2553,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::Py_GetSeqdescActivityName
     
-        typedef ::boost::python::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
+        typedef ::boost::python::api::object ( *GetSeqdescActivityName_function_type )( ::mstudioseqdesc_t const & );
         
         bp::def( 
             "GetSeqdescActivityName"
@@ -2564,7 +2564,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::Py_GetSeqdescLabel
     
-        typedef ::boost::python::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
+        typedef ::boost::python::api::object ( *GetSeqdescLabel_function_type )( ::mstudioseqdesc_t const & );
         
         bp::def( 
             "GetSeqdescLabel"

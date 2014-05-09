@@ -106,7 +106,7 @@ struct C_FuncUnit_wrapper : C_FuncUnit, bp::wrapper< C_FuncUnit > {
         return C_FuncUnit::GetIMouse( );
     }
 
-    virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    virtual bool IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         PY_OVERRIDE_CHECK( C_FuncUnit, IsSelectableByPlayer )
         PY_OVERRIDE_LOG( _entities, C_FuncUnit, IsSelectableByPlayer )
         bp::override func_IsSelectableByPlayer = this->get_override( "IsSelectableByPlayer" );
@@ -121,7 +121,7 @@ struct C_FuncUnit_wrapper : C_FuncUnit, bp::wrapper< C_FuncUnit > {
             return this->C_FuncUnit::IsSelectableByPlayer( pPlayer, target_selection );
     }
     
-    bool default_IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::object target_selection=boost::python::object() ) {
+    bool default_IsSelectableByPlayer( ::C_HL2WarsPlayer * pPlayer, ::boost::python::api::object target_selection=boost::python::api::object() ) {
         return C_FuncUnit::IsSelectableByPlayer( pPlayer, target_selection );
     }
 
@@ -1189,14 +1189,14 @@ void register_C_FuncUnit_class(){
         }
         { //::C_FuncUnit::IsSelectableByPlayer
         
-            typedef bool ( ::C_FuncUnit::*IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::object ) ;
-            typedef bool ( C_FuncUnit_wrapper::*default_IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::object ) ;
+            typedef bool ( ::C_FuncUnit::*IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::api::object ) ;
+            typedef bool ( C_FuncUnit_wrapper::*default_IsSelectableByPlayer_function_type )( ::C_HL2WarsPlayer *,::boost::python::api::object ) ;
             
             C_FuncUnit_exposer.def( 
                 "IsSelectableByPlayer"
                 , IsSelectableByPlayer_function_type(&::C_FuncUnit::IsSelectableByPlayer)
                 , default_IsSelectableByPlayer_function_type(&C_FuncUnit_wrapper::default_IsSelectableByPlayer)
-                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::object() ) );
+                , ( bp::arg("pPlayer"), bp::arg("target_selection")=boost::python::api::object() ) );
         
         }
         { //::C_FuncUnit::IsUnit

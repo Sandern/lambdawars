@@ -387,11 +387,12 @@ public:
 	virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
 	virtual bool		ShouldConsiderNavMesh( void );
 
+	
 	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
-	virtual void		ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
 
-	float				ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity, UnitBaseMoveCommand &MoveCommand );
-	float				ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
+	virtual float		ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCommand &MoveCommand );
+	float				GetEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
 
 	float				ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
 								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist, float &fDensity );
@@ -547,16 +548,10 @@ protected:
 	// =============================
 	// Flow variables
 	// =============================
-	struct consider_pos_t {
-		float m_fDensity;
-	};
-	struct consider_entity_t {
-		EHANDLE m_pEnt;
-		consider_pos_t positions[MAX_TESTDIRECTIONS];
-	};
-
-	consider_entity_t m_ConsiderList[CONSIDER_SIZE];
+	EHANDLE m_ConsiderList[CONSIDER_SIZE];
 	int m_iConsiderSize;
+	float m_DensitySums[MAX_TESTDIRECTIONS];
+	Vector m_vAverageVelocities[MAX_TESTDIRECTIONS];
 
 	Vector m_vTestDirections[MAX_TESTDIRECTIONS];
 	Vector m_vTestPositions[MAX_TESTDIRECTIONS];
@@ -612,6 +607,15 @@ private:
 inline float UnitBaseNavigator::GetEntityBoundingRadius( CBaseEntity *pEnt )
 {
 	return pEnt->CollisionProp()->BoundingRadius2D();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Get density to this entity based on distance
+//-----------------------------------------------------------------------------
+inline float UnitBaseNavigator::GetEntityDensity( const Vector &vPos, CBaseEntity *pEnt )
+{
+	VPROF_BUDGET( "UnitBaseNavigator::GetEntityDensity", VPROF_BUDGETGROUP_UNITS );
+	return pEnt->DensityMap()->Get(vPos);
 }
 
 inline BlockedStatus_t UnitBaseNavigator::GetBlockedStatus( void )

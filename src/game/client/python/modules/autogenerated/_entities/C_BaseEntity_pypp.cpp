@@ -2299,7 +2299,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::GetPyHandle
         
-            typedef ::boost::python::object ( ::C_BaseEntity::*GetHandle_function_type )(  ) const;
+            typedef ::boost::python::api::object ( ::C_BaseEntity::*GetHandle_function_type )(  ) const;
             
             C_BaseEntity_exposer.def( 
                 "GetHandle"
@@ -2317,7 +2317,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::GetPyThink
         
-            typedef ::boost::python::object ( ::C_BaseEntity::*GetThink_function_type )(  ) ;
+            typedef ::boost::python::api::object ( ::C_BaseEntity::*GetThink_function_type )(  ) ;
             
             C_BaseEntity_exposer.def( 
                 "GetThink"
@@ -3939,7 +3939,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::PhysicsPyDispatchThink
         
-            typedef void ( ::C_BaseEntity::*PhysicsPyDispatchThink_function_type )( ::boost::python::object ) ;
+            typedef void ( ::C_BaseEntity::*PhysicsPyDispatchThink_function_type )( ::boost::python::api::object ) ;
             
             C_BaseEntity_exposer.def( 
                 "PhysicsPyDispatchThink"
@@ -3949,7 +3949,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::PhysicsPyRunSpecificThink
         
-            typedef bool ( ::C_BaseEntity::*PhysicsPyRunSpecificThink_function_type )( int,::boost::python::object ) ;
+            typedef bool ( ::C_BaseEntity::*PhysicsPyRunSpecificThink_function_type )( int,::boost::python::api::object ) ;
             
             C_BaseEntity_exposer.def( 
                 "PhysicsPyRunSpecificThink"
@@ -5206,7 +5206,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::SetPyThink
         
-            typedef void ( ::C_BaseEntity::*SetThink_function_type )( ::boost::python::object,float,char const * ) ;
+            typedef void ( ::C_BaseEntity::*SetThink_function_type )( ::boost::python::api::object,float,char const * ) ;
             
             C_BaseEntity_exposer.def( 
                 "SetThink"
@@ -5216,7 +5216,7 @@ void register_C_BaseEntity_class(){
         }
         { //::C_BaseEntity::SetPyTouch
         
-            typedef void ( ::C_BaseEntity::*SetTouch_function_type )( ::boost::python::object ) ;
+            typedef void ( ::C_BaseEntity::*SetTouch_function_type )( ::boost::python::api::object ) ;
             
             C_BaseEntity_exposer.def( 
                 "SetTouch"

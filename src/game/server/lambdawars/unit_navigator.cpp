@@ -610,7 +610,7 @@ void UnitBaseNavigator::RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand
 	VPROF_BUDGET( "UnitBaseNavigator::RegenerateConsiderList", VPROF_BUDGETGROUP_UNITS );
 
 	CollectConsiderEntities( MoveCommand, GoalStatus );
-	ComputeConsiderDensAndDirs( vPathDir, GoalStatus );
+	ComputeConsiderDensAndDirs( MoveCommand, vPathDir, GoalStatus );
 }
 
 //-----------------------------------------------------------------------------
@@ -677,7 +677,7 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 		}
 
 		// Store general info
-		m_ConsiderList[m_iConsiderSize].m_pEnt = pEnt;
+		m_ConsiderList[m_iConsiderSize] = pEnt;
 		m_iConsiderSize++;
 
 		if( MoveCommand.HasBlocker( pEnt ) )
@@ -700,9 +700,9 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 //-----------------------------------------------------------------------------
 // Purpose: Calculates the allowed move directions and densities in those directions
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus )
+void UnitBaseNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus )
 {
-	int i, j;
+	int j;
 	const Vector &origin = GetAbsOrigin();
 	float fRadius = GetEntityBoundingRadius(m_pOuter);
 
@@ -720,12 +720,8 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalS
 	{
 		m_pOuter->GetVectors(&m_vTestDirections[m_iUsedTestDirections], NULL, NULL); // Just use forward as start dir
 		m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
-		for( i = 0; i < m_iConsiderSize; i++ )
-		{
-			if( !m_ConsiderList[i].m_pEnt ) 
-				continue;
-			m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-		}	
+		ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
+
 		m_iUsedTestDirections += 1;
 
 		// Full circle scan
@@ -733,13 +729,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalS
 		{
 			VectorYawRotate(m_vTestDirections[m_iUsedTestDirections-1], 45.0f, m_vTestDirections[m_iUsedTestDirections]);
 			m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
-
-			for( i = 0; i < m_iConsiderSize; i++ )
-			{
-				if( !m_ConsiderList[i].m_pEnt ) 
-					continue;
-				m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-			}	
+			ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
 
 			m_iUsedTestDirections += 1;
 		}
@@ -749,14 +739,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalS
 		// Compute density path direction
 		m_vTestDirections[m_iUsedTestDirections] = vPathDir;
 		m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
-		float fTotalDensity = 0.0f;
-		for( i = 0; i < m_iConsiderSize; i++ )
-		{
-			if( !m_ConsiderList[i].m_pEnt ) 
-				continue;
-			m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-			fTotalDensity += m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity;
-		}	
+		float fTotalDensity = ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
 
 		// Half circle scan with mid at waypoint direction (except if stuck, then do a full scan)
 		// Scan starts in the middle, alternating between the two different directions
@@ -777,14 +760,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalS
 
 			VectorYawRotate(m_vTestDirections[m_iUsedTestDirections-1], fRotate, m_vTestDirections[m_iUsedTestDirections]);
 			m_vTestPositions[m_iUsedTestDirections] = origin + m_vTestDirections[m_iUsedTestDirections] * fRadius;
-			fTotalDensity = 0.0f;
-			for( i = 0; i < m_iConsiderSize; i++ )
-			{
-				if( !m_ConsiderList[i].m_pEnt ) 
-					continue;
-				m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity = ComputeEntityDensity(m_vTestPositions[m_iUsedTestDirections], m_ConsiderList[i].m_pEnt);
-				fTotalDensity += m_ConsiderList[i].positions[m_iUsedTestDirections].m_fDensity;
-			}
+			fTotalDensity = ComputeDensityAndAvgVelocity( m_iUsedTestDirections, MoveCommand );
 
 			fRotate *= -1;
 			if( fRotate < 0.0 )
@@ -831,25 +807,30 @@ bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 //-----------------------------------------------------------------------------
 // Purpose: Computes the density and average velocity for a given direction.
 //-----------------------------------------------------------------------------
-float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVelocity, UnitBaseMoveCommand &MoveCommand )
+float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCommand &MoveCommand )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeDensityAndAvgVelocity", VPROF_BUDGETGROUP_UNITS );
+
+	Vector &vAvgVelocity = m_vAverageVelocities[iPos];
 
 	CBaseEntity *pEnt;
 	int i;
 	float fSumDensity;
-	
 	fSumDensity = 0.0f;
-	(*pAvgVelocity).Init(0, 0, 0);
+	
+	vAvgVelocity.Init( 0, 0, 0 );
+
+	const Vector &vPos = m_vTestPositions[ iPos ];
 
 	// Add in all entities we are considering
 	for( i = 0; i < m_iConsiderSize; i++ )
 	{
-		pEnt = m_ConsiderList[i].m_pEnt;
+		pEnt = m_ConsiderList[i];
 		if( !pEnt )
 			continue;
 
-		fSumDensity += m_ConsiderList[i].positions[iPos].m_fDensity;
+		float fEntDensity = GetEntityDensity( vPos, m_ConsiderList[i] );
+		fSumDensity += fEntDensity;
 
 		if( pEnt->GetMoveType() == MOVETYPE_NONE || pEnt->GetAbsVelocity().Length2D() < 25.0f )
 		{
@@ -857,13 +838,13 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 			Vector vDir = m_vTestPositions[iPos] - pEnt->GetAbsOrigin();
 			vDir.z = 0.0f;
 			float fSpeed = VectorNormalize(vDir);
-			fSpeed = m_ConsiderList[i].positions[iPos].m_fDensity*2000.0f;
-			*pAvgVelocity += m_ConsiderList[i].positions[iPos].m_fDensity * vDir * fSpeed;
+			fSpeed = fEntDensity * 2000.0f;
+			vAvgVelocity += fEntDensity * vDir * fSpeed;
 		}
 		else
 		{
 			// Moving units generate a flow velocity
-			*pAvgVelocity += m_ConsiderList[i].positions[iPos].m_fDensity * pEnt->GetAbsVelocity();
+			vAvgVelocity += fEntDensity * pEnt->GetAbsVelocity();
 		}
 	}	
 
@@ -887,14 +868,14 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 
 				// Add density from nav area
 				// TODO: Check if target area is valid? 
-				CNavArea *pAreaTo = TheNavMesh->GetNavArea( m_vTestPositions[iPos] + Vector(0,0,96.0f), 150.0f );
+				CNavArea *pAreaTo = TheNavMesh->GetNavArea( vPos + Vector(0,0,96.0f), 150.0f );
 				if( !pAreaTo /*|| !costFunc.IsAreaValid( pAreaTo )*/ )
 				{
 					float fDensity = THRESHOLD_MAX / 2.0f;
 					fSumDensity += fDensity;
-					Vector vDir = GetAbsOrigin() - m_vTestPositions[iPos]; //m_vTestPositions[iPos] - GetAbsOrigin();
+					Vector vDir = GetAbsOrigin() - vPos; //m_vTestPositions[iPos] - GetAbsOrigin();
 					VectorNormalize(vDir);
-					*pAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
+					vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
 				}
 			}
 
@@ -912,9 +893,9 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 				}
 
 				// Add seeds if in range
-				for( i = 0; i < m_Seeds.Count(); i++ )
+				for( int i = 0; i < m_Seeds.Count(); i++ )
 				{
-					fDist = (m_vTestPositions[iPos].AsVector2D() - m_Seeds[i].m_vPos).Length();
+					fDist = (vPos.AsVector2D() - m_Seeds[i].m_vPos).Length();
 					if( fDist < fRadius )
 						fSumDensity += fBaseDensitySeed - ( (fDist / fRadius) * fBaseDensitySeed );
 				}
@@ -925,7 +906,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 	// If our position is limited, make the density very high outside our limited radius
 	if( m_bLimitPositionActive )
 	{
-		float fDistSqr2D = m_vLimitPositionCenter.AsVector2D().DistToSqr( m_vTestPositions[iPos].AsVector2D() );
+		float fDistSqr2D = m_vLimitPositionCenter.AsVector2D().DistToSqr( vPos.AsVector2D() );
 		float fDistSqrMax = m_fLimitPositionRadius * m_fLimitPositionRadius;
 		//if( fDistSqr2D > fDistSqrMax )
 		{
@@ -934,28 +915,21 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, Vector *pAvgVel
 			fSumDensity += fDensity;
 			Vector vDir = m_vLimitPositionCenter - GetAbsOrigin();
 			VectorNormalize(vDir);
-			*pAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
+			vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
 		}
 	}
 
 	// Average the velocity
 	// FIXME: Find out why the avg is sometimes invalid
-	if( fSumDensity == 0 || !(*pAvgVelocity).IsValid() )
-		*pAvgVelocity = vec3_origin;
+	if( fSumDensity == 0 || !vAvgVelocity.IsValid() )
+		vAvgVelocity = vec3_origin;
 	else
-		*pAvgVelocity /= fSumDensity;
+		vAvgVelocity /= fSumDensity;
+
+	m_DensitySums[ iPos ] = fSumDensity;
 
 	return fSumDensity;
 
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Compute density to this entity based on distance
-//-----------------------------------------------------------------------------
-float UnitBaseNavigator::ComputeEntityDensity( const Vector &vPos, CBaseEntity *pEnt )
-{
-	VPROF_BUDGET( "UnitBaseNavigator::ComputeEntityDensity", VPROF_BUDGETGROUP_UNITS );
-	return pEnt->DensityMap()->Get(vPos);
 }
 
 //-----------------------------------------------------------------------------
@@ -967,7 +941,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeUnitCost", VPROF_BUDGETGROUP_UNITS );
 
 	float fSpeed, fDist;
-	Vector vFlowDir, vAvgVelocity, vPathVelocity, vFlowVelocity, vFinalVelocity, vPathDir;
+	Vector vFlowDir, vPathVelocity, vFlowVelocity, vFinalVelocity, vPathDir;
 
 	// Dist to next waypoints + speed predicted position
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GoalStatus != CHS_ATGOAL )
@@ -977,7 +951,8 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	else
 		fDist = 0.0f;
 	
-	fDensity = ComputeDensityAndAvgVelocity( iPos, &vAvgVelocity, MoveCommand );
+	fDensity = m_DensitySums[ iPos ];
+	const Vector &vAvgVelocity = m_vAverageVelocities[ iPos ];
 
 	// Compute path speed
 	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
@@ -2967,18 +2942,18 @@ void UnitBaseNavigator::DrawDebugInfo()
 	// Draw consider entities
 	for( i = 0; i < m_iConsiderSize; i++ )
 	{
-		if( m_ConsiderList[i].m_pEnt )
-			NDebugOverlay::EntityBounds(m_ConsiderList[i].m_pEnt, 0, 255, 0, 50, 0 );
+		if( m_ConsiderList[i] )
+			NDebugOverlay::EntityBounds(m_ConsiderList[i], 0, 255, 0, 50, 0 );
 	}	
 
 	// Draw test positions + density info
 	fDensity = 0;
-	Vector vAvgVel;
 	for( j = 0; j < m_iUsedTestDirections; j++ )
 	{
-		fDensity = ComputeDensityAndAvgVelocity( j, &vAvgVel, m_DebugLastMoveCommand );
-		NDebugOverlay::HorzArrow(GetLocalOrigin(), m_vTestPositions[j], 
-							2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0);
+		fDensity = m_DensitySums[ j ];
+
+		NDebugOverlay::HorzArrow( GetLocalOrigin(), m_vTestPositions[j], 
+							2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0 );
 		NDebugOverlay::Text( m_vTestPositions[j], UTIL_VarArgs("%f", fDensity), false, 0.0 );
 	}
 
