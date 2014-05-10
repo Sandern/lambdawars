@@ -24,7 +24,7 @@ public:
 
 	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir = NULL );
 
-	virtual void		ComputeConsiderDensAndDirs( Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
 };
 
 #endif // UNIT_VEHICLENAVIGATOR_H

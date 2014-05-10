@@ -22,6 +22,7 @@
 #include "c_basetempentity.h"
 #define CBaseTempEntity C_BaseTempEntity
 #define CTEIgniteFlora C_TEIgniteFlora
+#include "deferred/deferred_shared_common.h"
 #else
 #include "hl2wars_player.h"
 #endif // CLIENT_DLL
@@ -660,6 +661,9 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 //-----------------------------------------------------------------------------
 void CWarsFlora::SpawnMapFlora()
 {
+	if( GetDeferredManager()->IsDeferredRenderingEnabled() == false )
+		return;
+
 	const char *pMapData = engine->GetMapEntitiesString();
 	if( !pMapData )
 	{

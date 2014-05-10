@@ -70,7 +70,7 @@ baseincludes = [
     '../../thirdparty/python/Include',
     '../../thirdparty/python',
     
-	'../../boost',
+    '../../boost',
 ]
 
 serversymbols = basesymbols + [

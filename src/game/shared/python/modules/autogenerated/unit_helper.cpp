@@ -5981,12 +5981,12 @@ BOOST_PYTHON_MODULE(unit_helper){
         bp::implicitly_convertible< bp::api::object, UnitVehicleNavigator >();
         { //::UnitVehicleNavigator::ComputeConsiderDensAndDirs
         
-            typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::Vector &,::CheckGoalStatus_t ) ;
+            typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::UnitBaseMoveCommand &,::Vector &,::CheckGoalStatus_t ) ;
             
             UnitVehicleNavigator_exposer.def( 
                 "ComputeConsiderDensAndDirs"
                 , ComputeConsiderDensAndDirs_function_type( &::UnitVehicleNavigator::ComputeConsiderDensAndDirs )
-                , ( bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
+                , ( bp::arg("MoveCommand"), bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
         
         }
         { //::UnitVehicleNavigator::UpdateIdealAngles

@@ -841,6 +841,10 @@ private:
 	CUtlRBTree< IMaterial * > m_CachedMaterials;
 
 	CHudCloseCaption		*m_pHudCloseCaption;
+
+	bool m_bWasPaused;
+	float m_fPauseTime;
+	int m_nPauseTick;
 };
 
 
@@ -1315,6 +1319,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	CWarsFlora::InitFloraGrid();
 #endif // HL2WARS_DLL
 
+	m_bWasPaused = false;
+
 	COM_TimestampedLog( "ClientDLL Init - Finish" );
 	return true;
 }
@@ -1467,6 +1473,19 @@ void CHLClient::HudProcessInput( bool bActive )
 //-----------------------------------------------------------------------------
 void CHLClient::HudUpdate( bool bActive )
 {
+	// Ugly HACK! to prevent the game time from changing when paused
+	if( m_bWasPaused != engine->IsPaused() )
+	{
+		m_fPauseTime = gpGlobals->curtime;
+		m_nPauseTick = gpGlobals->tickcount;
+		m_bWasPaused = engine->IsPaused();
+	}
+	if( engine->IsPaused() )
+	{
+		gpGlobals->curtime = m_fPauseTime;
+		gpGlobals->tickcount = m_nPauseTick;
+	}
+
 	float frametime = gpGlobals->frametime;
 
 	GetClientVoiceMgr()->Frame( frametime );
