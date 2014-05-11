@@ -64,6 +64,11 @@ bool PyPhysicsShadowController::NonZero()
 	return m_pShadCont != NULL;
 }
 
+bool PyPhysicsShadowController::Bool()
+{
+	return m_pShadCont != NULL;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -272,6 +277,11 @@ bool PyPhysicsObject::Cmp( boost::python::object other )
 }
 
 bool PyPhysicsObject::NonZero()
+{
+	return m_pPhysObj != NULL;
+}
+
+bool PyPhysicsObject::Bool()
 {
 	return m_pPhysObj != NULL;
 }

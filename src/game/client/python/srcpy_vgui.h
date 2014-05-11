@@ -230,6 +230,7 @@ class DeadPanel
 {
 public:
 	static bool NonZero() { return false; }
+	static bool Bool() { return false; }
 };
 
 PyObject *GetPyPanel( const Panel *pPanel );

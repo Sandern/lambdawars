@@ -75,6 +75,15 @@ void register_PyHandle_class(){
         bp::scope PyHandle_scope( PyHandle_exposer );
         bp::implicitly_convertible< bp::api::object, PyHandle >();
         PyHandle_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
+        { //::PyHandle::Bool
+        
+            typedef bool ( ::PyHandle::*__bool___function_type )(  ) ;
+            
+            PyHandle_exposer.def( 
+                "__bool__"
+                , __bool___function_type( &::PyHandle::Bool ) );
+        
+        }
         { //::PyHandle::Cmp
         
             typedef int ( ::PyHandle::*__cmp___function_type )( ::boost::python::api::object ) ;
