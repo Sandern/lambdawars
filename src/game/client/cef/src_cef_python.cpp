@@ -96,7 +96,11 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
 		}
+#if PY_VERSION_HEX >= 0x03000000
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+#else
 		else if( valuetype == builtins.attr("list") )
+#endif // PY_VERSION_HEX >= 0x03000000
 		{
 			result->SetList( i, PyToCefValueList( boost::python::list( value ) ) );
 		}
@@ -186,7 +190,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 	for( boost::python::ssize_t u = 0; u < length; u++ )
 	{
 		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
-		boost::python::object value = item[0];
+		boost::python::object value = item[1];
 
 		boost::python::object valuetype = fntype( value );
 
@@ -225,7 +229,11 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		{
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
 		}
+#if PY_VERSION_HEX >= 0x03000000
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+#else
 		else if( valuetype == builtins.attr("list") )
+#endif // PY_VERSION_HEX >= 0x03000000
 		{
 			result->SetList( cefkey, PyToCefValueList( boost::python::list( value ) ) );
 		}
