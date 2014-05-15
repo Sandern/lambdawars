@@ -325,8 +325,8 @@ bool CSrcPython::InitInterpreter( void )
 #endif // OSX
 	
 #ifdef WIN32
-	::SetEnvironmentVariable( "PYTHONHOME", pythonhome );
-	::SetEnvironmentVariable( "PYTHONPATH", pythonpath );
+	::_putenv( VarArgs( "PYTHONHOME=%s", pythonhome ) );
+	::_putenv( VarArgs( "PYTHONPATH=%s", pythonpath ) );
 #else
 	::setenv( "PYTHONHOME", pythonhome, 1 );
     ::setenv( "PYTHONPATH", pythonpath, 1 );
