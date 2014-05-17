@@ -1396,6 +1396,9 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 		Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 	}
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// If we are a python entity, then grab our reference
 	if( GetPySelf() )
@@ -1411,6 +1414,9 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// Add the client entity to the spatial partition. (Collidable)
 	CollisionProp()->CreatePartitionHandle();
@@ -1515,6 +1521,9 @@ void C_BaseEntity::Release()
 
 	UpdateOnRemove();
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( m_pyInstance.ptr() != Py_None )
 	{
@@ -1522,6 +1531,9 @@ void C_BaseEntity::Release()
 	}
 	else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	{
 		delete this;
 	}
