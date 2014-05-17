@@ -42,6 +42,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_navigator.h"
+#include "unit_baseanimstate.h"
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
@@ -536,6 +537,8 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pPathDir )
 {
+	bool bZeroPitch = GetOuter()->GetAnimState() ? !GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
+
 	// Update facing target if any
 	// Call UpdateFacingTargetState after updating the idealangles, because it might clear
 	// the facing target.
@@ -548,12 +551,16 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	else if( m_hFacingTarget ) 
 	{
 		Vector dir = m_hFacingTarget->GetAbsOrigin() - GetAbsOrigin();
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone( m_hFacingTarget, m_fFacingCone ) );
 	}
 	else if( m_vFacingTargetPos != vec3_origin )
 	{
 		Vector dir = m_vFacingTargetPos - GetAbsOrigin();
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone(m_vFacingTargetPos, m_fFacingCone) );
 	}
@@ -561,6 +568,8 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	else if( pPathDir ) 
 	{
 		VectorAngles(*pPathDir, MoveCommand.idealviewangles);
+		if( bZeroPitch )
+			MoveCommand.idealviewangles.x = 0;
 	}
 }
 

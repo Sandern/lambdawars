@@ -1407,15 +1407,18 @@ class Entities(SemiSharedModuleGenerator):
         mb.free_function('SetPlayerRelationShip').include()
         mb.free_function('GetPlayerRelationShip').include()
         
+        if self.isserver:
+            for entcls in self.entclasses:
+                if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                    self.AddNetworkVarProperty('eyepitch', 'm_fEyePitch', 'float', entcls)
+        else:
+            self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
+            
         self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
-        
-        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
         self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
-        
         self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
         self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         self.IncludeVarAndRename('m_bFriendlyDamage', 'friendlydamage')
-        
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         
         # Pathfinding/Navmesh

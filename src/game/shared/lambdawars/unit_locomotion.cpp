@@ -6,6 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_locomotion.h"
+#include "unit_baseanimstate.h"
 #include "movevars_shared.h"
 #include "coordsize.h"
 
@@ -196,7 +197,6 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 	m_pOuter->SetLocalAngles( mv.viewangles );
 
 	// Set origin after setting the velocity, in case the trigger touch function changes the velocity.
-	//UTIL_SetOrigin(m_pOuter, mv.origin, true);
 	m_pOuter->SetAbsOrigin( mv.origin );
 	m_pOuter->PhysicsTouchTriggers();
 
@@ -663,6 +663,25 @@ void UnitBaseLocomotion::MoveFacing( void )
 
 	if( newYaw != current )
 		mv->viewangles.y = newYaw;
+
+	// Don't store pitch in result view angles for now. This pitch is used for aiming weapons, but does not change
+	// the body angles. Storing the pitch in the body angles will change attached entities and particles.
+	// TODO: Make this nicer
+	bool bUpdatePitch = GetOuter()->GetAnimState() ? GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
+	if( bUpdatePitch )
+	{
+		current = anglemod( GetOuter()->m_fEyePitch );
+		ideal = anglemod( mv->idealviewangles.x );
+
+		float newPitch = Unit_ClampYaw( mv->yawspeed * 10.0, current, ideal, mv->interval );
+
+		if( newPitch != current )
+			GetOuter()->m_fEyePitch = newPitch;
+	}
+	else
+	{
+		GetOuter()->m_fEyePitch = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------

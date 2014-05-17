@@ -172,7 +172,10 @@ IMPLEMENT_NETWORKCLASS_ALIASED( UnitBase, DT_UnitBase )
 BEGIN_NETWORK_TABLE( CUnitBase, DT_UnitBase )
 	RecvPropVectorXY( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ), 0, C_BaseEntity::RecvProxy_CellOriginXY ),
 	RecvPropFloat( RECVINFO_NAME( m_vecNetworkOrigin[2], m_vecOrigin[2] ), 0, C_BaseEntity::RecvProxy_CellOriginZ ),
+
 	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
+	RecvPropFloat( RECVINFO( m_fEyePitch ) ),
+
 	RecvPropInt		(RECVINFO( m_fFlags )),
 	RecvPropInt		(RECVINFO( m_NetworkedUnitTypeSymbol )),
 
@@ -400,17 +403,10 @@ void CUnitBase::UpdateClientSideAnimation()
 	if( m_bUpdateClientAnimations )
 	{
 		// Yaw and Pitch are updated in UserCmd if the unit has a commander
+		// The eye pitch is computed by the locomotion component and directly stored in m_fEyePitch.
 		if( !GetCommander() )
 		{
-			if( m_pAnimState && m_pAnimState->HasAimPoseParameters() )
-			{
-				AimGun();
-			}
-			else
-			{
-				m_fEyePitch = EyeAngles()[PITCH];
-				m_fEyeYaw = EyeAngles()[YAW];
-			}
+			m_fEyeYaw = EyeAngles()[YAW];
 		}
 
 		if( GetSequence() != -1 )
