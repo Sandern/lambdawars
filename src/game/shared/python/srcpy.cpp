@@ -345,17 +345,6 @@ bool CSrcPython::InitInterpreter( void )
 		Py_OptimizeFlag = 1;
 #endif // _DEBUG
 
-#if PY_VERSION_HEX < 0x03000000
-	// Python 3 warnings
-	const bool bPy3kWarnings = CommandLine() && CommandLine()->FindParm("-py3kwarnings") != 0;
-	if( bPy3kWarnings )
-	{
-		Py_Py3kWarningFlag = 1;
-		Py_BytesWarningFlag = 1;
-		//Py_HashRandomizationFlag = 1;
-	}
-#endif 
-
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
 #ifdef CLIENT_DLL
@@ -548,11 +537,6 @@ bool CSrcPython::ShutdownInterpreter( void )
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
 	Py_Finalize();
-#if PY_VERSION_HEX < 0x03000000
-#ifdef WIN32
-	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash if c extension modules are used.
-#endif // WIN32
-#endif // PY_VERSION_HEX < 0x03000000
 
 	m_bPythonIsFinalizing = false;
 	m_bPythonRunning = false;
@@ -1452,12 +1436,6 @@ boost::python::list CSrcPython::GetRegisteredTickMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
-#if defined( _DEBUG ) && defined( CLIENT_DLL )
-	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
-	// of bp::object. Disabled for now...
-	return false;
-#endif // _DEBUG
-
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
 		if( m_methodTickList[i].method == method )
@@ -1518,11 +1496,6 @@ boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
-#if defined( _DEBUG ) && defined( CLIENT_DLL )
-	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
-	// of bp::object. Disabled for now...
-	return false;
-#endif // _DEBUG
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )
