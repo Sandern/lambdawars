@@ -60,7 +60,7 @@
     <ClCompile>
       <AdditionalOptions>/Zm800 /Zm800 /Zm800 /Zm800 /Zm800 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\thirdparty\python;..\..\..\..\..\thirdparty\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\;..\..\..\..\..\thirdparty\python\PC;..\..\..\..\..\thirdparty\python\Include;..\..\..\..\..\public;..\..\..\..\..\public\tier0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_SOURCE;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
