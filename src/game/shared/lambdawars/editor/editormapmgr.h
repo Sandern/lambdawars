@@ -26,7 +26,7 @@ public:
 	const char *GetCurrentVmfPath();
 	bool IsMapLoaded();
 
-	void LoadVmf( const char *pszVmf );
+	void LoadVmf( const char *pszVmf, bool bDispatchSignal = true );
 
 	void AddDeletedHammerID( int iHammerID );
 

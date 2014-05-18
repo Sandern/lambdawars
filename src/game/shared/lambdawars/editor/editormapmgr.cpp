@@ -64,7 +64,7 @@ void CEditorMapMgr::ClearLoadedMap()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorMapMgr::LoadVmf( const char *pszVmf )
+void CEditorMapMgr::LoadVmf( const char *pszVmf, bool bDispatchSignal )
 {
 	V_snprintf( m_szCurrentVmf, sizeof( m_szCurrentVmf ), "%s", pszVmf );
 
@@ -78,7 +78,8 @@ void CEditorMapMgr::LoadVmf( const char *pszVmf )
 
 	if( ParseVmfFile( pKV ) )
 	{
-		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
+		if( bDispatchSignal )
+			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
 	}
 
 	pKV->deleteThis();
@@ -118,9 +119,13 @@ void CEditorMapMgr::SaveCurrentVmf()
 		return;
 	}
 
+	// Load VMF file again to make sure we have the latest changes
+	LoadVmf( m_szCurrentVmf, false );
+
 	// Collect and update VMF Keyvalues
 	if( !ApplyChangesToVmfFile() )
 	{
+		// Failed or nothing changed
 		return;
 	}
 
@@ -340,6 +345,8 @@ void CEditorMapMgr::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, i
 //-----------------------------------------------------------------------------
 bool CEditorMapMgr::ApplyChangesToVmfFile()
 {
+	bool bVMFChanged = false;
+
 	CUtlVector< KeyValues* > listToRemove;
 
 	CUtlMap< int, CBaseEntity * > updatedEntities( 0, 0, DefLessFunc( int ) );
@@ -349,6 +356,8 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 	int iHighestId = 0;
 	int iHighestHammerId = 0;
 
+	// Flora is no longer stored in vmf, so no need to create a visgroup
+#if 0
 	// Find or create the Wars Flora visgroup
 	m_iFloraVisGroupId = -1;
 	int iHighestVisGroupId = 0;
@@ -375,8 +384,11 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 			pKVNewVisGroup->SetInt( "visgroupid", m_iFloraVisGroupId );
 			pKVNewVisGroup->SetString( "color", "0 255 0" );
 			pVisGroupsKey->AddSubKey( pKVNewVisGroup );
+
+			bVMFChanged = true;
 		}
 	}
+#endif // 0
 
 	// Update existing entities and determine removed entities
 	for ( KeyValues *pKey = m_pKVVmf->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
@@ -408,6 +420,7 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 
 			pKey->Clear();
 			FillEntityEntry( pKey, pEnt, iTargetID, iHammerID );
+			bVMFChanged = true;
 
 			// Updated, so remove from list
 			updatedEntities.RemoveAt( idx );
@@ -425,7 +438,13 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 
 	// Remove deleted entities
 	FOR_EACH_VEC( listToRemove, i )
-		m_pKVVmf->RemoveSubKey( listToRemove[i] );
+	{
+		if( m_pKVVmf->ContainsSubKey( listToRemove[i] ) )
+		{
+			m_pKVVmf->RemoveSubKey( listToRemove[i] );
+			bVMFChanged = true;
+		}
+	}
 
 	// Add new entities
 	FOR_EACH_VEC( newEntities, entIdx )
@@ -436,9 +455,11 @@ bool CEditorMapMgr::ApplyChangesToVmfFile()
 		FillEntityEntry( pKVNew, pNewEnt, iHighestId++, iHighestHammerId++ );
 
 		m_pKVVmf->AddSubKey( pKVNew );
+
+		bVMFChanged = true;
 	}
 
-	return true;
+	return bVMFChanged;
 }
 
 //-----------------------------------------------------------------------------
