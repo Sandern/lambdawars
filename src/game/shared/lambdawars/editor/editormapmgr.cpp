@@ -271,9 +271,11 @@ bool CEditorMapMgr::ParseVmfFile( KeyValues *pKeyValues )
 	const int iMapVersion = pVersionKey->GetInt( "mapversion", -1 );
 	if( iMapVersion != iBspMapVersion )
 	{
-		LogError(  VarArgs("%s: Could not parse VMF. Map version does not match! (vmf %d != bsp %d)", m_szCurrentVmf, iMapVersion, iBspMapVersion) );
-		ClearLoadedMap();
-		return false;
+		// Just print a warning
+		Warning( "%s: VMF Map version does not match BSP version! (vmf %d != bsp %d)\n", m_szCurrentVmf, iMapVersion, iBspMapVersion );
+		//LogError(  VarArgs("%s: Could not parse VMF. Map version does not match! (vmf %d != bsp %d)", m_szCurrentVmf, iMapVersion, iBspMapVersion) );
+		//ClearLoadedMap();
+		//return false;
 	}
 
 	return true;
