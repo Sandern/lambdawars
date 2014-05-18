@@ -52,8 +52,9 @@ public:
 
 	// Spawns all flora entities on the client side
 	static const char *ParseEntity( const char *pEntData );
-	static void SpawnMapFlora();
 #endif // CLIENT_DLL 
+
+	static void		SpawnMapFlora();
 
 	static void		InitFloraGrid();
 	static void		DestroyFloraGrid();

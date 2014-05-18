@@ -11,6 +11,8 @@
 #endif
 
 #include "editormapmgr.h"
+#include "editorwarsmapmgr.h"
+
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
 #include "vgui/MouseCode.h"
@@ -148,6 +150,7 @@ private:
 
 private:
 	CEditorMapMgr m_MapManager;
+	CEditorWarsMapMgr m_WarsMapManager;
 
 	// Selection
 	CUtlVector<EHANDLE> m_hSelectedEntities;
@@ -192,16 +195,19 @@ inline bool CEditorSystem::IsActive()
 inline void CEditorSystem::ClearLoadedMap()
 {
 	m_MapManager.ClearLoadedMap();
+	m_WarsMapManager.ClearLoadedMap();
 }
 
 inline void CEditorSystem::LoadCurrentVmf()
 {
 	m_MapManager.LoadCurrentVmf();
+	m_WarsMapManager.LoadCurrentMap();
 }
 #ifndef CLIENT_DLL
 inline void CEditorSystem::SaveCurrentVmf()
 {
 	m_MapManager.SaveCurrentVmf();
+	m_WarsMapManager.SaveCurrentMap();
 }
 #endif // CLIENT_DLL
 inline const char *CEditorSystem::GetCurrentVmfPath()

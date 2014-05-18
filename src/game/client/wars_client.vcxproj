@@ -236,10 +236,12 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\deferred\CDefLightContainer.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLightGlobal.cpp" />
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp" />
+    <ClCompile Include="..\shared\lambdawars\editor\editorbasemapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorcommandproc.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editormapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorselection.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorsystem.cpp" />
+    <ClCompile Include="..\shared\lambdawars\editor\editorwarsmapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\fow_blocker.cpp" />
     <ClCompile Include="..\shared\lambdawars\unit_vehicleanimstate.cpp" />
     <ClCompile Include="..\shared\lambdawars\unit_vphysicslocomotion.cpp" />
@@ -1472,9 +1474,11 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\deferred\CDefLightGlobal.h" />
     <ClInclude Include="..\shared\deferred\deferred_shared_common.h" />
     <ClInclude Include="..\shared\deferred\ssemath_ext.h" />
+    <ClInclude Include="..\shared\lambdawars\editor\editorbasemapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editormapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorselection.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorsystem.h" />
+    <ClInclude Include="..\shared\lambdawars\editor\editorwarsmapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\fow_blocker.h" />
     <ClInclude Include="..\shared\lambdawars\unit_vehicleanimstate.h" />
     <ClInclude Include="..\shared\lambdawars\unit_vphysicslocomotion.h" />

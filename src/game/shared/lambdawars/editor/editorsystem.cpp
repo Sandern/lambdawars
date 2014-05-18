@@ -94,11 +94,8 @@ void CEditorSystem::OnEntityDeleted( CBaseEntity *pEntity )
 	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEntity );
 	if( pFloraEnt && pFloraEnt->IsEditorManaged() )
 	{
-		int iHammerId = pEntity->GetHammerID();
-		if( iHammerId != 0 )
-		{
-			m_MapManager.AddDeletedHammerID( iHammerId );
-		}
+		// GetFloraUUID returns a pooled game string, so valid while the level exists
+		m_WarsMapManager.AddDeletedUUID( pFloraEnt->GetFloraUUID() );
 	}
 }
 #endif // CLIENT_DLL

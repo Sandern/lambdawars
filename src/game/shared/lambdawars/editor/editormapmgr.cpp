@@ -42,7 +42,6 @@
 CEditorMapMgr::CEditorMapMgr() : m_pKVVmf(NULL)
 {
 	m_szCurrentVmf[0] = 0;
-	m_szMapError[0] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,54 +52,12 @@ void CEditorMapMgr::ClearLoadedMap()
 	*m_szCurrentVmf = 0;
 	m_iFloraVisGroupId = -1;
 
-	if( m_pKVVmf == NULL ) 
-		return;
-
-	m_pKVVmf->deleteThis();
-	m_pKVVmf = NULL;
-
-	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-KeyValues *CEditorMapMgr::VmfToKeyValues( const char *pszVmf )
-{
-	CUtlBuffer vmfBuffer;
-	vmfBuffer.SetBufferType( true, true );
-
-	vmfBuffer.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
-	vmfBuffer.PutString( "\"VMFfile\"\r\n{" );
-
-	KeyValues *pszKV = NULL;
-
-	if ( g_pFullFileSystem->ReadFile( pszVmf, NULL, vmfBuffer ) )
+	if( m_pKVVmf ) 
 	{
-		vmfBuffer.SeekPut( CUtlBuffer::SEEK_TAIL, 0 );
-		vmfBuffer.PutString( "\r\n}" );
-		vmfBuffer.PutChar( '\0' );
+		m_pKVVmf->deleteThis();
+		m_pKVVmf = NULL;
 
-		pszKV = new KeyValues("");
-
-		if ( !pszKV->LoadFromBuffer( "", vmfBuffer ) )
-		{
-			pszKV->deleteThis();
-			pszKV = NULL;
-		}
-	}
-
-	return pszKV;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CEditorMapMgr::KeyValuesToVmf( KeyValues *pKV, CUtlBuffer &vmf )
-{
-	for ( KeyValues *pKey = m_pKVVmf->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
-	{
-		pKey->RecursiveSaveToFile( vmf, 0 );
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
 	}
 }
 
@@ -353,8 +310,10 @@ void CEditorMapMgr::FillEntityEntry( KeyValues *pEntityKey, CBaseEntity *pEnt, i
 
 	// Write essential fields
 	pEntityKey->SetName( "entity" );
-	pEntityKey->SetInt( "id", iTargetID );
-	pEntityKey->SetInt( "hammerid", iHammerID );
+	if( iTargetID != -1 )
+		pEntityKey->SetInt( "id", iTargetID );
+	if( iHammerID != -1 )
+		pEntityKey->SetInt( "hammerid", iHammerID );
 	pEntityKey->SetString( "classname", pEnt->GetClassname() );
 
 	// Write Common fields
@@ -493,17 +452,15 @@ void CEditorMapMgr::CollectNewAndUpdatedEntities( CUtlMap< int, CBaseEntity * > 
 		bool bIsFloraEnt = !V_stricmp( pEnt->GetClassname(), "wars_flora" );
 		if( bIsFloraEnt )
 		{
+			// Editor managed flora moved to a separate "wars" map data file
 			CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEnt );
 			if( pFloraEnt && pFloraEnt->IsEditorManaged() )
 			{
 				int iHammerID = pEnt->GetHammerID();
 				if( iHammerID != 0 )
 				{
-					updatedEntities.Insert( iHammerID, pEnt );
-				}
-				else
-				{
-					newEntities.AddToTail( pEnt );
+					if( m_DeletedHammerIDs.Find( iHammerID ) == -1 )
+						m_DeletedHammerIDs.AddToTail( iHammerID );
 				}
 			}
 		}
@@ -551,13 +508,4 @@ bool CEditorMapMgr::BuildCurrentVmfPath( char *pszOut, int maxlen )
 
 	V_snprintf( pszOut, maxlen, "%s", vmfPath );
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CEditorMapMgr::LogError( const char *pErrorMsg )
-{
-	Warning("CEditorMapMgr: %s\n", pErrorMsg );
-	V_strncpy( m_szMapError, pErrorMsg, sizeof(m_szMapError) );
 }

@@ -1294,6 +1294,11 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	}
 
 	IGameSystem::LevelInitPostEntityAllSystems();
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::SpawnMapFlora();
+#endif // HL2WARS_DLL
+
 	// No more precaching after PostEntityAllSystems!!!
 	CBaseEntity::SetAllowPrecache( false );
 

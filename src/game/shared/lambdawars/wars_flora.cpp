@@ -29,6 +29,7 @@
 
 #include "editor/editorsystem.h"
 #include "warseditor/iwars_editor_storage.h"
+#include "editor/editorwarsmapmgr.h"
 
 extern "C"
 {
@@ -627,7 +628,7 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 
 	if ( !V_strcmp( className, "wars_flora" ) )
 	{
-		// always force clientside entitis placed in maps
+		// always force clientside entities placed in maps
 		CWarsFlora *pEntity = new CWarsFlora();
 
 		// Set up keyvalues.
@@ -656,11 +657,14 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 	return entData.CurrentBufferPosition();
 }
 
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CWarsFlora::SpawnMapFlora()
 {
+#ifdef CLIENT_DLL
 	if( GetDeferredManager()->IsDeferredRenderingEnabled() == false )
 		return;
 
@@ -706,9 +710,53 @@ void CWarsFlora::SpawnMapFlora()
 
 		nEntities++;
 	}
-}
-
 #endif // CLIENT_DLL
+
+	//
+	// Loop through wars flora 
+	//
+
+	// For now, just load the keyvalues directly
+	char curMap[MAX_PATH];
+	CEditorWarsMapMgr::BuildCurrentWarsPath( curMap, sizeof( curMap ) );
+
+	KeyValues *pKVWars = new KeyValues( "WarsMap" ); // VmfToKeyValues( m_szCurrentMap );
+	if( pKVWars->LoadFromFile( filesystem, curMap, NULL ) )
+	{
+		KeyValues *pFlora = pKVWars->FindKey( "flora" );
+		if( pFlora )
+		{
+			for ( KeyValues *pKey = pFlora->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+			{
+				if ( V_strcmp( pKey->GetName(), "entity" ) )
+					continue;
+
+#ifdef CLIENT_DLL
+				CWarsFlora *pEntity = new CWarsFlora();
+#else
+				const char *className = pKey->GetString( "classname", NULL );
+				if( !className )
+					continue;
+
+				CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName( className );
+#endif // CLIENT_DLL
+
+				FOR_EACH_VALUE( pKey, pValue )
+				{
+					pEntity->KeyValue( pValue->GetName(), pValue->GetString() );
+				}
+
+#ifdef CLIENT_DLL
+				if ( !pEntity->Initialize() )
+					pEntity->Release();
+#else
+				DispatchSpawn( pEntity );
+				pEntity->Activate();
+#endif // CLIENT_DLL
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
