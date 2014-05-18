@@ -903,7 +903,7 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 // Purpose: Spawn function mainly intended for editor or ingame testing
 //			The editor mode, the flora entity gets synced to the editing client
 //-----------------------------------------------------------------------------
-bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV )
+bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV, boost::python::object fnpostspawn )
 {
 	bool bEditorManaged = EditorSystem()->IsActive();
 
@@ -942,6 +942,20 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 #else
 	DispatchSpawn( pEntity );
 	pEntity->Activate();
+
+	if( fnpostspawn != boost::python::object() )
+	{
+		try
+		{
+			fnpostspawn( pEntity->GetPyHandle() );
+		}
+		catch( boost::python::error_already_set & )
+		{
+			PyErr_Print();
+			UTIL_Remove( pEntity );
+			return false;
+		}
+	}
 
 	if( bEditorManaged )
 	{

@@ -828,7 +828,11 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude anything return CBoneCache
         bonecache = mb.class_('CBoneCache')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(bonecache))), allow_empty=True).exclude()
-            
+        
+        # Transformations
+        mb.mem_funs('ComputeHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        mb.mem_funs('ComputeEntitySpaceHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        
         if self.isclient:
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'

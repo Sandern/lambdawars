@@ -62,7 +62,8 @@ public:
 	void			RemoveFromFloraGrid();
 	static void		InitFloraDataKeyValues();
 
-	static bool		SpawnFlora( const char *modelname, const Vector &position, const QAngle &angle, KeyValues *pExtraKV = NULL );
+	static bool		SpawnFlora( const char *modelname, const Vector &position, const QAngle &angle, KeyValues *pExtraKV = NULL, 
+		boost::python::object fnpostspawn = boost::python::object() );
 
 	static void		RemoveFloraByUUID( const char *pUUID );
 	static void		RemoveFloraInRadius( const Vector &position, float radius, int max = -1 );
