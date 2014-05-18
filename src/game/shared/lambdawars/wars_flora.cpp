@@ -966,8 +966,8 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 		KeyValues *pEntValues = new KeyValues( "keyvalues" );
 		pEntity->FillKeyValues( pEntValues );
 		pEntValues->SetString( "model", pModelname );
-		pEntValues->SetString( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
-		pEntValues->SetString( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
+		pEntValues->SetString( "angles", VarArgs( "%f %f %f", pEntity->GetAbsAngles().x, pEntity->GetAbsAngles().y, pEntity->GetAbsAngles().z ) );
+		pEntValues->SetString( "origin", VarArgs( "%f %f %f", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z ) );
 
 		pOperation->AddSubKey( pEntValues );
 
