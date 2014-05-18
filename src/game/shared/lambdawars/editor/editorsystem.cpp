@@ -117,7 +117,6 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 	const Vector &vMouseAim = pPlayer->GetMouseAim();
 	const Vector &vCamOffset = pPlayer->GetCameraOffset();
 
-	trace_t tr;
 	Vector vStartPos, vEndPos;
 	vStartPos = vPos + vCamOffset;
 	vEndPos = vStartPos + (vMouseAim *  MAX_TRACE_LENGTH);
@@ -125,7 +124,7 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 	//NDebugOverlay::Line( vStartPos, vEndPos, 0, 255, 0, true, 4.0f );
 
 	Ray_t pickerRay;
-	pickerRay.Init( vStartPos, vEndPos, EDITOR_MOUSE_TRACE_BOX_MINS, EDITOR_MOUSE_TRACE_BOX_MAXS );
+	pickerRay.Init( vStartPos, vEndPos );
 
 	CWarsFlora *pBest = NULL;
 	float fBestDistance = 0;
@@ -139,19 +138,36 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
 		if( pFlora )
 		{
-			CBaseTrace trace;
-			if ( IntersectRayWithBox( pickerRay,
-				pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMins(), pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMaxs(),
-				0.5f, &trace ) )
+			// Prefer testing against hitboxes
+			// If no hitboxes available, use the bounding box
+			trace_t trace;
+			bool bTestedHitBoxes = pFlora->TestHitboxes( pickerRay, MASK_SOLID, trace );
+			if( bTestedHitBoxes )
 			{
-				float fDistance = tr.endpos.DistTo( vStartPos );
-				if( !pBest || fDistance < fBestDistance )
+				if( trace.DidHit() )
 				{
-					pBest = pFlora;
-					fBestDistance = fDistance;
+					float fDistance = trace.endpos.DistTo( vStartPos );
+					if( !pBest || fDistance < fBestDistance )
+					{
+						pBest = pFlora;
+						fBestDistance = fDistance;
+					}
 				}
-				
-				break;
+			}
+			else
+			{
+				CBaseTrace trace2;
+				if ( IntersectRayWithBox( pickerRay,
+					pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMins(), pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMaxs(),
+					0.5f, &trace2 ) )
+				{
+					float fDistance = trace2.endpos.DistTo( vStartPos );
+					if( !pBest || fDistance < fBestDistance )
+					{
+						pBest = pFlora;
+						fBestDistance = fDistance;
+					}
+				}
 			}
 		}
 	}
