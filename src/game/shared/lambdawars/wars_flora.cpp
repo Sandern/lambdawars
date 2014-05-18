@@ -957,7 +957,7 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 
 		pOperation->AddSubKey( pEntValues );
 
-		warseditorstorage->AddEntityToQueue( pOperation );
+		warseditorstorage->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 
@@ -1043,7 +1043,7 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 		{
 			pOperation->AddSubKey( new KeyValues( "flora", "uuid", removeFlora[idx]->GetFloraUUID() ) );
 		}
-		warseditorstorage->AddEntityToQueue( pOperation );
+		warseditorstorage->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 

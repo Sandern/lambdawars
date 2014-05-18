@@ -86,6 +86,7 @@ public:
 	bool ProcessCommand( KeyValues *pCommand );
 	bool ProcessCreateCommand( KeyValues *pCommand );
 	bool ProcessDeleteFloraCommand( KeyValues *pCommand );
+	bool ProcessSelectCommand( KeyValues *pCommand );
 
 	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
 	KeyValues *CreateClearSelectionCommand();
@@ -146,6 +147,8 @@ private:
 
 	virtual void Update( float frametime );
 	virtual void PostRender();
+#else
+	virtual void FrameUpdatePostEntityThink();
 #endif // CLIENT_DLL
 
 private:

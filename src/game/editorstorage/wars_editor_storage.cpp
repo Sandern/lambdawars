@@ -74,25 +74,50 @@ void *CWarsEditorStorage::QueryInterface( const char *pInterfaceName )
 
 void CWarsEditorStorage::ClearData()
 {
-	for( int i = 0; i < m_hQueuedEntities.Count(); i++ )
-		m_hQueuedEntities[i]->deleteThis();
-	m_hQueuedEntities.Purge();
+	for( int i = 0; i < m_hQueuedClientCommands.Count(); i++ )
+		m_hQueuedClientCommands[i]->deleteThis();
+	m_hQueuedClientCommands.Purge();
+
+	for( int i = 0; i < m_hQueuedServerCommands.Count(); i++ )
+		m_hQueuedServerCommands[i]->deleteThis();
+	m_hQueuedServerCommands.Purge();
 }
 
-void CWarsEditorStorage::AddEntityToQueue( KeyValues *pEntity )
+void CWarsEditorStorage::QueueClientCommand( KeyValues *pCommand )
 {
-	m_hQueuedEntities.AddToTail( pEntity );
+	m_hQueuedClientCommands.AddToTail( pCommand );
 }
 
-KeyValues *CWarsEditorStorage::PopEntityFromQueue()
+void CWarsEditorStorage::QueueServerCommand( KeyValues *pCommand )
 {
-	if( m_hQueuedEntities.Count() == 0 )
+	m_hQueuedServerCommands.AddToTail( pCommand );
+}
+
+void CWarsEditorStorage::QueueCommand( KeyValues *pCommand )
+{
+	QueueClientCommand( pCommand->MakeCopy() );
+	QueueServerCommand( pCommand->MakeCopy() );
+	pCommand->deleteThis();
+}
+
+KeyValues *CWarsEditorStorage::PopClientCommandQueue()
+{
+	if( m_hQueuedClientCommands.Count() == 0 )
 		return NULL;
 
-	KeyValues *pEntity = m_hQueuedEntities.Head();
-	m_hQueuedEntities.Remove( 0 );
+	KeyValues *pEntity = m_hQueuedClientCommands.Head();
+	m_hQueuedClientCommands.Remove( 0 );
 	return pEntity;
 }
 
+KeyValues *CWarsEditorStorage::PopServerCommandQueue()
+{
+	if( m_hQueuedServerCommands.Count() == 0 )
+		return NULL;
+
+	KeyValues *pEntity = m_hQueuedServerCommands.Head();
+	m_hQueuedServerCommands.Remove( 0 );
+	return pEntity;
+}
 
 EXPOSE_SINGLE_INTERFACE( CWarsEditorStorage, IWarsEditorStorage, WARS_EDITOR_STORAGE_VERSION );

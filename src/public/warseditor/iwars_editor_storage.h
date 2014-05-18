@@ -18,10 +18,13 @@ abstract_class IWarsEditorStorage : public IAppSystem
 public:
 	virtual void ClearData() = 0;
 
-	// Server/Client only side entities
-	// Created at server side in editor, then synced to client through this bridge
-	virtual void AddEntityToQueue( KeyValues *pEntity ) = 0;
-	virtual KeyValues *PopEntityFromQueue() = 0;
+	// Methods for syncing commands between server and client through
+	// a direct bridge.
+	virtual void QueueClientCommand( KeyValues *pCommand ) = 0;
+	virtual void QueueServerCommand( KeyValues *pCommand ) = 0;
+	virtual void QueueCommand( KeyValues *pCommand ) = 0;
+	virtual KeyValues *PopClientCommandQueue() = 0;
+	virtual KeyValues *PopServerCommandQueue() = 0;
 };
 
 #define WARS_EDITOR_STORAGE_VERSION		"VWarsEditorStorage001"

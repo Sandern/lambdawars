@@ -37,7 +37,12 @@ bool CEditorSystem::ProcessCommand( KeyValues *pCommand )
 		ClearSelection();
 		return true;
 	}
+	else if( V_strcmp( pOperation, "select" ) == 0 )
+	{
+		return ProcessSelectCommand( pCommand );
+	}
 
+	Warning( "CEditorSystem::ProcessCommand: unprocessed operation type \"%s\"\n", pOperation );
 	return true;
 }
 
@@ -56,7 +61,7 @@ bool CEditorSystem::ProcessCreateCommand( KeyValues *pCommand )
 		if( pModelname && modelinfo->GetModelIndex( pModelname ) < 0 )
 		{
 			//modelinfo->FindOrLoadModel( pModelname );
-			warseditorstorage->AddEntityToQueue( pCommand );
+			warseditorstorage->QueueClientCommand( pCommand );
 			return false;
 		}
 #endif // CLIENT_DLL
@@ -131,6 +136,39 @@ bool CEditorSystem::ProcessDeleteFloraCommand( KeyValues *pCommand )
 			continue;
 
 		CWarsFlora::RemoveFloraByUUID( uuid );
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CEditorSystem::ProcessSelectCommand( KeyValues *pCommand )
+{
+	for ( KeyValues *pKey = pCommand->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+	{
+		if ( V_strcmp( pKey->GetName(), "flora" ) )
+			continue;
+
+		const char *uuid = pKey->GetString("uuid", NULL);
+		if( !uuid )
+			continue;
+
+		CWarsFlora *pFlora = CWarsFlora::FindFloraByUUID( uuid );
+		if( !pFlora )
+			continue;
+
+		bool bDoSelect = pKey->GetBool( "select", true );
+		bool bIsSelected = IsSelected( pFlora );
+		if( bDoSelect && !bIsSelected )
+		{
+			Select( pFlora );
+		}
+		else if( !bDoSelect && bIsSelected )
+		{
+			Deselect( pFlora );
+		}
 	}
 
 	return true;
