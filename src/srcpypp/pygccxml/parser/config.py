@@ -11,6 +11,7 @@ import os
 import sys
 import copy
 import types
+from .. import utils
 
 class parser_configuration_t(object):
     """
@@ -195,8 +196,6 @@ class gccxml_configuration_t(parser_configuration_t):
                       % self.gccxml_path
                 raise RuntimeError( msg )
 
-config_t = gccxml_configuration_t #backward computability
-
 gccxml_configuration_example = \
 """
 [gccxml]
@@ -240,7 +239,7 @@ def load_gccxml_configuration( configuration, **defaults ):
 
     """
     parser = configuration
-    if isinstance( configuration, str ):
+    if utils.is_str(configuration):
         try:
             from configparser import SafeConfigParser
         except ImportError:

@@ -10,7 +10,7 @@ import xml.sax
 import warnings
 import xml.sax.handler
 from pygccxml.declarations import *
-from pygccxml import utils
+from .. import utils
 
 ##convention
 #XML_NN - XML Node Name
@@ -225,7 +225,7 @@ class scanner_t( xml.sax.handler.ContentHandler ):
                 self.__types[ element_id ] = obj
                 self.__read_byte_size(obj, attrs)
                 self.__read_byte_align(obj, attrs)
-            elif isinstance( obj, str ):
+            elif utils.is_str(obj):
                 self.__files[ element_id ] = obj
             else:
                 self.logger.warning( 'Unknown object type has been found.'
@@ -369,8 +369,11 @@ class scanner_t( xml.sax.handler.ContentHandler ):
         try:
             return FUNDAMENTAL_TYPES[ attrs.get( XML_AN_NAME, '' ) ]
         except KeyError:
-            raise RuntimeError( "pygccxml error: unable to find fundamental type with name '%s'."
-                                % attrs.get( XML_AN_NAME, '' ) )
+            return None
+            # This code chokes on atomic_int_type in Boost 1.54 (and higher, probably).
+            # It seems ok to just silently ignore this error.
+            # raise RuntimeError( "pygccxml error: unable to find fundamental type with name '%s'."
+            #                     % attrs.get( XML_AN_NAME, '' ) )
 
     def __read_offset_type( self,attrs ):
         base = attrs[ XML_AN_BASE_TYPE ]

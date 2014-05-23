@@ -208,6 +208,26 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pCommand") ) );
         
         }
+        { //::CEditorSystem::ProcessSelectCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessSelectCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessSelectCommand"
+                , ProcessSelectCommand_function_type( &::CEditorSystem::ProcessSelectCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::QueueCommand
+        
+            typedef void ( ::CEditorSystem::*QueueCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "QueueCommand"
+                , QueueCommand_function_type( &::CEditorSystem::QueueCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::SetEditorMode
         
             typedef void ( ::CEditorSystem::*SetEditorMode_function_type )( ::CEditorSystem::EditorInteractionMode_t ) ;
@@ -471,6 +491,26 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "ProcessDeleteFloraCommand"
                 , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessSelectCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessSelectCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessSelectCommand"
+                , ProcessSelectCommand_function_type( &::CEditorSystem::ProcessSelectCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::QueueCommand
+        
+            typedef void ( ::CEditorSystem::*QueueCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "QueueCommand"
+                , QueueCommand_function_type( &::CEditorSystem::QueueCommand )
                 , ( bp::arg("pCommand") ) );
         
         }
