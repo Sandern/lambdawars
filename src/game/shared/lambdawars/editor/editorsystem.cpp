@@ -285,11 +285,11 @@ void CEditorSystem::PasteSelection()
 
 	// Clear selection, will select copy!
 	KeyValues *pClearSelection = CreateClearSelectionCommand();
-	warseditorstorage->QueueCommand( pClearSelection );
+	QueueCommand( pClearSelection );
 
 	for( int i = 0; i < m_SelectionCopyCommands.Count(); i++ )
 	{
-		warseditorstorage->QueueCommand( m_SelectionCopyCommands[i] );
+		QueueCommand( m_SelectionCopyCommands[i] );
 	}
 
 	m_SelectionCopyCommands.Purge();

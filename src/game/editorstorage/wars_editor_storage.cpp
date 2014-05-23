@@ -93,13 +93,6 @@ void CWarsEditorStorage::QueueServerCommand( KeyValues *pCommand )
 	m_hQueuedServerCommands.AddToTail( pCommand );
 }
 
-void CWarsEditorStorage::QueueCommand( KeyValues *pCommand )
-{
-	QueueClientCommand( pCommand->MakeCopy() );
-	QueueServerCommand( pCommand->MakeCopy() );
-	pCommand->deleteThis();
-}
-
 KeyValues *CWarsEditorStorage::PopClientCommandQueue()
 {
 	if( m_hQueuedClientCommands.Count() == 0 )

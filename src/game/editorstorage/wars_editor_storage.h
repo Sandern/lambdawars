@@ -24,7 +24,6 @@ public:
 	void ClearData();
 	virtual void QueueClientCommand( KeyValues *pCommand );
 	virtual void QueueServerCommand( KeyValues *pCommand );
-	virtual void QueueCommand( KeyValues *pCommand );
 	virtual KeyValues *PopClientCommandQueue();
 	virtual KeyValues *PopServerCommandQueue();
 

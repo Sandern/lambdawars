@@ -177,6 +177,16 @@ bool CEditorSystem::ProcessSelectCommand( KeyValues *pCommand )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CEditorSystem::QueueCommand( KeyValues *pCommand )
+{
+	warseditorstorage->QueueClientCommand( pCommand->MakeCopy() );
+	warseditorstorage->QueueServerCommand( pCommand->MakeCopy() );
+	pCommand->deleteThis();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 KeyValues *CEditorSystem::CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset )
 {
 	KeyValues *pOperation = new KeyValues( "data" );

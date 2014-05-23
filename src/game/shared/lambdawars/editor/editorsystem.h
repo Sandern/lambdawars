@@ -88,6 +88,7 @@ public:
 	bool ProcessDeleteFloraCommand( KeyValues *pCommand );
 	bool ProcessSelectCommand( KeyValues *pCommand );
 
+	void QueueCommand( KeyValues *pCommand );
 	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
 	KeyValues *CreateClearSelectionCommand();
 
