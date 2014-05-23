@@ -22,7 +22,6 @@ public:
 	// a direct bridge.
 	virtual void QueueClientCommand( KeyValues *pCommand ) = 0;
 	virtual void QueueServerCommand( KeyValues *pCommand ) = 0;
-	virtual void QueueCommand( KeyValues *pCommand ) = 0;
 	virtual KeyValues *PopClientCommandQueue() = 0;
 	virtual KeyValues *PopServerCommandQueue() = 0;
 };
