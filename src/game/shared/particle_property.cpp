@@ -87,11 +87,11 @@ int CParticleProperty::GetParticleAttachment( C_BaseEntity *pEntity, const char 
 {
 	Assert( pEntity && pEntity->GetBaseAnimating() );
 	if ( !pEntity || !pEntity->GetBaseAnimating() )
-		return -1;
+		return INVALID_PARTICLE_ATTACHMENT;
 
 	// Find the attachment point index
 	int iAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pszAttachmentName );
-	if ( iAttachment == -1 )
+	if ( iAttachment == INVALID_PARTICLE_ATTACHMENT )
 	{
 		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetModelName()), pszAttachmentName, pszParticleName );
 	}
@@ -129,7 +129,7 @@ int CParticleProperty::GetAllParticleEffectRenderables( IClientRenderable **pOut
 CNewParticleEffect *CParticleProperty::Create( const char *pszParticleName, ParticleAttachment_t iAttachType, const char *pszAttachmentName )
 {
 	int iAttachment = GetParticleAttachment( GetOuter(), pszAttachmentName, pszParticleName );
-	if ( iAttachment == -1 )
+	if ( iAttachment == INVALID_PARTICLE_ATTACHMENT )
 		return NULL;
 
 	// Create the system
@@ -206,7 +206,7 @@ CNewParticleEffect *CParticleProperty::Create( const char *pszParticleName, Part
 //-----------------------------------------------------------------------------
 void CParticleProperty::AddControlPoint( CNewParticleEffect *pEffect, int iPoint, C_BaseEntity *pEntity, ParticleAttachment_t iAttachType, const char *pszAttachmentName, Vector vecOriginOffset, matrix3x4_t *matOffset )
 {
-	int iAttachment = -1;
+	int iAttachment = INVALID_PARTICLE_ATTACHMENT;
 	if ( pszAttachmentName )
 	{
 		iAttachment = GetParticleAttachment( pEntity, pszAttachmentName, pEffect->GetEffectName() );
@@ -230,8 +230,23 @@ void CParticleProperty::AddControlPoint( int iEffectIndex, int iPoint, C_BaseEnt
 	ParticleEffectList_t *pEffect = &m_ParticleEffects[iEffectIndex];
 	Assert( pEffect->pControlPoints.Count() < MAX_PARTICLE_CONTROL_POINTS );
 
-	int iIndex = pEffect->pControlPoints.AddToTail();
-	ParticleControlPoint_t *pNewPoint = &pEffect->pControlPoints[iIndex];
+	// If the control point is already used, override it
+	ParticleControlPoint_t *pNewPoint = NULL;
+	int iIndex = iPoint;
+	FOR_EACH_VEC( pEffect->pControlPoints, i )
+	{
+		if ( pEffect->pControlPoints[i].iControlPoint == iPoint )
+		{
+			pNewPoint = &pEffect->pControlPoints[i];
+		}
+	}
+
+	if ( !pNewPoint )
+	{
+		iIndex = pEffect->pControlPoints.AddToTail();
+		pNewPoint = &pEffect->pControlPoints[iIndex];
+	}
+	
 	pNewPoint->iControlPoint = iPoint;
 	pNewPoint->hEntity = pEntity;
 	pNewPoint->iAttachType = iAttachType;
@@ -551,7 +566,8 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 	}
 
 	// Only update non-follow particles when we're initializing, 
-	if ( !bInitializing && (pPoint->iAttachType == PATTACH_ABSORIGIN || pPoint->iAttachType == PATTACH_POINT ) )
+	// unless we're parented to something, in which case we should always update
+	if ( !bInitializing && !pPoint->hEntity->GetMoveParent() && (pPoint->iAttachType == PATTACH_ABSORIGIN || pPoint->iAttachType == PATTACH_POINT ) )
 		return;
 
 	if ( pPoint->iAttachType == PATTACH_CUSTOMORIGIN )

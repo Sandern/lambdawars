@@ -65,7 +65,7 @@ public:
 		if ( pEntity )
 		{
 			m_vMark = pEntity->GetAbsOrigin();
-			m_flMarkTolerance = tolerance ;
+			m_flMarkTolerance = tolerance;
 		}
 	}
 	

@@ -21,6 +21,13 @@
 class CBaseEntity;
 class CNewParticleEffect;
 
+// Argh: Server considers -1 to be an invalid attachment, whereas the client uses 0
+#ifdef CLIENT_DLL
+#define INVALID_PARTICLE_ATTACHMENT			0
+#else
+#define INVALID_PARTICLE_ATTACHMENT			-1
+#endif
+
 struct ParticleControlPoint_t
 {
 	ParticleControlPoint_t()

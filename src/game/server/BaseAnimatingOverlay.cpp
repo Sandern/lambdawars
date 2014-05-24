@@ -105,9 +105,14 @@ void CAnimationLayer::Init( CBaseAnimatingOverlay *pOverlay )
 	m_nSequence = 0;
 	m_nPriority = 0;
 	m_nOrder.Set( CBaseAnimatingOverlay::MAX_OVERLAYS );
+
+	m_flBlendIn = 0.0;
+	m_flBlendOut = 0.0;
+
 	m_flKillRate = 100.0;
 	m_flKillDelay = 0.0;
 	m_flPlaybackRate = 1.0;
+	m_flLastEventCheck = 0.0;
 	m_flLastAccess = gpGlobals->curtime;
 	m_flLayerAnimtime = 0;
 	m_flLayerFadeOuttime = 0;
@@ -292,13 +297,13 @@ void CBaseAnimatingOverlay::StudioFrameAdvance ()
 				if (pLayer->m_flKillDelay > 0)
 				{
 					pLayer->m_flKillDelay -= flAdvance;
-					pLayer->m_flKillDelay = clamp( 	pLayer->m_flKillDelay, 0.0, 1.0 );
+					pLayer->m_flKillDelay = clamp( 	pLayer->m_flKillDelay, 0.0f, 1.0f );
 				}
 				else if (pLayer->m_flWeight != 0.0f)
 				{
 					// give it at least one frame advance cycle to propagate 0.0 to client
 					pLayer->m_flWeight -= pLayer->m_flKillRate * flAdvance;
-					pLayer->m_flWeight = clamp( 	pLayer->m_flWeight, 0.0, 1.0 );
+					pLayer->m_flWeight = clamp( (float) pLayer->m_flWeight, 0.0f, 1.0f );
 				}
 				else
 				{
@@ -410,7 +415,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 		if (flEnd >= flLastVisibleCycle || flEnd < 0.0) 
 		{
 			m_bSequenceFinished = true;
-			flEnd = 1.01f;
+			flEnd = 1.0f;
 		}
 	}
 	m_flLastEventCheck = flEnd;
@@ -469,7 +474,7 @@ void CBaseAnimatingOverlay::GetSkeleton( CStudioHdr *pStudioHdr, Vector pos[], Q
 	boneSetup.AccumulatePose( pos, q, GetSequence(), GetCycle(), 1.0, gpGlobals->curtime, m_pIk );
 
 	// sort the layers
-	int layer[MAX_OVERLAYS];
+	int layer[MAX_OVERLAYS] = {};
 	int i;
 	for (i = 0; i < m_AnimOverlay.Count(); i++)
 	{
@@ -918,7 +923,7 @@ void CBaseAnimatingOverlay::SetLayerCycle( int iLayer, float flCycle )
 
 	if (!m_AnimOverlay[iLayer].m_bLooping)
 	{
-		flCycle = clamp( flCycle, 0.0, 1.0 );
+		flCycle = clamp( flCycle, 0.0f, 1.0f );
 	}
 	m_AnimOverlay[iLayer].m_flCycle = flCycle;
 	m_AnimOverlay[iLayer].MarkActive( );
@@ -935,8 +940,8 @@ void CBaseAnimatingOverlay::SetLayerCycle( int iLayer, float flCycle, float flPr
 
 	if (!m_AnimOverlay[iLayer].m_bLooping)
 	{
-		flCycle = clamp( flCycle, 0.0, 1.0 );
-		flPrevCycle = clamp( flPrevCycle, 0.0, 1.0 );
+		flCycle = clamp( flCycle, 0.0f, 1.0f );
+		flPrevCycle = clamp( flPrevCycle, 0.0f, 1.0f );
 	}
 	m_AnimOverlay[iLayer].m_flCycle = flCycle;
 	m_AnimOverlay[iLayer].m_flPrevCycle = flPrevCycle;

@@ -155,7 +155,7 @@ void CBaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 		if (pflexcontroller->max != pflexcontroller->min)
 		{
 			value = (value - pflexcontroller->min) / (pflexcontroller->max - pflexcontroller->min);
-			value = clamp( value, 0.0, 1.0 );
+			value = clamp( value, 0.0f, 1.0f );
 		}
 
 		m_flexWeight.Set( index, value );
@@ -1426,9 +1426,9 @@ static Activity DetermineExpressionMoveActivity( CChoreoEvent *event, CAI_BaseNP
 
 	// Custom distance styles are appended to param2 with a space as a separator
 	const char *pszAct = Q_strstr( sParam2, " " );
+	char szActName[256];
 	if ( pszAct )
 	{
-		char szActName[256];
 		Q_strncpy( szActName, sParam2, sizeof(szActName) );
 		szActName[ (pszAct-sParam2) ] = '\0';
 		pszAct = szActName;
@@ -2038,7 +2038,7 @@ bool CBaseFlex::ProcessSequenceSceneEvent( CSceneEventInfo *info, CChoreoScene *
 			float dt =  scene->GetTime() - event->GetStartTime();
 			float seq_duration = SequenceDuration( info->m_nSequence );
 			float flCycle = dt / seq_duration;
-			flCycle = clamp( flCycle, 0, 1.0 );
+			flCycle = clamp( flCycle, 0.f, 1.0f );
 			SetLayerCycle( info->m_iLayer, flCycle );
 		}
 
