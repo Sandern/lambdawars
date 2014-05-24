@@ -6,11 +6,11 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include "hl2wars/tex_density.h"
+#include "tex_density.h"
 #include "density_weight_map.h"
 #include "unit_base_shared.h"
 #include "materialsystem/IMaterialVar.h"
-#include "hl2wars/fowmgr.h"
+#include "fowmgr.h"
 #include "materialsystem/ITexture.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
