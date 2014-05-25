@@ -1,8 +1,8 @@
 /* This file created by make_versioninfo.exe */
-#define FIELD3 3150
-#define MS_DLL_ID "3.3"
+#define FIELD3 150
+#define MS_DLL_ID "3.4"
 #ifndef _DEBUG
-#define PYTHON_DLL_NAME "python33.dll"
+#define PYTHON_DLL_NAME "python34.dll"
 #else
-#define PYTHON_DLL_NAME "python33_d.dll"
+#define PYTHON_DLL_NAME "python34_d.dll"
 #endif
