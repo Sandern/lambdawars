@@ -173,12 +173,30 @@ static char *GetPythonImport (HINSTANCE hModule)
     return NULL;
 }
 
+HINSTANCE g_hDLL;
+
+#define MAX_DYNAMIC_MODULES 1024
+static int g_iDynamicModulesCount = 0;
+static HINSTANCE g_DynamicModules[MAX_DYNAMIC_MODULES];
+
+void PyImport_FreeDynLibraries( void )
+{
+	int i;
+
+	for( i = 0; i < g_iDynamicModulesCount; i++ )
+	{
+		FreeLibrary(g_DynamicModules[i]);
+	}
+}
 dl_funcptr _PyImport_GetDynLoadWindows(const char *shortname,
                                        PyObject *pathname, FILE *fp)
 {
     dl_funcptr p;
     char funcname[258], *import_python;
     wchar_t *wpathname;
+	
+	if( g_iDynamicModulesCount == MAX_DYNAMIC_MODULES )
+		return NULL;
 
 #ifndef _DEBUG
     _Py_CheckPython3();
@@ -208,6 +226,7 @@ dl_funcptr _PyImport_GetDynLoadWindows(const char *shortname,
         /* XXX This call doesn't exist in Windows CE */
         hDLL = LoadLibraryExW(wpathname, NULL,
                               LOAD_WITH_ALTERED_SEARCH_PATH);
+		g_hDLL = hDLL;
 #if HAVE_SXS
         _Py_DeactivateActCtx(cookie);
 #endif
@@ -290,6 +309,9 @@ dl_funcptr _PyImport_GetDynLoadWindows(const char *shortname,
                 return NULL;
             }
         }
+
+		// Must register the dll, so we can free it on shutdown
+		g_DynamicModules[g_iDynamicModulesCount++] = hDLL;
         p = GetProcAddress(hDLL, funcname);
     }
 
