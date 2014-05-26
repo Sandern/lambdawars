@@ -349,10 +349,6 @@ public:
 
 	CBaseEntity *		GetEnemy();
 
-	virtual void		AimGun();
-	virtual void		RelaxAim();
-	virtual void		SetAim( Vector &vAimDir );
-
 	virtual Vector		GetShootEnemyDir( Vector &shootOrigin, bool noisy = true );
 	virtual Vector		BodyTarget( const Vector &posSrc, bool bNoisy = true );
 
@@ -426,7 +422,13 @@ public:
 	// FOW Variables
 	bool m_bFOWFilterFriendly;
 
-	float m_fEyePitch, m_fEyeYaw;
+	float m_fEyeYaw;
+#ifndef CLIENT_DLL
+	CNetworkVar(float, m_fEyePitch );
+#else
+	float m_fEyePitch;
+#endif // CLIENT_DLL
+
 	bool m_bNeverIgnoreAttacks;
 	bool m_bBodyTargetOriginBased;
 	bool m_bFriendlyDamage;

@@ -54,6 +54,9 @@ extern "C"
 	char dllVersionBuffer[16] = ""; // a private buffer
 	HMODULE PyWin_DLLhModule = NULL;
 	const char *PyWin_DLLVersionString = dllVersionBuffer;
+
+	// Needed to free dynamic imported modules (i.e. pyd modules)
+	void PyImport_FreeDynLibraries( void );
 }
 #endif // WIN32
 
@@ -275,7 +278,7 @@ bool CSrcPython::InitInterpreter( void )
 
 	double fStartTime = Plat_FloatTime();
 	
-#define PY_MAX_PATH 2048
+#define PY_MAX_PATH 1024
 
 	char buf[PY_MAX_PATH];
 	char pythonpath[PY_MAX_PATH];
@@ -295,38 +298,44 @@ bool CSrcPython::InitInterpreter( void )
 	V_strcat( pythonhome, buf, sizeof(pythonhome) );
 	
 	// Set PYTHONPATH
+#ifdef WIN32
+#ifdef CLIENT_DLL
+	filesystem->RelativePathToFullPath("python/ClientDLLs", "MOD", buf, sizeof(buf));
+	V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+#else
+	filesystem->RelativePathToFullPath("python/DLLs", "MOD", buf, sizeof(buf));
+	V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+#endif // CLIENT_DLL
+	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
+#endif // WIN32
+
 	filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
 	V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, buf, sizeof(pythonpath) );
-
-#ifdef WIN32
-	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-#ifdef CLIENT_DLL
-	filesystem->RelativePathToFullPath("python/Lib/ClientDLLs", "MOD", buf, sizeof(pythonpath));
-	V_FixupPathName(buf, sizeof(pythonpath), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
-#else
-	filesystem->RelativePathToFullPath("python/Lib/DLLs", "MOD", buf, sizeof(pythonpath));
-	V_FixupPathName(buf, sizeof(pythonpath), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
-#endif // CLIENT_DLL
-#endif // WIN32
 	
 #ifdef OSX
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	filesystem->RelativePathToFullPath("python/Lib/plat-darwin", "MOD", buf, sizeof(pythonpath));
-	V_FixupPathName(buf, sizeof(pythonpath), buf);
+	filesystem->RelativePathToFullPath("python/plat-darwin", "MOD", buf, sizeof(buf));
+	V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, buf, sizeof(pythonpath) );
 	
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(pythonpath));
-	V_FixupPathName(buf, sizeof(pythonpath), buf);
+	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
+	V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, buf, sizeof(pythonpath) );
 #endif // OSX
 	
+	if( g_debug_python.GetBool() )
+	{
+		DevMsg("PYTHONPATH: %s: %d\nPYTHONHOME: %s (d)\n", 
+			pythonpath, V_strlen(pythonpath), pythonhome, V_strlen(pythonhome));
+	}
+
 #ifdef WIN32
-	::SetEnvironmentVariable( "PYTHONHOME", pythonhome );
-	::SetEnvironmentVariable( "PYTHONPATH", pythonpath );
+	::_putenv( VarArgs( "PYTHONHOME=%s", pythonhome ) );
+	::_putenv( VarArgs( "PYTHONPATH=%s", pythonpath ) );
 #else
 	::setenv( "PYTHONHOME", pythonhome, 1 );
     ::setenv( "PYTHONPATH", pythonpath, 1 );
@@ -344,17 +353,6 @@ bool CSrcPython::InitInterpreter( void )
 	if( !developer.GetBool() )
 		Py_OptimizeFlag = 1;
 #endif // _DEBUG
-
-#if PY_VERSION_HEX < 0x03000000
-	// Python 3 warnings
-	const bool bPy3kWarnings = CommandLine() && CommandLine()->FindParm("-py3kwarnings") != 0;
-	if( bPy3kWarnings )
-	{
-		Py_Py3kWarningFlag = 1;
-		Py_BytesWarningFlag = 1;
-		//Py_HashRandomizationFlag = 1;
-	}
-#endif 
 
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
@@ -548,11 +546,9 @@ bool CSrcPython::ShutdownInterpreter( void )
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
 	Py_Finalize();
-#if PY_VERSION_HEX < 0x03000000
 #ifdef WIN32
 	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash if c extension modules are used.
 #endif // WIN32
-#endif // PY_VERSION_HEX < 0x03000000
 
 	m_bPythonIsFinalizing = false;
 	m_bPythonRunning = false;
@@ -1452,12 +1448,6 @@ boost::python::list CSrcPython::GetRegisteredTickMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
-#if defined( _DEBUG ) && defined( CLIENT_DLL )
-	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
-	// of bp::object. Disabled for now...
-	return false;
-#endif // _DEBUG
-
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
 		if( m_methodTickList[i].method == method )
@@ -1518,11 +1508,6 @@ boost::python::list CSrcPython::GetRegisteredPerFrameMethods()
 //-----------------------------------------------------------------------------
 bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
-#if defined( _DEBUG ) && defined( CLIENT_DLL )
-	// FIXME!: This is broken in debug mode for some reason on the client, crashes on the bool operator
-	// of bp::object. Disabled for now...
-	return false;
-#endif // _DEBUG
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
 		if( m_methodPerFrameList[i] == method )

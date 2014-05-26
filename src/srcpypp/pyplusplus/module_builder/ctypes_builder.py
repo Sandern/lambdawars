@@ -54,7 +54,7 @@ class ctypes_module_builder_t(module_builder.module_builder_t):
 
     def __parse_declarations( self, files, gccxml_config, compilation_mode=None, cache=None ):
         if None is gccxml_config:
-            gccxml_config = parser.config_t()
+            gccxml_config = parser.gccxml_configuration_t()
         if None is compilation_mode:
             compilation_mode = parser.COMPILATION_MODE.FILE_BY_FILE
         start_time = time.clock()

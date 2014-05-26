@@ -718,6 +718,7 @@ void CEditorSystem::RenderSelection()
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, 6 * m_hSelectedEntities.Count() );
 
+	Vector mins, maxs;
 	FOR_EACH_VEC( m_hSelectedEntities, i )
 	{
 		CBaseEntity *l = m_hSelectedEntities[ i ];
@@ -727,8 +728,15 @@ void CEditorSystem::RenderSelection()
 		Vector position = l->GetAbsOrigin();
 		Vector color( 0.5f, 1.0f, 0.25f );
 
-		const Vector &mins = l->CollisionProp()->OBBMins();
-		const Vector &maxs = l->CollisionProp()->OBBMaxs();
+		if( l->GetBaseAnimating() )
+		{
+			l->GetBaseAnimating()->ComputeEntitySpaceHitboxSurroundingBox( &mins, &maxs );
+		}
+		else
+		{
+			mins = l->CollisionProp()->OBBMins();
+			maxs = l->CollisionProp()->OBBMaxs();
+		}
 
 		Vector points[8] = {
 			Vector( maxs.x, maxs.y, maxs.z ),

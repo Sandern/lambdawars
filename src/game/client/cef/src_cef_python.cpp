@@ -96,7 +96,11 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 		{
 			result->SetBool( i, boost::python::extract<bool>(value) );
 		}
+#if PY_VERSION_HEX >= 0x03000000
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+#else
 		else if( valuetype == builtins.attr("list") )
+#endif // PY_VERSION_HEX >= 0x03000000
 		{
 			result->SetList( i, PyToCefValueList( boost::python::list( value ) ) );
 		}
@@ -180,16 +184,17 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 {
 	CefRefPtr<CefDictionaryValue> result = CefDictionaryValue::Create();
 
-	boost::python::object key, value;
-	const boost::python::object objectKeys = d.iterkeys();
-	unsigned long ulCount = boost::python::len(d); 
-	for( unsigned long i = 0; i < ulCount; i++ )
+	boost::python::object items = d.attr("items")();
+	boost::python::object iterator = items.attr("__iter__")();
+	boost::python::ssize_t length = boost::python::len(items); 
+	for( boost::python::ssize_t u = 0; u < length; u++ )
 	{
-		key = objectKeys.attr( "next" )();
-		value = d[key];
+		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
+		boost::python::object value = item[1];
+
 		boost::python::object valuetype = fntype( value );
 
-		CefString cefkey = boost::python::extract< const char * >( key );
+		CefString cefkey = boost::python::extract< const char * >( item[0] );
 
 		if( value == boost::python::object() )
 		{
@@ -224,7 +229,11 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		{
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
 		}
+#if PY_VERSION_HEX >= 0x03000000
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+#else
 		else if( valuetype == builtins.attr("list") )
+#endif // PY_VERSION_HEX >= 0x03000000
 		{
 			result->SetList( cefkey, PyToCefValueList( boost::python::list( value ) ) );
 		}
@@ -242,6 +251,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 			throw boost::python::error_already_set(); 
 		}
 	}
+
 	return result;
 }
 

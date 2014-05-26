@@ -181,6 +181,8 @@ public:
 	// AckTickCount
 	void					SetLastAckTickCount( int iAckTickCount ) { m_iLastAckTickCount = iAckTickCount; }
 	int						GetLastAckTickCount( void ) { return m_iLastAckTickCount; }
+	void					SetIsRequestingFullUpdate( bool bRequestingFullUpdate ) { m_bRequestingFullUpdate = bRequestingFullUpdate; }
+	bool					IsRequestingFullUpdate( void ) { return m_bRequestingFullUpdate; }
 
 private:
     void					OnLeftMouseButtonPressedInternal( const MouseTraceData_t &data );
@@ -248,6 +250,7 @@ private:
 
 	// Acknowledge tick
 	int m_iLastAckTickCount;
+	bool m_bRequestingFullUpdate;
 };
 
 // Inlines

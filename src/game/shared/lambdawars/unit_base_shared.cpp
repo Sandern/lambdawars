@@ -141,6 +141,9 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 {
 	SetAllowNavIgnore(true);
 
+	m_fEyePitch = 0;
+	m_fEyeYaw = 0;
+
 	// Default navigator/pathfind values
 	m_fDeathDrop = 600.0f;
 	m_fSaveDrop = 300.0f;
@@ -797,46 +800,6 @@ void CUnitBase::DispatchBurstFinished( void )
 const char *CUnitBase::GetUnitType()
 {
 	return STRING(m_UnitType);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CUnitBase::AimGun()
-{
-	if( GetEnemy() )
-	{
-		Vector vecShootOrigin = Weapon_ShootPosition();
-		Vector vecShootDir = GetShootEnemyDir( vecShootOrigin, false );
-		SetAim(vecShootDir);
-	}
-	else
-	{
-		RelaxAim();
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CUnitBase::RelaxAim()
-{
-	// dampen existing aim
-	m_fEyePitch = AngleNormalize( ApproachAngle(0, m_fEyePitch, 3 ));
-	m_fEyeYaw = GetAbsAngles().y;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CUnitBase::SetAim( Vector &vAimDir )
-{
-	QAngle angDir = QAngle();
-	VectorAngles(vAimDir, angDir);
-
-    // Just set pitch to enemy direction and yaw to our move directin
-	m_fEyePitch = angDir.x;
-    m_fEyeYaw = angDir.y; //GetAbsAngles().y;
 }
 
 //-----------------------------------------------------------------------------

@@ -93,6 +93,27 @@ struct CBaseAnimating_wrapper : CBaseAnimating, bp::wrapper< CBaseAnimating > {
         return CBaseAnimating::CanBecomeRagdoll( );
     }
 
+    static boost::python::tuple ComputeEntitySpaceHitboxSurroundingBox( ::CBaseAnimating & inst ){
+        Vector pVecWorldMins2;
+        Vector pVecWorldMaxs2;
+        bool result = inst.ComputeEntitySpaceHitboxSurroundingBox(&pVecWorldMins2, &pVecWorldMaxs2);
+        return bp::make_tuple( result, pVecWorldMins2, pVecWorldMaxs2 );
+    }
+
+    static boost::python::tuple ComputeHitboxSurroundingBox_f24bfa76b544643af6a33b16f6d51342( ::CBaseAnimating & inst ){
+        Vector pVecWorldMins2;
+        Vector pVecWorldMaxs2;
+        bool result = inst.ComputeHitboxSurroundingBox(&pVecWorldMins2, &pVecWorldMaxs2);
+        return bp::make_tuple( result, pVecWorldMins2, pVecWorldMaxs2 );
+    }
+
+    static boost::python::tuple ComputeHitboxSurroundingBox_d994fc021196753f3977cf78728a5bbe( ::CBaseAnimating & inst, int iHitbox ){
+        Vector pVecWorldMins2;
+        Vector pVecWorldMaxs2;
+        bool result = inst.ComputeHitboxSurroundingBox(iHitbox, &pVecWorldMins2, &pVecWorldMaxs2);
+        return bp::make_tuple( result, pVecWorldMins2, pVecWorldMaxs2 );
+    }
+
     virtual int DrawDebugTextOverlays(  ) {
         PY_OVERRIDE_CHECK( CBaseAnimating, DrawDebugTextOverlays )
         PY_OVERRIDE_LOG( _entities, CBaseAnimating, DrawDebugTextOverlays )
@@ -850,32 +871,32 @@ void register_CBaseAnimating_class(){
         }
         { //::CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox
         
-            typedef bool ( ::CBaseAnimating::*ComputeEntitySpaceHitboxSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
+            typedef boost::python::tuple ( *ComputeEntitySpaceHitboxSurroundingBox_function_type )( ::CBaseAnimating & );
             
             CBaseAnimating_exposer.def( 
                 "ComputeEntitySpaceHitboxSurroundingBox"
-                , ComputeEntitySpaceHitboxSurroundingBox_function_type( &::CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox )
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
+                , ComputeEntitySpaceHitboxSurroundingBox_function_type( &CBaseAnimating_wrapper::ComputeEntitySpaceHitboxSurroundingBox )
+                , ( bp::arg("inst") ) );
         
         }
         { //::CBaseAnimating::ComputeHitboxSurroundingBox
         
-            typedef bool ( ::CBaseAnimating::*ComputeHitboxSurroundingBox_function_type )( ::Vector *,::Vector * ) ;
+            typedef boost::python::tuple ( *ComputeHitboxSurroundingBox_function_type )( ::CBaseAnimating & );
             
             CBaseAnimating_exposer.def( 
                 "ComputeHitboxSurroundingBox"
-                , ComputeHitboxSurroundingBox_function_type( &::CBaseAnimating::ComputeHitboxSurroundingBox )
-                , ( bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
+                , ComputeHitboxSurroundingBox_function_type( &CBaseAnimating_wrapper::ComputeHitboxSurroundingBox_f24bfa76b544643af6a33b16f6d51342 )
+                , ( bp::arg("inst") ) );
         
         }
         { //::CBaseAnimating::ComputeHitboxSurroundingBox
         
-            typedef bool ( ::CBaseAnimating::*ComputeHitboxSurroundingBox_function_type )( int,::Vector *,::Vector * ) ;
+            typedef boost::python::tuple ( *ComputeHitboxSurroundingBox_function_type )( ::CBaseAnimating &,int );
             
             CBaseAnimating_exposer.def( 
                 "ComputeHitboxSurroundingBox"
-                , ComputeHitboxSurroundingBox_function_type( &::CBaseAnimating::ComputeHitboxSurroundingBox )
-                , ( bp::arg("iHitbox"), bp::arg("pVecWorldMins"), bp::arg("pVecWorldMaxs") ) );
+                , ComputeHitboxSurroundingBox_function_type( &CBaseAnimating_wrapper::ComputeHitboxSurroundingBox_d994fc021196753f3977cf78728a5bbe )
+                , ( bp::arg("inst"), bp::arg("iHitbox") ) );
         
         }
         { //::CBaseAnimating::CopyAnimationDataFrom

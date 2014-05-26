@@ -42,6 +42,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_navigator.h"
+#include "unit_baseanimstate.h"
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
@@ -533,9 +534,13 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 //-----------------------------------------------------------------------------
 // Purpose: Updates our preferred facing direction.
 //			Defaults to the path direction.
+//			TODO: Weapon shooting code depends on facing direction computed here.
+//				  Make this more robust.
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pPathDir )
 {
+	bool bZeroPitch = GetOuter()->GetAnimState() ? !GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
+
 	// Update facing target if any
 	// Call UpdateFacingTargetState after updating the idealangles, because it might clear
 	// the facing target.
@@ -547,20 +552,35 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	}
 	else if( m_hFacingTarget ) 
 	{
-		Vector dir = m_hFacingTarget->GetAbsOrigin() - GetAbsOrigin();
+		Vector dir = m_hFacingTarget->BodyTarget( GetLocalOrigin() ) - m_pOuter->EyePosition();
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone( m_hFacingTarget, m_fFacingCone ) );
 	}
 	else if( m_vFacingTargetPos != vec3_origin )
 	{
-		Vector dir = m_vFacingTargetPos - GetAbsOrigin();
+		Vector dir = m_vFacingTargetPos - m_pOuter->EyePosition();
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone(m_vFacingTargetPos, m_fFacingCone) );
+	}
+	// Face enemy for shooting by default
+	// TODO: This should be controlled from the AI action
+	else if( m_pOuter->GetEnemy() )
+	{
+		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - m_pOuter->EyePosition();
+		if( bZeroPitch )
+			dir.z = 0;
+		VectorAngles(dir, MoveCommand.idealviewangles);
 	}
 	// Face path dir if we are following a path
 	else if( pPathDir ) 
 	{
 		VectorAngles(*pPathDir, MoveCommand.idealviewangles);
+		if( bZeroPitch )
+			MoveCommand.idealviewangles.x = 0;
 	}
 }
 

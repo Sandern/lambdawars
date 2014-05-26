@@ -1071,15 +1071,6 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pEntity"), bp::arg("nDisposition"), bp::arg("nPriority") ) );
         
         }
-        { //::C_UnitBase::AimGun
-        
-            typedef void ( ::C_UnitBase::*AimGun_function_type )(  ) ;
-            
-            C_UnitBase_exposer.def( 
-                "AimGun"
-                , AimGun_function_type( &::C_UnitBase::AimGun ) );
-        
-        }
         { //::C_UnitBase::AreAttacksPassable
         
             typedef bool ( ::C_UnitBase::*AreAttacksPassable_function_type )( ::C_BaseEntity * ) ;
@@ -1797,15 +1788,6 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("updateType") ) );
         
         }
-        { //::C_UnitBase::RelaxAim
-        
-            typedef void ( ::C_UnitBase::*RelaxAim_function_type )(  ) ;
-            
-            C_UnitBase_exposer.def( 
-                "RelaxAim"
-                , RelaxAim_function_type( &::C_UnitBase::RelaxAim ) );
-        
-        }
         { //::C_UnitBase::RemoveEntityRelationship
         
             typedef bool ( ::C_UnitBase::*RemoveEntityRelationship_function_type )( ::C_BaseEntity * ) ;
@@ -1836,16 +1818,6 @@ void register_C_UnitBase_class(){
                 "SelectSlot"
                 , SelectSlot_function_type( &::C_UnitBase::SelectSlot )
                 , ( bp::arg("slot") ) );
-        
-        }
-        { //::C_UnitBase::SetAim
-        
-            typedef void ( ::C_UnitBase::*SetAim_function_type )( ::Vector & ) ;
-            
-            C_UnitBase_exposer.def( 
-                "SetAim"
-                , SetAim_function_type( &::C_UnitBase::SetAim )
-                , ( bp::arg("vAimDir") ) );
         
         }
         { //::C_UnitBase::SetCanBeSeen

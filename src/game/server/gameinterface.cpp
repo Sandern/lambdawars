@@ -249,9 +249,11 @@ ConVar *sv_maxreplay = NULL;
 static ConVar  *g_pcv_commentary = NULL;
 static ConVar *g_pcv_ThreadMode = NULL;
 
+#if 0 // No longer needed
 #ifdef HL2WARS_DLL
 ConVar wars_reset_known_on_dropspackets( "wars_reset_known_on_dropspackets", "100", FCVAR_CHEAT, "Resets known entities for player after x drop packets" );
 #endif // HL2WARS_DLL
+#endif // 0
 
 #if !defined(NO_STEAM)
 //-----------------------------------------------------------------------------
@@ -1294,6 +1296,11 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	}
 
 	IGameSystem::LevelInitPostEntityAllSystems();
+
+#ifdef HL2WARS_DLL
+	CWarsFlora::SpawnMapFlora();
+#endif // HL2WARS_DLL
+
 	// No more precaching after PostEntityAllSystems!!!
 	CBaseEntity::SetAllowPrecache( false );
 
@@ -2809,6 +2816,33 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( pRecipientPlayer );
 	if( pPlayer )
 	{
+		int iClientIdx = pRecipientPlayer->GetClientIndex();
+
+		// GetEntityTransmitBitsForClient returns NULL if no previous frame exists for the client
+		// This means the client just connected or is requesting a full update due packet loss
+		const CBitVec<MAX_EDICTS>* transmitBits = engine->GetEntityTransmitBitsForClient( iClientIdx );
+		if( transmitBits == NULL )
+		{
+			pPlayer->SetIsRequestingFullUpdate( true );
+		}
+		else
+		{
+			if( pPlayer->IsRequestingFullUpdate() )
+			{
+				DevMsg( "Detected player %s requesting full game update. Resetting known entities and python network variables\n", pPlayer->GetPlayerName() );
+
+				// Seems this information gets lost upon receiving a full update
+				FogOfWarMgr()->ResetKnownEntitiesForPlayer( iClientIdx );
+
+				// All Python network vars also need to be resend...
+				PyNetworkVarsResetClientTransmitBits( iClientIdx );
+
+				pPlayer->SetIsRequestingFullUpdate( false );
+			}
+		}
+
+		// Old less reliable code:
+#if 0
 		INetChannel *nc = (INetChannel *)engine->GetPlayerNetInfo( pRecipientPlayer->entindex() ); 
 		if ( nc )
 		{
@@ -2832,6 +2866,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				pPlayer->SetLastAckTickCount( iCurAckTickCount );
 			}
 		}
+#endif // 0
 	}
 #endif // HL2WARS_DLL
 }

@@ -459,7 +459,6 @@ void SrcCefVGUIPanel::OnCursorMoved( int x, int y )
 		CefDbgMsg( 3, "Cef#%d: passed cursor move %d %d to parent (alpha zero)\n", GetBrowserID(), x, y );
 
 		CallParentFunction(new KeyValues("OnCursorMoved", "x", x, "y", y));
-		//return;
 	}
 
 	CefMouseEvent me;

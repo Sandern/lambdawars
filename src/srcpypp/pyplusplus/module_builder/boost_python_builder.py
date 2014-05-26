@@ -65,14 +65,14 @@ class builder_t(module_builder.module_builder_t):
 
         :param cflags: Raw string to be added to gccxml command line.
 
-        :param gccxml_config: instance of pygccxml.parser.config_t class, holds
+        :param gccxml_config: instance of pygccxml.parser.gccxml_configuration_t class, holds
                               gccxml( compiler ) configuration. You can use this
                               argument instead of passing the compiler configuration separately.
         """
         module_builder.module_builder_t.__init__( self, global_ns=None, encoding=encoding )
 
         if not gccxml_config:
-            gccxml_config = parser.config_t( gccxml_path=gccxml_path
+            gccxml_config = parser.gccxml_configuration_t( gccxml_path=gccxml_path
                                              , working_directory=working_directory
                                              , include_paths=include_paths
                                              , define_symbols=define_symbols
@@ -129,7 +129,7 @@ class builder_t(module_builder.module_builder_t):
 
     def __parse_declarations( self, files, gccxml_config, compilation_mode, cache, indexing_suite_version ):
         if None is gccxml_config:
-            gccxml_config = parser.config_t()
+            gccxml_config = parser.gccxml_configuration_t()
         if None is compilation_mode:
             compilation_mode = parser.COMPILATION_MODE.FILE_BY_FILE
         start_time = time.clock()

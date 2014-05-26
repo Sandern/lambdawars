@@ -40,6 +40,7 @@ public:
 
 	int Cmp( boost::python::object other );
 	bool NonZero();
+	bool Bool();
 };
 
 template< class T >
@@ -115,6 +116,12 @@ inline bool CEPyHandle<T>::NonZero()
 	return this->Get() != NULL;
 }
 
+template< class T >
+inline bool CEPyHandle<T>::Bool()
+{
+	return this->Get() != NULL;
+}
+
 //----------------------------------------------------------------------------
 // Purpose: Python entity handle, for python entities only
 //-----------------------------------------------------------------------------
@@ -141,6 +148,7 @@ public:
 
 	int Cmp( boost::python::object other );
 	bool NonZero() { return PyGet().ptr() != Py_None; }
+	bool Bool() { return PyGet().ptr() != Py_None; }
 
 	virtual PyObject *GetPySelf() { return NULL; }
 
@@ -162,6 +170,7 @@ class DeadEntity
 {
 public:
 	bool NonZero() { return false; }
+	bool Bool() { return false; }
 };
 
 #ifdef CLIENT_DLL

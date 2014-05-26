@@ -803,8 +803,11 @@ void register_CWarsFlora_class(){
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
         .def( 
             "SpawnFlora"
-            , (bool (*)( char const *,::Vector const &,::QAngle const &,::KeyValues * ))( &::CWarsFlora::SpawnFlora )
-            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle"), bp::arg("pExtraKV")=bp::object() ) )    
+            , (bool (*)( char const *,::Vector const &,::QAngle const &,::KeyValues *,::boost::python::api::object ))( &::CWarsFlora::SpawnFlora )
+            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle"), bp::arg("pExtraKV")=bp::object(), bp::arg("fnpostspawn")=boost::python::api::object() ) )    
+        .def( 
+            "SpawnMapFlora"
+            , (void (*)(  ))( &::CWarsFlora::SpawnMapFlora ) )    
         .def( 
             "Activate"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
@@ -966,6 +969,7 @@ void register_CWarsFlora_class(){
         .staticmethod( "RemoveFloraByUUID" )    
         .staticmethod( "RemoveFloraInRadius" )    
         .staticmethod( "SpawnFlora" )    
+        .staticmethod( "SpawnMapFlora" )    
         .add_property( "lifestate", &CWarsFlora_wrapper::m_lifeState_Get, &CWarsFlora_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CWarsFlora_wrapper::m_takedamage_Get, &CWarsFlora_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CWarsFlora_wrapper::m_nSkin_Get, &CWarsFlora_wrapper::m_nSkin_Set );

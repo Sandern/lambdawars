@@ -65,7 +65,15 @@ tmpl_enthandle = '''{ //::%(handlename)s
                 "__nonzero__"
                 , NonZero_function_type( &::%(handlename)s::NonZero )
             );
+        }
+        { //::%(handlename)s::Bool
         
+            typedef bool ( ::%(handlename)s::*Bool_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__bool__"
+                , Bool_function_type( &::%(handlename)s::Bool )
+            );
         }
         { //::%(handlename)s::Set
         
@@ -504,6 +512,7 @@ class Entities(SemiSharedModuleGenerator):
         cls = mb.class_('DeadEntity')
         cls.include()
         cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_fun('Bool').rename('__bool__')
         
         # Entity Handles
         cls = mb.class_('CBaseHandle')
@@ -523,6 +532,7 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('SetAttr').rename('__setattr__')
         cls.mem_fun('Cmp').rename('__cmp__')
         cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_fun('Bool').rename('__bool__')
         cls.mem_fun('Str').rename('__str__')
         
         cls.add_wrapper_code(
@@ -818,7 +828,11 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude anything return CBoneCache
         bonecache = mb.class_('CBoneCache')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(bonecache))), allow_empty=True).exclude()
-            
+        
+        # Transformations
+        mb.mem_funs('ComputeHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        mb.mem_funs('ComputeEntitySpaceHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        
         if self.isclient:
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
@@ -1397,15 +1411,18 @@ class Entities(SemiSharedModuleGenerator):
         mb.free_function('SetPlayerRelationShip').include()
         mb.free_function('GetPlayerRelationShip').include()
         
+        if self.isserver:
+            for entcls in self.entclasses:
+                if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                    self.AddNetworkVarProperty('eyepitch', 'm_fEyePitch', 'float', entcls)
+        else:
+            self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
+            
         self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
-        
-        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
         self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
-        
         self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
         self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         self.IncludeVarAndRename('m_bFriendlyDamage', 'friendlydamage')
-        
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         
         # Pathfinding/Navmesh

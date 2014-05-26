@@ -1535,6 +1535,15 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("pEnt") ) );
         
         }
+        { //::CHL2WarsPlayer::IsRequestingFullUpdate
+        
+            typedef bool ( ::CHL2WarsPlayer::*IsRequestingFullUpdate_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "IsRequestingFullUpdate"
+                , IsRequestingFullUpdate_function_type( &::CHL2WarsPlayer::IsRequestingFullUpdate ) );
+        
+        }
         { //::CHL2WarsPlayer::IsRightDoublePressed
         
             typedef bool ( ::CHL2WarsPlayer::*IsRightDoublePressed_function_type )(  ) ;
@@ -1810,6 +1819,16 @@ void register_CHL2WarsPlayer_class(){
                 "SetControlledUnit"
                 , SetControlledUnit_function_type( &::CHL2WarsPlayer::SetControlledUnit )
                 , ( bp::arg("pUnit") ) );
+        
+        }
+        { //::CHL2WarsPlayer::SetIsRequestingFullUpdate
+        
+            typedef void ( ::CHL2WarsPlayer::*SetIsRequestingFullUpdate_function_type )( bool ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "SetIsRequestingFullUpdate"
+                , SetIsRequestingFullUpdate_function_type( &::CHL2WarsPlayer::SetIsRequestingFullUpdate )
+                , ( bp::arg("bRequestingFullUpdate") ) );
         
         }
         { //::CHL2WarsPlayer::SetLastAckTickCount

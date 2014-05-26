@@ -237,7 +237,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
             , (void ( ::SrcPyStdErr::* )(  ) )( &::SrcPyStdErr::flush ) )    
         .def( 
             "write"
-            , (void ( ::SrcPyStdErr::* )( ::boost::python::api::object ) )( &::SrcPyStdErr::write )
+            , (void ( ::SrcPyStdErr::* )( char const * ) )( &::SrcPyStdErr::write )
             , ( bp::arg("msg") ) );
 
     bp::class_< SrcPyStdOut >( "SrcPyStdOut" )    
@@ -246,7 +246,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
             , (void ( ::SrcPyStdOut::* )(  ) )( &::SrcPyStdOut::flush ) )    
         .def( 
             "write"
-            , (void ( ::SrcPyStdOut::* )( ::boost::python::api::object ) )( &::SrcPyStdOut::write )
+            , (void ( ::SrcPyStdOut::* )( char const * ) )( &::SrcPyStdOut::write )
             , ( bp::arg("msg") ) );
 
     bp::class_< color24 >( "color24" )    
@@ -305,7 +305,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::PyCOM_TimestampedLog
     
-        typedef void ( *COM_TimestampedLog_function_type )( ::boost::python::api::object );
+        typedef void ( *COM_TimestampedLog_function_type )( char const * );
         
         bp::def( 
             "COM_TimestampedLog"
@@ -338,7 +338,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyDevMsg
     
-        typedef void ( *DevMsg_function_type )( int,::boost::python::api::object );
+        typedef void ( *DevMsg_function_type )( int,char const * );
         
         bp::def( 
             "DevMsg"
@@ -349,7 +349,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyMsg
     
-        typedef void ( *Msg_function_type )( ::boost::python::api::object );
+        typedef void ( *Msg_function_type )( char const * );
         
         bp::def( 
             "Msg"
@@ -360,7 +360,7 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::SrcPyWarning
     
-        typedef void ( *PrintWarning_function_type )( ::boost::python::api::object );
+        typedef void ( *PrintWarning_function_type )( char const * );
         
         bp::def( 
             "PrintWarning"

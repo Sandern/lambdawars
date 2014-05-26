@@ -354,12 +354,33 @@ void HL2WarsViewport::PostChildPaint()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool HL2WarsViewport::ShouldDrawSelectBox( C_HL2WarsPlayer* pPlayer )
+{
+	if( !pPlayer->IsLeftPressed() )
+	{
+		return false;
+	}
+
+	if( EditorSystem()->IsActive() )
+	{
+		if( EditorSystem()->GetEditorMode() != CEditorSystem::EDITORINTERACTION_SELECT )
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 extern ConVar cl_mouse_selectionbox_threshold;
 void HL2WarsViewport::DrawSelectBox()
 {
 	C_HL2WarsPlayer* pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
 
-	if( !pPlayer->IsLeftPressed() )
+	if( !ShouldDrawSelectBox( pPlayer ) )
 	{
 		ClearSelectionBox();
 		return;

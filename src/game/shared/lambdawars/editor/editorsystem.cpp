@@ -94,11 +94,8 @@ void CEditorSystem::OnEntityDeleted( CBaseEntity *pEntity )
 	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEntity );
 	if( pFloraEnt && pFloraEnt->IsEditorManaged() )
 	{
-		int iHammerId = pEntity->GetHammerID();
-		if( iHammerId != 0 )
-		{
-			m_MapManager.AddDeletedHammerID( iHammerId );
-		}
+		// GetFloraUUID returns a pooled game string, so valid while the level exists
+		m_WarsMapManager.AddDeletedUUID( pFloraEnt->GetFloraUUID() );
 	}
 }
 #endif // CLIENT_DLL
@@ -111,11 +108,15 @@ void CEditorSystem::OnEntityDeleted( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 {
+#ifndef CLIENT_DLL
+	// Sync from client
+	return;
+#endif // CLIENT_DLL
+
 	Vector vPos = pPlayer->Weapon_ShootPosition();
 	const Vector &vMouseAim = pPlayer->GetMouseAim();
 	const Vector &vCamOffset = pPlayer->GetCameraOffset();
 
-	trace_t tr;
 	Vector vStartPos, vEndPos;
 	vStartPos = vPos + vCamOffset;
 	vEndPos = vStartPos + (vMouseAim *  MAX_TRACE_LENGTH);
@@ -123,9 +124,9 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 	//NDebugOverlay::Line( vStartPos, vEndPos, 0, 255, 0, true, 4.0f );
 
 	Ray_t pickerRay;
-	pickerRay.Init( vStartPos, vEndPos, EDITOR_MOUSE_TRACE_BOX_MINS, EDITOR_MOUSE_TRACE_BOX_MAXS );
+	pickerRay.Init( vStartPos, vEndPos );
 
-	CBaseEntity *pBest = NULL;
+	CWarsFlora *pBest = NULL;
 	float fBestDistance = 0;
 
 #ifdef CLIENT_DLL
@@ -137,19 +138,36 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 		CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEntity );
 		if( pFlora )
 		{
-			CBaseTrace trace;
-			if ( IntersectRayWithBox( pickerRay,
-				pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMins(), pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMaxs(),
-				0.5f, &trace ) )
+			// Prefer testing against hitboxes
+			// If no hitboxes available, use the bounding box
+			trace_t trace;
+			bool bTestedHitBoxes = pFlora->TestHitboxes( pickerRay, MASK_SOLID, trace );
+			if( bTestedHitBoxes )
 			{
-				float fDistance = tr.endpos.DistTo( vStartPos );
-				if( !pBest || fDistance < fBestDistance )
+				if( trace.DidHit() )
 				{
-					pBest = pEntity;
-					fBestDistance = fDistance;
+					float fDistance = trace.endpos.DistTo( vStartPos );
+					if( !pBest || fDistance < fBestDistance )
+					{
+						pBest = pFlora;
+						fBestDistance = fDistance;
+					}
 				}
-				
-				break;
+			}
+			else
+			{
+				CBaseTrace trace2;
+				if ( IntersectRayWithBox( pickerRay,
+					pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMins(), pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMaxs(),
+					0.5f, &trace2 ) )
+				{
+					float fDistance = trace2.endpos.DistTo( vStartPos );
+					if( !pBest || fDistance < fBestDistance )
+					{
+						pBest = pFlora;
+						fBestDistance = fDistance;
+					}
+				}
 			}
 		}
 	}
@@ -159,10 +177,24 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 		if( !IsSelected( pBest ) )
 		{
 			Select( pBest );
+
+			KeyValues *pOperation = new KeyValues( "data" );
+			pOperation->SetString("operation", "select");
+			KeyValues *pFloraKey = new KeyValues( "flora", "uuid", pBest->GetFloraUUID() );
+			pFloraKey->SetBool(  "select", true );
+			pOperation->AddSubKey( pFloraKey );
+			warseditorstorage->QueueServerCommand( pOperation );
 		}
 		else
 		{
 			Deselect( pBest );
+
+			KeyValues *pOperation = new KeyValues( "data" );
+			pOperation->SetString("operation", "select");
+			KeyValues *pFloraKey = new KeyValues( "flora", "uuid", pBest->GetFloraUUID() );
+			pFloraKey->SetBool(  "select", false );
+			pOperation->AddSubKey( pFloraKey );
+			warseditorstorage->QueueServerCommand( pOperation );
 		}
 		//NDebugOverlay::Box( pBest->GetAbsOrigin(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 255, 5.0f);
 	}
@@ -197,7 +229,7 @@ void CEditorSystem::DeleteSelection()
 	}
 
 	m_hSelectedEntities.Purge();
-	warseditorstorage->AddEntityToQueue( pOperation );
+	warseditorstorage->QueueClientCommand( pOperation );
 }
 
 #ifndef CLIENT_DLL
@@ -253,13 +285,11 @@ void CEditorSystem::PasteSelection()
 
 	// Clear selection, will select copy!
 	KeyValues *pClearSelection = CreateClearSelectionCommand();
-	ProcessCommand( pClearSelection );
-	warseditorstorage->AddEntityToQueue( pClearSelection );
+	QueueCommand( pClearSelection );
 
 	for( int i = 0; i < m_SelectionCopyCommands.Count(); i++ )
 	{
-		ProcessCommand( m_SelectionCopyCommands[i] );
-		warseditorstorage->AddEntityToQueue( m_SelectionCopyCommands[i] );
+		QueueCommand( m_SelectionCopyCommands[i] );
 	}
 
 	m_SelectionCopyCommands.Purge();
@@ -373,7 +403,7 @@ void CEditorSystem::Update( float frametime )
 
 	// Process commands from server
 	KeyValues *pCommand = NULL;
-	while( (pCommand = warseditorstorage->PopEntityFromQueue()) != NULL )
+	while( (pCommand = warseditorstorage->PopClientCommandQueue()) != NULL )
 	{
 		if( !ProcessCommand( pCommand ) )
 			break; // Assume the command was readded, so no need for cleanup. TODO: refine this.
@@ -393,5 +423,21 @@ void CEditorSystem::PostRender()
 
 	RenderSelection();
 	RenderHelpers();
+}
+#else
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorSystem::FrameUpdatePostEntityThink()
+{
+	KeyValues *pCommand = NULL;
+	while( (pCommand = warseditorstorage->PopServerCommandQueue()) != NULL )
+	{
+		if( !ProcessCommand( pCommand ) )
+			break; // Assume the command was readded, so no need for cleanup. TODO: refine this.
+
+		// Clean up keyvalues after processing
+		pCommand->deleteThis();
+	}
 }
 #endif // CLIENT_DLL

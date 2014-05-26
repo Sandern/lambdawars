@@ -331,7 +331,8 @@ class VGUIControls(ClientModuleGenerator):
         cls = mb.class_('DeadPanel')
         cls.include()
         cls.mem_fun('NonZero').rename('__nonzero__')
-
+        cls.mem_fun('Bool').rename('__bool__')
+        
         # For each panel sub class we take some default actions
         for cls_name in self.panel_cls_list:
             cls = mb.class_(cls_name)

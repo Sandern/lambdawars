@@ -67,8 +67,8 @@ baseincludes = [
     '../../game/shared/lambdawars',
     
     # Python/Boost folders
-    '../../python/Include',
-    '../../python',
+    '../../thirdparty/python/Include',
+    '../../thirdparty/python',
     
     '../../boost',
 ]
