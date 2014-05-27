@@ -430,6 +430,9 @@ void CEditorSystem::PostRender()
 //-----------------------------------------------------------------------------
 void CEditorSystem::FrameUpdatePostEntityThink()
 {
+	if( !IsActive() )
+		return;
+
 	KeyValues *pCommand = NULL;
 	while( (pCommand = warseditorstorage->PopServerCommandQueue()) != NULL )
 	{
