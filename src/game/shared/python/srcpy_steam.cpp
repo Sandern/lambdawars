@@ -25,3 +25,13 @@ boost::python::tuple PyGetLobbyDataByIndex( CSteamID steamIDLobby, int iLobbyDat
 	return boost::python::make_tuple( ret, key, value );
 }
 
+bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody, int cubMsgBody )
+{
+	if( !steamapicontext->SteamMatchmaking() )
+	{
+		PyErr_SetString(PyExc_Exception, "No steam matchmaking API available!" );
+		throw boost::python::error_already_set(); 
+	}
+
+	return steamapicontext->SteamMatchmaking()->SendLobbyChatMsg( steamIDLobby, (const void *)pvMsgBody, cubMsgBody );
+}

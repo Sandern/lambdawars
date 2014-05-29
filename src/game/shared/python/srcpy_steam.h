@@ -17,14 +17,32 @@
 #include "steam/steam_api.h"
 #include "steam/isteammatchmaking.h"
 
-// Generic macro for callbacks in Python
+// Generic macros for callbacks in Python
 #define PY_STEAM_CALLBACK_WRAPPER( name, dataclass ) \
 class name##Callback \
 { \
 public: \
-	name##Callback( SteamAPICall_t steamapicall ) \
+	name##Callback() : m_Callback( this, &name##Callback::On##name##Internal ) \
 	{ \
-		m_CallResult.Set( steamapicall, this, &name##Callback::On##name##Internal ); \
+	} \
+	virtual void On##name( dataclass *data ) \
+	{ \
+	} \
+private: \
+	void On##name##Internal( dataclass *data ) \
+	{ \
+		On##name( data ); \
+	} \
+	CCallback<name##Callback, dataclass, false> m_Callback; \
+};
+
+#define PY_STEAM_CALLRESULT_WRAPPER( name, dataclass ) \
+class name##CallResult \
+{ \
+public: \
+	name##CallResult( SteamAPICall_t steamapicall ) \
+	{ \
+		m_CallResult.Set( steamapicall, this, &name##CallResult::On##name##Internal ); \
 	} \
 	virtual void On##name( dataclass *data, bool iofailure ) \
 	{ \
@@ -34,10 +52,11 @@ private: \
 	{ \
 		On##name( data, bIOFailure ); \
 	} \
-	CCallResult<name##Callback, dataclass> m_CallResult; \
+	CCallResult<name##CallResult, dataclass> m_CallResult; \
 };
 
 // Wrapper functions
 boost::python::tuple PyGetLobbyDataByIndex( CSteamID steamIDLobby, int iLobbyData );
+bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody, int cubMsgBody );
 
 #endif // SRCPY_STEAM_H
