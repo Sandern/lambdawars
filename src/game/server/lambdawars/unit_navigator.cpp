@@ -541,6 +541,8 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 {
 	bool bZeroPitch = GetOuter()->GetAnimState() ? !GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
 
+	Vector vFacingOrigin = m_pOuter->GetActiveWeapon() ? m_pOuter->Weapon_ShootPosition() : m_pOuter->EyePosition();
+
 	// Update facing target if any
 	// Call UpdateFacingTargetState after updating the idealangles, because it might clear
 	// the facing target.
@@ -552,7 +554,7 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	}
 	else if( m_hFacingTarget ) 
 	{
-		Vector dir = m_hFacingTarget->BodyTarget( GetLocalOrigin() ) - m_pOuter->EyePosition();
+		Vector dir = m_hFacingTarget->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
 		if( bZeroPitch )
 			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
@@ -560,7 +562,7 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	}
 	else if( m_vFacingTargetPos != vec3_origin )
 	{
-		Vector dir = m_vFacingTargetPos - m_pOuter->EyePosition();
+		Vector dir = m_vFacingTargetPos - vFacingOrigin;
 		if( bZeroPitch )
 			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
@@ -570,7 +572,7 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	// TODO: This should be controlled from the AI action
 	else if( m_pOuter->GetEnemy() )
 	{
-		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - m_pOuter->EyePosition();
+		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
 		if( bZeroPitch )
 			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
