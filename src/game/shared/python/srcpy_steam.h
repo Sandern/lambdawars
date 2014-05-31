@@ -29,12 +29,12 @@ public: \
 	{ \
 	} \
 private: \
-	void On##name##Internal( dataclass *data ) \
-	{ \
-		On##name( data ); \
-	} \
-	CCallback<name##Callback, dataclass, false> m_Callback; \
-};
+	STEAM_CALLBACK( name##Callback, On##name##Internal, dataclass, m_Callback ); \
+}; \
+void name##Callback::On##name##Internal( dataclass *data ) \
+{ \
+	On##name( data ); \
+}
 
 #define PY_STEAM_CALLRESULT_WRAPPER( name, dataclass ) \
 class name##CallResult \

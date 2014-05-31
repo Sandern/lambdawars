@@ -176,6 +176,44 @@ struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
+
+struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
+
+    LobbyDataUpdateCallback_wrapper(LobbyDataUpdateCallback const & arg )
+    : LobbyDataUpdateCallback( arg )
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyDataUpdateCallback_wrapper()
+    : LobbyDataUpdateCallback()
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        bp::override func_OnLobbyDataUpdate = this->get_override( "OnLobbyDataUpdate" );
+        if( func_OnLobbyDataUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyDataUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+            }
+        else
+            this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+    
+    void default_OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -1290,6 +1328,16 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
     }
 
+    { //::LobbyDataUpdate_t
+        typedef bp::class_< LobbyDataUpdate_t > LobbyDataUpdate_t_exposer_t;
+        LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
+        bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
+        LobbyDataUpdate_t_exposer.def_readwrite( "m_bsuccess", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
     { //::LobbyGameCreated_t
         typedef bp::class_< LobbyGameCreated_t > LobbyGameCreated_t_exposer_t;
         LobbyGameCreated_t_exposer_t LobbyGameCreated_t_exposer = LobbyGameCreated_t_exposer_t( "LobbyGameCreated_t" );
@@ -1328,6 +1376,16 @@ BOOST_PYTHON_MODULE(_steam){
             "PySendLobbyChatMsg"
             , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
             , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) );
+    
+    }
+
+    { //::SteamAPI_RunCallbacks
+    
+        typedef void ( *SteamAPI_RunCallbacks_function_type )(  );
+        
+        bp::def( 
+            "SteamAPI_RunCallbacks"
+            , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
     
     }
 
@@ -1409,6 +1467,24 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyChatUpdate"
                 , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
                 , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyDataUpdateCallback
+        typedef bp::class_< LobbyDataUpdateCallback_wrapper > LobbyDataUpdateCallback_exposer_t;
+        LobbyDataUpdateCallback_exposer_t LobbyDataUpdateCallback_exposer = LobbyDataUpdateCallback_exposer_t( "LobbyDataUpdateCallback", bp::init<>() );
+        bp::scope LobbyDataUpdateCallback_scope( LobbyDataUpdateCallback_exposer );
+        { //::LobbyDataUpdateCallback::OnLobbyDataUpdate
+        
+            typedef void ( ::LobbyDataUpdateCallback::*OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            typedef void ( LobbyDataUpdateCallback_wrapper::*default_OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            
+            LobbyDataUpdateCallback_exposer.def( 
+                "OnLobbyDataUpdate"
+                , OnLobbyDataUpdate_function_type(&::LobbyDataUpdateCallback::OnLobbyDataUpdate)
+                , default_OnLobbyDataUpdate_function_type(&LobbyDataUpdateCallback_wrapper::default_OnLobbyDataUpdate)
                 , ( bp::arg("data") ) );
         
         }
@@ -1589,6 +1665,44 @@ struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
+
+struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
+
+    LobbyDataUpdateCallback_wrapper(LobbyDataUpdateCallback const & arg )
+    : LobbyDataUpdateCallback( arg )
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyDataUpdateCallback_wrapper()
+    : LobbyDataUpdateCallback()
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        bp::override func_OnLobbyDataUpdate = this->get_override( "OnLobbyDataUpdate" );
+        if( func_OnLobbyDataUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyDataUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+            }
+        else
+            this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+    
+    void default_OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -2703,6 +2817,16 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
     }
 
+    { //::LobbyDataUpdate_t
+        typedef bp::class_< LobbyDataUpdate_t > LobbyDataUpdate_t_exposer_t;
+        LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
+        bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
+        LobbyDataUpdate_t_exposer.def_readwrite( "m_bsuccess", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
     { //::LobbyGameCreated_t
         typedef bp::class_< LobbyGameCreated_t > LobbyGameCreated_t_exposer_t;
         LobbyGameCreated_t_exposer_t LobbyGameCreated_t_exposer = LobbyGameCreated_t_exposer_t( "LobbyGameCreated_t" );
@@ -2741,6 +2865,16 @@ BOOST_PYTHON_MODULE(_steam){
             "PySendLobbyChatMsg"
             , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
             , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) );
+    
+    }
+
+    { //::SteamAPI_RunCallbacks
+    
+        typedef void ( *SteamAPI_RunCallbacks_function_type )(  );
+        
+        bp::def( 
+            "SteamAPI_RunCallbacks"
+            , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
     
     }
 
@@ -2822,6 +2956,24 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyChatUpdate"
                 , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
                 , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyDataUpdateCallback
+        typedef bp::class_< LobbyDataUpdateCallback_wrapper > LobbyDataUpdateCallback_exposer_t;
+        LobbyDataUpdateCallback_exposer_t LobbyDataUpdateCallback_exposer = LobbyDataUpdateCallback_exposer_t( "LobbyDataUpdateCallback", bp::init<>() );
+        bp::scope LobbyDataUpdateCallback_scope( LobbyDataUpdateCallback_exposer );
+        { //::LobbyDataUpdateCallback::OnLobbyDataUpdate
+        
+            typedef void ( ::LobbyDataUpdateCallback::*OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            typedef void ( LobbyDataUpdateCallback_wrapper::*default_OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            
+            LobbyDataUpdateCallback_exposer.def( 
+                "OnLobbyDataUpdate"
+                , OnLobbyDataUpdate_function_type(&::LobbyDataUpdateCallback::OnLobbyDataUpdate)
+                , default_OnLobbyDataUpdate_function_type(&LobbyDataUpdateCallback_wrapper::default_OnLobbyDataUpdate)
                 , ( bp::arg("data") ) );
         
         }

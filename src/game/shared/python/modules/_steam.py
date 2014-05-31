@@ -185,8 +185,10 @@ class Steam(SemiSharedModuleGenerator):
         self.AddSteamCallResult('LobbyMatchList', 'LobbyMatchList_t')
         self.AddSteamCallResult('LobbyGameCreated', 'LobbyGameCreated_t')
         self.AddSteamCallResult('LobbyCreated', 'LobbyCreated_t')
+        
         self.AddSteamCallback('LobbyChatUpdate', 'LobbyChatUpdate_t')
-         
+        self.AddSteamCallback('LobbyDataUpdate', 'LobbyDataUpdate_t')
+        
         # Enums
         mb.enums('ELobbyType').include()
         mb.enums('ELobbyComparison').include()
@@ -217,6 +219,9 @@ class Steam(SemiSharedModuleGenerator):
         mb.enum('ESteamUserStatType').include()
         mb.enum('EChatEntryType').include()
         mb.enum('EChatRoomEnterResponse').include()
+        
+        # Generic API functions
+        mb.free_function('SteamAPI_RunCallbacks').include()
         
         # Accessor class for all
         mb.add_registration_code( "bp::scope().attr( \"steamapicontext\" ) = boost::ref(steamapicontext);" )
