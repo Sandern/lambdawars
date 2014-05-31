@@ -1655,6 +1655,16 @@ void register_CUnitBase_class(){
                 , HasEnterOffset_function_type( &::CUnitBase::HasEnterOffset ) );
         
         }
+        { //::CUnitBase::HasOverridenEntityRelationship
+        
+            typedef bool ( ::CUnitBase::*HasOverridenEntityRelationship_function_type )( ::CBaseEntity * ) ;
+            
+            CUnitBase_exposer.def( 
+                "HasOverridenEntityRelationship"
+                , HasOverridenEntityRelationship_function_type( &::CUnitBase::HasOverridenEntityRelationship )
+                , ( bp::arg("pEntity") ) );
+        
+        }
         { //::CUnitBase::HasRangeAttackLOS
         
             typedef bool ( ::CUnitBase::*HasRangeAttackLOS_function_type )( ::Vector const &,::CBaseEntity * ) ;

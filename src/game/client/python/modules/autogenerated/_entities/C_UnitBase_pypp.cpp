@@ -1402,6 +1402,16 @@ void register_C_UnitBase_class(){
                 , HasEnterOffset_function_type( &::C_UnitBase::HasEnterOffset ) );
         
         }
+        { //::C_UnitBase::HasOverridenEntityRelationship
+        
+            typedef bool ( ::C_UnitBase::*HasOverridenEntityRelationship_function_type )( ::C_BaseEntity * ) ;
+            
+            C_UnitBase_exposer.def( 
+                "HasOverridenEntityRelationship"
+                , HasOverridenEntityRelationship_function_type( &::C_UnitBase::HasOverridenEntityRelationship )
+                , ( bp::arg("pEntity") ) );
+        
+        }
         { //::C_UnitBase::IRelationPriority
         
             typedef int ( ::C_UnitBase::*IRelationPriority_function_type )( ::C_BaseEntity * ) ;

@@ -149,6 +149,9 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	{
 		pOther = ppUnits[i];
 
+		if( GetOuter()->HasOverridenEntityRelationship( pOther ) )
+			continue; // Will be checked later in special relations
+
 		otherDist = origin.AsVector2D().DistToSqr(pOther->GetAbsOrigin().AsVector2D());
 		if( otherDist > distSqr )
 			continue;
@@ -201,6 +204,9 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	{
 		pFuncOther = g_FuncUnitList[i];
 
+		if( GetOuter()->HasOverridenEntityRelationship( pFuncOther ) )
+			continue; // Will be checked later in special relations
+
 		if( !TestEntity( pFuncOther ) || !TestFuncUnit( pFuncOther ) )
 			continue;
 
@@ -243,12 +249,11 @@ int UnitBaseSense::LookForUnits( int iDistance )
 		}
 	}
 
-	// Then check for special relations
+	// Then check for special relations with custom priorities
 	for ( i = GetOuter()->m_Relationship.Count()-1; i >= 0; i-- ) 
 	{
 		pEntOther = GetOuter()->m_Relationship[i].entity;
-		if( pEntOther && !pEntOther->IsUnit() && 
-			GetOuter()->m_Relationship[i].disposition == D_HT )
+		if( pEntOther )
 		{
 			otherDist = origin.AsVector2D().DistToSqr( pEntOther->GetAbsOrigin().AsVector2D() );
 			if( otherDist > distSqr )
@@ -257,7 +262,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			if( !TestEntity( pEntOther ) )
 				continue;
 
-			if( m_pOuter->IRelationType( pEntOther ) == D_HT )
+			if( GetOuter()->m_Relationship[i].disposition == D_HT )
 			{
 				m_SeenEnemies.AddToTail();
 				m_SeenEnemies.Tail().entity = pEntOther;

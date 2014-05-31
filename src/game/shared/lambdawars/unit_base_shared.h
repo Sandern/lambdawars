@@ -257,6 +257,7 @@ public:
 
 	virtual void		AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority );
 	virtual bool		RemoveEntityRelationship( CBaseEntity *pEntity );
+	bool				HasOverridenEntityRelationship( CBaseEntity *pEntity );
 
 	virtual void		MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType );
 	virtual const char	*GetTracerType( void );
@@ -642,6 +643,19 @@ inline int CUnitBase::GetAttackPriority()
 inline void CUnitBase::SetAttackPriority( int priority )
 {
 	m_iAttackPriority = priority;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Tests if the unit has a specific added relationship for the target entity
+//-----------------------------------------------------------------------------
+inline bool CUnitBase::HasOverridenEntityRelationship( CBaseEntity *pEntity )
+{
+	for ( int i = 0; i < m_Relationship.Count(); i++ )
+	{
+		if( m_Relationship[i].entity == pEntity )
+			return true;
+	}
+	return false;
 }
 
 #ifdef ENABLE_PYTHON
