@@ -142,7 +142,7 @@ class Steam(SemiSharedModuleGenerator):
         ''' Removes prefixes from variable names and lower cases the variable. '''
         for var in cls.vars():
             varname = var.name
-            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e)', '', varname)
+            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_i)', '', varname)
             varname = varname.lower()
             var.rename(varname)
             
@@ -179,6 +179,7 @@ class Steam(SemiSharedModuleGenerator):
         
         mb.free_function('PyGetLobbyDataByIndex').include()
         mb.free_function('PySendLobbyChatMsg').include()
+        mb.free_function('PyGetLobbyChatEntry').include()
         
         mb.var('k_uAPICallInvalid').include()
         
@@ -187,6 +188,7 @@ class Steam(SemiSharedModuleGenerator):
         self.AddSteamCallResult('LobbyCreated', 'LobbyCreated_t')
         
         self.AddSteamCallback('LobbyChatUpdate', 'LobbyChatUpdate_t')
+        self.AddSteamCallback('LobbyChatMsg', 'LobbyChatMsg_t')
         self.AddSteamCallback('LobbyDataUpdate', 'LobbyDataUpdate_t')
         
         # Enums

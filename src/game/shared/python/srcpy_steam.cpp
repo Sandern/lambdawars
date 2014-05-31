@@ -25,7 +25,7 @@ boost::python::tuple PyGetLobbyDataByIndex( CSteamID steamIDLobby, int iLobbyDat
 	return boost::python::make_tuple( ret, key, value );
 }
 
-bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody, int cubMsgBody )
+bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody )
 {
 	if( !steamapicontext->SteamMatchmaking() )
 	{
@@ -33,5 +33,20 @@ bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody, int cubMs
 		throw boost::python::error_already_set(); 
 	}
 
-	return steamapicontext->SteamMatchmaking()->SendLobbyChatMsg( steamIDLobby, (const void *)pvMsgBody, cubMsgBody );
+	return steamapicontext->SteamMatchmaking()->SendLobbyChatMsg( steamIDLobby, (const void *)pvMsgBody, V_strlen(pvMsgBody) + 1 );
+}
+
+boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CSteamID *pSteamIDUser )
+{
+	if( !steamapicontext->SteamMatchmaking() )
+	{
+		PyErr_SetString(PyExc_Exception, "No steam matchmaking API available!" );
+		throw boost::python::error_already_set(); 
+	}
+	
+	char data[4096];
+	data[0] = '\0';
+	EChatEntryType eChatEntryType;
+	steamapicontext->SteamMatchmaking()->GetLobbyChatEntry( steamIDLobby, iChatID, pSteamIDUser, data, sizeof( data ), &eChatEntryType );
+	return boost::python::make_tuple( data, eChatEntryType );
 }

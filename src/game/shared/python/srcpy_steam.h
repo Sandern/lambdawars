@@ -57,6 +57,7 @@ private: \
 
 // Wrapper functions
 boost::python::tuple PyGetLobbyDataByIndex( CSteamID steamIDLobby, int iLobbyData );
-bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody, int cubMsgBody );
+bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody );
+boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CSteamID *pSteamIDUser );
 
 #endif // SRCPY_STEAM_H

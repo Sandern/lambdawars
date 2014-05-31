@@ -176,6 +176,44 @@ struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatMsg, LobbyChatMsg_t );
+
+struct LobbyChatMsgCallback_wrapper : LobbyChatMsgCallback, bp::wrapper< LobbyChatMsgCallback > {
+
+    LobbyChatMsgCallback_wrapper(LobbyChatMsgCallback const & arg )
+    : LobbyChatMsgCallback( arg )
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatMsgCallback_wrapper()
+    : LobbyChatMsgCallback()
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatMsgCallback, OnLobbyChatMsg )
+        PY_OVERRIDE_LOG( _steam, LobbyChatMsgCallback, OnLobbyChatMsg )
+        bp::override func_OnLobbyChatMsg = this->get_override( "OnLobbyChatMsg" );
+        if( func_OnLobbyChatMsg.ptr() != Py_None )
+            try {
+                func_OnLobbyChatMsg( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+            }
+        else
+            this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+    
+    void default_OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+};
+
 PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
 
 struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
@@ -1308,6 +1346,17 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 
+    { //::LobbyChatMsg_t
+        typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
+        LobbyChatMsg_t_exposer_t LobbyChatMsg_t_exposer = LobbyChatMsg_t_exposer_t( "LobbyChatMsg_t" );
+        bp::scope LobbyChatMsg_t_scope( LobbyChatMsg_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatMsg_t::k_iCallback;
+        LobbyChatMsg_t_exposer.def_readwrite( "chatentrytype", &LobbyChatMsg_t::m_eChatEntryType );
+        LobbyChatMsg_t_exposer.def_readwrite( "chatid", &LobbyChatMsg_t::m_iChatID );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamidlobby", &LobbyChatMsg_t::m_ulSteamIDLobby );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamiduser", &LobbyChatMsg_t::m_ulSteamIDUser );
+    }
+
     { //::LobbyChatUpdate_t
         typedef bp::class_< LobbyChatUpdate_t > LobbyChatUpdate_t_exposer_t;
         LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
@@ -1357,6 +1406,17 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
     }
 
+    { //::PyGetLobbyChatEntry
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
+        
+        bp::def( 
+            "PyGetLobbyChatEntry"
+            , PyGetLobbyChatEntry_function_type( &::PyGetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser") ) );
+    
+    }
+
     { //::PyGetLobbyDataByIndex
     
         typedef ::boost::python::tuple ( *PyGetLobbyDataByIndex_function_type )( ::CSteamID,int );
@@ -1370,12 +1430,12 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::PySendLobbyChatMsg
     
-        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const *,int );
+        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const * );
         
         bp::def( 
             "PySendLobbyChatMsg"
             , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
-            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) );
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody") ) );
     
     }
 
@@ -1467,6 +1527,24 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyChatUpdate"
                 , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
                 , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyChatMsgCallback
+        typedef bp::class_< LobbyChatMsgCallback_wrapper > LobbyChatMsgCallback_exposer_t;
+        LobbyChatMsgCallback_exposer_t LobbyChatMsgCallback_exposer = LobbyChatMsgCallback_exposer_t( "LobbyChatMsgCallback", bp::init<>() );
+        bp::scope LobbyChatMsgCallback_scope( LobbyChatMsgCallback_exposer );
+        { //::LobbyChatMsgCallback::OnLobbyChatMsg
+        
+            typedef void ( ::LobbyChatMsgCallback::*OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            typedef void ( LobbyChatMsgCallback_wrapper::*default_OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            
+            LobbyChatMsgCallback_exposer.def( 
+                "OnLobbyChatMsg"
+                , OnLobbyChatMsg_function_type(&::LobbyChatMsgCallback::OnLobbyChatMsg)
+                , default_OnLobbyChatMsg_function_type(&LobbyChatMsgCallback_wrapper::default_OnLobbyChatMsg)
                 , ( bp::arg("data") ) );
         
         }
@@ -1665,6 +1743,44 @@ struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatMsg, LobbyChatMsg_t );
+
+struct LobbyChatMsgCallback_wrapper : LobbyChatMsgCallback, bp::wrapper< LobbyChatMsgCallback > {
+
+    LobbyChatMsgCallback_wrapper(LobbyChatMsgCallback const & arg )
+    : LobbyChatMsgCallback( arg )
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatMsgCallback_wrapper()
+    : LobbyChatMsgCallback()
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatMsgCallback, OnLobbyChatMsg )
+        PY_OVERRIDE_LOG( _steam, LobbyChatMsgCallback, OnLobbyChatMsg )
+        bp::override func_OnLobbyChatMsg = this->get_override( "OnLobbyChatMsg" );
+        if( func_OnLobbyChatMsg.ptr() != Py_None )
+            try {
+                func_OnLobbyChatMsg( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+            }
+        else
+            this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+    
+    void default_OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+};
+
 PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
 
 struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
@@ -2797,6 +2913,17 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 
+    { //::LobbyChatMsg_t
+        typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
+        LobbyChatMsg_t_exposer_t LobbyChatMsg_t_exposer = LobbyChatMsg_t_exposer_t( "LobbyChatMsg_t" );
+        bp::scope LobbyChatMsg_t_scope( LobbyChatMsg_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatMsg_t::k_iCallback;
+        LobbyChatMsg_t_exposer.def_readwrite( "chatentrytype", &LobbyChatMsg_t::m_eChatEntryType );
+        LobbyChatMsg_t_exposer.def_readwrite( "chatid", &LobbyChatMsg_t::m_iChatID );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamidlobby", &LobbyChatMsg_t::m_ulSteamIDLobby );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamiduser", &LobbyChatMsg_t::m_ulSteamIDUser );
+    }
+
     { //::LobbyChatUpdate_t
         typedef bp::class_< LobbyChatUpdate_t > LobbyChatUpdate_t_exposer_t;
         LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
@@ -2846,6 +2973,17 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
     }
 
+    { //::PyGetLobbyChatEntry
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
+        
+        bp::def( 
+            "PyGetLobbyChatEntry"
+            , PyGetLobbyChatEntry_function_type( &::PyGetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser") ) );
+    
+    }
+
     { //::PyGetLobbyDataByIndex
     
         typedef ::boost::python::tuple ( *PyGetLobbyDataByIndex_function_type )( ::CSteamID,int );
@@ -2859,12 +2997,12 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::PySendLobbyChatMsg
     
-        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const *,int );
+        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const * );
         
         bp::def( 
             "PySendLobbyChatMsg"
             , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
-            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody"), bp::arg("cubMsgBody") ) );
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody") ) );
     
     }
 
@@ -2956,6 +3094,24 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyChatUpdate"
                 , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
                 , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyChatMsgCallback
+        typedef bp::class_< LobbyChatMsgCallback_wrapper > LobbyChatMsgCallback_exposer_t;
+        LobbyChatMsgCallback_exposer_t LobbyChatMsgCallback_exposer = LobbyChatMsgCallback_exposer_t( "LobbyChatMsgCallback", bp::init<>() );
+        bp::scope LobbyChatMsgCallback_scope( LobbyChatMsgCallback_exposer );
+        { //::LobbyChatMsgCallback::OnLobbyChatMsg
+        
+            typedef void ( ::LobbyChatMsgCallback::*OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            typedef void ( LobbyChatMsgCallback_wrapper::*default_OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            
+            LobbyChatMsgCallback_exposer.def( 
+                "OnLobbyChatMsg"
+                , OnLobbyChatMsg_function_type(&::LobbyChatMsgCallback::OnLobbyChatMsg)
+                , default_OnLobbyChatMsg_function_type(&LobbyChatMsgCallback_wrapper::default_OnLobbyChatMsg)
                 , ( bp::arg("data") ) );
         
         }
