@@ -143,7 +143,7 @@ class Steam(SemiSharedModuleGenerator):
         ''' Removes prefixes from variable names and lower cases the variable. '''
         for var in cls.vars():
             varname = var.name
-            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_i|m_b|m_c)', '', varname)
+            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf)', '', varname)
             varname = varname.lower()
             var.rename(varname)
             
@@ -187,6 +187,7 @@ class Steam(SemiSharedModuleGenerator):
         self.AddSteamCallResult('LobbyMatchList', 'LobbyMatchList_t')
         self.AddSteamCallResult('LobbyGameCreated', 'LobbyGameCreated_t')
         self.AddSteamCallResult('LobbyCreated', 'LobbyCreated_t')
+        self.AddSteamCallResult('LobbyEnter', 'LobbyEnter_t')
         
         self.AddSteamCallback('LobbyChatUpdate', 'LobbyChatUpdate_t')
         self.AddSteamCallback('LobbyChatMsg', 'LobbyChatMsg_t')

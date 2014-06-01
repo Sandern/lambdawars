@@ -140,6 +140,44 @@ struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< Lob
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( LobbyEnter, LobbyEnter_t );
+
+struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEnterCallResult > {
+
+    LobbyEnterCallResult_wrapper(LobbyEnterCallResult const & arg )
+    : LobbyEnterCallResult( arg )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // copy constructor
+        
+    }
+
+    LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyEnterCallResult( steamapicall )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyEnterCallResult, OnLobbyEnter )
+        PY_OVERRIDE_LOG( _steam, LobbyEnterCallResult, OnLobbyEnter )
+        bp::override func_OnLobbyEnter = this->get_override( "OnLobbyEnter" );
+        if( func_OnLobbyEnter.ptr() != Py_None )
+            try {
+                func_OnLobbyEnter( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+            }
+        else
+            this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+};
+
 PY_STEAM_CALLBACK_WRAPPER( LobbyChatUpdate, LobbyChatUpdate_t );
 
 struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< LobbyChatUpdateCallback > {
@@ -1584,7 +1622,7 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
         bp::scope LobbyChatUpdate_t_scope( LobbyChatUpdate_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyChatUpdate_t::k_iCallback;
-        LobbyChatUpdate_t_exposer.def_readwrite( "m_rgfchatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "chatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyChatUpdate_t::m_ulSteamIDLobby );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamidmakingchange", &LobbyChatUpdate_t::m_ulSteamIDMakingChange );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamiduserchanged", &LobbyChatUpdate_t::m_ulSteamIDUserChanged );
@@ -1607,6 +1645,17 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
+    { //::LobbyEnter_t
+        typedef bp::class_< LobbyEnter_t > LobbyEnter_t_exposer_t;
+        LobbyEnter_t_exposer_t LobbyEnter_t_exposer = LobbyEnter_t_exposer_t( "LobbyEnter_t" );
+        bp::scope LobbyEnter_t_scope( LobbyEnter_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyEnter_t::k_iCallback;
+        LobbyEnter_t_exposer.def_readwrite( "chatroomenterresponse", &LobbyEnter_t::m_EChatRoomEnterResponse );
+        LobbyEnter_t_exposer.def_readwrite( "locked", &LobbyEnter_t::m_bLocked );
+        LobbyEnter_t_exposer.def_readwrite( "chatpermissions", &LobbyEnter_t::m_rgfChatPermissions );
+        LobbyEnter_t_exposer.def_readwrite( "steamidlobby", &LobbyEnter_t::m_ulSteamIDLobby );
     }
 
     { //::LobbyGameCreated_t
@@ -1740,6 +1789,25 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyCreated"
                 , OnLobbyCreated_function_type(&::LobbyCreatedCallResult::OnLobbyCreated)
                 , default_OnLobbyCreated_function_type(&LobbyCreatedCallResult_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyEnterCallResult
+        typedef bp::class_< LobbyEnterCallResult_wrapper > LobbyEnterCallResult_exposer_t;
+        LobbyEnterCallResult_exposer_t LobbyEnterCallResult_exposer = LobbyEnterCallResult_exposer_t( "LobbyEnterCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyEnterCallResult_scope( LobbyEnterCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyEnterCallResult >();
+        { //::LobbyEnterCallResult::OnLobbyEnter
+        
+            typedef void ( ::LobbyEnterCallResult::*OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            typedef void ( LobbyEnterCallResult_wrapper::*default_OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            
+            LobbyEnterCallResult_exposer.def( 
+                "OnLobbyEnter"
+                , OnLobbyEnter_function_type(&::LobbyEnterCallResult::OnLobbyEnter)
+                , default_OnLobbyEnter_function_type(&LobbyEnterCallResult_wrapper::default_OnLobbyEnter)
                 , ( bp::arg("data"), bp::arg("iofailure") ) );
         
         }
@@ -1957,6 +2025,44 @@ struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< Lob
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( LobbyEnter, LobbyEnter_t );
+
+struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEnterCallResult > {
+
+    LobbyEnterCallResult_wrapper(LobbyEnterCallResult const & arg )
+    : LobbyEnterCallResult( arg )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // copy constructor
+        
+    }
+
+    LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyEnterCallResult( steamapicall )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyEnterCallResult, OnLobbyEnter )
+        PY_OVERRIDE_LOG( _steam, LobbyEnterCallResult, OnLobbyEnter )
+        bp::override func_OnLobbyEnter = this->get_override( "OnLobbyEnter" );
+        if( func_OnLobbyEnter.ptr() != Py_None )
+            try {
+                func_OnLobbyEnter( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+            }
+        else
+            this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+};
+
 PY_STEAM_CALLBACK_WRAPPER( LobbyChatUpdate, LobbyChatUpdate_t );
 
 struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< LobbyChatUpdateCallback > {
@@ -3401,7 +3507,7 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
         bp::scope LobbyChatUpdate_t_scope( LobbyChatUpdate_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyChatUpdate_t::k_iCallback;
-        LobbyChatUpdate_t_exposer.def_readwrite( "m_rgfchatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "chatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyChatUpdate_t::m_ulSteamIDLobby );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamidmakingchange", &LobbyChatUpdate_t::m_ulSteamIDMakingChange );
         LobbyChatUpdate_t_exposer.def_readwrite( "steamiduserchanged", &LobbyChatUpdate_t::m_ulSteamIDUserChanged );
@@ -3424,6 +3530,17 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
+    { //::LobbyEnter_t
+        typedef bp::class_< LobbyEnter_t > LobbyEnter_t_exposer_t;
+        LobbyEnter_t_exposer_t LobbyEnter_t_exposer = LobbyEnter_t_exposer_t( "LobbyEnter_t" );
+        bp::scope LobbyEnter_t_scope( LobbyEnter_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyEnter_t::k_iCallback;
+        LobbyEnter_t_exposer.def_readwrite( "chatroomenterresponse", &LobbyEnter_t::m_EChatRoomEnterResponse );
+        LobbyEnter_t_exposer.def_readwrite( "locked", &LobbyEnter_t::m_bLocked );
+        LobbyEnter_t_exposer.def_readwrite( "chatpermissions", &LobbyEnter_t::m_rgfChatPermissions );
+        LobbyEnter_t_exposer.def_readwrite( "steamidlobby", &LobbyEnter_t::m_ulSteamIDLobby );
     }
 
     { //::LobbyGameCreated_t
@@ -3557,6 +3674,25 @@ BOOST_PYTHON_MODULE(_steam){
                 "OnLobbyCreated"
                 , OnLobbyCreated_function_type(&::LobbyCreatedCallResult::OnLobbyCreated)
                 , default_OnLobbyCreated_function_type(&LobbyCreatedCallResult_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyEnterCallResult
+        typedef bp::class_< LobbyEnterCallResult_wrapper > LobbyEnterCallResult_exposer_t;
+        LobbyEnterCallResult_exposer_t LobbyEnterCallResult_exposer = LobbyEnterCallResult_exposer_t( "LobbyEnterCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyEnterCallResult_scope( LobbyEnterCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyEnterCallResult >();
+        { //::LobbyEnterCallResult::OnLobbyEnter
+        
+            typedef void ( ::LobbyEnterCallResult::*OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            typedef void ( LobbyEnterCallResult_wrapper::*default_OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            
+            LobbyEnterCallResult_exposer.def( 
+                "OnLobbyEnter"
+                , OnLobbyEnter_function_type(&::LobbyEnterCallResult::OnLobbyEnter)
+                , default_OnLobbyEnter_function_type(&LobbyEnterCallResult_wrapper::default_OnLobbyEnter)
                 , ( bp::arg("data"), bp::arg("iofailure") ) );
         
         }
