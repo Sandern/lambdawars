@@ -2472,9 +2472,6 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
             type->tp_dictoffset = slotoffset;
         slotoffset += sizeof(PyObject *);
     }
-    if (type->tp_dictoffset) {
-        et->ht_cached_keys = _PyDict_NewKeysForClass();
-    }
     if (add_weak) {
         assert(!base->tp_itemsize);
         type->tp_weaklistoffset = slotoffset;
@@ -2523,6 +2520,10 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
 
     /* Put the proper slots in place */
     fixup_slot_dispatchers(type);
+
+    if (type->tp_dictoffset) {
+        et->ht_cached_keys = _PyDict_NewKeysForClass();
+    }
 
     Py_DECREF(dict);
     return (PyObject *)type;
@@ -2640,9 +2641,6 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
             type->tp_doc = tp_doc;
         }
     }
-    if (type->tp_dictoffset) {
-        res->ht_cached_keys = _PyDict_NewKeysForClass();
-    }
     if (type->tp_dealloc == NULL) {
         /* It's a heap type, so needs the heap types' dealloc.
            subtype_dealloc will call the base type's tp_dealloc, if
@@ -2652,6 +2650,10 @@ PyType_FromSpecWithBases(PyType_Spec *spec, PyObject *bases)
 
     if (PyType_Ready(type) < 0)
         goto fail;
+
+    if (type->tp_dictoffset) {
+        res->ht_cached_keys = _PyDict_NewKeysForClass();
+    }
 
     /* Set type.__module__ */
     s = strrchr(spec->name, '.');
@@ -6178,7 +6180,7 @@ static slotdef slotdefs[] = {
     TPSLOT("__gt__", tp_richcompare, slot_tp_richcompare, richcmp_gt,
            "__gt__($self, value, /)\n--\n\nReturn self>value."),
     TPSLOT("__ge__", tp_richcompare, slot_tp_richcompare, richcmp_ge,
-           "__ge__=($self, value, /)\n--\n\nReturn self>=value."),
+           "__ge__($self, value, /)\n--\n\nReturn self>=value."),
     TPSLOT("__iter__", tp_iter, slot_tp_iter, wrap_unaryfunc,
            "__iter__($self, /)\n--\n\nImplement iter(self)."),
     TPSLOT("__next__", tp_iternext, slot_tp_iternext, wrap_next,
@@ -6274,7 +6276,7 @@ static slotdef slotdefs[] = {
            slot_nb_inplace_true_divide, wrap_binaryfunc, "/"),
     NBSLOT("__index__", nb_index, slot_nb_index, wrap_unaryfunc,
            "__index__($self, /)\n--\n\n"
-           "Return self converted to an integer, if self is suitable"
+           "Return self converted to an integer, if self is suitable "
            "for use as an index into a list."),
     MPSLOT("__len__", mp_length, slot_mp_length, wrap_lenfunc,
            "__len__($self, /)\n--\n\nReturn len(self)."),
@@ -6917,9 +6919,16 @@ super_init(PyObject *self, PyObject *args, PyObject *kwds)
     if (type == NULL) {
         /* Call super(), without args -- fill in from __class__
            and first local variable on the stack. */
-        PyFrameObject *f = PyThreadState_GET()->frame;
-        PyCodeObject *co = f->f_code;
+        PyFrameObject *f;
+        PyCodeObject *co;
         Py_ssize_t i, n;
+        f = PyThreadState_GET()->frame;
+        if (f == NULL) {
+            PyErr_SetString(PyExc_RuntimeError,
+                            "super(): no current frame");
+            return -1;
+        }
+        co = f->f_code;
         if (co == NULL) {
             PyErr_SetString(PyExc_RuntimeError,
                             "super(): no code object");

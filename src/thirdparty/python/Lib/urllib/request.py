@@ -511,9 +511,6 @@ def build_opener(*handlers):
     If any of the handlers passed as arguments are subclasses of the
     default handlers, the default handlers will not be used.
     """
-    def isclass(obj):
-        return isinstance(obj, type) or hasattr(obj, "__bases__")
-
     opener = OpenerDirector()
     default_classes = [ProxyHandler, UnknownHandler, HTTPHandler,
                        HTTPDefaultErrorHandler, HTTPRedirectHandler,
@@ -524,7 +521,7 @@ def build_opener(*handlers):
     skip = set()
     for klass in default_classes:
         for check in handlers:
-            if isclass(check):
+            if isinstance(check, type):
                 if issubclass(check, klass):
                     skip.add(klass)
             elif isinstance(check, klass):
@@ -536,7 +533,7 @@ def build_opener(*handlers):
         opener.add_handler(klass())
 
     for h in handlers:
-        if isclass(h):
+        if isinstance(h, type):
             h = h()
         opener.add_handler(h)
     return opener
@@ -690,50 +687,7 @@ def _parse_proxy(proxy):
 
     If a URL is supplied, it must have an authority (host:port) component.
     According to RFC 3986, having an authority component means the URL must
-    have two slashes after the scheme:
-
-    >>> _parse_proxy('file:/ftp.example.com/')
-    Traceback (most recent call last):
-    ValueError: proxy URL with no authority: 'file:/ftp.example.com/'
-
-    The first three items of the returned tuple may be None.
-
-    Examples of authority parsing:
-
-    >>> _parse_proxy('proxy.example.com')
-    (None, None, None, 'proxy.example.com')
-    >>> _parse_proxy('proxy.example.com:3128')
-    (None, None, None, 'proxy.example.com:3128')
-
-    The authority component may optionally include userinfo (assumed to be
-    username:password):
-
-    >>> _parse_proxy('joe:password@proxy.example.com')
-    (None, 'joe', 'password', 'proxy.example.com')
-    >>> _parse_proxy('joe:password@proxy.example.com:3128')
-    (None, 'joe', 'password', 'proxy.example.com:3128')
-
-    Same examples, but with URLs instead:
-
-    >>> _parse_proxy('http://proxy.example.com/')
-    ('http', None, None, 'proxy.example.com')
-    >>> _parse_proxy('http://proxy.example.com:3128/')
-    ('http', None, None, 'proxy.example.com:3128')
-    >>> _parse_proxy('http://joe:password@proxy.example.com/')
-    ('http', 'joe', 'password', 'proxy.example.com')
-    >>> _parse_proxy('http://joe:password@proxy.example.com:3128')
-    ('http', 'joe', 'password', 'proxy.example.com:3128')
-
-    Everything after the authority is ignored:
-
-    >>> _parse_proxy('ftp://joe:password@proxy.example.com/rubbish:3128')
-    ('ftp', 'joe', 'password', 'proxy.example.com')
-
-    Test for no trailing '/' case:
-
-    >>> _parse_proxy('http://joe:password@proxy.example.com')
-    ('http', 'joe', 'password', 'proxy.example.com')
-
+    have two slashes after the scheme.
     """
     scheme, r_scheme = splittype(proxy)
     if not r_scheme.startswith("/"):

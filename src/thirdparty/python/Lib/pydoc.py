@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate Python documentation in HTML or text for interactive use.
 
-In the Python interpreter, do "from pydoc import help" to provide
-help.  Calling help(thing) on a Python object documents the object.
+At the Python interactive prompt, calling help(thing) on a Python object
+documents the object, and calling help() starts up an interactive
+help session.
 
 Or, at the shell command line outside of Python:
 
@@ -66,7 +67,7 @@ import tokenize
 import warnings
 from collections import deque
 from reprlib import Repr
-from traceback import extract_tb, format_exception_only
+from traceback import format_exception_only
 
 
 # --------------------------------------------------------- common routines
@@ -1256,9 +1257,12 @@ location listed above.
                         doc = getdoc(value)
                     else:
                         doc = None
-                    push(self.docother(
-                        getattr(object, name, None) or homecls.__dict__[name],
-                        name, mod, maxlen=70, doc=doc) + '\n')
+                    try:
+                        obj = getattr(object, name)
+                    except AttributeError:
+                        obj = homecls.__dict__[name]
+                    push(self.docother(obj, name, mod, maxlen=70, doc=doc) +
+                         '\n')
             return attrs
 
         attrs = [(name, kind, cls, value)
@@ -1400,6 +1404,9 @@ class _PlainTextDoc(TextDoc):
 def pager(text):
     """The first time this is called, determine what kind of pager to use."""
     global pager
+    # Escape non-encodable characters to avoid encoding errors later
+    encoding = sys.getfilesystemencoding()
+    text = text.encode(encoding, 'backslashreplace').decode(encoding)
     pager = getpager()
     pager(text)
 
@@ -1862,7 +1869,7 @@ has the same effect as typing a particular string at the help> prompt.
 
     def intro(self):
         self.output.write('''
-Welcome to Python %s!  This is the interactive help utility.
+Welcome to Python %s's help utility!
 
 If this is your first time using Python, you should definitely check out
 the tutorial on the Internet at http://docs.python.org/%s/tutorial/.

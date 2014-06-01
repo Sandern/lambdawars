@@ -3542,7 +3542,7 @@ PyDec_Round(PyObject *dec, PyObject *args)
     }
 }
 
-static PyObject *DecimalTuple = NULL;
+static PyTypeObject *DecimalTuple = NULL;
 /* Return the DecimalTuple representation of a PyDecObject. */
 static PyObject *
 PyDec_AsTuple(PyObject *dec, PyObject *dummy UNUSED)
@@ -3625,7 +3625,7 @@ PyDec_AsTuple(PyObject *dec, PyObject *dummy UNUSED)
         }
     }
 
-    result = PyObject_CallFunctionObjArgs(DecimalTuple,
+    result = PyObject_CallFunctionObjArgs((PyObject *)DecimalTuple,
                                           sign, coeff, expt, NULL);
 
 out:
@@ -3927,9 +3927,6 @@ nm_mpd_qdivmod(PyObject *v, PyObject *w)
     Py_DECREF(q);
     return ret;
 }
-
-static mpd_uint_t data_zero[1] = {0};
-static const mpd_t zero = {MPD_STATIC|MPD_CONST_DATA, 0, 1, 1, 1, data_zero};
 
 static PyObject *
 nm_mpd_qpow(PyObject *base, PyObject *exp, PyObject *mod)
@@ -5565,9 +5562,14 @@ PyInit__decimal(void)
 
     /* DecimalTuple */
     ASSIGN_PTR(collections, PyImport_ImportModule("collections"));
-    ASSIGN_PTR(DecimalTuple, PyObject_CallMethod(collections,
+    ASSIGN_PTR(DecimalTuple, (PyTypeObject *)PyObject_CallMethod(collections,
                                  "namedtuple", "(ss)", "DecimalTuple",
                                  "sign digits exponent"));
+
+    ASSIGN_PTR(obj, PyUnicode_FromString("decimal"));
+    CHECK_INT(PyDict_SetItemString(DecimalTuple->tp_dict, "__module__", obj));
+    Py_CLEAR(obj);
+
     /* MutableMapping */
     ASSIGN_PTR(MutableMapping, PyObject_GetAttrString(collections,
                                                       "MutableMapping"));
@@ -5594,7 +5596,7 @@ PyInit__decimal(void)
     CHECK_INT(PyModule_AddObject(m, "Context",
                                  (PyObject *)&PyDecContext_Type));
     Py_INCREF(DecimalTuple);
-    CHECK_INT(PyModule_AddObject(m, "DecimalTuple", DecimalTuple));
+    CHECK_INT(PyModule_AddObject(m, "DecimalTuple", (PyObject *)DecimalTuple));
 
 
     /* Create top level exception */

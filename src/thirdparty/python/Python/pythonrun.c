@@ -35,6 +35,10 @@
 #define PATH_MAX MAXPATHLEN
 #endif
 
+#ifdef __gnu_hurd__
+#define PATH_MAX MAXPATHLEN
+#endif
+
 _Py_IDENTIFIER(builtins);
 _Py_IDENTIFIER(excepthook);
 _Py_IDENTIFIER(flush);
@@ -1440,12 +1444,13 @@ PyRun_InteractiveOneObject(FILE *fp, PyObject *filename, PyCompilerFlags *flags)
     d = PyModule_GetDict(m);
     v = run_mod(mod, filename, d, d, flags, arena);
     PyArena_Free(arena);
-    flush_io();
     if (v == NULL) {
         PyErr_Print();
+        flush_io();
         return -1;
     }
     Py_DECREF(v);
+    flush_io();
     return 0;
 }
 

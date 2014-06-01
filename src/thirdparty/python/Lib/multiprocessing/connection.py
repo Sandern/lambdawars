@@ -14,7 +14,6 @@ import os
 import sys
 import socket
 import struct
-import errno
 import time
 import tempfile
 import itertools
@@ -29,7 +28,7 @@ from .reduction import ForkingPickler
 
 try:
     import _winapi
-    from _winapi import WAIT_OBJECT_0, WAIT_TIMEOUT, INFINITE
+    from _winapi import WAIT_OBJECT_0, WAIT_ABANDONED_0, WAIT_TIMEOUT, INFINITE
 except ImportError:
     if sys.platform == 'win32':
         raise
@@ -77,7 +76,7 @@ def arbitrary_address(family):
         return tempfile.mktemp(prefix='listener-', dir=util.get_temp_dir())
     elif family == 'AF_PIPE':
         return tempfile.mktemp(prefix=r'\\.\pipe\pyc-%d-%d-' %
-                               (os.getpid(), next(_mmap_counter)))
+                               (os.getpid(), next(_mmap_counter)), dir="")
     else:
         raise ValueError('unrecognized family')
 

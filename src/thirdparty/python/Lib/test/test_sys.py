@@ -1,4 +1,5 @@
 import unittest, test.support
+from test.script_helper import assert_python_ok, assert_python_failure
 import sys, io, os
 import struct
 import subprocess
@@ -89,74 +90,54 @@ class SysModuleTest(unittest.TestCase):
     # Python/pythonrun.c::PyErr_PrintEx() is tricky.
 
     def test_exit(self):
-
+        # call with two arguments
         self.assertRaises(TypeError, sys.exit, 42, 42)
 
         # call without argument
-        try:
-            sys.exit(0)
-        except SystemExit as exc:
-            self.assertEqual(exc.code, 0)
-        except:
-            self.fail("wrong exception")
-        else:
-            self.fail("no exception")
+        with self.assertRaises(SystemExit) as cm:
+            sys.exit()
+        self.assertIsNone(cm.exception.code)
+
+        rc, out, err = assert_python_ok('-c', 'import sys; sys.exit()')
+        self.assertEqual(rc, 0)
+        self.assertEqual(out, b'')
+        self.assertEqual(err, b'')
+
+        # call with integer argument
+        with self.assertRaises(SystemExit) as cm:
+            sys.exit(42)
+        self.assertEqual(cm.exception.code, 42)
 
         # call with tuple argument with one entry
         # entry will be unpacked
-        try:
-            sys.exit(42)
-        except SystemExit as exc:
-            self.assertEqual(exc.code, 42)
-        except:
-            self.fail("wrong exception")
-        else:
-            self.fail("no exception")
-
-        # call with integer argument
-        try:
+        with self.assertRaises(SystemExit) as cm:
             sys.exit((42,))
-        except SystemExit as exc:
-            self.assertEqual(exc.code, 42)
-        except:
-            self.fail("wrong exception")
-        else:
-            self.fail("no exception")
+        self.assertEqual(cm.exception.code, 42)
 
         # call with string argument
-        try:
+        with self.assertRaises(SystemExit) as cm:
             sys.exit("exit")
-        except SystemExit as exc:
-            self.assertEqual(exc.code, "exit")
-        except:
-            self.fail("wrong exception")
-        else:
-            self.fail("no exception")
+        self.assertEqual(cm.exception.code, "exit")
 
         # call with tuple argument with two entries
-        try:
+        with self.assertRaises(SystemExit) as cm:
             sys.exit((17, 23))
-        except SystemExit as exc:
-            self.assertEqual(exc.code, (17, 23))
-        except:
-            self.fail("wrong exception")
-        else:
-            self.fail("no exception")
+        self.assertEqual(cm.exception.code, (17, 23))
 
         # test that the exit machinery handles SystemExits properly
-        rc = subprocess.call([sys.executable, "-c",
-                              "raise SystemExit(47)"])
+        rc, out, err = assert_python_failure('-c', 'raise SystemExit(47)')
         self.assertEqual(rc, 47)
+        self.assertEqual(out, b'')
+        self.assertEqual(err, b'')
 
-        def check_exit_message(code, expected, env=None):
-            process = subprocess.Popen([sys.executable, "-c", code],
-                                       stderr=subprocess.PIPE, env=env)
-            stdout, stderr = process.communicate()
-            self.assertEqual(process.returncode, 1)
-            self.assertTrue(stderr.startswith(expected),
-                "%s doesn't start with %s" % (ascii(stderr), ascii(expected)))
+        def check_exit_message(code, expected, **env_vars):
+            rc, out, err = assert_python_failure('-c', code, **env_vars)
+            self.assertEqual(rc, 1)
+            self.assertEqual(out, b'')
+            self.assertTrue(err.startswith(expected),
+                "%s doesn't start with %s" % (ascii(err), ascii(expected)))
 
-        # test that stderr buffer if flushed before the exit message is written
+        # test that stderr buffer is flushed before the exit message is written
         # into stderr
         check_exit_message(
             r'import sys; sys.stderr.write("unflushed,"); sys.exit("message")',
@@ -170,11 +151,9 @@ class SysModuleTest(unittest.TestCase):
 
         # test that the unicode message is encoded to the stderr encoding
         # instead of the default encoding (utf8)
-        env = os.environ.copy()
-        env['PYTHONIOENCODING'] = 'latin-1'
         check_exit_message(
             r'import sys; sys.exit("h\xe9")',
-            b"h\xe9", env=env)
+            b"h\xe9", PYTHONIOENCODING='latin-1')
 
     def test_getdefaultencoding(self):
         self.assertRaises(TypeError, sys.getdefaultencoding, 42)
@@ -539,6 +518,26 @@ class SysModuleTest(unittest.TestCase):
             self.assertEqual(type(getattr(sys.flags, attr)), int, attr)
         self.assertTrue(repr(sys.flags))
         self.assertEqual(len(sys.flags), len(attrs))
+
+    def assert_raise_on_new_sys_type(self, sys_attr):
+        # Users are intentionally prevented from creating new instances of
+        # sys.flags, sys.version_info, and sys.getwindowsversion.
+        attr_type = type(sys_attr)
+        with self.assertRaises(TypeError):
+            attr_type()
+        with self.assertRaises(TypeError):
+            attr_type.__new__(attr_type)
+
+    def test_sys_flags_no_instantiation(self):
+        self.assert_raise_on_new_sys_type(sys.flags)
+
+    def test_sys_version_info_no_instantiation(self):
+        self.assert_raise_on_new_sys_type(sys.version_info)
+
+    def test_sys_getwindowsversion_no_instantiation(self):
+        # Skip if not being run on Windows.
+        test.support.get_attribute(sys, "getwindowsversion")
+        self.assert_raise_on_new_sys_type(sys.getwindowsversion())
 
     def test_clear_type_cache(self):
         sys._clear_type_cache()

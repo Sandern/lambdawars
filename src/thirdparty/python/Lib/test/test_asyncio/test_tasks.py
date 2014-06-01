@@ -2,7 +2,9 @@
 
 import gc
 import os.path
+import types
 import unittest
+import weakref
 from test.script_helper import assert_python_ok
 
 import asyncio
@@ -830,7 +832,7 @@ class TaskTests(unittest.TestCase):
                 v = yield from f
                 self.assertEqual(v, 'a')
 
-        res = loop.run_until_complete(asyncio.Task(foo(), loop=loop))
+        loop.run_until_complete(asyncio.Task(foo(), loop=loop))
 
     def test_as_completed_reverse_wait(self):
 
@@ -964,13 +966,9 @@ class TaskTests(unittest.TestCase):
         loop = test_utils.TestLoop(gen)
         self.addCleanup(loop.close)
 
-        sleepfut = None
-
         @asyncio.coroutine
         def sleep(dt):
-            nonlocal sleepfut
-            sleepfut = asyncio.sleep(dt, loop=loop)
-            yield from sleepfut
+            yield from asyncio.sleep(dt, loop=loop)
 
         @asyncio.coroutine
         def doit():
@@ -1389,6 +1387,102 @@ class TaskTests(unittest.TestCase):
         # wait() expects at least a future
         self.assertRaises(ValueError, self.loop.run_until_complete,
             asyncio.wait([], loop=self.loop))
+
+    def test_corowrapper_mocks_generator(self):
+
+        def check():
+            # A function that asserts various things.
+            # Called twice, with different debug flag values.
+
+            @asyncio.coroutine
+            def coro():
+                # The actual coroutine.
+                self.assertTrue(gen.gi_running)
+                yield from fut
+
+            # A completed Future used to run the coroutine.
+            fut = asyncio.Future(loop=self.loop)
+            fut.set_result(None)
+
+            # Call the coroutine.
+            gen = coro()
+
+            # Check some properties.
+            self.assertTrue(asyncio.iscoroutine(gen))
+            self.assertIsInstance(gen.gi_frame, types.FrameType)
+            self.assertFalse(gen.gi_running)
+            self.assertIsInstance(gen.gi_code, types.CodeType)
+
+            # Run it.
+            self.loop.run_until_complete(gen)
+
+            # The frame should have changed.
+            self.assertIsNone(gen.gi_frame)
+
+        # Save debug flag.
+        old_debug = asyncio.tasks._DEBUG
+        try:
+            # Test with debug flag cleared.
+            asyncio.tasks._DEBUG = False
+            check()
+
+            # Test with debug flag set.
+            asyncio.tasks._DEBUG = True
+            check()
+
+        finally:
+            # Restore original debug flag.
+            asyncio.tasks._DEBUG = old_debug
+
+    def test_yield_from_corowrapper(self):
+        old_debug = asyncio.tasks._DEBUG
+        asyncio.tasks._DEBUG = True
+        try:
+            @asyncio.coroutine
+            def t1():
+                return (yield from t2())
+
+            @asyncio.coroutine
+            def t2():
+                f = asyncio.Future(loop=self.loop)
+                asyncio.Task(t3(f), loop=self.loop)
+                return (yield from f)
+
+            @asyncio.coroutine
+            def t3(f):
+                f.set_result((1, 2, 3))
+
+            task = asyncio.Task(t1(), loop=self.loop)
+            val = self.loop.run_until_complete(task)
+            self.assertEqual(val, (1, 2, 3))
+        finally:
+            asyncio.tasks._DEBUG = old_debug
+
+    def test_yield_from_corowrapper_send(self):
+        def foo():
+            a = yield
+            return a
+
+        def call(arg):
+            cw = asyncio.tasks.CoroWrapper(foo(), foo)
+            cw.send(None)
+            try:
+                cw.send(arg)
+            except StopIteration as ex:
+                return ex.args[0]
+            else:
+                raise AssertionError('StopIteration was expected')
+
+        self.assertEqual(call((1, 2)), (1, 2))
+        self.assertEqual(call('spam'), 'spam')
+
+    def test_corowrapper_weakref(self):
+        wd = weakref.WeakValueDictionary()
+        def foo(): yield from []
+        cw = asyncio.tasks.CoroWrapper(foo(), foo)
+        wd['cw'] = cw  # Would fail without __weakref__ slot.
+        cw.gen = None  # Suppress warning from __del__.
+
 
 class GatherTestsBase:
 

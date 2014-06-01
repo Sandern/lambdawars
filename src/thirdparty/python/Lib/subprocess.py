@@ -350,8 +350,6 @@ mswindows = (sys.platform == "win32")
 import io
 import os
 import time
-import traceback
-import gc
 import signal
 import builtins
 import warnings
@@ -407,6 +405,10 @@ else:
     import _posixsubprocess
     import select
     import selectors
+    try:
+        import threading
+    except ImportError:
+        import dummy_threading as threading
 
     # When select or poll has indicated that the file is writable,
     # we can write up to _PIPE_BUF bytes without risk of blocking.
@@ -738,6 +740,9 @@ _PLATFORM_DEFAULT_CLOSE_FDS = object()
 
 
 class Popen(object):
+
+    _child_created = False  # Set here since __del__ checks it
+
     def __init__(self, args, bufsize=-1, executable=None,
                  stdin=None, stdout=None, stderr=None,
                  preexec_fn=None, close_fds=_PLATFORM_DEFAULT_CLOSE_FDS,
@@ -747,8 +752,13 @@ class Popen(object):
                  pass_fds=()):
         """Create new Popen instance."""
         _cleanup()
+        # Held while anything is calling waitpid before returncode has been
+        # updated to prevent clobbering returncode if wait() or poll() are
+        # called from multiple threads at once.  After acquiring the lock,
+        # code must re-check self.returncode to see if another thread just
+        # finished a waitpid() call.
+        self._waitpid_lock = threading.Lock()
 
-        self._child_created = False
         self._input = None
         self._communication_started = False
         if bufsize is None:
@@ -890,11 +900,8 @@ class Popen(object):
         # Wait for the process to terminate, to avoid zombies.
         self.wait()
 
-    def __del__(self, _maxsize=sys.maxsize, _active=_active):
-        # If __init__ hasn't had a chance to execute (e.g. if it
-        # was passed an undeclared keyword argument), we don't
-        # have a _child_created attribute at all.
-        if not getattr(self, '_child_created', False):
+    def __del__(self, _maxsize=sys.maxsize):
+        if not self._child_created:
             # We didn't get to successfully create a child process.
             return
         # In case the child hasn't been waited on, check if it's done.
@@ -1187,7 +1194,15 @@ class Popen(object):
                     try:
                         self.stdin.write(input)
                     except OSError as e:
-                        if e.errno != errno.EPIPE:
+                        if e.errno == errno.EPIPE:
+                            # communicate() should ignore pipe full error
+                            pass
+                        elif (e.errno == errno.EINVAL
+                              and self.poll() is not None):
+                            # Issue #19612: stdin.write() fails with EINVAL
+                            # if the process already exited before the write
+                            pass
+                        else:
                             raise
                 self.stdin.close()
 
@@ -1445,8 +1460,9 @@ class Popen(object):
         def _handle_exitstatus(self, sts, _WIFSIGNALED=os.WIFSIGNALED,
                 _WTERMSIG=os.WTERMSIG, _WIFEXITED=os.WIFEXITED,
                 _WEXITSTATUS=os.WEXITSTATUS):
+            """All callers to this function MUST hold self._waitpid_lock."""
             # This method is called (indirectly) by __del__, so it cannot
-            # refer to anything outside of its local scope."""
+            # refer to anything outside of its local scope.
             if _WIFSIGNALED(sts):
                 self.returncode = -_WTERMSIG(sts)
             elif _WIFEXITED(sts):
@@ -1466,7 +1482,13 @@ class Popen(object):
 
             """
             if self.returncode is None:
+                if not self._waitpid_lock.acquire(False):
+                    # Something else is busy calling waitpid.  Don't allow two
+                    # at once.  We know nothing yet.
+                    return None
                 try:
+                    if self.returncode is not None:
+                        return self.returncode  # Another thread waited.
                     pid, sts = _waitpid(self.pid, _WNOHANG)
                     if pid == self.pid:
                         self._handle_exitstatus(sts)
@@ -1480,10 +1502,13 @@ class Popen(object):
                         # can't get the status.
                         # http://bugs.python.org/issue15756
                         self.returncode = 0
+                finally:
+                    self._waitpid_lock.release()
             return self.returncode
 
 
         def _try_wait(self, wait_flags):
+            """All callers to this function MUST hold self._waitpid_lock."""
             try:
                 (pid, sts) = _eintr_retry_call(os.waitpid, self.pid, wait_flags)
             except OSError as e:
@@ -1516,11 +1541,17 @@ class Popen(object):
                 # cribbed from Lib/threading.py in Thread.wait() at r71065.
                 delay = 0.0005 # 500 us -> initial delay of 1 ms
                 while True:
-                    (pid, sts) = self._try_wait(os.WNOHANG)
-                    assert pid == self.pid or pid == 0
-                    if pid == self.pid:
-                        self._handle_exitstatus(sts)
-                        break
+                    if self._waitpid_lock.acquire(False):
+                        try:
+                            if self.returncode is not None:
+                                break  # Another thread waited.
+                            (pid, sts) = self._try_wait(os.WNOHANG)
+                            assert pid == self.pid or pid == 0
+                            if pid == self.pid:
+                                self._handle_exitstatus(sts)
+                                break
+                        finally:
+                            self._waitpid_lock.release()
                     remaining = self._remaining_time(endtime)
                     if remaining <= 0:
                         raise TimeoutExpired(self.args, timeout)
@@ -1528,11 +1559,15 @@ class Popen(object):
                     time.sleep(delay)
             else:
                 while self.returncode is None:
-                    (pid, sts) = self._try_wait(0)
-                    # Check the pid and loop as waitpid has been known to return
-                    # 0 even without WNOHANG in odd situations.  issue14396.
-                    if pid == self.pid:
-                        self._handle_exitstatus(sts)
+                    with self._waitpid_lock:
+                        if self.returncode is not None:
+                            break  # Another thread waited.
+                        (pid, sts) = self._try_wait(0)
+                        # Check the pid and loop as waitpid has been known to
+                        # return 0 even without WNOHANG in odd situations.
+                        # http://bugs.python.org/issue14396.
+                        if pid == self.pid:
+                            self._handle_exitstatus(sts)
             return self.returncode
 
 

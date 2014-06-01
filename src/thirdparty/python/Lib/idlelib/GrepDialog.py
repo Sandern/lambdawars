@@ -98,7 +98,7 @@ class GrepDialog(SearchDialogBase):
     def findfiles(self, dir, base, rec):
         try:
             names = os.listdir(dir or os.curdir)
-        except OSerror as msg:
+        except OSError as msg:
             print(msg)
             return []
         list = []
@@ -125,4 +125,3 @@ if __name__ == "__main__":
     # Hence Idle must be restarted after editing this file for a live test.
     import unittest
     unittest.main('idlelib.idle_test.test_grep', verbosity=2, exit=False)
-

@@ -36,7 +36,7 @@ _DEBUG = (not sys.flags.ignore_environment
 class CoroWrapper:
     # Wrapper for coroutine in _DEBUG mode.
 
-    __slots__ = ['gen', 'func', '__name__', '__doc__']
+    __slots__ = ['gen', 'func', '__name__', '__doc__', '__weakref__']
 
     def __init__(self, gen, func):
         assert inspect.isgenerator(gen), gen
@@ -49,7 +49,12 @@ class CoroWrapper:
     def __next__(self):
         return next(self.gen)
 
-    def send(self, value):
+    def send(self, *value):
+        # We use `*value` because of a bug in CPythons prior
+        # to 3.4.1. See issue #21209 and test_yield_from_corowrapper
+        # for details.  This workaround should be removed in 3.5.0.
+        if len(value) == 1:
+            value = value[0]
         return self.gen.send(value)
 
     def throw(self, exc):
@@ -58,8 +63,22 @@ class CoroWrapper:
     def close(self):
         return self.gen.close()
 
+    @property
+    def gi_frame(self):
+        return self.gen.gi_frame
+
+    @property
+    def gi_running(self):
+        return self.gen.gi_running
+
+    @property
+    def gi_code(self):
+        return self.gen.gi_code
+
     def __del__(self):
-        frame = self.gen.gi_frame
+        # Be careful accessing self.gen.frame -- self.gen might not exist.
+        gen = getattr(self, 'gen', None)
+        frame = getattr(gen, 'gi_frame', None)
         if frame is not None and frame.f_lasti == -1:
             func = self.func
             code = func.__code__
@@ -250,6 +269,25 @@ class Task(futures.Future):
                 print(line, file=file, end='')
 
     def cancel(self):
+        """Request that a task to cancel itself.
+
+        This arranges for a CancellationError to be thrown into the
+        wrapped coroutine on the next cycle through the event loop.
+        The coroutine then has a chance to clean up or even deny
+        the request using try/except/finally.
+
+        Contrary to Future.cancel(), this does not guarantee that the
+        task will be cancelled: the exception might be caught and
+        acted upon, delaying cancellation of the task or preventing it
+        completely.  The task may also return a value or raise a
+        different exception.
+
+        Immediately after this method is called, Task.cancelled() will
+        not return True (unless the task was already cancelled).  A
+        task will be marked as cancelled when the wrapped coroutine
+        terminates with a CancelledError exception (even if cancel()
+        was not called).
+        """
         if self.done():
             return False
         if self._fut_waiter is not None:
@@ -325,7 +363,7 @@ class Task(futures.Future):
                         'Task got bad yield: {!r}'.format(result)))
         finally:
             self.__class__._current_tasks.pop(self._loop)
-        self = None
+            self = None  # Needed to break cycles when an exception occurs.
 
     def _wakeup(self, future):
         try:

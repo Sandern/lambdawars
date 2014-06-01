@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import importlib
 import shutil
 import sys
@@ -104,7 +102,7 @@ class TestSupport(unittest.TestCase):
                 self.assertTrue(os.path.isdir(path))
             self.assertFalse(os.path.isdir(path))
         finally:
-            shutil.rmtree(parent_dir)
+            support.rmtree(parent_dir)
 
     def test_temp_dir__path_none(self):
         """Test passing no path."""
@@ -306,6 +304,7 @@ class TestSupport(unittest.TestCase):
     # args_from_interpreter_flags
     # can_symlink
     # skip_unless_symlink
+    # SuppressCrashReport
 
 
 def test_main():

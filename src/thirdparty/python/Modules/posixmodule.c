@@ -92,7 +92,7 @@ corresponding Unix manual entries for more information on calls.");
 #undef HAVE_SCHED_SETAFFINITY
 #endif
 
-#if defined(HAVE_SYS_XATTR_H) && defined(__GLIBC__)
+#if defined(HAVE_SYS_XATTR_H) && defined(__GLIBC__) && !defined(__FreeBSD_kernel__) && !defined(__GNU__)
 #define USE_XATTRS
 #endif
 
@@ -4901,9 +4901,9 @@ posix_utime(PyObject *self, PyObject *args, PyObject *kwargs)
         }
         utime.now = 0;
         if (_PyTime_ObjectToTimespec(PyTuple_GET_ITEM(times, 0),
-                                     &a_sec, &a_nsec) == -1 ||
+                                     &a_sec, &a_nsec, _PyTime_ROUND_DOWN) == -1 ||
             _PyTime_ObjectToTimespec(PyTuple_GET_ITEM(times, 1),
-                                     &m_sec, &m_nsec) == -1) {
+                                     &m_sec, &m_nsec, _PyTime_ROUND_DOWN) == -1) {
             goto exit;
         }
         utime.atime_s = a_sec;

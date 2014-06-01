@@ -8,6 +8,7 @@ __all__ = ['Message']
 
 import re
 import uu
+import quopri
 from io import BytesIO, StringIO
 
 # Intrapackage imports
@@ -203,7 +204,11 @@ class Message:
         if self._payload is None:
             self._payload = [payload]
         else:
-            self._payload.append(payload)
+            try:
+                self._payload.append(payload)
+            except AttributeError:
+                raise TypeError("Attach is not valid on a message with a"
+                                " non-multipart payload")
 
     def get_payload(self, i=None, decode=False):
         """Return a reference to the payload.
@@ -274,7 +279,7 @@ class Message:
         if not decode:
             return payload
         if cte == 'quoted-printable':
-            return utils._qdecode(bpayload)
+            return quopri.decodestring(bpayload)
         elif cte == 'base64':
             # XXX: this is a bit of a hack; decode_b should probably be factored
             # out somewhere, but I haven't figured out where yet.

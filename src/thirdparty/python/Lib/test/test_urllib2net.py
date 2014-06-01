@@ -83,7 +83,7 @@ class CloseSocketTest(unittest.TestCase):
     def test_close(self):
         # calling .close() on urllib2's response objects should close the
         # underlying socket
-        url = "http://www.python.org/"
+        url = "http://www.example.com/"
         with support.transient_internet(url):
             response = _urlopen_with_retry(url)
             sock = response.fp
@@ -157,20 +157,20 @@ class OtherNetworkTests(unittest.TestCase):
 ##             self._test_urls(urls, self._extra_handlers()+[bauth, dauth])
 
     def test_urlwithfrag(self):
-        urlwith_frag = "http://docs.python.org/2/glossary.html#glossary"
+        urlwith_frag = "https://docs.python.org/2/glossary.html#glossary"
         with support.transient_internet(urlwith_frag):
             req = urllib.request.Request(urlwith_frag)
             res = urllib.request.urlopen(req)
             self.assertEqual(res.geturl(),
-                    "http://docs.python.org/2/glossary.html#glossary")
+                    "https://docs.python.org/2/glossary.html#glossary")
 
     def test_redirect_url_withfrag(self):
-        redirect_url_with_frag = "http://bitly.com/urllibredirecttest"
+        redirect_url_with_frag = "http://bit.ly/1iSHToT"
         with support.transient_internet(redirect_url_with_frag):
             req = urllib.request.Request(redirect_url_with_frag)
             res = urllib.request.urlopen(req)
             self.assertEqual(res.geturl(),
-                    "http://docs.python.org/3.4/glossary.html#term-global-interpreter-lock")
+                    "https://docs.python.org/3.4/glossary.html#term-global-interpreter-lock")
 
     def test_custom_headers(self):
         url = "http://www.example.com"
@@ -263,7 +263,7 @@ class OtherNetworkTests(unittest.TestCase):
 class TimeoutTest(unittest.TestCase):
     def test_http_basic(self):
         self.assertIsNone(socket.getdefaulttimeout())
-        url = "http://www.python.org"
+        url = "http://www.example.com"
         with support.transient_internet(url, timeout=None):
             u = _urlopen_with_retry(url)
             self.addCleanup(u.close)
@@ -271,7 +271,7 @@ class TimeoutTest(unittest.TestCase):
 
     def test_http_default_timeout(self):
         self.assertIsNone(socket.getdefaulttimeout())
-        url = "http://www.python.org"
+        url = "http://www.example.com"
         with support.transient_internet(url):
             socket.setdefaulttimeout(60)
             try:
@@ -283,7 +283,7 @@ class TimeoutTest(unittest.TestCase):
 
     def test_http_no_timeout(self):
         self.assertIsNone(socket.getdefaulttimeout())
-        url = "http://www.python.org"
+        url = "http://www.example.com"
         with support.transient_internet(url):
             socket.setdefaulttimeout(60)
             try:
@@ -294,7 +294,7 @@ class TimeoutTest(unittest.TestCase):
             self.assertIsNone(u.fp.raw._sock.gettimeout())
 
     def test_http_timeout(self):
-        url = "http://www.python.org"
+        url = "http://www.example.com"
         with support.transient_internet(url):
             u = _urlopen_with_retry(url, timeout=120)
             self.addCleanup(u.close)

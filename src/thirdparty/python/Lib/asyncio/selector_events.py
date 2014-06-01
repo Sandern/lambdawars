@@ -87,10 +87,17 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
             pass
 
     def _write_to_self(self):
-        try:
-            self._csock.send(b'x')
-        except (BlockingIOError, InterruptedError):
-            pass
+        # This may be called from a different thread, possibly after
+        # _close_self_pipe() has been called or even while it is
+        # running.  Guard for self._csock being None or closed.  When
+        # a socket is closed, send() raises OSError (with errno set to
+        # EBADF, but let's not rely on the exact error code).
+        csock = self._csock
+        if csock is not None:
+            try:
+                csock.send(b'x')
+            except OSError:
+                pass
 
     def _start_serving(self, protocol_factory, sock,
                        sslcontext=None, server=None):
@@ -136,6 +143,8 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 
     def add_reader(self, fd, callback, *args):
         """Add a reader callback."""
+        if self._selector is None:
+            raise RuntimeError('Event loop is closed')
         handle = events.Handle(callback, args, self)
         try:
             key = self._selector.get_key(fd)
@@ -151,6 +160,8 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 
     def remove_reader(self, fd):
         """Remove a reader callback."""
+        if self._selector is None:
+            return False
         try:
             key = self._selector.get_key(fd)
         except KeyError:
@@ -171,6 +182,8 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 
     def add_writer(self, fd, callback, *args):
         """Add a writer callback.."""
+        if self._selector is None:
+            raise RuntimeError('Event loop is closed')
         handle = events.Handle(callback, args, self)
         try:
             key = self._selector.get_key(fd)
@@ -186,6 +199,8 @@ class BaseSelectorEventLoop(base_events.BaseEventLoop):
 
     def remove_writer(self, fd):
         """Remove a writer callback."""
+        if self._selector is None:
+            return False
         try:
             key = self._selector.get_key(fd)
         except KeyError:
@@ -702,8 +717,7 @@ class _SelectorSslTransport(_SelectorTransport):
         if self._buffer:
             try:
                 n = self._sock.send(self._buffer)
-            except (BlockingIOError, InterruptedError,
-                    ssl.SSLWantWriteError):
+            except (BlockingIOError, InterruptedError, ssl.SSLWantWriteError):
                 n = 0
             except ssl.SSLWantReadError:
                 n = 0

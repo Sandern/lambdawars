@@ -763,7 +763,7 @@ class ExceptionTests(unittest.TestCase):
             pass
         self.assertEqual(e, (None, None, None))
 
-    def testUnicodeChangeAttributes(self):
+    def test_unicode_change_attributes(self):
         # See issue 7309. This was a crasher.
 
         u = UnicodeEncodeError('baz', 'xxxxx', 1, 5, 'foo')
@@ -799,6 +799,12 @@ class ExceptionTests(unittest.TestCase):
         self.assertEqual(str(u), "can't translate characters in position 1-4: 965230951443685724997")
         u.start = 1000
         self.assertEqual(str(u), "can't translate characters in position 1000-4: 965230951443685724997")
+
+    def test_unicode_errors_no_object(self):
+        # See issue #21134.
+        klasses = UnicodeEncodeError, UnicodeDecodeError, UnicodeTranslateError
+        for klass in klasses:
+            self.assertEqual(str(klass.__new__(klass)), "")
 
     @no_tracing
     def test_badisinstance(self):

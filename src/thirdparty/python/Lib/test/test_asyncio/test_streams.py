@@ -1,10 +1,11 @@
 """Tests for streams.py."""
 
-import functools
 import gc
+import os
 import socket
+import sys
 import unittest
-import unittest.mock
+from unittest import mock
 try:
     import ssl
 except ImportError:
@@ -29,7 +30,7 @@ class StreamReaderTests(unittest.TestCase):
         self.loop.close()
         gc.collect()
 
-    @unittest.mock.patch('asyncio.streams.events')
+    @mock.patch('asyncio.streams.events')
     def test_ctor_global_loop(self, m_events):
         stream = asyncio.StreamReader()
         self.assertIs(stream._loop, m_events.get_event_loop.return_value)
@@ -583,6 +584,43 @@ class StreamReaderTests(unittest.TestCase):
                                                             loop=self.loop))
             server.stop()
             self.assertEqual(msg, b"hello world!\n")
+
+    @unittest.skipIf(sys.platform == 'win32', "Don't have pipes")
+    def test_read_all_from_pipe_reader(self):
+        # See Tulip issue 168.  This test is derived from the example
+        # subprocess_attach_read_pipe.py, but we configure the
+        # StreamReader's limit so that twice it is less than the size
+        # of the data writter.  Also we must explicitly attach a child
+        # watcher to the event loop.
+
+        code = """\
+import os, sys
+fd = int(sys.argv[1])
+os.write(fd, b'data')
+os.close(fd)
+"""
+        rfd, wfd = os.pipe()
+        args = [sys.executable, '-c', code, str(wfd)]
+
+        pipe = open(rfd, 'rb', 0)
+        reader = asyncio.StreamReader(loop=self.loop, limit=1)
+        protocol = asyncio.StreamReaderProtocol(reader, loop=self.loop)
+        transport, _ = self.loop.run_until_complete(
+            self.loop.connect_read_pipe(lambda: protocol, pipe))
+
+        watcher = asyncio.SafeChildWatcher()
+        watcher.attach_loop(self.loop)
+        try:
+            asyncio.set_child_watcher(watcher)
+            proc = self.loop.run_until_complete(
+                asyncio.create_subprocess_exec(*args, pass_fds={wfd}, loop=self.loop))
+            self.loop.run_until_complete(proc.wait())
+        finally:
+            asyncio.set_child_watcher(None)
+
+        os.close(wfd)
+        data = self.loop.run_until_complete(reader.read(-1))
+        self.assertEqual(data, b'data')
 
 
 if __name__ == '__main__':

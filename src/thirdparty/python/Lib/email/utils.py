@@ -25,13 +25,10 @@ __all__ = [
 import os
 import re
 import time
-import base64
 import random
 import socket
 import datetime
 import urllib.parse
-import warnings
-from io import StringIO
 
 from email._parseaddr import quote
 from email._parseaddr import AddressList as _AddressList
@@ -39,10 +36,7 @@ from email._parseaddr import mktime_tz
 
 from email._parseaddr import parsedate, parsedate_tz, _parsedate_tz
 
-from quopri import decodestring as _qdecode
-
 # Intrapackage imports
-from email.encoders import _bencode, _qencode
 from email.charset import Charset
 
 COMMASPACE = ', '

@@ -10,7 +10,7 @@ import sys
 import urllib.request
 # The proxy bypass method imported below has logic specific to the OSX
 # proxy config data structure but is testable on all platforms.
-from urllib.request import Request, OpenerDirector, _proxy_bypass_macosx_sysconf
+from urllib.request import Request, OpenerDirector, _parse_proxy, _proxy_bypass_macosx_sysconf
 from urllib.parse import urlparse
 import urllib.error
 
@@ -1227,7 +1227,8 @@ class HandlerTests(unittest.TestCase):
             self.assertTrue(_proxy_bypass_macosx_sysconf(host, bypass),
                             'expected bypass of %s to be True' % host)
         # Check hosts that should not trigger the proxy bypass
-        for host in ('abc.foo.bar', 'bar.com', '127.0.0.2', '10.11.0.1', 'test'):
+        for host in ('abc.foo.bar', 'bar.com', '127.0.0.2', '10.11.0.1',
+                'notinbypass'):
             self.assertFalse(_proxy_bypass_macosx_sysconf(host, bypass),
                              'expected bypass of %s to be False' % host)
 
@@ -1439,7 +1440,7 @@ class MiscTests(unittest.TestCase):
                          'test requires network access')
     def test_issue16464(self):
         opener = urllib.request.build_opener()
-        request = urllib.request.Request("http://www.python.org/~jeremy/")
+        request = urllib.request.Request("http://www.example.com/")
         self.assertEqual(None, request.data)
 
         opener.open(request, "1".encode("us-ascii"))
@@ -1465,6 +1466,43 @@ class MiscTests(unittest.TestCase):
         self.assertEqual(err.headers, 'Content-Length: 42')
         expected_errmsg = 'HTTP Error %s: %s' % (err.code, err.msg)
         self.assertEqual(str(err), expected_errmsg)
+
+    def test_parse_proxy(self):
+        parse_proxy_test_cases = [
+            ('proxy.example.com',
+             (None, None, None, 'proxy.example.com')),
+            ('proxy.example.com:3128',
+             (None, None, None, 'proxy.example.com:3128')),
+            ('proxy.example.com', (None, None, None, 'proxy.example.com')),
+            ('proxy.example.com:3128',
+             (None, None, None, 'proxy.example.com:3128')),
+            # The authority component may optionally include userinfo
+            # (assumed to be # username:password):
+            ('joe:password@proxy.example.com',
+             (None, 'joe', 'password', 'proxy.example.com')),
+            ('joe:password@proxy.example.com:3128',
+             (None, 'joe', 'password', 'proxy.example.com:3128')),
+            #Examples with URLS
+            ('http://proxy.example.com/',
+             ('http', None, None, 'proxy.example.com')),
+            ('http://proxy.example.com:3128/',
+             ('http', None, None, 'proxy.example.com:3128')),
+            ('http://joe:password@proxy.example.com/',
+             ('http', 'joe', 'password', 'proxy.example.com')),
+            ('http://joe:password@proxy.example.com:3128',
+             ('http', 'joe', 'password', 'proxy.example.com:3128')),
+            # Everything after the authority is ignored
+            ('ftp://joe:password@proxy.example.com/rubbish:3128',
+             ('ftp', 'joe', 'password', 'proxy.example.com')),
+            # Test for no trailing '/' case
+            ('http://joe:password@proxy.example.com',
+             ('http', 'joe', 'password', 'proxy.example.com'))
+        ]
+
+        for tc, expected in parse_proxy_test_cases:
+            self.assertEqual(_parse_proxy(tc), expected)
+
+        self.assertRaises(ValueError, _parse_proxy, 'file:/ftp.example.com'),
 
 class RequestTests(unittest.TestCase):
     class PutRequest(Request):

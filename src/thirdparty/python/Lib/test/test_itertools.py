@@ -1,7 +1,7 @@
 import unittest
 from test import support
 from itertools import *
-from weakref import proxy
+import weakref
 from decimal import Decimal
 from fractions import Fraction
 import sys
@@ -411,7 +411,7 @@ class TestBasicOps(unittest.TestCase):
 
                 self.pickletest(permutations(values, r))                # test pickling
 
-    @support.impl_detail("tuple resuse is CPython specific")
+    @support.impl_detail("tuple reuse is specific to CPython")
     def test_permutations_tuple_reuse(self):
         self.assertEqual(len(set(map(id, permutations('abcde', 3)))), 1)
         self.assertNotEqual(len(set(map(id, list(permutations('abcde', 3))))), 1)
@@ -1087,6 +1087,15 @@ class TestBasicOps(unittest.TestCase):
                              list(range(*args)))
             self.pickletest(islice(range(100), *args))
 
+        # Issue #21321: check source iterator is not referenced
+        # from islice() after the latter has been exhausted
+        it = (x for x in (1, 2))
+        wr = weakref.ref(it)
+        it = islice(it, 1)
+        self.assertIsNotNone(wr())
+        list(it) # exhaust the iterator
+        self.assertIsNone(wr())
+
     def test_takewhile(self):
         data = [1, 3, 5, 20, 2, 4, 6, 8]
         self.assertEqual(list(takewhile(underten, data)), [1, 3, 5])
@@ -1203,7 +1212,7 @@ class TestBasicOps(unittest.TestCase):
 
         # test that tee objects are weak referencable
         a, b = tee(range(10))
-        p = proxy(a)
+        p = weakref.proxy(a)
         self.assertEqual(getattr(p, '__class__'), type(b))
         del a
         self.assertRaises(ReferenceError, getattr, p, '__class__')
@@ -1998,6 +2007,19 @@ Samuele
 ...     # unique_justseen('ABBCcAD', str.lower) --> A B C A D
 ...     return map(next, map(itemgetter(1), groupby(iterable, key)))
 
+>>> def first_true(iterable, default=False, pred=None):
+...     '''Returns the first true value in the iterable.
+...
+...     If no true value is found, returns *default*
+...
+...     If *pred* is not None, returns the first item
+...     for which pred(item) is true.
+...
+...     '''
+...     # first_true([a,b,c], x) --> a or b or c or x
+...     # first_true([a,b], x, f) --> a if f(a) else b if f(b) else x
+...     return next(filter(pred, iterable), default)
+
 This is not part of the examples but it tests to make sure the definitions
 perform as purported.
 
@@ -2074,6 +2096,9 @@ True
 
 >>> list(unique_justseen('ABBCcAD', str.lower))
 ['A', 'B', 'C', 'A', 'D']
+
+>>> first_true('ABC0DEF1', '9', str.isdigit)
+'0'
 
 """
 

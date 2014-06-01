@@ -8,7 +8,9 @@ OS X 10.5 and the 10.5 SDK.
 Please ensure that this script keeps working with Python 2.5, to avoid
 bootstrap issues (/usr/bin/python is Python 2.5 on OSX 10.5).  Sphinx,
 which is used to build the documentation, currently requires at least
-Python 2.4.
+Python 2.4.  However, as of Python 3.4.1, Doc builds require an external
+sphinx-build and the current versions of Sphinx now require at least
+Python 2.6.
 
 In addition to what is supplied with OS X 10.5+ and Xcode 3+, the script
 requires an installed version of hg and a third-party version of
@@ -21,8 +23,8 @@ installing the most recent ActiveTcl 8.4 or 8.5 version.
 
 32-bit-only installer builds are still possible on OS X 10.4 with Xcode 2.5
 and the installation of additional components, such as a newer Python
-(2.5 is needed for Python parser updates), hg, and svn (for the documentation
-build).
+(2.5 is needed for Python parser updates), hg, and for the documentation
+build either svn (pre-3.4.1) or sphinx-build (3.4.1 and later).
 
 Usage: see USAGE variable in the script.
 """
@@ -194,7 +196,7 @@ def library_recipes():
     LT_10_5 = bool(DEPTARGET < '10.5')
 
 #   Disable for now
-    if (DEPTARGET > '10.5') and (getVersionTuple() >= (3, 5)):
+    if False:   # if (DEPTARGET > '10.5') and (getVersionTuple() >= (3, 5)):
         result.extend([
           dict(
               name="Tcl 8.5.15",
@@ -365,7 +367,8 @@ def library_recipes():
 # Instructions for building packages inside the .mpkg.
 def pkg_recipes():
     unselected_for_python3 = ('selected', 'unselected')[PYTHON_3]
-    unselected_for_lt_python34 = ('selected', 'unselected')[getVersionTuple() < (3, 4)]
+    # unselected if 3.0 through 3.3, selected otherwise (2.x or >= 3.4)
+    unselected_for_lt_python34 = ('selected', 'unselected')[(3, 0) <= getVersionTuple() < (3, 4)]
     result = [
         dict(
             name="PythonFramework",
@@ -607,7 +610,11 @@ def checkEnvironment():
         base_path = base_path + ':' + OLD_DEVELOPER_TOOLS
     os.environ['PATH'] = base_path
     print("Setting default PATH: %s"%(os.environ['PATH']))
-
+    # Ensure ws have access to hg and to sphinx-build.
+    # You may have to create links in /usr/bin for them.
+    runCommand('hg --version')
+    if getVersionTuple() >= (3, 4):
+        runCommand('sphinx-build --version')
 
 def parseOptions(args=None):
     """
@@ -860,7 +867,7 @@ def buildRecipe(recipe, basedir, archList):
                         ' -arch '.join(archList),
                         shellQuote(SDKPATH)[1:-1],
                         shellQuote(basedir)[1:-1],),
-                "LDFLAGS=-mmacosx-version-min=%s -syslibroot,%s -L%s/usr/local/lib -arch %s"%(
+                "LDFLAGS=-mmacosx-version-min=%s -isysroot %s -L%s/usr/local/lib -arch %s"%(
                     DEPTARGET,
                     shellQuote(SDKPATH)[1:-1],
                     shellQuote(basedir)[1:-1],
@@ -920,8 +927,15 @@ def buildPythonDocs():
     docdir = os.path.join(rootDir, 'pydocs')
     curDir = os.getcwd()
     os.chdir(buildDir)
-    runCommand('make update')
-    runCommand("make html PYTHON='%s'" % os.path.abspath(sys.executable))
+    # The Doc build changed for 3.4 (technically, for 3.4.1)
+    if getVersionTuple() < (3, 4):
+        # This step does an svn checkout of sphinx and its dependencies
+        runCommand('make update')
+        runCommand("make html PYTHON='%s'" % os.path.abspath(sys.executable))
+    else:
+        runCommand('make clean')
+        # Assume sphinx-build is on our PATH, checked in checkEnvironment
+        runCommand('make html')
     os.chdir(curDir)
     if not os.path.exists(docdir):
         os.mkdir(docdir)

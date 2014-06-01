@@ -867,7 +867,7 @@ class GeneralModuleTests(unittest.TestCase):
         # Find one service that exists, then check all the related interfaces.
         # I've ordered this by protocols that have both a tcp and udp
         # protocol, at least for modern Linuxes.
-        if (sys.platform.startswith(('freebsd', 'netbsd'))
+        if (sys.platform.startswith(('freebsd', 'netbsd', 'gnukfreebsd'))
             or sys.platform in ('linux', 'darwin')):
             # avoid the 'echo' service on this platform, as there is an
             # assumption breaking non-standard port/protocol entry
@@ -1234,9 +1234,15 @@ class GeneralModuleTests(unittest.TestCase):
         # Issue #6697.
         self.assertRaises(UnicodeEncodeError, socket.getaddrinfo, 'localhost', '\uD800')
 
-        # Issue 17269
+        # Issue 17269: test workaround for OS X platform bug segfault
         if hasattr(socket, 'AI_NUMERICSERV'):
-            socket.getaddrinfo("localhost", None, 0, 0, 0, socket.AI_NUMERICSERV)
+            try:
+                # The arguments here are undefined and the call may succeed
+                # or fail.  All we care here is that it doesn't segfault.
+                socket.getaddrinfo("localhost", None, 0, 0, 0,
+                                   socket.AI_NUMERICSERV)
+            except socket.gaierror:
+                pass
 
     def test_getnameinfo(self):
         # only IP addresses are allowed

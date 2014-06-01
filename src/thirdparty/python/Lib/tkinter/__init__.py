@@ -35,8 +35,6 @@ if sys.platform == "win32":
     # Attempt to configure Tcl/Tk without requiring PATH
     from tkinter import _fix
 
-import warnings
-
 import _tkinter # If this fails your Python may not be configured for Tk
 TclError = _tkinter.TclError
 from tkinter.constants import *
@@ -1339,6 +1337,21 @@ class Misc:
             args = args + (col2, row2)
         return self._getints(self.tk.call(*args)) or None
     bbox = grid_bbox
+
+    def _gridconvvalue(self, value):
+        if isinstance(value, (str, _tkinter.Tcl_Obj)):
+            try:
+                svalue = str(value)
+                if not svalue:
+                    return None
+                elif '.' in svalue:
+                    return getdouble(svalue)
+                else:
+                    return getint(svalue)
+            except ValueError:
+                pass
+        return value
+
     def _grid_configure(self, command, index, cnf, kw):
         """Internal function."""
         if isinstance(cnf, str) and not kw:
@@ -1357,22 +1370,14 @@ class Misc:
             for i in range(0, len(words), 2):
                 key = words[i][1:]
                 value = words[i+1]
-                if not value:
-                    value = None
-                elif '.' in str(value):
-                    value = getdouble(value)
-                else:
-                    value = getint(value)
-                dict[key] = value
+                dict[key] = self._gridconvvalue(value)
             return dict
         res = self.tk.call(
                   ('grid', command, self._w, index)
                   + options)
         if len(options) == 1:
-            if not res: return None
-            # In Tk 7.5, -width can be a float
-            if '.' in res: return getdouble(res)
-            return getint(res)
+            return self._gridconvvalue(res)
+
     def grid_columnconfigure(self, index, cnf={}, **kw):
         """Configure column INDEX of a grid.
 

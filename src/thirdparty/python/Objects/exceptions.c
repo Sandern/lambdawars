@@ -1837,6 +1837,10 @@ UnicodeEncodeError_str(PyObject *self)
     PyObject *reason_str = NULL;
     PyObject *encoding_str = NULL;
 
+    if (!uself->object)
+        /* Not properly initialized. */
+        return PyUnicode_FromString("");
+
     /* Get reason and encoding as strings, which they might not be if
        they've been modified after we were contructed. */
     reason_str = PyObject_Str(uself->reason);
@@ -1955,6 +1959,10 @@ UnicodeDecodeError_str(PyObject *self)
     PyObject *reason_str = NULL;
     PyObject *encoding_str = NULL;
 
+    if (!uself->object)
+        /* Not properly initialized. */
+        return PyUnicode_FromString("");
+
     /* Get reason and encoding as strings, which they might not be if
        they've been modified after we were contructed. */
     reason_str = PyObject_Str(uself->reason);
@@ -2049,6 +2057,10 @@ UnicodeTranslateError_str(PyObject *self)
     PyObject *result = NULL;
     PyObject *reason_str = NULL;
 
+    if (!uself->object)
+        /* Not properly initialized. */
+        return PyUnicode_FromString("");
+
     /* Get reason as a string, which it might not be if it's been
        modified after we were contructed. */
     reason_str = PyObject_Str(uself->reason);
@@ -2112,7 +2124,7 @@ _PyUnicodeTranslateError_Create(
     PyObject *object,
     Py_ssize_t start, Py_ssize_t end, const char *reason)
 {
-    return PyObject_CallFunction(PyExc_UnicodeTranslateError, "Ons",
+    return PyObject_CallFunction(PyExc_UnicodeTranslateError, "Onns",
                                  object, start, end, reason);
 }
 

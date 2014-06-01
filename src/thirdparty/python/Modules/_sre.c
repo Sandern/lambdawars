@@ -505,14 +505,14 @@ pattern_dealloc(PatternObject* self)
 }
 
 LOCAL(Py_ssize_t)
-sre_match(SRE_STATE* state, SRE_CODE* pattern)
+sre_match(SRE_STATE* state, SRE_CODE* pattern, int match_all)
 {
     if (state->charsize == 1)
-        return sre_ucs1_match(state, pattern);
+        return sre_ucs1_match(state, pattern, match_all);
     if (state->charsize == 2)
-        return sre_ucs2_match(state, pattern);
+        return sre_ucs2_match(state, pattern, match_all);
     assert(state->charsize == 4);
-    return sre_ucs4_match(state, pattern);
+    return sre_ucs4_match(state, pattern, match_all);
 }
 
 LOCAL(Py_ssize_t)
@@ -526,59 +526,49 @@ sre_search(SRE_STATE* state, SRE_CODE* pattern)
     return sre_ucs4_search(state, pattern);
 }
 
-/*[clinic input]
-module _sre
-class _sre.SRE_Pattern "PatternObject *" "&Pattern_Type"
-
-_sre.SRE_Pattern.match as pattern_match
-
-    pattern: object
-    pos: Py_ssize_t = 0
-    endpos: Py_ssize_t(c_default="PY_SSIZE_T_MAX") = sys.maxsize
-
-Matches zero or more characters at the beginning of the string.
-[clinic start generated code]*/
-
-PyDoc_STRVAR(pattern_match__doc__,
-"match($self, /, pattern, pos=0, endpos=sys.maxsize)\n"
-"--\n"
-"\n"
-"Matches zero or more characters at the beginning of the string.");
-
-#define PATTERN_MATCH_METHODDEF    \
-    {"match", (PyCFunction)pattern_match, METH_VARARGS|METH_KEYWORDS, pattern_match__doc__},
-
 static PyObject *
-pattern_match_impl(PatternObject *self, PyObject *pattern, Py_ssize_t pos, Py_ssize_t endpos);
+fix_string_param(PyObject *string, PyObject *string2, const char *oldname)
+{
+    if (string2 != NULL) {
+        if (string != NULL) {
+            PyErr_Format(PyExc_TypeError,
+                         "Argument given by name ('%s') and position (1)",
+                         oldname);
+            return NULL;
+        }
+        if (PyErr_WarnFormat(PyExc_DeprecationWarning, 1,
+                             "The '%s' keyword parameter name is deprecated.  "
+                             "Use 'string' instead.", oldname) < 0)
+            return NULL;
+        return string2;
+    }
+    if (string == NULL) {
+        PyErr_SetString(PyExc_TypeError,
+                        "Required argument 'string' (pos 1) not found");
+        return NULL;
+    }
+    return string;
+}
 
 static PyObject *
 pattern_match(PatternObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyObject *return_value = NULL;
-    static char *_keywords[] = {"pattern", "pos", "endpos", NULL};
-    PyObject *pattern;
+    static char *_keywords[] = {"string", "pos", "endpos", "pattern", NULL};
+    PyObject *string = NULL;
     Py_ssize_t pos = 0;
     Py_ssize_t endpos = PY_SSIZE_T_MAX;
-
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
-        "O|nn:match", _keywords,
-        &pattern, &pos, &endpos))
-        goto exit;
-    return_value = pattern_match_impl(self, pattern, pos, endpos);
-
-exit:
-    return return_value;
-}
-
-static PyObject *
-pattern_match_impl(PatternObject *self, PyObject *pattern, Py_ssize_t pos, Py_ssize_t endpos)
-/*[clinic end generated code: output=1528eafdb8b025ad input=26f9fd31befe46b9]*/
-{
+    PyObject *pattern = NULL;
     SRE_STATE state;
     Py_ssize_t status;
-    PyObject *string;
 
-    string = state_init(&state, (PatternObject *)self, pattern, pos, endpos);
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs,
+        "|Onn$O:match", _keywords,
+        &string, &pos, &endpos, &pattern))
+        return NULL;
+    string = fix_string_param(string, pattern, "pattern");
+    if (!string)
+        return NULL;
+    string = state_init(&state, (PatternObject *)self, string, pos, endpos);
     if (!string)
         return NULL;
 
@@ -586,7 +576,7 @@ pattern_match_impl(PatternObject *self, PyObject *pattern, Py_ssize_t pos, Py_ss
 
     TRACE(("|%p|%p|MATCH\n", PatternObject_GetCode(self), state.ptr));
 
-    status = sre_match(&state, PatternObject_GetCode(self));
+    status = sre_match(&state, PatternObject_GetCode(self), 0);
 
     TRACE(("|%p|%p|END\n", PatternObject_GetCode(self), state.ptr));
     if (PyErr_Occurred())
@@ -603,24 +593,27 @@ pattern_fullmatch(PatternObject* self, PyObject* args, PyObject* kw)
     SRE_STATE state;
     Py_ssize_t status;
 
-    PyObject* string;
+    PyObject *string = NULL, *string2 = NULL;
     Py_ssize_t start = 0;
     Py_ssize_t end = PY_SSIZE_T_MAX;
-    static char* kwlist[] = { "pattern", "pos", "endpos", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "O|nn:fullmatch", kwlist,
-                                     &string, &start, &end))
+    static char* kwlist[] = { "string", "pos", "endpos", "pattern", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|Onn$O:fullmatch", kwlist,
+                                     &string, &start, &end, &string2))
+        return NULL;
+
+    string = fix_string_param(string, string2, "pattern");
+    if (!string)
         return NULL;
 
     string = state_init(&state, self, string, start, end);
     if (!string)
         return NULL;
 
-    state.match_all = 1;
     state.ptr = state.start;
 
     TRACE(("|%p|%p|FULLMATCH\n", PatternObject_GetCode(self), state.ptr));
 
-    status = sre_match(&state, PatternObject_GetCode(self));
+    status = sre_match(&state, PatternObject_GetCode(self), 1);
 
     TRACE(("|%p|%p|END\n", PatternObject_GetCode(self), state.ptr));
     if (PyErr_Occurred())
@@ -637,12 +630,16 @@ pattern_search(PatternObject* self, PyObject* args, PyObject* kw)
     SRE_STATE state;
     Py_ssize_t status;
 
-    PyObject* string;
+    PyObject *string = NULL, *string2 = NULL;
     Py_ssize_t start = 0;
     Py_ssize_t end = PY_SSIZE_T_MAX;
-    static char* kwlist[] = { "pattern", "pos", "endpos", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "O|nn:search", kwlist,
-                                     &string, &start, &end))
+    static char* kwlist[] = { "string", "pos", "endpos", "pattern", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|Onn$O:search", kwlist,
+                                     &string, &start, &end, &string2))
+        return NULL;
+
+    string = fix_string_param(string, string2, "pattern");
+    if (!string)
         return NULL;
 
     string = state_init(&state, self, string, start, end);
@@ -718,12 +715,16 @@ pattern_findall(PatternObject* self, PyObject* args, PyObject* kw)
     Py_ssize_t status;
     Py_ssize_t i, b, e;
 
-    PyObject* string;
+    PyObject *string = NULL, *string2 = NULL;
     Py_ssize_t start = 0;
     Py_ssize_t end = PY_SSIZE_T_MAX;
-    static char* kwlist[] = { "source", "pos", "endpos", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "O|nn:findall", kwlist,
-                                     &string, &start, &end))
+    static char* kwlist[] = { "string", "pos", "endpos", "source", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|Onn$O:findall", kwlist,
+                                     &string, &start, &end, &string2))
+        return NULL;
+
+    string = fix_string_param(string, string2, "source");
+    if (!string)
         return NULL;
 
     string = state_init(&state, self, string, start, end);
@@ -840,11 +841,15 @@ pattern_split(PatternObject* self, PyObject* args, PyObject* kw)
     Py_ssize_t i;
     void* last;
 
-    PyObject* string;
+    PyObject *string = NULL, *string2 = NULL;
     Py_ssize_t maxsplit = 0;
-    static char* kwlist[] = { "source", "maxsplit", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "O|n:split", kwlist,
-                                     &string, &maxsplit))
+    static char* kwlist[] = { "string", "maxsplit", "source", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|On$O:split", kwlist,
+                                     &string, &maxsplit, &string2))
+        return NULL;
+
+    string = fix_string_param(string, string2, "source");
+    if (!string)
         return NULL;
 
     string = state_init(&state, self, string, 0, PY_SSIZE_T_MAX);
@@ -1292,6 +1297,10 @@ done:
     return result;
 }
 
+PyDoc_STRVAR(pattern_match_doc,
+"match(string[, pos[, endpos]]) -> match object or None.\n\
+    Matches zero or more characters at the beginning of the string");
+
 PyDoc_STRVAR(pattern_fullmatch_doc,
 "fullmatch(string[, pos[, endpos]]) -> match object or None.\n\
     Matches against all of the string");
@@ -1329,7 +1338,8 @@ PyDoc_STRVAR(pattern_subn_doc,
 PyDoc_STRVAR(pattern_doc, "Compiled regular expression objects");
 
 static PyMethodDef pattern_methods[] = {
-    PATTERN_MATCH_METHODDEF
+    {"match", (PyCFunction) pattern_match, METH_VARARGS|METH_KEYWORDS,
+        pattern_match_doc},
     {"fullmatch", (PyCFunction) pattern_fullmatch, METH_VARARGS|METH_KEYWORDS,
         pattern_fullmatch_doc},
     {"search", (PyCFunction) pattern_search, METH_VARARGS|METH_KEYWORDS,
@@ -2561,7 +2571,7 @@ scanner_match(ScannerObject* self, PyObject *unused)
 
     state->ptr = state->start;
 
-    status = sre_match(state, PatternObject_GetCode(self->pattern));
+    status = sre_match(state, PatternObject_GetCode(self->pattern), 0);
     if (PyErr_Occurred())
         return NULL;
 
@@ -2654,12 +2664,16 @@ pattern_scanner(PatternObject* pattern, PyObject* args, PyObject* kw)
 
     ScannerObject* self;
 
-    PyObject* string;
+    PyObject *string = NULL, *string2 = NULL;
     Py_ssize_t start = 0;
     Py_ssize_t end = PY_SSIZE_T_MAX;
-    static char* kwlist[] = { "source", "pos", "endpos", NULL };
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "O|nn:scanner", kwlist,
-                                     &string, &start, &end))
+    static char* kwlist[] = { "string", "pos", "endpos", "source", NULL };
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|Onn$O:scanner", kwlist,
+                                     &string, &start, &end, &string2))
+        return NULL;
+
+    string = fix_string_param(string, string2, "source");
+    if (!string)
         return NULL;
 
     /* create scanner object */
