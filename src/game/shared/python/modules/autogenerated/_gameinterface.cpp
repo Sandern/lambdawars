@@ -2569,6 +2569,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "GetModelName"
             , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelName )
+            , ( bp::arg("model") ) )    
+        .def( 
+            "GetStudioModel"
+            , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetStudioModel )
             , ( bp::arg("model") ) );
 
     { //::lump_t
@@ -5365,6 +5369,10 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "GetModelName"
             , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelName )
+            , ( bp::arg("model") ) )    
+        .def( 
+            "GetStudioModel"
+            , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetStudioModel )
             , ( bp::arg("model") ) );
 
     bp::class_< edict_t >( "edict_t" );

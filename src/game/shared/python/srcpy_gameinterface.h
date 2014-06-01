@@ -750,6 +750,8 @@ public:
 	boost::python::tuple		GetModelBounds( model_t *pModel );
 	boost::python::object		GetModelName( model_t *model );
 	model_t *					FindOrLoadModel( const char *name );
+
+	boost::python::object		GetStudioModel( model_t *model );
 };
 extern PyVModelInfo *pymodelinfo;
 
