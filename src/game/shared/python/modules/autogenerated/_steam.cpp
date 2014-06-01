@@ -14,6 +14,8 @@
 
 #include "steam/steamclientpublic.h"
 
+#include "steam/isteamuserstats.h"
+
 #include "srcpy_steam.h"
 
 #include "vgui_avatarimage.h"
@@ -252,6 +254,44 @@ struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( NumberOfCurrentPlayers, NumberOfCurrentPlayers_t );
+
+struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResult, bp::wrapper< NumberOfCurrentPlayersCallResult > {
+
+    NumberOfCurrentPlayersCallResult_wrapper(NumberOfCurrentPlayersCallResult const & arg )
+    : NumberOfCurrentPlayersCallResult( arg )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // copy constructor
+        
+    }
+
+    NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : NumberOfCurrentPlayersCallResult( steamapicall )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        PY_OVERRIDE_LOG( _steam, NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        bp::override func_OnNumberOfCurrentPlayers = this->get_override( "OnNumberOfCurrentPlayers" );
+        if( func_OnNumberOfCurrentPlayers.ptr() != Py_None )
+            try {
+                func_OnNumberOfCurrentPlayers( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+            }
+        else
+            this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+    
+    void default_OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -283,6 +323,15 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .export_values()
+        ;
+
+    bp::enum_< EChatMemberStateChange>("EChatMemberStateChange")
+        .value("k_EChatMemberStateChangeEntered", k_EChatMemberStateChangeEntered)
+        .value("k_EChatMemberStateChangeLeft", k_EChatMemberStateChangeLeft)
+        .value("k_EChatMemberStateChangeDisconnected", k_EChatMemberStateChangeDisconnected)
+        .value("k_EChatMemberStateChangeKicked", k_EChatMemberStateChangeKicked)
+        .value("k_EChatMemberStateChangeBanned", k_EChatMemberStateChangeBanned)
         .export_values()
         ;
 
@@ -486,6 +535,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamUser"
             , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUserStats"
+            , (::ISteamUserStats * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUserStats )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUtils"
@@ -1273,6 +1326,175 @@ BOOST_PYTHON_MODULE(_steam){
             , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
             , ( bp::arg("steamID"), bp::arg("appID") ) );
 
+    bp::class_< ISteamUserStats, boost::noncopyable >( "ISteamUserStats", bp::no_init )    
+        .def( 
+            "AttachLeaderboardUGC"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::UGCHandle_t ) )( &::ISteamUserStats::AttachLeaderboardUGC )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("hUGC") ) )    
+        .def( 
+            "ClearAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::ClearAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "DownloadLeaderboardEntries"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardDataRequest,int,int ) )( &::ISteamUserStats::DownloadLeaderboardEntries )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardDataRequest"), bp::arg("nRangeStart"), bp::arg("nRangeEnd") ) )    
+        .def( 
+            "DownloadLeaderboardEntriesForUsers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::CSteamID *,int ) )( &::ISteamUserStats::DownloadLeaderboardEntriesForUsers )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("prgUsers"), bp::arg("cUsers") ) )    
+        .def( 
+            "FindLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::FindLeaderboard )
+            , ( bp::arg("pchLeaderboardName") ) )    
+        .def( 
+            "FindOrCreateLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const *,::ELeaderboardSortMethod,::ELeaderboardDisplayType ) )( &::ISteamUserStats::FindOrCreateLeaderboard )
+            , ( bp::arg("pchLeaderboardName"), bp::arg("eLeaderboardSortMethod"), bp::arg("eLeaderboardDisplayType") ) )    
+        .def( 
+            "GetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool * ) )( &::ISteamUserStats::GetAchievement )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetAchievementAchievedPercent"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetAchievementAchievedPercent )
+            , ( bp::arg("pchName"), bp::arg("pflPercent") ) )    
+        .def( 
+            "GetAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetAchievementAndUnlockTime )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetAchievementDisplayAttribute"
+            , (char const * ( ::ISteamUserStats::* )( char const *,char const * ) )( &::ISteamUserStats::GetAchievementDisplayAttribute )
+            , ( bp::arg("pchName"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetAchievementIcon"
+            , (int ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::GetAchievementIcon )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "GetAchievementName"
+            , (char const * ( ::ISteamUserStats::* )( ::uint32 ) )( &::ISteamUserStats::GetAchievementName )
+            , ( bp::arg("iAchievement") ) )    
+        .def( 
+            "GetDownloadedLeaderboardEntry"
+            , (bool ( ::ISteamUserStats::* )( ::SteamLeaderboardEntries_t,int,::LeaderboardEntry_t *,::int32 *,int ) )( &::ISteamUserStats::GetDownloadedLeaderboardEntry )
+            , ( bp::arg("hSteamLeaderboardEntries"), bp::arg("index"), bp::arg("pLeaderboardEntry"), bp::arg("pDetails"), bp::arg("cDetailsMax") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int64 * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,double * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,::int64 *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,double *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetLeaderboardDisplayType"
+            , (::ELeaderboardDisplayType ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardDisplayType )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardEntryCount"
+            , (int ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardEntryCount )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardName"
+            , (char const * ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardName )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardSortMethod"
+            , (::ELeaderboardSortMethod ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardSortMethod )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetMostAchievedAchievementInfo )
+            , ( bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNextMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( int,char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetNextMostAchievedAchievementInfo )
+            , ( bp::arg("iIteratorPrevious"), bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNumAchievements"
+            , (::uint32 ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumAchievements ) )    
+        .def( 
+            "GetNumberOfCurrentPlayers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumberOfCurrentPlayers ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserAchievement"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool * ) )( &::ISteamUserStats::GetUserAchievement )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetUserAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetUserAchievementAndUnlockTime )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,::int32 * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,float * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "IndicateAchievementProgress"
+            , (bool ( ::ISteamUserStats::* )( char const *,::uint32,::uint32 ) )( &::ISteamUserStats::IndicateAchievementProgress )
+            , ( bp::arg("pchName"), bp::arg("nCurProgress"), bp::arg("nMaxProgress") ) )    
+        .def( 
+            "RequestCurrentStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestCurrentStats ) )    
+        .def( 
+            "RequestGlobalAchievementPercentages"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestGlobalAchievementPercentages ) )    
+        .def( 
+            "RequestGlobalStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( int ) )( &::ISteamUserStats::RequestGlobalStats )
+            , ( bp::arg("nHistoryDays") ) )    
+        .def( 
+            "RequestUserStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::CSteamID ) )( &::ISteamUserStats::RequestUserStats )
+            , ( bp::arg("steamIDUser") ) )    
+        .def( 
+            "ResetAllStats"
+            , (bool ( ::ISteamUserStats::* )( bool ) )( &::ISteamUserStats::ResetAllStats )
+            , ( bp::arg("bAchievementsToo") ) )    
+        .def( 
+            "SetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::SetAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("nData") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("fData") ) )    
+        .def( 
+            "StoreStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::StoreStats ) )    
+        .def( 
+            "UpdateAvgRateStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float,double ) )( &::ISteamUserStats::UpdateAvgRateStat )
+            , ( bp::arg("pchName"), bp::arg("flCountThisSession"), bp::arg("dSessionLength") ) )    
+        .def( 
+            "UploadLeaderboardScore"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardUploadScoreMethod,::int32,::int32 const *,int ) )( &::ISteamUserStats::UploadLeaderboardScore )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardUploadScoreMethod"), bp::arg("nScore"), bp::arg("pScoreDetails"), bp::arg("cScoreDetailsCount") ) );
+
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
             "BOverlayNeedsPresent"
@@ -1382,7 +1604,7 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
         bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
-        LobbyDataUpdate_t_exposer.def_readwrite( "m_bsuccess", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
     }
@@ -1404,6 +1626,15 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope LobbyMatchList_t_scope( LobbyMatchList_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyMatchList_t::k_iCallback;
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
+    }
+
+    { //::NumberOfCurrentPlayers_t
+        typedef bp::class_< NumberOfCurrentPlayers_t > NumberOfCurrentPlayers_t_exposer_t;
+        NumberOfCurrentPlayers_t_exposer_t NumberOfCurrentPlayers_t_exposer = NumberOfCurrentPlayers_t_exposer_t( "NumberOfCurrentPlayers_t" );
+        bp::scope NumberOfCurrentPlayers_t_scope( NumberOfCurrentPlayers_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
     }
 
     { //::PyGetLobbyChatEntry
@@ -1568,6 +1799,25 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
+    { //::NumberOfCurrentPlayersCallResult
+        typedef bp::class_< NumberOfCurrentPlayersCallResult_wrapper > NumberOfCurrentPlayersCallResult_exposer_t;
+        NumberOfCurrentPlayersCallResult_exposer_t NumberOfCurrentPlayersCallResult_exposer = NumberOfCurrentPlayersCallResult_exposer_t( "NumberOfCurrentPlayersCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope NumberOfCurrentPlayersCallResult_scope( NumberOfCurrentPlayersCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, NumberOfCurrentPlayersCallResult >();
+        { //::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers
+        
+            typedef void ( ::NumberOfCurrentPlayersCallResult::*OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            typedef void ( NumberOfCurrentPlayersCallResult_wrapper::*default_OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            
+            NumberOfCurrentPlayersCallResult_exposer.def( 
+                "OnNumberOfCurrentPlayers"
+                , OnNumberOfCurrentPlayers_function_type(&::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers)
+                , default_OnNumberOfCurrentPlayers_function_type(&NumberOfCurrentPlayersCallResult_wrapper::default_OnNumberOfCurrentPlayers)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
     bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }
 #else
@@ -1582,6 +1832,8 @@ BOOST_PYTHON_MODULE(_steam){
 #include "steam/isteamuser.h"
 
 #include "steam/steamclientpublic.h"
+
+#include "steam/isteamuserstats.h"
 
 #include "srcpy_steam.h"
 
@@ -1819,6 +2071,44 @@ struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< L
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( NumberOfCurrentPlayers, NumberOfCurrentPlayers_t );
+
+struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResult, bp::wrapper< NumberOfCurrentPlayersCallResult > {
+
+    NumberOfCurrentPlayersCallResult_wrapper(NumberOfCurrentPlayersCallResult const & arg )
+    : NumberOfCurrentPlayersCallResult( arg )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // copy constructor
+        
+    }
+
+    NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : NumberOfCurrentPlayersCallResult( steamapicall )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        PY_OVERRIDE_LOG( _steam, NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        bp::override func_OnNumberOfCurrentPlayers = this->get_override( "OnNumberOfCurrentPlayers" );
+        if( func_OnNumberOfCurrentPlayers.ptr() != Py_None )
+            try {
+                func_OnNumberOfCurrentPlayers( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+            }
+        else
+            this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+    
+    void default_OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -1850,6 +2140,15 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .export_values()
+        ;
+
+    bp::enum_< EChatMemberStateChange>("EChatMemberStateChange")
+        .value("k_EChatMemberStateChangeEntered", k_EChatMemberStateChangeEntered)
+        .value("k_EChatMemberStateChangeLeft", k_EChatMemberStateChangeLeft)
+        .value("k_EChatMemberStateChangeDisconnected", k_EChatMemberStateChangeDisconnected)
+        .value("k_EChatMemberStateChangeKicked", k_EChatMemberStateChangeKicked)
+        .value("k_EChatMemberStateChangeBanned", k_EChatMemberStateChangeBanned)
         .export_values()
         ;
 
@@ -2053,6 +2352,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamUser"
             , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUserStats"
+            , (::ISteamUserStats * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUserStats )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUtils"
@@ -2840,6 +3143,175 @@ BOOST_PYTHON_MODULE(_steam){
             , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
             , ( bp::arg("steamID"), bp::arg("appID") ) );
 
+    bp::class_< ISteamUserStats, boost::noncopyable >( "ISteamUserStats", bp::no_init )    
+        .def( 
+            "AttachLeaderboardUGC"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::UGCHandle_t ) )( &::ISteamUserStats::AttachLeaderboardUGC )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("hUGC") ) )    
+        .def( 
+            "ClearAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::ClearAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "DownloadLeaderboardEntries"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardDataRequest,int,int ) )( &::ISteamUserStats::DownloadLeaderboardEntries )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardDataRequest"), bp::arg("nRangeStart"), bp::arg("nRangeEnd") ) )    
+        .def( 
+            "DownloadLeaderboardEntriesForUsers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::CSteamID *,int ) )( &::ISteamUserStats::DownloadLeaderboardEntriesForUsers )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("prgUsers"), bp::arg("cUsers") ) )    
+        .def( 
+            "FindLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::FindLeaderboard )
+            , ( bp::arg("pchLeaderboardName") ) )    
+        .def( 
+            "FindOrCreateLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const *,::ELeaderboardSortMethod,::ELeaderboardDisplayType ) )( &::ISteamUserStats::FindOrCreateLeaderboard )
+            , ( bp::arg("pchLeaderboardName"), bp::arg("eLeaderboardSortMethod"), bp::arg("eLeaderboardDisplayType") ) )    
+        .def( 
+            "GetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool * ) )( &::ISteamUserStats::GetAchievement )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetAchievementAchievedPercent"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetAchievementAchievedPercent )
+            , ( bp::arg("pchName"), bp::arg("pflPercent") ) )    
+        .def( 
+            "GetAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetAchievementAndUnlockTime )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetAchievementDisplayAttribute"
+            , (char const * ( ::ISteamUserStats::* )( char const *,char const * ) )( &::ISteamUserStats::GetAchievementDisplayAttribute )
+            , ( bp::arg("pchName"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetAchievementIcon"
+            , (int ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::GetAchievementIcon )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "GetAchievementName"
+            , (char const * ( ::ISteamUserStats::* )( ::uint32 ) )( &::ISteamUserStats::GetAchievementName )
+            , ( bp::arg("iAchievement") ) )    
+        .def( 
+            "GetDownloadedLeaderboardEntry"
+            , (bool ( ::ISteamUserStats::* )( ::SteamLeaderboardEntries_t,int,::LeaderboardEntry_t *,::int32 *,int ) )( &::ISteamUserStats::GetDownloadedLeaderboardEntry )
+            , ( bp::arg("hSteamLeaderboardEntries"), bp::arg("index"), bp::arg("pLeaderboardEntry"), bp::arg("pDetails"), bp::arg("cDetailsMax") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int64 * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,double * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,::int64 *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,double *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetLeaderboardDisplayType"
+            , (::ELeaderboardDisplayType ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardDisplayType )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardEntryCount"
+            , (int ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardEntryCount )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardName"
+            , (char const * ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardName )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardSortMethod"
+            , (::ELeaderboardSortMethod ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardSortMethod )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetMostAchievedAchievementInfo )
+            , ( bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNextMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( int,char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetNextMostAchievedAchievementInfo )
+            , ( bp::arg("iIteratorPrevious"), bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNumAchievements"
+            , (::uint32 ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumAchievements ) )    
+        .def( 
+            "GetNumberOfCurrentPlayers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumberOfCurrentPlayers ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserAchievement"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool * ) )( &::ISteamUserStats::GetUserAchievement )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetUserAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetUserAchievementAndUnlockTime )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,::int32 * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,float * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "IndicateAchievementProgress"
+            , (bool ( ::ISteamUserStats::* )( char const *,::uint32,::uint32 ) )( &::ISteamUserStats::IndicateAchievementProgress )
+            , ( bp::arg("pchName"), bp::arg("nCurProgress"), bp::arg("nMaxProgress") ) )    
+        .def( 
+            "RequestCurrentStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestCurrentStats ) )    
+        .def( 
+            "RequestGlobalAchievementPercentages"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestGlobalAchievementPercentages ) )    
+        .def( 
+            "RequestGlobalStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( int ) )( &::ISteamUserStats::RequestGlobalStats )
+            , ( bp::arg("nHistoryDays") ) )    
+        .def( 
+            "RequestUserStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::CSteamID ) )( &::ISteamUserStats::RequestUserStats )
+            , ( bp::arg("steamIDUser") ) )    
+        .def( 
+            "ResetAllStats"
+            , (bool ( ::ISteamUserStats::* )( bool ) )( &::ISteamUserStats::ResetAllStats )
+            , ( bp::arg("bAchievementsToo") ) )    
+        .def( 
+            "SetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::SetAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("nData") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("fData") ) )    
+        .def( 
+            "StoreStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::StoreStats ) )    
+        .def( 
+            "UpdateAvgRateStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float,double ) )( &::ISteamUserStats::UpdateAvgRateStat )
+            , ( bp::arg("pchName"), bp::arg("flCountThisSession"), bp::arg("dSessionLength") ) )    
+        .def( 
+            "UploadLeaderboardScore"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardUploadScoreMethod,::int32,::int32 const *,int ) )( &::ISteamUserStats::UploadLeaderboardScore )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardUploadScoreMethod"), bp::arg("nScore"), bp::arg("pScoreDetails"), bp::arg("cScoreDetailsCount") ) );
+
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
             "BOverlayNeedsPresent"
@@ -2949,7 +3421,7 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
         bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
-        LobbyDataUpdate_t_exposer.def_readwrite( "m_bsuccess", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
         LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
     }
@@ -2971,6 +3443,15 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope LobbyMatchList_t_scope( LobbyMatchList_t_exposer );
         bp::scope().attr("k_iCallback") = (int)LobbyMatchList_t::k_iCallback;
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
+    }
+
+    { //::NumberOfCurrentPlayers_t
+        typedef bp::class_< NumberOfCurrentPlayers_t > NumberOfCurrentPlayers_t_exposer_t;
+        NumberOfCurrentPlayers_t_exposer_t NumberOfCurrentPlayers_t_exposer = NumberOfCurrentPlayers_t_exposer_t( "NumberOfCurrentPlayers_t" );
+        bp::scope NumberOfCurrentPlayers_t_scope( NumberOfCurrentPlayers_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
     }
 
     { //::PyGetLobbyChatEntry
@@ -3131,6 +3612,25 @@ BOOST_PYTHON_MODULE(_steam){
                 , OnLobbyDataUpdate_function_type(&::LobbyDataUpdateCallback::OnLobbyDataUpdate)
                 , default_OnLobbyDataUpdate_function_type(&LobbyDataUpdateCallback_wrapper::default_OnLobbyDataUpdate)
                 , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::NumberOfCurrentPlayersCallResult
+        typedef bp::class_< NumberOfCurrentPlayersCallResult_wrapper > NumberOfCurrentPlayersCallResult_exposer_t;
+        NumberOfCurrentPlayersCallResult_exposer_t NumberOfCurrentPlayersCallResult_exposer = NumberOfCurrentPlayersCallResult_exposer_t( "NumberOfCurrentPlayersCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope NumberOfCurrentPlayersCallResult_scope( NumberOfCurrentPlayersCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, NumberOfCurrentPlayersCallResult >();
+        { //::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers
+        
+            typedef void ( ::NumberOfCurrentPlayersCallResult::*OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            typedef void ( NumberOfCurrentPlayersCallResult_wrapper::*default_OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            
+            NumberOfCurrentPlayersCallResult_exposer.def( 
+                "OnNumberOfCurrentPlayers"
+                , OnNumberOfCurrentPlayers_function_type(&::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers)
+                , default_OnNumberOfCurrentPlayers_function_type(&NumberOfCurrentPlayersCallResult_wrapper::default_OnNumberOfCurrentPlayers)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
         
         }
     }

@@ -131,6 +131,7 @@ class Steam(SemiSharedModuleGenerator):
             'steam/isteamutils.h',
             'steam/isteamuser.h',
             'steam/steamclientpublic.h',
+            'steam/isteamuserstats.h',
             
             'srcpy_steam.h',
         ]
@@ -142,7 +143,7 @@ class Steam(SemiSharedModuleGenerator):
         ''' Removes prefixes from variable names and lower cases the variable. '''
         for var in cls.vars():
             varname = var.name
-            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_i)', '', varname)
+            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_i|m_b|m_c)', '', varname)
             varname = varname.lower()
             var.rename(varname)
             
@@ -195,6 +196,13 @@ class Steam(SemiSharedModuleGenerator):
         mb.enums('ELobbyType').include()
         mb.enums('ELobbyComparison').include()
         mb.enums('ELobbyDistanceFilter').include()
+        
+    def ParseUserStats(self, mb):
+        cls = mb.class_('ISteamUserStats')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
+        
+        self.AddSteamCallResult('NumberOfCurrentPlayers', 'NumberOfCurrentPlayers_t')
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -221,6 +229,7 @@ class Steam(SemiSharedModuleGenerator):
         mb.enum('ESteamUserStatType').include()
         mb.enum('EChatEntryType').include()
         mb.enum('EChatRoomEnterResponse').include()
+        mb.enum('EChatMemberStateChange').include()
         
         # Generic API functions
         mb.free_function('SteamAPI_RunCallbacks').include()
@@ -231,7 +240,6 @@ class Steam(SemiSharedModuleGenerator):
         cls.include()
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
-        cls.mem_fun('SteamUserStats').exclude()
         cls.mem_fun('SteamApps').exclude()
         cls.mem_fun('SteamMatchmakingServers').exclude()
         
@@ -246,6 +254,7 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference() 
         cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference() 
         cls.mem_funs('SteamUser').call_policies = call_policies.return_internal_reference()
+        cls.mem_funs('SteamUserStats').call_policies = call_policies.return_internal_reference()
         
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_NOT_INITIALIZED\" ) = (int)QUERY_PORT_NOT_INITIALIZED;" )
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_ERROR\" ) = (int)QUERY_PORT_ERROR;" )
@@ -273,6 +282,7 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_fun('GetImageSize').exclude()
         
         self.ParseMatchmaking(mb)
+        self.ParseUserStats(mb)
         
         #mb.class_('ISteamUtils').mem_funs('GetImageSize').add_transformation( FT.output('pnWidth'), FT.output('pnHeight'))
         #mb.class_('ISteamUtils').mem_funs('GetCSERIPPort').add_transformation( FT.output('unIP'), FT.output('usPort'))
