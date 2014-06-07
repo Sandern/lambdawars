@@ -44,7 +44,10 @@ public:
 	void			GetPointInScreen( Vector2D *point, Vector *world );
 	virtual void	DrawMapBounderies();
 	virtual void	Paint();
+
+#ifdef ENABLE_CEF
 	virtual void PostChildPaint();
+#endif // ENABLE_CEF
 
 	bool			ShouldDrawSelectBox( C_HL2WarsPlayer* pPlayer );
 	void			DrawSelectBox();
