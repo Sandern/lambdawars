@@ -598,6 +598,7 @@ private:
 	Vector m_vDebugVelocity;
 	float m_fDebugLastBestCost;
 	UnitBaseMoveCommand m_DebugLastMoveCommand;
+	int m_iDebugBestDir;
 
 	static int m_iCurPathRecomputations;
 };

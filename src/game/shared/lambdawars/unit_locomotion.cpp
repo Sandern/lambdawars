@@ -338,7 +338,7 @@ float UnitBaseLocomotion::GetStopDistance()
 	
 	// Calculate speed
 	if( mv->velocity.IsValid() )
-		speed = VectorLength( mv->velocity );
+		speed = mv->velocity.Length2D();
 	else
 		speed = 0.0f;
 
@@ -356,6 +356,18 @@ float UnitBaseLocomotion::GetStopDistance()
 			// Bleed off some speed, but if we have less than the bleed
 			//  threshold, bleed the threshold amount.
 			control = (speed < stopspeed) ? stopspeed : speed;
+
+			// Add the amount to the drop amount.
+			drop += control * friction * mv->interval;
+		}
+		else
+		{
+			// apply friction
+			friction = sv_friction.GetFloat() * surfacefriction;
+
+			// Bleed off some speed, but if we have less than the bleed
+			//  threshold, bleed the threshold amount.
+			control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
 
 			// Add the amount to the drop amount.
 			drop += control * friction * mv->interval;
