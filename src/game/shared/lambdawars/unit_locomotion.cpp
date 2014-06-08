@@ -9,12 +9,9 @@
 #include "unit_baseanimstate.h"
 #include "movevars_shared.h"
 #include "coordsize.h"
-
-#ifndef CLIENT_DLL
+#include "hl2wars_util_shared.h"
 #include "nav_mesh.h"
 #include "nav_area.h"
-#endif // CLIENT_DLL
-
 #include "vphysics/object_hash.h"
 
 #ifdef ENABLE_PYTHON
@@ -572,17 +569,10 @@ void UnitBaseLocomotion::AirMove( void )
 		//m_pTraceListData->m_nEntityCount--;	
 	}
 
+	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
 	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
 	{
-		// Apply hack
-		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
-		mv->origin = trace.endpos;
-
-		if( unit_locomotion_debug.GetBool() )
-		{
-			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
-		}
+		DoUnstuck();
 	}
 
 	trace_t pm;
@@ -751,17 +741,10 @@ void UnitBaseLocomotion::GroundMove()
 	}
 	mv->origin = trace.endpos;
 
-	if( trace.startsolid )
+	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
+	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
 	{
-		// Apply hack
-		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
-		mv->origin = trace.endpos;
-
-		if( unit_locomotion_debug.GetBool() )
-		{
-			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
-		}
+		DoUnstuck();
 	}
 
 #if !defined(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )
@@ -1656,6 +1639,51 @@ int UnitBaseLocomotion::ClipVelocity( Vector& in, Vector& normal, Vector& out, f
 	return blocked;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Unstucks the unit. Should mainly be used as "hack" when the unit is
+//			in a solid for whatever reason.
+//-----------------------------------------------------------------------------
+void UnitBaseLocomotion::DoUnstuck()
+{
+	// Prefer finding a position in radius
+	bool bFoundPosition = false;
+	if( TheNavMesh && TheNavMesh->IsLoaded() )
+	{
+		CNavArea *pArea = TheNavMesh->GetNearestNavArea( mv->origin, true, 10000.0f, false, false );
+		if( pArea )
+		{
+			positioninfo_t info( pArea->GetCenter(), m_vecMins, m_vecMaxs, 0, 1024.0f );
+			UTIL_FindPosition( info );
+			if( info.m_bSuccess )
+			{
+				mv->origin = info.m_vPosition;
+				bFoundPosition = true;
+			}
+		}
+	}
+		
+	// Fall back to "going up" (which is pretty bad)
+	if( !bFoundPosition )
+	{
+		trace_t trace;
+		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
+		mv->origin = trace.endpos;
+	}
+
+#if 0
+	if( unit_locomotion_debug.GetBool() )
+	{
+		DevMsg( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
+			trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null" );
+	}
+#else
+	Warning( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, m_pOuter->GetClassname() );
+#endif // 0
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 {
 	m_vecMins = GetOuter()->CollisionProp()->OBBMins();

@@ -243,6 +243,9 @@ public:
 
 	void SetupMovementBounds( UnitBaseMoveCommand &mv );
 
+	// Helper for getting "unstuck"
+	virtual void DoUnstuck();
+
 protected:
 	void CheckVelocity( void );
 
