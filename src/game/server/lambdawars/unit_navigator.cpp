@@ -1193,10 +1193,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	// Reset current goal dependency
 	m_hAtGoalDependencyEnt = NULL;
 
-	// Store distance and range
-	UpdateGoalInfo();
-
-	// In case we have an target ent
+	// In case we have an target ent (note: before UpdateGoalInfo, because you can't update goal info if target is lost)
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT || GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 	{
 		// Check if still exists and alive.
@@ -1256,6 +1253,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
 	}
+
+	// Store distance and range
+	UpdateGoalInfo();
 
 	// Check distance we moved. Might have a max distance we may move to a target
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->m_fMaxMoveDist != 0 )
