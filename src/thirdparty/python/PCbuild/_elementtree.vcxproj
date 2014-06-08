@@ -210,6 +210,8 @@
     </ClCompile>
     <Link>
       <BaseAddress>0x1D100000</BaseAddress>
+      <AdditionalDependencies>server.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\game\server\Release_wars;$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Client|Win32'">
