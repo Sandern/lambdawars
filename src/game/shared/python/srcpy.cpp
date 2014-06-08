@@ -16,11 +16,13 @@
 #include "gamestringpool.h"
 
 #ifdef CLIENT_DLL
-	#include "networkstringtable_clientdll.h"
-	#include "srcpy_materials.h"
-	#include "gameui/wars/basemodpanel.h"
+#include "networkstringtable_clientdll.h"
+#include "srcpy_materials.h"
+#include "gameui/wars/basemodpanel.h"
+#include "c_world.h"
 #else
-	#include "networkstringtable_gamedll.h"
+#include "networkstringtable_gamedll.h"
+#include "world.h"
 #endif // CLIENT_DLL
 
 #ifdef WIN32
@@ -500,7 +502,21 @@ bool CSrcPython::ShutdownInterpreter( void )
 
 	// Clear Python gamerules
 	if( PyGameRules().ptr() != Py_None )
-		ClearPyGameRules();
+	{
+		// Ingame: install default c++ gamerules
+#ifdef CLIENT_DLL
+		if( GetClientWorldEntity() )
+#else
+		if( GetWorldEntity() )
+#endif // CLIENT_DLL
+		{
+			PyInstallGameRules( boost::python::object() );
+		}
+		else
+		{
+			ClearPyGameRules();
+		}
+	}
 
 	// Make sure these lists don't hold references
 	m_deleteList.Purge();
