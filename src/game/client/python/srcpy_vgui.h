@@ -229,7 +229,11 @@ void PyVGUIHandle<T>::Set( const T *pent )
 class DeadPanel 
 {
 public:
+#if PY_VERSION_HEX < 0x03000000
 	static bool NonZero() { return false; }
+#else
+	static bool Bool() { return false; }
+#endif // PY_VERSION_HEX < 0x03000000
 };
 
 PyObject *GetPyPanel( const Panel *pPanel );

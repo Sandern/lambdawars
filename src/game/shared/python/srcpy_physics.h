@@ -43,6 +43,7 @@ public:
 
 	bool Cmp( boost::python::object other );
 	bool NonZero();
+	bool Bool();
 
 public:
 	void Update( const Vector &position, const QAngle &angles, float timeOffset );
@@ -114,6 +115,7 @@ public:
 
 	bool Cmp( boost::python::object other );
 	bool NonZero();
+	bool Bool();
 
 	void CheckValid();
 

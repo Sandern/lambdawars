@@ -22,11 +22,14 @@ public:
 	
 	// IWarsEditorStorage
 	void ClearData();
-	void AddEntityToQueue( KeyValues *pEntity );
-	KeyValues *PopEntityFromQueue();
+	virtual void QueueClientCommand( KeyValues *pCommand );
+	virtual void QueueServerCommand( KeyValues *pCommand );
+	virtual KeyValues *PopClientCommandQueue();
+	virtual KeyValues *PopServerCommandQueue();
 
 private:
-	CUtlVector<KeyValues *> m_hQueuedEntities;
+	CUtlVector<KeyValues *> m_hQueuedClientCommands;
+	CUtlVector<KeyValues *> m_hQueuedServerCommands;
 };
 
 #endif // _INCLUDED_WARS_EDITOR_STORAGE_H

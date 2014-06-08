@@ -904,6 +904,9 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 	CheckHasThinkFunction( false );
 	CheckHasGamePhysicsSimulation();
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// In case this is not created through a factory in python, retrieve the reference here.
 	if( GetPySelf() && m_pyInstance.ptr() == Py_None )
@@ -919,32 +922,32 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
 
-	// Check Python init list
+	// Check the list of Python fields which require initialization
 	if( m_pyInstance.ptr() != Py_None )
 	{
-		bp::dict fieldinitmap;
+		boost::python::dict fieldinitmap;
 		try
 		{
-			fieldinitmap = bp::dict(m_pyInstance.attr("fieldinitmap"));
+			fieldinitmap = boost::python::dict(m_pyInstance.attr("fieldinitmap"));
 		} 
-		catch( bp::error_already_set & )
+		catch( boost::python::error_already_set & )
 		{
 			Warning("Python entity has no field init list!\n");
 			PyErr_Clear();
 		}
 
-		bp::object elem;
-		const bp::object objectValues = fieldinitmap.itervalues();
+		boost::python::object elem;
+		boost::python::list objectValues = fieldinitmap.values();
 
-		bp::ssize_t n = bp::len(fieldinitmap);
-		for( bp::ssize_t i=0; i < n; i++ ) 
+		boost::python::ssize_t n = boost::python::len(fieldinitmap);
+		for( boost::python::ssize_t i = 0; i < n; i++ ) 
 		{
-			elem = objectValues.attr( "next" )();
+			elem = objectValues[i];
 			try 
 			{
 				elem.attr("InitField")(m_pyInstance);
 			}
-			catch( bp::error_already_set & )
+			catch( boost::python::error_already_set & )
 			{
 				Warning("Failed to initialize field: \n");
 				PyErr_Print();
@@ -952,6 +955,9 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 //-----------------------------------------------------------------------------
@@ -4622,24 +4628,18 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 		}
 	}
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// Check Python input map
 	if( m_pyInstance.ptr() != Py_None )
 	{
-		bp::object inputmap;
 		try
 		{
-			inputmap = m_pyInstance.attr("inputmap");
-		} 
-		catch( bp::error_already_set & )
-		{
-			Warning("Python entity has no inputmap!\n");
-			PyErr_Clear();
-		}
+			boost::python::object inputmap = m_pyInstance.attr("inputmap");
 
-		try
-		{
-			bp::object inputmethod = inputmap.attr("get")( szInputName, bp::object() );
+			boost::python::object inputmethod = inputmap.attr("get")(szInputName, boost::python::object());
 			if( inputmethod.ptr() != Py_None )
 			{
 				// found a match
@@ -4654,7 +4654,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 				{
 					V_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input <NULL>: %s.%s(%s)\n", gpGlobals->curtime, GetDebugName(), szInputName, Value.String() );
 				}
-				DevMsg( 2, szBuffer );
+				DevMsg( 2, "%s", szBuffer );
 				ADD_DEBUG_HISTORY( HISTORY_ENTITY_IO, szBuffer );
 
 				if (m_debugOverlays & OVERLAY_MESSAGE_BIT)
@@ -4663,7 +4663,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 				}
 
 				// convert the value if necessary
-				fieldtype_t fieldtype = bp::extract< fieldtype_t >( inputmethod.attr("fieldtype") );
+				fieldtype_t fieldtype = boost::python::extract< fieldtype_t >( inputmethod.attr("fieldtype") );
 				if ( Value.FieldType() != fieldtype )
 				{
 					if ( !(Value.FieldType() == FIELD_VOID && fieldtype == FIELD_STRING) ) // allow empty strings
@@ -4687,17 +4687,28 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 				data.value = Value;
 				data.nOutputID = outputID;
 
-				inputmethod( m_pyInstance, data );
+				try
+				{
+					inputmethod(m_pyInstance, data);
+				}
+				catch( boost::python::error_already_set & )
+				{
+					Warning("Exception during executing an input method:\n");
+					PyErr_Print();
+				}
 				return true;
 			}
-		}
-		catch( bp::error_already_set & )
+		} 
+		catch( boost::python::error_already_set & )
 		{
-			Warning( "Failed to execute input method %s!\n", szInputName );
+			Warning("Python entity has an invalid inputmap map!\n");
 			PyErr_Print();
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	DevMsg( 2, "unhandled input: (%s) -> (%s,%s)\n", szInputName, STRING(m_iClassname), GetDebugName()/*,", from (%s,%s)" STRING(pCaller->m_iClassname), STRING(pCaller->m_iName)*/ );
 	return false;

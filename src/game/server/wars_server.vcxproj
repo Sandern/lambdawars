@@ -60,7 +60,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\lambdawars;..\..\game\shared\lambdawars;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\lambdawars;..\..\game\shared\lambdawars;.\python;..\..\game\shared\python;..\..\thirdparty\python\Include;..\..\thirdparty\python\PC;..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SDK_SERVER_DLL;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;HL2WARS_DLL;ENABLE_PYTHON;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -92,7 +92,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python27_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)server.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -145,7 +145,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\lambdawars;..\..\game\shared\lambdawars;.\python;..\..\game\shared\python;..\..\python\Include;..\..\python;..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\lambdawars;..\..\game\shared\lambdawars;.\python;..\..\game\shared\python;..\..\thirdparty\python\Include;..\..\thirdparty\python\PC;..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_PYTHON_NO_PY_SIGNATURES;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_ENABLE_SHARED;Py_BUILD_CORE;HL2WARS_DLL;ENABLE_PYTHON;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
@@ -176,7 +176,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)server.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -231,10 +231,12 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\deferred\CDefLightGlobal.cpp" />
     <ClCompile Include="..\shared\deferred\deferred_shared_common.cpp" />
     <ClCompile Include="..\shared\lambdawars\dota.cpp" />
+    <ClCompile Include="..\shared\lambdawars\editor\editorbasemapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorcommandproc.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editormapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorselection.cpp" />
     <ClCompile Include="..\shared\lambdawars\editor\editorsystem.cpp" />
+    <ClCompile Include="..\shared\lambdawars\editor\editorwarsmapmgr.cpp" />
     <ClCompile Include="..\shared\lambdawars\fow_blocker.cpp" />
     <ClCompile Include="..\shared\lambdawars\unit_vehicleanimstate.cpp" />
     <ClCompile Include="..\shared\lambdawars\unit_vphysicslocomotion.cpp" />
@@ -1009,8 +1011,10 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\deferred\CDefLightGlobal.h" />
     <ClInclude Include="..\shared\deferred\deferred_shared_common.h" />
     <ClInclude Include="..\shared\deferred\ssemath_ext.h" />
+    <ClInclude Include="..\shared\lambdawars\editor\editorbasemapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editormapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorsystem.h" />
+    <ClInclude Include="..\shared\lambdawars\editor\editorwarsmapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\unit_vehicleanimstate.h" />
     <ClInclude Include="..\shared\lambdawars\unit_vphysicslocomotion.h" />
     <ClInclude Include="..\shared\lambdawars\wars_flora.h" />

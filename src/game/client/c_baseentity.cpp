@@ -1301,6 +1301,9 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	m_hScriptInstance = NULL;
 	
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
@@ -1319,13 +1322,13 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 			PyErr_Clear();
 		}
 
-		boost::python::object elem ;
-		const boost::python::object objectValues = fieldinitmap.itervalues();
+		boost::python::object elem;
+		boost::python::list objectValues = fieldinitmap.values();
 
 		boost::python::ssize_t n = boost::python::len(fieldinitmap);
-		for( boost::python::ssize_t i=0; i < n; i++ ) 
+		for( boost::python::ssize_t i = 0; i < n; i++ ) 
 		{
-			elem = objectValues.attr( "next" )();
+			elem = objectValues[i];
 			try 
 			{
 				elem.attr("InitField")(m_pyInstance);
@@ -1338,6 +1341,9 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	return true;
 }
@@ -1390,6 +1396,9 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 		Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 	}
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// If we are a python entity, then grab our reference
 	if( GetPySelf() )
@@ -1405,6 +1414,9 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, bool bRenderWith
 	if( SrcPySystem()->IsPythonRunning() )
 		m_pyHandle = CreatePyHandle();
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// Add the client entity to the spatial partition. (Collidable)
 	CollisionProp()->CreatePartitionHandle();
@@ -1509,6 +1521,9 @@ void C_BaseEntity::Release()
 
 	UpdateOnRemove();
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( m_pyInstance.ptr() != Py_None )
 	{
@@ -1516,6 +1531,9 @@ void C_BaseEntity::Release()
 	}
 	else
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	{
 		delete this;
 	}

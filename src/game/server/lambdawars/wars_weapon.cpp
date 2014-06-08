@@ -342,14 +342,40 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	CBaseEntity	*pHitEnt = tr.m_pEnt;
 
 	// Hitting our enemy is a success case
-	if ( pTarget && pHitEnt == pTarget )
+	if ( pHitEnt && pTarget )
 	{
-		if ( g_debug_wars_weapon.GetBool() )
+		if(pHitEnt == pTarget )
 		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+			if ( g_debug_wars_weapon.GetBool() )
+				NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+
+			return true;
 		}
 
-		return true;
+		// TODO improve: an enemy building can consist of dummy buildings. When los is blocked by one of them, los is ok
+		CBaseEntity *pHitEntOwner = pHitEnt->GetOwnerEntity();
+		CBaseEntity *pTargetOwner = pTarget->GetOwnerEntity();
+		if( pHitEntOwner && pHitEntOwner == pTarget )
+		{
+			if ( g_debug_wars_weapon.GetBool() )
+				NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+
+			return true;
+		}
+		else if( pTargetOwner && pHitEntOwner == pTargetOwner )
+		{
+			if ( g_debug_wars_weapon.GetBool() )
+				NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+
+			return true;
+		}
+		else if( pHitEntOwner && pTargetOwner && pHitEntOwner == pTargetOwner )
+		{
+			if ( g_debug_wars_weapon.GetBool() )
+				NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
+
+			return true;
+		}
 	}
 
 	// See if we completed the trace without interruption

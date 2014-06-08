@@ -124,6 +124,7 @@ void PyHandle::SetAttr( const char *name, bp::object v )
 	PyGet().attr("__setattr__")(name, v);
 }
 
+#if PY_VERSION_HEX < 0x03000000
 int PyHandle::Cmp( bp::object other )
 {
 	// The thing to which we compare is NULL
@@ -183,6 +184,7 @@ int PyHandle::Cmp( bp::object other )
 
 	return -1;
 }
+#endif // PY_VERSION_HEX < 0x03000000
 
 boost::python::object PyHandle::Str()
 {

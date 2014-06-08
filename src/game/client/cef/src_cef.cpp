@@ -477,7 +477,7 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 		// TODO: Deal with game bindings
 		vgui::VPANEL focus = vgui::input()->GetFocus();
 		vgui::Panel *pPanel = m_CefBrowsers[i]->GetPanel();
-		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() || !pPanel->IsVisible() || focus != 0 )
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() || !pPanel->IsVisible() || (focus != 0 && focus != pPanel->GetVPanel()) )
 			continue;
 
 		CefRefPtr<CefBrowser> browser = m_CefBrowsers[i]->GetBrowser();

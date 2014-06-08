@@ -20,6 +20,7 @@
 #include "nb_header_footer.h"
 #include "glow_outline_effect.h"
 #include "c_hl2wars_player.h"
+#include "viewpostprocess.h"
 
 #ifdef ENABLE_CEF
 #include "src_cef.h"
@@ -271,6 +272,12 @@ IClientMode *GetFullscreenClientMode( void )
 	return &g_FullscreenClientMode;
 }
 
+ClientModeSDK::ClientModeSDK()
+{
+	m_pCurrentPostProcessController = NULL;
+	m_PostProcessLerpTimer.Invalidate();
+	m_pCurrentColorCorrection = NULL;
+}
 
 void ClientModeSDK::Init()
 {
@@ -486,4 +493,46 @@ void ClientModeSDK::OnColorCorrectionWeightsReset( void )
 		}
 		m_pCurrentColorCorrection = pNewColorCorrection;
 	}
+}
+
+void ClientModeSDK::Update( void )
+{
+	UpdatePostProcessingEffects();
+}
+
+void ClientModeSDK::UpdatePostProcessingEffects()
+{
+	C_PostProcessController *pNewPostProcessController = NULL;
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if ( pPlayer )
+	{
+		pNewPostProcessController = pPlayer->GetActivePostProcessController();
+	}
+
+	// Figure out new endpoints for parameter lerping
+	if ( pNewPostProcessController != m_pCurrentPostProcessController )
+	{
+		m_LerpStartPostProcessParameters = m_CurrentPostProcessParameters;
+		m_LerpEndPostProcessParameters = pNewPostProcessController ? pNewPostProcessController->m_PostProcessParameters : PostProcessParameters_t();
+		m_pCurrentPostProcessController = pNewPostProcessController;
+
+		float flFadeTime = pNewPostProcessController ? pNewPostProcessController->m_PostProcessParameters.m_flParameters[ PPPN_FADE_TIME ] : 0.0f;
+		if ( flFadeTime <= 0.0f )
+		{
+			flFadeTime = 0.001f;
+		}
+		m_PostProcessLerpTimer.Start( flFadeTime );
+	}
+
+	// Lerp between start and end
+	float flLerpFactor = 1.0f - m_PostProcessLerpTimer.GetRemainingRatio();
+	for ( int nParameter = 0; nParameter < POST_PROCESS_PARAMETER_COUNT; ++ nParameter )
+	{
+		m_CurrentPostProcessParameters.m_flParameters[ nParameter ] = 
+			Lerp( 
+				flLerpFactor, 
+				m_LerpStartPostProcessParameters.m_flParameters[ nParameter ], 
+				m_LerpEndPostProcessParameters.m_flParameters[ nParameter ] );
+	}
+	SetPostProcessParams( &m_CurrentPostProcessParameters );
 }

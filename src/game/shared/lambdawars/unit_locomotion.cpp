@@ -6,14 +6,12 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_locomotion.h"
+#include "unit_baseanimstate.h"
 #include "movevars_shared.h"
 #include "coordsize.h"
-
-#ifndef CLIENT_DLL
+#include "hl2wars_util_shared.h"
 #include "nav_mesh.h"
 #include "nav_area.h"
-#endif // CLIENT_DLL
-
 #include "vphysics/object_hash.h"
 
 #ifdef ENABLE_PYTHON
@@ -196,7 +194,6 @@ void UnitBaseLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 	m_pOuter->SetLocalAngles( mv.viewangles );
 
 	// Set origin after setting the velocity, in case the trigger touch function changes the velocity.
-	//UTIL_SetOrigin(m_pOuter, mv.origin, true);
 	m_pOuter->SetAbsOrigin( mv.origin );
 	m_pOuter->PhysicsTouchTriggers();
 
@@ -338,7 +335,7 @@ float UnitBaseLocomotion::GetStopDistance()
 	
 	// Calculate speed
 	if( mv->velocity.IsValid() )
-		speed = VectorLength( mv->velocity );
+		speed = mv->velocity.Length2D();
 	else
 		speed = 0.0f;
 
@@ -356,6 +353,18 @@ float UnitBaseLocomotion::GetStopDistance()
 			// Bleed off some speed, but if we have less than the bleed
 			//  threshold, bleed the threshold amount.
 			control = (speed < stopspeed) ? stopspeed : speed;
+
+			// Add the amount to the drop amount.
+			drop += control * friction * mv->interval;
+		}
+		else
+		{
+			// apply friction
+			friction = sv_friction.GetFloat() * surfacefriction;
+
+			// Bleed off some speed, but if we have less than the bleed
+			//  threshold, bleed the threshold amount.
+			control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
 
 			// Add the amount to the drop amount.
 			drop += control * friction * mv->interval;
@@ -560,17 +569,10 @@ void UnitBaseLocomotion::AirMove( void )
 		//m_pTraceListData->m_nEntityCount--;	
 	}
 
+	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
 	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
 	{
-		// Apply hack
-		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
-		mv->origin = trace.endpos;
-
-		if( unit_locomotion_debug.GetBool() )
-		{
-			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
-		}
+		DoUnstuck();
 	}
 
 	trace_t pm;
@@ -663,6 +665,25 @@ void UnitBaseLocomotion::MoveFacing( void )
 
 	if( newYaw != current )
 		mv->viewangles.y = newYaw;
+
+	// Don't store pitch in result view angles for now. This pitch is used for aiming weapons, but does not change
+	// the body angles. Storing the pitch in the body angles will change attached entities and particles.
+	// TODO: Make this nicer
+	bool bUpdatePitch = GetOuter()->GetAnimState() ? GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
+	if( bUpdatePitch )
+	{
+		current = anglemod( GetOuter()->m_fEyePitch );
+		ideal = anglemod( mv->idealviewangles.x );
+
+		float newPitch = Unit_ClampYaw( mv->yawspeed * 10.0, current, ideal, mv->interval );
+
+		if( newPitch != current )
+			GetOuter()->m_fEyePitch = newPitch;
+	}
+	else
+	{
+		GetOuter()->m_fEyePitch = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -720,17 +741,10 @@ void UnitBaseLocomotion::GroundMove()
 	}
 	mv->origin = trace.endpos;
 
-	if( trace.startsolid )
+	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
+	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
 	{
-		// Apply hack
-		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
-		mv->origin = trace.endpos;
-
-		if( unit_locomotion_debug.GetBool() )
-		{
-			DevMsg("#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-				trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null");
-		}
+		DoUnstuck();
 	}
 
 #if !defined(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )
@@ -1625,6 +1639,51 @@ int UnitBaseLocomotion::ClipVelocity( Vector& in, Vector& normal, Vector& out, f
 	return blocked;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Unstucks the unit. Should mainly be used as "hack" when the unit is
+//			in a solid for whatever reason.
+//-----------------------------------------------------------------------------
+void UnitBaseLocomotion::DoUnstuck()
+{
+	// Prefer finding a position in radius
+	bool bFoundPosition = false;
+	if( TheNavMesh && TheNavMesh->IsLoaded() )
+	{
+		CNavArea *pArea = TheNavMesh->GetNearestNavArea( mv->origin, true, 10000.0f, false, false );
+		if( pArea )
+		{
+			positioninfo_t info( pArea->GetCenter(), m_vecMins, m_vecMaxs, 0, 1024.0f );
+			UTIL_FindPosition( info );
+			if( info.m_bSuccess )
+			{
+				mv->origin = info.m_vPosition;
+				bFoundPosition = true;
+			}
+		}
+	}
+		
+	// Fall back to "going up" (which is pretty bad)
+	if( !bFoundPosition )
+	{
+		trace_t trace;
+		TraceUnitBBox( mv->origin + Vector(0,0,64.0f), mv->origin, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
+		mv->origin = trace.endpos;
+	}
+
+#if 0
+	if( unit_locomotion_debug.GetBool() )
+	{
+		DevMsg( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
+			trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null" );
+	}
+#else
+	Warning( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, m_pOuter->GetClassname() );
+#endif // 0
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void UnitBaseLocomotion::SetupMovementBounds( UnitBaseMoveCommand &mv )
 {
 	m_vecMins = GetOuter()->CollisionProp()->OBBMins();

@@ -14,6 +14,8 @@
 
 #include "steam/steamclientpublic.h"
 
+#include "steam/isteamuserstats.h"
+
 #include "srcpy_steam.h"
 
 #include "vgui_avatarimage.h"
@@ -24,117 +26,307 @@
 
 namespace bp = boost::python;
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyMatchList, LobbyMatchList_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyMatchList, LobbyMatchList_t );
 
-struct LobbyMatchListCallback_wrapper : LobbyMatchListCallback, bp::wrapper< LobbyMatchListCallback > {
+struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper< LobbyMatchListCallResult > {
 
-    LobbyMatchListCallback_wrapper(LobbyMatchListCallback const & arg )
-    : LobbyMatchListCallback( arg )
-      , bp::wrapper< LobbyMatchListCallback >(){
+    LobbyMatchListCallResult_wrapper(LobbyMatchListCallResult const & arg )
+    : LobbyMatchListCallResult( arg )
+      , bp::wrapper< LobbyMatchListCallResult >(){
         // copy constructor
         
     }
 
-    LobbyMatchListCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyMatchListCallback( steamapicall )
-      , bp::wrapper< LobbyMatchListCallback >(){
+    LobbyMatchListCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyMatchListCallResult( steamapicall )
+      , bp::wrapper< LobbyMatchListCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyMatchListCallback, OnLobbyMatchList )
-        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallback, OnLobbyMatchList )
+        PY_OVERRIDE_CHECK( LobbyMatchListCallResult, OnLobbyMatchList )
+        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallResult, OnLobbyMatchList )
         bp::override func_OnLobbyMatchList = this->get_override( "OnLobbyMatchList" );
         if( func_OnLobbyMatchList.ptr() != Py_None )
             try {
                 func_OnLobbyMatchList( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+                this->LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
             }
         else
-            this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+            this->LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
     }
     
     void default_OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
-        LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+        LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
     }
 };
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
 
-struct LobbyGameCreatedCallback_wrapper : LobbyGameCreatedCallback, bp::wrapper< LobbyGameCreatedCallback > {
+struct LobbyGameCreatedCallResult_wrapper : LobbyGameCreatedCallResult, bp::wrapper< LobbyGameCreatedCallResult > {
 
-    LobbyGameCreatedCallback_wrapper(LobbyGameCreatedCallback const & arg )
-    : LobbyGameCreatedCallback( arg )
-      , bp::wrapper< LobbyGameCreatedCallback >(){
+    LobbyGameCreatedCallResult_wrapper(LobbyGameCreatedCallResult const & arg )
+    : LobbyGameCreatedCallResult( arg )
+      , bp::wrapper< LobbyGameCreatedCallResult >(){
         // copy constructor
         
     }
 
-    LobbyGameCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyGameCreatedCallback( steamapicall )
-      , bp::wrapper< LobbyGameCreatedCallback >(){
+    LobbyGameCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyGameCreatedCallResult( steamapicall )
+      , bp::wrapper< LobbyGameCreatedCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyGameCreatedCallback, OnLobbyGameCreated )
-        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallback, OnLobbyGameCreated )
+        PY_OVERRIDE_CHECK( LobbyGameCreatedCallResult, OnLobbyGameCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallResult, OnLobbyGameCreated )
         bp::override func_OnLobbyGameCreated = this->get_override( "OnLobbyGameCreated" );
         if( func_OnLobbyGameCreated.ptr() != Py_None )
             try {
                 func_OnLobbyGameCreated( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+                this->LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
             }
         else
-            this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+            this->LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
     }
     
     void default_OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
-        LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+        LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
     }
 };
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyCreated, LobbyCreated_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyCreated, LobbyCreated_t );
 
-struct LobbyCreatedCallback_wrapper : LobbyCreatedCallback, bp::wrapper< LobbyCreatedCallback > {
+struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< LobbyCreatedCallResult > {
 
-    LobbyCreatedCallback_wrapper(LobbyCreatedCallback const & arg )
-    : LobbyCreatedCallback( arg )
-      , bp::wrapper< LobbyCreatedCallback >(){
+    LobbyCreatedCallResult_wrapper(LobbyCreatedCallResult const & arg )
+    : LobbyCreatedCallResult( arg )
+      , bp::wrapper< LobbyCreatedCallResult >(){
         // copy constructor
         
     }
 
-    LobbyCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyCreatedCallback( steamapicall )
-      , bp::wrapper< LobbyCreatedCallback >(){
+    LobbyCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyCreatedCallResult( steamapicall )
+      , bp::wrapper< LobbyCreatedCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyCreatedCallback, OnLobbyCreated )
-        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallback, OnLobbyCreated )
+        PY_OVERRIDE_CHECK( LobbyCreatedCallResult, OnLobbyCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallResult, OnLobbyCreated )
         bp::override func_OnLobbyCreated = this->get_override( "OnLobbyCreated" );
         if( func_OnLobbyCreated.ptr() != Py_None )
             try {
                 func_OnLobbyCreated( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+                this->LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
             }
         else
-            this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+            this->LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
     }
     
     void default_OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
-        LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+        LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( LobbyEnter, LobbyEnter_t );
+
+struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEnterCallResult > {
+
+    LobbyEnterCallResult_wrapper(LobbyEnterCallResult const & arg )
+    : LobbyEnterCallResult( arg )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // copy constructor
+        
+    }
+
+    LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyEnterCallResult( steamapicall )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyEnterCallResult, OnLobbyEnter )
+        PY_OVERRIDE_LOG( _steam, LobbyEnterCallResult, OnLobbyEnter )
+        bp::override func_OnLobbyEnter = this->get_override( "OnLobbyEnter" );
+        if( func_OnLobbyEnter.ptr() != Py_None )
+            try {
+                func_OnLobbyEnter( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+            }
+        else
+            this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatUpdate, LobbyChatUpdate_t );
+
+struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< LobbyChatUpdateCallback > {
+
+    LobbyChatUpdateCallback_wrapper(LobbyChatUpdateCallback const & arg )
+    : LobbyChatUpdateCallback( arg )
+      , bp::wrapper< LobbyChatUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatUpdateCallback_wrapper()
+    : LobbyChatUpdateCallback()
+      , bp::wrapper< LobbyChatUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatUpdate( ::LobbyChatUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatUpdateCallback, OnLobbyChatUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyChatUpdateCallback, OnLobbyChatUpdate )
+        bp::override func_OnLobbyChatUpdate = this->get_override( "OnLobbyChatUpdate" );
+        if( func_OnLobbyChatUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyChatUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+            }
+        else
+            this->LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+    }
+    
+    void default_OnLobbyChatUpdate( ::LobbyChatUpdate_t * pData ) {
+        LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatMsg, LobbyChatMsg_t );
+
+struct LobbyChatMsgCallback_wrapper : LobbyChatMsgCallback, bp::wrapper< LobbyChatMsgCallback > {
+
+    LobbyChatMsgCallback_wrapper(LobbyChatMsgCallback const & arg )
+    : LobbyChatMsgCallback( arg )
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatMsgCallback_wrapper()
+    : LobbyChatMsgCallback()
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatMsgCallback, OnLobbyChatMsg )
+        PY_OVERRIDE_LOG( _steam, LobbyChatMsgCallback, OnLobbyChatMsg )
+        bp::override func_OnLobbyChatMsg = this->get_override( "OnLobbyChatMsg" );
+        if( func_OnLobbyChatMsg.ptr() != Py_None )
+            try {
+                func_OnLobbyChatMsg( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+            }
+        else
+            this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+    
+    void default_OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
+
+struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
+
+    LobbyDataUpdateCallback_wrapper(LobbyDataUpdateCallback const & arg )
+    : LobbyDataUpdateCallback( arg )
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyDataUpdateCallback_wrapper()
+    : LobbyDataUpdateCallback()
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        bp::override func_OnLobbyDataUpdate = this->get_override( "OnLobbyDataUpdate" );
+        if( func_OnLobbyDataUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyDataUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+            }
+        else
+            this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+    
+    void default_OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( NumberOfCurrentPlayers, NumberOfCurrentPlayers_t );
+
+struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResult, bp::wrapper< NumberOfCurrentPlayersCallResult > {
+
+    NumberOfCurrentPlayersCallResult_wrapper(NumberOfCurrentPlayersCallResult const & arg )
+    : NumberOfCurrentPlayersCallResult( arg )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // copy constructor
+        
+    }
+
+    NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : NumberOfCurrentPlayersCallResult( steamapicall )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        PY_OVERRIDE_LOG( _steam, NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        bp::override func_OnNumberOfCurrentPlayers = this->get_override( "OnNumberOfCurrentPlayers" );
+        if( func_OnNumberOfCurrentPlayers.ptr() != Py_None )
+            try {
+                func_OnNumberOfCurrentPlayers( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+            }
+        else
+            this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+    
+    void default_OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
     }
 };
 
@@ -169,6 +361,15 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .export_values()
+        ;
+
+    bp::enum_< EChatMemberStateChange>("EChatMemberStateChange")
+        .value("k_EChatMemberStateChangeEntered", k_EChatMemberStateChangeEntered)
+        .value("k_EChatMemberStateChangeLeft", k_EChatMemberStateChangeLeft)
+        .value("k_EChatMemberStateChangeDisconnected", k_EChatMemberStateChangeDisconnected)
+        .value("k_EChatMemberStateChangeKicked", k_EChatMemberStateChangeKicked)
+        .value("k_EChatMemberStateChangeBanned", k_EChatMemberStateChangeBanned)
         .export_values()
         ;
 
@@ -372,6 +573,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamUser"
             , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUserStats"
+            , (::ISteamUserStats * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUserStats )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUtils"
@@ -1159,6 +1364,175 @@ BOOST_PYTHON_MODULE(_steam){
             , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
             , ( bp::arg("steamID"), bp::arg("appID") ) );
 
+    bp::class_< ISteamUserStats, boost::noncopyable >( "ISteamUserStats", bp::no_init )    
+        .def( 
+            "AttachLeaderboardUGC"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::UGCHandle_t ) )( &::ISteamUserStats::AttachLeaderboardUGC )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("hUGC") ) )    
+        .def( 
+            "ClearAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::ClearAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "DownloadLeaderboardEntries"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardDataRequest,int,int ) )( &::ISteamUserStats::DownloadLeaderboardEntries )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardDataRequest"), bp::arg("nRangeStart"), bp::arg("nRangeEnd") ) )    
+        .def( 
+            "DownloadLeaderboardEntriesForUsers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::CSteamID *,int ) )( &::ISteamUserStats::DownloadLeaderboardEntriesForUsers )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("prgUsers"), bp::arg("cUsers") ) )    
+        .def( 
+            "FindLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::FindLeaderboard )
+            , ( bp::arg("pchLeaderboardName") ) )    
+        .def( 
+            "FindOrCreateLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const *,::ELeaderboardSortMethod,::ELeaderboardDisplayType ) )( &::ISteamUserStats::FindOrCreateLeaderboard )
+            , ( bp::arg("pchLeaderboardName"), bp::arg("eLeaderboardSortMethod"), bp::arg("eLeaderboardDisplayType") ) )    
+        .def( 
+            "GetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool * ) )( &::ISteamUserStats::GetAchievement )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetAchievementAchievedPercent"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetAchievementAchievedPercent )
+            , ( bp::arg("pchName"), bp::arg("pflPercent") ) )    
+        .def( 
+            "GetAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetAchievementAndUnlockTime )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetAchievementDisplayAttribute"
+            , (char const * ( ::ISteamUserStats::* )( char const *,char const * ) )( &::ISteamUserStats::GetAchievementDisplayAttribute )
+            , ( bp::arg("pchName"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetAchievementIcon"
+            , (int ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::GetAchievementIcon )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "GetAchievementName"
+            , (char const * ( ::ISteamUserStats::* )( ::uint32 ) )( &::ISteamUserStats::GetAchievementName )
+            , ( bp::arg("iAchievement") ) )    
+        .def( 
+            "GetDownloadedLeaderboardEntry"
+            , (bool ( ::ISteamUserStats::* )( ::SteamLeaderboardEntries_t,int,::LeaderboardEntry_t *,::int32 *,int ) )( &::ISteamUserStats::GetDownloadedLeaderboardEntry )
+            , ( bp::arg("hSteamLeaderboardEntries"), bp::arg("index"), bp::arg("pLeaderboardEntry"), bp::arg("pDetails"), bp::arg("cDetailsMax") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int64 * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,double * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,::int64 *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,double *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetLeaderboardDisplayType"
+            , (::ELeaderboardDisplayType ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardDisplayType )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardEntryCount"
+            , (int ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardEntryCount )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardName"
+            , (char const * ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardName )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardSortMethod"
+            , (::ELeaderboardSortMethod ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardSortMethod )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetMostAchievedAchievementInfo )
+            , ( bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNextMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( int,char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetNextMostAchievedAchievementInfo )
+            , ( bp::arg("iIteratorPrevious"), bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNumAchievements"
+            , (::uint32 ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumAchievements ) )    
+        .def( 
+            "GetNumberOfCurrentPlayers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumberOfCurrentPlayers ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserAchievement"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool * ) )( &::ISteamUserStats::GetUserAchievement )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetUserAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetUserAchievementAndUnlockTime )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,::int32 * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,float * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "IndicateAchievementProgress"
+            , (bool ( ::ISteamUserStats::* )( char const *,::uint32,::uint32 ) )( &::ISteamUserStats::IndicateAchievementProgress )
+            , ( bp::arg("pchName"), bp::arg("nCurProgress"), bp::arg("nMaxProgress") ) )    
+        .def( 
+            "RequestCurrentStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestCurrentStats ) )    
+        .def( 
+            "RequestGlobalAchievementPercentages"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestGlobalAchievementPercentages ) )    
+        .def( 
+            "RequestGlobalStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( int ) )( &::ISteamUserStats::RequestGlobalStats )
+            , ( bp::arg("nHistoryDays") ) )    
+        .def( 
+            "RequestUserStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::CSteamID ) )( &::ISteamUserStats::RequestUserStats )
+            , ( bp::arg("steamIDUser") ) )    
+        .def( 
+            "ResetAllStats"
+            , (bool ( ::ISteamUserStats::* )( bool ) )( &::ISteamUserStats::ResetAllStats )
+            , ( bp::arg("bAchievementsToo") ) )    
+        .def( 
+            "SetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::SetAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("nData") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("fData") ) )    
+        .def( 
+            "StoreStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::StoreStats ) )    
+        .def( 
+            "UpdateAvgRateStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float,double ) )( &::ISteamUserStats::UpdateAvgRateStat )
+            , ( bp::arg("pchName"), bp::arg("flCountThisSession"), bp::arg("dSessionLength") ) )    
+        .def( 
+            "UploadLeaderboardScore"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardUploadScoreMethod,::int32,::int32 const *,int ) )( &::ISteamUserStats::UploadLeaderboardScore )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardUploadScoreMethod"), bp::arg("nScore"), bp::arg("pScoreDetails"), bp::arg("cScoreDetailsCount") ) );
+
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
             "BOverlayNeedsPresent"
@@ -1232,6 +1606,28 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 
+    { //::LobbyChatMsg_t
+        typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
+        LobbyChatMsg_t_exposer_t LobbyChatMsg_t_exposer = LobbyChatMsg_t_exposer_t( "LobbyChatMsg_t" );
+        bp::scope LobbyChatMsg_t_scope( LobbyChatMsg_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatMsg_t::k_iCallback;
+        LobbyChatMsg_t_exposer.def_readwrite( "chatentrytype", &LobbyChatMsg_t::m_eChatEntryType );
+        LobbyChatMsg_t_exposer.def_readwrite( "chatid", &LobbyChatMsg_t::m_iChatID );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamidlobby", &LobbyChatMsg_t::m_ulSteamIDLobby );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamiduser", &LobbyChatMsg_t::m_ulSteamIDUser );
+    }
+
+    { //::LobbyChatUpdate_t
+        typedef bp::class_< LobbyChatUpdate_t > LobbyChatUpdate_t_exposer_t;
+        LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
+        bp::scope LobbyChatUpdate_t_scope( LobbyChatUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatUpdate_t::k_iCallback;
+        LobbyChatUpdate_t_exposer.def_readwrite( "chatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyChatUpdate_t::m_ulSteamIDLobby );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamidmakingchange", &LobbyChatUpdate_t::m_ulSteamIDMakingChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamiduserchanged", &LobbyChatUpdate_t::m_ulSteamIDUserChanged );
+    }
+
     { //::LobbyCreated_t
         typedef bp::class_< LobbyCreated_t > LobbyCreated_t_exposer_t;
         LobbyCreated_t_exposer_t LobbyCreated_t_exposer = LobbyCreated_t_exposer_t( "LobbyCreated_t" );
@@ -1239,6 +1635,27 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope().attr("k_iCallback") = (int)LobbyCreated_t::k_iCallback;
         LobbyCreated_t_exposer.def_readwrite( "result", &LobbyCreated_t::m_eResult );
         LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
+    }
+
+    { //::LobbyDataUpdate_t
+        typedef bp::class_< LobbyDataUpdate_t > LobbyDataUpdate_t_exposer_t;
+        LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
+        bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
+        LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
+    { //::LobbyEnter_t
+        typedef bp::class_< LobbyEnter_t > LobbyEnter_t_exposer_t;
+        LobbyEnter_t_exposer_t LobbyEnter_t_exposer = LobbyEnter_t_exposer_t( "LobbyEnter_t" );
+        bp::scope LobbyEnter_t_scope( LobbyEnter_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyEnter_t::k_iCallback;
+        LobbyEnter_t_exposer.def_readwrite( "chatroomenterresponse", &LobbyEnter_t::m_EChatRoomEnterResponse );
+        LobbyEnter_t_exposer.def_readwrite( "locked", &LobbyEnter_t::m_bLocked );
+        LobbyEnter_t_exposer.def_readwrite( "chatpermissions", &LobbyEnter_t::m_rgfChatPermissions );
+        LobbyEnter_t_exposer.def_readwrite( "steamidlobby", &LobbyEnter_t::m_ulSteamIDLobby );
     }
 
     { //::LobbyGameCreated_t
@@ -1260,69 +1677,24 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
     }
 
-    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
-
-    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
-
-    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
-
-    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
-
-    { //::LobbyMatchListCallback
-        typedef bp::class_< LobbyMatchListCallback_wrapper > LobbyMatchListCallback_exposer_t;
-        LobbyMatchListCallback_exposer_t LobbyMatchListCallback_exposer = LobbyMatchListCallback_exposer_t( "LobbyMatchListCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyMatchListCallback_scope( LobbyMatchListCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallback >();
-        { //::LobbyMatchListCallback::OnLobbyMatchList
-        
-            typedef void ( ::LobbyMatchListCallback::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
-            typedef void ( LobbyMatchListCallback_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
-            
-            LobbyMatchListCallback_exposer.def( 
-                "OnLobbyMatchList"
-                , OnLobbyMatchList_function_type(&::LobbyMatchListCallback::OnLobbyMatchList)
-                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallback_wrapper::default_OnLobbyMatchList)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
+    { //::NumberOfCurrentPlayers_t
+        typedef bp::class_< NumberOfCurrentPlayers_t > NumberOfCurrentPlayers_t_exposer_t;
+        NumberOfCurrentPlayers_t_exposer_t NumberOfCurrentPlayers_t_exposer = NumberOfCurrentPlayers_t_exposer_t( "NumberOfCurrentPlayers_t" );
+        bp::scope NumberOfCurrentPlayers_t_scope( NumberOfCurrentPlayers_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
     }
 
-    { //::LobbyGameCreatedCallback
-        typedef bp::class_< LobbyGameCreatedCallback_wrapper > LobbyGameCreatedCallback_exposer_t;
-        LobbyGameCreatedCallback_exposer_t LobbyGameCreatedCallback_exposer = LobbyGameCreatedCallback_exposer_t( "LobbyGameCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyGameCreatedCallback_scope( LobbyGameCreatedCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallback >();
-        { //::LobbyGameCreatedCallback::OnLobbyGameCreated
+    { //::PyGetLobbyChatEntry
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
         
-            typedef void ( ::LobbyGameCreatedCallback::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
-            typedef void ( LobbyGameCreatedCallback_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
-            
-            LobbyGameCreatedCallback_exposer.def( 
-                "OnLobbyGameCreated"
-                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallback::OnLobbyGameCreated)
-                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallback_wrapper::default_OnLobbyGameCreated)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
-    }
-
-    { //::LobbyCreatedCallback
-        typedef bp::class_< LobbyCreatedCallback_wrapper > LobbyCreatedCallback_exposer_t;
-        LobbyCreatedCallback_exposer_t LobbyCreatedCallback_exposer = LobbyCreatedCallback_exposer_t( "LobbyCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyCreatedCallback_scope( LobbyCreatedCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallback >();
-        { //::LobbyCreatedCallback::OnLobbyCreated
-        
-            typedef void ( ::LobbyCreatedCallback::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
-            typedef void ( LobbyCreatedCallback_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
-            
-            LobbyCreatedCallback_exposer.def( 
-                "OnLobbyCreated"
-                , OnLobbyCreated_function_type(&::LobbyCreatedCallback::OnLobbyCreated)
-                , default_OnLobbyCreated_function_type(&LobbyCreatedCallback_wrapper::default_OnLobbyCreated)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
+        bp::def( 
+            "PyGetLobbyChatEntry"
+            , PyGetLobbyChatEntry_function_type( &::PyGetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser") ) );
+    
     }
 
     { //::PyGetLobbyDataByIndex
@@ -1335,6 +1707,186 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData") ) );
     
     }
+
+    { //::PySendLobbyChatMsg
+    
+        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const * );
+        
+        bp::def( 
+            "PySendLobbyChatMsg"
+            , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody") ) );
+    
+    }
+
+    { //::SteamAPI_RunCallbacks
+    
+        typedef void ( *SteamAPI_RunCallbacks_function_type )(  );
+        
+        bp::def( 
+            "SteamAPI_RunCallbacks"
+            , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
+    
+    }
+
+    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
+
+    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
+
+    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
+
+    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
+
+    { //::LobbyMatchListCallResult
+        typedef bp::class_< LobbyMatchListCallResult_wrapper > LobbyMatchListCallResult_exposer_t;
+        LobbyMatchListCallResult_exposer_t LobbyMatchListCallResult_exposer = LobbyMatchListCallResult_exposer_t( "LobbyMatchListCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyMatchListCallResult_scope( LobbyMatchListCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallResult >();
+        { //::LobbyMatchListCallResult::OnLobbyMatchList
+        
+            typedef void ( ::LobbyMatchListCallResult::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            typedef void ( LobbyMatchListCallResult_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            
+            LobbyMatchListCallResult_exposer.def( 
+                "OnLobbyMatchList"
+                , OnLobbyMatchList_function_type(&::LobbyMatchListCallResult::OnLobbyMatchList)
+                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallResult_wrapper::default_OnLobbyMatchList)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyGameCreatedCallResult
+        typedef bp::class_< LobbyGameCreatedCallResult_wrapper > LobbyGameCreatedCallResult_exposer_t;
+        LobbyGameCreatedCallResult_exposer_t LobbyGameCreatedCallResult_exposer = LobbyGameCreatedCallResult_exposer_t( "LobbyGameCreatedCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyGameCreatedCallResult_scope( LobbyGameCreatedCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallResult >();
+        { //::LobbyGameCreatedCallResult::OnLobbyGameCreated
+        
+            typedef void ( ::LobbyGameCreatedCallResult::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            typedef void ( LobbyGameCreatedCallResult_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            
+            LobbyGameCreatedCallResult_exposer.def( 
+                "OnLobbyGameCreated"
+                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallResult::OnLobbyGameCreated)
+                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallResult_wrapper::default_OnLobbyGameCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyCreatedCallResult
+        typedef bp::class_< LobbyCreatedCallResult_wrapper > LobbyCreatedCallResult_exposer_t;
+        LobbyCreatedCallResult_exposer_t LobbyCreatedCallResult_exposer = LobbyCreatedCallResult_exposer_t( "LobbyCreatedCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyCreatedCallResult_scope( LobbyCreatedCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallResult >();
+        { //::LobbyCreatedCallResult::OnLobbyCreated
+        
+            typedef void ( ::LobbyCreatedCallResult::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            typedef void ( LobbyCreatedCallResult_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            
+            LobbyCreatedCallResult_exposer.def( 
+                "OnLobbyCreated"
+                , OnLobbyCreated_function_type(&::LobbyCreatedCallResult::OnLobbyCreated)
+                , default_OnLobbyCreated_function_type(&LobbyCreatedCallResult_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyEnterCallResult
+        typedef bp::class_< LobbyEnterCallResult_wrapper > LobbyEnterCallResult_exposer_t;
+        LobbyEnterCallResult_exposer_t LobbyEnterCallResult_exposer = LobbyEnterCallResult_exposer_t( "LobbyEnterCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyEnterCallResult_scope( LobbyEnterCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyEnterCallResult >();
+        { //::LobbyEnterCallResult::OnLobbyEnter
+        
+            typedef void ( ::LobbyEnterCallResult::*OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            typedef void ( LobbyEnterCallResult_wrapper::*default_OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            
+            LobbyEnterCallResult_exposer.def( 
+                "OnLobbyEnter"
+                , OnLobbyEnter_function_type(&::LobbyEnterCallResult::OnLobbyEnter)
+                , default_OnLobbyEnter_function_type(&LobbyEnterCallResult_wrapper::default_OnLobbyEnter)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyChatUpdateCallback
+        typedef bp::class_< LobbyChatUpdateCallback_wrapper > LobbyChatUpdateCallback_exposer_t;
+        LobbyChatUpdateCallback_exposer_t LobbyChatUpdateCallback_exposer = LobbyChatUpdateCallback_exposer_t( "LobbyChatUpdateCallback", bp::init<>() );
+        bp::scope LobbyChatUpdateCallback_scope( LobbyChatUpdateCallback_exposer );
+        { //::LobbyChatUpdateCallback::OnLobbyChatUpdate
+        
+            typedef void ( ::LobbyChatUpdateCallback::*OnLobbyChatUpdate_function_type )( ::LobbyChatUpdate_t * ) ;
+            typedef void ( LobbyChatUpdateCallback_wrapper::*default_OnLobbyChatUpdate_function_type )( ::LobbyChatUpdate_t * ) ;
+            
+            LobbyChatUpdateCallback_exposer.def( 
+                "OnLobbyChatUpdate"
+                , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
+                , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyChatMsgCallback
+        typedef bp::class_< LobbyChatMsgCallback_wrapper > LobbyChatMsgCallback_exposer_t;
+        LobbyChatMsgCallback_exposer_t LobbyChatMsgCallback_exposer = LobbyChatMsgCallback_exposer_t( "LobbyChatMsgCallback", bp::init<>() );
+        bp::scope LobbyChatMsgCallback_scope( LobbyChatMsgCallback_exposer );
+        { //::LobbyChatMsgCallback::OnLobbyChatMsg
+        
+            typedef void ( ::LobbyChatMsgCallback::*OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            typedef void ( LobbyChatMsgCallback_wrapper::*default_OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            
+            LobbyChatMsgCallback_exposer.def( 
+                "OnLobbyChatMsg"
+                , OnLobbyChatMsg_function_type(&::LobbyChatMsgCallback::OnLobbyChatMsg)
+                , default_OnLobbyChatMsg_function_type(&LobbyChatMsgCallback_wrapper::default_OnLobbyChatMsg)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyDataUpdateCallback
+        typedef bp::class_< LobbyDataUpdateCallback_wrapper > LobbyDataUpdateCallback_exposer_t;
+        LobbyDataUpdateCallback_exposer_t LobbyDataUpdateCallback_exposer = LobbyDataUpdateCallback_exposer_t( "LobbyDataUpdateCallback", bp::init<>() );
+        bp::scope LobbyDataUpdateCallback_scope( LobbyDataUpdateCallback_exposer );
+        { //::LobbyDataUpdateCallback::OnLobbyDataUpdate
+        
+            typedef void ( ::LobbyDataUpdateCallback::*OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            typedef void ( LobbyDataUpdateCallback_wrapper::*default_OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            
+            LobbyDataUpdateCallback_exposer.def( 
+                "OnLobbyDataUpdate"
+                , OnLobbyDataUpdate_function_type(&::LobbyDataUpdateCallback::OnLobbyDataUpdate)
+                , default_OnLobbyDataUpdate_function_type(&LobbyDataUpdateCallback_wrapper::default_OnLobbyDataUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::NumberOfCurrentPlayersCallResult
+        typedef bp::class_< NumberOfCurrentPlayersCallResult_wrapper > NumberOfCurrentPlayersCallResult_exposer_t;
+        NumberOfCurrentPlayersCallResult_exposer_t NumberOfCurrentPlayersCallResult_exposer = NumberOfCurrentPlayersCallResult_exposer_t( "NumberOfCurrentPlayersCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope NumberOfCurrentPlayersCallResult_scope( NumberOfCurrentPlayersCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, NumberOfCurrentPlayersCallResult >();
+        { //::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers
+        
+            typedef void ( ::NumberOfCurrentPlayersCallResult::*OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            typedef void ( NumberOfCurrentPlayersCallResult_wrapper::*default_OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            
+            NumberOfCurrentPlayersCallResult_exposer.def( 
+                "OnNumberOfCurrentPlayers"
+                , OnNumberOfCurrentPlayers_function_type(&::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers)
+                , default_OnNumberOfCurrentPlayers_function_type(&NumberOfCurrentPlayersCallResult_wrapper::default_OnNumberOfCurrentPlayers)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }
 #else
 #include "cbase.h"
@@ -1349,6 +1901,8 @@ BOOST_PYTHON_MODULE(_steam){
 
 #include "steam/steamclientpublic.h"
 
+#include "steam/isteamuserstats.h"
+
 #include "srcpy_steam.h"
 
 #include "srcpy.h"
@@ -1357,117 +1911,307 @@ BOOST_PYTHON_MODULE(_steam){
 
 namespace bp = boost::python;
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyMatchList, LobbyMatchList_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyMatchList, LobbyMatchList_t );
 
-struct LobbyMatchListCallback_wrapper : LobbyMatchListCallback, bp::wrapper< LobbyMatchListCallback > {
+struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper< LobbyMatchListCallResult > {
 
-    LobbyMatchListCallback_wrapper(LobbyMatchListCallback const & arg )
-    : LobbyMatchListCallback( arg )
-      , bp::wrapper< LobbyMatchListCallback >(){
+    LobbyMatchListCallResult_wrapper(LobbyMatchListCallResult const & arg )
+    : LobbyMatchListCallResult( arg )
+      , bp::wrapper< LobbyMatchListCallResult >(){
         // copy constructor
         
     }
 
-    LobbyMatchListCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyMatchListCallback( steamapicall )
-      , bp::wrapper< LobbyMatchListCallback >(){
+    LobbyMatchListCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyMatchListCallResult( steamapicall )
+      , bp::wrapper< LobbyMatchListCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyMatchListCallback, OnLobbyMatchList )
-        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallback, OnLobbyMatchList )
+        PY_OVERRIDE_CHECK( LobbyMatchListCallResult, OnLobbyMatchList )
+        PY_OVERRIDE_LOG( _steam, LobbyMatchListCallResult, OnLobbyMatchList )
         bp::override func_OnLobbyMatchList = this->get_override( "OnLobbyMatchList" );
         if( func_OnLobbyMatchList.ptr() != Py_None )
             try {
                 func_OnLobbyMatchList( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+                this->LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
             }
         else
-            this->LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+            this->LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
     }
     
     void default_OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
-        LobbyMatchListCallback::OnLobbyMatchList( pData, bIOFailure );
+        LobbyMatchListCallResult::OnLobbyMatchList( pData, bIOFailure );
     }
 };
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyGameCreated, LobbyGameCreated_t );
 
-struct LobbyGameCreatedCallback_wrapper : LobbyGameCreatedCallback, bp::wrapper< LobbyGameCreatedCallback > {
+struct LobbyGameCreatedCallResult_wrapper : LobbyGameCreatedCallResult, bp::wrapper< LobbyGameCreatedCallResult > {
 
-    LobbyGameCreatedCallback_wrapper(LobbyGameCreatedCallback const & arg )
-    : LobbyGameCreatedCallback( arg )
-      , bp::wrapper< LobbyGameCreatedCallback >(){
+    LobbyGameCreatedCallResult_wrapper(LobbyGameCreatedCallResult const & arg )
+    : LobbyGameCreatedCallResult( arg )
+      , bp::wrapper< LobbyGameCreatedCallResult >(){
         // copy constructor
         
     }
 
-    LobbyGameCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyGameCreatedCallback( steamapicall )
-      , bp::wrapper< LobbyGameCreatedCallback >(){
+    LobbyGameCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyGameCreatedCallResult( steamapicall )
+      , bp::wrapper< LobbyGameCreatedCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyGameCreatedCallback, OnLobbyGameCreated )
-        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallback, OnLobbyGameCreated )
+        PY_OVERRIDE_CHECK( LobbyGameCreatedCallResult, OnLobbyGameCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyGameCreatedCallResult, OnLobbyGameCreated )
         bp::override func_OnLobbyGameCreated = this->get_override( "OnLobbyGameCreated" );
         if( func_OnLobbyGameCreated.ptr() != Py_None )
             try {
                 func_OnLobbyGameCreated( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+                this->LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
             }
         else
-            this->LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+            this->LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
     }
     
     void default_OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
-        LobbyGameCreatedCallback::OnLobbyGameCreated( pData, bIOFailure );
+        LobbyGameCreatedCallResult::OnLobbyGameCreated( pData, bIOFailure );
     }
 };
 
-PY_STEAM_CALLBACK_WRAPPER( LobbyCreated, LobbyCreated_t );
+PY_STEAM_CALLRESULT_WRAPPER( LobbyCreated, LobbyCreated_t );
 
-struct LobbyCreatedCallback_wrapper : LobbyCreatedCallback, bp::wrapper< LobbyCreatedCallback > {
+struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< LobbyCreatedCallResult > {
 
-    LobbyCreatedCallback_wrapper(LobbyCreatedCallback const & arg )
-    : LobbyCreatedCallback( arg )
-      , bp::wrapper< LobbyCreatedCallback >(){
+    LobbyCreatedCallResult_wrapper(LobbyCreatedCallResult const & arg )
+    : LobbyCreatedCallResult( arg )
+      , bp::wrapper< LobbyCreatedCallResult >(){
         // copy constructor
         
     }
 
-    LobbyCreatedCallback_wrapper(::SteamAPICall_t steamapicall )
-    : LobbyCreatedCallback( steamapicall )
-      , bp::wrapper< LobbyCreatedCallback >(){
+    LobbyCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyCreatedCallResult( steamapicall )
+      , bp::wrapper< LobbyCreatedCallResult >(){
         // constructor
     
     }
 
     virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
-        PY_OVERRIDE_CHECK( LobbyCreatedCallback, OnLobbyCreated )
-        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallback, OnLobbyCreated )
+        PY_OVERRIDE_CHECK( LobbyCreatedCallResult, OnLobbyCreated )
+        PY_OVERRIDE_LOG( _steam, LobbyCreatedCallResult, OnLobbyCreated )
         bp::override func_OnLobbyCreated = this->get_override( "OnLobbyCreated" );
         if( func_OnLobbyCreated.ptr() != Py_None )
             try {
                 func_OnLobbyCreated( boost::python::ptr(pData), bIOFailure );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+                this->LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
             }
         else
-            this->LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+            this->LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
     }
     
     void default_OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
-        LobbyCreatedCallback::OnLobbyCreated( pData, bIOFailure );
+        LobbyCreatedCallResult::OnLobbyCreated( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( LobbyEnter, LobbyEnter_t );
+
+struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEnterCallResult > {
+
+    LobbyEnterCallResult_wrapper(LobbyEnterCallResult const & arg )
+    : LobbyEnterCallResult( arg )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // copy constructor
+        
+    }
+
+    LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : LobbyEnterCallResult( steamapicall )
+      , bp::wrapper< LobbyEnterCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( LobbyEnterCallResult, OnLobbyEnter )
+        PY_OVERRIDE_LOG( _steam, LobbyEnterCallResult, OnLobbyEnter )
+        bp::override func_OnLobbyEnter = this->get_override( "OnLobbyEnter" );
+        if( func_OnLobbyEnter.ptr() != Py_None )
+            try {
+                func_OnLobbyEnter( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+            }
+        else
+            this->LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+    
+    void default_OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
+        LobbyEnterCallResult::OnLobbyEnter( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatUpdate, LobbyChatUpdate_t );
+
+struct LobbyChatUpdateCallback_wrapper : LobbyChatUpdateCallback, bp::wrapper< LobbyChatUpdateCallback > {
+
+    LobbyChatUpdateCallback_wrapper(LobbyChatUpdateCallback const & arg )
+    : LobbyChatUpdateCallback( arg )
+      , bp::wrapper< LobbyChatUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatUpdateCallback_wrapper()
+    : LobbyChatUpdateCallback()
+      , bp::wrapper< LobbyChatUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatUpdate( ::LobbyChatUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatUpdateCallback, OnLobbyChatUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyChatUpdateCallback, OnLobbyChatUpdate )
+        bp::override func_OnLobbyChatUpdate = this->get_override( "OnLobbyChatUpdate" );
+        if( func_OnLobbyChatUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyChatUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+            }
+        else
+            this->LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+    }
+    
+    void default_OnLobbyChatUpdate( ::LobbyChatUpdate_t * pData ) {
+        LobbyChatUpdateCallback::OnLobbyChatUpdate( pData );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyChatMsg, LobbyChatMsg_t );
+
+struct LobbyChatMsgCallback_wrapper : LobbyChatMsgCallback, bp::wrapper< LobbyChatMsgCallback > {
+
+    LobbyChatMsgCallback_wrapper(LobbyChatMsgCallback const & arg )
+    : LobbyChatMsgCallback( arg )
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyChatMsgCallback_wrapper()
+    : LobbyChatMsgCallback()
+      , bp::wrapper< LobbyChatMsgCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyChatMsgCallback, OnLobbyChatMsg )
+        PY_OVERRIDE_LOG( _steam, LobbyChatMsgCallback, OnLobbyChatMsg )
+        bp::override func_OnLobbyChatMsg = this->get_override( "OnLobbyChatMsg" );
+        if( func_OnLobbyChatMsg.ptr() != Py_None )
+            try {
+                func_OnLobbyChatMsg( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+            }
+        else
+            this->LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+    
+    void default_OnLobbyChatMsg( ::LobbyChatMsg_t * pData ) {
+        LobbyChatMsgCallback::OnLobbyChatMsg( pData );
+    }
+};
+
+PY_STEAM_CALLBACK_WRAPPER( LobbyDataUpdate, LobbyDataUpdate_t );
+
+struct LobbyDataUpdateCallback_wrapper : LobbyDataUpdateCallback, bp::wrapper< LobbyDataUpdateCallback > {
+
+    LobbyDataUpdateCallback_wrapper(LobbyDataUpdateCallback const & arg )
+    : LobbyDataUpdateCallback( arg )
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // copy constructor
+        
+    }
+
+    LobbyDataUpdateCallback_wrapper()
+    : LobbyDataUpdateCallback()
+      , bp::wrapper< LobbyDataUpdateCallback >(){
+        // constructor
+    
+    }
+
+    virtual void OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        PY_OVERRIDE_CHECK( LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        PY_OVERRIDE_LOG( _steam, LobbyDataUpdateCallback, OnLobbyDataUpdate )
+        bp::override func_OnLobbyDataUpdate = this->get_override( "OnLobbyDataUpdate" );
+        if( func_OnLobbyDataUpdate.ptr() != Py_None )
+            try {
+                func_OnLobbyDataUpdate( boost::python::ptr(pData) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+            }
+        else
+            this->LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+    
+    void default_OnLobbyDataUpdate( ::LobbyDataUpdate_t * pData ) {
+        LobbyDataUpdateCallback::OnLobbyDataUpdate( pData );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( NumberOfCurrentPlayers, NumberOfCurrentPlayers_t );
+
+struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResult, bp::wrapper< NumberOfCurrentPlayersCallResult > {
+
+    NumberOfCurrentPlayersCallResult_wrapper(NumberOfCurrentPlayersCallResult const & arg )
+    : NumberOfCurrentPlayersCallResult( arg )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // copy constructor
+        
+    }
+
+    NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : NumberOfCurrentPlayersCallResult( steamapicall )
+      , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
+        // constructor
+    
+    }
+
+    virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        PY_OVERRIDE_LOG( _steam, NumberOfCurrentPlayersCallResult, OnNumberOfCurrentPlayers )
+        bp::override func_OnNumberOfCurrentPlayers = this->get_override( "OnNumberOfCurrentPlayers" );
+        if( func_OnNumberOfCurrentPlayers.ptr() != Py_None )
+            try {
+                func_OnNumberOfCurrentPlayers( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+            }
+        else
+            this->NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
+    }
+    
+    void default_OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
+        NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers( pData, bIOFailure );
     }
 };
 
@@ -1502,6 +2246,15 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .export_values()
+        ;
+
+    bp::enum_< EChatMemberStateChange>("EChatMemberStateChange")
+        .value("k_EChatMemberStateChangeEntered", k_EChatMemberStateChangeEntered)
+        .value("k_EChatMemberStateChangeLeft", k_EChatMemberStateChangeLeft)
+        .value("k_EChatMemberStateChangeDisconnected", k_EChatMemberStateChangeDisconnected)
+        .value("k_EChatMemberStateChangeKicked", k_EChatMemberStateChangeKicked)
+        .value("k_EChatMemberStateChangeBanned", k_EChatMemberStateChangeBanned)
         .export_values()
         ;
 
@@ -1705,6 +2458,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamUser"
             , (::ISteamUser * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUser )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUserStats"
+            , (::ISteamUserStats * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUserStats )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUtils"
@@ -2492,6 +3249,175 @@ BOOST_PYTHON_MODULE(_steam){
             , (::EUserHasLicenseForAppResult ( ::ISteamUser::* )( ::CSteamID,::AppId_t ) )( &::ISteamUser::UserHasLicenseForApp )
             , ( bp::arg("steamID"), bp::arg("appID") ) );
 
+    bp::class_< ISteamUserStats, boost::noncopyable >( "ISteamUserStats", bp::no_init )    
+        .def( 
+            "AttachLeaderboardUGC"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::UGCHandle_t ) )( &::ISteamUserStats::AttachLeaderboardUGC )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("hUGC") ) )    
+        .def( 
+            "ClearAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::ClearAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "DownloadLeaderboardEntries"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardDataRequest,int,int ) )( &::ISteamUserStats::DownloadLeaderboardEntries )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardDataRequest"), bp::arg("nRangeStart"), bp::arg("nRangeEnd") ) )    
+        .def( 
+            "DownloadLeaderboardEntriesForUsers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::CSteamID *,int ) )( &::ISteamUserStats::DownloadLeaderboardEntriesForUsers )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("prgUsers"), bp::arg("cUsers") ) )    
+        .def( 
+            "FindLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::FindLeaderboard )
+            , ( bp::arg("pchLeaderboardName") ) )    
+        .def( 
+            "FindOrCreateLeaderboard"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( char const *,::ELeaderboardSortMethod,::ELeaderboardDisplayType ) )( &::ISteamUserStats::FindOrCreateLeaderboard )
+            , ( bp::arg("pchLeaderboardName"), bp::arg("eLeaderboardSortMethod"), bp::arg("eLeaderboardDisplayType") ) )    
+        .def( 
+            "GetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool * ) )( &::ISteamUserStats::GetAchievement )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetAchievementAchievedPercent"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetAchievementAchievedPercent )
+            , ( bp::arg("pchName"), bp::arg("pflPercent") ) )    
+        .def( 
+            "GetAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetAchievementAndUnlockTime )
+            , ( bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetAchievementDisplayAttribute"
+            , (char const * ( ::ISteamUserStats::* )( char const *,char const * ) )( &::ISteamUserStats::GetAchievementDisplayAttribute )
+            , ( bp::arg("pchName"), bp::arg("pchKey") ) )    
+        .def( 
+            "GetAchievementIcon"
+            , (int ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::GetAchievementIcon )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "GetAchievementName"
+            , (char const * ( ::ISteamUserStats::* )( ::uint32 ) )( &::ISteamUserStats::GetAchievementName )
+            , ( bp::arg("iAchievement") ) )    
+        .def( 
+            "GetDownloadedLeaderboardEntry"
+            , (bool ( ::ISteamUserStats::* )( ::SteamLeaderboardEntries_t,int,::LeaderboardEntry_t *,::int32 *,int ) )( &::ISteamUserStats::GetDownloadedLeaderboardEntry )
+            , ( bp::arg("hSteamLeaderboardEntries"), bp::arg("index"), bp::arg("pLeaderboardEntry"), bp::arg("pDetails"), bp::arg("cDetailsMax") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int64 * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,double * ) )( &::ISteamUserStats::GetGlobalStat )
+            , ( bp::arg("pchStatName"), bp::arg("pData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,::int64 *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetGlobalStatHistory"
+            , (::int32 ( ::ISteamUserStats::* )( char const *,double *,::uint32 ) )( &::ISteamUserStats::GetGlobalStatHistory )
+            , ( bp::arg("pchStatName"), bp::arg("pData"), bp::arg("cubData") ) )    
+        .def( 
+            "GetLeaderboardDisplayType"
+            , (::ELeaderboardDisplayType ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardDisplayType )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardEntryCount"
+            , (int ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardEntryCount )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardName"
+            , (char const * ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardName )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetLeaderboardSortMethod"
+            , (::ELeaderboardSortMethod ( ::ISteamUserStats::* )( ::SteamLeaderboard_t ) )( &::ISteamUserStats::GetLeaderboardSortMethod )
+            , ( bp::arg("hSteamLeaderboard") ) )    
+        .def( 
+            "GetMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetMostAchievedAchievementInfo )
+            , ( bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNextMostAchievedAchievementInfo"
+            , (int ( ::ISteamUserStats::* )( int,char *,::uint32,float *,bool * ) )( &::ISteamUserStats::GetNextMostAchievedAchievementInfo )
+            , ( bp::arg("iIteratorPrevious"), bp::arg("pchName"), bp::arg("unNameBufLen"), bp::arg("pflPercent"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetNumAchievements"
+            , (::uint32 ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumAchievements ) )    
+        .def( 
+            "GetNumberOfCurrentPlayers"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::GetNumberOfCurrentPlayers ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float * ) )( &::ISteamUserStats::GetStat )
+            , ( bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserAchievement"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool * ) )( &::ISteamUserStats::GetUserAchievement )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved") ) )    
+        .def( 
+            "GetUserAchievementAndUnlockTime"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,bool *,::uint32 * ) )( &::ISteamUserStats::GetUserAchievementAndUnlockTime )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pbAchieved"), bp::arg("punUnlockTime") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,::int32 * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "GetUserStat"
+            , (bool ( ::ISteamUserStats::* )( ::CSteamID,char const *,float * ) )( &::ISteamUserStats::GetUserStat )
+            , ( bp::arg("steamIDUser"), bp::arg("pchName"), bp::arg("pData") ) )    
+        .def( 
+            "IndicateAchievementProgress"
+            , (bool ( ::ISteamUserStats::* )( char const *,::uint32,::uint32 ) )( &::ISteamUserStats::IndicateAchievementProgress )
+            , ( bp::arg("pchName"), bp::arg("nCurProgress"), bp::arg("nMaxProgress") ) )    
+        .def( 
+            "RequestCurrentStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestCurrentStats ) )    
+        .def( 
+            "RequestGlobalAchievementPercentages"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::RequestGlobalAchievementPercentages ) )    
+        .def( 
+            "RequestGlobalStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( int ) )( &::ISteamUserStats::RequestGlobalStats )
+            , ( bp::arg("nHistoryDays") ) )    
+        .def( 
+            "RequestUserStats"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::CSteamID ) )( &::ISteamUserStats::RequestUserStats )
+            , ( bp::arg("steamIDUser") ) )    
+        .def( 
+            "ResetAllStats"
+            , (bool ( ::ISteamUserStats::* )( bool ) )( &::ISteamUserStats::ResetAllStats )
+            , ( bp::arg("bAchievementsToo") ) )    
+        .def( 
+            "SetAchievement"
+            , (bool ( ::ISteamUserStats::* )( char const * ) )( &::ISteamUserStats::SetAchievement )
+            , ( bp::arg("pchName") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,::int32 ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("nData") ) )    
+        .def( 
+            "SetStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float ) )( &::ISteamUserStats::SetStat )
+            , ( bp::arg("pchName"), bp::arg("fData") ) )    
+        .def( 
+            "StoreStats"
+            , (bool ( ::ISteamUserStats::* )(  ) )( &::ISteamUserStats::StoreStats ) )    
+        .def( 
+            "UpdateAvgRateStat"
+            , (bool ( ::ISteamUserStats::* )( char const *,float,double ) )( &::ISteamUserStats::UpdateAvgRateStat )
+            , ( bp::arg("pchName"), bp::arg("flCountThisSession"), bp::arg("dSessionLength") ) )    
+        .def( 
+            "UploadLeaderboardScore"
+            , (::SteamAPICall_t ( ::ISteamUserStats::* )( ::SteamLeaderboard_t,::ELeaderboardUploadScoreMethod,::int32,::int32 const *,int ) )( &::ISteamUserStats::UploadLeaderboardScore )
+            , ( bp::arg("hSteamLeaderboard"), bp::arg("eLeaderboardUploadScoreMethod"), bp::arg("nScore"), bp::arg("pScoreDetails"), bp::arg("cScoreDetailsCount") ) );
+
     bp::class_< ISteamUtils, boost::noncopyable >( "ISteamUtils", bp::no_init )    
         .def( 
             "BOverlayNeedsPresent"
@@ -2565,6 +3491,28 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
             , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
 
+    { //::LobbyChatMsg_t
+        typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
+        LobbyChatMsg_t_exposer_t LobbyChatMsg_t_exposer = LobbyChatMsg_t_exposer_t( "LobbyChatMsg_t" );
+        bp::scope LobbyChatMsg_t_scope( LobbyChatMsg_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatMsg_t::k_iCallback;
+        LobbyChatMsg_t_exposer.def_readwrite( "chatentrytype", &LobbyChatMsg_t::m_eChatEntryType );
+        LobbyChatMsg_t_exposer.def_readwrite( "chatid", &LobbyChatMsg_t::m_iChatID );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamidlobby", &LobbyChatMsg_t::m_ulSteamIDLobby );
+        LobbyChatMsg_t_exposer.def_readwrite( "steamiduser", &LobbyChatMsg_t::m_ulSteamIDUser );
+    }
+
+    { //::LobbyChatUpdate_t
+        typedef bp::class_< LobbyChatUpdate_t > LobbyChatUpdate_t_exposer_t;
+        LobbyChatUpdate_t_exposer_t LobbyChatUpdate_t_exposer = LobbyChatUpdate_t_exposer_t( "LobbyChatUpdate_t" );
+        bp::scope LobbyChatUpdate_t_scope( LobbyChatUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyChatUpdate_t::k_iCallback;
+        LobbyChatUpdate_t_exposer.def_readwrite( "chatmemberstatechange", &LobbyChatUpdate_t::m_rgfChatMemberStateChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyChatUpdate_t::m_ulSteamIDLobby );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamidmakingchange", &LobbyChatUpdate_t::m_ulSteamIDMakingChange );
+        LobbyChatUpdate_t_exposer.def_readwrite( "steamiduserchanged", &LobbyChatUpdate_t::m_ulSteamIDUserChanged );
+    }
+
     { //::LobbyCreated_t
         typedef bp::class_< LobbyCreated_t > LobbyCreated_t_exposer_t;
         LobbyCreated_t_exposer_t LobbyCreated_t_exposer = LobbyCreated_t_exposer_t( "LobbyCreated_t" );
@@ -2572,6 +3520,27 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope().attr("k_iCallback") = (int)LobbyCreated_t::k_iCallback;
         LobbyCreated_t_exposer.def_readwrite( "result", &LobbyCreated_t::m_eResult );
         LobbyCreated_t_exposer.def_readwrite( "steamidlobby", &LobbyCreated_t::m_ulSteamIDLobby );
+    }
+
+    { //::LobbyDataUpdate_t
+        typedef bp::class_< LobbyDataUpdate_t > LobbyDataUpdate_t_exposer_t;
+        LobbyDataUpdate_t_exposer_t LobbyDataUpdate_t_exposer = LobbyDataUpdate_t_exposer_t( "LobbyDataUpdate_t" );
+        bp::scope LobbyDataUpdate_t_scope( LobbyDataUpdate_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyDataUpdate_t::k_iCallback;
+        LobbyDataUpdate_t_exposer.def_readwrite( "success", &LobbyDataUpdate_t::m_bSuccess );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidlobby", &LobbyDataUpdate_t::m_ulSteamIDLobby );
+        LobbyDataUpdate_t_exposer.def_readwrite( "steamidmember", &LobbyDataUpdate_t::m_ulSteamIDMember );
+    }
+
+    { //::LobbyEnter_t
+        typedef bp::class_< LobbyEnter_t > LobbyEnter_t_exposer_t;
+        LobbyEnter_t_exposer_t LobbyEnter_t_exposer = LobbyEnter_t_exposer_t( "LobbyEnter_t" );
+        bp::scope LobbyEnter_t_scope( LobbyEnter_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)LobbyEnter_t::k_iCallback;
+        LobbyEnter_t_exposer.def_readwrite( "chatroomenterresponse", &LobbyEnter_t::m_EChatRoomEnterResponse );
+        LobbyEnter_t_exposer.def_readwrite( "locked", &LobbyEnter_t::m_bLocked );
+        LobbyEnter_t_exposer.def_readwrite( "chatpermissions", &LobbyEnter_t::m_rgfChatPermissions );
+        LobbyEnter_t_exposer.def_readwrite( "steamidlobby", &LobbyEnter_t::m_ulSteamIDLobby );
     }
 
     { //::LobbyGameCreated_t
@@ -2593,69 +3562,24 @@ BOOST_PYTHON_MODULE(_steam){
         LobbyMatchList_t_exposer.def_readwrite( "lobbiesmatching", &LobbyMatchList_t::m_nLobbiesMatching );
     }
 
-    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
-
-    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
-
-    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
-
-    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
-
-    { //::LobbyMatchListCallback
-        typedef bp::class_< LobbyMatchListCallback_wrapper > LobbyMatchListCallback_exposer_t;
-        LobbyMatchListCallback_exposer_t LobbyMatchListCallback_exposer = LobbyMatchListCallback_exposer_t( "LobbyMatchListCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyMatchListCallback_scope( LobbyMatchListCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallback >();
-        { //::LobbyMatchListCallback::OnLobbyMatchList
-        
-            typedef void ( ::LobbyMatchListCallback::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
-            typedef void ( LobbyMatchListCallback_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
-            
-            LobbyMatchListCallback_exposer.def( 
-                "OnLobbyMatchList"
-                , OnLobbyMatchList_function_type(&::LobbyMatchListCallback::OnLobbyMatchList)
-                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallback_wrapper::default_OnLobbyMatchList)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
+    { //::NumberOfCurrentPlayers_t
+        typedef bp::class_< NumberOfCurrentPlayers_t > NumberOfCurrentPlayers_t_exposer_t;
+        NumberOfCurrentPlayers_t_exposer_t NumberOfCurrentPlayers_t_exposer = NumberOfCurrentPlayers_t_exposer_t( "NumberOfCurrentPlayers_t" );
+        bp::scope NumberOfCurrentPlayers_t_scope( NumberOfCurrentPlayers_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
+        NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
     }
 
-    { //::LobbyGameCreatedCallback
-        typedef bp::class_< LobbyGameCreatedCallback_wrapper > LobbyGameCreatedCallback_exposer_t;
-        LobbyGameCreatedCallback_exposer_t LobbyGameCreatedCallback_exposer = LobbyGameCreatedCallback_exposer_t( "LobbyGameCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyGameCreatedCallback_scope( LobbyGameCreatedCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallback >();
-        { //::LobbyGameCreatedCallback::OnLobbyGameCreated
+    { //::PyGetLobbyChatEntry
+    
+        typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
         
-            typedef void ( ::LobbyGameCreatedCallback::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
-            typedef void ( LobbyGameCreatedCallback_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
-            
-            LobbyGameCreatedCallback_exposer.def( 
-                "OnLobbyGameCreated"
-                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallback::OnLobbyGameCreated)
-                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallback_wrapper::default_OnLobbyGameCreated)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
-    }
-
-    { //::LobbyCreatedCallback
-        typedef bp::class_< LobbyCreatedCallback_wrapper > LobbyCreatedCallback_exposer_t;
-        LobbyCreatedCallback_exposer_t LobbyCreatedCallback_exposer = LobbyCreatedCallback_exposer_t( "LobbyCreatedCallback", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
-        bp::scope LobbyCreatedCallback_scope( LobbyCreatedCallback_exposer );
-        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallback >();
-        { //::LobbyCreatedCallback::OnLobbyCreated
-        
-            typedef void ( ::LobbyCreatedCallback::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
-            typedef void ( LobbyCreatedCallback_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
-            
-            LobbyCreatedCallback_exposer.def( 
-                "OnLobbyCreated"
-                , OnLobbyCreated_function_type(&::LobbyCreatedCallback::OnLobbyCreated)
-                , default_OnLobbyCreated_function_type(&LobbyCreatedCallback_wrapper::default_OnLobbyCreated)
-                , ( bp::arg("data"), bp::arg("iofailure") ) );
-        
-        }
+        bp::def( 
+            "PyGetLobbyChatEntry"
+            , PyGetLobbyChatEntry_function_type( &::PyGetLobbyChatEntry )
+            , ( bp::arg("steamIDLobby"), bp::arg("iChatID"), bp::arg("pSteamIDUser") ) );
+    
     }
 
     { //::PyGetLobbyDataByIndex
@@ -2668,6 +3592,186 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("steamIDLobby"), bp::arg("iLobbyData") ) );
     
     }
+
+    { //::PySendLobbyChatMsg
+    
+        typedef bool ( *PySendLobbyChatMsg_function_type )( ::CSteamID,char const * );
+        
+        bp::def( 
+            "PySendLobbyChatMsg"
+            , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
+            , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody") ) );
+    
+    }
+
+    { //::SteamAPI_RunCallbacks
+    
+        typedef void ( *SteamAPI_RunCallbacks_function_type )(  );
+        
+        bp::def( 
+            "SteamAPI_RunCallbacks"
+            , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
+    
+    }
+
+    bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
+
+    bp::scope().attr( "QUERY_PORT_NOT_INITIALIZED" ) = (int)QUERY_PORT_NOT_INITIALIZED;
+
+    bp::scope().attr( "QUERY_PORT_ERROR" ) = (int)QUERY_PORT_ERROR;
+
+    bp::scope().attr( "k_cchPersonaNameMax" ) = (int)k_cchPersonaNameMax;
+
+    { //::LobbyMatchListCallResult
+        typedef bp::class_< LobbyMatchListCallResult_wrapper > LobbyMatchListCallResult_exposer_t;
+        LobbyMatchListCallResult_exposer_t LobbyMatchListCallResult_exposer = LobbyMatchListCallResult_exposer_t( "LobbyMatchListCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyMatchListCallResult_scope( LobbyMatchListCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyMatchListCallResult >();
+        { //::LobbyMatchListCallResult::OnLobbyMatchList
+        
+            typedef void ( ::LobbyMatchListCallResult::*OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            typedef void ( LobbyMatchListCallResult_wrapper::*default_OnLobbyMatchList_function_type )( ::LobbyMatchList_t *,bool ) ;
+            
+            LobbyMatchListCallResult_exposer.def( 
+                "OnLobbyMatchList"
+                , OnLobbyMatchList_function_type(&::LobbyMatchListCallResult::OnLobbyMatchList)
+                , default_OnLobbyMatchList_function_type(&LobbyMatchListCallResult_wrapper::default_OnLobbyMatchList)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyGameCreatedCallResult
+        typedef bp::class_< LobbyGameCreatedCallResult_wrapper > LobbyGameCreatedCallResult_exposer_t;
+        LobbyGameCreatedCallResult_exposer_t LobbyGameCreatedCallResult_exposer = LobbyGameCreatedCallResult_exposer_t( "LobbyGameCreatedCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyGameCreatedCallResult_scope( LobbyGameCreatedCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyGameCreatedCallResult >();
+        { //::LobbyGameCreatedCallResult::OnLobbyGameCreated
+        
+            typedef void ( ::LobbyGameCreatedCallResult::*OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            typedef void ( LobbyGameCreatedCallResult_wrapper::*default_OnLobbyGameCreated_function_type )( ::LobbyGameCreated_t *,bool ) ;
+            
+            LobbyGameCreatedCallResult_exposer.def( 
+                "OnLobbyGameCreated"
+                , OnLobbyGameCreated_function_type(&::LobbyGameCreatedCallResult::OnLobbyGameCreated)
+                , default_OnLobbyGameCreated_function_type(&LobbyGameCreatedCallResult_wrapper::default_OnLobbyGameCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyCreatedCallResult
+        typedef bp::class_< LobbyCreatedCallResult_wrapper > LobbyCreatedCallResult_exposer_t;
+        LobbyCreatedCallResult_exposer_t LobbyCreatedCallResult_exposer = LobbyCreatedCallResult_exposer_t( "LobbyCreatedCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyCreatedCallResult_scope( LobbyCreatedCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyCreatedCallResult >();
+        { //::LobbyCreatedCallResult::OnLobbyCreated
+        
+            typedef void ( ::LobbyCreatedCallResult::*OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            typedef void ( LobbyCreatedCallResult_wrapper::*default_OnLobbyCreated_function_type )( ::LobbyCreated_t *,bool ) ;
+            
+            LobbyCreatedCallResult_exposer.def( 
+                "OnLobbyCreated"
+                , OnLobbyCreated_function_type(&::LobbyCreatedCallResult::OnLobbyCreated)
+                , default_OnLobbyCreated_function_type(&LobbyCreatedCallResult_wrapper::default_OnLobbyCreated)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyEnterCallResult
+        typedef bp::class_< LobbyEnterCallResult_wrapper > LobbyEnterCallResult_exposer_t;
+        LobbyEnterCallResult_exposer_t LobbyEnterCallResult_exposer = LobbyEnterCallResult_exposer_t( "LobbyEnterCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope LobbyEnterCallResult_scope( LobbyEnterCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, LobbyEnterCallResult >();
+        { //::LobbyEnterCallResult::OnLobbyEnter
+        
+            typedef void ( ::LobbyEnterCallResult::*OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            typedef void ( LobbyEnterCallResult_wrapper::*default_OnLobbyEnter_function_type )( ::LobbyEnter_t *,bool ) ;
+            
+            LobbyEnterCallResult_exposer.def( 
+                "OnLobbyEnter"
+                , OnLobbyEnter_function_type(&::LobbyEnterCallResult::OnLobbyEnter)
+                , default_OnLobbyEnter_function_type(&LobbyEnterCallResult_wrapper::default_OnLobbyEnter)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::LobbyChatUpdateCallback
+        typedef bp::class_< LobbyChatUpdateCallback_wrapper > LobbyChatUpdateCallback_exposer_t;
+        LobbyChatUpdateCallback_exposer_t LobbyChatUpdateCallback_exposer = LobbyChatUpdateCallback_exposer_t( "LobbyChatUpdateCallback", bp::init<>() );
+        bp::scope LobbyChatUpdateCallback_scope( LobbyChatUpdateCallback_exposer );
+        { //::LobbyChatUpdateCallback::OnLobbyChatUpdate
+        
+            typedef void ( ::LobbyChatUpdateCallback::*OnLobbyChatUpdate_function_type )( ::LobbyChatUpdate_t * ) ;
+            typedef void ( LobbyChatUpdateCallback_wrapper::*default_OnLobbyChatUpdate_function_type )( ::LobbyChatUpdate_t * ) ;
+            
+            LobbyChatUpdateCallback_exposer.def( 
+                "OnLobbyChatUpdate"
+                , OnLobbyChatUpdate_function_type(&::LobbyChatUpdateCallback::OnLobbyChatUpdate)
+                , default_OnLobbyChatUpdate_function_type(&LobbyChatUpdateCallback_wrapper::default_OnLobbyChatUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyChatMsgCallback
+        typedef bp::class_< LobbyChatMsgCallback_wrapper > LobbyChatMsgCallback_exposer_t;
+        LobbyChatMsgCallback_exposer_t LobbyChatMsgCallback_exposer = LobbyChatMsgCallback_exposer_t( "LobbyChatMsgCallback", bp::init<>() );
+        bp::scope LobbyChatMsgCallback_scope( LobbyChatMsgCallback_exposer );
+        { //::LobbyChatMsgCallback::OnLobbyChatMsg
+        
+            typedef void ( ::LobbyChatMsgCallback::*OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            typedef void ( LobbyChatMsgCallback_wrapper::*default_OnLobbyChatMsg_function_type )( ::LobbyChatMsg_t * ) ;
+            
+            LobbyChatMsgCallback_exposer.def( 
+                "OnLobbyChatMsg"
+                , OnLobbyChatMsg_function_type(&::LobbyChatMsgCallback::OnLobbyChatMsg)
+                , default_OnLobbyChatMsg_function_type(&LobbyChatMsgCallback_wrapper::default_OnLobbyChatMsg)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::LobbyDataUpdateCallback
+        typedef bp::class_< LobbyDataUpdateCallback_wrapper > LobbyDataUpdateCallback_exposer_t;
+        LobbyDataUpdateCallback_exposer_t LobbyDataUpdateCallback_exposer = LobbyDataUpdateCallback_exposer_t( "LobbyDataUpdateCallback", bp::init<>() );
+        bp::scope LobbyDataUpdateCallback_scope( LobbyDataUpdateCallback_exposer );
+        { //::LobbyDataUpdateCallback::OnLobbyDataUpdate
+        
+            typedef void ( ::LobbyDataUpdateCallback::*OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            typedef void ( LobbyDataUpdateCallback_wrapper::*default_OnLobbyDataUpdate_function_type )( ::LobbyDataUpdate_t * ) ;
+            
+            LobbyDataUpdateCallback_exposer.def( 
+                "OnLobbyDataUpdate"
+                , OnLobbyDataUpdate_function_type(&::LobbyDataUpdateCallback::OnLobbyDataUpdate)
+                , default_OnLobbyDataUpdate_function_type(&LobbyDataUpdateCallback_wrapper::default_OnLobbyDataUpdate)
+                , ( bp::arg("data") ) );
+        
+        }
+    }
+
+    { //::NumberOfCurrentPlayersCallResult
+        typedef bp::class_< NumberOfCurrentPlayersCallResult_wrapper > NumberOfCurrentPlayersCallResult_exposer_t;
+        NumberOfCurrentPlayersCallResult_exposer_t NumberOfCurrentPlayersCallResult_exposer = NumberOfCurrentPlayersCallResult_exposer_t( "NumberOfCurrentPlayersCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope NumberOfCurrentPlayersCallResult_scope( NumberOfCurrentPlayersCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, NumberOfCurrentPlayersCallResult >();
+        { //::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers
+        
+            typedef void ( ::NumberOfCurrentPlayersCallResult::*OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            typedef void ( NumberOfCurrentPlayersCallResult_wrapper::*default_OnNumberOfCurrentPlayers_function_type )( ::NumberOfCurrentPlayers_t *,bool ) ;
+            
+            NumberOfCurrentPlayersCallResult_exposer.def( 
+                "OnNumberOfCurrentPlayers"
+                , OnNumberOfCurrentPlayers_function_type(&::NumberOfCurrentPlayersCallResult::OnNumberOfCurrentPlayers)
+                , default_OnNumberOfCurrentPlayers_function_type(&NumberOfCurrentPlayersCallResult_wrapper::default_OnNumberOfCurrentPlayers)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }
 #endif
 

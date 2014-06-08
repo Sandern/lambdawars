@@ -38,8 +38,16 @@ public:
 
 	boost::python::object GetAttr( const char *name );
 
+	bool	operator==( boost::python::object val ) const;
+	bool	operator!=( boost::python::object val ) const;
+
+#if PY_VERSION_HEX < 0x03000000
 	int Cmp( boost::python::object other );
 	bool NonZero();
+#else
+	bool Bool();
+#endif // PY_VERSION_HEX < 0x03000000
+	Py_hash_t Hash();
 };
 
 template< class T >
@@ -48,6 +56,81 @@ inline boost::python::object CEPyHandle<T>::GetAttr( const char *name )
 	return boost::python::object(boost::python::ptr(this->Get())).attr(name);
 }
 
+template< class T >
+inline bool CEPyHandle<T>::operator==( boost::python::object other ) const
+{
+	// Other value is None, this handle should be None too
+	PyObject *pPyObject = other.ptr();
+	if( pPyObject == Py_None )
+	{
+		return this->Get() == NULL;
+	}
+
+	// Other value is not None
+	if( this->Get() == NULL )
+	{
+		return false; // Can't be same
+	}
+
+	// Check if it is directly a pointer to an entity
+#ifdef CLIENT_DLL
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("C_BaseEntity")).ptr()) )
+#else
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseEntity")).ptr()) )
+#endif // CLIENT_DLL
+	{
+		CBaseEntity *pSelf = this->Get();
+		CBaseEntity *pOther = boost::python::extract<CBaseEntity *>( other );
+		return pSelf == pOther;
+	}
+
+	// Maybe it's a CBaseHandle?
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseHandle")).ptr()) )
+	{
+		return this == boost::python::extract< const CBaseHandle *>( other );
+	}
+
+	return false;
+}
+
+template< class T >
+inline bool CEPyHandle<T>::operator!=( boost::python::object other ) const
+{
+	// Other value is None, this handle should not be None
+	PyObject *pPyObject = other.ptr();
+	if( pPyObject == Py_None )
+	{
+		return this->Get() != NULL;
+	}
+
+	// Other value is not None
+	if( this->Get() == NULL )
+	{
+		return true; // Can't be same
+	}
+
+	// Check if it is directly a pointer to an entity
+#ifdef CLIENT_DLL
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("C_BaseEntity")).ptr()) )
+#else
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseEntity")).ptr()) )
+#endif // CLIENT_DLL
+	{
+		CBaseEntity *pSelf = this->Get();
+		CBaseEntity *pOther = boost::python::extract<CBaseEntity *>(other);
+		return pSelf != pOther;
+	}
+
+	// Maybe it's a CBaseHandle?
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseHandle")).ptr()) )
+	{
+		return this != boost::python::extract< const CBaseHandle *>( other );
+	}
+
+	return true;
+}
+
+#if PY_VERSION_HEX < 0x03000000
 template< class T >
 int CEPyHandle<T>::Cmp( boost::python::object other )
 {
@@ -115,6 +198,22 @@ inline bool CEPyHandle<T>::NonZero()
 	return this->Get() != NULL;
 }
 
+#else
+
+template< class T >
+inline bool CEPyHandle<T>::Bool()
+{
+	return this->Get() != NULL;
+}
+
+template< class T >
+inline Py_hash_t CEPyHandle<T>::Hash()
+{
+	return this->Get() ? (Py_hash_t)this->Get() : PyObject_Hash( Py_None );
+}
+
+#endif // PY_VERSION_HEX < 0x03000000
+
 //----------------------------------------------------------------------------
 // Purpose: Python entity handle, for python entities only
 //-----------------------------------------------------------------------------
@@ -139,13 +238,23 @@ public:
 	boost::python::object GetAttribute( const char *name );
 	void SetAttr( const char *name, boost::python::object v );
 
+	Py_hash_t Hash();
+#if PY_VERSION_HEX < 0x03000000
 	int Cmp( boost::python::object other );
 	bool NonZero() { return PyGet().ptr() != Py_None; }
+#else
+	bool Bool() { return PyGet().ptr() != Py_None; }
+#endif // PY_VERSION_HEX < 0x03000000
 
 	virtual PyObject *GetPySelf() { return NULL; }
 
 	boost::python::object Str();
 };
+
+inline Py_hash_t PyHandle::Hash()
+{
+	return PyGet().ptr() ? PyObject_Hash( PyGet().ptr() ) : PyObject_Hash( Py_None );
+}
 
 boost::python::object CreatePyHandle( int iEntry, int iSerialNumber );
 
@@ -161,7 +270,11 @@ boost::python::object PyGetWorldEntity();
 class DeadEntity 
 {
 public:
-	bool NonZero() { return false; }
+#if PY_VERSION_HEX < 0x03000000
+	static bool NonZero() { return false; }
+#else
+	static bool Bool() { return false; }
+#endif // PY_VERSION_HEX < 0x03000000
 };
 
 #ifdef CLIENT_DLL

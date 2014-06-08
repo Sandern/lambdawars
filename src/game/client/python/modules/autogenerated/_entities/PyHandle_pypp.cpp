@@ -75,14 +75,13 @@ void register_PyHandle_class(){
         bp::scope PyHandle_scope( PyHandle_exposer );
         bp::implicitly_convertible< bp::api::object, PyHandle >();
         PyHandle_exposer.def( bp::init< int, int >(( bp::arg("iEntry"), bp::arg("iSerialNumber") )) );
-        { //::PyHandle::Cmp
+        { //::PyHandle::Bool
         
-            typedef int ( ::PyHandle::*__cmp___function_type )( ::boost::python::api::object ) ;
+            typedef bool ( ::PyHandle::*__bool___function_type )(  ) ;
             
             PyHandle_exposer.def( 
-                "__cmp__"
-                , __cmp___function_type( &::PyHandle::Cmp )
-                , ( bp::arg("other") ) );
+                "__bool__"
+                , __bool___function_type( &::PyHandle::Bool ) );
         
         }
         { //::PyHandle::GetAttr
@@ -105,13 +104,13 @@ void register_PyHandle_class(){
                 , ( bp::arg("name") ) );
         
         }
-        { //::PyHandle::NonZero
+        { //::PyHandle::Hash
         
-            typedef bool ( ::PyHandle::*__nonzero___function_type )(  ) ;
+            typedef ::Py_hash_t ( ::PyHandle::*__hash___function_type )(  ) ;
             
             PyHandle_exposer.def( 
-                "__nonzero__"
-                , __nonzero___function_type( &::PyHandle::NonZero ) );
+                "__hash__"
+                , __hash___function_type( &::PyHandle::Hash ) );
         
         }
         { //::PyHandle::PyGet

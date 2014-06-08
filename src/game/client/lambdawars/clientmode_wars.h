@@ -23,6 +23,8 @@ class ClientModeSDK : public ClientModeShared
 public:
 	DECLARE_CLASS( ClientModeSDK, ClientModeShared );
 
+	ClientModeSDK();
+
 	virtual void	Init();
 	//virtual void	InitWeaponSelectionHudElement() { return; }
 	virtual void	InitViewport();
@@ -41,7 +43,17 @@ public:
 
 	virtual int		KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
+	virtual void	Update( void );
+
 private:
+	void UpdatePostProcessingEffects();
+
+private:
+	const C_PostProcessController *m_pCurrentPostProcessController;
+	PostProcessParameters_t m_CurrentPostProcessParameters;
+	PostProcessParameters_t m_LerpStartPostProcessParameters, m_LerpEndPostProcessParameters;
+	CountdownTimer m_PostProcessLerpTimer;
+
 	CHandle<C_ColorCorrection> m_pCurrentColorCorrection;
 };
 

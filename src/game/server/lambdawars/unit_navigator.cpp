@@ -42,6 +42,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_navigator.h"
+#include "unit_baseanimstate.h"
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
@@ -108,6 +109,7 @@ ConVar unit_navigator_debug_show("unit_navigator_debug_show", "0", 0, "Shows deb
 ConVar unit_navigator_debugoverlay_ent("unit_navigator_debugoverlay_ent", "-1", 0, "Shows debug overlay information only for specific unit");
 ConVar unit_navigator_debugscreen_ent("unit_navigator_debugscreen_ent", "-1", 0, "Shows debug screen information only for specific unit");
 ConVar unit_navigator_notestnearbyunits("unit_navigator_notestnearbyunits", "0", 0, "Don't test nearby units for same goal");
+ConVar unit_navigator_debug_showavgvels("unit_navigator_debug_showavgvels", "0", 0, "");
 
 #define THRESHOLD unit_potential_threshold.GetFloat()
 #define THRESHOLD_MIN (THRESHOLD+(GetPath()->m_iGoalType != GOALTYPE_NONE ? unit_potential_tmin_offset.GetFloat() : unit_potential_nogoal_tmin_offset.GetFloat()) )
@@ -533,9 +535,15 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 //-----------------------------------------------------------------------------
 // Purpose: Updates our preferred facing direction.
 //			Defaults to the path direction.
+//			TODO: Weapon shooting code depends on facing direction computed here.
+//				  Make this more robust.
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pPathDir )
 {
+	bool bZeroPitch = GetOuter()->GetAnimState() ? !GetOuter()->GetAnimState()->HasAimPoseParameters() : false;
+
+	Vector vFacingOrigin = m_pOuter->GetActiveWeapon() ? m_pOuter->Weapon_ShootPosition() : m_pOuter->EyePosition();
+
 	// Update facing target if any
 	// Call UpdateFacingTargetState after updating the idealangles, because it might clear
 	// the facing target.
@@ -547,20 +555,35 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	}
 	else if( m_hFacingTarget ) 
 	{
-		Vector dir = m_hFacingTarget->GetAbsOrigin() - GetAbsOrigin();
+		Vector dir = m_hFacingTarget->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone( m_hFacingTarget, m_fFacingCone ) );
 	}
 	else if( m_vFacingTargetPos != vec3_origin )
 	{
-		Vector dir = m_vFacingTargetPos - GetAbsOrigin();
+		Vector dir = m_vFacingTargetPos - vFacingOrigin;
+		if( bZeroPitch )
+			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone(m_vFacingTargetPos, m_fFacingCone) );
+	}
+	// Face enemy for shooting by default
+	// TODO: This should be controlled from the AI action
+	else if( m_pOuter->GetEnemy() )
+	{
+		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
+		if( bZeroPitch )
+			dir.z = 0;
+		VectorAngles(dir, MoveCommand.idealviewangles);
 	}
 	// Face path dir if we are following a path
 	else if( pPathDir ) 
 	{
 		VectorAngles(*pPathDir, MoveCommand.idealviewangles);
+		if( bZeroPitch )
+			MoveCommand.idealviewangles.x = 0;
 	}
 }
 
@@ -835,7 +858,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 		if( pEnt->GetMoveType() == MOVETYPE_NONE || pEnt->GetAbsVelocity().Length2D() < 25.0f )
 		{
 			// Non-moving units should generate an outward velocity
-			Vector vDir = m_vTestPositions[iPos] - pEnt->GetAbsOrigin();
+			Vector vDir = vPos - pEnt->GetAbsOrigin();
 			vDir.z = 0.0f;
 			float fSpeed = VectorNormalize(vDir);
 			fSpeed = fEntDensity * 2000.0f;
@@ -873,7 +896,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 				{
 					float fDensity = THRESHOLD_MAX / 2.0f;
 					fSumDensity += fDensity;
-					Vector vDir = GetAbsOrigin() - vPos; //m_vTestPositions[iPos] - GetAbsOrigin();
+					Vector vDir = GetAbsOrigin() - vPos;
 					VectorNormalize(vDir);
 					vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
 				}
@@ -921,7 +944,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 
 	// Average the velocity
 	// FIXME: Find out why the avg is sometimes invalid
-	if( fSumDensity == 0 || !vAvgVelocity.IsValid() )
+	if( fSumDensity < FLT_EPSILON || !vAvgVelocity.IsValid() )
 		vAvgVelocity = vec3_origin;
 	else
 		vAvgVelocity /= fSumDensity;
@@ -946,7 +969,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// Dist to next waypoints + speed predicted position
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GoalStatus != CHS_ATGOAL )
 		fDist = UnitComputePathDirection2(m_vTestPositions[iPos], GetPath()->m_pWaypointHead, vPathDir);
-	else if( m_vForceGoalVelocity != vec3_origin )
+	else if( m_vForceGoalVelocity.IsValid() )
 		fDist = ( (m_vForceGoalVelocity * 2) - m_vTestPositions[iPos] ).Length2D();
 	else
 		fDist = 0.0f;
@@ -974,7 +997,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// Zero out flow velocity if too low. Otherwise it results in retarded movement.
 	if( vFlowVelocity.Length2D() < 15.0f )
 		vFlowVelocity.Zero();
-
+	
 	// Depending on the thresholds use path, flow or interpolated speed
 	float fThresholdMin = THRESHOLD_MIN;
 	float fThresholdMax = THRESHOLD_MAX;
@@ -996,7 +1019,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	*pFinalVelocity = vFinalVelocity;
 
 	// Velocity when having no goal is solely based on the density (i.e. just move away if something is getting close)
-	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL || fSpeed == 0 ) 
+	if( GoalStatus == CHS_NOGOAL || GoalStatus == CHS_ATGOAL || fSpeed < FLT_EPSILON ) 
 	{
 		return fDensity; 
 	}
@@ -1067,6 +1090,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			{
 				fBestCost = fCost;
 				m_fLastBestDensity = fComputedDensity;
+				m_iDebugBestDir = i;
 				pos = i;
 			}
 		}
@@ -1088,6 +1112,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			{
 				fBestCost = fCost;
 				m_fLastBestDensity = fComputedDensity;
+				m_iDebugBestDir = i;
 				vBestVel = vVelocity;
 			}
 		}
@@ -1168,10 +1193,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 	// Reset current goal dependency
 	m_hAtGoalDependencyEnt = NULL;
 
-	// Store distance and range
-	UpdateGoalInfo();
-
-	// In case we have an target ent
+	// In case we have an target ent (note: before UpdateGoalInfo, because you can't update goal info if target is lost)
 	if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT || GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 	{
 		// Check if still exists and alive.
@@ -1231,6 +1253,9 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
 	}
+
+	// Store distance and range
+	UpdateGoalInfo();
 
 	// Check distance we moved. Might have a max distance we may move to a target
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->m_fMaxMoveDist != 0 )
@@ -2952,14 +2977,27 @@ void UnitBaseNavigator::DrawDebugInfo()
 	{
 		fDensity = m_DensitySums[ j ];
 
-		NDebugOverlay::HorzArrow( GetLocalOrigin(), m_vTestPositions[j], 
-							2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0 );
-		NDebugOverlay::Text( m_vTestPositions[j], UTIL_VarArgs("%f", fDensity), false, 0.0 );
+		if( unit_navigator_debug_showavgvels.GetBool() )
+		{
+			NDebugOverlay::HorzArrow( GetLocalOrigin(), GetLocalOrigin() + m_vAverageVelocities[j], 
+								2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0 );
+		}
+		else
+		{
+			NDebugOverlay::HorzArrow( GetLocalOrigin(), m_vTestPositions[j], 
+								2.0f, fDensity*255, (1.0f-Min<float>(1.0f, Max<float>(0.0,fDensity)))*255, 0, 200, true, 0 );
+			NDebugOverlay::Text( m_vTestPositions[j], UTIL_VarArgs("%f", fDensity), false, 0.0 );
+		}
 	}
 
 	// Draw velocities
 	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vDebugVelocity, 
 						4.0f, 0, 0, 255, 200, true, 0);
+
+	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vTestDirections[m_iDebugBestDir] * 96.0f, 
+						4.0f, 0, 255, 255, 200, true, 0);
+
+	
 
 	// Draw out blocking direction
 	NDebugOverlay::HorzArrow(GetAbsOrigin(), GetAbsOrigin() + m_vBlockingDirection * 64.0, 

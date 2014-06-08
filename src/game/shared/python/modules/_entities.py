@@ -47,6 +47,7 @@ tmpl_enthandle = '''{ //::%(handlename)s
             );
         
         }
+#if PY_VERSION_HEX < 0x03000000
         { //::%(handlename)s::Cmp
         
             typedef bool ( ::%(handlename)s::*Cmp_function_type )( bp::object ) const;
@@ -65,7 +66,26 @@ tmpl_enthandle = '''{ //::%(handlename)s
                 "__nonzero__"
                 , NonZero_function_type( &::%(handlename)s::NonZero )
             );
+        }
+#else
+        { //::%(handlename)s::Bool
         
+            typedef bool ( ::%(handlename)s::*Bool_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__bool__"
+                , Bool_function_type( &::%(handlename)s::Bool )
+            );
+        }
+#endif // PY_VERSION_HEX < 0x03000000
+        { //::%(handlename)s::Hash
+        
+            typedef Py_hash_t ( ::%(handlename)s::*Hash_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__hash__"
+                , Hash_function_type( &::%(handlename)s::Hash )
+            );
         }
         { //::%(handlename)s::Set
         
@@ -97,8 +117,8 @@ tmpl_enthandle = '''{ //::%(handlename)s
             );
         
         }
-        %(handlename)s_exposer.def( bp::self != bp::self );
-        %(handlename)s_exposer.def( bp::self == bp::self );
+        %(handlename)s_exposer.def( bp::self != bp::other< bp::api::object >() );
+        %(handlename)s_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
 '''
 
@@ -503,7 +523,8 @@ class Entities(SemiSharedModuleGenerator):
         # Dead entity
         cls = mb.class_('DeadEntity')
         cls.include()
-        cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_funs('NonZero', allow_empty=True).rename('__nonzero__') # Py2
+        cls.mem_funs('Bool', allow_empty=True).rename('__bool__') # Py3
         
         # Entity Handles
         cls = mb.class_('CBaseHandle')
@@ -521,8 +542,10 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('GetAttr').rename('__getattr__')
         cls.mem_fun('GetAttribute').rename('__getattribute__')
         cls.mem_fun('SetAttr').rename('__setattr__')
-        cls.mem_fun('Cmp').rename('__cmp__')
-        cls.mem_fun('NonZero').rename('__nonzero__')
+        cls.mem_funs('Cmp', allow_empty=True).rename('__cmp__') # Py2
+        cls.mem_funs('NonZero', allow_empty=True).rename('__nonzero__') # Py2
+        cls.mem_funs('Bool', allow_empty=True).rename('__bool__') # Py3
+        cls.mem_fun('Hash').rename('__hash__')
         cls.mem_fun('Str').rename('__str__')
         
         cls.add_wrapper_code(
@@ -818,7 +841,11 @@ class Entities(SemiSharedModuleGenerator):
         # Exclude anything return CBoneCache
         bonecache = mb.class_('CBoneCache')
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(bonecache))), allow_empty=True).exclude()
-            
+        
+        # Transformations
+        mb.mem_funs('ComputeHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        mb.mem_funs('ComputeEntitySpaceHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
+        
         if self.isclient:
             mb.mem_funs('PyOnNewModel').rename('OnNewModel')
             mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
@@ -1397,15 +1424,18 @@ class Entities(SemiSharedModuleGenerator):
         mb.free_function('SetPlayerRelationShip').include()
         mb.free_function('GetPlayerRelationShip').include()
         
+        if self.isserver:
+            for entcls in self.entclasses:
+                if entcls == cls or next((x for x in entcls.recursive_bases if x.related_class == cls), None):
+                    self.AddNetworkVarProperty('eyepitch', 'm_fEyePitch', 'float', entcls)
+        else:
+            self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
+            
         self.IncludeVarAndRename('m_bFOWFilterFriendly', 'fowfilterfriendly')
-        
-        self.IncludeVarAndRename('m_fEyePitch', 'eyepitch')
         self.IncludeVarAndRename('m_fEyeYaw', 'eyeyaw')
-        
         self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
         self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         self.IncludeVarAndRename('m_bFriendlyDamage', 'friendlydamage')
-        
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         
         # Pathfinding/Navmesh

@@ -252,18 +252,16 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 	try 
 	{
 		int event;
-		boost::python::object objectKey, objectValue;
-		const boost::python::object objectKeys = d.iterkeys();
-		const boost::python::object objectValues = d.itervalues();
-		unsigned long ulCount = boost::python::len(d); 
-		for( unsigned long u = 0; u < ulCount; u++ )
+		boost::python::object items = d.attr("items")();
+		boost::python::object iterator = items.attr("__iter__")();
+		boost::python::ssize_t length = boost::python::len(items); 
+		for( boost::python::ssize_t u = 0; u < length; u++ )
 		{
-			objectKey = objectKeys.attr( "next" )();
-			objectValue = objectValues.attr( "next" )();
+			boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
 
 			try 
 			{
-				event = boost::python::extract<int>(objectKey);
+				event = boost::python::extract<int>( item[0] );
 			}
 			catch( boost::python::error_already_set & )
 			{
@@ -271,7 +269,7 @@ void AnimEventMap::AddAnimEventHandlers( boost::python::dict d )
 				continue;
 			}
 
-			SetAnimEventHandler(event, objectValue);
+			SetAnimEventHandler( event, item[1] );
 		}
 	}
 	catch( boost::python::error_already_set & )
@@ -505,7 +503,9 @@ END_SEND_TABLE()
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
 	SendPropFloat( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
+	
 	SendPropAngle( SENDINFO_VECTORELEM( m_angRotation, 1 ), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
+	SendPropFloat( SENDINFO( m_fEyePitch ), 10, SPROP_CHANGES_OFTEN ),
 
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
 	// The only flag used right now is FL_ONGROUND, so just send one bit..
@@ -696,18 +696,11 @@ void CUnitBase::UpdateServerAnimation( void )
 	if( m_fNextServerAnimStateTime > gpGlobals->curtime )
 		return;
 
-	if( GetAnimState()->HasAimPoseParameters() )
-	{
-		if( !GetCommander() )
-			AimGun();
-		GetAnimState()->Update( m_fEyeYaw, m_fEyePitch );
-		
-	}
-	else
-	{
-		const QAngle &eyeangles = EyeAngles();
-		GetAnimState()->Update( eyeangles[YAW], eyeangles[PITCH] );
-	}
+	// The eye pitch is computed by the locomotion component and directly stored in m_fEyePitch.
+	const QAngle &eyeangles = EyeAngles();
+	m_fEyeYaw = eyeangles.y;
+
+	GetAnimState()->Update( m_fEyeYaw, m_fEyePitch );
 
 	m_fNextServerAnimStateTime = gpGlobals->curtime + unit_nextserveranimupdatetime.GetFloat();
 }

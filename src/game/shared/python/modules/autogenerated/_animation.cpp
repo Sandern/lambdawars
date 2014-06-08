@@ -182,7 +182,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::CStudioHdr
         typedef bp::class_< CStudioHdr_wrapper, boost::noncopyable > CStudioHdr_exposer_t;
-        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr", bp::no_init );
+        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr" );
         bp::scope CStudioHdr_scope( CStudioHdr_exposer );
         { //::CStudioHdr::CActivityToSequenceMapping
             typedef bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper, boost::noncopyable > CActivityToSequenceMapping_exposer_t;
@@ -1152,6 +1152,17 @@ BOOST_PYTHON_MODULE(_animation){
             "EventList_RegisterPrivateEvent"
             , EventList_RegisterPrivateEvent_function_type( &::EventList_RegisterPrivateEvent )
             , ( bp::arg("pszEventName") ) );
+    
+    }
+
+    { //::ExtractBbox
+    
+        typedef int ( *ExtractBbox_function_type )( ::CStudioHdr *,int,::Vector &,::Vector & );
+        
+        bp::def( 
+            "ExtractBbox"
+            , ExtractBbox_function_type( &::ExtractBbox )
+            , ( bp::arg("pstudiohdr"), bp::arg("sequence"), bp::arg("mins"), bp::arg("maxs") ) );
     
     }
 
@@ -1490,7 +1501,7 @@ BOOST_PYTHON_MODULE(_animation){
 
     { //::CStudioHdr
         typedef bp::class_< CStudioHdr_wrapper, boost::noncopyable > CStudioHdr_exposer_t;
-        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr", bp::no_init );
+        CStudioHdr_exposer_t CStudioHdr_exposer = CStudioHdr_exposer_t( "CStudioHdr" );
         bp::scope CStudioHdr_scope( CStudioHdr_exposer );
         { //::CStudioHdr::CActivityToSequenceMapping
             typedef bp::class_< CStudioHdr_wrapper::CActivityToSequenceMapping_wrapper, boost::noncopyable > CActivityToSequenceMapping_exposer_t;
@@ -2460,6 +2471,17 @@ BOOST_PYTHON_MODULE(_animation){
             "EventList_RegisterPrivateEvent"
             , EventList_RegisterPrivateEvent_function_type( &::EventList_RegisterPrivateEvent )
             , ( bp::arg("pszEventName") ) );
+    
+    }
+
+    { //::ExtractBbox
+    
+        typedef int ( *ExtractBbox_function_type )( ::CStudioHdr *,int,::Vector &,::Vector & );
+        
+        bp::def( 
+            "ExtractBbox"
+            , ExtractBbox_function_type( &::ExtractBbox )
+            , ( bp::arg("pstudiohdr"), bp::arg("sequence"), bp::arg("mins"), bp::arg("maxs") ) );
     
     }
 

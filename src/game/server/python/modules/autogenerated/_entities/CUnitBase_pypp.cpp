@@ -1311,6 +1311,10 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
 
     static void m_nSkin_Set( CUnitBase & inst, int val ) { inst.m_nSkin.Set( val ); }
 
+    static float m_fEyePitch_Get( CUnitBase const & inst ) { return inst.m_fEyePitch.Get(); }
+
+    static void m_fEyePitch_Set( CUnitBase & inst, float val ) { inst.m_fEyePitch.Set( val ); }
+
 };
 
 void register_CUnitBase_class(){
@@ -1328,15 +1332,6 @@ void register_CUnitBase_class(){
                 "AddEntityRelationship"
                 , AddEntityRelationship_function_type( &::CUnitBase::AddEntityRelationship )
                 , ( bp::arg("pEntity"), bp::arg("nDisposition"), bp::arg("nPriority") ) );
-        
-        }
-        { //::CUnitBase::AimGun
-        
-            typedef void ( ::CUnitBase::*AimGun_function_type )(  ) ;
-            
-            CUnitBase_exposer.def( 
-                "AimGun"
-                , AimGun_function_type( &::CUnitBase::AimGun ) );
         
         }
         { //::CUnitBase::AlwaysSendFullSelectionData
@@ -1658,6 +1653,16 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "HasEnterOffset"
                 , HasEnterOffset_function_type( &::CUnitBase::HasEnterOffset ) );
+        
+        }
+        { //::CUnitBase::HasOverridenEntityRelationship
+        
+            typedef bool ( ::CUnitBase::*HasOverridenEntityRelationship_function_type )( ::CBaseEntity * ) ;
+            
+            CUnitBase_exposer.def( 
+                "HasOverridenEntityRelationship"
+                , HasOverridenEntityRelationship_function_type( &::CUnitBase::HasOverridenEntityRelationship )
+                , ( bp::arg("pEntity") ) );
         
         }
         { //::CUnitBase::HasRangeAttackLOS
@@ -2040,15 +2045,6 @@ void register_CUnitBase_class(){
                 , PhysicsSolidMaskForEntity_function_type( &::CUnitBase::PhysicsSolidMaskForEntity ) );
         
         }
-        { //::CUnitBase::RelaxAim
-        
-            typedef void ( ::CUnitBase::*RelaxAim_function_type )(  ) ;
-            
-            CUnitBase_exposer.def( 
-                "RelaxAim"
-                , RelaxAim_function_type( &::CUnitBase::RelaxAim ) );
-        
-        }
         { //::CUnitBase::RemoveEntityRelationship
         
             typedef bool ( ::CUnitBase::*RemoveEntityRelationship_function_type )( ::CBaseEntity * ) ;
@@ -2069,16 +2065,6 @@ void register_CUnitBase_class(){
                 , Select_function_type(&::CUnitBase::Select)
                 , default_Select_function_type(&CUnitBase_wrapper::default_Select)
                 , ( bp::arg("pPlayer"), bp::arg("bTriggerOnSel")=(bool)(true) ) );
-        
-        }
-        { //::CUnitBase::SetAim
-        
-            typedef void ( ::CUnitBase::*SetAim_function_type )( ::Vector & ) ;
-            
-            CUnitBase_exposer.def( 
-                "SetAim"
-                , SetAim_function_type( &::CUnitBase::SetAim )
-                , ( bp::arg("vAimDir") ) );
         
         }
         { //::CUnitBase::SetAlwaysSendFullSelectionData
@@ -2313,7 +2299,6 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.def_readwrite( "accuracy", &CUnitBase::m_fAccuracy );
         CUnitBase_exposer.def_readwrite( "deathdrop", &CUnitBase::m_fDeathDrop );
         CUnitBase_exposer.def_readwrite( "enemychangetolerancesqr", &CUnitBase::m_fEnemyChangeToleranceSqr );
-        CUnitBase_exposer.def_readwrite( "eyepitch", &CUnitBase::m_fEyePitch );
         CUnitBase_exposer.def_readwrite( "eyeyaw", &CUnitBase::m_fEyeYaw );
         CUnitBase_exposer.def_readwrite( "maxclimbheight", &CUnitBase::m_fMaxClimbHeight );
         CUnitBase_exposer.def_readwrite( "minslope", &CUnitBase::m_fMinSlope );
@@ -2783,6 +2768,7 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.add_property( "lifestate", &CUnitBase_wrapper::m_lifeState_Get, &CUnitBase_wrapper::m_lifeState_Set );
         CUnitBase_exposer.add_property( "takedamage", &CUnitBase_wrapper::m_takedamage_Get, &CUnitBase_wrapper::m_takedamage_Set );
         CUnitBase_exposer.add_property( "skin", &CUnitBase_wrapper::m_nSkin_Get, &CUnitBase_wrapper::m_nSkin_Set );
+        CUnitBase_exposer.add_property( "eyepitch", &CUnitBase_wrapper::m_fEyePitch_Get, &CUnitBase_wrapper::m_fEyePitch_Set );
     }
 
 }

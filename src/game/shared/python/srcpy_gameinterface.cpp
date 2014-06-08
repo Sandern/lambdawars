@@ -568,8 +568,8 @@ boost::python::tuple PyVModelInfo::GetModelBounds(model_t *pModel)
 {
 	Vector mins, maxs;
 	if( modelinfo )
-		modelinfo->GetModelBounds(pModel, mins, maxs);
-	return boost::python::make_tuple(mins, maxs);
+		modelinfo->GetModelBounds( pModel, mins, maxs );
+	return boost::python::make_tuple( mins, maxs );
 }
 
 boost::python::object PyVModelInfo::GetModelName( model_t *model )
@@ -584,12 +584,36 @@ model_t *PyVModelInfo::FindOrLoadModel( const char *name )
 {
 	if( name == NULL || V_strlen(name) == 0 )
 	{
-		PyErr_SetString(PyExc_Exception, "Name cannot be None" );
+		PyErr_SetString( PyExc_Exception, "Name cannot be None" );
 		throw boost::python::error_already_set(); 
 		return NULL;
 	}
 
-	return (model_t *)modelinfo->FindOrLoadModel(name);
+	return (model_t *)modelinfo->FindOrLoadModel( name );
+}
+
+boost::python::object PyVModelInfo::GetStudioModel( model_t *model )
+{
+	if( model == NULL )
+	{
+		PyErr_SetString(PyExc_Exception, "model cannot be None" );
+		throw boost::python::error_already_set(); 
+		return boost::python::object();
+	}
+	 
+	const studiohdr_t *pStudioHDR_t = modelinfo->GetStudiomodel( model );
+	if( !pStudioHDR_t )
+	{
+		return boost::python::object();
+	}
+
+	boost::python::object studiohdr = SrcPySystem()->Import("_animation").attr("CStudioHdr")();
+	CStudioHdr *pStudioHDR = boost::python::extract< CStudioHdr * >( studiohdr );
+	if( pStudioHDR )
+	{
+		pStudioHDR->Init( pStudioHDR_t );
+	}
+	return studiohdr;
 }
 
 static PyVModelInfo pypymodelinfo;

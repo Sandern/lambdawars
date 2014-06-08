@@ -183,8 +183,8 @@ src/game/client/Debug_swarm/*
 src/game/server/Debug_swarm/*
 src/game/missionchooser/*
 src/boost/libs/python/build/VisualStudio/release-obj/*
-src/python/Srcbuild/Win32-temp-Release/*
-src/python/Srcbuild/Win32-temp-Debug/*
+src/thirdparty/python/Srcbuild/Win32-temp-Release/*
+src/thirdparty/python/Srcbuild/Win32-temp-Debug/*
 
 # Shaders
 .vcs
@@ -206,6 +206,6 @@ src/materialsystem/stdshaders/shaders/*
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
 src/lib/public/boost_python.lib
-src/lib/public/python27.lib
+src/lib/public/python34.lib
 
 

@@ -26,6 +26,7 @@ class Physics(SemiSharedModuleGenerator):
         cls.calldefs().virtuality = 'not virtual'   
         cls.mem_funs('Cmp').rename('__cmp__')
         cls.mem_funs('NonZero').rename('__nonzero__')
+        cls.mem_funs('Bool').rename('__bool__')
         
         cls.mem_fun('CheckValid').exclude()
         cls.mem_funs('GetPySelf').exclude()  
@@ -47,6 +48,7 @@ class Physics(SemiSharedModuleGenerator):
         cls.mem_fun('CheckValid').exclude()
         cls.mem_funs('Cmp').rename('__cmp__')
         cls.mem_funs('NonZero').rename('__nonzero__')
+        cls.mem_funs('Bool').rename('__bool__')
         
     def ParsePhysicCollision(self, mb):
         cls = mb.class_('PyPhysicsCollision')

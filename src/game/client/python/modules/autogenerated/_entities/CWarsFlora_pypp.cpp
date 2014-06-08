@@ -670,8 +670,8 @@ void register_CWarsFlora_class(){
             , (void ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_Spawn) )    
         .def( 
             "SpawnFlora"
-            , (bool (*)( char const *,::Vector const &,::QAngle const &,::KeyValues * ))( &::CWarsFlora::SpawnFlora )
-            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle"), bp::arg("pExtraKV")=bp::object() ) )    
+            , (bool (*)( char const *,::Vector const &,::QAngle const &,::KeyValues *,::boost::python::api::object ))( &::CWarsFlora::SpawnFlora )
+            , ( bp::arg("modelname"), bp::arg("position"), bp::arg("angle"), bp::arg("pExtraKV")=bp::object(), bp::arg("fnpostspawn")=boost::python::api::object() ) )    
         .def( 
             "SpawnMapFlora"
             , (void (*)(  ))( &::CWarsFlora::SpawnMapFlora ) )    

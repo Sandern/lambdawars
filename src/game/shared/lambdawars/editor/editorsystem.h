@@ -11,6 +11,8 @@
 #endif
 
 #include "editormapmgr.h"
+#include "editorwarsmapmgr.h"
+
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
 #include "vgui/MouseCode.h"
@@ -84,7 +86,9 @@ public:
 	bool ProcessCommand( KeyValues *pCommand );
 	bool ProcessCreateCommand( KeyValues *pCommand );
 	bool ProcessDeleteFloraCommand( KeyValues *pCommand );
+	bool ProcessSelectCommand( KeyValues *pCommand );
 
+	void QueueCommand( KeyValues *pCommand );
 	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
 	KeyValues *CreateClearSelectionCommand();
 
@@ -144,10 +148,13 @@ private:
 
 	virtual void Update( float frametime );
 	virtual void PostRender();
+#else
+	virtual void FrameUpdatePostEntityThink();
 #endif // CLIENT_DLL
 
 private:
 	CEditorMapMgr m_MapManager;
+	CEditorWarsMapMgr m_WarsMapManager;
 
 	// Selection
 	CUtlVector<EHANDLE> m_hSelectedEntities;
@@ -192,16 +199,19 @@ inline bool CEditorSystem::IsActive()
 inline void CEditorSystem::ClearLoadedMap()
 {
 	m_MapManager.ClearLoadedMap();
+	m_WarsMapManager.ClearLoadedMap();
 }
 
 inline void CEditorSystem::LoadCurrentVmf()
 {
 	m_MapManager.LoadCurrentVmf();
+	m_WarsMapManager.LoadCurrentMap();
 }
 #ifndef CLIENT_DLL
 inline void CEditorSystem::SaveCurrentVmf()
 {
 	m_MapManager.SaveCurrentVmf();
+	m_WarsMapManager.SaveCurrentMap();
 }
 #endif // CLIENT_DLL
 inline const char *CEditorSystem::GetCurrentVmfPath()

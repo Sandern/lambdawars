@@ -29,6 +29,7 @@
 
 #include "editor/editorsystem.h"
 #include "warseditor/iwars_editor_storage.h"
+#include "editor/editorwarsmapmgr.h"
 
 extern "C"
 {
@@ -627,7 +628,7 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 
 	if ( !V_strcmp( className, "wars_flora" ) )
 	{
-		// always force clientside entitis placed in maps
+		// always force clientside entities placed in maps
 		CWarsFlora *pEntity = new CWarsFlora();
 
 		// Set up keyvalues.
@@ -656,11 +657,14 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 	return entData.CurrentBufferPosition();
 }
 
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CWarsFlora::SpawnMapFlora()
 {
+#ifdef CLIENT_DLL
 	if( GetDeferredManager()->IsDeferredRenderingEnabled() == false )
 		return;
 
@@ -706,9 +710,53 @@ void CWarsFlora::SpawnMapFlora()
 
 		nEntities++;
 	}
-}
-
 #endif // CLIENT_DLL
+
+	//
+	// Loop through wars flora 
+	//
+
+	// For now, just load the keyvalues directly
+	char curMap[MAX_PATH];
+	CEditorWarsMapMgr::BuildCurrentWarsPath( curMap, sizeof( curMap ) );
+
+	KeyValues *pKVWars = new KeyValues( "WarsMap" ); // VmfToKeyValues( m_szCurrentMap );
+	if( pKVWars->LoadFromFile( filesystem, curMap, NULL ) )
+	{
+		KeyValues *pFlora = pKVWars->FindKey( "flora" );
+		if( pFlora )
+		{
+			for ( KeyValues *pKey = pFlora->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
+			{
+				if ( V_strcmp( pKey->GetName(), "entity" ) )
+					continue;
+
+#ifdef CLIENT_DLL
+				CWarsFlora *pEntity = new CWarsFlora();
+#else
+				const char *className = pKey->GetString( "classname", NULL );
+				if( !className )
+					continue;
+
+				CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName( className );
+#endif // CLIENT_DLL
+
+				FOR_EACH_VALUE( pKey, pValue )
+				{
+					pEntity->KeyValue( pValue->GetName(), pValue->GetString() );
+				}
+
+#ifdef CLIENT_DLL
+				if ( !pEntity->Initialize() )
+					pEntity->Release();
+#else
+				DispatchSpawn( pEntity );
+				pEntity->Activate();
+#endif // CLIENT_DLL
+			}
+		}
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -855,7 +903,7 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 // Purpose: Spawn function mainly intended for editor or ingame testing
 //			The editor mode, the flora entity gets synced to the editing client
 //-----------------------------------------------------------------------------
-bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV )
+bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV, boost::python::object fnpostspawn )
 {
 	bool bEditorManaged = EditorSystem()->IsActive();
 
@@ -895,6 +943,20 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 	DispatchSpawn( pEntity );
 	pEntity->Activate();
 
+	if( fnpostspawn != boost::python::object() )
+	{
+		try
+		{
+			fnpostspawn( pEntity->GetPyHandle() );
+		}
+		catch( boost::python::error_already_set & )
+		{
+			PyErr_Print();
+			UTIL_Remove( pEntity );
+			return false;
+		}
+	}
+
 	if( bEditorManaged )
 	{
 		KeyValues *pOperation = new KeyValues( "data" );
@@ -904,12 +966,12 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 		KeyValues *pEntValues = new KeyValues( "keyvalues" );
 		pEntity->FillKeyValues( pEntValues );
 		pEntValues->SetString( "model", pModelname );
-		pEntValues->SetString( "angles", VarArgs( "%f %f %f", vAngle.x, vAngle.y, vAngle.z ) );
-		pEntValues->SetString( "origin", VarArgs( "%f %f %f", vPosition.x, vPosition.y, vPosition.z ) );
+		pEntValues->SetString( "angles", VarArgs( "%f %f %f", pEntity->GetAbsAngles().x, pEntity->GetAbsAngles().y, pEntity->GetAbsAngles().z ) );
+		pEntValues->SetString( "origin", VarArgs( "%f %f %f", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z ) );
 
 		pOperation->AddSubKey( pEntValues );
 
-		warseditorstorage->AddEntityToQueue( pOperation );
+		warseditorstorage->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 
@@ -995,7 +1057,7 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 		{
 			pOperation->AddSubKey( new KeyValues( "flora", "uuid", removeFlora[idx]->GetFloraUUID() ) );
 		}
-		warseditorstorage->AddEntityToQueue( pOperation );
+		warseditorstorage->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 

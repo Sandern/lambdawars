@@ -13,6 +13,8 @@
 #include <utlvector.h>
 #include "ehandle.h"
 
+class C_HL2WarsPlayer;
+
 using namespace vgui;
 
 namespace vgui 
@@ -42,8 +44,12 @@ public:
 	void			GetPointInScreen( Vector2D *point, Vector *world );
 	virtual void	DrawMapBounderies();
 	virtual void	Paint();
-	virtual void PostChildPaint();
 
+#ifdef ENABLE_CEF
+	virtual void PostChildPaint();
+#endif // ENABLE_CEF
+
+	bool			ShouldDrawSelectBox( C_HL2WarsPlayer* pPlayer );
 	void			DrawSelectBox();
 	void			DrawRightClick();
 

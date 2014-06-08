@@ -339,12 +339,6 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 								int nTryHitbox = pParticles->RandomInt( nHitboxMin, nHitboxMax );
 								mstudiobbox_t *pBox = set->pHitbox(nTryHitbox);
 								
-								// E3 HACK - check for hitboxes at the origin and ignore those
-								if ( fabs( (*hitboxbones[pBox->bone])[0][3] ) < POINT_AT_ORIGIN_EPSILON && fabs( (*hitboxbones[pBox->bone])[1][3] ) < POINT_AT_ORIGIN_EPSILON && fabs( (*hitboxbones[pBox->bone])[2][3] ) < POINT_AT_ORIGIN_EPSILON )
-								{
-									continue;
-								}
-
 								float flTryU = pParticles->RandomFloat( flRandMin, flRandMax );
 								float flTryV = pParticles->RandomFloat( flRandMin, flRandMax );
 								float flTryW = pParticles->RandomFloat( flRandMin, flRandMax );

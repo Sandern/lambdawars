@@ -44,8 +44,9 @@ void register_DeadEntity_class(){
 
     bp::class_< DeadEntity >( "DeadEntity" )    
         .def( 
-            "__nonzero__"
-            , (bool ( ::DeadEntity::* )(  ) )( &::DeadEntity::NonZero ) );
+            "__bool__"
+            , (bool (*)(  ))( &::DeadEntity::Bool ) )    
+        .staticmethod( "__bool__" );
 
 }
 
