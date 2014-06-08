@@ -40,16 +40,12 @@ public:
 
 	bool	operator==( boost::python::object val ) const;
 	bool	operator!=( boost::python::object val ) const;
-	bool	operator==( const CEPyHandle<T> &val ) const;
-	bool	operator!=( const CEPyHandle<T> &val ) const;
 
 #if PY_VERSION_HEX < 0x03000000
 	int Cmp( boost::python::object other );
 	bool NonZero();
 #else
 	bool Bool();
-	//bool Eq( boost::python::object other );
-	//bool Ne( boost::python::object other );
 #endif // PY_VERSION_HEX < 0x03000000
 	Py_hash_t Hash();
 };
@@ -84,8 +80,14 @@ inline bool CEPyHandle<T>::operator==( boost::python::object other ) const
 #endif // CLIENT_DLL
 	{
 		CBaseEntity *pSelf = this->Get();
-		CBaseEntity *pOther = boost::python::extract<CBaseEntity *>(other);
+		CBaseEntity *pOther = boost::python::extract<CBaseEntity *>( other );
 		return pSelf == pOther;
+	}
+
+	// Maybe it's a CBaseHandle?
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseHandle")).ptr()) )
+	{
+		return this == boost::python::extract< const CBaseHandle *>( other );
 	}
 
 	return false;
@@ -119,19 +121,13 @@ inline bool CEPyHandle<T>::operator!=( boost::python::object other ) const
 		return pSelf != pOther;
 	}
 
+	// Maybe it's a CBaseHandle?
+	if( PyObject_IsInstance(pPyObject, boost::python::object(_entities.attr("CBaseHandle")).ptr()) )
+	{
+		return this != boost::python::extract< const CBaseHandle *>( other );
+	}
+
 	return true;
-}
-
-template< class T >
-inline bool CEPyHandle<T>::operator==( const CEPyHandle<T> &val ) const
-{
-	return Get() == val.Get();
-}
-
-template< class T >
-inline bool CEPyHandle<T>::operator!=( const CEPyHandle<T> &val ) const
-{
-	return Get() != val.Get();
 }
 
 #if PY_VERSION_HEX < 0x03000000
@@ -216,17 +212,6 @@ inline Py_hash_t CEPyHandle<T>::Hash()
 	return this->Get() ? (Py_hash_t)this->Get() : PyObject_Hash( Py_None );
 }
 
-/*template< class T >
-inline bool CEPyHandle<T>::Eq( boost::python::object other )
-{
-	return Hash() == other.attr("__hash__")();
-}
-
-template< class T >
-inline bool CEPyHandle<T>::Ne( boost::python::object other )
-{
-	return Hash() != other.attr("__hash__")();
-}*/
 #endif // PY_VERSION_HEX < 0x03000000
 
 //----------------------------------------------------------------------------

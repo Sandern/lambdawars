@@ -1258,8 +1258,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseEntityHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseEntityHANDLE_exposer.def( bp::self == bp::self );
         C_BaseEntityHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseEntityHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1355,8 +1353,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseAnimatingHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseAnimatingHANDLE_exposer.def( bp::self == bp::self );
         C_BaseAnimatingHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseAnimatingHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1452,8 +1448,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseAnimatingOverlayHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseAnimatingOverlayHANDLE_exposer.def( bp::self == bp::self );
         C_BaseAnimatingOverlayHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseAnimatingOverlayHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1549,8 +1543,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseFlexHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseFlexHANDLE_exposer.def( bp::self == bp::self );
         C_BaseFlexHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseFlexHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1646,8 +1638,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseCombatCharacterHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseCombatCharacterHANDLE_exposer.def( bp::self == bp::self );
         C_BaseCombatCharacterHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseCombatCharacterHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1743,8 +1733,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseCombatWeaponHANDLE_exposer.def( bp::self == bp::self );
         C_BaseCombatWeaponHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseCombatWeaponHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1840,8 +1828,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseProjectileHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseProjectileHANDLE_exposer.def( bp::self == bp::self );
         C_BaseProjectileHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseProjectileHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -1937,8 +1923,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseGrenadeHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseGrenadeHANDLE_exposer.def( bp::self == bp::self );
         C_BaseGrenadeHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseGrenadeHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2034,8 +2018,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BasePlayerHANDLE_exposer.def( bp::self != bp::self );
-        C_BasePlayerHANDLE_exposer.def( bp::self == bp::self );
         C_BasePlayerHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BasePlayerHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2131,8 +2113,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_PlayerResourceHANDLE_exposer.def( bp::self != bp::self );
-        C_PlayerResourceHANDLE_exposer.def( bp::self == bp::self );
         C_PlayerResourceHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_PlayerResourceHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2228,8 +2208,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BreakablePropHANDLE_exposer.def( bp::self != bp::self );
-        C_BreakablePropHANDLE_exposer.def( bp::self == bp::self );
         C_BreakablePropHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BreakablePropHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2325,8 +2303,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseToggleHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseToggleHANDLE_exposer.def( bp::self == bp::self );
         C_BaseToggleHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseToggleHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2422,8 +2398,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseTriggerHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseTriggerHANDLE_exposer.def( bp::self == bp::self );
         C_BaseTriggerHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseTriggerHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2519,8 +2493,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_FuncBrushHANDLE_exposer.def( bp::self != bp::self );
-        C_FuncBrushHANDLE_exposer.def( bp::self == bp::self );
         C_FuncBrushHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_FuncBrushHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2616,8 +2588,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_SpriteHANDLE_exposer.def( bp::self != bp::self );
-        C_SpriteHANDLE_exposer.def( bp::self == bp::self );
         C_SpriteHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_SpriteHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2713,8 +2683,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_SpriteTrailHANDLE_exposer.def( bp::self != bp::self );
-        C_SpriteTrailHANDLE_exposer.def( bp::self == bp::self );
         C_SpriteTrailHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_SpriteTrailHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2810,8 +2778,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseParticleEntityHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseParticleEntityHANDLE_exposer.def( bp::self == bp::self );
         C_BaseParticleEntityHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseParticleEntityHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -2907,8 +2873,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_SmokeTrailHANDLE_exposer.def( bp::self != bp::self );
-        C_SmokeTrailHANDLE_exposer.def( bp::self == bp::self );
         C_SmokeTrailHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_SmokeTrailHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3004,8 +2968,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_RocketTrailHANDLE_exposer.def( bp::self != bp::self );
-        C_RocketTrailHANDLE_exposer.def( bp::self == bp::self );
         C_RocketTrailHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_RocketTrailHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3101,8 +3063,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BeamHANDLE_exposer.def( bp::self != bp::self );
-        C_BeamHANDLE_exposer.def( bp::self == bp::self );
         C_BeamHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BeamHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3198,8 +3158,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_HL2WarsPlayerHANDLE_exposer.def( bp::self != bp::self );
-        C_HL2WarsPlayerHANDLE_exposer.def( bp::self == bp::self );
         C_HL2WarsPlayerHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_HL2WarsPlayerHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3295,8 +3253,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_UnitBaseHANDLE_exposer.def( bp::self != bp::self );
-        C_UnitBaseHANDLE_exposer.def( bp::self == bp::self );
         C_UnitBaseHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_UnitBaseHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3392,8 +3348,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_FuncUnitHANDLE_exposer.def( bp::self != bp::self );
-        C_FuncUnitHANDLE_exposer.def( bp::self == bp::self );
         C_FuncUnitHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_FuncUnitHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3489,8 +3443,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_WarsWeaponHANDLE_exposer.def( bp::self != bp::self );
-        C_WarsWeaponHANDLE_exposer.def( bp::self == bp::self );
         C_WarsWeaponHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_WarsWeaponHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3586,8 +3538,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        C_BaseFuncMapBoundaryHANDLE_exposer.def( bp::self != bp::self );
-        C_BaseFuncMapBoundaryHANDLE_exposer.def( bp::self == bp::self );
         C_BaseFuncMapBoundaryHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         C_BaseFuncMapBoundaryHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
@@ -3683,8 +3633,6 @@ BOOST_PYTHON_MODULE(_entities){
             );
         
         }
-        CWarsFloraHANDLE_exposer.def( bp::self != bp::self );
-        CWarsFloraHANDLE_exposer.def( bp::self == bp::self );
         CWarsFloraHANDLE_exposer.def( bp::self != bp::other< bp::api::object >() );
         CWarsFloraHANDLE_exposer.def( bp::self == bp::other< bp::api::object >() );
     }

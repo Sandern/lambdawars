@@ -117,8 +117,6 @@ tmpl_enthandle = '''{ //::%(handlename)s
             );
         
         }
-        %(handlename)s_exposer.def( bp::self != bp::self );
-        %(handlename)s_exposer.def( bp::self == bp::self );
         %(handlename)s_exposer.def( bp::self != bp::other< bp::api::object >() );
         %(handlename)s_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
