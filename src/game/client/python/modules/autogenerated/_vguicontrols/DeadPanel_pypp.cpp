@@ -35,10 +35,6 @@ void register_DeadPanel_class(){
         .def( 
             "__bool__"
             , (bool (*)(  ))( &::DeadPanel::Bool ) )    
-        .def( 
-            "__nonzero__"
-            , (bool (*)(  ))( &::DeadPanel::NonZero ) )    
-        .staticmethod( "__bool__" )    
-        .staticmethod( "__nonzero__" );
+        .staticmethod( "__bool__" );
 
 }

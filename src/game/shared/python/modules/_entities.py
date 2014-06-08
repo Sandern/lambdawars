@@ -47,6 +47,7 @@ tmpl_enthandle = '''{ //::%(handlename)s
             );
         
         }
+#if PY_VERSION_HEX < 0x03000000
         { //::%(handlename)s::Cmp
         
             typedef bool ( ::%(handlename)s::*Cmp_function_type )( bp::object ) const;
@@ -66,6 +67,7 @@ tmpl_enthandle = '''{ //::%(handlename)s
                 , NonZero_function_type( &::%(handlename)s::NonZero )
             );
         }
+#else
         { //::%(handlename)s::Bool
         
             typedef bool ( ::%(handlename)s::*Bool_function_type )( ) const;
@@ -73,6 +75,16 @@ tmpl_enthandle = '''{ //::%(handlename)s
             %(handlename)s_exposer.def( 
                 "__bool__"
                 , Bool_function_type( &::%(handlename)s::Bool )
+            );
+        }
+#endif // PY_VERSION_HEX < 0x03000000
+        { //::%(handlename)s::Hash
+        
+            typedef Py_hash_t ( ::%(handlename)s::*Hash_function_type )( ) const;
+            
+            %(handlename)s_exposer.def( 
+                "__hash__"
+                , Hash_function_type( &::%(handlename)s::Hash )
             );
         }
         { //::%(handlename)s::Set
@@ -107,6 +119,8 @@ tmpl_enthandle = '''{ //::%(handlename)s
         }
         %(handlename)s_exposer.def( bp::self != bp::self );
         %(handlename)s_exposer.def( bp::self == bp::self );
+        %(handlename)s_exposer.def( bp::self != bp::other< bp::api::object >() );
+        %(handlename)s_exposer.def( bp::self == bp::other< bp::api::object >() );
     }
 '''
 
@@ -511,8 +525,8 @@ class Entities(SemiSharedModuleGenerator):
         # Dead entity
         cls = mb.class_('DeadEntity')
         cls.include()
-        cls.mem_fun('NonZero').rename('__nonzero__')
-        cls.mem_fun('Bool').rename('__bool__')
+        cls.mem_funs('NonZero', allow_empty=True).rename('__nonzero__') # Py2
+        cls.mem_funs('Bool', allow_empty=True).rename('__bool__') # Py3
         
         # Entity Handles
         cls = mb.class_('CBaseHandle')
@@ -530,9 +544,10 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('GetAttr').rename('__getattr__')
         cls.mem_fun('GetAttribute').rename('__getattribute__')
         cls.mem_fun('SetAttr').rename('__setattr__')
-        cls.mem_fun('Cmp').rename('__cmp__')
-        cls.mem_fun('NonZero').rename('__nonzero__')
-        cls.mem_fun('Bool').rename('__bool__')
+        cls.mem_funs('Cmp', allow_empty=True).rename('__cmp__') # Py2
+        cls.mem_funs('NonZero', allow_empty=True).rename('__nonzero__') # Py2
+        cls.mem_funs('Bool', allow_empty=True).rename('__bool__') # Py3
+        cls.mem_fun('Hash').rename('__hash__')
         cls.mem_fun('Str').rename('__str__')
         
         cls.add_wrapper_code(
