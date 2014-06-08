@@ -799,7 +799,7 @@ void CSrcPython::LevelInitPreEntity()
 	const char *pLevelName = STRING(gpGlobals->mapname);
 #endif
 
-	m_LevelName = AllocPooledString(pLevelName);
+	V_strncpy( m_LevelName, pLevelName, sizeof( m_LevelName ) );
 
 	// BEFORE creating the entities setup the network tables
 #ifndef CLIENT_DLL
@@ -807,17 +807,17 @@ void CSrcPython::LevelInitPreEntity()
 #endif // CLIENT_DLL
 
 	// srcmgr level init
-	Run<const char *>( Get("_LevelInitPreEntity", "srcmgr", true), pLevelName );
+	Run<const char *>( Get("_LevelInitPreEntity", "srcmgr", true), m_LevelName );
 	
 	// Send prelevelinit signal
 	try 
 	{
 		CallSignalNoArgs( Get("prelevelinit", "core.signals", true) );
-		CallSignalNoArgs( Get("map_prelevelinit", "core.signals", true)[STRING(m_LevelName)] );
+		CallSignalNoArgs( Get("map_prelevelinit", "core.signals", true)[m_LevelName] );
 	} 
 	catch( bp::error_already_set & ) 
 	{
-		Warning("Failed to retrieve level signal:\n");
+		Warning( "Failed to retrieve pre level init signal (level name: %s):\n", m_LevelName );
 		PyErr_Print();
 	}
 }
@@ -837,11 +837,11 @@ void CSrcPython::LevelInitPostEntity()
 	try 
 	{
 		CallSignalNoArgs( Get("postlevelinit", "core.signals", true) );
-		CallSignalNoArgs( Get("map_postlevelinit", "core.signals", true)[STRING(m_LevelName)] );
+		CallSignalNoArgs( Get("map_postlevelinit", "core.signals", true)[m_LevelName] );
 	} 
 	catch( bp::error_already_set & ) 
 	{
-		Warning("Failed to retrieve level signal:\n");
+		Warning( "Failed to retrieve post level init signal (level name: %s):\n", m_LevelName );
 		PyErr_Print();
 	}
 }
@@ -861,11 +861,11 @@ void CSrcPython::LevelShutdownPreEntity()
 	try 
 	{
 		CallSignalNoArgs( Get("prelevelshutdown", "core.signals", true) );
-		CallSignalNoArgs( Get("map_prelevelshutdown", "core.signals", true)[STRING(m_LevelName)] );
+		CallSignalNoArgs( Get("map_prelevelshutdown", "core.signals", true)[m_LevelName] );
 	} 
 	catch( bp::error_already_set & ) 
 	{
-		Warning("Failed to retrieve level signal:\n");
+		Warning( "Failed to retrieve pre level shutdown signal (level name: %s):\n", m_LevelName );
 		PyErr_Print();
 	}
 }
@@ -890,11 +890,11 @@ void CSrcPython::LevelShutdownPostEntity()
 	try 
 	{
 		CallSignalNoArgs( Get("postlevelshutdown", "core.signals", true) );
-		CallSignalNoArgs( Get("map_postlevelshutdown", "core.signals", true)[STRING(m_LevelName)] );
+		CallSignalNoArgs( Get("map_postlevelshutdown", "core.signals", true)[m_LevelName] );
 	} 
 	catch( bp::error_already_set & ) 
 	{
-		Warning("Failed to retrieve level signal:\n");
+		Warning( "Failed to retrieve post level shutdown signal (level name: %s):\n", m_LevelName );
 		PyErr_Print();
 	}
 

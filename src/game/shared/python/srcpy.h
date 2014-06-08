@@ -412,7 +412,7 @@ private:
 	bool m_bPathProtected;
 
 	bool m_bActive;
-	string_t m_LevelName;
+	char m_LevelName[2048];
 
 	// Delete list
 	CUtlVector< boost::python::object > m_deleteList;
