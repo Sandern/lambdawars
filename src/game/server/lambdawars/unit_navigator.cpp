@@ -2031,10 +2031,11 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 	}
 
 	// Detect low velocity situation (which means the unit is not moving from the current position)
+	float fWishSpeedThreshold = MoveCommand.maxspeed * 0.35f;
 	float fWishSpeed = m_vLastWishVelocity.Length2DSqr();
 	float fVelocity2dSqr = GetAbsVelocity().Length2DSqr();
 
-	if( unit_blocked_lowvel_check.GetBool() && fWishSpeed > 100.0f && fVelocity2dSqr < 100.0 )
+	if( unit_blocked_lowvel_check.GetBool() && fWishSpeed > fWishSpeedThreshold && fVelocity2dSqr < fWishSpeedThreshold )
 	{
 		if( !m_bLowVelocityDetectionActive )
 		{
@@ -2061,7 +2062,7 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 		m_vBlockedLastPosition = GetAbsOrigin();
 #else
 		// Only perform this check if we have no target or if the target is not moving
-		if( unit_blocked_longdist_check.GetBool() && fWishSpeed > 100.0f && ( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) ) )
+		if( unit_blocked_longdist_check.GetBool() && fWishSpeed > fWishSpeedThreshold && ( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) ) )
 		{
 			if( m_fLastWaypointDistance < 0 )
 			{

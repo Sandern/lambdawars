@@ -1652,11 +1652,13 @@ void UnitBaseLocomotion::DoUnstuck()
 		CNavArea *pArea = TheNavMesh->GetNearestNavArea( mv->origin, true, 10000.0f, false, false );
 		if( pArea )
 		{
-			positioninfo_t info( pArea->GetCenter(), m_vecMins, m_vecMaxs, 0, 1024.0f );
+			positioninfo_t info( pArea->GetCenter(), m_vecMins, m_vecMaxs, 0, 1024.0f, 0, 0, NULL,
+								 8.0f, 256.0f, MASK_NPCSOLID, true );
 			UTIL_FindPosition( info );
 			if( info.m_bSuccess )
 			{
 				mv->origin = info.m_vPosition;
+				mv->origin.z += 16.0f;
 				bFoundPosition = true;
 			}
 		}
