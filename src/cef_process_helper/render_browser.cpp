@@ -1,5 +1,5 @@
-#include "render_browser.h"
 #include "client_app.h"
+#include "render_browser.h"
 
 #include "render_browser_helpers.h"
 
@@ -81,23 +81,43 @@ void RenderBrowser::Clear()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::RegisterObject( int iIdentifier, CefRefPtr<CefV8Value> object )
+bool RenderBrowser::RegisterObject( CefRefPtr<CefV8Value> object, WarsCefJSObject_t &data )
 {
-	std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
-	if( it != m_Objects.end() )
-		return false;
+	char uuid[37];
+	WarsCef_GenerateUUID( uuid );
+	m_Objects[uuid] = object;
 
-	m_Objects[iIdentifier] = object;
+	V_strncpy( data.uuid, uuid, sizeof( uuid ) );
+
+	return true;
+}
+
+bool RenderBrowser::RegisterObject( CefString identifier, CefRefPtr<CefV8Value> object )
+{
+	m_Objects[identifier] = object;
 	return true;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::CreateGlobalObject( int iIdentifier, CefString name )
+CefRefPtr<CefV8Value> RenderBrowser::FindObjectForUUID( CefString uuid )
+{
+	std::map< CefString, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( uuid );
+	if( it != m_Objects.end() )
+		return it->second;
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool RenderBrowser::CreateGlobalObject( CefString identifier, CefString name )
 {
 	if( !m_Context || !m_Context->Enter() )
 		return false;
+
+	bool bRet = false;
 
 	// Retrieve the context's window object.
 	CefRefPtr<CefV8Value> object = m_Context->GetGlobal();
@@ -108,32 +128,40 @@ bool RenderBrowser::CreateGlobalObject( int iIdentifier, CefString name )
 	object->SetValue(name, newobject, V8_PROPERTY_ATTRIBUTE_NONE);
 
 	// Remember we created this object
-	if( !RegisterObject( iIdentifier, newobject ) )
-		return false;
-	m_GlobalObjects[name] = newobject;
+	if( RegisterObject( identifier, newobject ) )
+	{
+		m_GlobalObjects[name] = newobject;
+		bRet = true;
+	}
+
 
 	m_Context->Exit();
 
-	return true;
+	return bRet;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::CreateFunction( int iIdentifier, CefString name, int iParentIdentifier, bool bCallback )
+bool RenderBrowser::CreateFunction( CefString identifier, CefString name, CefString iParentIdentifier, bool bCallback )
 {
 	if( !m_Context || !m_Context->Enter() )
 		return false;
 
 	// Get object to bind to
 	CefRefPtr<CefV8Value> object;
-	if( iParentIdentifier != INVALID_IDENTIFIER )
+	if( !iParentIdentifier.empty() )
 	{
-		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iParentIdentifier );
+		std::map< CefString, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iParentIdentifier );
 		if( it != m_Objects.end() )
+		{
 			object = m_Objects[iParentIdentifier];
+		}
 		else
+		{
+			m_Context->Exit();
 			return false;
+		}
 	}
 	else
 	{
@@ -148,8 +176,17 @@ bool RenderBrowser::CreateFunction( int iIdentifier, CefString name, int iParent
 	object->SetValue( name, func, V8_PROPERTY_ATTRIBUTE_NONE );
 
 	// Register
-	if( !RegisterObject( iIdentifier, func ) )
+	if( !RegisterObject( identifier, func ) )
+	{
+		m_Context->Exit();
 		return false;
+	}
+
+	// Set the identifier as user data on the object
+	// This is needed for making method calls with the right identifier (e.g. might get multiple identifiers at some point)
+	CefRefPtr<WarsCefUserData> warsUserData = new WarsCefUserData();
+	warsUserData->function_uuid = identifier;
+	func->SetUserData( warsUserData.get() );
 
 	m_Context->Exit();
 
@@ -159,7 +196,7 @@ bool RenderBrowser::CreateFunction( int iIdentifier, CefString name, int iParent
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::ExecuteJavascriptWithResult( int iIdentifier, CefString code )
+bool RenderBrowser::ExecuteJavascriptWithResult( CefString identifier, CefString code )
 {
 	if( !m_Context || !m_Context->Enter() )
 		return false;
@@ -174,7 +211,7 @@ bool RenderBrowser::ExecuteJavascriptWithResult( int iIdentifier, CefString code
 	}
 
 	// Register object
-	if( !RegisterObject( iIdentifier, retval ) )
+	if( !RegisterObject( identifier, retval ) )
 	{
 		m_Context->Exit();
 		return false;
@@ -193,7 +230,8 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 					CefRefPtr<CefV8Value>& retval, 
 					CefRefPtr<CefV8Value> callback )
 {
-	std::map< int, CefRefPtr<CefV8Value> >::iterator i = m_Objects.begin();
+#if 0
+	std::map< CefString, CefRefPtr<CefV8Value> >::iterator i = m_Objects.begin();
 	for( ; i != m_Objects.end(); ++i )
 	{
 		if( i->second->IsSame( object ) )
@@ -203,7 +241,7 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 			CefRefPtr<CefListValue> args = message->GetArgumentList();
 
 			CefRefPtr<CefListValue> methodargs = CefListValue::Create();
-			V8ValueListToListValue( arguments, methodargs );
+			V8ValueListToListValue( this, arguments, methodargs );
 
 			if( callback )
 			{
@@ -213,7 +251,7 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 				methodargs->Remove( methodargs->GetSize() - 1 );
 			}
 
-			args->SetInt( 0, i->first );
+			args->SetString( 0, i->first );
 			args->SetList( 1, methodargs );
 
 			// Store callback
@@ -237,6 +275,52 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 			return true;
 		}
 	}
+#else
+	CefRefPtr<CefBase> user_data = object->GetUserData();
+	if( user_data )
+	{
+		WarsCefUserData* user_data_impl = static_cast<WarsCefUserData*>(user_data.get());
+
+		// Create message
+		CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("methodcall");
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+
+		CefRefPtr<CefListValue> methodargs = CefListValue::Create();
+		V8ValueListToListValue( this, arguments, methodargs );
+
+		if( callback )
+		{
+			// Remove last, this is the callback method
+			// Do this before the SetList call
+			// SetList will invalidate methodargs and take ownership
+			methodargs->Remove( methodargs->GetSize() - 1 );
+		}
+
+		args->SetString( 0, user_data_impl->function_uuid );
+		args->SetList( 1, methodargs );
+
+		// Store callback
+		if( callback )
+		{
+			m_Callbacks.push_back( jscallback_t() );
+			m_Callbacks.back().callback = callback;
+			m_Callbacks.back().callbackid = s_NextCallbackID++;
+			m_Callbacks.back().thisobject = object;
+
+			args->SetInt( 2, m_Callbacks.back().callbackid );
+		}
+		else
+		{
+			args->SetNull( 2 );
+		}
+
+		// Send message
+		m_Browser->SendProcessMessage(PID_BROWSER, message);
+
+		return true;
+	}
+
+#endif // 0
 
 	return false;
 }
@@ -255,7 +339,7 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 			if( m_Context && m_Context->Enter() )
 			{
 				CefV8ValueList args;
-				ListValueToV8ValueList( methodargs, args );
+				ListValueToV8ValueList( this, methodargs, args );
 
 				CefRefPtr<CefV8Value> result = (*i).callback->ExecuteFunction((*i).thisobject, args);
 				if( !result )
@@ -279,7 +363,7 @@ bool RenderBrowser::DoCallback( int iCallbackID, CefRefPtr<CefListValue> methoda
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
+bool RenderBrowser::Invoke( CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
 {
 	if( !m_Context )
 		return false;
@@ -287,9 +371,9 @@ bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<Cef
 	// Get object
 	CefRefPtr<CefV8Value> object = NULL;
 
-	if( iIdentifier != INVALID_IDENTIFIER )
+	if( !identifier.empty() )
 	{
-		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
+		std::map< CefString, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( identifier );
 		if( it == m_Objects.end() )
 		{
 			return false;
@@ -314,7 +398,7 @@ bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<Cef
 	{
 		// Execute method
 		CefV8ValueList args;
-		ListValueToV8ValueList( methodargs, args );
+		ListValueToV8ValueList( this, methodargs, args );
 
 		result = method->ExecuteFunction( object, args );
 	}
@@ -330,7 +414,7 @@ bool RenderBrowser::Invoke( int iIdentifier, CefString methodname, CefRefPtr<Cef
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::InvokeWithResult( int iResultIdentifier, int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
+bool RenderBrowser::InvokeWithResult( CefString iResultIdentifier, CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs )
 {
 	if( !m_Context )
 		return false;
@@ -338,9 +422,9 @@ bool RenderBrowser::InvokeWithResult( int iResultIdentifier, int iIdentifier, Ce
 	// Get object
 	CefRefPtr<CefV8Value> object = NULL;
 
-	if( iIdentifier != INVALID_IDENTIFIER )
+	if( !identifier.empty() )
 	{
-		std::map< int, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( iIdentifier );
+		std::map< CefString, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( identifier );
 		if( it == m_Objects.end() )
 			return false;
 
@@ -362,7 +446,7 @@ bool RenderBrowser::InvokeWithResult( int iResultIdentifier, int iIdentifier, Ce
 	{
 		// Execute method
 		CefV8ValueList args;
-		ListValueToV8ValueList( methodargs, args );
+		ListValueToV8ValueList( this, methodargs, args );
 
 		result = method->ExecuteFunction( object, args );
 

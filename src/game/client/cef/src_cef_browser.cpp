@@ -238,17 +238,17 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "methodcall" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefRefPtr<CefListValue> methodargs = args->GetList( 1 );
 	
 		if( args->GetType( 2 ) == VTYPE_NULL )
 		{
-			m_pSrcBrowser->OnMethodCall( iIdentifier, methodargs );
+			m_pSrcBrowser->OnMethodCall( identifier, methodargs );
 		}
 		else
 		{
 			int iCallbackID = args->GetInt( 2 );
-			m_pSrcBrowser->OnMethodCall( iIdentifier, methodargs, &iCallbackID );
+			m_pSrcBrowser->OnMethodCall( identifier, methodargs, &iCallbackID );
 		}
 		return true;
 	}
@@ -1016,7 +1016,7 @@ CefRefPtr<JSObject> SrcCefBrowser::ExecuteJavaScriptWithResult( const char *code
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create("calljswithresult");
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 0, jsObject->GetIdentifier() );
 	args->SetString( 1, code );
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
 	return jsObject;
@@ -1035,7 +1035,7 @@ CefRefPtr<JSObject> SrcCefBrowser::CreateGlobalObject( const char *name )
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create("createglobalobject");
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 0, jsObject->GetIdentifier() );
 	args->SetString( 1, name );
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
 	return jsObject;
@@ -1054,10 +1054,10 @@ CefRefPtr<JSObject> SrcCefBrowser::CreateFunction( const char *name, CefRefPtr<J
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create( !bHasCallback ? "createfunction" : "createfunctionwithcallback" );
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, jsObject->GetIdentifier() );
+	args->SetString( 0, jsObject->GetIdentifier() );
 	args->SetString( 1, name );
 	if( object )
-		args->SetInt( 2, object->GetIdentifier() );
+		args->SetString( 2, object->GetIdentifier() );
 	else
 		args->SetNull( 2 );
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
@@ -1098,7 +1098,7 @@ void SrcCefBrowser::Invoke( CefRefPtr<JSObject> object, const char *methodname, 
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create("invoke");
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, object ? object->GetIdentifier() : -1 );
+	args->SetString( 0, object ? object->GetIdentifier() : "" );
 	args->SetString( 1, methodname );
 	args->SetList( 2, methodargs );
 
@@ -1118,8 +1118,8 @@ CefRefPtr<JSObject> SrcCefBrowser::InvokeWithResult( CefRefPtr<JSObject> object,
 	CefRefPtr<CefProcessMessage> message =
 		CefProcessMessage::Create("invokewithresult");
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
-	args->SetInt( 0, jsResultObject->GetIdentifier() );
-	args->SetInt( 1, object ? object->GetIdentifier() : -1 );
+	args->SetString( 0, jsResultObject->GetIdentifier() );
+	args->SetString( 1, object ? object->GetIdentifier() : "" );
 	args->SetString( 2, methodname );
 	args->SetList( 3, methodargs );
 
@@ -1131,7 +1131,7 @@ CefRefPtr<JSObject> SrcCefBrowser::InvokeWithResult( CefRefPtr<JSObject> object,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
+void SrcCefBrowser::OnMethodCall( CefString identifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID )
 {
 #ifdef ENABLE_PYTHON
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -1139,7 +1139,7 @@ void SrcCefBrowser::OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> metho
 
 	try
 	{
-		PyOnMethodCall( iIdentifier, CefValueListToPy( methodargs ), pCallbackID ? boost::python::object( *pCallbackID ) : boost::python::object() );
+		PyOnMethodCall( boost::python::object( identifier.ToString().c_str() ), CefValueListToPy( methodargs ), pCallbackID ? boost::python::object( *pCallbackID ) : boost::python::object() );
 	}
 	catch(boost::python::error_already_set &)
 	{

@@ -25,13 +25,26 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		//SendMsg( browser, "Pong from render browser %d\n", browser->GetIdentifier() );
 		return true;
 	}
+	if( msgname == "requeststats" ) 
+	{
+		CefRefPtr<CefProcessMessage> retmessage =
+			CefProcessMessage::Create("statistics");
+		browser->SendProcessMessage(PID_BROWSER, retmessage);
+
+		//char buf[512];
+		//CefRefPtr<CefListValue> args = retmessage->GetArgumentList();
+		//V_snprintf( "Objects: %d", sizeof( buf ), renderBrowser->geto
+		//args->SetString(0, );
+
+		return true;
+	}
 	else if( msgname == "createglobalobject" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefString objectName = args->GetString( 1 );
 
-		if( !renderBrowser->CreateGlobalObject( iIdentifier, objectName ) )
+		if( !renderBrowser->CreateGlobalObject( identifier, objectName ) )
 			SendWarning(browser, "Failed to create global object %ls\n", objectName.c_str());
 
 		return true;
@@ -39,13 +52,13 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	else if( msgname == "createfunction" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefString objectName = args->GetString( 1 );
-		int iParentIdentifier = -1;
-		if( args->GetType( 2 ) == VTYPE_INT )
-			iParentIdentifier = args->GetInt( 2 );
+		CefString iParentIdentifier = "";
+		if( args->GetType( 2 ) == VTYPE_STRING )
+			iParentIdentifier = args->GetString( 2 );
 
-		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier ) )
+		if( !renderBrowser->CreateFunction( identifier, objectName, iParentIdentifier ) )
 			SendWarning(browser, "Failed to create function object %ls\n", objectName.c_str());
 
 		return true;
@@ -53,13 +66,13 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	else if( msgname == "createfunctionwithcallback" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefString objectName = args->GetString( 1 );
-		int iParentIdentifier = -1;
-		if( args->GetType( 2 ) == VTYPE_INT )
-			iParentIdentifier = args->GetInt( 2 );
+		CefString iParentIdentifier = "";
+		if( args->GetType( 2 ) == VTYPE_STRING )
+			iParentIdentifier = args->GetString( 2 );
 
-		if( !renderBrowser->CreateFunction( iIdentifier, objectName, iParentIdentifier, true ) )
+		if( !renderBrowser->CreateFunction( identifier, objectName, iParentIdentifier, true ) )
 			SendWarning(browser, "Failed to create function with callback object %ls\n", objectName.c_str());
 
 		return true;
@@ -78,10 +91,10 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	else if( msgname == "calljswithresult" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefString code = args->GetString( 1 );
 
-		if( !renderBrowser->ExecuteJavascriptWithResult( iIdentifier, code ) )
+		if( !renderBrowser->ExecuteJavascriptWithResult( identifier, code ) )
 			SendWarning(browser, "Failed to call javascript with result: %ls\n", code.c_str());
 
 		return true;
@@ -89,25 +102,25 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	else if( msgname == "invoke" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iIdentifier = args->GetInt( 0 );
+		CefString identifier = args->GetString( 0 );
 		CefString methodname = args->GetString( 1 );
 		CefRefPtr<CefListValue> methodargs = args->GetList( 2 );
 
-		if( !renderBrowser->Invoke( iIdentifier, methodname, methodargs ) )
-			SendWarning(browser, "Failed to invoke id %d with methodname %ls\n", iIdentifier, methodname.c_str());
+		if( !renderBrowser->Invoke( identifier, methodname, methodargs ) )
+			SendWarning(browser, "Failed to invoke id %d with methodname %ls\n", identifier, methodname.c_str());
 
 		return true;
 	}
 	else if( msgname == "invokewithresult" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		int iResultIdentifier = args->GetInt( 0 );
-		int iIdentifier = args->GetInt( 1 );
+		CefString iResultIdentifier = args->GetString( 0 );
+		CefString identifier = args->GetString( 1 );
 		CefString methodname = args->GetString( 2 );
 		CefRefPtr<CefListValue> methodargs = args->GetList( 3 );
 
-		if( !renderBrowser->InvokeWithResult( iResultIdentifier, iIdentifier, methodname, methodargs ) )
-			SendWarning(browser, "Failed to invoke with result id %d / %d with methodname %ls\n", iResultIdentifier, iIdentifier, methodname.c_str());
+		if( !renderBrowser->InvokeWithResult( iResultIdentifier, identifier, methodname, methodargs ) )
+			SendWarning(browser, "Failed to invoke with result id %d / %d with methodname %ls\n", iResultIdentifier, identifier, methodname.c_str());
 
 		return true;
 	}

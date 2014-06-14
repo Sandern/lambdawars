@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Link Libraries">
+      <UniqueIdentifier>{adfc723b-af61-473c-a691-feaf6b4cddad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -55,5 +58,13 @@
     <ResourceCompile Include="wars_browser_helper.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\lib\public\tier1.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
+    <Library Include="..\lib\public\tier0.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 #include "src_cef_python.h"
 #include "srcpy.h"
 #include "src_cef_js.h"
+#include "warscef/wars_cef_shared.h"
 
 // CEF
 #include "include/cef_v8.h"
@@ -34,9 +35,9 @@ CefRefPtr<JSObject> PyJSObject::GetJSObject()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-int PyJSObject::GetIdentifier()
+boost::python::object PyJSObject::GetIdentifier()
 {
-	return m_Object->GetIdentifier();
+	return boost::python::object( m_Object->GetIdentifier().ToString().c_str() );
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +114,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 			const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
 			const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
 			char buf[512];
-			V_snprintf( buf, 512, "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+			V_snprintf( buf, sizeof(buf), "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
 			PyErr_SetString( PyExc_ValueError, buf );
 			throw boost::python::error_already_set(); 
 		}
@@ -152,11 +153,24 @@ boost::python::list CefValueListToPy( CefRefPtr<CefListValue> l )
 				result.append( l->GetString( i ).ToString().c_str() );
 				break;
 			}
-			/*case VTYPE_BINARY:
+			case VTYPE_BINARY:
 			{
-				result.append( l->GetBinary( i )->GetData );
+				WarsCefData_t warsCefData;
+				l->GetBinary( i )->GetData( &warsCefData, sizeof( warsCefData ), 0 );
+				if( warsCefData.type == WARSCEF_TYPE_JSOBJECT )
+				{
+					WarsCefJSObject_t warsCefJSObject;
+					l->GetBinary( i )->GetData( &warsCefJSObject, sizeof( warsCefJSObject ), 0 );
+
+					CefRefPtr<JSObject> jsResultObject = new JSObject( "", warsCefJSObject.uuid );
+					result.append( boost::python::object( PyJSObject( jsResultObject ) ) );
+				}
+				else
+				{
+					result.append( boost::python::object() );
+				}
 				break;
-			}*/
+			}
 			case VTYPE_DICTIONARY:
 			{
 				result.append( CefDictionaryValueToPy( l->GetDictionary( i ) ) );
@@ -246,7 +260,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 			const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
 			const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
 			char buf[512];
-			V_snprintf( buf, 512, "PyToCefDictionaryValue: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+			V_snprintf( buf, sizeof(buf), "PyToCefDictionaryValue: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
 			PyErr_SetString(PyExc_ValueError, buf );
 			throw boost::python::error_already_set(); 
 		}
@@ -289,6 +303,25 @@ boost::python::dict CefDictionaryValueToPy( CefRefPtr<CefDictionaryValue> d )
 			case VTYPE_STRING:
 			{
 				result[k.c_str()] = d->GetString( keys[i] ).ToString().c_str();
+				break;
+			}
+			case VTYPE_BINARY:
+			{
+				WarsCefData_t warsCefData;
+				CefRefPtr<CefBinaryValue> binaryData = d->GetBinary( keys[i] );
+				binaryData->GetData( &warsCefData, sizeof( warsCefData ), 0 );
+				if( warsCefData.type == WARSCEF_TYPE_JSOBJECT )
+				{
+					WarsCefJSObject_t warsCefJSObject;
+					binaryData->GetData( &warsCefJSObject, sizeof( warsCefJSObject ), 0 );
+
+					CefRefPtr<JSObject> jsResultObject = new JSObject( "", warsCefJSObject.uuid );
+					result[k.c_str()] = boost::python::object( PyJSObject( jsResultObject ) );
+				}
+				else
+				{
+					result[k.c_str()] = boost::python::object();
+				}
 				break;
 			}
 			case VTYPE_DICTIONARY:

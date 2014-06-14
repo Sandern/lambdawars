@@ -18,21 +18,22 @@ class CefFrame;
 class JSObject
 {
 public:
-	JSObject( const char *pName = "" );
+	JSObject( const char *pName = "", const char *pUUID = NULL );
+	~JSObject();
 
-	int GetIdentifier();
+	CefString GetIdentifier();
 	CefString GetName();
 
 private:
-	int m_iIdentifier;
 	CefString m_Name;
+	CefString m_UUID;
 
 	IMPLEMENT_REFCOUNTING( JSObject );
 };
 
-inline int JSObject::GetIdentifier()
+inline CefString JSObject::GetIdentifier()
 {
-	return m_iIdentifier;
+	return m_UUID;
 }
 
 inline CefString JSObject::GetName()

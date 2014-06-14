@@ -33,7 +33,7 @@ public:
 
 	CefRefPtr<JSObject> GetJSObject();
 
-	int GetIdentifier();
+	boost::python::object GetIdentifier();
 	boost::python::object GetName();
 
 private:

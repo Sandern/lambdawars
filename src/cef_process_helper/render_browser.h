@@ -6,11 +6,20 @@
 
 #include "include/cef_app.h"
 #include "include/cef_v8.h"
+#include "warscef/wars_cef_shared.h"
 
 class RenderBrowser;
 class ClientApp;
 
 #define INVALID_IDENTIFIER -1
+
+class WarsCefUserData : public CefBase 
+{
+public:
+	WarsCefUserData() {}
+	CefString function_uuid;
+	IMPLEMENT_REFCOUNTING(UserData);
+};
 
 class FunctionV8Handler : public CefV8Handler
 {
@@ -59,14 +68,19 @@ public:
 	void Clear();
 
 	// Creating new objects
-	bool RegisterObject( int iIdentifier, CefRefPtr<CefV8Value> object );
+	bool RegisterObject( CefRefPtr<CefV8Value> object, WarsCefJSObject_t &data );
+	bool RegisterObject( CefString identifier, CefRefPtr<CefV8Value> object );
 
-	bool CreateGlobalObject( int iIdentifier, CefString name );
+	CefRefPtr<CefV8Value> FindObjectForUUID( CefString uuid );
 
-	bool CreateFunction( int iIdentifier, CefString name, int iParentIdentifier = -1, bool bCallback = false );
+	bool CreateGlobalObject( CefString identifier, CefString name );
+
+	bool CreateFunction( CefString identifier, CefString name, CefString iParentIdentifier = "", bool bCallback = false );
+
+
 
 	// Function calling with "result"
-	bool ExecuteJavascriptWithResult( int iIdentifier, CefString code );
+	bool ExecuteJavascriptWithResult( CefString identifier, CefString code );
 
 	// Function handlers
 	bool CallFunction(	CefRefPtr<CefV8Value> object, 
@@ -75,16 +89,16 @@ public:
 						CefRefPtr<CefV8Value> callback = NULL );
 
 	bool DoCallback( int iCallbackID, CefRefPtr<CefListValue> methodargs );
-	bool Invoke( int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
-	bool InvokeWithResult( int iResultIdentifier, int iIdentifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
+	bool Invoke( CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
+	bool InvokeWithResult( CefString iResultIdentifier, CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 
 private:
 	CefRefPtr<CefBrowser> m_Browser;
 	CefRefPtr<ClientApp> m_ClientApp;
 	CefRefPtr<CefV8Context> m_Context;
 
-	std::map< int, CefRefPtr<CefV8Value> > m_Objects;
-	std::map< CefString, CefRefPtr<CefV8Value> > m_GlobalObjects;
+	std::map< CefString, CefRefPtr<CefV8Value>> m_Objects;
+	std::map< CefString, CefRefPtr<CefV8Value>> m_GlobalObjects;
 
 	typedef struct jscallback_t {
 		int callbackid;

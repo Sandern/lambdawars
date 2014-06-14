@@ -295,11 +295,16 @@ void CWarsFlora::GenerateFloraUUID()
     UuidCreate ( &uuid );
 
     unsigned char * str;
-    UuidToStringA ( &uuid, &str );
+    if( UuidToStringA ( &uuid, &str ) == RPC_S_OK )
+	{
+		m_iszFloraUUID = AllocPooledString( ( char* ) str );
 
-	m_iszFloraUUID = AllocPooledString( ( char* ) str );
-
-    RpcStringFreeA ( &str );
+		RpcStringFreeA ( &str );
+	}
+	else
+	{
+		Warning( "WarsFlora::GenerateFloraUUID: Could not generate flora UUID\n");
+	}
 #else
     uuid_t uuid;
     uuid_generate_random ( uuid );

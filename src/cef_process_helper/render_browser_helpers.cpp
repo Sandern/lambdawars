@@ -1,10 +1,12 @@
 #include "render_browser_helpers.h"
-
+#include "render_browser.h"
+#include "client_app.h"
+#include "warscef/wars_cef_shared.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Helper for converting a V8ValueList to CefList
 //-----------------------------------------------------------------------------
-void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListValue> args )
+void V8ValueListToListValue( RenderBrowser *pBrowser, const CefV8ValueList& arguments, CefRefPtr<CefListValue> args )
 {
 	int idx = 0;
 
@@ -31,7 +33,10 @@ void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListV
 		}
 		else if( value->IsObject() )
 		{
-			args->SetString( idx, value->GetStringValue() );
+			WarsCefJSObject_t data;
+			pBrowser->RegisterObject( value, data );
+			CefRefPtr<CefBinaryValue> pRefData = CefBinaryValue::Create( &data, sizeof( data ) );
+			args->SetBinary( idx, pRefData );
 		}
 		else
 		{
@@ -42,7 +47,24 @@ void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListV
 	}
 }
 
-CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryValue> args, const CefString &key )
+static CefRefPtr<CefV8Value> BinaryToV8Value( RenderBrowser *pBrowser, CefRefPtr<CefBinaryValue> binaryValue )
+{
+	WarsCefData_t warsCefData;
+	binaryValue->GetData( &warsCefData, sizeof( warsCefData ), 0 );
+	if( warsCefData.type == WARSCEF_TYPE_JSOBJECT )
+	{
+		WarsCefJSObject_t warsCefJSObject;
+		binaryValue->GetData( &warsCefJSObject, sizeof( warsCefJSObject ), 0 );
+
+		return pBrowser->FindObjectForUUID( warsCefJSObject.uuid );
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+CefRefPtr<CefV8Value> DictionaryValueToV8Value( RenderBrowser *pBrowser, const CefRefPtr<CefDictionaryValue> args, const CefString &key )
 {
 	CefRefPtr<CefV8Value> ret = NULL;
 
@@ -69,6 +91,11 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryVal
 			ret = CefV8Value::CreateString( args->GetString( key ) );
 			break;
 		}
+		case VTYPE_BINARY:
+		{
+			ret = BinaryToV8Value( pBrowser, args->GetBinary( key ) );
+			break;
+		}
 		case VTYPE_LIST:
 		{
 			CefRefPtr<CefListValue> src = args->GetList( key );
@@ -76,7 +103,7 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryVal
 			if( v )
 			{
 				for( int i = 0; i < v->GetArrayLength(); i++ )
-					v->SetValue( i, ListValueToV8Value( src, i ) );
+					v->SetValue( i, ListValueToV8Value( pBrowser, src, i ) );
 				ret = v;
 			}
 			break;
@@ -92,7 +119,7 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryVal
 			{
 				for( size_t i = 0; i < keys.size(); i++ )
 				{
-					v->SetValue( keys[i], DictionaryValueToV8Value( src, keys[i] ), V8_PROPERTY_ATTRIBUTE_NONE );
+					v->SetValue( keys[i], DictionaryValueToV8Value( pBrowser, src, keys[i] ), V8_PROPERTY_ATTRIBUTE_NONE );
 				}
 			}
 			ret = v;
@@ -108,7 +135,7 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryVal
 	return ret ? ret : CefV8Value::CreateString( "Error" );
 }
 
-CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, int idx )
+CefRefPtr<CefV8Value> ListValueToV8Value( RenderBrowser *pBrowser, const CefRefPtr<CefListValue> args, int idx )
 {
 	CefRefPtr<CefV8Value> ret = NULL;
 
@@ -135,6 +162,11 @@ CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, in
 			ret = CefV8Value::CreateString( args->GetString( idx ) );
 			break;
 		}
+		case VTYPE_BINARY:
+		{
+			ret = BinaryToV8Value( pBrowser, args->GetBinary( idx ) );
+			break;
+		}
 		case VTYPE_LIST:
 		{
 			CefRefPtr<CefListValue> src = args->GetList( idx );
@@ -142,7 +174,7 @@ CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, in
 			if( v )
 			{
 				for( int i = 0; i < v->GetArrayLength(); i++ )
-					v->SetValue( i, ListValueToV8Value( src, i ) );
+					v->SetValue( i, ListValueToV8Value( pBrowser, src, i ) );
 				ret = v;
 			}
 			break;
@@ -158,7 +190,7 @@ CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, in
 			{
 				for( size_t i = 0; i < keys.size(); i++ )
 				{
-					v->SetValue( keys[i], DictionaryValueToV8Value( src, keys[i] ), V8_PROPERTY_ATTRIBUTE_NONE );
+					v->SetValue( keys[i], DictionaryValueToV8Value( pBrowser, src, keys[i] ), V8_PROPERTY_ATTRIBUTE_NONE );
 				}
 			}
 			ret = v;
@@ -174,7 +206,7 @@ CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, in
 	return ret ? ret : CefV8Value::CreateString( "Error" );
 }
 
-void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8ValueList& arguments )
+void ListValueToV8ValueList( RenderBrowser *pBrowser, const CefRefPtr<CefListValue> args, CefV8ValueList& arguments )
 {
 	int idx = 0;
 
@@ -183,5 +215,5 @@ void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8ValueList&
 	size_t n = args->GetSize();
 
 	for( size_t i = 0; i < n; i++ )
-		arguments.push_back( ListValueToV8Value( args, i ) );
+		arguments.push_back( ListValueToV8Value( pBrowser, args, i ) );
 }

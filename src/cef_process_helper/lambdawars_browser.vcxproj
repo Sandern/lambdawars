@@ -84,7 +84,7 @@ cscript //nologo ..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../cef</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../cef;../public</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -92,7 +92,7 @@ cscript //nologo ..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../lib/public</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib\common\.;..\lib\public\.</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcef.lib;libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
@@ -128,6 +128,10 @@ cscript //nologo ..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetName).
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wars_browser_helper.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\lib\public\tier0.lib" />
+    <Library Include="..\lib\public\tier1.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -325,7 +325,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::PyOnLoadStart( frame );
     }
 
-    virtual void PyOnMethodCall( int identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
+    virtual void PyOnMethodCall( ::boost::python::api::object identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, PyOnMethodCall )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, PyOnMethodCall )
         bp::override func_OnMethodCall = this->get_override( "OnMethodCall" );
@@ -340,7 +340,7 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
             this->SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
     
-    void default_OnMethodCall( int identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
+    void default_OnMethodCall( ::boost::python::api::object identifier, ::boost::python::api::object methodargs, ::boost::python::api::object callbackid ) {
         SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
 
@@ -564,7 +564,7 @@ BOOST_PYTHON_MODULE(_cef){
         bp::implicitly_convertible< CefRefPtr< JSObject >, PyJSObject >();
         { //property "identifier"[fget=::PyJSObject::GetIdentifier]
         
-            typedef int ( ::PyJSObject::*fget )(  ) ;
+            typedef ::boost::python::api::object ( ::PyJSObject::*fget )(  ) ;
             
             JSObject_exposer.add_property( 
                 "identifier"
@@ -945,8 +945,8 @@ BOOST_PYTHON_MODULE(_cef){
         }
         { //::SrcCefBrowser::PyOnMethodCall
         
-            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( int,::boost::python::api::object,::boost::python::api::object ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( int,::boost::python::api::object,::boost::python::api::object ) ;
+            typedef void ( ::SrcCefBrowser::*OnMethodCall_function_type )( ::boost::python::api::object,::boost::python::api::object,::boost::python::api::object ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnMethodCall_function_type )( ::boost::python::api::object,::boost::python::api::object,::boost::python::api::object ) ;
             
             SrcCefBrowser_exposer.def( 
                 "OnMethodCall"

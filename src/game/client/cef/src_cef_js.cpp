@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "src_cef_js.h"
+#include "warscef/wars_cef_shared.h"
 
 // CEF
 #include "include/cef_v8.h"
@@ -15,8 +16,23 @@
 
 static int s_NextJSObjectID = 0;
 
-JSObject::JSObject( const char *pName )
+JSObject::JSObject( const char *pName, const char *pUUID )
 {
-	m_iIdentifier = s_NextJSObjectID++;
 	m_Name = pName;
+
+	if( pUUID == NULL )
+	{
+		char uuid[37];
+		WarsCef_GenerateUUID( uuid );
+		m_UUID = uuid;
+	}
+	else
+	{
+		m_UUID = pUUID;
+	}
+}
+
+JSObject::~JSObject()
+{
+	// TODO: cleanup
 }

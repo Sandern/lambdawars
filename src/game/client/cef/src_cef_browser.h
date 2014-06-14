@@ -12,6 +12,7 @@
 
 #include <string>
 #include "include/internal/cef_ptr.h"
+#include "include/internal/cef_string.h"
 
 // Forward declarations
 class CefClientHandler;
@@ -113,7 +114,7 @@ public:
 	CefRefPtr<JSObject> InvokeWithResult( CefRefPtr<JSObject> object, const char *methodname,  CefRefPtr<CefListValue> methodargs );
 
 	// Method Handlers
-	virtual void OnMethodCall( int iIdentifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
+	virtual void OnMethodCall( CefString identifier, CefRefPtr<CefListValue> methodargs, int *pCallbackID = NULL );
 
 	// Python methods
 #ifdef ENABLE_PYTHON
@@ -131,7 +132,7 @@ public:
 	void PyInvoke( PyJSObject *object, const char *methodname, boost::python::list methodargs = boost::python::list() );
 	boost::python::object PyInvokeWithResult( PyJSObject *object, const char *methodname, boost::python::list methodargs );
 
-	virtual void PyOnMethodCall( int identifier, boost::python::object methodargs, boost::python::object callbackid ) {}
+	virtual void PyOnMethodCall( boost::python::object identifier, boost::python::object methodargs, boost::python::object callbackid ) {}
 #endif // ENABLE_PYTHON
 
 	void Ping();

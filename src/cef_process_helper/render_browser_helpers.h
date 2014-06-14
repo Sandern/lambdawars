@@ -6,9 +6,11 @@
 
 #include "include/cef_v8.h"
 
-void V8ValueListToListValue( const CefV8ValueList& arguments, CefRefPtr<CefListValue> args );
-CefRefPtr<CefV8Value> DictionaryValueToV8Value( const CefRefPtr<CefDictionaryValue> args, const CefString &key );
-CefRefPtr<CefV8Value> ListValueToV8Value( const CefRefPtr<CefListValue> args, int idx );
-void ListValueToV8ValueList( const CefRefPtr<CefListValue> args, CefV8ValueList& arguments );
+class RenderBrowser;
+
+void V8ValueListToListValue( RenderBrowser *pBrowser, const CefV8ValueList& arguments, CefRefPtr<CefListValue> args );
+CefRefPtr<CefV8Value> DictionaryValueToV8Value( RenderBrowser *pBrowser, const CefRefPtr<CefDictionaryValue> args, const CefString &key );
+CefRefPtr<CefV8Value> ListValueToV8Value( RenderBrowser *pBrowser, const CefRefPtr<CefListValue> args, int idx );
+void ListValueToV8ValueList( RenderBrowser *pBrowser, const CefRefPtr<CefListValue> args, CefV8ValueList& arguments );
 
 #endif // RENDER_BROWSER_HELPERS_H
