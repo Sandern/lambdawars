@@ -1303,6 +1303,23 @@ bool CNavArea::SplitEdit( bool splitAlongX, float splitEdge, CNavArea **outAlpha
 	}
 #endif // CLIENT_DLL
 
+	// Move spots to either alpha or beta
+	const HidingSpotVector *spots = GetHidingSpots();
+	for( int i = 0; i < spots->Count(); i++ )
+	{
+		HidingSpot *pNewSpot = TheNavMesh->CreateHidingSpot();
+		pNewSpot->SetPosition( (*spots)[i]->GetPosition() );
+		pNewSpot->SetFlags( (*spots)[i]->GetFlags() );
+		if( alpha->IsOverlapping( (*spots)[i]->GetPosition() ) )
+		{
+			alpha->AddHidingSpot( pNewSpot );
+		}
+		else
+		{
+			beta->AddHidingSpot( pNewSpot );
+		}
+	}
+
 	// remove original area
 #ifndef CLIENT_DLL
 	TheNavMesh->OnEditDestroyNotify( this );
