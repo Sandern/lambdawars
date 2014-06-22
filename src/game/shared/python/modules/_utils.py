@@ -42,6 +42,7 @@ class Utils(SemiSharedModuleGenerator):
         mb.free_functions('UTIL_FunctionToName').exclude()
         if self.settings.branch == 'swarm':
             mb.free_functions('UTIL_FunctionFromName').exclude()
+        mb.free_function('UTIL_GetModDir').exclude()
         
         # Exclude for now
         mb.free_functions('UTIL_GetDebugColorForRelationship').exclude()
