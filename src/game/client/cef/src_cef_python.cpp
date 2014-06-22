@@ -52,16 +52,18 @@ boost::python::object PyJSObject::GetName()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
+CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l )
 {
 	int n = boost::python::len( l );
 
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
-	for( int i = 0; i < n; i++ )
+	boost::python::object iterator = l.attr("__iter__")();
+	boost::python::ssize_t length = boost::python::len(l); 
+	for( boost::python::ssize_t i = 0; i < length; i++ )
 	{
-		boost::python::object value = l[i];
+		boost::python::object value = iterator.attr( PY_NEXT_METHODNAME )();
 		boost::python::object valuetype = fntype( value );
 
 		if( value == boost::python::object() )
@@ -98,12 +100,12 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::list l )
 			result->SetBool( i, boost::python::extract<bool>(value) );
 		}
 #if PY_VERSION_HEX >= 0x03000000
-		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
 #else
-		else if( valuetype == builtins.attr("list") )
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
 #endif // PY_VERSION_HEX >= 0x03000000
 		{
-			result->SetList( i, PyToCefValueList( boost::python::list( value ) ) );
+			result->SetList( i, PyToCefValueList( value ) );
 		}
 		else if( valuetype == builtins.attr("dict") )
 		{
@@ -244,12 +246,12 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 			result->SetBool( cefkey, boost::python::extract<bool>(value) );
 		}
 #if PY_VERSION_HEX >= 0x03000000
-		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("map") )
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
 #else
-		else if( valuetype == builtins.attr("list") )
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
 #endif // PY_VERSION_HEX >= 0x03000000
 		{
-			result->SetList( cefkey, PyToCefValueList( boost::python::list( value ) ) );
+			result->SetList( cefkey, PyToCefValueList( value ) );
 		}
 		else if( valuetype == builtins.attr("dict") )
 		{
