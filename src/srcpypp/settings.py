@@ -66,6 +66,7 @@ modules = [
     ('_vgui', 'VGUI'),
     ('_vguicontrols', 'VGUIControls'),
     ('_cef', 'CEF'),
+    ('_gameui', 'GameUI'),
     
     # Wars
     ('unit_helper', 'UnitHelper'),

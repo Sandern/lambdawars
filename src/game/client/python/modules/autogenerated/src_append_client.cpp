@@ -15,11 +15,13 @@ extern "C" __declspec(dllexport) PYINIT_DECL(_input)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_vgui)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_vguicontrols)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_cef)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_gameui)();
 #else
 extern "C" PYINIT_DECL(_input)();
 extern "C" PYINIT_DECL(_vgui)();
 extern "C" PYINIT_DECL(_vguicontrols)();
 extern "C" PYINIT_DECL(_cef)();
+extern "C" PYINIT_DECL(_gameui)();
 #endif // _WIN32
 
 // The append function
@@ -29,4 +31,5 @@ void AppendClientModules()
 	APPEND_MODULE(_vgui)
 	APPEND_MODULE(_vguicontrols)
 	APPEND_MODULE(_cef)
+	APPEND_MODULE(_gameui)
 }
