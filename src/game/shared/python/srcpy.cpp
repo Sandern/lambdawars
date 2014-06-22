@@ -29,6 +29,9 @@
 #include <winlite.h>
 #endif // WIN32
 
+//#include "../python/importlib.h" // Original
+#include "srcpy_importlib.h" // Custom importlib for loading from vpk files
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -59,6 +62,14 @@ extern "C"
 
 	// Needed to free dynamic imported modules (i.e. pyd modules)
 	void PyImport_FreeDynLibraries( void );
+
+	// Custom frozen modules
+	static const struct _frozen _PyImport_FrozenModules[] = {
+		/* importlib */
+		{"_frozen_importlib", _Py_M__importlib, (int)sizeof(_Py_M__importlib)},
+		{0, 0, 0} /* sentinel */
+	};
+
 }
 #endif // WIN32
 
@@ -168,6 +179,8 @@ CSrcPython::CSrcPython()
 #endif // CLIENT_DLL
 	AppendSharedModules();
 
+	PyImport_FrozenModules = _PyImport_FrozenModules;
+
 #ifdef CLIENT_DLL
 	DevMsg( "CLIENT: " );
 #else
@@ -260,6 +273,10 @@ bool CSrcPython::InitInterpreter( void )
 	if( m_bPythonRunning )
 		return true;
 
+	filesystem->AddVPKFile( "python\\pythonlib_dir.vpk" );
+
+	const int iVerbose = CommandLine() ? CommandLine()->ParmValue("-pythonverbose", 0) : 0;
+
 #ifdef CLIENT_DLL
 	// WarsSplitscreen: only one player
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
@@ -313,6 +330,16 @@ bool CSrcPython::InitInterpreter( void )
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 #endif // WIN32
 
+	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
+	V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
+
+	if( filesystem->FileExists( "python/Lib", "MOD" ) == false )
+	{
+		filesystem->CreateDirHierarchy( "python/Lib", "MOD" );
+	}
+
 	filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
 	V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, buf, sizeof(pythonpath) );
@@ -331,7 +358,7 @@ bool CSrcPython::InitInterpreter( void )
 	
 	if( g_debug_python.GetBool() )
 	{
-		DevMsg("PYTHONPATH: %s: %d\nPYTHONHOME: %s (d)\n", 
+		DevMsg("PYTHONPATH: %s (%d)\nPYTHONHOME: %s (%d)\n", 
 			pythonpath, V_strlen(pythonpath), pythonhome, V_strlen(pythonhome));
 	}
 
@@ -343,8 +370,6 @@ bool CSrcPython::InitInterpreter( void )
     ::setenv( "PYTHONPATH", pythonpath, 1 );
 #endif // WIN32
 
-	//DevMsg( "PYTHONHOME: %s\nPYTHONPATH: %s\n", pythonhome, pythonpath );
-    
 #ifdef OSX
 	Py_NoSiteFlag = 1;
 #endif // OSX
@@ -355,6 +380,9 @@ bool CSrcPython::InitInterpreter( void )
 	if( !developer.GetBool() )
 		Py_OptimizeFlag = 1;
 #endif // _DEBUG
+
+	if( iVerbose > 0 )
+		Py_VerboseFlag = iVerbose;
 
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
