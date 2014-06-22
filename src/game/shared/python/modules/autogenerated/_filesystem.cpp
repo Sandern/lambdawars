@@ -30,12 +30,34 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_FullPathToRelativePath
     
-        typedef ::boost::python::api::object ( *FullPathToRelativePath_function_type )( char const *,char const * );
+        typedef ::boost::python::api::object ( *FullPathToRelativePath_function_type )( char const *,char const *,::boost::python::api::object );
         
         bp::def( 
             "FullPathToRelativePath"
             , FullPathToRelativePath_function_type( &::PyFS_FullPathToRelativePath )
-            , ( bp::arg("path"), bp::arg("pathid")=bp::object() ) );
+            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("defaultvalue")=boost::python::api::object() ) );
+    
+    }
+
+    { //::PyFS_GetFileTime
+    
+        typedef long int ( *GetFileTime_function_type )( char const *,char const * );
+        
+        bp::def( 
+            "GetFileTime"
+            , GetFileTime_function_type( &::PyFS_GetFileTime )
+            , ( bp::arg("pFileName"), bp::arg("pPathID")=bp::object() ) );
+    
+    }
+
+    { //::PyFS_IsAbsolutePath
+    
+        typedef bool ( *IsAbsolutePath_function_type )( char const * );
+        
+        bp::def( 
+            "IsAbsolutePath"
+            , IsAbsolutePath_function_type( &::PyFS_IsAbsolutePath )
+            , ( bp::arg("path") ) );
     
     }
 
@@ -52,12 +74,12 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_ListDir
     
-        typedef ::boost::python::list ( *ListDir_function_type )( char const *,char const *,char const * );
+        typedef ::boost::python::list ( *ListDir_function_type )( char const *,char const *,char const *,bool );
         
         bp::def( 
             "ListDir"
             , ListDir_function_type( &::PyFS_ListDir )
-            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*" ) );
+            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("wildcard")="*", bp::arg("appendslashdir")=(bool)(true) ) );
     
     }
 
@@ -74,12 +96,23 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_RelativePathToFullPath
     
-        typedef ::boost::python::api::object ( *RelativePathToFullPath_function_type )( char const *,char const * );
+        typedef ::boost::python::api::object ( *RelativePathToFullPath_function_type )( char const *,char const *,::boost::python::api::object );
         
         bp::def( 
             "RelativePathToFullPath"
             , RelativePathToFullPath_function_type( &::PyFS_RelativePathToFullPath )
-            , ( bp::arg("path"), bp::arg("pathid")=bp::object() ) );
+            , ( bp::arg("path"), bp::arg("pathid")=bp::object(), bp::arg("defaultvalue")=boost::python::api::object() ) );
+    
+    }
+
+    { //::PyFS_Size
+    
+        typedef unsigned int ( *Size_function_type )( char const *,char const * );
+        
+        bp::def( 
+            "Size"
+            , Size_function_type( &::PyFS_Size )
+            , ( bp::arg("pFileName"), bp::arg("pPathID")=bp::object() ) );
     
     }
 }
