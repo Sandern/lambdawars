@@ -26,8 +26,8 @@ static void CalcBoundaries( Vector *list, const int &num, Vector &min, Vector &m
 	{
 		for ( int x = 0; x < 3; x++ )
 		{
-			min[ x ] = MIN( min[ x ], list[ i ][ x ] );
-			max[ x ] = MAX( max[ x ], list[ i ][ x ] );
+			min[ x ] = Min( min[ x ], list[ i ][ x ] );
+			max[ x ] = Max( max[ x ], list[ i ][ x ] );
 		}
 	}
 }
@@ -431,6 +431,9 @@ void CEditorSystem::PostRender()
 void CEditorSystem::FrameUpdatePostEntityThink()
 {
 	if( !IsActive() )
+		return;
+
+	if( !warseditorstorage )
 		return;
 
 	KeyValues *pCommand = NULL;
