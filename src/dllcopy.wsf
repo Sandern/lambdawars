@@ -12,7 +12,7 @@
   <!-- Script Constants: -->
   <object id="fsObject" progid="Scripting.FileSystemObject" />
   <object id="wshShell" progid="WScript.Shell" />
-  <resource id="mod directory">SteamApps\common\Lambda Wars\lambdawars</resource>
+  <resource id="mod directory">SteamApps\common\Lambda Wars\lambdawarsdev</resource>
   <resource id="subdirectory">bin</resource>
   <!-- For Games: -->
   <resource id="reg value">HKCU\Software\Valve\Steam\SteamPath</resource>
