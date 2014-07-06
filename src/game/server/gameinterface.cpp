@@ -1133,6 +1133,9 @@ bool CServerGameDLL::SupportsSaveRestore()
 // Called any time a new level is started (after GameInit() also on level transitions within a game)
 bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background )
 {
+	m_bPaused = false;
+	m_bWasPaused = false;
+
 	VPROF("CServerGameDLL::LevelInit");
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );
@@ -1543,6 +1546,9 @@ void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_
 // Called when a level is shutdown (including changing levels)
 void CServerGameDLL::LevelShutdown( void )
 {
+	m_bPaused = false;
+	m_bWasPaused = false;
+
 #if !defined( NO_STEAM )
 	steamgameserverapicontext->Clear();
 #endif
