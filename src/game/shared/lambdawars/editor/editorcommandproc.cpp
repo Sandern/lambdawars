@@ -41,6 +41,10 @@ bool CEditorSystem::ProcessCommand( KeyValues *pCommand )
 	{
 		return ProcessSelectCommand( pCommand );
 	}
+	else if( V_strcmp( pOperation, "edit" ) == 0 )
+	{
+		return ProcessEditCommand( pCommand );
+	}
 
 	Warning( "CEditorSystem::ProcessCommand: unprocessed operation type \"%s\"\n", pOperation );
 	return true;
@@ -177,6 +181,37 @@ bool CEditorSystem::ProcessSelectCommand( KeyValues *pCommand )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CEditorSystem::ProcessEditCommand( KeyValues *pCommand )
+{
+	KeyValues *pAttributes = pCommand->FindKey("keyvalues");
+	if( pAttributes )
+	{
+		for( int i = 0; i < GetNumSelected(); i++ )
+		{
+			CBaseEntity *pEnt = GetSelected( i );
+			if( !pEnt )
+				continue;
+
+			FOR_EACH_VALUE( pAttributes, pValue )
+			{
+				pEnt->KeyValue( pValue->GetName(), pValue->GetString() );
+			}
+
+			// Sequences of flora might have changed
+			CWarsFlora *pFlora = dynamic_cast<CWarsFlora *>( pEnt );
+			if( pFlora )
+			{
+				pFlora->InitFloraSequences();
+			}
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::QueueCommand( KeyValues *pCommand )
 {
 	warseditorstorage->QueueClientCommand( pCommand->MakeCopy() );
@@ -217,5 +252,17 @@ KeyValues *CEditorSystem::CreateClearSelectionCommand()
 {
 	KeyValues *pOperation = new KeyValues( "data" );
 	pOperation->SetString("operation", "clearselection");
+	return pOperation;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+KeyValues *CEditorSystem::CreateEditCommand( KeyValues *pAttributes )
+{
+	KeyValues *pOperation = new KeyValues( "data" );
+	pOperation->SetString("operation", "edit");
+	pAttributes->SetName("keyvalues"); // Override name, not nice
+	pOperation->AddSubKey(pAttributes);
 	return pOperation;
 }

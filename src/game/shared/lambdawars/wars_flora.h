@@ -32,6 +32,7 @@ public:
 #endif // CLIENT_DLL
 	virtual void Spawn();
 	virtual void InitFloraData();
+	virtual void InitFloraSequences();
 
 	// For managing flora in ingame prop editor
 	bool HasFloraUUID();
@@ -78,6 +79,12 @@ public:
 
 	bool			FillKeyValues( KeyValues *pEntityKey, int iVisGroupId = -1 );
 
+	const char *	GetIdleAnimationName();
+	const char *	GetSqueezeDownAnimationName();
+	const char *	GetSqueezeDownIdleAnimationName();
+	const char *	GetSqueezeUpAnimationName();
+	const char *	GetDestructAnimationName();
+	
 private:
 	int				m_iKey;
 
@@ -113,6 +120,27 @@ private:
 inline bool CWarsFlora::IsEditorManaged()
 {
 	return m_bEditorManaged;
+}
+
+inline const char *CWarsFlora::GetIdleAnimationName()
+{
+	return STRING( m_iszIdleAnimationName );
+}
+inline const char *CWarsFlora::GetSqueezeDownAnimationName()
+{
+	return STRING( m_iszSqueezeDownAnimationName );
+}
+inline const char *CWarsFlora::GetSqueezeDownIdleAnimationName()
+{
+	return STRING( m_iszSqueezeDownIdleAnimationName );
+}
+inline const char *CWarsFlora::GetSqueezeUpAnimationName()
+{
+	return STRING( m_iszSqueezeUpAnimationName );
+}
+inline const char *CWarsFlora::GetDestructAnimationName()
+{
+	return STRING( m_iszDestructionAnimationName );
 }
 
 #endif // WARS_FLORA_H

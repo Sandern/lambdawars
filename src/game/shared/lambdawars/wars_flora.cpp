@@ -184,19 +184,11 @@ void CWarsFlora::Spawn()
 #endif // CLIENT_DLL
 
 	InitFloraData();
-
-	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
-	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
-	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
-	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
-	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
+	InitFloraSequences();
 
 	m_iPoseX = LookupPoseParameter( "x" );
 	m_iPoseY = LookupPoseParameter( "y" );
 	m_iPoseZ = LookupPoseParameter( "z" );
-
-	if( m_iIdleSequence != -1 )
-		SetSequence( m_iIdleSequence );
 
 	SetSolid( SOLID_NONE );
 	Vector vecMins = CollisionProp()->OBBMins();
@@ -275,6 +267,21 @@ void CWarsFlora::InitFloraData()
 	float fademaxdist = pSection->GetFloat( keyMaxDist, GetMaxFadeDist() < 1.0f ? 2500.0f : GetMaxFadeDist() );
 	SetDistanceFade( fademindist, fademaxdist );
 #endif // CLIENT_DLL
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Reads out sequences
+//-----------------------------------------------------------------------------
+void CWarsFlora::InitFloraSequences()
+{
+	m_iIdleSequence = (m_iszIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszIdleAnimationName ) ) : -1);
+	m_iSqueezeDownSequence = (m_iszSqueezeDownAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownAnimationName ) ) : -1);
+	m_iSqueezeDownIdleSequence = (m_iszSqueezeDownIdleAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeDownIdleAnimationName ) ) : -1);
+	m_iSqueezeUpSequence = (m_iszSqueezeUpAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszSqueezeUpAnimationName ) ) : -1);
+	m_iDestructSequence = (m_iszDestructionAnimationName != NULL_STRING ? LookupSequence( STRING( m_iszDestructionAnimationName ) ) : -1);
+
+	if( m_iIdleSequence != -1 )
+		SetSequence( m_iIdleSequence );
 }
 
 //-----------------------------------------------------------------------------

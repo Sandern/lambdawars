@@ -602,8 +602,23 @@ void register_CWarsFlora_class(){
             "GenerateFloraUUID"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GenerateFloraUUID ) )    
         .def( 
+            "GetDestructAnimationName"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetDestructAnimationName ) )    
+        .def( 
             "GetFloraUUID"
             , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetFloraUUID ) )    
+        .def( 
+            "GetIdleAnimationName"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetIdleAnimationName ) )    
+        .def( 
+            "GetSqueezeDownAnimationName"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetSqueezeDownAnimationName ) )    
+        .def( 
+            "GetSqueezeDownIdleAnimationName"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetSqueezeDownIdleAnimationName ) )    
+        .def( 
+            "GetSqueezeUpAnimationName"
+            , (char const * ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::GetSqueezeUpAnimationName ) )    
         .def( 
             "HasFloraUUID"
             , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::HasFloraUUID ) )    
@@ -628,6 +643,9 @@ void register_CWarsFlora_class(){
         .def( 
             "InitFloraGrid"
             , (void (*)(  ))( &::CWarsFlora::InitFloraGrid ) )    
+        .def( 
+            "InitFloraSequences"
+            , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::InitFloraSequences ) )    
         .def( 
             "Initialize"
             , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::Initialize ) )    

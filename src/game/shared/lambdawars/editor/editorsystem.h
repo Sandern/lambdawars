@@ -93,10 +93,12 @@ public:
 	bool ProcessCreateCommand( KeyValues *pCommand );
 	bool ProcessDeleteFloraCommand( KeyValues *pCommand );
 	bool ProcessSelectCommand( KeyValues *pCommand );
+	bool ProcessEditCommand( KeyValues *pCommand );
 
 	void QueueCommand( KeyValues *pCommand );
 	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
 	KeyValues *CreateClearSelectionCommand();
+	KeyValues *CreateEditCommand( KeyValues *pAttributes );
 
 private:
 	// Selection

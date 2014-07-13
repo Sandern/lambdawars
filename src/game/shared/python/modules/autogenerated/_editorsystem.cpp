@@ -56,6 +56,17 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::CEditorSystem::CreateEditCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateEditCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateEditCommand"
+                , CreateEditCommand_function_type( &::CEditorSystem::CreateEditCommand )
+                , ( bp::arg("pAttributes") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CEditorSystem::CreateFloraCreateCommand
         
             typedef ::KeyValues * ( ::CEditorSystem::*CreateFloraCreateCommand_function_type )( ::CWarsFlora *,::Vector const * ) ;
@@ -255,6 +266,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pCommand") ) );
         
         }
+        { //::CEditorSystem::ProcessEditCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessEditCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessEditCommand"
+                , ProcessEditCommand_function_type( &::CEditorSystem::ProcessEditCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::ProcessSelectCommand
         
             typedef bool ( ::CEditorSystem::*ProcessSelectCommand_function_type )( ::KeyValues * ) ;
@@ -387,6 +408,17 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "CreateClearSelectionCommand"
                 , CreateClearSelectionCommand_function_type( &::CEditorSystem::CreateClearSelectionCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateEditCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateEditCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateEditCommand"
+                , CreateEditCommand_function_type( &::CEditorSystem::CreateEditCommand )
+                , ( bp::arg("pAttributes") )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
@@ -585,6 +617,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "ProcessDeleteFloraCommand"
                 , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessEditCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessEditCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessEditCommand"
+                , ProcessEditCommand_function_type( &::CEditorSystem::ProcessEditCommand )
                 , ( bp::arg("pCommand") ) );
         
         }
