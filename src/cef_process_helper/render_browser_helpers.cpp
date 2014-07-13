@@ -11,10 +11,10 @@ void V8ValueListToListValue( RenderBrowser *pBrowser, const CefV8ValueList& argu
 	int idx = 0;
 
 	// Add arguments
-	CefV8ValueList::const_iterator i2 = arguments.begin();
-	for( ; i2 != arguments.end(); ++i2 )
+	CefV8ValueList::const_iterator it = arguments.begin();
+	for( ; it != arguments.end(); ++it )
 	{
-		CefRefPtr<CefV8Value> value = (*i2);
+		CefRefPtr<CefV8Value> value = (*it);
 		if( value->IsBool() )
 		{
 			args->SetBool( idx, value->GetBoolValue() );
@@ -30,6 +30,17 @@ void V8ValueListToListValue( RenderBrowser *pBrowser, const CefV8ValueList& argu
 		else if( value->IsString() )
 		{
 			args->SetString( idx, value->GetStringValue() );
+		}
+		else if( value->IsArray() )
+		{
+			CefV8ValueList subvalues; 
+			for( int i = 0; i < value->GetArrayLength(); i++ )
+			{
+				subvalues.push_back( value->GetValue( i ) );
+			}
+			CefRefPtr<CefListValue> cefSubValues = CefListValue::Create();
+			V8ValueListToListValue( pBrowser, subvalues, cefSubValues );
+			args->SetList( idx, cefSubValues );
 		}
 		else if( value->IsObject() )
 		{
