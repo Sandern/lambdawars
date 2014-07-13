@@ -329,6 +329,7 @@ void InitAllPythonEntities();
 
 boost::python::object PyGetClassByClassname( const char *class_name );
 boost::python::list PyGetAllClassnames();
+boost::python::dict PyReadDataDesc( CBaseEntity *entity );
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------

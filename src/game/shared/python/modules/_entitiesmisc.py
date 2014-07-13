@@ -91,6 +91,8 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_function('PyGetClassByClassname').rename('GetClassByClassname')
         mb.free_function('PyGetAllClassnames').include()
         mb.free_function('PyGetAllClassnames').rename('GetAllClassnames')
+        mb.free_function('PyReadDataDesc').include()
+        mb.free_function('PyReadDataDesc').rename('ReadDataDesc')
         
         # Client only structs
         cls = mb.class_('SpatializationInfo_t')

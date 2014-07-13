@@ -23,6 +23,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
+
 namespace bp = boost::python;
 
 // -------------------------------------------------------------------------------
@@ -478,6 +480,50 @@ void InitAllPythonEntities( void )
 
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: Allows reading out the data desc of an entity in Python
+//-----------------------------------------------------------------------------
+boost::python::dict PyReadDataDesc( CBaseEntity *entity )
+{
+	bp::dict datadesc;
+	if( !entity )
+		return datadesc;
+
+	char szValue[256];
+
+	for ( datamap_t *dmap = entity->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
+	{
+		int iNumFields = dmap->dataNumFields;
+		typedescription_t 	*pField;
+		typedescription_t *pFields = dmap->dataDesc;
+		for ( int i = 0; i < iNumFields; i++ )
+		{
+			pField = &pFields[i];
+			if( !(pField->flags & FTYPEDESC_KEY) )
+				continue;
+
+			bp::object key( pField->externalName );
+			if( !datadesc.contains( key ) )
+			{
+				szValue[0] = 0;
+				if ( ::ExtractKeyvalue( entity, pFields, iNumFields, pField->externalName, szValue, 256 ) )
+				{
+					try 
+					{
+						datadesc[key] = bp::object( szValue );
+					} 
+					catch( bp::error_already_set & ) // Can happen due decode errors
+					{
+						Warning( "PyReadDataDesc: error while reading key %s\n", pField->externalName );
+						datadesc[key] = bp::object( "<unknown>" );
+					}
+				}
+			}
+		}
+	}
+
+	return datadesc;
+}
 
 // -------------------------------------------------------------------------------
 #ifdef CLIENT_DLL

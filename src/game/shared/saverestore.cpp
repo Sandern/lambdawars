@@ -3463,6 +3463,7 @@ bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields,
 {
 	int i;
 	typedescription_t 	*pField;
+	string_t *pStringValue;
 
 	for ( i = 0; i < iNumFields; i++ )
 	{
@@ -3488,7 +3489,9 @@ bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields,
 			case FIELD_MODELNAME:
 			case FIELD_SOUNDNAME:
 			case FIELD_STRING:
-				Q_strncpy( szValue, ((char *)pObject + fieldOffset), iMaxLen );
+				//Q_strncpy( szValue, ((char *)pObject + fieldOffset), iMaxLen ); // Bug: This should always be a string_t?
+				pStringValue = ( string_t* )((char *)pObject + fieldOffset);
+				Q_strncpy( szValue, STRING( *pStringValue ), iMaxLen );
 				return true;
 
 			case FIELD_TIME:

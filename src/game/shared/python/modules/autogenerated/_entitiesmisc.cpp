@@ -2789,8 +2789,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
     
     }
 
-    ptr_imouse_to_py_imouse();
-
     { //::PyGetClassByClassname
     
         typedef ::boost::python::api::object ( *GetClassByClassname_function_type )( char const * );
@@ -2799,6 +2797,19 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "GetClassByClassname"
             , GetClassByClassname_function_type( &::PyGetClassByClassname )
             , ( bp::arg("class_name") ) );
+    
+    }
+
+    ptr_imouse_to_py_imouse();
+
+    { //::PyReadDataDesc
+    
+        typedef ::boost::python::dict ( *ReadDataDesc_function_type )( ::C_BaseEntity * );
+        
+        bp::def( 
+            "ReadDataDesc"
+            , ReadDataDesc_function_type( &::PyReadDataDesc )
+            , ( bp::arg("entity") ) );
     
     }
 }
