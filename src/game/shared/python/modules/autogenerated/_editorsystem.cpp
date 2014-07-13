@@ -113,6 +113,44 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
         
         }
+        { //::CEditorSystem::GetNumSelected
+        
+            typedef int ( ::CEditorSystem::*GetNumSelected_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetNumSelected"
+                , GetNumSelected_function_type( &::CEditorSystem::GetNumSelected ) );
+        
+        }
+        { //::CEditorSystem::GetSelected
+        
+            typedef ::C_BaseEntity * ( ::CEditorSystem::*GetSelected_function_type )( int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelected"
+                , GetSelected_function_type( &::CEditorSystem::GetSelected )
+                , ( bp::arg("idx") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::GetSelectionCenter
+        
+            typedef ::Vector ( ::CEditorSystem::*GetSelectionCenter_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelectionCenter"
+                , GetSelectionCenter_function_type( &::CEditorSystem::GetSelectionCenter ) );
+        
+        }
+        { //::CEditorSystem::GetSelectionOrientation
+        
+            typedef ::QAngle ( ::CEditorSystem::*GetSelectionOrientation_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelectionOrientation"
+                , GetSelectionOrientation_function_type( &::CEditorSystem::GetSelectionOrientation ) );
+        
+        }
         { //::CEditorSystem::Init
         
             typedef bool ( ::CEditorSystem::*Init_function_type )(  ) ;
@@ -129,6 +167,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "IsActive"
                 , IsActive_function_type( &::CEditorSystem::IsActive ) );
+        
+        }
+        { //::CEditorSystem::IsAnythingSelected
+        
+            typedef bool ( ::CEditorSystem::*IsAnythingSelected_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsAnythingSelected"
+                , IsAnythingSelected_function_type( &::CEditorSystem::IsAnythingSelected ) );
         
         }
         { //::CEditorSystem::IsMapLoaded
@@ -400,6 +447,44 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
         
         }
+        { //::CEditorSystem::GetNumSelected
+        
+            typedef int ( ::CEditorSystem::*GetNumSelected_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetNumSelected"
+                , GetNumSelected_function_type( &::CEditorSystem::GetNumSelected ) );
+        
+        }
+        { //::CEditorSystem::GetSelected
+        
+            typedef ::CBaseEntity * ( ::CEditorSystem::*GetSelected_function_type )( int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelected"
+                , GetSelected_function_type( &::CEditorSystem::GetSelected )
+                , ( bp::arg("idx") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::GetSelectionCenter
+        
+            typedef ::Vector ( ::CEditorSystem::*GetSelectionCenter_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelectionCenter"
+                , GetSelectionCenter_function_type( &::CEditorSystem::GetSelectionCenter ) );
+        
+        }
+        { //::CEditorSystem::GetSelectionOrientation
+        
+            typedef ::QAngle ( ::CEditorSystem::*GetSelectionOrientation_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "GetSelectionOrientation"
+                , GetSelectionOrientation_function_type( &::CEditorSystem::GetSelectionOrientation ) );
+        
+        }
         { //::CEditorSystem::Init
         
             typedef bool ( ::CEditorSystem::*Init_function_type )(  ) ;
@@ -416,6 +501,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "IsActive"
                 , IsActive_function_type( &::CEditorSystem::IsActive ) );
+        
+        }
+        { //::CEditorSystem::IsAnythingSelected
+        
+            typedef bool ( ::CEditorSystem::*IsAnythingSelected_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsAnythingSelected"
+                , IsAnythingSelected_function_type( &::CEditorSystem::IsAnythingSelected ) );
         
         }
         { //::CEditorSystem::IsMapLoaded

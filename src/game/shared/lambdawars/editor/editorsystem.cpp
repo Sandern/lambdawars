@@ -307,6 +307,14 @@ int CEditorSystem::GetNumSelected()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+CBaseEntity *CEditorSystem::GetSelected( int idx )
+{
+	return m_hSelectedEntities.IsValidIndex( idx ) ? m_hSelectedEntities[idx] : NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CEditorSystem::IsAnythingSelected()
 {
 	return GetNumSelected() > 0;

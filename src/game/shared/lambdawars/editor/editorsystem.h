@@ -57,6 +57,12 @@ public:
 	void DeleteSelection();
 	void SetSelectionCenterLocked( bool locked );
 
+	int GetNumSelected();
+	CBaseEntity *GetSelected( int idx );
+	bool IsAnythingSelected();
+	Vector GetSelectionCenter();
+	QAngle GetSelectionOrientation();
+
 #ifndef CLIENT_DLL
 	void ClearCopyCommands();
 	void CopySelection();
@@ -97,11 +103,6 @@ private:
 	bool IsSelected( CBaseEntity *pEntity );
 	void Deselect( CBaseEntity *pEntity );
 	void Select( CBaseEntity *pEntity );
-
-	int GetNumSelected();
-	bool IsAnythingSelected();
-	Vector GetSelectionCenter();
-	QAngle GetSelectionOrientation();
 
 	// Axis interaction for translation/rotation only exists on client
 	// On drag end, the result is synced to server
