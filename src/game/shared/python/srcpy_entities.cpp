@@ -491,6 +491,7 @@ boost::python::dict PyReadDataDesc( CBaseEntity *entity )
 
 	char szValue[256];
 
+	// Read key values from data desc
 	for ( datamap_t *dmap = entity->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
 	{
 		int iNumFields = dmap->dataNumFields;
@@ -521,6 +522,14 @@ boost::python::dict PyReadDataDesc( CBaseEntity *entity )
 			}
 		}
 	}
+
+	// Add in some fixed properties not part of the data desc
+	V_snprintf( szValue, sizeof( szValue ), "%.2f %.2f %.2f", entity->GetAbsOrigin().x, entity->GetAbsOrigin().y, entity->GetAbsOrigin().z );
+	datadesc["origin"] = bp::object( szValue );
+	V_snprintf( szValue, sizeof( szValue ), "%.2f %.2f %.2f", entity->GetAbsAngles().x, entity->GetAbsAngles().y, entity->GetAbsAngles().z );
+	datadesc["angles"] = bp::object( szValue );
+	V_snprintf( szValue, sizeof( szValue ), "%d %d %d", entity->GetRenderColor().r, entity->GetRenderColor().g, entity->GetRenderColor().b );
+	datadesc["rendercolor"] = bp::object( szValue );
 
 	return datadesc;
 }
