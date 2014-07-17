@@ -11,6 +11,10 @@
 
 #include "warseditor/iwars_editor_storage.h"
 
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -198,6 +202,10 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 		}
 		//NDebugOverlay::Box( pBest->GetAbsOrigin(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 255, 5.0f);
 	}
+	else
+	{
+		ClearSelection();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -230,6 +238,46 @@ void CEditorSystem::DeleteSelection()
 
 	m_hSelectedEntities.Purge();
 	warseditorstorage->QueueClientCommand( pOperation );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::ClearSelection()
+{
+	m_hSelectedEntities.Purge();
+	m_bSelectionChanged = true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::Deselect( CBaseEntity *pEntity )
+{
+	m_hSelectedEntities.FindAndRemove( pEntity );
+	m_bSelectionChanged = true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::Select( CBaseEntity *pEntity )
+{
+	if( !m_hSelectedEntities.HasElement( pEntity ) ) {
+		m_hSelectedEntities.AddToTail( pEntity );
+		m_bSelectionChanged = true;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void CEditorSystem::FireSelectionChangedSignal()
+{
+	boost::python::dict kwargs;
+	kwargs["sender"] = boost::python::object();
+	kwargs["selection"] = UtlVectorToListByValue<EHANDLE>( m_hSelectedEntities );
+	SrcPySystem()->CallSignal( SrcPySystem()->Get("editorselectionchanged", "core.signals", true), kwargs );
 }
 
 #ifndef CLIENT_DLL
@@ -429,6 +477,12 @@ void CEditorSystem::PostRender()
 	if( !IsActive() )
 		return;
 
+	if( m_bSelectionChanged )
+	{
+		FireSelectionChangedSignal();
+		m_bSelectionChanged = false;
+	}
+
 	RenderSelection();
 	RenderHelpers();
 }
@@ -440,6 +494,12 @@ void CEditorSystem::FrameUpdatePostEntityThink()
 {
 	if( !IsActive() )
 		return;
+
+	if( m_bSelectionChanged )
+	{
+		FireSelectionChangedSignal();
+		m_bSelectionChanged = false;
+	}
 
 	if( !warseditorstorage )
 		return;

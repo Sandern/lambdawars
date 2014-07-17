@@ -198,6 +198,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , IsMapLoaded_function_type( &::CEditorSystem::IsMapLoaded ) );
         
         }
+        { //::CEditorSystem::IsSelected
+        
+            typedef bool ( ::CEditorSystem::*IsSelected_function_type )( ::C_BaseEntity * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsSelected"
+                , IsSelected_function_type( &::CEditorSystem::IsSelected )
+                , ( bp::arg("pEntity") ) );
+        
+        }
         { //::CEditorSystem::LevelShutdownPreEntity
         
             typedef void ( ::CEditorSystem::*LevelShutdownPreEntity_function_type )(  ) ;
@@ -551,6 +561,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "IsMapLoaded"
                 , IsMapLoaded_function_type( &::CEditorSystem::IsMapLoaded ) );
+        
+        }
+        { //::CEditorSystem::IsSelected
+        
+            typedef bool ( ::CEditorSystem::*IsSelected_function_type )( ::CBaseEntity * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "IsSelected"
+                , IsSelected_function_type( &::CEditorSystem::IsSelected )
+                , ( bp::arg("pEntity") ) );
         
         }
         { //::CEditorSystem::LevelShutdownPreEntity

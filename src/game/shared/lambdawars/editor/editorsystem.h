@@ -57,6 +57,7 @@ public:
 	void DeleteSelection();
 	void SetSelectionCenterLocked( bool locked );
 
+	bool IsSelected( CBaseEntity *pEntity );
 	int GetNumSelected();
 	CBaseEntity *GetSelected( int idx );
 	bool IsAnythingSelected();
@@ -102,9 +103,9 @@ public:
 
 private:
 	// Selection
-	bool IsSelected( CBaseEntity *pEntity );
 	void Deselect( CBaseEntity *pEntity );
 	void Select( CBaseEntity *pEntity );
+	void FireSelectionChangedSignal();
 
 	// Axis interaction for translation/rotation only exists on client
 	// On drag end, the result is synced to server
@@ -163,6 +164,7 @@ private:
 	CUtlVector<EHANDLE> m_hSelectedEntities;
 	bool m_bSelectionCenterLocked;
 	Vector m_vecSelectionCenterCache;
+	bool m_bSelectionChanged;
 
 	CUtlVector<KeyValues *> m_SelectionCopyCommands;
 
@@ -229,26 +231,10 @@ inline const char *CEditorSystem::GetLastMapError()
 {
 	return m_MapManager.GetLastMapError();
 }
-// Selection
-inline void CEditorSystem::ClearSelection()
-{
-	m_hSelectedEntities.Purge();
-}
 
 inline bool CEditorSystem::IsSelected( CBaseEntity *pEntity )
 {
 	return m_hSelectedEntities.HasElement( pEntity );
-}
-
-inline void CEditorSystem::Deselect( CBaseEntity *pEntity )
-{
-	m_hSelectedEntities.FindAndRemove( pEntity );
-}
-
-inline void CEditorSystem::Select( CBaseEntity *pEntity )
-{
-	if( !m_hSelectedEntities.HasElement( pEntity ) )
-		m_hSelectedEntities.AddToTail( pEntity );
 }
 
 #ifdef CLIENT_DLL

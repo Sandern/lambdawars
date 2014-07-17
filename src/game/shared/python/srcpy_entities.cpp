@@ -530,6 +530,7 @@ boost::python::dict PyReadDataDesc( CBaseEntity *entity )
 	datadesc["angles"] = bp::object( szValue );
 	V_snprintf( szValue, sizeof( szValue ), "%d %d %d", entity->GetRenderColor().r, entity->GetRenderColor().g, entity->GetRenderColor().b );
 	datadesc["rendercolor"] = bp::object( szValue );
+	datadesc["modelname"] = bp::object( entity->GetModelName() );
 
 	return datadesc;
 }
