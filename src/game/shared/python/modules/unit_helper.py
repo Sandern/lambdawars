@@ -207,6 +207,10 @@ class UnitHelper(SemiSharedModuleGenerator):
                          , cls.mem_fun('GetFacingTargetPos')
                          , cls.mem_fun('SetFacingTargetPos') )
                          
+        cls.add_property( 'testroutemask'
+                         , cls.mem_fun('GetTestRouteMask')
+                         , cls.mem_fun('SetTestRouteMask') )
+                         
         cls.var('m_fIdealYawTolerance').rename('idealyawtolerance') 
         cls.var('m_fFacingCone').rename('facingcone') 
         cls.var('m_bFacingFaceTarget').rename('facingfacetarget') 
@@ -254,9 +258,6 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.mem_funs().exclude()
         cls.mem_fun('Update').include()
         cls.mem_fun('TestRoute').include()
-        cls.add_property( 'testroutemask'
-                         , cls.mem_fun('GetTestRouteMask')
-                         , cls.mem_fun('SetTestRouteMask') )
         cls.add_property( 'testrouteworldonly'
                          , cls.mem_fun('GetTestRouteWorldOnly')
                          , cls.mem_fun('SetTestRouteWorldOnly') )

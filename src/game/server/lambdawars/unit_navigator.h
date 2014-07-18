@@ -413,6 +413,9 @@ public:
 	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
+	int					GetTestRouteMask();
+	void				SetTestRouteMask( int mask );
+
 	bool				TestNearbyUnitsWithSameGoal( UnitBaseMoveCommand &MoveCommand );
 
 	BlockedStatus_t		GetBlockedStatus( void );
@@ -581,6 +584,8 @@ protected:
 	int m_iBlockResolveDirection;
 	float m_fNextChooseDirection;
 
+	int m_iTestRouteMask;
+
 private:
 	// =============================
 	// Misc variables
@@ -691,6 +696,16 @@ inline bool UnitBaseNavigator::DoFindPathToPosInRange()
 inline bool UnitBaseNavigator::DoFindPathToPos()
 {
 	return DoFindPathToPos( GetPath() );
+}
+
+inline int UnitBaseNavigator::GetTestRouteMask()
+{
+	return m_iTestRouteMask;
+}
+
+inline void UnitBaseNavigator::SetTestRouteMask( int mask )
+{
+	m_iTestRouteMask = mask;
 }
 
 #endif // UNIT_NAVIGATOR_H

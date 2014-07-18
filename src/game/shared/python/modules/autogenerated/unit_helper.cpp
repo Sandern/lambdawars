@@ -1674,6 +1674,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , CreateMoveCommand_function_type( &::UnitBaseLocomotion::CreateMoveCommand ) );
         
         }
+        { //::UnitBaseLocomotion::DoUnstuck
+        
+            typedef void ( ::UnitBaseLocomotion::*DoUnstuck_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "DoUnstuck"
+                , DoUnstuck_function_type( &::UnitBaseLocomotion::DoUnstuck ) );
+        
+        }
         { //::UnitBaseLocomotion::FinishGravity
         
             typedef void ( ::UnitBaseLocomotion::*FinishGravity_function_type )(  ) ;
@@ -4706,6 +4715,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , CreateMoveCommand_function_type( &::UnitBaseLocomotion::CreateMoveCommand ) );
         
         }
+        { //::UnitBaseLocomotion::DoUnstuck
+        
+            typedef void ( ::UnitBaseLocomotion::*DoUnstuck_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "DoUnstuck"
+                , DoUnstuck_function_type( &::UnitBaseLocomotion::DoUnstuck ) );
+        
+        }
         { //::UnitBaseLocomotion::FinishGravity
         
             typedef void ( ::UnitBaseLocomotion::*FinishGravity_function_type )(  ) ;
@@ -5359,6 +5377,17 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , fset( &::UnitBaseNavigator::SetFacingTargetPos ) );
         
         }
+        { //property "testroutemask"[fget=::UnitBaseNavigator::GetTestRouteMask, fset=::UnitBaseNavigator::SetTestRouteMask]
+        
+            typedef int ( ::UnitBaseNavigator::*fget )(  ) ;
+            typedef void ( ::UnitBaseNavigator::*fset )( int ) ;
+            
+            UnitBaseNavigator_exposer.add_property( 
+                "testroutemask"
+                , fget( &::UnitBaseNavigator::GetTestRouteMask )
+                , fset( &::UnitBaseNavigator::SetTestRouteMask ) );
+        
+        }
     }
 
     { //::UnitBaseAirNavigator
@@ -5384,17 +5413,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "Update"
                 , Update_function_type( &::UnitBaseAirNavigator::Update )
                 , ( bp::arg("mv") ) );
-        
-        }
-        { //property "testroutemask"[fget=::UnitBaseAirNavigator::GetTestRouteMask, fset=::UnitBaseAirNavigator::SetTestRouteMask]
-        
-            typedef int ( ::UnitBaseAirNavigator::*fget )(  ) ;
-            typedef void ( ::UnitBaseAirNavigator::*fset )( int ) ;
-            
-            UnitBaseAirNavigator_exposer.add_property( 
-                "testroutemask"
-                , fget( &::UnitBaseAirNavigator::GetTestRouteMask )
-                , fset( &::UnitBaseAirNavigator::SetTestRouteMask ) );
         
         }
         { //property "testrouteworldonly"[fget=::UnitBaseAirNavigator::GetTestRouteWorldOnly, fset=::UnitBaseAirNavigator::SetTestRouteWorldOnly]

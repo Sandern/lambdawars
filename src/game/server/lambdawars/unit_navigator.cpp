@@ -196,6 +196,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_bNoNavAreasNearby = false;
 	m_fNextAllowPathRecomputeTime = 0.0f;
 	m_bLimitPositionActive = false;
+	m_iTestRouteMask = MASK_SOLID;
 }
 #endif // ENABLE_PYTHON
 
@@ -1784,7 +1785,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 	bool bBlocked = false;
 
 	UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin()-Vector(0,0,MAX_TRACE_LENGTH), 
-		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
+		WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
 		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
 	testPos = tr.endpos;
 
@@ -1922,7 +1923,7 @@ bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
 	{
 		trace_t tr;
 		UTIL_TraceHull( GetAbsOrigin() + Vector(0, 0, 16), GetPath()->m_vGoalPos + Vector(0, 0, 16), 
-			WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
+			WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
 			GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
 		if( tr.fraction == 1.0f || tr.m_pEnt == GetPath()->m_hTarget )
 		{
@@ -1955,7 +1956,7 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 	//CTraceFilterWorldOnly filter;
 	trace_t tr;
 	UTIL_TraceHull( vNewStart, nNewEnd, 
-		WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, 
+		WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
 		GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
 	if( tr.fraction != 1.0f )
 	{
@@ -2459,7 +2460,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const 
 		//Do a simple trace
 		trace_t tr;
 		UTIL_TraceHull(GetAbsOrigin()+Vector(0,0,16.0), vGoalPos+Vector(0,0,16.0), 
-			WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
+			WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
 		if( tr.DidHit() && (!GetPath()->m_hTarget || !tr.m_pEnt || tr.m_pEnt != GetPath()->m_hTarget) )
 			return NULL;
 

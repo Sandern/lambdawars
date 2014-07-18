@@ -32,9 +32,6 @@ public:
 
 	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
-	int GetTestRouteMask();
-	void SetTestRouteMask( int mask );
-
 	bool GetTestRouteWorldOnly();
 	void SetTestRouteWorldOnly( bool enable );
 
@@ -44,7 +41,6 @@ public:
 private:
 	float m_fCurrentHeight;
 	float m_fDesiredHeight;
-	int m_iTestRouteMask;
 	bool m_bTestRouteWorldOnly;
 	bool m_bUseSimplifiedRouteBuilding;
 };
@@ -53,16 +49,6 @@ private:
 inline bool UnitBaseAirNavigator::ShouldConsiderNavMesh( void )
 {
 	return false; // Never add density from nav areas
-}
-
-inline int UnitBaseAirNavigator::GetTestRouteMask()
-{
-	return m_iTestRouteMask;
-}
-
-inline void UnitBaseAirNavigator::SetTestRouteMask( int mask )
-{
-	m_iTestRouteMask = mask;
 }
 
 inline bool UnitBaseAirNavigator::GetTestRouteWorldOnly()
