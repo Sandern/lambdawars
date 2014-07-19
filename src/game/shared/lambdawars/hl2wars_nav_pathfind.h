@@ -148,7 +148,7 @@ public:
 					if( heightdiff > m_pUnit->m_fMaxClimbHeight )
 						return -1;
 
-					cost += heightdiff * 2;
+					cost += heightdiff * 3.0f;
 				}
 				else
 				{
@@ -156,7 +156,7 @@ public:
 					if( fabs(heightdiff) > m_pUnit->m_fSaveDrop )
 						return -1;
 
-					cost += fabs(heightdiff) * 1.1f;
+					cost += fabs(heightdiff) * 3.0f;
 				}
 			}
 

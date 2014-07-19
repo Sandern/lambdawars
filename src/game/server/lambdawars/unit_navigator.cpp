@@ -1215,7 +1215,8 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		// Check if the target ent moved into another area. In that case recalculate the path.
 		// In the other case just update the goal pos (quick).
 		// Note that after a path recomputation, we won't try to recompute the path for a while anymore (performance)
-		const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition();
+		//const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition(); // Eye position may be too high for some targets
+		const Vector &vTargetOrigin = GetPath()->m_hTarget->WorldSpaceCenter();
 
 		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 8.0f )
 		{
@@ -1231,7 +1232,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 						GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
 
 				// Update goal target position and recompute
-				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+				GetPath()->m_vGoalPos =vTargetOrigin;
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 					DoFindPathToPosInRange();
 				else
@@ -1243,14 +1244,14 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			else
 			{
 				// Just update goal target position and update the last waypoint
-				GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+				GetPath()->m_vGoalPos = vTargetOrigin;
 				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 			}
 		}
 		else
 		{
 			// Just update goal target position and update the last waypoint
-			GetPath()->m_vGoalPos = GetPath()->m_hTarget->EyePosition();
+			GetPath()->m_vGoalPos = vTargetOrigin;
 			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
 	}
@@ -1668,8 +1669,8 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 	}
 	else
 	{
-		float fToleranceX = pCurWaypoint->flToleranceX+GetPath()->m_waypointTolerance;
-		float fToleranceY = pCurWaypoint->flToleranceY+GetPath()->m_waypointTolerance;
+		float fToleranceX = pCurWaypoint->flToleranceX + GetPath()->m_waypointTolerance;
+		float fToleranceY = pCurWaypoint->flToleranceY + GetPath()->m_waypointTolerance;
 
 		if( ( pCurWaypoint->pTo && IsCompleteInArea(pCurWaypoint->pTo, GetAbsOrigin()) ) || 
 			( (fabs(GetAbsOrigin().x - pCurWaypoint->GetPos().x) < fToleranceY) && 
@@ -1683,13 +1684,13 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 			{
 				if( SpecialGoalStatus == CHS_CLIMB )
 				{
-					Vector end = ComputeWaypointTarget(GetAbsOrigin(), pNextWaypoint);
+					Vector end = ComputeWaypointTarget( GetAbsOrigin(), pNextWaypoint );
 
 					// Calculate climb direction.
 					m_fClimbHeight = end.z - pCurWaypoint->GetPos().z;
 					//Msg("%f = %f - %f (end: %f %f %f, tol: %f %f)\n", m_fClimbHeight, end.z, pCurWaypoint->GetPos().z, end.x, end.y, end.z, pNextWaypoint->flToleranceX, pNextWaypoint->flToleranceY);
 					//UnitComputePathDirection2(pCurWaypoint->GetPos(), pNextWaypoint, m_vecClimbDirection);
-					UnitComputePathDirection(pCurWaypoint->GetPos(), pNextWaypoint->GetPos(), m_vecClimbDirection);
+					UnitComputePathDirection( pCurWaypoint->GetPos(), pNextWaypoint->GetPos(), m_vecClimbDirection );
 				}
 				else if( SpecialGoalStatus == CHS_EDGEDOWN )
 				{
@@ -1819,7 +1820,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 				break;
 
 			// Don't further check in case we encounter a "special travel" node like an edge
-			if( pCurTest->SpecialGoalStatus == CHS_NOSIMPLIFY )
+			if( pCurTest->SpecialGoalStatus == CHS_NOSIMPLIFY || pCurTest->SpecialGoalStatus == CHS_CLIMBDEST || pCurTest->SpecialGoalStatus == CHS_CLIMB )
 				break;
 
 			pCur = pCurTest; // Valid waypoint for checking up to
@@ -2141,7 +2142,7 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 #endif // ENABLE_PYTHON
 		return false;
 	}
-	bool bResult = FindPath( GOALTYPE_TARGETENT, pTarget->EyePosition(), goaltolerance, goalflags, 0, 0, pTarget, avoidenemies );
+	bool bResult = FindPath( GOALTYPE_TARGETENT, pTarget->WorldSpaceCenter(), goaltolerance, goalflags, 0, 0, pTarget, avoidenemies );
 	if( !bResult )
 	{
 		GetPath()->m_iGoalType = GOALTYPE_NONE; // Keep path around for querying the information about the last path
@@ -2513,10 +2514,10 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 	hmargin = margin/2.0f;
 
 	// Shouldn't be needed with the new tolerance settings
-	fromfromdir = fromArea->GetParent() ? OppositeDirection((NavDirType)fromArea->GetParentHow()) : -1;
+	fromfromdir = fromArea->GetParent() ? OppositeDirection( (NavDirType)fromArea->GetParentHow() ) : -1;
 
 	// Get tolerances
-	float fTolerance = Max(halfWidth-hmargin, 0.0f);
+	float fTolerance = Max( halfWidth - hmargin, 0.0f );
 
 	// Calculate tolerance + new hookpos
 
@@ -2656,10 +2657,12 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 					if( dir == WEST || dir == EAST )
 					{
 						pFromAreaWayPoint->flToleranceY = 2.0f;
+						pGoalAreaWayPoint->flToleranceY = 2.0f;
 					}
 					else
 					{
 						pFromAreaWayPoint->flToleranceX = 2.0f;
+						pGoalAreaWayPoint->flToleranceX = 2.0f;
 					}
 
 

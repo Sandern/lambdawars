@@ -40,25 +40,35 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 	MoveCommand.upmove = 0.0f;
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GetPath()->GetCurWaypoint() )
 	{
+		bool bCurTargetIsGoal = (GetPath()->m_iGoalType == GOALTYPE_TARGETENT || GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE) && GetPath()->CurWaypointIsGoal();
+
 		float fTargetZ = GetPath()->GetCurWaypoint()->GetPos().z + (-GetOuter()->CollisionProp()->OBBMins().z);
-		if( m_LastGoalStatus == CHS_CLIMBDEST )
-			fTargetZ += m_fDesiredHeight; // Note: only when it's a climb destination
+		if( m_LastGoalStatus == CHS_CLIMBDEST || !bCurTargetIsGoal )
+			fTargetZ += m_fDesiredHeight;
 
-		if( fTargetZ > GetAbsOrigin().z )
+		if( m_LastGoalStatus == CHS_CLIMBDEST || bCurTargetIsGoal )
 		{
-			// Calculate needed up movement
-			MoveCommand.upmove = Max( 0.0f, Min(
-				fTargetZ - GetAbsOrigin().z,
-				MoveCommand.maxspeed
-			) );
+			if( fTargetZ > GetAbsOrigin().z )
+			{
+				// Calculate needed up movement
+				MoveCommand.upmove = Max( 0.0f, Min(
+					(fTargetZ - GetAbsOrigin().z) / MoveCommand.interval,
+					MoveCommand.maxspeed
+				) );
 
-			// Zero out other movement (so we don't bump into a cliff or wall)
-			if( m_LastGoalStatus == CHS_CLIMBDEST )
-				MoveCommand.forwardmove = MoveCommand.sidemove = 0.0f;
+				// Zero out other movement (so we don't bump into a cliff or wall)
+				if( m_LastGoalStatus == CHS_CLIMBDEST )
+					MoveCommand.forwardmove = MoveCommand.sidemove = 0.0f;
+			}
+			else
+			{
+				// Avoid going down again
+				MoveCommand.upmove = 1.0f;
+			}
 		}
-		else if( m_LastGoalStatus == CHS_CLIMBDEST )
+		else if( fTargetZ > GetAbsOrigin().z )
 		{
-			// Avoid going down again
+			// Avoid going down again to prevent navigation issues
 			MoveCommand.upmove = 1.0f;
 		}
 	}
@@ -85,7 +95,7 @@ CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand 
 bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
 {
 	Vector vStart = vStartPos;
-	vStart.z += m_fDesiredHeight;
+	vStart.z += m_fCurrentHeight;
 	Vector vEnd = vEndPos;
 	vEnd.z += m_fDesiredHeight;
 
@@ -96,6 +106,7 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 		CTraceFilterWorldOnly filter;
 		UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
 			&filter, &tr);
+		//NDebugOverlay::SweptBox( vStart, tr.endpos, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 255, 0.1f );
 	}
 	else
 	{

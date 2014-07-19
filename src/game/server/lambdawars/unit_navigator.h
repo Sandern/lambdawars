@@ -63,7 +63,6 @@ enum CheckGoalStatus_t
 	CHS_CLIMBDEST, // End point of climbing (placed into the new area)
 	CHS_EDGEDOWN, // Fall down, likely a small gap between the two navigation meshes too.
 	CHS_EDGEDOWNDEST,
-	CHS_BLOCKED, // Indicates we are currently blocked and are trying to resolve it
 	CHS_NOSIMPLIFY, // For waypoints, indicates reactive path should not skip this point
 };
 

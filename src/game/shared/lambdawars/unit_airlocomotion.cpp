@@ -109,7 +109,7 @@ void UnitBaseAirLocomotion::FullAirMove()
 	CategorizePosition();
 	UpdateCurrentHeight();
 
-	if( mv->upmove == 0.0f )
+	if( mv->upmove == 0 )
 	{
 		// Get Ground distance and compare to desired height. Modify up/down velocity based on it.
 		float fDiff = m_fDesiredHeight - m_fCurrentHeight;
