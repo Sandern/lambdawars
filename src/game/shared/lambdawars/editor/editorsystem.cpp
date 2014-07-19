@@ -150,7 +150,7 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 			{
 				if( trace.DidHit() )
 				{
-					float fDistance = trace.endpos.DistTo( vStartPos );
+					float fDistance = trace.endpos.DistTo( pFlora->GetAbsOrigin() );
 					if( !pBest || fDistance < fBestDistance )
 					{
 						pBest = pFlora;
@@ -165,7 +165,7 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 					pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMins(), pFlora->GetAbsOrigin() + pFlora->CollisionProp()->OBBMaxs(),
 					0.5f, &trace2 ) )
 				{
-					float fDistance = trace2.endpos.DistTo( vStartPos );
+					float fDistance = trace2.endpos.DistTo( pFlora->GetAbsOrigin() );
 					if( !pBest || fDistance < fBestDistance )
 					{
 						pBest = pFlora;
