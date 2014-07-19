@@ -195,6 +195,12 @@ bool CEditorSystem::ProcessEditCommand( KeyValues *pCommand )
 			FOR_EACH_VALUE( pAttributes, pValue )
 			{
 				pEnt->KeyValue( pValue->GetName(), pValue->GetString() );
+
+				if( V_strcmp( pValue->GetName(), "model" ) == 0 )
+				{
+					CBaseEntity::PrecacheModel( pValue->GetString() );
+					pEnt->SetModel( pValue->GetString() );
+				}
 			}
 
 			// Sequences of flora might have changed
