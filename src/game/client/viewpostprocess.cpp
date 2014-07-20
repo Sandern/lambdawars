@@ -21,7 +21,9 @@
 #include "imaterialproxydict.h"
 #include "model_types.h"
 
-
+#ifdef HL2WARS_DLL
+#include "c_hl2wars_player.h"
+#endif // HL2WARS_DLL
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -2085,11 +2087,17 @@ struct MotionBlurHistory_t
 void DoImageSpaceMotionBlur( const CViewSetup &view )
 {
 
-
 	if ( ( !mat_motion_blur_enabled.GetInt() ) || ( view.m_nMotionBlurMode == MOTION_BLUR_DISABLE ) )
 	{
 		return;
 	}
+
+#ifdef HL2WARS_DLL
+	if( C_HL2WarsPlayer::GetLocalHL2WarsPlayer() && C_HL2WarsPlayer::GetLocalHL2WarsPlayer()->IsStrategicModeOn() )
+	{
+		return;
+	}
+#endif // HL2WARS_DLL
 
 	int x = view.x;
 	int y = view.y;
