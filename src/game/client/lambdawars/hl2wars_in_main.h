@@ -54,9 +54,7 @@ public:
 	virtual		void		UpdateMouseRotation();
 
 	// Speed computation
-	void					ComputeMoveSpeed( float frametime );
 	void					SetScrollTimeOut( bool forward );
-	float					ComputeScrollSpeed( float frametime );
 	void					CapAndSetSpeed( CUserCmd *cmd );
 	
 	// Binding switching
@@ -81,12 +79,14 @@ public:
 	virtual		void		ActivateMouseClipping( void );
 	virtual		void		DeactivateMouseClipping( void );
 
+#ifdef WIN32
 	// Windows
 	void					BuildWindowList();
 	void					AddWindow( HWND hwnd ) { m_Windows.AddToTail( hwnd ); }
 	bool					HasWindowFocus();
 	//HWND					GetWindow();
-
+#endif // WIN32
+	
 private:
 	float					m_fCurrentSampleTime;
 
@@ -115,10 +115,13 @@ private:
 	// What is the current camera offset from the view origin?
 	//Vector		m_vecCameraOffset;
 
+#ifdef WIN32
 	// Windows..
 	CUtlVector< HWND > m_Windows;
+#endif // WIN32
 };
 
+#ifdef WIN32
 #ifdef USECUSTOMMOUSECLIPPING
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -130,6 +133,7 @@ inline HWND CHL2WarsInput::GetWindow()
 	return 0;
 }
 #endif // USECUSTOMMOUSECLIPPING
+#endif // WIN32
 
 //-----------------------------------------------------------------------------
 // Purpose: Update the aim of the mouse pointer

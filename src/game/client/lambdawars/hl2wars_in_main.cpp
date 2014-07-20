@@ -129,7 +129,9 @@ void CHL2WarsInput::Init_All( void )
 {
 	CInput::Init_All();
 
+#ifdef WIN32
 	BuildWindowList();
+#endif // WIN32
 }
 
 //-----------------------------------------------------------------------------
@@ -335,9 +337,6 @@ void CHL2WarsInput::CreateMove ( int sequence_number, float input_sample_frameti
 			// Determine view angles
 			AdjustAngles ( nSlot, input_sample_frametime );
 
-			// Determine movement
-			ComputeMoveSpeed( input_sample_frametime );
-
 			CapAndSetSpeed( cmd );
 		}
 
@@ -464,9 +463,6 @@ void CHL2WarsInput::ExtraMouseSample( float frametime, bool active )
 		// Determine view angles
 		AdjustAngles ( nSlot, frametime );
 
-		// Determine movement
-		ComputeMoveSpeed( frametime );
-
 		CapAndSetSpeed( cmd );
 
 		// Allow mice and other controllers to add their inputs
@@ -509,24 +505,6 @@ void CHL2WarsInput::SetScrollTimeOut(bool forward)
 	m_bScrollForward = forward;
 	m_fScrollTimeOut = gpGlobals->curtime + cl_strategic_cam_scrolltimeout.GetFloat();
 	m_bScrolling = true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-float CHL2WarsInput::ComputeScrollSpeed( float frametime )
-{
-	float fScrollSpeed = 0.0f;
-
-	return fScrollSpeed;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHL2WarsInput::ComputeMoveSpeed( float frametime )
-{
-
 }
 
 //-----------------------------------------------------------------------------
@@ -841,6 +819,7 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 				const Vector& vOrigin = pPlayer->GetAbsOrigin();
 
 				Vector vDir = pPlayer->GetMouseData().m_vWorldOnlyEndPos - vOrigin;
+				vDir.z = 0;
 				float fDistance = VectorNormalize( vDir );
 				Vector vTargetMousePos = vOrigin + (-vDir * fDistance);
 
@@ -848,24 +827,18 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 				//NDebugOverlay::Box( vOrigin, -Vector(16, 16, 16), Vector(16, 16, 16), 255, 0, 0, 255, gpGlobals->frametime );
 				//NDebugOverlay::Box( vTargetPos, -Vector(16, 16, 16), Vector(16, 16, 16), 
 				//	0, 255, 0, 255, gpGlobals->frametime );
-				
-				if( vTargetPos.DistToSqr( vOrigin ) > 32.0f*32.0f ) 
-				{
-					Vector vDir = (vTargetPos - m_vMiddleMousePlayerDragSmoothed);
-					float fDistance = VectorNormalize( vDir );
-					Vector vOffsetChange = vDir * Min(fDistance, gpGlobals->frametime * cl_strategic_cam_mmouse_dragspeed.GetFloat());
-					m_vMiddleMousePlayerDragSmoothed += vOffsetChange;
-					m_vMiddleMouseStartPoint += vOffsetChange;
+			
+				vDir = (vTargetPos - m_vMiddleMousePlayerDragSmoothed);
+				vDir.z = 0;
+				fDistance = VectorNormalize( vDir );
+				Vector vOffsetChange = vDir * Min( fDistance, m_fCurrentSampleTime * cl_strategic_cam_mmouse_dragspeed.GetFloat() );
+				m_vMiddleMousePlayerDragSmoothed += vOffsetChange;
+				m_vMiddleMouseStartPoint += vOffsetChange;
 
-					CBaseFuncMapBoundary::SnapToNearestBoundary( m_vMiddleMousePlayerDragSmoothed, pPlayer->GetPlayerMins(), pPlayer->GetPlayerMaxs(), false );
+				CBaseFuncMapBoundary::SnapToNearestBoundary( m_vMiddleMousePlayerDragSmoothed, pPlayer->GetPlayerMins(), pPlayer->GetPlayerMaxs(), false );
 
-					cmd->vecmovetoposition = m_vMiddleMousePlayerDragSmoothed;
-					cmd->directmove = true;
-				}
-				else
-				{
-					cmd->directmove = false;
-				}
+				cmd->vecmovetoposition = m_vMiddleMousePlayerDragSmoothed;
+				cmd->directmove = true;
 			}
 			else
 			{
@@ -1024,6 +997,7 @@ void CHL2WarsInput::ActivateMouseClipping( void )
 #ifndef USECUSTOMMOUSECLIPPING
 	engine->SetMouseWindowLock( true );
 #else
+#ifdef WIN32
 	int x, y, w, h, offsetx, offsety;
 	RECT r;
 	POINT p;
@@ -1042,6 +1016,9 @@ void CHL2WarsInput::ActivateMouseClipping( void )
 	r.top = offsety;
 	r.bottom = offsety + h;
 	ClipCursor( &r );
+#else
+	Warning("CHL2WarsInput::ActivateMouseClipping: Not implemented\n");
+#endif // WIN32
 #endif
 }
 
@@ -1050,10 +1027,15 @@ void CHL2WarsInput::DeactivateMouseClipping( void )
 #ifndef USECUSTOMMOUSECLIPPING
 	engine->SetMouseWindowLock( false );
 #else
+#ifdef WIN32
 	ClipCursor( NULL );
+#else
+	Warning("CHL2WarsInput::DeactivateMouseClipping: Not implemented\n");
+#endif // WIN32
 #endif
 }
 
+#ifdef WIN32
 //-----------------------------------------------------------------------------
 // Purpose: Hacky way to detect input focus.
 //-----------------------------------------------------------------------------
@@ -1092,3 +1074,4 @@ bool CHL2WarsInput::HasWindowFocus()
 	}
 	return false;
 }
+#endif // WIN32

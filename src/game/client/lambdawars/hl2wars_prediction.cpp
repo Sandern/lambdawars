@@ -158,12 +158,6 @@ void CHL2WarsPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveH
 	//C_HL2WarsPlayer *pWarsPlayer = (C_HL2WarsPlayer*)player;
 	//Assert( pWarsPlayer );
 
-	// Teleport
-	if( ucmd->directmove )
-	{
-		g_pMoveData->SetAbsOrigin( ucmd->vecmovetoposition );
-	}
-	
 	/*C_HL2WarsPlayer *pWarsPlayer = static_cast<C_HL2WarsPlayer*>( player );
 	if ( !asw_allow_detach.GetBool() )
 	{		
@@ -191,7 +185,10 @@ void CHL2WarsPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveH
 	//pASWMove->m_iForcedAction = ucmd->forced_action;
 
 	// setup trace optimization
-	g_pGameMovement->SetupMovementBounds( move );
+	if( !ucmd->directmove ) 
+	{
+		g_pGameMovement->SetupMovementBounds( move );
+	}
 }
 
 extern void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... );
@@ -280,14 +277,21 @@ void CHL2WarsPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMove
 	// Run regular player movement if we're not controlling a marine
 	if ( !pWarsPlayer->GetControlledUnit() )
 	{
-		if ( !pVehicle )
+		if( ucmd->directmove )
 		{
-			Assert( g_pGameMovement );
-			g_pGameMovement->ProcessMovement( player, g_pMoveData );
+			g_pMoveData->SetAbsOrigin( ucmd->vecmovetoposition );
 		}
 		else
 		{
-			pVehicle->ProcessMovement( player, g_pMoveData );
+			if ( !pVehicle )
+			{
+				Assert( g_pGameMovement );
+				g_pGameMovement->ProcessMovement( player, g_pMoveData );
+			}
+			else
+			{
+				pVehicle->ProcessMovement( player, g_pMoveData );
+			}
 		}
 	}
 

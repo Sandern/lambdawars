@@ -60,13 +60,6 @@ void CHL2WarsPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHe
 
 	BaseClass::SetupMove( player, ucmd, pHelper, move );
 
-	// Teleport
-	if( ucmd->directmove )
-	{
-		trace_t tr;
-		g_pMoveData->SetAbsOrigin( ucmd->vecmovetoposition );
-	}
-
 	// this forces horizontal movement
 	/*CHL2WarsPlayer *pWarsPlayer = dynamic_cast<CHL2WarsPlayer*>(player);
 	if (pWarsPlayer && pWarsPlayer->GetControlledUnit() )
@@ -91,7 +84,10 @@ void CHL2WarsPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHe
 	//pASWMove->m_iForcedAction = ucmd->forced_action;
 
 	// setup trace optimization
-	g_pGameMovement->SetupMovementBounds( move );
+	if( !ucmd->directmove ) 
+	{
+		g_pGameMovement->SetupMovementBounds( move );
+	}
 }
 
 extern void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... );
@@ -185,16 +181,23 @@ void CHL2WarsPlayerMove::RunCommand( CBasePlayer *player, CUserCmd *ucmd, IMoveH
 	// Let the game do the movement.
 	if( pWarsPlayer && !pWarsPlayer->GetControlledUnit() )
 	{
-		if ( !pVehicle )
+		if( ucmd->directmove )
 		{
-			VPROF( "g_pGameMovement->ProcessMovement()" );
-			Assert( g_pGameMovement );
-			g_pGameMovement->ProcessMovement( player, g_pMoveData );
+			g_pMoveData->SetAbsOrigin( ucmd->vecmovetoposition );
 		}
 		else
 		{
-			VPROF( "pVehicle->ProcessMovement()" );
-			pVehicle->ProcessMovement( player, g_pMoveData );
+			if ( !pVehicle )
+			{
+				VPROF( "g_pGameMovement->ProcessMovement()" );
+				Assert( g_pGameMovement );
+				g_pGameMovement->ProcessMovement( player, g_pMoveData );
+			}
+			else
+			{
+				VPROF( "pVehicle->ProcessMovement()" );
+				pVehicle->ProcessMovement( player, g_pMoveData );
+			}
 		}
 	}
 
