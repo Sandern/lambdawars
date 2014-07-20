@@ -1360,9 +1360,9 @@ void UnitAnimState::ComputePoseParam_Lean()
 		float targetLean = GetOuter()->GetPoseParameter( m_iMoveY ) * 30.0f;
 		float curLean = GetOuter()->GetPoseParameter( m_iLeanYaw );
 		if( curLean < targetLean )
-			curLean += Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean += Min((float)fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		else
-			curLean -= Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean -= Min((float)fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		SetOuterPoseParameter( m_iLeanYaw, curLean );
 	}
 
@@ -1371,9 +1371,9 @@ void UnitAnimState::ComputePoseParam_Lean()
 		float targetLean = GetOuter()->GetPoseParameter( m_iMoveX ) * -30.0f;
 		float curLean = GetOuter()->GetPoseParameter( m_iLeanPitch );
 		if( curLean < targetLean )
-			curLean += Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean += Min((float)fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		else
-			curLean -= Min(fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
+			curLean -= Min((float)fabs(targetLean-curLean), GetAnimTimeInterval()*15.0f);
 		SetOuterPoseParameter( m_iLeanPitch, curLean );
 	}
 }

@@ -6,6 +6,8 @@
 
 #include "editor/editorsystem.h"
 
+#include "wars_flora.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -352,6 +354,8 @@ BOOST_PYTHON_MODULE(_editorsystem){
 #include "cbase.h"
 
 #include "editor/editorsystem.h"
+
+#include "wars_flora.h"
 
 #include "srcpy.h"
 

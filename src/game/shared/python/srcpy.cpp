@@ -297,7 +297,7 @@ bool CSrcPython::InitInterpreter( void )
 
 	double fStartTime = Plat_FloatTime();
 	
-#define PY_MAX_PATH 1024
+#define PY_MAX_PATH 2048
 
 	char buf[PY_MAX_PATH];
 	char pythonpath[PY_MAX_PATH];

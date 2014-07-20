@@ -77,6 +77,8 @@
 
 #include "wars_flora.h"
 
+#include "unit_sense.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"

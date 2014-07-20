@@ -28,6 +28,7 @@ class Utils(SemiSharedModuleGenerator):
         '$view.h',
         
         'hl2wars_util_shared.h',
+        '$c_hl2wars_player.h',
     ]
 
     def ParseServer(self, mb):

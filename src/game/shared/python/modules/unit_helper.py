@@ -27,6 +27,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         '#unit_sense.h',
         '#unit_base.h',
         '#unit_vehiclenavigator.h',
+        'wars_func_unit.h',
     ]
     
     def AddUnitComponent(self, mb):

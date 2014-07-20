@@ -40,6 +40,7 @@
 #include "srcpy_util.h"
 #include "wars_weapon.h"
 #include "wars_flora.h"
+#include "unit_sense.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "CBaseEntity_pypp.hpp"

@@ -228,6 +228,8 @@ class Entities(SemiSharedModuleGenerator):
             '$c_wars_weapon.h',
             '#wars_weapon.h',
             'wars_flora.h',
+            '#unit_sense.h',
+            '$unit_baseanimstate.h',
         ])
         
     # List of entity classes want to have exposed

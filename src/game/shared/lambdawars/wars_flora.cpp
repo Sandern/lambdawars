@@ -354,7 +354,7 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey, int iVisGroupId )
 	pEntityKey->SetString( "squeezeupanimation", STRING( m_iszSqueezeUpAnimationName ) );
 	pEntityKey->SetString( "destructionanimation", STRING( m_iszDestructionAnimationName ) );
 
-	pEntityKey->SetString( "rendercolor", UTIL_VarArgs("%d %d %d", GetRenderColor().r, GetRenderColor().g, GetRenderColor().b ) );
+	pEntityKey->SetString( "rendercolor", VarArgs("%d %d %d", GetRenderColor().r, GetRenderColor().g, GetRenderColor().b ) );
 	pEntityKey->SetInt( "spawnflags", GetSpawnFlags() );
 	pEntityKey->SetInt( "skin", GetSkin() );
 

@@ -8,6 +8,7 @@ class NavMesh(SemiSharedModuleGenerator):
     files = [
         'cbase.h',
         'srcpy_navmesh.h',
+        'unit_base_shared.h',
     ]
  
     def Parse(self, mb):

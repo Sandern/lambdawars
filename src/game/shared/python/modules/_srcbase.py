@@ -8,7 +8,7 @@ class SrcBase(SharedModuleGenerator):
     
     files = [
         'cbase.h',
-        'tier0\dbg.h',
+        'tier0/dbg.h',
         
         'srcpy_base.h',
         'igamemovement.h',

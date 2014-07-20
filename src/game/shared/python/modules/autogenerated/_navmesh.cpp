@@ -10,6 +10,8 @@
 
 #include "srcpy_navmesh.h"
 
+#include "unit_base_shared.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -282,6 +284,8 @@ BOOST_PYTHON_MODULE(_navmesh){
 #include "cbase.h"
 
 #include "srcpy_navmesh.h"
+
+#include "unit_base_shared.h"
 
 #include "srcpy.h"
 

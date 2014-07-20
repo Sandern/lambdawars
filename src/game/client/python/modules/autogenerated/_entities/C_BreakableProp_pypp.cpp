@@ -34,6 +34,7 @@
 #include "srcpy_util.h"
 #include "c_wars_weapon.h"
 #include "wars_flora.h"
+#include "unit_baseanimstate.h"
 #include "srcpy.h"
 #include "tier0/memdbgon.h"
 #include "C_BreakableProp_pypp.hpp"

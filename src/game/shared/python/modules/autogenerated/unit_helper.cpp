@@ -22,6 +22,8 @@
 
 #include "c_unit_base.h"
 
+#include "wars_func_unit.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -2256,6 +2258,8 @@ BOOST_PYTHON_MODULE(unit_helper){
 #include "unit_base.h"
 
 #include "unit_vehiclenavigator.h"
+
+#include "wars_func_unit.h"
 
 #include "srcpy.h"
 

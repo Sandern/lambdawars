@@ -25,6 +25,7 @@
 #include "shot_manipulator.h"
 #include "ai_debug_shared.h"
 #include "collisionutils.h"
+#include "unit_baseanimstate.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

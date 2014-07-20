@@ -26,6 +26,8 @@
 
 #include "hl2wars_util_shared.h"
 
+#include "c_hl2wars_player.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"

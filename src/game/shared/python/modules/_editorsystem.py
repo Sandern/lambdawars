@@ -9,6 +9,7 @@ class EditorSystem(SemiSharedModuleGenerator):
     files = [
         'cbase.h',
         'editor/editorsystem.h',
+        'wars_flora.h',
     ]
     
     def Parse(self, mb):

@@ -69,6 +69,8 @@
 
 #include "wars_flora.h"
 
+#include "unit_baseanimstate.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
