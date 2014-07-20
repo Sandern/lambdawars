@@ -25,14 +25,14 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
-WNDPROC RealWndProc;
-
-LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
 ConVar g_debug_cef("g_debug_cef", "0");
 extern ConVar developer;
 
 #ifdef WIN32
+WNDPROC RealWndProc;
+
+LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
 //-----------------------------------------------------------------------------
 // Purpose: Helper for finding the main window
 //-----------------------------------------------------------------------------
@@ -176,10 +176,12 @@ bool CCefSystem::Init()
 		return false;
 	}
 
+#ifdef WIN32 
 	// Find and set the main window
 	EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
 
 	RealWndProc = (WNDPROC)SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)CefWndProcHook);
+#endif // WIN32
 
 	// Arguments
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
@@ -219,8 +221,10 @@ void CCefSystem::Shutdown()
 
 	DevMsg("Shutting down CEF\n");
 
+#ifdef WIN32
 	// Restore window process to prevent unwanted callbacks
 	SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)RealWndProc);
+#endif // WIN32
 
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )

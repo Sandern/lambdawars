@@ -70,8 +70,8 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	const unsigned char *srcbuffer = m_pBrowser->GetOSRHandler()->GetTextureBuffer();
 
 	// Copy per row
-	int clampedwidth = MIN(srcwidth, pSubRect->width);
-	int yend = MIN(srcheight, pSubRect->y + pSubRect->height);
+	int clampedwidth = Min( srcwidth, pSubRect->width );
+	int yend = Min( srcheight, pSubRect->y + pSubRect->height );
 	int xoffset = (pSubRect->x * channels);
 	for( int y = pSubRect->y; y < yend; y++ )
 	{
