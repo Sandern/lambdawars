@@ -500,10 +500,11 @@ void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 	int dirtyx, dirtyy, dirtyw, dirtyh;
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 	{
-		if( m_CefBrowsers[i]->IsValid() )
-			m_CefBrowsers[i]->InvalidateLayout();
+		if( !m_CefBrowsers[i]->IsValid() )
+			continue;
 
-		// Full dirty
+		m_CefBrowsers[i]->InvalidateLayout();
+
 		dirtyx = 0;
 		dirtyy = 0;
 		dirtyw = m_CefBrowsers[i]->GetOSRHandler()->GetWidth();

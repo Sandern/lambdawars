@@ -62,6 +62,8 @@ public:
 	float GetTexT1();
 	void SetDoNotDraw( bool state );
 	bool GetDoNotDraw( void );
+	float GetTexWide();
+	float GetTexTall();
 
 protected:
 	int	GetBrowserID();
@@ -116,6 +118,16 @@ inline float SrcCefVGUIPanel::GetTexS1()
 inline float SrcCefVGUIPanel::GetTexT1()
 {
 	return m_fTexT1;
+}
+
+inline float SrcCefVGUIPanel::GetTexWide()
+{
+	return m_iTexWide;
+}
+
+inline float SrcCefVGUIPanel::GetTexTall()
+{
+	return m_iTexTall;
 }
 
 inline void SrcCefVGUIPanel::SetDoNotDraw( bool state )
