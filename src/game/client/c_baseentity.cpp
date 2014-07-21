@@ -3723,6 +3723,14 @@ void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 {
 	m_hOldMoveParent = m_hNetworkMoveParent;
 	m_iOldParentAttachment = m_iParentAttachment;
+
+	// Ensures Python networked variables are processed on client creation of this entity
+#ifdef ENABLE_PYTHON
+	if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
+	{
+		SrcPySystem()->ProcessDelayedUpdates( this );
+	}
+#endif // ENABLE_PYTHON
 }
 
 void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
