@@ -693,12 +693,12 @@ void CUnitBase::UpdateServerAnimation( void )
 	if( !GetAnimState() )
 		return;
 
-	if( m_fNextServerAnimStateTime > gpGlobals->curtime )
-		return;
-
 	// The eye pitch is computed by the locomotion component and directly stored in m_fEyePitch.
 	const QAngle &eyeangles = EyeAngles();
 	m_fEyeYaw = eyeangles.y;
+
+	if( m_fNextServerAnimStateTime > gpGlobals->curtime )
+		return;
 
 	GetAnimState()->Update( m_fEyeYaw, m_fEyePitch );
 
