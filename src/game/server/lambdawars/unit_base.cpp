@@ -962,23 +962,36 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 
 	// For large units (i.e. buildings) use a trace
 	float fBoundingRadius2D = pTarget->CollisionProp()->BoundingRadius2D();
-	if( fBoundingRadius2D > 96.0f )
+	if( fBoundingRadius2D > 96.0f || pTarget->VPhysicsGetObject() )
 	{
+		// Try hitting against the eye position. This is usually good!
 		trace_t tr;
 		Ray_t ray;
-		ray.Init( pos, pTarget->EyePosition() ); // For buildings, the eye position is usually a better test position
+		ray.Init( pos, pTarget->EyePosition() ); 
 		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pTarget, &tr );
 		if( tr.DidHit() )
 		{
 			return (pos - tr.endpos).Length2D();
 		}
-		else
+
+		// Second try against world space center.
+		ray.Init( pos, pTarget->WorldSpaceCenter() );
+		enginetrace->ClipRayToEntity( ray, MASK_SOLID, pTarget, &tr );
+		if( tr.DidHit() )
+		{
+			return (pos - tr.endpos).Length2D();
+		}
+
+		if( g_debug_rangeattacklos.GetBool() )
 		{
 			Warning( "CUnitBase::TargetDistance: Entity #%d:%s not hit target entity #%d:%s!\n", 
 						entindex(), GetClassname(), pTarget->entindex(), pTarget->GetClassname() );
-			if( g_debug_rangeattacklos.GetBool() )
-				NDebugOverlay::Line( pos, pTarget->EyePosition(), 255, 255, 0, true, 1.0f );
+
+			NDebugOverlay::Line( pos, pTarget->EyePosition(), 255, 255, 0, true, 1.0f );
 		}
+
+		// Failed, while not expected. Just return the distance to world center
+		return (pos - tr.endpos).Length2D();
 	}
 
 	Vector enemyDelta = targetPos - pos;
