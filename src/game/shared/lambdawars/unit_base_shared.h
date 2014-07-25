@@ -428,6 +428,7 @@ public:
 	CNetworkVar(float, m_fEyePitch );
 #else
 	float m_fEyePitch;
+	float m_fSmoothedEyePitch;
 #endif // CLIENT_DLL
 
 	bool m_bNeverIgnoreAttacks;

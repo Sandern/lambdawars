@@ -143,6 +143,9 @@ CUnitBase::CUnitBase() : m_fAccuracy(1.0f), m_bCanBeSeen(true)
 	SetAllowNavIgnore(true);
 
 	m_fEyePitch = 0;
+#ifdef CLIENT_DLL
+	m_fSmoothedEyePitch = 0;
+#endif // 0
 	m_fEyeYaw = 0;
 
 	// Default navigator/pathfind values

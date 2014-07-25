@@ -36,6 +36,8 @@ static ConVar	cl_wars_smoothtime	(
 	true, 2.0
 	 );
 
+extern float Unit_ClampYaw( float yawSpeedPerSec, float current, float target, float time );
+
 //-----------------------------------------------------------------------------
 // Purpose: Recv proxies
 //-----------------------------------------------------------------------------
@@ -414,7 +416,9 @@ void CUnitBase::UpdateClientSideAnimation()
 
 		if( m_pAnimState )
 		{
-			m_pAnimState->Update( m_fEyeYaw, m_fEyePitch );
+			m_fSmoothedEyePitch = Unit_ClampYaw( 25.0f, m_fSmoothedEyePitch, m_fEyePitch, gpGlobals->frametime );
+
+			m_pAnimState->Update( m_fEyeYaw, m_fSmoothedEyePitch );
 		}
 	}
 
