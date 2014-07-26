@@ -788,9 +788,10 @@ private:
 //-----------------------------------------------------------------------------
 bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos, CBaseEntity *pTarget )
 {
-	if( GetActiveWeapon() )
+	CWarsWeapon *pWarsWeapon = GetActiveWarsWeapon();
+	if( pWarsWeapon )
 	{
-		m_bHasRangeAttackLOS = GetActiveWeapon()->WeaponLOSCondition( GetLocalOrigin(), vTargetPos, pTarget );
+		m_bHasRangeAttackLOS = pWarsWeapon->WeaponLOSCondition( GetLocalOrigin(), vTargetPos, pTarget );
 	}
 	else
 	{

@@ -26,6 +26,7 @@ extern ConVar g_unit_force_minimal_sendtable;
 #define CUnitBase C_UnitBase
 #define CBaseCombatCharacter C_BaseCombatCharacter
 #define CHL2WarsPlayer C_HL2WarsPlayer
+#define CWarsWeapon C_WarsWeapon
 
 class CGlowObject;
 #endif
@@ -40,6 +41,7 @@ class UnitBaseSense;
 class UnitBaseNavigator;
 class UnitExpresser;
 class UnitBaseAnimState;
+class CWarsWeapon;
 
 //=============================================================================
 //
@@ -277,6 +279,7 @@ public:
 public:
 	virtual void		FireBullets( const FireBulletsInfo_t &info );
 	virtual bool		TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
+	CWarsWeapon*		GetActiveWarsWeapon() const;
 
 	// UNDONE: Make this data?
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;

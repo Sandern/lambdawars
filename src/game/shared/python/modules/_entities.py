@@ -1400,18 +1400,9 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('OnInSelectionBox').virtuality = 'virtual'
             cls.mem_funs('OnOutSelectionBox').virtuality = 'virtual'
             
-        cls.add_property( 'selectionpriority'
-                         , cls.mem_fun('GetSelectionPriority')
-                         , cls.mem_fun('SetSelectionPriority')) 
-        cls.add_property( 'attackpriority'
-                         , cls.mem_fun('GetAttackPriority')
-                         , cls.mem_fun('SetAttackPriority')) 
-                         
-        cls.mem_fun('GetSelectionPriority').exclude()
-        cls.mem_fun('SetSelectionPriority').exclude()
-        cls.mem_fun('GetAttackPriority').exclude()
-        cls.mem_fun('SetAttackPriority').exclude()
-        
+        self.AddProperty(cls, 'selectionpriority', 'GetSelectionPriority', 'SetSelectionPriority')
+        self.AddProperty(cls, 'attackpriority', 'GetAttackPriority', 'SetAttackPriority')
+
         if self.isclient:
             self.AddProperty(cls, 'energy', 'GetEnergy')
             self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
@@ -1460,12 +1451,9 @@ class Entities(SemiSharedModuleGenerator):
         
         self.ParseUnitBaseShared(mb, cls_name)
         
-        cls.mem_funs('PyGetAnimState').exclude() 
+        cls.mem_fun('GetActiveWarsWeapon').exclude()
         cls.mem_funs('GetAnimState').exclude() 
-        cls.mem_funs('SetAnimState').exclude() 
-        cls.add_property( 'animstate'
-                         , cls.mem_fun('PyGetAnimState')
-                         , cls.mem_fun('SetAnimState') )
+        self.AddProperty(cls, 'animstate', 'PyGetAnimState', 'SetAnimState')
         
         #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.mem_funs('GetEnemy').exclude() 
@@ -1484,7 +1472,7 @@ class Entities(SemiSharedModuleGenerator):
             
             self.IncludeVarAndRename('m_fEnemyChangeToleranceSqr', 'enemychangetolerancesqr')
             
-            cls.mem_funs('SetEnemy').exclude() 
+            cls.mem_funs('SetEnemy').exclude()
             cls.add_property( 'enemy'
                              , cls.mem_fun('GetEnemy')
                              , cls.mem_fun('SetEnemy')) 

@@ -520,7 +520,7 @@ const char *CUnitBase::GetTracerType( void )
 //-----------------------------------------------------------------------------
 void CUnitBase::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
-	CWarsWeapon *pWeapon = dynamic_cast<CWarsWeapon *>( GetActiveWeapon() );
+	CWarsWeapon *pWeapon = GetActiveWarsWeapon();
 	if ( pWeapon )
 	{
 		pWeapon->MakeTracer( vecTracerSrc, tr, iTracerType );
@@ -913,3 +913,11 @@ void CUnitBase::SetAnimState( boost::python::object animstate )
 	}
 }
 #endif // ENABLE_PYTHON
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CWarsWeapon* CUnitBase::GetActiveWarsWeapon() const
+{
+	return dynamic_cast< CWarsWeapon* >( GetActiveWeapon() );
+}
