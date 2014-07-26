@@ -495,12 +495,12 @@ void CHL2WarsInput::ExtraMouseSample( float frametime, bool active )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHL2WarsInput::SetScrollTimeOut(bool forward)
+void CHL2WarsInput::SetScrollTimeOut( bool forward, float sampleTime )
 {
 	if( forward )
-		m_flDesiredCameraDist += cl_strategic_cam_scrolldelta.GetFloat();
+		m_flDesiredCameraDist += cl_strategic_cam_scrolldelta.GetFloat() * sampleTime;
 	else
-		m_flDesiredCameraDist -= cl_strategic_cam_scrolldelta.GetFloat();
+		m_flDesiredCameraDist -= cl_strategic_cam_scrolldelta.GetFloat() * sampleTime;
 
 	m_bScrollForward = forward;
 	m_fScrollTimeOut = gpGlobals->curtime + cl_strategic_cam_scrolltimeout.GetFloat();
@@ -529,6 +529,13 @@ void CHL2WarsInput::CapAndSetSpeed( CUserCmd *cmd )
 
 	viewangles[YAW] = anglemod(viewangles[YAW] + (fRotSpeed * m_fCurrentSampleTime));
 	engine->SetViewAngles( viewangles );
+
+	// Scroll using keys
+	// TODO: rework, make scrolling nice with both mouse wheel and keys
+	if( cmd->upmove > 0 )
+		SetScrollTimeOut( true, m_fCurrentSampleTime * 3.5f );
+	else if( cmd->upmove < 0 )
+		SetScrollTimeOut( false, m_fCurrentSampleTime * 3.5f );
 
 	if( !GetMapBoundaryList() )
 	{

@@ -54,7 +54,7 @@ public:
 	virtual		void		UpdateMouseRotation();
 
 	// Speed computation
-	void					SetScrollTimeOut( bool forward );
+	void					SetScrollTimeOut( bool forward, float sampleTime = 1.0f );
 	void					CapAndSetSpeed( CUserCmd *cmd );
 	
 	// Binding switching
