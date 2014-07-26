@@ -790,13 +790,10 @@ bool CUnitBase::HasRangeAttackLOS( const Vector &vTargetPos, CBaseEntity *pTarge
 {
 	if( GetActiveWeapon() )
 	{
-		m_bHasRangeAttackLOS = GetActiveWeapon()->WeaponLOSCondition( GetLocalOrigin(), vTargetPos, false );
+		m_bHasRangeAttackLOS = GetActiveWeapon()->WeaponLOSCondition( GetLocalOrigin(), vTargetPos, pTarget );
 	}
 	else
 	{
-		if( !pTarget )
-			pTarget = GetEnemy();
-
 		trace_t result;
 		CUnitLOSFilter traceFilter( this, pTarget, GetCollisionGroup() );
 		UTIL_TraceLine( EyePosition(), vTargetPos, m_iAttackLOSMask, &traceFilter, &result );
@@ -816,25 +813,7 @@ bool CUnitBase::HasRangeAttackLOSTarget( CBaseEntity *pTarget )
 	if( !pTarget || !pTarget->IsSolid() )
 		return false;
 
-	if( GetActiveWeapon() )
-	{
-		CWarsWeapon *pWeapon = dynamic_cast<CWarsWeapon *>( GetActiveWeapon() );
-		if( pWeapon )
-			m_bHasRangeAttackLOS = pWeapon->WeaponLOSCondition( GetLocalOrigin(), pTarget->BodyTarget( GetLocalOrigin() ), pTarget );
-		else
-			m_bHasRangeAttackLOS = false;
-	}
-	else
-	{
-		trace_t result;
-		CUnitLOSFilter traceFilter( this, pTarget, GetCollisionGroup() );
-		UTIL_TraceLine( EyePosition(), pTarget->BodyTarget( GetLocalOrigin() ), m_iAttackLOSMask, &traceFilter, &result );
-		if( g_debug_rangeattacklos.GetBool() )
-			NDebugOverlay::Line( EyePosition(), result.endpos, 0, 255, 0, true, 1.0f );
-		m_bHasRangeAttackLOS = (result.fraction == 1.0f);
-	}
-	m_fLastRangeAttackLOSTime = gpGlobals->curtime;
-	return m_bHasRangeAttackLOS;
+	return HasRangeAttackLOS( pTarget->BodyTarget( GetLocalOrigin() ), pTarget );
 }
 
 //-----------------------------------------------------------------------------

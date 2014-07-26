@@ -231,91 +231,11 @@ private:
 
 bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions )
 {
-	// --------------------
-	// Check for occlusion
-	// --------------------
-	CUnitBase *npcOwner = GetOwner()->MyUnitPointer();
-	if( !npcOwner )
+	CUnitBase *pOwner = GetOwner()->MyUnitPointer();
+	if( !pOwner )
 		return true;
-	
-	// Find its relative shoot position
-	Vector vecRelativeShootPosition;
-	VectorSubtract( npcOwner->Weapon_ShootPosition(), npcOwner->GetAbsOrigin(), vecRelativeShootPosition );
-	Vector barrelPos = ownerPos + vecRelativeShootPosition;
 
-	// FIXME: If we're in a vehicle, we need some sort of way to handle shooting out of them
-
-	// Use the custom LOS trace filter
-	CWarsWeaponLOSFilter traceFilter( npcOwner, npcOwner->GetEnemy(), COLLISION_GROUP_BREAKABLE_GLASS );
-	trace_t tr;
-	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT|MASK_BLOCKLOS, &traceFilter, &tr );
-
-	CBaseEntity	*pHitEnt = tr.m_pEnt;
-
-	// Hitting our enemy is a success case
-	if ( pHitEnt == npcOwner->GetEnemy() )
-	{
-		if ( g_debug_wars_weapon.GetBool() )
-		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
-		}
-
-		return true;
-	}
-
-	// See if we completed the trace without interruption
-	if ( tr.fraction == 1.0 )
-	{
-		if ( g_debug_wars_weapon.GetBool() )
-		{
-			NDebugOverlay::Line( barrelPos, targetPos, 0, 255, 0, true, 1.0 );
-		}
-
-		return true;
-	}
-
-	/*
-	CBasePlayer *pEnemyPlayer = ToBasePlayer( npcOwner->GetEnemy() );
-
-	// is player in a vehicle? if so, verify vehicle is target and return if so (so npc shoots at vehicle)
-	if ( pEnemyPlayer && pEnemyPlayer->IsInAVehicle() )
-	{
-		// Ok, player in vehicle, check if vehicle is target we're looking at, fire if it is
-		// Also, check to see if the owner of the entity is the vehicle, in which case it's valid too.
-		// This catches vehicles that use bone followers.
-		CBaseEntity	*pVehicle  = pEnemyPlayer->GetVehicle()->GetVehicleEnt();
-		if ( pHitEnt == pVehicle || pHitEnt->GetOwnerEntity() == pVehicle )
-			return true;
-	}*/
-
-	// If a vehicle is blocking the view, grab its driver and use that as the combat character
-	
-#if 0
-	CBaseCombatCharacter *pBCC;
-	/*IServerVehicle *pVehicle = pHitEnt->GetServerVehicle();
-	if ( pVehicle )
-	{
-		pBCC = pVehicle->GetPassenger( );
-	}
-	else */
-	{
-		pBCC = ToBaseCombatCharacter( pHitEnt );
-	}
-
-
-	if ( pBCC && !pBCC->BlocksLOS() ) 
-	{
-		if ( npcOwner->IRelationType( pBCC ) == D_HT )
-			return true;
-	}
-#endif // 0
-
-	if ( g_debug_wars_weapon.GetBool() )
-	{
-		NDebugOverlay::Line( barrelPos, targetPos, 255, 0, 0, true, 1.0 );
-	}
-
-	return false;
+	return WeaponLOSCondition( ownerPos, targetPos, pOwner->GetEnemy() );
 }
 
 bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, CBaseEntity *pTarget )

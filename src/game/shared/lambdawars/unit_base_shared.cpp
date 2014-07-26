@@ -839,41 +839,33 @@ Vector CUnitBase::GetShootEnemyDir( Vector &shootOrigin, bool noisy )
 //-----------------------------------------------------------------------------
 Vector CUnitBase::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
-	Vector result;
+	Vector result, low, high, delta;
+	const Vector &vOrigin = GetAbsOrigin();
 	if( m_bBodyTargetOriginBased )
 	{
-		Vector vUpdatedWorldSpaceCenter = GetAbsOrigin();
-		vUpdatedWorldSpaceCenter.z = GetAbsOrigin().z + (CollisionProp()->OBBMaxs().z / 2.0f);
-		Vector low = vUpdatedWorldSpaceCenter - ( vUpdatedWorldSpaceCenter - GetAbsOrigin() ) * .25;
-		Vector high = EyePosition();
-		Vector delta = high - low;
-	
-		if ( bNoisy )
-		{
-			// bell curve
-			float rand1 = random->RandomFloat( 0.0, 0.5 );
-			float rand2 = random->RandomFloat( 0.0, 0.5 );
-			result = low + delta * rand1 + delta * rand2;
-		}
-		else
-			result = low + delta * 0.5; 
+		// Building/structures mode, which might not have proper eye positions or world space centers
+		low = vOrigin;
+		high = vOrigin + CollisionProp()->OBBMaxs() * 0.8f;
+		delta = high - low;
 	}
 	else
 	{
-		Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetAbsOrigin() ) * .25;
-		Vector high = EyePosition();
-		Vector delta = high - low;
-	
-		if ( bNoisy )
-		{
-			// bell curve
-			float rand1 = random->RandomFloat( 0.0, 0.5 );
-			float rand2 = random->RandomFloat( 0.0, 0.5 );
-			result = low + delta * rand1 + delta * rand2;
-		}
-		else
-			result = low + delta * 0.5; 
+		// Regular mode for units with a proper world space center and eye position
+		low = WorldSpaceCenter() - ( WorldSpaceCenter() - vOrigin ) * .25;
+		high = EyePosition();
+		delta = high - low;
 	}
+
+	/*if ( bNoisy )
+	{
+		// bell curve
+		float rand1 = random->RandomFloat( 0.0, 0.5 );
+		float rand2 = random->RandomFloat( 0.0, 0.5 );
+		result = low + delta * rand1 + delta * rand2;
+	}
+	else*/
+		result = low + delta * 0.5; 
+
 	return result;
 }
 

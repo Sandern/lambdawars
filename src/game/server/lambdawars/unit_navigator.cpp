@@ -1536,7 +1536,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 			}
 			else if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
 			{
-				if( !m_pOuter->HasRangeAttackLOS( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ) ) )
+				if( !m_pOuter->HasRangeAttackLOS( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ), GetPath()->m_hTarget ) )
 				{
 					if( unit_navigator_debug_inrange.GetBool() )
 						DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No LOS to target using HasRangeAttackLOS\n", GetOuter()->entindex() );
