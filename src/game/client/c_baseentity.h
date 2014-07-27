@@ -1961,7 +1961,8 @@ public:
 	virtual void					PyReceiveMessage( boost::python::list msg ) {}
 
 	// Updates a Python network var after receiving
-	void							PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged = false );
+	void							PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged = false, bool oncreated = false );
+	void							PyNetworkVarChanged( const char *pName );
 
 	// Python Think support
 	void							SetPyThink( boost::python::object think_method, float flNextThinkTime = 0, const char *szContext = 0 );

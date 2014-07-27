@@ -401,7 +401,8 @@ public:
 
 	void AddToDelayedUpdateList( EHANDLE hEnt, char *name, boost::python::object data, bool callchanged=false );
 	void CleanupDelayedUpdateList(); // TODO: Remove?
-	void ProcessDelayedUpdates( CBaseEntity *pEntity );
+	void PreProcessDelayedUpdates( CBaseEntity *pEntity );
+	void PostProcessDelayedUpdates( CBaseEntity *pEntity );
 #endif // CLIENT_DLL
 
 private:

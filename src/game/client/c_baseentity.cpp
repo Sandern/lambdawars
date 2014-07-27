@@ -3728,7 +3728,7 @@ void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 #ifdef ENABLE_PYTHON
 	if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
 	{
-		SrcPySystem()->ProcessDelayedUpdates( this );
+		SrcPySystem()->PreProcessDelayedUpdates( this );
 	}
 #endif // ENABLE_PYTHON
 }
@@ -3744,6 +3744,14 @@ void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		UpdateVisibility();
+
+	// Ensures Python networked variables are processed on client creation of this entity
+#ifdef ENABLE_PYTHON
+		if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
+		{
+			SrcPySystem()->PostProcessDelayedUpdates( this );
+		}
+#endif // ENABLE_PYTHON
 	}
 
 	// These may have changed in the network update
@@ -6652,36 +6660,50 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 //------------------------------------------------------------------------------
 // Purpose:
 //------------------------------------------------------------------------------
-void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged )
+void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged, bool oncreated )
 {
 	// Set new var
-	try {
+	try 
+	{
 		// Only set if changed.
 		if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
 			return;
 
-		setattr(m_pyInstance, pName, data);
-	} catch(boost::python::error_already_set &) {
+		setattr( m_pyInstance, pName, data );
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
 		PyErr_Clear();
 		return;
 	}
 
-	// Mark as data changed
-	AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
+	if( !oncreated )
+	{
+		// Mark as data changed
+		AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
+	}
 
 	// Dispatch changed callback if needed
 	if( callchanged )
 	{
-		try 
-		{
-			getattr( m_pyInstance, (const char *)VarArgs( "__%s__Changed", pName ) )();
-		} 
-		catch( boost::python::error_already_set & ) 
-		{
-			PyErr_Print();
-			PyErr_Clear();
-		}
+		PyNetworkVarChanged( pName );
+	}
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+//------------------------------------------------------------------------------
+void C_BaseEntity::PyNetworkVarChanged( const char *pName )
+{
+	try 
+	{
+		getattr( m_pyInstance, (const char *)VarArgs( "__%s__Changed", pName ) )();
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
+		PyErr_Print();
+		PyErr_Clear();
 	}
 }
 

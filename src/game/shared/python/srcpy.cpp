@@ -1438,7 +1438,7 @@ void CSrcPython::CleanupDelayedUpdateList()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CSrcPython::ProcessDelayedUpdates( CBaseEntity *pEntity )
+void CSrcPython::PreProcessDelayedUpdates( CBaseEntity *pEntity )
 {
 	for( int i = py_delayed_data_update_list.Count() - 1; i >= 0; i-- )
 	{
@@ -1454,7 +1454,37 @@ void CSrcPython::ProcessDelayedUpdates( CBaseEntity *pEntity )
 			}
 			
 			h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
-				py_delayed_data_update_list[i].data, py_delayed_data_update_list[i].callchanged );
+				py_delayed_data_update_list[i].data, false, true );
+
+			if( !py_delayed_data_update_list[i].callchanged )
+				py_delayed_data_update_list.Remove(i);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::PostProcessDelayedUpdates( CBaseEntity *pEntity )
+{
+	for( int i = py_delayed_data_update_list.Count() - 1; i >= 0; i-- )
+	{
+		EHANDLE h = py_delayed_data_update_list[i].hEnt;
+		if( h == pEntity )
+		{	
+			if( g_debug_pynetworkvar.GetBool() )
+			{
+				DevMsg("#%d Post Processing delayed PyNetworkVar update %s (callback: %d)\n", 
+					h.GetEntryIndex(),
+					py_delayed_data_update_list[i].name,
+					py_delayed_data_update_list[i].callchanged );
+			}
+			
+			// Dispatch changed callback if needed
+			if( py_delayed_data_update_list[i].callchanged )
+			{
+				h->PyNetworkVarChanged( py_delayed_data_update_list[i].name );
+			}
 
 			py_delayed_data_update_list.Remove(i);
 		}
