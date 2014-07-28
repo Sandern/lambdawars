@@ -26,10 +26,10 @@
 			float			writefloat;
 			const char *	writestr;
 			bool			writebool;
+			float			writevector[3];
+			byte			writecolor[4];
 		};
 
-		Vector			writevector;
-		//QAngle			writeangle;
 		EHANDLE			writehandle;
 		CUtlVector< struct pywrite > writelist;
 	} pywrite;

@@ -35,6 +35,7 @@ enum PyType{
 	PYTYPE_DICT,
 	PYTYPE_TUPLE,
 	PYTYPE_SET,
+	PYTYPE_COLOR,
 };
 
 #ifndef CLIENT_DLL
@@ -130,13 +131,25 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "Vector", 6 ) )
 	{
 		w.type = PYTYPE_VECTOR;
-		w.writevector = boost::python::extract<Vector>(data);
+		Vector vData = boost::python::extract<Vector>(data);
+		vData.CopyToArray(w.writevector);
 	}
 	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "QAngle", 6 ) )
 	{
 		w.type = PYTYPE_QANGLE;
 		QAngle angle = boost::python::extract<QAngle>(data);
-		w.writevector = Vector(angle.x, angle.y, angle.z);
+		w.writevector[0] = angle.x;
+		w.writevector[1] = angle.y;
+		w.writevector[2] = angle.z;
+	}
+	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "Color", 5 ) )
+	{
+		w.type = PYTYPE_COLOR;
+		Color c = boost::python::extract<Color>(data);
+		w.writecolor[0] = c.r();
+		w.writecolor[1] = c.g();
+		w.writecolor[2] = c.b();
+		w.writecolor[3] = c.a();
 	}
 	else
 	{
@@ -195,6 +208,12 @@ void PyWriteElement( pywrite &w )
 		WRITE_FLOAT(w.writevector[1]);
 		WRITE_FLOAT(w.writevector[2]);
 		break;
+	case PYTYPE_COLOR:
+		WRITE_BYTE(w.writecolor[0]);
+		WRITE_BYTE(w.writecolor[1]);
+		WRITE_BYTE(w.writecolor[2]);
+		WRITE_BYTE(w.writecolor[3]);
+		break;
 	case PYTYPE_LIST:
 	case PYTYPE_TUPLE:
 	case PYTYPE_SET:
@@ -243,6 +262,12 @@ void PyPrintElement( pywrite &w, int indent )
 		DevMsg("QAngle: %f %f %f\n", w.writevector[0],
 			w.writevector[1],
 			w.writevector[2] );
+		break;
+	case PYTYPE_COLOR:
+		DevMsg("Color: %d %d %d %d\n", w.writecolor[0],
+			w.writecolor[1],
+			w.writecolor[2],
+			w.writecolor[3]);
 		break;
 	case PYTYPE_NONE:
 		DevMsg("None\n");
@@ -337,6 +362,7 @@ boost::python::object PyReadElement( bf_read &msg )
 	int type = msg.ReadByte();
 	char buf[255];	// User message is max 255 bytes, so if a string it is likely smaller
 	float x, y, z;
+	byte r, g, b, a;
 	long iEncodedEHandle;
 	int iSerialNum, iEntryIndex;
 	EHANDLE handle;
@@ -369,6 +395,12 @@ boost::python::object PyReadElement( bf_read &msg )
 			y = msg.ReadFloat();
 			z = msg.ReadFloat();
 			return boost::python::object(QAngle(x, y, z));
+		case PYTYPE_COLOR:
+			r = msg.ReadByte();
+			g = msg.ReadByte();
+			b = msg.ReadByte();
+			a = msg.ReadByte();
+			return boost::python::object(Color(r, g, b, a));
 		case PYTYPE_HANDLE:
 			// Decode handle
 			iEncodedEHandle = msg.ReadLong();
