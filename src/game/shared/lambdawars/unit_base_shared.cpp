@@ -420,22 +420,22 @@ void CUnitBase::SetDefaultEyeOffset( Vector *pCustomOfset )
 //-----------------------------------------------------------------------------
 // Purpose: Relationships
 //-----------------------------------------------------------------------------
-Disposition_t CUnitBase::IRelationType ( CBaseEntity *pTarget )
+Disposition_t CUnitBase::IRelationType( CBaseEntity *pTarget )
 {
-	if ( pTarget )
+	if( pTarget )
 	{
 		// First check for specific relationship with this edict
-		for (int i=0;i<m_Relationship.Count();i++) 
+		for( int i = 0; i < m_Relationship.Count(); i++ ) 
 		{
-			if (pTarget == m_Relationship[i].entity) 
+			if( pTarget == m_Relationship[i].entity ) 
 			{
 				return m_Relationship[i].disposition;
 			}
 		}
 
 		// Global relationships between teams
-		if(GetOwnerNumber() < 0 || GetOwnerNumber() >= MAX_PLAYERS || 
-				pTarget->GetOwnerNumber() < 0 || pTarget->GetOwnerNumber() >= MAX_PLAYERS)
+		if( GetOwnerNumber() < 0 || GetOwnerNumber() >= MAX_PLAYERS || 
+				pTarget->GetOwnerNumber() < 0 || pTarget->GetOwnerNumber() >= MAX_PLAYERS )
 			return D_NU;
 		return g_playerrelationships[GetOwnerNumber()][pTarget->GetOwnerNumber()];
 	}
@@ -455,16 +455,16 @@ int CUnitBase::IRelationPriority( CBaseEntity *pTarget )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-void CUnitBase::AddEntityRelationship ( CBaseEntity* pEntity, Disposition_t disposition, int priority )
+void CUnitBase::AddEntityRelationship( CBaseEntity* pEntity, Disposition_t disposition, int priority )
 {
 	// First check to see if a relationship has already been declared for this entity
 	// If so, update it with the new relationship
-	for (int i=m_Relationship.Count()-1;i >= 0;i--) 
+	for( int i = m_Relationship.Count() - 1; i >= 0; i-- ) 
 	{
-		if (m_Relationship[i].entity == pEntity) 
+		if( m_Relationship[i].entity == pEntity ) 
 		{
-			m_Relationship[i].disposition	= disposition;
-			if ( priority != DEF_RELATIONSHIP_PRIORITY )
+			m_Relationship[i].disposition = disposition;
+			if( priority != DEF_RELATIONSHIP_PRIORITY )
 				m_Relationship[i].priority	= priority;
 			return;
 		}
@@ -485,9 +485,9 @@ void CUnitBase::AddEntityRelationship ( CBaseEntity* pEntity, Disposition_t disp
 bool CUnitBase::RemoveEntityRelationship( CBaseEntity *pEntity )
 {
 	// Find the entity in our list, if it exists
-	for ( int i = m_Relationship.Count()-1; i >= 0; i-- ) 
+	for( int i = m_Relationship.Count()-1; i >= 0; i-- ) 
 	{
-		if ( m_Relationship[i].entity == pEntity )
+		if( m_Relationship[i].entity == pEntity )
 		{
 			// Done, remove it
 			m_Relationship.Remove( i );

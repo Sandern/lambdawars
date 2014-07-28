@@ -487,7 +487,8 @@ private:
 	CUtlVector< CHandle< CHL2WarsPlayer > > m_SelectedByPlayers;
 
 	// Entity relationships
-	CUtlVector<UnitRelationship_t>		m_Relationship;
+	CUtlVector<UnitRelationship_t> m_Relationship;
+
 
 	bool m_bHasEnterOffset;
 	Vector m_vEnterOffset; 
