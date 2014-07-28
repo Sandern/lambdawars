@@ -300,6 +300,7 @@ class Entities(SemiSharedModuleGenerator):
         'SmokeTrail',
         'RocketTrail',
         'CBeam',
+        'SporeExplosion',
         
         # Wars
         'CHL2WarsPlayer',
@@ -696,6 +697,7 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_funs('AttemptToPowerup').exclude() # CDamageModifier has no class on the client...
             
             mb.mem_funs('PyUpdateNetworkVar').exclude() # Internal for network vars
+            mb.mem_funs('PyNetworkVarChanged').exclude() # Internal for network vars
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetClientAlphaProperty').exclude()
@@ -1200,12 +1202,28 @@ class Entities(SemiSharedModuleGenerator):
             mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
             mb.add_registration_code( 'bp::def( "PlayerResource", wrap_PlayerResource, bp::return_value_policy< bp::return_by_value >() );' )   
             
+    # TODO: Preferably, this should 
     def ParseEffects(self, mb):
         if self.isserver:
+            entcolortmpl = '''
+            { //property "endcolor"[fget=::%(clsname)s_wrapper::GetEndColor, fset=::%(clsname)s_wrapper::SetEndColor]
+            
+                typedef Vector ( ::%(clsname)s_wrapper::*fget )(  ) const;
+                typedef void ( ::%(clsname)s_wrapper::*fset )( Vector & ) ;
+                
+                %(clsname)s_exposer.add_property( 
+                    "endcolor"
+                    , fget( &::%(clsname)s_wrapper::GetEndColor )
+                    , fset( &::%(clsname)s_wrapper::SetEndColor ) );
+            
+            }
+            '''
+        
             # CSprite
             mb.free_functions('SpawnBlood').include()
 
-            cls = mb.class_('SmokeTrail')
+            clsname = 'SmokeTrail'
+            cls = mb.class_(clsname)
             self.IncludeVarAndRename('m_EndSize', 'endsize')
             self.IncludeVarAndRename('m_MaxSpeed', 'maxspeed')
             self.IncludeVarAndRename('m_MinSpeed', 'minspeed')
@@ -1221,18 +1239,7 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_nAttachment', 'attachment')
 
 
-            cls.add_registration_code('''
-            { //property "endcolor"[fget=::SmokeTrail_wrapper::GetEndColor, fset=::SmokeTrail_wrapper::SetEndColor]
-            
-                typedef Vector ( ::SmokeTrail_wrapper::*fget )(  ) const;
-                typedef void ( ::SmokeTrail_wrapper::*fset )( Vector & ) ;
-                
-                SmokeTrail_exposer.add_property( 
-                    "endcolor"
-                    , fget( &::SmokeTrail_wrapper::GetEndColor )
-                    , fset( &::SmokeTrail_wrapper::SetEndColor ) );
-            
-            }''', False)
+            cls.add_registration_code(entcolortmpl % {'clsname' : clsname}, False)
             cls.add_wrapper_code('Vector GetEndColor() { return m_EndColor; }')
             cls.add_wrapper_code('void SetEndColor(Vector &endcolor) { m_EndColor = endcolor; }')
             
@@ -1251,7 +1258,8 @@ class Entities(SemiSharedModuleGenerator):
             cls.add_wrapper_code('Vector GetStartColor() { return m_StartColor.Get(); }')
             cls.add_wrapper_code('void SetStartColor(Vector &startcolor) { m_StartColor = startcolor; }')
             
-            cls = mb.class_('RocketTrail')
+            clsname = 'RocketTrail'
+            cls = mb.class_(clsname)
             self.IncludeVarAndRename('m_EndSize', 'endsize')
             self.IncludeVarAndRename('m_MaxSpeed', 'maxspeed')
             self.IncludeVarAndRename('m_MinSpeed', 'minspeed')
@@ -1266,18 +1274,7 @@ class Entities(SemiSharedModuleGenerator):
             self.IncludeVarAndRename('m_bDamaged', 'damaged')
             self.IncludeVarAndRename('m_flFlareScale', 'flarescale')
             
-            cls.add_registration_code('''
-            { //property "endcolor"[fget=::RocketTrail_wrapper::GetEndColor, fset=::RocketTrail_wrapper::SetEndColor]
-            
-                typedef Vector ( ::RocketTrail_wrapper::*fget )(  ) const;
-                typedef void ( ::RocketTrail_wrapper::*fset )( Vector & ) ;
-                
-                RocketTrail_exposer.add_property( 
-                    "endcolor"
-                    , fget( &::RocketTrail_wrapper::GetEndColor )
-                    , fset( &::RocketTrail_wrapper::SetEndColor ) );
-            
-            }''', False)
+            cls.add_registration_code(entcolortmpl % {'clsname' : clsname}, False)
             cls.add_wrapper_code('Vector GetEndColor() { return m_EndColor; }')
             cls.add_wrapper_code('void SetEndColor(Vector &endcolor) { m_EndColor = endcolor; }')
             
@@ -1295,6 +1292,16 @@ class Entities(SemiSharedModuleGenerator):
             }''', False)
             cls.add_wrapper_code('Vector GetStartColor() { return m_StartColor.Get(); }')
             cls.add_wrapper_code('void SetStartColor(Vector &startcolor) { m_StartColor = startcolor; }')
+            
+            # SporeExplosion
+            clsname = 'SporeExplosion'
+            cls = mb.class_(clsname)
+            self.IncludeVarAndRename('m_flSpawnRate', 'spawnrate')
+            self.IncludeVarAndRename('m_flStartSize', 'startsize')
+            self.IncludeVarAndRename('m_flEndSize', 'endsize')
+            self.IncludeVarAndRename('m_flParticleLifetime', 'particlelifetime')
+            self.IncludeVarAndRename('m_flSpawnRadius', 'spawnradius')
+            self.IncludeVarAndRename('m_bEmit', 'emit')
             
         else:
             # C_Sprite

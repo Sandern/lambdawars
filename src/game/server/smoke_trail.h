@@ -129,6 +129,7 @@ class SporeExplosion : public CBaseParticleEntity
 public:
 	DECLARE_CLASS( SporeExplosion, CBaseParticleEntity );
 	DECLARE_SERVERCLASS();
+	DECLARE_PYCLASS( SporeExplosion ); // TODO: Remove from Python, particle system is sufficient!
 
 	SporeExplosion( void );
 	void Spawn( void );
