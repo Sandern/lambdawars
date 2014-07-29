@@ -508,6 +508,24 @@ void HL2WarsViewport::UpdateCursor()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void HL2WarsViewport::SetMouseInputEnabled( bool state )
+{
+	// Mouse capture is set to the child panel (CEF) and calls the parent panel.
+	// However, if mouse input is disabled, it won't get called. Due this buttons
+	// can get in a stuck state. This would happen if you hold the middle mouse 
+	// button and go into the menu and release it.
+	if( !state )
+	{
+		m_nMouseButtons = 0;
+		m_bMiddleMouseActive = false;
+	}
+
+	BaseClass::SetMouseInputEnabled( state );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void HL2WarsViewport::OnCursorMoved(int x, int y)
 {
 }
@@ -598,17 +616,22 @@ void HL2WarsViewport::OnMouseReleased(MouseCode code)
 	}
 
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-	if( !pPlayer )
-		return;
 
-	// clear
+	// Clear buttons. Don't bug out when the player entity does not exists, otherwise
+	// some button states might be stuck until the next time the mouse is pressed.
 	switch( code ) {
 		case MOUSE_LEFT:
-			pPlayer->OnLeftMouseButtonReleasedInternal( pPlayer->GetMouseData() );
+			if( pPlayer ) 
+			{
+				pPlayer->OnLeftMouseButtonReleasedInternal( pPlayer->GetMouseData() );
+			}
 			m_nMouseButtons &= ~(IN_MOUSELEFT|IN_MOUSELEFTDOUBLE);
 			break;
 		case MOUSE_RIGHT:
-			pPlayer->OnRightMouseButtonReleasedInternal( pPlayer->GetMouseData() );
+			if( pPlayer ) 
+			{
+				pPlayer->OnRightMouseButtonReleasedInternal( pPlayer->GetMouseData() );
+			}
 			m_nMouseButtons &= ~(IN_MOUSERIGHT|IN_MOUSERIGHTDOUBLE);
 			break;
 		case MOUSE_MIDDLE:

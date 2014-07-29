@@ -39,6 +39,7 @@ public:
 		
 	int				GetDeathMessageStartHeight( void );
 
+	virtual void	SetMouseInputEnabled( bool state );
 	virtual void	OnThink();
 
 	void			GetPointInScreen( Vector2D *point, Vector *world );
