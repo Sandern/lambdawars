@@ -384,7 +384,12 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 	else
 		falloff = 1.0;
 
-	int bInWater = (UTIL_PointContents ( vecSrc, MASK_WATER ) & MASK_WATER) ? true : false;
+#ifdef HL2WARS_DLL
+	// For LWars: don't make a difference between being in the water or not. Only confusing.
+	bool bInWater = false;
+#else
+	bool bInWater = (UTIL_PointContents ( vecSrc, MASK_WATER ) & MASK_WATER) ? true : false;
+#endif // HL2WARS_DLL
 
 #ifdef HL2_DLL
 	if( bInWater )
