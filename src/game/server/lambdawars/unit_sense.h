@@ -48,6 +48,8 @@ public:
 	int CountSeenOther();
 	CBaseEntity *GetEnemy( int idx );
 	CBaseEntity *GetOther( int idx );
+	bool HasEnemy( CBaseEntity *pEnemy );
+	bool HasOther( CBaseEntity *pOther );
 
 #ifdef ENABLE_PYTHON
 	boost::python::object PyGetEnemy( int idx );
@@ -163,6 +165,26 @@ inline CBaseEntity *UnitBaseSense::GetEnemy( int idx )
 	if( !m_SeenEnemies.IsValidIndex(idx) )
 		return NULL;
 	return m_SeenEnemies.Element(idx).entity;
+}
+
+inline bool UnitBaseSense::HasEnemy( CBaseEntity *pEnemy )
+{
+	for( int i = 0; i < m_SeenEnemies.Count(); i++ ) 
+	{
+		if( m_SeenEnemies.Element(i).entity == pEnemy )
+			return true;
+	}
+	return false;
+}
+
+inline bool UnitBaseSense::HasOther( CBaseEntity *pOther )
+{
+	for( int i = 0; i < m_SeenEnemies.Count(); i++ ) 
+	{
+		if( m_SeenOther.Element(i).entity == pOther )
+			return true;
+	}
+	return false;
 }
 
 inline CBaseEntity *UnitBaseSense::GetNearestEnemy()

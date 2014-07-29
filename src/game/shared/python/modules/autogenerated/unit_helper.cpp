@@ -5572,6 +5572,26 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::UnitBaseSense::HasEnemy
+        
+            typedef bool ( ::UnitBaseSense::*HasEnemy_function_type )( ::CBaseEntity * ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "HasEnemy"
+                , HasEnemy_function_type( &::UnitBaseSense::HasEnemy )
+                , ( bp::arg("pEnemy") ) );
+        
+        }
+        { //::UnitBaseSense::HasOther
+        
+            typedef bool ( ::UnitBaseSense::*HasOther_function_type )( ::CBaseEntity * ) ;
+            
+            UnitBaseSense_exposer.def( 
+                "HasOther"
+                , HasOther_function_type( &::UnitBaseSense::HasOther )
+                , ( bp::arg("pOther") ) );
+        
+        }
         { //::UnitBaseSense::IsEnabled
         
             typedef bool ( ::UnitBaseSense::*IsEnabled_function_type )(  ) ;
