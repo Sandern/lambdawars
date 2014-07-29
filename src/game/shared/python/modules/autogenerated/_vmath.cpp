@@ -1531,6 +1531,17 @@ BOOST_PYTHON_MODULE(_vmath){
     
     }
 
+    { //::AngularImpulseToQAngle
+    
+        typedef void ( *AngularImpulseToQAngle_function_type )( ::AngularImpulse const &,::QAngle & );
+        
+        bp::def( 
+            "AngularImpulseToQAngle"
+            , AngularImpulseToQAngle_function_type( &::AngularImpulseToQAngle )
+            , ( bp::arg("impulse"), bp::arg("angles") ) );
+    
+    }
+
     { //::Approach
     
         typedef float ( *Approach_function_type )( float,float,float );
@@ -2969,6 +2980,17 @@ BOOST_PYTHON_MODULE(_vmath){
             "PositionMatrix"
             , PositionMatrix_function_type( &::PositionMatrix )
             , ( bp::arg("position"), bp::arg("mat") ) );
+    
+    }
+
+    { //::QAngleToAngularImpulse
+    
+        typedef void ( *QAngleToAngularImpulse_function_type )( ::QAngle const &,::AngularImpulse & );
+        
+        bp::def( 
+            "QAngleToAngularImpulse"
+            , QAngleToAngularImpulse_function_type( &::QAngleToAngularImpulse )
+            , ( bp::arg("angles"), bp::arg("impulse") ) );
     
     }
 

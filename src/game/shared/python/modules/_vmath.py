@@ -81,6 +81,9 @@ class VMath(SharedModuleGenerator):
         cls.include()
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
         
+        mb.free_function('QAngleToAngularImpulse').include()
+        mb.free_function('AngularImpulseToQAngle').include()
+        
         # Call policies
         mb.mem_funs('AsVector2D').call_policies = call_policies.return_internal_reference()
 
