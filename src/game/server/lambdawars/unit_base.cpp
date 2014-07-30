@@ -1017,6 +1017,10 @@ bool CUnitBase::FInAimCone( CBaseEntity *pEntity, float fMinDot/*==0.994f*/ )
 {
 	if( !pEntity )
 		return false;
+	// Special case is when trying to face itself. For convenience we just
+	// say this is true.
+	if( pEntity == this )
+		return true; 
 	return FInAimCone( pEntity->BodyTarget( EyePosition() ), fMinDot );
 }
 
