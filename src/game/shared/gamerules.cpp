@@ -555,12 +555,14 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 		adjustedInfo.SetRadius( flRadius );
 		adjustedInfo.SetDamage( flAdjustedDamage - (flAdjustedDamage * flBlockedDamagePercent) );
 
+#ifndef HL2WARS_DLL
 		// Now make a consideration for skill level!
 		if( info.GetAttacker() && info.GetAttacker()->IsPlayer() && pEntity->IsNPC() )
 		{
 			// An explosion set off by the player is harming an NPC. Adjust damage accordingly.
 			adjustedInfo.AdjustPlayerDamageInflictedForSkillLevel();
 		}
+#endif // HL2WARS_DLL
 
 		Vector dir = vecSpot - vecSrc;
 		VectorNormalize( dir );
@@ -595,6 +597,7 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 		// Now hit all triggers along the way that respond to damage... 
 		pEntity->TraceAttackToTriggers( adjustedInfo, vecSrc, tr.endpos, dir );
 
+#ifndef HL2WARS_DLL
 #if defined( GAME_DLL )
 		if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() && ToBaseCombatCharacter( tr.m_pEnt ) )
 		{
@@ -611,6 +614,7 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 			gamestats->Event_WeaponHit( player, bIsPrimary, (pWeapon != NULL) ? player->GetActiveWeapon()->GetClassname() : "NULL", info );
 		}
 #endif
+#endif // HL2WARS_DLL
 	}
 }
 
