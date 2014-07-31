@@ -34,6 +34,8 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 	m_fCurrentHeight = MoveCommand.height;
 	m_fDesiredHeight = MoveCommand.desiredheight;
 
+	bool bIsAtMinDesiredHeight = m_fCurrentHeight >= m_fDesiredHeight;
+
 	BaseClass::Update( MoveCommand );
 
 	// Calculate upmove if needed
@@ -60,13 +62,13 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 				if( m_LastGoalStatus == CHS_CLIMBDEST )
 					MoveCommand.forwardmove = MoveCommand.sidemove = 0.0f;
 			}
-			else
+			else if( bIsAtMinDesiredHeight )
 			{
 				// Avoid going down again
 				MoveCommand.upmove = 1.0f;
 			}
 		}
-		else if( fTargetZ > GetAbsOrigin().z )
+		else if( fTargetZ > GetAbsOrigin().z && bIsAtMinDesiredHeight )
 		{
 			// Avoid going down again to prevent navigation issues
 			MoveCommand.upmove = 1.0f;
