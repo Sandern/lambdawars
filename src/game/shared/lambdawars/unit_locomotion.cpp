@@ -166,13 +166,11 @@ void UnitBaseLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 {
 	mv.blockers.RemoveAll();
 
+	mv.viewangles = m_pOuter->GetAbsAngles();
+	mv.velocity = m_pOuter->GetAbsVelocity();
 #ifdef CLIENT_DLL
-	mv.velocity = m_pOuter->GetAbsVelocity();
 	mv.origin = m_pOuter->GetNetworkOrigin();
-	mv.viewangles = m_pOuter->GetAbsAngles();
 #else
-	mv.viewangles = m_pOuter->GetAbsAngles();
-	mv.velocity = m_pOuter->GetAbsVelocity();
 	mv.origin = m_pOuter->GetAbsOrigin();
 #endif // CLIENT_DLL
 
@@ -514,7 +512,7 @@ void UnitBaseLocomotion::AirMove( void )
 	Vector		wishdir;
 	float		wishspeed;
 	Vector forward, right, up;
-	Vector dest;
+	//Vector dest;
 
 	AngleVectors (mv->viewangles, &forward, &right, &up);  // Determine movement angles
 
@@ -552,8 +550,8 @@ void UnitBaseLocomotion::AirMove( void )
 		return;
 	}
 
-	// first try just moving to the destination	
-	dest = mv->origin + mv->velocity*mv->interval;
+	// first try just moving to the destination?	
+	//dest = mv->origin + mv->velocity*mv->interval;
 
 	CUtlVector<CBaseEntity *> ignoredEntities;
 	trace_t trace;

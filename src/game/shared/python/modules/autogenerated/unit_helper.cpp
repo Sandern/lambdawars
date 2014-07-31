@@ -2029,6 +2029,25 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , FullWalkMove_function_type( &::UnitVPhysicsLocomotion::FullWalkMove ) );
         
         }
+        { //::UnitVPhysicsLocomotion::GetStopDistance
+        
+            typedef float ( ::UnitVPhysicsLocomotion::*GetStopDistance_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "GetStopDistance"
+                , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::SetupMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "SetupMove"
+                , SetupMove_function_type( &::UnitVPhysicsLocomotion::SetupMove )
+                , ( bp::arg("mv") ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::VPhysicsMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*VPhysicsMove_function_type )(  ) ;
@@ -5839,6 +5858,25 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitVPhysicsLocomotion_exposer.def( 
                 "FullWalkMove"
                 , FullWalkMove_function_type( &::UnitVPhysicsLocomotion::FullWalkMove ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::GetStopDistance
+        
+            typedef float ( ::UnitVPhysicsLocomotion::*GetStopDistance_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "GetStopDistance"
+                , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::SetupMove
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "SetupMove"
+                , SetupMove_function_type( &::UnitVPhysicsLocomotion::SetupMove )
+                , ( bp::arg("mv") ) );
         
         }
         { //::UnitVPhysicsLocomotion::VPhysicsMove

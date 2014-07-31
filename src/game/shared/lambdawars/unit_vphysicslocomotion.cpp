@@ -6,6 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "unit_vphysicslocomotion.h"
+#include "movevars_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -23,9 +24,41 @@ UnitVPhysicsLocomotion::UnitVPhysicsLocomotion( boost::python::object outer ) : 
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
+void UnitVPhysicsLocomotion::SetupMove( UnitBaseMoveCommand &mv )
+{
+	mv.blockers.RemoveAll();
+
+	IPhysicsObject *pPhysObj = GetOuter()->VPhysicsGetObject();
+	if( !pPhysObj )
+	{
+		Warning( "UnitVPhysicsLocomotion: No VPhysics object for entity #%d\n", GetOuter()->entindex() );
+		return;
+	}
+
+#ifdef CLIENT_DLL
+	mv.origin = m_pOuter->GetNetworkOrigin();
+	mv.viewangles = m_pOuter->GetAbsAngles();
+#else
+	mv.viewangles = m_pOuter->GetAbsAngles();
+	mv.origin = m_pOuter->GetAbsOrigin();
+#endif // CLIENT_DLL
+
+	pPhysObj->GetVelocity( &(mv.velocity), NULL );
+
+	// Clamp maxspeed
+	mv.maxspeed = Min(mv.maxspeed, 5000.0f);
+
+	SetupMovementBounds( mv );
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
 void UnitVPhysicsLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 {
 	m_pOuter->PhysicsTouchTriggers();
+
+	m_pOuter->SetAbsVelocity( mv.velocity );
 
 #ifdef ENABLE_PYTHON
 	// For Python: keep list of blockers
@@ -61,6 +94,73 @@ void UnitVPhysicsLocomotion::FullWalkMove( )
 		mv->velocity.z = 0.0f;
 }
 
+
+//-----------------------------------------------------------------------------
+// If I were to stop moving, how much distance would I walk before I'm halted?
+//-----------------------------------------------------------------------------
+float UnitVPhysicsLocomotion::GetStopDistance()
+{
+
+	float	speed, newspeed, control;
+	float	friction;
+	float	drop;
+	float	distance;
+	int		i;
+	
+	// Calculate speed
+	if( mv->velocity.IsValid() )
+		speed = mv->velocity.Length();
+	else
+		speed = 0.0f;
+
+	distance = 0.0f;
+
+	for( i = 0; i < 1000; i++ )
+	{
+		drop = 0;
+
+		// apply ground friction
+		if (m_pOuter->GetGroundEntity() != NULL)  // On an entity that is the ground
+		{
+			friction = worldfriction * surfacefriction;
+
+			// Bleed off some speed, but if we have less than the bleed
+			//  threshold, bleed the threshold amount.
+			control = (speed < stopspeed) ? stopspeed : speed;
+
+			// Add the amount to the drop amount.
+			drop += control * friction * mv->interval;
+		}
+		else
+		{
+			// apply friction
+			friction = sv_friction.GetFloat() * surfacefriction;
+
+			// Bleed off some speed, but if we have less than the bleed
+			//  threshold, bleed the threshold amount.
+			control = (speed < sv_stopspeed.GetFloat()) ? sv_stopspeed.GetFloat() : speed;
+
+			// Add the amount to the drop amount.
+			drop += control * friction * mv->interval;
+		}
+
+		// scale the velocity
+		newspeed = speed - drop;
+		if (newspeed < 0)
+			newspeed = 0;
+
+		distance += newspeed * mv->interval;
+
+		speed = newspeed;
+
+		if( speed <= 0.1f )
+			break;
+	}
+
+	return distance;
+}
+
+
 //-----------------------------------------------------------------------------
 // Walking
 //-----------------------------------------------------------------------------
@@ -69,14 +169,16 @@ void UnitVPhysicsLocomotion::VPhysicsMove( void )
 	int i;
 
 	Vector wishvel;
-	float fmove, smove;
+	float fmove, smove, umove;
 	Vector wishdir;
 	float wishspeed;
 
 	Vector dest;
 	Vector forward, right, up;
 
-	AngleVectors (mv->viewangles, &forward, &right, &up);  // Determine movement angles
+	QAngle viewangles = mv->viewangles;
+	viewangles.x = viewangles.z = 0;
+	AngleVectors (viewangles, &forward, &right, &up);  // Determine movement angles
 
 	CHandle< CBaseEntity > oldground;
 	oldground = GetOuter()->GetGroundEntity();
@@ -84,26 +186,16 @@ void UnitVPhysicsLocomotion::VPhysicsMove( void )
 	// Copy movement amounts
 	fmove = mv->forwardmove;
 	smove = mv->sidemove;
+	umove = mv->upmove;
 
-	// Zero out z components of movement vectors
-	if ( forward[2] != 0 )
-	{
-		forward[2] = 0;
-		VectorNormalize( forward );
-	}
-
-	if ( right[2] != 0 )
-	{
-		right[2] = 0;
-		VectorNormalize( right );
-	}
-
-	for (i=0 ; i<2 ; i++)       // Determine x and y parts of velocity
-		wishvel[i] = forward[i]*fmove + right[i]*smove;
-
-	wishvel[2] = 0;             // Zero out z part of velocity
+	for ( i = 0 ; i < 2 ; i++ )       // Determine x and y parts of velocity
+		wishvel[i] = forward[i]*fmove + right[i]*smove + up[i]*umove;
 
 	VectorCopy (wishvel, wishdir);   // Determine maginitude of speed of move
+
+	//Vector vTransformedVelocity;
+	//VectorRotate( wishvel, /*GetOuter()->GetAbsAngles()*/ QAngle(-45, 0, 0), wishdir );
+
 	wishspeed = VectorNormalize(wishdir);
 
 	//
@@ -146,42 +238,46 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		return;
 	}
 
-	CUtlVector<CBaseEntity *> ignoredEntities;
-	trace_t trace;
 	Vector stepEnd;
-	float fIntervalStepSize;
 	int i;
 
 	// Clear current blocker
 	ClearBlockers();
 
-	// Calculate the max stepsize for this interval
-	// Assume we can move up/down stepsize per 48.0
-	fIntervalStepSize = Max<float>( stepsize, (stepsize * ( mv->interval*mv->maxspeed/48.0 ) ) );
-
 	// Test our start position.
 	// Set blocker to ignore if allowed.
-	stepEnd = mv->origin;
-	stepEnd.z = mv->origin.z + 1.0f;
+	CUtlVector<CBaseEntity *> ignoredEntities;
+	trace_t trace;
 	for( i = 0; i < 8; i++ )
 	{
-		TraceUnitBBox( mv->origin, stepEnd, unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
+		TraceUnitBBox( mv->origin, mv->origin+Vector(0,0,1), unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
 		if( !trace.startsolid || !trace.m_pEnt || 
 			(!trace.m_pEnt->AllowNavIgnore() && trace.m_pEnt->GetMoveType() != MOVETYPE_VPHYSICS) )
 			break;
 		ignoredEntities.AddToTail( trace.m_pEnt );
 		trace.m_pEnt->SetNavIgnore();
+		//m_pTraceListData->m_aEntityList.FindAndRemove( trace.m_pEnt );
+		//m_pTraceListData->m_nEntityCount--;	
 	}
 
+	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
+	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
+	{
+		DoUnstuck();
+	}
+
+	//pPhysObj->AddVelocity( NULL, &vAddVel );
+	//Vector vAngVel( 0, 0, 0 );
+	Vector newVelocity = mv->velocity + Vector(0, 0, 48.0f);
+	pPhysObj->SetVelocity(  &newVelocity, NULL );
+
+#if 0
 	Vector curVel, curAngVel;
 	pPhysObj->GetVelocity( &curVel, &curAngVel );
-
-	Vector vAddVel = mv->velocity;
-	VectorNormalize( vAddVel );
-	vAddVel *= mv->interval*mv->maxspeed;
-	
-	pPhysObj->AddVelocity( &vAddVel, NULL );
-	//pPhysObj->SetVelocity( &(mv->velocity), NULL );
+	engine->Con_NPrintf( 0, "Velocity: %f %f %f (%f)", mv->velocity.x, mv->velocity.y, mv->velocity.z, mv->velocity.Length() );
+	engine->Con_NPrintf( 2, "Cur Velocity: %f %f %f (%f)", curVel.x, curVel.y, curVel.z, curVel.Length() );
+	engine->Con_NPrintf( 3, "Cur Ang Velocity: %f %f %f (%f)", curAngVel.x, curAngVel.y, curAngVel.z, curAngVel.Length() );
+#endif // 0
 
 	// Clear nav ignored entities	
 	for ( i = 0; i < ignoredEntities.Count(); i++ )
