@@ -40,7 +40,9 @@
 #endif
 #include "matchmaking/imatchframework.h"
 
-
+#ifdef ENABLE_PYTHON
+	#include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -508,7 +510,27 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 	{
 		if ( down )
 		{
-			StartMessageMode( MM_SAY );
+			//StartMessageMode( MM_SAY );
+
+#ifdef ENABLE_PYTHON
+			if( SrcPySystem()->IsPythonRunning() )
+			{
+				try 
+				{
+					// Tell python
+					boost::python::dict kwargs;
+					kwargs["sender"] = boost::python::object();
+					kwargs["mode"] = (int)MM_SAY;
+					boost::python::object signal = SrcPySystem()->Get( "startclientchat", "core.signals", true );
+					SrcPySystem()->CallSignal( signal, kwargs );
+				} 
+				catch( boost::python::error_already_set & ) 
+				{
+					Warning( "Failed to dispatch chat start signal" );
+					PyErr_Print();
+				}
+			}
+#endif // ENABLE_PYTHON
 		}
 		return 0;
 	}
@@ -518,7 +540,27 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 	{
 		if ( down )
 		{
-			StartMessageMode( MM_SAY_TEAM );
+			//StartMessageMode( MM_SAY_TEAM );
+
+#ifdef ENABLE_PYTHON
+			if( SrcPySystem()->IsPythonRunning() )
+			{
+				try 
+				{
+					// Tell python
+					boost::python::dict kwargs;
+					kwargs["sender"] = boost::python::object();
+					kwargs["mode"] = (int)MM_SAY_TEAM;
+					boost::python::object signal = SrcPySystem()->Get( "startclientchat", "core.signals", true );
+					SrcPySystem()->CallSignal( signal, kwargs );
+				} 
+				catch( boost::python::error_already_set & ) 
+				{
+					Warning( "Failed to dispatch chat start signal" );
+					PyErr_Print();
+				}
+			}
+#endif // ENABLE_PYTHON
 		}
 		return 0;
 	}

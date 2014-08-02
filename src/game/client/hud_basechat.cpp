@@ -1767,11 +1767,26 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, .
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		// Tell python
-		SrcPySystem()->Run<int, int, const char *>(SrcPySystem()->Get("_OnChatPrintf", "srcmgr"), iPlayerIndex, iFilter, pmsg);
+		try 
+		{
+			// Tell python
+			boost::python::dict kwargs;
+			kwargs["sender"] = boost::python::object();
+			kwargs["playerindex"] = iPlayerIndex;
+			kwargs["filter"] = iFilter;
+			kwargs["msg"] = boost::python::object( (const char *)pmsg );
+			boost::python::object signal = SrcPySystem()->Get( "receiveclientchat", "core.signals", true );
+			SrcPySystem()->CallSignal( signal, kwargs );
+		} 
+		catch( boost::python::error_already_set & ) 
+		{
+			Warning( "Failed to dispatch chat received signal" );
+			PyErr_Print();
+		}
 	}
 #endif // ENABLE_PYTHON
 
+#if 0 // Use html based chat element
 	CBaseHudChatLine *line = (CBaseHudChatLine *)FindUnusedChatLine();
 	if ( !line )
 	{
@@ -1848,6 +1863,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, const char *fmt, .
 
 		line->InsertAndColorizeText( wbuf, iPlayerIndex );
 	}
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
