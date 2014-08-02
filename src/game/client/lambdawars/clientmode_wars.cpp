@@ -26,8 +26,13 @@
 #include "src_cef.h"
 #endif // ENABLE_CEF
 
+#ifdef ENABLE_PYTHON
+	#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 #include "vgui/surface_passthru.h"
 #include <vgui_controls/Controls.h>
+#include <vgui/IInput.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -428,6 +433,66 @@ int	ClientModeSDK::KeyInput( int down, ButtonCode_t keynum, const char *pszCurre
 	if( ret == 0 )
 		return 0;
 #endif // ENABLE_CEF
+
+	// Should we start typing a message?
+	if ( pszCurrentBinding &&
+		( Q_strcmp( pszCurrentBinding, "messagemode" ) == 0 ||
+		Q_strcmp( pszCurrentBinding, "say" ) == 0 ) )
+	{
+		if ( down )
+		{
+#ifdef ENABLE_PYTHON
+			bool bShift = input()->IsKeyDown( KEY_LSHIFT ) || input()->IsKeyDown( KEY_RSHIFT );
+
+			if( SrcPySystem()->IsPythonRunning() )
+			{
+				try 
+				{
+					// Tell python
+					boost::python::dict kwargs;
+					kwargs["sender"] = boost::python::object();
+					kwargs["mode"] = (int)(bShift ? MM_SAY_TEAM : MM_SAY);
+					boost::python::object signal = SrcPySystem()->Get( "startclientchat", "core.signals", true );
+					SrcPySystem()->CallSignal( signal, kwargs );
+				} 
+				catch( boost::python::error_already_set & ) 
+				{
+					Warning( "Failed to dispatch chat start signal" );
+					PyErr_Print();
+				}
+			}
+#endif // ENABLE_PYTHON
+		}
+		return 0;
+	}
+	else if ( pszCurrentBinding &&
+		( Q_strcmp( pszCurrentBinding, "messagemode2" ) == 0 ||
+		Q_strcmp( pszCurrentBinding, "say_team" ) == 0 ) )
+	{
+		if ( down )
+		{
+#ifdef ENABLE_PYTHON
+			if( SrcPySystem()->IsPythonRunning() )
+			{
+				try 
+				{
+					// Tell python
+					boost::python::dict kwargs;
+					kwargs["sender"] = boost::python::object();
+					kwargs["mode"] = (int)MM_SAY_TEAM;
+					boost::python::object signal = SrcPySystem()->Get( "startclientchat", "core.signals", true );
+					SrcPySystem()->CallSignal( signal, kwargs );
+				} 
+				catch( boost::python::error_already_set & ) 
+				{
+					Warning( "Failed to dispatch chat start signal" );
+					PyErr_Print();
+				}
+			}
+#endif // ENABLE_PYTHON
+		}
+		return 0;
+	}
 
 	return BaseClass::KeyInput(down, keynum, pszCurrentBinding);
 }
