@@ -1525,7 +1525,12 @@ void CSrcPython::UnregisterTickMethod( bp::object method )
 
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
+		// HACK for debug mode, but unstable. bool_type operator causes a crash.
+#if defined( CLIENT_DLL ) && defined( _DEBUG )
+		if( PyObject_IsTrue( (m_methodTickList[i].method == method).ptr() ) )
+#else
 		if( m_methodTickList[i].method == method )
+#endif
 		{
 			m_methodTickList.Remove(i);
 			return;
@@ -1554,8 +1559,14 @@ bool CSrcPython::IsTickMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodTickList.Count(); i++ )
 	{
+		// HACK for debug mode, but unstable. bool_type operator causes a crash.
+#if defined( CLIENT_DLL ) && defined( _DEBUG )
+		if( PyObject_IsTrue( (m_methodTickList[i].method == method).ptr() ) )
+			return true;
+#else
 		if( m_methodTickList[i].method == method )
 			return true;
+#endif 
 	}
 	return false;
 }
@@ -1586,7 +1597,12 @@ void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
+		// HACK for debug mode, but unstable. bool_type operator causes a crash.
+#if defined( CLIENT_DLL ) && defined( _DEBUG )
+		if( PyObject_IsTrue( (m_methodPerFrameList[i] == method).ptr() ) )
+#else
 		if( m_methodPerFrameList[i] == method )
+#endif
 		{
 			m_methodPerFrameList.Remove(i);
 			return;
@@ -1614,8 +1630,14 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 {
 	for( int i = 0; i < m_methodPerFrameList.Count(); i++ )
 	{
+		// HACK for debug mode, but unstable. bool_type operator causes a crash.
+#if defined( CLIENT_DLL ) && defined( _DEBUG )
+		if( PyObject_IsTrue( (m_methodTickList[i].method == method).ptr() ) )
+			return true;
+#else
 		if( m_methodPerFrameList[i] == method )
 			return true;
+#endif 
 	}
 	return false;
 }
