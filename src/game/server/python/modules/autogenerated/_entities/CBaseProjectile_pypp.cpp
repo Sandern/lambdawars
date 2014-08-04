@@ -708,10 +708,16 @@ struct CBaseProjectile_wrapper : CBaseProjectile, bp::wrapper< CBaseProjectile >
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseProjectile, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseProjectile, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CBaseProjectile::GetServerClass();
     }
 

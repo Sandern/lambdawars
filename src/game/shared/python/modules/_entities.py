@@ -13,20 +13,32 @@ tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return %(clsname)s::GetClientClass();
 #endif // _WIN32
-        PY_OVERRIDE_LOG( %(modulename)s, %(clsname)s, GetClientClass )
-        ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
-        if( pClientClass )
-            return pClientClass;
+        try
+        {
+            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+            if( pClientClass )
+                return pClientClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return %(clsname)s::GetClientClass();
     }
 '''
 
 tmpl_serverclass = '''virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( %(clsname)s, GetServerClass )
-        PY_OVERRIDE_LOG( %(modulename)s, %(clsname)s, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return %(clsname)s::GetServerClass();
     }
 '''

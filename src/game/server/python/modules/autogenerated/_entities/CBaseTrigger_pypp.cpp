@@ -670,10 +670,16 @@ struct CBaseTrigger_wrapper : CBaseTrigger, bp::wrapper< CBaseTrigger > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseTrigger, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseTrigger, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CBaseTrigger::GetServerClass();
     }
 

@@ -597,10 +597,16 @@ struct C_BaseCombatWeapon_wrapper : C_BaseCombatWeapon, bp::wrapper< C_BaseComba
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_BaseCombatWeapon::GetClientClass();
 #endif // _WIN32
-        PY_OVERRIDE_LOG( _entities, C_BaseCombatWeapon, GetClientClass )
-        ClientClass *pClientClass = SrcPySystem()->Get<ClientClass *>( "pyClientClass", GetPyInstance(), NULL, true );
-        if( pClientClass )
-            return pClientClass;
+        try
+        {
+            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+            if( pClientClass )
+                return pClientClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return C_BaseCombatWeapon::GetClientClass();
     }
 

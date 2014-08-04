@@ -875,10 +875,16 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBasePlayer, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBasePlayer, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CBasePlayer::GetServerClass();
     }
 

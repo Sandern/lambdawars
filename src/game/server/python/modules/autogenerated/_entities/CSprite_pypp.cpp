@@ -651,10 +651,16 @@ struct CSprite_wrapper : CSprite, bp::wrapper< CSprite > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CSprite, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CSprite, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CSprite::GetServerClass();
     }
 

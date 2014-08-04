@@ -651,10 +651,16 @@ struct CServerOnlyEntity_wrapper : CServerOnlyEntity, bp::wrapper< CServerOnlyEn
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CBaseEntity::GetServerClass();
     }
 

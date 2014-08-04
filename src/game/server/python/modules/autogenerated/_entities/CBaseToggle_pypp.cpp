@@ -670,10 +670,16 @@ struct CBaseToggle_wrapper : CBaseToggle, bp::wrapper< CBaseToggle > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseToggle, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CBaseToggle, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CBaseToggle::GetServerClass();
     }
 

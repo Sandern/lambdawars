@@ -1293,10 +1293,16 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CUnitBase, GetServerClass )
-        PY_OVERRIDE_LOG( _entities, CUnitBase, GetServerClass )
-        ServerClass *pServerClass = SrcPySystem()->Get<ServerClass *>( "pyServerClass", GetPyInstance(), NULL, true );
-        if( pServerClass )
-            return pServerClass;
+        try
+        {
+            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+            if( pServerClass )
+                return pServerClass;
+        }
+        catch( bp::error_already_set & ) 
+        {
+            PyErr_Print();
+        }
         return CUnitBase::GetServerClass();
     }
 
