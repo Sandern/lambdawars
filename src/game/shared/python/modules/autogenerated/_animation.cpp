@@ -1309,6 +1309,28 @@ BOOST_PYTHON_MODULE(_animation){
     
     }
 
+    { //::SelectHeaviestSequence
+    
+        typedef int ( *SelectHeaviestSequence_function_type )( ::CStudioHdr *,int );
+        
+        bp::def( 
+            "SelectHeaviestSequence"
+            , SelectHeaviestSequence_function_type( &::SelectHeaviestSequence )
+            , ( bp::arg("pstudiohdr"), bp::arg("activity") ) );
+    
+    }
+
+    { //::SelectWeightedSequence
+    
+        typedef int ( *SelectWeightedSequence_function_type )( ::CStudioHdr *,int,int );
+        
+        bp::def( 
+            "SelectWeightedSequence"
+            , SelectWeightedSequence_function_type( &::SelectWeightedSequence )
+            , ( bp::arg("pstudiohdr"), bp::arg("activity"), bp::arg("curSequence")=(int)(-0x000000001) ) );
+    
+    }
+
     { //::VerifySequenceIndex
     
         typedef void ( *VerifySequenceIndex_function_type )( ::CStudioHdr * );
@@ -2625,6 +2647,28 @@ BOOST_PYTHON_MODULE(_animation){
             "ResetEventIndexes"
             , ResetEventIndexes_function_type( &::ResetEventIndexes )
             , ( bp::arg("pstudiohdr") ) );
+    
+    }
+
+    { //::SelectHeaviestSequence
+    
+        typedef int ( *SelectHeaviestSequence_function_type )( ::CStudioHdr *,int );
+        
+        bp::def( 
+            "SelectHeaviestSequence"
+            , SelectHeaviestSequence_function_type( &::SelectHeaviestSequence )
+            , ( bp::arg("pstudiohdr"), bp::arg("activity") ) );
+    
+    }
+
+    { //::SelectWeightedSequence
+    
+        typedef int ( *SelectWeightedSequence_function_type )( ::CStudioHdr *,int,int );
+        
+        bp::def( 
+            "SelectWeightedSequence"
+            , SelectWeightedSequence_function_type( &::SelectWeightedSequence )
+            , ( bp::arg("pstudiohdr"), bp::arg("activity"), bp::arg("curSequence")=(int)(-0x000000001) ) );
     
     }
 

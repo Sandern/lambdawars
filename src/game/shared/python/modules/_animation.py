@@ -103,6 +103,8 @@ class Animation(SemiSharedModuleGenerator):
         mb.free_function('GetSequenceFlags').include()
         mb.free_function('GetAnimationEvent').include()
         mb.free_function('HasAnimationEventOfType').include()
+        mb.free_function('SelectWeightedSequence').include()
+        mb.free_function('SelectHeaviestSequence').include()
         
         # Activity
         mb.free_function('ActivityList_RegisterPrivateActivity').include()
