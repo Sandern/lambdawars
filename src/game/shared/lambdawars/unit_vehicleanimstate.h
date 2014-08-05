@@ -21,6 +21,8 @@ public:
 	UnitVehicleAnimState( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
+	virtual void CalcWheelData();
+
 	virtual const QAngle& GetRenderAngles();
 
 	virtual void Update( float eyeYaw, float eyePitch );
@@ -38,10 +40,20 @@ public:
 	int m_iVehicleRLSpin;
 	int m_iVehicleRRSpin;
 
-	float m_fWheelRadius;
+	int m_iVehicleFLHeight;
+	int m_iVehicleFRHeight;
+	int m_iVehicleRLHeight;
+	int m_iVehicleRRHeight;
+
+	float m_fFrontWheelRadius;
+	float m_fRearWheelRadius;
 
 private:
 	QAngle m_angRender;
+	float m_wheelBaseHeight[4];
+	float m_wheelTotalHeight[4];
+	Vector m_vOffsetWheelFL, m_vOffsetWheelFR, m_vOffsetWheelRL, m_vOffsetWheelRR;
+
 };
 
 #endif // UNIT_VEHICLEANIMSTATE_H

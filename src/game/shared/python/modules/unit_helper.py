@@ -164,8 +164,13 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_iVehicleFRSpin').rename('vehiclefrspin')
         cls.var('m_iVehicleRLSpin').rename('vehiclerlspin')
         cls.var('m_iVehicleRRSpin').rename('vehiclerrspin')
+        cls.var('m_iVehicleFLHeight').rename('vehicleflheight')
+        cls.var('m_iVehicleFRHeight').rename('vehiclefrheight')
+        cls.var('m_iVehicleRLHeight').rename('vehiclerlheight')
+        cls.var('m_iVehicleRRHeight').rename('vehiclerrheight')
         
-        cls.var('m_fWheelRadius').rename('wheelradius')
+        cls.var('m_fFrontWheelRadius').rename('frontwheelradius')
+        cls.var('m_fRearWheelRadius').rename('rearwheelradius')
         
     def AddNavigator(self, mb):
         # Main class

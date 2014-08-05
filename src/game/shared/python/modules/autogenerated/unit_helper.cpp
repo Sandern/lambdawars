@@ -2093,6 +2093,15 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVehicleAnimState >();
+        { //::UnitVehicleAnimState::CalcWheelData
+        
+            typedef void ( ::UnitVehicleAnimState::*CalcWheelData_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "CalcWheelData"
+                , CalcWheelData_function_type( &::UnitVehicleAnimState::CalcWheelData ) );
+        
+        }
         { //::UnitVehicleAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -2141,10 +2150,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
         
         }
-        UnitVehicleAnimState_exposer.def_readwrite( "wheelradius", &UnitVehicleAnimState::m_fWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "frontwheelradius", &UnitVehicleAnimState::m_fFrontWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "rearwheelradius", &UnitVehicleAnimState::m_fRearWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehicleflheight", &UnitVehicleAnimState::m_iVehicleFLHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrheight", &UnitVehicleAnimState::m_iVehicleFRHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlheight", &UnitVehicleAnimState::m_iVehicleRLHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrheight", &UnitVehicleAnimState::m_iVehicleRRHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrspin", &UnitVehicleAnimState::m_iVehicleRRSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclesteer", &UnitVehicleAnimState::m_iVehicleSteer );
         { //::UnitBaseAnimState::GetOuterAbsVelocity
@@ -5924,6 +5938,15 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleAnimState_exposer_t UnitVehicleAnimState_exposer = UnitVehicleAnimState_exposer_t( "UnitVehicleAnimState", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleAnimState_scope( UnitVehicleAnimState_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVehicleAnimState >();
+        { //::UnitVehicleAnimState::CalcWheelData
+        
+            typedef void ( ::UnitVehicleAnimState::*CalcWheelData_function_type )(  ) ;
+            
+            UnitVehicleAnimState_exposer.def( 
+                "CalcWheelData"
+                , CalcWheelData_function_type( &::UnitVehicleAnimState::CalcWheelData ) );
+        
+        }
         { //::UnitVehicleAnimState::GetRenderAngles
         
             typedef ::QAngle const & ( ::UnitVehicleAnimState::*GetRenderAngles_function_type )(  ) ;
@@ -5972,10 +5995,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , UpdateWheels_function_type( &::UnitVehicleAnimState::UpdateWheels ) );
         
         }
-        UnitVehicleAnimState_exposer.def_readwrite( "wheelradius", &UnitVehicleAnimState::m_fWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "frontwheelradius", &UnitVehicleAnimState::m_fFrontWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "rearwheelradius", &UnitVehicleAnimState::m_fRearWheelRadius );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehicleflheight", &UnitVehicleAnimState::m_iVehicleFLHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehicleflspin", &UnitVehicleAnimState::m_iVehicleFLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrheight", &UnitVehicleAnimState::m_iVehicleFRHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclefrspin", &UnitVehicleAnimState::m_iVehicleFRSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlheight", &UnitVehicleAnimState::m_iVehicleRLHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerlspin", &UnitVehicleAnimState::m_iVehicleRLSpin );
+        UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrheight", &UnitVehicleAnimState::m_iVehicleRRHeight );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclerrspin", &UnitVehicleAnimState::m_iVehicleRRSpin );
         UnitVehicleAnimState_exposer.def_readwrite( "vehiclesteer", &UnitVehicleAnimState::m_iVehicleSteer );
         { //::UnitBaseAnimState::GetOuterAbsVelocity
