@@ -572,15 +572,18 @@ struct C_BaseEntity_wrapper : C_BaseEntity, bp::wrapper< C_BaseEntity > {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_BaseEntity::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return C_BaseEntity::GetClientClass();
     }

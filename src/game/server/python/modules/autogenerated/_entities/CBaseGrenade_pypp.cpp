@@ -605,6 +605,25 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
         CBaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ){
+        PY_OVERRIDE_CHECK( CBaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->CBaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    virtual void default_PostOnNewModel(  ){
+        CBaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual void Spawn(  ) {
         PY_OVERRIDE_CHECK( CBaseAnimating, Spawn )
         PY_OVERRIDE_LOG( _entities, CBaseAnimating, Spawn )
@@ -727,15 +746,18 @@ struct CBaseGrenade_wrapper : CBaseGrenade, bp::wrapper< CBaseGrenade > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseGrenade, GetServerClass )
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
-            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
-            if( pServerClass )
-                return pServerClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+                if( pServerClass )
+                    return pServerClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return CBaseGrenade::GetServerClass();
     }
@@ -1292,6 +1314,15 @@ void register_CBaseGrenade_class(){
             CBaseGrenade_exposer.def( 
                 "OnNewModel"
                 , OnNewModel_function_type( &CBaseGrenade_wrapper::default_OnNewModel ) );
+        
+        }
+        { //::CBaseAnimating::PyPostOnNewModel
+        
+            typedef void ( CBaseGrenade_wrapper::*PostOnNewModel_function_type )(  ) ;
+            
+            CBaseGrenade_exposer.def( 
+                "PostOnNewModel"
+                , PostOnNewModel_function_type( &CBaseGrenade_wrapper::default_PostOnNewModel ) );
         
         }
         { //::CBaseAnimating::Spawn

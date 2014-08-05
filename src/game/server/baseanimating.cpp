@@ -1425,7 +1425,10 @@ bool CBaseAnimating::HasPoseParameter( int iSequence, int iParameter )
 //=========================================================
 void	CBaseAnimating::PopulatePoseParameters( void )
 {
+#ifdef ENABLE_PYTHON
 	PyOnNewModel();
+	PyPostOnNewModel();
+#endif // ENABLE_PYTHON
 }
 
 //=========================================================

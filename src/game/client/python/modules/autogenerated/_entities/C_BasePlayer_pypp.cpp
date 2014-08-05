@@ -501,6 +501,25 @@ struct C_BasePlayer_wrapper : C_BasePlayer, bp::wrapper< C_BasePlayer > {
         C_BaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ) {
+        PY_OVERRIDE_CHECK( C_BaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->C_BaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    void default_PostOnNewModel(  ) {
+        C_BaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
         PY_OVERRIDE_CHECK( C_BaseEntity, PyReceiveMessage )
         PY_OVERRIDE_LOG( _entities, C_BaseEntity, PyReceiveMessage )
@@ -569,15 +588,18 @@ struct C_BasePlayer_wrapper : C_BasePlayer, bp::wrapper< C_BasePlayer > {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_BasePlayer::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return C_BasePlayer::GetClientClass();
     }
@@ -1373,6 +1395,10 @@ void register_C_BasePlayer_class(){
             "OnNewModel"
             , (void ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::PyOnNewModel)
             , (void ( C_BasePlayer_wrapper::* )(  ) )(&C_BasePlayer_wrapper::default_OnNewModel) )    
+        .def( 
+            "PostOnNewModel"
+            , (void ( ::C_BaseAnimating::* )(  ) )(&::C_BaseAnimating::PyPostOnNewModel)
+            , (void ( C_BasePlayer_wrapper::* )(  ) )(&C_BasePlayer_wrapper::default_PostOnNewModel) )    
         .def( 
             "ReceiveMessage"
             , (void ( ::C_BaseEntity::* )( ::boost::python::list ) )(&::C_BaseEntity::PyReceiveMessage)

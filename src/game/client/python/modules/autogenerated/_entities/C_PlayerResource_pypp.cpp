@@ -540,15 +540,18 @@ struct C_PlayerResource_wrapper : C_PlayerResource, bp::wrapper< C_PlayerResourc
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_PlayerResource::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return C_PlayerResource::GetClientClass();
     }

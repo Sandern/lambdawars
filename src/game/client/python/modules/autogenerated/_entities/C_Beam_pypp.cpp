@@ -540,15 +540,18 @@ struct C_Beam_wrapper : C_Beam, bp::wrapper< C_Beam > {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_Beam::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return C_Beam::GetClientClass();
     }

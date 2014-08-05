@@ -624,6 +624,25 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
         CBaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ){
+        PY_OVERRIDE_CHECK( CBaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->CBaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    virtual void default_PostOnNewModel(  ){
+        CBaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -708,15 +727,18 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBreakableProp, GetServerClass )
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
-            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
-            if( pServerClass )
-                return pServerClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+                if( pServerClass )
+                    return pServerClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return CBreakableProp::GetServerClass();
     }
@@ -974,6 +996,9 @@ void register_CPhysicsProp_class(){
         .def( 
             "OnNewModel"
             , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_OnNewModel) )    
+        .def( 
+            "PostOnNewModel"
+            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_PostOnNewModel) )    
         .def( 
             "StartTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)

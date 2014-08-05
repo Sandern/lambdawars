@@ -852,6 +852,25 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         CBaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ){
+        PY_OVERRIDE_CHECK( CBaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->CBaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    virtual void default_PostOnNewModel(  ){
+        CBaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CBaseCombatCharacter, ShouldGib )
         PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, ShouldGib )
@@ -993,15 +1012,18 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CHL2WarsPlayer, GetServerClass )
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
-            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
-            if( pServerClass )
-                return pServerClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+                if( pServerClass )
+                    return pServerClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return CHL2WarsPlayer::GetServerClass();
     }
@@ -2353,6 +2375,15 @@ void register_CHL2WarsPlayer_class(){
             CHL2WarsPlayer_exposer.def( 
                 "OnNewModel"
                 , OnNewModel_function_type( &CHL2WarsPlayer_wrapper::default_OnNewModel ) );
+        
+        }
+        { //::CBaseAnimating::PyPostOnNewModel
+        
+            typedef void ( CHL2WarsPlayer_wrapper::*PostOnNewModel_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "PostOnNewModel"
+                , PostOnNewModel_function_type( &CHL2WarsPlayer_wrapper::default_PostOnNewModel ) );
         
         }
         { //::CBaseCombatCharacter::ShouldGib

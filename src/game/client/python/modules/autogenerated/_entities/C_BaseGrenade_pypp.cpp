@@ -453,6 +453,25 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         C_BaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ) {
+        PY_OVERRIDE_CHECK( C_BaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, C_BaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->C_BaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->C_BaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    void default_PostOnNewModel(  ) {
+        C_BaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual void PyReceiveMessage( ::boost::python::list msg ) {
         PY_OVERRIDE_CHECK( C_BaseEntity, PyReceiveMessage )
         PY_OVERRIDE_LOG( _entities, C_BaseEntity, PyReceiveMessage )
@@ -578,15 +597,18 @@ struct C_BaseGrenade_wrapper : C_BaseGrenade, bp::wrapper< C_BaseGrenade > {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return C_BaseGrenade::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return C_BaseGrenade::GetClientClass();
     }
@@ -1052,6 +1074,17 @@ void register_C_BaseGrenade_class(){
                 "OnNewModel"
                 , OnNewModel_function_type(&::C_BaseAnimating::PyOnNewModel)
                 , default_OnNewModel_function_type(&C_BaseGrenade_wrapper::default_OnNewModel) );
+        
+        }
+        { //::C_BaseAnimating::PyPostOnNewModel
+        
+            typedef void ( ::C_BaseAnimating::*PostOnNewModel_function_type )(  ) ;
+            typedef void ( C_BaseGrenade_wrapper::*default_PostOnNewModel_function_type )(  ) ;
+            
+            C_BaseGrenade_exposer.def( 
+                "PostOnNewModel"
+                , PostOnNewModel_function_type(&::C_BaseAnimating::PyPostOnNewModel)
+                , default_PostOnNewModel_function_type(&C_BaseGrenade_wrapper::default_PostOnNewModel) );
         
         }
         { //::C_BaseEntity::PyReceiveMessage

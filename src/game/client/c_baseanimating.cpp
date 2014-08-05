@@ -4892,7 +4892,20 @@ void C_BaseAnimating::NotifyShouldTransmit( ShouldTransmitState_t state )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 {
+#ifdef ENABLE_PYTHON
+	const model_t *oldModel = GetModel();
+#endif // ENABLE_PYTHON
+
 	BaseClass::PostDataUpdate( updateType );
+
+#ifdef ENABLE_PYTHON
+	const model_t *newModel = GetModel();
+
+	if ( oldModel != newModel )
+	{
+		m_bModelChanged = true;
+	}
+#endif // ENABLE_PYTHON
 
 	if ( m_bClientSideAnimation )
 	{
@@ -5314,6 +5327,14 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 	}
 
 	m_bIsUsingRelativeLighting = ( m_hLightingOrigin.Get() != NULL );
+
+#ifdef ENABLE_PYTHON
+	if( m_bModelChanged )
+	{
+		PyPostOnNewModel();
+		m_bModelChanged = false;
+	}
+#endif // ENABLE_PYTHON
 }
 
 

@@ -13,15 +13,18 @@ tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
         if( GetCurrentThreadId() != g_hPythonThreadID )
             return %(clsname)s::GetClientClass();
 #endif // _WIN32
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
-            ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
-            if( pClientClass )
-                return pClientClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ClientClass *pClientClass = boost::python::extract<ClientClass *>( GetPyInstance().attr("pyClientClass") );
+                if( pClientClass )
+                    return pClientClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return %(clsname)s::GetClientClass();
     }
@@ -29,15 +32,18 @@ tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
 
 tmpl_serverclass = '''virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( %(clsname)s, GetServerClass )
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
-            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
-            if( pServerClass )
-                return pServerClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+                if( pServerClass )
+                    return pServerClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return %(clsname)s::GetServerClass();
     }
@@ -862,10 +868,14 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('ComputeHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
         mb.mem_funs('ComputeEntitySpaceHitboxSurroundingBox').add_transformation(FT.output('pVecWorldMins'), FT.output('pVecWorldMaxs'))
         
+        mb.mem_funs('PyOnNewModel').include()
+        mb.mem_funs('PyOnNewModel').rename('OnNewModel')
+        mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
+        mb.mem_funs('PyPostOnNewModel').include()
+        mb.mem_funs('PyPostOnNewModel').rename('PostOnNewModel')
+        mb.mem_funs('PyPostOnNewModel').virtuality = 'virtual'
+        
         if self.isclient:
-            mb.mem_funs('PyOnNewModel').rename('OnNewModel')
-            mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
-            
             # Exclude
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetBoneArrayForWrite').exclude()
@@ -877,9 +887,6 @@ class Entities(SemiSharedModuleGenerator):
             cls.mem_fun('GetCustomLightingOffset').exclude()
             cls.mem_fun('SetCustomLightingOffset').exclude()
         else:
-            mb.mem_funs('PyOnNewModel').include()
-            mb.mem_funs('PyOnNewModel').rename('OnNewModel')
-            mb.mem_funs('PyOnNewModel').virtuality = 'virtual'
             if self.settings.branch == 'swarm':
                 mb.mem_funs('OnSequenceSet').virtuality = 'virtual'
             

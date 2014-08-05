@@ -178,7 +178,10 @@ protected:
 	// in general code -- it causes many many string comparisons, which is slower than you think. Better is to 
 	// save off your pose parameters in member variables in your derivation of this function:
 	virtual void	PopulatePoseParameters( void );
+#ifdef ENABLE_PYTHON
 	virtual void	PyOnNewModel( void ) {}
+	virtual void	PyPostOnNewModel( void ) {}
+#endif // ENABLE_PYTHON
 
 public:
 

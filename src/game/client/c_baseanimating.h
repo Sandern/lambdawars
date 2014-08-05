@@ -199,7 +199,10 @@ public:
 	// virtual	void FreeMaterials( void );
 
 	virtual CStudioHdr *OnNewModel( void );
+#ifdef ENABLE_PYTHON
 	virtual void PyOnNewModel( void ) {}
+	virtual void PyPostOnNewModel( void ) {}
+#endif // ENABLE_PYTHON
 	CStudioHdr	*GetModelPtr() const;
 	void InvalidateMdlCache();
 	
@@ -681,6 +684,8 @@ private:
 
 	CUtlReference<CNewParticleEffect>	m_ejectBrassEffect;
 	int									m_iEjectBrassAttachment;
+
+	bool					m_bModelChanged;
 
 	// Material overriding
 	IMaterial *				m_pOverrideMaterial;

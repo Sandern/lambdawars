@@ -776,6 +776,25 @@ struct CBaseCombatCharacter_wrapper : CBaseCombatCharacter, bp::wrapper< CBaseCo
         CBaseAnimating::PyOnNewModel( );
     }
 
+    virtual void PyPostOnNewModel(  ){
+        PY_OVERRIDE_CHECK( CBaseAnimating, PyPostOnNewModel )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, PyPostOnNewModel )
+        bp::override func_PostOnNewModel = this->get_override( "PostOnNewModel" );
+        if( func_PostOnNewModel.ptr() != Py_None )
+            try {
+                func_PostOnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseAnimating::PyPostOnNewModel(  );
+            }
+        else
+            this->CBaseAnimating::PyPostOnNewModel(  );
+    }
+    
+    virtual void default_PostOnNewModel(  ){
+        CBaseAnimating::PyPostOnNewModel( );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -860,15 +879,18 @@ struct CBaseCombatCharacter_wrapper : CBaseCombatCharacter, bp::wrapper< CBaseCo
 
     virtual ServerClass* GetServerClass() {
         PY_OVERRIDE_CHECK( CBaseCombatCharacter, GetServerClass )
-        try
+        if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
-            ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
-            if( pServerClass )
-                return pServerClass;
-        }
-        catch( bp::error_already_set & ) 
-        {
-            PyErr_Print();
+            try
+            {
+                ServerClass *pServerClass = boost::python::extract<ServerClass *>( GetPyInstance().attr("pyServerClass") );
+                if( pServerClass )
+                    return pServerClass;
+            }
+            catch( bp::error_already_set & ) 
+            {
+                PyErr_Print();
+            }
         }
         return CBaseCombatCharacter::GetServerClass();
     }
@@ -2736,6 +2758,15 @@ void register_CBaseCombatCharacter_class(){
             CBaseCombatCharacter_exposer.def( 
                 "OnNewModel"
                 , OnNewModel_function_type( &CBaseCombatCharacter_wrapper::default_OnNewModel ) );
+        
+        }
+        { //::CBaseAnimating::PyPostOnNewModel
+        
+            typedef void ( CBaseCombatCharacter_wrapper::*PostOnNewModel_function_type )(  ) ;
+            
+            CBaseCombatCharacter_exposer.def( 
+                "PostOnNewModel"
+                , PostOnNewModel_function_type( &CBaseCombatCharacter_wrapper::default_PostOnNewModel ) );
         
         }
         { //::CBaseEntity::StartTouch
