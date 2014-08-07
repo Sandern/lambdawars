@@ -1,11 +1,13 @@
 import re
 
 from srcpy.module_generators import SemiSharedModuleGenerator
+from srcpy.matchers import calldef_withtypes
 
 from pyplusplus import function_transformers as FT
 from pyplusplus.module_builder import call_policies
 from pygccxml.declarations import matchers, pointer_t, const_t, declarated_t, char_t
 
+# Templates for the most common callback cases
 callback_wrapper_tmpl = '''struct %(name)sCallback_wrapper : %(name)sCallback, bp::wrapper< %(name)sCallback > {
 
     %(name)sCallback_wrapper(%(name)sCallback const & arg )
@@ -68,14 +70,12 @@ callresult_wrapper_tmpl = '''struct %(name)sCallResult_wrapper : %(name)sCallRes
     : %(name)sCallResult( arg )
       , bp::wrapper< %(name)sCallResult >(){
         // copy constructor
-        
     }
 
     %(name)sCallResult_wrapper(::SteamAPICall_t steamapicall )
     : %(name)sCallResult( steamapicall )
       , bp::wrapper< %(name)sCallResult >(){
         // constructor
-    
     }
 
     virtual void On%(name)s( ::%(dataclass)s * pData, bool bIOFailure ) {
@@ -143,7 +143,7 @@ class Steam(SemiSharedModuleGenerator):
         ''' Removes prefixes from variable names and lower cases the variable. '''
         for var in cls.vars():
             varname = var.name
-            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf)', '', varname)
+            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf|m_sz)', '', varname)
             varname = varname.lower()
             var.rename(varname)
             
@@ -174,6 +174,7 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_registration_code(callresult_reg_tmpl % {'name' : name, 'dataclass' : dataclsname})
         
     def ParseMatchmaking(self, mb):
+        # The main matchmaking interface
         cls = mb.class_('ISteamMatchmaking')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual'
@@ -193,10 +194,55 @@ class Steam(SemiSharedModuleGenerator):
         self.AddSteamCallback('LobbyChatMsg', 'LobbyChatMsg_t')
         self.AddSteamCallback('LobbyDataUpdate', 'LobbyDataUpdate_t')
         
+        # Servers matchmaking interface
+        cls = mb.class_('PySteamMatchmakingServers')
+        cls.include()
+        cls.rename('SteamMatchmakingServers')
+        cls.mem_funs('GetServerDetails').call_policies = call_policies.return_internal_reference()
+        
+        '''cls = mb.class_('ISteamMatchmakingServers')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.mem_fun('RequestInternetServerList').exclude()
+        cls.mem_fun('RequestLANServerList').exclude()
+        cls.mem_fun('RequestFriendsServerList').exclude()
+        cls.mem_fun('RequestFavoritesServerList').exclude()
+        cls.mem_fun('RequestHistoryServerList').exclude()
+        cls.mem_fun('RequestSpectatorServerList').exclude()
+        cls.mem_funs('GetServerDetails').call_policies = call_policies.return_internal_reference()'''
+        
+        cls = mb.class_('PySteamMatchmakingServerListResponse')
+        cls.include()
+        cls.rename('SteamMatchmakingServerListResponse')
+        cls.mem_fun('PyServerResponded').rename('ServerResponded')
+        cls.mem_fun('PyServerFailedToRespond').rename('ServerFailedToRespond')
+        cls.mem_fun('PyRefreshComplete').rename('RefreshComplete')
+        
+        cls = mb.class_('gameserveritem_t')
+        cls.include()
+        cls.mem_fun('SetName').exclude()
+        self.PythonfyVariables(cls)
+        
+        cls = mb.class_('servernetadr_t')
+        cls.include()
+        
+        cls = mb.class_('PySteamMatchmakingPingResponse')
+        cls.include()
+        cls.rename('SteamMatchmakingPingResponse')
+        
+        cls = mb.class_('PySteamMatchmakingPlayersResponse')
+        cls.include()
+        cls.rename('SteamMatchmakingPlayersResponse')
+        
+        cls = mb.class_('PySteamMatchmakingRulesResponse')
+        cls.include()
+        cls.rename('SteamMatchmakingRulesResponse')
+        
         # Enums
         mb.enums('ELobbyType').include()
         mb.enums('ELobbyComparison').include()
         mb.enums('ELobbyDistanceFilter').include()
+        mb.enums('EMatchMakingServerResponse').include()
         
     def ParseUserStats(self, mb):
         cls = mb.class_('ISteamUserStats')
@@ -242,18 +288,19 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
         cls.mem_fun('SteamApps').exclude()
-        cls.mem_fun('SteamMatchmakingServers').exclude()
         
         cls.mem_fun('SteamHTTP').exclude()
         cls.mem_fun('SteamScreenshots').exclude()
         cls.mem_fun('SteamUnifiedMessages').exclude()
+        cls.mem_fun('SteamMatchmakingServers').exclude() # Full python class wrapper
 
         cls.mem_fun('SteamNetworking').exclude()
         cls.mem_fun('SteamRemoteStorage').exclude()
         
-        cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference() 
-        cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference() 
-        cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference() 
+        cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference()
+        cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference()
+        cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference()
+        cls.mem_funs('SteamMatchmakingServers').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUser').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUserStats').call_policies = call_policies.return_internal_reference()
         

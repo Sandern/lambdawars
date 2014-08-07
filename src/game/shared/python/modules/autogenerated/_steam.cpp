@@ -2,6 +2,8 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
+#include "__array_1.pypp.hpp"
+
 #include "cbase.h"
 
 #include "steam/steam_api.h"
@@ -26,6 +28,325 @@
 
 namespace bp = boost::python;
 
+struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
+
+    PySteamMatchmakingPingResponse_wrapper(PySteamMatchmakingPingResponse const & arg )
+    : PySteamMatchmakingPingResponse( arg )
+      , bp::wrapper< PySteamMatchmakingPingResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingPingResponse_wrapper()
+    : PySteamMatchmakingPingResponse()
+      , bp::wrapper< PySteamMatchmakingPingResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void ServerFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPingResponse, ServerFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPingResponse, ServerFailedToRespond )
+        bp::override func_ServerFailedToRespond = this->get_override( "ServerFailedToRespond" );
+        if( func_ServerFailedToRespond.ptr() != Py_None )
+            try {
+                func_ServerFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPingResponse::ServerFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingPingResponse::ServerFailedToRespond(  );
+    }
+    
+    void default_ServerFailedToRespond(  ) {
+        PySteamMatchmakingPingResponse::ServerFailedToRespond( );
+    }
+
+    virtual void ServerResponded( ::gameserveritem_t & server ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPingResponse, ServerResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPingResponse, ServerResponded )
+        bp::override func_ServerResponded = this->get_override( "ServerResponded" );
+        if( func_ServerResponded.ptr() != Py_None )
+            try {
+                func_ServerResponded( boost::ref(server) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPingResponse::ServerResponded( server );
+            }
+        else
+            this->PySteamMatchmakingPingResponse::ServerResponded( server );
+    }
+    
+    void default_ServerResponded( ::gameserveritem_t & server ) {
+        PySteamMatchmakingPingResponse::ServerResponded( server );
+    }
+
+};
+
+struct PySteamMatchmakingPlayersResponse_wrapper : PySteamMatchmakingPlayersResponse, bp::wrapper< PySteamMatchmakingPlayersResponse > {
+
+    PySteamMatchmakingPlayersResponse_wrapper(PySteamMatchmakingPlayersResponse const & arg )
+    : PySteamMatchmakingPlayersResponse( arg )
+      , bp::wrapper< PySteamMatchmakingPlayersResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingPlayersResponse_wrapper()
+    : PySteamMatchmakingPlayersResponse()
+      , bp::wrapper< PySteamMatchmakingPlayersResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void AddPlayerToList( char const * pchName, int nScore, float flTimePlayed ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, AddPlayerToList )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, AddPlayerToList )
+        bp::override func_AddPlayerToList = this->get_override( "AddPlayerToList" );
+        if( func_AddPlayerToList.ptr() != Py_None )
+            try {
+                func_AddPlayerToList( pchName, nScore, flTimePlayed );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+    }
+    
+    void default_AddPlayerToList( char const * pchName, int nScore, float flTimePlayed ) {
+        PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+    }
+
+    virtual void PlayersFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, PlayersFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, PlayersFailedToRespond )
+        bp::override func_PlayersFailedToRespond = this->get_override( "PlayersFailedToRespond" );
+        if( func_PlayersFailedToRespond.ptr() != Py_None )
+            try {
+                func_PlayersFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::PlayersFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::PlayersFailedToRespond(  );
+    }
+    
+    void default_PlayersFailedToRespond(  ) {
+        PySteamMatchmakingPlayersResponse::PlayersFailedToRespond( );
+    }
+
+    virtual void PlayersRefreshComplete(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, PlayersRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, PlayersRefreshComplete )
+        bp::override func_PlayersRefreshComplete = this->get_override( "PlayersRefreshComplete" );
+        if( func_PlayersRefreshComplete.ptr() != Py_None )
+            try {
+                func_PlayersRefreshComplete(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::PlayersRefreshComplete(  );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::PlayersRefreshComplete(  );
+    }
+    
+    void default_PlayersRefreshComplete(  ) {
+        PySteamMatchmakingPlayersResponse::PlayersRefreshComplete( );
+    }
+
+};
+
+struct PySteamMatchmakingRulesResponse_wrapper : PySteamMatchmakingRulesResponse, bp::wrapper< PySteamMatchmakingRulesResponse > {
+
+    PySteamMatchmakingRulesResponse_wrapper(PySteamMatchmakingRulesResponse const & arg )
+    : PySteamMatchmakingRulesResponse( arg )
+      , bp::wrapper< PySteamMatchmakingRulesResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingRulesResponse_wrapper()
+    : PySteamMatchmakingRulesResponse()
+      , bp::wrapper< PySteamMatchmakingRulesResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void RulesFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesFailedToRespond )
+        bp::override func_RulesFailedToRespond = this->get_override( "RulesFailedToRespond" );
+        if( func_RulesFailedToRespond.ptr() != Py_None )
+            try {
+                func_RulesFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesFailedToRespond(  );
+    }
+    
+    void default_RulesFailedToRespond(  ) {
+        PySteamMatchmakingRulesResponse::RulesFailedToRespond( );
+    }
+
+    virtual void RulesRefreshComplete(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesRefreshComplete )
+        bp::override func_RulesRefreshComplete = this->get_override( "RulesRefreshComplete" );
+        if( func_RulesRefreshComplete.ptr() != Py_None )
+            try {
+                func_RulesRefreshComplete(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesRefreshComplete(  );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesRefreshComplete(  );
+    }
+    
+    void default_RulesRefreshComplete(  ) {
+        PySteamMatchmakingRulesResponse::RulesRefreshComplete( );
+    }
+
+    virtual void RulesResponded( char const * pchRule, char const * pchValue ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesResponded )
+        bp::override func_RulesResponded = this->get_override( "RulesResponded" );
+        if( func_RulesResponded.ptr() != Py_None )
+            try {
+                func_RulesResponded( pchRule, pchValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+    }
+    
+    void default_RulesResponded( char const * pchRule, char const * pchValue ) {
+        PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+    }
+
+};
+
+struct PySteamMatchmakingServerListResponse_wrapper : PySteamMatchmakingServerListResponse, bp::wrapper< PySteamMatchmakingServerListResponse > {
+
+    PySteamMatchmakingServerListResponse_wrapper(PySteamMatchmakingServerListResponse const & arg )
+    : PySteamMatchmakingServerListResponse( arg )
+      , bp::wrapper< PySteamMatchmakingServerListResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingServerListResponse_wrapper()
+    : PySteamMatchmakingServerListResponse()
+      , bp::wrapper< PySteamMatchmakingServerListResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void PyRefreshComplete( int hRequest, ::EMatchMakingServerResponse response ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyRefreshComplete )
+        bp::override func_RefreshComplete = this->get_override( "RefreshComplete" );
+        if( func_RefreshComplete.ptr() != Py_None )
+            try {
+                func_RefreshComplete( hRequest, response );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+    }
+    
+    void default_RefreshComplete( int hRequest, ::EMatchMakingServerResponse response ) {
+        PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+    }
+
+    virtual void PyServerFailedToRespond( int hRequest, int iServer ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyServerFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyServerFailedToRespond )
+        bp::override func_ServerFailedToRespond = this->get_override( "ServerFailedToRespond" );
+        if( func_ServerFailedToRespond.ptr() != Py_None )
+            try {
+                func_ServerFailedToRespond( hRequest, iServer );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+    }
+    
+    void default_ServerFailedToRespond( int hRequest, int iServer ) {
+        PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+    }
+
+    virtual void PyServerResponded( int hRequest, int iServer ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyServerResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyServerResponded )
+        bp::override func_ServerResponded = this->get_override( "ServerResponded" );
+        if( func_ServerResponded.ptr() != Py_None )
+            try {
+                func_ServerResponded( hRequest, iServer );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+    }
+    
+    void default_ServerResponded( int hRequest, int iServer ) {
+        PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+    }
+
+};
+
+struct gameserveritem_t_wrapper : gameserveritem_t, bp::wrapper< gameserveritem_t > {
+
+    gameserveritem_t_wrapper(gameserveritem_t const & arg )
+    : gameserveritem_t( arg )
+      , bp::wrapper< gameserveritem_t >(){
+        // copy constructor
+        
+    }
+
+    gameserveritem_t_wrapper( )
+    : gameserveritem_t( )
+      , bp::wrapper< gameserveritem_t >(){
+        // null constructor
+    
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 64>
+    pyplusplus_m_szGameDescription_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.m_szGameDescription );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 32>
+    pyplusplus_m_szGameDir_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szGameDir );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 128>
+    pyplusplus_m_szGameTags_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 128>( inst.m_szGameTags );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 32>
+    pyplusplus_m_szMap_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szMap );
+    }
+
+};
+
 PY_STEAM_CALLRESULT_WRAPPER( LobbyMatchList, LobbyMatchList_t );
 
 struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper< LobbyMatchListCallResult > {
@@ -34,14 +355,12 @@ struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper<
     : LobbyMatchListCallResult( arg )
       , bp::wrapper< LobbyMatchListCallResult >(){
         // copy constructor
-        
     }
 
     LobbyMatchListCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyMatchListCallResult( steamapicall )
       , bp::wrapper< LobbyMatchListCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
@@ -72,14 +391,12 @@ struct LobbyGameCreatedCallResult_wrapper : LobbyGameCreatedCallResult, bp::wrap
     : LobbyGameCreatedCallResult( arg )
       , bp::wrapper< LobbyGameCreatedCallResult >(){
         // copy constructor
-        
     }
 
     LobbyGameCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyGameCreatedCallResult( steamapicall )
       , bp::wrapper< LobbyGameCreatedCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
@@ -110,14 +427,12 @@ struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< Lob
     : LobbyCreatedCallResult( arg )
       , bp::wrapper< LobbyCreatedCallResult >(){
         // copy constructor
-        
     }
 
     LobbyCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyCreatedCallResult( steamapicall )
       , bp::wrapper< LobbyCreatedCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
@@ -148,14 +463,12 @@ struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEn
     : LobbyEnterCallResult( arg )
       , bp::wrapper< LobbyEnterCallResult >(){
         // copy constructor
-        
     }
 
     LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyEnterCallResult( steamapicall )
       , bp::wrapper< LobbyEnterCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
@@ -300,14 +613,12 @@ struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResu
     : NumberOfCurrentPlayersCallResult( arg )
       , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
         // copy constructor
-        
     }
 
     NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
     : NumberOfCurrentPlayersCallResult( steamapicall )
       , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
         // constructor
-    
     }
 
     virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
@@ -444,6 +755,13 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_ELobbyTypeFriendsOnly", k_ELobbyTypeFriendsOnly)
         .value("k_ELobbyTypePublic", k_ELobbyTypePublic)
         .value("k_ELobbyTypeInvisible", k_ELobbyTypeInvisible)
+        .export_values()
+        ;
+
+    bp::enum_< EMatchMakingServerResponse>("EMatchMakingServerResponse")
+        .value("eServerResponded", eServerResponded)
+        .value("eServerFailedToRespond", eServerFailedToRespond)
+        .value("eNoServersListedOnMasterServer", eNoServersListedOnMasterServer)
         .export_values()
         ;
 
@@ -1684,6 +2002,260 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
         NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
         NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
+    }
+
+    bp::class_< PySteamMatchmakingPingResponse_wrapper >( "SteamMatchmakingPingResponse" )    
+        .def( 
+            "ServerFailedToRespond"
+            , (void ( ::PySteamMatchmakingPingResponse::* )(  ) )(&::PySteamMatchmakingPingResponse::ServerFailedToRespond)
+            , (void ( PySteamMatchmakingPingResponse_wrapper::* )(  ) )(&PySteamMatchmakingPingResponse_wrapper::default_ServerFailedToRespond) )    
+        .def( 
+            "ServerResponded"
+            , (void ( ::PySteamMatchmakingPingResponse::* )( ::gameserveritem_t & ) )(&::PySteamMatchmakingPingResponse::ServerResponded)
+            , (void ( PySteamMatchmakingPingResponse_wrapper::* )( ::gameserveritem_t & ) )(&PySteamMatchmakingPingResponse_wrapper::default_ServerResponded)
+            , ( bp::arg("server") ) );
+
+    bp::class_< PySteamMatchmakingPlayersResponse_wrapper >( "SteamMatchmakingPlayersResponse" )    
+        .def( 
+            "AddPlayerToList"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )( char const *,int,float ) )(&::PySteamMatchmakingPlayersResponse::AddPlayerToList)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )( char const *,int,float ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_AddPlayerToList)
+            , ( bp::arg("pchName"), bp::arg("nScore"), bp::arg("flTimePlayed") ) )    
+        .def( 
+            "PlayersFailedToRespond"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )(  ) )(&::PySteamMatchmakingPlayersResponse::PlayersFailedToRespond)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )(  ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_PlayersFailedToRespond) )    
+        .def( 
+            "PlayersRefreshComplete"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )(  ) )(&::PySteamMatchmakingPlayersResponse::PlayersRefreshComplete)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )(  ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_PlayersRefreshComplete) );
+
+    bp::class_< PySteamMatchmakingRulesResponse_wrapper >( "SteamMatchmakingRulesResponse" )    
+        .def( 
+            "RulesFailedToRespond"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )(  ) )(&::PySteamMatchmakingRulesResponse::RulesFailedToRespond)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )(  ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesFailedToRespond) )    
+        .def( 
+            "RulesRefreshComplete"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )(  ) )(&::PySteamMatchmakingRulesResponse::RulesRefreshComplete)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )(  ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesRefreshComplete) )    
+        .def( 
+            "RulesResponded"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )( char const *,char const * ) )(&::PySteamMatchmakingRulesResponse::RulesResponded)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )( char const *,char const * ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesResponded)
+            , ( bp::arg("pchRule"), bp::arg("pchValue") ) );
+
+    bp::class_< PySteamMatchmakingServerListResponse_wrapper >( "SteamMatchmakingServerListResponse" )    
+        .def( 
+            "RefreshComplete"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,::EMatchMakingServerResponse ) )(&::PySteamMatchmakingServerListResponse::PyRefreshComplete)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,::EMatchMakingServerResponse ) )(&PySteamMatchmakingServerListResponse_wrapper::default_RefreshComplete)
+            , ( bp::arg("hRequest"), bp::arg("response") ) )    
+        .def( 
+            "ServerFailedToRespond"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,int ) )(&::PySteamMatchmakingServerListResponse::PyServerFailedToRespond)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerFailedToRespond)
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) )    
+        .def( 
+            "ServerResponded"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,int ) )(&::PySteamMatchmakingServerListResponse::PyServerResponded)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerResponded)
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) );
+
+    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers" )    
+        .def( 
+            "CancelServerQuery"
+            , (void ( ::PySteamMatchmakingServers::* )( ::HServerQuery ) )( &::PySteamMatchmakingServers::CancelServerQuery )
+            , ( bp::arg("hServerQuery") ) )    
+        .def( 
+            "GetServerDetails"
+            , (::gameserveritem_t * ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
+            , ( bp::arg("hRequest"), bp::arg("iServer") )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "PingServer"
+            , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPingResponse * ) )( &::PySteamMatchmakingServers::PingServer )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "PlayerDetails"
+            , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPlayersResponse * ) )( &::PySteamMatchmakingServers::PlayerDetails )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "ReleaseRequest"
+            , (void ( ::PySteamMatchmakingServers::* )( int ) )( &::PySteamMatchmakingServers::ReleaseRequest )
+            , ( bp::arg("hServerListRequest") ) )    
+        .def( 
+            "RequestInternetServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::PySteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestInternetServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "ServerRules"
+            , (::HServerQuery ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingRulesResponse * ) )( &::PySteamMatchmakingServers::ServerRules )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) );
+
+    { //::gameserveritem_t
+        typedef bp::class_< gameserveritem_t_wrapper > gameserveritem_t_exposer_t;
+        gameserveritem_t_exposer_t gameserveritem_t_exposer = gameserveritem_t_exposer_t( "gameserveritem_t", bp::init< >() );
+        bp::scope gameserveritem_t_scope( gameserveritem_t_exposer );
+        { //::gameserveritem_t::GetName
+        
+            typedef char const * ( ::gameserveritem_t::*GetName_function_type )(  ) const;
+            
+            gameserveritem_t_exposer.def( 
+                "GetName"
+                , GetName_function_type( &::gameserveritem_t::GetName ) );
+        
+        }
+        gameserveritem_t_exposer.def_readwrite( "m_netadr", &gameserveritem_t::m_NetAdr );
+        gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
+        gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
+        gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
+        gameserveritem_t_exposer.def_readwrite( "secure", &gameserveritem_t::m_bSecure );
+        gameserveritem_t_exposer.def_readwrite( "appid", &gameserveritem_t::m_nAppID );
+        gameserveritem_t_exposer.def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers );
+        gameserveritem_t_exposer.def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers );
+        gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
+        gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
+        gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
+        gameserveritem_t_exposer.def_readwrite( "m_steamid", &gameserveritem_t::m_steamID );
+        pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
+        { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameDescription"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDescription_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        pyplusplus::containers::static_sized::register_array_1< char, 32 >( "__array_1_char_32" );
+        { //gameserveritem_t::m_szGameDir [variable], type=char[32]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameDir"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDir_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        pyplusplus::containers::static_sized::register_array_1< char, 128 >( "__array_1_char_128" );
+        { //gameserveritem_t::m_szGameTags [variable], type=char[128]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 128> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameTags"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameTags_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        { //gameserveritem_t::m_szMap [variable], type=char[32]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szMap"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szMap_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        gameserveritem_t_exposer.def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+    }
+
+    { //::servernetadr_t
+        typedef bp::class_< servernetadr_t > servernetadr_t_exposer_t;
+        servernetadr_t_exposer_t servernetadr_t_exposer = servernetadr_t_exposer_t( "servernetadr_t" );
+        bp::scope servernetadr_t_scope( servernetadr_t_exposer );
+        { //::servernetadr_t::GetConnectionAddressString
+        
+            typedef char const * ( ::servernetadr_t::*GetConnectionAddressString_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetConnectionAddressString"
+                , GetConnectionAddressString_function_type( &::servernetadr_t::GetConnectionAddressString ) );
+        
+        }
+        { //::servernetadr_t::GetConnectionPort
+        
+            typedef ::uint16 ( ::servernetadr_t::*GetConnectionPort_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetConnectionPort"
+                , GetConnectionPort_function_type( &::servernetadr_t::GetConnectionPort ) );
+        
+        }
+        { //::servernetadr_t::GetIP
+        
+            typedef ::uint32 ( ::servernetadr_t::*GetIP_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetIP"
+                , GetIP_function_type( &::servernetadr_t::GetIP ) );
+        
+        }
+        { //::servernetadr_t::GetQueryAddressString
+        
+            typedef char const * ( ::servernetadr_t::*GetQueryAddressString_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetQueryAddressString"
+                , GetQueryAddressString_function_type( &::servernetadr_t::GetQueryAddressString ) );
+        
+        }
+        { //::servernetadr_t::GetQueryPort
+        
+            typedef ::uint16 ( ::servernetadr_t::*GetQueryPort_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetQueryPort"
+                , GetQueryPort_function_type( &::servernetadr_t::GetQueryPort ) );
+        
+        }
+        { //::servernetadr_t::Init
+        
+            typedef void ( ::servernetadr_t::*Init_function_type )( unsigned int,::uint16,::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "Init"
+                , Init_function_type( &::servernetadr_t::Init )
+                , ( bp::arg("ip"), bp::arg("usQueryPort"), bp::arg("usConnectionPort") ) );
+        
+        }
+        { //::servernetadr_t::SetConnectionPort
+        
+            typedef void ( ::servernetadr_t::*SetConnectionPort_function_type )( ::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetConnectionPort"
+                , SetConnectionPort_function_type( &::servernetadr_t::SetConnectionPort )
+                , ( bp::arg("usPort") ) );
+        
+        }
+        { //::servernetadr_t::SetIP
+        
+            typedef void ( ::servernetadr_t::*SetIP_function_type )( ::uint32 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetIP"
+                , SetIP_function_type( &::servernetadr_t::SetIP )
+                , ( bp::arg("unIP") ) );
+        
+        }
+        { //::servernetadr_t::SetQueryPort
+        
+            typedef void ( ::servernetadr_t::*SetQueryPort_function_type )( ::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetQueryPort"
+                , SetQueryPort_function_type( &::servernetadr_t::SetQueryPort )
+                , ( bp::arg("usPort") ) );
+        
+        }
+        servernetadr_t_exposer.def( bp::self < bp::self );
+        { //::servernetadr_t::operator=
+        
+            typedef void ( ::servernetadr_t::*assign_function_type )( ::servernetadr_t const & ) ;
+            
+            servernetadr_t_exposer.def( 
+                "assign"
+                , assign_function_type( &::servernetadr_t::operator= )
+                , ( bp::arg("that") ) );
+        
+        }
     }
 
     { //::PyGetLobbyChatEntry
@@ -1889,6 +2461,8 @@ BOOST_PYTHON_MODULE(_steam){
     bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }
 #else
+#include "__array_1.pypp.hpp"
+
 #include "cbase.h"
 
 #include "steam/steam_api.h"
@@ -1911,6 +2485,325 @@ BOOST_PYTHON_MODULE(_steam){
 
 namespace bp = boost::python;
 
+struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
+
+    PySteamMatchmakingPingResponse_wrapper(PySteamMatchmakingPingResponse const & arg )
+    : PySteamMatchmakingPingResponse( arg )
+      , bp::wrapper< PySteamMatchmakingPingResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingPingResponse_wrapper()
+    : PySteamMatchmakingPingResponse()
+      , bp::wrapper< PySteamMatchmakingPingResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void ServerFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPingResponse, ServerFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPingResponse, ServerFailedToRespond )
+        bp::override func_ServerFailedToRespond = this->get_override( "ServerFailedToRespond" );
+        if( func_ServerFailedToRespond.ptr() != Py_None )
+            try {
+                func_ServerFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPingResponse::ServerFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingPingResponse::ServerFailedToRespond(  );
+    }
+    
+    void default_ServerFailedToRespond(  ) {
+        PySteamMatchmakingPingResponse::ServerFailedToRespond( );
+    }
+
+    virtual void ServerResponded( ::gameserveritem_t & server ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPingResponse, ServerResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPingResponse, ServerResponded )
+        bp::override func_ServerResponded = this->get_override( "ServerResponded" );
+        if( func_ServerResponded.ptr() != Py_None )
+            try {
+                func_ServerResponded( boost::ref(server) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPingResponse::ServerResponded( server );
+            }
+        else
+            this->PySteamMatchmakingPingResponse::ServerResponded( server );
+    }
+    
+    void default_ServerResponded( ::gameserveritem_t & server ) {
+        PySteamMatchmakingPingResponse::ServerResponded( server );
+    }
+
+};
+
+struct PySteamMatchmakingPlayersResponse_wrapper : PySteamMatchmakingPlayersResponse, bp::wrapper< PySteamMatchmakingPlayersResponse > {
+
+    PySteamMatchmakingPlayersResponse_wrapper(PySteamMatchmakingPlayersResponse const & arg )
+    : PySteamMatchmakingPlayersResponse( arg )
+      , bp::wrapper< PySteamMatchmakingPlayersResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingPlayersResponse_wrapper()
+    : PySteamMatchmakingPlayersResponse()
+      , bp::wrapper< PySteamMatchmakingPlayersResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void AddPlayerToList( char const * pchName, int nScore, float flTimePlayed ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, AddPlayerToList )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, AddPlayerToList )
+        bp::override func_AddPlayerToList = this->get_override( "AddPlayerToList" );
+        if( func_AddPlayerToList.ptr() != Py_None )
+            try {
+                func_AddPlayerToList( pchName, nScore, flTimePlayed );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+    }
+    
+    void default_AddPlayerToList( char const * pchName, int nScore, float flTimePlayed ) {
+        PySteamMatchmakingPlayersResponse::AddPlayerToList( pchName, nScore, flTimePlayed );
+    }
+
+    virtual void PlayersFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, PlayersFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, PlayersFailedToRespond )
+        bp::override func_PlayersFailedToRespond = this->get_override( "PlayersFailedToRespond" );
+        if( func_PlayersFailedToRespond.ptr() != Py_None )
+            try {
+                func_PlayersFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::PlayersFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::PlayersFailedToRespond(  );
+    }
+    
+    void default_PlayersFailedToRespond(  ) {
+        PySteamMatchmakingPlayersResponse::PlayersFailedToRespond( );
+    }
+
+    virtual void PlayersRefreshComplete(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingPlayersResponse, PlayersRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingPlayersResponse, PlayersRefreshComplete )
+        bp::override func_PlayersRefreshComplete = this->get_override( "PlayersRefreshComplete" );
+        if( func_PlayersRefreshComplete.ptr() != Py_None )
+            try {
+                func_PlayersRefreshComplete(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingPlayersResponse::PlayersRefreshComplete(  );
+            }
+        else
+            this->PySteamMatchmakingPlayersResponse::PlayersRefreshComplete(  );
+    }
+    
+    void default_PlayersRefreshComplete(  ) {
+        PySteamMatchmakingPlayersResponse::PlayersRefreshComplete( );
+    }
+
+};
+
+struct PySteamMatchmakingRulesResponse_wrapper : PySteamMatchmakingRulesResponse, bp::wrapper< PySteamMatchmakingRulesResponse > {
+
+    PySteamMatchmakingRulesResponse_wrapper(PySteamMatchmakingRulesResponse const & arg )
+    : PySteamMatchmakingRulesResponse( arg )
+      , bp::wrapper< PySteamMatchmakingRulesResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingRulesResponse_wrapper()
+    : PySteamMatchmakingRulesResponse()
+      , bp::wrapper< PySteamMatchmakingRulesResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void RulesFailedToRespond(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesFailedToRespond )
+        bp::override func_RulesFailedToRespond = this->get_override( "RulesFailedToRespond" );
+        if( func_RulesFailedToRespond.ptr() != Py_None )
+            try {
+                func_RulesFailedToRespond(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesFailedToRespond(  );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesFailedToRespond(  );
+    }
+    
+    void default_RulesFailedToRespond(  ) {
+        PySteamMatchmakingRulesResponse::RulesFailedToRespond( );
+    }
+
+    virtual void RulesRefreshComplete(  ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesRefreshComplete )
+        bp::override func_RulesRefreshComplete = this->get_override( "RulesRefreshComplete" );
+        if( func_RulesRefreshComplete.ptr() != Py_None )
+            try {
+                func_RulesRefreshComplete(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesRefreshComplete(  );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesRefreshComplete(  );
+    }
+    
+    void default_RulesRefreshComplete(  ) {
+        PySteamMatchmakingRulesResponse::RulesRefreshComplete( );
+    }
+
+    virtual void RulesResponded( char const * pchRule, char const * pchValue ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingRulesResponse, RulesResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingRulesResponse, RulesResponded )
+        bp::override func_RulesResponded = this->get_override( "RulesResponded" );
+        if( func_RulesResponded.ptr() != Py_None )
+            try {
+                func_RulesResponded( pchRule, pchValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+            }
+        else
+            this->PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+    }
+    
+    void default_RulesResponded( char const * pchRule, char const * pchValue ) {
+        PySteamMatchmakingRulesResponse::RulesResponded( pchRule, pchValue );
+    }
+
+};
+
+struct PySteamMatchmakingServerListResponse_wrapper : PySteamMatchmakingServerListResponse, bp::wrapper< PySteamMatchmakingServerListResponse > {
+
+    PySteamMatchmakingServerListResponse_wrapper(PySteamMatchmakingServerListResponse const & arg )
+    : PySteamMatchmakingServerListResponse( arg )
+      , bp::wrapper< PySteamMatchmakingServerListResponse >(){
+        // copy constructor
+        
+    }
+
+    PySteamMatchmakingServerListResponse_wrapper()
+    : PySteamMatchmakingServerListResponse()
+      , bp::wrapper< PySteamMatchmakingServerListResponse >(){
+        // null constructor
+        
+    }
+
+    virtual void PyRefreshComplete( int hRequest, ::EMatchMakingServerResponse response ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyRefreshComplete )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyRefreshComplete )
+        bp::override func_RefreshComplete = this->get_override( "RefreshComplete" );
+        if( func_RefreshComplete.ptr() != Py_None )
+            try {
+                func_RefreshComplete( hRequest, response );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+    }
+    
+    void default_RefreshComplete( int hRequest, ::EMatchMakingServerResponse response ) {
+        PySteamMatchmakingServerListResponse::PyRefreshComplete( hRequest, response );
+    }
+
+    virtual void PyServerFailedToRespond( int hRequest, int iServer ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyServerFailedToRespond )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyServerFailedToRespond )
+        bp::override func_ServerFailedToRespond = this->get_override( "ServerFailedToRespond" );
+        if( func_ServerFailedToRespond.ptr() != Py_None )
+            try {
+                func_ServerFailedToRespond( hRequest, iServer );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+    }
+    
+    void default_ServerFailedToRespond( int hRequest, int iServer ) {
+        PySteamMatchmakingServerListResponse::PyServerFailedToRespond( hRequest, iServer );
+    }
+
+    virtual void PyServerResponded( int hRequest, int iServer ) {
+        PY_OVERRIDE_CHECK( PySteamMatchmakingServerListResponse, PyServerResponded )
+        PY_OVERRIDE_LOG( _steam, PySteamMatchmakingServerListResponse, PyServerResponded )
+        bp::override func_ServerResponded = this->get_override( "ServerResponded" );
+        if( func_ServerResponded.ptr() != Py_None )
+            try {
+                func_ServerResponded( hRequest, iServer );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+            }
+        else
+            this->PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+    }
+    
+    void default_ServerResponded( int hRequest, int iServer ) {
+        PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
+    }
+
+};
+
+struct gameserveritem_t_wrapper : gameserveritem_t, bp::wrapper< gameserveritem_t > {
+
+    gameserveritem_t_wrapper(gameserveritem_t const & arg )
+    : gameserveritem_t( arg )
+      , bp::wrapper< gameserveritem_t >(){
+        // copy constructor
+        
+    }
+
+    gameserveritem_t_wrapper( )
+    : gameserveritem_t( )
+      , bp::wrapper< gameserveritem_t >(){
+        // null constructor
+    
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 64>
+    pyplusplus_m_szGameDescription_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.m_szGameDescription );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 32>
+    pyplusplus_m_szGameDir_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szGameDir );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 128>
+    pyplusplus_m_szGameTags_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 128>( inst.m_szGameTags );
+    }
+
+    static pyplusplus::containers::static_sized::array_1_t< char, 32>
+    pyplusplus_m_szMap_wrapper( ::gameserveritem_t & inst ){
+        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szMap );
+    }
+
+};
+
 PY_STEAM_CALLRESULT_WRAPPER( LobbyMatchList, LobbyMatchList_t );
 
 struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper< LobbyMatchListCallResult > {
@@ -1919,14 +2812,12 @@ struct LobbyMatchListCallResult_wrapper : LobbyMatchListCallResult, bp::wrapper<
     : LobbyMatchListCallResult( arg )
       , bp::wrapper< LobbyMatchListCallResult >(){
         // copy constructor
-        
     }
 
     LobbyMatchListCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyMatchListCallResult( steamapicall )
       , bp::wrapper< LobbyMatchListCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyMatchList( ::LobbyMatchList_t * pData, bool bIOFailure ) {
@@ -1957,14 +2848,12 @@ struct LobbyGameCreatedCallResult_wrapper : LobbyGameCreatedCallResult, bp::wrap
     : LobbyGameCreatedCallResult( arg )
       , bp::wrapper< LobbyGameCreatedCallResult >(){
         // copy constructor
-        
     }
 
     LobbyGameCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyGameCreatedCallResult( steamapicall )
       , bp::wrapper< LobbyGameCreatedCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyGameCreated( ::LobbyGameCreated_t * pData, bool bIOFailure ) {
@@ -1995,14 +2884,12 @@ struct LobbyCreatedCallResult_wrapper : LobbyCreatedCallResult, bp::wrapper< Lob
     : LobbyCreatedCallResult( arg )
       , bp::wrapper< LobbyCreatedCallResult >(){
         // copy constructor
-        
     }
 
     LobbyCreatedCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyCreatedCallResult( steamapicall )
       , bp::wrapper< LobbyCreatedCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyCreated( ::LobbyCreated_t * pData, bool bIOFailure ) {
@@ -2033,14 +2920,12 @@ struct LobbyEnterCallResult_wrapper : LobbyEnterCallResult, bp::wrapper< LobbyEn
     : LobbyEnterCallResult( arg )
       , bp::wrapper< LobbyEnterCallResult >(){
         // copy constructor
-        
     }
 
     LobbyEnterCallResult_wrapper(::SteamAPICall_t steamapicall )
     : LobbyEnterCallResult( steamapicall )
       , bp::wrapper< LobbyEnterCallResult >(){
         // constructor
-    
     }
 
     virtual void OnLobbyEnter( ::LobbyEnter_t * pData, bool bIOFailure ) {
@@ -2185,14 +3070,12 @@ struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResu
     : NumberOfCurrentPlayersCallResult( arg )
       , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
         // copy constructor
-        
     }
 
     NumberOfCurrentPlayersCallResult_wrapper(::SteamAPICall_t steamapicall )
     : NumberOfCurrentPlayersCallResult( steamapicall )
       , bp::wrapper< NumberOfCurrentPlayersCallResult >(){
         // constructor
-    
     }
 
     virtual void OnNumberOfCurrentPlayers( ::NumberOfCurrentPlayers_t * pData, bool bIOFailure ) {
@@ -2329,6 +3212,13 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_ELobbyTypeFriendsOnly", k_ELobbyTypeFriendsOnly)
         .value("k_ELobbyTypePublic", k_ELobbyTypePublic)
         .value("k_ELobbyTypeInvisible", k_ELobbyTypeInvisible)
+        .export_values()
+        ;
+
+    bp::enum_< EMatchMakingServerResponse>("EMatchMakingServerResponse")
+        .value("eServerResponded", eServerResponded)
+        .value("eServerFailedToRespond", eServerFailedToRespond)
+        .value("eNoServersListedOnMasterServer", eNoServersListedOnMasterServer)
         .export_values()
         ;
 
@@ -3569,6 +4459,260 @@ BOOST_PYTHON_MODULE(_steam){
         bp::scope().attr("k_iCallback") = (int)NumberOfCurrentPlayers_t::k_iCallback;
         NumberOfCurrentPlayers_t_exposer.def_readwrite( "success", &NumberOfCurrentPlayers_t::m_bSuccess );
         NumberOfCurrentPlayers_t_exposer.def_readwrite( "players", &NumberOfCurrentPlayers_t::m_cPlayers );
+    }
+
+    bp::class_< PySteamMatchmakingPingResponse_wrapper >( "SteamMatchmakingPingResponse" )    
+        .def( 
+            "ServerFailedToRespond"
+            , (void ( ::PySteamMatchmakingPingResponse::* )(  ) )(&::PySteamMatchmakingPingResponse::ServerFailedToRespond)
+            , (void ( PySteamMatchmakingPingResponse_wrapper::* )(  ) )(&PySteamMatchmakingPingResponse_wrapper::default_ServerFailedToRespond) )    
+        .def( 
+            "ServerResponded"
+            , (void ( ::PySteamMatchmakingPingResponse::* )( ::gameserveritem_t & ) )(&::PySteamMatchmakingPingResponse::ServerResponded)
+            , (void ( PySteamMatchmakingPingResponse_wrapper::* )( ::gameserveritem_t & ) )(&PySteamMatchmakingPingResponse_wrapper::default_ServerResponded)
+            , ( bp::arg("server") ) );
+
+    bp::class_< PySteamMatchmakingPlayersResponse_wrapper >( "SteamMatchmakingPlayersResponse" )    
+        .def( 
+            "AddPlayerToList"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )( char const *,int,float ) )(&::PySteamMatchmakingPlayersResponse::AddPlayerToList)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )( char const *,int,float ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_AddPlayerToList)
+            , ( bp::arg("pchName"), bp::arg("nScore"), bp::arg("flTimePlayed") ) )    
+        .def( 
+            "PlayersFailedToRespond"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )(  ) )(&::PySteamMatchmakingPlayersResponse::PlayersFailedToRespond)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )(  ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_PlayersFailedToRespond) )    
+        .def( 
+            "PlayersRefreshComplete"
+            , (void ( ::PySteamMatchmakingPlayersResponse::* )(  ) )(&::PySteamMatchmakingPlayersResponse::PlayersRefreshComplete)
+            , (void ( PySteamMatchmakingPlayersResponse_wrapper::* )(  ) )(&PySteamMatchmakingPlayersResponse_wrapper::default_PlayersRefreshComplete) );
+
+    bp::class_< PySteamMatchmakingRulesResponse_wrapper >( "SteamMatchmakingRulesResponse" )    
+        .def( 
+            "RulesFailedToRespond"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )(  ) )(&::PySteamMatchmakingRulesResponse::RulesFailedToRespond)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )(  ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesFailedToRespond) )    
+        .def( 
+            "RulesRefreshComplete"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )(  ) )(&::PySteamMatchmakingRulesResponse::RulesRefreshComplete)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )(  ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesRefreshComplete) )    
+        .def( 
+            "RulesResponded"
+            , (void ( ::PySteamMatchmakingRulesResponse::* )( char const *,char const * ) )(&::PySteamMatchmakingRulesResponse::RulesResponded)
+            , (void ( PySteamMatchmakingRulesResponse_wrapper::* )( char const *,char const * ) )(&PySteamMatchmakingRulesResponse_wrapper::default_RulesResponded)
+            , ( bp::arg("pchRule"), bp::arg("pchValue") ) );
+
+    bp::class_< PySteamMatchmakingServerListResponse_wrapper >( "SteamMatchmakingServerListResponse" )    
+        .def( 
+            "RefreshComplete"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,::EMatchMakingServerResponse ) )(&::PySteamMatchmakingServerListResponse::PyRefreshComplete)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,::EMatchMakingServerResponse ) )(&PySteamMatchmakingServerListResponse_wrapper::default_RefreshComplete)
+            , ( bp::arg("hRequest"), bp::arg("response") ) )    
+        .def( 
+            "ServerFailedToRespond"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,int ) )(&::PySteamMatchmakingServerListResponse::PyServerFailedToRespond)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerFailedToRespond)
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) )    
+        .def( 
+            "ServerResponded"
+            , (void ( ::PySteamMatchmakingServerListResponse::* )( int,int ) )(&::PySteamMatchmakingServerListResponse::PyServerResponded)
+            , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerResponded)
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) );
+
+    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers" )    
+        .def( 
+            "CancelServerQuery"
+            , (void ( ::PySteamMatchmakingServers::* )( ::HServerQuery ) )( &::PySteamMatchmakingServers::CancelServerQuery )
+            , ( bp::arg("hServerQuery") ) )    
+        .def( 
+            "GetServerDetails"
+            , (::gameserveritem_t * ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
+            , ( bp::arg("hRequest"), bp::arg("iServer") )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "PingServer"
+            , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPingResponse * ) )( &::PySteamMatchmakingServers::PingServer )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "PlayerDetails"
+            , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPlayersResponse * ) )( &::PySteamMatchmakingServers::PlayerDetails )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "ReleaseRequest"
+            , (void ( ::PySteamMatchmakingServers::* )( int ) )( &::PySteamMatchmakingServers::ReleaseRequest )
+            , ( bp::arg("hServerListRequest") ) )    
+        .def( 
+            "RequestInternetServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::PySteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestInternetServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "ServerRules"
+            , (::HServerQuery ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingRulesResponse * ) )( &::PySteamMatchmakingServers::ServerRules )
+            , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) );
+
+    { //::gameserveritem_t
+        typedef bp::class_< gameserveritem_t_wrapper > gameserveritem_t_exposer_t;
+        gameserveritem_t_exposer_t gameserveritem_t_exposer = gameserveritem_t_exposer_t( "gameserveritem_t", bp::init< >() );
+        bp::scope gameserveritem_t_scope( gameserveritem_t_exposer );
+        { //::gameserveritem_t::GetName
+        
+            typedef char const * ( ::gameserveritem_t::*GetName_function_type )(  ) const;
+            
+            gameserveritem_t_exposer.def( 
+                "GetName"
+                , GetName_function_type( &::gameserveritem_t::GetName ) );
+        
+        }
+        gameserveritem_t_exposer.def_readwrite( "m_netadr", &gameserveritem_t::m_NetAdr );
+        gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
+        gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
+        gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
+        gameserveritem_t_exposer.def_readwrite( "secure", &gameserveritem_t::m_bSecure );
+        gameserveritem_t_exposer.def_readwrite( "appid", &gameserveritem_t::m_nAppID );
+        gameserveritem_t_exposer.def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers );
+        gameserveritem_t_exposer.def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers );
+        gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
+        gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
+        gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
+        gameserveritem_t_exposer.def_readwrite( "m_steamid", &gameserveritem_t::m_steamID );
+        pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
+        { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameDescription"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDescription_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        pyplusplus::containers::static_sized::register_array_1< char, 32 >( "__array_1_char_32" );
+        { //gameserveritem_t::m_szGameDir [variable], type=char[32]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameDir"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDir_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        pyplusplus::containers::static_sized::register_array_1< char, 128 >( "__array_1_char_128" );
+        { //gameserveritem_t::m_szGameTags [variable], type=char[128]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 128> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szGameTags"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameTags_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        { //gameserveritem_t::m_szMap [variable], type=char[32]
+        
+            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            
+            gameserveritem_t_exposer.add_property( "m_szMap"
+                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szMap_wrapper)
+                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
+        }
+        gameserveritem_t_exposer.def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+    }
+
+    { //::servernetadr_t
+        typedef bp::class_< servernetadr_t > servernetadr_t_exposer_t;
+        servernetadr_t_exposer_t servernetadr_t_exposer = servernetadr_t_exposer_t( "servernetadr_t" );
+        bp::scope servernetadr_t_scope( servernetadr_t_exposer );
+        { //::servernetadr_t::GetConnectionAddressString
+        
+            typedef char const * ( ::servernetadr_t::*GetConnectionAddressString_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetConnectionAddressString"
+                , GetConnectionAddressString_function_type( &::servernetadr_t::GetConnectionAddressString ) );
+        
+        }
+        { //::servernetadr_t::GetConnectionPort
+        
+            typedef ::uint16 ( ::servernetadr_t::*GetConnectionPort_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetConnectionPort"
+                , GetConnectionPort_function_type( &::servernetadr_t::GetConnectionPort ) );
+        
+        }
+        { //::servernetadr_t::GetIP
+        
+            typedef ::uint32 ( ::servernetadr_t::*GetIP_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetIP"
+                , GetIP_function_type( &::servernetadr_t::GetIP ) );
+        
+        }
+        { //::servernetadr_t::GetQueryAddressString
+        
+            typedef char const * ( ::servernetadr_t::*GetQueryAddressString_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetQueryAddressString"
+                , GetQueryAddressString_function_type( &::servernetadr_t::GetQueryAddressString ) );
+        
+        }
+        { //::servernetadr_t::GetQueryPort
+        
+            typedef ::uint16 ( ::servernetadr_t::*GetQueryPort_function_type )(  ) const;
+            
+            servernetadr_t_exposer.def( 
+                "GetQueryPort"
+                , GetQueryPort_function_type( &::servernetadr_t::GetQueryPort ) );
+        
+        }
+        { //::servernetadr_t::Init
+        
+            typedef void ( ::servernetadr_t::*Init_function_type )( unsigned int,::uint16,::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "Init"
+                , Init_function_type( &::servernetadr_t::Init )
+                , ( bp::arg("ip"), bp::arg("usQueryPort"), bp::arg("usConnectionPort") ) );
+        
+        }
+        { //::servernetadr_t::SetConnectionPort
+        
+            typedef void ( ::servernetadr_t::*SetConnectionPort_function_type )( ::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetConnectionPort"
+                , SetConnectionPort_function_type( &::servernetadr_t::SetConnectionPort )
+                , ( bp::arg("usPort") ) );
+        
+        }
+        { //::servernetadr_t::SetIP
+        
+            typedef void ( ::servernetadr_t::*SetIP_function_type )( ::uint32 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetIP"
+                , SetIP_function_type( &::servernetadr_t::SetIP )
+                , ( bp::arg("unIP") ) );
+        
+        }
+        { //::servernetadr_t::SetQueryPort
+        
+            typedef void ( ::servernetadr_t::*SetQueryPort_function_type )( ::uint16 ) ;
+            
+            servernetadr_t_exposer.def( 
+                "SetQueryPort"
+                , SetQueryPort_function_type( &::servernetadr_t::SetQueryPort )
+                , ( bp::arg("usPort") ) );
+        
+        }
+        servernetadr_t_exposer.def( bp::self < bp::self );
+        { //::servernetadr_t::operator=
+        
+            typedef void ( ::servernetadr_t::*assign_function_type )( ::servernetadr_t const & ) ;
+            
+            servernetadr_t_exposer.def( 
+                "assign"
+                , assign_function_type( &::servernetadr_t::operator= )
+                , ( bp::arg("that") ) );
+        
+        }
     }
 
     { //::PyGetLobbyChatEntry
