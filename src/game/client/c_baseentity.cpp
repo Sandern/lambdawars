@@ -1151,9 +1151,15 @@ void C_BaseEntity::CleanUpAlphaProperty()
 //-----------------------------------------------------------------------------
 C_BaseEntity::~C_BaseEntity()
 {
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	{	
 		if( m_nFOWFlags & FOWFLAG_UPDATER )
 			FogOfWarMgr()->RemoveFogUpdater( m_iOwnerNumber, this );
@@ -1865,10 +1871,17 @@ void C_BaseEntity::ReceiveMessage( int classID, bf_read &msg )
 	{
 		case BASEENTITY_MSG_REMOVE_DECALS:	RemoveAllDecals();
 											break;
+
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 		case BASEENTITY_MSG_PYTHON: PyReceiveMessageInternal(classID, msg); 
 											break;
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	}
 }
 
@@ -3724,6 +3737,9 @@ void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 	m_hOldMoveParent = m_hNetworkMoveParent;
 	m_iOldParentAttachment = m_iParentAttachment;
 
+// =======================================
+// PySource Additions
+// =======================================
 	// Ensures Python networked variables are processed on client creation of this entity
 #ifdef ENABLE_PYTHON
 	if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
@@ -3731,6 +3747,9 @@ void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 		SrcPySystem()->PreProcessDelayedUpdates( this );
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
@@ -3745,6 +3764,9 @@ void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
 	{
 		UpdateVisibility();
 
+// =======================================
+// PySource Additions
+// =======================================
 	// Ensures Python networked variables are processed on client creation of this entity
 #ifdef ENABLE_PYTHON
 		if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
@@ -3752,6 +3774,9 @@ void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
 			SrcPySystem()->PostProcessDelayedUpdates( this );
 		}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	}
 
 	// These may have changed in the network update
