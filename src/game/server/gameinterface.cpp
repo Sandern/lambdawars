@@ -122,8 +122,9 @@
 #include "editor/editorsystem.h"
 #include "wars_flora.h"
 
-#include "INetChannel.h"
-#include "IClient.h"
+//#include "INetChannel.h"
+//#include "IClient.h"
+#include "hl2wars_gameinterface.h"
 
 #include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
@@ -702,13 +703,8 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( cvar == NULL )
 		return false;
 
-#if !defined( SWDS ) && !defined(NO_STEAM)
-	SteamAPI_InitSafe();
 	s_SteamAPIContext.Init();
-#endif
-#if !defined(NO_STEAM)
 	s_SteamGameServerAPIContext.Init();
-#endif
 
 	COM_TimestampedLog( "Factories - Start" );
 
@@ -981,11 +977,8 @@ void CServerGameDLL::DLLShutdown( void )
 	CWarsFlora::DestroyFloraGrid();
 #endif // HL2WARS_DLL
 
-#if !defined(NO_STEAM)
 	s_SteamAPIContext.Clear(); // Steam API context shutdown
 	s_SteamGameServerAPIContext.Clear();	
-	// SteamAPI_Shutdown(); << Steam shutdown is controlled by engine
-#endif
 
 #ifdef ENABLE_PYTHON
 	SrcPySystem()->ExtraShutdown();
@@ -1537,6 +1530,10 @@ void CServerGameDLL::Think( bool finalTick )
 #ifdef ENABLE_PYTHON
 	SrcPySystem()->UpdateRealtimeTickMethods();
 #endif // ENABLE_PYTHON
+
+#ifdef HL2WARS_DLL
+	WarsUpdateGameServer();
+#endif // HL2WARS_DLL
 }
 
 void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
@@ -2105,6 +2102,16 @@ void CServerGameDLL::GetMatchmakingTags( char *buf, size_t bufSize )
 void CServerGameDLL::GetMatchmakingGameData( char *buf, size_t bufSize )
 {
 	char * const bufBase = buf;
+
+#ifdef HL2WARS_DLL
+	int len = 0;
+
+	// Put the game key
+	Q_snprintf( buf, bufSize, "g:lw," );
+	len = strlen( buf );
+	buf += len;
+	bufSize -= len;
+#endif // GAME
 
 #ifdef TERROR
 	int len = 0;

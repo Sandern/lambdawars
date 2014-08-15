@@ -12,5 +12,7 @@
 
 bool AddToDownloadables( const char *file );
 
+void WarsUpdateGameServer();
+
 #endif // HL2WARS_GAMEINTERFACE_H
 

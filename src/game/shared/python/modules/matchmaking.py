@@ -9,6 +9,8 @@ class MatchMaking(SemiSharedModuleGenerator):
         'srcpy_matchmaking.h',
         #'steam/isteammatchmaking.h',
         #'matchmaking/imatchframework.h',
+        
+        'wars_matchmaking.h',
     ]
         
     def Parse(self, mb):
@@ -64,4 +66,6 @@ class MatchMaking(SemiSharedModuleGenerator):
         cls.include()
         cls.rename('steammatchmaking')
         
+        # Wars
+        mb.free_function('WarsSendTestMessage').include()
         

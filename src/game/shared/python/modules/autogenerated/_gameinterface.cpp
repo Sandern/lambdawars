@@ -28,6 +28,8 @@
 
 #include "wars_mount_system.h"
 
+#include "clientsteamcontext.h"
+
 #include "srcpy_gameinterface_converters.h"
 
 #include "srcpy.h"

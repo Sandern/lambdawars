@@ -20,8 +20,6 @@
 
 #include "srcpy_steam.h"
 
-#include "vgui_avatarimage.h"
-
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -855,6 +853,16 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultBadResponse", k_EResultBadResponse)
         .value("k_EResultRequirePasswordReEntry", k_EResultRequirePasswordReEntry)
         .value("k_EResultValueOutOfRange", k_EResultValueOutOfRange)
+        .value("k_EResultUnexpectedError", k_EResultUnexpectedError)
+        .value("k_EResultDisabled", k_EResultDisabled)
+        .value("k_EResultInvalidCEGSubmission", k_EResultInvalidCEGSubmission)
+        .value("k_EResultRestrictedDevice", k_EResultRestrictedDevice)
+        .value("k_EResultRegionLocked", k_EResultRegionLocked)
+        .value("k_EResultRateLimitExceeded", k_EResultRateLimitExceeded)
+        .value("k_EResultAccountLoginDeniedNeedTwoFactor", k_EResultAccountLoginDeniedNeedTwoFactor)
+        .value("k_EResultItemDeleted", k_EResultItemDeleted)
+        .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
+        .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .export_values()
         ;
 
@@ -1258,7 +1266,7 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetClanChatMessage"
             , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType *,::CSteamID * ) )( &::ISteamFriends::GetClanChatMessage )
-            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("arg4"), bp::arg("arg5") ) )    
+            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("peChatEntryType"), bp::arg("psteamidChatter") ) )    
         .def( 
             "GetClanCount"
             , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetClanCount ) )    
@@ -1363,6 +1371,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetPersonaState"
             , (::EPersonaState ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaState ) )    
+        .def( 
+            "GetPlayerNickname"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetPlayerNickname )
+            , ( bp::arg("steamIDPlayer") ) )    
         .def( 
             "GetSmallFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetSmallFriendAvatar )
@@ -1639,8 +1651,15 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetEncryptedAppTicket )
             , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
         .def( 
+            "GetGameBadgeLevel"
+            , (int ( ::ISteamUser::* )( int,bool ) )( &::ISteamUser::GetGameBadgeLevel )
+            , ( bp::arg("nSeries"), bp::arg("bFoil") ) )    
+        .def( 
             "GetHSteamUser"
             , (::HSteamUser ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetHSteamUser ) )    
+        .def( 
+            "GetPlayerSteamLevel"
+            , (int ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetPlayerSteamLevel ) )    
         .def( 
             "GetSteamID"
             , (::CSteamID ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetSteamID ) )    
@@ -1913,6 +1932,9 @@ BOOST_PYTHON_MODULE(_steam){
             "IsOverlayEnabled"
             , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::IsOverlayEnabled ) )    
         .def( 
+            "IsSteamRunningInVR"
+            , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::IsSteamRunningInVR ) )    
+        .def( 
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
         .def( 
@@ -1921,8 +1943,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("eNotificationPosition") ) )    
         .def( 
             "ShowGamepadTextInput"
-            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
-            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
+            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32,char const * ) )( &::ISteamUtils::ShowGamepadTextInput )
+            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax"), bp::arg("pchExistingText") ) );
 
     { //::LobbyChatMsg_t
         typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
@@ -2106,7 +2128,7 @@ BOOST_PYTHON_MODULE(_steam){
                 , GetName_function_type( &::gameserveritem_t::GetName ) );
         
         }
-        gameserveritem_t_exposer.def_readwrite( "m_netadr", &gameserveritem_t::m_NetAdr );
+        gameserveritem_t_exposer.def_readwrite( "netadr", &gameserveritem_t::m_NetAdr );
         gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
         gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
         gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
@@ -2117,7 +2139,7 @@ BOOST_PYTHON_MODULE(_steam){
         gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
         gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
         gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
-        gameserveritem_t_exposer.def_readwrite( "m_steamid", &gameserveritem_t::m_steamID );
+        gameserveritem_t_exposer.def_readwrite( "steamid", &gameserveritem_t::m_steamID );
         pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
         { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
         
@@ -3312,6 +3334,16 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultBadResponse", k_EResultBadResponse)
         .value("k_EResultRequirePasswordReEntry", k_EResultRequirePasswordReEntry)
         .value("k_EResultValueOutOfRange", k_EResultValueOutOfRange)
+        .value("k_EResultUnexpectedError", k_EResultUnexpectedError)
+        .value("k_EResultDisabled", k_EResultDisabled)
+        .value("k_EResultInvalidCEGSubmission", k_EResultInvalidCEGSubmission)
+        .value("k_EResultRestrictedDevice", k_EResultRestrictedDevice)
+        .value("k_EResultRegionLocked", k_EResultRegionLocked)
+        .value("k_EResultRateLimitExceeded", k_EResultRateLimitExceeded)
+        .value("k_EResultAccountLoginDeniedNeedTwoFactor", k_EResultAccountLoginDeniedNeedTwoFactor)
+        .value("k_EResultItemDeleted", k_EResultItemDeleted)
+        .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
+        .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .export_values()
         ;
 
@@ -3715,7 +3747,7 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetClanChatMessage"
             , (int ( ::ISteamFriends::* )( ::CSteamID,int,void *,int,::EChatEntryType *,::CSteamID * ) )( &::ISteamFriends::GetClanChatMessage )
-            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("arg4"), bp::arg("arg5") ) )    
+            , ( bp::arg("steamIDClanChat"), bp::arg("iMessage"), bp::arg("prgchText"), bp::arg("cchTextMax"), bp::arg("peChatEntryType"), bp::arg("psteamidChatter") ) )    
         .def( 
             "GetClanCount"
             , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetClanCount ) )    
@@ -3820,6 +3852,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetPersonaState"
             , (::EPersonaState ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetPersonaState ) )    
+        .def( 
+            "GetPlayerNickname"
+            , (char const * ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetPlayerNickname )
+            , ( bp::arg("steamIDPlayer") ) )    
         .def( 
             "GetSmallFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetSmallFriendAvatar )
@@ -4096,8 +4132,15 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamUser::* )( void *,int,::uint32 * ) )( &::ISteamUser::GetEncryptedAppTicket )
             , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
         .def( 
+            "GetGameBadgeLevel"
+            , (int ( ::ISteamUser::* )( int,bool ) )( &::ISteamUser::GetGameBadgeLevel )
+            , ( bp::arg("nSeries"), bp::arg("bFoil") ) )    
+        .def( 
             "GetHSteamUser"
             , (::HSteamUser ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetHSteamUser ) )    
+        .def( 
+            "GetPlayerSteamLevel"
+            , (int ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetPlayerSteamLevel ) )    
         .def( 
             "GetSteamID"
             , (::CSteamID ( ::ISteamUser::* )(  ) )( &::ISteamUser::GetSteamID ) )    
@@ -4370,6 +4413,9 @@ BOOST_PYTHON_MODULE(_steam){
             "IsOverlayEnabled"
             , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::IsOverlayEnabled ) )    
         .def( 
+            "IsSteamRunningInVR"
+            , (bool ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::IsSteamRunningInVR ) )    
+        .def( 
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
         .def( 
@@ -4378,8 +4424,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("eNotificationPosition") ) )    
         .def( 
             "ShowGamepadTextInput"
-            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32 ) )( &::ISteamUtils::ShowGamepadTextInput )
-            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax") ) );
+            , (bool ( ::ISteamUtils::* )( ::EGamepadTextInputMode,::EGamepadTextInputLineMode,char const *,::uint32,char const * ) )( &::ISteamUtils::ShowGamepadTextInput )
+            , ( bp::arg("eInputMode"), bp::arg("eLineInputMode"), bp::arg("pchDescription"), bp::arg("unCharMax"), bp::arg("pchExistingText") ) );
 
     { //::LobbyChatMsg_t
         typedef bp::class_< LobbyChatMsg_t > LobbyChatMsg_t_exposer_t;
@@ -4563,7 +4609,7 @@ BOOST_PYTHON_MODULE(_steam){
                 , GetName_function_type( &::gameserveritem_t::GetName ) );
         
         }
-        gameserveritem_t_exposer.def_readwrite( "m_netadr", &gameserveritem_t::m_NetAdr );
+        gameserveritem_t_exposer.def_readwrite( "netadr", &gameserveritem_t::m_NetAdr );
         gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
         gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
         gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
@@ -4574,7 +4620,7 @@ BOOST_PYTHON_MODULE(_steam){
         gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
         gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
         gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
-        gameserveritem_t_exposer.def_readwrite( "m_steamid", &gameserveritem_t::m_steamID );
+        gameserveritem_t_exposer.def_readwrite( "steamid", &gameserveritem_t::m_steamID );
         pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
         { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
         

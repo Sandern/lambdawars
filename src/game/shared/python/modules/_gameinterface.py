@@ -38,6 +38,7 @@ class GameInterface(SemiSharedModuleGenerator):
         
         '#hl2wars_gameinterface.h',
         'wars_mount_system.h',
+        '$clientsteamcontext.h',
     ]
 
     def Parse(self, mb):

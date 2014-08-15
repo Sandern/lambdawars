@@ -14,6 +14,8 @@
 #include "isteamgameserver.h"
 #include "isteamgameserverstats.h"
 
+#include "isteamclient009.h"
+
 enum EServerMode
 {
 	eServerModeInvalid = 0, // DO NOT USE		
@@ -100,14 +102,14 @@ public:
 	ISteamUtils *SteamGameServerUtils() { return m_pSteamGameServerUtils; }
 	ISteamNetworking *SteamGameServerNetworking() { return m_pSteamGameServerNetworking; }
 	ISteamGameServerStats *SteamGameServerStats() { return m_pSteamGameServerStats; }
-	ISteamHTTP *SteamHTTP() { return m_pSteamHTTP; }
+	//ISteamHTTP *SteamHTTP() { return m_pSteamHTTP; }
 
 private:
 	ISteamGameServer			*m_pSteamGameServer;
 	ISteamUtils					*m_pSteamGameServerUtils;
 	ISteamNetworking			*m_pSteamGameServerNetworking;
 	ISteamGameServerStats		*m_pSteamGameServerStats;
-	ISteamHTTP					*m_pSteamHTTP;
+	//ISteamHTTP					*m_pSteamHTTP;
 };
 
 inline CSteamGameServerAPIContext::CSteamGameServerAPIContext()
@@ -121,7 +123,7 @@ inline void CSteamGameServerAPIContext::Clear()
 	m_pSteamGameServerUtils = NULL;
 	m_pSteamGameServerNetworking = NULL;
 	m_pSteamGameServerStats = NULL;
-	m_pSteamHTTP = NULL;
+	//m_pSteamHTTP = NULL;
 }
 
 S_API ISteamClient *g_pSteamClientGameServer;
@@ -131,28 +133,32 @@ inline bool CSteamGameServerAPIContext::Init()
 	if ( !g_pSteamClientGameServer )
 		return false;
 
+	// !? g_pSteamClientGameServer is set by the engine through SteamGameServer_InitSafe. Since it's linked to an older
+	// steamworks sdk, it gets a different Steam client interface.
+	ISteamClient009 *pSteamClient009 = (ISteamClient009 *)g_pSteamClientGameServer;
+
 	HSteamUser hSteamUser = SteamGameServer_GetHSteamUser();
 	HSteamPipe hSteamPipe = SteamGameServer_GetHSteamPipe();
 
-	m_pSteamGameServer = g_pSteamClientGameServer->GetISteamGameServer( hSteamUser, hSteamPipe, STEAMGAMESERVER_INTERFACE_VERSION );
+	m_pSteamGameServer = pSteamClient009->GetISteamGameServer( hSteamUser, hSteamPipe, STEAMGAMESERVER_INTERFACE_VERSION );
 	if ( !m_pSteamGameServer )
 		return false;
 
-	m_pSteamGameServerUtils = g_pSteamClientGameServer->GetISteamUtils( hSteamPipe, STEAMUTILS_INTERFACE_VERSION );
+	m_pSteamGameServerUtils = pSteamClient009->GetISteamUtils( hSteamPipe, STEAMUTILS_INTERFACE_VERSION );
 	if ( !m_pSteamGameServerUtils )
 		return false;
 
-	m_pSteamGameServerNetworking = g_pSteamClientGameServer->GetISteamNetworking( hSteamUser, hSteamPipe, STEAMNETWORKING_INTERFACE_VERSION );
+	m_pSteamGameServerNetworking = pSteamClient009->GetISteamNetworking( hSteamUser, hSteamPipe, STEAMNETWORKING_INTERFACE_VERSION );
 	if ( !m_pSteamGameServerNetworking )
 		return false;
 
-	m_pSteamGameServerStats = g_pSteamClientGameServer->GetISteamGameServerStats( hSteamUser, hSteamPipe, STEAMGAMESERVERSTATS_INTERFACE_VERSION );
+	m_pSteamGameServerStats = pSteamClient009->GetISteamGameServerStats( hSteamUser, hSteamPipe, STEAMGAMESERVERSTATS_INTERFACE_VERSION );
 	if ( !m_pSteamGameServerStats )
 		return false;
 
-	m_pSteamHTTP = g_pSteamClientGameServer->GetISteamHTTP( hSteamUser, hSteamPipe, STEAMHTTP_INTERFACE_VERSION );
+	/*m_pSteamHTTP = pSteamClient009->GetISteamHTTP( hSteamUser, hSteamPipe, STEAMHTTP_INTERFACE_VERSION );
 	if ( !m_pSteamHTTP )
-		return false;
+		return false;*/
 
 	return true;
 }

@@ -121,6 +121,7 @@ callresult_reg_tmpl = '''{ //::%(name)sCallResult
 
 class Steam(SemiSharedModuleGenerator):
     module_name = '_steam'
+    steamsdkversion = (1, 30)
     
     @property
     def files(self):
@@ -135,8 +136,6 @@ class Steam(SemiSharedModuleGenerator):
             
             'srcpy_steam.h',
         ]
-        if self.settings.branch == 'swarm':
-            files.append('$vgui_avatarimage.h')
         return files
         
     def PythonfyVariables(self, cls):
@@ -144,6 +143,7 @@ class Steam(SemiSharedModuleGenerator):
         for var in cls.vars():
             varname = var.name
             varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf|m_sz)', '', varname)
+            varname = re.sub('^(m_)', '', varname)
             varname = varname.lower()
             var.rename(varname)
             
@@ -265,9 +265,9 @@ class Steam(SemiSharedModuleGenerator):
         cls.constructors(matchers.calldef_matcher_t(arg_types=[constpchararg, None])).exclude()
         cls.mem_funs('Render').exclude()
         cls.mem_funs('SetFromStringStrict').exclude()
-        cls.mem_funs('SetFromString').exclude()      # No definition...
-        cls.mem_funs('SetFromSteam2String').exclude()      # No definition...
-        cls.mem_funs('BValidExternalSteamID').exclude()      # No definition...
+        cls.mem_funs('SetFromString').exclude() # No definition...
+        cls.mem_funs('SetFromSteam2String').exclude() # No definition...
+        cls.mem_funs('BValidExternalSteamID').exclude() # No definition...
         
         mb.enum('EResult').include()
         mb.enum('EDenyReason').include()
@@ -289,14 +289,21 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_fun('Clear').exclude()
         cls.mem_fun('SteamApps').exclude()
         
-        cls.mem_fun('SteamHTTP').exclude()
-        cls.mem_fun('SteamScreenshots').exclude()
-        cls.mem_fun('SteamUnifiedMessages').exclude()
+        if self.steamsdkversion > (1, 11):
+            cls.mem_fun('SteamHTTP').exclude()
+            cls.mem_fun('SteamScreenshots').exclude()
+            cls.mem_fun('SteamUnifiedMessages').exclude()
         cls.mem_fun('SteamMatchmakingServers').exclude() # Full python class wrapper
 
         cls.mem_fun('SteamNetworking').exclude()
         cls.mem_fun('SteamRemoteStorage').exclude()
-        
+        if self.steamsdkversion > (1, 11):
+            cls.mem_fun('SteamAppList').exclude()
+            cls.mem_fun('SteamController').exclude()
+            cls.mem_fun('SteamMusic').exclude()
+            cls.mem_fun('SteamMusicRemote').exclude()
+            cls.mem_fun('SteamUGC').exclude() 
+            
         cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference()

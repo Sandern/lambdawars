@@ -6,6 +6,8 @@
 
 #include "srcpy_matchmaking.h"
 
+#include "wars_matchmaking.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -207,6 +209,17 @@ BOOST_PYTHON_MODULE(matchmaking){
             "MatchSession"
             , MatchSession_function_type( &::PyMKMatchSession )
             , ( bp::arg("pSettings") ) );
+    
+    }
+
+    { //::WarsSendTestMessage
+    
+        typedef void ( *WarsSendTestMessage_function_type )( ::CSteamID );
+        
+        bp::def( 
+            "WarsSendTestMessage"
+            , WarsSendTestMessage_function_type( &::WarsSendTestMessage )
+            , ( bp::arg("serverSteamId") ) );
     
     }
 }
@@ -215,6 +228,8 @@ BOOST_PYTHON_MODULE(matchmaking){
 
 #include "srcpy_matchmaking.h"
 
+#include "wars_matchmaking.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -416,6 +431,17 @@ BOOST_PYTHON_MODULE(matchmaking){
             "MatchSession"
             , MatchSession_function_type( &::PyMKMatchSession )
             , ( bp::arg("pSettings") ) );
+    
+    }
+
+    { //::WarsSendTestMessage
+    
+        typedef void ( *WarsSendTestMessage_function_type )( ::CSteamID );
+        
+        bp::def( 
+            "WarsSendTestMessage"
+            , WarsSendTestMessage_function_type( &::WarsSendTestMessage )
+            , ( bp::arg("serverSteamId") ) );
     
     }
 }

@@ -161,6 +161,9 @@ extern void AppendServerModules();
 #endif // CLIENT_DLL
 extern void AppendSharedModules();
 
+extern struct _inittab *PyImport_Inittab;
+extern struct _inittab _PySourceImport_Inittab[];
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -171,7 +174,10 @@ CSrcPython::CSrcPython()
 	m_bPathProtected = true;
 
 	double fStartTime = Plat_FloatTime();
+
 	// Before the python interpreter is initialized, the modules must be appended
+	PyImport_Inittab = _PySourceImport_Inittab;
+
 #ifdef CLIENT_DLL
 	AppendClientModules();
 #else
@@ -282,7 +288,6 @@ bool CSrcPython::InitInterpreter( void )
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
 #endif // CLIENT_DLL
 
-#if 1
 	if( !bNoChangeWorkingDirectory )
 	{
 		// Change working directory	
@@ -291,7 +296,6 @@ bool CSrcPython::InitInterpreter( void )
 		V_FixupPathName(moddir, _MAX_PATH, moddir);	
 		V_SetCurrentDirectory(moddir);
 	}
-#endif // 0
 
 	m_bPythonRunning = true;
 
@@ -370,9 +374,7 @@ bool CSrcPython::InitInterpreter( void )
     ::setenv( "PYTHONPATH", pythonpath, 1 );
 #endif // WIN32
 
-#ifdef OSX
-	Py_NoSiteFlag = 1;
-#endif // OSX
+	Py_NoSiteFlag = 1; // Not needed, so disabled
 
 	// Enable optimizations when not running in developer mode
 	// This removes asserts and statements with "if __debug__"

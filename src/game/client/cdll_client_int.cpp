@@ -94,6 +94,7 @@
 #include "qlimits.h"
 #include "engine/ireplayhistorymanager.h"
 #endif
+#include "clientsteamcontext.h"
 #include "ixboxsystem.h"
 #include "matchmaking/imatchframework.h"
 #include "cdll_bounded_cvars.h"
@@ -228,8 +229,6 @@ IGameSystem *SoundEmitterSystem();
 IGameSystem *ToolFrameworkClientSystem();
 IViewRender *GetViewRenderInstance();
 
-static CSteamAPIContext g_SteamAPIContext;
-CSteamAPIContext *steamapicontext = &g_SteamAPIContext;
 
 
 bool g_bEngineIsHLTV = false;
@@ -1142,13 +1141,8 @@ int CHLClient::Connect( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGl
 	ConnectTier2Libraries( &appSystemFactory, 1 );
 	ConnectTier3Libraries( &appSystemFactory, 1 );
 
-#ifndef _X360
-	SteamAPI_InitSafe();
-	g_SteamAPIContext.Init();
-
-#ifdef INFESTED_DLL
-	
-#endif
+#ifndef NO_STEAM
+	ClientSteamContext().Activate();
 #endif
 
 	// Initialize the console variables.
@@ -1403,19 +1397,7 @@ void CHLClient::Shutdown( void )
 	ClearKeyValuesCache();
 
 #ifndef NO_STEAM
-	g_SteamAPIContext.Clear();
-#ifndef _DEBUG
-	// NOTE1: Close here, because when the engine shuts down it hangs on cnet encrypt thread...
-	// NOTE2: Not in debug mode, causes a crash on exit..
-	//SteamAPI_Shutdown(); // << Steam shutdown is controlled by engine 
-
-	//SteamClient()->ReleaseUser( GetHSteamPipe(), GetHSteamUser() );
-	//SteamClient()->BReleaseSteamPipe( GetHSteamPipe() );
-
-#endif // _DEBUG
-#ifdef INFESTED_DLL
-	
-#endif
+	ClientSteamContext().Shutdown();
 #endif
 
 #ifndef _XBOX

@@ -20,6 +20,8 @@
 	#include "srcpy_base.h"
 #endif // ENABLE_PYTHON
 
+#include "wars_gameserver.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -219,4 +221,52 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 				szMapCommand ) );
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: callback hook for debug text emitted from the Steam API
+//-----------------------------------------------------------------------------
+extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDebugText )
+{
+	// if you're running in the debugger, only warnings (nSeverity >= 1) will be sent
+	// if you add -debug_steamapi to the command-line, a lot of extra informational messages will also be sent
+	Warning( pchDebugText );
+	Warning("\n");
+
+	if ( nSeverity >= 1 )
+	{
+		// place to set a breakpoint for catching API errors
+		int x = 3;
+		x = x;
+	}
+}
+
+WarsGameServer *g_pGameServerTest = NULL;
+
+void WarsUpdateGameServer()
+{
+	if( !engine->IsDedicatedServer() )
+		return;
+
+	if( !steamgameserverapicontext || !g_pSteamClientGameServer )
+		return;
+
+	// set our debug handler
+	g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
+
+	if( !steamgameserverapicontext->SteamGameServerNetworking() )
+	{
+		steamgameserverapicontext->Init();
+	}
+
+	if( !steamgameserverapicontext->SteamGameServerNetworking() )
+		return;
+
+	if( !g_pGameServerTest )
+	{
+		g_pGameServerTest = new WarsGameServer();
+		Msg("Create wars game server\n");
+	}
+
+	g_pGameServerTest->RunFrame();
 }
