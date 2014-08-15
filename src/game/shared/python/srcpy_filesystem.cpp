@@ -77,8 +77,13 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 		throw boost::python::error_already_set(); 
 	}
 
-	boost::python::object content( boost::python::handle<>( PyBytes_FromStringAndSize( (const char *)buffer, len ) ) );
-	delete buffer; buffer = NULL;
+	boost::python::object content( boost::python::handle<>( PyBytes_FromStringAndSize( (const char *)buffer, (Py_ssize_t)len ) ) );
+
+	if( optimalalloc )
+		filesystem->FreeOptimalReadBuffer( buffer );
+	else
+		free( buffer );
+	buffer = NULL;
 	return content;
 }
 
@@ -121,7 +126,10 @@ boost::python::list PyFS_ListDir( const char *pPath, const char *pPathID, const 
 	FileFindHandle_t fh;
 	boost::python::list result;
 
+	// Construct the wildcard
 	V_strncpy( wildcard, pPath, sizeof( wildcard ) );
+	if( V_strlen( wildcard ) == 0 )
+		V_strncpy( wildcard, "./", sizeof( wildcard ) );
 	if( appendslashdir && filesystem->IsDirectory( pPath ) )
 		V_AppendSlash( wildcard, sizeof( wildcard ) );
 	V_strcat( wildcard, pWildCard, sizeof( wildcard ) );
