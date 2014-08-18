@@ -2,6 +2,10 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
+#include "__convenience.pypp.hpp"
+
+#include "__call_policies.pypp.hpp"
+
 #include "__array_1.pypp.hpp"
 
 #include "cbase.h"
@@ -25,6 +29,17 @@
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
+
+static boost::python::tuple GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee( ::ISteamMatchmaking & inst, ::CSteamID steamIDLobby ){
+    unsigned int punGameServerIP2;
+    short unsigned int punGameServerPort2;
+    CSteamID psteamIDGameServer2;
+    bool result = inst.GetLobbyGameServer(steamIDLobby, &punGameServerIP2, &punGameServerPort2, &psteamIDGameServer2);
+    return bp::make_tuple( result
+                            , punGameServerIP2
+                            , punGameServerPort2
+                            , psteamIDGameServer2 );
+}
 
 struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
 
@@ -1529,8 +1544,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("steamIDLobby") ) )    
         .def( 
             "GetLobbyGameServer"
-            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32 *,::uint16 *,::CSteamID * ) )( &::ISteamMatchmaking::GetLobbyGameServer )
-            , ( bp::arg("steamIDLobby"), bp::arg("punGameServerIP"), bp::arg("punGameServerPort"), bp::arg("psteamIDGameServer") ) )    
+            , (boost::python::tuple (*)( ::ISteamMatchmaking &,::CSteamID ))( &GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee )
+            , ( bp::arg("inst"), bp::arg("steamIDLobby") ) )    
         .def( 
             "GetLobbyMemberByIndex"
             , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::GetLobbyMemberByIndex )
@@ -2179,14 +2194,14 @@ BOOST_PYTHON_MODULE(_steam){
     }
 
     { //::servernetadr_t
-        typedef bp::class_< servernetadr_t > servernetadr_t_exposer_t;
-        servernetadr_t_exposer_t servernetadr_t_exposer = servernetadr_t_exposer_t( "servernetadr_t" );
-        bp::scope servernetadr_t_scope( servernetadr_t_exposer );
+        typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         
             typedef char const * ( ::servernetadr_t::*GetConnectionAddressString_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetConnectionAddressString"
                 , GetConnectionAddressString_function_type( &::servernetadr_t::GetConnectionAddressString ) );
         
@@ -2195,7 +2210,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint16 ( ::servernetadr_t::*GetConnectionPort_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetConnectionPort"
                 , GetConnectionPort_function_type( &::servernetadr_t::GetConnectionPort ) );
         
@@ -2204,7 +2219,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint32 ( ::servernetadr_t::*GetIP_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetIP"
                 , GetIP_function_type( &::servernetadr_t::GetIP ) );
         
@@ -2213,7 +2228,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef char const * ( ::servernetadr_t::*GetQueryAddressString_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetQueryAddressString"
                 , GetQueryAddressString_function_type( &::servernetadr_t::GetQueryAddressString ) );
         
@@ -2222,7 +2237,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint16 ( ::servernetadr_t::*GetQueryPort_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetQueryPort"
                 , GetQueryPort_function_type( &::servernetadr_t::GetQueryPort ) );
         
@@ -2231,7 +2246,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*Init_function_type )( unsigned int,::uint16,::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "Init"
                 , Init_function_type( &::servernetadr_t::Init )
                 , ( bp::arg("ip"), bp::arg("usQueryPort"), bp::arg("usConnectionPort") ) );
@@ -2241,7 +2256,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetConnectionPort_function_type )( ::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetConnectionPort"
                 , SetConnectionPort_function_type( &::servernetadr_t::SetConnectionPort )
                 , ( bp::arg("usPort") ) );
@@ -2251,7 +2266,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetIP_function_type )( ::uint32 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetIP"
                 , SetIP_function_type( &::servernetadr_t::SetIP )
                 , ( bp::arg("unIP") ) );
@@ -2261,18 +2276,18 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetQueryPort_function_type )( ::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetQueryPort"
                 , SetQueryPort_function_type( &::servernetadr_t::SetQueryPort )
                 , ( bp::arg("usPort") ) );
         
         }
-        servernetadr_t_exposer.def( bp::self < bp::self );
+        servernetadr_exposer.def( bp::self < bp::self );
         { //::servernetadr_t::operator=
         
             typedef void ( ::servernetadr_t::*assign_function_type )( ::servernetadr_t const & ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "assign"
                 , assign_function_type( &::servernetadr_t::operator= )
                 , ( bp::arg("that") ) );
@@ -2483,6 +2498,10 @@ BOOST_PYTHON_MODULE(_steam){
     bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }
 #else
+#include "__convenience.pypp.hpp"
+
+#include "__call_policies.pypp.hpp"
+
 #include "__array_1.pypp.hpp"
 
 #include "cbase.h"
@@ -2506,6 +2525,17 @@ BOOST_PYTHON_MODULE(_steam){
 #include "tier0/memdbgon.h"
 
 namespace bp = boost::python;
+
+static boost::python::tuple GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee( ::ISteamMatchmaking & inst, ::CSteamID steamIDLobby ){
+    unsigned int punGameServerIP2;
+    short unsigned int punGameServerPort2;
+    CSteamID psteamIDGameServer2;
+    bool result = inst.GetLobbyGameServer(steamIDLobby, &punGameServerIP2, &punGameServerPort2, &psteamIDGameServer2);
+    return bp::make_tuple( result
+                            , punGameServerIP2
+                            , punGameServerPort2
+                            , psteamIDGameServer2 );
+}
 
 struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
 
@@ -4010,8 +4040,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("steamIDLobby") ) )    
         .def( 
             "GetLobbyGameServer"
-            , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::uint32 *,::uint16 *,::CSteamID * ) )( &::ISteamMatchmaking::GetLobbyGameServer )
-            , ( bp::arg("steamIDLobby"), bp::arg("punGameServerIP"), bp::arg("punGameServerPort"), bp::arg("psteamIDGameServer") ) )    
+            , (boost::python::tuple (*)( ::ISteamMatchmaking &,::CSteamID ))( &GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee )
+            , ( bp::arg("inst"), bp::arg("steamIDLobby") ) )    
         .def( 
             "GetLobbyMemberByIndex"
             , (::CSteamID ( ::ISteamMatchmaking::* )( ::CSteamID,int ) )( &::ISteamMatchmaking::GetLobbyMemberByIndex )
@@ -4660,14 +4690,14 @@ BOOST_PYTHON_MODULE(_steam){
     }
 
     { //::servernetadr_t
-        typedef bp::class_< servernetadr_t > servernetadr_t_exposer_t;
-        servernetadr_t_exposer_t servernetadr_t_exposer = servernetadr_t_exposer_t( "servernetadr_t" );
-        bp::scope servernetadr_t_scope( servernetadr_t_exposer );
+        typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         
             typedef char const * ( ::servernetadr_t::*GetConnectionAddressString_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetConnectionAddressString"
                 , GetConnectionAddressString_function_type( &::servernetadr_t::GetConnectionAddressString ) );
         
@@ -4676,7 +4706,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint16 ( ::servernetadr_t::*GetConnectionPort_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetConnectionPort"
                 , GetConnectionPort_function_type( &::servernetadr_t::GetConnectionPort ) );
         
@@ -4685,7 +4715,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint32 ( ::servernetadr_t::*GetIP_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetIP"
                 , GetIP_function_type( &::servernetadr_t::GetIP ) );
         
@@ -4694,7 +4724,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef char const * ( ::servernetadr_t::*GetQueryAddressString_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetQueryAddressString"
                 , GetQueryAddressString_function_type( &::servernetadr_t::GetQueryAddressString ) );
         
@@ -4703,7 +4733,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef ::uint16 ( ::servernetadr_t::*GetQueryPort_function_type )(  ) const;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "GetQueryPort"
                 , GetQueryPort_function_type( &::servernetadr_t::GetQueryPort ) );
         
@@ -4712,7 +4742,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*Init_function_type )( unsigned int,::uint16,::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "Init"
                 , Init_function_type( &::servernetadr_t::Init )
                 , ( bp::arg("ip"), bp::arg("usQueryPort"), bp::arg("usConnectionPort") ) );
@@ -4722,7 +4752,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetConnectionPort_function_type )( ::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetConnectionPort"
                 , SetConnectionPort_function_type( &::servernetadr_t::SetConnectionPort )
                 , ( bp::arg("usPort") ) );
@@ -4732,7 +4762,7 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetIP_function_type )( ::uint32 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetIP"
                 , SetIP_function_type( &::servernetadr_t::SetIP )
                 , ( bp::arg("unIP") ) );
@@ -4742,18 +4772,18 @@ BOOST_PYTHON_MODULE(_steam){
         
             typedef void ( ::servernetadr_t::*SetQueryPort_function_type )( ::uint16 ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "SetQueryPort"
                 , SetQueryPort_function_type( &::servernetadr_t::SetQueryPort )
                 , ( bp::arg("usPort") ) );
         
         }
-        servernetadr_t_exposer.def( bp::self < bp::self );
+        servernetadr_exposer.def( bp::self < bp::self );
         { //::servernetadr_t::operator=
         
             typedef void ( ::servernetadr_t::*assign_function_type )( ::servernetadr_t const & ) ;
             
-            servernetadr_t_exposer.def( 
+            servernetadr_exposer.def( 
                 "assign"
                 , assign_function_type( &::servernetadr_t::operator= )
                 , ( bp::arg("that") ) );

@@ -81,21 +81,15 @@ class ISteamFriends;
 class ISteamUtils;
 class ISteamMatchmaking;
 class ISteamContentServer;
+class ISteamMasterServerUpdater;
 class ISteamMatchmakingServers;
 class ISteamUserStats;
 class ISteamApps;
 class ISteamNetworking;
 class ISteamRemoteStorage;
-class ISteamScreenshots;
-class ISteamMusic;
-class ISteamMusicRemote;
 class ISteamGameServerStats;
 class ISteamPS3OverlayRender;
 class ISteamHTTP;
-class ISteamUnifiedMessages;
-class ISteamController;
-class ISteamUGC;
-class ISteamAppList;
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to creating a new steam instance, or to
@@ -144,6 +138,9 @@ public:
 	// returns the ISteamMatchmaking interface
 	virtual ISteamMatchmaking *GetISteamMatchmaking( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
 
+	// returns the ISteamMasterServerUpdater interface
+	virtual ISteamMasterServerUpdater *GetISteamMasterServerUpdater( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
+
 	// returns the ISteamMatchmakingServers interface
 	virtual ISteamMatchmakingServers *GetISteamMatchmakingServers( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
 
@@ -164,10 +161,6 @@ public:
 
 	// remote storage
 	virtual ISteamRemoteStorage *GetISteamRemoteStorage( HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-
-	// user screenshots
-	virtual ISteamScreenshots *GetISteamScreenshots( HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-
 
 	// this needs to be called every frame to process matchmaking results
 	// redundant if you're already calling SteamAPI_RunCallbacks()
@@ -195,26 +188,10 @@ public:
 	// Expose HTTP interface
 	virtual ISteamHTTP *GetISteamHTTP( HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
 
-	// Exposes the ISteamUnifiedMessages interface
-	virtual ISteamUnifiedMessages *GetISteamUnifiedMessages( HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
 
-	// Exposes the ISteamController interface
-	virtual ISteamController *GetISteamController( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-
-	// Exposes the ISteamUGC interface
-	virtual ISteamUGC *GetISteamUGC( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-
-	// returns app list interface, only available on specially registered apps
-	virtual ISteamAppList *GetISteamAppList( HSteamUser hSteamUser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-	
-	// Music Player
-	virtual ISteamMusic *GetISteamMusic( HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion ) = 0;
-
-	// Music Player Remote
-	virtual ISteamMusicRemote *GetISteamMusicRemote(HSteamUser hSteamuser, HSteamPipe hSteamPipe, const char *pchVersion) = 0;
 };
 
-#define STEAMCLIENT_INTERFACE_VERSION		"SteamClient015"
+#define STEAMCLIENT_INTERFACE_VERSION		"SteamClient010"
 
 //-----------------------------------------------------------------------------
 // Purpose: Base values for callback identifiers, each callback must

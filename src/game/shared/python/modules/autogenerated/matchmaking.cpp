@@ -212,14 +212,14 @@ BOOST_PYTHON_MODULE(matchmaking){
     
     }
 
-    { //::WarsSendTestMessage
+    { //::WarsRequestGameServer
     
-        typedef void ( *WarsSendTestMessage_function_type )( ::CSteamID );
+        typedef void ( *WarsRequestGameServer_function_type )( ::CSteamID,::CSteamID );
         
         bp::def( 
-            "WarsSendTestMessage"
-            , WarsSendTestMessage_function_type( &::WarsSendTestMessage )
-            , ( bp::arg("serverSteamId") ) );
+            "WarsRequestGameServer"
+            , WarsRequestGameServer_function_type( &::WarsRequestGameServer )
+            , ( bp::arg("serverSteamId"), bp::arg("lobbySteamId") ) );
     
     }
 }
@@ -434,14 +434,14 @@ BOOST_PYTHON_MODULE(matchmaking){
     
     }
 
-    { //::WarsSendTestMessage
+    { //::WarsRequestGameServer
     
-        typedef void ( *WarsSendTestMessage_function_type )( ::CSteamID );
+        typedef void ( *WarsRequestGameServer_function_type )( ::CSteamID,::CSteamID );
         
         bp::def( 
-            "WarsSendTestMessage"
-            , WarsSendTestMessage_function_type( &::WarsSendTestMessage )
-            , ( bp::arg("serverSteamId") ) );
+            "WarsRequestGameServer"
+            , WarsRequestGameServer_function_type( &::WarsRequestGameServer )
+            , ( bp::arg("serverSteamId"), bp::arg("lobbySteamId") ) );
     
     }
 }

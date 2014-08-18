@@ -121,7 +121,7 @@ callresult_reg_tmpl = '''{ //::%(name)sCallResult
 
 class Steam(SemiSharedModuleGenerator):
     module_name = '_steam'
-    steamsdkversion = (1, 30)
+    steamsdkversion = (1, 15)
     
     @property
     def files(self):
@@ -178,6 +178,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamMatchmaking')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual'
+        cls.mem_funs('GetLobbyGameServer').add_transformation(FT.output('punGameServerIP'), FT.output('punGameServerPort'), FT.output('psteamIDGameServer'))
         
         mb.free_function('PyGetLobbyDataByIndex').include()
         mb.free_function('PySendLobbyChatMsg').include()
@@ -225,6 +226,7 @@ class Steam(SemiSharedModuleGenerator):
         
         cls = mb.class_('servernetadr_t')
         cls.include()
+        cls.rename('servernetadr')
         
         cls = mb.class_('PySteamMatchmakingPingResponse')
         cls.include()
@@ -291,13 +293,15 @@ class Steam(SemiSharedModuleGenerator):
         
         if self.steamsdkversion > (1, 11):
             cls.mem_fun('SteamHTTP').exclude()
+        if self.steamsdkversion > (1, 15):
             cls.mem_fun('SteamScreenshots').exclude()
+        if self.steamsdkversion > (1, 20):
             cls.mem_fun('SteamUnifiedMessages').exclude()
         cls.mem_fun('SteamMatchmakingServers').exclude() # Full python class wrapper
 
         cls.mem_fun('SteamNetworking').exclude()
         cls.mem_fun('SteamRemoteStorage').exclude()
-        if self.steamsdkversion > (1, 11):
+        if self.steamsdkversion > (1, 16):
             cls.mem_fun('SteamAppList').exclude()
             cls.mem_fun('SteamController').exclude()
             cls.mem_fun('SteamMusic').exclude()

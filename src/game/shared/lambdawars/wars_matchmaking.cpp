@@ -9,7 +9,7 @@
 #include "clientsteamcontext.h"
 #endif // CLIENT_DLL
 
-void WarsSendTestMessage( CSteamID serverSteamId )
+void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId )
 {
 #ifdef CLIENT_DLL
 	if( !steamapicontext )
@@ -18,7 +18,9 @@ void WarsSendTestMessage( CSteamID serverSteamId )
 	if( !steamapicontext->SteamNetworking() )
 		return;
 
-	WarsMessage_t data;
+	WarsRequestServerMessage_t data;
+	data.type = k_EMsgServerRequestGame;
+	data.lobbySteamId = lobbySteamId;
 	steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, &data, sizeof(data), k_EP2PSendReliable );
 #endif // CLIENT_DLL
 }

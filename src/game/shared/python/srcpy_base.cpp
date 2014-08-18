@@ -36,7 +36,31 @@ boost::python::dict PyKeyValuesToDict( const KeyValues *pKV )
 			d[name] = boost::python::list();
 
 		boost::python::list l = boost::python::extract< boost::python::list >(d[name]);
-		l.append( pValue->GetString() ); // TODO: Convert to right type
+
+		switch( pValue->GetDataType() )
+		{
+		case KeyValues::TYPE_STRING:
+			l.append( pValue->GetString() );
+			break;
+		case KeyValues::TYPE_INT:
+			l.append( pValue->GetInt() );
+			break;
+		case KeyValues::TYPE_FLOAT:
+			l.append( pValue->GetFloat() );
+			break;
+		case KeyValues::TYPE_WSTRING:
+			l.append( pValue->GetWString() );
+			break;
+		case KeyValues::TYPE_COLOR:
+			l.append( pValue->GetColor() );
+			break;
+		case KeyValues::TYPE_UINT64:
+			l.append( pValue->GetUint64() );
+			break;
+		default:
+			l.append( pValue->GetString() );
+			break;
+		}
 	}
 
 	return d;

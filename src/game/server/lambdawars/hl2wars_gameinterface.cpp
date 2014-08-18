@@ -241,8 +241,6 @@ extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDeb
 	}
 }
 
-WarsGameServer *g_pGameServerTest = NULL;
-
 void WarsUpdateGameServer()
 {
 	if( !engine->IsDedicatedServer() )
@@ -262,11 +260,13 @@ void WarsUpdateGameServer()
 	if( !steamgameserverapicontext->SteamGameServerNetworking() )
 		return;
 
-	if( !g_pGameServerTest )
+	if( !WarsGameServer() )
 	{
-		g_pGameServerTest = new WarsGameServer();
+		WarsInitGameServer();
 		Msg("Create wars game server\n");
 	}
-
-	g_pGameServerTest->RunFrame();
+	else 
+	{
+		WarsGameServer()->RunFrame();
+	}
 }

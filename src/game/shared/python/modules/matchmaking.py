@@ -67,5 +67,5 @@ class MatchMaking(SemiSharedModuleGenerator):
         cls.rename('steammatchmaking')
         
         # Wars
-        mb.free_function('WarsSendTestMessage').include()
+        mb.free_function('WarsRequestGameServer').include()
         
