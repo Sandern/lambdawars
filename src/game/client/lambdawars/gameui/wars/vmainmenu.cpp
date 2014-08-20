@@ -95,7 +95,7 @@ MainMenu::MainMenu( Panel *parent, const char *panelName ):
 	{
 		try
 		{
-			boost::python::object mainmenu = SrcPySystem()->Get( "CefMainMenu", "vgui.mainmenu" );
+			boost::python::object mainmenu = SrcPySystem()->Get( "CefMainMenu", "menu.mainmenu" );
 			m_refCefMainMenu = mainmenu( ((vgui::Panel *)this) );
 			m_pCefMainMenu = boost::python::extract<SrcCefBrowser *>( m_refCefMainMenu );
 			if( m_pCefMainMenu )
