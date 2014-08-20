@@ -125,6 +125,7 @@
 //#include "INetChannel.h"
 //#include "IClient.h"
 #include "hl2wars_gameinterface.h"
+#include "wars_gameserver.h"
 
 #include "warseditor/iwars_editor_storage.h"
 #endif // HL2WARS_DLL
@@ -2097,6 +2098,13 @@ void CServerGameDLL::GetMatchmakingTags( char *buf, size_t bufSize )
 	if ( buf > bufBase )
 		buf[ -1 ] = 0;
 #endif // SDK_DLL
+
+#ifdef HL2WARS_DLL
+	if( WarsGameServer() )
+	{
+		WarsGameServer()->GetMatchmakingTags( buf, bufSize );
+	}
+#endif // HL2WARS_DLL
 }
 
 void CServerGameDLL::GetMatchmakingGameData( char *buf, size_t bufSize )

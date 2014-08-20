@@ -106,6 +106,11 @@ class PySteamMatchmakingServers
 {
 public:
 	int RequestInternetServerList( AppId_t iApp, boost::python::list filters, PySteamMatchmakingServerListResponse *pRequestServersResponse );
+	int RequestLANServerList( AppId_t iApp, ISteamMatchmakingServerListResponse *pRequestServersResponse );
+	int RequestFriendsServerList( AppId_t iApp, boost::python::list filters, ISteamMatchmakingServerListResponse *pRequestServersResponse );
+	int RequestFavoritesServerList( AppId_t iApp, boost::python::list filters, ISteamMatchmakingServerListResponse *pRequestServersResponse );
+	int RequestHistoryServerList( AppId_t iApp, boost::python::list filters, ISteamMatchmakingServerListResponse *pRequestServersResponse );
+	int RequestSpectatorServerList( AppId_t iApp, boost::python::list filters, ISteamMatchmakingServerListResponse *pRequestServersResponse );
 
 	void ReleaseRequest( int hServerListRequest );
 

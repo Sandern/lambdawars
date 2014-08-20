@@ -2122,8 +2122,28 @@ BOOST_PYTHON_MODULE(_steam){
             , (void ( ::PySteamMatchmakingServers::* )( int ) )( &::PySteamMatchmakingServers::ReleaseRequest )
             , ( bp::arg("hServerListRequest") ) )    
         .def( 
+            "RequestFavoritesServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestFavoritesServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestFriendsServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestFriendsServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestHistoryServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestHistoryServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
             "RequestInternetServerList"
             , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::PySteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestInternetServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestLANServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestLANServerList )
+            , ( bp::arg("iApp"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestSpectatorServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestSpectatorServerList )
             , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
         .def( 
             "ServerRules"
@@ -3420,6 +3440,12 @@ BOOST_PYTHON_MODULE(_steam){
             , (::ISteamUtils * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUtils )
             , bp::return_internal_reference< >() );
 
+    bp::class_< CSteamGameServerAPIContext >( "CSteamGameServerAPIContext", bp::init< >() )    
+        .def( 
+            "SteamGameServer"
+            , (::ISteamGameServer * ( ::CSteamGameServerAPIContext::* )(  ) )( &::CSteamGameServerAPIContext::SteamGameServer )
+            , bp::return_internal_reference< >() );
+
     { //::CSteamID
         typedef bp::class_< CSteamID > CSteamID_exposer_t;
         CSteamID_exposer_t CSteamID_exposer = CSteamID_exposer_t( "CSteamID", bp::init< >() );
@@ -3969,6 +3995,172 @@ BOOST_PYTHON_MODULE(_steam){
             "SetRichPresence"
             , (bool ( ::ISteamFriends::* )( char const *,char const * ) )( &::ISteamFriends::SetRichPresence )
             , ( bp::arg("pchKey"), bp::arg("pchValue") ) );
+
+    bp::class_< ISteamGameServer, boost::noncopyable >( "ISteamGameServer", bp::no_init )    
+        .def( 
+            "AssociateWithClan"
+            , (::SteamAPICall_t ( ::ISteamGameServer::* )( ::CSteamID ) )( &::ISteamGameServer::AssociateWithClan )
+            , ( bp::arg("steamIDClan") ) )    
+        .def( 
+            "BLoggedOn"
+            , (bool ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::BLoggedOn ) )    
+        .def( 
+            "BSecure"
+            , (bool ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::BSecure ) )    
+        .def( 
+            "BUpdateUserData"
+            , (bool ( ::ISteamGameServer::* )( ::CSteamID,char const *,::uint32 ) )( &::ISteamGameServer::BUpdateUserData )
+            , ( bp::arg("steamIDUser"), bp::arg("pchPlayerName"), bp::arg("uScore") ) )    
+        .def( 
+            "BeginAuthSession"
+            , (::EBeginAuthSessionResult ( ::ISteamGameServer::* )( void const *,int,::CSteamID ) )( &::ISteamGameServer::BeginAuthSession )
+            , ( bp::arg("pAuthTicket"), bp::arg("cbAuthTicket"), bp::arg("steamID") ) )    
+        .def( 
+            "CancelAuthTicket"
+            , (void ( ::ISteamGameServer::* )( ::HAuthTicket ) )( &::ISteamGameServer::CancelAuthTicket )
+            , ( bp::arg("hAuthTicket") ) )    
+        .def( 
+            "ClearAllKeyValues"
+            , (void ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::ClearAllKeyValues ) )    
+        .def( 
+            "ComputeNewPlayerCompatibility"
+            , (::SteamAPICall_t ( ::ISteamGameServer::* )( ::CSteamID ) )( &::ISteamGameServer::ComputeNewPlayerCompatibility )
+            , ( bp::arg("steamIDNewPlayer") ) )    
+        .def( 
+            "CreateUnauthenticatedUserConnection"
+            , (::CSteamID ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::CreateUnauthenticatedUserConnection ) )    
+        .def( 
+            "EnableHeartbeats"
+            , (void ( ::ISteamGameServer::* )( bool ) )( &::ISteamGameServer::EnableHeartbeats )
+            , ( bp::arg("bActive") ) )    
+        .def( 
+            "EndAuthSession"
+            , (void ( ::ISteamGameServer::* )( ::CSteamID ) )( &::ISteamGameServer::EndAuthSession )
+            , ( bp::arg("steamID") ) )    
+        .def( 
+            "ForceHeartbeat"
+            , (void ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::ForceHeartbeat ) )    
+        .def( 
+            "GetAuthSessionTicket"
+            , (::HAuthTicket ( ::ISteamGameServer::* )( void *,int,::uint32 * ) )( &::ISteamGameServer::GetAuthSessionTicket )
+            , ( bp::arg("pTicket"), bp::arg("cbMaxTicket"), bp::arg("pcbTicket") ) )    
+        .def( 
+            "GetGameplayStats"
+            , (void ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::GetGameplayStats ) )    
+        .def( 
+            "GetNextOutgoingPacket"
+            , (int ( ::ISteamGameServer::* )( void *,int,::uint32 *,::uint16 * ) )( &::ISteamGameServer::GetNextOutgoingPacket )
+            , ( bp::arg("pOut"), bp::arg("cbMaxOut"), bp::arg("pNetAdr"), bp::arg("pPort") ) )    
+        .def( 
+            "GetPublicIP"
+            , (::uint32 ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::GetPublicIP ) )    
+        .def( 
+            "GetServerReputation"
+            , (::SteamAPICall_t ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::GetServerReputation ) )    
+        .def( 
+            "GetSteamID"
+            , (::CSteamID ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::GetSteamID ) )    
+        .def( 
+            "HandleIncomingPacket"
+            , (bool ( ::ISteamGameServer::* )( void const *,int,::uint32,::uint16 ) )( &::ISteamGameServer::HandleIncomingPacket )
+            , ( bp::arg("pData"), bp::arg("cbData"), bp::arg("srcIP"), bp::arg("srcPort") ) )    
+        .def( 
+            "InitGameServer"
+            , (bool ( ::ISteamGameServer::* )( ::uint32,::uint16,::uint16,::uint32,::AppId_t,char const * ) )( &::ISteamGameServer::InitGameServer )
+            , ( bp::arg("unIP"), bp::arg("usGamePort"), bp::arg("usQueryPort"), bp::arg("unFlags"), bp::arg("nGameAppId"), bp::arg("pchVersionString") ) )    
+        .def( 
+            "LogOff"
+            , (void ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::LogOff ) )    
+        .def( 
+            "LogOn"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::LogOn )
+            , ( bp::arg("pszToken") ) )    
+        .def( 
+            "LogOnAnonymous"
+            , (void ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::LogOnAnonymous ) )    
+        .def( 
+            "RequestUserGroupStatus"
+            , (bool ( ::ISteamGameServer::* )( ::CSteamID,::CSteamID ) )( &::ISteamGameServer::RequestUserGroupStatus )
+            , ( bp::arg("steamIDUser"), bp::arg("steamIDGroup") ) )    
+        .def( 
+            "SendUserConnectAndAuthenticate"
+            , (bool ( ::ISteamGameServer::* )( ::uint32,void const *,::uint32,::CSteamID * ) )( &::ISteamGameServer::SendUserConnectAndAuthenticate )
+            , ( bp::arg("unIPClient"), bp::arg("pvAuthBlob"), bp::arg("cubAuthBlobSize"), bp::arg("pSteamIDUser") ) )    
+        .def( 
+            "SendUserDisconnect"
+            , (void ( ::ISteamGameServer::* )( ::CSteamID ) )( &::ISteamGameServer::SendUserDisconnect )
+            , ( bp::arg("steamIDUser") ) )    
+        .def( 
+            "SetBotPlayerCount"
+            , (void ( ::ISteamGameServer::* )( int ) )( &::ISteamGameServer::SetBotPlayerCount )
+            , ( bp::arg("cBotplayers") ) )    
+        .def( 
+            "SetDedicatedServer"
+            , (void ( ::ISteamGameServer::* )( bool ) )( &::ISteamGameServer::SetDedicatedServer )
+            , ( bp::arg("bDedicated") ) )    
+        .def( 
+            "SetGameData"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetGameData )
+            , ( bp::arg("pchGameData") ) )    
+        .def( 
+            "SetGameDescription"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetGameDescription )
+            , ( bp::arg("pszGameDescription") ) )    
+        .def( 
+            "SetGameTags"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetGameTags )
+            , ( bp::arg("pchGameTags") ) )    
+        .def( 
+            "SetHeartbeatInterval"
+            , (void ( ::ISteamGameServer::* )( int ) )( &::ISteamGameServer::SetHeartbeatInterval )
+            , ( bp::arg("iHeartbeatInterval") ) )    
+        .def( 
+            "SetKeyValue"
+            , (void ( ::ISteamGameServer::* )( char const *,char const * ) )( &::ISteamGameServer::SetKeyValue )
+            , ( bp::arg("pKey"), bp::arg("pValue") ) )    
+        .def( 
+            "SetMapName"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetMapName )
+            , ( bp::arg("pszMapName") ) )    
+        .def( 
+            "SetMaxPlayerCount"
+            , (void ( ::ISteamGameServer::* )( int ) )( &::ISteamGameServer::SetMaxPlayerCount )
+            , ( bp::arg("cPlayersMax") ) )    
+        .def( 
+            "SetModDir"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetModDir )
+            , ( bp::arg("pszModDir") ) )    
+        .def( 
+            "SetPasswordProtected"
+            , (void ( ::ISteamGameServer::* )( bool ) )( &::ISteamGameServer::SetPasswordProtected )
+            , ( bp::arg("bPasswordProtected") ) )    
+        .def( 
+            "SetProduct"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetProduct )
+            , ( bp::arg("pszProduct") ) )    
+        .def( 
+            "SetRegion"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetRegion )
+            , ( bp::arg("pszRegion") ) )    
+        .def( 
+            "SetServerName"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetServerName )
+            , ( bp::arg("pszServerName") ) )    
+        .def( 
+            "SetSpectatorPort"
+            , (void ( ::ISteamGameServer::* )( ::uint16 ) )( &::ISteamGameServer::SetSpectatorPort )
+            , ( bp::arg("unSpectatorPort") ) )    
+        .def( 
+            "SetSpectatorServerName"
+            , (void ( ::ISteamGameServer::* )( char const * ) )( &::ISteamGameServer::SetSpectatorServerName )
+            , ( bp::arg("pszSpectatorServerName") ) )    
+        .def( 
+            "UserHasLicenseForApp"
+            , (::EUserHasLicenseForAppResult ( ::ISteamGameServer::* )( ::CSteamID,::AppId_t ) )( &::ISteamGameServer::UserHasLicenseForApp )
+            , ( bp::arg("steamID"), bp::arg("appID") ) )    
+        .def( 
+            "WasRestartRequested"
+            , (bool ( ::ISteamGameServer::* )(  ) )( &::ISteamGameServer::WasRestartRequested ) );
 
     bp::class_< ISteamMatchmaking, boost::noncopyable >( "ISteamMatchmaking", bp::no_init )    
         .def( 
@@ -4618,8 +4810,28 @@ BOOST_PYTHON_MODULE(_steam){
             , (void ( ::PySteamMatchmakingServers::* )( int ) )( &::PySteamMatchmakingServers::ReleaseRequest )
             , ( bp::arg("hServerListRequest") ) )    
         .def( 
+            "RequestFavoritesServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestFavoritesServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestFriendsServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestFriendsServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestHistoryServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestHistoryServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
             "RequestInternetServerList"
             , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::PySteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestInternetServerList )
+            , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestLANServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestLANServerList )
+            , ( bp::arg("iApp"), bp::arg("pRequestServersResponse") ) )    
+        .def( 
+            "RequestSpectatorServerList"
+            , (int ( ::PySteamMatchmakingServers::* )( ::AppId_t,::boost::python::list,::ISteamMatchmakingServerListResponse * ) )( &::PySteamMatchmakingServers::RequestSpectatorServerList )
             , ( bp::arg("iApp"), bp::arg("filters"), bp::arg("pRequestServersResponse") ) )    
         .def( 
             "ServerRules"
@@ -4990,6 +5202,8 @@ BOOST_PYTHON_MODULE(_steam){
         
         }
     }
+
+    bp::scope().attr( "steamgameserverapicontext" ) = boost::ref(steamgameserverapicontext);
 
     bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 }

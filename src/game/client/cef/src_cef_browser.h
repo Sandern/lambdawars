@@ -42,6 +42,7 @@ public:
 
 	// General/Layout
 	virtual void OnAfterCreated( void );
+	virtual void OnDestroy() {}
 	virtual void PerformLayout( void );
 	virtual void InvalidateLayout( void );
 

@@ -159,8 +159,8 @@
 #include "wars_mount_system.h"
 #include "wars_flora.h"
 #include "editor/editorsystem.h"
-
 #include "warseditor/iwars_editor_storage.h"
+#include "wars_matchmaking.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -1496,6 +1496,49 @@ void CHLClient::HudUpdate( bool bActive )
 	// I don't think this is necessary any longer, but I will leave it until
 	// I can check into this further.
 	C_BaseTempEntity::CheckDynamicTempEnts();
+
+	// 
+	char *pchRecvBuf = NULL;
+	uint32 cubMsgSize;
+	CSteamID steamIDRemote;
+	while ( steamapicontext->SteamNetworking()->IsP2PPacketAvailable( &cubMsgSize ) )
+	{
+		// free any previous receive buffer
+		if ( pchRecvBuf )
+			free( pchRecvBuf );
+
+		// alloc a new receive buffer of the right size
+		pchRecvBuf = (char *)malloc( cubMsgSize );
+
+		// see if there is any data waiting on the socket
+		if ( !steamapicontext->SteamNetworking()->ReadP2PPacket( pchRecvBuf, cubMsgSize, &cubMsgSize, &steamIDRemote ) )
+			break;
+
+		if ( cubMsgSize < sizeof( uint32 ) )
+		{
+			Warning( "Got garbage on server socket, too short\n" );
+			continue;
+		}
+
+		EMessage eMsg = (EMessage)( *(uint32*)pchRecvBuf );
+		Msg("Received message of type %d\n", eMsg);
+
+		switch( eMsg )
+		{
+		case k_EMsgClientRequestGameAccepted:
+			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_accept", "core.signals", true ) );
+			break;
+		case k_EMsgClientRequestGameDenied:
+			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+			break;
+		default:
+			Warning("Unknown client message type %d\n", eMsg); 
+			break;
+		}
+	}
+
+	if ( pchRecvBuf )
+		free( pchRecvBuf );
 }
 
 //-----------------------------------------------------------------------------

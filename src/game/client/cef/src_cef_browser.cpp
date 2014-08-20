@@ -516,6 +516,8 @@ SrcCefBrowser::~SrcCefBrowser()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Destroy( void )
 {
+	OnDestroy();
+
 	// Delete panel
 	if( m_pPanel )
 	{

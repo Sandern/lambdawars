@@ -252,6 +252,26 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual'
         
         self.AddSteamCallResult('NumberOfCurrentPlayers', 'NumberOfCurrentPlayers_t')
+        
+    def ParseGameServer(self, mb):
+        cls = mb.class_('ISteamGameServer')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
+        
+    def ParseServerOnly(self, mb):
+        # Accessor class game server
+        mb.add_registration_code( "bp::scope().attr( \"steamgameserverapicontext\" ) = boost::ref(steamgameserverapicontext);" )
+        cls = mb.class_('CSteamGameServerAPIContext')
+        cls.include()
+        cls.mem_fun('Init').exclude()
+        cls.mem_fun('Clear').exclude()
+        cls.mem_fun('SteamGameServerUtils').exclude()
+        cls.mem_fun('SteamGameServerNetworking').exclude()
+        cls.mem_fun('SteamGameServerStats').exclude()
+        
+        cls.mem_funs('SteamGameServer').call_policies = call_policies.return_internal_reference()
+    
+        self.ParseGameServer(mb)
 
     def Parse(self, mb):
         # Exclude everything by default
@@ -283,7 +303,7 @@ class Steam(SemiSharedModuleGenerator):
         # Generic API functions
         mb.free_function('SteamAPI_RunCallbacks').include()
         
-        # Accessor class for all
+        # Accessor class client
         mb.add_registration_code( "bp::scope().attr( \"steamapicontext\" ) = boost::ref(steamapicontext);" )
         cls = mb.class_('CSteamAPIContext')
         cls.include()
@@ -345,4 +365,7 @@ class Steam(SemiSharedModuleGenerator):
         
         #mb.class_('ISteamUtils').mem_funs('GetImageSize').add_transformation( FT.output('pnWidth'), FT.output('pnHeight'))
         #mb.class_('ISteamUtils').mem_funs('GetCSERIPPort').add_transformation( FT.output('unIP'), FT.output('usPort'))
+        
+        if self.isserver:
+            self.ParseServerOnly(mb)
         

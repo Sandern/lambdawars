@@ -11,12 +11,20 @@
 #pragma once
 #endif
 
+#include "wars_matchmaking.h"
+
 class CWarsGameServer
 {
 public:
 	CWarsGameServer();
 
+	void PrintDebugInfo();
 	void RunFrame();
+
+	void SetState( EGameServerState state );
+	EGameServerState GetState();
+
+	virtual void GetMatchmakingTags( char *buf, size_t bufSize );
 
 private:
 	// Tells us when we have successfully connected to Steam
@@ -37,7 +45,17 @@ private:
 	STEAM_CALLBACK( CWarsGameServer, OnLobbyDataUpdate, LobbyDataUpdate_t, m_CallbackLobbyDataUpdate );
 
 	bool m_bConnectedToSteam;
+	EGameServerState m_State;
+	int m_nConnectedPlayers;
+
+	float m_fGameStateStartTime;
+	float m_fLastPlayedConnectedTime;
 };
+
+inline EGameServerState CWarsGameServer::GetState()
+{
+	return m_State;
+}
 
 void WarsInitGameServer();
 void WarsShutdownGameServer();

@@ -165,8 +165,8 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	//g_bOfflineGame = pKV->GetString( "map/offline", NULL ) != NULL;
 	g_bOfflineGame = !Q_stricmp( pKV->GetString( "system/network", "LIVE" ), "offline" );
 
-	//Msg( "GameInterface reservation payload:\n" );
-	//KeyValuesDumpAsDevMsg( pKV );
+	Msg( "GameInterface reservation payload:\n" );
+	KeyValuesDumpAsDevMsg( pKV );
 
 	// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
 	if ( sv_force_transmit_ents.IsFlagSet( FCVAR_DEVELOPMENTONLY ) &&	// any convar with FCVAR_DEVELOPMENTONLY flag will be sufficient here
@@ -249,12 +249,12 @@ void WarsUpdateGameServer()
 	if( !steamgameserverapicontext || !g_pSteamClientGameServer )
 		return;
 
-	// set our debug handler
-	g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
-
 	if( !steamgameserverapicontext->SteamGameServerNetworking() )
 	{
 		steamgameserverapicontext->Init();
+
+		// set our debug handler
+		g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
 	}
 
 	if( !steamgameserverapicontext->SteamGameServerNetworking() )
@@ -263,7 +263,6 @@ void WarsUpdateGameServer()
 	if( !WarsGameServer() )
 	{
 		WarsInitGameServer();
-		Msg("Create wars game server\n");
 	}
 	else 
 	{
