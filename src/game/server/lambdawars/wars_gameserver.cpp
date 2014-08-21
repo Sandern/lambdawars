@@ -52,11 +52,12 @@ void CWarsGameServer::RunFrame()
 	uint32 cubMsgSize;
 	CSteamID steamIDRemote;
 
-	KeyValues *pData = NULL;
+	KeyValues *pData = NULL, *pGameData = NULL;
 
 	if( steamgameserverapicontext->SteamGameServer() )
 	{
-		//steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
+		steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
+		steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
 		//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
 	}
 	else
@@ -122,6 +123,8 @@ void CWarsGameServer::RunFrame()
 		static WarsMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
 		static WarsMessage_t denyGameMsg( k_EMsgClientRequestGameDenied );
 
+		CUtlBuffer data;
+
 		switch( eMsg )
 		{
 		case k_EMsgServerRequestGame:
@@ -132,25 +135,21 @@ void CWarsGameServer::RunFrame()
 			}
 			else
 			{
+				data.Put( pchRecvBuf + sizeof( WarsRequestServerMessage_t ), cubMsgSize - sizeof( WarsRequestServerMessage_t ) );
+				//Msg("Message size: %d, size keyvalues: %d\n", cubMsgSize, cubMsgSize - sizeof( WarsRequestServerMessage_t ) );
+				pGameData = new KeyValues( "GameData" );
+				if( !pGameData->ReadAsBinary( data ) )
+				{
+					Warning("k_EMsgServerRequestGame: reading game data failed\n");
+				}
+				pGameData->SetName( COM_GetModDirectory() );
+
+				KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+
 				// Tell lobby owner the game is accepted and players can connect to the server
 				steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 
-				// Setup game
-				pData = KeyValues::FromString(
-				"settings",
-				" system { "
-				" network LIVE "
-				" access public "
-				" } "
-				" game { "
-				" mode annihilation "
-				" mission hlw_forest "
-				" } "
-				);
-				pData->SetName( COM_GetModDirectory() );
-				g_ServerGameDLL.ApplyGameSettings( pData );
-
-				//g_pMatchFramework->CreateSession( pData );
+				g_ServerGameDLL.ApplyGameSettings( pGameData );
 
 				SetState( k_EGameServer_InGame );
 			}
@@ -289,6 +288,9 @@ CWarsGameServer *WarsGameServer()
 
 CON_COMMAND_F( wars_gameserver_info, "", 0 )
 {
+	if( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	if( !WarsGameServer() )
 	{
 		Msg("No running wars game server\n");
@@ -296,4 +298,18 @@ CON_COMMAND_F( wars_gameserver_info, "", 0 )
 	}
 
 	WarsGameServer()->PrintDebugInfo();
+}
+
+CON_COMMAND_F( wars_gameserver_force_available, "", 0 )
+{
+	if( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
+	if( !WarsGameServer() )
+	{
+		Msg("No running wars game server\n");
+		return;
+	}
+
+	WarsGameServer()->SetState( k_EGameServer_Available );
 }

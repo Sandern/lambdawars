@@ -9,7 +9,7 @@
 #include "clientsteamcontext.h"
 #endif // CLIENT_DLL
 
-void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId )
+void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData )
 {
 #ifdef CLIENT_DLL
 	if( !steamapicontext )
@@ -18,9 +18,29 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId )
 	if( !steamapicontext->SteamNetworking() )
 		return;
 
+	if( !pGameData )
+	{
+		Warning( "WarsRequestGameServer: no game data specified\n" );
+		return;
+	}
+
+	//CUtlBuffer keyvaluesData( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	//pGameData->RecursiveSaveToFile( keyvaluesData, 0 );
+	CUtlBuffer keyvaluesData;
+	pGameData->WriteAsBinary( keyvaluesData );
+
 	WarsRequestServerMessage_t data;
 	data.type = k_EMsgServerRequestGame;
 	data.lobbySteamId = lobbySteamId;
-	steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, &data, sizeof(data), k_EP2PSendReliable );
+
+	int dataSize = sizeof(data) + keyvaluesData.TellPut();
+	char* pszData = (char*)stackalloc( dataSize );
+	V_memcpy( pszData, &data, sizeof(data) );
+	V_memcpy( pszData + sizeof(data), keyvaluesData.Base(), keyvaluesData.TellPut());
+
+	Msg("Wrote game data. Total message size: %d, game data size: %d\n", dataSize, keyvaluesData.TellPut() );
+	KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+
+	steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable );
 #endif // CLIENT_DLL
 }

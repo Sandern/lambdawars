@@ -43,6 +43,6 @@ typedef struct WarsRequestServerMessage_t : public WarsMessage_t
 	CSteamID lobbySteamId;
 } WarsRequestServerMessage_t;
 
-void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId );
+void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData );
 
 #endif // WARS_MATCHMAKING_H
