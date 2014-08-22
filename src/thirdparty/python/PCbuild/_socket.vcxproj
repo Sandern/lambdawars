@@ -203,6 +203,9 @@
       <BaseAddress>0x1e1D0000</BaseAddress>
       <AdditionalLibraryDirectories>$(ProjectDir)\..\..\..\game\server\Release_wars;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Client|Win32'">
     <Link>
