@@ -176,6 +176,26 @@ BOOST_PYTHON_MODULE(_srcbase){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::PyKeyValues::GetBool
+        
+            typedef bool ( ::PyKeyValues::*GetBool_function_type )( char const *,bool ) ;
+            
+            KeyValues_exposer.def( 
+                "GetBool"
+                , GetBool_function_type( &::PyKeyValues::GetBool )
+                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")=(bool)(false) ) );
+        
+        }
+        { //::PyKeyValues::GetBool
+        
+            typedef bool ( ::PyKeyValues::*GetBool_function_type )( int,bool ) ;
+            
+            KeyValues_exposer.def( 
+                "GetBool"
+                , GetBool_function_type( &::PyKeyValues::GetBool )
+                , ( bp::arg("keySymbol"), bp::arg("defaultValue")=(bool)(false) ) );
+        
+        }
         { //::PyKeyValues::GetColor
         
             typedef ::Color ( ::PyKeyValues::*GetColor_function_type )( char const * ) ;
@@ -392,6 +412,16 @@ BOOST_PYTHON_MODULE(_srcbase){
                 "RemoveSubKey"
                 , RemoveSubKey_function_type( &::PyKeyValues::RemoveSubKey )
                 , ( bp::arg("subKey") ) );
+        
+        }
+        { //::PyKeyValues::SetBool
+        
+            typedef void ( ::PyKeyValues::*SetBool_function_type )( char const *,bool ) ;
+            
+            KeyValues_exposer.def( 
+                "SetBool"
+                , SetBool_function_type( &::PyKeyValues::SetBool )
+                , ( bp::arg("keyName"), bp::arg("value") ) );
         
         }
         { //::PyKeyValues::SetColor

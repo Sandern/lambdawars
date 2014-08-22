@@ -132,6 +132,7 @@ public:
 	//const wchar_t *GetWString( const char *keyName = NULL, const wchar_t *defaultValue = L"" ) { return m_realKeyValues->GetInt(keyName, defaultValue); }
 	//void *GetPtr( const char *keyName = NULL, void *defaultValue = (void*)0 ) { return m_realKeyValues->GetInt(keyName, defaultValue); }
 	Color GetColor( const char *keyName = NULL /* default value is all black */) { return m_realKeyValues->GetColor(keyName); }
+	bool GetBool( const char *keyName = NULL, bool defaultValue = false ) { return GetInt( keyName, defaultValue ? 1 : 0 ) ? true : false; }
 	bool  IsEmpty(const char *keyName = NULL) { return m_realKeyValues->IsEmpty(keyName); }
 
 	// Data access
@@ -141,6 +142,7 @@ public:
 	//const wchar_t *GetWString( int keySymbol, const wchar_t *defaultValue = L"" );
 	//void *GetPtr( int keySymbol, void *defaultValue = (void*)0 );
 	Color GetColor( int keySymbol /* default value is all black */) { return m_realKeyValues->GetColor(keySymbol); }
+	bool GetBool( int keySymbol, bool defaultValue = false ) { return GetInt( keySymbol, defaultValue ? 1 : 0 ) ? true : false; }
 	bool  IsEmpty( int keySymbol ) { return m_realKeyValues->IsEmpty(keySymbol); }
 
 	// Key writing
@@ -151,6 +153,7 @@ public:
 	void SetFloat( const char *keyName, float value ) { m_realKeyValues->SetFloat(keyName, value); }
 	//void SetPtr( const char *keyName, void *value );
 	void SetColor( const char *keyName, Color value) { m_realKeyValues->SetColor(keyName, value); }
+	void SetBool( const char *keyName, bool value ) { SetInt( keyName, value ? 1 : 0 ); }
 
 	//KeyValues& operator=( KeyValues& src );
 
