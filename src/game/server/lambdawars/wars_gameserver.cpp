@@ -272,11 +272,17 @@ void CWarsGameServer::OnLobbyDataUpdate( LobbyDataUpdate_t *pCallback )
 
 void WarsInitGameServer()
 {
+	if( g_pGameServerTest )
+		return;
+
 	g_pGameServerTest = new CWarsGameServer();
 }
 
 void WarsShutdownGameServer()
 {
+	if( !g_pGameServerTest )
+		return;
+
 	delete g_pGameServerTest;
 	g_pGameServerTest = NULL;
 }

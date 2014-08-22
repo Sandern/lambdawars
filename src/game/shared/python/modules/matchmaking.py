@@ -11,6 +11,7 @@ class MatchMaking(SemiSharedModuleGenerator):
         #'matchmaking/imatchframework.h',
         
         'wars_matchmaking.h',
+        '#wars_gameserver.h',
     ]
         
     def Parse(self, mb):
@@ -68,4 +69,8 @@ class MatchMaking(SemiSharedModuleGenerator):
         
         # Wars
         mb.free_function('WarsRequestGameServer').include()
+        
+        if self.isserver:
+            mb.free_function('WarsInitGameServer').include()
+            mb.free_function('WarsShutdownGameServer').include()
         

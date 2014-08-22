@@ -230,6 +230,8 @@ BOOST_PYTHON_MODULE(matchmaking){
 
 #include "wars_matchmaking.h"
 
+#include "wars_gameserver.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -434,6 +436,16 @@ BOOST_PYTHON_MODULE(matchmaking){
     
     }
 
+    { //::WarsInitGameServer
+    
+        typedef void ( *WarsInitGameServer_function_type )(  );
+        
+        bp::def( 
+            "WarsInitGameServer"
+            , WarsInitGameServer_function_type( &::WarsInitGameServer ) );
+    
+    }
+
     { //::WarsRequestGameServer
     
         typedef void ( *WarsRequestGameServer_function_type )( ::CSteamID,::CSteamID,::KeyValues * );
@@ -442,6 +454,16 @@ BOOST_PYTHON_MODULE(matchmaking){
             "WarsRequestGameServer"
             , WarsRequestGameServer_function_type( &::WarsRequestGameServer )
             , ( bp::arg("serverSteamId"), bp::arg("lobbySteamId"), bp::arg("pGameData") ) );
+    
+    }
+
+    { //::WarsShutdownGameServer
+    
+        typedef void ( *WarsShutdownGameServer_function_type )(  );
+        
+        bp::def( 
+            "WarsShutdownGameServer"
+            , WarsShutdownGameServer_function_type( &::WarsShutdownGameServer ) );
     
     }
 }
