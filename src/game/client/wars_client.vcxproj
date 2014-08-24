@@ -1480,7 +1480,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\deferred\ssemath_ext.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorbasemapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editormapmgr.h" />
-    <ClInclude Include="..\shared\lambdawars\editor\editorselection.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorsystem.h" />
     <ClInclude Include="..\shared\lambdawars\editor\editorwarsmapmgr.h" />
     <ClInclude Include="..\shared\lambdawars\fow_blocker.h" />
