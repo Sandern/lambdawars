@@ -59,6 +59,8 @@ inline EGameServerState CWarsGameServer::GetState()
 
 void WarsInitGameServer();
 void WarsShutdownGameServer();
+EGameServerState GetWarsGameServerState();
+
 CWarsGameServer *WarsGameServer();
 
 #endif // WARSGAMESERVER_H

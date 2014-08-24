@@ -278,6 +278,13 @@ struct PyMatchEventsSink_wrapper : PyMatchEventsSink, bp::wrapper< PyMatchEvents
 BOOST_PYTHON_MODULE(matchmaking){
     bp::docstring_options doc_options( true, true, false );
 
+    bp::enum_< EGameServerState>("EGameServerState")
+        .value("k_EGameServer_Error", k_EGameServer_Error)
+        .value("k_EGameServer_Available", k_EGameServer_Available)
+        .value("k_EGameServer_InGame", k_EGameServer_InGame)
+        .export_values()
+        ;
+
     bp::class_< PyMatchEventsSink_wrapper >( "MatchEventsSink" )    
         .def( 
             "OnEvent"
@@ -393,6 +400,16 @@ BOOST_PYTHON_MODULE(matchmaking){
             , (void (*)( ::ELobbyDistanceFilter ))( &::PySteamMatchmaking::AddRequestLobbyListDistanceFilter )
             , ( bp::arg("eLobbyDistanceFilter") ) )    
         .staticmethod( "AddRequestLobbyListDistanceFilter" );
+
+    { //::GetWarsGameServerState
+    
+        typedef ::EGameServerState ( *GetWarsGameServerState_function_type )(  );
+        
+        bp::def( 
+            "GetWarsGameServerState"
+            , GetWarsGameServerState_function_type( &::GetWarsGameServerState ) );
+    
+    }
 
     { //::PyMKCloseSession
     

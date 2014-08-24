@@ -287,6 +287,13 @@ void WarsShutdownGameServer()
 	g_pGameServerTest = NULL;
 }
 
+EGameServerState GetWarsGameServerState()
+{
+	if( !WarsGameServer() )
+		return k_EGameServer_Error;
+	return WarsGameServer()->GetState();
+}
+
 CWarsGameServer *WarsGameServer()
 {
 	return g_pGameServerTest;
@@ -318,4 +325,9 @@ CON_COMMAND_F( wars_gameserver_force_available, "", 0 )
 	}
 
 	WarsGameServer()->SetState( k_EGameServer_Available );
+}
+
+CON_COMMAND_F( wars_gameserver_start, "", 0 )
+{
+	WarsInitGameServer();
 }

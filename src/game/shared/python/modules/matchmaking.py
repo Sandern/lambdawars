@@ -71,6 +71,8 @@ class MatchMaking(SemiSharedModuleGenerator):
         mb.free_function('WarsRequestGameServer').include()
         
         if self.isserver:
+            mb.enum('EGameServerState').include()
+        
             mb.free_function('WarsInitGameServer').include()
             mb.free_function('WarsShutdownGameServer').include()
-        
+            mb.free_function('GetWarsGameServerState').include()

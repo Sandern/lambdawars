@@ -26,6 +26,7 @@ enum EMessage
 
 enum EGameServerState
 {
+	k_EGameServer_Error = -1,
 	k_EGameServer_Available = 0,
 	k_EGameServer_InGame,
 };
