@@ -33,7 +33,27 @@ inline void decref(T* p)
 template <class T>
 inline void xdecref(T* p)
 {
-    Py_XDECREF(python::upcast<PyObject>(p));
+#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1700)
+	// Workaround VS2012 & VS2013 internal compiler error...
+	PyObject *_py_tmp = (PyObject *)(python::upcast<PyObject>(p));
+	if (_py_tmp != NULL) 
+	{    
+		_Py_DEC_REFTOTAL;
+		--(_py_tmp->ob_refcnt);
+	}				
+
+	if (_py_tmp != NULL && _py_tmp->ob_refcnt != 0)
+	{
+		_Py_CHECK_REFCNT(_py_tmp);
+	}
+	else if (_py_tmp != NULL && _py_tmp->ob_refcnt == 0)
+	{
+		_Py_INC_TPFREES(_py_tmp) _Py_COUNT_ALLOCS_COMMA
+		(*_py_tmp->ob_type->tp_dealloc)((PyObject *)(_py_tmp));
+	}
+#else
+	Py_XDECREF(python::upcast<PyObject>(p));
+#endif
 }
 
 }} // namespace boost::python

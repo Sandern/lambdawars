@@ -1188,7 +1188,12 @@ initstdio(void)
      * and fileno() may point to an invalid file descriptor. For example
      * GUI apps don't have valid standard streams by default.
      */
+	// Workaround http://bugs.python.org/issue17797
+#ifdef MS_WINDOWS
+	if (!is_valid_fd(fd) || GetStdHandle(STD_INPUT_HANDLE) == NULL) {
+#else
     if (!is_valid_fd(fd)) {
+#endif
         std = Py_None;
         Py_INCREF(std);
     }
@@ -1203,7 +1208,11 @@ initstdio(void)
 
     /* Set sys.stdout */
     fd = fileno(stdout);
+#ifdef MS_WINDOWS
+	if (!is_valid_fd(fd) || GetStdHandle(STD_OUTPUT_HANDLE) == NULL) {
+#else
     if (!is_valid_fd(fd)) {
+#endif
         std = Py_None;
         Py_INCREF(std);
     }
@@ -1219,7 +1228,11 @@ initstdio(void)
 #if 1 /* Disable this if you have trouble debugging bootstrap stuff */
     /* Set sys.stderr, replaces the preliminary stderr */
     fd = fileno(stderr);
+#ifdef MS_WINDOWS
+	if (!is_valid_fd(fd) || GetStdHandle(STD_ERROR_HANDLE) == NULL) {
+#else
     if (!is_valid_fd(fd)) {
+#endif
         std = Py_None;
         Py_INCREF(std);
     }
