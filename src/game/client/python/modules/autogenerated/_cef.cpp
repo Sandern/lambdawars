@@ -211,6 +211,25 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::OnContextCreated( );
     }
 
+    virtual void OnDestroy(  ) {
+        PY_OVERRIDE_CHECK( SrcCefBrowser, OnDestroy )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnDestroy )
+        bp::override func_OnDestroy = this->get_override( "OnDestroy" );
+        if( func_OnDestroy.ptr() != Py_None )
+            try {
+                func_OnDestroy(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SrcCefBrowser::OnDestroy(  );
+            }
+        else
+            this->SrcCefBrowser::OnDestroy(  );
+    }
+    
+    void default_OnDestroy(  ) {
+        SrcCefBrowser::OnDestroy( );
+    }
+
     virtual void OnLoadingStateChange( bool isLoading, bool canGoBack, bool canGoForward ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, OnLoadingStateChange )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, OnLoadingStateChange )
@@ -803,6 +822,17 @@ BOOST_PYTHON_MODULE(_cef){
                 "OnContextCreated"
                 , OnContextCreated_function_type(&::SrcCefBrowser::OnContextCreated)
                 , default_OnContextCreated_function_type(&SrcCefBrowser_wrapper::default_OnContextCreated) );
+        
+        }
+        { //::SrcCefBrowser::OnDestroy
+        
+            typedef void ( ::SrcCefBrowser::*OnDestroy_function_type )(  ) ;
+            typedef void ( SrcCefBrowser_wrapper::*default_OnDestroy_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "OnDestroy"
+                , OnDestroy_function_type(&::SrcCefBrowser::OnDestroy)
+                , default_OnDestroy_function_type(&SrcCefBrowser_wrapper::default_OnDestroy) );
         
         }
         { //::SrcCefBrowser::OnLoadingStateChange

@@ -516,8 +516,6 @@ SrcCefBrowser::~SrcCefBrowser()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Destroy( void )
 {
-	OnDestroy();
-
 	// Delete panel
 	if( m_pPanel )
 	{
@@ -528,6 +526,8 @@ void SrcCefBrowser::Destroy( void )
 	// Close browser
 	if( m_CefClientHandler )
 	{
+		OnDestroy();
+
 		if( g_debug_cef.GetBool() )
 			DevMsg( "#%d %s: SrcCefBrowser::Destroy\n", GetBrowser() ? GetBrowser()->GetIdentifier() : -1, m_Name.c_str() );
 
