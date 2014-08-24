@@ -3769,7 +3769,7 @@ void C_BaseEntity::OnDataChanged( DataUpdateType_t type )
 // =======================================
 	// Ensures Python networked variables are processed on client creation of this entity
 #ifdef ENABLE_PYTHON
-		if ( type == DATA_UPDATE_CREATED && GetPySelf() != NULL )
+		if ( GetPySelf() != NULL )
 		{
 			SrcPySystem()->PostProcessDelayedUpdates( this );
 		}
@@ -6687,10 +6687,8 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 //------------------------------------------------------------------------------
 void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object data, bool callchanged, bool oncreated )
 {
-	// Set new var
 	try 
 	{
-		// Only set if changed.
 		if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
 			return;
 
@@ -6705,11 +6703,9 @@ void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object 
 
 	if( !oncreated )
 	{
-		// Mark as data changed
 		AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
 	}
 
-	// Dispatch changed callback if needed
 	if( callchanged )
 	{
 		PyNetworkVarChanged( pName );

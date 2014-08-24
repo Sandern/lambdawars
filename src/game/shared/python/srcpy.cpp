@@ -1032,8 +1032,6 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 
 #ifdef CLIENT_DLL
 	PyUpdateProceduralMaterials();
-
-	CleanupDelayedUpdateList();
 #endif // CLIENT_DLL
 
 	// Clears references from the delete list, causing instances to cleanup if possible
@@ -1405,36 +1403,6 @@ void CSrcPython::AddToDelayedUpdateList( EHANDLE hEnt, char *name, bp::object da
 	v.data = data;
 	v.callchanged = callchanged;
 	py_delayed_data_update_list.AddToTail( v );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// TODO: Remove? This is likely not needed, since ProcessDelayedUpdates is 
-//		 called upon creation.
-//-----------------------------------------------------------------------------
-void CSrcPython::CleanupDelayedUpdateList()
-{
-	for( int i = py_delayed_data_update_list.Count() - 1; i >= 0; i-- )
-	{
-		EHANDLE h = py_delayed_data_update_list[i].hEnt;
-		if( h != NULL )
-		{	
-			DevMsg("CleanupDelayedUpdateList called while not expected\n");
-
-			if( g_debug_pynetworkvar.GetBool() )
-			{
-				DevMsg("#%d Cleaning up delayed PyNetworkVar update %s (callback: %d)\n", 
-					h.GetEntryIndex(),
-					py_delayed_data_update_list[i].name,
-					py_delayed_data_update_list[i].callchanged );
-			}
-			
-			h->PyUpdateNetworkVar( py_delayed_data_update_list[i].name, 
-				py_delayed_data_update_list[i].data, py_delayed_data_update_list[i].callchanged );
-
-			py_delayed_data_update_list.Remove(i);
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
