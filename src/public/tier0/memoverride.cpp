@@ -703,24 +703,141 @@ int __cdecl _CrtDbgReport( int nRptType, const char * szFile,
 {
 	static char output[1024];
 	va_list args;
-	va_start( args, szFormat );
-	_vsnprintf( output, sizeof( output )-1, szFormat, args );
-	va_end( args );
+	if ( szFormat )
+	{
+		va_start( args, szFormat );
+		_vsnprintf( output, sizeof( output )-1, szFormat, args );
+		va_end( args );
+	}
+	else
+	{
+		output[0] = 0;
+	}
 
 	return g_pMemAlloc->CrtDbgReport( nRptType, szFile, nLine, szModule, output );
 }
 
 #if _MSC_VER >= 1400
 
+// Configure VS so that it will record crash dumps on pure-call violations
+// and invalid parameter handlers.
+// If you manage to call a pure-virtual function (easily done if you indirectly
+// call a pure-virtual function from the base-class constructor or destructor)
+// or if you invoke the invalid parameter handler (printf(NULL); is one way)
+// then no crash dump will be created.
+// This crash redirects the handlers for these two events so that crash dumps
+// are created.
+//
+// The ErrorHandlerRegistrar object must be in memoverride.cpp so that it will
+// be placed in every DLL and EXE. This is required because each DLL and EXE
+// gets its own copy of the C run-time and these overrides are set on a per-CRT
+// basis.
+
+/*
+// This sample code will cause pure-call and invalid_parameter violations and
+// was used for testing:
+class Base
+{
+public:
+	virtual void PureFunction() = 0;
+
+	Base()
+	{
+		NonPureFunction();
+	}
+
+	void NonPureFunction()
+	{
+		PureFunction();
+	}
+};
+
+class Derived : public Base
+{
+public:
+	void PureFunction() OVERRIDE
+	{
+	}
+};
+
+void PureCallViolation()
+{
+	Derived derived;
+}
+
+void InvalidParameterViolation()
+{
+	printf( NULL );
+}
+*/
+
+#include <stdlib.h>
+#include "minidump.h"
+
+// Disable compiler optimizations. If we don't do this then VC++ generates code
+// that confuses the Visual Studio debugger and causes it to display completely
+// random call stacks. That makes the minidumps excruciatingly hard to understand.
+#pragma optimize("", off)
+
+// Write a minidump file, unless running under the debugger in which case break
+// into the debugger.
+// The "int dummy" parameter is so that the callers can be unique so that the
+// linker won't use its /opt:icf optimization to collapse them together. This
+// makes reading the call stack easier.
+void __cdecl WriteMiniDumpOrBreak( int dummy )
+{
+	if ( Plat_IsInDebugSession() )
+	{
+		__debugbreak();
+		// Continue at your peril...
+	}
+	else
+	{
+		WriteMiniDump();
+		// Call Plat_ExitProcess so we don't continue in a bad state. 
+		TerminateProcess(GetCurrentProcess(), 0);
+	}
+}
+
+void __cdecl VPureCall()
+{
+	WriteMiniDumpOrBreak( 0/*, "PureClass"*/ );
+}
+
+void VInvalidParameterHandler(const wchar_t* expression,
+   const wchar_t* function, 
+   const wchar_t* file, 
+   unsigned int line, 
+   uintptr_t pReserved)
+{
+	WriteMiniDumpOrBreak( 1/*, "InvalidParameterHandler"*/ );
+}
+
+// Restore compiler optimizations.
+#pragma optimize("", on)
+
+// Helper class for registering error callbacks. See above for details.
+class ErrorHandlerRegistrar
+{
+public:
+	ErrorHandlerRegistrar();
+} s_ErrorHandlerRegistration;
+
+ErrorHandlerRegistrar::ErrorHandlerRegistrar()
+{
+	_set_purecall_handler( VPureCall );
+	_set_invalid_parameter_handler( VInvalidParameterHandler );
+}
+
 #if defined( _DEBUG )
  
-#if 0
 // wrapper which passes no debug info; not available in debug
+#ifndef	SUPPRESS_INVALID_PARAMETER_NO_INFO
 void __cdecl _invalid_parameter_noinfo(void)
 {
     Assert(0);
 }
-#endif // 0
+#endif
 
 #endif /* defined( _DEBUG ) */
 
@@ -935,7 +1052,10 @@ size_t __cdecl _CrtSetDebugFillThreshold( size_t _NewDebugFillThreshold)
 
 char * __cdecl _strdup ( const char * string )
 {
-	int nSize = strlen(string) + 1;
+	int nSize = (int)strlen(string) + 1;
+	// Check for integer underflow.
+	if ( nSize <= 0 )
+		return NULL;
 	char *pCopy = (char*)AllocUnattributed( nSize );
 	if ( pCopy )
 		memcpy( pCopy, string, nSize );
@@ -1166,10 +1286,135 @@ SIZE_T WINAPI XMemSize( PVOID pAddress, DWORD dwAllocAttributes )
 #define MAX_MODIFIER_LEN    0   /* max modifier name length - n/a */
 #define MAX_LC_LEN          (MAX_LANG_LEN+MAX_CTRY_LEN+MAX_MODIFIER_LEN+3)
 
+#if _MSC_VER >= 1700 // VS 11
+// Copied from C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\crt\src\mtdll.h
+#ifndef _SETLOC_STRUCT_DEFINED
 struct _is_ctype_compatible {
         unsigned long id;
         int is_clike;
 };
+
+typedef struct setloc_struct {
+    /* getqloc static variables */
+    wchar_t *pchLanguage;
+    wchar_t *pchCountry;
+    int iLocState;
+    int iPrimaryLen;
+    BOOL bAbbrevLanguage;
+    BOOL bAbbrevCountry;
+    UINT        _cachecp;
+    wchar_t     _cachein[MAX_LC_LEN];
+    wchar_t     _cacheout[MAX_LC_LEN];
+    /* _setlocale_set_cat (LC_CTYPE) static variable */
+    struct _is_ctype_compatible _Loc_c[5];
+    wchar_t _cacheLocaleName[LOCALE_NAME_MAX_LENGTH];
+} _setloc_struct, *_psetloc_struct;
+#define _SETLOC_STRUCT_DEFINED
+#endif  /* _SETLOC_STRUCT_DEFINED */
+
+_CRTIMP extern unsigned long __cdecl __threadid(void);
+#define _threadid   (__threadid())
+_CRTIMP extern uintptr_t __cdecl __threadhandle(void);
+#define _threadhandle   (__threadhandle())
+
+/* Structure for each thread's data */
+
+struct _tiddata {
+    unsigned long   _tid;       /* thread ID */
+
+
+    uintptr_t _thandle;         /* thread handle */
+
+    int     _terrno;            /* errno value */
+    unsigned long   _tdoserrno; /* _doserrno value */
+    unsigned int    _fpds;      /* Floating Point data segment */
+    unsigned long   _holdrand;  /* rand() seed value */
+    char *      _token;         /* ptr to strtok() token */
+    wchar_t *   _wtoken;        /* ptr to wcstok() token */
+    unsigned char * _mtoken;    /* ptr to _mbstok() token */
+
+    /* following pointers get malloc'd at runtime */
+    char *      _errmsg;        /* ptr to strerror()/_strerror() buff */
+    wchar_t *   _werrmsg;       /* ptr to _wcserror()/__wcserror() buff */
+    char *      _namebuf0;      /* ptr to tmpnam() buffer */
+    wchar_t *   _wnamebuf0;     /* ptr to _wtmpnam() buffer */
+    char *      _namebuf1;      /* ptr to tmpfile() buffer */
+    wchar_t *   _wnamebuf1;     /* ptr to _wtmpfile() buffer */
+    char *      _asctimebuf;    /* ptr to asctime() buffer */
+    wchar_t *   _wasctimebuf;   /* ptr to _wasctime() buffer */
+    void *      _gmtimebuf;     /* ptr to gmtime() structure */
+    char *      _cvtbuf;        /* ptr to ecvt()/fcvt buffer */
+    unsigned char _con_ch_buf[MB_LEN_MAX];
+                                /* ptr to putch() buffer */
+    unsigned short _ch_buf_used;   /* if the _con_ch_buf is used */
+
+    /* following fields are needed by _beginthread code */
+    void *      _initaddr;      /* initial user thread address */
+    void *      _initarg;       /* initial user thread argument */
+
+    /* following three fields are needed to support signal handling and
+     * runtime errors */
+    void *      _pxcptacttab;   /* ptr to exception-action table */
+    void *      _tpxcptinfoptrs; /* ptr to exception info pointers */
+    int         _tfpecode;      /* float point exception code */
+
+    /* pointer to the copy of the multibyte character information used by
+     * the thread */
+    pthreadmbcinfo  ptmbcinfo;
+
+    /* pointer to the copy of the locale informaton used by the thead */
+    pthreadlocinfo  ptlocinfo;
+    int         _ownlocale;     /* if 1, this thread owns its own locale */
+
+    /* following field is needed by NLG routines */
+    unsigned long   _NLG_dwCode;
+
+    /*
+     * Per-Thread data needed by C++ Exception Handling
+     */
+    void *      _terminate;     /* terminate() routine */
+    void *      _unexpected;    /* unexpected() routine */
+    void *      _translator;    /* S.E. translator */
+    void *      _purecall;      /* called when pure virtual happens */
+    void *      _curexception;  /* current exception */
+    void *      _curcontext;    /* current exception context */
+    int         _ProcessingThrow; /* for uncaught_exception */
+    void *      _curexcspec;    /* for handling exceptions thrown from std::unexpected */
+#if defined (_M_X64) || defined (_M_ARM)
+    void *      _pExitContext;
+    void *      _pUnwindContext;
+    void *      _pFrameInfoChain;
+#if defined (_WIN64)
+    unsigned __int64    _ImageBase;
+    unsigned __int64    _ThrowImageBase;
+#else  /* defined (_WIN64) */
+    unsigned __int32    _ImageBase;
+    unsigned __int32    _ThrowImageBase;
+#endif  /* defined (_WIN64) */
+    void *      _pForeignException;
+#elif defined (_M_IX86)
+    void *      _pFrameInfoChain;
+#endif  /* defined (_M_IX86) */
+    _setloc_struct _setloc_data;
+
+    void *      _reserved1;     /* nothing */
+    void *      _reserved2;     /* nothing */
+    void *      _reserved3;     /* nothing */
+#ifdef _M_IX86
+    void *      _reserved4;     /* nothing */
+    void *      _reserved5;     /* nothing */
+#endif  /* _M_IX86 */
+
+    int _cxxReThrow;        /* Set to True if it's a rethrown C++ Exception */
+
+    unsigned long __initDomain;     /* initial domain used by _beginthread[ex] for managed function */
+};
+#else
+struct _is_ctype_compatible {
+        unsigned long id;
+        int is_clike;
+};
+
 typedef struct setloc_struct {
     /* getqloc static variables */
     char *pchLanguage;
@@ -1276,6 +1521,7 @@ struct _tiddata {
 
     unsigned long __initDomain;     /* initial domain used by _beginthread[ex] for managed function */
 };
+#endif
 
 typedef struct _tiddata * _ptiddata;
 

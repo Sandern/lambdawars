@@ -4,7 +4,7 @@ Source code of Lambda Wars (formerly known as Half-Life 2: Wars, http://lambdawa
 Game code can be found at: http://svn.hl2wars.com/
 
 ## Compiling
-Tested with Visual Studio 2010 SP1:
+Tested with Visual Studio 2013:
 
 1. Open src/python/srcbuid/pcbuild.pln and build the pythoncore project
 2. Open src/hl2wars.sln and compile the full project
