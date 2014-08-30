@@ -209,7 +209,7 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0
 //-----------------------------------------------------------------------------
 void CefClientHandler::Destroy()
 {
-	if( GetBrowser() )
+	if (GetBrowser() && GetBrowser()->GetHost())
 	{
 		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
@@ -340,7 +340,6 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
 	if( browser->IsLoading() )
 		browser->StopLoad();
-	browser->GetHost()->ParentWindowWillClose();
 	return false;
 }
 
@@ -479,8 +478,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	m_CefClientHandler = new CefClientHandler( this );
 
     CefWindowInfo info;
-	info.SetAsOffScreen( 0 );
-	info.SetTransparentPainting( TRUE );
+	info.SetAsWindowless( CEFSystem().GetMainWindow(), true );
 
 	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
 	

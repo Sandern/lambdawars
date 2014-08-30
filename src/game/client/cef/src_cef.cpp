@@ -196,6 +196,7 @@ bool CCefSystem::Init()
 	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
 	//settings.pack_loading_disabled = true;
 	settings.remote_debugging_port = 8088;
+	settings.windowless_rendering_enabled = true;
 	CefString(&settings.cache_path) = CefString( "cache" );
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
