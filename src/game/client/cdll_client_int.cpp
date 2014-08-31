@@ -1947,6 +1947,8 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 		return;
 	g_bLevelInitialized = true;
 
+	m_bWasPaused = false;
+
 	engine->TickProgressBar();
 
 	input->LevelInit();

@@ -529,6 +529,25 @@ struct CServerOnlyPointEntity_wrapper : CServerOnlyPointEntity, bp::wrapper< CSe
         CBaseEntity::Precache( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::Restore( restore );
+            }
+        else
+            return this->CBaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseEntity::Restore( restore );
+    }
+
     virtual void Spawn(  ) {
         PY_OVERRIDE_CHECK( CBaseEntity, Spawn )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, Spawn )
@@ -797,6 +816,11 @@ void register_CServerOnlyPointEntity_class(){
             "Precache"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Precache)
             , (void ( CServerOnlyPointEntity_wrapper::* )(  ) )(&CServerOnlyPointEntity_wrapper::default_Precache) )    
+        .def( 
+            "Restore"
+            , (int ( ::CBaseEntity::* )( ::IRestore & ) )(&::CBaseEntity::Restore)
+            , (int ( CServerOnlyPointEntity_wrapper::* )( ::IRestore & ) )(&CServerOnlyPointEntity_wrapper::default_Restore)
+            , ( bp::arg("restore") ) )    
         .def( 
             "Spawn"
             , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::Spawn)

@@ -598,6 +598,25 @@ struct CBaseAnimatingOverlay_wrapper : CBaseAnimatingOverlay, bp::wrapper< CBase
         CBaseAnimating::PyPostOnNewModel( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseAnimating::Restore( restore );
+            }
+        else
+            return this->CBaseAnimating::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseAnimating::Restore( restore );
+    }
+
     virtual void Spawn(  ) {
         PY_OVERRIDE_CHECK( CBaseAnimating, Spawn )
         PY_OVERRIDE_LOG( _entities, CBaseAnimating, Spawn )
@@ -1472,6 +1491,18 @@ void register_CBaseAnimatingOverlay_class(){
             CBaseAnimatingOverlay_exposer.def( 
                 "PostOnNewModel"
                 , PostOnNewModel_function_type( &CBaseAnimatingOverlay_wrapper::default_PostOnNewModel ) );
+        
+        }
+        { //::CBaseAnimating::Restore
+        
+            typedef int ( ::CBaseAnimating::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CBaseAnimatingOverlay_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CBaseAnimatingOverlay_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBaseAnimating::Restore)
+                , default_Restore_function_type(&CBaseAnimatingOverlay_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseAnimating::Spawn

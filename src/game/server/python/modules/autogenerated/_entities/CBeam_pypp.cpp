@@ -567,6 +567,25 @@ struct CBeam_wrapper : CBeam, bp::wrapper< CBeam > {
         CBaseEntity::PostConstructor( szClassname );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::Restore( restore );
+            }
+        else
+            return this->CBaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseEntity::Restore( restore );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -1653,6 +1672,18 @@ void register_CBeam_class(){
                 , PostConstructor_function_type(&::CBaseEntity::PostConstructor)
                 , default_PostConstructor_function_type(&CBeam_wrapper::default_PostConstructor)
                 , ( bp::arg("szClassname") ) );
+        
+        }
+        { //::CBaseEntity::Restore
+        
+            typedef int ( ::CBaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CBeam_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CBeam_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBaseEntity::Restore)
+                , default_Restore_function_type(&CBeam_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseEntity::StartTouch

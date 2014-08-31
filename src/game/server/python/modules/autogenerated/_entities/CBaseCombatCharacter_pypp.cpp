@@ -187,6 +187,25 @@ struct CBaseCombatCharacter_wrapper : CBaseCombatCharacter, bp::wrapper< CBaseCo
         CBaseCombatCharacter::Precache( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseCombatCharacter::Restore( restore );
+            }
+        else
+            return this->CBaseCombatCharacter::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseCombatCharacter::Restore( restore );
+    }
+
     virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CBaseCombatCharacter, ShouldGib )
         PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, ShouldGib )
@@ -2021,10 +2040,12 @@ void register_CBaseCombatCharacter_class(){
         { //::CBaseCombatCharacter::Restore
         
             typedef int ( ::CBaseCombatCharacter::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CBaseCombatCharacter_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
             
             CBaseCombatCharacter_exposer.def( 
                 "Restore"
-                , Restore_function_type( &::CBaseCombatCharacter::Restore )
+                , Restore_function_type(&::CBaseCombatCharacter::Restore)
+                , default_Restore_function_type(&CBaseCombatCharacter_wrapper::default_Restore)
                 , ( bp::arg("restore") ) );
         
         }

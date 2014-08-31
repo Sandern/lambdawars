@@ -296,6 +296,14 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.add_registration_code( 'def("GetEnt", &::gamevcollisionevent_t_wrapper::GetEnt)')
             
     def ParseMisc(self, mb):
+        # Save/restore interfaces. Just empty.
+        cls = mb.class_('IRestore')
+        cls.include()
+        cls.calldefs().exclude()
+        cls = mb.class_('ISave')
+        cls.include()
+        cls.calldefs().exclude()
+    
         if self.isserver:
             # Sky camera
             mb.free_function('GetCurrentSkyCamera').include()

@@ -2503,6 +2503,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 #ifdef ENABLE_PYTHON
 	DEFINE_THINKFUNC( PyThink ),
+	DEFINE_ENTITYFUNC( PyTouch ),
 #endif // ENABLE_PYTHON
 
 #ifdef HL2WARS_DLL
@@ -3757,6 +3758,44 @@ int CBaseEntity::Save( ISave &save )
 {
 	// loop through the data description list, saving each data desc block
 	int status = SaveDataDescBlock( save, GetDataDescMap() );
+
+#if 0
+	if (m_pyInstance.ptr() != Py_None)
+	{
+		boost::python::object fields;
+		try
+		{
+			fields = m_pyInstance.attr("fields");
+
+			bp::object items = fields.attr("items")();
+			bp::object iterator = items.attr("__iter__")();
+			unsigned long ulCount = bp::len(items);
+			for (unsigned long u = 0; u < ulCount; u++)
+			{
+				bp::object item = iterator.attr(PY_NEXT_METHODNAME)();
+
+				if (item[1].attr("cppimplemented"))
+				{
+					continue;
+				}
+
+				bp::object data = m_pyInstance.attr(item[0]);
+				bp::object datatype = fntype( data );
+
+				if (datatype == builtins.attr("str"))
+				{
+					Msg("#%d field: %s value: %s\n", boost::python::extract<const char *>(item[0]), boost::python::extract<const char *>(data));
+					save.WriteString(boost::python::extract<const char *>(item[0]), boost::python::extract<const char *>(data));
+				}
+			}
+		}
+		catch (boost::python::error_already_set &)
+		{
+			Warning("#%d: Failed to save Python fields\n", entindex());
+			PyErr_Print();
+		}
+	}
+#endif // 0
 
 	return status;
 }

@@ -548,6 +548,25 @@ struct CSpriteTrail_wrapper : CSpriteTrail, bp::wrapper< CSpriteTrail > {
         CBaseEntity::PostConstructor( szClassname );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::Restore( restore );
+            }
+        else
+            return this->CBaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseEntity::Restore( restore );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -837,6 +856,11 @@ void register_CSpriteTrail_class(){
             , (void ( ::CBaseEntity::* )( char const * ) )(&::CBaseEntity::PostConstructor)
             , (void ( CSpriteTrail_wrapper::* )( char const * ) )(&CSpriteTrail_wrapper::default_PostConstructor)
             , ( bp::arg("szClassname") ) )    
+        .def( 
+            "Restore"
+            , (int ( ::CBaseEntity::* )( ::IRestore & ) )(&::CBaseEntity::Restore)
+            , (int ( CSpriteTrail_wrapper::* )( ::IRestore & ) )(&CSpriteTrail_wrapper::default_Restore)
+            , ( bp::arg("restore") ) )    
         .def( 
             "StartTouch"
             , (void ( ::CBaseEntity::* )( ::CBaseEntity * ) )(&::CBaseEntity::StartTouch)

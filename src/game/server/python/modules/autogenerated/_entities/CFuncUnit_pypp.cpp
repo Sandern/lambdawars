@@ -947,6 +947,25 @@ struct CFuncUnit_wrapper : CFuncUnit, bp::wrapper< CFuncUnit > {
         CBaseEntity::Precache( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::Restore( restore );
+            }
+        else
+            return this->CBaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseEntity::Restore( restore );
+    }
+
     virtual void StartTouch( ::CBaseEntity * pOther ) {
         PY_OVERRIDE_CHECK( CBaseEntity, StartTouch )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, StartTouch )
@@ -1771,6 +1790,18 @@ void register_CFuncUnit_class(){
                 "Precache"
                 , Precache_function_type(&::CBaseEntity::Precache)
                 , default_Precache_function_type(&CFuncUnit_wrapper::default_Precache) );
+        
+        }
+        { //::CBaseEntity::Restore
+        
+            typedef int ( ::CBaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CFuncUnit_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CFuncUnit_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBaseEntity::Restore)
+                , default_Restore_function_type(&CFuncUnit_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseEntity::StartTouch

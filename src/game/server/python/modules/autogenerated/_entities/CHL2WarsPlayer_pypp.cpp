@@ -871,6 +871,25 @@ struct CHL2WarsPlayer_wrapper : CHL2WarsPlayer, bp::wrapper< CHL2WarsPlayer > {
         CBaseAnimating::PyPostOnNewModel( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBasePlayer, Restore )
+        PY_OVERRIDE_LOG( _entities, CBasePlayer, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBasePlayer::Restore( restore );
+            }
+        else
+            return this->CBasePlayer::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBasePlayer::Restore( restore );
+    }
+
     virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CBaseCombatCharacter, ShouldGib )
         PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, ShouldGib )
@@ -2384,6 +2403,18 @@ void register_CHL2WarsPlayer_class(){
             CHL2WarsPlayer_exposer.def( 
                 "PostOnNewModel"
                 , PostOnNewModel_function_type( &CHL2WarsPlayer_wrapper::default_PostOnNewModel ) );
+        
+        }
+        { //::CBasePlayer::Restore
+        
+            typedef int ( ::CBasePlayer::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CHL2WarsPlayer_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBasePlayer::Restore)
+                , default_Restore_function_type(&CHL2WarsPlayer_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseCombatCharacter::ShouldGib

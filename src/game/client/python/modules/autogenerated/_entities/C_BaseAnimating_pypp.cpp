@@ -518,6 +518,25 @@ struct C_BaseAnimating_wrapper : C_BaseAnimating, bp::wrapper< C_BaseAnimating >
         C_BaseEntity::RemoveFromEntityList( listId );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( C_BaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->C_BaseEntity::Restore( restore );
+            }
+        else
+            return this->C_BaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return C_BaseEntity::Restore( restore );
+    }
+
     virtual bool ShouldDraw(  ) {
         PY_OVERRIDE_CHECK( C_BaseEntity, ShouldDraw )
         PY_OVERRIDE_LOG( _entities, C_BaseEntity, ShouldDraw )
@@ -2822,6 +2841,18 @@ void register_C_BaseAnimating_class(){
                 "RemoveFromEntityList"
                 , RemoveFromEntityList_function_type( &C_BaseAnimating_wrapper::RemoveFromEntityList )
                 , ( bp::arg("listId") ) );
+        
+        }
+        { //::C_BaseEntity::Restore
+        
+            typedef int ( ::C_BaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( C_BaseAnimating_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            C_BaseAnimating_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::C_BaseEntity::Restore)
+                , default_Restore_function_type(&C_BaseAnimating_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::C_BaseEntity::ShouldDraw

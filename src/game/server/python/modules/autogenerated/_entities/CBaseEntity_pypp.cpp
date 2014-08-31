@@ -555,6 +555,25 @@ struct CBaseEntity_wrapper : CBaseEntity, bp::wrapper< CBaseEntity > {
         CBaseEntity::Precache( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseEntity::Restore( restore );
+            }
+        else
+            return this->CBaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseEntity::Restore( restore );
+    }
+
     virtual void Spawn(  ) {
         PY_OVERRIDE_CHECK( CBaseEntity, Spawn )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, Spawn )
@@ -4447,10 +4466,12 @@ void register_CBaseEntity_class(){
         { //::CBaseEntity::Restore
         
             typedef int ( ::CBaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CBaseEntity_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
             
             CBaseEntity_exposer.def( 
                 "Restore"
-                , Restore_function_type( &::CBaseEntity::Restore )
+                , Restore_function_type(&::CBaseEntity::Restore)
+                , default_Restore_function_type(&CBaseEntity_wrapper::default_Restore)
                 , ( bp::arg("restore") ) );
         
         }

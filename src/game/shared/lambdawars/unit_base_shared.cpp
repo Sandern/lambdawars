@@ -224,7 +224,7 @@ void CUnitBase::OnRestore()
 	BaseClass::OnRestore();
 
 #ifndef CLIENT_DLL
-	OnUnitTypeChanged( GetUnitType() );
+	SetUnitType( GetUnitType() );
 #endif // CLIENT_DLL
 }
 

@@ -106,6 +106,9 @@ void CRecipientFilter::AddRecipient( CBasePlayer *player )
 {
 	Assert( player );
 
+	if ( !player )
+		return;
+
 	int index = player->entindex();
 
 	// If we're predicting and this is not the first time we've predicted this sound

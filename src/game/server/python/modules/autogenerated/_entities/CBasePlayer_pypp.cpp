@@ -282,6 +282,25 @@ struct CBasePlayer_wrapper : CBasePlayer, bp::wrapper< CBasePlayer > {
         CBasePlayer::Precache( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBasePlayer, Restore )
+        PY_OVERRIDE_LOG( _entities, CBasePlayer, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBasePlayer::Restore( restore );
+            }
+        else
+            return this->CBasePlayer::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBasePlayer::Restore( restore );
+    }
+
     virtual void Spawn(  ) {
         PY_OVERRIDE_CHECK( CBasePlayer, Spawn )
         PY_OVERRIDE_LOG( _entities, CBasePlayer, Spawn )
@@ -1871,7 +1890,8 @@ void register_CBasePlayer_class(){
             , (void ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::ResetScores ) )    
         .def( 
             "Restore"
-            , (int ( ::CBasePlayer::* )( ::IRestore & ) )( &::CBasePlayer::Restore )
+            , (int ( ::CBasePlayer::* )( ::IRestore & ) )(&::CBasePlayer::Restore)
+            , (int ( CBasePlayer_wrapper::* )( ::IRestore & ) )(&CBasePlayer_wrapper::default_Restore)
             , ( bp::arg("restore") ) )    
         .def( 
             "RumbleEffect"

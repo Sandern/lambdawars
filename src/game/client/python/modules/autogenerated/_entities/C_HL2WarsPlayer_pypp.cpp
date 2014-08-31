@@ -637,6 +637,25 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
         C_BaseEntity::RemoveFromEntityList( listId );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( C_BaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->C_BaseEntity::Restore( restore );
+            }
+        else
+            return this->C_BaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return C_BaseEntity::Restore( restore );
+    }
+
     virtual bool ShouldDraw(  ) {
         PY_OVERRIDE_CHECK( C_BasePlayer, ShouldDraw )
         PY_OVERRIDE_LOG( _entities, C_BasePlayer, ShouldDraw )
@@ -2007,6 +2026,18 @@ void register_C_HL2WarsPlayer_class(){
                 "RemoveFromEntityList"
                 , RemoveFromEntityList_function_type( &C_HL2WarsPlayer_wrapper::RemoveFromEntityList )
                 , ( bp::arg("listId") ) );
+        
+        }
+        { //::C_BaseEntity::Restore
+        
+            typedef int ( ::C_BaseEntity::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( C_HL2WarsPlayer_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::C_BaseEntity::Restore)
+                , default_Restore_function_type(&C_HL2WarsPlayer_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::C_BasePlayer::ShouldDraw

@@ -652,6 +652,25 @@ struct CWarsWeapon_wrapper : CWarsWeapon, bp::wrapper< CWarsWeapon > {
         CBaseAnimating::PyPostOnNewModel( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseAnimating, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseAnimating, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseAnimating::Restore( restore );
+            }
+        else
+            return this->CBaseAnimating::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseAnimating::Restore( restore );
+    }
+
     virtual void SecondaryAttack(  ) {
         PY_OVERRIDE_CHECK( CBaseCombatWeapon, SecondaryAttack )
         PY_OVERRIDE_LOG( _entities, CBaseCombatWeapon, SecondaryAttack )
@@ -1395,6 +1414,18 @@ void register_CWarsWeapon_class(){
             CWarsWeapon_exposer.def( 
                 "PostOnNewModel"
                 , PostOnNewModel_function_type( &CWarsWeapon_wrapper::default_PostOnNewModel ) );
+        
+        }
+        { //::CBaseAnimating::Restore
+        
+            typedef int ( ::CBaseAnimating::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CWarsWeapon_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CWarsWeapon_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBaseAnimating::Restore)
+                , default_Restore_function_type(&CWarsWeapon_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseCombatWeapon::SecondaryAttack

@@ -2429,6 +2429,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "OnHoverPaint"
             , bp::pure_virtual( (void ( ::IMouse::* )(  ) )(&::IMouse::OnHoverPaint) ) );
 
+    bp::class_< IRestore, boost::noncopyable >( "IRestore", bp::no_init );
+
+    bp::class_< ISave, boost::noncopyable >( "ISave", bp::no_init );
+
     { //::MouseTraceData_t
         typedef bp::class_< MouseTraceData_t > MouseTraceData_exposer_t;
         MouseTraceData_exposer_t MouseTraceData_exposer = MouseTraceData_exposer_t( "MouseTraceData", bp::init< >() );
@@ -5573,6 +5577,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "OnCursorExited"
             , bp::pure_virtual( (void ( ::IMouse::* )( ::CHL2WarsPlayer * ) )(&::IMouse::OnCursorExited) )
             , ( bp::arg("player") ) );
+
+    bp::class_< IRestore, boost::noncopyable >( "IRestore", bp::no_init );
+
+    bp::class_< ISave, boost::noncopyable >( "ISave", bp::no_init );
 
     { //::MouseTraceData_t
         typedef bp::class_< MouseTraceData_t > MouseTraceData_exposer_t;

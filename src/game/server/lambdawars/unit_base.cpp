@@ -562,8 +562,10 @@ BEGIN_DATADESC( CUnitBase )
 	DEFINE_FIELD( m_vEnterOffset, FIELD_VECTOR ),
 
 	DEFINE_FIELD( m_UnitType, FIELD_STRING ),
-	DEFINE_FIELD( m_NetworkedUnitTypeSymbol, FIELD_INTEGER ),
 	DEFINE_FIELD( m_fLastTakeDamageTime, FIELD_FLOAT ),
+
+	DEFINE_FIELD( m_bCrouching, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bClimbing, FIELD_BOOLEAN ),
 
 	DEFINE_FIELD( m_iEnergy, FIELD_INTEGER ),
 	DEFINE_FIELD( m_iMaxEnergy, FIELD_INTEGER ),

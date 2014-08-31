@@ -1194,6 +1194,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         CBaseAnimating::PyPostOnNewModel( );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Restore )
+        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CBaseCombatCharacter::Restore( restore );
+            }
+        else
+            return this->CBaseCombatCharacter::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CBaseCombatCharacter::Restore( restore );
+    }
+
     virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
         PY_OVERRIDE_CHECK( CBaseCombatCharacter, ShouldGib )
         PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, ShouldGib )
@@ -2606,6 +2625,18 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "PostOnNewModel"
                 , PostOnNewModel_function_type( &CUnitBase_wrapper::default_PostOnNewModel ) );
+        
+        }
+        { //::CBaseCombatCharacter::Restore
+        
+            typedef int ( ::CBaseCombatCharacter::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CUnitBase_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CUnitBase_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CBaseCombatCharacter::Restore)
+                , default_Restore_function_type(&CUnitBase_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseCombatCharacter::ShouldGib

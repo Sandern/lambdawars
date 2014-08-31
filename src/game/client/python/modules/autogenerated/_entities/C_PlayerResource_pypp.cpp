@@ -438,6 +438,25 @@ struct C_PlayerResource_wrapper : C_PlayerResource, bp::wrapper< C_PlayerResourc
         C_BaseEntity::RemoveFromEntityList( listId );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( C_BaseEntity, Restore )
+        PY_OVERRIDE_LOG( _entities, C_BaseEntity, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->C_BaseEntity::Restore( restore );
+            }
+        else
+            return this->C_BaseEntity::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return C_BaseEntity::Restore( restore );
+    }
+
     virtual bool ShouldDraw(  ) {
         PY_OVERRIDE_CHECK( C_BaseEntity, ShouldDraw )
         PY_OVERRIDE_LOG( _entities, C_BaseEntity, ShouldDraw )
@@ -741,6 +760,11 @@ void register_C_PlayerResource_class(){
             "RemoveFromEntityList"
             , (void ( C_PlayerResource_wrapper::* )( ::entity_list_ids_t ) )(&C_PlayerResource_wrapper::RemoveFromEntityList)
             , ( bp::arg("listId") ) )    
+        .def( 
+            "Restore"
+            , (int ( ::C_BaseEntity::* )( ::IRestore & ) )(&::C_BaseEntity::Restore)
+            , (int ( C_PlayerResource_wrapper::* )( ::IRestore & ) )(&C_PlayerResource_wrapper::default_Restore)
+            , ( bp::arg("restore") ) )    
         .def( 
             "ShouldDraw"
             , (bool ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::ShouldDraw)

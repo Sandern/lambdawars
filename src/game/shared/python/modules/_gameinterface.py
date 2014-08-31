@@ -272,7 +272,7 @@ class GameInterface(SemiSharedModuleGenerator):
             cls = mb.class_('PyVEngineClient')
             cls.rename('VEngineClient')
             cls.include()
-            cls.mem_funs('LoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            cls.mem_funs('LoadModel').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.add_registration_code( "bp::scope().attr( \"engine\" ) = boost::ref(pyengine);" )   
         
         # Command line access
@@ -292,8 +292,8 @@ class GameInterface(SemiSharedModuleGenerator):
         cls = mb.class_('PyVModelInfo')
         cls.rename('VModelInfo')
         cls.include()
-        cls.mem_funs('GetModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
-        cls.mem_funs('FindOrLoadModel').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        cls.mem_funs('GetModel').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs('FindOrLoadModel').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.add_registration_code( "bp::scope().attr( \"modelinfo\" ) = boost::ref(pymodelinfo);" )   
         
         if self.isserver:
@@ -302,7 +302,7 @@ class GameInterface(SemiSharedModuleGenerator):
             
             cls = mb.class_('IMapEntityFilter')
             cls.include()
-            cls.mem_fun('CreateNextEntity').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+            cls.mem_fun('CreateNextEntity').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
             
             mb.class_('CMapEntityRef').include()
             mb.free_function('PyGetMapEntityRef').include()
@@ -319,6 +319,18 @@ class GameInterface(SemiSharedModuleGenerator):
             
             # Event queue
             mb.free_function('ServiceEventQueue').include()
+            
+            cls = mb.class_('CServerGameDLL')
+            cls.include()
+            cls.mem_funs().virtuality = 'not virtual'
+            
+            cls.mem_fun('FindLaunchOptionByValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            cls.mem_fun('GetAllServerClasses').exclude()
+            cls.mem_fun('GetStandardSendProxies').exclude()
+            cls.mem_fun('SaveInit').exclude()
+            
+            mb.add_declaration_code('extern CServerGameDLL g_ServerGameDLL;')
+            mb.add_registration_code("bp::scope().attr( \"servergamedll\" ) = boost::ref(g_ServerGameDLL);")   
             
         # model_t
         cls = mb.class_('wrap_model_t')

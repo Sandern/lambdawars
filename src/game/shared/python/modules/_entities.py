@@ -606,6 +606,7 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('UpdateTransmitState').virtuality = 'virtual'
         mb.mem_funs('ComputeWorldSpaceSurroundingBox').virtuality = 'virtual'
         mb.mem_funs('OnRestore').virtuality = 'virtual'
+        mb.mem_funs('Restore').virtuality = 'virtual'
         
         # Call policies
         cls.mem_funs('CollisionProp').call_policies = call_policies.return_internal_reference()
