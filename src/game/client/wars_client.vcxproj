@@ -277,7 +277,9 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_gamerules.cpp" />
     <ClCompile Include="..\shared\python\srcpy_te.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
-    <ClCompile Include="cef\src_cef_vtf_handler.cpp" />
+    <ClCompile Include="cef\src_cef_vtf_handler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="clientsteamcontext.cpp" />
     <ClCompile Include="deferred\cascade_t.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_client.cpp" />
@@ -2332,6 +2334,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <Library Include="..\..\lib\public\vpklib.lib" />
     <Library Include="..\..\lib\public\vstdlib.lib" />
     <Library Include="..\..\lib\public\vtf.lib" />
+    <Library Include="..\..\lib\public\VTFLib.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

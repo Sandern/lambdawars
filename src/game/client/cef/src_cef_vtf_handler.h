@@ -15,13 +15,6 @@
 class VTFSchemeHandlerFactory : public CefSchemeHandlerFactory 
 {
 public:
-	enum AvatarType
-	{
-		k_AvatarTypeSmall = 0,
-		k_AvatarTypeMedium = 1,
-		k_AvatarTypeLarge = 2,
-	};
-
 	VTFSchemeHandlerFactory();
 
 	virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,

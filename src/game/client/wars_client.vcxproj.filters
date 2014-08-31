@@ -5022,5 +5022,8 @@
     <Library Include="..\..\lib\public\vtf.lib">
       <Filter>Link Libraries</Filter>
     </Library>
+    <Library Include="..\..\lib\public\VTFLib.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
   </ItemGroup>
 </Project>
