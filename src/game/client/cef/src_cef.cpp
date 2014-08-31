@@ -9,6 +9,7 @@
 #include "src_cef_browser.h"
 #include "src_cef_osrenderer.h"
 #include "src_cef_avatar_handler.h"
+#include "src_cef_vtf_handler.h"
 #include <filesystem.h>
 
 #include <vgui/IInput.h>
@@ -118,6 +119,7 @@ void ClientApp::OnContextInitialized()
 	CefRegisterSchemeHandlerFactory( "steam", "avatarsmall", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeSmall ) );
 	CefRegisterSchemeHandlerFactory( "steam", "avatarmedium", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeMedium ) );
 	CefRegisterSchemeHandlerFactory( "steam", "avatarlarge", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeLarge ) );
+	CefRegisterSchemeHandlerFactory("vtf", "", new VTFSchemeHandlerFactory());
 }
 
 //-----------------------------------------------------------------------------

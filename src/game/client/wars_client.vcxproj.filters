@@ -2444,6 +2444,9 @@
     <ClCompile Include="..\shared\lambdawars\wars_matchmaking.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="cef\src_cef_vtf_handler.cpp">
+      <Filter>Source Files\cef</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -4947,6 +4950,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_matchmaking.h">
       <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="cef\src_cef_vtf_handler.h">
+      <Filter>Source Files\cef</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
