@@ -434,6 +434,9 @@
     <ClCompile Include="GlobalLitGeneric.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WebView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\dx9sdk\lib\d3dx9.lib">

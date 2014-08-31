@@ -179,11 +179,11 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	// Create a material
 	char MatBufName[_MAX_PATH];
 	V_snprintf( MatBufName, _MAX_PATH, "materials/%s.vmt", m_MatWebViewName );
-	KeyValues *pVMT = new KeyValues("UnlitGeneric");
+	KeyValues *pVMT = new KeyValues("WebView");
 	pVMT->SetString("$basetexture", m_TextureWebViewName);
 	pVMT->SetString("$translucent", "1");
-	pVMT->SetString("$no_fullbright", "1");
-	pVMT->SetString("$ignorez", "1");
+	//pVMT->SetString("$no_fullbright", "1");
+	//pVMT->SetString("$ignorez", "1");
 
 #if 1
 	// Save to file

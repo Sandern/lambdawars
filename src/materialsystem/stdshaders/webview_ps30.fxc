@@ -1,0 +1,22 @@
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
+
+#include "shader_constant_register_map.h"
+#include "common_fog_ps_fxc.h"
+#include "fow_ps_fxc.h"
+
+sampler BaseSampler1					: register( s0 );	// Base map 1
+
+struct PS_INPUT
+{
+	float4 vProjPos							: POSITION;	
+	float2 vBaseTexCoord					: TEXCOORD0;	// xy = blend 1 coord
+	float4 worldPos_projPosZ				: TEXCOORD1;
+	
+};
+
+float4 main( PS_INPUT i ) : COLOR
+{
+	float4 result = tex2Dsrgb( BaseSampler1, i.vBaseTexCoord.xy );
+	
+	return FinalOutput( result, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
+}

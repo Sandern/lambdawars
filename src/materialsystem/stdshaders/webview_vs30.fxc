@@ -1,0 +1,43 @@
+//========== Copyright (c) Valve Corporation, All rights reserved. ==========//
+//
+// Purpose: 
+//
+//===========================================================================//
+
+#include "common_fog_vs_fxc.h"
+
+#include "common_vs_fxc.h"
+#include "fow_vs_fxc.h"
+
+struct VS_INPUT
+{
+	float3 vPos							: POSITION;
+	float2 vBaseTexCoord				: TEXCOORD0;
+};
+
+struct VS_OUTPUT
+{
+	float4 vProjPos							: POSITION;	
+	float2 vBaseTexCoord					: TEXCOORD0;	// xy = blend 1 coord
+	float4 worldPos_projPosZ				: TEXCOORD1;
+};
+
+VS_OUTPUT main( const VS_INPUT v )
+{
+	VS_OUTPUT o;
+
+	float4 vProjPos;
+	float3 vWorldPos;
+
+	vProjPos = mul( float4( v.vPos, 1 ), cModelViewProj );
+	o.vProjPos = vProjPos;
+
+	vWorldPos = mul( float4( v.vPos, 1 ), cModel[0] );
+	
+	o.worldPos_projPosZ.w = vProjPos.z;
+	o.worldPos_projPosZ.xyz = vWorldPos;
+
+	o.vBaseTexCoord.xy = v.vBaseTexCoord;
+
+	return o;
+}
