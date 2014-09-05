@@ -55,7 +55,7 @@ bool PyFS_IsAbsolutePath( const char *path )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, bool optimalalloc, int maxbytes, int startingbyte )
+boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, bool optimalalloc, int maxbytes, int startingbyte, bool textmode )
 {
 	if( !filepath )
 	{
@@ -78,6 +78,8 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 	}
 
 	boost::python::object content( boost::python::handle<>( PyBytes_FromStringAndSize( (const char *)buffer, (Py_ssize_t)len ) ) );
+	if( textmode )
+		content = content.attr("decode")("utf-8"); // TODO: improve. Look at how Python "wt" mode handles text
 
 	if( optimalalloc )
 		filesystem->FreeOptimalReadBuffer( buffer );

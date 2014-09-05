@@ -26,6 +26,7 @@ class CBasePlayer;
 // Purpose: Safe KeyValues version for Python
 //-----------------------------------------------------------------------------
 boost::python::dict PyKeyValuesToDict( const KeyValues *pKV );
+boost::python::object PyKeyValuesToDictFromFile( const char *pFileName );
 KeyValues *PyDictToKeyValues( boost::python::dict d );
 
 //boost::python::dict PyKeyValues( boost::python::object name, 

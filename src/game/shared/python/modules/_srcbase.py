@@ -91,6 +91,11 @@ class SrcBase(SharedModuleGenerator):
         mb.add_registration_code( "keyvalues_to_py_keyvalues();" )
         mb.add_registration_code( "py_keyvalues_to_keyvalues();" )
         
+        mb.free_function('PyKeyValuesToDict').include()
+        mb.free_function('PyKeyValuesToDict').rename('KeyValuesToDict')
+        mb.free_function('PyKeyValuesToDictFromFile').include()
+        mb.free_function('PyKeyValuesToDictFromFile').rename('KeyValuesToDictFromFile')
+        
         #mb.add_registration_code( "bp::to_python_converter<\r\n\tRay_t,\r\n\tray_t_to_python_ray>();")
         
         # //--------------------------------------------------------------------------------------------------------------------------------

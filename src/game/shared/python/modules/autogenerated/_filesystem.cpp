@@ -85,12 +85,12 @@ BOOST_PYTHON_MODULE(_filesystem){
 
     { //::PyFS_ReadFile
     
-        typedef ::boost::python::api::object ( *ReadFile_function_type )( char const *,char const *,bool,int,int );
+        typedef ::boost::python::api::object ( *ReadFile_function_type )( char const *,char const *,bool,int,int,bool );
         
         bp::def( 
             "ReadFile"
             , ReadFile_function_type( &::PyFS_ReadFile )
-            , ( bp::arg("filepath"), bp::arg("pathid"), bp::arg("optimalalloc")=(bool)(false), bp::arg("maxtyes")=(int)(0), bp::arg("startingbyte")=(int)(0) ) );
+            , ( bp::arg("filepath"), bp::arg("pathid"), bp::arg("optimalalloc")=(bool)(false), bp::arg("maxtyes")=(int)(0), bp::arg("startingbyte")=(int)(0), bp::arg("textmode")=(bool)(false) ) );
     
     }
 

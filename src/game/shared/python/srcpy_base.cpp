@@ -23,47 +23,89 @@ boost::python::dict PyKeyValuesToDict( const KeyValues *pKV )
 	for ( KeyValues *pKey = pNonConstKV->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
 		boost::python::object name(pKey->GetName());
-		if( d.has_key( name ) == false )
-			d[name] = boost::python::list();
 
-		boost::python::list l = boost::python::extract< boost::python::list >(d[name]);
-		l.append( PyKeyValuesToDict( pKey ) );
+		if( d.has_key( name ) )
+		{
+			if( fntype(d.get(name)) != builtins.attr("list") )
+			{
+				boost::python::object tmp = d[name];
+				d[name] = boost::python::list();
+				d[name].attr("append")( tmp );
+			}
+			d[name].attr("append")( PyKeyValuesToDict( pKey ) );
+		}
+		else
+		{
+			d[name] = PyKeyValuesToDict( pKey );
+		}
 	}
 	for ( KeyValues *pValue = pNonConstKV->GetFirstValue(); pValue; pValue = pValue->GetNextValue() )
 	{
 		boost::python::object name(pValue->GetName());
-		if( d.has_key( name ) == false )
-			d[name] = boost::python::list();
+		boost::python::object value;
 
-		boost::python::list l = boost::python::extract< boost::python::list >(d[name]);
-
-		switch( pValue->GetDataType() )
+		try
 		{
-		case KeyValues::TYPE_STRING:
-			l.append( pValue->GetString() );
-			break;
-		case KeyValues::TYPE_INT:
-			l.append( pValue->GetInt() );
-			break;
-		case KeyValues::TYPE_FLOAT:
-			l.append( pValue->GetFloat() );
-			break;
-		case KeyValues::TYPE_WSTRING:
-			l.append( pValue->GetWString() );
-			break;
-		case KeyValues::TYPE_COLOR:
-			l.append( pValue->GetColor() );
-			break;
-		case KeyValues::TYPE_UINT64:
-			l.append( pValue->GetUint64() );
-			break;
-		default:
-			l.append( pValue->GetString() );
-			break;
+			switch( pValue->GetDataType() )
+			{
+			case KeyValues::TYPE_STRING:
+				value = boost::python::object( pValue->GetString() );
+				break;
+			case KeyValues::TYPE_INT:
+				value = boost::python::object( pValue->GetInt() );
+				break;
+			case KeyValues::TYPE_FLOAT:
+				value = boost::python::object( pValue->GetFloat() );
+				break;
+			case KeyValues::TYPE_WSTRING:
+				value = boost::python::object( pValue->GetWString() );
+				break;
+			case KeyValues::TYPE_COLOR:
+				value = boost::python::object( pValue->GetColor() );
+				break;
+			case KeyValues::TYPE_UINT64:
+				value = boost::python::object( pValue->GetUint64() );
+				break;
+			default:
+				value = boost::python::object( pValue->GetString() );
+				break;
+			}
+		}
+		catch( boost::python::error_already_set & ) 
+		{
+			Warning("PyKeyValuesToDict: failed to convert key %s\n", pValue->GetName());
+			PyErr_Print();
+			continue;
+		}
+
+		if( d.has_key( name ) )
+		{
+			if( fntype(d.get(name)) != builtins.attr("list") )
+			{
+				boost::python::object tmp = d[name];
+				d[name] = boost::python::list();
+				d[name].attr("append")( tmp );
+			}
+			d[name].attr("append")( value );
+		}
+		else
+		{
+			d[name] = value;
 		}
 	}
 
 	return d;
+}
+
+boost::python::object PyKeyValuesToDictFromFile( const char *pFileName )
+{
+	KeyValues *pData = new KeyValues("data");
+	KeyValues::AutoDelete autodelete( pData );
+	if( pData->LoadFromFile( filesystem, pFileName ) )
+	{
+		return PyKeyValuesToDict( pData );
+	}
+	return boost::python::object();
 }
 
 KeyValues *PyDictToKeyValues( boost::python::dict d )

@@ -834,6 +834,28 @@ BOOST_PYTHON_MODULE(_srcbase){
     
     }
 
+    { //::KeyValuesDumpAsDevMsg
+    
+        typedef bool ( *KeyValuesDumpAsDevMsg_function_type )( ::KeyValues *,int,int );
+        
+        bp::def( 
+            "KeyValuesDumpAsDevMsg"
+            , KeyValuesDumpAsDevMsg_function_type( &::KeyValuesDumpAsDevMsg )
+            , ( bp::arg("pKeyValues"), bp::arg("nIndentLevel")=(int)(0), bp::arg("nDeveloperLevel")=(int)(1) ) );
+    
+    }
+
+    { //::PyKeyValuesToDict
+    
+        typedef ::boost::python::dict ( *KeyValuesToDict_function_type )( ::KeyValues const * );
+        
+        bp::def( 
+            "KeyValuesToDict"
+            , KeyValuesToDict_function_type( &::PyKeyValuesToDict )
+            , ( bp::arg("pKV") ) );
+    
+    }
+
     ptr_keyvalues_to_py_keyvalues();
 
     keyvalues_to_py_keyvalues();
@@ -1298,14 +1320,14 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     bp::scope().attr( "HIDEHUD_BITCOUNT" ) = (int)HIDEHUD_BITCOUNT;
 
-    { //::KeyValuesDumpAsDevMsg
+    { //::PyKeyValuesToDictFromFile
     
-        typedef bool ( *KeyValuesDumpAsDevMsg_function_type )( ::KeyValues *,int,int );
+        typedef ::boost::python::api::object ( *KeyValuesToDictFromFile_function_type )( char const * );
         
         bp::def( 
-            "KeyValuesDumpAsDevMsg"
-            , KeyValuesDumpAsDevMsg_function_type( &::KeyValuesDumpAsDevMsg )
-            , ( bp::arg("pKeyValues"), bp::arg("nIndentLevel")=(int)(0), bp::arg("nDeveloperLevel")=(int)(1) ) );
+            "KeyValuesToDictFromFile"
+            , KeyValuesToDictFromFile_function_type( &::PyKeyValuesToDictFromFile )
+            , ( bp::arg("pFileName") ) );
     
     }
 }
