@@ -48,27 +48,21 @@ void CWarsGameServer::PrintDebugInfo()
 //-----------------------------------------------------------------------------
 void CWarsGameServer::RunFrame()
 {
+	if( steamgameserverapicontext->SteamGameServer() )
+	{
+		Warning("No steam game server interface\n");
+		return;
+	}
+
 	char *pchRecvBuf = NULL;
 	uint32 cubMsgSize;
 	CSteamID steamIDRemote;
 
 	KeyValues *pData = NULL, *pGameData = NULL;
 
-	if( steamgameserverapicontext->SteamGameServer() )
-	{
-		steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
-		steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
-		//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
-	}
-	else
-	{
-		Warning("No steam game server interface\n");
-	}
-
-	/*if( steamgameserverapicontext->SteamGameServer() )
-		
-	else
-		*/
+	//steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
+	//steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
+	//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
 
 	if( GetState() == k_EGameServer_InGame )
 	{
