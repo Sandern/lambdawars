@@ -94,6 +94,7 @@ void VKeyboard::OnKeyCodePressed(KeyCode code)
 	case KEY_XBUTTON_B:
 		// Ready to write that data... go ahead and nav back
 		BaseClass::OnKeyCodePressed(code);
+		this->Close();
 		break;
 
 	default:

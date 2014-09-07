@@ -78,6 +78,15 @@ inline UI_BASEMOD_PANEL_CLASS & GetUiBaseModPanelClass() { return UI_BASEMOD_PAN
 inline UI_BASEMOD_PANEL_CLASS & ConstructUiBaseModPanelClass() { return * new UI_BASEMOD_PANEL_CLASS(); }
 class IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 
+#if defined(ENABLE_PYTHON) && defined(ENABLE_CEF)
+#include "cbase.h" // ugly
+#include "srcpy.h"
+#include "src_cef.h"
+
+static boost::python::object s_ref_ui_basemodpanel;
+SrcCefBrowser *s_ui_basemodpanel;
+#endif // ENABLE_PYTHON && ENABLE_CEF
+
 #elif defined( SDK_CLIENT_DLL )
 
 #include "sdk/basemodpanel.h"
@@ -278,6 +287,43 @@ void CGameUI::PostInit()
 	}
 
 #ifdef HL2WARS_DLL
+	//vgui::VPANEL rootpanel = enginevguifuncs->GetPanel( PANEL_GAMEUIDLL );
+
+#ifdef ENABLE_PYTHON
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		try
+		{
+			boost::python::object mainmenu = SrcPySystem()->Get( "CefMainMenu", "menu.mainmenu" );
+			s_ref_ui_basemodpanel = mainmenu( ((vgui::Panel *)this) );
+			s_ui_basemodpanel = boost::python::extract<SrcCefBrowser *>( s_ref_ui_basemodpanel );
+			if( s_ui_basemodpanel )
+			{
+				SrcCefVGUIPanel *pPanel = s_ui_basemodpanel->GetPanel();
+
+				pPanel->SetBounds( 0, 0, 640, 480 );
+				pPanel->SetPaintBorderEnabled( false );
+				pPanel->SetPaintBackgroundEnabled( true );
+				pPanel->SetPaintEnabled( true );
+				pPanel->SetVisible( true );
+
+				pPanel->SetMouseInputEnabled( true );
+				pPanel->SetKeyBoardInputEnabled( true );
+
+				pPanel->SetParent( GetUiBaseModPanelClass().GetVPanel() );
+
+				// Once the original ui base mod panel is removed, we can just hookup to the root gameui panel:
+				//pPanel->SetParent( rootpanel );
+				//pPanel->MakePopup(false, false);
+			}
+		}
+		catch( boost::python::error_already_set & )
+		{
+			PyErr_Print();
+		}
+	}
+#endif // ENABLE_PYTHON
+
 	// to know once client dlls have been loaded
 	BaseModUI::CUIGameData::Get()->OnGameUIPostInit();
 #endif

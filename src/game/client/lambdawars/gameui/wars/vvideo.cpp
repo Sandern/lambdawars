@@ -801,7 +801,8 @@ void Video::OnKeyCodePressed(KeyCode code)
 	{
 	case KEY_XBUTTON_B:
 		// nav back
-		BaseClass::OnKeyCodePressed(code);
+		//BaseClass::OnKeyCodePressed(code);
+		this->Close();
 		break;
 
 	default:
@@ -1053,6 +1054,7 @@ void Video::OnCommand(const char *command)
 	}
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
+		ApplyChanges();
 		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
 	}
 	else if( Q_stricmp( "3rdPartyCredits", command ) == 0 )

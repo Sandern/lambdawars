@@ -545,6 +545,14 @@ bool SrcCefBrowser::IsValid( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+vgui::VPANEL SrcCefBrowser::GetVPanel()
+{
+	return m_pPanel ? m_pPanel->GetVPanel() : 0;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CefRefPtr<SrcCefOSRRenderer> SrcCefBrowser::GetOSRHandler()
 {
 	return m_CefClientHandler->GetOSRHandler();

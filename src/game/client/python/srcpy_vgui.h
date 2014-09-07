@@ -668,7 +668,4 @@ extern PyLocalize *g_pylocalize;
 bool	PyIsGameUIVisible();
 VPANEL  PyGetPanel( VGuiPanel_t type );
 
-// emporary function until everything is ported over to the new html based menu
-void PyGameUICommand( const char *command );
-
 #endif // SRCPY_VGUI_H

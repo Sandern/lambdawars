@@ -90,6 +90,7 @@ MainMenu::MainMenu( Panel *parent, const char *panelName ):
 	m_iQuickJoinHelpText = MMQJHT_NONE;
 
 	m_pCefMainMenu = NULL;
+#if 0
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
@@ -109,6 +110,7 @@ MainMenu::MainMenu( Panel *parent, const char *panelName ):
 		}
 	}
 #endif // ENABLE_PYTHON
+#endif // 0
 	SetDeleteSelfOnClose( true );
 }
 

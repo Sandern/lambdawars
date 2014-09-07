@@ -8,6 +8,10 @@
 
 #include "videocfg/videocfg.h"
 
+#include "cbase.h"
+
+#include "srcpy_gameui.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -16,6 +20,54 @@ namespace bp = boost::python;
 
 BOOST_PYTHON_MODULE(_gameui){
     bp::docstring_options doc_options( true, true, false );
+
+    bp::enum_< BaseModUI::WINDOW_TYPE>("WINDOW_TYPE")
+        .value("WT_NONE", BaseModUI::WT_NONE)
+        .value("WT_ACHIEVEMENTS", BaseModUI::WT_ACHIEVEMENTS)
+        .value("WT_AUDIO", BaseModUI::WT_AUDIO)
+        .value("WT_AUDIOVIDEO", BaseModUI::WT_AUDIOVIDEO)
+        .value("WT_CLOUD", BaseModUI::WT_CLOUD)
+        .value("WT_CONTROLLER", BaseModUI::WT_CONTROLLER)
+        .value("WT_CONTROLLER_STICKS", BaseModUI::WT_CONTROLLER_STICKS)
+        .value("WT_CONTROLLER_BUTTONS", BaseModUI::WT_CONTROLLER_BUTTONS)
+        .value("WT_DOWNLOADS", BaseModUI::WT_DOWNLOADS)
+        .value("WT_GAMELOBBY", BaseModUI::WT_GAMELOBBY)
+        .value("WT_GAMEOPTIONS", BaseModUI::WT_GAMEOPTIONS)
+        .value("WT_GAMESETTINGS", BaseModUI::WT_GAMESETTINGS)
+        .value("WT_GENERICCONFIRMATION", BaseModUI::WT_GENERICCONFIRMATION)
+        .value("WT_INGAMEDIFFICULTYSELECT", BaseModUI::WT_INGAMEDIFFICULTYSELECT)
+        .value("WT_INGAMEMAINMENU", BaseModUI::WT_INGAMEMAINMENU)
+        .value("WT_INGAMECHAPTERSELECT", BaseModUI::WT_INGAMECHAPTERSELECT)
+        .value("WT_INGAMEKICKPLAYERLIST", BaseModUI::WT_INGAMEKICKPLAYERLIST)
+        .value("WT_VOTEOPTIONS", BaseModUI::WT_VOTEOPTIONS)
+        .value("WT_KEYBOARDMOUSE", BaseModUI::WT_KEYBOARDMOUSE)
+        .value("WT_LOADINGPROGRESSBKGND", BaseModUI::WT_LOADINGPROGRESSBKGND)
+        .value("WT_LOADINGPROGRESS", BaseModUI::WT_LOADINGPROGRESS)
+        .value("WT_MAINMENU", BaseModUI::WT_MAINMENU)
+        .value("WT_MULTIPLAYER", BaseModUI::WT_MULTIPLAYER)
+        .value("WT_OPTIONS", BaseModUI::WT_OPTIONS)
+        .value("WT_SEARCHINGFORLIVEGAMES", BaseModUI::WT_SEARCHINGFORLIVEGAMES)
+        .value("WT_SIGNINDIALOG", BaseModUI::WT_SIGNINDIALOG)
+        .value("WT_SINGLEPLAYER", BaseModUI::WT_SINGLEPLAYER)
+        .value("WT_GENERICWAITSCREEN", BaseModUI::WT_GENERICWAITSCREEN)
+        .value("WT_ATTRACTSCREEN", BaseModUI::WT_ATTRACTSCREEN)
+        .value("WT_ALLGAMESEARCHRESULTS", BaseModUI::WT_ALLGAMESEARCHRESULTS)
+        .value("WT_FOUNDPUBLICGAMES", BaseModUI::WT_FOUNDPUBLICGAMES)
+        .value("WT_TRANSITIONSCREEN", BaseModUI::WT_TRANSITIONSCREEN)
+        .value("WT_PASSWORDENTRY", BaseModUI::WT_PASSWORDENTRY)
+        .value("WT_VIDEO", BaseModUI::WT_VIDEO)
+        .value("WT_STEAMCLOUDCONFIRM", BaseModUI::WT_STEAMCLOUDCONFIRM)
+        .value("WT_STEAMGROUPSERVERS", BaseModUI::WT_STEAMGROUPSERVERS)
+        .value("WT_CUSTOMCAMPAIGNS", BaseModUI::WT_CUSTOMCAMPAIGNS)
+        .value("WT_ADDONS", BaseModUI::WT_ADDONS)
+        .value("WT_DOWNLOADCAMPAIGN", BaseModUI::WT_DOWNLOADCAMPAIGN)
+        .value("WT_LEADERBOARD", BaseModUI::WT_LEADERBOARD)
+        .value("WT_ADDONASSOCIATION", BaseModUI::WT_ADDONASSOCIATION)
+        .value("WT_GETLEGACYDATA", BaseModUI::WT_GETLEGACYDATA)
+        .value("WT_JUKEBOX", BaseModUI::WT_JUKEBOX)
+        .value("WT_WINDOW_COUNT", BaseModUI::WT_WINDOW_COUNT)
+        .export_values()
+        ;
 
     { //::CGameUIConVarRef
         typedef bp::class_< CGameUIConVarRef > CGameUIConVarRef_exposer_t;
@@ -157,6 +209,39 @@ BOOST_PYTHON_MODULE(_gameui){
                 , ( bp::arg("bValue") ) );
         
         }
+    }
+
+    { //::OpenGammaDialog
+    
+        typedef void ( *OpenGammaDialog_function_type )( ::vgui::VPANEL );
+        
+        bp::def( 
+            "OpenGammaDialog"
+            , OpenGammaDialog_function_type( &::OpenGammaDialog )
+            , ( bp::arg("parent") ) );
+    
+    }
+
+    { //::PyGameUICommand
+    
+        typedef void ( *GameUICommand_function_type )( char const * );
+        
+        bp::def( 
+            "GameUICommand"
+            , GameUICommand_function_type( &::PyGameUICommand )
+            , ( bp::arg("command") ) );
+    
+    }
+
+    { //::PyGameUIOpenWindow
+    
+        typedef void ( *GameUIOpenWindow_function_type )( ::BaseModUI::WINDOW_TYPE,bool,::KeyValues * );
+        
+        bp::def( 
+            "GameUIOpenWindow"
+            , GameUIOpenWindow_function_type( &::PyGameUIOpenWindow )
+            , ( bp::arg("windowtype"), bp::arg("hideprevious")=(bool)(true), bp::arg("parameters")=bp::object() ) );
+    
     }
 
     { //::ReadCurrentVideoConfig

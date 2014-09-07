@@ -1037,7 +1037,8 @@ void FoundGames::OnCommand( const char *command )
 	if( V_strcmp( command, "Back" ) == 0 )
 	{
 		// Act as though 360 B button was pressed
-		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		//OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
+		this->Close();
 	}
 	else if( V_strcmp( command, "CreateGame" ) == 0 )
 	{

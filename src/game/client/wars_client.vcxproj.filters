@@ -2447,6 +2447,9 @@
     <ClCompile Include="cef\src_cef_vtf_handler.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
+    <ClCompile Include="python\srcpy_gameui.cpp">
+      <Filter>Source Files\Python</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -4953,6 +4956,9 @@
     </ClInclude>
     <ClInclude Include="cef\src_cef_vtf_handler.h">
       <Filter>Source Files\cef</Filter>
+    </ClInclude>
+    <ClInclude Include="python\srcpy_gameui.h">
+      <Filter>Source Files\Python</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

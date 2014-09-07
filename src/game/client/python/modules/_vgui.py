@@ -247,8 +247,6 @@ class VGUI(ClientModuleGenerator):
         mb.free_function('PyGetPanel').rename('GetPanel')
         #mb.free_function('PyGetPanel').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.enum('VGuiPanel_t').include()
-        mb.free_function('PyGameUICommand').include() # Temporary function
-        mb.free_function('PyGameUICommand').rename('GameUICommand')
         
         # Message map types
         mb.enum('DataType_t').include()

@@ -339,6 +339,7 @@ void Multiplayer::OnKeyCodePressed(KeyCode code)
 	case KEY_XBUTTON_B:
 		// nav back
 		BaseClass::OnKeyCodePressed(code);
+		this->Close();
 		break;
 
 	default:

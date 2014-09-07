@@ -699,6 +699,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , GetUseMouseCapture_function_type( &::SrcCefBrowser::GetUseMouseCapture ) );
         
         }
+        { //::SrcCefBrowser::GetVPanel
+        
+            typedef ::vgui::VPANEL ( ::SrcCefBrowser::*GetVPanel_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "GetVPanel"
+                , GetVPanel_function_type( &::SrcCefBrowser::GetVPanel ) );
+        
+        }
         { //::SrcCefBrowser::InvalidateLayout
         
             typedef void ( ::SrcCefBrowser::*InvalidateLayout_function_type )(  ) ;

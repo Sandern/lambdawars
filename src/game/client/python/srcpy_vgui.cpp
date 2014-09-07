@@ -751,16 +751,3 @@ CON_COMMAND(py_debug_panel_count, "Debug command for getting the number of pytho
 {
 	Msg("Python Panels: %d\n", g_PythonPanelCount );
 }
-
-
-//-----------------------------------------------------------------------------
-// Temporary function until everything is ported over to the new html based
-// menu.
-//-----------------------------------------------------------------------------
-void PyGameUICommand( const char *command )
-{
-	BaseModUI::WINDOW_TYPE type = BaseModUI::CBaseModPanel::GetSingleton().GetActiveWindowType();
-	BaseModUI::CBaseModFrame *pActivePanel = BaseModUI::CBaseModPanel::GetSingleton().GetWindow( type );
-	if( pActivePanel )
-		pActivePanel->OnCommand( command );
-}

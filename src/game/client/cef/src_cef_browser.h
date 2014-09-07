@@ -140,6 +140,7 @@ public:
 
 	// Internal
 	SrcCefVGUIPanel *GetPanel() { return m_pPanel; }
+	vgui::VPANEL GetVPanel();
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
 	CefRefPtr<CefBrowser> GetBrowser();
 	const char *GetName();

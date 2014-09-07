@@ -637,6 +637,8 @@ void Audio::OnKeyCodePressed(KeyCode code)
 		{
 			// Ready to write that data... go ahead and nav back
 			BaseClass::OnKeyCodePressed(code);
+
+			this->Close();
 		}
 		break;
 
