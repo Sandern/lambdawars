@@ -102,8 +102,8 @@ extern IReplayHistoryManager *g_pReplayHistoryManager;
 #endif
 
 #ifdef HL2WARS_DLL
-class IWarsEditorStorage;
-extern IWarsEditorStorage *warseditorstorage;
+class IWarsExtension;
+extern IWarsExtension *warsextension;
 #endif
 
 // Returns the CPU/GPU level

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>warseditorstorage</ProjectName>
+    <ProjectName>warsextension</ProjectName>
     <ProjectGuid>{F943FE32-078E-414B-8BE8-C2565B767C24}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -145,7 +145,7 @@ cscript //nologo ..\..\dllcopy_editor.wsf "$(TargetDir)/$(TargetName).pdb" "$(Ta
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.;vgui;vgui\dialogs;TileSource;keyvalues_editor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=warseditorstorage;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=warseditorstorage;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=warsextension;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=warsextension;VERSION_SAFE_STEAM_API_INTERFACES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -219,11 +219,11 @@ cscript //nologo ..\..\dllcopy_editor.wsf "$(TargetDir)/$(TargetName).pdb" "$(Ta
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="wars_editor_storage.cpp" />
+    <ClCompile Include="wars_extension.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\public\warseditor\iwars_editor_storage.h" />
-    <ClInclude Include="wars_editor_storage.h" />
+    <ClInclude Include="wars_extension.h" />
     <ClInclude Include="..\..\public\tier1\interface.h" />
   </ItemGroup>
   <ItemGroup>

@@ -41,9 +41,6 @@ private:
 
 	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnP2PSessionRequest, P2PSessionRequest_t, m_CallbackP2PSessionRequest );
 
-	// lobby state change handler
-	STEAM_CALLBACK( CWarsGameServer, OnLobbyDataUpdate, LobbyDataUpdate_t, m_CallbackLobbyDataUpdate );
-
 	bool m_bConnectedToSteam;
 	EGameServerState m_State;
 	int m_nConnectedPlayers;

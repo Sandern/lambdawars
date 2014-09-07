@@ -8,7 +8,7 @@
 #include "editorsystem.h"
 #include "wars_flora.h"
 #include "collisionutils.h"
-#include "warseditor/iwars_editor_storage.h"
+#include "wars/iwars_extension.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -65,7 +65,7 @@ bool CEditorSystem::ProcessCreateCommand( KeyValues *pCommand )
 		if( pModelname && modelinfo->GetModelIndex( pModelname ) < 0 )
 		{
 			//modelinfo->FindOrLoadModel( pModelname );
-			warseditorstorage->QueueClientCommand( pCommand );
+			warsextension->QueueClientCommand( pCommand );
 			return false;
 		}
 #endif // CLIENT_DLL
@@ -220,8 +220,8 @@ bool CEditorSystem::ProcessEditCommand( KeyValues *pCommand )
 //-----------------------------------------------------------------------------
 void CEditorSystem::QueueCommand( KeyValues *pCommand )
 {
-	warseditorstorage->QueueClientCommand( pCommand->MakeCopy() );
-	warseditorstorage->QueueServerCommand( pCommand->MakeCopy() );
+	warsextension->QueueClientCommand( pCommand->MakeCopy() );
+	warsextension->QueueServerCommand( pCommand->MakeCopy() );
 	pCommand->deleteThis();
 }
 

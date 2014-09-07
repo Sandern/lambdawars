@@ -9,7 +9,7 @@
 #include "wars_flora.h"
 #include "collisionutils.h"
 
-#include "warseditor/iwars_editor_storage.h"
+#include "wars/iwars_extension.h"
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -187,7 +187,7 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 			KeyValues *pFloraKey = new KeyValues( "flora", "uuid", pBest->GetFloraUUID() );
 			pFloraKey->SetBool(  "select", true );
 			pOperation->AddSubKey( pFloraKey );
-			warseditorstorage->QueueServerCommand( pOperation );
+			warsextension->QueueServerCommand( pOperation );
 		}
 		else
 		{
@@ -198,7 +198,7 @@ void CEditorSystem::DoSelect( CHL2WarsPlayer *pPlayer )
 			KeyValues *pFloraKey = new KeyValues( "flora", "uuid", pBest->GetFloraUUID() );
 			pFloraKey->SetBool(  "select", false );
 			pOperation->AddSubKey( pFloraKey );
-			warseditorstorage->QueueServerCommand( pOperation );
+			warsextension->QueueServerCommand( pOperation );
 		}
 		//NDebugOverlay::Box( pBest->GetAbsOrigin(), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 255, 5.0f);
 	}
@@ -237,7 +237,7 @@ void CEditorSystem::DeleteSelection()
 	}
 
 	m_hSelectedEntities.Purge();
-	warseditorstorage->QueueClientCommand( pOperation );
+	warsextension->QueueClientCommand( pOperation );
 }
 
 //-----------------------------------------------------------------------------
@@ -454,12 +454,12 @@ void CEditorSystem::Update( float frametime )
 
 	UpdateEditorInteraction();
 
-	if( !warseditorstorage )
+	if( !warsextension )
 		return;
 
 	// Process commands from server
 	KeyValues *pCommand = NULL;
-	while( (pCommand = warseditorstorage->PopClientCommandQueue()) != NULL )
+	while( (pCommand = warsextension->PopClientCommandQueue()) != NULL )
 	{
 		if( !ProcessCommand( pCommand ) )
 			break; // Assume the command was readded, so no need for cleanup. TODO: refine this.
@@ -501,11 +501,11 @@ void CEditorSystem::FrameUpdatePostEntityThink()
 		m_bSelectionChanged = false;
 	}
 
-	if( !warseditorstorage )
+	if( !warsextension )
 		return;
 
 	KeyValues *pCommand = NULL;
-	while( (pCommand = warseditorstorage->PopServerCommandQueue()) != NULL )
+	while( (pCommand = warsextension->PopServerCommandQueue()) != NULL )
 	{
 		if( !ProcessCommand( pCommand ) )
 			break; // Assume the command was readded, so no need for cleanup. TODO: refine this.

@@ -28,7 +28,7 @@
 #endif // CLIENT_DLL
 
 #include "editor/editorsystem.h"
-#include "warseditor/iwars_editor_storage.h"
+#include "wars/iwars_extension.h"
 #include "editor/editorwarsmapmgr.h"
 
 extern "C"
@@ -983,7 +983,7 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 
 		pOperation->AddSubKey( pEntValues );
 
-		warseditorstorage->QueueClientCommand( pOperation );
+		warsextension->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 
@@ -1069,7 +1069,7 @@ void CWarsFlora::RemoveFloraInRadius( const Vector &vPosition, float fRadius, in
 		{
 			pOperation->AddSubKey( new KeyValues( "flora", "uuid", removeFlora[idx]->GetFloraUUID() ) );
 		}
-		warseditorstorage->QueueClientCommand( pOperation );
+		warsextension->QueueClientCommand( pOperation );
 	}
 #endif // CLIENT_DLL
 

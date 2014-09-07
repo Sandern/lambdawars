@@ -127,7 +127,7 @@
 #include "hl2wars_gameinterface.h"
 #include "wars_gameserver.h"
 
-#include "warseditor/iwars_editor_storage.h"
+#include "wars/iwars_extension.h"
 #endif // HL2WARS_DLL
 
 // =======================================
@@ -223,7 +223,7 @@ IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #endif
 
 #ifdef HL2WARS_DLL
-IWarsEditorStorage *warseditorstorage = NULL;
+IWarsExtension *warsextension = NULL;
 #endif // HL2WARS_DLL
 
 IGameSystem *SoundEmitterSystem();
@@ -783,7 +783,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #endif
 
 #ifdef HL2WARS_DLL
-	warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
+	warsextension = (IWarsExtension *)appSystemFactory(WARS_EXTENSION_VERSION, NULL);
 #endif // HL2WARS_DLL
 
 	if ( !g_pMatchFramework )
@@ -3739,7 +3739,7 @@ public:
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
 #ifdef HL2WARS_DLL
-		AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+		AddAppSystem( "warsextension", WARS_EXTENSION_VERSION );
 #endif // HL2WARS_DLL
 	}
 

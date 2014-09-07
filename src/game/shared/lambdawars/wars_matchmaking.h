@@ -12,17 +12,7 @@
 #endif
 
 #include "steam/steamclientpublic.h"
-
-// Network message types
-enum EMessage
-{
-	// Server messages
-	k_EMsgServerRequestGame = 0,
-
-	// Client Messages
-	k_EMsgClientRequestGameAccepted,
-	k_EMsgClientRequestGameDenied,
-};
+#include "wars/iwars_extension.h"
 
 enum EGameServerState
 {
@@ -36,6 +26,7 @@ typedef struct WarsMessage_t
 	WarsMessage_t() {}
 	WarsMessage_t( uint32 _type ) : type(_type) {}
 
+	//uint16 protocolversion;
 	uint32 type;
 } WarsMessage_t;
 

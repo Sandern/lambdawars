@@ -2,6 +2,7 @@
 #include "cbase.h"
 #include "wars_gameserver.h"
 #include "gameinterface.h"
+#include "tier1/utlbuffer.h"
 
 #include "matchmaking/imatchframework.h"
 
@@ -24,7 +25,6 @@ CWarsGameServer::CWarsGameServer() :
 	m_CallbackSteamServersDisconnected( this, &CWarsGameServer::OnSteamServersDisconnected ),
 	m_CallbackSteamServersConnectFailure( this, &CWarsGameServer::OnSteamServersConnectFailure ),
 	m_CallbackPolicyResponse( this, &CWarsGameServer::OnPolicyResponse ),
-	m_CallbackLobbyDataUpdate( this, &CWarsGameServer::OnLobbyDataUpdate ),
 	m_State( k_EGameServer_Available ),
 	m_fGameStateStartTime( 0.0f ),
 	m_fLastPlayedConnectedTime( 0.0f )
@@ -48,15 +48,16 @@ void CWarsGameServer::PrintDebugInfo()
 //-----------------------------------------------------------------------------
 void CWarsGameServer::RunFrame()
 {
-	if( steamgameserverapicontext->SteamGameServer() )
+	if( !steamgameserverapicontext->SteamGameServer() )
 	{
 		Warning("No steam game server interface\n");
 		return;
 	}
-
-	char *pchRecvBuf = NULL;
-	uint32 cubMsgSize;
-	CSteamID steamIDRemote;
+	if( !warsextension )
+	{
+		Warning("No steam warsextension interface\n");
+		return;
+	}
 
 	KeyValues *pData = NULL, *pGameData = NULL;
 
@@ -92,27 +93,13 @@ void CWarsGameServer::RunFrame()
 	// Update state
 	steamgameserverapicontext->SteamGameServer()->SetKeyValue( "available", m_State == k_EGameServer_Available ? "1" : "0" );
 
-	while ( steamgameserverapicontext->SteamGameServerNetworking()->IsP2PPacketAvailable( &cubMsgSize ) )
+	warsextension->ReceiveSteamP2PMessages( steamgameserverapicontext->SteamGameServerNetworking() );
+
+	// Process server messages
+	WarsMessageData_t *messageData = warsextension->ServerMessageHead();
+	while( messageData )
 	{
-		// free any previous receive buffer
-		if ( pchRecvBuf )
-			free( pchRecvBuf );
-
-		// alloc a new receive buffer of the right size
-		pchRecvBuf = (char *)malloc( cubMsgSize );
-
-		// see if there is any data waiting on the socket
-		if ( !steamgameserverapicontext->SteamGameServerNetworking()->ReadP2PPacket( pchRecvBuf, cubMsgSize, &cubMsgSize, &steamIDRemote ) )
-			break;
-
-		if ( cubMsgSize < sizeof( uint32 ) )
-		{
-			Warning( "Got garbage on server socket, too short\n" );
-			continue;
-		}
-
-		EMessage eMsg = (EMessage)( *(uint32*)pchRecvBuf );
-		Msg("Received message of type %d\n", eMsg);
+		EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
 
 		static WarsMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
 		static WarsMessage_t denyGameMsg( k_EMsgClientRequestGameDenied );
@@ -125,39 +112,44 @@ void CWarsGameServer::RunFrame()
 			if( GetState() != k_EGameServer_Available )
 			{
 				// Tell lobby owner the server is not available and should look for another server
-				steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+				steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
 			}
 			else
 			{
-				data.Put( pchRecvBuf + sizeof( WarsRequestServerMessage_t ), cubMsgSize - sizeof( WarsRequestServerMessage_t ) );
-				//Msg("Message size: %d, size keyvalues: %d\n", cubMsgSize, cubMsgSize - sizeof( WarsRequestServerMessage_t ) );
+				data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
 				pGameData = new KeyValues( "GameData" );
 				if( !pGameData->ReadAsBinary( data ) )
 				{
 					Warning("k_EMsgServerRequestGame: reading game data failed\n");
+					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+
 				}
-				pGameData->SetName( COM_GetModDirectory() );
+				else
+				{
+					pGameData->SetName( COM_GetModDirectory() );
 
-				KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+					KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
-				// Tell lobby owner the game is accepted and players can connect to the server
-				steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+					// Tell lobby owner the game is accepted and players can connect to the server
+					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 
-				g_ServerGameDLL.ApplyGameSettings( pGameData );
+					g_ServerGameDLL.ApplyGameSettings( pGameData );
 
-				SetState( k_EGameServer_InGame );
+					SetState( k_EGameServer_InGame );
+				}
 			}
 			break;
 		default:
-			Warning("Game server received unknown/unsupported message\n");
+			Warning("Game server received unknown/unsupported message type %d\n", eMsg);
 			break;
 		}
+
+		warsextension->NextServerMessage();
+		messageData = warsextension->ServerMessageHead();
 	}
 
 	if( pData )
 		pData->deleteThis();
-	if ( pchRecvBuf )
-		free( pchRecvBuf );
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +186,6 @@ void CWarsGameServer::GetMatchmakingTags( char *buf, size_t bufSize )
 //-----------------------------------------------------------------------------
 void CWarsGameServer::OnP2PSessionRequest( P2PSessionRequest_t *pCallback )
 {
-	//Msg("Accepting OnP2PSessionRequest\n");
 	// we'll accept a connection from anyone
 	steamgameserverapicontext->SteamGameServerNetworking()->AcceptP2PSessionWithUser( pCallback->m_steamIDRemote );
 }
@@ -250,18 +241,6 @@ void CWarsGameServer::OnPolicyResponse( GSPolicyResponse_t *pPolicyResponse )
 	_snprintf( rgch, 128, "Game server SteamID: %llu\n", steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64() );
 	Msg( rgch );
 #endif // 0
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Handles lobby data changing
-//-----------------------------------------------------------------------------
-void CWarsGameServer::OnLobbyDataUpdate( LobbyDataUpdate_t *pCallback )
-{
-	Msg("WarsGameServer: got lobby data update\n");
-	// callbacks are broadcast to all listeners, so we'll get this for every lobby we're requesting
-	//if ( m_steamIDLobby != pCallback->m_ulSteamIDLobby )
-	//	return;
-
 }
 
 void WarsInitGameServer()

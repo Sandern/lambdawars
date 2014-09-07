@@ -18,11 +18,11 @@
     <ClInclude Include="..\..\public\tier1\interface.h">
       <Filter>Public Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wars_editor_storage.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\public\warseditor\iwars_editor_storage.h">
       <Filter>Public Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wars_extension.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,7 +76,7 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="wars_editor_storage.cpp">
+    <ClCompile Include="wars_extension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

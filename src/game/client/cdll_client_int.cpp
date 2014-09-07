@@ -159,7 +159,7 @@
 #include "wars_mount_system.h"
 #include "wars_flora.h"
 #include "editor/editorsystem.h"
-#include "warseditor/iwars_editor_storage.h"
+#include "wars/iwars_extension.h"
 #include "wars_matchmaking.h"
 #endif // HL2WARS_DLL
 
@@ -220,7 +220,7 @@ IReplayHistoryManager *g_pReplayHistoryManager = NULL;
 #endif
 
 #ifdef HL2WARS_DLL
-IWarsEditorStorage *warseditorstorage = NULL;
+IWarsExtension *warsextension = NULL;
 #endif // HL2WARS_DLL
 
 IScriptManager *scriptmanager = NULL;
@@ -564,7 +564,7 @@ public:
 		AddAppSystem( "missionchooser", ASW_MISSION_CHOOSER_VERSION );
 #endif
 #ifdef HL2WARS_DLL
-		AddAppSystem( "warseditorstorage", WARS_EDITOR_STORAGE_VERSION );
+		AddAppSystem( "warsextension", WARS_EXTENSION_VERSION );
 #endif // HL2WARS_DLL
 	}
 
@@ -1230,7 +1230,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 #endif
 
 #ifdef HL2WARS_DLL
-	warseditorstorage = (IWarsEditorStorage *)appSystemFactory(WARS_EDITOR_STORAGE_VERSION, NULL);
+	warsextension = (IWarsExtension *)appSystemFactory(WARS_EXTENSION_VERSION, NULL);
 #endif // HL2WARS_DLL
 
 	if ( !CommandLine()->CheckParm( "-noscripting") )
@@ -1497,48 +1497,36 @@ void CHLClient::HudUpdate( bool bActive )
 	// I can check into this further.
 	C_BaseTempEntity::CheckDynamicTempEnts();
 
-	// 
-	char *pchRecvBuf = NULL;
-	uint32 cubMsgSize;
-	CSteamID steamIDRemote;
-	while ( steamapicontext->SteamNetworking()->IsP2PPacketAvailable( &cubMsgSize ) )
+	// Receive/Process client messages
+	if( warsextension )
 	{
-		// free any previous receive buffer
-		if ( pchRecvBuf )
-			free( pchRecvBuf );
+		warsextension->ReceiveSteamP2PMessages( steamapicontext->SteamNetworking() );
 
-		// alloc a new receive buffer of the right size
-		pchRecvBuf = (char *)malloc( cubMsgSize );
-
-		// see if there is any data waiting on the socket
-		if ( !steamapicontext->SteamNetworking()->ReadP2PPacket( pchRecvBuf, cubMsgSize, &cubMsgSize, &steamIDRemote ) )
-			break;
-
-		if ( cubMsgSize < sizeof( uint32 ) )
+		// Process client messages
+		WarsMessageData_t *messageData = warsextension->ClientMessageHead();
+		while( messageData )
 		{
-			Warning( "Got garbage on server socket, too short\n" );
-			continue;
-		}
+			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
 
-		EMessage eMsg = (EMessage)( *(uint32*)pchRecvBuf );
-		Msg("Received message of type %d\n", eMsg);
+			CUtlBuffer data;
 
-		switch( eMsg )
-		{
-		case k_EMsgClientRequestGameAccepted:
-			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_accept", "core.signals", true ) );
-			break;
-		case k_EMsgClientRequestGameDenied:
-			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
-			break;
-		default:
-			Warning("Unknown client message type %d\n", eMsg); 
-			break;
+			switch( eMsg )
+			{
+				case k_EMsgClientRequestGameAccepted:
+					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_accept", "core.signals", true ) );
+					break;
+				case k_EMsgClientRequestGameDenied:
+					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+					break;
+				default:
+					Warning("Unknown client message type %d\n", eMsg); 
+					break;
+			}
+
+			warsextension->NextClientMessage();
+			messageData = warsextension->ClientMessageHead();
 		}
 	}
-
-	if ( pchRecvBuf )
-		free( pchRecvBuf );
 }
 
 //-----------------------------------------------------------------------------
