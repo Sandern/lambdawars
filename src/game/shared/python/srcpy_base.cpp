@@ -12,8 +12,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern const char *COM_GetModDirectory( void );
-
 boost::python::dict PyKeyValuesToDict( const KeyValues *pKV )
 {
 	boost::python::dict d;
@@ -298,16 +296,11 @@ KeyValues * PyKeyValues::FromString( char const *szName, char const *szStringVal
 // Purpose: Almost the same as V_FixupPathName, but does not lowercase
 //			Linux/Python fileobject does not like that.
 //-----------------------------------------------------------------------------
-void SrcPyFixupPathName( char *pOut )
+static void SrcPyFixupPathName( char *pOut )
 {
 	V_FixSlashes( pOut );
 	V_RemoveDotSlashes( pOut );
 	V_FixDoubleSlashes( pOut );
-}
-
-bool IsPathProtected()
-{
-	return SrcPySystem()->IsPathProtected();
 }
 
 extern  "C" {
@@ -335,15 +328,6 @@ int SrcPyPathIsInGameFolder( const char *pPath )
 		}
 	}
 	return 1;
-}
-
-int SrcPyIsClient( void )
-{
-#ifdef CLIENT_DLL
-	return 1;
-#else
-	return 0;
-#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -413,16 +397,7 @@ int SrcPyGetFullPath( const char *pAssumedRelativePath, char *pFullPath, int siz
 	}
 	return 1;
 }
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: Used by the python library
-//-----------------------------------------------------------------------------
-extern  "C" {
-	int getmoddir( const char *path, int len )
-	{
-		return g_pFullFileSystem->GetSearchPath("MOD", false, (char *)path, len);
-	}
 }
 
 //-----------------------------------------------------------------------------

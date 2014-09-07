@@ -29,10 +29,6 @@ boost::python::dict PyKeyValuesToDict( const KeyValues *pKV );
 boost::python::object PyKeyValuesToDictFromFile( const char *pFileName );
 KeyValues *PyDictToKeyValues( boost::python::dict d );
 
-//boost::python::dict PyKeyValues( boost::python::object name, 
-//	boost::python::object firstKey = boost::python::object(), boost::python::object firstValue = boost::python::object(),
-//	boost::python::object secondKey = boost::python::object(), boost::python::object secondValue = boost::python::object() );
-
 #if 1
 class PyKeyValues
 {
