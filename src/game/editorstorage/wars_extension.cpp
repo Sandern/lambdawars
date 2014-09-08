@@ -187,6 +187,12 @@ bool CWarsExtension::NextServerMessage()
 	return m_hQueuedServerP2PMessages.Count() != 0;
 }
 
+WarsMessageData_t *CWarsExtension::InsertServerMessage()
+{
+	m_hQueuedServerP2PMessages.AddToTail();
+	return &m_hQueuedServerP2PMessages.Tail();
+}
+
 WarsMessageData_t *CWarsExtension::ClientMessageHead()
 {
 	if( m_hQueuedClientP2PMessages.Count() == 0 )
@@ -201,6 +207,12 @@ bool CWarsExtension::NextClientMessage()
 
 	m_hQueuedClientP2PMessages.Remove(0);
 	return m_hQueuedClientP2PMessages.Count() != 0;
+}
+
+WarsMessageData_t *CWarsExtension::InsertClientMessage()
+{
+	m_hQueuedClientP2PMessages.AddToTail();
+	return &m_hQueuedClientP2PMessages.Tail();
 }
 
 EXPOSE_SINGLE_INTERFACE( CWarsExtension, IWarsExtension, WARS_EXTENSION_VERSION );

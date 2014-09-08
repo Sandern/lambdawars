@@ -1130,6 +1130,11 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	m_bPaused = false;
 	m_bWasPaused = false;
 
+	// At this point the game server api context should exist
+#if !defined( NO_STEAM )
+	steamgameserverapicontext->Init();
+#endif
+
 	VPROF("CServerGameDLL::LevelInit");
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );

@@ -24,13 +24,13 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 		return;
 	}
 
-	//CUtlBuffer keyvaluesData( 0, 0, CUtlBuffer::TEXT_BUFFER );
-	//pGameData->RecursiveSaveToFile( keyvaluesData, 0 );
+	bool bIsRequestingLocalGameServer = steamapicontext->SteamUser()->GetSteamID() == serverSteamId;
+
 	CUtlBuffer keyvaluesData;
 	pGameData->WriteAsBinary( keyvaluesData );
 
 	WarsRequestServerMessage_t data;
-	data.type = k_EMsgServerRequestGame;
+	data.type = bIsRequestingLocalGameServer ? k_EMsgLocalServerRequestGame : k_EMsgServerRequestGame;
 	data.lobbySteamId = lobbySteamId;
 
 	int dataSize = sizeof(data) + keyvaluesData.TellPut();
@@ -38,8 +38,8 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	V_memcpy( pszData, &data, sizeof(data) );
 	V_memcpy( pszData + sizeof(data), keyvaluesData.Base(), keyvaluesData.TellPut());
 
-	Msg("Wrote game data. Total message size: %d, game data size: %d\n", dataSize, keyvaluesData.TellPut() );
-	KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+	//Msg("Wrote game data. Total message size: %d, game data size: %d\n", dataSize, keyvaluesData.TellPut() );
+	//KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
 	steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable );
 #endif // CLIENT_DLL

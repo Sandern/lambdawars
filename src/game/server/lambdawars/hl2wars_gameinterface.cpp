@@ -243,13 +243,21 @@ extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDeb
 
 void WarsUpdateGameServer()
 {
-	if( !engine->IsDedicatedServer() )
-		return;
+	//if( !engine->IsDedicatedServer() )
+	//	return;
 
-	if( !steamgameserverapicontext || !g_pSteamClientGameServer )
-		return;
+	//if( !steamgameserverapicontext || !g_pSteamClientGameServer )
+	//	return;
 
-	if( !steamgameserverapicontext->SteamGameServerNetworking() )
+	if( g_pSteamClientGameServer && !steamgameserverapicontext->SteamGameServerNetworking() )
+	{
+		steamgameserverapicontext->Init();
+
+		// set our debug handler
+		g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
+	}
+
+	/*if( !steamgameserverapicontext->SteamGameServerNetworking() )
 	{
 		steamgameserverapicontext->Init();
 
@@ -258,7 +266,7 @@ void WarsUpdateGameServer()
 	}
 
 	if( !steamgameserverapicontext->SteamGameServerNetworking() )
-		return;
+		return;*/
 
 	if( !WarsGameServer() )
 	{

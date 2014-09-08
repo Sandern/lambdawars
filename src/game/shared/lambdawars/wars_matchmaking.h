@@ -19,6 +19,7 @@ enum EGameServerState
 	k_EGameServer_Error = -1,
 	k_EGameServer_Available = 0,
 	k_EGameServer_InGame,
+	k_EGameServer_InGameFreeStyle, // Not created through matchmaking, but players are on the server
 };
 
 typedef struct WarsMessage_t

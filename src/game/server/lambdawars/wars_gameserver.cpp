@@ -44,54 +44,13 @@ void CWarsGameServer::PrintDebugInfo()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Updates a wars game server
+// Purpose: 
 //-----------------------------------------------------------------------------
-void CWarsGameServer::RunFrame()
+void CWarsGameServer::ProcessMessages()
 {
-	if( !steamgameserverapicontext->SteamGameServer() )
-	{
-		Warning("No steam game server interface\n");
-		return;
-	}
-	if( !warsextension )
-	{
-		Warning("No steam warsextension interface\n");
-		return;
-	}
+	bool bGameServerIsRunning = steamgameserverapicontext->SteamGameServer() != NULL;
 
 	KeyValues *pData = NULL, *pGameData = NULL;
-
-	//steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
-	//steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
-	//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
-
-	if( GetState() == k_EGameServer_InGame )
-	{
-		int nConnected = 0;
-		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
-		{
-			CBasePlayer *pPlayer = (CBasePlayer*)UTIL_PlayerByIndex( i );
-		
-			if ( pPlayer && pPlayer->IsConnected() )
-			{
-				nConnected++;
-			}
-		}
-		m_nConnectedPlayers = nConnected;
-
-		if( m_nConnectedPlayers > 0 )
-		{
-			m_fLastPlayedConnectedTime = Plat_FloatTime();
-		}
-		else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > 60.0f )
-		{
-			SetState( k_EGameServer_Available );
-			Msg("Changing wars game server back to available due inactivity (no connected players)\n");
-		}
-	}
-
-	// Update state
-	steamgameserverapicontext->SteamGameServer()->SetKeyValue( "available", m_State == k_EGameServer_Available ? "1" : "0" );
 
 	warsextension->ReceiveSteamP2PMessages( steamgameserverapicontext->SteamGameServerNetworking() );
 
@@ -106,22 +65,19 @@ void CWarsGameServer::RunFrame()
 
 		CUtlBuffer data;
 
-		switch( eMsg )
+		if( !bGameServerIsRunning )
 		{
-		case k_EMsgServerRequestGame:
-			if( GetState() != k_EGameServer_Available )
-			{
-				// Tell lobby owner the server is not available and should look for another server
-				steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
-			}
-			else
+			// Special case
+			if( eMsg == k_EMsgLocalServerRequestGame )
 			{
 				data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
 				pGameData = new KeyValues( "GameData" );
 				if( !pGameData->ReadAsBinary( data ) )
 				{
 					Warning("k_EMsgServerRequestGame: reading game data failed\n");
-					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+					pMessageData->buf.Put( &denyGameMsg, sizeof(denyGameMsg) );
+					pMessageData->steamIDRemote = messageData->steamIDRemote;
 
 				}
 				else
@@ -131,17 +87,59 @@ void CWarsGameServer::RunFrame()
 					KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
 					// Tell lobby owner the game is accepted and players can connect to the server
-					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+					pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+					pMessageData->steamIDRemote = messageData->steamIDRemote;
 
 					g_ServerGameDLL.ApplyGameSettings( pGameData );
 
 					SetState( k_EGameServer_InGame );
 				}
 			}
-			break;
-		default:
-			Warning("Game server received unknown/unsupported message type %d\n", eMsg);
-			break;
+			else
+			{
+				Warning("Receiving game server message %d while not running. Discarding...\n", eMsg);
+			}
+		}
+		else
+		{
+			switch( eMsg )
+			{
+			case k_EMsgServerRequestGame:
+				if( GetState() != k_EGameServer_Available )
+				{
+					// Tell lobby owner the server is not available and should look for another server
+					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+				}
+				else
+				{
+					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
+					pGameData = new KeyValues( "GameData" );
+					if( !pGameData->ReadAsBinary( data ) )
+					{
+						Warning("k_EMsgServerRequestGame: reading game data failed\n");
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+
+					}
+					else
+					{
+						pGameData->SetName( COM_GetModDirectory() );
+
+						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+
+						// Tell lobby owner the game is accepted and players can connect to the server
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+
+						g_ServerGameDLL.ApplyGameSettings( pGameData );
+
+						SetState( k_EGameServer_InGame );
+					}
+				}
+				break;
+			default:
+				Warning("Game server received unknown/unsupported message type %d\n", eMsg);
+				break;
+			}
 		}
 
 		warsextension->NextServerMessage();
@@ -150,6 +148,66 @@ void CWarsGameServer::RunFrame()
 
 	if( pData )
 		pData->deleteThis();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Updates a wars game server
+//-----------------------------------------------------------------------------
+void CWarsGameServer::RunFrame()
+{
+	if( !steamgameserverapicontext->SteamGameServer() )
+	{
+		ProcessMessages();
+		//Warning("No steam game server interface\n");
+		return;
+	}
+	if( !warsextension )
+	{
+		Error("No steam warsextension interface\n");
+		return;
+	}
+
+	//steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
+	//steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
+	//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
+
+	int nConnected = 0;
+	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = (CBasePlayer*)UTIL_PlayerByIndex( i );
+		
+		if ( pPlayer && pPlayer->IsConnected() )
+		{
+			nConnected++;
+		}
+	}
+	m_nConnectedPlayers = nConnected;
+
+	if( GetState() == k_EGameServer_InGame || GetState() == k_EGameServer_InGameFreeStyle )
+	{
+		if( m_nConnectedPlayers > 0 )
+		{
+			m_fLastPlayedConnectedTime = Plat_FloatTime();
+		}
+		else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > 60.0f )
+		{
+			SetState( k_EGameServer_Available );
+			Msg("Changing wars game server back to available due inactivity (no connected players)\n");
+		}
+	}
+	else if( GetState() == k_EGameServer_Available )
+	{
+		if( nConnected > 0 )
+		{
+			SetState( k_EGameServer_InGameFreeStyle );
+			Msg("Changing wars game server to free style ingame since players are connected\n");
+		}
+	}
+
+	// Update state
+	steamgameserverapicontext->SteamGameServer()->SetKeyValue( "available", m_State == k_EGameServer_Available ? "1" : "0" );
+
+	ProcessMessages();
 }
 
 //-----------------------------------------------------------------------------

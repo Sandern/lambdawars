@@ -19,6 +19,7 @@ public:
 	CWarsGameServer();
 
 	void PrintDebugInfo();
+	void ProcessMessages();
 	void RunFrame();
 
 	void SetState( EGameServerState state );

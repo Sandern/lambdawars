@@ -17,6 +17,7 @@ enum EMessage
 {
 	// Server messages
 	k_EMsgServerRequestGame = 0,
+	k_EMsgLocalServerRequestGame,
 
 	// Client Messages
 	k_EMsgClientFirstMsg,
@@ -50,8 +51,10 @@ public:
 	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking ) = 0;
 	virtual WarsMessageData_t *ServerMessageHead() = 0;
 	virtual bool NextServerMessage() = 0;
+	virtual WarsMessageData_t *InsertServerMessage() = 0;
 	virtual WarsMessageData_t *ClientMessageHead() = 0;
 	virtual bool NextClientMessage() = 0;
+	virtual WarsMessageData_t *InsertClientMessage() = 0;
 };
 
 #define WARS_EXTENSION_VERSION		"VWarsExtension001"

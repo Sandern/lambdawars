@@ -34,8 +34,10 @@ public:
 	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking );
 	virtual WarsMessageData_t *ServerMessageHead();
 	virtual bool NextServerMessage();
+	virtual WarsMessageData_t *InsertServerMessage();
 	virtual WarsMessageData_t *ClientMessageHead();
 	virtual bool NextClientMessage();
+	virtual WarsMessageData_t *InsertClientMessage();
 
 private:
 	// Wars Editor commands
