@@ -48,6 +48,8 @@ void CWarsGameServer::PrintDebugInfo()
 //-----------------------------------------------------------------------------
 void CWarsGameServer::ProcessMessages()
 {
+	ConVarRef hostport("hostport");
+
 	bool bGameServerIsRunning = steamgameserverapicontext->SteamGameServer() != NULL;
 
 	KeyValues *pData = NULL, *pGameData = NULL;
@@ -60,14 +62,14 @@ void CWarsGameServer::ProcessMessages()
 	{
 		EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
 
-		static WarsMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
+		static WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
 		static WarsMessage_t denyGameMsg( k_EMsgClientRequestGameDenied );
 
 		CUtlBuffer data;
 
 		if( !bGameServerIsRunning )
 		{
-			// Special case
+			// Special case when local client starts game server from main menu/lobby
 			if( eMsg == k_EMsgLocalServerRequestGame )
 			{
 				data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
@@ -87,13 +89,16 @@ void CWarsGameServer::ProcessMessages()
 					KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
 					// Tell lobby owner the game is accepted and players can connect to the server
-					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-					pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-					pMessageData->steamIDRemote = messageData->steamIDRemote;
+					//WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+					//pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+					//pMessageData->steamIDRemote = messageData->steamIDRemote;
 
 					g_ServerGameDLL.ApplyGameSettings( pGameData );
+					//g_pMatchFramework->CreateSession( pGameData );
+					//g_pMatchFramework->GetMatchSession()->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
 
-					SetState( k_EGameServer_InGame );
+					SetState( k_EGameServer_StartingGame );
+					m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
 				}
 			}
 			else
@@ -124,13 +129,20 @@ void CWarsGameServer::ProcessMessages()
 					else
 					{
 						pGameData->SetName( COM_GetModDirectory() );
-
+						//pGameData->SetUint64( "options/sessionid", steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64() );
+						
 						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+
+						acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+						acceptGameMsg.gamePort = hostport.GetInt();
+						acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
 
 						// Tell lobby owner the game is accepted and players can connect to the server
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
-
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
+						//g_pMatchFramework->CreateSession( pGameData );
+						//g_pMatchFramework->GetMatchSession()->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
+						//KeyValuesDumpAsDevMsg( g_pMatchFramework->GetMatchSession()->GetSessionSettings() );
 
 						SetState( k_EGameServer_InGame );
 					}
@@ -183,8 +195,37 @@ void CWarsGameServer::RunFrame()
 	}
 	m_nConnectedPlayers = nConnected;
 
-	if( GetState() == k_EGameServer_InGame || GetState() == k_EGameServer_InGameFreeStyle )
+	if( GetState() == k_EGameServer_StartingGame )
 	{
+		if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
+		{
+			if( m_LobbyPlayerRequestingGameID.IsValid() ) 
+			{
+				ConVarRef hostport("hostport");
+
+				WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
+				acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+				acceptGameMsg.gamePort = hostport.GetInt();
+				acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
+				//steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( m_LobbyPlayerRequestingGameID, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+
+				WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+				pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+				pMessageData->steamIDRemote = m_LobbyPlayerRequestingGameID;
+			}
+
+			m_LobbyPlayerRequestingGameID.Clear();
+			SetState( k_EGameServer_InGame );
+		}
+	}
+	else if( GetState() == k_EGameServer_InGame || GetState() == k_EGameServer_InGameFreeStyle )
+	{
+		static float s_lastPrintTime = 0;
+		if( g_pMatchFramework->GetMatchSession() && Plat_FloatTime() - s_lastPrintTime > 60.0f )
+		{
+			KeyValuesDumpAsDevMsg( g_pMatchFramework->GetMatchSession()->GetSessionSettings(), 0, 0 );
+			s_lastPrintTime = Plat_FloatTime();
+		}
 		if( m_nConnectedPlayers > 0 )
 		{
 			m_fLastPlayedConnectedTime = Plat_FloatTime();
@@ -201,6 +242,10 @@ void CWarsGameServer::RunFrame()
 		{
 			SetState( k_EGameServer_InGameFreeStyle );
 			Msg("Changing wars game server to free style ingame since players are connected\n");
+		}
+		else
+		{
+			m_fLastPlayedConnectedTime = Plat_FloatTime();
 		}
 	}
 

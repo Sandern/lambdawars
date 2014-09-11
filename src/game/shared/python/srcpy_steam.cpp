@@ -62,8 +62,8 @@ boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CS
 	for( int i = 0; i < nFilters; i++ )	\
 	{	\
 		ppchFilters[i] = (MatchMakingKeyValuePair_t *)stackalloc( sizeof( MatchMakingKeyValuePair_t ) );	\
-		V_strcpy( ppchFilters[i]->m_szKey, boost::python::extract<const char *>( filters[i][0] ) );	\
-		V_strcpy( ppchFilters[i]->m_szValue, boost::python::extract<const char *>( filters[i][1] ) );	\
+		V_strncpy( ppchFilters[i]->m_szKey, boost::python::extract<const char *>( filters[i][0] ), sizeof(ppchFilters[i]->m_szKey) );	\
+		V_strncpy( ppchFilters[i]->m_szValue, boost::python::extract<const char *>( filters[i][1] ), sizeof(ppchFilters[i]->m_szValue) );	\
 	}
 
 int PySteamMatchmakingServers::RequestInternetServerList( AppId_t iApp, boost::python::list filters, PySteamMatchmakingServerListResponse *pRequestServersResponse )

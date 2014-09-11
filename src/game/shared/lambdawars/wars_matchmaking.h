@@ -20,6 +20,7 @@ enum EGameServerState
 	k_EGameServer_Available = 0,
 	k_EGameServer_InGame,
 	k_EGameServer_InGameFreeStyle, // Not created through matchmaking, but players are on the server
+	k_EGameServer_StartingGame, // Delays sending back the "accept game" message until the game server is started
 };
 
 typedef struct WarsMessage_t
@@ -35,6 +36,16 @@ typedef struct WarsRequestServerMessage_t : public WarsMessage_t
 {
 	CSteamID lobbySteamId;
 } WarsRequestServerMessage_t;
+
+typedef struct WarsAcceptGameMessage_t : public WarsMessage_t
+{
+	WarsAcceptGameMessage_t() {}
+	WarsAcceptGameMessage_t( uint32 _type ) : WarsMessage_t(_type) {}
+
+	uint32 publicIP;
+	uint32 gamePort;
+	uint64 serverSteamID;
+} WarsAcceptGameMessage_t;
 
 void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData );
 

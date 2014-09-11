@@ -48,6 +48,8 @@ private:
 
 	float m_fGameStateStartTime;
 	float m_fLastPlayedConnectedTime;
+
+	CSteamID m_LobbyPlayerRequestingGameID;
 };
 
 inline EGameServerState CWarsGameServer::GetState()

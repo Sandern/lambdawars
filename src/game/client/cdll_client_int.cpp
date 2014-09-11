@@ -1509,11 +1509,31 @@ void CHLClient::HudUpdate( bool bActive )
 			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
 
 			CUtlBuffer data;
+			boost::python::dict kwargs;
+			boost::python::object signal;
+			uint32 publicIP = 0;
+			uint32 gamePort = 0;
+			CSteamID serverSteamID;
 
 			switch( eMsg )
 			{
 				case k_EMsgClientRequestGameAccepted:
-					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_accept", "core.signals", true ) );
+
+					if( messageData->buf.Size() >= sizeof(WarsAcceptGameMessage_t) )
+					{
+						WarsAcceptGameMessage_t *acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
+
+						publicIP = acceptMessageData->publicIP;
+						gamePort = acceptMessageData->gamePort;
+						serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
+					}
+					
+					kwargs["sender"] = boost::python::object();
+					kwargs["publicip"] = publicIP;
+					kwargs["gameport"] = gamePort;
+					kwargs["serversteamid"] = serverSteamID;
+					signal = SrcPySystem()->Get("lobby_gameserver_accept", "core.signals", true);
+					SrcPySystem()->CallSignal( signal, kwargs );
 					break;
 				case k_EMsgClientRequestGameDenied:
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
