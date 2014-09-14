@@ -706,7 +706,7 @@ BOOST_PYTHON_MODULE(_particles){
         
             typedef pyplusplus::containers::static_sized::array_1_t< unsigned char, 3> ( *array_wrapper_creator )( ::SimpleParticle & );
             
-            SimpleParticle_exposer.add_property( "m_uchColor"
+            SimpleParticle_exposer.add_property( "color"
                 , bp::make_function( array_wrapper_creator(&SimpleParticle_wrapper::pyplusplus_m_uchColor_wrapper)
                                     , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }

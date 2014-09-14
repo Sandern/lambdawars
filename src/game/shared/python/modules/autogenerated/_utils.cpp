@@ -2141,17 +2141,6 @@ BOOST_PYTHON_MODULE(_utils){
     
     }
 
-    { //::UTIL_GetModDir
-    
-        typedef bool ( *UTIL_GetModDir_function_type )( char *,unsigned int );
-        
-        bp::def( 
-            "UTIL_GetModDir"
-            , UTIL_GetModDir_function_type( &::UTIL_GetModDir )
-            , ( bp::arg("lpszTextOut"), bp::arg("nSize") ) );
-    
-    }
-
     { //::UTIL_GetMouseAim
     
         typedef ::Vector ( *UTIL_GetMouseAim_function_type )( ::C_HL2WarsPlayer *,int,int );
