@@ -412,7 +412,7 @@ class array_mv_t( member_variable_base_t ):
                 doc = self.documentation
             answer.append( self.parent.class_var_name + '.add_property' )
         answer.append( '( ' )
-        answer.append('"%s"' % self.declaration.name )
+        answer.append('"%s"' % self.alias )
         answer.append( os.linesep + self.indent( self.PARAM_SEPARATOR ) )
         temp = [ algorithm.create_identifier( self, "::boost::python::make_function" ) ]
         temp.append( '( ' )
