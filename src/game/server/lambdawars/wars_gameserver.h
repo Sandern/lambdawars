@@ -25,7 +25,7 @@ public:
 	void SetState( EGameServerState state );
 	EGameServerState GetState();
 
-	virtual void GetMatchmakingTags( char *buf, size_t bufSize );
+	virtual char *GetMatchmakingTags( char *buf, size_t bufSize );
 
 private:
 	// Tells us when we have successfully connected to Steam
@@ -45,6 +45,8 @@ private:
 	bool m_bConnectedToSteam;
 	EGameServerState m_State;
 	int m_nConnectedPlayers;
+
+	bool m_bUpdateMatchmakingTags;
 
 	float m_fGameStateStartTime;
 	float m_fLastPlayedConnectedTime;

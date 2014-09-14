@@ -27,7 +27,8 @@ CWarsGameServer::CWarsGameServer() :
 	m_CallbackPolicyResponse( this, &CWarsGameServer::OnPolicyResponse ),
 	m_State( k_EGameServer_Available ),
 	m_fGameStateStartTime( 0.0f ),
-	m_fLastPlayedConnectedTime( 0.0f )
+	m_fLastPlayedConnectedTime( 0.0f ),
+	m_bUpdateMatchmakingTags(true)
 {
 	DevMsg("Created Wars game server\n");
 }
@@ -129,7 +130,6 @@ void CWarsGameServer::ProcessMessages()
 					else
 					{
 						pGameData->SetName( COM_GetModDirectory() );
-						//pGameData->SetUint64( "options/sessionid", steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64() );
 						
 						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
@@ -253,6 +253,17 @@ void CWarsGameServer::RunFrame()
 	steamgameserverapicontext->SteamGameServer()->SetKeyValue( "available", m_State == k_EGameServer_Available ? "1" : "0" );
 
 	ProcessMessages();
+
+	// Update tags for matchmaking if needed
+	if( m_bUpdateMatchmakingTags ) 
+	{
+		m_bUpdateMatchmakingTags = false;
+
+		char buf[1024];
+		g_ServerGameDLL.GetMatchmakingTags( buf, sizeof(buf) );
+
+		steamgameserverapicontext->SteamGameServer()->SetGameTags( buf );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -267,21 +278,24 @@ void CWarsGameServer::SetState( EGameServerState state )
 
 	m_State = state;
 	m_fGameStateStartTime = Plat_FloatTime();
+	m_bUpdateMatchmakingTags = true;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CWarsGameServer::GetMatchmakingTags( char *buf, size_t bufSize )
+char *CWarsGameServer::GetMatchmakingTags( char *buf, size_t bufSize )
 {
 	int len = 0;
 	if( m_State == k_EGameServer_Available )
 	{
-		Q_strncpy( buf, "Available,", bufSize );
-		len = strlen( buf );
+		V_strncpy( buf, "Available,", bufSize );
+		len = V_strlen( buf );
 		buf += len;
 		bufSize -= len;
 	}
+
+	return buf;
 }
 
 //-----------------------------------------------------------------------------

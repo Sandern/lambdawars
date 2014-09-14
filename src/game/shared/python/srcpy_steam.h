@@ -102,6 +102,15 @@ public:
 	void RulesRefreshComplete() {}
 };
 
+class pygameserveritem_t : public gameserveritem_t 
+{
+public:
+	const char *GetGameDir() { return m_szGameDir; }
+	const char *GetMap() { return m_szMap; }
+	const char *GetGameDescription() { return m_szGameDescription; }
+	const char *GetGameTags() { return m_szGameTags; }
+};
+
 class PySteamMatchmakingServers
 {
 public:
@@ -114,7 +123,7 @@ public:
 
 	void ReleaseRequest( int hServerListRequest );
 
-	gameserveritem_t *GetServerDetails( int hRequest, int iServer );
+	pygameserveritem_t GetServerDetails( int hRequest, int iServer );
 
 	// --
 	int PingServer( uint32 unIP, uint16 usPort, PySteamMatchmakingPingResponse *pRequestServersResponse ); 

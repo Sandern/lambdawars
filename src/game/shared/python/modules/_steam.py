@@ -140,7 +140,7 @@ class Steam(SemiSharedModuleGenerator):
         
     def PythonfyVariables(self, cls):
         ''' Removes prefixes from variable names and lower cases the variable. '''
-        for var in cls.vars():
+        for var in cls.vars(allow_empty=True):
             varname = var.name
             varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf|m_sz)', '', varname)
             varname = re.sub('^(m_)', '', varname)
@@ -199,7 +199,6 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('PySteamMatchmakingServers')
         cls.include()
         cls.rename('SteamMatchmakingServers')
-        cls.mem_funs('GetServerDetails').call_policies = call_policies.return_internal_reference()
         
         '''cls = mb.class_('ISteamMatchmakingServers')
         cls.include()
@@ -223,6 +222,18 @@ class Steam(SemiSharedModuleGenerator):
         cls.include()
         cls.mem_fun('SetName').exclude()
         self.PythonfyVariables(cls)
+        cls.var('m_szGameDir').exclude()
+        cls.var('m_szMap').exclude()
+        cls.var('m_szGameDescription').exclude()
+        cls.var('m_szGameTags').exclude()
+        
+        cls = mb.class_('pygameserveritem_t')
+        cls.include()
+        self.PythonfyVariables(cls)
+        self.AddProperty(cls, 'gamedir', 'GetGameDir')
+        self.AddProperty(cls, 'map', 'GetMap')
+        self.AddProperty(cls, 'gamedescription', 'GetGameDescription')
+        self.AddProperty(cls, 'gametags', 'GetGameTags')
         
         cls = mb.class_('servernetadr_t')
         cls.include()

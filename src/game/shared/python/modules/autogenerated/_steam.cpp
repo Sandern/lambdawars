@@ -6,8 +6,6 @@
 
 #include "__call_policies.pypp.hpp"
 
-#include "__array_1.pypp.hpp"
-
 #include "cbase.h"
 
 #include "steam/steam_api.h"
@@ -318,44 +316,6 @@ struct PySteamMatchmakingServerListResponse_wrapper : PySteamMatchmakingServerLi
     
     void default_ServerResponded( int hRequest, int iServer ) {
         PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
-    }
-
-};
-
-struct gameserveritem_t_wrapper : gameserveritem_t, bp::wrapper< gameserveritem_t > {
-
-    gameserveritem_t_wrapper(gameserveritem_t const & arg )
-    : gameserveritem_t( arg )
-      , bp::wrapper< gameserveritem_t >(){
-        // copy constructor
-        
-    }
-
-    gameserveritem_t_wrapper( )
-    : gameserveritem_t( )
-      , bp::wrapper< gameserveritem_t >(){
-        // null constructor
-    
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 64>
-    pyplusplus_m_szGameDescription_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.m_szGameDescription );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 32>
-    pyplusplus_m_szGameDir_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szGameDir );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 128>
-    pyplusplus_m_szGameTags_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 128>( inst.m_szGameTags );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 32>
-    pyplusplus_m_szMap_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szMap );
     }
 
 };
@@ -878,6 +838,7 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultItemDeleted", k_EResultItemDeleted)
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
+        .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
         .export_values()
         ;
 
@@ -2106,9 +2067,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("hServerQuery") ) )    
         .def( 
             "GetServerDetails"
-            , (::gameserveritem_t * ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
-            , ( bp::arg("hRequest"), bp::arg("iServer") )
-            , bp::return_internal_reference< >() )    
+            , (::pygameserveritem_t ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) )    
         .def( 
             "PingServer"
             , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPingResponse * ) )( &::PySteamMatchmakingServers::PingServer )
@@ -2150,67 +2110,64 @@ BOOST_PYTHON_MODULE(_steam){
             , (::HServerQuery ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingRulesResponse * ) )( &::PySteamMatchmakingServers::ServerRules )
             , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) );
 
-    { //::gameserveritem_t
-        typedef bp::class_< gameserveritem_t_wrapper > gameserveritem_t_exposer_t;
-        gameserveritem_t_exposer_t gameserveritem_t_exposer = gameserveritem_t_exposer_t( "gameserveritem_t", bp::init< >() );
-        bp::scope gameserveritem_t_scope( gameserveritem_t_exposer );
-        { //::gameserveritem_t::GetName
+    bp::class_< gameserveritem_t >( "gameserveritem_t", bp::init< >() )    
+        .def( 
+            "GetName"
+            , (char const * ( ::gameserveritem_t::* )(  ) const)( &::gameserveritem_t::GetName ) )    
+        .def_readwrite( "netadr", &gameserveritem_t::m_NetAdr )    
+        .def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh )    
+        .def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse )    
+        .def_readwrite( "password", &gameserveritem_t::m_bPassword )    
+        .def_readwrite( "secure", &gameserveritem_t::m_bSecure )    
+        .def_readwrite( "appid", &gameserveritem_t::m_nAppID )    
+        .def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers )    
+        .def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers )    
+        .def_readwrite( "ping", &gameserveritem_t::m_nPing )    
+        .def_readwrite( "players", &gameserveritem_t::m_nPlayers )    
+        .def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion )    
+        .def_readwrite( "steamid", &gameserveritem_t::m_steamID )    
+        .def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+
+    { //::pygameserveritem_t
+        typedef bp::class_< pygameserveritem_t, bp::bases< gameserveritem_t > > pygameserveritem_t_exposer_t;
+        pygameserveritem_t_exposer_t pygameserveritem_t_exposer = pygameserveritem_t_exposer_t( "pygameserveritem_t" );
+        bp::scope pygameserveritem_t_scope( pygameserveritem_t_exposer );
+        { //property "gamedir"[fget=::pygameserveritem_t::GetGameDir]
         
-            typedef char const * ( ::gameserveritem_t::*GetName_function_type )(  ) const;
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.def( 
-                "GetName"
-                , GetName_function_type( &::gameserveritem_t::GetName ) );
+            pygameserveritem_t_exposer.add_property( 
+                "gamedir"
+                , fget( &::pygameserveritem_t::GetGameDir ) );
         
         }
-        gameserveritem_t_exposer.def_readwrite( "netadr", &gameserveritem_t::m_NetAdr );
-        gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
-        gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
-        gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
-        gameserveritem_t_exposer.def_readwrite( "secure", &gameserveritem_t::m_bSecure );
-        gameserveritem_t_exposer.def_readwrite( "appid", &gameserveritem_t::m_nAppID );
-        gameserveritem_t_exposer.def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers );
-        gameserveritem_t_exposer.def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers );
-        gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
-        gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
-        gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
-        gameserveritem_t_exposer.def_readwrite( "steamid", &gameserveritem_t::m_steamID );
-        pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
-        { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
+        { //property "map"[fget=::pygameserveritem_t::GetMap]
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.add_property( "m_szGameDescription"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDescription_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        pyplusplus::containers::static_sized::register_array_1< char, 32 >( "__array_1_char_32" );
-        { //gameserveritem_t::m_szGameDir [variable], type=char[32]
+            pygameserveritem_t_exposer.add_property( 
+                "map"
+                , fget( &::pygameserveritem_t::GetMap ) );
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
-            
-            gameserveritem_t_exposer.add_property( "m_szGameDir"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDir_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        pyplusplus::containers::static_sized::register_array_1< char, 128 >( "__array_1_char_128" );
-        { //gameserveritem_t::m_szGameTags [variable], type=char[128]
+        { //property "gamedescription"[fget=::pygameserveritem_t::GetGameDescription]
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 128> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.add_property( "m_szGameTags"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameTags_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        { //gameserveritem_t::m_szMap [variable], type=char[32]
+            pygameserveritem_t_exposer.add_property( 
+                "gamedescription"
+                , fget( &::pygameserveritem_t::GetGameDescription ) );
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
-            
-            gameserveritem_t_exposer.add_property( "m_szMap"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szMap_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        gameserveritem_t_exposer.def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+        { //property "gametags"[fget=::pygameserveritem_t::GetGameTags]
+        
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
+            
+            pygameserveritem_t_exposer.add_property( 
+                "gametags"
+                , fget( &::pygameserveritem_t::GetGameTags ) );
+        
+        }
     }
 
     { //::servernetadr_t
@@ -2522,8 +2479,6 @@ BOOST_PYTHON_MODULE(_steam){
 
 #include "__call_policies.pypp.hpp"
 
-#include "__array_1.pypp.hpp"
-
 #include "cbase.h"
 
 #include "steam/steam_api.h"
@@ -2834,44 +2789,6 @@ struct PySteamMatchmakingServerListResponse_wrapper : PySteamMatchmakingServerLi
     
     void default_ServerResponded( int hRequest, int iServer ) {
         PySteamMatchmakingServerListResponse::PyServerResponded( hRequest, iServer );
-    }
-
-};
-
-struct gameserveritem_t_wrapper : gameserveritem_t, bp::wrapper< gameserveritem_t > {
-
-    gameserveritem_t_wrapper(gameserveritem_t const & arg )
-    : gameserveritem_t( arg )
-      , bp::wrapper< gameserveritem_t >(){
-        // copy constructor
-        
-    }
-
-    gameserveritem_t_wrapper( )
-    : gameserveritem_t( )
-      , bp::wrapper< gameserveritem_t >(){
-        // null constructor
-    
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 64>
-    pyplusplus_m_szGameDescription_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.m_szGameDescription );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 32>
-    pyplusplus_m_szGameDir_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szGameDir );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 128>
-    pyplusplus_m_szGameTags_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 128>( inst.m_szGameTags );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 32>
-    pyplusplus_m_szMap_wrapper( ::gameserveritem_t & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 32>( inst.m_szMap );
     }
 
 };
@@ -3394,6 +3311,7 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultItemDeleted", k_EResultItemDeleted)
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
+        .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
         .export_values()
         ;
 
@@ -4794,9 +4712,8 @@ BOOST_PYTHON_MODULE(_steam){
             , ( bp::arg("hServerQuery") ) )    
         .def( 
             "GetServerDetails"
-            , (::gameserveritem_t * ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
-            , ( bp::arg("hRequest"), bp::arg("iServer") )
-            , bp::return_internal_reference< >() )    
+            , (::pygameserveritem_t ( ::PySteamMatchmakingServers::* )( int,int ) )( &::PySteamMatchmakingServers::GetServerDetails )
+            , ( bp::arg("hRequest"), bp::arg("iServer") ) )    
         .def( 
             "PingServer"
             , (int ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingPingResponse * ) )( &::PySteamMatchmakingServers::PingServer )
@@ -4838,67 +4755,64 @@ BOOST_PYTHON_MODULE(_steam){
             , (::HServerQuery ( ::PySteamMatchmakingServers::* )( ::uint32,::uint16,::PySteamMatchmakingRulesResponse * ) )( &::PySteamMatchmakingServers::ServerRules )
             , ( bp::arg("unIP"), bp::arg("usPort"), bp::arg("pRequestServersResponse") ) );
 
-    { //::gameserveritem_t
-        typedef bp::class_< gameserveritem_t_wrapper > gameserveritem_t_exposer_t;
-        gameserveritem_t_exposer_t gameserveritem_t_exposer = gameserveritem_t_exposer_t( "gameserveritem_t", bp::init< >() );
-        bp::scope gameserveritem_t_scope( gameserveritem_t_exposer );
-        { //::gameserveritem_t::GetName
+    bp::class_< gameserveritem_t >( "gameserveritem_t", bp::init< >() )    
+        .def( 
+            "GetName"
+            , (char const * ( ::gameserveritem_t::* )(  ) const)( &::gameserveritem_t::GetName ) )    
+        .def_readwrite( "netadr", &gameserveritem_t::m_NetAdr )    
+        .def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh )    
+        .def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse )    
+        .def_readwrite( "password", &gameserveritem_t::m_bPassword )    
+        .def_readwrite( "secure", &gameserveritem_t::m_bSecure )    
+        .def_readwrite( "appid", &gameserveritem_t::m_nAppID )    
+        .def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers )    
+        .def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers )    
+        .def_readwrite( "ping", &gameserveritem_t::m_nPing )    
+        .def_readwrite( "players", &gameserveritem_t::m_nPlayers )    
+        .def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion )    
+        .def_readwrite( "steamid", &gameserveritem_t::m_steamID )    
+        .def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+
+    { //::pygameserveritem_t
+        typedef bp::class_< pygameserveritem_t, bp::bases< gameserveritem_t > > pygameserveritem_t_exposer_t;
+        pygameserveritem_t_exposer_t pygameserveritem_t_exposer = pygameserveritem_t_exposer_t( "pygameserveritem_t" );
+        bp::scope pygameserveritem_t_scope( pygameserveritem_t_exposer );
+        { //property "gamedir"[fget=::pygameserveritem_t::GetGameDir]
         
-            typedef char const * ( ::gameserveritem_t::*GetName_function_type )(  ) const;
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.def( 
-                "GetName"
-                , GetName_function_type( &::gameserveritem_t::GetName ) );
+            pygameserveritem_t_exposer.add_property( 
+                "gamedir"
+                , fget( &::pygameserveritem_t::GetGameDir ) );
         
         }
-        gameserveritem_t_exposer.def_readwrite( "netadr", &gameserveritem_t::m_NetAdr );
-        gameserveritem_t_exposer.def_readwrite( "donotrefresh", &gameserveritem_t::m_bDoNotRefresh );
-        gameserveritem_t_exposer.def_readwrite( "hadsuccessfulresponse", &gameserveritem_t::m_bHadSuccessfulResponse );
-        gameserveritem_t_exposer.def_readwrite( "password", &gameserveritem_t::m_bPassword );
-        gameserveritem_t_exposer.def_readwrite( "secure", &gameserveritem_t::m_bSecure );
-        gameserveritem_t_exposer.def_readwrite( "appid", &gameserveritem_t::m_nAppID );
-        gameserveritem_t_exposer.def_readwrite( "botplayers", &gameserveritem_t::m_nBotPlayers );
-        gameserveritem_t_exposer.def_readwrite( "maxplayers", &gameserveritem_t::m_nMaxPlayers );
-        gameserveritem_t_exposer.def_readwrite( "ping", &gameserveritem_t::m_nPing );
-        gameserveritem_t_exposer.def_readwrite( "players", &gameserveritem_t::m_nPlayers );
-        gameserveritem_t_exposer.def_readwrite( "serverversion", &gameserveritem_t::m_nServerVersion );
-        gameserveritem_t_exposer.def_readwrite( "steamid", &gameserveritem_t::m_steamID );
-        pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
-        { //gameserveritem_t::m_szGameDescription [variable], type=char[64]
+        { //property "map"[fget=::pygameserveritem_t::GetMap]
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.add_property( "m_szGameDescription"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDescription_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        pyplusplus::containers::static_sized::register_array_1< char, 32 >( "__array_1_char_32" );
-        { //gameserveritem_t::m_szGameDir [variable], type=char[32]
+            pygameserveritem_t_exposer.add_property( 
+                "map"
+                , fget( &::pygameserveritem_t::GetMap ) );
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
-            
-            gameserveritem_t_exposer.add_property( "m_szGameDir"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameDir_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        pyplusplus::containers::static_sized::register_array_1< char, 128 >( "__array_1_char_128" );
-        { //gameserveritem_t::m_szGameTags [variable], type=char[128]
+        { //property "gamedescription"[fget=::pygameserveritem_t::GetGameDescription]
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 128> ( *array_wrapper_creator )( ::gameserveritem_t & );
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
             
-            gameserveritem_t_exposer.add_property( "m_szGameTags"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szGameTags_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        { //gameserveritem_t::m_szMap [variable], type=char[32]
+            pygameserveritem_t_exposer.add_property( 
+                "gamedescription"
+                , fget( &::pygameserveritem_t::GetGameDescription ) );
         
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 32> ( *array_wrapper_creator )( ::gameserveritem_t & );
-            
-            gameserveritem_t_exposer.add_property( "m_szMap"
-                , bp::make_function( array_wrapper_creator(&gameserveritem_t_wrapper::pyplusplus_m_szMap_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        gameserveritem_t_exposer.def_readwrite( "timelastplayed", &gameserveritem_t::m_ulTimeLastPlayed );
+        { //property "gametags"[fget=::pygameserveritem_t::GetGameTags]
+        
+            typedef char const * ( ::pygameserveritem_t::*fget )(  ) ;
+            
+            pygameserveritem_t_exposer.add_property( 
+                "gametags"
+                , fget( &::pygameserveritem_t::GetGameTags ) );
+        
+        }
     }
 
     { //::servernetadr_t

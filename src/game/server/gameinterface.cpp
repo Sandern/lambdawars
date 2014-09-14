@@ -2105,10 +2105,16 @@ void CServerGameDLL::GetMatchmakingTags( char *buf, size_t bufSize )
 #endif // SDK_DLL
 
 #ifdef HL2WARS_DLL
+	char * const bufBase = buf;
+
 	if( WarsGameServer() )
 	{
-		WarsGameServer()->GetMatchmakingTags( buf, bufSize );
+		buf = WarsGameServer()->GetMatchmakingTags( buf, bufSize );
 	}
+
+	// Trim the last comma if anything was written
+	if ( buf > bufBase )
+		buf[ -1 ] = 0;
 #endif // HL2WARS_DLL
 }
 
