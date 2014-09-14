@@ -315,6 +315,11 @@ void CGameUI::PostInit()
 				// Once the original ui base mod panel is removed, we can just hookup to the root gameui panel:
 				//pPanel->SetParent( rootpanel );
 				//pPanel->MakePopup(false, false);
+
+				if( m_bActivatedUI )
+				{
+					SrcPySystem()->Run( SrcPySystem()->Get( "OnGameUIActivated", s_ref_ui_basemodpanel, true ), true );
+				}
 			}
 		}
 		catch( boost::python::error_already_set & )
@@ -662,6 +667,13 @@ void CGameUI::OnGameUIActivated()
 	if ( bNeedActivation )
 	{
 		GetUiBaseModPanelClass().OnGameUIActivated();
+
+#ifdef ENABLE_PYTHON
+		if( SrcPySystem()->IsPythonRunning() )
+		{
+			SrcPySystem()->Run( SrcPySystem()->Get( "OnGameUIActivated", s_ref_ui_basemodpanel, true ), true );
+		}
+#endif // ENABLE_PYTHON
 	}
 }
 
@@ -677,6 +689,10 @@ void CGameUI::OnGameUIHidden()
 	engine->ClientCmd_Unrestricted( "unpause nomsg" );
 
 	GetUiBaseModPanelClass().OnGameUIHidden();
+
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run( SrcPySystem()->Get( "OnGameUIHidden", s_ref_ui_basemodpanel, true ), true );
+#endif // ENABLE_PYTHON
 
 	// Restore to default
 	if ( bWasActive )
