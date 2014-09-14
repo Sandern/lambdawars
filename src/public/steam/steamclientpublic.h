@@ -112,7 +112,8 @@ enum EResult
 	k_EResultAccountLoginDeniedNeedTwoFactor = 85,	// Need two-factor code to login
 	k_EResultItemDeleted = 86,					// The thing we're trying to access has been deleted
 	k_EResultAccountLoginDeniedThrottle = 87,	// login attempt failed, try to throttle response to possible attacker
-	k_EResultTwoFactorCodeMismatch = 88,		// two factor code mismatch (only on token setup, not on login path)
+	k_EResultTwoFactorCodeMismatch = 88,		// two factor code mismatch
+	k_EResultTwoFactorActivationCodeMismatch = 89,	// activation code for two-factor didn't match
 };
 
 // Error codes for use with the voice functions
@@ -177,6 +178,7 @@ typedef enum
 	k_EAuthSessionResponseAuthTicketCanceled = 6,			// The ticket has been canceled by the issuer
 	k_EAuthSessionResponseAuthTicketInvalidAlreadyUsed = 7,	// This ticket has already been used, it is not valid.
 	k_EAuthSessionResponseAuthTicketInvalid = 8,			// This ticket is not from a user instance currently connected to steam.
+	k_EAuthSessionResponsePublisherIssuedBan = 9,			// The user is banned for this game. The ban came via the web api and not VAC
 } EAuthSessionResponse;
 
 // results from UserHasLicenseForApp
