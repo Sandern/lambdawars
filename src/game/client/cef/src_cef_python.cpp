@@ -59,6 +59,8 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l )
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
+	boost::python::object jsobject = _cef.attr("JSObject");
+
 	boost::python::object iterator = l.attr("__iter__")();
 	boost::python::ssize_t length = boost::python::len(l); 
 	for( boost::python::ssize_t i = 0; i < length; i++ )
@@ -110,6 +112,15 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l )
 		else if( valuetype == builtins.attr("dict") )
 		{
 			result->SetDictionary( i, PyToCefDictionaryValue( boost::python::dict( value ) ) );
+		}
+		else if( valuetype == jsobject )
+		{
+			PyJSObject *pJSObject = boost::python::extract< PyJSObject * >( value );
+			WarsCefJSObject_t warsCefJSObject;
+			V_strncpy( warsCefJSObject.uuid, pJSObject->GetJSObject()->GetIdentifier().ToString().c_str(), sizeof( warsCefJSObject.uuid ) );
+			
+			CefRefPtr<CefBinaryValue> pRefData = CefBinaryValue::Create( &warsCefJSObject, sizeof( warsCefJSObject ) );
+			result->SetBinary( i, pRefData );
 		}
 		else
 		{

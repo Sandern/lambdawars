@@ -109,6 +109,7 @@ bp::object matchmaking;
 
 #ifdef CLIENT_DLL
 	boost::python::object _vguicontrols;
+	bp::object _cef;
 #endif // CLIENT_DLL
 
 bp::object unit_helper;
@@ -484,7 +485,7 @@ bool CSrcPython::InitInterpreter( void )
 #ifdef CLIENT_DLL
 	Run( "import input" );		// Registers buttons
 	_vguicontrols = Import("_vguicontrols");
-	Run( "import _cef" );
+	_cef = Import("_cef");
 #endif	// CLIENT_DLL
 
 	//  initialize the module that manages the python side
@@ -583,6 +584,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	matchmaking = bp::object();
 #ifdef CLIENT_DLL
 	_vguicontrols = bp::object();
+	_cef = bp::object();
 #endif // CLIENT_DLL
 
 	fntype = bp::object();

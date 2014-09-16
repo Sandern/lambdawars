@@ -99,6 +99,7 @@ extern boost::python::object unit_helper;
 
 #ifdef CLIENT_DLL
 	extern boost::python::object _vguicontrols;
+	extern boost::python::object _cef;
 #endif // CLIENT_DLL
 
 extern boost::python::object fntype;

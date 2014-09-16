@@ -107,7 +107,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefListValue> methodargs = args->GetList( 2 );
 
 		if( !renderBrowser->Invoke( identifier, methodname, methodargs ) )
-			SendWarning(browser, "Failed to invoke id %d with methodname %ls\n", identifier, methodname.c_str());
+			SendWarning(browser, "Failed to invoke id %ls with methodname %ls\n", identifier.c_str(), methodname.c_str());
 
 		return true;
 	}
@@ -120,7 +120,7 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefListValue> methodargs = args->GetList( 3 );
 
 		if( !renderBrowser->InvokeWithResult( iResultIdentifier, identifier, methodname, methodargs ) )
-			SendWarning(browser, "Failed to invoke with result id %d / %d with methodname %ls\n", iResultIdentifier, identifier, methodname.c_str());
+			SendWarning(browser, "Failed to invoke with result id %ls / %ls with methodname %ls\n", iResultIdentifier.c_str(), identifier.c_str(), methodname.c_str());
 
 		return true;
 	}
