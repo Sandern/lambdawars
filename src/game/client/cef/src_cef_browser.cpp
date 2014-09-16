@@ -1256,6 +1256,27 @@ boost::python::object SrcCefBrowser::PyInvokeWithResult( PyJSObject *object, con
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void SrcCefBrowser::PyObjectSetAttr( PyJSObject *object, const char *attrname, boost::python::object value )
+{
+	if( !IsValid() )
+		return;
+
+	if( !attrname )
+		return;
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("objectsetattr");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetString( 0, object ? object->GetJSObject()->GetIdentifier() : "" );
+	args->SetString( 1, attrname );
+	PySingleToCefValueList( value, args, 2 );
+
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::PySendCallback( boost::python::object callbackid, boost::python::list pymethodargs )
 {
 	if( callbackid.ptr() == Py_None )

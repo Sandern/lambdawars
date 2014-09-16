@@ -461,3 +461,35 @@ bool RenderBrowser::InvokeWithResult( CefString iResultIdentifier, CefString ide
 		return false;
 	return true;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool RenderBrowser::ObjectSetAttr( CefString identifier, CefString attrname, CefRefPtr<CefV8Value> value )
+{
+	if( !m_Context )
+		return false;
+
+	// Get object
+	CefRefPtr<CefV8Value> object = NULL;
+
+	if( !identifier.empty() )
+	{
+		std::map< CefString, CefRefPtr<CefV8Value> >::const_iterator it = m_Objects.find( identifier );
+		if( it == m_Objects.end() )
+			return false;
+
+		object = it->second;
+	}
+
+	// Enter context and Make call
+	if( !m_Context->Enter() )
+		return false;
+
+	object->SetValue( attrname, value, V8_PROPERTY_ATTRIBUTE_NONE );
+
+	// Leave context
+	m_Context->Exit();
+
+	return true;
+}

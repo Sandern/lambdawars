@@ -1,4 +1,5 @@
 #include "client_app.h"
+#include "render_browser_helpers.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -123,6 +124,17 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 			SendWarning(browser, "Failed to invoke with result id %ls / %ls with methodname %ls\n", iResultIdentifier.c_str(), identifier.c_str(), methodname.c_str());
 
 		return true;
+	}
+	else if( msgname == "objectsetattr" ) 
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		CefString identifier = args->GetString( 0 );
+		CefString attrname = args->GetString( 1 );
+
+		CefRefPtr<CefV8Value> value = ListValueToV8Value( renderBrowser, args, 2 );
+		if( !renderBrowser->ObjectSetAttr( identifier, attrname, value ) ) {
+			SendWarning(browser, "Failed to set attribute for object with id %ls with attrname %ls\n", identifier.c_str(), attrname.c_str());
+		}
 	}
 	else
 	{

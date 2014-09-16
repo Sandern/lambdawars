@@ -92,6 +92,8 @@ public:
 	bool Invoke( CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 	bool InvokeWithResult( CefString iResultIdentifier, CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 
+	bool ObjectSetAttr( CefString identifier, CefString attrname,  CefRefPtr<CefV8Value> value );
+
 private:
 	CefRefPtr<CefBrowser> m_Browser;
 	CefRefPtr<ClientApp> m_ClientApp;

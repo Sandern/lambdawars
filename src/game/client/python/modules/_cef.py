@@ -65,6 +65,7 @@ class CEF(ClientModuleGenerator):
         cls.mem_fun('PySendCallback').rename('SendCallback')
         cls.mem_fun('PyInvoke').rename('Invoke')
         cls.mem_fun('PyInvokeWithResult').rename('InvokeWithResult')
+        cls.mem_fun('PyObjectSetAttr').rename('ObjectSetAttr')
         
         cls = mb.class_('PyJSObject')
         cls.include()
@@ -78,24 +79,6 @@ class CEF(ClientModuleGenerator):
                          , cls.mem_fun('GetIdentifier') )
         cls.add_property( 'name'
                          , cls.mem_fun('GetName') )
-        
-        '''
-        cls = mb.class_('PyCefV8Value')
-        cls.include()
-        cls.rename('CefV8Value')
-        
-        cls.mem_fun('GetAttr').rename('__getattr__')
-        cls.mem_fun('GetAttribute').rename('__getattribute__')
-        cls.mem_fun('SetAttr').rename('__setattr__')
-        
-        cls = mb.class_('PyCefV8Context')
-        cls.include()
-        cls.rename('CefV8Context')
-        cls.no_init = True
-        
-        cls.mem_fun('Enter').rename('__enter__')
-        cls.mem_fun('Exit').rename('__exit__')
-        '''
         
         cls = mb.class_('PyCefFrame')
         cls.include()

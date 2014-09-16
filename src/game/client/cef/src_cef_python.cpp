@@ -52,6 +52,79 @@ boost::python::object PyJSObject::GetName()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void PySingleToCefValueList( boost::python::object value, CefListValue *result, int i )
+{
+	boost::python::object jsobject = _cef.attr("JSObject");
+	boost::python::object valuetype = fntype( value );
+
+	if( value == boost::python::object() )
+	{
+		result->SetNull( i );
+	}
+	else if( valuetype == builtins.attr("int") )
+	{
+		result->SetInt( i, boost::python::extract<int>(value) );
+	}
+	else if( valuetype == builtins.attr("float") )
+	{
+		result->SetDouble( i, boost::python::extract<float>(value) );
+	}
+	else if( valuetype == builtins.attr("str") )
+	{
+		const char *pStr = boost::python::extract<const char *>(value);
+		result->SetString( i, pStr );
+	}
+#if PY_VERSION_HEX < 0x03000000
+	else if( valuetype == builtins.attr("unicode") )
+	{
+		const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
+		if( !pStr )
+		{
+			PyErr_SetString(PyExc_ValueError, "PyToCefValueList: Invalid unicode object in message list" );
+			throw boost::python::error_already_set(); 
+		}
+		result->SetString( i, pStr );
+	}
+#endif // PY_VERSION_HEX < 0x03000000
+	else if( valuetype == builtins.attr("bool") )
+	{
+		result->SetBool( i, boost::python::extract<bool>(value) );
+	}
+#if PY_VERSION_HEX >= 0x03000000
+	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
+#else
+	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
+#endif // PY_VERSION_HEX >= 0x03000000
+	{
+		result->SetList( i, PyToCefValueList( value ) );
+	}
+	else if( valuetype == builtins.attr("dict") )
+	{
+		result->SetDictionary( i, PyToCefDictionaryValue( boost::python::dict( value ) ) );
+	}
+	else if( valuetype == jsobject )
+	{
+		PyJSObject *pJSObject = boost::python::extract< PyJSObject * >( value );
+		WarsCefJSObject_t warsCefJSObject;
+		V_strncpy( warsCefJSObject.uuid, pJSObject->GetJSObject()->GetIdentifier().ToString().c_str(), sizeof( warsCefJSObject.uuid ) );
+			
+		CefRefPtr<CefBinaryValue> pRefData = CefBinaryValue::Create( &warsCefJSObject, sizeof( warsCefJSObject ) );
+		result->SetBinary( i, pRefData );
+	}
+	else
+	{
+		const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
+		const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
+		char buf[512];
+		V_snprintf( buf, sizeof(buf), "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
+		PyErr_SetString( PyExc_ValueError, buf );
+		throw boost::python::error_already_set(); 
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l )
 {
 	int n = boost::python::len( l );
@@ -59,78 +132,12 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l )
 	CefRefPtr<CefListValue> result = CefListValue::Create();
 	result->SetSize( n );
 
-	boost::python::object jsobject = _cef.attr("JSObject");
-
 	boost::python::object iterator = l.attr("__iter__")();
 	boost::python::ssize_t length = boost::python::len(l); 
 	for( boost::python::ssize_t i = 0; i < length; i++ )
 	{
 		boost::python::object value = iterator.attr( PY_NEXT_METHODNAME )();
-		boost::python::object valuetype = fntype( value );
-
-		if( value == boost::python::object() )
-		{
-			result->SetNull( i );
-		}
-		else if( valuetype == builtins.attr("int") )
-		{
-			result->SetInt( i, boost::python::extract<int>(value) );
-		}
-		else if( valuetype == builtins.attr("float") )
-		{
-			result->SetDouble( i, boost::python::extract<float>(value) );
-		}
-		else if( valuetype == builtins.attr("str") )
-		{
-			const char *pStr = boost::python::extract<const char *>(value);
-			result->SetString( i, pStr );
-		}
-#if PY_VERSION_HEX < 0x03000000
-		else if( valuetype == builtins.attr("unicode") )
-		{
-			const wchar_t *pStr = PyUnicode_AS_UNICODE( value.ptr() );
-			if( !pStr )
-			{
-				PyErr_SetString(PyExc_ValueError, "PyToCefValueList: Invalid unicode object in message list" );
-				throw boost::python::error_already_set(); 
-			}
-			result->SetString( i, pStr );
-		}
-#endif // PY_VERSION_HEX < 0x03000000
-		else if( valuetype == builtins.attr("bool") )
-		{
-			result->SetBool( i, boost::python::extract<bool>(value) );
-		}
-#if PY_VERSION_HEX >= 0x03000000
-		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
-#else
-		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
-#endif // PY_VERSION_HEX >= 0x03000000
-		{
-			result->SetList( i, PyToCefValueList( value ) );
-		}
-		else if( valuetype == builtins.attr("dict") )
-		{
-			result->SetDictionary( i, PyToCefDictionaryValue( boost::python::dict( value ) ) );
-		}
-		else if( valuetype == jsobject )
-		{
-			PyJSObject *pJSObject = boost::python::extract< PyJSObject * >( value );
-			WarsCefJSObject_t warsCefJSObject;
-			V_strncpy( warsCefJSObject.uuid, pJSObject->GetJSObject()->GetIdentifier().ToString().c_str(), sizeof( warsCefJSObject.uuid ) );
-			
-			CefRefPtr<CefBinaryValue> pRefData = CefBinaryValue::Create( &warsCefJSObject, sizeof( warsCefJSObject ) );
-			result->SetBinary( i, pRefData );
-		}
-		else
-		{
-			const char *pObjectTypeStr = boost::python::extract<const char *>( boost::python::str( valuetype ) );
-			const char *pObjectStr = boost::python::extract<const char *>( boost::python::str( value ) );
-			char buf[512];
-			V_snprintf( buf, sizeof(buf), "PyToCefValueList: Unsupported type \"%s\" for object \"%s\" in message list", pObjectTypeStr, pObjectStr );
-			PyErr_SetString( PyExc_ValueError, buf );
-			throw boost::python::error_already_set(); 
-		}
+		PySingleToCefValueList( value, result, i );
 	}
 
 	return result;

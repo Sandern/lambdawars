@@ -19,6 +19,7 @@ class CefListValue;
 class CefDictionaryValue;
 
 // Helper functions
+void PySingleToCefValueList( boost::python::object value, CefListValue *result, int i );
 CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l ); // l must be iterable
 boost::python::list CefValueListToPy( CefRefPtr<CefListValue> l );
 
