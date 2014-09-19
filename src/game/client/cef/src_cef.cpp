@@ -10,6 +10,7 @@
 #include "src_cef_osrenderer.h"
 #include "src_cef_avatar_handler.h"
 #include "src_cef_vtf_handler.h"
+#include "warscef/wars_cef_shared.h"
 #include <filesystem.h>
 
 #include <vgui/IInput.h>
@@ -22,12 +23,19 @@
 #include "include/cef_frame.h"
 #include "include/cef_runnable.h"
 #include "include/cef_client.h"
+#include "include/cef_sandbox_win.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
 ConVar g_debug_cef("g_debug_cef", "0");
 extern ConVar developer;
+
+#if CEF_ENABLE_SANDBOX
+// The cef_sandbox.lib static library is currently built with VS2010. It may not
+// link successfully with other VS versions.
+#pragma comment(lib, "cef_sandbox.lib")
+#endif
 
 #ifdef WIN32
 WNDPROC RealWndProc;
@@ -199,12 +207,20 @@ bool CCefSystem::Init()
 	//settings.pack_loading_disabled = true;
 	settings.remote_debugging_port = 8088;
 	settings.windowless_rendering_enabled = true;
+#if !CEF_ENABLE_SANDBOX
+	settings.no_sandbox = true;
+#endif
 	CefString(&settings.cache_path) = CefString( "cache" );
 
 	CefString(&settings.browser_subprocess_path) = CefString( browser_subprocess_path );
 
 	// Initialize CEF.
-	void* sandbox_info = NULL;
+	void *sandbox_info = NULL;
+#if CEF_ENABLE_SANDBOX
+	CefScopedSandboxInfo scoped_sandbox;
+	sandbox_info = scoped_sandbox.sandbox_info();
+#endif
+
 	CefInitialize( main_args, settings, g_pClientApp.get(), sandbox_info );
 
 	DevMsg("Initialized CEF\n");

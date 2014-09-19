@@ -6,6 +6,14 @@
 
 #include "tier1/strtools.h"
 
+#ifdef WIN32
+#include <Rpc.h>
+#else
+#include <uuid/uuid.h>
+#endif
+
+#define CEF_ENABLE_SANDBOX 0
+
 inline bool WarsCef_GenerateUUID( char *destuuid )
 {
 #ifdef WIN32
