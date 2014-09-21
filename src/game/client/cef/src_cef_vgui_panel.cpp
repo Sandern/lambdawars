@@ -747,5 +747,5 @@ void SrcCefVGUIPanel::InternalFocusChanged(bool lost)
 //-----------------------------------------------------------------------------
 int	SrcCefVGUIPanel::GetBrowserID()
 {
-	return m_pBrowser->GetBrowser()->GetIdentifier();
+	return m_pBrowser->GetBrowser() ? m_pBrowser->GetBrowser()->GetIdentifier() : -1;
 }

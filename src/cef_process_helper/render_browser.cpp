@@ -230,52 +230,6 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 					CefRefPtr<CefV8Value>& retval, 
 					CefRefPtr<CefV8Value> callback )
 {
-#if 0
-	std::map< CefString, CefRefPtr<CefV8Value> >::iterator i = m_Objects.begin();
-	for( ; i != m_Objects.end(); ++i )
-	{
-		if( i->second->IsSame( object ) )
-		{
-			// Create message
-			CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("methodcall");
-			CefRefPtr<CefListValue> args = message->GetArgumentList();
-
-			CefRefPtr<CefListValue> methodargs = CefListValue::Create();
-			V8ValueListToListValue( this, arguments, methodargs );
-
-			if( callback )
-			{
-				// Remove last, this is the callback method
-				// Do this before the SetList call
-				// SetList will invalidate methodargs and take ownership
-				methodargs->Remove( methodargs->GetSize() - 1 );
-			}
-
-			args->SetString( 0, i->first );
-			args->SetList( 1, methodargs );
-
-			// Store callback
-			if( callback )
-			{
-				m_Callbacks.push_back( jscallback_t() );
-				m_Callbacks.back().callback = callback;
-				m_Callbacks.back().callbackid = s_NextCallbackID++;
-				m_Callbacks.back().thisobject = object;
-
-				args->SetInt( 2, m_Callbacks.back().callbackid );
-			}
-			else
-			{
-				args->SetNull( 2 );
-			}
-
-			// Send message
-			m_Browser->SendProcessMessage(PID_BROWSER, message);
-
-			return true;
-		}
-	}
-#else
 	CefRefPtr<CefBase> user_data = object->GetUserData();
 	if( user_data )
 	{
@@ -319,9 +273,8 @@ bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 
 		return true;
 	}
-
-#endif // 0
-
+	
+	m_ClientApp->SendWarning( m_Browser, "Failed to call js bound function %ls\n", object->GetFunctionName().c_str() );
 	return false;
 }
 

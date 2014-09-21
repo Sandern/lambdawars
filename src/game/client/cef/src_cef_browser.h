@@ -71,7 +71,8 @@ public:
 
 	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
-	void ShowDevTools( );
+	void ShowDevTools();
+	void CloseDevTools();
 
 	// Load handler methods
 	virtual void OnLoadStart( CefRefPtr<CefFrame> frame );
@@ -90,6 +91,7 @@ public:
 	virtual void Unfocus();
 
 	virtual void LoadURL( const char *url );
+	virtual const char *GetURL();
 
 	virtual void WasHidden( bool hidden );
 

@@ -414,7 +414,7 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 	{
 		// Always allow dev tools urls
 		std::string url = request->GetURL().ToString();
-		std::string chromedevtoolspro( "chrome-devtools://");
+		static std::string chromedevtoolspro( "chrome-devtools://");
 		if( url.compare( 0, chromedevtoolspro.size(), chromedevtoolspro ) != 0 )
 		{
 			if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
@@ -425,10 +425,11 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 			}
 			else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
 			{
-				// This mode only allows navigating to urls starting with the file protocol
-				std::string filepro( "file://");
+				// This mode only allows navigating to urls starting with the file or custom local protocol
+				static std::string filepro( "file://");
+				static std::string localpro( "local:");
 
-				if( url.compare( 0, filepro.size(), filepro ) )
+				if( url.compare( 0, filepro.size(), filepro ) && url.compare( 0, localpro.size(), localpro ) )
 					bDenyNavigation = true;
 			}
 		}
@@ -440,6 +441,8 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 		}
 	}
 
+	if( g_debug_cef.GetBool() )
+		DevMsg( "#%d %s: SrcCefBrowser::OnBeforeBrowse %s. Deny: %d\n", browser->GetIdentifier(), m_pSrcBrowser->GetName(), request->GetURL().ToString().c_str(), bDenyNavigation );
 	return bDenyNavigation;
 }
 
@@ -514,6 +517,8 @@ SrcCefBrowser::~SrcCefBrowser()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Destroy( void )
 {
+	CloseDevTools();
+
 	// Delete panel
 	if( m_pPanel )
 	{
@@ -974,6 +979,23 @@ void SrcCefBrowser::LoadURL( const char *url )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+const char *SrcCefBrowser::GetURL()
+{
+	if( !IsValid() )
+		return "";
+
+	CefRefPtr<CefFrame> mainFrame = m_CefClientHandler->GetBrowser()->GetMainFrame();
+	if( !mainFrame )
+		return "";
+
+	static std::string s_url;
+	s_url = mainFrame->GetURL().ToString(); // ugly
+	return s_url.c_str();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void SrcCefBrowser::WasHidden( bool hidden )
 {
 	if( !IsValid() )
@@ -1311,8 +1333,11 @@ void SrcCefBrowser::Ping()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void SrcCefBrowser::ShowDevTools( ) 
+void SrcCefBrowser::ShowDevTools() 
 {
+	if( !IsValid() )
+		return;
+
 	CefWindowInfo windowInfo;
 	CefBrowserSettings settings;
 
@@ -1321,4 +1346,15 @@ void SrcCefBrowser::ShowDevTools( )
 #endif
 
 	GetBrowser()->GetHost()->ShowDevTools(windowInfo, m_CefClientHandler, settings);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::CloseDevTools() 
+{
+	if( !IsValid() )
+		return;
+
+	GetBrowser()->GetHost()->CloseDevTools();
 }

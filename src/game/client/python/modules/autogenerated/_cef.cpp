@@ -78,6 +78,25 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         return SrcCefBrowser::GetNavigationBehavior( );
     }
 
+    virtual char const * GetURL(  ) {
+        PY_OVERRIDE_CHECK( SrcCefBrowser, GetURL )
+        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, GetURL )
+        bp::override func_GetURL = this->get_override( "GetURL" );
+        if( func_GetURL.ptr() != Py_None )
+            try {
+                return func_GetURL(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->SrcCefBrowser::GetURL(  );
+            }
+        else
+            return this->SrcCefBrowser::GetURL(  );
+    }
+    
+    char const * default_GetURL(  ) {
+        return SrcCefBrowser::GetURL( );
+    }
+
     virtual void InvalidateLayout(  ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, InvalidateLayout )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, InvalidateLayout )
@@ -612,6 +631,15 @@ BOOST_PYTHON_MODULE(_cef){
             .export_values()
             ;
         bp::implicitly_convertible< char const *, SrcCefBrowser >();
+        { //::SrcCefBrowser::CloseDevTools
+        
+            typedef void ( ::SrcCefBrowser::*CloseDevTools_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "CloseDevTools"
+                , CloseDevTools_function_type( &::SrcCefBrowser::CloseDevTools ) );
+        
+        }
         { //::SrcCefBrowser::Destroy
         
             typedef void ( ::SrcCefBrowser::*Destroy_function_type )(  ) ;
@@ -688,6 +716,17 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "GetPassMouseTruIfAlphaZero"
                 , GetPassMouseTruIfAlphaZero_function_type( &::SrcCefBrowser::GetPassMouseTruIfAlphaZero ) );
+        
+        }
+        { //::SrcCefBrowser::GetURL
+        
+            typedef char const * ( ::SrcCefBrowser::*GetURL_function_type )(  ) ;
+            typedef char const * ( SrcCefBrowser_wrapper::*default_GetURL_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "GetURL"
+                , GetURL_function_type(&::SrcCefBrowser::GetURL)
+                , default_GetURL_function_type(&SrcCefBrowser_wrapper::default_GetURL) );
         
         }
         { //::SrcCefBrowser::GetUseMouseCapture

@@ -573,6 +573,11 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 //-----------------------------------------------------------------------------
 void CGameUI::Shutdown()
 {
+#ifdef ENABLE_PYTHON
+	s_ref_ui_basemodpanel = boost::python::object();
+	s_ui_basemodpanel = NULL;
+#endif // ENABLE_PYTHON
+
 	// notify all the modules of Shutdown
 	g_VModuleLoader.ShutdownPlatformModules();
 
@@ -691,7 +696,10 @@ void CGameUI::OnGameUIHidden()
 	GetUiBaseModPanelClass().OnGameUIHidden();
 
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->Run( SrcPySystem()->Get( "OnGameUIHidden", s_ref_ui_basemodpanel, true ), true );
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		SrcPySystem()->Run( SrcPySystem()->Get( "OnGameUIHidden", s_ref_ui_basemodpanel, true ), true );
+	}
 #endif // ENABLE_PYTHON
 
 	// Restore to default
