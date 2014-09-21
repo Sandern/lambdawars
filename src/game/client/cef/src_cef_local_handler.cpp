@@ -28,12 +28,16 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 {
 	CefRefPtr<CefResourceHandler> pResourceHandler = NULL;
 
-	// Parse the request url into components so we can retrieve the requested steam id
 	CefURLParts parts;
 	CefParseURL(request->GetURL(), parts);
 
+	if( CefString(&parts.path).size() < 2 )
+	{
+		return NULL;
+	}
+
 	char path[MAX_PATH];
-	V_strncpy( path, CefString(&parts.path).ToString().c_str() + 2, sizeof(path) );
+	V_strncpy( path, CefString(&parts.path).ToString().c_str() + 1, sizeof(path) );
 
 	if( filesystem->IsDirectory( path ) ) 
 	{
@@ -45,11 +49,6 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 
 	//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d\n", 
 	//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ) );
-
-	CefString(&parts.path) = std::string("//") + std::string(path);
-	CefString newUrl;
-	CefCreateURL( parts, newUrl );
-	request->SetURL( newUrl );
 
 	CUtlBuffer buf;
 	if( filesystem->ReadFile( path, NULL, buf ) )
