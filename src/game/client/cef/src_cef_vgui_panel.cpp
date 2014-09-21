@@ -18,6 +18,9 @@
 // CEF
 #include "include/cef_browser.h"
 
+#include "../materialsystem/IShaderSystem.h"
+#include "shaderapi/IShaderAPI.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -150,9 +153,11 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	// IMPORTANT: Use TEXTUREFLAGS_POINTSAMPLE. Otherwise mat_filtertextures will make it really blurred and ugly.
 	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specify
 	//				a sub rect when calling ->Download()).
-	m_RenderBuffer.InitProceduralTexture( m_TextureWebViewName, TEXTURE_GROUP_VGUI, m_iTexWide, m_iTexTall, IMAGE_FORMAT_BGRA8888, 
-		TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY|
-		TEXTUREFLAGS_PRE_SRGB|TEXTUREFLAGS_NODEPTHBUFFER);
+	m_iTexImageFormat = IMAGE_FORMAT_BGRA8888; // IMAGE_FORMAT_RGBA8888;
+	m_iTexFlags = TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY|
+		TEXTUREFLAGS_PRE_SRGB|TEXTUREFLAGS_NODEPTHBUFFER;
+
+	m_RenderBuffer.InitProceduralTexture( m_TextureWebViewName, TEXTURE_GROUP_VGUI, m_iTexWide, m_iTexTall, m_iTexImageFormat, m_iTexFlags);
 	if( !m_RenderBuffer.IsValid() )
 	{
 		Warning("Cef: Failed to initialize render buffer texture\n");
@@ -202,6 +207,36 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	CefDbgMsg( 1, "Cef#%d: Finished initializing web material.\n", GetBrowserID() );
 	return true;
 }
+
+#if 0
+// This code could be used to allocate a vtf texture when the render buffer changes
+// and download the texture directly to the vtf using the regenerator.
+// However it's much faster to just directly update through the shader api, bypassing
+// the unnecessary copies (since we don't use mipmaps/frames/etc)
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::AllocateVTFTexture()
+{
+	DeallocateVTFTexture();
+
+	m_pVTFTexture = CreateVTFTexture();
+	m_pVTFTexture->Init( m_iTexWide, m_iTexTall, 1,
+		m_iTexImageFormat, m_iTexFlags, 1 );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::DeallocateVTFTexture()
+{
+	if( !m_pVTFTexture )
+		return;
+
+	DestroyVTFTexture( m_pVTFTexture );
+	m_pVTFTexture = NULL;
+}
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -282,13 +317,24 @@ void SrcCefVGUIPanel::Paint()
 		//	DevMsg("CEF: texture requires full regeneration\n");
 		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
 		{
-			VPROF_BUDGET( "Download", "CefDownloadTexture" );
-			Rect_t dirtyArea;
-			dirtyArea.x = m_iDirtyX;
-			dirtyArea.y = m_iDirtyY;
-			dirtyArea.width = m_iDirtyXEnd - m_iDirtyX;
-			dirtyArea.height = m_iDirtyYEnd - m_iDirtyY;
-			m_RenderBuffer->Download( &dirtyArea );
+			VPROF_BUDGET( "Upload", "CefUploadTexture" );
+
+			CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
+			if( renderer->GetTextureBuffer() )
+			{
+				int nFrame = 0;
+				int nTextureChannel = 0;
+				ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+
+				int iFace = 0;
+				int iMip = 0;
+				int z = 0;
+
+				g_pShaderAPI->ModifyTexture( textureHandle );
+				g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+
+				m_pTextureRegen->ClearDirty();
+			}
 		}
 
 		// Clear if no longer dirty
@@ -298,9 +344,6 @@ void SrcCefVGUIPanel::Paint()
 			m_iDirtyY = m_iWVTall;
 			m_iDirtyXEnd = m_iDirtyYEnd = 0;
 		}
-
-		//if( m_pTextureRegen->IsDirty() == false )
-		//	materials->ReloadMaterials(m_MatWebViewName); // FIXME
 	}
 
 	// Must have a valid texture and the texture regenerator should be valid

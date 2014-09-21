@@ -33,8 +33,8 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         
     }
 
-    SrcCefBrowser_wrapper(char const * name, char const * url="" )
-    : SrcCefBrowser( name, url )
+    SrcCefBrowser_wrapper(char const * name, char const * url="", int renderframerate=30 )
+    : SrcCefBrowser( name, url, renderframerate )
       , bp::wrapper< SrcCefBrowser >(){
         // constructor
     
@@ -622,7 +622,7 @@ BOOST_PYTHON_MODULE(_cef){
 
     { //::SrcCefBrowser
         typedef bp::class_< SrcCefBrowser_wrapper > SrcCefBrowser_exposer_t;
-        SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const * > >(( bp::arg("name"), bp::arg("url")="" )) );
+        SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const *, int > >(( bp::arg("name"), bp::arg("url")="", bp::arg("renderframerate")=(int)(30) )) );
         bp::scope SrcCefBrowser_scope( SrcCefBrowser_exposer );
         bp::enum_< SrcCefBrowser::NavigationType>("NavigationType")
             .value("NT_DEFAULT", SrcCefBrowser::NT_DEFAULT)

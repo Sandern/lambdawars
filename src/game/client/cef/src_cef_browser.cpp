@@ -459,7 +459,7 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
 	m_bInitializePingSuccessful(false), m_bWasHidden(false)
 {
@@ -488,6 +488,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL ) : m_bPerformL
 	// Browser settings
     CefBrowserSettings settings;
 	settings.web_security = STATE_DISABLED;
+	settings.windowless_frame_rate = renderFrameRate;
 
     // Creat the new child browser window
 	if( g_debug_cef.GetBool() )

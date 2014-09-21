@@ -26,6 +26,7 @@ public:
 
 	bool IsDirty() { return m_bIsDirty; }
 	void MakeDirty() { m_bIsDirty = true; }
+	void ClearDirty() { m_bIsDirty = false; }
 
 private:
 	bool m_bIsDirty;

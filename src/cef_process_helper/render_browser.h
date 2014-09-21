@@ -18,7 +18,7 @@ class WarsCefUserData : public CefBase
 public:
 	WarsCefUserData() {}
 	CefString function_uuid;
-	IMPLEMENT_REFCOUNTING(UserData);
+	IMPLEMENT_REFCOUNTING(WarsCefUserData);
 };
 
 class FunctionV8Handler : public CefV8Handler
@@ -39,7 +39,7 @@ protected:
 	CefRefPtr<CefV8Value> m_Func;
 
 	// Provide the reference counting implementation for this class.
-	IMPLEMENT_REFCOUNTING(DefaultV8Handler);
+	IMPLEMENT_REFCOUNTING(FunctionV8Handler);
 };
 
 class FunctionWithCallbackV8Handler : public FunctionV8Handler

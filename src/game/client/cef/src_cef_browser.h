@@ -14,6 +14,8 @@
 #include "include/internal/cef_ptr.h"
 #include "include/internal/cef_string.h"
 
+#include "src_cef_js.h"
+
 // Forward declarations
 class CefClientHandler;
 class SrcCefVGUIPanel;
@@ -23,7 +25,6 @@ class CefFrame;
 class CefProcessMessage;
 class CefListValue;
 
-class JSObject;
 class PyJSObject;
 
 //-----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ class SrcCefBrowser
 	friend class CCefSystem;
 
 public:
-	SrcCefBrowser( const char *name, const char *url = "" );
+	SrcCefBrowser( const char *name, const char *url = "", int renderframerate = 30 );
 	~SrcCefBrowser();
 
 	void Destroy( void );

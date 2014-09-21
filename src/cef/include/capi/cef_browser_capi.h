@@ -391,12 +391,12 @@ typedef struct _cef_browser_host_t {
       struct _cef_browser_host_t* self);
 
   ///
-  // Invalidate the |dirtyRect| region of the view. The browser will call
-  // cef_render_handler_t::OnPaint asynchronously with the updated regions. This
-  // function is only used when window rendering is disabled.
+  // Invalidate the view. The browser will call cef_render_handler_t::OnPaint
+  // asynchronously. This function is only used when window rendering is
+  // disabled.
   ///
   void (CEF_CALLBACK *invalidate)(struct _cef_browser_host_t* self,
-      const cef_rect_t* dirtyRect, cef_paint_element_type_t type);
+      cef_paint_element_type_t type);
 
   ///
   // Send a key event to the browser.

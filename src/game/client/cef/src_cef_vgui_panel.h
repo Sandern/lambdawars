@@ -89,11 +89,15 @@ private:
 	char m_MatWebViewName[MAX_PATH];
 	char m_TextureWebViewName[MAX_PATH];
 
+	//IVTFTexture *m_pVTFTexture;
+
 	vgui::HFont m_hLoadingFont;
 
 	int m_iTextureID;
 	int m_iWVWide, m_iWVTall;
 	int m_iTexWide, m_iTexTall;
+	int m_iTexFlags;
+	ImageFormat m_iTexImageFormat;
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 

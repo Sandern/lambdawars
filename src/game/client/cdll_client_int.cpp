@@ -161,6 +161,9 @@
 #include "editor/editorsystem.h"
 #include "wars/iwars_extension.h"
 #include "wars_matchmaking.h"
+
+#include "../materialsystem/IShaderSystem.h"
+#include "shaderapi/ishaderapi.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -221,6 +224,8 @@ IReplayHistoryManager *g_pReplayHistoryManager = NULL;
 
 #ifdef HL2WARS_DLL
 IWarsExtension *warsextension = NULL;
+IShaderSystem* g_pSLShaderSystem;
+IShaderAPI* g_pShaderAPI;
 #endif // HL2WARS_DLL
 
 IScriptManager *scriptmanager = NULL;
@@ -1231,6 +1236,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 
 #ifdef HL2WARS_DLL
 	warsextension = (IWarsExtension *)appSystemFactory(WARS_EXTENSION_VERSION, NULL);
+
+	g_pSLShaderSystem =  (IShaderSystem*)appSystemFactory( SHADERSYSTEM_INTERFACE_VERSION, NULL );
+	g_pShaderAPI = (IShaderAPI*)appSystemFactory( SHADERAPI_INTERFACE_VERSION, NULL );
 #endif // HL2WARS_DLL
 
 	if ( !CommandLine()->CheckParm( "-noscripting") )

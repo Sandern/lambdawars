@@ -104,6 +104,10 @@ extern IReplayHistoryManager *g_pReplayHistoryManager;
 #ifdef HL2WARS_DLL
 class IWarsExtension;
 extern IWarsExtension *warsextension;
+class IShaderSystem;
+extern IShaderSystem* g_pSLShaderSystem;
+class IShaderAPI;
+extern IShaderAPI* g_pShaderAPI;
 #endif
 
 // Returns the CPU/GPU level
