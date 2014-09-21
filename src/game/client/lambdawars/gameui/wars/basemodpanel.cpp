@@ -2464,6 +2464,9 @@ bool CBaseModPanel::StartBackgroundMusic( float fVol )
 	if ( m_backgroundMusic.IsEmpty() )
 		return false;
 
+	if ( CommandLine()->FindParm( "-nostartupsound" ) )
+		return false;
+
 	// trying to exit, cannot start it
 	if ( m_ExitingFrameCount )
 		return false;
