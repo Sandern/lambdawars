@@ -190,7 +190,6 @@ private:
 	float m_fLastPingTime;
 
 	// Internal
-	HWND m_hostWindow;
 	SrcCefBrowser *m_pSrcBrowser;
 
 	IMPLEMENT_REFCOUNTING( CefClientHandler );
@@ -481,7 +480,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFram
 	m_CefClientHandler = new CefClientHandler( this );
 
     CefWindowInfo info;
-	info.SetAsWindowless( CEFSystem().GetMainWindow(), true );
+	info.SetAsWindowless( /*CEFSystem().GetMainWindow()*/ NULL, true );
 
 	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
 	
