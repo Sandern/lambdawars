@@ -45,6 +45,15 @@ public:
 	virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
 								CefCursorHandle cursor);
 
+	virtual bool StartDragging(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefDragData> drag_data,
+								DragOperationsMask allowed_ops,
+								int x, int y);
+
+	virtual void UpdateDragCursor(CefRefPtr<CefBrowser> browser,
+								DragOperation operation);
+
+
 	virtual void OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser);
 
 	virtual void SetCursor( vgui::CursorCode cursor );

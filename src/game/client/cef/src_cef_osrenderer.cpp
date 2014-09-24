@@ -268,6 +268,24 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 	return alpha;
 }
 
+bool SrcCefOSRRenderer::StartDragging(CefRefPtr<CefBrowser> browser,
+							CefRefPtr<CefDragData> drag_data,
+							DragOperationsMask allowed_ops,
+							int x, int y)
+{
+	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer StartDragging called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
+	if( !browser->GetHost() )
+		return false;
+	browser->GetHost()->DragSourceSystemDragEnded();
+	return true;
+}
+
+void SrcCefOSRRenderer::UpdateDragCursor(CefRefPtr<CefBrowser> browser,
+							DragOperation operation)
+{
+	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer UpdateDragCursor called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------

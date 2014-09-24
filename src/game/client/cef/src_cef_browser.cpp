@@ -69,6 +69,7 @@ class CefClientHandler : public CefClient,
                       public CefContextMenuHandler,
                       public CefDisplayHandler,
                       public CefDownloadHandler,
+					  public CefDragHandler,
                       public CefGeolocationHandler,
                       public CefKeyboardHandler,
                       public CefLifeSpanHandler,
@@ -91,6 +92,9 @@ public:
 		return this;
 	}
 	virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefDragHandler> GetDragHandler() {
 		return this;
 	}
 	virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler() {
@@ -135,6 +139,11 @@ public:
 		CefRefPtr<CefDownloadItem> download_item,
 		const CefString& suggested_name,
 		CefRefPtr<CefBeforeDownloadCallback> callback) {}
+
+	// CefDragHandler methods
+	virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser,
+                           CefRefPtr<CefDragData> dragData,
+                           CefDragHandler::DragOperationsMask mask) { return true; }
 
 	// CefLifeSpanHandler methods
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
