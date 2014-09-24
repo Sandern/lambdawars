@@ -45,18 +45,23 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 		V_strcat( path, "index.html", sizeof(path) );
 	}
 
-	const char *pExtension = V_GetFileExtension( path );
-
-	//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d\n", 
-	//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ) );
-
-	CUtlBuffer buf;
-	if( filesystem->ReadFile( path, NULL, buf ) )
+	if( filesystem->FileExists( path, NULL ) )
 	{
-		CefRefPtr<CefStreamReader> stream =
-			CefStreamReader::CreateForData( buf.Base(), buf.TellPut() );
+		const char *pExtension = V_GetFileExtension( path );
 
-		pResourceHandler = new CefStreamResourceHandler(CefGetMimeType(pExtension), stream);
+		//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d\n", 
+		//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ) );
+
+		CUtlBuffer buf( 0, filesystem->Size( path, NULL ) );
+		if( filesystem->ReadFile( path, NULL, buf ) )
+		{
+			CefRefPtr<CefStreamReader> stream =
+				CefStreamReader::CreateForData( buf.Base(), buf.TellPut() );
+			if( stream != NULL ) 
+			{
+				pResourceHandler = new CefStreamResourceHandler(CefGetMimeType(pExtension), stream);
+			}
+		}
 	}
 
 	return pResourceHandler;

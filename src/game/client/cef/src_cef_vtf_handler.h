@@ -12,6 +12,10 @@
 
 #include "include/cef_scheme.h"
 
+class CUtlBuffer;
+
+void VTFHandler_ConvertImageToJPG( CUtlBuffer &buf, unsigned char *imageData, uint32 width, uint32 height );
+
 class VTFSchemeHandlerFactory : public CefSchemeHandlerFactory 
 {
 public:

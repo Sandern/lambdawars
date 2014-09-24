@@ -120,6 +120,57 @@ GLOBAL(void) jpeg_UtlBuffer_dest(j_compress_ptr cinfo, CUtlBuffer *pBuffer)
 	dest->pBuffer = pBuffer;
 }
 
+void VTFHandler_ConvertImageToJPG( CUtlBuffer &buf, unsigned char *imageData, uint32 width, uint32 height )
+{
+	int quality = 100;
+
+	JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
+	int row_stride;              // physical row width in image buffer
+
+	// stderr handler
+	struct jpeg_error_mgr jerr;
+
+	// compression data structure
+	struct jpeg_compress_struct cinfo;
+
+	row_stride = width * 3; // JSAMPLEs per row in image_buffer
+
+	// point at stderr
+	cinfo.err = jpeg_std_error(&jerr);
+
+	// create compressor
+	jpeg_create_compress(&cinfo);
+
+	// Hook CUtlBuffer to compression
+	jpeg_UtlBuffer_dest(&cinfo, &buf);
+
+	// image width and height, in pixels
+	cinfo.image_width = width;
+	cinfo.image_height = height;
+	cinfo.input_components = 3;
+	cinfo.in_color_space = JCS_RGB;
+
+	// Apply settings
+	jpeg_set_defaults(&cinfo);
+	jpeg_set_quality(&cinfo, quality, TRUE);
+
+	// Start compressor
+	jpeg_start_compress(&cinfo, TRUE);
+
+	// Write scanlines
+	while (cinfo.next_scanline < cinfo.image_height)
+	{
+		row_pointer[0] = &imageData[cinfo.next_scanline * row_stride];
+		jpeg_write_scanlines(&cinfo, row_pointer, 1);
+	}
+
+	// Finalize image
+	jpeg_finish_compress(&cinfo);
+
+	// Cleanup
+	jpeg_destroy_compress(&cinfo);
+}
+
 VTFSchemeHandlerFactory::VTFSchemeHandlerFactory()
 {
 }
@@ -157,58 +208,15 @@ CefRefPtr<CefResourceHandler> VTFSchemeHandlerFactory::Create(CefRefPtr<CefBrows
 		if (VTFFile.Convert(VTFFile.GetData(0, 0, 0, 0), lpImageData, uiWidth, uiHeight, VTFFile.GetFormat(), IMAGE_FORMAT_RGB888))
 		{
 			CUtlBuffer buf;
-			int quality = 100;
+			VTFHandler_ConvertImageToJPG( buf, lpImageData, uiWidth, uiHeight );
 
-			JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
-			int row_stride;              // physical row width in image buffer
-
-			// stderr handler
-			struct jpeg_error_mgr jerr;
-
-			// compression data structure
-			struct jpeg_compress_struct cinfo;
-
-			row_stride = uiWidth * 3; // JSAMPLEs per row in image_buffer
-
-			// point at stderr
-			cinfo.err = jpeg_std_error(&jerr);
-
-			// create compressor
-			jpeg_create_compress(&cinfo);
-
-			// Hook CUtlBuffer to compression
-			jpeg_UtlBuffer_dest(&cinfo, &buf);
-
-			// image width and height, in pixels
-			cinfo.image_width = uiWidth;
-			cinfo.image_height = uiHeight;
-			cinfo.input_components = 3;
-			cinfo.in_color_space = JCS_RGB;
-
-			// Apply settings
-			jpeg_set_defaults(&cinfo);
-			jpeg_set_quality(&cinfo, quality, TRUE);
-
-			// Start compressor
-			jpeg_start_compress(&cinfo, TRUE);
-
-			// Write scanlines
-			while (cinfo.next_scanline < cinfo.image_height)
+			if( buf.Size() > 0 )
 			{
-				row_pointer[0] = &lpImageData[cinfo.next_scanline * row_stride];
-				jpeg_write_scanlines(&cinfo, row_pointer, 1);
+				CefRefPtr<CefStreamReader> stream =
+					CefStreamReader::CreateForData(static_cast<void*>(buf.Base()), buf.Size());
+
+				pResourceHandler = new CefStreamResourceHandler("image/jpeg", stream);
 			}
-
-			// Finalize image
-			jpeg_finish_compress(&cinfo);
-
-			// Cleanup
-			jpeg_destroy_compress(&cinfo);
-
-			CefRefPtr<CefStreamReader> stream =
-				CefStreamReader::CreateForData(static_cast<void*>(buf.Base()), buf.Size());
-
-			pResourceHandler = new CefStreamResourceHandler("image/jpeg", stream);
 		}
 	}
 

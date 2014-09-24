@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "src_cef_avatar_handler.h"
+#include "src_cef_vtf_handler.h"
 
 #include "steam/steam_api.h"
 
@@ -65,17 +66,38 @@ CefRefPtr<CefResourceHandler> AvatarSchemeHandlerFactory::Create(CefRefPtr<CefBr
 				if ( steamapicontext->SteamUtils()->GetImageSize( iAvatar, &wide, &tall ) && wide > 0 && tall > 0 )
 				{
 					int destBufferSize = wide * tall * 4;
-					byte *rgbDest = (byte*)stackalloc( destBufferSize );
-					if ( steamapicontext->SteamUtils()->GetImageRGBA( iAvatar, rgbDest, destBufferSize ) )
+					byte *rgbaDest = (byte*)stackalloc( destBufferSize );
+					if ( steamapicontext->SteamUtils()->GetImageRGBA( iAvatar, rgbaDest, destBufferSize ) )
 					{
-						CefRefPtr<CefStreamReader> stream =
-							CefStreamReader::CreateForData( static_cast<void*>(rgbDest), destBufferSize );
+						int destRGBBufferSize = wide * tall * 3;
+						byte *rgbDest = (byte*)stackalloc( destRGBBufferSize );
 
-						pResourceHandler = new CefStreamResourceHandler("application/octet-stream", stream);
+						int x, y;
+						for( y = 0; y < tall; y++ ) 
+						{
+							for( x = 0; x < wide; x++ ) 
+							{
+								rgbDest[y*wide*3+x*3] = rgbaDest[y*wide*4+x*4];
+								rgbDest[y*wide*3+x*3 + 1] = rgbaDest[y*wide*4+x*4 + 1];
+								rgbDest[y*wide*3+x*3 + 2] = rgbaDest[y*wide*4+x*4 + 2];
+							}
+						}
+
+						CUtlBuffer buf;
+						VTFHandler_ConvertImageToJPG( buf, rgbDest, wide, tall );
+
+						CefRefPtr<CefStreamReader> stream =
+							CefStreamReader::CreateForData( static_cast<void*>(buf.Base()), buf.Size() );
+						if( stream )
+						{
+							pResourceHandler = new CefStreamResourceHandler("image/jpeg", stream);
+						}
+
+						// CefStreamReader creates a copy of the data, so we can safely release it
+						stackfree( rgbDest );
 					}
 					
-					// CefStreamReader creates a copy of the data, so we can safely release it
-					stackfree( rgbDest );
+					stackfree( rgbaDest );
 				}
 			}
 		}
