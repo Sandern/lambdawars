@@ -72,7 +72,7 @@ CefRefPtr<CefResourceHandler> AvatarSchemeHandlerFactory::Create(CefRefPtr<CefBr
 						int destRGBBufferSize = wide * tall * 3;
 						byte *rgbDest = (byte*)stackalloc( destRGBBufferSize );
 
-						int x, y;
+						uint32 x, y;
 						for( y = 0; y < tall; y++ ) 
 						{
 							for( x = 0; x < wide; x++ ) 
@@ -90,7 +90,9 @@ CefRefPtr<CefResourceHandler> AvatarSchemeHandlerFactory::Create(CefRefPtr<CefBr
 							CefStreamReader::CreateForData( static_cast<void*>(buf.Base()), buf.Size() );
 						if( stream )
 						{
-							pResourceHandler = new CefStreamResourceHandler("image/jpeg", stream);
+							CefResponse::HeaderMap header_map;
+							header_map.insert( std::pair<CefString,CefString>( CefString("Cache-Control"), CefString("no-cache") ) ); 
+							pResourceHandler = new CefStreamResourceHandler(200, "OK", "image/jpeg", header_map, stream);
 						}
 
 						// CefStreamReader creates a copy of the data, so we can safely release it
