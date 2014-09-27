@@ -134,12 +134,6 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	Assert( dirtyRects.size() > 0 );
 
-	int dirtyx, dirtyy, dirtyxend, dirtyyend;
-	dirtyx = width;
-	dirtyy = height;
-	dirtyxend = 0;
-	dirtyyend = 0;
-
 	//AUTO_LOCK( s_BufferMutex );
 
 	// Update image buffer size if needed
@@ -154,38 +148,11 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		m_iWidth = width;
 		m_iHeight = height;
 		m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
-
-		// Full dirty
-		dirtyx = 0;
-		dirtyy = 0;
-		dirtyxend = m_iWidth;
-		dirtyyend = m_iHeight;
 	}
 
-	const unsigned char *imagebuffer = (const unsigned char *)buffer;
+	memcpy( m_pTextureBuffer, buffer, m_iWidth * m_iHeight * channels );
 
-	// Update dirty rects
-	CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
-	for (; i != dirtyRects.end(); ++i) 
-	{
-		const CefRect& rect = *i;
-
-		for( int y = rect.y; y < rect.y + rect.height; y++ )
-		{
-			memcpy( m_pTextureBuffer + (y * m_iWidth * channels) + (rect.x * channels), // Our current row + x offset
-				imagebuffer + (y * m_iWidth * channels) + (rect.x * channels), // Source offset
-				rect.width * channels // size of row we want to copy
-			); 
-		}
-
-		// Update max dirty area
-		dirtyx = Min( rect.x, dirtyx );
-		dirtyy = Min( rect.y, dirtyy );
-		dirtyxend = Max( rect.x + rect.width, dirtyxend );
-		dirtyyend = Max( rect.y + rect.height, dirtyyend );
-	}
-
-	m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
+	m_pBrowser->GetPanel()->MarkTextureDirty( 0, 0, m_iWidth, m_iHeight );
 }
 
 //-----------------------------------------------------------------------------
