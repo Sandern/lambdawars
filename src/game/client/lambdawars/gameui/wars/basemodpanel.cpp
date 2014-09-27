@@ -552,6 +552,11 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 		newNav->SetVisible( false );
 	}
 
+	if( m_FooterPanel )
+	{
+		m_FooterPanel->SetVisible( wt != WT_MAINMENU );
+	}
+
 	newNav->SetDataSettings( pParameters );
 
 	if (setActiveWindow)
@@ -704,6 +709,11 @@ void CBaseModPanel::OnFrameClosed( WINDOW_PRIORITY pri, WINDOW_TYPE wt )
 
 	// Mark the frame that just closed as NULL so that nobody could find it
 	m_Frames[wt] = NULL;
+
+	if( m_FooterPanel )
+	{
+		m_FooterPanel->SetVisible( false );
+	}
 
 	if ( m_bClosingAllWindows )
 	{
