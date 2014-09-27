@@ -60,6 +60,10 @@ boost::python::tuple PyGetLobbyDataByIndex( CSteamID steamIDLobby, int iLobbyDat
 bool PySendLobbyChatMsg( CSteamID steamIDLobby, const char *pvMsgBody );
 boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CSteamID *pSteamIDUser );
 
+// Wrapper functions UserStats
+boost::python::object PyGetStatFloat( const char *name );
+boost::python::object PyGetStatInt( const char *name );
+
 // Wrapper functions Matchmaking Servers
 class PySteamMatchmakingServerListResponse : public ISteamMatchmakingServerListResponse
 {

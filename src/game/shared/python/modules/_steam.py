@@ -173,6 +173,36 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_declaration_code(callresult_wrapper_tmpl % {'name' : name, 'dataclass' : dataclsname})
         mb.add_registration_code(callresult_reg_tmpl % {'name' : name, 'dataclass' : dataclsname})
         
+    def ParseSteamFriends(self, mb):
+        cls = mb.class_('ISteamFriends')
+        cls.include()
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.mem_fun('GetFriendGamePlayed').exclude()
+        
+        mb.enum('EFriendRelationship').include()
+        mb.enum('EPersonaState').include()
+        mb.enum('EPersonaChange').include()
+        mb.add_registration_code( "bp::scope().attr( \"k_cchPersonaNameMax\" ) = (int)k_cchPersonaNameMax;" )
+        
+        self.AddSteamCallback('PersonaStateChange', 'PersonaStateChange_t')
+        self.AddSteamCallback('GameOverlayActivated', 'GameOverlayActivated_t')
+        self.AddSteamCallback('GameServerChangeRequested', 'GameServerChangeRequested_t')
+        self.AddSteamCallback('GameLobbyJoinRequested', 'GameLobbyJoinRequested_t')
+        self.AddSteamCallback('AvatarImageLoaded', 'AvatarImageLoaded_t')
+        self.AddSteamCallback('ClanOfficerListResponse', 'ClanOfficerListResponse_t')
+        self.AddSteamCallback('FriendRichPresenceUpdate', 'FriendRichPresenceUpdate_t')
+        self.AddSteamCallback('GameRichPresenceJoinRequested', 'GameRichPresenceJoinRequested_t')
+        self.AddSteamCallback('GameConnectedClanChatMsg', 'GameConnectedClanChatMsg_t')
+        self.AddSteamCallback('GameConnectedChatJoin', 'GameConnectedChatJoin_t')
+        self.AddSteamCallback('GameConnectedChatLeave', 'GameConnectedChatLeave_t')
+        self.AddSteamCallback('DownloadClanActivityCountsResult', 'DownloadClanActivityCountsResult_t')
+        self.AddSteamCallback('JoinClanChatRoomCompletionResult', 'JoinClanChatRoomCompletionResult_t')
+        self.AddSteamCallback('GameConnectedFriendChatMsg', 'GameConnectedFriendChatMsg_t')
+        self.AddSteamCallback('FriendsGetFollowerCount', 'FriendsGetFollowerCount_t')
+        self.AddSteamCallback('FriendsIsFollowing', 'FriendsIsFollowing_t')
+        self.AddSteamCallback('FriendsEnumerateFollowingList', 'FriendsEnumerateFollowingList_t')
+        self.AddSteamCallback('SetPersonaNameResponse', 'SetPersonaNameResponse_t')
+        
     def ParseMatchmaking(self, mb):
         # The main matchmaking interface
         cls = mb.class_('ISteamMatchmaking')
@@ -199,17 +229,6 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('PySteamMatchmakingServers')
         cls.include()
         cls.rename('SteamMatchmakingServers')
-        
-        '''cls = mb.class_('ISteamMatchmakingServers')
-        cls.include()
-        cls.mem_funs().virtuality = 'not virtual'
-        cls.mem_fun('RequestInternetServerList').exclude()
-        cls.mem_fun('RequestLANServerList').exclude()
-        cls.mem_fun('RequestFriendsServerList').exclude()
-        cls.mem_fun('RequestFavoritesServerList').exclude()
-        cls.mem_fun('RequestHistoryServerList').exclude()
-        cls.mem_fun('RequestSpectatorServerList').exclude()
-        cls.mem_funs('GetServerDetails').call_policies = call_policies.return_internal_reference()'''
         
         cls = mb.class_('PySteamMatchmakingServerListResponse')
         cls.include()
@@ -263,6 +282,9 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual'
         
         self.AddSteamCallResult('NumberOfCurrentPlayers', 'NumberOfCurrentPlayers_t')
+        
+        mb.free_function('PyGetStatFloat').include()
+        mb.free_function('PyGetStatInt').include()
         
     def ParseGameServer(self, mb):
         cls = mb.class_('ISteamGameServer')
@@ -349,15 +371,7 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_NOT_INITIALIZED\" ) = (int)QUERY_PORT_NOT_INITIALIZED;" )
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_ERROR\" ) = (int)QUERY_PORT_ERROR;" )
         
-        # Friends
-        cls = mb.class_('ISteamFriends')
-        cls.include()
-        cls.mem_funs().virtuality = 'not virtual'
-        cls.mem_fun('GetFriendGamePlayed').exclude()
-        
-        mb.enum('EFriendRelationship').include()
-        mb.enum('EPersonaState').include()
-        mb.add_registration_code( "bp::scope().attr( \"k_cchPersonaNameMax\" ) = (int)k_cchPersonaNameMax;" )
+        self.ParseSteamFriends(mb)
         
         # User
         cls = mb.class_('ISteamUser')

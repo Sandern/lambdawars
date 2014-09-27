@@ -51,6 +51,38 @@ boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CS
 	return boost::python::make_tuple( data, eChatEntryType );
 }
 
+boost::python::object PyGetStatFloat( const char *name )
+{
+	if( !steamapicontext->SteamUserStats() )
+	{
+		PyErr_SetString(PyExc_Exception, "No steam user stats API available!" );
+		throw boost::python::error_already_set(); 
+	}
+
+	float stat;
+	if( !steamapicontext->SteamUserStats()->GetStat( name, &stat ) )
+	{
+		return boost::python::object();
+	}
+	return boost::python::object( stat );
+}
+
+boost::python::object PyGetStatInt( const char *name )
+{
+	if( !steamapicontext->SteamUserStats() )
+	{
+		PyErr_SetString(PyExc_Exception, "No steam user stats API available!" );
+		throw boost::python::error_already_set(); 
+	}
+
+	int32 stat;
+	if( !steamapicontext->SteamUserStats()->GetStat( name, &stat ) )
+	{
+		return boost::python::object();
+	}
+	return boost::python::object( stat );
+}
+
 #define STEAM_MM_SERVERS_VALID()	if( !steamapicontext->SteamMatchmakingServers() ) \
 	{ \
 		PyErr_SetString(PyExc_Exception, "No steam matchmaking servers API available!" ); \
