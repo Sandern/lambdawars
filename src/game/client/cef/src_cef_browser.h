@@ -137,6 +137,7 @@ public:
 	boost::python::object PyInvokeWithResult( PyJSObject *object, const char *methodname, boost::python::list methodargs );
 
 	void PyObjectSetAttr( PyJSObject *object, const char *attrname, boost::python::object value );
+	boost::python::object PyObjectGetAttr( PyJSObject *object, const char *attrname );
 
 	virtual void PyOnMethodCall( boost::python::object identifier, boost::python::object methodargs, boost::python::object callbackid ) {}
 #endif // ENABLE_PYTHON

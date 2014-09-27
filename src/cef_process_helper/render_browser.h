@@ -75,7 +75,7 @@ public:
 
 	bool CreateGlobalObject( CefString identifier, CefString name );
 
-	bool CreateFunction( CefString identifier, CefString name, CefString iParentIdentifier = "", bool bCallback = false );
+	bool CreateFunction( CefString identifier, CefString name, CefString parentIdentifier = "", bool bCallback = false );
 
 
 
@@ -90,9 +90,10 @@ public:
 
 	bool DoCallback( int iCallbackID, CefRefPtr<CefListValue> methodargs );
 	bool Invoke( CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
-	bool InvokeWithResult( CefString iResultIdentifier, CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
+	bool InvokeWithResult( CefString resultIdentifier, CefString identifier, CefString methodname, CefRefPtr<CefListValue> methodargs );
 
 	bool ObjectSetAttr( CefString identifier, CefString attrname,  CefRefPtr<CefV8Value> value );
+	bool ObjectGetAttr( CefString identifier, CefString attrname, CefString resultIdentifier );
 
 private:
 	CefRefPtr<CefBrowser> m_Browser;

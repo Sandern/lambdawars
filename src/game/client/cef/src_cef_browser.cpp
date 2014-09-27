@@ -1300,9 +1300,34 @@ void SrcCefBrowser::PyObjectSetAttr( PyJSObject *object, const char *attrname, b
 	CefRefPtr<CefListValue> args = message->GetArgumentList();
 	args->SetString( 0, object ? object->GetJSObject()->GetIdentifier() : "" );
 	args->SetString( 1, attrname );
-	PySingleToCefValueList( value, args, 2 );
+	args->SetString( 1, attrname );
 
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::object SrcCefBrowser::PyObjectGetAttr( PyJSObject *object, const char *attrname )
+{
+	if( !IsValid() )
+		return boost::python::object();
+
+	if( !attrname )
+		return boost::python::object();
+
+	CefRefPtr<JSObject> jsResultObject = new JSObject();
+
+	CefRefPtr<CefProcessMessage> message =
+		CefProcessMessage::Create("objectgetattr");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+	args->SetString( 0, object ? object->GetJSObject()->GetIdentifier() : "" );
+	args->SetString( 1, attrname );
+	args->SetString( 2, jsResultObject->GetIdentifier() );
+
+	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+
+	return boost::python::object( PyJSObject( jsResultObject ) );
 }
 
 //-----------------------------------------------------------------------------

@@ -55,11 +55,11 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		CefString identifier = args->GetString( 0 );
 		CefString objectName = args->GetString( 1 );
-		CefString iParentIdentifier = "";
+		CefString parentIdentifier = "";
 		if( args->GetType( 2 ) == VTYPE_STRING )
-			iParentIdentifier = args->GetString( 2 );
+			parentIdentifier = args->GetString( 2 );
 
-		if( !renderBrowser->CreateFunction( identifier, objectName, iParentIdentifier ) )
+		if( !renderBrowser->CreateFunction( identifier, objectName, parentIdentifier ) )
 			SendWarning(browser, "Failed to create function object %ls\n", objectName.c_str());
 
 		return true;
@@ -69,11 +69,11 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
 		CefString identifier = args->GetString( 0 );
 		CefString objectName = args->GetString( 1 );
-		CefString iParentIdentifier = "";
+		CefString parentIdentifier = "";
 		if( args->GetType( 2 ) == VTYPE_STRING )
-			iParentIdentifier = args->GetString( 2 );
+			parentIdentifier = args->GetString( 2 );
 
-		if( !renderBrowser->CreateFunction( identifier, objectName, iParentIdentifier, true ) )
+		if( !renderBrowser->CreateFunction( identifier, objectName, parentIdentifier, true ) )
 			SendWarning(browser, "Failed to create function with callback object %ls\n", objectName.c_str());
 
 		return true;
@@ -115,13 +115,13 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 	else if( msgname == "invokewithresult" ) 
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
-		CefString iResultIdentifier = args->GetString( 0 );
+		CefString resultIdentifier = args->GetString( 0 );
 		CefString identifier = args->GetString( 1 );
 		CefString methodname = args->GetString( 2 );
 		CefRefPtr<CefListValue> methodargs = args->GetList( 3 );
 
-		if( !renderBrowser->InvokeWithResult( iResultIdentifier, identifier, methodname, methodargs ) )
-			SendWarning(browser, "Failed to invoke with result id %ls / %ls with methodname %ls\n", iResultIdentifier.c_str(), identifier.c_str(), methodname.c_str());
+		if( !renderBrowser->InvokeWithResult( resultIdentifier, identifier, methodname, methodargs ) )
+			SendWarning(browser, "Failed to invoke with result id %ls / %ls with methodname %ls\n", resultIdentifier.c_str(), identifier.c_str(), methodname.c_str());
 
 		return true;
 	}
@@ -134,6 +134,17 @@ bool ClientApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
 		CefRefPtr<CefV8Value> value = ListValueToV8Value( renderBrowser, args, 2 );
 		if( !renderBrowser->ObjectSetAttr( identifier, attrname, value ) ) {
 			SendWarning(browser, "Failed to set attribute for object with id %ls with attrname %ls\n", identifier.c_str(), attrname.c_str());
+		}
+	}
+	else if( msgname == "objectgetattr" ) 
+	{
+		CefRefPtr<CefListValue> args = message->GetArgumentList();
+		CefString identifier = args->GetString( 0 );
+		CefString attrname = args->GetString( 1 );
+		CefString resultIdentifier = args->GetString( 2 );
+
+		if( !renderBrowser->ObjectGetAttr( identifier, attrname, resultIdentifier ) ) {
+			SendWarning(browser, "Failed to get attribute for object with id %ls with attrname %ls\n", identifier.c_str(), attrname.c_str());
 		}
 	}
 	else

@@ -985,6 +985,16 @@ BOOST_PYTHON_MODULE(_cef){
                 , ( bp::arg("object"), bp::arg("methodname"), bp::arg("methodargs") ) );
         
         }
+        { //::SrcCefBrowser::PyObjectGetAttr
+        
+            typedef ::boost::python::api::object ( ::SrcCefBrowser::*ObjectGetAttr_function_type )( ::PyJSObject *,char const * ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "ObjectGetAttr"
+                , ObjectGetAttr_function_type( &::SrcCefBrowser::PyObjectGetAttr )
+                , ( bp::arg("object"), bp::arg("attrname") ) );
+        
+        }
         { //::SrcCefBrowser::PyObjectSetAttr
         
             typedef void ( ::SrcCefBrowser::*ObjectSetAttr_function_type )( ::PyJSObject *,char const *,::boost::python::api::object ) ;

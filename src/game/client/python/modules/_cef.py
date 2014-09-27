@@ -66,6 +66,7 @@ class CEF(ClientModuleGenerator):
         cls.mem_fun('PyInvoke').rename('Invoke')
         cls.mem_fun('PyInvokeWithResult').rename('InvokeWithResult')
         cls.mem_fun('PyObjectSetAttr').rename('ObjectSetAttr')
+        cls.mem_fun('PyObjectGetAttr').rename('ObjectGetAttr')
         
         cls = mb.class_('PyJSObject')
         cls.include()
