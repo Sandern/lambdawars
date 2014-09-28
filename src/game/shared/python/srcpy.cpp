@@ -18,7 +18,7 @@
 #ifdef CLIENT_DLL
 #include "networkstringtable_clientdll.h"
 #include "srcpy_materials.h"
-#include "gameui/wars/basemodpanel.h"
+#include "gameui/gameui_interface.h"
 #include "c_world.h"
 #else
 #include "networkstringtable_gamedll.h"
@@ -524,8 +524,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	GarbageCollect();
 
 #ifdef CLIENT_DLL
-	// Part of the main menu is in Python, so all windows must be closed when shutting down Python
-	BaseModUI::CBaseModPanel::GetSingleton().CloseAllWindows();
+	GameUI().ShutdownPyMenu();
 
 	// Clear python panels
 	DestroyPyPanels();

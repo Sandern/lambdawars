@@ -34,6 +34,8 @@ public:
 	virtual void RunFrame();
 	virtual void PostInit();
 
+	void ShutdownPyMenu();
+
 	// plays the startup mp3 when GameUI starts
 	void PlayGameStartupSound();
 

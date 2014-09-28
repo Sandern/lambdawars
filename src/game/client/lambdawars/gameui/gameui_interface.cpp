@@ -568,16 +568,27 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 	return (platformDir[0] != 0);
 }
 
+#ifdef ENABLE_PYTHON
+//-----------------------------------------------------------------------------
+// Purpose: Called before Python interpreter is shutdown, which is before
+//			CGameUI:Shutdown. Python managed GameUI should be destroyed here.
+//-----------------------------------------------------------------------------
+void CGameUI::ShutdownPyMenu()
+{
+	if( s_ui_basemodpanel && s_ui_basemodpanel->GetPanel() )
+	{
+		s_ui_basemodpanel->GetPanel()->SetParent( (vgui::Panel *)NULL ); // Detach from gameui base panel
+	}
+	s_ref_ui_basemodpanel = boost::python::object();
+	s_ui_basemodpanel = NULL;
+}
+#endif // ENABLE_PYTHON
+
 //-----------------------------------------------------------------------------
 // Purpose: Called to Shutdown the game UI system
 //-----------------------------------------------------------------------------
 void CGameUI::Shutdown()
 {
-#ifdef ENABLE_PYTHON
-	s_ref_ui_basemodpanel = boost::python::object();
-	s_ui_basemodpanel = NULL;
-#endif // ENABLE_PYTHON
-
 	// notify all the modules of Shutdown
 	g_VModuleLoader.ShutdownPlatformModules();
 
