@@ -316,16 +316,16 @@ void SrcCefVGUIPanel::Paint()
 		//if( g_cef_debug_texture.GetBool() )
 		//	DevMsg("CEF: texture requires full regeneration\n");
 		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
+		if( g_pShaderAPI && m_RenderBuffer.IsValid() )
 		{
 			VPROF_BUDGET( "Upload", "CefUploadTexture" );
 
 			CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
-			if( renderer->GetTextureBuffer() )
+			int nFrame = 0;
+			int nTextureChannel = 0;
+			ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+			if( renderer->GetTextureBuffer() && g_pShaderAPI->IsTexture( textureHandle ) )
 			{
-				int nFrame = 0;
-				int nTextureChannel = 0;
-				ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
-
 				int iFace = 0;
 				int iMip = 0;
 				int z = 0;
