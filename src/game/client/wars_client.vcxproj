@@ -18,12 +18,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,10 +60,10 @@
       </Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm200 /Gw %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\hl2;.\lambdawars;.\lambdawars\vgui;..\statemachine;..\..\game\shared\multiplayer;..\..\game\shared\lambdawars;.\;..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\shared;.\game_controls;$(IntDir);..\..\game\client\lambdawars\gameui;.\python;..\..\game\shared\python;..\..\thirdparty\python\Include;..\..\thirdparty\python\PC;..\..\boost;..\..\cef;..\..\game\client\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;USE_DETAIL_SHAPES;HL2WARS_DLL;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;ENABLE_CEF;ENABLE_PYTHON;CHROMIUM_BUILD;USING_CEF_SHARED;USE_SKIA;ENABLE_GPU=1;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=client;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=client;NO_STRING_T;CLIENT_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;ENABLE_HTMLWINDOW;fopen=dont_use_fopen;SDK_CLIENT_DLL;SDK_DLL;GAMEUI_EMBEDDED;GAMEUI_EXPORTS;USE_DETAIL_SHAPES;HL2WARS_DLL;Py_NO_ENABLE_SHARED;Py_BUILD_CORE;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;ENABLE_CEF;ENABLE_PYTHON;CHROMIUM_BUILD;USING_CEF_SHARED;USE_SKIA;ENABLE_GPU=1;DEFERRED_ENABLED;SUPPRESS_INVALID_PARAMETER_NO_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
@@ -91,18 +91,19 @@
       <ErrorReporting>Prompt</ErrorReporting>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
+      <DisableSpecificWarnings>;4316</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34_d.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\lib\common\.;..\..\lib\public\.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -112,6 +113,7 @@
       </BaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkErrorReporting>PromptImmediately</LinkErrorReporting>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <Manifest>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -176,6 +178,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>CompileAsCpp</CompileAs>
       <ErrorReporting>Prompt</ErrorReporting>
+      <DisableSpecificWarnings>;4316</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -280,6 +283,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="cef\src_cef_local_handler.cpp" />
     <ClCompile Include="cef\src_cef_vtf_handler.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="clientsteamcontext.cpp" />
     <ClCompile Include="deferred\cascade_t.cpp" />

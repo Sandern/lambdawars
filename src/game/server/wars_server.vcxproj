@@ -18,12 +18,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -57,10 +57,10 @@
       </Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm200 /Gw %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;.\;..\..\game\shared;..\..\utils\common;..\..\game\server\NextBot;$(IntDir);.\hl2;..\..\game\shared\hl2;.\lambdawars;..\..\game\shared\lambdawars;.\python;..\..\game\shared\python;..\..\thirdparty\python\Include;..\..\thirdparty\python\PC;..\..\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;SDK_SERVER_DLL;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_ENABLE_SHARED;Py_BUILD_CORE;Py_DEBUG;HL2WARS_DLL;ENABLE_PYTHON;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=server;VPCGAME=swarm;VPCGAMECAPS=SWARM;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=server;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;SDK_SERVER_DLL;BOOST_AUTO_LINK_NOMANGLE;BOOST_PYTHON_STATIC_LIB;BOOST_SERIALIZATION_NO_LIB;BOOST_PYTHON_MAX_ARITY=20;Py_NO_ENABLE_SHARED;Py_BUILD_CORE;HL2WARS_DLL;ENABLE_PYTHON;DEFERRED_ENABLED;SUPPRESS_INVALID_PARAMETER_NO_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
@@ -91,12 +91,12 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)server.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\lib\common\.;..\..\lib\public\.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -169,6 +169,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>CompileAsCpp</CompileAs>
       <ErrorReporting>Prompt</ErrorReporting>
+      <DisableSpecificWarnings>;4316</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>

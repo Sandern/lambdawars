@@ -269,7 +269,6 @@ size_t __cdecl _heapused( size_t *, size_t * )
 }
 
 #ifdef _WIN32
-#include <malloc.h>
 int __cdecl _heapwalk( _HEAPINFO * )
 {
 	return 0;

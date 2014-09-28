@@ -18,12 +18,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -69,10 +69,10 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <Inputs>$(TargetFileName)</Inputs>
     </CustomBuildStep>
     <ClCompile>
-      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm200 /Gw %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;fxctmp9;vshtmp9;..\..\dx9sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;USE_ACTUAL_DX;DEFERRED_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;DLLNAME=stdshader_dx9;VPCGAME=valve;VPCGAMECAPS=VALVE;_DLL_EXT=.dll;COMPILER_MSVC32;COMPILER_MSVC;MEMOVERRIDE_MODULE=stdshader_dx9;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;USE_ACTUAL_DX;DEFERRED_ENABLED;SUPPRESS_INVALID_PARAMETER_NO_INFO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>
@@ -108,7 +108,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <OutputFile>$(OutDir)game_shader_dx9.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\..\lib\common\.;..\..\lib\public\.;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
