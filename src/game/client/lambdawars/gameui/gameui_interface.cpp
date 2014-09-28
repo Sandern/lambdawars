@@ -573,7 +573,7 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 // Purpose: Called before Python interpreter is shutdown, which is before
 //			CGameUI:Shutdown. Python managed GameUI should be destroyed here.
 //-----------------------------------------------------------------------------
-void CGameUI::ShutdownPyMenu()
+void CGameUI::ShutdownCEFMenu()
 {
 	if( s_ui_basemodpanel && s_ui_basemodpanel->GetPanel() )
 	{

@@ -34,7 +34,9 @@ public:
 	virtual void RunFrame();
 	virtual void PostInit();
 
-	void ShutdownPyMenu();
+#ifdef ENABLE_PYTHON
+	void ShutdownCEFMenu();
+#endif // ENABLE_PYTHON
 
 	// plays the startup mp3 when GameUI starts
 	void PlayGameStartupSound();

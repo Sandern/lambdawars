@@ -13,6 +13,7 @@
 #include "src_cef_local_handler.h"
 #include "warscef/wars_cef_shared.h"
 #include <filesystem.h>
+#include "gameui/gameui_interface.h"
 
 #include <vgui/IInput.h>
 
@@ -241,6 +242,10 @@ void CCefSystem::Shutdown()
 {
 	if( !m_bIsRunning )
 		return;
+
+#ifdef ENABLE_PYTHON
+	GameUI().ShutdownCEFMenu();
+#endif // ENABLE_PYTHON
 
 	DevMsg("Shutting down CEF\n");
 

@@ -11,21 +11,166 @@
 #endif
 
 #include <string>
-#include "include/internal/cef_ptr.h"
-#include "include/internal/cef_string.h"
-
 #include "src_cef_js.h"
+#include "src_cef_vgui_panel.h"
+#include "src_cef_osrenderer.h"
+
+// CEF
+#include "include/cef_app.h"
+#include "include/cef_browser.h"
+#include "include/cef_frame.h"
+#include "include/cef_runnable.h"
+#include "include/cef_client.h"
 
 // Forward declarations
-class CefClientHandler;
-class SrcCefVGUIPanel;
-class SrcCefOSRRenderer;
-class CefBrowser;
-class CefFrame;
-class CefProcessMessage;
-class CefListValue;
+//class CefBrowser;
+//class CefFrame;
+//class CefProcessMessage;
+//class CefListValue;
 
 class PyJSObject;
+
+//-----------------------------------------------------------------------------
+// Purpose: Cef browser internal implementation
+//-----------------------------------------------------------------------------
+class CefClientHandler : public CefClient,
+                      public CefContextMenuHandler,
+                      public CefDisplayHandler,
+                      public CefDownloadHandler,
+					  public CefDragHandler,
+                      public CefGeolocationHandler,
+                      public CefKeyboardHandler,
+                      public CefLifeSpanHandler,
+                      public CefLoadHandler,
+                      public CefRequestHandler
+{
+public:
+	CefClientHandler( SrcCefBrowser *pSrcBrowser );
+
+	CefRefPtr<CefBrowser> GetBrowser() { return m_Browser; }
+	int GetBrowserId() { return m_BrowserId; }
+
+	virtual void Destroy();
+
+	// CefClient methods
+	virtual CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefDragHandler> GetDragHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefKeyboardHandler> GetKeyboardHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() {
+		return this;
+	}
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() {
+		return m_OSRHandler.get();
+	}
+	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() {
+		return this;
+	}
+
+	// Client
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
+										CefProcessId source_process,
+										CefRefPtr<CefProcessMessage> message);
+
+	// CefContextMenuHandler methods
+	virtual void OnBeforeContextMenu(CefRefPtr<CefBrowser> browser,
+									CefRefPtr<CefFrame> frame,
+									CefRefPtr<CefContextMenuParams> params,
+									CefRefPtr<CefMenuModel> model);
+
+	// CefDisplayHandler methods
+	virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
+								const CefString& message,
+								const CefString& source,
+								int line);
+
+	// CefDownloadHandler methods
+	virtual void OnBeforeDownload(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		const CefString& suggested_name,
+		CefRefPtr<CefBeforeDownloadCallback> callback) {}
+
+	// CefDragHandler methods
+	virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser,
+                           CefRefPtr<CefDragData> dragData,
+                           CefDragHandler::DragOperationsMask mask) { return true; }
+
+	// CefLifeSpanHandler methods
+	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser);
+
+	virtual bool DoClose(CefRefPtr<CefBrowser> browser);
+
+	virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+										TerminationStatus status);
+
+	// CefLoadHandler methods
+	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame);
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode);
+	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
+							const CefString& errorText, const CefString& failedUrl);
+
+	virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
+									bool isLoading,
+									bool canGoBack,
+									bool canGoForward);
+
+	// CefRequestHandler
+	virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								CefRefPtr<CefRequest> request,
+								bool is_redirect);
+
+	virtual void OnResourceRedirect(CefRefPtr<CefBrowser> browser,
+								CefRefPtr<CefFrame> frame,
+								const CefString& old_url,
+								CefString& new_url);
+
+	// CefRenderHandler
+	void SetOSRHandler(CefRefPtr<SrcCefOSRRenderer> handler) {
+		m_OSRHandler = handler;
+	}
+	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler() { return m_OSRHandler; }
+
+	// Misc
+	bool IsInitialized() { return m_bInitialized; }
+	float GetLastPingTime() { return m_fLastPingTime; }
+
+private:
+	// The child browser window
+	CefRefPtr<CefBrowser> m_Browser;
+	CefRefPtr<SrcCefOSRRenderer> m_OSRHandler;
+
+	// The child browser id
+	int m_BrowserId;
+
+	// Tests if "OnAfterCreated" is called. This means the browser/webview is "initialized"
+	bool m_bInitialized;
+	// Last time we received a pong from the browser process
+	float m_fLastPingTime;
+
+	// Internal
+	SrcCefBrowser *m_pSrcBrowser;
+
+	IMPLEMENT_REFCOUNTING( CefClientHandler );
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -155,7 +300,7 @@ private:
 	virtual void Think( void );
 
 private:
-	CefClientHandler *m_CefClientHandler;
+	CefRefPtr<CefClientHandler> m_CefClientHandler;
 
 	SrcCefVGUIPanel *m_pPanel;
 
