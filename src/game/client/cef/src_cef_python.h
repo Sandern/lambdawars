@@ -24,7 +24,7 @@ CefRefPtr<CefListValue> PyToCefValueList( boost::python::object l ); // l must b
 boost::python::list CefValueListToPy( CefRefPtr<CefListValue> l );
 
 boost::python::dict CefDictionaryValueToPy( CefRefPtr<CefDictionaryValue> d );
-CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d );
+CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::object d );
 
 // JS object
 class PyJSObject 

@@ -94,6 +94,7 @@ bp::object consolespace; // Used by spy/cpy commands
 // Global module references.
 bp::object builtins;
 bp::object types;
+bp::object collections;
 bp::object sys;
 
 bp::object weakref;
@@ -471,6 +472,7 @@ bool CSrcPython::InitInterpreter( void )
 
 	Import( "srcbase" );
 	types = Import("types");
+	collections = Import("collections");
 	steam = Import("steam");
 	Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
 	Run( "import _entitiesmisc" );
@@ -567,6 +569,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 	srcbuiltins = bp::object();
 	sys = bp::object();
 	types = bp::object();
+	collections = bp::object();
 	srcmgr = bp::object();
 	gamemgr = bp::object();
 	weakref = bp::object();

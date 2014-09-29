@@ -98,9 +98,9 @@ void PySingleToCefValueList( boost::python::object value, CefListValue *result, 
 	{
 		result->SetList( i, PyToCefValueList( value ) );
 	}
-	else if( valuetype == builtins.attr("dict") )
+	else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
 	{
-		result->SetDictionary( i, PyToCefDictionaryValue( boost::python::dict( value ) ) );
+		result->SetDictionary( i, PyToCefDictionaryValue( value ) );
 	}
 	else if( valuetype == jsobject )
 	{
@@ -214,7 +214,7 @@ boost::python::list CefValueListToPy( CefRefPtr<CefListValue> l )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
+CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::object d )
 {
 	CefRefPtr<CefDictionaryValue> result = CefDictionaryValue::Create();
 
@@ -228,7 +228,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 
 		boost::python::object valuetype = fntype( value );
 
-		CefString cefkey = boost::python::extract< const char * >( item[0] );
+		CefString cefkey = boost::python::extract< const char * >( boost::python::str( item[0] ) );
 
 		if( value == boost::python::object() )
 		{
@@ -271,9 +271,9 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::dict d )
 		{
 			result->SetList( cefkey, PyToCefValueList( value ) );
 		}
-		else if( valuetype == builtins.attr("dict") )
+		else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
 		{
-			result->SetDictionary( cefkey, PyToCefDictionaryValue( boost::python::dict( value ) ) );
+			result->SetDictionary( cefkey, PyToCefDictionaryValue( value ) );
 		}
 		else
 		{
