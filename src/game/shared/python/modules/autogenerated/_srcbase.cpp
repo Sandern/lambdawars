@@ -845,6 +845,18 @@ BOOST_PYTHON_MODULE(_srcbase){
     
     }
 
+    { //::PyDictToKeyValues
+    
+        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object );
+        
+        bp::def( 
+            "DictToKeyValues"
+            , DictToKeyValues_function_type( &::PyDictToKeyValues )
+            , ( bp::arg("d") )
+            , bp::return_value_policy< bp::return_by_value >() );
+    
+    }
+
     { //::PyKeyValuesToDict
     
         typedef ::boost::python::dict ( *KeyValuesToDict_function_type )( ::KeyValues const * );

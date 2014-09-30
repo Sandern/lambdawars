@@ -19,7 +19,7 @@ class SrcBase(SharedModuleGenerator):
         # Exclude everything by default
         mb.decls().exclude()      
         
-        # Linux model_t fix ( correct? )
+        # Linux model_t fix
         mb.add_declaration_code( '#ifdef _LINUX\r\n' + \
                              'typedef struct model_t {};\r\n' + \
                              '#endif // _LINUX\r\n'
@@ -43,7 +43,6 @@ class SrcBase(SharedModuleGenerator):
         # KeyValues
         mb.add_declaration_code( 'PyTypeObject *g_PyKeyValuesType = NULL;' )
         cls = mb.class_('KeyValues')
-        #mb.class_('KeyValues').include()
         self.IncludeEmptyClass(mb, 'KeyValues')
         cls.no_init = True # Destructor is private + new operator is overloaded = problems. Write a wrapper class
         cls.rename('RealKeyValues')
@@ -63,21 +62,19 @@ class SrcBase(SharedModuleGenerator):
         mb.mem_funs('GetRawKeyValues').rename('__GetRawKeyValues')
         
         # Call policies <- by value means use the converter
-        mb.mem_funs('MakeCopy').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('CreateNewKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('FindKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetFirstSubKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetNextKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetFirstTrueSubKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetNextTrueSubKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetFirstValue').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('CreateKey').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        mb.mem_funs('GetNextValue').call_policies = call_policies.return_value_policy( call_policies.return_by_value )
+        mb.mem_funs('MakeCopy').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('CreateNewKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('FindKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetFirstSubKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetNextKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetFirstTrueSubKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetNextTrueSubKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetFirstValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('CreateKey').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
+        mb.mem_funs('GetNextValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         if self.settings.branch == 'swarm':
-            mb.mem_funs('FromString').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+            mb.mem_funs('FromString').call_policies = call_policies.return_value_policy(call_policies.return_by_value)  
         
-        #mb.free_function('PyKeyValues').include()
-        #mb.free_function('PyKeyValues').rename('KeyValues')
         mb.free_function('KeyValuesDumpAsDevMsg').include()
         
         # Exclude vars we don't need
@@ -95,6 +92,9 @@ class SrcBase(SharedModuleGenerator):
         mb.free_function('PyKeyValuesToDict').rename('KeyValuesToDict')
         mb.free_function('PyKeyValuesToDictFromFile').include()
         mb.free_function('PyKeyValuesToDictFromFile').rename('KeyValuesToDictFromFile')
+        mb.free_function('PyDictToKeyValues').include()
+        mb.free_function('PyDictToKeyValues').rename('DictToKeyValues')
+        mb.free_function('PyDictToKeyValues').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         #mb.add_registration_code( "bp::to_python_converter<\r\n\tRay_t,\r\n\tray_t_to_python_ray>();")
         

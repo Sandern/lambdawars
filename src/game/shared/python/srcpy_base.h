@@ -23,13 +23,12 @@
 class CBasePlayer;
 
 //-----------------------------------------------------------------------------
-// Purpose: Safe KeyValues version for Python
+// Purpose: Safe (but inefficient) KeyValues version for Python
 //-----------------------------------------------------------------------------
 boost::python::dict PyKeyValuesToDict( const KeyValues *pKV );
 boost::python::object PyKeyValuesToDictFromFile( const char *pFileName );
-KeyValues *PyDictToKeyValues( boost::python::dict d );
+KeyValues *PyDictToKeyValues( boost::python::object d );
 
-#if 1
 class PyKeyValues
 {
 public:
@@ -204,7 +203,6 @@ public:
 private:
 	KeyValues *m_realKeyValues;
 };
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 

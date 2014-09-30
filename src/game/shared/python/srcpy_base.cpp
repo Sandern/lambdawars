@@ -106,11 +106,55 @@ boost::python::object PyKeyValuesToDictFromFile( const char *pFileName )
 	return boost::python::object();
 }
 
-KeyValues *PyDictToKeyValues( boost::python::dict d )
+static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::object value, KeyValues *pKV )
 {
-	boost::python::object type = builtins.attr("type");
-	boost::python::object dicttype = types.attr("DictType");
+	boost::python::object valuetype = fntype( value );
 
+	if( value == boost::python::object() )
+	{
+		pKV->SetInt( pKeyName, 0 );
+	}
+	else if( valuetype == builtins.attr("int") )
+	{
+		pKV->SetInt( pKeyName, boost::python::extract<int>(value) );
+	}
+	else if( valuetype == builtins.attr("float") )
+	{
+		pKV->SetFloat( pKeyName, boost::python::extract<float>(value) );
+	}
+	else if( valuetype == builtins.attr("str") )
+	{
+		pKV->SetString( pKeyName, boost::python::extract<const char *>(value) );
+	}
+	else if( valuetype == builtins.attr("bool") )
+	{
+		pKV->SetBool( pKeyName, boost::python::extract<bool>(value) );
+	}
+#if PY_VERSION_HEX >= 0x03000000
+	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
+#else
+	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
+#endif // PY_VERSION_HEX >= 0x03000000
+	{
+		boost::python::object elements = boost::python::list( value );
+		for( int i = 0; i < boost::python::len( elements ); i++ ) 
+		{
+			// Assume lists for one key only contain dictionaries
+			pKV->AddSubKey( PyDictToKeyValues( elements[i] ) );
+		}
+	}
+	else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
+	{
+		pKV->AddSubKey( PyDictToKeyValues( value ) );
+	}
+	else
+	{
+		pKV->SetString( pKeyName, boost::python::extract< const char * >( value ) );
+	}
+}
+
+KeyValues *PyDictToKeyValues( boost::python::object d )
+{
 	KeyValues *pKV = new KeyValues("Data");
 
 	boost::python::object items = d.attr("items")();
@@ -120,63 +164,15 @@ KeyValues *PyDictToKeyValues( boost::python::dict d )
 	for( unsigned long u = 0; u < length; u++ )
 	{
 		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
+		const char *pKeyName = boost::python::extract< const char * >( item[0] );
+		boost::python::object value = item[1];
 
-		boost::python::list elements = boost::python::list(item[1]);
-		boost::python::ssize_t n = boost::python::len(elements);
-		for( boost::python::ssize_t i=0; i < n; i++ ) 
-		{
-			 if( type(elements[i]) == dicttype )
-			 {
-				 pKV->AddSubKey( PyDictToKeyValues(boost::python::dict(elements[i])) );
-			 }
-			 else
-			 {
-				 pKV->SetString( boost::python::extract< const char * >( item[0] ), 
-								 boost::python::extract< const char * >( elements[i] ) );
-			 }
-		}
+		PyDictToKeyValuesConvertValue( pKeyName, value, pKV );
 	}
 
 	return pKV;
 }
 
-#if 0
-boost::python::dict PyKeyValues( boost::python::object name, boost::python::object firstKey, boost::python::object firstValue, boost::python::object secondKey, boost::python::object secondValue )
-{
-	boost::python::object type = builtins.attr("type");
-	boost::python::object dicttype = types.attr("DictType");
-	if( type(name) == dicttype )
-	{
-		return boost::python::dict(name);
-	}
-
-	boost::python::dict d;
-	d[name] = boost::python::dict();
-	if( firstKey != boost::python::object() )
-	{
-		boost::python::list l;
-		l.append( firstValue );
-		d[name][firstKey] = l;
-	}
-
-	if( secondKey != boost::python::object() )
-	{
-		if( firstKey == secondKey )
-		{
-			boost::python::list(d[name][firstKey]).append( secondValue );
-		}
-		else
-		{
-			boost::python::list l;
-			l.append( secondValue );
-			d[name][secondKey] = l;
-		}
-	}
-	return d;
-}
-#endif // 0
-
-#if 1
 //-----------------------------------------------------------------------------
 // Purpose: Safe KeyValues version for Python
 //-----------------------------------------------------------------------------
@@ -289,8 +285,6 @@ KeyValues * PyKeyValues::FromString( char const *szName, char const *szStringVal
 {
 	return KeyValues::FromString( szName, szStringVal, ppEndOfParse );
 }
-
-#endif // 1
 
 //-----------------------------------------------------------------------------
 // Purpose: Almost the same as V_FixupPathName, but does not lowercase
