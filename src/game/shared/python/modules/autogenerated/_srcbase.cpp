@@ -882,6 +882,8 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     bp::scope().attr( "TEAM_SPECTATOR" ) = TEAM_SPECTATOR;
 
+    bp::scope().attr( "FIRST_GAME_TEAM" ) = FIRST_GAME_TEAM;
+
     bp::scope().attr( "MASK_ALL" ) = MASK_ALL;
 
     bp::scope().attr( "MASK_SOLID" ) = MASK_SOLID;

@@ -103,6 +103,7 @@ class SrcBase(SharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"TEAM_INVALID\" ) = TEAM_INVALID;" )
         mb.add_registration_code( "bp::scope().attr( \"TEAM_UNASSIGNED\" ) = TEAM_UNASSIGNED;" )
         mb.add_registration_code( "bp::scope().attr( \"TEAM_SPECTATOR\" ) = TEAM_SPECTATOR;" )
+        mb.add_registration_code( "bp::scope().attr( \"FIRST_GAME_TEAM\" ) = FIRST_GAME_TEAM;" )
 
         # CUserCmd
         cls = mb.class_('CUserCmd')
