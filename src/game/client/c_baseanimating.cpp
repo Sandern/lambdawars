@@ -3587,7 +3587,7 @@ int C_BaseAnimating::InternalDrawModel( int flags, const RenderableInstance_t &i
 		// Suppress unlocking
 		CMatRenderDataReference rd( pRenderContext );
 		DrawModelState_t state;
-		matrix3x4_t *pBoneToWorld;
+		matrix3x4_t *pBoneToWorld = NULL;
 		bMarkAsDrawn = modelrender->DrawModelSetup( *pInfo, &state, &pBoneToWorld );
 
 		// Scale the base transform if we don't have a bone hierarchy
@@ -3657,6 +3657,9 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 {
+	if ( !pStudioHdr )
+		return;
+
 	bool watch = false;//IsPlayer(); // Q_strstr( hdr->name, "rifle" ) ? true : false;
 
 	//Adrian: eh? This should never happen.
@@ -3833,7 +3836,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 	p = nexttoken( token, p, ' ' );
 
 	// Find the weapon type
-	if ( token ) 
+	if ( token[0] ) 
 	{
 		//TODO: Parse the type from a list instead
 		if ( Q_stricmp( token, "COMBINE" ) == 0 )
@@ -3879,7 +3882,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 	int	attachmentIndex = -1;
 
 	// Find the attachment name
-	if ( token ) 
+	if ( token[0] ) 
 	{
 		attachmentIndex = LookupAttachment( token );
 
@@ -4143,7 +4146,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 
 			// Get the attachment point index
 			p = nexttoken(token, p, ' ');
-			if ( token )
+			if ( token[0] )
 			{
 				iAttachment = atoi(token);
 

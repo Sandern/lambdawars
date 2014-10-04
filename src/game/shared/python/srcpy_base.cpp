@@ -130,6 +130,10 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 	{
 		pKV->SetBool( pKeyName, boost::python::extract<bool>(value) );
 	}
+	else if( valuetype == srcbuiltins.attr("Color") )
+	{
+		pKV->SetColor( pKeyName, boost::python::extract<Color>(value) );
+	}
 #if PY_VERSION_HEX >= 0x03000000
 	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
 #else

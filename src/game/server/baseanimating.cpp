@@ -432,12 +432,12 @@ float CBaseAnimating::GetAnimTimeInterval( void ) const
 	if (m_flAnimTime < gpGlobals->curtime)
 	{
 		// estimate what it'll be this frame
-		flInterval = clamp( gpGlobals->curtime - m_flAnimTime, 0, MAX_ANIMTIME_INTERVAL );
+		flInterval = clamp( gpGlobals->curtime - m_flAnimTime, 0.f, MAX_ANIMTIME_INTERVAL );
 	}
 	else
 	{
 		// report actual
-		flInterval = clamp( m_flAnimTime - m_flPrevAnimTime, 0, MAX_ANIMTIME_INTERVAL );
+		flInterval = clamp( m_flAnimTime - m_flPrevAnimTime, 0.f, MAX_ANIMTIME_INTERVAL );
 	}
 	return flInterval;
 }
@@ -1465,9 +1465,11 @@ float CBaseAnimating::EdgeLimitPoseParameter( int iParameter, float flValue, flo
 //-----------------------------------------------------------------------------
 int CBaseAnimating::LookupBone( const char *szName )
 {
-	Assert( GetModelPtr() );
-
-	return Studio_BoneIndexByName( GetModelPtr(), szName );
+	const CStudioHdr *pStudioHdr = GetModelPtr();
+	Assert( pStudioHdr );
+	if ( !pStudioHdr )
+		return -1;
+	return Studio_BoneIndexByName( pStudioHdr, szName );
 }
 
 
@@ -1622,7 +1624,7 @@ void CBaseAnimating::UpdateStepOrigin()
 				m_flEstIkFloor = m_flEstIkFloor * 0.2 + m_flIKGroundMinHeight * 0.8;
 
 				// don't let heigth difference between min and max exceed step height
-				float bias = clamp( (m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0, height );
+				float bias = clamp( (m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height );
 				// save off reasonable offset
 				m_flEstIkOffset = clamp( m_flEstIkFloor - GetAbsOrigin().z, -height + bias, 0.0f );
 				return;

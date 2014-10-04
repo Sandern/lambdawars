@@ -87,6 +87,7 @@ extern boost::python::object builtins;
 extern boost::python::object types;
 extern boost::python::object sys;
 extern boost::python::object collections;
+extern boost::python::object srcbuiltins;
 extern boost::python::object steam;
 extern boost::python::object _entitiesmisc;
 extern boost::python::object _entities;
