@@ -58,15 +58,28 @@ public:
 
 	virtual void SetCursor( vgui::CursorCode cursor );
 
-	// For texture generation
+	// Image buffer containing the pet view
 	unsigned char *GetTextureBuffer() { return m_pTextureBuffer; }
 	int GetWidth() { return m_iWidth; }
 	int GetHeight() { return m_iHeight; }
+
+	// Image buffer containing the popup view (if any)
+	unsigned char *GetPopupBuffer() { return m_pPopupBuffer; }
+	int GetPopupOffsetX() { return m_iPopupOffsetX; }
+	int GetPopupOffsetY() { return m_iPopupOffsetY; }
+	int GetPopupWidth() { return m_iPopupWidth; }
+	int GetPopupHeight() { return m_iPopupHeight; }
 
 	//void LockTextureBuffer() { s_BufferMutex.Lock(); }
 	//void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
 
 	int GetAlphaAt( int x, int y );
+
+	const CefRect& popup_rect() const { return popup_rect_; }
+	const CefRect& original_popup_rect() const { return original_popup_rect_; }
+
+	CefRect GetPopupRectInWebView(const CefRect& original_rect);
+	void ClearPopupRects();
 
 private:
 	// Cursors
@@ -84,6 +97,13 @@ private:
 private:
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;
+
+	int m_iPopupOffsetX, m_iPopupOffsetY;
+	int m_iPopupWidth, m_iPopupHeight;
+	unsigned char *m_pPopupBuffer;
+
+	CefRect popup_rect_;
+	CefRect original_popup_rect_;
 
 	//CThreadFastMutex s_BufferMutex;
 

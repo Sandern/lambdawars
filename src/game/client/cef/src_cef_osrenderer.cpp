@@ -21,7 +21,8 @@ ConVar cef_alpha_force_zero("cef_alpha_force_zero", "0");
 // Purpose:
 //-----------------------------------------------------------------------------
 SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent ) 
-	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_iWidth(0), m_iHeight(0)
+	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_pPopupBuffer(NULL), 
+	m_iWidth(0), m_iHeight(0), m_iPopupWidth(0), m_iPopupHeight(0)
 {
 	m_hArrow = LoadCursor (NULL, IDC_ARROW );
 	m_hCross = LoadCursor (NULL, IDC_CROSS );
@@ -44,6 +45,11 @@ SrcCefOSRRenderer::~SrcCefOSRRenderer()
 	{
 		free( m_pTextureBuffer );
 		m_pTextureBuffer = NULL;
+	}
+	if( m_pPopupBuffer != NULL )
+	{
+		free( m_pPopupBuffer );
+		m_pPopupBuffer = NULL;
 	}
 }
 
@@ -96,7 +102,16 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 						bool show)
 {
+	if (!show) {
+		// Clear the popup rectangle.
+		ClearPopupRects();
 
+		if( m_pPopupBuffer != NULL )
+		{
+			free( m_pPopupBuffer );
+			m_pPopupBuffer = NULL;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -105,7 +120,43 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnPopupSize(CefRefPtr<CefBrowser> browser,
 						const CefRect& rect)
 {
+	if (rect.width <= 0 || rect.height <= 0)
+		return;
+	original_popup_rect_ = rect;
+	popup_rect_ = GetPopupRectInWebView(original_popup_rect_);
+}
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+CefRect SrcCefOSRRenderer::GetPopupRectInWebView(const CefRect& original_rect) 
+{
+	CefRect rc(original_rect);
+	// if x or y are negative, move them to 0.
+	if (rc.x < 0)
+		rc.x = 0;
+	if (rc.y < 0)
+		rc.y = 0;
+	// if popup goes outside the view, try to reposition origin
+	if (rc.x + rc.width > m_iWidth)
+		rc.x = m_iWidth - rc.width;
+	if (rc.y + rc.height > m_iHeight)
+		rc.y = m_iHeight - rc.height;
+	// if x or y became negative, move them to 0 again.
+	if (rc.x < 0)
+		rc.x = 0;
+	if (rc.y < 0)
+		rc.y = 0;
+	return rc;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefOSRRenderer::ClearPopupRects() 
+{
+	popup_rect_.Set(0, 0, 0, 0);
+	original_popup_rect_.Set(0, 0, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -126,32 +177,71 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	int channels = 4;
 
-	if( type != PET_VIEW )
-	{
-		Warning("SrcCefOSRRenderer::OnPaint: Unsupported paint type\n");
-		return;
-	}
-
 	Assert( dirtyRects.size() > 0 );
 
 	//AUTO_LOCK( s_BufferMutex );
-
-	// Update image buffer size if needed
-	if( m_iWidth != width || m_iHeight != height )
+	if( type == PET_VIEW )
 	{
-		if( m_pTextureBuffer != NULL )
+		// Update image buffer size if needed
+		if( m_iWidth != width || m_iHeight != height )
 		{
-			free( m_pTextureBuffer );
-			m_pTextureBuffer = NULL;
+			if( m_pTextureBuffer != NULL )
+			{
+				free( m_pTextureBuffer );
+				m_pTextureBuffer = NULL;
+			}
+			DevMsg("Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
+			m_iWidth = width;
+			m_iHeight = height;
+			m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
 		}
-		DevMsg("Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
-		m_iWidth = width;
-		m_iHeight = height;
-		m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
+
+		// Old code for drawing dirty rectangles. However it now always receives the full frame.
+#if 0
+		// Update dirty rects
+		CefRenderHandler::RectList::const_iterator i = dirtyRects.begin();
+		for (; i != dirtyRects.end(); ++i) 
+		{
+			const CefRect& rect = *i;
+			Msg("Painting dirty rect: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
+
+			for( int y = rect.y; y < rect.y + rect.height; y++ )
+			{
+				memcpy( m_pTextureBuffer + (y * m_iWidth * channels) + (rect.x * channels), // Our current row + x offset
+					imagebuffer + (y * m_iWidth * channels) + (rect.x * channels), // Source offset
+					rect.width * channels // size of row we want to copy
+				);*
+			}
+		}
+#endif // 0
+
+		V_memcpy( m_pTextureBuffer, buffer, m_iWidth * m_iHeight * channels );
 	}
+	else if( type == PET_POPUP )
+	{
+		// Update image buffer size if needed
+		if( !m_pPopupBuffer || m_iPopupWidth != popup_rect_.width || m_iPopupHeight != popup_rect_.height )
+		{
+			if( m_pPopupBuffer != NULL )
+			{
+				free( m_pPopupBuffer );
+				m_pPopupBuffer = NULL;
+			}
+			m_iPopupWidth = width;
+			m_iPopupHeight = height;
+			m_pPopupBuffer = (unsigned char*) malloc( m_iPopupWidth * m_iPopupHeight * channels );
+		}
 
-	memcpy( m_pTextureBuffer, buffer, m_iWidth * m_iHeight * channels );
+		m_iPopupOffsetX = popup_rect_.x;
+		m_iPopupOffsetY = popup_rect_.y;
 
+		V_memcpy( m_pPopupBuffer, buffer, m_iPopupWidth * m_iPopupHeight * channels );
+	}
+	else
+	{
+		Warning("SrcCefOSRRenderer::OnPaint: Unsupported paint type %d\n", type);
+		return;
+	}
 	m_pBrowser->GetPanel()->MarkTextureDirty( 0, 0, m_iWidth, m_iHeight );
 }
 

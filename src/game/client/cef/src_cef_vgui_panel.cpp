@@ -333,6 +333,12 @@ void SrcCefVGUIPanel::Paint()
 				g_pShaderAPI->ModifyTexture( textureHandle );
 				g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
 
+				if( renderer->GetPopupBuffer() )
+				{
+					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
+						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
+				}
+
 				m_pTextureRegen->ClearDirty();
 			}
 		}
