@@ -7,7 +7,7 @@
 #pragma warning (disable: 4100)
 #pragma warning (disable: 4530)
 
-//#include "cbase.h"
+#include "cbase.h"
 #include "src_cef_vtf_handler.h"
 #include <filesystem.h>
 
@@ -15,7 +15,6 @@
 #include "include/wrapper/cef_stream_resource_handler.h"
 #include "include/cef_url.h"
 
-#include <vtflib/vtflib.h>
 #include <jpeglib/jpeglib.h>
 
 // NOTE: This has to be the last file included!
@@ -188,27 +187,32 @@ CefRefPtr<CefResourceHandler> VTFSchemeHandlerFactory::Create(CefRefPtr<CefBrows
 	std::string strVtfPath = CefString(&parts.path);
 
 	char vtfPath[MAX_PATH];
-	V_snprintf(vtfPath, sizeof(vtfPath), "materials/%s", strVtfPath.c_str());
+	V_snprintf( vtfPath, sizeof(vtfPath), "materials/%s", strVtfPath.c_str() );
 
 	if (!filesystem->FileExists(vtfPath))
 	{
-		Warning("VTFSchemeHandlerFactory: invalid vtf %s\n", vtfPath);
+		Warning( "VTFSchemeHandlerFactory: invalid vtf %s\n", vtfPath );
 		return NULL;
 	}
 
-	VTFLib::CVTFFile VTFFile = VTFLib::CVTFFile();
-
-	if (VTFFile.Load(vtfPath))
+	CUtlBuffer imageDataBuffer( 0, filesystem->Size(vtfPath), 0 );
+	if( !filesystem->ReadFile( vtfPath, NULL, imageDataBuffer ) ) 
 	{
-		vlUInt uiWidth = VTFFile.GetWidth(), uiHeight = VTFFile.GetHeight();
+		Warning( "VTFSchemeHandlerFactory: failed to read vtf %s\n", vtfPath );
+		return NULL;
+	}
 
-		uint32 vtfImageSize = VTFFile.ComputeImageSize(uiWidth, uiHeight, 1, IMAGE_FORMAT_RGB888);
-		vlByte *lpImageData = new vlByte[vtfImageSize];
+	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	if( pVTFTexture->Unserialize( imageDataBuffer ) )
+	{
+		pVTFTexture->ConvertImageFormat( IMAGE_FORMAT_RGB888, false, false );
 
-		if (VTFFile.Convert(VTFFile.GetData(0, 0, 0, 0), lpImageData, uiWidth, uiHeight, VTFFile.GetFormat(), IMAGE_FORMAT_RGB888))
+		if( pVTFTexture->Format() == IMAGE_FORMAT_RGB888 )
 		{
+			uint8 *pImageData = pVTFTexture->ImageData();
+
 			CUtlBuffer buf;
-			VTFHandler_ConvertImageToJPG( buf, lpImageData, uiWidth, uiHeight );
+			VTFHandler_ConvertImageToJPG( buf, pImageData, pVTFTexture->Width(), pVTFTexture->Height() );
 
 			if( buf.Size() > 0 )
 			{
@@ -218,7 +222,12 @@ CefRefPtr<CefResourceHandler> VTFSchemeHandlerFactory::Create(CefRefPtr<CefBrows
 				pResourceHandler = new CefStreamResourceHandler("image/jpeg", stream);
 			}
 		}
+		else
+		{
+			Warning( "VTFSchemeHandlerFactory: unable to convert vtf %s to rgb format\n", vtfPath );
+		}
 	}
+	DestroyVTFTexture( pVTFTexture );
 
 	return pResourceHandler;
 }
