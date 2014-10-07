@@ -102,6 +102,11 @@ void PySingleToCefValueList( boost::python::object value, CefListValue *result, 
 	{
 		result->SetDictionary( i, PyToCefDictionaryValue( value ) );
 	}
+	else if( valuetype == srcbuiltins.attr("Color") )
+	{
+		Color c = boost::python::extract<Color>(value);
+		result->SetString( i, UTIL_VarArgs("rgba(%d, %d, %d, %.2f)", c.r(), c.g(), c.b(), c.a() / 255.0f) );
+	}
 	else if( valuetype == jsobject )
 	{
 		PyJSObject *pJSObject = boost::python::extract< PyJSObject * >( value );
@@ -274,6 +279,11 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::object d )
 		else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
 		{
 			result->SetDictionary( cefkey, PyToCefDictionaryValue( value ) );
+		}
+		else if( valuetype == srcbuiltins.attr("Color") )
+		{
+			Color c = boost::python::extract<Color>(value);
+			result->SetString( cefkey, UTIL_VarArgs("rgba(%d, %d, %d, %.2f)", c.r(), c.g(), c.b(), c.a() / 255.0f) );
 		}
 		else
 		{
