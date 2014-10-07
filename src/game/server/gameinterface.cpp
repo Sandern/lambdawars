@@ -976,6 +976,8 @@ void CServerGameDLL::DLLShutdown( void )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
+
+	WarsShutdownGameServer();
 #endif // HL2WARS_DLL
 
 	s_SteamAPIContext.Clear(); // Steam API context shutdown
