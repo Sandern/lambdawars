@@ -187,7 +187,8 @@ CefRefPtr<CefResourceHandler> VTFSchemeHandlerFactory::Create(CefRefPtr<CefBrows
 	std::string strVtfPath = CefString(&parts.path);
 
 	char vtfPath[MAX_PATH];
-	V_snprintf( vtfPath, sizeof(vtfPath), "materials/%s", strVtfPath.c_str() );
+	V_snprintf( vtfPath, sizeof( vtfPath ), "materials/%s", strVtfPath.c_str() );
+	V_FixupPathName( vtfPath, sizeof( vtfPath ), vtfPath );
 
 	if (!filesystem->FileExists(vtfPath))
 	{

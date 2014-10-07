@@ -38,6 +38,7 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 
 	char path[MAX_PATH];
 	V_strncpy( path, CefString(&parts.path).ToString().c_str() + 1, sizeof(path) );
+	V_FixupPathName( path, sizeof( path ), path );
 
 	if( filesystem->IsDirectory( path ) ) 
 	{
