@@ -331,10 +331,14 @@ bool SrcCefOSRRenderer::StartDragging(CefRefPtr<CefBrowser> browser,
 							int x, int y)
 {
 	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer StartDragging called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
+#if 0
 	if( !browser->GetHost() )
 		return false;
 	browser->GetHost()->DragSourceSystemDragEnded();
 	return true;
+#else
+	return false;
+#endif // 0
 }
 
 void SrcCefOSRRenderer::UpdateDragCursor(CefRefPtr<CefBrowser> browser,
