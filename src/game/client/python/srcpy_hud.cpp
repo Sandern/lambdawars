@@ -44,7 +44,6 @@ CPyHudElementHelper::CPyHudElementHelper( boost::python::object hud )
 	}
 
 	// Add to the global HUD thing
-	//Msg("Adding python hud element %s\n", m_pHud->GetName());
 	m_pyHud = hud;
 	m_pHud->m_pyInstance = m_pyHud;
 	GetHud().AddHudElement( m_pHud );
@@ -59,14 +58,17 @@ CPyHudElementHelper::CPyHudElementHelper( boost::python::object hud )
 
 CPyHudElementHelper::~CPyHudElementHelper(  )
 {
-	// Remove hud element
-	//Msg("Removing python hud element %s\n", m_pHud->GetName());
-	if( SrcPySystem()->IsPythonRunning() )
+	if( m_pHud )
 	{
-		GetHud().RemoveHudElement(m_pHud);
+		// Remove hud element
+		if( SrcPySystem()->IsPythonRunning() )
+		{
+			GetHud( m_pHud->GetSplitScreenPlayerSlot() ).RemoveHudElement (m_pHud );
+			m_pHud->SetNeedsRemove( false );
+		}
+		m_pHud->m_pyInstance = boost::python::object();		// Avoid circular reference
+		m_pHud = NULL;	// Python will delete the hud instance
 	}
-	m_pHud->m_pyInstance = boost::python::object();		// Avoid circular reference
-	m_pHud = NULL;	// Python will clear
 
 	// Remove ourself from the list
 	if( this == m_sHelpers )
