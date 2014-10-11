@@ -842,6 +842,16 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( !sv_cheats )
 		return false;
 
+#ifdef HL2WARS_DLL
+	// Use our own matchmaking system, so this should never be enabled
+	ConVar *sv_allow_lobby_connect_only = g_pCVar->FindVar( "sv_allow_lobby_connect_only" );
+	if ( sv_allow_lobby_connect_only )
+	{
+		sv_allow_lobby_connect_only->SetValue( 0 );
+	}
+	
+#endif // HL2WARS_DLL
+
 	g_pcv_commentary = g_pCVar->FindVar( "commentary" );
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
