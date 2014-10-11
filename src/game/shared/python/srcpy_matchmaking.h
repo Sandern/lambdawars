@@ -24,6 +24,7 @@ void PyMKMatchSession( KeyValues *pSettings );
 void PyMKCloseSession();
 bool PyMKIsSessionActive();
 
+#if 0
 //=============================================================================
 // Search Result
 //=============================================================================
@@ -106,6 +107,7 @@ public:
 	static void RegisterEventData( KeyValues *pEventData );
 	static KeyValues * GetEventData( char const *szEventDataKey );
 };
+#endif // 0
 
 //=============================================================================
 // MatchSession
@@ -119,6 +121,7 @@ public:
 	static void Command( KeyValues *pCommand );
 };
 
+#if 0
 //=============================================================================
 // MatchSystem
 //=============================================================================
@@ -136,5 +139,6 @@ class PySteamMatchmaking
 public:
 	static void AddRequestLobbyListDistanceFilter( ELobbyDistanceFilter eLobbyDistanceFilter );
 };
+#endif // 0
 
 #endif // SRCPY_MATCHMAKING_H

@@ -25,6 +25,7 @@
 	} \
 }
 
+#if 0
 //=============================================================================
 // Match Result
 //=============================================================================
@@ -179,6 +180,7 @@ PyMatchEventsSink::~PyMatchEventsSink()
 {
 	PyMatchEventsSubscription::Unsubscribe( this );
 }
+#endif // 0
 
 //=============================================================================
 // MatchFramework
@@ -203,6 +205,7 @@ bool PyMKIsSessionActive()
 	return g_pMatchFramework->GetMatchSession() != NULL;
 }
 
+#if 0
 //=============================================================================
 // MatchEventsSubscription
 //=============================================================================
@@ -230,6 +233,7 @@ KeyValues * PyMatchEventsSubscription::GetEventData( char const *szEventDataKey 
 {
 	return g_pMatchFramework->GetEventsSubscription()->GetEventData( szEventDataKey );
 }
+#endif // 0
 
 //=============================================================================
 // MatchSession
@@ -259,6 +263,7 @@ void PyMatchSession::Command( KeyValues *pCommand )
 	g_pMatchFramework->GetMatchSession()->Command( pCommand );
 }
 
+#if 0
 //=============================================================================
 // MatchSystem
 //=============================================================================
@@ -294,3 +299,4 @@ void PySteamMatchmaking::AddRequestLobbyListDistanceFilter( ELobbyDistanceFilter
 		pSteamMatchMaking->AddRequestLobbyListDistanceFilter( eLobbyDistanceFilter );
 	}
 }
+#endif // 0

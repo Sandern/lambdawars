@@ -27,11 +27,11 @@ class MatchMaking(SemiSharedModuleGenerator):
         mb.free_function('PyMKIsSessionActive').include()
         mb.free_function('PyMKIsSessionActive').rename('IsSessionActive')
 
-        cls = mb.class_('PyMatchEventsSubscription')
+        '''cls = mb.class_('PyMatchEventsSubscription')
         cls.include()
         cls.rename('matcheventssubscription')
         cls.mem_funs().virtuality = 'not virtual'
-        cls.mem_fun('GetEventData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+        cls.mem_fun('GetEventData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  '''
         
         cls = mb.class_('PyMatchSession')
         cls.include()
@@ -40,7 +40,7 @@ class MatchMaking(SemiSharedModuleGenerator):
         cls.mem_fun('GetSessionSystemData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         cls.mem_fun('GetSessionSettings').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
         
-        cls = mb.class_('PyMatchSystem')
+        '''cls = mb.class_('PyMatchSystem')
         cls.include()
         cls.rename('matchsystem')
         cls.mem_funs().virtuality = 'not virtual' 
@@ -65,7 +65,7 @@ class MatchMaking(SemiSharedModuleGenerator):
 
         cls = mb.class_('PySteamMatchmaking')
         cls.include()
-        cls.rename('steammatchmaking')
+        cls.rename('steammatchmaking')'''
         
         # Wars
         mb.free_function('WarsRequestGameServer').include()
