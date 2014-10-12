@@ -22,12 +22,6 @@
 #include "include/cef_runnable.h"
 #include "include/cef_client.h"
 
-// Forward declarations
-//class CefBrowser;
-//class CefFrame;
-//class CefProcessMessage;
-//class CefListValue;
-
 class PyJSObject;
 
 //-----------------------------------------------------------------------------

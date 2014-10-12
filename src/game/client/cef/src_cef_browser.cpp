@@ -24,9 +24,6 @@
 #include <ShellAPI.h>
 #endif // WIN32
 
-// CEF
-
-
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 

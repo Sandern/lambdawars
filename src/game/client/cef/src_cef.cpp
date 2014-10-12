@@ -209,7 +209,6 @@ bool CCefSystem::Init()
 	settings.multi_threaded_message_loop = false;
 	settings.log_severity = developer.GetBool() ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DEFAULT;
 	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
-	//settings.pack_loading_disabled = true;
 	settings.remote_debugging_port = 8088;
 	settings.windowless_rendering_enabled = true;
 #if !CEF_ENABLE_SANDBOX
