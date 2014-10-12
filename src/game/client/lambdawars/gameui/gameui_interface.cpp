@@ -84,7 +84,7 @@ class IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #include "src_cef.h"
 
 static boost::python::object s_ref_ui_basemodpanel;
-SrcCefBrowser *s_ui_basemodpanel;
+SrcCefBrowser *s_ui_basemodpanel = NULL;
 #endif // ENABLE_PYTHON && ENABLE_CEF
 
 #elif defined( SDK_CLIENT_DLL )
@@ -287,8 +287,6 @@ void CGameUI::PostInit()
 	}
 
 #ifdef HL2WARS_DLL
-	//vgui::VPANEL rootpanel = enginevguifuncs->GetPanel( PANEL_GAMEUIDLL );
-
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{

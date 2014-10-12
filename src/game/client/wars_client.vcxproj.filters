@@ -1964,9 +1964,6 @@
     <ClCompile Include="lambdawars\gameui\wars\vloadingprogress.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="lambdawars\gameui\wars\vmainmenu.cpp">
-      <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
-    </ClCompile>
     <ClCompile Include="lambdawars\gameui\wars\vmenubackground.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>

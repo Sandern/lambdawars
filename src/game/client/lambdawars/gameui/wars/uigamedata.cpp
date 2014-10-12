@@ -38,7 +38,7 @@
 #include "VGenericConfirmation.h"
 #include "VGenericWaitScreen.h"
 #include "VInGameMainMenu.h"
-#include "VMainMenu.h"
+//#include "VMainMenu.h"
 #include "VFooterPanel.h"
 #include "VAttractScreen.h"
 #include "VPasswordEntry.h"
