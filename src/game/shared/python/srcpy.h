@@ -105,6 +105,7 @@ extern boost::python::object unit_helper;
 #endif // CLIENT_DLL
 
 extern boost::python::object fntype;
+extern boost::python::object fnisinstance;
 
 //-----------------------------------------------------------------------------
 // Purpose: Adding modules to python

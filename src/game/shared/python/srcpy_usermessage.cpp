@@ -7,6 +7,7 @@
 #include "srcpy.h"
 #include "srcpy_usermessage.h"
 #include "srcpy_entities.h"
+#include <steam/steamclientpublic.h>
 
 #ifndef CLIENT_DLL
 	#include "enginecallback.h"
@@ -36,6 +37,7 @@ enum PyType{
 	PYTYPE_TUPLE,
 	PYTYPE_SET,
 	PYTYPE_COLOR,
+	PYTYPE_STEAMID,
 };
 
 #ifndef CLIENT_DLL
@@ -68,7 +70,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	{
 		w.type = PYTYPE_NONE;
 	}
-	else if( datatype == builtins.attr("list") )
+	else if( fnisinstance( data, boost::python::object( builtins.attr("list") ) ) )
 	{
 		w.type = PYTYPE_LIST;
 
@@ -106,7 +108,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 			w.writelist.AddToTail(write);
 		}
 	}
-	else if( datatype == builtins.attr("dict") )
+	else if( fnisinstance( data, boost::python::object( builtins.attr("dict") ) ) )
 	{
 		w.type = PYTYPE_DICT;
 
@@ -128,13 +130,13 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 			w.writelist.AddToTail(write2);
 		}
 	}
-	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "Vector", 6 ) )
+	else if( !V_strncmp( Py_TYPE(data.ptr())->tp_name, "Vector", 6 ) )
 	{
 		w.type = PYTYPE_VECTOR;
 		Vector vData = boost::python::extract<Vector>(data);
 		vData.CopyToArray(w.writevector);
 	}
-	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "QAngle", 6 ) )
+	else if( !V_strncmp( Py_TYPE(data.ptr())->tp_name, "QAngle", 6 ) )
 	{
 		w.type = PYTYPE_QANGLE;
 		QAngle angle = boost::python::extract<QAngle>(data);
@@ -142,7 +144,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 		w.writevector[1] = angle.y;
 		w.writevector[2] = angle.z;
 	}
-	else if( !Q_strncmp( Py_TYPE(data.ptr())->tp_name, "Color", 5 ) )
+	else if( !V_strncmp( Py_TYPE(data.ptr())->tp_name, "Color", 5 ) )
 	{
 		w.type = PYTYPE_COLOR;
 		Color c = boost::python::extract<Color>(data);
@@ -150,6 +152,12 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 		w.writecolor[1] = c.g();
 		w.writecolor[2] = c.b();
 		w.writecolor[3] = c.a();
+	}
+	else if( !V_strncmp( Py_TYPE(data.ptr())->tp_name, "CSteamID", 8 ) )
+	{
+		w.type = PYTYPE_STEAMID;
+		CSteamID steamid = boost::python::extract<CSteamID>(data);
+		w.writeuint64 = steamid.ConvertToUint64();
 	}
 	else
 	{
@@ -226,6 +234,9 @@ void PyWriteElement( pywrite &w )
 		for( int i = 0; i < w.writelist.Count(); i++ )
 			PyWriteElement( w.writelist[i] );
 		break;
+	case PYTYPE_STEAMID:
+		WRITE_BYTES( &w.writeuint64, sizeof( w.writeuint64 ) );
+		break;
 	case PYTYPE_NONE:
 		break;
 	case PYTYPE_HANDLE:
@@ -294,6 +305,9 @@ void PyPrintElement( pywrite &w, int indent )
 		break;
 	case PYTYPE_HANDLE:
 		DevMsg("Handle: %d\n", w.writehandle.Get());
+		break;
+	case PYTYPE_STEAMID:
+		DevMsg("SteamID ");
 		break;
 	}
 }
@@ -369,6 +383,7 @@ boost::python::object PyReadElement( bf_read &msg )
 	int length;
 	boost::python::list embeddedlist;
 	boost::python::dict embeddeddict;
+	uint64 steamid;
 
 	try
 	{
@@ -444,6 +459,9 @@ boost::python::object PyReadElement( bf_read &msg )
 			for( int i = 0; i < length; i++ )
 				embeddeddict[PyReadElement(msg)] = PyReadElement(msg);
 			return embeddeddict;
+		case PYTYPE_STEAMID:
+			msg.ReadBytes( &steamid, sizeof( steamid ) );
+			return bp::object( CSteamID( steamid ) );
 		default:
 			Warning("PyReadElement: Unknown type %d\n", type);
 			break;

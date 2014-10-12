@@ -28,6 +28,7 @@
 			bool			writebool;
 			float			writevector[3];
 			byte			writecolor[4];
+			uint64			writeuint64;
 		};
 
 		EHANDLE			writehandle;

@@ -117,6 +117,7 @@ bp::object srcmgr;
 bp::object gamemgr;
 
 boost::python::object fntype;
+boost::python::object fnisinstance;
 
 static CSrcPython g_SrcPythonSystem;
 
@@ -459,6 +460,7 @@ bool CSrcPython::InitInterpreter( void )
 	}
 
 	fntype = builtins.attr("type");
+	fnisinstance = builtins.attr("isinstance");
 
 	// Add the maps directory to the modules path
 	SysAppendPath("maps");
@@ -587,6 +589,7 @@ bool CSrcPython::ShutdownInterpreter( void )
 #endif // CLIENT_DLL
 
 	fntype = bp::object();
+	fnisinstance = bp::object();
 
 	// Finalize
 	m_bPythonIsFinalizing = true;
