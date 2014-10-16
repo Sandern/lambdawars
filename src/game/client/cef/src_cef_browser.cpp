@@ -1229,7 +1229,7 @@ void SrcCefBrowser::ShowDevTools()
 	windowInfo.SetAsPopup( GetBrowser()->GetHost()->GetWindowHandle(), "Lambda Wars Chromium DevTools" );
 #endif
 
-	GetBrowser()->GetHost()->ShowDevTools(windowInfo, m_CefClientHandler, settings);
+	GetBrowser()->GetHost()->ShowDevTools(windowInfo, m_CefClientHandler, settings, CefPoint());
 }
 
 //-----------------------------------------------------------------------------

@@ -333,12 +333,14 @@ typedef struct _cef_browser_host_t {
       int clearSelection);
 
   ///
-  // Open developer tools in its own window.
+  // Open developer tools in its own window. If |inspect_element_at| is non-
+  // NULL the element at the specified (x,y) location will be inspected.
   ///
   void (CEF_CALLBACK *show_dev_tools)(struct _cef_browser_host_t* self,
       const struct _cef_window_info_t* windowInfo,
       struct _cef_client_t* client,
-      const struct _cef_browser_settings_t* settings);
+      const struct _cef_browser_settings_t* settings,
+      const cef_point_t* inspect_element_at);
 
   ///
   // Explicitly close the developer tools window if one exists for this browser
@@ -357,6 +359,13 @@ typedef struct _cef_browser_host_t {
   ///
   int (CEF_CALLBACK *is_mouse_cursor_change_disabled)(
       struct _cef_browser_host_t* self);
+
+  ///
+  // If a misspelled word is currently selected in an editable node calling this
+  // function will replace it with the specified |word|.
+  ///
+  void (CEF_CALLBACK *replace_misspelling)(struct _cef_browser_host_t* self,
+      const cef_string_t* word);
 
   ///
   // Returns true (1) if window rendering is disabled.
