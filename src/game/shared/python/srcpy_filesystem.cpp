@@ -96,8 +96,8 @@ boost::python::object PyFS_FullPathToRelativePath( const char *path, const char 
 {
 	if( !path )
 		return defaultvalue;
-	char temp[_MAX_PATH];
-	if( !filesystem->FullPathToRelativePathEx( path, pathid, temp, _MAX_PATH ) )
+	char temp[MAX_PATH];
+	if( !filesystem->FullPathToRelativePathEx( path, pathid, temp, sizeof( temp ) ) )
 		return defaultvalue;
 	return boost::python::object(temp);
 }
@@ -109,8 +109,8 @@ boost::python::object PyFS_RelativePathToFullPath( const char *path, const char 
 {
 	if( !path )
 		return defaultvalue;
-	char temp[_MAX_PATH];
-	if( !filesystem->RelativePathToFullPath( path, pathid, temp, _MAX_PATH ) )
+	char temp[MAX_PATH];
+	if( !filesystem->RelativePathToFullPath( path, pathid, temp, sizeof( temp ) ) )
 		return defaultvalue;
 	return boost::python::object(temp);
 }

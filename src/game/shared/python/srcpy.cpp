@@ -341,9 +341,14 @@ bool CSrcPython::InitInterpreter( void )
 	V_strcat( pythonpath, buf, sizeof(pythonpath) );
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 
+	// Workaround for adding these paths
 	if( filesystem->FileExists( "python/Lib", "MOD" ) == false )
 	{
 		filesystem->CreateDirHierarchy( "python/Lib", "MOD" );
+	}
+	if( filesystem->FileExists( "python/srclib", "MOD" ) == false )
+	{
+		filesystem->CreateDirHierarchy( "python/srclib", "MOD" );
 	}
 
 	filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
@@ -417,8 +422,6 @@ bool CSrcPython::InitInterpreter( void )
 	}
 
 	// Import sys module
-	Run( "import sys" );
-	
 	sys = Import("sys");
 
 	// Redirect stdout/stderr to source print functions
@@ -464,13 +467,12 @@ bool CSrcPython::InitInterpreter( void )
 
 	// Add the maps directory to the modules path
 	SysAppendPath("maps");
-	SysAppendPath("python//srclib");
+	SysAppendPath("python\\srclib");
 
 	// Default imports
 	Import( "vmath" );
 
 	srcmgr = Import("srcmgr");
-	Run( "import srcmgr" );
 
 	Import( "srcbase" );
 	types = Import("types");
@@ -1173,10 +1175,18 @@ void CSrcPython::Run( bp::object method, bool report_errors )
 //-----------------------------------------------------------------------------
 void CSrcPython::Run( const char *pString, const char *pModule )
 {
+	Run( pString, pModule ? Import(pModule).attr("__dict__") : mainnamespace );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::Run( const char *pString, boost::python::object module )
+{
 	// execute statement
 	try
 	{
-		bp::object dict = pModule ? Import(pModule).attr("__dict__") : mainnamespace;
+		bp::object dict = module.ptr() != Py_None ? module.attr("__dict__") : mainnamespace;
 		bp::exec( pString, dict, dict );
 	}
 	catch( bp::error_already_set & )
@@ -1264,12 +1274,12 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 	bp::object append = Get("append", Get("path", "sys", true), true);
 
 	// Fixup path
-	char char_output_full_filename[ _MAX_PATH ];
-	char p_out[_MAX_PATH];
-	filesystem->RelativePathToFullPath(path,"GAME",char_output_full_filename,sizeof(char_output_full_filename));
-	V_FixupPathName(char_output_full_filename, _MAX_PATH, char_output_full_filename );
-	V_StrSubst(char_output_full_filename, "\\", "//", p_out, _MAX_PATH ); 
-
+	char char_output_full_filename[MAX_PATH];
+	char p_out[MAX_PATH];
+	filesystem->RelativePathToFullPath( path, NULL, char_output_full_filename, sizeof( char_output_full_filename ) );
+	V_FixupPathName( char_output_full_filename, sizeof( char_output_full_filename ), char_output_full_filename );
+	V_StrSubst( char_output_full_filename, "\\", "/", p_out, sizeof( p_out ) ); 
+	
 	// Append
 	Run<const char *>( append, p_out, true );
 
@@ -1279,8 +1289,8 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 		char wildcard[MAX_PATH];
 		FileFindHandle_t findHandle;
 		
-		V_snprintf( wildcard, sizeof( wildcard ), "%s//*", path );
-		const char *pFilename = filesystem->FindFirstEx( wildcard, "MOD", &findHandle );
+		V_snprintf( wildcard, sizeof( wildcard ), "%s/*", path );
+		const char *pFilename = filesystem->FindFirstEx( wildcard, NULL, &findHandle );
 		while ( pFilename != NULL )
 		{
 
@@ -1289,8 +1299,8 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 				filesystem->FindIsDirectory(findHandle) ) 
 			{
 				char path2[MAX_PATH];
-				V_snprintf( path2, sizeof( path2 ), "%s//%s", path, pFilename );
-				SysAppendPath(path2, inclsubdirs);
+				V_snprintf( path2, sizeof( path2 ), "%s/%s", path, pFilename );
+				SysAppendPath( path2, inclsubdirs );
 			}
 			pFilename = filesystem->FindNext( findHandle );
 		}
@@ -1325,7 +1335,7 @@ void CSrcPython::ExecuteAllScriptsInPath( const char *pPath )
 	V_snprintf( wildcard, sizeof( wildcard ), "%s*.py", pPath );
 
 	FileFindHandle_t findHandle;
-	const char *pFilename = filesystem->FindFirstEx( wildcard, "GAME", &findHandle );
+	const char *pFilename = filesystem->FindFirstEx( wildcard, NULL, &findHandle );
 	while ( pFilename != NULL )
 	{
 		V_snprintf( tempfile, sizeof( tempfile ), "%s/%s", pPath, pFilename );
@@ -1653,7 +1663,7 @@ CON_COMMAND_F( cpy, "Run a string on the python interpreter", FCVAR_CHEAT)
 	if( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 #endif // CLIENT_DLL
-	g_SrcPythonSystem.Run( args.ArgS(), "consolespace" );
+	g_SrcPythonSystem.Run( args.ArgS(), consolespace );
 }
 
 #ifndef CLIENT_DLL
@@ -1798,7 +1808,7 @@ CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, P
 #endif // CLIENT_DLL
 	char command[MAX_PATH];
 	V_snprintf( command, sizeof( command ), "import %s", args.ArgS() );
-	g_SrcPythonSystem.Run( command, "consolespace" );
+	g_SrcPythonSystem.Run( command, consolespace );
 }
 
 //-----------------------------------------------------------------------------
