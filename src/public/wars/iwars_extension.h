@@ -20,7 +20,7 @@ enum EMessage
 	k_EMsgLocalServerRequestGame,
 
 	// Client Messages
-	k_EMsgClientFirstMsg,
+	k_EMsgClientFirstMsg = 5000,
 	k_EMsgClientRequestGameAccepted = k_EMsgClientFirstMsg,
 	k_EMsgClientRequestGameDenied,
 };
