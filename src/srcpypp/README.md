@@ -37,3 +37,11 @@ Merge changes from https://bitbucket.org/ompl/pyplusplus
 	- `gcc -print-prog-name=cc1` -v
 3. Update symbols gccxml_gcc_options file
 	- gcc -dM -E - < /dev/null
+
+## Modifying importlib/_bootstrap.py
+Contains modified importlib._bootstrap, to allow loading modules from vpk files. This module must be frozen and included in the server/client dlls.
+
+Steps:
+1. Compile _freeze_importlib project (thirdparty/python/pcbuild/_freeze_importlib)
+2. Use it on _bootstrap.py: .\_freeze_importlib.exe _bootstrap.py srcpy_importlib.h
+3. Update shared/python/srcpy_importlib.h and recompile game

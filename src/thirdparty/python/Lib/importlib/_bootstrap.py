@@ -26,14 +26,17 @@ _CASE_INSENSITIVE_PLATFORMS = 'win', 'cygwin', 'darwin'
 
 
 def _make_relax_case():
-    if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
+    '''if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
         def _relax_case():
             """True if filenames must be checked case-insensitively."""
             return b'PYTHONCASEOK' in _os.environ
     else:
         def _relax_case():
             """True if filenames must be checked case-insensitively."""
-            return False
+            return False'''
+    def _relax_case():
+        """True if filenames must be checked case-insensitively."""
+        return True # VPK makes files always lower case
     return _relax_case
 
 
@@ -2110,6 +2113,151 @@ class FileFinder:
     def __repr__(self):
         return 'FileFinder({!r})'.format(self.path)
 
+# Source Engine VPK File Loader
+def _vpk_path_isfile(path):
+    """Replacement for os.path.isfile."""
+    return _filesystem.FileExists(path) and not _vpk_path_isdir(path)
+
+def _vpk_path_isdir(path):
+    """Replacement for os.path.isdir."""
+    if not path:
+        path = '.'
+    return _filesystem.IsDirectory(path)
+    
+class VPKPathFinder(PathFinder):
+    @classmethod
+    def _path_importer_cache(cls, path):
+        """Get the finder for the path entry from sys.path_importer_cache.
+
+        If the path entry is not in the cache, find the appropriate finder
+        and cache it. If no finder is available, store None.
+
+        """
+        if path == '':
+            path = '.'
+        try:
+            finder = sys.path_importer_cache[path]
+        except KeyError:
+            finder = cls._path_hooks(path)
+            sys.path_importer_cache[path] = finder
+        return finder
+                
+class VPKSourceFileLoader(SourceFileLoader):
+    def path_stats(self, path):
+        """Return the metadata for the path."""
+        return {'mtime': _filesystem.GetFileTime(path), 'size': _filesystem.Size(path)}
+        
+    def get_data(self, path):
+        """Return the data from path as raw bytes."""
+        return _filesystem.ReadFile(path, 'GAME')
+        
+class VPKFileFinder(FileFinder):
+    def __init__(self, *args, **kwargs):
+        super(VPKFileFinder, self).__init__(*args, **kwargs)
+        
+        if _filesystem.IsAbsolutePath(self.path):
+            self.path = _filesystem.FullPathToRelativePath(self.path + '\\', defaultvalue=self.path)
+        if self.path:
+            self.path = self.path.rstrip('/\\') 
+        
+    def find_spec(self, fullname, target=None):
+        """Try to find a loader for the specified module, or the namespace
+        package portions. Returns (loader, list-of-portions)."""
+        is_namespace = False
+        tail_module = fullname.rpartition('.')[2]
+        try:
+            mtime = _filesystem.GetFileTime(self.path)
+            if mtime == 0:
+                mtime = -1 # Expects -1
+        except OSError:
+            mtime = -1
+        if mtime != self._path_mtime:
+            self._fill_cache()
+            self._path_mtime = mtime
+        # tail_module keeps the original casing, for __file__ and friends
+        if _relax_case():
+            cache = self._relaxed_path_cache
+            cache_module = tail_module.lower()
+        else:
+            cache = self._path_cache
+            cache_module = tail_module
+        # Check if the module is the name of a directory (and thus a package).
+        if cache_module in cache:
+            base_path = _path_join(self.path, tail_module)
+            for suffix, loader_class in self._loaders:
+                init_filename = '__init__' + suffix
+                full_path = _path_join(base_path, init_filename)
+                if _vpk_path_isfile(full_path):
+                    return self._get_spec(loader_class, fullname, full_path, [base_path], target)
+            else:
+                # If a namespace package, return the path if we don't
+                #  find a module in the next section.
+                is_namespace = _vpk_path_isdir(base_path)
+        # Check for a file w/ a proper suffix exists.
+        for suffix, loader_class in self._loaders:
+            full_path = _path_join(self.path, tail_module + suffix)
+            _verbose_message('trying {}'.format(full_path), verbosity=2)
+            if cache_module + suffix in cache:
+                if _vpk_path_isfile(full_path):
+                    return self._get_spec(loader_class, fullname, full_path, None, target)
+        if is_namespace:
+            _verbose_message('possible namespace for {}'.format(base_path))
+            spec = ModuleSpec(fullname, None)
+            spec.submodule_search_locations = [base_path]
+            return spec
+        return None
+        
+    def _fill_cache(self):
+        """Fill the cache of potential modules and packages for this directory."""
+        path = self.path
+        try:
+            contents = _filesystem.ListDir(path)
+        except (FileNotFoundError, PermissionError, NotADirectoryError):
+            # Directory has either been removed, turned into a file, or made
+            # unreadable.
+            contents = []
+        # We store two cached versions, to handle runtime changes of the
+        # PYTHONCASEOK environment variable.
+        if not sys.platform.startswith('win'):
+            self._path_cache = set(contents)
+        else:
+            # Windows users can import modules with case-insensitive file
+            # suffixes (for legacy reasons). Make the suffix lowercase here
+            # so it's done once instead of for every import. This is safe as
+            # the specified suffixes to check against are always specified in a
+            # case-sensitive manner.
+            lower_suffix_contents = set()
+            for item in contents:
+                name, dot, suffix = item.partition('.')
+                if dot:
+                    new_name = '{}.{}'.format(name, suffix.lower())
+                else:
+                    new_name = name
+                lower_suffix_contents.add(new_name)
+            self._path_cache = lower_suffix_contents
+        if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
+            self._relaxed_path_cache = {fn.lower() for fn in contents}
+            
+    @classmethod
+    def path_hook(cls, *loader_details):
+        """A class method which returns a closure to use on sys.path_hook
+        which will return an instance using the specified loaders and the path
+        called on the closure.
+
+        If the path called on the closure is not a directory, ImportError is
+        raised.
+
+        """
+        def path_hook_for_VPKFileFinder(path):
+            """Path hook for importlib.machinery.FileFinder."""
+            if not _vpk_path_isdir(path):
+                raise ImportError('only directories are supported', path=path)
+            return cls(path, *loader_details)
+
+        return path_hook_for_VPKFileFinder
+            
+    def __repr__(self):
+        return 'VPKFileFinder({!r})'.format(self.path)
 
 # Import itself ###############################################################
 
@@ -2314,7 +2462,7 @@ def _get_supported_file_loaders():
     Each item is a tuple (loader, suffixes).
     """
     extensions = ExtensionFileLoader, _imp.extension_suffixes()
-    source = SourceFileLoader, SOURCE_SUFFIXES
+    source = VPKSourceFileLoader, SOURCE_SUFFIXES
     bytecode = SourcelessFileLoader, BYTECODE_SUFFIXES
     return [extensions, source, bytecode]
 
@@ -2370,7 +2518,7 @@ def _setup(sys_module, _imp_module):
     modules, those two modules must be explicitly passed in.
 
     """
-    global _imp, sys, BYTECODE_SUFFIXES
+    global _imp, sys, _filesystem, srcbuiltins, BYTECODE_SUFFIXES
     _imp = _imp_module
     sys = sys_module
 
@@ -2419,6 +2567,26 @@ def _setup(sys_module, _imp_module):
                 continue
     else:
         raise ImportError('importlib requires posix or nt')
+        
+    if '_filesystem' in sys.modules:
+        _filesystem = sys.modules['_filesystem']
+    else:
+        try:
+            _filesystem = _builtin_from_name('_filesystem')
+        except ImportError:
+            raise ImportError('importlib requires _filesystem')
+            
+    # The following code can be used for debugging the frozen importlib module:
+    # A message can be printed using "srcbuiltins.Msg"
+    # print does not work yet, because it's not redirected
+    '''if 'srcbuiltins' in sys.modules:
+        srcbuiltins = sys.modules['srcbuiltins']
+    else:
+        try:
+            srcbuiltins = _builtin_from_name('srcbuiltins')
+        except ImportError:
+            raise ImportError('importlib requires srcbuiltins')'''
+                
     setattr(self_module, '_os', os_module)
     setattr(self_module, 'path_sep', path_sep)
     setattr(self_module, 'path_separators', ''.join(path_separators))
@@ -2453,9 +2621,10 @@ def _install(sys_module, _imp_module):
     """Install importlib as the implementation of import."""
     _setup(sys_module, _imp_module)
     supported_loaders = _get_supported_file_loaders()
-    sys.path_hooks.extend([FileFinder.path_hook(*supported_loaders)])
+    sys.path_hooks.extend([VPKFileFinder.path_hook(*supported_loaders)])
     sys.meta_path.append(BuiltinImporter)
     sys.meta_path.append(FrozenImporter)
     if _os.__name__ == 'nt':
         sys.meta_path.append(WindowsRegistryFinder)
-    sys.meta_path.append(PathFinder)
+    #sys.meta_path.append(PathFinder)
+    sys.meta_path.append(VPKPathFinder)

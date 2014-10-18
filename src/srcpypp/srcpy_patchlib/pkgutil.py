@@ -119,7 +119,6 @@ def iter_modules(path=None, prefix=''):
     else:
         importers = map(get_importer, path)
 
-    print('iter_modules: %s' % (str(list(importers))))
     yielded = {}
     for i in importers:
         for name, ispkg in iter_importer_modules(i, prefix):
@@ -143,7 +142,7 @@ def _iter_file_finder_modules(importer, prefix=''):
     yielded = {}
     import inspect
     try:
-        filenames = os.listdir(importer.path)
+        filenames = filesystem.ListDir(importer.path)
     except OSError:
         # ignore unreadable directories like import does
         filenames = []
@@ -157,10 +156,10 @@ def _iter_file_finder_modules(importer, prefix=''):
         path = os.path.join(importer.path, fn)
         ispkg = False
 
-        if not modname and os.path.isdir(path) and '.' not in fn:
+        if not modname and filesystem.IsDirectory(path) and '.' not in fn:
             modname = fn
             try:
-                dircontents = os.listdir(path)
+                dircontents = filesystem.ListDir(path)
             except OSError:
                 # ignore unreadable directories like import does
                 dircontents = []
@@ -177,8 +176,7 @@ def _iter_file_finder_modules(importer, prefix=''):
             yield prefix + modname, ispkg
 
 iter_importer_modules.register(
-    importlib.machinery.FileFinder, _iter_file_finder_modules)
-
+    importlib.machinery.VPKFileFinder, _iter_file_finder_modules)
 
 def _import_imp():
     global imp

@@ -2116,7 +2116,7 @@ class FileFinder:
 # Source Engine VPK File Loader
 def _vpk_path_isfile(path):
     """Replacement for os.path.isfile."""
-    return _filesystem.FileExists(path)
+    return _filesystem.FileExists(path) and not _vpk_path_isdir(path)
 
 def _vpk_path_isdir(path):
     """Replacement for os.path.isdir."""
@@ -2237,6 +2237,24 @@ class VPKFileFinder(FileFinder):
             self._path_cache = lower_suffix_contents
         if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
             self._relaxed_path_cache = {fn.lower() for fn in contents}
+            
+    @classmethod
+    def path_hook(cls, *loader_details):
+        """A class method which returns a closure to use on sys.path_hook
+        which will return an instance using the specified loaders and the path
+        called on the closure.
+
+        If the path called on the closure is not a directory, ImportError is
+        raised.
+
+        """
+        def path_hook_for_VPKFileFinder(path):
+            """Path hook for importlib.machinery.FileFinder."""
+            if not _vpk_path_isdir(path):
+                raise ImportError('only directories are supported', path=path)
+            return cls(path, *loader_details)
+
+        return path_hook_for_VPKFileFinder
             
     def __repr__(self):
         return 'VPKFileFinder({!r})'.format(self.path)
