@@ -67,4 +67,9 @@
       <Filter>Link Libraries</Filter>
     </Library>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
