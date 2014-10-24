@@ -326,10 +326,11 @@ void CGameUI::PostInit()
 		}
 	}
 #endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
 
 	// to know once client dlls have been loaded
 	BaseModUI::CUIGameData::Get()->OnGameUIPostInit();
-#endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -573,12 +574,15 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 //-----------------------------------------------------------------------------
 void CGameUI::ShutdownCEFMenu()
 {
-	if( s_ui_basemodpanel && s_ui_basemodpanel->GetPanel() )
+	if( SrcPySystem()->IsPythonRunning() )
 	{
-		s_ui_basemodpanel->GetPanel()->SetParent( (vgui::Panel *)NULL ); // Detach from gameui base panel
+		if( s_ui_basemodpanel && s_ui_basemodpanel->GetPanel() )
+		{
+			s_ui_basemodpanel->GetPanel()->SetParent( (vgui::Panel *)NULL ); // Detach from gameui base panel
+		}
+		s_ref_ui_basemodpanel = boost::python::object();
+		s_ui_basemodpanel = NULL;
 	}
-	s_ref_ui_basemodpanel = boost::python::object();
-	s_ui_basemodpanel = NULL;
 }
 #endif // ENABLE_PYTHON
 

@@ -13,14 +13,6 @@
 #pragma comment(lib, "cef_sandbox.lib")
 #endif
 
-// Stub implementations.
-std::string AppGetWorkingDirectory() {
-	return std::string();
-}
-CefWindowHandle AppGetMainHwnd() {
-	return NULL;
-}
-
 // Process entry point.
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow )
 {
@@ -41,5 +33,5 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	sandbox_info = scoped_sandbox.sandbox_info();
 #endif
 
-	return CefExecuteProcess(main_args, app, sandbox_info);
+	return CefExecuteProcess(main_args, app.get(), sandbox_info);
 }

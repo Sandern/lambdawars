@@ -246,12 +246,7 @@ void CCefSystem::Shutdown()
 	GameUI().ShutdownCEFMenu();
 #endif // ENABLE_PYTHON
 
-	DevMsg("Shutting down CEF\n");
-
-#ifdef WIN32
-	// Restore window process to prevent unwanted callbacks
-	SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)RealWndProc);
-#endif // WIN32
+	DevMsg( "Shutting down CEF (%d active browsers)\n", m_CefBrowsers.Count() );
 
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
@@ -261,6 +256,11 @@ void CCefSystem::Shutdown()
 	// Shut down CEF.
 	CefShutdown();
 
+#ifdef WIN32
+	// Restore window process to prevent unwanted callbacks
+	SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)RealWndProc);
+#endif // WIN32
+
 	m_bIsRunning = false;
 }
 
@@ -269,6 +269,9 @@ void CCefSystem::Shutdown()
 //-----------------------------------------------------------------------------
 void CCefSystem::Update( float frametime ) 
 { 
+	if( !m_bIsRunning )
+		return;
+
 	// Perform a single iteration of the CEF message loop
 	CefDoMessageLoopWork();
 
@@ -504,11 +507,14 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 #else
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
+		if( !!m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+			continue;
+
 		// Only send key input if no vgui panel has key focus
 		// TODO: Deal with game bindings
 		vgui::VPANEL focus = vgui::input()->GetFocus();
 		vgui::Panel *pPanel = m_CefBrowsers[i]->GetPanel();
-		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() || !pPanel->IsVisible() || (focus != 0 && focus != pPanel->GetVPanel()) )
+		if( !pPanel || !pPanel->IsVisible() || (focus != 0 && focus != pPanel->GetVPanel()) )
 			continue;
 
 		CefRefPtr<CefBrowser> browser = m_CefBrowsers[i]->GetBrowser();
