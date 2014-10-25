@@ -181,7 +181,10 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	Assert( dirtyRects.size() > 0 );
 
-	//AUTO_LOCK( s_BufferMutex );
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AUTO_LOCK( s_BufferMutex );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	if( type == PET_VIEW )
 	{
 		// Update image buffer size if needed

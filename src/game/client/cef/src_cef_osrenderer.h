@@ -70,8 +70,11 @@ public:
 	int GetPopupWidth() { return m_iPopupWidth; }
 	int GetPopupHeight() { return m_iPopupHeight; }
 
-	//void LockTextureBuffer() { s_BufferMutex.Lock(); }
-	//void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	void LockTextureBuffer() { s_BufferMutex.Lock(); }
+	void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
+	CThreadFastMutex &GetTextureBufferMutex() { return s_BufferMutex; }
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	int GetAlphaAt( int x, int y );
 
@@ -107,8 +110,9 @@ private:
 	CefRect popup_rect_;
 	CefRect original_popup_rect_;
 
-	//CThreadFastMutex s_BufferMutex;
-
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CThreadFastMutex s_BufferMutex;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	SrcCefBrowser *m_pBrowser;
 
 	IMPLEMENT_REFCOUNTING(SrcCefOSRRenderer);

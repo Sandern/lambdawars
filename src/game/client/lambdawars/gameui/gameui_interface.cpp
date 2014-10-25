@@ -1171,3 +1171,32 @@ void CGameUI::OnDemoTimeout()
 }
 #endif
 
+#ifndef _X360
+CON_COMMAND_F( openserverbrowser, "Opens server browser", 0 )
+{
+	bool isSteam = IsPC() && steamapicontext->SteamFriends() && steamapicontext->SteamUtils();
+	if ( isSteam )
+	{
+		// show the server browser
+		g_VModuleLoader.ActivateModule("Servers");
+
+		// if an argument was passed, that's the tab index to show, send a message to server browser to switch to that tab
+		if ( args.ArgC() > 1 )
+		{
+			KeyValues *pKV = new KeyValues( "ShowServerBrowserPage" );
+			pKV->SetInt( "page", atoi( args[1] ) );
+			g_VModuleLoader.PostMessageToAllModules( pKV );
+		}
+
+#ifdef INFESTED_DLL
+		KeyValues *pSchemeKV = new KeyValues( "SetCustomScheme" );
+		pSchemeKV->SetString( "SchemeName", "SwarmServerBrowserScheme" );
+		g_VModuleLoader.PostMessageToAllModules( pSchemeKV );
+#else
+		KeyValues *pSchemeKV = new KeyValues( "SetCustomScheme" );
+		pSchemeKV->SetString( "SchemeName", "SourceScheme" );
+		g_VModuleLoader.PostMessageToAllModules( pSchemeKV );
+#endif
+	}
+}
+#endif

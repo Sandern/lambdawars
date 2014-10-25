@@ -26,17 +26,17 @@ namespace bp = boost::python;
 
 struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
 
-    SrcCefBrowser_wrapper(SrcCefBrowser const & arg )
-    : SrcCefBrowser( arg )
-      , bp::wrapper< SrcCefBrowser >(){
-        // copy constructor
-        
-    }
-
     SrcCefBrowser_wrapper(char const * name, char const * url="", int renderframerate=30 )
     : SrcCefBrowser( name, url, renderframerate )
       , bp::wrapper< SrcCefBrowser >(){
         // constructor
+    
+    }
+
+    SrcCefBrowser_wrapper(::SrcCefBrowser const & vec )
+    : SrcCefBrowser( vec )
+      , bp::wrapper< SrcCefBrowser >(){
+        // copy constructor
     
     }
 
@@ -336,7 +336,7 @@ BOOST_PYTHON_MODULE(_cef){
     }
 
     { //::SrcCefBrowser
-        typedef bp::class_< SrcCefBrowser_wrapper > SrcCefBrowser_exposer_t;
+        typedef bp::class_< SrcCefBrowser_wrapper, boost::noncopyable > SrcCefBrowser_exposer_t;
         SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const *, int > >(( bp::arg("name"), bp::arg("url")="", bp::arg("renderframerate")=(int)(30) )) );
         bp::scope SrcCefBrowser_scope( SrcCefBrowser_exposer );
         bp::enum_< SrcCefBrowser::NavigationType>("NavigationType")
@@ -346,6 +346,7 @@ BOOST_PYTHON_MODULE(_cef){
             .export_values()
             ;
         bp::implicitly_convertible< char const *, SrcCefBrowser >();
+        SrcCefBrowser_exposer.def( bp::init< SrcCefBrowser const & >(( bp::arg("vec") )) );
         { //::SrcCefBrowser::CloseDevTools
         
             typedef void ( ::SrcCefBrowser::*CloseDevTools_function_type )(  ) ;

@@ -307,48 +307,53 @@ void SrcCefVGUIPanel::Paint()
 		vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
 	}
 
-	if( !m_pTextureRegen )
-		return;
-
-	// Regenerate texture (partially) if needed
-	if( m_pTextureRegen->IsDirty() )
+	if( m_pTextureRegen )
 	{
-		//if( g_cef_debug_texture.GetBool() )
-		//	DevMsg("CEF: texture requires full regeneration\n");
-		m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-		if( g_pShaderAPI && m_RenderBuffer.IsValid() )
-		{
-			VPROF_BUDGET( "Upload", "CefUploadTexture" );
+		CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
 
-			CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
-			int nFrame = 0;
-			int nTextureChannel = 0;
-			ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
-			if( renderer->GetTextureBuffer() && g_pShaderAPI->IsTexture( textureHandle ) )
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+		AUTO_LOCK( renderer->GetTextureBufferMutex() );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
+		// Regenerate texture (partially) if needed
+		if( m_pTextureRegen->IsDirty() )
+		{
+			//if( g_cef_debug_texture.GetBool() )
+			//	DevMsg("CEF: texture requires full regeneration\n");
+			m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
+			if( g_pShaderAPI && m_RenderBuffer.IsValid() )
 			{
-				int iFace = 0;
-				int iMip = 0;
-				int z = 0;
+				VPROF_BUDGET( "Upload", "CefUploadTexture" );
 
-				g_pShaderAPI->ModifyTexture( textureHandle );
-				g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
-
-				if( renderer->GetPopupBuffer() )
+				int nFrame = 0;
+				int nTextureChannel = 0;
+				ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+				if( renderer->GetTextureBuffer() && g_pShaderAPI->IsTexture( textureHandle ) )
 				{
-					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
-						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
+					int iFace = 0;
+					int iMip = 0;
+					int z = 0;
+
+					g_pShaderAPI->ModifyTexture( textureHandle );
+					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+
+					if( renderer->GetPopupBuffer() )
+					{
+						g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
+							m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
+					}
+
+					m_pTextureRegen->ClearDirty();
 				}
-
-				m_pTextureRegen->ClearDirty();
 			}
-		}
 
-		// Clear if no longer dirty
-		if( !m_pTextureRegen->IsDirty() )
-		{
-			m_iDirtyX = m_iWVWide;
-			m_iDirtyY = m_iWVTall;
-			m_iDirtyXEnd = m_iDirtyYEnd = 0;
+			// Clear if no longer dirty
+			if( !m_pTextureRegen->IsDirty() )
+			{
+				m_iDirtyX = m_iWVWide;
+				m_iDirtyY = m_iWVTall;
+				m_iDirtyXEnd = m_iDirtyYEnd = 0;
+			}
 		}
 	}
 

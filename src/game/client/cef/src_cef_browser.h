@@ -10,6 +10,11 @@
 #pragma once
 #endif
 
+// Indicates to use the mulithreaded message loop
+// CefClientHandler will still add individual cases to a message queue, 
+// so in SrcCefBrowser they are still processed on the main thread.
+#define USE_MULTITHREADED_MESSAGELOOP
+
 #include <string>
 #include "src_cef_js.h"
 #include "src_cef_vgui_panel.h"
@@ -166,6 +171,32 @@ private:
 	// Internal
 	SrcCefBrowser *m_pSrcBrowser;
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CThreadFastMutex m_MessageQueueMutex;
+
+	enum messageType_e {
+		MT_LOADSTART = 0,
+		MT_LOADEND,
+		MT_LOADERROR,
+		MT_LOADINGSTATECHANGE,
+		MT_CONTEXTCREATED,
+		MT_METHODCALL,
+	};
+	typedef struct messageData_t {
+		messageData_t( messageType_e type, CefRefPtr<CefFrame> frame, CefRefPtr<CefListValue> data ) :
+			type(type), frame(frame), data(data) {}
+		messageType_e type;
+		CefRefPtr<CefFrame> frame;
+		CefRefPtr<CefListValue> data;
+	} messageData_t;
+	CUtlVector< messageData_t > m_messageQueue;
+
+	void AddMessage( messageType_e type, CefRefPtr<CefFrame> frame, CefRefPtr<CefListValue> data );
+public:
+	void ProcessMessages();
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
+private:
 	IMPLEMENT_REFCOUNTING( CefClientHandler );
 };
 #endif // PYPP_GENERATION
@@ -176,6 +207,7 @@ private:
 class SrcCefBrowser
 {
 	friend class CCefSystem;
+	friend class CefClientHandler;
 
 public:
 	SrcCefBrowser( const char *name, const char *url = "", int renderframerate = 30 );
@@ -293,6 +325,9 @@ public:
 	CefRefPtr<SrcCefOSRRenderer> GetOSRHandler();
 	CefRefPtr<CefBrowser> GetBrowser();
 	const char *GetName();
+
+protected:
+	SrcCefBrowser( SrcCefBrowser const& vec ) { Assert(0); }
 
 private:
 	virtual void Think( void );

@@ -206,7 +206,11 @@ bool CCefSystem::Init()
 	// Settings
 	CefSettings settings;
 	settings.single_process = false;
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	settings.multi_threaded_message_loop = true;
+#else 
 	settings.multi_threaded_message_loop = false;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	settings.log_severity = developer.GetBool() ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DEFAULT;
 	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
 	settings.remote_debugging_port = 8088;
@@ -251,7 +255,9 @@ void CCefSystem::Shutdown()
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 		m_CefBrowsers[i]->Destroy();
+#ifndef USE_MULTITHREADED_MESSAGELOOP
 	CefDoMessageLoopWork();
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	// Shut down CEF.
 	CefShutdown();
@@ -272,8 +278,10 @@ void CCefSystem::Update( float frametime )
 	if( !m_bIsRunning )
 		return;
 
+#ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Perform a single iteration of the CEF message loop
 	CefDoMessageLoopWork();
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	// Let browser think
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )

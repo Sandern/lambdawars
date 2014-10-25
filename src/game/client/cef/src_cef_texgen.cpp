@@ -28,12 +28,24 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 	if( g_debug_cef_test.GetBool() )
 		return;
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
+
+	if( !renderer )
+		return;
+
+	AUTO_LOCK( renderer->GetTextureBufferMutex() );
+
+	if( !renderer->GetTextureBuffer() )
+		return;
+#endif
+
 	// Don't regenerate while loading
 	if( engine->IsDrawingLoadingImage() )
 	{
 		int width, height;
-		width = m_pBrowser->GetOSRHandler()->GetWidth();
-		height = m_pBrowser->GetOSRHandler()->GetHeight();
+		width = renderer->GetWidth();
+		height = renderer->GetHeight();
 
 		m_pBrowser->GetPanel()->MarkTextureDirty( 0, 0, width, height );
 		return;
@@ -45,8 +57,11 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 		return;
 	}
 
-	if( !m_pBrowser->GetOSRHandler() || !m_pBrowser->GetOSRHandler()->GetTextureBuffer() )
+#ifndef USE_MULTITHREADED_MESSAGELOOP
+	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
+	if( !renderer || !renderer->GetTextureBuffer() )
 		return;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	int width, height, channels;
 	int srcwidth, srcheight;
@@ -60,14 +75,14 @@ void CCefTextureGenerator::RegenerateTextureBits( ITexture *pTexture, IVTFTextur
 
 	m_bIsDirty = false;
 
-	srcwidth = m_pBrowser->GetOSRHandler()->GetWidth();
-	srcheight = m_pBrowser->GetOSRHandler()->GetHeight();
+	srcwidth = renderer->GetWidth();
+	srcheight = renderer->GetHeight();
 
 	// Shouldn't happen, but can happen
 	if( srcwidth > width || srcheight > height )
 		return;
 
-	const unsigned char *srcbuffer = m_pBrowser->GetOSRHandler()->GetTextureBuffer();
+	const unsigned char *srcbuffer = renderer->GetTextureBuffer();
 
 	// Copy per row
 	int clampedwidth = Min( srcwidth, pSubRect->width );

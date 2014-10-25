@@ -73,7 +73,7 @@ void CefClientHandler::Destroy()
 
 	m_Browser = NULL;
 	m_pSrcBrowser = NULL;
-	SetOSRHandler( NULL );
+	//SetOSRHandler( NULL );
 }
 
 //-----------------------------------------------------------------------------
@@ -96,6 +96,9 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 	else if( message->GetName() == "methodcall" )
 	{
 		CefRefPtr<CefListValue> args = message->GetArgumentList();
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+		AddMessage( MT_METHODCALL, NULL, args->Copy() );
+#else
 		CefString identifier = args->GetString( 0 );
 		CefRefPtr<CefListValue> methodargs = args->GetList( 1 );
 	
@@ -108,11 +111,16 @@ bool CefClientHandler::OnProcessMessageReceived(	CefRefPtr<CefBrowser> browser,
 			int iCallbackID = args->GetInt( 2 );
 			m_pSrcBrowser->OnMethodCall( identifier, methodargs, &iCallbackID );
 		}
+#endif // USE_MULTITHREADED_MESSAGELOOP
 		return true;
 	}
 	else if( message->GetName() == "oncontextcreated" )
 	{
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+		AddMessage( MT_CONTEXTCREATED, NULL, NULL );
+#else
 		m_pSrcBrowser->OnContextCreated();
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	}
 	else if( message->GetName() == "openurl" )
 	{
@@ -196,8 +204,8 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 //-----------------------------------------------------------------------------
 bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 {
-	if( browser->IsLoading() )
-		browser->StopLoad();
+	//if( browser->IsLoading() )
+	//	browser->StopLoad();
 	return false;
 }
 
@@ -212,7 +220,11 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 	if( g_debug_cef.GetBool() )
 		DevMsg( "#%d %s: SrcCefBrowser::OnLoadStart\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AddMessage( MT_LOADSTART, frame, NULL );
+#else
 	m_pSrcBrowser->OnLoadStart( frame );
+#endif // USE_MULTITHREADED_MESSAGELOOP
 }
 
 //-----------------------------------------------------------------------------
@@ -226,7 +238,13 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 	if( g_debug_cef.GetBool() )
 		DevMsg( "#%d %s: SrcCefBrowser::OnLoadEnd\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CefRefPtr<CefListValue> data = CefListValue::Create();
+	data->SetInt( 0, httpStatusCode );
+	AddMessage( MT_LOADEND, frame, data );
+#else
 	m_pSrcBrowser->OnLoadEnd( frame, httpStatusCode );
+#endif // USE_MULTITHREADED_MESSAGELOOP
 }
 
 //-----------------------------------------------------------------------------
@@ -237,7 +255,15 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 {
 	if( !m_pSrcBrowser )
 		return;
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CefRefPtr<CefListValue> data = CefListValue::Create();
+	data->SetInt( 0, errorCode );
+	data->SetString( 1, errorText );
+	data->SetString( 2, failedUrl );
+	AddMessage( MT_LOADERROR, frame, data );
+#else
 	m_pSrcBrowser->OnLoadError( frame, errorCode, errorText.c_str(), failedUrl.c_str() );
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +276,16 @@ void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 {
 	if( !m_pSrcBrowser )
 		return;
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CefRefPtr<CefListValue> data = CefListValue::Create();
+	data->SetBool( 0, isLoading );
+	data->SetBool( 1, canGoBack );
+	data->SetBool( 2, canGoForward );
+	AddMessage( MT_LOADINGSTATECHANGE, NULL, data );
+#else
 	m_pSrcBrowser->OnLoadingStateChange( isLoading, canGoBack, canGoForward );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -313,6 +348,72 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 								CefString& new_url)
 {
 }
+
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CefClientHandler::AddMessage( messageType_e type, CefRefPtr<CefFrame> frame, CefRefPtr<CefListValue> data )
+{
+	m_MessageQueueMutex.Lock();
+	m_messageQueue.AddToTail( messageData_t( type, frame, data ) );
+	m_MessageQueueMutex.Unlock();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CefClientHandler::ProcessMessages()
+{
+	m_MessageQueueMutex.Lock();
+
+	for( int i = 0; i < m_messageQueue.Count(); i++ ) 
+	{
+		messageData_t &data = m_messageQueue[i];
+		CefString identifier;
+		CefRefPtr<CefListValue> methodargs;
+
+		switch( data.type)
+		{
+		case MT_LOADSTART:
+			m_pSrcBrowser->OnLoadStart( data.frame );
+			break;
+		case MT_LOADEND:
+			m_pSrcBrowser->OnLoadEnd( data.frame, data.data->GetInt( 0 ) );
+			break;
+		case MT_LOADERROR:
+			m_pSrcBrowser->OnLoadError( data.frame, data.data->GetInt( 0 ), data.data->GetString( 1 ).c_str(), data.data->GetString( 2 ).c_str() );
+			break;
+		case MT_LOADINGSTATECHANGE:
+			m_pSrcBrowser->OnLoadingStateChange( data.data->GetBool( 0 ), data.data->GetBool( 1 ), data.data->GetBool( 2 ) );
+			break;
+		case MT_CONTEXTCREATED:
+			m_pSrcBrowser->OnContextCreated();
+			break;
+		case MT_METHODCALL:
+			identifier = data.data->GetString( 0 );
+			methodargs = data.data->GetList( 1 );
+	
+			if( data.data->GetType( 2 ) == VTYPE_NULL )
+			{
+				m_pSrcBrowser->OnMethodCall( identifier, methodargs );
+			}
+			else
+			{
+				int iCallbackID = data.data->GetInt( 2 );
+				m_pSrcBrowser->OnMethodCall( identifier, methodargs, &iCallbackID );
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	m_messageQueue.Purge();
+
+	m_MessageQueueMutex.Unlock();
+}
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -435,6 +536,10 @@ CefRefPtr<CefBrowser> SrcCefBrowser::GetBrowser()
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::Think( void )
 {
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	m_CefClientHandler->ProcessMessages();
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	if( m_bPerformLayout )
 	{
 		PerformLayout();
