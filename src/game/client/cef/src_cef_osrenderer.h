@@ -81,6 +81,7 @@ public:
 	CefRect GetPopupRectInWebView(const CefRect& original_rect);
 	void ClearPopupRects();
 
+#ifdef WIN32
 private:
 	// Cursors
 	HCURSOR m_hArrow;
@@ -93,6 +94,7 @@ private:
 	HCURSOR m_hSizeNESW;
 	HCURSOR m_hSizeWE;
 	HCURSOR m_hSizeNS;
+#endif // WIN32
 
 private:
 	int m_iWidth, m_iHeight;

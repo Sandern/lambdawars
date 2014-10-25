@@ -15,15 +15,18 @@
 #include "src_cef_vgui_panel.h"
 #include "src_cef_osrenderer.h"
 
+#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 // CEF
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
 #include "include/cef_frame.h"
 #include "include/cef_runnable.h"
 #include "include/cef_client.h"
+#endif // PYPP_GENERATION
 
 class PyJSObject;
 
+#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser internal implementation
 //-----------------------------------------------------------------------------
@@ -165,6 +168,7 @@ private:
 
 	IMPLEMENT_REFCOUNTING( CefClientHandler );
 };
+#endif // PYPP_GENERATION
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
@@ -294,7 +298,9 @@ private:
 	virtual void Think( void );
 
 private:
+#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 	CefRefPtr<CefClientHandler> m_CefClientHandler;
+#endif // PYPP_GENERATION
 
 	SrcCefVGUIPanel *m_pPanel;
 

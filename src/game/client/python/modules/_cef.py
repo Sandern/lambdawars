@@ -35,6 +35,24 @@ class CEF(ClientModuleGenerator):
         # Cef browser
         cls = mb.class_('SrcCefBrowser')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual' 
+        
+        # Overrides
+        cls.mem_funs('PyOnLoadStart').virtuality = 'virtual'
+        cls.mem_funs('PyOnLoadEnd').virtuality = 'virtual'
+        cls.mem_funs('PyOnLoadError').virtuality = 'virtual'
+        cls.mem_funs('OnLoadingStateChange').virtuality = 'virtual'
+        cls.mem_funs('PyOnMethodCall').virtuality = 'virtual'
+        cls.mem_funs('OnContextCreated').virtuality = 'virtual'
+        
+        cls.mem_funs('KeyInput').virtuality = 'virtual'
+        cls.mem_funs('WasHidden').virtuality = 'virtual'
+        cls.mem_funs('OnThink').virtuality = 'virtual'
+        
+        cls.mem_funs('OnAfterCreated').virtuality = 'virtual'
+        cls.mem_funs('OnDestroy').virtuality = 'virtual'
+        cls.mem_funs('PerformLayout').virtuality = 'virtual'
+        cls.mem_funs('InvalidateLayout').virtuality = 'virtual'
         
         # Excludes
         cls.mem_fun('GetPanel').exclude()

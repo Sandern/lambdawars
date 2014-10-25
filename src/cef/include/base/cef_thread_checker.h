@@ -56,11 +56,11 @@
 // disabled) but have DCHECKs enabled at runtime.
 #if (!defined(NDEBUG) || defined(DCHECK_ALWAYS_ON))
 #define ENABLE_THREAD_CHECKER 1
+
+#include "include/base/internal/cef_thread_checker_impl.h"
 #else
 #define ENABLE_THREAD_CHECKER 0
 #endif
-
-#include "include/base/internal/cef_thread_checker_impl.h"
 
 namespace base {
 

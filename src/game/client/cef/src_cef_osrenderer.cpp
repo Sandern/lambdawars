@@ -24,6 +24,7 @@ SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent 
 	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_pPopupBuffer(NULL), 
 	m_iWidth(0), m_iHeight(0), m_iPopupWidth(0), m_iPopupHeight(0)
 {
+#ifdef WIN32
 	m_hArrow = LoadCursor (NULL, IDC_ARROW );
 	m_hCross = LoadCursor (NULL, IDC_CROSS );
 	m_hHand = LoadCursor (NULL, IDC_HAND );
@@ -34,6 +35,7 @@ SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent 
 	m_hSizeNESW = LoadCursor (NULL, IDC_SIZENESW ); // dc_sizenesw
 	m_hSizeWE = LoadCursor (NULL, IDC_SIZEWE ); // dc_sizewe
 	m_hSizeNS = LoadCursor (NULL, IDC_SIZENS ); // dc_sizens
+#endif // WIN32
 }
 
 //-----------------------------------------------------------------------------
@@ -251,6 +253,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 							CefCursorHandle cursor)
 {
+#ifdef WIN32
 	if( cursor == m_hArrow )
 	{
 		SetCursor( vgui::dc_arrow );
@@ -292,6 +295,7 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 		SetCursor( vgui::dc_sizens );
 	}
 	else
+#endif // WIN32
 	{
 		SetCursor( vgui::dc_arrow );
 	}

@@ -40,63 +40,6 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     
     }
 
-    virtual void Focus(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, Focus )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Focus )
-        bp::override func_Focus = this->get_override( "Focus" );
-        if( func_Focus.ptr() != Py_None )
-            try {
-                func_Focus(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::Focus(  );
-            }
-        else
-            this->SrcCefBrowser::Focus(  );
-    }
-    
-    void default_Focus(  ) {
-        SrcCefBrowser::Focus( );
-    }
-
-    virtual ::SrcCefBrowser::NavigationType GetNavigationBehavior(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, GetNavigationBehavior )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, GetNavigationBehavior )
-        bp::override func_GetNavigationBehavior = this->get_override( "GetNavigationBehavior" );
-        if( func_GetNavigationBehavior.ptr() != Py_None )
-            try {
-                return func_GetNavigationBehavior(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->SrcCefBrowser::GetNavigationBehavior(  );
-            }
-        else
-            return this->SrcCefBrowser::GetNavigationBehavior(  );
-    }
-    
-    ::SrcCefBrowser::NavigationType default_GetNavigationBehavior(  ) {
-        return SrcCefBrowser::GetNavigationBehavior( );
-    }
-
-    virtual char const * GetURL(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, GetURL )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, GetURL )
-        bp::override func_GetURL = this->get_override( "GetURL" );
-        if( func_GetURL.ptr() != Py_None )
-            try {
-                return func_GetURL(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->SrcCefBrowser::GetURL(  );
-            }
-        else
-            return this->SrcCefBrowser::GetURL(  );
-    }
-    
-    char const * default_GetURL(  ) {
-        return SrcCefBrowser::GetURL( );
-    }
-
     virtual void InvalidateLayout(  ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, InvalidateLayout )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, InvalidateLayout )
@@ -116,44 +59,6 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::InvalidateLayout( );
     }
 
-    virtual bool IsLoading(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, IsLoading )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, IsLoading )
-        bp::override func_IsLoading = this->get_override( "IsLoading" );
-        if( func_IsLoading.ptr() != Py_None )
-            try {
-                return func_IsLoading(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->SrcCefBrowser::IsLoading(  );
-            }
-        else
-            return this->SrcCefBrowser::IsLoading(  );
-    }
-    
-    bool default_IsLoading(  ) {
-        return SrcCefBrowser::IsLoading( );
-    }
-
-    virtual bool IsVisible(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, IsVisible )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, IsVisible )
-        bp::override func_IsVisible = this->get_override( "IsVisible" );
-        if( func_IsVisible.ptr() != Py_None )
-            try {
-                return func_IsVisible(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->SrcCefBrowser::IsVisible(  );
-            }
-        else
-            return this->SrcCefBrowser::IsVisible(  );
-    }
-    
-    bool default_IsVisible(  ) {
-        return SrcCefBrowser::IsVisible( );
-    }
-
     virtual int KeyInput( int down, ::ButtonCode_t keynum, char const * pszCurrentBinding ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, KeyInput )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, KeyInput )
@@ -171,25 +76,6 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
     
     int default_KeyInput( int down, ::ButtonCode_t keynum, char const * pszCurrentBinding ) {
         return SrcCefBrowser::KeyInput( down, keynum, pszCurrentBinding );
-    }
-
-    virtual void LoadURL( char const * url ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, LoadURL )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, LoadURL )
-        bp::override func_LoadURL = this->get_override( "LoadURL" );
-        if( func_LoadURL.ptr() != Py_None )
-            try {
-                func_LoadURL( url );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::LoadURL( url );
-            }
-        else
-            this->SrcCefBrowser::LoadURL( url );
-    }
-    
-    void default_LoadURL( char const * url ) {
-        SrcCefBrowser::LoadURL( url );
     }
 
     virtual void OnAfterCreated(  ) {
@@ -382,177 +268,6 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
         SrcCefBrowser::PyOnMethodCall( identifier, methodargs, callbackid );
     }
 
-    virtual void Reload(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, Reload )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Reload )
-        bp::override func_Reload = this->get_override( "Reload" );
-        if( func_Reload.ptr() != Py_None )
-            try {
-                func_Reload(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::Reload(  );
-            }
-        else
-            this->SrcCefBrowser::Reload(  );
-    }
-    
-    void default_Reload(  ) {
-        SrcCefBrowser::Reload( );
-    }
-
-    virtual void ReloadIgnoreCache(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, ReloadIgnoreCache )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, ReloadIgnoreCache )
-        bp::override func_ReloadIgnoreCache = this->get_override( "ReloadIgnoreCache" );
-        if( func_ReloadIgnoreCache.ptr() != Py_None )
-            try {
-                func_ReloadIgnoreCache(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::ReloadIgnoreCache(  );
-            }
-        else
-            this->SrcCefBrowser::ReloadIgnoreCache(  );
-    }
-    
-    void default_ReloadIgnoreCache(  ) {
-        SrcCefBrowser::ReloadIgnoreCache( );
-    }
-
-    virtual void SetNavigationBehavior( ::SrcCefBrowser::NavigationType behavior ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, SetNavigationBehavior )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetNavigationBehavior )
-        bp::override func_SetNavigationBehavior = this->get_override( "SetNavigationBehavior" );
-        if( func_SetNavigationBehavior.ptr() != Py_None )
-            try {
-                func_SetNavigationBehavior( behavior );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::SetNavigationBehavior( behavior );
-            }
-        else
-            this->SrcCefBrowser::SetNavigationBehavior( behavior );
-    }
-    
-    void default_SetNavigationBehavior( ::SrcCefBrowser::NavigationType behavior ) {
-        SrcCefBrowser::SetNavigationBehavior( behavior );
-    }
-
-    virtual void SetPos( int x, int y ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, SetPos )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetPos )
-        bp::override func_SetPos = this->get_override( "SetPos" );
-        if( func_SetPos.ptr() != Py_None )
-            try {
-                func_SetPos( x, y );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::SetPos( x, y );
-            }
-        else
-            this->SrcCefBrowser::SetPos( x, y );
-    }
-    
-    void default_SetPos( int x, int y ) {
-        SrcCefBrowser::SetPos( x, y );
-    }
-
-    virtual void SetSize( int wide, int tall ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, SetSize )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetSize )
-        bp::override func_SetSize = this->get_override( "SetSize" );
-        if( func_SetSize.ptr() != Py_None )
-            try {
-                func_SetSize( wide, tall );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::SetSize( wide, tall );
-            }
-        else
-            this->SrcCefBrowser::SetSize( wide, tall );
-    }
-    
-    void default_SetSize( int wide, int tall ) {
-        SrcCefBrowser::SetSize( wide, tall );
-    }
-
-    virtual void SetVisible( bool state ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, SetVisible )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetVisible )
-        bp::override func_SetVisible = this->get_override( "SetVisible" );
-        if( func_SetVisible.ptr() != Py_None )
-            try {
-                func_SetVisible( state );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::SetVisible( state );
-            }
-        else
-            this->SrcCefBrowser::SetVisible( state );
-    }
-    
-    void default_SetVisible( bool state ) {
-        SrcCefBrowser::SetVisible( state );
-    }
-
-    virtual void SetZPos( int z ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, SetZPos )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, SetZPos )
-        bp::override func_SetZPos = this->get_override( "SetZPos" );
-        if( func_SetZPos.ptr() != Py_None )
-            try {
-                func_SetZPos( z );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::SetZPos( z );
-            }
-        else
-            this->SrcCefBrowser::SetZPos( z );
-    }
-    
-    void default_SetZPos( int z ) {
-        SrcCefBrowser::SetZPos( z );
-    }
-
-    virtual void StopLoad(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, StopLoad )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, StopLoad )
-        bp::override func_StopLoad = this->get_override( "StopLoad" );
-        if( func_StopLoad.ptr() != Py_None )
-            try {
-                func_StopLoad(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::StopLoad(  );
-            }
-        else
-            this->SrcCefBrowser::StopLoad(  );
-    }
-    
-    void default_StopLoad(  ) {
-        SrcCefBrowser::StopLoad( );
-    }
-
-    virtual void Unfocus(  ) {
-        PY_OVERRIDE_CHECK( SrcCefBrowser, Unfocus )
-        PY_OVERRIDE_LOG( _cef, SrcCefBrowser, Unfocus )
-        bp::override func_Unfocus = this->get_override( "Unfocus" );
-        if( func_Unfocus.ptr() != Py_None )
-            try {
-                func_Unfocus(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->SrcCefBrowser::Unfocus(  );
-            }
-        else
-            this->SrcCefBrowser::Unfocus(  );
-    }
-    
-    void default_Unfocus(  ) {
-        SrcCefBrowser::Unfocus( );
-    }
-
     virtual void WasHidden( bool hidden ) {
         PY_OVERRIDE_CHECK( SrcCefBrowser, WasHidden )
         PY_OVERRIDE_LOG( _cef, SrcCefBrowser, WasHidden )
@@ -662,12 +377,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::Focus
         
             typedef void ( ::SrcCefBrowser::*Focus_function_type )(  ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_Focus_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "Focus"
-                , Focus_function_type(&::SrcCefBrowser::Focus)
-                , default_Focus_function_type(&SrcCefBrowser_wrapper::default_Focus) );
+                , Focus_function_type( &::SrcCefBrowser::Focus ) );
         
         }
         { //::SrcCefBrowser::GetAlphaAt
@@ -701,12 +414,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::GetNavigationBehavior
         
             typedef ::SrcCefBrowser::NavigationType ( ::SrcCefBrowser::*GetNavigationBehavior_function_type )(  ) ;
-            typedef ::SrcCefBrowser::NavigationType ( SrcCefBrowser_wrapper::*default_GetNavigationBehavior_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "GetNavigationBehavior"
-                , GetNavigationBehavior_function_type(&::SrcCefBrowser::GetNavigationBehavior)
-                , default_GetNavigationBehavior_function_type(&SrcCefBrowser_wrapper::default_GetNavigationBehavior) );
+                , GetNavigationBehavior_function_type( &::SrcCefBrowser::GetNavigationBehavior ) );
         
         }
         { //::SrcCefBrowser::GetPassMouseTruIfAlphaZero
@@ -721,12 +432,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::GetURL
         
             typedef char const * ( ::SrcCefBrowser::*GetURL_function_type )(  ) ;
-            typedef char const * ( SrcCefBrowser_wrapper::*default_GetURL_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "GetURL"
-                , GetURL_function_type(&::SrcCefBrowser::GetURL)
-                , default_GetURL_function_type(&SrcCefBrowser_wrapper::default_GetURL) );
+                , GetURL_function_type( &::SrcCefBrowser::GetURL ) );
         
         }
         { //::SrcCefBrowser::GetUseMouseCapture
@@ -789,12 +498,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::IsLoading
         
             typedef bool ( ::SrcCefBrowser::*IsLoading_function_type )(  ) ;
-            typedef bool ( SrcCefBrowser_wrapper::*default_IsLoading_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "IsLoading"
-                , IsLoading_function_type(&::SrcCefBrowser::IsLoading)
-                , default_IsLoading_function_type(&SrcCefBrowser_wrapper::default_IsLoading) );
+                , IsLoading_function_type( &::SrcCefBrowser::IsLoading ) );
         
         }
         { //::SrcCefBrowser::IsMouseInputEnabled
@@ -818,12 +525,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::IsVisible
         
             typedef bool ( ::SrcCefBrowser::*IsVisible_function_type )(  ) ;
-            typedef bool ( SrcCefBrowser_wrapper::*default_IsVisible_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "IsVisible"
-                , IsVisible_function_type(&::SrcCefBrowser::IsVisible)
-                , default_IsVisible_function_type(&SrcCefBrowser_wrapper::default_IsVisible) );
+                , IsVisible_function_type( &::SrcCefBrowser::IsVisible ) );
         
         }
         { //::SrcCefBrowser::KeyInput
@@ -841,12 +546,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::LoadURL
         
             typedef void ( ::SrcCefBrowser::*LoadURL_function_type )( char const * ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_LoadURL_function_type )( char const * ) ;
             
             SrcCefBrowser_exposer.def( 
                 "LoadURL"
-                , LoadURL_function_type(&::SrcCefBrowser::LoadURL)
-                , default_LoadURL_function_type(&SrcCefBrowser_wrapper::default_LoadURL)
+                , LoadURL_function_type( &::SrcCefBrowser::LoadURL )
                 , ( bp::arg("url") ) );
         
         }
@@ -1066,23 +769,19 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::Reload
         
             typedef void ( ::SrcCefBrowser::*Reload_function_type )(  ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_Reload_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "Reload"
-                , Reload_function_type(&::SrcCefBrowser::Reload)
-                , default_Reload_function_type(&SrcCefBrowser_wrapper::default_Reload) );
+                , Reload_function_type( &::SrcCefBrowser::Reload ) );
         
         }
         { //::SrcCefBrowser::ReloadIgnoreCache
         
             typedef void ( ::SrcCefBrowser::*ReloadIgnoreCache_function_type )(  ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_ReloadIgnoreCache_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "ReloadIgnoreCache"
-                , ReloadIgnoreCache_function_type(&::SrcCefBrowser::ReloadIgnoreCache)
-                , default_ReloadIgnoreCache_function_type(&SrcCefBrowser_wrapper::default_ReloadIgnoreCache) );
+                , ReloadIgnoreCache_function_type( &::SrcCefBrowser::ReloadIgnoreCache ) );
         
         }
         { //::SrcCefBrowser::SetCursor
@@ -1128,12 +827,10 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::SetNavigationBehavior
         
             typedef void ( ::SrcCefBrowser::*SetNavigationBehavior_function_type )( ::SrcCefBrowser::NavigationType ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_SetNavigationBehavior_function_type )( ::SrcCefBrowser::NavigationType ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SetNavigationBehavior"
-                , SetNavigationBehavior_function_type(&::SrcCefBrowser::SetNavigationBehavior)
-                , default_SetNavigationBehavior_function_type(&SrcCefBrowser_wrapper::default_SetNavigationBehavior)
+                , SetNavigationBehavior_function_type( &::SrcCefBrowser::SetNavigationBehavior )
                 , ( bp::arg("behavior") ) );
         
         }
@@ -1150,24 +847,20 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::SetPos
         
             typedef void ( ::SrcCefBrowser::*SetPos_function_type )( int,int ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_SetPos_function_type )( int,int ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SetPos"
-                , SetPos_function_type(&::SrcCefBrowser::SetPos)
-                , default_SetPos_function_type(&SrcCefBrowser_wrapper::default_SetPos)
+                , SetPos_function_type( &::SrcCefBrowser::SetPos )
                 , ( bp::arg("x"), bp::arg("y") ) );
         
         }
         { //::SrcCefBrowser::SetSize
         
             typedef void ( ::SrcCefBrowser::*SetSize_function_type )( int,int ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_SetSize_function_type )( int,int ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SetSize"
-                , SetSize_function_type(&::SrcCefBrowser::SetSize)
-                , default_SetSize_function_type(&SrcCefBrowser_wrapper::default_SetSize)
+                , SetSize_function_type( &::SrcCefBrowser::SetSize )
                 , ( bp::arg("wide"), bp::arg("tall") ) );
         
         }
@@ -1184,24 +877,20 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::SetVisible
         
             typedef void ( ::SrcCefBrowser::*SetVisible_function_type )( bool ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_SetVisible_function_type )( bool ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SetVisible"
-                , SetVisible_function_type(&::SrcCefBrowser::SetVisible)
-                , default_SetVisible_function_type(&SrcCefBrowser_wrapper::default_SetVisible)
+                , SetVisible_function_type( &::SrcCefBrowser::SetVisible )
                 , ( bp::arg("state") ) );
         
         }
         { //::SrcCefBrowser::SetZPos
         
             typedef void ( ::SrcCefBrowser::*SetZPos_function_type )( int ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_SetZPos_function_type )( int ) ;
             
             SrcCefBrowser_exposer.def( 
                 "SetZPos"
-                , SetZPos_function_type(&::SrcCefBrowser::SetZPos)
-                , default_SetZPos_function_type(&SrcCefBrowser_wrapper::default_SetZPos)
+                , SetZPos_function_type( &::SrcCefBrowser::SetZPos )
                 , ( bp::arg("z") ) );
         
         }
@@ -1217,23 +906,19 @@ BOOST_PYTHON_MODULE(_cef){
         { //::SrcCefBrowser::StopLoad
         
             typedef void ( ::SrcCefBrowser::*StopLoad_function_type )(  ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_StopLoad_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "StopLoad"
-                , StopLoad_function_type(&::SrcCefBrowser::StopLoad)
-                , default_StopLoad_function_type(&SrcCefBrowser_wrapper::default_StopLoad) );
+                , StopLoad_function_type( &::SrcCefBrowser::StopLoad ) );
         
         }
         { //::SrcCefBrowser::Unfocus
         
             typedef void ( ::SrcCefBrowser::*Unfocus_function_type )(  ) ;
-            typedef void ( SrcCefBrowser_wrapper::*default_Unfocus_function_type )(  ) ;
             
             SrcCefBrowser_exposer.def( 
                 "Unfocus"
-                , Unfocus_function_type(&::SrcCefBrowser::Unfocus)
-                , default_Unfocus_function_type(&SrcCefBrowser_wrapper::default_Unfocus) );
+                , Unfocus_function_type( &::SrcCefBrowser::Unfocus ) );
         
         }
         { //::SrcCefBrowser::WasHidden
