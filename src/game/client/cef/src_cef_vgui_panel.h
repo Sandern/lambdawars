@@ -48,10 +48,12 @@ public:
 	virtual void OnMouseReleased(vgui::MouseCode code);
 	virtual void OnMouseWheeled(int delta);
 
+#if 0
 	virtual void OnKeyCodePressed(vgui::KeyCode code);
 	virtual void OnKeyCodeTyped(vgui::KeyCode code);
 	virtual void OnKeyTyped(wchar_t unichar);
 	virtual void OnKeyCodeReleased(vgui::KeyCode code);
+#endif // 0
 
 	virtual vgui::HCursor GetCursor();
 

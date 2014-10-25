@@ -264,7 +264,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	factoryBasePanel.SetMouseInputEnabled( IsPC() );
 	// factoryBasePanel.SetKeyBoardInputEnabled( IsPC() );
-	factoryBasePanel.SetKeyBoardInputEnabled( true );
+	factoryBasePanel.SetKeyBoardInputEnabled( false );
 
 	vgui::VPANEL rootpanel = enginevguifuncs->GetPanel( PANEL_GAMEUIDLL );
 	factoryBasePanel.SetParent( rootpanel );
@@ -299,14 +299,14 @@ void CGameUI::PostInit()
 			{
 				SrcCefVGUIPanel *pPanel = s_ui_basemodpanel->GetPanel();
 
-				pPanel->SetBounds( 0, 0, 640, 480 );
+				/*pPanel->SetBounds( 0, 0, 640, 480 );
 				pPanel->SetPaintBorderEnabled( false );
 				pPanel->SetPaintBackgroundEnabled( true );
-				pPanel->SetPaintEnabled( true );
+				pPanel->SetPaintEnabled( true );*/
 				pPanel->SetVisible( true );
 
-				pPanel->SetMouseInputEnabled( true );
-				pPanel->SetKeyBoardInputEnabled( true );
+				//pPanel->SetMouseInputEnabled( true );
+				//pPanel->SetKeyBoardInputEnabled( true );
 
 				pPanel->SetParent( GetUiBaseModPanelClass().GetVPanel() );
 

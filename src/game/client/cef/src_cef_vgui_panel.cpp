@@ -736,6 +736,7 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, CEFSystem().GetLastMouseWheelDist() );
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -767,6 +768,7 @@ void SrcCefVGUIPanel::OnKeyCodeReleased(vgui::KeyCode code)
 {
 	BaseClass::OnKeyCodeReleased( code );
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 

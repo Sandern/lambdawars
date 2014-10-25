@@ -270,8 +270,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 	CBaseModFrame *newNav = m_Frames[ wt ].Get();
 	bool setActiveWindow = true;
 
-	bool bMoveToBack = false;
-
 	// Window priority is used to track which windows are visible at all times
 	// it is used to resolve the situations when a game requests an error box to popup
 	// while a loading progress bar is active.
@@ -378,7 +376,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 
 		case WT_INGAMEMAINMENU:
 			m_Frames[wt] = new InGameMainMenu(this, "InGameMainMenu");
-			bMoveToBack = true;
 			break;
 
 		case WT_INGAMECHAPTERSELECT:
@@ -413,7 +410,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 
 		case WT_MAINMENU:
 			//m_Frames[wt] = new MainMenu(this, "MainMenu");
-			bMoveToBack = true;
 			break;
 
 		case WT_MULTIPLAYER:
@@ -557,6 +553,8 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 		m_FooterPanel->SetVisible( wt != WT_MAINMENU );
 	}
 
+	SetKeyBoardInputEnabled( WT_MAINMENU != wt );
+
 	newNav->SetDataSettings( pParameters );
 
 	if (setActiveWindow)
@@ -619,15 +617,6 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 	{
 		DbgShowCurrentUIState();
 	}
-
-	/*if( bMoveToBack ) 
-	{
-		vgui::surface()->MovePopupToBack( GetVPanel() );
-	}
-	else
-	{
-		vgui::surface()->MovePopupToFront( GetVPanel() );
-	}*/
 
 	return newNav;
 }
@@ -710,6 +699,8 @@ void CBaseModPanel::OnFrameClosed( WINDOW_PRIORITY pri, WINDOW_TYPE wt )
 	// Mark the frame that just closed as NULL so that nobody could find it
 	m_Frames[wt] = NULL;
 
+	SetKeyBoardInputEnabled( false );
+
 	if( m_FooterPanel )
 	{
 		m_FooterPanel->SetVisible( false );
@@ -761,6 +752,7 @@ void CBaseModPanel::OnFrameClosed( WINDOW_PRIORITY pri, WINDOW_TYPE wt )
 			DbgShowCurrentUIState();
 		}
 
+		SetKeyBoardInputEnabled( true );
 		return;
 	}
 }
