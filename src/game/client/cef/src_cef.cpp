@@ -515,7 +515,7 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 #else
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( !!m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
 			continue;
 
 		// Only send key input if no vgui panel has key focus
