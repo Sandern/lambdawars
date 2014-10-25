@@ -112,11 +112,14 @@ COptionsSubKeyboard::~COptionsSubKeyboard()
 	}
 
 #ifdef ENABLE_PYTHON
-	// Setup dict for sending a signal
-	boost::python::dict kwargs;
-	kwargs["sender"] = boost::python::object();
-	boost::python::object signal = SrcPySystem()->Get( "clientconfigchanged", "core.signals", true );
-	SrcPySystem()->CallSignal( signal, kwargs );
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		// Setup dict for sending a signal
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
+		boost::python::object signal = SrcPySystem()->Get( "clientconfigchanged", "core.signals", true );
+		SrcPySystem()->CallSignal( signal, kwargs );
+	}
 #endif // ENABLE_PYTHON
 }
 
