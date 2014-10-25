@@ -22,6 +22,8 @@ public:
 	SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent );
 	virtual ~SrcCefOSRRenderer();
 
+	void Destroy();
+
 	// CefRenderHandler methods
 	virtual bool GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 									CefRect& rect);
@@ -100,6 +102,7 @@ private:
 #endif // WIN32
 
 private:
+	bool m_bActive;
 	int m_iWidth, m_iHeight;
 	unsigned char *m_pTextureBuffer;
 

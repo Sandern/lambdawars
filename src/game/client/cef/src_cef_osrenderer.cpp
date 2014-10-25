@@ -21,7 +21,7 @@ ConVar cef_alpha_force_zero("cef_alpha_force_zero", "0");
 // Purpose:
 //-----------------------------------------------------------------------------
 SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent ) 
-	: m_pBrowser(pBrowser), m_pTextureBuffer(NULL), m_pPopupBuffer(NULL), 
+	: m_pBrowser(pBrowser), m_bActive(true), m_pTextureBuffer(NULL), m_pPopupBuffer(NULL), 
 	m_iWidth(0), m_iHeight(0), m_iPopupWidth(0), m_iPopupHeight(0)
 {
 #ifdef WIN32
@@ -43,6 +43,16 @@ SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent 
 //-----------------------------------------------------------------------------
 SrcCefOSRRenderer::~SrcCefOSRRenderer()
 {
+	Destroy();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefOSRRenderer::Destroy()
+{
+	m_bActive = false;
+
 	if( m_pTextureBuffer != NULL )
 	{
 		free( m_pTextureBuffer );
@@ -171,7 +181,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 					int width,
 					int height)
 {
-	if( !m_pBrowser || !m_pBrowser->GetPanel() )
+	if( !m_pBrowser || !m_pBrowser->GetPanel() || !m_bActive )
 	{
 		Warning("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet\n");
 		return;
