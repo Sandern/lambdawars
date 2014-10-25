@@ -179,6 +179,7 @@ private:
 		MT_LOADEND,
 		MT_LOADERROR,
 		MT_LOADINGSTATECHANGE,
+		MT_AFTERCREATED,
 		MT_CONTEXTCREATED,
 		MT_METHODCALL,
 	};
@@ -223,11 +224,12 @@ public:
 	virtual void InvalidateLayout( void );
 
 	// Window Methods
-	virtual void SetSize( int wide, int tall );
-	virtual void SetPos( int x, int y );
-	virtual void SetZPos( int z );
-	virtual void SetVisible(bool state);
-	virtual bool IsVisible();
+	void SetSize( int wide, int tall );
+	void SetPos( int x, int y );
+	void SetZPos( int z );
+	void SetVisible(bool state);
+	bool IsVisible();
+	bool IsFullyVisible();
 	virtual void OnThink( void ) {}
 	void SetMouseInputEnabled( bool state );
 	void SetKeyBoardInputEnabled( bool state );

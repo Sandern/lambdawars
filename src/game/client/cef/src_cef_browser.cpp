@@ -196,7 +196,12 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
 	m_bInitialized = true;
 	m_pSrcBrowser->Ping();
+
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AddMessage( MT_AFTERCREATED, NULL, NULL );
+#else
 	m_pSrcBrowser->OnAfterCreated();
+#endif // USE_MULTITHREADED_MESSAGELOOP
 }
 
 //-----------------------------------------------------------------------------
@@ -386,6 +391,9 @@ void CefClientHandler::ProcessMessages()
 			break;
 		case MT_LOADINGSTATECHANGE:
 			m_pSrcBrowser->OnLoadingStateChange( data.data->GetBool( 0 ), data.data->GetBool( 1 ), data.data->GetBool( 2 ) );
+			break;
+		case MT_AFTERCREATED:
+			m_pSrcBrowser->OnAfterCreated();
 			break;
 		case MT_CONTEXTCREATED:
 			m_pSrcBrowser->OnContextCreated();
@@ -763,6 +771,17 @@ bool SrcCefBrowser::IsVisible()
 		return false;
 
 	return m_pPanel->IsVisible(); 
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool SrcCefBrowser::IsFullyVisible()
+{
+	if( !IsValid() )
+		return false;
+
+	return m_pPanel->IsFullyVisible(); 
 }
 
 //-----------------------------------------------------------------------------

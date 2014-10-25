@@ -478,6 +478,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , ( bp::arg("x"), bp::arg("y") ) );
         
         }
+        { //::SrcCefBrowser::IsFullyVisible
+        
+            typedef bool ( ::SrcCefBrowser::*IsFullyVisible_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "IsFullyVisible"
+                , IsFullyVisible_function_type( &::SrcCefBrowser::IsFullyVisible ) );
+        
+        }
         { //::SrcCefBrowser::IsGameInputEnabled
         
             typedef bool ( ::SrcCefBrowser::*IsGameInputEnabled_function_type )(  ) ;
