@@ -104,9 +104,28 @@ class VGUI(ClientModuleGenerator):
         cls = mb.class_('ISystem')
         cls.include()
         cls.mem_funs().virtuality = 'not virtual' 
-        cls.mem_funs( 'GetUserConfigFileData' ).call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
-        cls.mem_funs( 'GetRegistryInteger' ).add_transformation( FT.output('value'))
-    
+        cls.mem_funs('GetUserConfigFileData').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_funs('GetRegistryInteger').add_transformation(FT.output('value'))
+        
+        # Exclude registry modification functions, likely not needed from Python
+        cls.mem_funs('SetRegistryInteger').exclude()
+        cls.mem_funs('SetRegistryString').exclude()
+        cls.mem_funs('DeleteRegistryKey').exclude()
+        
+        # Properly wrap getting a registery string
+        mb.add_declaration_code('''static boost::python::tuple GetRegistryString_cc10e70c5f6b49d5963b27442c970b19( ::vgui::ISystem & inst, char const * key ){
+    char value2[512];
+    bool result = inst.GetRegistryString(key, value2, sizeof(value2));
+    return bp::make_tuple( result, value2 );
+}
+        ''')
+        cls.mem_funs('GetRegistryString').exclude()
+        cls.add_registration_code('''def( 
+            "GetRegistryString"
+            , (boost::python::tuple (*)( ::vgui::ISystem &,char const * ))( &GetRegistryString_cc10e70c5f6b49d5963b27442c970b19 )
+            , ( bp::arg("inst"), bp::arg("key") ) )
+        ''')
+        
         vgui = mb.namespace('vgui')
         vgui.free_function('system').include()
         vgui.free_function('system').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object) 

@@ -1122,6 +1122,12 @@ static boost::python::tuple GetRegistryInteger_7b85c41418413c1905617b15737023e0(
     return bp::make_tuple( result, value2 );
 }
 
+static boost::python::tuple GetRegistryString_cc10e70c5f6b49d5963b27442c970b19( ::vgui::ISystem & inst, char const * key ){
+    char value2[512];
+    bool result = inst.GetRegistryString(key, value2, sizeof(value2));
+    return bp::make_tuple( result, value2 );
+}
+
 IClientMode *wrap_GetClientMode( void )
 {
 	return GetClientMode();
@@ -4435,10 +4441,6 @@ BOOST_PYTHON_MODULE(_vgui){
             , (bool ( ::vgui::ISystem::* )( char const *,char const *,char const *,char const *,char const * ) )( &::vgui::ISystem::CreateShortcut )
             , ( bp::arg("linkFileName"), bp::arg("targetPath"), bp::arg("arguments"), bp::arg("workingDirectory"), bp::arg("iconFile") ) )    
         .def( 
-            "DeleteRegistryKey"
-            , (bool ( ::vgui::ISystem::* )( char const * ) )( &::vgui::ISystem::DeleteRegistryKey )
-            , ( bp::arg("keyName") ) )    
-        .def( 
             "GetAvailableDrives"
             , (int ( ::vgui::ISystem::* )( char *,int ) )( &::vgui::ISystem::GetAvailableDrives )
             , ( bp::arg("buf"), bp::arg("bufLen") ) )    
@@ -4482,10 +4484,6 @@ BOOST_PYTHON_MODULE(_vgui){
             , (boost::python::tuple (*)( ::vgui::ISystem &,char const * ))( &GetRegistryInteger_7b85c41418413c1905617b15737023e0 )
             , ( bp::arg("inst"), bp::arg("key") ) )    
         .def( 
-            "GetRegistryString"
-            , (bool ( ::vgui::ISystem::* )( char const *,char *,int ) )( &::vgui::ISystem::GetRegistryString )
-            , ( bp::arg("key"), bp::arg("value"), bp::arg("valueLen") ) )    
-        .def( 
             "GetShortcutTarget"
             , (bool ( ::vgui::ISystem::* )( char const *,char *,char *,int ) )( &::vgui::ISystem::GetShortcutTarget )
             , ( bp::arg("linkFileName"), bp::arg("targetPath"), bp::arg("arguments"), bp::arg("destBufferSizes") ) )    
@@ -4527,14 +4525,6 @@ BOOST_PYTHON_MODULE(_vgui){
             , (void ( ::vgui::ISystem::* )( wchar_t const *,int ) )( &::vgui::ISystem::SetClipboardText )
             , ( bp::arg("text"), bp::arg("textLen") ) )    
         .def( 
-            "SetRegistryInteger"
-            , (bool ( ::vgui::ISystem::* )( char const *,int ) )( &::vgui::ISystem::SetRegistryInteger )
-            , ( bp::arg("key"), bp::arg("value") ) )    
-        .def( 
-            "SetRegistryString"
-            , (bool ( ::vgui::ISystem::* )( char const *,char const * ) )( &::vgui::ISystem::SetRegistryString )
-            , ( bp::arg("key"), bp::arg("value") ) )    
-        .def( 
             "SetUserConfigFile"
             , (void ( ::vgui::ISystem::* )( char const *,char const * ) )( &::vgui::ISystem::SetUserConfigFile )
             , ( bp::arg("fileName"), bp::arg("pathName") ) )    
@@ -4552,7 +4542,11 @@ BOOST_PYTHON_MODULE(_vgui){
             , ( bp::arg("command"), bp::arg("file"), bp::arg("pParams") ) )    
         .def( 
             "Shutdown"
-            , (void ( ::vgui::ISystem::* )(  ) )( &::vgui::ISystem::Shutdown ) );
+            , (void ( ::vgui::ISystem::* )(  ) )( &::vgui::ISystem::Shutdown ) )    
+        .def( 
+            "GetRegistryString"
+            , (boost::python::tuple (*)( ::vgui::ISystem &,char const * ))( &GetRegistryString_cc10e70c5f6b49d5963b27442c970b19 )
+            , ( bp::arg("inst"), bp::arg("key") ) );
 
     bp::class_< vgui::IntRect >( "IntRect" )    
         .def_readwrite( "x0", &vgui::IntRect::x0 )    
