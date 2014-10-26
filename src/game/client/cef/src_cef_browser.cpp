@@ -19,10 +19,7 @@
 #include "materialsystem/materialsystem_config.h"
 #include "steam/steam_api.h"
 
-#ifdef WIN32
-#include <winlite.h>
-#include <ShellAPI.h>
-#endif // WIN32
+#include "vgui/ISystem.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -34,15 +31,12 @@ static void OpenURL( const char *url )
 {
 	// Open url in steam browser if fullscreen
 	// If windowed, just do a shell execute so it executes in the default browser
-#ifdef WIN32
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	if( config.Windowed() )
 	{
-		ShellExecute(NULL, "open", url,
-						NULL, NULL, SW_SHOWNORMAL);
+		vgui::system()->ShellExecute( "open", url );
 	}
 	else
-#endif // WIN32
 	{
 		if( !steamapicontext || !steamapicontext->SteamFriends() )
 		{

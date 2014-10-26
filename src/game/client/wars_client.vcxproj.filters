@@ -1700,9 +1700,6 @@
     <ClCompile Include="python\SurfaceBuffer.cpp">
       <Filter>Source Files\Python</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\lambdawars\wars_plat_misc_win32.cpp">
-      <Filter>Source Files\wars\Shared</Filter>
-    </ClCompile>
     <ClCompile Include="lambdawars\gameui\backgroundmenubutton.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI</Filter>
     </ClCompile>
@@ -4452,9 +4449,6 @@
     </ClInclude>
     <ClInclude Include="python\SurfaceBuffer.h">
       <Filter>Source Files\Python</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\lambdawars\wars_plat_misc.h">
-      <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="lambdawars\gameui\backgroundmenubutton.h">
       <Filter>Source Files\wars\GameUI - Embedded\Base GameUI\Headers</Filter>

@@ -1828,9 +1828,6 @@
     <ClCompile Include="..\shared\lambdawars\wars_mapboundary.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\lambdawars\wars_plat_misc_win32.cpp">
-      <Filter>Source Files\wars\Shared</Filter>
-    </ClCompile>
     <ClCompile Include="hl2\weapon_cguard.cpp">
       <Filter>Source Files\From HL2</Filter>
     </ClCompile>
@@ -3727,9 +3724,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_mapboundary.h">
-      <Filter>Source Files\wars\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\lambdawars\wars_plat_misc.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\hl2wars_nav_pathfind.h">
