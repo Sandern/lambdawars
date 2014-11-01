@@ -65,6 +65,11 @@ void CefClientHandler::Destroy()
 		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
 
+	if( GetOSRHandler() )
+	{
+		GetOSRHandler()->Destroy();
+	}
+
 	m_Browser = NULL;
 	m_pSrcBrowser = NULL;
 	//SetOSRHandler( NULL );

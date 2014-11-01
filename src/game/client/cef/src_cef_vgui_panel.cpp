@@ -106,6 +106,16 @@ SrcCefVGUIPanel::~SrcCefVGUIPanel()
 //-----------------------------------------------------------------------------
 bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 {
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	if( !m_pBrowser )
+		return false;
+	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
+	if( !renderer )
+		return false;
+
+	AUTO_LOCK( renderer->GetTextureBufferMutex() );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	m_iWVWide = width;
 	m_iWVTall = height;
 

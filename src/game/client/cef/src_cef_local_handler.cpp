@@ -50,8 +50,9 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 	{
 		const char *pExtension = V_GetFileExtension( path );
 
-		//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d\n", 
-		//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ) );
+		//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d, resource type: %d\n", 
+		//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ),
+		//	request->GetResourceType() );
 
 		CUtlBuffer buf( 0, filesystem->Size( path, NULL ) );
 		if( filesystem->ReadFile( path, NULL, buf ) )
@@ -60,7 +61,7 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 				CefStreamReader::CreateForData( buf.Base(), buf.TellPut() );
 			if( stream != NULL ) 
 			{
-				pResourceHandler = new CefStreamResourceHandler(CefGetMimeType(pExtension), stream);
+				pResourceHandler = new CefStreamResourceHandler( CefGetMimeType(pExtension), stream );
 			}
 		}
 	}
