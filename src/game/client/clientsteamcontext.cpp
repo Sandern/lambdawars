@@ -2,6 +2,10 @@
 #include "cbase.h"
 #include "clientsteamcontext.h"
 
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -97,18 +101,48 @@ void CClientSteamContext::OnSteamServersDisconnected( SteamServersDisconnected_t
 {
 	UpdateLoggedOnState();
 	Msg( "CClientSteamContext OnSteamServersDisconnected logged on = %d\n", m_bLoggedOn );
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("steam_serversdisconnected", "core.signals", true) );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 void CClientSteamContext::OnSteamServerConnectFailure( SteamServerConnectFailure_t *pConnectFailure )
 {
 	UpdateLoggedOnState();
 	Msg( "CClientSteamContext OnSteamServerConnectFailure logged on = %d\n", m_bLoggedOn );
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("steam_serverconnectfailure", "core.signals", true) );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 
 void CClientSteamContext::OnSteamServersConnected( SteamServersConnected_t *pConnected )
 {
 	UpdateLoggedOnState();
 	Msg( "CClientSteamContext OnSteamServersConnected logged on = %d\n", m_bLoggedOn );
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("steam_serversconnected", "core.signals", true) );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 }
 #endif // !defined(NO_STEAM)
 

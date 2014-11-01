@@ -330,7 +330,18 @@ class GameInterface(SemiSharedModuleGenerator):
             cls.mem_fun('SaveInit').exclude()
             
             mb.add_declaration_code('extern CServerGameDLL g_ServerGameDLL;')
-            mb.add_registration_code("bp::scope().attr( \"servergamedll\" ) = boost::ref(g_ServerGameDLL);")   
+            mb.add_registration_code("bp::scope().attr( \"servergamedll\" ) = boost::ref(g_ServerGameDLL);")
+            
+        if self.isclient:
+            cls = mb.class_('CClientSteamContext')
+            cls.include()
+            cls.mem_fun('InstallCallback').exclude()
+            cls.mem_fun('RemoveCallback').exclude()
+            cls.mem_fun('Activate').exclude()
+            cls.mem_fun('Shutdown').exclude()
+            
+            mb.free_function('ClientSteamContext').include()
+            mb.free_function('ClientSteamContext').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
             
         # model_t
         cls = mb.class_('wrap_model_t')

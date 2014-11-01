@@ -1774,6 +1774,37 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
     bp::class_< CBroadcastRecipientFilter, bp::bases< C_RecipientFilter >, boost::noncopyable >( "CBroadcastRecipientFilter", bp::init< >() );
 
+    bp::class_< CClientSteamContext, boost::noncopyable >( "CClientSteamContext", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "BLoggedOn"
+            , (bool ( ::CClientSteamContext::* )(  ) )( &::CClientSteamContext::BLoggedOn ) )    
+        .def( 
+            "GetAppID"
+            , (::uint32 ( ::CClientSteamContext::* )(  ) )( &::CClientSteamContext::GetAppID ) )    
+        .def( 
+            "GetConnectedUniverse"
+            , (::EUniverse ( ::CClientSteamContext::* )(  ) )( &::CClientSteamContext::GetConnectedUniverse ) )    
+        .def( 
+            "GetLocalPlayerSteamID"
+            , (::CSteamID const & ( ::CClientSteamContext::* )(  ) )( &::CClientSteamContext::GetLocalPlayerSteamID )
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "OnSteamServerConnectFailure"
+            , (void ( ::CClientSteamContext::* )( ::SteamServerConnectFailure_t * ) )( &::CClientSteamContext::OnSteamServerConnectFailure )
+            , ( bp::arg("pParam") ) )    
+        .def( 
+            "OnSteamServersConnected"
+            , (void ( ::CClientSteamContext::* )( ::SteamServersConnected_t * ) )( &::CClientSteamContext::OnSteamServersConnected )
+            , ( bp::arg("pParam") ) )    
+        .def( 
+            "OnSteamServersDisconnected"
+            , (void ( ::CClientSteamContext::* )( ::SteamServersDisconnected_t * ) )( &::CClientSteamContext::OnSteamServersDisconnected )
+            , ( bp::arg("pParam") ) )    
+        .def_readwrite( "m_CallbackSteamServerConnectFailure", &CClientSteamContext::m_CallbackSteamServerConnectFailure )    
+        .def_readwrite( "m_CallbackSteamServersConnected", &CClientSteamContext::m_CallbackSteamServersConnected )    
+        .def_readwrite( "m_CallbackSteamServersDisconnected", &CClientSteamContext::m_CallbackSteamServersDisconnected );
+
     bp::class_< CCommand >( "CCommand", bp::init< >() )    
         .def( bp::init< int, char const * * >(( bp::arg("nArgC"), bp::arg("ppArgV") )) )    
         .def( 
@@ -2619,6 +2650,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
     }
 
     bp::class_< wrap_model_t >( "model_t", bp::no_init );
+
+    { //::ClientSteamContext
+    
+        typedef ::CClientSteamContext & ( *ClientSteamContext_function_type )(  );
+        
+        bp::def( 
+            "ClientSteamContext"
+            , ClientSteamContext_function_type( &::ClientSteamContext )
+            , bp::return_value_policy< bp::reference_existing_object >() );
+    
+    }
 
     { //::CommandLine
     
