@@ -2485,9 +2485,6 @@
     <ClInclude Include="..\shared\python\srcpy_networkvar.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\python\srcpy_converters.h">
-      <Filter>Source Files\Python</Filter>
-    </ClInclude>
     <ClInclude Include="python\srcpy_client_class.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>

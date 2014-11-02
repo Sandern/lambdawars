@@ -17,7 +17,7 @@
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
-	#include "srcpy_base.h"
+	#include "srcpy_srcbuiltins.h"
 #endif // ENABLE_PYTHON
 
 #include "wars_gameserver.h"

@@ -14,8 +14,6 @@
 
 #include "in_buttons.h"
 
-#include "srcpy_converters.h"
-
 #include "coordsize.h"
 
 #include "srcpy.h"
@@ -24,472 +22,8 @@
 
 namespace bp = boost::python;
 
-#ifdef _LINUX
-typedef struct model_t {};
-#endif // _LINUX
-
-PyTypeObject *g_PyKeyValuesType = NULL;
-
 BOOST_PYTHON_MODULE(_srcbase){
     bp::docstring_options doc_options( true, true, false );
-
-    { //::KeyValues
-        typedef bp::class_< KeyValues, boost::noncopyable > RealKeyValues_exposer_t;
-        RealKeyValues_exposer_t RealKeyValues_exposer = RealKeyValues_exposer_t( "RealKeyValues", bp::no_init );
-        bp::scope RealKeyValues_scope( RealKeyValues_exposer );
-        bp::enum_< KeyValues::types_t>("types_t")
-            .value("TYPE_NONE", KeyValues::TYPE_NONE)
-            .value("TYPE_STRING", KeyValues::TYPE_STRING)
-            .value("TYPE_INT", KeyValues::TYPE_INT)
-            .value("TYPE_FLOAT", KeyValues::TYPE_FLOAT)
-            .value("TYPE_PTR", KeyValues::TYPE_PTR)
-            .value("TYPE_WSTRING", KeyValues::TYPE_WSTRING)
-            .value("TYPE_COLOR", KeyValues::TYPE_COLOR)
-            .value("TYPE_UINT64", KeyValues::TYPE_UINT64)
-            .value("TYPE_COMPILED_INT_BYTE", KeyValues::TYPE_COMPILED_INT_BYTE)
-            .value("TYPE_COMPILED_INT_0", KeyValues::TYPE_COMPILED_INT_0)
-            .value("TYPE_COMPILED_INT_1", KeyValues::TYPE_COMPILED_INT_1)
-            .value("TYPE_NUMTYPES", KeyValues::TYPE_NUMTYPES)
-            .export_values()
-            ;
-    }
-
-    { //::PyKeyValues
-        typedef bp::class_< PyKeyValues > KeyValues_exposer_t;
-        KeyValues_exposer_t KeyValues_exposer = KeyValues_exposer_t( "KeyValues", bp::init< KeyValues const * >(( bp::arg("pKV") )) );
-        bp::scope KeyValues_scope( KeyValues_exposer );
-        bp::enum_< PyKeyValues::pytypes_t>("pytypes_t")
-            .value("TYPE_NONE", PyKeyValues::TYPE_NONE)
-            .value("TYPE_STRING", PyKeyValues::TYPE_STRING)
-            .value("TYPE_INT", PyKeyValues::TYPE_INT)
-            .value("TYPE_FLOAT", PyKeyValues::TYPE_FLOAT)
-            .value("TYPE_PTR", PyKeyValues::TYPE_PTR)
-            .value("TYPE_WSTRING", PyKeyValues::TYPE_WSTRING)
-            .value("TYPE_COLOR", PyKeyValues::TYPE_COLOR)
-            .value("TYPE_UINT64", PyKeyValues::TYPE_UINT64)
-            .value("TYPE_NUMTYPES", PyKeyValues::TYPE_NUMTYPES)
-            .export_values()
-            ;
-        bp::implicitly_convertible< KeyValues const *, PyKeyValues >();
-        KeyValues_exposer.def( bp::init< PyKeyValues const & >(( bp::arg("src") )) );
-        KeyValues_exposer.def( bp::init< char const * >(( bp::arg("setName") )) );
-        bp::implicitly_convertible< char const *, PyKeyValues >();
-        KeyValues_exposer.def( bp::init< char const *, char const *, char const * >(( bp::arg("setName"), bp::arg("firstKey"), bp::arg("firstValue") )) );
-        KeyValues_exposer.def( bp::init< char const *, char const *, int >(( bp::arg("setName"), bp::arg("firstKey"), bp::arg("firstValue") )) );
-        KeyValues_exposer.def( bp::init< char const *, char const *, char const *, char const *, char const * >(( bp::arg("setName"), bp::arg("firstKey"), bp::arg("firstValue"), bp::arg("secondKey"), bp::arg("secondValue") )) );
-        KeyValues_exposer.def( bp::init< char const *, char const *, int, char const *, int >(( bp::arg("setName"), bp::arg("firstKey"), bp::arg("firstValue"), bp::arg("secondKey"), bp::arg("secondValue") )) );
-        { //::PyKeyValues::AddSubKey
-        
-            typedef void ( ::PyKeyValues::*AddSubKey_function_type )( ::KeyValues * ) ;
-            
-            KeyValues_exposer.def( 
-                "AddSubKey"
-                , AddSubKey_function_type( &::PyKeyValues::AddSubKey )
-                , ( bp::arg("pSubkey") ) );
-        
-        }
-        { //::PyKeyValues::ChainKeyValue
-        
-            typedef void ( ::PyKeyValues::*ChainKeyValue_function_type )( ::KeyValues * ) ;
-            
-            KeyValues_exposer.def( 
-                "ChainKeyValue"
-                , ChainKeyValue_function_type( &::PyKeyValues::ChainKeyValue )
-                , ( bp::arg("pChain") ) );
-        
-        }
-        { //::PyKeyValues::Clear
-        
-            typedef void ( ::PyKeyValues::*Clear_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "Clear"
-                , Clear_function_type( &::PyKeyValues::Clear ) );
-        
-        }
-        { //::PyKeyValues::CreateNewKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*CreateNewKey_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "CreateNewKey"
-                , CreateNewKey_function_type( &::PyKeyValues::CreateNewKey )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::FindKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*FindKey_function_type )( char const *,bool ) ;
-            
-            KeyValues_exposer.def( 
-                "FindKey"
-                , FindKey_function_type( &::PyKeyValues::FindKey )
-                , ( bp::arg("keyName"), bp::arg("bCreate")=(bool)(false) )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::FindKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*FindKey_function_type )( int ) const;
-            
-            KeyValues_exposer.def( 
-                "FindKey"
-                , FindKey_function_type( &::PyKeyValues::FindKey )
-                , ( bp::arg("keySymbol") )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::FromString
-        
-            typedef ::KeyValues * ( *FromString_function_type )( char const *,char const *,char const * * );
-            
-            KeyValues_exposer.def( 
-                "FromString"
-                , FromString_function_type( &::PyKeyValues::FromString )
-                , ( bp::arg("szName"), bp::arg("szStringVal"), bp::arg("ppEndOfParse")=bp::object() )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetBool
-        
-            typedef bool ( ::PyKeyValues::*GetBool_function_type )( char const *,bool ) ;
-            
-            KeyValues_exposer.def( 
-                "GetBool"
-                , GetBool_function_type( &::PyKeyValues::GetBool )
-                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")=(bool)(false) ) );
-        
-        }
-        { //::PyKeyValues::GetBool
-        
-            typedef bool ( ::PyKeyValues::*GetBool_function_type )( int,bool ) ;
-            
-            KeyValues_exposer.def( 
-                "GetBool"
-                , GetBool_function_type( &::PyKeyValues::GetBool )
-                , ( bp::arg("keySymbol"), bp::arg("defaultValue")=(bool)(false) ) );
-        
-        }
-        { //::PyKeyValues::GetColor
-        
-            typedef ::Color ( ::PyKeyValues::*GetColor_function_type )( char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "GetColor"
-                , GetColor_function_type( &::PyKeyValues::GetColor )
-                , ( bp::arg("keyName")=bp::object() ) );
-        
-        }
-        { //::PyKeyValues::GetColor
-        
-            typedef ::Color ( ::PyKeyValues::*GetColor_function_type )( int ) ;
-            
-            KeyValues_exposer.def( 
-                "GetColor"
-                , GetColor_function_type( &::PyKeyValues::GetColor )
-                , ( bp::arg("keySymbol") ) );
-        
-        }
-        { //::PyKeyValues::GetDataType
-        
-            typedef ::KeyValues::types_t ( ::PyKeyValues::*GetDataType_function_type )( char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "GetDataType"
-                , GetDataType_function_type( &::PyKeyValues::GetDataType )
-                , ( bp::arg("keyName")=bp::object() ) );
-        
-        }
-        { //::PyKeyValues::GetFirstSubKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetFirstSubKey_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetFirstSubKey"
-                , GetFirstSubKey_function_type( &::PyKeyValues::GetFirstSubKey )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetFirstTrueSubKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetFirstTrueSubKey_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetFirstTrueSubKey"
-                , GetFirstTrueSubKey_function_type( &::PyKeyValues::GetFirstTrueSubKey )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetFirstValue
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetFirstValue_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetFirstValue"
-                , GetFirstValue_function_type( &::PyKeyValues::GetFirstValue )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetFloat
-        
-            typedef float ( ::PyKeyValues::*GetFloat_function_type )( char const *,float ) ;
-            
-            KeyValues_exposer.def( 
-                "GetFloat"
-                , GetFloat_function_type( &::PyKeyValues::GetFloat )
-                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")=0.0f ) );
-        
-        }
-        { //::PyKeyValues::GetFloat
-        
-            typedef float ( ::PyKeyValues::*GetFloat_function_type )( int,float ) ;
-            
-            KeyValues_exposer.def( 
-                "GetFloat"
-                , GetFloat_function_type( &::PyKeyValues::GetFloat )
-                , ( bp::arg("keySymbol"), bp::arg("defaultValue")=0.0f ) );
-        
-        }
-        { //::PyKeyValues::GetInt
-        
-            typedef int ( ::PyKeyValues::*GetInt_function_type )( char const *,int ) ;
-            
-            KeyValues_exposer.def( 
-                "GetInt"
-                , GetInt_function_type( &::PyKeyValues::GetInt )
-                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")=(int)(0) ) );
-        
-        }
-        { //::PyKeyValues::GetInt
-        
-            typedef int ( ::PyKeyValues::*GetInt_function_type )( int,int ) ;
-            
-            KeyValues_exposer.def( 
-                "GetInt"
-                , GetInt_function_type( &::PyKeyValues::GetInt )
-                , ( bp::arg("keySymbol"), bp::arg("defaultValue")=(int)(0) ) );
-        
-        }
-        { //::PyKeyValues::GetName
-        
-            typedef char const * ( ::PyKeyValues::*GetName_function_type )(  ) const;
-            
-            KeyValues_exposer.def( 
-                "GetName"
-                , GetName_function_type( &::PyKeyValues::GetName ) );
-        
-        }
-        { //::PyKeyValues::GetNameSymbol
-        
-            typedef int ( ::PyKeyValues::*GetNameSymbol_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetNameSymbol"
-                , GetNameSymbol_function_type( &::PyKeyValues::GetNameSymbol ) );
-        
-        }
-        { //::PyKeyValues::GetNextKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetNextKey_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetNextKey"
-                , GetNextKey_function_type( &::PyKeyValues::GetNextKey )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetNextTrueSubKey
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetNextTrueSubKey_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetNextTrueSubKey"
-                , GetNextTrueSubKey_function_type( &::PyKeyValues::GetNextTrueSubKey )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetNextValue
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*GetNextValue_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "GetNextValue"
-                , GetNextValue_function_type( &::PyKeyValues::GetNextValue )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::PyKeyValues::GetRawKeyValues
-        
-            typedef ::KeyValues * ( ::PyKeyValues::*__GetRawKeyValues_function_type )(  ) const;
-            
-            KeyValues_exposer.def( 
-                "__GetRawKeyValues"
-                , __GetRawKeyValues_function_type( &::PyKeyValues::GetRawKeyValues )
-                , bp::return_value_policy< bp::reference_existing_object >() );
-        
-        }
-        { //::PyKeyValues::GetString
-        
-            typedef char const * ( ::PyKeyValues::*GetString_function_type )( char const *,char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "GetString"
-                , GetString_function_type( &::PyKeyValues::GetString )
-                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")="" ) );
-        
-        }
-        { //::PyKeyValues::GetString
-        
-            typedef char const * ( ::PyKeyValues::*GetString_function_type )( int,char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "GetString"
-                , GetString_function_type( &::PyKeyValues::GetString )
-                , ( bp::arg("keySymbol"), bp::arg("defaultValue")="" ) );
-        
-        }
-        { //::PyKeyValues::GetUint64
-        
-            typedef ::uint64 ( ::PyKeyValues::*GetUint64_function_type )( char const *,::uint64 ) ;
-            
-            KeyValues_exposer.def( 
-                "GetUint64"
-                , GetUint64_function_type( &::PyKeyValues::GetUint64 )
-                , ( bp::arg("keyName")=bp::object(), bp::arg("defaultValue")=(::uint64)(0) ) );
-        
-        }
-        { //::PyKeyValues::IsEmpty
-        
-            typedef bool ( ::PyKeyValues::*IsEmpty_function_type )( char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "IsEmpty"
-                , IsEmpty_function_type( &::PyKeyValues::IsEmpty )
-                , ( bp::arg("keyName")=bp::object() ) );
-        
-        }
-        { //::PyKeyValues::IsEmpty
-        
-            typedef bool ( ::PyKeyValues::*IsEmpty_function_type )( int ) ;
-            
-            KeyValues_exposer.def( 
-                "IsEmpty"
-                , IsEmpty_function_type( &::PyKeyValues::IsEmpty )
-                , ( bp::arg("keySymbol") ) );
-        
-        }
-        { //::PyKeyValues::RemoveSubKey
-        
-            typedef void ( ::PyKeyValues::*RemoveSubKey_function_type )( ::KeyValues * ) ;
-            
-            KeyValues_exposer.def( 
-                "RemoveSubKey"
-                , RemoveSubKey_function_type( &::PyKeyValues::RemoveSubKey )
-                , ( bp::arg("subKey") ) );
-        
-        }
-        { //::PyKeyValues::SetBool
-        
-            typedef void ( ::PyKeyValues::*SetBool_function_type )( char const *,bool ) ;
-            
-            KeyValues_exposer.def( 
-                "SetBool"
-                , SetBool_function_type( &::PyKeyValues::SetBool )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::SetColor
-        
-            typedef void ( ::PyKeyValues::*SetColor_function_type )( char const *,::Color ) ;
-            
-            KeyValues_exposer.def( 
-                "SetColor"
-                , SetColor_function_type( &::PyKeyValues::SetColor )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::SetFloat
-        
-            typedef void ( ::PyKeyValues::*SetFloat_function_type )( char const *,float ) ;
-            
-            KeyValues_exposer.def( 
-                "SetFloat"
-                , SetFloat_function_type( &::PyKeyValues::SetFloat )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::SetInt
-        
-            typedef void ( ::PyKeyValues::*SetInt_function_type )( char const *,int ) ;
-            
-            KeyValues_exposer.def( 
-                "SetInt"
-                , SetInt_function_type( &::PyKeyValues::SetInt )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::SetName
-        
-            typedef void ( ::PyKeyValues::*SetName_function_type )( char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "SetName"
-                , SetName_function_type( &::PyKeyValues::SetName )
-                , ( bp::arg("setName") ) );
-        
-        }
-        { //::PyKeyValues::SetNextKey
-        
-            typedef void ( ::PyKeyValues::*SetNextKey_function_type )( ::KeyValues * ) ;
-            
-            KeyValues_exposer.def( 
-                "SetNextKey"
-                , SetNextKey_function_type( &::PyKeyValues::SetNextKey )
-                , ( bp::arg("pDat") ) );
-        
-        }
-        { //::PyKeyValues::SetString
-        
-            typedef void ( ::PyKeyValues::*SetString_function_type )( char const *,char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "SetString"
-                , SetString_function_type( &::PyKeyValues::SetString )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::SetStringValue
-        
-            typedef void ( ::PyKeyValues::*SetStringValue_function_type )( char const * ) ;
-            
-            KeyValues_exposer.def( 
-                "SetStringValue"
-                , SetStringValue_function_type( &::PyKeyValues::SetStringValue )
-                , ( bp::arg("strValue") ) );
-        
-        }
-        { //::PyKeyValues::SetUint64
-        
-            typedef void ( ::PyKeyValues::*SetUint64_function_type )( char const *,::uint64 ) ;
-            
-            KeyValues_exposer.def( 
-                "SetUint64"
-                , SetUint64_function_type( &::PyKeyValues::SetUint64 )
-                , ( bp::arg("keyName"), bp::arg("value") ) );
-        
-        }
-        { //::PyKeyValues::deleteThis
-        
-            typedef void ( ::PyKeyValues::*deleteThis_function_type )(  ) ;
-            
-            KeyValues_exposer.def( 
-                "deleteThis"
-                , deleteThis_function_type( &::PyKeyValues::deleteThis ) );
-        
-        }
-        KeyValues_exposer.staticmethod( "FromString" );
-        g_PyKeyValuesType = (PyTypeObject *)KeyValues_exposer.ptr();
-    }
 
     { //::PyUtlFlags
         typedef bp::class_< PyUtlFlags > UtlFlags_exposer_t;
@@ -555,287 +89,6 @@ BOOST_PYTHON_MODULE(_srcbase){
         
         }
     }
-
-    { //::PyUtlRBTree
-        typedef bp::class_< PyUtlRBTree > UtlRBTree_exposer_t;
-        UtlRBTree_exposer_t UtlRBTree_exposer = UtlRBTree_exposer_t( "UtlRBTree", bp::init< bp::optional< int, int, bp::api::object > >(( bp::arg("growSize")=(int)(0), bp::arg("initSize")=(int)(0), bp::arg("lessfunc")=boost::python::api::object() )) );
-        bp::scope UtlRBTree_scope( UtlRBTree_exposer );
-        bp::implicitly_convertible< int, PyUtlRBTree >();
-        UtlRBTree_exposer.def( bp::init< bp::api::object >(( bp::arg("lessfunc") )) );
-        bp::implicitly_convertible< bp::api::object, PyUtlRBTree >();
-        UtlRBTree_exposer.def( bp::init< PyUtlRBTree const & >(( bp::arg("tree") )) );
-        { //::PyUtlRBTree::Count
-        
-            typedef unsigned int ( ::PyUtlRBTree::*Count_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "Count"
-                , Count_function_type( &::PyUtlRBTree::Count ) );
-        
-        }
-        { //::PyUtlRBTree::Element
-        
-            typedef ::boost::python::api::object ( ::PyUtlRBTree::*Element_function_type )( int ) ;
-            
-            UtlRBTree_exposer.def( 
-                "Element"
-                , Element_function_type( &::PyUtlRBTree::Element )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::Find
-        
-            typedef int ( ::PyUtlRBTree::*Find_function_type )( ::boost::python::api::object ) const;
-            
-            UtlRBTree_exposer.def( 
-                "Find"
-                , Find_function_type( &::PyUtlRBTree::Find )
-                , ( bp::arg("search") ) );
-        
-        }
-        { //::PyUtlRBTree::FindInsertionPosition
-        
-            typedef void ( ::PyUtlRBTree::*FindInsertionPosition_function_type )( ::boost::python::api::object const &,int &,bool & ) ;
-            
-            UtlRBTree_exposer.def( 
-                "FindInsertionPosition"
-                , FindInsertionPosition_function_type( &::PyUtlRBTree::FindInsertionPosition )
-                , ( bp::arg("insert"), bp::arg("parent"), bp::arg("leftchild") ) );
-        
-        }
-        { //::PyUtlRBTree::FirstInorder
-        
-            typedef int ( ::PyUtlRBTree::*FirstInorder_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "FirstInorder"
-                , FirstInorder_function_type( &::PyUtlRBTree::FirstInorder ) );
-        
-        }
-        { //::PyUtlRBTree::FirstPostorder
-        
-            typedef int ( ::PyUtlRBTree::*FirstPostorder_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "FirstPostorder"
-                , FirstPostorder_function_type( &::PyUtlRBTree::FirstPostorder ) );
-        
-        }
-        { //::PyUtlRBTree::FirstPreorder
-        
-            typedef int ( ::PyUtlRBTree::*FirstPreorder_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "FirstPreorder"
-                , FirstPreorder_function_type( &::PyUtlRBTree::FirstPreorder ) );
-        
-        }
-        { //::PyUtlRBTree::Insert
-        
-            typedef int ( ::PyUtlRBTree::*Insert_function_type )( ::boost::python::api::object ) ;
-            
-            UtlRBTree_exposer.def( 
-                "Insert"
-                , Insert_function_type( &::PyUtlRBTree::Insert )
-                , ( bp::arg("insert") ) );
-        
-        }
-        { //::PyUtlRBTree::InsertAt
-        
-            typedef int ( ::PyUtlRBTree::*InsertAt_function_type )( int,bool ) ;
-            
-            UtlRBTree_exposer.def( 
-                "InsertAt"
-                , InsertAt_function_type( &::PyUtlRBTree::InsertAt )
-                , ( bp::arg("parent"), bp::arg("leftchild") ) );
-        
-        }
-        { //::PyUtlRBTree::InsertIfNotFound
-        
-            typedef int ( ::PyUtlRBTree::*InsertIfNotFound_function_type )( ::boost::python::api::object ) ;
-            
-            UtlRBTree_exposer.def( 
-                "InsertIfNotFound"
-                , InsertIfNotFound_function_type( &::PyUtlRBTree::InsertIfNotFound )
-                , ( bp::arg("insert") ) );
-        
-        }
-        { //::PyUtlRBTree::LastInorder
-        
-            typedef int ( ::PyUtlRBTree::*LastInorder_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "LastInorder"
-                , LastInorder_function_type( &::PyUtlRBTree::LastInorder ) );
-        
-        }
-        { //::PyUtlRBTree::LastPreorder
-        
-            typedef int ( ::PyUtlRBTree::*LastPreorder_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "LastPreorder"
-                , LastPreorder_function_type( &::PyUtlRBTree::LastPreorder ) );
-        
-        }
-        { //::PyUtlRBTree::NextInorder
-        
-            typedef int ( ::PyUtlRBTree::*NextInorder_function_type )( int ) const;
-            
-            UtlRBTree_exposer.def( 
-                "NextInorder"
-                , NextInorder_function_type( &::PyUtlRBTree::NextInorder )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::NextPostorder
-        
-            typedef int ( ::PyUtlRBTree::*NextPostorder_function_type )( int ) const;
-            
-            UtlRBTree_exposer.def( 
-                "NextPostorder"
-                , NextPostorder_function_type( &::PyUtlRBTree::NextPostorder )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::NextPreorder
-        
-            typedef int ( ::PyUtlRBTree::*NextPreorder_function_type )( int ) const;
-            
-            UtlRBTree_exposer.def( 
-                "NextPreorder"
-                , NextPreorder_function_type( &::PyUtlRBTree::NextPreorder )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::PrevInorder
-        
-            typedef int ( ::PyUtlRBTree::*PrevInorder_function_type )( int ) const;
-            
-            UtlRBTree_exposer.def( 
-                "PrevInorder"
-                , PrevInorder_function_type( &::PyUtlRBTree::PrevInorder )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::PrevPreorder
-        
-            typedef int ( ::PyUtlRBTree::*PrevPreorder_function_type )( int ) const;
-            
-            UtlRBTree_exposer.def( 
-                "PrevPreorder"
-                , PrevPreorder_function_type( &::PyUtlRBTree::PrevPreorder )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::Purge
-        
-            typedef void ( ::PyUtlRBTree::*Purge_function_type )(  ) ;
-            
-            UtlRBTree_exposer.def( 
-                "Purge"
-                , Purge_function_type( &::PyUtlRBTree::Purge ) );
-        
-        }
-        { //::PyUtlRBTree::Remove
-        
-            typedef bool ( ::PyUtlRBTree::*Remove_function_type )( ::boost::python::api::object ) ;
-            
-            UtlRBTree_exposer.def( 
-                "Remove"
-                , Remove_function_type( &::PyUtlRBTree::Remove )
-                , ( bp::arg("remove") ) );
-        
-        }
-        { //::PyUtlRBTree::RemoveAll
-        
-            typedef void ( ::PyUtlRBTree::*RemoveAll_function_type )(  ) ;
-            
-            UtlRBTree_exposer.def( 
-                "RemoveAll"
-                , RemoveAll_function_type( &::PyUtlRBTree::RemoveAll ) );
-        
-        }
-        { //::PyUtlRBTree::RemoveAt
-        
-            typedef void ( ::PyUtlRBTree::*RemoveAt_function_type )( int ) ;
-            
-            UtlRBTree_exposer.def( 
-                "RemoveAt"
-                , RemoveAt_function_type( &::PyUtlRBTree::RemoveAt )
-                , ( bp::arg("i") ) );
-        
-        }
-        { //::PyUtlRBTree::Root
-        
-            typedef int ( ::PyUtlRBTree::*Root_function_type )(  ) const;
-            
-            UtlRBTree_exposer.def( 
-                "Root"
-                , Root_function_type( &::PyUtlRBTree::Root ) );
-        
-        }
-        { //::PyUtlRBTree::SetLessFunc
-        
-            typedef void ( ::PyUtlRBTree::*SetLessFunc_function_type )( ::boost::python::api::object ) ;
-            
-            UtlRBTree_exposer.def( 
-                "SetLessFunc"
-                , SetLessFunc_function_type( &::PyUtlRBTree::SetLessFunc )
-                , ( bp::arg("func") ) );
-        
-        }
-        { //::PyUtlRBTree::operator[]
-        
-            typedef ::boost::python::api::object ( ::PyUtlRBTree::*__getitem___function_type )( int ) ;
-            
-            UtlRBTree_exposer.def( 
-                "__getitem__"
-                , __getitem___function_type( &::PyUtlRBTree::operator[] )
-                , ( bp::arg("i") ) );
-        
-        }
-    }
-
-    { //::KeyValuesDumpAsDevMsg
-    
-        typedef bool ( *KeyValuesDumpAsDevMsg_function_type )( ::KeyValues *,int,int );
-        
-        bp::def( 
-            "KeyValuesDumpAsDevMsg"
-            , KeyValuesDumpAsDevMsg_function_type( &::KeyValuesDumpAsDevMsg )
-            , ( bp::arg("pKeyValues"), bp::arg("nIndentLevel")=(int)(0), bp::arg("nDeveloperLevel")=(int)(1) ) );
-    
-    }
-
-    { //::PyDictToKeyValues
-    
-        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object );
-        
-        bp::def( 
-            "DictToKeyValues"
-            , DictToKeyValues_function_type( &::PyDictToKeyValues )
-            , ( bp::arg("d") )
-            , bp::return_value_policy< bp::return_by_value >() );
-    
-    }
-
-    { //::PyKeyValuesToDict
-    
-        typedef ::boost::python::dict ( *KeyValuesToDict_function_type )( ::KeyValues const * );
-        
-        bp::def( 
-            "KeyValuesToDict"
-            , KeyValuesToDict_function_type( &::PyKeyValuesToDict )
-            , ( bp::arg("pKV") ) );
-    
-    }
-
-    ptr_keyvalues_to_py_keyvalues();
-
-    keyvalues_to_py_keyvalues();
-
-    py_keyvalues_to_keyvalues();
 
     bp::scope().attr( "MAX_PLAYERS" ) = MAX_PLAYERS;
 
@@ -1297,14 +550,244 @@ BOOST_PYTHON_MODULE(_srcbase){
 
     bp::scope().attr( "HIDEHUD_BITCOUNT" ) = (int)HIDEHUD_BITCOUNT;
 
-    { //::PyKeyValuesToDictFromFile
-    
-        typedef ::boost::python::api::object ( *KeyValuesToDictFromFile_function_type )( char const * );
+    { //::PyUtlRBTree
+        typedef bp::class_< PyUtlRBTree > UtlRBTree_exposer_t;
+        UtlRBTree_exposer_t UtlRBTree_exposer = UtlRBTree_exposer_t( "UtlRBTree", bp::init< bp::optional< int, int, bp::api::object > >(( bp::arg("growSize")=(int)(0), bp::arg("initSize")=(int)(0), bp::arg("lessfunc")=boost::python::api::object() )) );
+        bp::scope UtlRBTree_scope( UtlRBTree_exposer );
+        bp::implicitly_convertible< int, PyUtlRBTree >();
+        UtlRBTree_exposer.def( bp::init< bp::api::object >(( bp::arg("lessfunc") )) );
+        bp::implicitly_convertible< bp::api::object, PyUtlRBTree >();
+        UtlRBTree_exposer.def( bp::init< PyUtlRBTree const & >(( bp::arg("tree") )) );
+        { //::PyUtlRBTree::Count
         
-        bp::def( 
-            "KeyValuesToDictFromFile"
-            , KeyValuesToDictFromFile_function_type( &::PyKeyValuesToDictFromFile )
-            , ( bp::arg("pFileName") ) );
-    
+            typedef unsigned int ( ::PyUtlRBTree::*Count_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "Count"
+                , Count_function_type( &::PyUtlRBTree::Count ) );
+        
+        }
+        { //::PyUtlRBTree::Element
+        
+            typedef ::boost::python::api::object ( ::PyUtlRBTree::*Element_function_type )( int ) ;
+            
+            UtlRBTree_exposer.def( 
+                "Element"
+                , Element_function_type( &::PyUtlRBTree::Element )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::Find
+        
+            typedef int ( ::PyUtlRBTree::*Find_function_type )( ::boost::python::api::object ) const;
+            
+            UtlRBTree_exposer.def( 
+                "Find"
+                , Find_function_type( &::PyUtlRBTree::Find )
+                , ( bp::arg("search") ) );
+        
+        }
+        { //::PyUtlRBTree::FindInsertionPosition
+        
+            typedef void ( ::PyUtlRBTree::*FindInsertionPosition_function_type )( ::boost::python::api::object const &,int &,bool & ) ;
+            
+            UtlRBTree_exposer.def( 
+                "FindInsertionPosition"
+                , FindInsertionPosition_function_type( &::PyUtlRBTree::FindInsertionPosition )
+                , ( bp::arg("insert"), bp::arg("parent"), bp::arg("leftchild") ) );
+        
+        }
+        { //::PyUtlRBTree::FirstInorder
+        
+            typedef int ( ::PyUtlRBTree::*FirstInorder_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "FirstInorder"
+                , FirstInorder_function_type( &::PyUtlRBTree::FirstInorder ) );
+        
+        }
+        { //::PyUtlRBTree::FirstPostorder
+        
+            typedef int ( ::PyUtlRBTree::*FirstPostorder_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "FirstPostorder"
+                , FirstPostorder_function_type( &::PyUtlRBTree::FirstPostorder ) );
+        
+        }
+        { //::PyUtlRBTree::FirstPreorder
+        
+            typedef int ( ::PyUtlRBTree::*FirstPreorder_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "FirstPreorder"
+                , FirstPreorder_function_type( &::PyUtlRBTree::FirstPreorder ) );
+        
+        }
+        { //::PyUtlRBTree::Insert
+        
+            typedef int ( ::PyUtlRBTree::*Insert_function_type )( ::boost::python::api::object ) ;
+            
+            UtlRBTree_exposer.def( 
+                "Insert"
+                , Insert_function_type( &::PyUtlRBTree::Insert )
+                , ( bp::arg("insert") ) );
+        
+        }
+        { //::PyUtlRBTree::InsertAt
+        
+            typedef int ( ::PyUtlRBTree::*InsertAt_function_type )( int,bool ) ;
+            
+            UtlRBTree_exposer.def( 
+                "InsertAt"
+                , InsertAt_function_type( &::PyUtlRBTree::InsertAt )
+                , ( bp::arg("parent"), bp::arg("leftchild") ) );
+        
+        }
+        { //::PyUtlRBTree::InsertIfNotFound
+        
+            typedef int ( ::PyUtlRBTree::*InsertIfNotFound_function_type )( ::boost::python::api::object ) ;
+            
+            UtlRBTree_exposer.def( 
+                "InsertIfNotFound"
+                , InsertIfNotFound_function_type( &::PyUtlRBTree::InsertIfNotFound )
+                , ( bp::arg("insert") ) );
+        
+        }
+        { //::PyUtlRBTree::LastInorder
+        
+            typedef int ( ::PyUtlRBTree::*LastInorder_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "LastInorder"
+                , LastInorder_function_type( &::PyUtlRBTree::LastInorder ) );
+        
+        }
+        { //::PyUtlRBTree::LastPreorder
+        
+            typedef int ( ::PyUtlRBTree::*LastPreorder_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "LastPreorder"
+                , LastPreorder_function_type( &::PyUtlRBTree::LastPreorder ) );
+        
+        }
+        { //::PyUtlRBTree::NextInorder
+        
+            typedef int ( ::PyUtlRBTree::*NextInorder_function_type )( int ) const;
+            
+            UtlRBTree_exposer.def( 
+                "NextInorder"
+                , NextInorder_function_type( &::PyUtlRBTree::NextInorder )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::NextPostorder
+        
+            typedef int ( ::PyUtlRBTree::*NextPostorder_function_type )( int ) const;
+            
+            UtlRBTree_exposer.def( 
+                "NextPostorder"
+                , NextPostorder_function_type( &::PyUtlRBTree::NextPostorder )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::NextPreorder
+        
+            typedef int ( ::PyUtlRBTree::*NextPreorder_function_type )( int ) const;
+            
+            UtlRBTree_exposer.def( 
+                "NextPreorder"
+                , NextPreorder_function_type( &::PyUtlRBTree::NextPreorder )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::PrevInorder
+        
+            typedef int ( ::PyUtlRBTree::*PrevInorder_function_type )( int ) const;
+            
+            UtlRBTree_exposer.def( 
+                "PrevInorder"
+                , PrevInorder_function_type( &::PyUtlRBTree::PrevInorder )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::PrevPreorder
+        
+            typedef int ( ::PyUtlRBTree::*PrevPreorder_function_type )( int ) const;
+            
+            UtlRBTree_exposer.def( 
+                "PrevPreorder"
+                , PrevPreorder_function_type( &::PyUtlRBTree::PrevPreorder )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::Purge
+        
+            typedef void ( ::PyUtlRBTree::*Purge_function_type )(  ) ;
+            
+            UtlRBTree_exposer.def( 
+                "Purge"
+                , Purge_function_type( &::PyUtlRBTree::Purge ) );
+        
+        }
+        { //::PyUtlRBTree::Remove
+        
+            typedef bool ( ::PyUtlRBTree::*Remove_function_type )( ::boost::python::api::object ) ;
+            
+            UtlRBTree_exposer.def( 
+                "Remove"
+                , Remove_function_type( &::PyUtlRBTree::Remove )
+                , ( bp::arg("remove") ) );
+        
+        }
+        { //::PyUtlRBTree::RemoveAll
+        
+            typedef void ( ::PyUtlRBTree::*RemoveAll_function_type )(  ) ;
+            
+            UtlRBTree_exposer.def( 
+                "RemoveAll"
+                , RemoveAll_function_type( &::PyUtlRBTree::RemoveAll ) );
+        
+        }
+        { //::PyUtlRBTree::RemoveAt
+        
+            typedef void ( ::PyUtlRBTree::*RemoveAt_function_type )( int ) ;
+            
+            UtlRBTree_exposer.def( 
+                "RemoveAt"
+                , RemoveAt_function_type( &::PyUtlRBTree::RemoveAt )
+                , ( bp::arg("i") ) );
+        
+        }
+        { //::PyUtlRBTree::Root
+        
+            typedef int ( ::PyUtlRBTree::*Root_function_type )(  ) const;
+            
+            UtlRBTree_exposer.def( 
+                "Root"
+                , Root_function_type( &::PyUtlRBTree::Root ) );
+        
+        }
+        { //::PyUtlRBTree::SetLessFunc
+        
+            typedef void ( ::PyUtlRBTree::*SetLessFunc_function_type )( ::boost::python::api::object ) ;
+            
+            UtlRBTree_exposer.def( 
+                "SetLessFunc"
+                , SetLessFunc_function_type( &::PyUtlRBTree::SetLessFunc )
+                , ( bp::arg("func") ) );
+        
+        }
+        { //::PyUtlRBTree::operator[]
+        
+            typedef ::boost::python::api::object ( ::PyUtlRBTree::*__getitem___function_type )( int ) ;
+            
+            UtlRBTree_exposer.def( 
+                "__getitem__"
+                , __getitem___function_type( &::PyUtlRBTree::operator[] )
+                , ( bp::arg("i") ) );
+        
+        }
     }
 }

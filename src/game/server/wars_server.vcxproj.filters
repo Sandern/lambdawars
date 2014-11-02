@@ -2004,9 +2004,6 @@
     <ClInclude Include="..\shared\python\srcpy_networkvar.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\python\srcpy_converters.h">
-      <Filter>Source Files\Python</Filter>
-    </ClInclude>
     <ClInclude Include="..\shared\python\srcpy_matchmaking.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>

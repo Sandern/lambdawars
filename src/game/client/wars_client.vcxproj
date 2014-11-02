@@ -1542,7 +1542,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_util.h" />
     <ClInclude Include="..\shared\python\srcpy_navmesh.h" />
     <ClInclude Include="..\shared\python\srcpy_networkvar.h" />
-    <ClInclude Include="..\shared\python\srcpy_converters.h" />
     <ClInclude Include="python\srcpy_client_class.h" />
     <ClInclude Include="..\shared\python\srcpy_matchmaking.h" />
     <ClInclude Include="..\shared\python\srcpy_particles.h" />

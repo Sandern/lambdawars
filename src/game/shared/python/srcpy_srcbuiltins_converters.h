@@ -16,7 +16,6 @@
 
 namespace bp = boost::python;
 
-#if 0 // TODO
 // ---------------------------------------------------------------------------------------------------------
 // -- KeyValues converter
 struct ptr_keyvalues_to_py_keyvalues : boost::python::to_python_converter<KeyValues *, ptr_keyvalues_to_py_keyvalues>
@@ -73,8 +72,6 @@ struct py_keyvalues_to_keyvalues
 #endif // 0
 	}
 };
-
-#endif // 0
 
 // ---------------------------------------------------------------------------------------------------------
 // -- string_t converter
