@@ -122,7 +122,7 @@ void Append%(AppendFunctionName)sModules()
 }
 '''
 
-def GenerateAppendCode(f, modulenames, dllname):
+def GenerateAppendCode(modulenames, dllname):
     win32decls = []
     unixdecls = []
     appendlist = []
@@ -132,19 +132,31 @@ def GenerateAppendCode(f, modulenames, dllname):
         unixdecls.append('extern "C" PYINIT_DECL(%s)();' % (name))
         appendlist.append('\tAPPEND_MODULE(%s)' % (name))
         
-    f.write(appendtemplate % {
+    return appendtemplate % {
         'win32decls' : '\n'.join(win32decls),
         'unixdecls' : '\n'.join(unixdecls),
         'appendlist' : '\n'.join(appendlist),
         'AppendFunctionName' : dllname[0].capitalize() + dllname[1:len(dllname)],
-    })
+    }
 
 def GenerateAppendFile(path, module_names, dll_name):
     ''' Writes the append file, which registers all modules in Python.'''
     filename = 'src_append_%s.cpp' % (dll_name)
     path = os.path.join(path, filename)
+    
+    appendcode = GenerateAppendCode(module_names, dll_name)
+    if os.path.exists(path):
+        try:
+            with open(path, 'r') as fp:
+                oldappendcode = fp.read()
+            if oldappendcode == appendcode:
+                return path # Unchanged
+        except IOError as e:
+            print('Could not read "%s": %s' % (path, e))
+    
+    print('Writing append file "%s" (changed)' % (path))
     with open(path, 'w+') as fp:
-        GenerateAppendCode(fp, module_names, dll_name)
+        fp.write(appendcode)
     return path
         
 def GetFilenames(rm, isclient=False):
