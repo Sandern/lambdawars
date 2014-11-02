@@ -299,8 +299,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls = mb.class_('CUserCmd')
         cls.include()
         cls.calldefs().exclude()
-        cls.var('m_vCameraOffset').rename('cameraoffset')
-        cls.var('m_vMouseAim').rename('mouseaim')
+        self.PythonfyVariables(cls)
     
         # Save/restore interfaces. Just empty.
         cls = mb.class_('IRestore')

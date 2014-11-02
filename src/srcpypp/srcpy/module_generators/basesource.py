@@ -1,4 +1,5 @@
 import os
+import re
 
 from . basegenerator import ModuleGenerator
 from .. src_module_builder import src_module_builder_t
@@ -175,3 +176,11 @@ class SourceModuleGenerator(ModuleGenerator):
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(void_t()))), allow_empty=True).exclude()
         mb.calldefs(matchers.calldef_matcher_t(return_type=pointer_t(const_t(declarated_t(void_t())))), allow_empty=True).exclude()
         
+    def PythonfyVariables(self, cls):
+        ''' Removes prefixes from variable names and lower cases the variable. '''
+        for var in cls.vars(allow_empty=True):
+            varname = var.name
+            varname = re.sub('^(m_ul|m_un|m_us|m_n|m_e|m_E|m_i|m_b|m_c|m_rgf|m_sz|m_v)', '', varname)
+            varname = re.sub('^(m_)', '', varname)
+            varname = varname.lower()
+            var.rename(varname)
