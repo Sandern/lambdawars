@@ -24,10 +24,7 @@ class SrcBase(SharedModuleGenerator):
                              'typedef struct model_t {};\r\n' + \
                              '#endif // _LINUX\r\n'
                            )
-        
-        # Useful free functions
-        mb.free_function('IsSolid').include()
-        
+                           
         # RBTree
         cls = mb.class_('PyUtlRBTree')
         cls.include()
@@ -105,13 +102,6 @@ class SrcBase(SharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"TEAM_SPECTATOR\" ) = TEAM_SPECTATOR;" )
         mb.add_registration_code( "bp::scope().attr( \"FIRST_GAME_TEAM\" ) = FIRST_GAME_TEAM;" )
 
-        # CUserCmd
-        cls = mb.class_('CUserCmd')
-        cls.include()
-        cls.calldefs().exclude()
-        cls.var('m_vCameraOffset').rename('cameraoffset')
-        cls.var('m_vMouseAim').rename('mouseaim')
-        
         # MASKS
         mb.add_registration_code( "bp::scope().attr( \"MASK_ALL\" ) = MASK_ALL;" )
         mb.add_registration_code( "bp::scope().attr( \"MASK_SOLID\" ) = MASK_SOLID;" )

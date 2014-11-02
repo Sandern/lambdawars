@@ -292,6 +292,17 @@ BOOST_PYTHON_MODULE(srcbuiltins){
     
     }
 
+    { //::IsSolid
+    
+        typedef bool ( *IsSolid_function_type )( ::SolidType_t,int );
+        
+        bp::def( 
+            "IsSolid"
+            , IsSolid_function_type( &::IsSolid )
+            , ( bp::arg("solidType"), bp::arg("nSolidFlags") ) );
+    
+    }
+
     { //::IsTickMethodRegistered
     
         typedef bool ( *IsTickMethodRegistered_function_type )( ::boost::python::api::object );

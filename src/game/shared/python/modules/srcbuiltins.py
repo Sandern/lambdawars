@@ -64,6 +64,9 @@ class SrcBuiltins(SharedModuleGenerator):
         mb.class_('CGlobalVars').include()
         mb.vars('pSaveData').exclude()
         
+        # Useful free functions
+        mb.free_function('IsSolid').include()
+        
         # Add converters
         mb.add_registration_code( "bp::to_python_converter<\n\tstring_t,\n\tstring_t_to_python_str>();")
         mb.add_registration_code( "python_str_to_string_t();" )

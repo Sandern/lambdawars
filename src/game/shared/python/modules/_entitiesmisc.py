@@ -295,6 +295,13 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.add_registration_code( 'def("GetEnt", &::gamevcollisionevent_t_wrapper::GetEnt)')
             
     def ParseMisc(self, mb):
+        # CUserCmd, player commands
+        cls = mb.class_('CUserCmd')
+        cls.include()
+        cls.calldefs().exclude()
+        cls.var('m_vCameraOffset').rename('cameraoffset')
+        cls.var('m_vMouseAim').rename('mouseaim')
+    
         # Save/restore interfaces. Just empty.
         cls = mb.class_('IRestore')
         cls.include()

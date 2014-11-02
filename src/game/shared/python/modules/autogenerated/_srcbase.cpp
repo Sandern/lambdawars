@@ -33,32 +33,6 @@ PyTypeObject *g_PyKeyValuesType = NULL;
 BOOST_PYTHON_MODULE(_srcbase){
     bp::docstring_options doc_options( true, true, false );
 
-    { //::CUserCmd
-        typedef bp::class_< CUserCmd > CUserCmd_exposer_t;
-        CUserCmd_exposer_t CUserCmd_exposer = CUserCmd_exposer_t( "CUserCmd" );
-        bp::scope CUserCmd_scope( CUserCmd_exposer );
-        CUserCmd_exposer.def_readwrite( "buttons", &CUserCmd::buttons );
-        CUserCmd_exposer.def_readwrite( "command_number", &CUserCmd::command_number );
-        CUserCmd_exposer.def_readwrite( "directmove", &CUserCmd::directmove );
-        CUserCmd_exposer.def_readwrite( "forwardmove", &CUserCmd::forwardmove );
-        CUserCmd_exposer.def_readwrite( "hasbeenpredicted", &CUserCmd::hasbeenpredicted );
-        CUserCmd_exposer.def_readwrite( "headangles", &CUserCmd::headangles );
-        CUserCmd_exposer.def_readwrite( "headoffset", &CUserCmd::headoffset );
-        CUserCmd_exposer.def_readwrite( "impulse", &CUserCmd::impulse );
-        CUserCmd_exposer.def_readwrite( "cameraoffset", &CUserCmd::m_vCameraOffset );
-        CUserCmd_exposer.def_readwrite( "mouseaim", &CUserCmd::m_vMouseAim );
-        CUserCmd_exposer.def_readwrite( "mousedx", &CUserCmd::mousedx );
-        CUserCmd_exposer.def_readwrite( "mousedy", &CUserCmd::mousedy );
-        CUserCmd_exposer.def_readwrite( "random_seed", &CUserCmd::random_seed );
-        CUserCmd_exposer.def_readwrite( "sidemove", &CUserCmd::sidemove );
-        CUserCmd_exposer.def_readwrite( "tick_count", &CUserCmd::tick_count );
-        CUserCmd_exposer.def_readwrite( "upmove", &CUserCmd::upmove );
-        CUserCmd_exposer.def_readwrite( "vecmovetoposition", &CUserCmd::vecmovetoposition );
-        CUserCmd_exposer.def_readwrite( "viewangles", &CUserCmd::viewangles );
-        CUserCmd_exposer.def_readwrite( "weaponselect", &CUserCmd::weaponselect );
-        CUserCmd_exposer.def_readwrite( "weaponsubtype", &CUserCmd::weaponsubtype );
-    }
-
     { //::KeyValues
         typedef bp::class_< KeyValues, boost::noncopyable > RealKeyValues_exposer_t;
         RealKeyValues_exposer_t RealKeyValues_exposer = RealKeyValues_exposer_t( "RealKeyValues", bp::no_init );
@@ -821,17 +795,6 @@ BOOST_PYTHON_MODULE(_srcbase){
                 , ( bp::arg("i") ) );
         
         }
-    }
-
-    { //::IsSolid
-    
-        typedef bool ( *IsSolid_function_type )( ::SolidType_t,int );
-        
-        bp::def( 
-            "IsSolid"
-            , IsSolid_function_type( &::IsSolid )
-            , ( bp::arg("solidType"), bp::arg("nSolidFlags") ) );
-    
     }
 
     { //::KeyValuesDumpAsDevMsg
