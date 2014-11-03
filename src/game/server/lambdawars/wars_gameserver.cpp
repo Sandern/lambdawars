@@ -140,9 +140,6 @@ void CWarsGameServer::ProcessMessages()
 						// Tell lobby owner the game is accepted and players can connect to the server
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
-						//g_pMatchFramework->CreateSession( pGameData );
-						//g_pMatchFramework->GetMatchSession()->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
-						//KeyValuesDumpAsDevMsg( g_pMatchFramework->GetMatchSession()->GetSessionSettings() );
 
 						SetState( k_EGameServer_InGame );
 					}

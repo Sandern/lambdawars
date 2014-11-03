@@ -15,9 +15,6 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	if( !steamapicontext )
 		return;
 
-	if( !steamapicontext->SteamNetworking() )
-		return;
-
 	if( !pGameData )
 	{
 		Warning( "WarsRequestGameServer: no game data specified\n" );
@@ -41,6 +38,17 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	//Msg("Wrote game data. Total message size: %d, game data size: %d\n", dataSize, keyvaluesData.TellPut() );
 	//KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
-	steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable );
+	if( bIsRequestingLocalGameServer )
+	{
+		WarsMessageData_t *pMessageData = warsextension->InsertServerMessage();
+		pMessageData->buf.Put( pszData, dataSize );
+		pMessageData->steamIDRemote = steamapicontext->SteamUser()->GetSteamID();
+	}
+	else
+	{
+		if( !steamapicontext->SteamNetworking() )
+			return;
+		steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable );
+	}
 #endif // CLIENT_DLL
 }
