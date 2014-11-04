@@ -112,9 +112,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	{
 		w.type = PYTYPE_DICT;
 
-		bp::dict dictdata( bp::detail::borrowed_reference(data.ptr()) );
-
-		bp::object items = dictdata.attr("items")();
+		bp::object items = data.attr("items")();
 		bp::object iterator = items.attr("__iter__")();
 		unsigned long ulCount = bp::len(items); 
 		for( unsigned long u = 0; u < ulCount; u++ )
