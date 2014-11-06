@@ -406,7 +406,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="cef\src_cef_browser.cpp" />
     <ClCompile Include="cef\src_cef_osrenderer.cpp" />
     <ClCompile Include="cef\src_cef_python.cpp" />
-    <ClCompile Include="cef\src_cef_texgen.cpp" />
     <ClCompile Include="cef\src_cef_vgui_panel.cpp" />
     <ClCompile Include="lambdawars\gameui\backgroundmenubutton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -1560,7 +1559,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="cef\src_cef_js.h" />
     <ClInclude Include="cef\src_cef_osrenderer.h" />
     <ClInclude Include="cef\src_cef_python.h" />
-    <ClInclude Include="cef\src_cef_texgen.h" />
     <ClInclude Include="cef\src_cef_vgui_panel.h" />
     <ClInclude Include="lambdawars\c_strider_fx.h" />
     <ClInclude Include="lambdawars\gameui\backgroundmenubutton.h" />

@@ -2009,9 +2009,6 @@
     <ClCompile Include="cef\src_cef_osrenderer.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
-    <ClCompile Include="cef\src_cef_texgen.cpp">
-      <Filter>Source Files\cef</Filter>
-    </ClCompile>
     <ClCompile Include="cef\src_cef_vgui_panel.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
@@ -4766,9 +4763,6 @@
       <Filter>Source Files\cef</Filter>
     </ClInclude>
     <ClInclude Include="cef\src_cef_osrenderer.h">
-      <Filter>Source Files\cef</Filter>
-    </ClInclude>
-    <ClInclude Include="cef\src_cef_texgen.h">
       <Filter>Source Files\cef</Filter>
     </ClInclude>
     <ClInclude Include="cef\src_cef_vgui_panel.h">

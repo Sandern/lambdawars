@@ -51,6 +51,10 @@ SrcCefOSRRenderer::~SrcCefOSRRenderer()
 //-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::Destroy()
 {
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AUTO_LOCK( s_BufferMutex );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	m_bActive = false;
 
 	if( m_pTextureBuffer != NULL )
@@ -63,6 +67,8 @@ void SrcCefOSRRenderer::Destroy()
 		free( m_pPopupBuffer );
 		m_pPopupBuffer = NULL;
 	}
+
+	m_pBrowser = NULL;
 }
 
 //-----------------------------------------------------------------------------

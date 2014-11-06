@@ -14,7 +14,7 @@
 #include "materialsystem/MaterialSystemUtil.h"
 
 class SrcCefBrowser;
-class CCefTextureGenerator;
+//class CCefTextureGenerator;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -33,8 +33,8 @@ public:
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void OnThink();
 	virtual void Paint();
-	virtual void OnSizeChanged(int newWide, int newTall);
-	virtual void PerformLayout();
+	//virtual void OnSizeChanged(int newWide, int newTall);
+	//virtual void PerformLayout();
 
 	virtual void DrawWebview();
 
@@ -84,9 +84,9 @@ private:
 	bool m_bCalledMiddlePressedParent;
 
 	// Texture variables
-	bool m_bSizeChanged;
+	//bool m_bSizeChanged;
 	CTextureReference	m_RenderBuffer;
-	CCefTextureGenerator *m_pTextureRegen;
+	//CCefTextureGenerator *m_pTextureRegen;
 	CMaterialReference m_MatRef;
 	char m_MatWebViewName[MAX_PATH];
 	char m_TextureWebViewName[MAX_PATH];
@@ -103,7 +103,8 @@ private:
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 
-	int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+	//int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+	bool m_bTextureDirty;
 
 	// Hack for working nice with VGUI input
 	int m_iTopZPos, m_iBottomZPos;
