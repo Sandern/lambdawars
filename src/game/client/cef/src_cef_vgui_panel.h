@@ -28,13 +28,11 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual bool ResizeTexture( int width, int height );
-	virtual void MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend );
+	void MarkTextureDirty();
 
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void OnThink();
 	virtual void Paint();
-	//virtual void OnSizeChanged(int newWide, int newTall);
-	//virtual void PerformLayout();
 
 	virtual void DrawWebview();
 
@@ -84,14 +82,10 @@ private:
 	bool m_bCalledMiddlePressedParent;
 
 	// Texture variables
-	//bool m_bSizeChanged;
 	CTextureReference	m_RenderBuffer;
-	//CCefTextureGenerator *m_pTextureRegen;
 	CMaterialReference m_MatRef;
 	char m_MatWebViewName[MAX_PATH];
 	char m_TextureWebViewName[MAX_PATH];
-
-	//IVTFTexture *m_pVTFTexture;
 
 	vgui::HFont m_hLoadingFont;
 
@@ -145,6 +139,14 @@ inline void SrcCefVGUIPanel::SetDoNotDraw( bool state )
 inline bool SrcCefVGUIPanel::GetDoNotDraw( void )
 {
 	return m_bDontDraw;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline void SrcCefVGUIPanel::MarkTextureDirty()
+{
+	m_bTextureDirty = true;
 }
 
 #endif // SRC_CEF_VGUI_PANEL_H

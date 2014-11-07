@@ -263,7 +263,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		Warning("SrcCefOSRRenderer::OnPaint: Unsupported paint type %d\n", type);
 		return;
 	}
-	m_pBrowser->GetPanel()->MarkTextureDirty( 0, 0, m_iWidth, m_iHeight );
+	m_pBrowser->GetPanel()->MarkTextureDirty();
 }
 
 //-----------------------------------------------------------------------------
@@ -354,14 +354,7 @@ bool SrcCefOSRRenderer::StartDragging(CefRefPtr<CefBrowser> browser,
 							int x, int y)
 {
 	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer StartDragging called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
-#if 0
-	if( !browser->GetHost() )
-		return false;
-	browser->GetHost()->DragSourceSystemDragEnded();
-	return true;
-#else
 	return false;
-#endif // 0
 }
 
 void SrcCefOSRRenderer::UpdateDragCursor(CefRefPtr<CefBrowser> browser,

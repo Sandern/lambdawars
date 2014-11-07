@@ -425,7 +425,7 @@ void CefClientHandler::ProcessMessages()
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
 	m_bInitializePingSuccessful(false), m_bWasHidden(false)
 {
@@ -433,6 +433,12 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFram
 
 	// Create panel and texture generator
 	m_pPanel = new SrcCefVGUIPanel( name, this, NULL );
+
+	// Have the option to set the initial width and tall here, so CreateBrowser gets the correct view rectangle
+	if( wide > 0 && tall > 0 )
+	{
+		m_pPanel->SetSize( wide, tall );
+	}
 
 	// Initialize browser
 	CEFSystem().AddBrowser( this );

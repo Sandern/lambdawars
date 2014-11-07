@@ -211,7 +211,7 @@ class SrcCefBrowser
 	friend class CefClientHandler;
 
 public:
-	SrcCefBrowser( const char *name, const char *url = "", int renderframerate = 30 );
+	SrcCefBrowser( const char *name, const char *url = "", int renderframerate = 30, int wide = 0, int tall = 0 );
 	~SrcCefBrowser();
 
 	void Destroy( void );

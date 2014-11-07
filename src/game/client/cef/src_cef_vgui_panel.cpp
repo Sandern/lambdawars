@@ -8,7 +8,6 @@
 #include "src_cef_vgui_panel.h"
 #include "src_cef_browser.h"
 #include "src_cef.h"
-//#include "src_cef_texgen.h"
 #include "src_cef_osrenderer.h"
 #include "clientmode_shared.h"
 
@@ -42,8 +41,7 @@ static int nexthigher( int k )
 // Purpose: 
 //-----------------------------------------------------------------------------
 SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent ) 
-	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1),// m_bSizeChanged(false), 
-		m_bTextureDirty(true)//m_pTextureRegen(NULL)
+	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bTextureDirty(true)
 {
 	// WarsSplitscreen: only one player
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
@@ -59,10 +57,6 @@ SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController,
 	m_iEventFlags = EVENTFLAG_NONE;
 	m_iMouseX = 0;
 	m_iMouseY = 0;
-
-#if 0
-	m_iDirtyX = m_iDirtyY = m_iDirtyXEnd = m_iDirtyYEnd = 0;
-#endif // 0
 
 	m_bCalledLeftPressedParent = m_bCalledRightPressedParent = m_bCalledMiddlePressedParent = false;
 
@@ -96,13 +90,6 @@ SrcCefVGUIPanel::~SrcCefVGUIPanel()
 	{
 		m_MatRef.Shutdown();
 	}
-#if 0
-	if( m_pTextureRegen )
-	{
-		delete m_pTextureRegen; 
-		m_pTextureRegen = NULL;
-	}
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -143,22 +130,6 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	m_fTexS1 = 1.0 - (m_iTexWide - m_iWVWide) / (float)m_iTexWide;
 	m_fTexT1 = 1.0 - (m_iTexTall - m_iWVTall) / (float)m_iTexTall;
 
-#if 0
-	if( !m_pTextureRegen )
-	{
-		if( g_debug_cef.GetBool() )
-			DevMsg("Cef: initializing texture regenerator\n");
-		m_pTextureRegen = new CCefTextureGenerator( m_pBrowser );
-	}
-	else
-	{
-		if( g_debug_cef.GetBool() )
-			DevMsg("Cef: Invalidating old render texture\n");
-		m_RenderBuffer->SetTextureRegenerator( NULL );
-		m_RenderBuffer.Shutdown();
-		m_MatRef.Shutdown();
-	}
-#else
 	if( m_RenderBuffer.IsValid() ) 
 	{
 		m_RenderBuffer.Shutdown();
@@ -167,7 +138,6 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	{
 		m_MatRef.Shutdown();
 	}
-#endif // 0
 
 	static int staticTextureID = 0;
 	V_snprintf( m_TextureWebViewName, _MAX_PATH, "_rt_test%d", staticTextureID++ );
@@ -189,12 +159,8 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 		return false;
 	}
 
-#if 0
-	m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-#endif // 0
-
 	// Mark full dirty
-	MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
+	MarkTextureDirty();
 
 	//if( m_MatRef.IsValid() )
 	//	m_MatRef.Shutdown();
@@ -232,6 +198,18 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	pVMT->deleteThis();
 
 	CefDbgMsg( 1, "Cef#%d: Finished initializing web material.\n", GetBrowserID() );
+
+	// Update texture ID
+	CefDbgMsg( 1, "Cef#%d: initializing texture id...\n", GetBrowserID() );
+
+	if( m_iTextureID != -1 )
+	{
+		vgui::surface()->DestroyTextureID( m_iTextureID );
+	}
+
+	m_iTextureID = vgui::surface()->CreateNewTextureID( true );
+	vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
+
 	return true;
 }
 
@@ -320,44 +298,8 @@ void SrcCefVGUIPanel::Paint()
 		{
 			if( !ResizeTexture( renderer->GetWidth(), renderer->GetHeight() ) )
 				return;
-
-			// Update texture ID
-			CefDbgMsg( 1, "Cef#%d: initializing texture id...\n", GetBrowserID() );
-
-			if( m_iTextureID != -1 )
-			{
-				vgui::surface()->DestroyTextureID( m_iTextureID );
-			}
-
-			m_iTextureID = vgui::surface()->CreateNewTextureID( true );
-			vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
 		}
 	}
-
-#if 0
-	// Update texture if needed
-	if( m_bSizeChanged )
-	{
-		// Update texture
-		if( !ResizeTexture( iWide, iTall ) )
-			return;
-
-		m_bSizeChanged = false;
-
-		// Update texture ID
-		CefDbgMsg( 1, "Cef#%d: initializing texture id...\n", GetBrowserID() );
-
-		if( m_iTextureID != -1 )
-		{
-			vgui::surface()->DestroyTextureID( m_iTextureID );
-		}
-
-		m_iTextureID = vgui::surface()->CreateNewTextureID( true );
-		vgui::surface()->DrawSetTextureFile( m_iTextureID, m_MatWebViewName, false, false );
-
-		m_bTextureDirty = true;
-	}
-#endif // 0
 
 	//if( m_pTextureRegen )
 	{
@@ -368,7 +310,6 @@ void SrcCefVGUIPanel::Paint()
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 		// Regenerate texture (partially) if needed
-		//if( m_pTextureRegen->IsDirty() )
 		if( m_bTextureDirty )
 		{
 			//if( g_cef_debug_texture.GetBool() )
@@ -396,18 +337,9 @@ void SrcCefVGUIPanel::Paint()
 							m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
 					}
 
-					//m_pTextureRegen->ClearDirty();
 					m_bTextureDirty = false;
 				}
 			}
-
-			// Clear if no longer dirty
-			/*if( !m_pTextureRegen->IsDirty() )
-			{
-				m_iDirtyX = m_iWVWide;
-				m_iDirtyY = m_iWVTall;
-				m_iDirtyXEnd = m_iDirtyYEnd = 0;
-			}*/
 		}
 	}
 
@@ -465,57 +397,6 @@ void SrcCefVGUIPanel::DrawWebview()
 		}
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::MarkTextureDirty( int dirtyx, int dirtyy, int dirtyxend, int dirtyyend )
-{
-#if 0
-	m_iDirtyX = Min( m_iDirtyX, dirtyx );
-	m_iDirtyY = Min( m_iDirtyY, dirtyy );
-	m_iDirtyXEnd = Max( m_iDirtyXEnd, dirtyxend );
-	m_iDirtyYEnd = Max( m_iDirtyYEnd, dirtyyend );
-
-	if( !m_pTextureRegen )
-		return;
-	m_pTextureRegen->MakeDirty();
-#endif // 0
-	m_bTextureDirty = true;
-}
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnSizeChanged(int newWide, int newTall)
-{
-	BaseClass::OnSizeChanged( newWide, newTall );
-
-	//if( m_pTextureRegen )
-	{
-		int iWide, iTall;
-		GetSize( iWide, iTall );
-
-		m_bTextureDirty = true;
-		m_bSizeChanged = true;
-		if( !ResizeTexture( iWide, iTall ) )
-			m_bSizeChanged = false;
-	}
-	/*else
-	{
-		m_bSizeChanged = true;
-	}*/
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::PerformLayout()
-{
-	BaseClass::PerformLayout();
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -843,21 +724,6 @@ vgui::HCursor SrcCefVGUIPanel::GetCursor()
 
 	return BaseClass::GetCursor();
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::InternalFocusChanged(bool lost)
-{
-	if( g_debug_cef.GetBool() )
-		DevMsg("CEF: InternalFocusChanged lost:%d\n", lost);
-	if( lost )
-		m_pBrowser->Unfocus();
-	else
-		m_pBrowser->Focus();
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
