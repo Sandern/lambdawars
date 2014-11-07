@@ -562,6 +562,8 @@ void ClientModeSDK::OnColorCorrectionWeightsReset( void )
 
 void ClientModeSDK::Update( void )
 {
+	BaseClass::Update();
+
 	UpdatePostProcessingEffects();
 }
 
