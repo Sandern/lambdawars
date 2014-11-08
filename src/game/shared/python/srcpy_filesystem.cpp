@@ -7,10 +7,36 @@
 
 #include "cbase.h"
 #include "srcpy_filesystem.h"
+#include "srcpy.h"
 #include <filesystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+static bool SrcPyPathIsInGameFolder( const char *pPath )
+{
+	if( SrcPySystem()->IsPathProtected() )
+	{
+		// Verify the file is in the gamefolder
+		char searchPaths[_MAX_PATH];
+		filesystem->GetSearchPath( "MOD", true, searchPaths, sizeof( searchPaths ) );
+		V_StripTrailingSlash( searchPaths );
+
+		if( V_IsAbsolutePath(pPath) )
+		{
+			if( V_strnicmp(pPath, searchPaths, V_strlen(searchPaths)) != 0 ) 
+				return false;
+		}
+		else
+		{
+			char pFullPath[_MAX_PATH];
+			filesystem->RelativePathToFullPath(pPath, "MOD", pFullPath, _MAX_PATH);
+			if( V_strnicmp(pFullPath, searchPaths, V_strlen(searchPaths)) != 0 ) 
+				return false;
+		}
+	}
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -62,6 +88,11 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 		PyErr_SetString(PyExc_IOError, "No filepath specified" );
 		throw boost::python::error_already_set(); 
 	}
+	if( !SrcPyPathIsInGameFolder( filepath ) )
+	{
+		PyErr_SetString(PyExc_IOError, "filesystem module only allows paths in the game folder" );
+		throw boost::python::error_already_set(); 
+	}
 	if( !filesystem->FileExists( filepath, pathid ) )
 	{
 		PyErr_SetString(PyExc_IOError, "File does not exists" );
@@ -87,6 +118,49 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 		free( buffer );
 	buffer = NULL;
 	return content;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void PyFS_WriteFile( const char *filepath, const char *pathid, const char *content )
+{
+	if( !filepath )
+	{
+		PyErr_SetString(PyExc_IOError, "No filepath specified" );
+		throw boost::python::error_already_set(); 
+	}
+	if( !content )
+	{
+		PyErr_SetString(PyExc_IOError, "Content cannot be empty" );
+		throw boost::python::error_already_set(); 
+	}
+
+	char convertedPath[MAX_PATH];
+	if( V_IsAbsolutePath( filepath ) )
+	{
+		V_strncpy( convertedPath, filepath, sizeof(convertedPath) );
+	}
+	else
+	{
+		char moddir[_MAX_PATH];
+		filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
+		V_MakeAbsolutePath( convertedPath, sizeof(convertedPath), filepath, moddir );
+	}
+
+	if( !SrcPyPathIsInGameFolder( convertedPath ) )
+	{
+		PyErr_SetString(PyExc_IOError, "filesystem module only allows paths in the game folder" );
+		throw boost::python::error_already_set(); 
+	}
+
+	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	buf.Put( content, V_strlen( content ) );
+	if( !filesystem->WriteFile( convertedPath, pathid, buf ) )
+	{
+		PyErr_SetString(PyExc_IOError, "Failed to write file" );
+		throw boost::python::error_already_set(); 
+	}
 }
 
 //-----------------------------------------------------------------------------

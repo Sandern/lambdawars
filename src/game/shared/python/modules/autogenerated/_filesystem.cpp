@@ -115,4 +115,15 @@ BOOST_PYTHON_MODULE(_filesystem){
             , ( bp::arg("pFileName"), bp::arg("pPathID")=bp::object() ) );
     
     }
+
+    { //::PyFS_WriteFile
+    
+        typedef void ( *WriteFile_function_type )( char const *,char const *,char const * );
+        
+        bp::def( 
+            "WriteFile"
+            , WriteFile_function_type( &::PyFS_WriteFile )
+            , ( bp::arg("filepath"), bp::arg("pathid"), bp::arg("content") ) );
+    
+    }
 }
