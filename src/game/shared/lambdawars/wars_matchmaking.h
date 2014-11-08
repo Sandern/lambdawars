@@ -21,6 +21,7 @@ enum EGameServerState
 	k_EGameServer_InGame,
 	k_EGameServer_InGameFreeStyle, // Not created through matchmaking, but players are on the server
 	k_EGameServer_StartingGame, // Delays sending back the "accept game" message until the game server is started
+	k_EGameServer_GameEnded, // Tells game server the current game ended
 };
 
 typedef struct WarsMessage_t

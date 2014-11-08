@@ -116,6 +116,7 @@ BOOST_PYTHON_MODULE(matchmaking){
         .value("k_EGameServer_InGame", k_EGameServer_InGame)
         .value("k_EGameServer_InGameFreeStyle", k_EGameServer_InGameFreeStyle)
         .value("k_EGameServer_StartingGame", k_EGameServer_StartingGame)
+        .value("k_EGameServer_GameEnded", k_EGameServer_GameEnded)
         .export_values()
         ;
 
@@ -140,6 +141,16 @@ BOOST_PYTHON_MODULE(matchmaking){
         .staticmethod( "GetSessionSettings" )    
         .staticmethod( "GetSessionSystemData" )    
         .staticmethod( "UpdateSessionSettings" );
+
+    { //::GetActiveGameLobbySteamID
+    
+        typedef ::CSteamID ( *GetActiveGameLobbySteamID_function_type )(  );
+        
+        bp::def( 
+            "GetActiveGameLobbySteamID"
+            , GetActiveGameLobbySteamID_function_type( &::GetActiveGameLobbySteamID ) );
+    
+    }
 
     { //::GetWarsGameServerState
     
@@ -190,6 +201,17 @@ BOOST_PYTHON_MODULE(matchmaking){
             "MatchSession"
             , MatchSession_function_type( &::PyMKMatchSession )
             , ( bp::arg("pSettings") ) );
+    
+    }
+
+    { //::SetWarsGameServerState
+    
+        typedef void ( *SetWarsGameServerState_function_type )( ::EGameServerState );
+        
+        bp::def( 
+            "SetWarsGameServerState"
+            , SetWarsGameServerState_function_type( &::SetWarsGameServerState )
+            , ( bp::arg("state") ) );
     
     }
 

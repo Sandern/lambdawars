@@ -73,6 +73,8 @@ void CWarsGameServer::ProcessMessages()
 			// Special case when local client starts game server from main menu/lobby
 			if( eMsg == k_EMsgLocalServerRequestGame )
 			{
+				WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
+
 				data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
 				pGameData = new KeyValues( "GameData" );
 				if( !pGameData->ReadAsBinary( data ) )
@@ -100,6 +102,8 @@ void CWarsGameServer::ProcessMessages()
 
 					SetState( k_EGameServer_StartingGame );
 					m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
+
+					m_ActiveGameLobbySteamID =  requestMsg->lobbySteamId;
 				}
 			}
 			else
@@ -119,6 +123,8 @@ void CWarsGameServer::ProcessMessages()
 				}
 				else
 				{
+					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
+
 					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
 					pGameData = new KeyValues( "GameData" );
 					if( !pGameData->ReadAsBinary( data ) )
@@ -142,6 +148,7 @@ void CWarsGameServer::ProcessMessages()
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
 
 						SetState( k_EGameServer_InGame );
+						m_ActiveGameLobbySteamID = requestMsg->lobbySteamId;
 					}
 				}
 				break;
@@ -217,12 +224,6 @@ void CWarsGameServer::RunFrame()
 	}
 	else if( GetState() == k_EGameServer_InGame || GetState() == k_EGameServer_InGameFreeStyle )
 	{
-		static float s_lastPrintTime = 0;
-		if( g_pMatchFramework->GetMatchSession() && Plat_FloatTime() - s_lastPrintTime > 60.0f )
-		{
-			KeyValuesDumpAsDevMsg( g_pMatchFramework->GetMatchSession()->GetSessionSettings(), 0, 0 );
-			s_lastPrintTime = Plat_FloatTime();
-		}
 		if( m_nConnectedPlayers > 0 )
 		{
 			m_fLastPlayedConnectedTime = Plat_FloatTime();
@@ -231,6 +232,16 @@ void CWarsGameServer::RunFrame()
 		{
 			SetState( k_EGameServer_Available );
 			Msg("Changing wars game server back to available due inactivity (no connected players)\n");
+		}
+	}
+	else if( k_EGameServer_GameEnded )
+	{
+		// Game ended just servers as a way to directly become available again after no players are connected any more
+		// k_EGameServer_InGame uses a time out before doing so.
+		if( m_nConnectedPlayers == 0 )
+		{
+			SetState( k_EGameServer_Available );
+			Msg("Changing wars game server back to available because game ended and no players are connected anymore\n");
 		}
 	}
 	else if( GetState() == k_EGameServer_Available )
@@ -276,6 +287,11 @@ void CWarsGameServer::SetState( EGameServerState state )
 	m_State = state;
 	m_fGameStateStartTime = Plat_FloatTime();
 	m_bUpdateMatchmakingTags = true;
+
+	if( state == k_EGameServer_Available )
+	{
+		m_ActiveGameLobbySteamID.Clear();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -379,6 +395,20 @@ EGameServerState GetWarsGameServerState()
 	if( !WarsGameServer() )
 		return k_EGameServer_Error;
 	return WarsGameServer()->GetState();
+}
+
+void SetWarsGameServerState( EGameServerState state )
+{
+	if( !WarsGameServer() )
+		return;
+	return WarsGameServer()->SetState( state );
+}
+
+CSteamID GetActiveGameLobbySteamID()
+{
+	if( !WarsGameServer() )
+		return CSteamID();
+	return WarsGameServer()->GetActiveGameLobbySteamID();
 }
 
 CWarsGameServer *WarsGameServer()

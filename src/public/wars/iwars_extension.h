@@ -18,6 +18,7 @@ enum EMessage
 	// Server messages
 	k_EMsgServerRequestGame = 0,
 	k_EMsgLocalServerRequestGame,
+	k_EMsgIsLobbyGameActive,
 
 	// Client Messages
 	k_EMsgClientFirstMsg = 5000,
