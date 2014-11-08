@@ -71,3 +71,23 @@ CON_COMMAND( debug_dxlevel_force, "" )
 	config = g_pMaterialSystem->GetCurrentConfigForVideoCard();
 	Msg("New dxlevel: %d\n", config.dxSupportLevel );
 }
+
+CON_COMMAND( debug_print_threaded_mode, "" )
+{
+	Msg("Threaded mode is: ");
+	switch( materials->GetThreadMode() )
+	{
+	case MATERIAL_SINGLE_THREADED:
+		Msg("MATERIAL_SINGLE_THREADED\n");
+		break;
+	case MATERIAL_QUEUED_SINGLE_THREADED:
+		Msg("MATERIAL_QUEUED_SINGLE_THREADED\n");
+		break;
+	case MATERIAL_QUEUED_THREADED:
+		Msg("MATERIAL_QUEUED_THREADED\n");
+		break;
+	default:
+		Msg("UNKNOWN!\n");
+		break;
+	}
+}
