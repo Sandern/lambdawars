@@ -360,6 +360,10 @@ void InGameMainMenu::OnCommand( const char *command )
 			}
 			*/
 		}
+		else if( !Q_strcmp( command, "FlmForfeit" ) )
+		{
+			engine->ServerCmd("player_forfeit");
+		}
 
 		// does this command match a flyout menu?
 		BaseModUI::FlyoutMenu *flyout = dynamic_cast< FlyoutMenu* >( FindChildByName( pchCommand ) );
@@ -612,7 +616,7 @@ void InGameMainMenu::PerformLayout( void )
 	{
 		if ( bCanVote )
 		{
-			pVoteButton->SetText( "#L4D360UI_InGameMainMenu_CallAVote" );
+			pVoteButton->SetText( "#Wars_InGameMainMenu_Forfeit" );
 			pVoteButton->SetVisible( true );
 		}
 		else
