@@ -199,61 +199,73 @@ void CWarsGameServer::RunFrame()
 	}
 	m_nConnectedPlayers = nConnected;
 
-	if( GetState() == k_EGameServer_StartingGame )
+	switch( GetState() )
 	{
-		if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
+		case k_EGameServer_StartingGame:
 		{
-			if( m_LobbyPlayerRequestingGameID.IsValid() ) 
+			if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
 			{
-				ConVarRef hostport("hostport");
+				if( m_LobbyPlayerRequestingGameID.IsValid() ) 
+				{
+					ConVarRef hostport("hostport");
 
-				WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
-				acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
-				acceptGameMsg.gamePort = hostport.GetInt();
-				acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
-				//steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( m_LobbyPlayerRequestingGameID, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+					WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
+					acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+					acceptGameMsg.gamePort = hostport.GetInt();
+					acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
+					//steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( m_LobbyPlayerRequestingGameID, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 
-				WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-				pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-				pMessageData->steamIDRemote = m_LobbyPlayerRequestingGameID;
+					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+					pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+					pMessageData->steamIDRemote = m_LobbyPlayerRequestingGameID;
+				}
+
+				m_LobbyPlayerRequestingGameID.Clear();
+				SetState( k_EGameServer_InGame );
 			}
-
-			m_LobbyPlayerRequestingGameID.Clear();
-			SetState( k_EGameServer_InGame );
+			break;
 		}
-	}
-	else if( GetState() == k_EGameServer_InGame || GetState() == k_EGameServer_InGameFreeStyle )
-	{
-		if( m_nConnectedPlayers > 0 )
+		case k_EGameServer_InGame:
+		case k_EGameServer_InGameFreeStyle:
 		{
-			m_fLastPlayedConnectedTime = Plat_FloatTime();
+			if( m_nConnectedPlayers > 0 )
+			{
+				m_fLastPlayedConnectedTime = Plat_FloatTime();
+			}
+			else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > 60.0f )
+			{
+				SetState( k_EGameServer_Available );
+				Msg("Changing wars game server back to available due inactivity (no connected players)\n");
+			}
+			break;
 		}
-		else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > 60.0f )
+		case k_EGameServer_GameEnded:
 		{
-			SetState( k_EGameServer_Available );
-			Msg("Changing wars game server back to available due inactivity (no connected players)\n");
+			// Game ended just servers as a way to directly become available again after no players are connected any more
+			// k_EGameServer_InGame uses a time out before doing so.
+			if( m_nConnectedPlayers == 0 )
+			{
+				SetState( k_EGameServer_Available );
+				Msg("Changing wars game server back to available because game ended and no players are connected anymore\n");
+			}
+			break;
 		}
-	}
-	else if( k_EGameServer_GameEnded )
-	{
-		// Game ended just servers as a way to directly become available again after no players are connected any more
-		// k_EGameServer_InGame uses a time out before doing so.
-		if( m_nConnectedPlayers == 0 )
+		case k_EGameServer_Available:
 		{
-			SetState( k_EGameServer_Available );
-			Msg("Changing wars game server back to available because game ended and no players are connected anymore\n");
+			if( nConnected > 0 )
+			{
+				SetState( k_EGameServer_InGameFreeStyle );
+				Msg("Changing wars game server to free style ingame since players are connected\n");
+			}
+			else
+			{
+				m_fLastPlayedConnectedTime = Plat_FloatTime();
+			}
+			break;
 		}
-	}
-	else if( GetState() == k_EGameServer_Available )
-	{
-		if( nConnected > 0 )
+		default:
 		{
-			SetState( k_EGameServer_InGameFreeStyle );
-			Msg("Changing wars game server to free style ingame since players are connected\n");
-		}
-		else
-		{
-			m_fLastPlayedConnectedTime = Plat_FloatTime();
+			break;
 		}
 	}
 

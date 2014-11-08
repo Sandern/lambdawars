@@ -2,12 +2,12 @@
 #include "cbase.h"
 #include "wars_matchmaking.h"
 
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
-
 #ifdef CLIENT_DLL
 #include "clientsteamcontext.h"
 #endif // CLIENT_DLL
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
 
 void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData )
 {
