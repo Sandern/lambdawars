@@ -679,6 +679,16 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 		{
 			if( pEnt == GetPath()->m_hTarget )
 				continue;
+
+			// MAYBE?
+#if 0
+			if( GetPath()->m_iGoalFlags & GF_OWNERISTARGET )
+			{
+				CBaseEntity *pOwnerEntity = pEnt->GetOwnerEntity();
+				if( pOwnerEntity && pOwnerEntity == GetPath()->m_hTarget.Get() )
+					continue;
+			}
+#endif // 0
 		}
 
 		// If specified, don't avoid enemies
