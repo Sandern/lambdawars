@@ -3081,6 +3081,11 @@ void CHLClient::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 	FogOfWarMgr()->OnResolutionChanged();
 #endif // HL2WARS_DLL
 
+// Maybe do it here instead of through mode change callback?
+//#ifdef DEFERRED_ENABLED
+//	InitDeferredRTs( false );
+//#endif // DEFERRED_ENABLED
+
 #ifdef ENABLE_CEF
 	CEFSystem().OnScreenSizeChanged( nOldWidth, nOldHeight );
 #endif // ENALBE_CEF

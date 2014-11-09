@@ -984,12 +984,16 @@ void CFogOfWarMgr::OnResolutionChanged()
 			return; // Nothing to do
 	}
 
-	materials->ReEnableRenderTargetAllocation_IRealizeIfICallThisAllTexturesWillBeUnloadedAndLoadTimeWillSufferHorribly();
-	materials->BeginRenderTargetAllocation();
-	ShutdownRenderTargets();
-	InitRenderTargets();
-	materials->EndRenderTargetAllocation();
-	materials->FinishRenderTargetAllocation();
+	// Causes a crash ingame, so only allow in main menu
+	if( !engine->IsInGame() )
+	{
+		materials->ReEnableRenderTargetAllocation_IRealizeIfICallThisAllTexturesWillBeUnloadedAndLoadTimeWillSufferHorribly();
+		materials->BeginRenderTargetAllocation();
+		ShutdownRenderTargets();
+		InitRenderTargets();
+		materials->EndRenderTargetAllocation();
+		materials->FinishRenderTargetAllocation();
+	}
 #endif // FOW_USE_PROCTEX
 }
 
