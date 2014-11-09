@@ -223,6 +223,7 @@ public:
 	virtual void OnDestroy() {}
 	virtual void PerformLayout( void );
 	virtual void InvalidateLayout( void );
+	void NotifyScreenInfoChanged();
 
 	// Window Methods
 	void SetSize( int wide, int tall );

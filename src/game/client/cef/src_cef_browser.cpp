@@ -718,6 +718,16 @@ void SrcCefBrowser::InvalidateLayout( void )
 	m_bPerformLayout = true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefBrowser::NotifyScreenInfoChanged()
+{
+	if( !IsValid() )
+		return;
+	m_CefClientHandler->GetBrowser()->GetHost()->NotifyScreenInfoChanged();
+}
+
 // Usage functions
 //-----------------------------------------------------------------------------
 // Purpose:

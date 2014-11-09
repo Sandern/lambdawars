@@ -544,6 +544,7 @@ void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 			continue;
 
 		m_CefBrowsers[i]->InvalidateLayout();
+		m_CefBrowsers[i]->NotifyScreenInfoChanged();
 
 		m_CefBrowsers[i]->GetPanel()->MarkTextureDirty();
 	}
