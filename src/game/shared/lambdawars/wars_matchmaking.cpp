@@ -4,6 +4,10 @@
 
 #ifdef CLIENT_DLL
 #include "clientsteamcontext.h"
+
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -52,3 +56,12 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	}
 #endif // CLIENT_DLL
 }
+
+#ifdef CLIENT_DLL
+void WarsFireMMSessionJoinFailedSignal()
+{
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("mm_joinsessionfailed", "core.signals", true) );
+#endif // ENABLE_PYTHON
+}
+#endif // CLIENT_DLL

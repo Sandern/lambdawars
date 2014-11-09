@@ -53,6 +53,10 @@
 
 #include "gameui_util.h"
 
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+extern void WarsFireMMSessionJoinFailedSignal();
+#endif 
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1206,6 +1210,7 @@ void CUIGameData::OnEvent( KeyValues *pEvent )
 	}
 	else if ( !Q_stricmp( "OnMatchSessionUpdate", szEvent ) )
 	{
+#ifndef HL2WARS_DLL
 		if ( !Q_stricmp( "error", pEvent->GetString( "state", "" ) ) )
 		{
 			g_pMatchFramework->CloseSession();
@@ -1321,6 +1326,14 @@ void CUIGameData::OnEvent( KeyValues *pEvent )
 			
 			confirmation->SetUsageData(data);
 		}
+#else
+#ifdef ENABLE_PYTHON
+		if ( !Q_stricmp( "error", pEvent->GetString( "state", "" ) ) )
+		{
+			WarsFireMMSessionJoinFailedSignal();
+		}
+#endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
 	}
 }
 

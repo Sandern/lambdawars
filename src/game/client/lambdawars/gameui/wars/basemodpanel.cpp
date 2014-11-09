@@ -1481,6 +1481,10 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 
 	if ( !Q_stricmp( "OnMatchSessionUpdate", szEvent ) )
 	{
+		Msg("OnMatchSessionUpdate: \n");
+		KeyValuesDumpAsDevMsg( pEvent );
+
+#ifndef HL2WARS_DLL
 		char const *szState = pEvent->GetString( "state", "" );
 		if ( !Q_stricmp( "ready", szState ) )
 		{
@@ -1675,6 +1679,7 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 				CUIGameData::Get()->OpenWaitScreen( arrText[numResults], 0.0f, pSettings );
 			}
 		}
+#endif // HL2WARS_DLL
 	}
 	else if ( !Q_stricmp( "OnEngineLevelLoadingSession", szEvent ) )
 	{
