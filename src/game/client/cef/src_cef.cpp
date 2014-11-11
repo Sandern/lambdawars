@@ -373,7 +373,7 @@ int CCefSystem::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentB
 	// Give browser implementations directly a chance to override the input
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( !m_CefBrowsers[i]->IsValid() )
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsFullyVisible() )
 			continue;
 
 		int ret = m_CefBrowsers[i]->KeyInput( down, keynum, pszCurrentBinding );
@@ -515,7 +515,7 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 #else
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsFullyVisible() || !m_CefBrowsers[i]->IsGameInputEnabled() )
 			continue;
 
 		// Only send key input if no vgui panel has key focus
