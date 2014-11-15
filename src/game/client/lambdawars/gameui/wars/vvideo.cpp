@@ -1086,8 +1086,8 @@ int Video::FindMSAAMode( int nAASamples, int nAAQuality )
 static vmode_t s_pWindowedModes[] = 
 {
 	// NOTE: These must be sorted by ascending width, then ascending height
-	{ 640, 480, 32, 60 },
-	{ 852, 480, 32, 60 },
+	//{ 640, 480, 32, 60 },
+	//{ 852, 480, 32, 60 },
 	{ 1280, 720, 32, 60 },
 	{ 1920, 1080, 32, 60 },
 };
