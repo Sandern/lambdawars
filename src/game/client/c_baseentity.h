@@ -184,10 +184,16 @@ struct thinkfunc_t
 	int			m_nNextThinkTick;
 	int			m_nLastThinkTick;
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// MUST BE LAST
-	boost::python::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
+	boost::python::object  m_pyThink; // If not Py_None and m_pfnThink != NULL, then call the python method
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 #define CREATE_PREDICTED_ENTITY( className )	\

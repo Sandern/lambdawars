@@ -651,6 +651,9 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('RemoveDataObjectType').exclude() # Don't care
         mb.mem_funs('HasDataObjectType').exclude() # Don't care
         
+        if self.settings.branch == 'source2013':
+            mb.mem_funs('GetHasAttributesInterfacePtr').exclude()
+        
         # Use isclient/isserver globals/builtins
         mb.mem_funs('IsServer').exclude() 
         mb.mem_funs('IsClient').exclude() 

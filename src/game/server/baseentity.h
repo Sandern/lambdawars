@@ -260,10 +260,16 @@ struct thinkfunc_t
 
 	DECLARE_SIMPLE_DATADESC();
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// MUST BE LAST
 	boost::python::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 struct EmitSound_t;
@@ -2991,6 +2997,9 @@ inline CBaseEntity *CBaseEntity::GetMousePassEntity( )
 	return m_hMousePassEntity.Get();
 }
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 inline boost::python::object CBaseEntity::GetPyInstance() const 
 { 
@@ -3013,6 +3022,9 @@ inline boost::python::object CBaseEntity::GetPyThink()
 	return m_pyThink; 
 }
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 //-----------------------------------------------------------------------------
 // 

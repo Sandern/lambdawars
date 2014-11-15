@@ -825,9 +825,15 @@ extern bool g_bDisableEhandleAccess;
 //-----------------------------------------------------------------------------
 CBaseEntity::~CBaseEntity( )
 {
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( m_bPyManaged == false )
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	{
 		if( m_nFOWFlags & FOWFLAG_UPDATER )
 			FogOfWarMgr()->RemoveFogUpdater( m_iOwnerNumber, this );
@@ -4298,12 +4304,18 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 
 	pInfo->m_pTransmitEdict->Set( index );
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	// Python networkvars: mark player as transmit
 	int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
 	m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
 	PyNetworkVarsUpdateClient( this, iClientIdx );
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// HLTV/Replay need to know if this entity is culled by PVS limits
 	if ( pInfo->m_pTransmitAlways )

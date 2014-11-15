@@ -93,7 +93,6 @@ extern boost::python::object _entitiesmisc;
 extern boost::python::object _entities;
 extern boost::python::object _particles;
 extern boost::python::object _physics;
-extern boost::python::object matchmaking;
 
 extern boost::python::object srcmgr;
 extern boost::python::object gamemgr;

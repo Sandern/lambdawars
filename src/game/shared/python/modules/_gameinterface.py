@@ -35,10 +35,10 @@ class GameInterface(SemiSharedModuleGenerator):
         'cdll_int.h',
         '#%team.h',
         '$%c_team.h',
+        '$clientsteamcontext.h',
         
         '#hl2wars_gameinterface.h',
         'wars_mount_system.h',
-        '$clientsteamcontext.h',
     ]
 
     def Parse(self, mb):
