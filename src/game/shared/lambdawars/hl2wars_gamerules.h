@@ -108,6 +108,10 @@ public:
 
 	DECLARE_CLIENTCLASS_NOBASE(); // This makes datatables able to access our private vars.
 
+#ifdef ENABLE_PYTHON
+	boost::python::object GetTableInfoString(const char *entry);
+#endif // ENABLE_PYTHON
+
 #else
 
 	DECLARE_SERVERCLASS_NOBASE(); // This makes datatables able to access our private vars.

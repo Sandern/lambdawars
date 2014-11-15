@@ -24,6 +24,7 @@
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
+	#include <networkstringtabledefs.h>
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -119,7 +120,34 @@ bool CHL2WarsGameRules::ShouldCollide( int collisionGroup0, int collisionGroup1 
 }
 
 #ifdef CLIENT_DLL
+	
+#ifdef ENABLE_PYTHON
+extern INetworkStringTable *g_pStringTableInfoPanel;
 
+boost::python::object CHL2WarsGameRules::GetTableInfoString(const char *entry)
+{
+	if( !entry )
+	{
+		return boost::python::object();
+	}
+
+	const char *data = NULL;
+	int length = 0;
+
+	if ( NULL == g_pStringTableInfoPanel )
+		return boost::python::object();
+
+	int index = g_pStringTableInfoPanel->FindStringIndex( entry );
+
+	if (index != ::INVALID_STRING_INDEX)
+		data = (const char *)g_pStringTableInfoPanel->GetStringUserData(index, &length);
+
+	if (!data || !data[0])
+		return boost::python::object(); // nothing to show
+
+	return boost::python::object( data );
+}
+#endif // ENABLE_PYTHON
 
 #else
 

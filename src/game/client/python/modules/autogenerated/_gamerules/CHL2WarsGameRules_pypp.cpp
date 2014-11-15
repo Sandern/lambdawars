@@ -726,6 +726,10 @@ void register_CHL2WarsGameRules_class(){
             "GetMapElapsedTime"
             , (float ( ::C_HL2WarsGameRules::* )(  ) )( &::C_HL2WarsGameRules::GetMapElapsedTime ) )    
         .def( 
+            "GetTableInfoString"
+            , (::boost::python::api::object ( ::C_HL2WarsGameRules::* )( char const * ) )( &::C_HL2WarsGameRules::GetTableInfoString )
+            , ( bp::arg("entry") ) )    
+        .def( 
             "IsTeamplay"
             , (bool ( ::C_HL2WarsGameRules::* )(  ) )(&::C_HL2WarsGameRules::IsTeamplay)
             , (bool ( C_HL2WarsGameRules_wrapper::* )(  ) )(&C_HL2WarsGameRules_wrapper::default_IsTeamplay) )    
