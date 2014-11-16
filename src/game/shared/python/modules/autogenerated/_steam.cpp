@@ -3122,7 +3122,7 @@ BOOST_PYTHON_MODULE(_steam){
             , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerResponded)
             , ( bp::arg("hRequest"), bp::arg("iServer") ) );
 
-    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers", bp::no_init )    
+    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers" )    
         .def( 
             "CancelServerQuery"
             , (void ( ::PySteamMatchmakingServers::* )( ::HServerQuery ) )( &::PySteamMatchmakingServers::CancelServerQuery )
@@ -7186,7 +7186,7 @@ BOOST_PYTHON_MODULE(_steam){
             , (void ( PySteamMatchmakingServerListResponse_wrapper::* )( int,int ) )(&PySteamMatchmakingServerListResponse_wrapper::default_ServerResponded)
             , ( bp::arg("hRequest"), bp::arg("iServer") ) );
 
-    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers", bp::no_init )    
+    bp::class_< PySteamMatchmakingServers >( "SteamMatchmakingServers" )    
         .def( 
             "CancelServerQuery"
             , (void ( ::PySteamMatchmakingServers::* )( ::HServerQuery ) )( &::PySteamMatchmakingServers::CancelServerQuery )

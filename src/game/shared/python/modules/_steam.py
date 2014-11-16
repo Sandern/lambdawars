@@ -247,7 +247,6 @@ class Steam(SemiSharedModuleGenerator):
         # Servers matchmaking interface
         cls = mb.class_('PySteamMatchmakingServers')
         cls.include()
-        cls.no_init = True
         cls.rename('SteamMatchmakingServers')
         
         cls = mb.class_('PySteamMatchmakingServerListResponse')
