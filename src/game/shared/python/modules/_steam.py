@@ -173,9 +173,27 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_declaration_code(callresult_wrapper_tmpl % {'name' : name, 'dataclass' : dataclsname})
         mb.add_registration_code(callresult_reg_tmpl % {'name' : name, 'dataclass' : dataclsname})
         
+    def ParseSteamApps(self, mb):
+        cls = mb.class_('ISteamApps')
+        cls.include()
+        cls.no_init = True
+        cls.mem_funs().virtuality = 'not virtual'
+        
+        cls.mem_fun('GetCurrentBetaName').exclude()
+        mb.add_declaration_code('''static bp::tuple GetCurrentBetaName_44cfc773ce5b4e98b34b5a2219de76ad( ::ISteamApps & inst ){
+    char buf[1024];
+    bool rv = inst.GetCurrentBetaName( buf, sizeof(buf) );
+    return bp::make_tuple( rv, bp::object( buf ) );
+}''')
+        cls.add_registration_code('''def( 
+            "GetCurrentBetaName"
+            , (bp::tuple (*)( ::ISteamApps & ) )( &GetCurrentBetaName_44cfc773ce5b4e98b34b5a2219de76ad )
+            , ( bp::arg("inst") ) )''')
+        
     def ParseSteamFriends(self, mb):
         cls = mb.class_('ISteamFriends')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetFriendGamePlayed').exclude()
         
@@ -207,6 +225,7 @@ class Steam(SemiSharedModuleGenerator):
         # The main matchmaking interface
         cls = mb.class_('ISteamMatchmaking')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_funs('GetLobbyGameServer').add_transformation(FT.output('punGameServerIP'), FT.output('punGameServerPort'), FT.output('psteamIDGameServer'))
         
@@ -228,6 +247,7 @@ class Steam(SemiSharedModuleGenerator):
         # Servers matchmaking interface
         cls = mb.class_('PySteamMatchmakingServers')
         cls.include()
+        cls.no_init = True
         cls.rename('SteamMatchmakingServers')
         
         cls = mb.class_('PySteamMatchmakingServerListResponse')
@@ -279,6 +299,7 @@ class Steam(SemiSharedModuleGenerator):
     def ParseUserStats(self, mb):
         cls = mb.class_('ISteamUserStats')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         
         self.AddSteamCallResult('NumberOfCurrentPlayers', 'NumberOfCurrentPlayers_t')
@@ -289,6 +310,7 @@ class Steam(SemiSharedModuleGenerator):
     def ParseGameServer(self, mb):
         cls = mb.class_('ISteamGameServer')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         
     def ParseServerOnly(self, mb):
@@ -296,6 +318,7 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"steamgameserverapicontext\" ) = boost::ref(steamgameserverapicontext);" )
         cls = mb.class_('CSteamGameServerAPIContext')
         cls.include()
+        cls.no_init = True
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
         cls.mem_fun('SteamGameServerUtils').exclude()
@@ -346,9 +369,9 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"steamapicontext\" ) = boost::ref(steamapicontext);" )
         cls = mb.class_('CSteamAPIContext')
         cls.include()
+        cls.no_init = True
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
-        cls.mem_fun('SteamApps').exclude()
         
         if self.steamsdkversion > (1, 11):
             cls.mem_fun('SteamHTTP').exclude()
@@ -369,6 +392,7 @@ class Steam(SemiSharedModuleGenerator):
             cls.mem_fun('SteamUGC').exclude() 
             cls.mem_fun('SteamHTMLSurface').exclude()
             
+        cls.mem_funs('SteamApps').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamMatchmaking').call_policies = call_policies.return_internal_reference()
@@ -379,16 +403,19 @@ class Steam(SemiSharedModuleGenerator):
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_NOT_INITIALIZED\" ) = (int)QUERY_PORT_NOT_INITIALIZED;" )
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_ERROR\" ) = (int)QUERY_PORT_ERROR;" )
         
+        self.ParseSteamApps(mb)
         self.ParseSteamFriends(mb)
         
         # User
         cls = mb.class_('ISteamUser')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         
         # Utils
         cls = mb.class_('ISteamUtils')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetImageRGBA').exclude()
         cls.mem_fun('GetImageSize').exclude()
