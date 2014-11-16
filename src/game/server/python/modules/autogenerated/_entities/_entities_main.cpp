@@ -33,6 +33,8 @@
 
 #include "saverestore.h"
 
+#include "saverestoretypes.h"
+
 #include "vcollide_parse.h"
 
 #include "iservervehicle.h"

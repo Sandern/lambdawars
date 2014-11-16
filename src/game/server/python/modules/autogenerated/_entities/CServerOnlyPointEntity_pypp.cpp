@@ -16,6 +16,7 @@
 #include "triggers.h"
 #include "AI_Criteria.h"
 #include "saverestore.h"
+#include "saverestoretypes.h"
 #include "vcollide_parse.h"
 #include "iservervehicle.h"
 #include "gib.h"
