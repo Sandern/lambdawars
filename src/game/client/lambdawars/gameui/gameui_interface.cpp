@@ -83,7 +83,7 @@ class IMatchExtSwarm *g_pMatchExtSwarm = NULL;
 #include "srcpy.h"
 #include "src_cef.h"
 
-static boost::python::object s_ref_ui_basemodpanel;
+boost::python::object s_ref_ui_basemodpanel;
 SrcCefBrowser *s_ui_basemodpanel = NULL;
 #endif // ENABLE_PYTHON && ENABLE_CEF
 

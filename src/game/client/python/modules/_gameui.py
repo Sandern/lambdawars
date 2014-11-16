@@ -34,5 +34,7 @@ class GameUI(ClientModuleGenerator):
         
         mb.free_function('OpenGammaDialog').include()
         
+        mb.free_function('GetMainMenu').include()
+        
         # Remove any protected function 
         mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()

@@ -14,6 +14,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern boost::python::object s_ref_ui_basemodpanel;
+
 //-----------------------------------------------------------------------------
 // Temporary function until everything is ported over to the new html based
 // menu.
@@ -30,4 +32,12 @@ void PyGameUIOpenWindow( BaseModUI::WINDOW_TYPE windowType, bool hidePrevious, K
 {
 	BaseModUI::CBaseModPanel &baseModPanel = BaseModUI::CBaseModPanel::GetSingleton();
 	baseModPanel.OpenWindow( windowType, NULL, hidePrevious, pParameters );
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+boost::python::object GetMainMenu()
+{
+	return s_ref_ui_basemodpanel;
 }

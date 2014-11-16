@@ -211,6 +211,16 @@ BOOST_PYTHON_MODULE(_gameui){
         }
     }
 
+    { //::GetMainMenu
+    
+        typedef ::boost::python::api::object ( *GetMainMenu_function_type )(  );
+        
+        bp::def( 
+            "GetMainMenu"
+            , GetMainMenu_function_type( &::GetMainMenu ) );
+    
+    }
+
     { //::OpenGammaDialog
     
         typedef void ( *OpenGammaDialog_function_type )( ::vgui::VPANEL );

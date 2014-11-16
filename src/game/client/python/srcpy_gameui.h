@@ -19,4 +19,6 @@ void PyGameUIOpenWindow( BaseModUI::WINDOW_TYPE windowtype, bool hideprevious = 
 
 void OpenGammaDialog( vgui::VPANEL parent );
 
+boost::python::object GetMainMenu();
+
 #endif // SRCPY_GAMEUI_H
