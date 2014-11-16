@@ -203,6 +203,7 @@ class Entities(SemiSharedModuleGenerator):
             '$soundinfo.h',
             '#AI_Criteria.h',
             'saverestore.h',
+            'saverestoretypes.h',
             'vcollide_parse.h', # solid_t
             '#iservervehicle.h',
             '$iclientvehicle.h',

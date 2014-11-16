@@ -302,11 +302,17 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_fun('SteamGameServerNetworking').exclude()
         cls.mem_fun('SteamGameServerStats').exclude()
         
+        if self.steamsdkversion > (1, 16):
+            cls.mem_fun('SteamHTTP').exclude()
+        
         cls.mem_funs('SteamGameServer').call_policies = call_policies.return_internal_reference()
     
         self.ParseGameServer(mb)
 
     def Parse(self, mb):
+        if self.settings.branch == 'source2013':
+            self.steamsdkversion = (1, 30)
+    
         # Exclude everything by default
         mb.decls().exclude()  
 
@@ -350,6 +356,7 @@ class Steam(SemiSharedModuleGenerator):
             cls.mem_fun('SteamScreenshots').exclude()
         if self.steamsdkversion > (1, 20):
             cls.mem_fun('SteamUnifiedMessages').exclude()
+            
         cls.mem_fun('SteamMatchmakingServers').exclude() # Full python class wrapper
 
         cls.mem_fun('SteamNetworking').exclude()
@@ -360,6 +367,7 @@ class Steam(SemiSharedModuleGenerator):
             cls.mem_fun('SteamMusic').exclude()
             cls.mem_fun('SteamMusicRemote').exclude()
             cls.mem_fun('SteamUGC').exclude() 
+            cls.mem_fun('SteamHTMLSurface').exclude()
             
         cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUtils').call_policies = call_policies.return_internal_reference()

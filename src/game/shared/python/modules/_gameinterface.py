@@ -21,6 +21,7 @@ class GameInterface(SemiSharedModuleGenerator):
         '#recipientfilter.h',
         '#srcpy_usermessage.h',
         '#mapentities.h',
+        'saverestoretypes.h',
         
         '$gamerules.h',
         '$multiplay_gamerules.h',
