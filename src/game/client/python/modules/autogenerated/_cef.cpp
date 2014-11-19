@@ -563,6 +563,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , ( bp::arg("url") ) );
         
         }
+        { //::SrcCefBrowser::NotifyScreenInfoChanged
+        
+            typedef void ( ::SrcCefBrowser::*NotifyScreenInfoChanged_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "NotifyScreenInfoChanged"
+                , NotifyScreenInfoChanged_function_type( &::SrcCefBrowser::NotifyScreenInfoChanged ) );
+        
+        }
         { //::SrcCefBrowser::OnAfterCreated
         
             typedef void ( ::SrcCefBrowser::*OnAfterCreated_function_type )(  ) ;
