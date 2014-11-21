@@ -463,7 +463,6 @@ bool CSrcPython::InitInterpreter( void )
 	fnisinstance = builtins.attr("isinstance");
 
 	// Add the maps directory to the modules path
-	SysAppendPath("maps");
 	SysAppendPath("python\\srclib");
 
 	// Default imports

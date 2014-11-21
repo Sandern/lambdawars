@@ -1229,16 +1229,6 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	//  to be parsed (the above code has loaded all point_template entities)
 	PrecachePointTemplates();
 
-#ifdef ENABLE_PYTHON
-	// Import map script (find better place?)
-	char buf[_MAX_PATH];
-	Q_snprintf(buf, _MAX_PATH, "maps/%s.py", pMapName);
-	if( SrcPySystem()->IsPythonRunning() && filesystem->FileExists( buf ) )
-	{
-		SrcPySystem()->Import(pMapName);
-	}
-#endif // ENABLE_PYTHON
-
 	// load MOTD from file into stringtable
 	LoadMessageOfTheDay();
 
