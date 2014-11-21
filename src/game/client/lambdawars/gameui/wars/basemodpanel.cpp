@@ -1484,7 +1484,6 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 		//Msg("OnMatchSessionUpdate: \n");
 		//KeyValuesDumpAsDevMsg( pEvent );
 
-#ifndef HL2WARS_DLL_TEST
 		char const *szState = pEvent->GetString( "state", "" );
 		if ( !Q_stricmp( "ready", szState ) )
 		{
@@ -1493,13 +1492,18 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 			if ( !pSession )
 				return;
 
+#ifdef HL2WARS_DLL
+			// Automatically start the map, no configuration required
+			pSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
+			return;
+#else
 			KeyValues *pSettings = pSession->GetSessionSettings();
 			if ( !pSettings )
 				return;
 
 			char const *szNetwork = pSettings->GetString( "system/network", "" );
 			int numLocalPlayers = pSettings->GetInt( "members/numPlayers", 1 );
-			
+
 			WINDOW_TYPE wtGameLobby = WT_GAMELOBBY;
 			if ( !Q_stricmp( "offline", szNetwork ) &&
 				 numLocalPlayers <= 1 )
@@ -1548,6 +1552,7 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 					CUIGameData::Get()->CloseWaitScreen( NULL, NULL );
 				}
 			}
+#endif // HL2WARS_DLL
 		}
 		else if ( !Q_stricmp( "created", szState ) )
 		{
@@ -1612,7 +1617,6 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 
 				confirmation->SetUsageData(data);
 			}
-#endif // HL2WARS_DLL
 		}
 		else if ( !Q_stricmp( "progress", szState ) )
 		{
@@ -1682,8 +1686,8 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 					numResults = 0;
 				CUIGameData::Get()->OpenWaitScreen( arrText[numResults], 0.0f, pSettings );
 			}
-		}
 #endif // HL2WARS_DLL
+		}
 	}
 	else if ( !Q_stricmp( "OnEngineLevelLoadingSession", szEvent ) )
 	{
