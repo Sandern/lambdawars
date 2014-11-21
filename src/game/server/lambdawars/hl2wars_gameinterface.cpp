@@ -162,6 +162,12 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	if ( Q_stricmp( pKV->GetName(), pGameDir ) || bAlreadyLoadingMap )
 		return;
 
+	if( WarsGameServer() && WarsGameServer()->GetLocalPlayerGameData() )
+	{
+		pKV = WarsGameServer()->GetLocalPlayerGameData();
+		DevMsg("Using local player game data\n");
+	}
+
 	//g_bOfflineGame = pKV->GetString( "map/offline", NULL ) != NULL;
 	g_bOfflineGame = !Q_stricmp( pKV->GetString( "system/network", "LIVE" ), "offline" );
 

@@ -1481,10 +1481,10 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 
 	if ( !Q_stricmp( "OnMatchSessionUpdate", szEvent ) )
 	{
-		Msg("OnMatchSessionUpdate: \n");
-		KeyValuesDumpAsDevMsg( pEvent );
+		//Msg("OnMatchSessionUpdate: \n");
+		//KeyValuesDumpAsDevMsg( pEvent );
 
-#ifndef HL2WARS_DLL
+#ifndef HL2WARS_DLL_TEST
 		char const *szState = pEvent->GetString( "state", "" );
 		if ( !Q_stricmp( "ready", szState ) )
 		{
@@ -1551,6 +1551,9 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 		}
 		else if ( !Q_stricmp( "created", szState ) )
 		{
+#ifdef HL2WARS_DLL
+
+#else
 			//
 			// This section of code catches when we just connected to a lobby that
 			// is playing a campaign that we do not have installed.
@@ -1609,6 +1612,7 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 
 				confirmation->SetUsageData(data);
 			}
+#endif // HL2WARS_DLL
 		}
 		else if ( !Q_stricmp( "progress", szState ) )
 		{

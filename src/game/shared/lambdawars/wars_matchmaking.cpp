@@ -4,6 +4,7 @@
 
 #ifdef CLIENT_DLL
 #include "clientsteamcontext.h"
+#include "matchmaking/imatchframework.h"
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -44,9 +45,13 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 
 	if( bIsRequestingLocalGameServer )
 	{
+		// Sends the data correctly
 		WarsMessageData_t *pMessageData = warsextension->InsertServerMessage();
 		pMessageData->buf.Put( pszData, dataSize );
 		pMessageData->steamIDRemote = steamapicontext->SteamUser()->GetSteamID();
+
+		// Creates the session
+		g_pMatchFramework->CreateSession( pGameData );
 	}
 	else
 	{

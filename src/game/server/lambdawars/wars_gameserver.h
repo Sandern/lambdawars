@@ -30,6 +30,9 @@ public:
 	// Returns a valid lobby steam id if the active game was started from a Steam lobby
 	CSteamID GetActiveGameLobbySteamID();
 
+	// Returns game data from a local player starting a server
+	KeyValues *GetLocalPlayerGameData();
+
 private:
 	// Tells us when we have successfully connected to Steam
 	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnSteamServersConnected, SteamServersConnected_t, m_CallbackSteamServersConnected );
@@ -58,6 +61,9 @@ private:
 
 	// Lobby SteamID from this game server was triggered. Players can use this to poll if the game server is still active.
 	CSteamID m_ActiveGameLobbySteamID;
+
+	// Game data from a local player starting a server
+	KeyValues *m_pLocalPlayerGameData;
 };
 
 inline EGameServerState CWarsGameServer::GetState()
@@ -68,6 +74,11 @@ inline EGameServerState CWarsGameServer::GetState()
 inline CSteamID CWarsGameServer::GetActiveGameLobbySteamID()
 {
 	return m_ActiveGameLobbySteamID;
+}
+
+inline KeyValues *CWarsGameServer::GetLocalPlayerGameData()
+{
+	return m_pLocalPlayerGameData;
 }
 
 void WarsInitGameServer();

@@ -28,7 +28,8 @@ CWarsGameServer::CWarsGameServer() :
 	m_State( k_EGameServer_Available ),
 	m_fGameStateStartTime( 0.0f ),
 	m_fLastPlayedConnectedTime( 0.0f ),
-	m_bUpdateMatchmakingTags(true)
+	m_bUpdateMatchmakingTags(true),
+	m_pLocalPlayerGameData(NULL)
 {
 	DevMsg("Created Wars game server\n");
 }
@@ -91,14 +92,14 @@ void CWarsGameServer::ProcessMessages()
 
 					KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
+					m_pLocalPlayerGameData = pGameData->MakeCopy();
+
 					// Tell lobby owner the game is accepted and players can connect to the server
 					//WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
 					//pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
 					//pMessageData->steamIDRemote = messageData->steamIDRemote;
 
-					g_ServerGameDLL.ApplyGameSettings( pGameData );
-					//g_pMatchFramework->CreateSession( pGameData );
-					//g_pMatchFramework->GetMatchSession()->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
+					//g_ServerGameDLL.ApplyGameSettings( pGameData );
 
 					SetState( k_EGameServer_StartingGame );
 					m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
@@ -213,7 +214,6 @@ void CWarsGameServer::RunFrame()
 					acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
 					acceptGameMsg.gamePort = hostport.GetInt();
 					acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
-					//steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( m_LobbyPlayerRequestingGameID, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 
 					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
 					pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
@@ -221,6 +221,11 @@ void CWarsGameServer::RunFrame()
 				}
 
 				m_LobbyPlayerRequestingGameID.Clear();
+				if( m_pLocalPlayerGameData )
+				{
+					m_pLocalPlayerGameData->deleteThis();
+					m_pLocalPlayerGameData = NULL;
+				}
 				SetState( k_EGameServer_InGame );
 			}
 			break;
@@ -303,6 +308,11 @@ void CWarsGameServer::SetState( EGameServerState state )
 	if( state == k_EGameServer_Available )
 	{
 		m_ActiveGameLobbySteamID.Clear();
+		if( m_pLocalPlayerGameData )
+		{
+			m_pLocalPlayerGameData->deleteThis();
+			m_pLocalPlayerGameData = NULL;
+		}
 	}
 }
 
