@@ -36,5 +36,8 @@ class GameUI(ClientModuleGenerator):
         
         mb.free_function('GetMainMenu').include()
         
+        mb.free_function('GetKeyboardLangIds').include()
+        mb.free_function('GetCurrentKeyboardLangId').include()
+        
         # Remove any protected function 
         mb.calldefs( matchers.access_type_matcher_t( 'protected' ) ).exclude()

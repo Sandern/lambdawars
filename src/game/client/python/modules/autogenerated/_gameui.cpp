@@ -211,6 +211,26 @@ BOOST_PYTHON_MODULE(_gameui){
         }
     }
 
+    { //::GetCurrentKeyboardLangId
+    
+        typedef ::boost::python::api::object ( *GetCurrentKeyboardLangId_function_type )(  );
+        
+        bp::def( 
+            "GetCurrentKeyboardLangId"
+            , GetCurrentKeyboardLangId_function_type( &::GetCurrentKeyboardLangId ) );
+    
+    }
+
+    { //::GetKeyboardLangIds
+    
+        typedef ::boost::python::api::object ( *GetKeyboardLangIds_function_type )(  );
+        
+        bp::def( 
+            "GetKeyboardLangIds"
+            , GetKeyboardLangIds_function_type( &::GetKeyboardLangIds ) );
+    
+    }
+
     { //::GetMainMenu
     
         typedef ::boost::python::api::object ( *GetMainMenu_function_type )(  );

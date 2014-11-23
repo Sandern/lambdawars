@@ -21,4 +21,7 @@ void OpenGammaDialog( vgui::VPANEL parent );
 
 boost::python::object GetMainMenu();
 
+boost::python::object GetKeyboardLangIds();
+boost::python::object GetCurrentKeyboardLangId();
+
 #endif // SRCPY_GAMEUI_H

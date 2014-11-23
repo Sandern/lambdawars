@@ -20,6 +20,10 @@
 
 #include <set>
 
+#ifdef ENABLE_PYTHON
+#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // CEF
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
@@ -81,6 +85,13 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		CEFSystem().SetLastMouseWheelDist( (short)HIWORD(wParam) );
 		break;
 	}
+#ifdef ENABLE_PYTHON
+	case WM_INPUTLANGCHANGE:
+	{
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "gameui_inputlanguage_changed", "core.signals", true ) );
+		break;
+	}
+#endif // ENABLE_PYTHON
 	default:
 		break;
 	}
