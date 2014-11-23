@@ -16,6 +16,7 @@
 #include "gameui/gameui_interface.h"
 
 #include <vgui/IInput.h>
+#include "inputsystem/iinputsystem.h"
 
 #include <set>
 
@@ -40,10 +41,11 @@ extern ConVar developer;
 #endif
 
 #ifdef WIN32
-WNDPROC RealWndProc;
+static WNDPROC s_pChainedWndProc;
 
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: Helper for finding the main window
 //-----------------------------------------------------------------------------
@@ -55,9 +57,10 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 	if( windowRect.left == 0 && windowRect.top == 0 && windowRect.right == 0 && windowRect.bottom == 0 )
 		return true;
 
-	CEFSystem().SetMainWIndow( hwnd );
+	CEFSystem().SetMainWindow( hwnd );
 	return true;
 }
+#endif // 0
 
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -82,7 +85,7 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		break;
 	}
  
-	return CallWindowProc(RealWndProc, hWnd, message, wParam, lParam);
+	return CallWindowProc(s_pChainedWndProc, hWnd, message, wParam, lParam);
 }
 #endif // WIN32
 
@@ -193,9 +196,15 @@ bool CCefSystem::Init()
 
 #ifdef WIN32 
 	// Find and set the main window
-	EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
+	//EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
 
-	RealWndProc = (WNDPROC)SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)CefWndProcHook);
+	HWND inputWindow = (HWND)inputsystem->GetAttachedWindow();
+	//inputsystem->DetachFromWindow();
+	SetMainWindow( inputWindow );
+
+	s_pChainedWndProc = reinterpret_cast<WNDPROC>( SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( CefWndProcHook ) ) );
+
+	//inputsystem->AttachToWindow( inputWindow );
 #endif // WIN32
 
 	// Arguments
@@ -264,7 +273,7 @@ void CCefSystem::Shutdown()
 
 #ifdef WIN32
 	// Restore window process to prevent unwanted callbacks
-	SetWindowLong(GetMainWindow(), GWL_WNDPROC, (LONG)RealWndProc);
+	SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( s_pChainedWndProc ) );
 #endif // WIN32
 
 	m_bIsRunning = false;
@@ -480,21 +489,54 @@ static int getKeyModifiers( WPARAM wparam, LPARAM lparam )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
+void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 {
 	if( wParam ==  VK_ESCAPE )
 		return;
 
 	CefKeyEvent keyevent;
 
-	keyevent.character = wParam;
-
 	if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
+	{
 		keyevent.type = KEYEVENT_RAWKEYDOWN;
+	}
 	else if (message == WM_KEYUP || message == WM_SYSKEYUP)
+	{
 		keyevent.type = KEYEVENT_KEYUP;
+	}
 	else
+	{
 		keyevent.type = KEYEVENT_CHAR;
+
+		// CEF key event expects the unicode version, but our multi byte application does not
+		// receive the right code from the message loop. This is a problem for languages such as
+		// Cyrillic. Convert the virtual key to the right unicode char.
+		HKL currentKb = ::GetKeyboardLayout( 0 );
+
+		UINT scancode = ( lParam >> 16 ) & 0xFF;
+		UINT virtualKey = MapVirtualKeyEx(scancode, MAPVK_VSC_TO_VK, currentKb);
+
+		BYTE kbrdState[256];
+		if( GetKeyboardState(kbrdState) )
+		{
+			wchar_t unicode[2];
+			ToUnicodeEx(virtualKey, scancode, (BYTE*)kbrdState, unicode, 2, 0, currentKb);
+			//Msg("wParam: %d, Unicode: %d\n", wParam, unicode[0] );
+
+			// Only change wParam if there is a translation for our active keyboard
+			if( unicode[0] != 0 )
+			{
+				wParam = unicode[0];
+			}
+		}
+		/*else
+		{
+			Warning("Could not get keyboard state\n");
+		}*/
+	}
+
+	keyevent.character = (wchar_t)wParam;
+	keyevent.unmodified_character = (wchar_t)wParam;
 
 	keyevent.windows_key_code = wParam;
 	keyevent.native_key_code = lParam;
@@ -505,14 +547,6 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 	m_iKeyModifiers = getKeyModifiers( wParam, lParam );
 	keyevent.modifiers = m_iKeyModifiers;
 
-#if 0
-	if (message == WM_KEYDOWN || message == WM_SYSKEYDOWN)
-		m_LastKeyDownEvent = keyevent;
-	else if (message == WM_KEYUP || message == WM_SYSKEYUP)
-		m_LastKeyUpEvent = keyevent;
-	else	
-		m_LastKeyCharEvent = keyevent;
-#else
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsFullyVisible() || !m_CefBrowsers[i]->IsGameInputEnabled() )
@@ -529,7 +563,6 @@ void CCefSystem::ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam )
 
 		browser->GetHost()->SendKeyEvent( keyevent );
 	}
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------

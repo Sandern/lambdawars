@@ -57,21 +57,16 @@ public:
 	virtual int KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding );
 
 #ifdef WIN32
-	void ProcessKeyInput( INT message, WPARAM wParam, LPARAM lParam );
+	void ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam );
 #endif WIN32
 
-#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
-	const CefKeyEvent &GetLastKeyUpEvent();
-	const CefKeyEvent &GetLastKeyDownEvent();
-	const CefKeyEvent &GetLastKeyCharEvent();
-#endif // PYPP_GENERATION
 	int GetKeyModifiers();
 
 	void SetFocus( bool focus );
 
 #ifdef WIN32
 	HWND GetMainWindow( void );
-	void SetMainWIndow( HWND hWnd );
+	void SetMainWindow( HWND hWnd );
 
 	short GetLastMouseWheelDist() { return m_iLastMouseWheelDist; }
 	void SetLastMouseWheelDist( short dist ) { m_iLastMouseWheelDist = dist; }
@@ -94,11 +89,6 @@ private:
 	bool m_bIsRunning;
 	int m_iKeyModifiers;
 
-#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
-	CefKeyEvent m_LastKeyUpEvent;
-	CefKeyEvent m_LastKeyDownEvent;
-	CefKeyEvent m_LastKeyCharEvent;
-#endif // PYPP_GENERATION
 	bool m_bHasKeyFocus;
 
 #ifdef WIN32
@@ -124,37 +114,11 @@ inline HWND CCefSystem::GetMainWindow( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-inline void CCefSystem::SetMainWIndow( HWND hWnd )
+inline void CCefSystem::SetMainWindow( HWND hWnd )
 {
 	m_MainWindow = hWnd;
 }
 #endif // WIN32
-
-#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-inline const CefKeyEvent &CCefSystem::GetLastKeyUpEvent()
-{
-	return m_LastKeyUpEvent;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-inline const CefKeyEvent &CCefSystem::GetLastKeyDownEvent()
-{
-	return m_LastKeyDownEvent;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-inline const CefKeyEvent &CCefSystem::GetLastKeyCharEvent()
-{
-	return m_LastKeyCharEvent;
-}
-#endif // PYPP_GENERATION
 
 //-----------------------------------------------------------------------------
 // Purpose: 
