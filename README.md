@@ -1,5 +1,5 @@
-## Lambda Wars (Alien Swarm engine).
-Source code of Lambda Wars (formerly known as Half-Life 2: Wars, http://lambdawars.com/).
+## Lambda Wars (based on Alien Swarm SDK).
+Source code of Lambda Wars (http://lambdawars.com/).
 
 Game code can be found at: http://svn.hl2wars.com/
 
@@ -29,6 +29,6 @@ From here you can run a few commands:
 
 ## License
 Creative Commons Attribution-NonCommercial 3.0 Unported
-Only applies to the new code in the sdk (in particular the code in the hl2wars and python folders).
+Only applies to the new code in the sdk (in particular the code in game/(.*)/(lambdawars|python|cef) folders).
 
 See license.txt
