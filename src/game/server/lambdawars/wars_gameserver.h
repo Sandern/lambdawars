@@ -27,6 +27,10 @@ public:
 
 	virtual char *GetMatchmakingTags( char *buf, size_t bufSize );
 
+	// Shutdowns game once all players have left
+	void ScheduleShutdown();
+	void CancelSheduledShutdown();
+
 	// Returns a valid lobby steam id if the active game was started from a Steam lobby
 	CSteamID GetActiveGameLobbySteamID();
 
@@ -56,6 +60,8 @@ private:
 
 	float m_fGameStateStartTime;
 	float m_fLastPlayedConnectedTime;
+
+	bool m_bShutdownScheduled;
 
 	CSteamID m_LobbyPlayerRequestingGameID;
 

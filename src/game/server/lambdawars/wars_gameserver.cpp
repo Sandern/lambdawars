@@ -29,7 +29,8 @@ CWarsGameServer::CWarsGameServer() :
 	m_fGameStateStartTime( 0.0f ),
 	m_fLastPlayedConnectedTime( 0.0f ),
 	m_bUpdateMatchmakingTags(true),
-	m_pLocalPlayerGameData(NULL)
+	m_pLocalPlayerGameData(NULL),
+	m_bShutdownScheduled(false)
 {
 	DevMsg("Created Wars game server\n");
 }
@@ -313,6 +314,12 @@ void CWarsGameServer::SetState( EGameServerState state )
 			m_pLocalPlayerGameData->deleteThis();
 			m_pLocalPlayerGameData = NULL;
 		}
+
+		if( m_bShutdownScheduled )
+		{
+			engine->ServerCommand( "exit\n" );
+			m_bShutdownScheduled = false;
+		}
 	}
 }
 
@@ -395,6 +402,34 @@ void CWarsGameServer::OnPolicyResponse( GSPolicyResponse_t *pPolicyResponse )
 #endif // 0
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsGameServer::ScheduleShutdown()
+{
+	if( !engine->IsDedicatedServer() )
+	{
+		Msg("Only dedicated servers can schedule shutdowns\n");
+		return;
+	}
+
+	if( GetState() == k_EGameServer_Available )
+	{
+		engine->ServerCommand( "exit\n" );
+		return;
+	}
+
+	m_bShutdownScheduled = true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CWarsGameServer::CancelSheduledShutdown()
+{
+	m_bShutdownScheduled = false;
+}
+
 void WarsInitGameServer()
 {
 	if( g_pGameServerTest )
@@ -438,6 +473,9 @@ CWarsGameServer *WarsGameServer()
 	return g_pGameServerTest;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Wars Game Server commands
+//-----------------------------------------------------------------------------
 CON_COMMAND_F( wars_gameserver_info, "", 0 )
 {
 	if( !UTIL_IsCommandIssuedByServerAdmin() )
@@ -468,5 +506,30 @@ CON_COMMAND_F( wars_gameserver_force_available, "", 0 )
 
 CON_COMMAND_F( wars_gameserver_start, "", 0 )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
 	WarsInitGameServer();
+}
+
+CON_COMMAND_F( wars_gameserver_scheduleshutdown, "", 0 )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
+	if( WarsGameServer() )
+	{
+		WarsGameServer()->ScheduleShutdown();
+	}
+}
+
+CON_COMMAND_F( wars_gameserver_cancelscheduledshutdown, "", 0 )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+
+	if( WarsGameServer() )
+	{
+		WarsGameServer()->CancelSheduledShutdown();
+	}
 }
