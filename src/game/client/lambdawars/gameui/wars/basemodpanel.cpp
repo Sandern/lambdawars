@@ -375,7 +375,7 @@ CBaseModFrame* CBaseModPanel::OpenWindow(const WINDOW_TYPE & wt, CBaseModFrame *
 			break;
 
 		case WT_INGAMEMAINMENU:
-			m_Frames[wt] = new InGameMainMenu(this, "InGameMainMenu");
+			//m_Frames[wt] = new InGameMainMenu(this, "InGameMainMenu");
 			break;
 
 		case WT_INGAMECHAPTERSELECT:

@@ -892,6 +892,11 @@ void CGameUI::OnLevelLoadingStarted( const char *levelName, bool bShowProgressDi
 	g_VModuleLoader.PostMessageToAllModules( new KeyValues( "LoadingStarted" ) );
 
 	GetUiBaseModPanelClass().OnLevelLoadingStarted( levelName, bShowProgressDialog );
+
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run< const char *, bool >( SrcPySystem()->Get( "OnLevelLoadingStarted", s_ref_ui_basemodpanel, true ), levelName, bShowProgressDialog, true );
+#endif // ENABLE_PYTHON
+
 	ShowLoadingBackgroundDialog();
 
 	if ( bShowProgressDialog )
@@ -914,6 +919,10 @@ void CGameUI::OnLevelLoadingFinished(bool bError, const char *failureReason, con
 	g_VModuleLoader.PostMessageToAllModules( new KeyValues( "LoadingFinished" ) );
 
 	GetUiBaseModPanelClass().OnLevelLoadingFinished( new KeyValues( "LoadingFinished" ) );
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run< bool, const char *, const char * >( SrcPySystem()->Get( "OnLevelLoadingFinished", s_ref_ui_basemodpanel, true ), bError, failureReason, extendedReason, true );
+#endif // ENABLE_PYTHON
+
 	HideLoadingBackgroundDialog();
 
 
