@@ -45,7 +45,9 @@ public:
 						int width,
 						int height);
 	virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
-								CefCursorHandle cursor);
+                              CefCursorHandle cursor,
+                              CursorType type,
+                              const CefCursorInfo& custom_cursor_info);
 
 	virtual bool StartDragging(CefRefPtr<CefBrowser> browser,
 								CefRefPtr<CefDragData> drag_data,

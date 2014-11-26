@@ -270,7 +270,9 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 // Purpose:
 //-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
-							CefCursorHandle cursor)
+                              CefCursorHandle cursor,
+                              CursorType type,
+                              const CefCursorInfo& custom_cursor_info)
 {
 #ifdef WIN32
 	if( cursor == m_hArrow )
