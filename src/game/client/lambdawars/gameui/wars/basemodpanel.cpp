@@ -47,7 +47,7 @@
 #include "VGenericWaitScreen.h"
 #include "vgetlegacydata.h"
 #include "VInGameDifficultySelect.h"
-#include "VInGameMainMenu.h"
+//#include "VInGameMainMenu.h"
 //#include "VInGameChapterSelect.h"
 #include "VInGameKickPlayerList.h"
 #include "VKeyboardMouse.h"

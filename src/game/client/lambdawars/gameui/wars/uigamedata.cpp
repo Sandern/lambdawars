@@ -37,7 +37,7 @@
 #include "VGameLobby.h"
 #include "VGenericConfirmation.h"
 #include "VGenericWaitScreen.h"
-#include "VInGameMainMenu.h"
+//#include "VInGameMainMenu.h"
 //#include "VMainMenu.h"
 #include "VFooterPanel.h"
 #include "VAttractScreen.h"

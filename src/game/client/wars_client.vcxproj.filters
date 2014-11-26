@@ -1946,9 +1946,6 @@
     <ClCompile Include="lambdawars\gameui\wars\vingamekickplayerlist.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
-    <ClCompile Include="lambdawars\gameui\wars\vingamemainmenu.cpp">
-      <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
-    </ClCompile>
     <ClCompile Include="lambdawars\gameui\wars\vjukebox.cpp">
       <Filter>Source Files\wars\GameUI - Embedded\Wars GameUI</Filter>
     </ClCompile>
