@@ -20,6 +20,7 @@ public:
 
 	void PrintDebugInfo();
 	void ProcessMessages();
+	void UpdateServer();
 	void RunFrame();
 
 	void SetState( EGameServerState state );
@@ -55,6 +56,7 @@ private:
 	bool m_bConnectedToSteam;
 	EGameServerState m_State;
 	int m_nConnectedPlayers;
+	bool m_bUpdatingServer;
 
 	bool m_bUpdateMatchmakingTags;
 

@@ -9,6 +9,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static ConVar wars_gamserver_debug("wars_gamserver_debug", "0");
+
 extern CServerGameDLL g_ServerGameDLL;
 
 extern const char *COM_GetModDirectory( void );
@@ -20,6 +22,7 @@ static CWarsGameServer *g_pGameServerTest = NULL;
 //-----------------------------------------------------------------------------
 CWarsGameServer::CWarsGameServer() :
 	m_bConnectedToSteam(false),
+	m_bUpdatingServer(false),
 	m_CallbackP2PSessionRequest( this, &CWarsGameServer::OnP2PSessionRequest ),
 	m_CallbackSteamServersConnected( this, &CWarsGameServer::OnSteamServersConnected ),
 	m_CallbackSteamServersDisconnected( this, &CWarsGameServer::OnSteamServersDisconnected ),
@@ -75,37 +78,47 @@ void CWarsGameServer::ProcessMessages()
 			// Special case when local client starts game server from main menu/lobby
 			if( eMsg == k_EMsgLocalServerRequestGame )
 			{
-				WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
-
-				data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
-				pGameData = new KeyValues( "GameData" );
-				if( !pGameData->ReadAsBinary( data ) )
+				if( GetState() != k_EGameServer_Available )
 				{
-					Warning("k_EMsgServerRequestGame: reading game data failed\n");
+					// Tell lobby owner the server is not available and should look for another server
 					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
 					pMessageData->buf.Put( &denyGameMsg, sizeof(denyGameMsg) );
 					pMessageData->steamIDRemote = messageData->steamIDRemote;
-
 				}
 				else
 				{
-					pGameData->SetName( COM_GetModDirectory() );
+					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
-					KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
+					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
+					pGameData = new KeyValues( "GameData" );
+					if( !pGameData->ReadAsBinary( data ) )
+					{
+						Warning("k_EMsgServerRequestGame: reading game data failed\n");
+						WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+						pMessageData->buf.Put( &denyGameMsg, sizeof(denyGameMsg) );
+						pMessageData->steamIDRemote = messageData->steamIDRemote;
 
-					m_pLocalPlayerGameData = pGameData->MakeCopy();
+					}
+					else
+					{
+						pGameData->SetName( COM_GetModDirectory() );
 
-					// Tell lobby owner the game is accepted and players can connect to the server
-					//WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-					//pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-					//pMessageData->steamIDRemote = messageData->steamIDRemote;
+						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
-					//g_ServerGameDLL.ApplyGameSettings( pGameData );
+						m_pLocalPlayerGameData = pGameData->MakeCopy();
 
-					SetState( k_EGameServer_StartingGame );
-					m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
+						// Tell lobby owner the game is accepted and players can connect to the server
+						//WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+						//pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+						//pMessageData->steamIDRemote = messageData->steamIDRemote;
 
-					m_ActiveGameLobbySteamID =  requestMsg->lobbySteamId;
+						//g_ServerGameDLL.ApplyGameSettings( pGameData );
+
+						SetState( k_EGameServer_StartingGame );
+						m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
+
+						m_ActiveGameLobbySteamID =  requestMsg->lobbySteamId;
+					}
 				}
 			}
 			else
@@ -137,8 +150,12 @@ void CWarsGameServer::ProcessMessages()
 					}
 					else
 					{
+						SetState( k_EGameServer_InGame );
+						m_ActiveGameLobbySteamID = requestMsg->lobbySteamId;
+
 						pGameData->SetName( COM_GetModDirectory() );
 						
+						Msg("Starting wars game server with following settings: ");
 						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
 						acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
@@ -148,9 +165,6 @@ void CWarsGameServer::ProcessMessages()
 						// Tell lobby owner the game is accepted and players can connect to the server
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
-
-						SetState( k_EGameServer_InGame );
-						m_ActiveGameLobbySteamID = requestMsg->lobbySteamId;
 					}
 				}
 				break;
@@ -169,22 +183,10 @@ void CWarsGameServer::ProcessMessages()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Updates a wars game server
+// Purpose: 
 //-----------------------------------------------------------------------------
-void CWarsGameServer::RunFrame()
+void CWarsGameServer::UpdateServer()
 {
-	if( !steamgameserverapicontext->SteamGameServer() )
-	{
-		ProcessMessages();
-		//Warning("No steam game server interface\n");
-		return;
-	}
-	if( !warsextension )
-	{
-		Error("No steam warsextension interface\n");
-		return;
-	}
-
 	//steamgameserverapicontext->SteamGameServer()->EnableHeartbeats( true );
 	//steamgameserverapicontext->SteamGameServer()->SetHeartbeatInterval( -1 );
 	//steamgameserverapicontext->SteamGameServer()->ForceHeartbeat();
@@ -293,6 +295,33 @@ void CWarsGameServer::RunFrame()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Updates a wars game server
+//-----------------------------------------------------------------------------
+void CWarsGameServer::RunFrame()
+{
+	if( !steamgameserverapicontext->SteamGameServer() )
+	{
+		ProcessMessages();
+		//Warning("No steam game server interface\n");
+		return;
+	}
+	if( !warsextension )
+	{
+		Error("No steam warsextension interface\n");
+		return;
+	}
+
+	if( !m_bUpdatingServer )
+	{
+		// ApplyGameSettings will do a RunFrame, but this gives undesired behaviour when
+		// the server is started from inside RunFrame
+		m_bUpdatingServer = true;
+		UpdateServer();
+		m_bUpdatingServer = false;
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CWarsGameServer::SetState( EGameServerState state )
@@ -300,6 +329,11 @@ void CWarsGameServer::SetState( EGameServerState state )
 	if( m_State == state ) 
 	{
 		return;
+	}
+
+	if( wars_gamserver_debug.GetBool() ) 
+	{
+		Msg( "WarsGameserver state changed from %d to %d\n", m_State, state );
 	}
 
 	m_State = state;
