@@ -58,7 +58,9 @@ public:
 
 #ifdef WIN32
 	void ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam );
+	void ProcessDeadChar( UINT message, WPARAM wParam, LPARAM lParam );
 #endif WIN32
+	void SendKeyEventToBrowsers( const CefKeyEvent &keyevent );
 
 	int GetKeyModifiers();
 
@@ -96,6 +98,12 @@ private:
 	HWND m_MainWindow;
 	// Stores the last mouse movement
 	short m_iLastMouseWheelDist;
+
+	// Stores last dead char vk and scancode
+	bool m_bHasDeadChar;
+	UINT m_lastDeadChar_scancode;
+	UINT m_lastDeadChar_virtualKey;
+	BYTE m_lastDeadChar_kbrdState[256];
 #endif WIN32
 
 	// Browser

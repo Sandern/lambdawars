@@ -68,32 +68,43 @@ BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
 
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
+	if( CEFSystem().IsRunning() )
 	{
-	case WM_SYSCHAR:
-	case WM_SYSKEYDOWN:
-	case WM_KEYDOWN:
-	case WM_SYSKEYUP:
-	case WM_KEYUP:
-	case WM_CHAR:
-	{
-		CEFSystem().ProcessKeyInput( message, wParam, lParam );
-		break;
-	}
-	case WM_MOUSEWHEEL:
-	{
-		CEFSystem().SetLastMouseWheelDist( (short)HIWORD(wParam) );
-		break;
-	}
+		switch (message)
+		{
+		case WM_SYSCHAR:
+		case WM_SYSKEYDOWN:
+		case WM_KEYDOWN:
+		case WM_SYSKEYUP:
+		case WM_KEYUP:
+		case WM_CHAR:
+		{
+			CEFSystem().ProcessKeyInput( message, wParam, lParam );
+			break;
+		}
+		case WM_DEADCHAR:
+		{
+			CEFSystem().ProcessDeadChar( message, wParam, lParam );
+			break;
+		}
+		case WM_MOUSEWHEEL:
+		{
+			CEFSystem().SetLastMouseWheelDist( (short)HIWORD(wParam) );
+			break;
+		}
 #ifdef ENABLE_PYTHON
-	case WM_INPUTLANGCHANGE:
-	{
-		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "gameui_inputlanguage_changed", "core.signals", true ) );
-		break;
-	}
+		case WM_INPUTLANGCHANGE:
+		{
+			if( SrcPySystem()->IsPythonRunning() )
+			{
+				SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "gameui_inputlanguage_changed", "core.signals", true ) );
+			}
+			break;
+		}
 #endif // ENABLE_PYTHON
-	default:
-		break;
+		default:
+			break;
+		}
 	}
  
 	return CallWindowProc(s_pChainedWndProc, hWnd, message, wParam, lParam);
@@ -173,7 +184,7 @@ void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CCefSystem::CCefSystem() : m_bIsRunning(false), m_bHasKeyFocus(false)
+CCefSystem::CCefSystem() : m_bIsRunning(false), m_bHasKeyFocus(false), m_bHasDeadChar(false)
 {
 
 }
@@ -517,12 +528,28 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 	}
 	else
 	{
+		HKL currentKb = ::GetKeyboardLayout( 0 );
+
+		// Source's input system seems to be doing the same call to ToUnicodeEx, due which 
+		// it breaks (since the dead char is buffered and processed in the next call).
+		// Delay processing it, so everything gets called in the right order.
+		if( m_bHasDeadChar )
+		{
+			m_bHasDeadChar = false;
+
+			CefKeyEvent deadCharKeyevent;
+			deadCharKeyevent.type = KEYEVENT_CHAR;
+
+			wchar_t unicode[2];
+			int deadCharRet = ToUnicodeEx(m_lastDeadChar_virtualKey, m_lastDeadChar_scancode, (BYTE*)m_lastDeadChar_kbrdState, unicode, 2, 0, currentKb);
+			Assert( deadCharRet == -1 ); // -1 means dead char
+		}
+
 		keyevent.type = KEYEVENT_CHAR;
 
 		// CEF key event expects the unicode version, but our multi byte application does not
 		// receive the right code from the message loop. This is a problem for languages such as
 		// Cyrillic. Convert the virtual key to the right unicode char.
-		HKL currentKb = ::GetKeyboardLayout( 0 );
 
 		UINT scancode = ( lParam >> 16 ) & 0xFF;
 		UINT virtualKey = MapVirtualKeyEx(scancode, MAPVK_VSC_TO_VK, currentKb);
@@ -531,11 +558,11 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 		if( GetKeyboardState(kbrdState) )
 		{
 			wchar_t unicode[2];
-			ToUnicodeEx(virtualKey, scancode, (BYTE*)kbrdState, unicode, 2, 0, currentKb);
-			//Msg("wParam: %d, Unicode: %d\n", wParam, unicode[0] );
+			int ret = ToUnicodeEx(virtualKey, scancode, (BYTE*)kbrdState, unicode, 2, 0, currentKb);
+			//Msg("wParam: %d, Unicode: %d, ret: %d\n", wParam, unicode[0], ret );
 
 			// Only change wParam if there is a translation for our active keyboard
-			if( unicode[0] != 0 )
+			if( ret == 1 )
 			{
 				wParam = unicode[0];
 			}
@@ -558,6 +585,26 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 	m_iKeyModifiers = getKeyModifiers( wParam, lParam );
 	keyevent.modifiers = m_iKeyModifiers;
 
+	SendKeyEventToBrowsers( keyevent );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CCefSystem::ProcessDeadChar( UINT message, WPARAM wParam, LPARAM lParam )
+{
+	m_bHasDeadChar = true;
+	HKL currentKb = ::GetKeyboardLayout( 0 );
+	m_lastDeadChar_scancode = ( lParam >> 16 ) & 0xFF;
+	m_lastDeadChar_virtualKey = MapVirtualKeyEx( m_lastDeadChar_scancode, MAPVK_VSC_TO_VK, currentKb );
+	GetKeyboardState( m_lastDeadChar_kbrdState );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CCefSystem::SendKeyEventToBrowsers( const CefKeyEvent &keyevent )
+{
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
 		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsFullyVisible() || !m_CefBrowsers[i]->IsGameInputEnabled() )
