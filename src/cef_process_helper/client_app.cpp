@@ -194,6 +194,7 @@ void ClientApp::OnBrowserDestroyed(CefRefPtr<CefBrowser> browser)
 	{
 		if( (*i)->GetBrowser()->GetIdentifier() == browser->GetIdentifier() )
 		{
+			(*i)->OnDestroyed();
 			m_Browsers.erase( i );
 			break;
 		}

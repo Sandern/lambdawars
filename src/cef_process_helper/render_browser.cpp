@@ -55,6 +55,17 @@ RenderBrowser::RenderBrowser( CefRefPtr<CefBrowser> browser, CefRefPtr<ClientApp
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Called once when the browser is destroyed.
+//-----------------------------------------------------------------------------
+void RenderBrowser::OnDestroyed()
+{
+	Clear();
+
+	m_Browser = NULL;
+	m_ClientApp = NULL;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void RenderBrowser::SetV8Context( CefRefPtr<CefV8Context> context )

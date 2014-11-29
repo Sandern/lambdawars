@@ -60,6 +60,8 @@ class RenderBrowser
 public:
 	RenderBrowser( CefRefPtr<CefBrowser> browser, CefRefPtr<ClientApp> clientApp );
 
+	void OnDestroyed();
+
 	CefRefPtr<CefBrowser> GetBrowser();
 
 	void SetV8Context( CefRefPtr<CefV8Context> context );
