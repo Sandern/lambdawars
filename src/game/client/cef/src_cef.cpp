@@ -296,6 +296,11 @@ void CCefSystem::Shutdown()
 #ifdef WIN32
 	// Restore window process to prevent unwanted callbacks
 	SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( s_pChainedWndProc ) );
+
+	// Workaround crash on exit: minimize window...
+	// If the window is still shown, an unwanted unhandled user callback occurs
+	// Using the multi_threaded_message_loop the crash does not occur, but causes other problems that need to be solved first
+	ShowWindow( GetMainWindow(), SW_MINIMIZE );
 #endif // WIN32
 
 	m_bIsRunning = false;
@@ -541,7 +546,10 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 			deadCharKeyevent.type = KEYEVENT_CHAR;
 
 			wchar_t unicode[2];
-			int deadCharRet = ToUnicodeEx(m_lastDeadChar_virtualKey, m_lastDeadChar_scancode, (BYTE*)m_lastDeadChar_kbrdState, unicode, 2, 0, currentKb);
+#ifdef _DEBUG
+			int deadCharRet = 
+#endif // _DEBUG
+				ToUnicodeEx(m_lastDeadChar_virtualKey, m_lastDeadChar_scancode, (BYTE*)m_lastDeadChar_kbrdState, unicode, 2, 0, currentKb);
 			Assert( deadCharRet == -1 ); // -1 means dead char
 		}
 
