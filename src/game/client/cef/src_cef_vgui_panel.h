@@ -67,6 +67,7 @@ public:
 
 protected:
 	int	GetBrowserID();
+	bool IsValid();
 
 private:
 	virtual void UpdatePressedParent( vgui::MouseCode code, bool state );

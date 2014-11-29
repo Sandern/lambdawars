@@ -97,9 +97,10 @@ SrcCefVGUIPanel::~SrcCefVGUIPanel()
 //-----------------------------------------------------------------------------
 bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 {
-#ifdef USE_MULTITHREADED_MESSAGELOOP
 	if( !m_pBrowser )
 		return false;
+
+#ifdef USE_MULTITHREADED_MESSAGELOOP
 	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
 	if( !renderer )
 		return false;
@@ -411,6 +412,9 @@ int	SrcCefVGUIPanel::GetEventFlags()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorEntered()
 {
+	if( !IsValid() )
+		return;
+
 	// Called before OnCursorMoved, so mouse coordinates might be outdated
 	int x, y;
 	vgui::input()->GetCursorPos( x, y );
@@ -433,6 +437,9 @@ void SrcCefVGUIPanel::OnCursorEntered()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorExited()
 {
+	if( !IsValid() )
+		return;
+
 	CefMouseEvent me;
 	me.x = m_iMouseX;
 	me.y = m_iMouseY;
@@ -447,6 +454,9 @@ void SrcCefVGUIPanel::OnCursorExited()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnCursorMoved( int x, int y )
 {
+	if( !IsValid() )
+		return;
+
 	m_iMouseX = x;
 	m_iMouseY = y;
 
@@ -507,6 +517,9 @@ bool SrcCefVGUIPanel::IsPressedParent( vgui::MouseCode code )
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 {
+	if( !IsValid() )
+		return;
+
 	// Do click on parent if needed
 	// Store if we pressed on the parent
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
@@ -564,6 +577,9 @@ void SrcCefVGUIPanel::OnMousePressed(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 {
+	if( !IsValid() )
+		return;
+
 	// Do click on parent if needed
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
@@ -606,7 +622,10 @@ void SrcCefVGUIPanel::OnMouseDoublePressed(vgui::MouseCode code)
 // Purpose: 
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
-{
+{	
+	if( !IsValid() )
+		return;
+
 	// Check mouse capture and make sure it is cleared
 	bool bHasMouseCapture = vgui::input()->GetMouseCapture() == GetVPanel();
 	if( bHasMouseCapture )
@@ -660,6 +679,9 @@ void SrcCefVGUIPanel::OnMouseReleased(vgui::MouseCode code)
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 {
+	if( !IsValid() )
+		return;
+
 	if( m_pBrowser->GetPassMouseTruIfAlphaZero() && m_pBrowser->IsAlphaZeroAt( m_iMouseX, m_iMouseY ) )
 	{
 		CallParentFunction(new KeyValues("MouseWheeled", "delta", delta));
@@ -730,5 +752,13 @@ vgui::HCursor SrcCefVGUIPanel::GetCursor()
 //-----------------------------------------------------------------------------
 int	SrcCefVGUIPanel::GetBrowserID()
 {
-	return m_pBrowser->GetBrowser() ? m_pBrowser->GetBrowser()->GetIdentifier() : -1;
+	return m_pBrowser && m_pBrowser->GetBrowser() ? m_pBrowser->GetBrowser()->GetIdentifier() : -1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool SrcCefVGUIPanel::IsValid()
+{
+	return m_pBrowser && m_pBrowser->GetBrowser();
 }
