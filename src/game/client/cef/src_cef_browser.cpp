@@ -60,19 +60,32 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0
 //-----------------------------------------------------------------------------
 void CefClientHandler::Destroy()
 {
-	if (GetBrowser() && GetBrowser()->GetHost())
+	if( GetBrowser() && GetBrowser()->GetHost() )
 	{
 		GetBrowser()->GetHost()->CloseBrowser( true );
 	}
+	m_pSrcBrowser = NULL;
+}
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
+{
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
+{
 	if( GetOSRHandler() )
 	{
 		GetOSRHandler()->Destroy();
 	}
 
 	m_Browser = NULL;
-	m_pSrcBrowser = NULL;
-	//SetOSRHandler( NULL );
 }
 
 //-----------------------------------------------------------------------------
@@ -201,16 +214,6 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 #else
 	m_pSrcBrowser->OnAfterCreated();
 #endif // USE_MULTITHREADED_MESSAGELOOP
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
-{
-	//if( browser->IsLoading() )
-	//	browser->StopLoad();
-	return false;
 }
 
 //-----------------------------------------------------------------------------

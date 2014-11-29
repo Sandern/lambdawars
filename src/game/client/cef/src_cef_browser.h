@@ -121,6 +121,8 @@ public:
 
 	virtual bool DoClose(CefRefPtr<CefBrowser> browser);
 
+	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser);
+
 	virtual void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 										TerminationStatus status);
 
