@@ -151,9 +151,9 @@ ClientApp::ClientApp()
 //-----------------------------------------------------------------------------
 void ClientApp::OnContextInitialized()
 {
-	CefRegisterSchemeHandlerFactory( "steam", "avatarsmall", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeSmall ) );
-	CefRegisterSchemeHandlerFactory( "steam", "avatarmedium", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeMedium ) );
-	CefRegisterSchemeHandlerFactory( "steam", "avatarlarge", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeLarge ) );
+	CefRegisterSchemeHandlerFactory( "avatar", "small", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeSmall ) );
+	CefRegisterSchemeHandlerFactory( "avatar", "medium", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeMedium ) );
+	CefRegisterSchemeHandlerFactory( "avatar", "large", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeLarge ) );
 	CefRegisterSchemeHandlerFactory("vtf", "", new VTFSchemeHandlerFactory());
 	CefRegisterSchemeHandlerFactory("local", "", new LocalSchemeHandlerFactory());
 }
@@ -176,7 +176,7 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
 {
-	registrar->AddCustomScheme("steam", true, false, false);
+	registrar->AddCustomScheme("avatar", true, false, false);
 	registrar->AddCustomScheme("vtf", false /* Not a standard url */, false, false);
 	registrar->AddCustomScheme("local", true, false, false);
 }

@@ -171,7 +171,7 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
 {
-	registrar->AddCustomScheme("steam", true, false, false);
+	registrar->AddCustomScheme("avatar", true, false, false);
 	registrar->AddCustomScheme("vtf", false /* Not a standard url */, false, false);
 	registrar->AddCustomScheme("local", true, false, false);
 }
