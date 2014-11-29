@@ -78,6 +78,7 @@ void CWarsGameServer::ProcessMessages()
 			// Special case when local client starts game server from main menu/lobby
 			if( eMsg == k_EMsgLocalServerRequestGame )
 			{
+#if 0 // Currently does not work properly because the server is not cleaned up nicely for local players
 				if( GetState() != k_EGameServer_Available )
 				{
 					// Tell lobby owner the server is not available and should look for another server
@@ -86,6 +87,7 @@ void CWarsGameServer::ProcessMessages()
 					pMessageData->steamIDRemote = messageData->steamIDRemote;
 				}
 				else
+#endif // 0
 				{
 					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
