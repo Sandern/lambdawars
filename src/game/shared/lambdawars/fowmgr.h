@@ -93,6 +93,7 @@ public: // CBaseGameSystem overrides
 	void				RemoveStaticBlockers();
 #endif // CLIENT_DLL
 	void				LoadHeightMap();
+	void				ClearHeightMap();
 	void				ModifyHeightAtTile( int x, int y, float fHeight, bool updateDynamic = true );
 	void				ModifyHeightAtPoint( const Vector &vPoint, float fHeight, bool updateDynamic = true );
 	void				ModifyHeightAtExtent( const Vector &vMins, const Vector &vMaxs, float fHeight );

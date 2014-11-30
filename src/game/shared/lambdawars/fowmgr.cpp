@@ -79,6 +79,8 @@ ConVar sv_fogofwar_tilesize( "sv_fogofwar_tilesize", "64", FCVAR_CHEAT | FCVAR_R
 #endif
 
 #ifdef CLIENT_DLL
+int GetMapVersion( const char *pszLevelname );
+
 // Precache materials on client
 PRECACHE_REGISTER_BEGIN( GLOBAL, PrecacheFogOfWar )
 	PRECACHE( MATERIAL, "fow/fow" )
@@ -549,42 +551,44 @@ void CFogOfWarMgr::LoadHeightMap()
 
 	// Read file
 	CUtlBuffer buf;
-	if ( !filesystem->ReadFile( szNrpFilename, "game", buf ) )
+	if( !filesystem->ReadFile( szNrpFilename, "game", buf ) )
 	{
 		DevMsg( "Height map %s does not exists\n", szNrpFilename );
+		ClearHeightMap();
 		return;
 	}
 
 	// ---------------------------
 	// Check the version number
 	// ---------------------------
-	if ( buf.GetChar() == 'V' && buf.GetChar() == 'e' && buf.GetChar() == 'r' )
+	if( buf.GetChar() == 'V' && buf.GetChar() == 'e' && buf.GetChar() == 'r' )
 	{
 		DevMsg( "Height map %s is out of date\n", szNrpFilename );
+		ClearHeightMap();
 		return;
 	}
 
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 
 	int version = buf.GetInt();
-	if ( version != HEIGHTMAP_VERSION_NUMBER)
+	if( version != HEIGHTMAP_VERSION_NUMBER)
 	{
 		DevMsg( "Height map %s is out of date\n", szNrpFilename );
+		ClearHeightMap();
 		return;
 	}
 
-	
-#ifndef CLIENT_DLL
 	int mapversion = buf.GetInt();
-	if ( mapversion != gpGlobals->mapversion )
+#ifndef CLIENT_DLL
+	if( mapversion != gpGlobals->mapversion )
+#else
+	if( mapversion != GetMapVersion( engine->GetLevelName() ) )
+#endif // CLIENT_DLL
 	{
 		DevMsg( "Height map %s is out of date (map version changed)\n", szNrpFilename );
+		ClearHeightMap();
 		return;
 	}
-#else
-	// Skip check on client for now
-	buf.GetInt();
-#endif // CLIENT_DLL
 
 	// ---------------------------
 	// Check grid size
@@ -593,6 +597,7 @@ void CFogOfWarMgr::LoadHeightMap()
 	if( gridsize != m_nGridSize )
 	{
 		DevMsg( "Height map %s is out of date (grid size changed %d -> %d)\n", szNrpFilename, gridsize, m_nGridSize );
+		ClearHeightMap();
 		return;
 	}
 
@@ -621,6 +626,20 @@ void CFogOfWarMgr::LoadHeightMap()
 
 	DevMsg("CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime);
 	m_bHeightMapLoaded = true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Fills height map with minimum map
+//-----------------------------------------------------------------------------
+void CFogOfWarMgr::ClearHeightMap()
+{
+	for( int x = 0; x < m_nGridSize; x++ )
+	{
+		for( int y = 0; y < m_nGridSize; y++ )
+		{
+			m_TileHeights[FOWINDEX(x, y)] = MIN_COORD_INTEGER;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------

@@ -211,7 +211,7 @@ bool CEditorMapMgr::IsMapLoaded()
 //-----------------------------------------------------------------------------
 // Purpose: Helper to get map version on client
 //-----------------------------------------------------------------------------
-static int GetMapVersion( const char *pszLevelname )
+int GetMapVersion( const char *pszLevelname )
 {
 	char destPath[MAX_PATH];
 	V_snprintf( destPath, sizeof(destPath), "%s", pszLevelname );
