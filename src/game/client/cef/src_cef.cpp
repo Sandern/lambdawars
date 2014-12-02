@@ -644,8 +644,7 @@ void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 
 		m_CefBrowsers[i]->InvalidateLayout();
 		m_CefBrowsers[i]->NotifyScreenInfoChanged();
-
-		m_CefBrowsers[i]->GetPanel()->MarkTextureDirty();
+		m_CefBrowsers[i]->GetPanel()->MarkTextureFullDirty();
 	}
 }
 
@@ -663,10 +662,10 @@ CON_COMMAND_F( cef_debug_markfulldirty, "Invalidates render textures of each web
 
 	for( int i = browsers.Count() - 1; i >= 0; i-- )
 	{
-		if( browsers[i]->IsValid() )
-		{
-			browsers[i]->GetPanel()->MarkTextureDirty();
-		}
+		if( !browsers[i]->IsValid() )
+			continue;
+
+		browsers[i]->GetPanel()->MarkTextureFullDirty();
 	}
 }
 

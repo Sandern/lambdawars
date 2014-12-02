@@ -28,7 +28,9 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual bool ResizeTexture( int width, int height );
-	void MarkTextureDirty();
+	void MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd );
+	void MarkTextureFullDirty();
+	void MarkPopupDirty();
 
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void OnThink();
@@ -98,8 +100,9 @@ private:
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 
-	//int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+	int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
 	bool m_bTextureDirty;
+	bool m_bPopupTextureDirty;
 
 	// Hack for working nice with VGUI input
 	int m_iTopZPos, m_iBottomZPos;
@@ -145,9 +148,26 @@ inline bool SrcCefVGUIPanel::GetDoNotDraw( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-inline void SrcCefVGUIPanel::MarkTextureDirty()
+inline void SrcCefVGUIPanel::MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd )
 {
 	m_bTextureDirty = true;
+
+	m_iDirtyX = Max( 0, Min( m_iDirtyX, iDirtyX ) );
+	m_iDirtyY = Max( 0, Min( m_iDirtyY, iDirtyY ) );
+	m_iDirtyXEnd = Min( m_iWVWide, Max( m_iDirtyXEnd, iDirtyXEnd ) );
+	m_iDirtyYEnd = Min( m_iWVTall, Max( m_iDirtyYEnd, iDirtyYEnd ) );
+}
+
+inline void SrcCefVGUIPanel::MarkTextureFullDirty()
+{
+	m_iDirtyX = m_iDirtyY = 0;
+	m_iDirtyXEnd = m_iWVWide;
+	m_iDirtyYEnd = m_iWVTall;
+}
+
+inline void SrcCefVGUIPanel::MarkPopupDirty()
+{
+	m_bPopupTextureDirty = true;
 }
 
 #endif // SRC_CEF_VGUI_PANEL_H

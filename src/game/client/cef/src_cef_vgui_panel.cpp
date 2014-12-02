@@ -41,7 +41,7 @@ static int nexthigher( int k )
 // Purpose: 
 //-----------------------------------------------------------------------------
 SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent ) 
-	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bTextureDirty(true)
+	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bTextureDirty(true), m_bPopupTextureDirty(false)
 {
 	// WarsSplitscreen: only one player
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
@@ -161,7 +161,7 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	}
 
 	// Mark full dirty
-	MarkTextureDirty();
+	MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
 
 	//if( m_MatRef.IsValid() )
 	//	m_MatRef.Shutdown();
@@ -310,35 +310,51 @@ void SrcCefVGUIPanel::Paint()
 		AUTO_LOCK( renderer->GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
-		// Regenerate texture (partially) if needed
-		if( m_bTextureDirty )
+		if( g_pShaderAPI && m_RenderBuffer.IsValid() )
 		{
-			//if( g_cef_debug_texture.GetBool() )
-			//	DevMsg("CEF: texture requires full regeneration\n");
-			//m_RenderBuffer->SetTextureRegenerator( m_pTextureRegen );
-			if( g_pShaderAPI && m_RenderBuffer.IsValid() )
-			{
-				VPROF_BUDGET( "Upload", "CefUploadTexture" );
+			VPROF_BUDGET( "Upload", "CefUploadTexture" );
 
-				int nFrame = 0;
-				int nTextureChannel = 0;
-				ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
-				if( renderer->GetTextureBuffer() && g_pShaderAPI->IsTexture( textureHandle ) )
+			int nFrame = 0;
+			int nTextureChannel = 0;
+			ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+			if( g_pShaderAPI->IsTexture( textureHandle ) )
+			{
+				int iFace = 0;
+				int iMip = 0;
+				int z = 0;
+
+				if( renderer->GetTextureBuffer() && m_bTextureDirty )
 				{
-					int iFace = 0;
-					int iMip = 0;
-					int z = 0;
+					//DevMsg("Rendering: X:%d Y:%d W:%d H:%d\n", m_iDirtyX, m_iDirtyY, m_iDirtyXEnd - m_iDirtyX, m_iDirtyYEnd - m_iDirtyY );
 
 					g_pShaderAPI->ModifyTexture( textureHandle );
-					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
 
-					if( renderer->GetPopupBuffer() )
+					// Full Copy
+					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+					// Partial copy, would work if we had a partial buffer:
+					//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
+					//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
+					// Copy by line, but call too expensive to do per line:
+					/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
+					for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
 					{
-						g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
-							m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
-					}
+						g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
+							subWidth, 1, m_iTexImageFormat, 0, false, 
+							renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
+					}*/
 
 					m_bTextureDirty = false;
+					m_iDirtyX = renderer->GetWidth();
+					m_iDirtyY = renderer->GetHeight();
+					m_iDirtyXEnd = m_iDirtyYEnd = 0;
+				}
+
+				if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
+				{
+					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
+						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
+
+					m_bPopupTextureDirty = false;
 				}
 			}
 		}
