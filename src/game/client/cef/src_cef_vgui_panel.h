@@ -28,8 +28,9 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual bool ResizeTexture( int width, int height );
-	void MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd );
-	void MarkTextureFullDirty();
+	void MarkTextureDirty();
+	//void MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd );
+	//void MarkTextureFullDirty();
 	void MarkPopupDirty();
 
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
@@ -100,7 +101,7 @@ private:
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 
-	int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+	//int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
 	bool m_bTextureDirty;
 	bool m_bPopupTextureDirty;
 
@@ -145,6 +146,7 @@ inline bool SrcCefVGUIPanel::GetDoNotDraw( void )
 	return m_bDontDraw;
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -156,6 +158,9 @@ inline void SrcCefVGUIPanel::MarkTextureDirty( int iDirtyX, int iDirtyY, int iDi
 	m_iDirtyY = Max( 0, Min( m_iDirtyY, iDirtyY ) );
 	m_iDirtyXEnd = Min( m_iWVWide, Max( m_iDirtyXEnd, iDirtyXEnd ) );
 	m_iDirtyYEnd = Min( m_iWVTall, Max( m_iDirtyYEnd, iDirtyYEnd ) );
+
+	// Popup always becomes dirty because it is drawn on top of the base texture
+	MarkPopupDirty();
 }
 
 inline void SrcCefVGUIPanel::MarkTextureFullDirty()
@@ -163,7 +168,21 @@ inline void SrcCefVGUIPanel::MarkTextureFullDirty()
 	m_iDirtyX = m_iDirtyY = 0;
 	m_iDirtyXEnd = m_iWVWide;
 	m_iDirtyYEnd = m_iWVTall;
+
+	// Popup always becomes dirty because it is drawn on top of the base texture
+	MarkPopupDirty();
 }
+#else
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline void SrcCefVGUIPanel::MarkTextureDirty()
+{
+	m_bTextureDirty = true;
+	// Popup always becomes dirty because it is drawn on top of the base texture
+	MarkPopupDirty();
+}
+#endif // 0
 
 inline void SrcCefVGUIPanel::MarkPopupDirty()
 {

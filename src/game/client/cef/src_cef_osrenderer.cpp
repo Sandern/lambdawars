@@ -129,6 +129,8 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 			free( m_pPopupBuffer );
 			m_pPopupBuffer = NULL;
 		}
+
+		m_pBrowser->GetPanel()->MarkTextureDirty();
 	}
 }
 
@@ -203,11 +205,13 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	if( type == PET_VIEW )
 	{
+#if 0
 		int dirtyx, dirtyy, dirtyxend, dirtyyend;
 		dirtyx = width;
 		dirtyy = height;
 		dirtyxend = 0;
 		dirtyyend = 0;
+#endif // 0
 
 		// Update image buffer size if needed
 		if( m_iWidth != width || m_iHeight != height )
@@ -222,13 +226,16 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 			m_iHeight = height;
 			m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
 
+#if 0
 			// Full dirty
 			dirtyx = 0;
 			dirtyy = 0;
 			dirtyxend = m_iWidth;
 			dirtyyend = m_iHeight;
+#endif // 0
 		}
 
+#if 0
 		const unsigned char *imagebuffer = (const unsigned char *)buffer;
 
 		// Update dirty rects
@@ -252,8 +259,14 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 			dirtyxend = Max( rect.x + rect.width, dirtyxend );
 			dirtyyend = Max( rect.y + rect.height, dirtyyend );
 		}
+#endif // 0
+		V_memcpy( m_pTextureBuffer, buffer, m_iWidth * m_iHeight * channels );
 
+#if 0
 		m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
+#else
+		m_pBrowser->GetPanel()->MarkTextureDirty();
+#endif // 0
 	}
 	else if( type == PET_POPUP )
 	{

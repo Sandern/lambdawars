@@ -161,7 +161,8 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	}
 
 	// Mark full dirty
-	MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
+	//MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
+	MarkTextureDirty();
 
 	//if( m_MatRef.IsValid() )
 	//	m_MatRef.Shutdown();
@@ -302,60 +303,55 @@ void SrcCefVGUIPanel::Paint()
 		}
 	}
 
-	//if( m_pTextureRegen )
-	{
-		CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
-
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-		AUTO_LOCK( renderer->GetTextureBufferMutex() );
+	AUTO_LOCK( renderer->GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
-		if( g_pShaderAPI && m_RenderBuffer.IsValid() )
+	if( g_pShaderAPI && m_RenderBuffer.IsValid() )
+	{
+		VPROF_BUDGET( "Upload", "CefUploadTexture" );
+
+		int nFrame = 0;
+		int nTextureChannel = 0;
+		ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+		if( g_pShaderAPI->IsTexture( textureHandle ) )
 		{
-			VPROF_BUDGET( "Upload", "CefUploadTexture" );
+			int iFace = 0;
+			int iMip = 0;
+			int z = 0;
 
-			int nFrame = 0;
-			int nTextureChannel = 0;
-			ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
-			if( g_pShaderAPI->IsTexture( textureHandle ) )
+			g_pShaderAPI->ModifyTexture( textureHandle );
+
+			if( renderer->GetTextureBuffer() && m_bTextureDirty )
 			{
-				int iFace = 0;
-				int iMip = 0;
-				int z = 0;
-
-				if( renderer->GetTextureBuffer() && m_bTextureDirty )
+				// Full Copy
+				g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+				// Partial copy, would work if we had a partial buffer:
+				//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
+				//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
+				// Copy by line, but call too expensive to do per line:
+				/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
+				for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
 				{
-					//DevMsg("Rendering: X:%d Y:%d W:%d H:%d\n", m_iDirtyX, m_iDirtyY, m_iDirtyXEnd - m_iDirtyX, m_iDirtyYEnd - m_iDirtyY );
+					g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
+						subWidth, 1, m_iTexImageFormat, 0, false, 
+						renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
+				}*/
 
-					g_pShaderAPI->ModifyTexture( textureHandle );
+				m_bTextureDirty = false;
+#if 0
+				m_iDirtyX = renderer->GetWidth();
+				m_iDirtyY = renderer->GetHeight();
+				m_iDirtyXEnd = m_iDirtyYEnd = 0;
+#endif // 0
+			}
 
-					// Full Copy
-					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
-					// Partial copy, would work if we had a partial buffer:
-					//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
-					//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
-					// Copy by line, but call too expensive to do per line:
-					/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
-					for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
-					{
-						g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
-							subWidth, 1, m_iTexImageFormat, 0, false, 
-							renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
-					}*/
+			if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
+			{
+				g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
+					m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
 
-					m_bTextureDirty = false;
-					m_iDirtyX = renderer->GetWidth();
-					m_iDirtyY = renderer->GetHeight();
-					m_iDirtyXEnd = m_iDirtyYEnd = 0;
-				}
-
-				if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
-				{
-					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
-						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
-
-					m_bPopupTextureDirty = false;
-				}
+				m_bPopupTextureDirty = false;
 			}
 		}
 	}

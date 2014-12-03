@@ -314,6 +314,8 @@ void CCefSystem::Update( float frametime )
 	if( !m_bIsRunning )
 		return;
 
+	VPROF_BUDGET( "Cef", "Cef" );
+
 #ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Perform a single iteration of the CEF message loop
 	CefDoMessageLoopWork();
@@ -644,7 +646,7 @@ void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 
 		m_CefBrowsers[i]->InvalidateLayout();
 		m_CefBrowsers[i]->NotifyScreenInfoChanged();
-		m_CefBrowsers[i]->GetPanel()->MarkTextureFullDirty();
+		m_CefBrowsers[i]->GetPanel()->MarkTextureDirty();
 	}
 }
 
@@ -665,7 +667,7 @@ CON_COMMAND_F( cef_debug_markfulldirty, "Invalidates render textures of each web
 		if( !browsers[i]->IsValid() )
 			continue;
 
-		browsers[i]->GetPanel()->MarkTextureFullDirty();
+		browsers[i]->GetPanel()->MarkTextureDirty();
 	}
 }
 
