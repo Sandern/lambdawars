@@ -56,6 +56,10 @@ public:
 	virtual WarsMessageData_t *ClientMessageHead() = 0;
 	virtual bool NextClientMessage() = 0;
 	virtual WarsMessageData_t *InsertClientMessage() = 0;
+
+	// Hack to tell client we are paused (engine->IsPaused is broken...)
+	virtual void SetPaused( bool bPaused ) = 0;
+	virtual bool IsPaused() = 0;
 };
 
 #define WARS_EXTENSION_VERSION		"VWarsExtension001"

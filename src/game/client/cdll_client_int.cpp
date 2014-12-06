@@ -1464,13 +1464,13 @@ void CHLClient::HudProcessInput( bool bActive )
 void CHLClient::HudUpdate( bool bActive )
 {
 	// Ugly HACK! to prevent the game time from changing when paused
-	if( m_bWasPaused != engine->IsPaused() )
+	if( m_bWasPaused != warsextension->IsPaused() )
 	{
 		m_fPauseTime = gpGlobals->curtime;
 		m_nPauseTick = gpGlobals->tickcount;
-		m_bWasPaused = engine->IsPaused();
+		m_bWasPaused = warsextension->IsPaused();
 	}
-	if( engine->IsPaused() )
+	if( warsextension->IsPaused() )
 	{
 		gpGlobals->curtime = m_fPauseTime;
 		gpGlobals->tickcount = m_nPauseTick;

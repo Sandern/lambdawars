@@ -15,7 +15,7 @@ class CWarsExtension : public CTier3AppSystem< IWarsExtension >
 {
 	typedef CTier3AppSystem< IWarsExtension > BaseClass;
 public:
-
+	CWarsExtension() : m_bPaused(false) {}
 	// Methods of IAppSystem
 	virtual bool Connect( CreateInterfaceFn factory );
 	virtual void Disconnect();
@@ -39,6 +39,10 @@ public:
 	virtual bool NextClientMessage();
 	virtual WarsMessageData_t *InsertClientMessage();
 
+	// Hack to tell client we are paused (engine->IsPaused is broken...)
+	virtual void SetPaused( bool bPaused ) { m_bPaused = bPaused; }
+	virtual bool IsPaused() { return m_bPaused; }
+
 private:
 	// Wars Editor commands
 	CUtlVector<KeyValues *> m_hQueuedClientCommands;
@@ -47,6 +51,9 @@ private:
 	// Steam P2P messages
 	CUtlVector<WarsMessageData_t> m_hQueuedClientP2PMessages;
 	CUtlVector<WarsMessageData_t> m_hQueuedServerP2PMessages;
+
+	// Paused?
+	bool m_bPaused;
 };
 
 #endif // _INCLUDED_WARS_EXTENSION_H

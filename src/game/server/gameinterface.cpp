@@ -3320,6 +3320,7 @@ float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int nu
 	int dropped_packets, bool ignore, bool paused )
 {
 	g_ServerGameDLL.m_bPaused = paused;
+	warsextension->SetPaused( paused );
 
 	int				i;
 	CUserCmd		*from, *to;
