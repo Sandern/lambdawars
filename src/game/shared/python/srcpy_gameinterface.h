@@ -442,7 +442,7 @@ public:
 	inline const char		*GetMostRecentSaveGame( void ) { return engine->GetMostRecentSaveGame(); }
 	inline void			SetMostRecentSaveGame( const char *lpszFilename )  { engine->SetMostRecentSaveGame(lpszFilename); }
 
-	inline bool IsActiveApp() { return engine->GetMostRecentSaveGame(); }
+	inline bool IsActiveApp() { return engine->IsActiveApp(); }
 
 	// is this client running inside the same process as an active server?
 	inline bool IsClientLocalToActiveServer() { return engine->IsClientLocalToActiveServer(); }
