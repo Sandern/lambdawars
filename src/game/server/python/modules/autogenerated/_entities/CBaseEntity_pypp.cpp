@@ -4280,6 +4280,26 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("name") ) );
         
         }
+        { //::CBaseEntity::PyRestoreDataDescBlock
+        
+            typedef int ( ::CBaseEntity::*PyRestoreDataDescBlock_function_type )( ::IRestore & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "PyRestoreDataDescBlock"
+                , PyRestoreDataDescBlock_function_type( &::CBaseEntity::PyRestoreDataDescBlock )
+                , ( bp::arg("restore") ) );
+        
+        }
+        { //::CBaseEntity::PySaveDataDescBlock
+        
+            typedef int ( ::CBaseEntity::*PySaveDataDescBlock_function_type )( ::ISave & ) ;
+            
+            CBaseEntity_exposer.def( 
+                "PySaveDataDescBlock"
+                , PySaveDataDescBlock_function_type( &::CBaseEntity::PySaveDataDescBlock )
+                , ( bp::arg("save") ) );
+        
+        }
         { //::CBaseEntity::PySendEvent
         
             typedef void ( ::CBaseEntity::*SendEvent_function_type )( ::IRecipientFilter &,int,int ) ;

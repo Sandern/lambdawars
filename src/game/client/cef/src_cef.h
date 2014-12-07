@@ -30,6 +30,7 @@
 #else
 	class SrcCefBrowser;
 	class CefBrowser;
+	class CefKeyEventTraits;
 #endif // PYPP_GENERATION
 
 extern ConVar g_debug_cef;
@@ -60,7 +61,9 @@ public:
 	void ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam );
 	void ProcessDeadChar( UINT message, WPARAM wParam, LPARAM lParam );
 #endif WIN32
+#ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 	void SendKeyEventToBrowsers( const CefKeyEvent &keyevent );
+#endif // PYPP_GENERATION
 
 	int GetKeyModifiers();
 

@@ -5421,7 +5421,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .def( 
             "__setitem__"
             , (void ( ::CPythonNetworkArray::* )( ::boost::python::api::object,::boost::python::api::object ) )( &::CPythonNetworkArray::SetItem )
-            , ( bp::arg("key"), bp::arg("data") ) );
+            , ( bp::arg("key"), bp::arg("data") ) )    
+        .def( 
+            "__str__"
+            , (::boost::python::api::object ( ::CPythonNetworkArray::* )(  ) )( &::CPythonNetworkArray::Str ) );
 
     bp::class_< CPythonNetworkDict >( "NetworkDictInternal", bp::init< bp::api::object, char const *, bp::optional< bp::dict, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
         .def( 
@@ -5435,7 +5438,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .def( 
             "__setitem__"
             , (void ( ::CPythonNetworkDict::* )( ::boost::python::api::object,::boost::python::api::object ) )( &::CPythonNetworkDict::SetItem )
-            , ( bp::arg("key"), bp::arg("data") ) );
+            , ( bp::arg("key"), bp::arg("data") ) )    
+        .def( 
+            "__str__"
+            , (::boost::python::api::object ( ::CPythonNetworkDict::* )(  ) )( &::CPythonNetworkDict::Str ) );
 
     bp::class_< CPythonNetworkVar >( "NetworkVarInternal", bp::init< bp::api::object, char const *, bp::optional< bp::api::object, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::api::object(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
         .def( 
@@ -5444,7 +5450,10 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .def( 
             "Set"
             , (void ( ::CPythonNetworkVar::* )( ::boost::python::api::object ) )( &::CPythonNetworkVar::Set )
-            , ( bp::arg("data") ) );
+            , ( bp::arg("data") ) )    
+        .def( 
+            "__str__"
+            , (::boost::python::api::object ( ::CPythonNetworkVar::* )(  ) )( &::CPythonNetworkVar::Str ) );
 
     bp::class_< CPythonSendProxyBase_wrapper >( "SendProxyBase" )    
         .def( 
