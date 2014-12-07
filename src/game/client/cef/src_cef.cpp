@@ -14,6 +14,7 @@
 #include "warscef/wars_cef_shared.h"
 #include <filesystem.h>
 #include "gameui/gameui_interface.h"
+#include "materialsystem/materialsystem_config.h"
 
 #include <vgui/IInput.h>
 #include "inputsystem/iinputsystem.h"
@@ -315,6 +316,19 @@ void CCefSystem::Update( float frametime )
 		return;
 
 	VPROF_BUDGET( "Cef", "Cef" );
+
+	// Detect if the user alt-tabbed and tell cef we changed
+	// TODO: Probably just need to redraw the texture
+	static bool sActiveApp = false;
+	if( sActiveApp != engine->IsActiveApp() ) 
+	{
+		sActiveApp = engine->IsActiveApp();
+		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
+		if( sActiveApp && !config.Windowed() )
+		{
+			OnScreenSizeChanged( ScreenWidth(), ScreenHeight() );
+		}
+	}
 
 #ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Perform a single iteration of the CEF message loop
