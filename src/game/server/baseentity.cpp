@@ -798,7 +798,7 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 		memset(&m_bInFOW, 0, sizeof(bool)*FOWMAXPLAYERS);
 	DensityMap()->Init(this);
 #ifdef ENABLE_PYTHON
-	m_pyInstance = bp::object();
+	m_pyInstance = boost::python::object();
 #endif // ENABLE_PYTHON
 }
 
@@ -3765,43 +3765,18 @@ int CBaseEntity::Save( ISave &save )
 	// loop through the data description list, saving each data desc block
 	int status = SaveDataDescBlock( save, GetDataDescMap() );
 
-#if 0
-	if (m_pyInstance.ptr() != Py_None)
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	if( status == 1 )
 	{
-		boost::python::object fields;
-		try
-		{
-			fields = m_pyInstance.attr("fields");
-
-			bp::object items = fields.attr("items")();
-			bp::object iterator = items.attr("__iter__")();
-			unsigned long ulCount = bp::len(items);
-			for (unsigned long u = 0; u < ulCount; u++)
-			{
-				bp::object item = iterator.attr(PY_NEXT_METHODNAME)();
-
-				if (item[1].attr("cppimplemented"))
-				{
-					continue;
-				}
-
-				bp::object data = m_pyInstance.attr(item[0]);
-				bp::object datatype = fntype( data );
-
-				if (datatype == builtins.attr("str"))
-				{
-					Msg("#%d field: %s value: %s\n", boost::python::extract<const char *>(item[0]), boost::python::extract<const char *>(data));
-					save.WriteString(boost::python::extract<const char *>(item[0]), boost::python::extract<const char *>(data));
-				}
-			}
-		}
-		catch (boost::python::error_already_set &)
-		{
-			Warning("#%d: Failed to save Python fields\n", entindex());
-			PyErr_Print();
-		}
+		status = PySaveDataDescBlock( save );
 	}
-#endif // 0
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	return status;
 }
@@ -3828,6 +3803,19 @@ int CBaseEntity::Restore( IRestore &restore )
 
 	// loops through the data description list, restoring each data desc block in order
 	int status = RestoreDataDescBlock( restore, GetDataDescMap() );
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	if( status == 1 )
+	{
+		status = PyRestoreDataDescBlock( restore );
+	}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// ---------------------------------------------------------------
 	// HACKHACK: We don't know the space of these vectors until now
@@ -9016,7 +9004,7 @@ void CBaseEntity::DestroyPyInstance()
 	// Dereferencing m_pyInstance here might result in direct deletion of the entity
 	// This will result into heap corruption.
 	SrcPySystem()->AddToDeleteList( m_pyInstance );
-	m_pyInstance = bp::object();
+	m_pyInstance = boost::python::object();
 }
 
 //------------------------------------------------------------------------------
@@ -9076,7 +9064,7 @@ void CBaseEntity::PySendEvent( IRecipientFilter &filter, int event, int data )
 //------------------------------------------------------------------------------
 // Purpose: Send Python Entity Message
 //------------------------------------------------------------------------------
-void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
+void CBaseEntity::PySendMessage( boost::python::list msg, bool reliable )
 {
 	// Skip parsing if none
 	if( msg.ptr() == Py_None )
@@ -9117,5 +9105,37 @@ void CBaseEntity::PySendMessage( bp::list msg, bool reliable )
 			PyWriteElement(writelist.Element(i));
 		}
 	MessageEnd();
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+// Output : int 0 on failure, 1 on success
+//------------------------------------------------------------------------------
+int CBaseEntity::PySaveDataDescBlock( ISave &save )
+{
+	int status = 1;
+
+	if (m_pyInstance.ptr() != Py_None)
+	{
+		status = save.PyWriteAll( m_pyInstance );
+	}
+
+	return status;
+}
+
+//------------------------------------------------------------------------------
+// Purpose: 
+// Output : int 0 on failure, 1 on success
+//------------------------------------------------------------------------------
+int CBaseEntity::PyRestoreDataDescBlock( IRestore &restore )
+{
+	int status = 1;
+
+	if (m_pyInstance.ptr() != Py_None)
+	{
+		status = restore.PyReadAll( m_pyInstance );
+	}
+
+	return status;
 }
 #endif // ENABLE_PYTHON

@@ -12,6 +12,16 @@
 #include "datamap.h"
 #include "mathlib/vmatrix.h"
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+#include "srcpy_boostpython.h"
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 #if defined( _WIN32 )
 #pragma once
 #endif
@@ -209,6 +219,17 @@ public:
 
 protected:
 	virtual ~ISave() {};
+
+public:
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	virtual int		PyWriteAll( boost::python::object instance ) = 0;
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 //-----------------------------------------------------------------------------
@@ -309,6 +330,17 @@ public:
 
 protected:
 	virtual ~IRestore() {};
+
+public:
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	virtual int		PyReadAll( boost::python::object instance ) = 0;
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 };
 
 //-----------------------------------------------------------------------------

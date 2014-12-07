@@ -153,6 +153,14 @@ bp::object CPythonNetworkVar::Get( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bp::object CPythonNetworkVar::Str()
+{
+	return m_dataInternal.attr("__str__")();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
 	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
@@ -244,6 +252,14 @@ void CPythonNetworkArray::Set( bp::list data )
 {
 	m_dataInternal = data;
 	NetworkStateChanged();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bp::object CPythonNetworkArray::Str()
+{
+	return m_dataInternal.attr("__str__")();
 }
 
 //-----------------------------------------------------------------------------
@@ -353,6 +369,14 @@ void CPythonNetworkDict::Set( bp::dict data )
 {
 	m_dataInternal = data;
 	NetworkStateChanged();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bp::object CPythonNetworkDict::Str()
+{
+	return m_dataInternal.attr("__str__")();
 }
 
 //-----------------------------------------------------------------------------

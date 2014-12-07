@@ -61,6 +61,16 @@ public:
 	
 	int				WriteFields( const char *pname, const void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount );
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	int				PyWriteAll( boost::python::object instance );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 	//---------------------------------
 	// Block support
 	//
@@ -203,6 +213,16 @@ public:
 	
 	int				ReadFields( const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount );
 	void 			EmptyFields( void *pBaseData, typedescription_t *pFields, int fieldCount );
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	int				PyReadAll( boost::python::object instance );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	//---------------------------------
 	// Block support

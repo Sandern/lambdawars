@@ -2010,6 +2010,10 @@ public:
 	// Allows sending an event on this Python entity
 	void							PySendEvent( IRecipientFilter &filter, int event, int data = 0 );
 
+	// Save/restore support
+	int								PySaveDataDescBlock( ISave &save );
+	int								PyRestoreDataDescBlock( IRestore &restore );
+
 protected:
 	bool		ValidatePyInstance();
 

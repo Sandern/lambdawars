@@ -125,6 +125,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls = mb.class_('CPythonNetworkVar')
         cls.include()
         cls.rename('NetworkVarInternal') 
+        cls.mem_funs('Str').rename('__str__')
         cls.mem_funs('NetworkVarsUpdateClient').exclude()
 
         cls = mb.class_('CPythonNetworkArray')
@@ -134,6 +135,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('GetItem').rename('__getitem__')
         cls.mem_funs('SetItem').rename('__setitem__')
         cls.mem_funs('DelItem').rename('__delitem__')
+        cls.mem_funs('Str').rename('__str__')
         
         cls = mb.class_('CPythonNetworkDict')
         cls.include()
@@ -141,6 +143,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('NetworkVarsUpdateClient').exclude()
         cls.mem_funs('GetItem').rename('__getitem__')
         cls.mem_funs('SetItem').rename('__setitem__')
+        cls.mem_funs('Str').rename('__str__')
         
         # Send proxies for python network variables
         cls = mb.class_('CPythonSendProxyBase')

@@ -882,6 +882,80 @@ int CSave::DoWriteAll( const void *pLeafObject, datamap_t *pLeafMap, datamap_t *
 
 	return WriteFields( pCurMap->dataClassName, pLeafObject, pLeafMap, pCurMap->dataDesc, pCurMap->dataNumFields );
 }
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+int CSave::PyWriteAll( boost::python::object instance )
+{
+	try
+	{
+		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
+		//Msg("Starting writing python fields for %s\n", pName );
+
+		int iHeaderPos = m_pData->GetCurPos();
+		int count = -1;
+		WriteInt( pName, &count, 1 );
+
+		count = 0;
+
+		boost::python::object fields;
+
+		fields = instance.attr("fields");
+
+		boost::python::object items = fields.attr("items")();
+		boost::python::object iterator = items.attr("__iter__")();
+		unsigned long ulCount = boost::python::len(items);
+		for (unsigned long u = 0; u < ulCount; u++)
+		{
+			boost::python::object item = iterator.attr(PY_NEXT_METHODNAME)();
+			boost::python::object field = item[1];
+
+			if( field.attr("save") == false )
+			{
+				continue;
+			}
+
+			try
+			{
+				boost::python::object data = field.attr("Save")( instance );
+
+				const char *pFieldName = boost::python::extract<const char *>(item[0]);
+				const char *pFieldData = boost::python::extract<const char *>(data);
+				//Msg("SAVE field: %s value: %s\n", pFieldName, pFieldData);
+				WriteString( pFieldName, pFieldData );
+
+				count++;
+			}
+			catch (boost::python::error_already_set &)
+			{
+				PyErr_Print();
+			}
+		}
+
+		int iCurPos = m_pData->GetCurPos();
+		int iRewind = iCurPos - iHeaderPos;
+		m_pData->Rewind( iRewind );
+		WriteInt( pName, &count, 1 );
+		iCurPos = m_pData->GetCurPos();
+		m_pData->MoveCurPos( iRewind - ( iCurPos - iHeaderPos ) );
+
+		//Msg( "Wrote %d python fields to save file\n", count );
+	}
+	catch (boost::python::error_already_set &)
+	{
+		Warning( "Failed to save Python fields\n" );
+		PyErr_Print();
+		return 0;
+	}
+
+	return 1;
+}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	
 //-------------------------------------
 
@@ -1785,6 +1859,76 @@ int CRestore::DoReadAll( void *pLeafObject, datamap_t *pLeafMap, datamap_t *pCur
 
 	return ReadFields( pCurMap->dataClassName, pLeafObject, pLeafMap, pCurMap->dataDesc, pCurMap->dataNumFields );
 }
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+int CRestore::PyReadAll( boost::python::object instance )
+{
+	try
+	{
+		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
+
+		Verify( ReadShort() == sizeof(int) );			// First entry should be an int
+		int symName = m_pData->FindCreateSymbol(pName);
+
+		// Check the struct name
+		int curSym = ReadShort();
+		if ( curSym != symName )			// Field Set marker
+		{
+			const char *pCurName = m_pData->StringFromSymbol( curSym );
+			Msg( "Expected %s found %s ( raw '%s' )!\n", pName, pCurName, BufferPointer() );
+			Msg( "Field type name may have changed or inheritance graph changed, save file is suspect\n" );
+			m_pData->Rewind( 2*sizeof(short) );
+			return 0;
+		}
+
+		// Skip over the struct name
+		int i;
+		int nFieldsSaved = ReadInt();						// Read field count
+		SaveRestoreRecordHeader_t header;
+		char buf[2048];
+
+		boost::python::object fields = instance.attr("fields");
+
+		for ( i = 0; i < nFieldsSaved; i++ )
+		{
+			ReadHeader( &header );
+		
+			boost::python::object field = fields.attr("get")( m_pData->StringFromSymbol( header.symbol ), boost::python::object() );
+			if( field.ptr() != Py_None ) 
+			{
+				ReadString( buf, sizeof(buf), 0 ) ;
+				//Msg( "Reading data for field %s, applying: %s\n", m_pData->StringFromSymbol( header.symbol ), buf );
+				try
+				{
+					field.attr("Restore")( instance, buf );
+				}
+				catch (boost::python::error_already_set &)
+				{
+					PyErr_Print();
+				}
+			} 
+			else 
+			{
+				Msg( "Skipping reading field %s\n", m_pData->StringFromSymbol( header.symbol ) );
+				BufferSkipBytes( header.size );			// Advance to next field
+			}
+		}
+	}
+	catch (boost::python::error_already_set &)
+	{
+		PyErr_Print();
+		return 0;
+	}
+
+	return 1;
+}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 //-------------------------------------
 

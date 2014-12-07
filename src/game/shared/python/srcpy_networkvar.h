@@ -13,12 +13,6 @@
 
 #include "srcpy_boostpython.h"
 
-#if 0
-#include <set>
-#endif // 0
-
-namespace bp = boost::python;
-
 extern ConVar g_debug_pynetworkvar;
 
 #ifndef CLIENT_DLL
@@ -47,7 +41,7 @@ public:
 class CPythonNetworkVarBase
 {
 public:
-	CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback=false, bp::object sendproxy=bp::object() );
+	CPythonNetworkVarBase( boost::python::object ent, const char *name, bool changedcallback=false, boost::python::object sendproxy=boost::python::object() );
 	~CPythonNetworkVarBase();
 
 	void Remove( CBaseEntity *pEnt );
@@ -67,63 +61,66 @@ protected:
 	bool m_bChangedCallback;
 	bool m_bInitialState;
 
-	bp::object m_wrefEnt;
+	boost::python::object m_wrefEnt;
 
 	CPythonSendProxyBase *m_pPySendProxy;
-	bp::object m_pySendProxyRef;
+	boost::python::object m_pySendProxyRef;
 };
 
 class CPythonNetworkVar : public CPythonNetworkVarBase
 {
 public:
-	CPythonNetworkVar( bp::object self, const char *name, bp::object data = bp::object(), 
-		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
+	CPythonNetworkVar( boost::python::object self, const char *name, boost::python::object data = boost::python::object(), 
+		bool initstatechanged=false, bool changedcallback=false, boost::python::object sendproxy=boost::python::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
-	void Set( bp::object data );
-	bp::object Get( void );
+	void Set( boost::python::object data );
+	boost::python::object Get( void );
+	boost::python::object Str();
 
 private:
-	bp::object m_dataInternal;
+	boost::python::object m_dataInternal;
 };
 
 class CPythonNetworkArray : public CPythonNetworkVarBase
 {
 public:
-	CPythonNetworkArray( bp::object self, const char *name, bp::list data = bp::list(), 
-		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
+	CPythonNetworkArray( boost::python::object self, const char *name, boost::python::list data = boost::python::list(), 
+		bool initstatechanged=false, bool changedcallback=false, boost::python::object sendproxy=boost::python::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
-	void SetItem( bp::object key, bp::object data );
-	bp::object GetItem( bp::object key );
-	void DelItem( bp::object key );
+	void SetItem( boost::python::object key, boost::python::object data );
+	boost::python::object GetItem( boost::python::object key );
+	void DelItem( boost::python::object key );
 
-	void Set( bp::list data );
+	void Set( boost::python::list data );
+	boost::python::object Str();
 
 private:
-	bp::list m_dataInternal;
+	boost::python::list m_dataInternal;
 };
 
 class CPythonNetworkDict : public CPythonNetworkVarBase
 {
 public:
-	CPythonNetworkDict( bp::object self, const char *name, bp::dict data = bp::dict(), 
-		bool initstatechanged=false, bool changedcallback=false, bp::object sendproxy=bp::object() );
+	CPythonNetworkDict( boost::python::object self, const char *name, boost::python::dict data = boost::python::dict(), 
+		bool initstatechanged=false, bool changedcallback=false, boost::python::object sendproxy=boost::python::object() );
 
 	void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
 
-	void SetItem( bp::object key, bp::object data );
-	bp::object GetItem(  bp::object key );
+	void SetItem( boost::python::object key, boost::python::object data );
+	boost::python::object GetItem(  boost::python::object key );
 
-	void Set( bp::dict data );
+	void Set( boost::python::dict data );
+	boost::python::object Str();
 
 private:
-	bp::dict m_dataInternal;
+	boost::python::dict m_dataInternal;
 
 #if 0
-	std::set<bp::object> m_changedKeys;
+	std::set<boost::python::object> m_changedKeys;
 #endif // 0
 };
 
