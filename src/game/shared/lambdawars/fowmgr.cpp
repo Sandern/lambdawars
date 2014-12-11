@@ -846,6 +846,7 @@ void CFogOfWarMgr::AllocateFogOfWar()
 
 	m_FogOfWar.SetCount( m_nGridSize*m_nGridSize );
 	m_TileHeights.SetCount( m_nGridSize*m_nGridSize );
+	m_TileHeightsStatic.SetCount( m_nGridSize*m_nGridSize );
 
 	if( m_bActive )
 	{
