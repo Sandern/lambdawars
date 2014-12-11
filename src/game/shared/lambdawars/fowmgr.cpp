@@ -637,7 +637,9 @@ void CFogOfWarMgr::ClearHeightMap()
 	{
 		for( int y = 0; y < m_nGridSize; y++ )
 		{
-			m_TileHeights[FOWINDEX(x, y)] = MIN_COORD_INTEGER;
+			int idx = FOWINDEX(x, y);
+			m_TileHeightsStatic[idx] = MIN_COORD_INTEGER;
+			m_TileHeights[idx] = MIN_COORD_INTEGER;
 		}
 	}
 }
