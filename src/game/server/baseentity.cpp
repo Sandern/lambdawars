@@ -619,9 +619,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 
 	SendPropInt			(SENDINFO(m_cellbits), MINIMUM_BITS_NEEDED( 32 ), SPROP_UNSIGNED, 0, SENDPROP_CELL_INFO_PRIORITY ),
 //	SendPropArray       (SendPropInt(SENDINFO_ARRAY(m_cellXY), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ), m_cellXY),
-	SendPropInt			(SENDINFO(m_cellX), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED, CBaseEntity::SendProxy_CellX, SENDPROP_CELL_INFO_PRIORITY ), // 32 priority in the send table
-	SendPropInt			(SENDINFO(m_cellY), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED, CBaseEntity::SendProxy_CellY, SENDPROP_CELL_INFO_PRIORITY ),
-	SendPropInt			(SENDINFO(m_cellZ), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED, CBaseEntity::SendProxy_CellZ, SENDPROP_CELL_INFO_PRIORITY ),
+	SendPropInt			(SENDINFO(m_cellX), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_CellX, SENDPROP_CELL_INFO_PRIORITY ), // 32 priority in the send table
+	SendPropInt			(SENDINFO(m_cellY), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_CellY, SENDPROP_CELL_INFO_PRIORITY ),
+	SendPropInt			(SENDINFO(m_cellZ), CELL_COUNT_BITS( CELL_BASEENTITY_ORIGIN_CELL_BITS ), SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_CellZ, SENDPROP_CELL_INFO_PRIORITY ),
 	SendPropVector		(SENDINFO(m_vecOrigin), CELL_BASEENTITY_ORIGIN_CELL_BITS, SENDPROP_VECORIGIN_FLAGS, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOrigin ),
 
 	SendPropModelIndex(SENDINFO(m_nModelIndex)),
@@ -792,11 +792,9 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 
 	m_pEvent = NULL;
 
-	if( sv_fogofwar.GetBool() )
-		memset(&m_bInFOW, 1, sizeof(bool)*FOWMAXPLAYERS);
-	else
-		memset(&m_bInFOW, 0, sizeof(bool)*FOWMAXPLAYERS);
-	DensityMap()->Init(this);
+	V_memset( &m_bInFOW, sv_fogofwar.GetBool() ? 1 : 0, sizeof(bool)*FOWMAXPLAYERS );
+
+	DensityMap()->Init( this );
 #ifdef ENABLE_PYTHON
 	m_pyInstance = boost::python::object();
 #endif // ENABLE_PYTHON

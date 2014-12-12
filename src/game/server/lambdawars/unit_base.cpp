@@ -300,8 +300,13 @@ void AnimEventMap::SetAnimEventHandler(int event, boost::python::object pyhandle
 // Unit Send Tables
 //
 // Note1: Don't try to split vecOrigin and vecAngles over multiple tables.
-//		  The first few frames seem to send this data from all tables (Valve BUG?)
+//		  The first few frames seem to send this data from all tables (Engine BUG?)
 //		  This ends up taking a big hit in Overrun due spawning many enemies at a high rate.
+// Note2: Added SPROP_ENCODED_AGAINST_TICKCOUNT to props that are not send in 
+//		  in minimal mode. Otherwise a lot of console spam will appear (ENTITY_CHANGE_NONE).
+//        This is because we supress the state changed to once per 0.4s in minimal mode.
+//        Not sure if it has down-sides, but from my understanding it should not
+//        since simulationTick is already marked with the same.
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -447,14 +452,14 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
 
 	// This data is only send to the commander for prediction
 	//SendPropVector		( SENDINFO( m_vecBaseVelocity ), 20, 0, -1000, 1000 ),
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 0), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 1), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 2), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN ),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 0), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 1), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 2), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
 	// Update SetDefaultEyeOffset when changing the range!
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 0), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 1), 10, SPROP_ROUNDDOWN, -256.0, 256.0f),
-	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 2), 12, SPROP_CHANGES_OFTEN,	-1.0f, 1024.0f),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 0), 10, SPROP_ROUNDDOWN|SPROP_ENCODED_AGAINST_TICKCOUNT, -256.0, 256.0f),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 1), 10, SPROP_ROUNDDOWN|SPROP_ENCODED_AGAINST_TICKCOUNT, -256.0, 256.0f),
+	SendPropFloat		( SENDINFO_VECTORELEM(m_vecViewOffset, 2), 12, SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT,	-1.0f, 1024.0f),
 
 END_SEND_TABLE()
 
@@ -468,18 +473,18 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	// The unit does not receive an update once the full table is selected again.
 	//SendPropFloat   ( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 10, SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_AnglesX ),
+	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 10, SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_AnglesZ ),
 	
-	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iMaxHealth ), 15, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropInt		(SENDINFO( m_iMaxEnergy ), 15, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
-	SendPropInt		(SENDINFO( m_takedamage ), 3, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_takedamage ), 3, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropInt		(SENDINFO( m_lifeState ), 3, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
-	SendPropEHandle		( SENDINFO( m_hSquadUnit ) ),
-	SendPropEHandle		( SENDINFO( m_hCommander ) ),
-	SendPropEHandle		( SENDINFO( m_hEnemy ) ),
+	SendPropEHandle		( SENDINFO( m_hSquadUnit ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropEHandle		( SENDINFO( m_hCommander ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropEHandle		( SENDINFO( m_hEnemy ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),
@@ -488,28 +493,28 @@ END_SEND_TABLE()
 // Single Unit Selection Table. Only send when the player has exactly one unit selected.
 // Used for displaying data in the hud
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_SingleSelectionTable )
-	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),
-	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED ),
+	SendPropInt		(SENDINFO( m_iHealth ), 15, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropInt		(SENDINFO( m_iEnergy ), 15, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropInt		(SENDINFO( m_iKills ), 9, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT ),
 END_SEND_TABLE()
 
 // Send when the unit is in a multi selection or is not selected at all
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_MultiOrNoneSelectionTable )
-	SendPropInt		(SENDINFO( m_iHealth ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED/*|SPROP_CHANGES_OFTEN*/, SendProxy_Health ),
-	SendPropInt		(SENDINFO( m_iEnergy ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED, SendProxy_Energy ),
+	SendPropInt		(SENDINFO( m_iHealth ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT/*|SPROP_CHANGES_OFTEN*/, SendProxy_Health ),
+	SendPropInt		(SENDINFO( m_iEnergy ), SENDPROP_HEALTH_BITS_LOW, SPROP_UNSIGNED|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_Energy ),
 END_SEND_TABLE()
 
 // Main Unit Send Table. Always send
 IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
-	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
-	SendPropFloat( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
+	SendPropVectorXY( SENDINFO( m_vecOrigin ), 				 CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN| SPROP_ENCODED_AGAINST_TICKCOUNT, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginXY, SENDPROP_NONLOCALPLAYER_ORIGINXY_PRIORITY ),
+	SendPropFloat( SENDINFO_VECTORELEM( m_vecOrigin, 2 ), CELL_BASEENTITY_ORIGIN_CELL_BITS, SPROP_CELL_COORD_LOWPRECISION | SPROP_CHANGES_OFTEN| SPROP_ENCODED_AGAINST_TICKCOUNT, 0.0f, HIGH_DEFAULT, CBaseEntity::SendProxy_CellOriginZ, SENDPROP_NONLOCALPLAYER_ORIGINZ_PRIORITY ),
 	
-	SendPropAngle( SENDINFO_VECTORELEM( m_angRotation, 1 ), 10, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
-	SendPropFloat( SENDINFO( m_fEyePitch ), 10, SPROP_CHANGES_OFTEN ),
+	SendPropAngle( SENDINFO_VECTORELEM( m_angRotation, 1 ), 10, SPROP_CHANGES_OFTEN | SPROP_ENCODED_AGAINST_TICKCOUNT, CBaseEntity::SendProxy_AnglesY ),
+	SendPropFloat( SENDINFO( m_fEyePitch ), 10, SPROP_CHANGES_OFTEN| SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
 	// Send the same flags as done for the players. These flags are used to execute the animstate on the client
 	// The only flag used right now is FL_ONGROUND, so just send one bit..
-	SendPropInt		(SENDINFO( m_fFlags ), 1, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN ),	
+	SendPropInt		(SENDINFO( m_fFlags ), 1, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN| SPROP_ENCODED_AGAINST_TICKCOUNT ),	
 
 	SendPropInt		(SENDINFO( m_NetworkedUnitTypeSymbol ), MAX_GAMEDBNAMES_STRING_BITS, SPROP_UNSIGNED ),
 
