@@ -2127,7 +2127,7 @@ void CFogOfWarMgr::UpdateVisibility( void )
 			pEnt->SetInFOW(false);
 			pEnt->UpdateVisibility();
 #else
-			memset( pEnt->m_bInFOW, false, FOWMAXPLAYERS*sizeof(bool) );
+			V_memset( pEnt->m_bInFOW, false, FOWMAXPLAYERS*sizeof(bool) );
 			pEnt->DispatchUpdateTransmitState();
 #endif // CLIENT_DLL
 			continue;
