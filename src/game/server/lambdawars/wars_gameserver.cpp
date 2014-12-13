@@ -290,6 +290,7 @@ void CWarsGameServer::UpdateServer()
 		m_bUpdateMatchmakingTags = false;
 
 		char buf[1024];
+		buf[0] = 0;
 		g_ServerGameDLL.GetMatchmakingTags( buf, sizeof(buf) );
 
 		steamgameserverapicontext->SteamGameServer()->SetGameTags( buf );
