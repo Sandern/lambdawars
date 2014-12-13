@@ -16,6 +16,7 @@
 
 extern ConVar g_debug_cef;
 ConVar cef_alpha_force_zero("cef_alpha_force_zero", "0");
+ConVar cef_debug_nopaint("cef_debug_nopaint", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -195,6 +196,11 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		return;
 	}
 
+	if( cef_debug_nopaint.GetBool() )
+	{
+		return;
+	}
+
 	int channels = 4;
 
 	Assert( dirtyRects.size() > 0 );
@@ -235,7 +241,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 #endif // 0
 		}
 
-#if 0
+#if 1
 		const unsigned char *imagebuffer = (const unsigned char *)buffer;
 
 		// Update dirty rects
@@ -253,14 +259,15 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 				);
 			}
 
+#if 0
 			// Update max dirty area
 			dirtyx = Min( rect.x, dirtyx );
 			dirtyy = Min( rect.y, dirtyy );
 			dirtyxend = Max( rect.x + rect.width, dirtyxend );
 			dirtyyend = Max( rect.y + rect.height, dirtyyend );
+#endif // 0
 		}
 #endif // 0
-		V_memcpy( m_pTextureBuffer, buffer, m_iWidth * m_iHeight * channels );
 
 #if 0
 		m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
