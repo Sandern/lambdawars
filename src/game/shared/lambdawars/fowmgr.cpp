@@ -250,10 +250,13 @@ void CFogOfWarMgr::LevelInitPreEntity()
 		mat_fogofwar_b.SetValue( mat_fogofwar_b.GetDefault() );
 		mat_fogofwar_a.SetValue( mat_fogofwar_a.GetDefault() );
 	}
-#endif //0
+#endif // 0
 #else
 	for( int i = 0; i < MAX_PLAYERS; i++ )
+	{
 		ResetToKnown( i );
+		m_KnownEntitiesUpdatePending[i].ClearAll();
+	}
 #endif // CLIENT_DLL
 }
 
