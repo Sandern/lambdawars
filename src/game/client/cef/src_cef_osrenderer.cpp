@@ -36,6 +36,8 @@ SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent 
 	m_rootScreenRect.width = ScreenWidth();
 	m_rootScreenRect.height = ScreenHeight();
 
+	m_viewRect = m_rootScreenRect;
+
 #ifdef WIN32
 	m_hArrow = LoadCursor (NULL, IDC_ARROW );
 	m_hCross = LoadCursor (NULL, IDC_CROSS );
@@ -414,14 +416,14 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 	if( cef_alpha_force_zero.GetBool() )
 		return 0;
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AUTO_LOCK( s_BufferMutex );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	if( x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )
 		return 0;
 
 	int channels = 4;
-
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( s_BufferMutex );
-#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	unsigned char *pImageData = m_pTextureBuffer;
 	unsigned char alpha = pImageData ? pImageData[(y * m_iWidth * channels) + (x * channels) + 3] : 0;

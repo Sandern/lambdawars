@@ -391,7 +391,7 @@ void SrcCefVGUIPanel::DrawWebview()
 	int iWide, iTall;
 	GetSize( iWide, iTall );
 
-	if( surface()->IsTextureIDValid( m_iTextureID ) && !m_bTextureDirty && g_cef_draw.GetBool() )
+	if( surface()->IsTextureIDValid( m_iTextureID ) && g_cef_draw.GetBool() )
 	{
 		vgui::surface()->DrawSetColor( m_Color );
 		vgui::surface()->DrawSetTexture( m_iTextureID );

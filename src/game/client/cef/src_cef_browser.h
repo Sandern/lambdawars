@@ -14,7 +14,7 @@
 // CefClientHandler will still add individual cases to a message queue, 
 // so in SrcCefBrowser they are still processed on the main thread.
 // TODO: More testing. Don't know if it's ok to call Panel functions from the CEF message thread.
-//#define USE_MULTITHREADED_MESSAGELOOP
+#define USE_MULTITHREADED_MESSAGELOOP
 
 #include <string>
 #include "src_cef_js.h"
