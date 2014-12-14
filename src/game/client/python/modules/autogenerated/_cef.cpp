@@ -404,6 +404,15 @@ BOOST_PYTHON_MODULE(_cef){
                 , GetCursor_function_type( &::SrcCefBrowser::GetCursor ) );
         
         }
+        { //::SrcCefBrowser::GetIgnoreTabKey
+        
+            typedef bool ( ::SrcCefBrowser::*GetIgnoreTabKey_function_type )(  ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "GetIgnoreTabKey"
+                , GetIgnoreTabKey_function_type( &::SrcCefBrowser::GetIgnoreTabKey ) );
+        
+        }
         { //::SrcCefBrowser::GetName
         
             typedef char const * ( ::SrcCefBrowser::*GetName_function_type )(  ) ;
@@ -813,6 +822,16 @@ BOOST_PYTHON_MODULE(_cef){
                 "SetGameInputEnabled"
                 , SetGameInputEnabled_function_type( &::SrcCefBrowser::SetGameInputEnabled )
                 , ( bp::arg("state") ) );
+        
+        }
+        { //::SrcCefBrowser::SetIgnoreTabKey
+        
+            typedef void ( ::SrcCefBrowser::*SetIgnoreTabKey_function_type )( bool ) ;
+            
+            SrcCefBrowser_exposer.def( 
+                "SetIgnoreTabKey"
+                , SetIgnoreTabKey_function_type( &::SrcCefBrowser::SetIgnoreTabKey )
+                , ( bp::arg("ignoreTabKey") ) );
         
         }
         { //::SrcCefBrowser::SetKeyBoardInputEnabled

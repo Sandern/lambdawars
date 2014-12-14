@@ -266,6 +266,8 @@ public:
 	vgui::HCursor GetCursor();
 	void SetUseMouseCapture( bool usemousecapture ) { m_bUseMouseCapture = usemousecapture; }
 	bool GetUseMouseCapture( ) { return m_bUseMouseCapture; }
+	void SetIgnoreTabKey( bool ignoreTabKey ) { m_bIgnoreTabKey = ignoreTabKey; }
+	bool GetIgnoreTabKey( ) { return m_bIgnoreTabKey; }
 
 	bool IsAlphaZeroAt( int x, int y );
 	int GetAlphaAt( int x, int y );
@@ -365,6 +367,7 @@ private:
 	bool m_bPassMouseTruIfAlphaZero;
 	bool m_bUseMouseCapture;
 	bool m_bGameInputEnabled;
+	bool m_bIgnoreTabKey;
 
 	bool m_bHasFocus;
 

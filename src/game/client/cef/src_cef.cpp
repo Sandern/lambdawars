@@ -633,7 +633,11 @@ void CCefSystem::SendKeyEventToBrowsers( const CefKeyEvent &keyevent )
 {
 	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
 	{
-		if( !m_CefBrowsers[i]->IsValid() || !m_CefBrowsers[i]->IsFullyVisible() || !m_CefBrowsers[i]->IsGameInputEnabled() )
+		SrcCefBrowser *pBrowser = m_CefBrowsers[i];
+		if( !pBrowser->IsValid() || !pBrowser->IsFullyVisible() || !pBrowser->IsGameInputEnabled() )
+			continue;
+
+		if( pBrowser->GetIgnoreTabKey() && keyevent.windows_key_code == VK_TAB )
 			continue;
 
 		// Only send key input if no vgui panel has key focus

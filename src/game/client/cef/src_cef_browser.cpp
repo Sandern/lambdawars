@@ -450,7 +450,7 @@ void CefClientHandler::ProcessMessages()
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall, SrcCefNavigationType navigationbehavior ) : 
 	m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
-	m_bInitializePingSuccessful(false), m_bWasHidden(false)
+	m_bInitializePingSuccessful(false), m_bWasHidden(false), m_bIgnoreTabKey(false)
 {
 	m_Name = name ? name : "UnknownCefBrowser";
 
