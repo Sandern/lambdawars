@@ -119,7 +119,7 @@ class ClientApp : public CefApp,
 					public CefBrowserProcessHandler
 {
 public:
-	ClientApp();
+	ClientApp( bool bCefEnableGPU );
 
 protected:
 	// CefBrowserProcessHandler
@@ -136,6 +136,7 @@ private:
 private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
 
+	bool m_bEnableGPU;
 };
 
 CefRefPtr<ClientApp> g_pClientApp;
@@ -143,7 +144,7 @@ CefRefPtr<ClientApp> g_pClientApp;
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-ClientApp::ClientApp()
+ClientApp::ClientApp( bool bCefEnableGPU ) : m_bEnableGPU( bCefEnableGPU )
 {
 }
 
@@ -167,6 +168,9 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
+
+	if( !m_bEnableGPU )
+		command_line->AppendSwitch( CefString( "disable-gpu" ) );
 
 	if( g_debug_cef.GetBool() )
 		DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
@@ -206,6 +210,8 @@ bool CCefSystem::Init()
 	if( bDebugCef )
 		g_debug_cef.SetValue( CommandLine()->ParmValue( "-debugcef", 1 ) );
 
+	const bool bCefEnableGPU = CommandLine() && CommandLine()->FindParm("-cefenablegpu") != 0;
+
 	// Get path to subprocess browser
 	char browser_subprocess_path[_MAX_PATH];
 	filesystem->RelativePathToFullPath( "bin/lambdawars_browser.exe", "MOD", browser_subprocess_path, _MAX_PATH );
@@ -233,7 +239,7 @@ bool CCefSystem::Init()
 	// Arguments
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	CefMainArgs main_args( hinst );
-	g_pClientApp = new ClientApp;
+	g_pClientApp = new ClientApp( bCefEnableGPU );
 
 	// Settings
 	CefSettings settings;
