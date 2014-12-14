@@ -4981,6 +4981,16 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("allow") ) );
         
         }
+        { //::CBaseEntity::SetAlwaysNavIgnore
+        
+            typedef void ( ::CBaseEntity::*SetAlwaysNavIgnore_function_type )( bool ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetAlwaysNavIgnore"
+                , SetAlwaysNavIgnore_function_type( &::CBaseEntity::SetAlwaysNavIgnore )
+                , ( bp::arg("bAlwaysNavIgnore") ) );
+        
+        }
         { //::CBaseEntity::SetAnimatedEveryTick
         
             typedef void ( ::CBaseEntity::*SetAnimatedEveryTick_function_type )( bool ) ;

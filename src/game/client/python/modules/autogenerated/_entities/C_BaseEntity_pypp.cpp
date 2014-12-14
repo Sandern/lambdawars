@@ -4658,6 +4658,16 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("allow") ) );
         
         }
+        { //::C_BaseEntity::SetAlwaysNavIgnore
+        
+            typedef void ( ::C_BaseEntity::*SetAlwaysNavIgnore_function_type )( bool ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetAlwaysNavIgnore"
+                , SetAlwaysNavIgnore_function_type( &::C_BaseEntity::SetAlwaysNavIgnore )
+                , ( bp::arg("bAlwaysNavIgnore") ) );
+        
+        }
         { //::C_BaseEntity::SetAnimTime
         
             typedef void ( ::C_BaseEntity::*SetAnimTime_function_type )( float ) ;

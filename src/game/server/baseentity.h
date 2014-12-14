@@ -389,6 +389,8 @@ public:
 	void					SetNavIgnore( float duration = FLT_MAX );
 	void					ClearNavIgnore();
 	bool					IsNavIgnored() const;
+	void					SetAlwaysNavIgnore( bool bAlwaysNavIgnore );
+	bool					AlwaysNavIgnore();
 
 	// Is the entity floating?
 	bool					IsFloating();
@@ -1679,6 +1681,7 @@ protected:
 	unsigned char	m_nWaterType;
 	CNetworkVarForDerived( unsigned char, m_nWaterLevel );
 	float			m_flNavIgnoreUntilTime;
+	bool			m_bAlwaysIgnoreNav;
 
 	CNetworkHandleForDerived( CBaseEntity, m_hGroundEntity );
 	float			m_flGroundChangeTime; // Time that the ground entity changed
@@ -2366,6 +2369,16 @@ inline void	CBaseEntity::ClearNavIgnore()
 inline bool	CBaseEntity::IsNavIgnored() const
 {
 	return ( gpGlobals->curtime <= m_flNavIgnoreUntilTime );
+}
+
+inline void	CBaseEntity::SetAlwaysNavIgnore( bool bAlwaysNavIgnore )
+{
+	m_bAlwaysIgnoreNav = bAlwaysNavIgnore;
+}
+
+inline bool CBaseEntity::AlwaysNavIgnore()
+{
+	return m_bAlwaysIgnoreNav;
 }
 
 inline bool CBaseEntity::GetCheckUntouch() const

@@ -1885,6 +1885,8 @@ public:
 	void							SetNavIgnore( float duration = FLT_MAX );
 	void							ClearNavIgnore();
 	bool							IsNavIgnored() const;
+	void							SetAlwaysNavIgnore( bool bAlwaysNavIgnore );
+	bool							AlwaysNavIgnore();
 
 	// Owner number
 	int								GetOwnerNumber( void );
@@ -1933,6 +1935,7 @@ private:
 
 	bool m_bAllowNavIgnore;
 	float m_flNavIgnoreUntilTime;
+	bool m_bAlwaysIgnoreNav;
 
 	ShouldTransmitState_t m_LastShouldTransmitState;
 
@@ -2535,6 +2538,16 @@ inline void	CBaseEntity::ClearNavIgnore()
 inline bool	CBaseEntity::IsNavIgnored() const
 {
 	return ( gpGlobals->curtime <= m_flNavIgnoreUntilTime );
+}
+
+inline void	CBaseEntity::SetAlwaysNavIgnore( bool bAlwaysNavIgnore )
+{
+	m_bAlwaysIgnoreNav = bAlwaysNavIgnore;
+}
+
+inline bool CBaseEntity::AlwaysNavIgnore()
+{
+	return m_bAlwaysIgnoreNav;
 }
 
 //-----------------------------------------------------------------------------

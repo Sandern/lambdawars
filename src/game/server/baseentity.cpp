@@ -2431,6 +2431,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 //	DEFINE_FIELD( m_nWaterTouch,		FIELD_INTEGER ),
 //	DEFINE_FIELD( m_nSlimeTouch,		FIELD_INTEGER ),
 	DEFINE_FIELD( m_flNavIgnoreUntilTime,	FIELD_TIME ),
+	DEFINE_FIELD( m_bAlwaysIgnoreNav,	FIELD_BOOLEAN ),
 
 //	DEFINE_FIELD( m_bToolRecording,		FIELD_BOOLEAN ),
 //	DEFINE_FIELD( m_ToolHandle,		FIELD_INTEGER ),
