@@ -103,6 +103,7 @@ private:
 	float m_fTexS1, m_fTexT1;
 
 	//int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+	bool m_bTextureGeneratedOnce;
 	bool m_bTextureDirty;
 	bool m_bPopupTextureDirty;
 

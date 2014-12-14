@@ -41,7 +41,8 @@ static int nexthigher( int k )
 // Purpose: 
 //-----------------------------------------------------------------------------
 SrcCefVGUIPanel::SrcCefVGUIPanel( const char *pName, SrcCefBrowser *pController, vgui::Panel *pParent ) 
-	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), m_bTextureDirty(true), m_bPopupTextureDirty(false)
+	: Panel( NULL, "SrcCefPanel" ), m_pBrowser(pController), m_iTextureID(-1), 
+	m_bTextureDirty(true), m_bPopupTextureDirty(false), m_bTextureGeneratedOnce(false)
 {
 	// WarsSplitscreen: only one player
 	ACTIVE_SPLITSCREEN_PLAYER_GUARD( 0 );
@@ -340,6 +341,7 @@ void SrcCefVGUIPanel::Paint()
 					}*/
 
 					m_bTextureDirty = false;
+					m_bTextureGeneratedOnce = true;
 	#if 0
 					m_iDirtyX = renderer->GetWidth();
 					m_iDirtyY = renderer->GetHeight();
@@ -391,7 +393,7 @@ void SrcCefVGUIPanel::DrawWebview()
 	int iWide, iTall;
 	GetSize( iWide, iTall );
 
-	if( surface()->IsTextureIDValid( m_iTextureID ) && g_cef_draw.GetBool() )
+	if( surface()->IsTextureIDValid( m_iTextureID ) && m_bTextureGeneratedOnce && g_cef_draw.GetBool() )
 	{
 		vgui::surface()->DrawSetColor( m_Color );
 		vgui::surface()->DrawSetTexture( m_iTextureID );
