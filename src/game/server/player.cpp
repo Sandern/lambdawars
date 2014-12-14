@@ -8864,6 +8864,24 @@ void CBasePlayer::SetPlayerName( const char *name )
 	}
 }
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+boost::python::object CBasePlayer::PyGetPlayerName()
+{
+	const char *pPlayerName = GetPlayerName();
+	return boost::python::object(
+		boost::python::handle<>( 
+			PyUnicode_DecodeUTF8( pPlayerName, V_strlen( pPlayerName ), "ignore" )
+		)
+	);
+}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CBasePlayer::PrepareForFullUpdate( void )

@@ -316,6 +316,15 @@ public:
 
 	// returns the player name
 	const char *				GetPlayerName();
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	boost::python::object		PyGetPlayerName();
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	virtual const Vector		GetPlayerMins( void ) const; // uses local player
 	virtual const Vector		GetPlayerMaxs( void ) const; // uses local player
 

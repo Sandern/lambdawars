@@ -859,9 +859,6 @@ void register_C_BasePlayer_class(){
             "GetPlayerMins"
             , (::Vector const ( ::C_BasePlayer::* )(  ) const)( &::C_BasePlayer::GetPlayerMins ) )    
         .def( 
-            "GetPlayerName"
-            , (char const * ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::GetPlayerName ) )    
-        .def( 
             "GetPlayerRenderMode"
             , (::PlayerRenderMode_t ( ::C_BasePlayer::* )( int ) )( &::C_BasePlayer::GetPlayerRenderMode )
             , ( bp::arg("nSlot") ) )    
@@ -1082,6 +1079,9 @@ void register_C_BasePlayer_class(){
         .def( 
             "PreThink"
             , (void ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::PreThink ) )    
+        .def( 
+            "GetPlayerName"
+            , (::boost::python::api::object ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::PyGetPlayerName ) )    
         .def( 
             "RecvProxy_LocalOriginXY"
             , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalOriginXY )

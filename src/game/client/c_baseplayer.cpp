@@ -623,6 +623,24 @@ const char * C_BasePlayer::GetPlayerName()
 	return g_PR ? g_PR->GetPlayerName( entindex() ) : "";
 }
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+boost::python::object C_BasePlayer::PyGetPlayerName()
+{
+	const char *pPlayerName = GetPlayerName();
+	return boost::python::object(
+		boost::python::handle<>( 
+			PyUnicode_DecodeUTF8( pPlayerName, V_strlen( pPlayerName ), "ignore" )
+		)
+	);
+}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 //-----------------------------------------------------------------------------
 // Is the player dead?
 //-----------------------------------------------------------------------------

@@ -387,6 +387,15 @@ public:
 	// returns the player name
 	const char *			GetPlayerName() const { return m_szNetname; }
 	void					SetPlayerName( const char *name );
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	boost::python::object	PyGetPlayerName();
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	virtual const char *	GetCharacterDisplayName() { return GetPlayerName(); }
 

@@ -1411,9 +1411,6 @@ void register_CBasePlayer_class(){
             "GetPlayerMins"
             , (::Vector const ( ::CBasePlayer::* )(  ) const)( &::CBasePlayer::GetPlayerMins ) )    
         .def( 
-            "GetPlayerName"
-            , (char const * ( ::CBasePlayer::* )(  ) const)( &::CBasePlayer::GetPlayerName ) )    
-        .def( 
             "GetPotentialUseEntity"
             , (::CBaseEntity * ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::GetPotentialUseEntity )
             , bp::return_value_policy< bp::return_by_value >() )    
@@ -1845,6 +1842,9 @@ void register_CBasePlayer_class(){
         .def( 
             "PrepareForFullUpdate"
             , (void ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::PrepareForFullUpdate ) )    
+        .def( 
+            "GetPlayerName"
+            , (::boost::python::api::object ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::PyGetPlayerName ) )    
         .def( 
             "RemoveAllItems"
             , (void ( ::CBasePlayer::* )( bool ) )( &::CBasePlayer::RemoveAllItems )

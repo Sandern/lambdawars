@@ -1084,6 +1084,10 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_fun('Hints').exclude()
         if self.settings.branch == 'source2013' or self.isserver:
             cls.mem_fun('GetSurfaceData').exclude()
+            
+        excludetypes = [pointer_t(const_t(declarated_t(char_t())))]
+        cls.calldefs(name='GetPlayerName', function=calldef_withtypes(excludetypes)).exclude()
+        cls.mem_fun('PyGetPlayerName').rename('GetPlayerName')
         
         if self.isclient:
             # Client excludes
@@ -1223,8 +1227,11 @@ class Entities(SemiSharedModuleGenerator):
             mb.enum('GibType_e').include()
         else:
             # C_PlayerResource
+            cls = mb.class_('C_PlayerResource')
+            cls.mem_fun('GetPlayerName').exclude()
+            cls.mem_fun('PyGetPlayerName').rename('GetPlayerName')
             mb.add_declaration_code( "C_PlayerResource *wrap_PlayerResource( void )\r\n{\r\n\treturn g_PR;\r\n}\r\n" )
-            mb.add_registration_code( 'bp::def( "PlayerResource", wrap_PlayerResource, bp::return_value_policy< bp::return_by_value >() );' )   
+            mb.add_registration_code( 'bp::def( "PlayerResource", wrap_PlayerResource, bp::return_value_policy< bp::return_by_value >() );' )
             
     # TODO: Preferably, this should 
     def ParseEffects(self, mb):

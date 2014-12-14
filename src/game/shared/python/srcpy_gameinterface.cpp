@@ -486,9 +486,17 @@ bool PyVEngineServer::GetPlayerInfo( int ent_num, py_player_info_t *ppyinfo )
 {
 	if( !ppyinfo )
 		return false;
+
 	player_info_s info;
 	bool rv = engine->GetPlayerInfo(ent_num, &info);
-	ppyinfo->name = boost::python::object(info.name);
+
+	boost::python::object name = boost::python::object(
+		boost::python::handle<>( 
+			PyUnicode_DecodeUTF8( info.name, sizeof( info.name ), "ignore" )
+		)
+	);
+
+	ppyinfo->name = name;
 	ppyinfo->userID = info.userID;
 	ppyinfo->guid = boost::python::object(info.guid);
 	ppyinfo->friendsID = info.friendsID;

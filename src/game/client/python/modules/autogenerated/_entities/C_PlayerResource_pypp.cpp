@@ -614,10 +614,6 @@ void register_C_PlayerResource_class(){
             , (int ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetPing )
             , ( bp::arg("index") ) )    
         .def( 
-            "GetPlayerName"
-            , (char const * ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetPlayerName )
-            , ( bp::arg("index") ) )    
-        .def( 
             "GetPlayerScore"
             , (int ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetPlayerScore )
             , ( bp::arg("index") ) )    
@@ -666,6 +662,10 @@ void register_C_PlayerResource_class(){
             , (void ( ::C_PlayerResource::* )( ::DataUpdateType_t ) )(&::C_PlayerResource::OnDataChanged)
             , (void ( C_PlayerResource_wrapper::* )( ::DataUpdateType_t ) )(&C_PlayerResource_wrapper::default_OnDataChanged)
             , ( bp::arg("updateType") ) )    
+        .def( 
+            "GetPlayerName"
+            , (::boost::python::api::object ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::PyGetPlayerName )
+            , ( bp::arg("index") ) )    
         .def( 
             "TeamChanged"
             , (void ( ::C_PlayerResource::* )(  ) )( &::C_PlayerResource::TeamChanged ) )    
