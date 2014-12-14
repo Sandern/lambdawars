@@ -393,25 +393,6 @@ struct RichText_wrapper : PyPanel, vgui::RichText, bp::wrapper< vgui::RichText >
         vgui::RichText::SetFgColor( color );
     }
 
-    virtual void SetText( char const * text ) {
-        PY_OVERRIDE_CHECK( vgui::RichText, SetText )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::RichText, SetText )
-        bp::override func_SetText = this->get_override( "SetText" );
-        if( func_SetText.ptr() != Py_None )
-            try {
-                func_SetText( text );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::RichText::SetText( text );
-            }
-        else
-            this->vgui::RichText::SetText( text );
-    }
-    
-    void default_SetText( char const * text ) {
-        vgui::RichText::SetText( text );
-    }
-
     virtual void SetText( wchar_t const * text ) {
         PY_OVERRIDE_CHECK( vgui::RichText, SetText )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::RichText, SetText )
@@ -1363,16 +1344,6 @@ void register_RichText_class(){
         }
         { //::vgui::RichText::InsertString
         
-            typedef void ( ::vgui::RichText::*InsertString_function_type )( char const * ) ;
-            
-            RichText_exposer.def( 
-                "InsertString"
-                , InsertString_function_type( &::vgui::RichText::InsertString )
-                , ( bp::arg("text") ) );
-        
-        }
-        { //::vgui::RichText::InsertString
-        
             typedef void ( ::vgui::RichText::*InsertString_function_type )( wchar_t const * ) ;
             
             RichText_exposer.def( 
@@ -1696,18 +1667,6 @@ void register_RichText_class(){
                 "SetPanelInteractive"
                 , SetPanelInteractive_function_type( &::vgui::RichText::SetPanelInteractive )
                 , ( bp::arg("bInteractive") ) );
-        
-        }
-        { //::vgui::RichText::SetText
-        
-            typedef void ( ::vgui::RichText::*SetText_function_type )( char const * ) ;
-            typedef void ( RichText_wrapper::*default_SetText_function_type )( char const * ) ;
-            
-            RichText_exposer.def( 
-                "SetText"
-                , SetText_function_type(&::vgui::RichText::SetText)
-                , default_SetText_function_type(&RichText_wrapper::default_SetText)
-                , ( bp::arg("text") ) );
         
         }
         { //::vgui::RichText::SetText

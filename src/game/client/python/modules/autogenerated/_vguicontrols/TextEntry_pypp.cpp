@@ -554,25 +554,6 @@ struct TextEntry_wrapper : PyPanel, vgui::TextEntry, bp::wrapper< vgui::TextEntr
         vgui::TextEntry::SetText( wszText );
     }
 
-    virtual void SetText( char const * text ) {
-        PY_OVERRIDE_CHECK( vgui::TextEntry, SetText )
-        PY_OVERRIDE_LOG( _vguicontrols, vgui::TextEntry, SetText )
-        bp::override func_SetText = this->get_override( "SetText" );
-        if( func_SetText.ptr() != Py_None )
-            try {
-                func_SetText( text );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->vgui::TextEntry::SetText( text );
-            }
-        else
-            this->vgui::TextEntry::SetText( text );
-    }
-    
-    void default_SetText( char const * text ) {
-        vgui::TextEntry::SetText( text );
-    }
-
     virtual void SetVerticalScrollbar( bool state ) {
         PY_OVERRIDE_CHECK( vgui::TextEntry, SetVerticalScrollbar )
         PY_OVERRIDE_LOG( _vguicontrols, vgui::TextEntry, SetVerticalScrollbar )
@@ -1715,16 +1696,6 @@ void register_TextEntry_class(){
         }
         { //::vgui::TextEntry::InsertString
         
-            typedef void ( ::vgui::TextEntry::*InsertString_function_type )( char const * ) ;
-            
-            TextEntry_exposer.def( 
-                "InsertString"
-                , InsertString_function_type( &::vgui::TextEntry::InsertString )
-                , ( bp::arg("text") ) );
-        
-        }
-        { //::vgui::TextEntry::InsertString
-        
             typedef void ( ::vgui::TextEntry::*InsertString_function_type )( wchar_t * ) ;
             
             TextEntry_exposer.def( 
@@ -2398,18 +2369,6 @@ void register_TextEntry_class(){
                 , SetText_function_type(&::vgui::TextEntry::SetText)
                 , default_SetText_function_type(&TextEntry_wrapper::default_SetText)
                 , ( bp::arg("wszText") ) );
-        
-        }
-        { //::vgui::TextEntry::SetText
-        
-            typedef void ( ::vgui::TextEntry::*SetText_function_type )( char const * ) ;
-            typedef void ( TextEntry_wrapper::*default_SetText_function_type )( char const * ) ;
-            
-            TextEntry_exposer.def( 
-                "SetText"
-                , SetText_function_type(&::vgui::TextEntry::SetText)
-                , default_SetText_function_type(&TextEntry_wrapper::default_SetText)
-                , ( bp::arg("text") ) );
         
         }
         { //::vgui::TextEntry::SetTextHidden

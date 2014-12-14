@@ -225,6 +225,27 @@ struct python_unicode_to_ptr_const_wchar_t
 		return 0;
 	}
 };
+#else
+struct python_unicode_to_ptr_const_wchar_t
+{
+	python_unicode_to_ptr_const_wchar_t()
+	{
+		boost::python::converter::registry::insert(
+			&convert_to_wcstring, 
+			boost::python::type_id<wchar_t>(),
+			&boost::python::converter::wrap_pytype<&PyUnicode_Type>::get_pytype
+		);
+	}
+
+	static void *convert_to_wcstring(PyObject* obj)
+	{
+		if( PyUnicode_Check( obj ) )
+		{
+			return PyUnicode_AsUnicode( obj );
+		}
+		return 0;
+	}
+};
 #endif
 
 #endif // SRCPYTHON_CONVERTERS_H

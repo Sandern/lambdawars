@@ -813,11 +813,14 @@ class VGUIControls(ClientModuleGenerator):
         mb.mem_funs( 'GetSelectedRange' ).add_transformation( FT.output('cx0'), FT.output('cx1') )   
         mb.mem_funs( 'CursorToPixelSpace' ).add_transformation( FT.inout('cx'), FT.inout('cy') ) 
         mb.mem_funs( 'AddAnotherLine' ).add_transformation( FT.output('cx'), FT.output('cy') ) 
-        mb.mem_funs( 'GetStartDrawIndex' ).add_transformation( FT.output('lineBreakIndexIndex') ) 
+        mb.mem_funs( 'GetStartDrawIndex' ).add_transformation( FT.output('lineBreakIndexIndex') )
+        
+        charstrexcludetypes = [pointer_t(const_t(declarated_t(char_t())))]
         
         # Wrap GetText manual
-        mb.class_('TextEntry').mem_funs('GetText').exclude()
-        mb.class_('TextEntry').add_wrapper_code(
+        cls = mb.class_('TextEntry')
+        cls.mem_funs('GetText').exclude()
+        cls.add_wrapper_code(
             'boost::python::object GetText() {\r\n' + \
             '    const char *buf = (const char *)malloc( (GetTextLength()+1)*sizeof(char) );\r\n' + \
             '    TextEntry::GetText((char *)buf, GetTextLength()+1);\r\n' + \
@@ -827,13 +830,19 @@ class VGUIControls(ClientModuleGenerator):
             '}'
         )
         
-        mb.class_('TextEntry').add_registration_code(
+        cls.add_registration_code(
             'def( \r\n' + \
             '    "GetText"\r\n' + \
             '    , (boost::python::object ( TextEntry_wrapper::* )())( &TextEntry_wrapper::GetText ) )'
         )
+        
+        cls.calldefs(name='SetText', function=calldef_withtypes(charstrexcludetypes)).exclude()
+        cls.calldefs(name='InsertString', function=calldef_withtypes(charstrexcludetypes)).exclude()
 
         # RichText
+        cls = mb.class_('RichText')
+        cls.calldefs(name='SetText', function=calldef_withtypes(charstrexcludetypes)).exclude()
+        cls.calldefs(name='InsertString', function=calldef_withtypes(charstrexcludetypes)).exclude()
         if self.settings.branch == 'swarm':
             mb.mem_funs('GetScrollBar').exclude()
             
