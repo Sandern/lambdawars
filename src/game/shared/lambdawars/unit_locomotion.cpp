@@ -71,7 +71,7 @@ bool CTraceFilterUnitNav::ShouldHitEntity( IHandleEntity *pHandleEntity, int con
 	//	return false;
 	CBaseEntity *pEntity = (CBaseEntity *)pHandleEntity;
 
-	if ( pEntity->IsNavIgnored() )
+	if ( pEntity->IsNavIgnored() || pEntity->AlwaysNavIgnore() )
 		return false;
 
 	if ( m_bCheckCollisionTable )
