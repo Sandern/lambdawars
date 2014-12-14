@@ -105,7 +105,7 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	if( !renderer )
 		return false;
 
-	AUTO_LOCK( renderer->GetTextureBufferMutex() );
+	//AUTO_LOCK( renderer->GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	m_iWVWide = width;
@@ -290,68 +290,70 @@ void SrcCefVGUIPanel::OnThink()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::Paint()
 {
-	int iWide, iTall;
-	GetSize( iWide, iTall );
+	//int iWide, iTall;
+	//GetSize( iWide, iTall );
 
 	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
 	if( renderer )
 	{
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+		AUTO_LOCK( renderer->GetTextureBufferMutex() );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 		if( renderer->GetWidth() != m_iWVWide || renderer->GetHeight() != m_iWVTall )
 		{
 			if( !ResizeTexture( renderer->GetWidth(), renderer->GetHeight() ) )
 				return;
 		}
-	}
 
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( renderer->GetTextureBufferMutex() );
-#endif // USE_MULTITHREADED_MESSAGELOOP
+		SetCursor( renderer->GetCursor() );
 
-	if( g_pShaderAPI && m_RenderBuffer.IsValid() )
-	{
-		VPROF_BUDGET( "Upload", "CefUploadTexture" );
-
-		int nFrame = 0;
-		int nTextureChannel = 0;
-		ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
-		if( g_pShaderAPI->IsTexture( textureHandle ) )
+		if( g_pShaderAPI && m_RenderBuffer.IsValid() )
 		{
-			int iFace = 0;
-			int iMip = 0;
-			int z = 0;
+			VPROF_BUDGET( "Upload", "CefUploadTexture" );
 
-			g_pShaderAPI->ModifyTexture( textureHandle );
-
-			if( renderer->GetTextureBuffer() && m_bTextureDirty )
+			int nFrame = 0;
+			int nTextureChannel = 0;
+			ShaderAPITextureHandle_t textureHandle = g_pSLShaderSystem->GetShaderAPITextureBindHandle( m_RenderBuffer, nFrame, nTextureChannel );
+			if( g_pShaderAPI->IsTexture( textureHandle ) )
 			{
-				// Full Copy
-				g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
-				// Partial copy, would work if we had a partial buffer:
-				//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
-				//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
-				// Copy by line, but call too expensive to do per line:
-				/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
-				for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
+				int iFace = 0;
+				int iMip = 0;
+				int z = 0;
+
+				g_pShaderAPI->ModifyTexture( textureHandle );
+
+				if( renderer->GetTextureBuffer() && m_bTextureDirty )
 				{
-					g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
-						subWidth, 1, m_iTexImageFormat, 0, false, 
-						renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
-				}*/
+					// Full Copy
+					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+					// Partial copy, would work if we had a partial buffer:
+					//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
+					//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
+					// Copy by line, but call too expensive to do per line:
+					/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
+					for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
+					{
+						g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
+							subWidth, 1, m_iTexImageFormat, 0, false, 
+							renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
+					}*/
 
-				m_bTextureDirty = false;
-#if 0
-				m_iDirtyX = renderer->GetWidth();
-				m_iDirtyY = renderer->GetHeight();
-				m_iDirtyXEnd = m_iDirtyYEnd = 0;
-#endif // 0
-			}
+					m_bTextureDirty = false;
+	#if 0
+					m_iDirtyX = renderer->GetWidth();
+					m_iDirtyY = renderer->GetHeight();
+					m_iDirtyXEnd = m_iDirtyYEnd = 0;
+	#endif // 0
+				}
 
-			if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
-			{
-				g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
-					m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
+				if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
+				{
+					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
+						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
 
-				m_bPopupTextureDirty = false;
+					m_bPopupTextureDirty = false;
+				}
 			}
 		}
 	}
@@ -361,6 +363,24 @@ void SrcCefVGUIPanel::Paint()
 	{
 		DrawWebview();
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void SrcCefVGUIPanel::PerformLayout()
+{
+	BaseClass::PerformLayout();
+
+	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
+	if( !renderer )
+		return;
+
+	int x, y, wide, tall;
+	GetPos( x, y );
+	GetSize( wide, tall );
+
+	renderer->UpdateViewRect( x, y, wide, tall );
 }
 
 //-----------------------------------------------------------------------------

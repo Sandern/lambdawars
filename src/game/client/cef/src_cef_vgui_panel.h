@@ -36,6 +36,7 @@ public:
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	virtual void OnThink();
 	virtual void Paint();
+	virtual void PerformLayout();
 
 	virtual void DrawWebview();
 

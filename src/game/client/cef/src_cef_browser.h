@@ -32,6 +32,14 @@
 
 class PyJSObject;
 
+// Navigation behavior
+enum SrcCefNavigationType
+{
+	NT_DEFAULT = 0, // All navigation is allowed
+	NT_PREVENTALL, // Prevent navigating away from the current page
+	NT_ONLYFILEPROT, // Only allow navigating to file protocol urls
+};
+
 #ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser internal implementation
@@ -48,7 +56,7 @@ class CefClientHandler : public CefClient,
                       public CefRequestHandler
 {
 public:
-	CefClientHandler( SrcCefBrowser *pSrcBrowser );
+	CefClientHandler( SrcCefBrowser *pSrcBrowser, SrcCefNavigationType navigationbehavior, const char *pDebugName );
 
 	CefRefPtr<CefBrowser> GetBrowser() { return m_Browser; }
 	int GetBrowserId() { return m_BrowserId; }
@@ -170,6 +178,8 @@ private:
 	bool m_bInitialized;
 	// Last time we received a pong from the browser process
 	float m_fLastPingTime;
+	// Navigation behavior
+	SrcCefNavigationType m_NavigationBehavior;
 
 	// Internal
 	SrcCefBrowser *m_pSrcBrowser;
@@ -178,6 +188,7 @@ private:
 	CThreadFastMutex m_MessageQueueMutex;
 
 	enum messageType_e {
+		MT_UNKNOWN = -1,
 		MT_LOADSTART = 0,
 		MT_LOADEND,
 		MT_LOADERROR,
@@ -185,8 +196,10 @@ private:
 		MT_AFTERCREATED,
 		MT_CONTEXTCREATED,
 		MT_METHODCALL,
+		MT_OPENURL,
 	};
 	typedef struct messageData_t {
+		messageData_t() : type(MT_UNKNOWN), frame(NULL), data(NULL) {}
 		messageData_t( messageType_e type, CefRefPtr<CefFrame> frame, CefRefPtr<CefListValue> data ) :
 			type(type), frame(frame), data(data) {}
 		messageType_e type;
@@ -202,6 +215,8 @@ public:
 
 private:
 	IMPLEMENT_REFCOUNTING( CefClientHandler );
+
+	CefString m_DebugName;
 };
 #endif // PYPP_GENERATION
 
@@ -214,7 +229,13 @@ class SrcCefBrowser
 	friend class CefClientHandler;
 
 public:
-	SrcCefBrowser( const char *name, const char *url = "", int renderframerate = 30, int wide = 0, int tall = 0 );
+	SrcCefBrowser( 
+		const char *name, 
+		const char *url = "", 
+		int renderframerate = 30,
+		int wide = 0, 
+		int tall = 0, 
+		SrcCefNavigationType navigationbehavior = NT_DEFAULT );
 	~SrcCefBrowser();
 
 	void Destroy( void );
@@ -276,16 +297,6 @@ public:
 	virtual const char *GetURL();
 
 	virtual void WasHidden( bool hidden );
-
-	// Navigation behavior
-	enum NavigationType
-	{
-		NT_DEFAULT = 0, // All navigation is allowed
-		NT_PREVENTALL, // Prevent navigating away from the current page
-		NT_ONLYFILEPROT, // Only allow navigating to file protocol urls
-	};
-	virtual void SetNavigationBehavior( NavigationType behavior );
-	virtual NavigationType GetNavigationBehavior();
 
 	// Javascript methods
 	void ExecuteJavaScript( const char *code, const char *script_url, int start_line = 0 );
@@ -356,7 +367,6 @@ private:
 	bool m_bGameInputEnabled;
 
 	bool m_bHasFocus;
-	NavigationType m_navigationBehavior;
 
 	float m_fBrowserCreateTime;
 	bool m_bInitializePingSuccessful;
@@ -380,11 +390,6 @@ inline const char *SrcCefBrowser::GetName()
 inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
 {
 	return GetAlphaAt( x, y ) == 0;
-}
-
-inline SrcCefBrowser::NavigationType SrcCefBrowser::GetNavigationBehavior()
-{
-	return m_navigationBehavior;
 }
 
 #endif // SRC_CEF_BROWSER_H

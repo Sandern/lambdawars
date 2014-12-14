@@ -26,8 +26,8 @@ namespace bp = boost::python;
 
 struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
 
-    SrcCefBrowser_wrapper(char const * name, char const * url="", int renderframerate=30, int wide=0, int tall=0 )
-    : SrcCefBrowser( name, url, renderframerate, wide, tall )
+    SrcCefBrowser_wrapper(char const * name, char const * url="", int renderframerate=30, int wide=0, int tall=0, ::SrcCefNavigationType navigationbehavior=::NT_DEFAULT )
+    : SrcCefBrowser( name, url, renderframerate, wide, tall, navigationbehavior )
       , bp::wrapper< SrcCefBrowser >(){
         // constructor
     
@@ -292,6 +292,13 @@ struct SrcCefBrowser_wrapper : SrcCefBrowser, bp::wrapper< SrcCefBrowser > {
 BOOST_PYTHON_MODULE(_cef){
     bp::docstring_options doc_options( true, true, false );
 
+    bp::enum_< SrcCefNavigationType>("SrcCefNavigationType")
+        .value("NT_DEFAULT", NT_DEFAULT)
+        .value("NT_PREVENTALL", NT_PREVENTALL)
+        .value("NT_ONLYFILEPROT", NT_ONLYFILEPROT)
+        .export_values()
+        ;
+
     bp::class_< CCefSystem, boost::noncopyable >( "CCefSystem", bp::no_init )    
         .def( bp::init< >() )    
         .def( 
@@ -337,14 +344,8 @@ BOOST_PYTHON_MODULE(_cef){
 
     { //::SrcCefBrowser
         typedef bp::class_< SrcCefBrowser_wrapper, boost::noncopyable > SrcCefBrowser_exposer_t;
-        SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const *, int, int, int > >(( bp::arg("name"), bp::arg("url")="", bp::arg("renderframerate")=(int)(30), bp::arg("wide")=(int)(0), bp::arg("tall")=(int)(0) )) );
+        SrcCefBrowser_exposer_t SrcCefBrowser_exposer = SrcCefBrowser_exposer_t( "SrcCefBrowser", bp::init< char const *, bp::optional< char const *, int, int, int, SrcCefNavigationType > >(( bp::arg("name"), bp::arg("url")="", bp::arg("renderframerate")=(int)(30), bp::arg("wide")=(int)(0), bp::arg("tall")=(int)(0), bp::arg("navigationbehavior")=::NT_DEFAULT )) );
         bp::scope SrcCefBrowser_scope( SrcCefBrowser_exposer );
-        bp::enum_< SrcCefBrowser::NavigationType>("NavigationType")
-            .value("NT_DEFAULT", SrcCefBrowser::NT_DEFAULT)
-            .value("NT_PREVENTALL", SrcCefBrowser::NT_PREVENTALL)
-            .value("NT_ONLYFILEPROT", SrcCefBrowser::NT_ONLYFILEPROT)
-            .export_values()
-            ;
         bp::implicitly_convertible< char const *, SrcCefBrowser >();
         SrcCefBrowser_exposer.def( bp::init< SrcCefBrowser const & >(( bp::arg("vec") )) );
         { //::SrcCefBrowser::CloseDevTools
@@ -410,15 +411,6 @@ BOOST_PYTHON_MODULE(_cef){
             SrcCefBrowser_exposer.def( 
                 "GetName"
                 , GetName_function_type( &::SrcCefBrowser::GetName ) );
-        
-        }
-        { //::SrcCefBrowser::GetNavigationBehavior
-        
-            typedef ::SrcCefBrowser::NavigationType ( ::SrcCefBrowser::*GetNavigationBehavior_function_type )(  ) ;
-            
-            SrcCefBrowser_exposer.def( 
-                "GetNavigationBehavior"
-                , GetNavigationBehavior_function_type( &::SrcCefBrowser::GetNavigationBehavior ) );
         
         }
         { //::SrcCefBrowser::GetPassMouseTruIfAlphaZero
@@ -841,16 +833,6 @@ BOOST_PYTHON_MODULE(_cef){
                 "SetMouseInputEnabled"
                 , SetMouseInputEnabled_function_type( &::SrcCefBrowser::SetMouseInputEnabled )
                 , ( bp::arg("state") ) );
-        
-        }
-        { //::SrcCefBrowser::SetNavigationBehavior
-        
-            typedef void ( ::SrcCefBrowser::*SetNavigationBehavior_function_type )( ::SrcCefBrowser::NavigationType ) ;
-            
-            SrcCefBrowser_exposer.def( 
-                "SetNavigationBehavior"
-                , SetNavigationBehavior_function_type( &::SrcCefBrowser::SetNavigationBehavior )
-                , ( bp::arg("behavior") ) );
         
         }
         { //::SrcCefBrowser::SetPassMouseTruIfAlphaZero

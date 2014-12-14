@@ -298,10 +298,12 @@ void CCefSystem::Shutdown()
 	// Restore window process to prevent unwanted callbacks
 	SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( s_pChainedWndProc ) );
 
+#ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Workaround crash on exit: minimize window...
 	// If the window is still shown, an unwanted unhandled user callback occurs
 	// Using the multi_threaded_message_loop the crash does not occur, but causes other problems that need to be solved first
 	ShowWindow( GetMainWindow(), SW_MINIMIZE );
+#endif // USE_MULTITHREADED_MESSAGELOOP
 #endif // WIN32
 
 	m_bIsRunning = false;
@@ -661,6 +663,12 @@ void CCefSystem::OnScreenSizeChanged( int nOldWidth, int nOldHeight )
 		m_CefBrowsers[i]->InvalidateLayout();
 		m_CefBrowsers[i]->NotifyScreenInfoChanged();
 		m_CefBrowsers[i]->GetPanel()->MarkTextureDirty();
+
+		CefRefPtr<SrcCefOSRRenderer> renderer = m_CefBrowsers[i]->GetOSRHandler();
+		if( renderer )
+		{
+			renderer->UpdateRootScreenRect( 0, 0, ScreenWidth(), ScreenHeight() );
+		}
 	}
 }
 

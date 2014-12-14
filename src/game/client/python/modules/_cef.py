@@ -32,6 +32,8 @@ class CEF(ClientModuleGenerator):
         mb.free_function('CEFSystem').include()
         mb.free_function('CEFSystem').call_policies = call_policies.return_value_policy( call_policies.reference_existing_object )
        
+        mb.enum('SrcCefNavigationType').include()
+        
         # Cef browser
         cls = mb.class_('SrcCefBrowser')
         cls.include()

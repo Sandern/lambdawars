@@ -11,6 +11,10 @@
 #include "src_cef_vgui_panel.h"
 #include "vgui/Cursor.h"
 
+// Cef
+#include "include/base/cef_bind.h"
+#include "include/wrapper/cef_closure_task.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -25,6 +29,13 @@ SrcCefOSRRenderer::SrcCefOSRRenderer( SrcCefBrowser *pBrowser, bool transparent 
 	: m_pBrowser(pBrowser), m_bActive(true), m_pTextureBuffer(NULL), m_pPopupBuffer(NULL), 
 	m_iWidth(0), m_iHeight(0), m_iPopupWidth(0), m_iPopupHeight(0)
 {
+	m_Cursor = vgui::dc_arrow;
+
+	m_rootScreenRect.x = 0;
+	m_rootScreenRect.y = 0;
+	m_rootScreenRect.width = ScreenWidth();
+	m_rootScreenRect.height = ScreenHeight();
+
 #ifdef WIN32
 	m_hArrow = LoadCursor (NULL, IDC_ARROW );
 	m_hCross = LoadCursor (NULL, IDC_CROSS );
@@ -78,10 +89,16 @@ void SrcCefOSRRenderer::Destroy()
 bool SrcCefOSRRenderer::GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 								CefRect& rect)
 {
+#ifndef USE_MULTITHREADED_MESSAGELOOP
+	Assert( !CefCurrentlyOn(TID_UI) );
 	rect.x = 0;
 	rect.y = 0;
 	rect.width = ScreenWidth();
 	rect.height = ScreenHeight();
+#else
+	Assert( CefCurrentlyOn(TID_UI) );
+	rect = m_rootScreenRect;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	return true;
 }
 
@@ -91,10 +108,16 @@ bool SrcCefOSRRenderer::GetRootScreenRect(CefRefPtr<CefBrowser> browser,
 bool SrcCefOSRRenderer::GetViewRect(CefRefPtr<CefBrowser> browser,
 						CefRect& rect)
 {
+#ifndef USE_MULTITHREADED_MESSAGELOOP
+	Assert( !CefCurrentlyOn(TID_UI) );
 	if( !m_pBrowser || !m_pBrowser->GetPanel() )
 		return false;
 	m_pBrowser->GetPanel()->GetPos( rect.x, rect.y );
 	m_pBrowser->GetPanel()->GetSize( rect.width, rect.height );
+#else
+	Assert( CefCurrentlyOn(TID_UI) );
+	rect = m_viewRect;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	return true;
 }
 
@@ -107,11 +130,19 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 							int& screenX,
 							int& screenY)
 {
+#ifndef USE_MULTITHREADED_MESSAGELOOP
+	Assert( !CefCurrentlyOn(TID_UI) );
 	if( !m_pBrowser || !m_pBrowser->GetPanel() )
 		return false;
 	screenX = viewX;
 	screenY = viewY;
 	m_pBrowser->GetPanel()->LocalToScreen( screenX, screenY );
+#else
+	Assert( CefCurrentlyOn(TID_UI) );
+	screenX = viewX;
+	screenY = viewY;
+	// TODO: translate to screen
+#endif // USE_MULTITHREADED_MESSAGELOOP
 	return true;
 }
 
@@ -121,6 +152,7 @@ bool SrcCefOSRRenderer::GetScreenPoint(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 						bool show)
 {
+	Assert( !CefCurrentlyOn(TID_UI) );
 	if (!show) {
 		// Clear the popup rectangle.
 		ClearPopupRects();
@@ -141,6 +173,7 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnPopupSize(CefRefPtr<CefBrowser> browser,
 						const CefRect& rect)
 {
+	Assert( !CefCurrentlyOn(TID_UI) );
 	if (rect.width <= 0 || rect.height <= 0)
 		return;
 	original_popup_rect_ = rect;
@@ -190,7 +223,12 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 					int width,
 					int height)
 {
-	if( !m_pBrowser || !m_pBrowser->GetPanel() || !m_bActive )
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	Assert( CefCurrentlyOn(TID_UI) );
+	AUTO_LOCK( s_BufferMutex );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
+	if( !m_bActive || !m_pBrowser || !m_pBrowser->GetPanel() )
 	{
 		Warning("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet\n");
 		return;
@@ -204,10 +242,6 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 	int channels = 4;
 
 	Assert( dirtyRects.size() > 0 );
-
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( s_BufferMutex );
-#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	if( type == PET_VIEW )
 	{
@@ -312,6 +346,7 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
                               CursorType type,
                               const CefCursorInfo& custom_cursor_info)
 {
+	Assert( CefCurrentlyOn(TID_UI) );
 #ifdef WIN32
 	if( cursor == m_hArrow )
 	{
@@ -365,8 +400,10 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
 {
-	CefDbgMsg( 2, "#%dCef: OnCursorChange -> %d\n", m_pBrowser->GetBrowser()->GetIdentifier(), cursor );
-	m_pBrowser->GetPanel()->SetCursor( cursor );
+	//CefDbgMsg( 2, "#%dCef: OnCursorChange -> %d\n", m_pBrowser->GetBrowser()->GetIdentifier(), cursor );
+	//m_pBrowser->GetPanel()->SetCursor( cursor );
+	CefDbgMsg( 2, "Cef: OnCursorChange -> %d\n", cursor );
+	m_Cursor = cursor;
 }
 
 //-----------------------------------------------------------------------------
@@ -382,7 +419,10 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 
 	int channels = 4;
 
-	//AUTO_LOCK( s_BufferMutex );
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AUTO_LOCK( s_BufferMutex );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 	unsigned char *pImageData = m_pTextureBuffer;
 	unsigned char alpha = pImageData ? pImageData[(y * m_iWidth * channels) + (x * channels) + 3] : 0;
 	return alpha;
@@ -409,4 +449,40 @@ void SrcCefOSRRenderer::UpdateDragCursor(CefRefPtr<CefBrowser> browser,
 void SrcCefOSRRenderer::OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser)
 {
 	CefDbgMsg( 2, "#%dCef: SrcCefOSRRenderer OnScrollOffsetChanged called\n", m_pBrowser->GetBrowser()->GetIdentifier() );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefOSRRenderer::UpdateRootScreenRect( int x, int y, int wide, int tall )
+{
+	if (!CefCurrentlyOn(TID_UI)) {
+		CefPostTask(TID_UI, 
+			base::Bind(&SrcCefOSRRenderer::UpdateViewRect, this,
+			x, y, wide, tall));
+		return;
+	}
+
+	m_rootScreenRect.x = x;
+	m_rootScreenRect.y = y;
+	m_rootScreenRect.width = wide;
+	m_rootScreenRect.height = tall;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+void SrcCefOSRRenderer::UpdateViewRect( int x, int y, int wide, int tall )
+{
+	if (!CefCurrentlyOn(TID_UI)) {
+		CefPostTask(TID_UI, 
+			base::Bind(&SrcCefOSRRenderer::UpdateViewRect, this,
+			x, y, wide, tall));
+		return;
+	}
+
+	m_viewRect.x = x;
+	m_viewRect.y = y;
+	m_viewRect.width = wide;
+	m_viewRect.height = tall;
 }

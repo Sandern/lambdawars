@@ -61,6 +61,7 @@ public:
 	virtual void OnScrollOffsetChanged(CefRefPtr<CefBrowser> browser);
 
 	virtual void SetCursor( vgui::CursorCode cursor );
+	vgui::CursorCode GetCursor();
 
 	// Image buffer containing the pet view
 	unsigned char *GetTextureBuffer() { return m_pTextureBuffer; }
@@ -88,6 +89,9 @@ public:
 	CefRect GetPopupRectInWebView(const CefRect& original_rect);
 	void ClearPopupRects();
 
+	void UpdateRootScreenRect( int x, int y, int wide, int tall );
+	void UpdateViewRect( int x, int y, int wide, int tall );
+
 #ifdef WIN32
 private:
 	// Cursors
@@ -105,7 +109,17 @@ private:
 
 private:
 	bool m_bActive;
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	CThreadFastMutex s_BufferMutex;
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
+	// ===== Game thread data
+	SrcCefBrowser *m_pBrowser;
+
+	// ===== CEF UI thread data
+	// Texture buffers + cursor can be accessed after locking s_BufferMutex
 	int m_iWidth, m_iHeight;
+	vgui::CursorCode m_Cursor;
 	unsigned char *m_pTextureBuffer;
 
 	int m_iPopupOffsetX, m_iPopupOffsetY;
@@ -115,12 +129,18 @@ private:
 	CefRect popup_rect_;
 	CefRect original_popup_rect_;
 
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-	CThreadFastMutex s_BufferMutex;
-#endif // USE_MULTITHREADED_MESSAGELOOP
-	SrcCefBrowser *m_pBrowser;
+	CefRect m_rootScreenRect;
+	CefRect m_viewRect;
 
 	IMPLEMENT_REFCOUNTING(SrcCefOSRRenderer);
 };
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+inline vgui::CursorCode SrcCefOSRRenderer::GetCursor()
+{
+	return m_Cursor;
+}
 
 #endif // SRC_CEF_RENDERER_H

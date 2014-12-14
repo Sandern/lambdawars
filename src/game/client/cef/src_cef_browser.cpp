@@ -50,7 +50,8 @@ static void OpenURL( const char *url )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0), m_pSrcBrowser( pSrcBrowser ), 
+CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser, SrcCefNavigationType navigationbehavior, const char *pDebugName ) : 
+	m_BrowserId(0), m_pSrcBrowser( pSrcBrowser ), m_NavigationBehavior(navigationbehavior), m_DebugName(pDebugName),
 	m_OSRHandler( NULL ), m_bInitialized(false), m_fLastPingTime(-1)
 {
 }
@@ -60,6 +61,7 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser ) : m_BrowserId(0
 //-----------------------------------------------------------------------------
 void CefClientHandler::Destroy()
 {
+	Assert( !CefCurrentlyOn(TID_UI) );
 	if( GetBrowser() && GetBrowser()->GetHost() )
 	{
 		GetBrowser()->GetHost()->CloseBrowser( true );
@@ -80,6 +82,7 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
+	Assert( CefCurrentlyOn(TID_UI) );
 	if( GetOSRHandler() )
 	{
 		GetOSRHandler()->Destroy();
@@ -197,7 +200,7 @@ void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 		return;
 
 	if( g_debug_cef.GetBool() )
-		DevMsg( "#%d %s: SrcCefBrowser::OnAfterCreated\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+		DevMsg( "#%d %s: SrcCefBrowser::OnAfterCreated\n", browser->GetIdentifier(), m_DebugName.ToString().c_str() );
 
 	if( !m_Browser.get() ) 
 	{
@@ -225,7 +228,7 @@ void CefClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 		return;
 
 	if( g_debug_cef.GetBool() )
-		DevMsg( "#%d %s: SrcCefBrowser::OnLoadStart\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+		DevMsg( "#%d %s: SrcCefBrowser::OnLoadStart\n", browser->GetIdentifier(), m_DebugName.ToString().c_str() );
 
 #ifdef USE_MULTITHREADED_MESSAGELOOP
 	AddMessage( MT_LOADSTART, frame, NULL );
@@ -243,7 +246,7 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 		return;
 
 	if( g_debug_cef.GetBool() )
-		DevMsg( "#%d %s: SrcCefBrowser::OnLoadEnd\n", browser->GetIdentifier(), m_pSrcBrowser->GetName() );
+		DevMsg( "#%d %s: SrcCefBrowser::OnLoadEnd\n", browser->GetIdentifier(), m_DebugName.ToString().c_str() );
 
 #ifdef USE_MULTITHREADED_MESSAGELOOP
 	CefRefPtr<CefListValue> data = CefListValue::Create();
@@ -260,8 +263,6 @@ void CefClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFra
 void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 						const CefString& errorText, const CefString& failedUrl)
 {
-	if( !m_pSrcBrowser )
-		return;
 #ifdef USE_MULTITHREADED_MESSAGELOOP
 	CefRefPtr<CefListValue> data = CefListValue::Create();
 	data->SetInt( 0, errorCode );
@@ -269,6 +270,8 @@ void CefClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 	data->SetString( 2, failedUrl );
 	AddMessage( MT_LOADERROR, frame, data );
 #else
+	if( !m_pSrcBrowser )
+		return;
 	m_pSrcBrowser->OnLoadError( frame, errorCode, errorText.c_str(), failedUrl.c_str() );
 #endif // 0
 }
@@ -281,8 +284,6 @@ void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 									bool canGoBack,
 									bool canGoForward)
 {
-	if( !m_pSrcBrowser )
-		return;
 #ifdef USE_MULTITHREADED_MESSAGELOOP
 	CefRefPtr<CefListValue> data = CefListValue::Create();
 	data->SetBool( 0, isLoading );
@@ -290,6 +291,8 @@ void CefClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser,
 	data->SetBool( 2, canGoForward );
 	AddMessage( MT_LOADINGSTATECHANGE, NULL, data );
 #else
+	if( !m_pSrcBrowser )
+		return;
 	m_pSrcBrowser->OnLoadingStateChange( isLoading, canGoBack, canGoForward );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 	
@@ -303,8 +306,7 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 							CefRefPtr<CefRequest> request,
 							bool is_redirect)
 {
-	if( !m_pSrcBrowser )
-		return false;
+	Assert( CefCurrentlyOn(TID_UI) );
 
 	// Default behavior: allow navigating away
 	bool bDenyNavigation = false;
@@ -317,13 +319,13 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 		static std::string chromedevtoolspro( "chrome-devtools://");
 		if( url.compare( 0, chromedevtoolspro.size(), chromedevtoolspro ) != 0 )
 		{
-			if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_PREVENTALL )
+			if( m_NavigationBehavior == SrcCefNavigationType::NT_PREVENTALL )
 			{
 				// This mode prevents from navigating away from the current page
 				if( browser->GetMainFrame()->GetURL() != request->GetURL() )
 					bDenyNavigation = true;
 			}
-			else if( m_pSrcBrowser->GetNavigationBehavior() == SrcCefBrowser::NT_ONLYFILEPROT )
+			else if( m_NavigationBehavior == SrcCefNavigationType::NT_ONLYFILEPROT )
 			{
 				// This mode only allows navigating to urls starting with the file or custom local protocol
 				static std::string filepro( "file://");
@@ -337,12 +339,22 @@ bool CefClientHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 		// If we don't allow navigation, open the url in a new window
 		if( bDenyNavigation )
 		{
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+			CefRefPtr<CefListValue> data = CefListValue::Create();
+			data->SetString( 0, request->GetURL() );
+			AddMessage( MT_OPENURL, NULL, data );
+#else
 			OpenURL( request->GetURL().ToString().c_str() );
+#endif // USE_MULTITHREADED_MESSAGELOOP
 		}
 	}
 
 	if( g_debug_cef.GetBool() )
-		DevMsg( "#%d %s: SrcCefBrowser::OnBeforeBrowse %s. Deny: %d\n", browser->GetIdentifier(), m_pSrcBrowser->GetName(), request->GetURL().ToString().c_str(), bDenyNavigation );
+	{
+		DevMsg( "#%d %s: SrcCefBrowser::OnBeforeBrowse %s. Deny: %d\n", 
+			browser->GetIdentifier(), m_DebugName.ToString().c_str(), 
+			request->GetURL().ToString().c_str(), bDenyNavigation );
+	}
 	return bDenyNavigation;
 }
 
@@ -362,9 +374,8 @@ void CefClientHandler::OnResourceRedirect(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 void CefClientHandler::AddMessage( messageType_e type, CefRefPtr<CefFrame> frame, CefRefPtr<CefListValue> data )
 {
-	m_MessageQueueMutex.Lock();
+	AUTO_LOCK( m_MessageQueueMutex );
 	m_messageQueue.AddToTail( messageData_t( type, frame, data ) );
-	m_MessageQueueMutex.Unlock();
 }
 
 //-----------------------------------------------------------------------------
@@ -372,11 +383,20 @@ void CefClientHandler::AddMessage( messageType_e type, CefRefPtr<CefFrame> frame
 //-----------------------------------------------------------------------------
 void CefClientHandler::ProcessMessages()
 {
-	m_MessageQueueMutex.Lock();
-
-	for( int i = 0; i < m_messageQueue.Count(); i++ ) 
+	if( m_messageQueue.Count() == 0 )
 	{
-		messageData_t &data = m_messageQueue[i];
+		return;
+	}
+
+	m_MessageQueueMutex.Lock();
+	CUtlVector< messageData_t > messageQueue( 0, m_messageQueue.Count() );
+	messageQueue.CopyArray( m_messageQueue.Base(), m_messageQueue.Count() );
+	m_messageQueue.Purge();
+	m_MessageQueueMutex.Unlock();
+
+	for( int i = 0; i < messageQueue.Count(); i++ ) 
+	{
+		messageData_t &data = messageQueue[i];
 		CefString identifier;
 		CefRefPtr<CefListValue> methodargs;
 
@@ -414,21 +434,21 @@ void CefClientHandler::ProcessMessages()
 				m_pSrcBrowser->OnMethodCall( identifier, methodargs, &iCallbackID );
 			}
 			break;
+		case MT_OPENURL:
+			OpenURL( data.data->GetString( 0 ).ToString().c_str() );
+			break;
 		default:
 			break;
 		}
 	}
-
-	m_messageQueue.Purge();
-
-	m_MessageQueueMutex.Unlock();
 }
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 //-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
-SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall ) : m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
+SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall, SrcCefNavigationType navigationbehavior ) : 
+	m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
 	m_bInitializePingSuccessful(false), m_bWasHidden(false)
 {
@@ -453,7 +473,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFram
 	}
 
 	m_URL = pURL ? pURL : "";
-	m_CefClientHandler = new CefClientHandler( this );
+	m_CefClientHandler = new CefClientHandler( this, navigationbehavior, name );
 
     CefWindowInfo info;
 	info.SetAsWindowless( /*CEFSystem().GetMainWindow()*/ NULL, true );
@@ -1003,20 +1023,6 @@ void SrcCefBrowser::WasHidden( bool hidden )
 		return;
 
 	m_CefClientHandler->GetBrowser()->GetHost()->WasHidden( hidden );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void SrcCefBrowser::SetNavigationBehavior( NavigationType behavior )
-{
-	if( !IsValid() )
-		return;
-
-	if( m_navigationBehavior == behavior )
-		return;
-
-	m_navigationBehavior = behavior; 
 }
 
 //-----------------------------------------------------------------------------
