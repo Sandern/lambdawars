@@ -843,9 +843,21 @@ Vector CUnitBase::BodyTarget( const Vector &posSrc, bool bNoisy )
 	const Vector &vOrigin = GetAbsOrigin();
 	if( m_bBodyTargetOriginBased )
 	{
-		// Building/structures mode, which might not have proper eye positions or world space centers
 		low = vOrigin;
-		high = vOrigin + CollisionProp()->OBBMaxs() * 0.8f;
+
+		IPhysicsObject *pPhysObject = VPhysicsGetObject();
+		if( pPhysObject )
+		{
+			const CPhysCollide *pCollide = pPhysObject->GetCollide();
+			Vector mins, maxs;
+			physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+			high = vOrigin + maxs * 0.8f;
+		}
+		else 
+		{
+			// Building/structures mode, which might not have proper eye positions or world space centers
+			high = vOrigin + CollisionProp()->OBBMaxs() * 0.8f;
+		}
 		delta = high - low;
 	}
 	else
