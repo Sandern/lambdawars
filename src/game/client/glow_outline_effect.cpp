@@ -13,11 +13,17 @@
 
 #define FULL_FRAME_TEXTURE "_rt_FullFrameFB"
 
-ConVar glow_outline_effect_enable( "glow_outline_effect_enable", "1", FCVAR_CHEAT, "Enable entity outline glow effects." );
-ConVar glow_outline_effect_width( "glow_outline_width", "6.0f", FCVAR_CHEAT, "Width of glow outline effect in screen space." );
+#ifdef HL2WARS_DLL
+#define GLOW_FCVAR_FLAGS FCVAR_ARCHIVE
+#else 
+#define GLOW_FCVAR_FLAGS FCVAR_CHEAT
+#endif // HL2WARS_DLL
 
-ConVar glow_outline_effect_dim( "glow_outline_dim", "1.0f", FCVAR_CHEAT, "" );
-ConVar glow_outline_effect_luminance( "glow_outline_luminance", "0.8f", FCVAR_CHEAT, "" );
+ConVar glow_outline_effect_enable( "glow_outline_effect_enable", "1", GLOW_FCVAR_FLAGS, "Enable entity outline glow effects." );
+ConVar glow_outline_effect_width( "glow_outline_width", "6.0f", GLOW_FCVAR_FLAGS, "Width of glow outline effect in screen space." );
+
+ConVar glow_outline_effect_dim( "glow_outline_dim", "1.0f", GLOW_FCVAR_FLAGS, "" );
+ConVar glow_outline_effect_luminance( "glow_outline_luminance", "0.8f", GLOW_FCVAR_FLAGS, "" );
 
 CGlowObjectManager g_GlowObjectManager;
 
