@@ -949,7 +949,7 @@ float CUnitBase::TargetDistance( const Vector &pos, CBaseEntity *pTarget, bool b
 
 	// For large units (i.e. buildings) use a trace
 	float fBoundingRadius2D = pTarget->CollisionProp()->BoundingRadius2D();
-	if( fBoundingRadius2D > 96.0f || pTarget->VPhysicsGetObject() )
+	if( fBoundingRadius2D > 96.0f || (pTarget->GetSolid() == SOLID_VPHYSICS && pTarget->VPhysicsGetObject()) )
 	{
 		// Try hitting against the eye position. This is usually good!
 		trace_t tr;
