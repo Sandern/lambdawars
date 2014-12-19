@@ -1969,6 +1969,9 @@
     <ClCompile Include="..\shared\lambdawars\wars_matchmaking.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\wars_network.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3823,6 +3826,9 @@
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_matchmaking.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\lambdawars\wars_network.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>
