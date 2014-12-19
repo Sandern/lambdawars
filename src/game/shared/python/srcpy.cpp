@@ -954,8 +954,6 @@ void CSrcPython::LevelShutdownPostEntity()
 	m_bActive = false;
 }
 
-static ConVar py_disable_update("py_disable_update", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
-
 #ifdef CLIENT_DLL
 void CSrcPython::Update( float frametime )
 #else
