@@ -753,6 +753,9 @@ void C_BaseExplosionEffect::CreateDynamicLight( void )
 #ifdef DEFERRED_ENABLED
 		else
 		{
+			if( GetLightingManager()->CountTempLights() >= 4 )
+				return;
+
 			def_light_temp_t *l = new def_light_temp_t( false, wars_explosion_light_duration.GetFloat() );
 
 			l->ang = vec3_angle;
