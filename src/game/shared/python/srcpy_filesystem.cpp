@@ -213,7 +213,11 @@ boost::python::list PyFS_ListDir( const char *pPath, const char *pPathID, const 
 	pFileName = filesystem->FindFirstEx( wildcard, pPathID, &fh );
 	while( pFileName )
 	{
-		result.append( boost::python::object( pFileName ) );
+		result.append( boost::python::object(
+			boost::python::handle<>( 
+				PyUnicode_DecodeUTF8( pFileName, V_strlen( pFileName ), "ignore" )
+			)
+		) );
 		pFileName = filesystem->FindNext( fh );
 	}
 	filesystem->FindClose( fh );
