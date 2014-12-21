@@ -246,7 +246,12 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	SetAbsAngles( orientation );
 	SetMoveType( MOVETYPE_PUSH );
 	SetSolid( SOLID_VPHYSICS );
+#ifdef HL2WARS_DLL
+	// "temp" fix. Only used by striders, don't want it to affect navigation/movement.
+	SetCollisionGroup( WARS_COLLISION_GROUP_IGNORE_ALL_UNITS_AND_BUILD );
+#else
 	SetCollisionGroup( pOwner->GetCollisionGroup() );
+#endif // HL2WARS_DLL
 	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	solid.params.pGameData = (void *)this;
 	IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false, &solid );
