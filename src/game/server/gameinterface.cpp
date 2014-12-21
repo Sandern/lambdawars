@@ -910,7 +910,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 
-	m_bPaused = false;
+	warsextension->SetPaused( false );
 	m_bWasPaused = false;
 
 	return true;
@@ -1139,7 +1139,7 @@ bool CServerGameDLL::SupportsSaveRestore()
 // Called any time a new level is started (after GameInit() also on level transitions within a game)
 bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background )
 {
-	m_bPaused = false;
+	warsextension->SetPaused( false );
 	m_bWasPaused = false;
 
 	// At this point the game server api context should exist
@@ -1341,13 +1341,13 @@ void CServerGameDLL::GameFrame( bool simulating )
 	VPROF( "CServerGameDLL::GameFrame" );
 
 	// Ugly HACK! to prevent the game time from changing when paused
-	if( m_bWasPaused != m_bPaused )
+	if( m_bWasPaused != warsextension->IsPaused() )
 	{
 		m_fPauseTime = gpGlobals->curtime;
 		m_nPauseTick = gpGlobals->tickcount;
-		m_bWasPaused = m_bPaused;
+		m_bWasPaused = warsextension->IsPaused();
 	}
-	if( m_bPaused )
+	if( warsextension->IsPaused() )
 	{
 		gpGlobals->curtime = m_fPauseTime;
 		gpGlobals->tickcount = m_nPauseTick;
@@ -1551,7 +1551,7 @@ void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_
 // Called when a level is shutdown (including changing levels)
 void CServerGameDLL::LevelShutdown( void )
 {
-	m_bPaused = false;
+	warsextension->SetPaused( false );
 	m_bWasPaused = false;
 
 #if !defined( NO_STEAM )
@@ -3319,7 +3319,6 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int numcmds, int totalcmds,
 	int dropped_packets, bool ignore, bool paused )
 {
-	g_ServerGameDLL.m_bPaused = paused;
 	warsextension->SetPaused( paused );
 
 	int				i;

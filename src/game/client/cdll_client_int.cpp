@@ -1464,16 +1464,21 @@ void CHLClient::HudProcessInput( bool bActive )
 void CHLClient::HudUpdate( bool bActive )
 {
 	// Ugly HACK! to prevent the game time from changing when paused
-	if( m_bWasPaused != warsextension->IsPaused() )
+	if( gpGlobals->maxClients == 1 )
 	{
-		m_fPauseTime = gpGlobals->curtime;
-		m_nPauseTick = gpGlobals->tickcount;
-		m_bWasPaused = warsextension->IsPaused();
-	}
-	if( warsextension->IsPaused() )
-	{
-		gpGlobals->curtime = m_fPauseTime;
-		gpGlobals->tickcount = m_nPauseTick;
+		if( m_bWasPaused != warsextension->IsPaused() )
+		{
+			m_fPauseTime = gpGlobals->curtime;
+			m_nPauseTick = gpGlobals->tickcount;
+			m_bWasPaused = warsextension->IsPaused();
+		}
+		if( warsextension->IsPaused() )
+		{
+			gpGlobals->curtime = m_fPauseTime;
+			gpGlobals->tickcount = m_nPauseTick;
+		}
+	} else if( warsextension->IsPaused() ) {
+		warsextension->SetPaused( false );
 	}
 
 	float frametime = gpGlobals->frametime;
@@ -2174,6 +2179,11 @@ void CHLClient::LevelShutdown( void )
 #endif
 
 	TheNavMesh->Reset();
+
+#ifdef HL2WARS_DLL
+	// Should never be paused at this point
+	warsextension->SetPaused( false );
+#endif // HL2WARS_DLL
 }
 
 

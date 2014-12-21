@@ -463,9 +463,9 @@ void CFogOfWarMgr::SaveHeightMap()
 {
 	// Get filename
 	char szNrpFilename[MAX_PATH];
-	Q_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
-	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
-	Q_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
+	V_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
+	V_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
+	V_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 	DevMsg("Saving height map to %s\n", szNrpFilename);
 
 	CUtlBuffer buf;
@@ -546,10 +546,10 @@ void CFogOfWarMgr::LoadHeightMap()
 #ifdef CLIENT_DLL
 	V_StripExtension( engine->GetLevelName(), szNrpFilename, MAX_PATH );
 #else
-	Q_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
-	Q_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
+	V_strncpy( szNrpFilename, "maps/" ,sizeof(szNrpFilename));
+	V_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
 #endif // CLIENT_DLL
-	Q_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
+	V_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
 	double fStartTime = Plat_FloatTime();
 
 	// Read file
@@ -636,15 +636,8 @@ void CFogOfWarMgr::LoadHeightMap()
 //-----------------------------------------------------------------------------
 void CFogOfWarMgr::ClearHeightMap()
 {
-	for( int x = 0; x < m_nGridSize; x++ )
-	{
-		for( int y = 0; y < m_nGridSize; y++ )
-		{
-			int idx = FOWINDEX(x, y);
-			m_TileHeightsStatic[idx] = MIN_COORD_INTEGER;
-			m_TileHeights[idx] = MIN_COORD_INTEGER;
-		}
-	}
+	m_TileHeightsStatic.FillWithValue( MIN_COORD_INTEGER );
+	m_TileHeights.FillWithValue( MIN_COORD_INTEGER );
 }
 
 //-----------------------------------------------------------------------------

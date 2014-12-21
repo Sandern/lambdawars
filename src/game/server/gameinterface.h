@@ -156,12 +156,10 @@ private:
 	void LevelInit_ParseAllEntities( const char *pMapEntities );
 	void LoadMessageOfTheDay();
 
+	// HACK for dumb Alien Swarm engine bug (broken pause behavior...)
 	bool m_bWasPaused;
 	float m_fPauseTime;
 	int m_nPauseTick;
-
-public:
-	bool m_bPaused; // HACK for dumb Alien Swarm engine bug
 };
 
 

@@ -4960,7 +4960,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , (void ( ::CServerGameDLL::* )( ::CSaveRestoreData * ) )( &::CServerGameDLL::WriteSaveHeaders )
             , ( bp::arg("arg0") ) )    
         .def_readwrite( "m_bIsHibernating", &CServerGameDLL::m_bIsHibernating )    
-        .def_readwrite( "m_bPaused", &CServerGameDLL::m_bPaused )    
         .def_readwrite( "m_fAutoSaveDangerousMinHealthToCommit", &CServerGameDLL::m_fAutoSaveDangerousMinHealthToCommit )    
         .def_readwrite( "m_fAutoSaveDangerousTime", &CServerGameDLL::m_fAutoSaveDangerousTime );
 
