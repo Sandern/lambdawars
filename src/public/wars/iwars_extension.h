@@ -24,6 +24,8 @@ enum EMessage
 	k_EMsgClientFirstMsg = 5000,
 	k_EMsgClientRequestGameAccepted = k_EMsgClientFirstMsg,
 	k_EMsgClientRequestGameDenied,
+	k_EMsgClient_PyEntityClasses,
+	k_EMsgClient_PyEntityUpdate,
 };
 
 typedef struct WarsMessageData_t
