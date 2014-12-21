@@ -710,6 +710,10 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 			}
 		}
 
+		// In list of ignored nav entities last locomotion run
+		if( IsEntityNavIgnored( MoveCommand, pEnt ) )
+			continue;
+
 		// Store general info
 		m_ConsiderList[m_iConsiderSize] = pEnt;
 		m_iConsiderSize++;
@@ -729,6 +733,20 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 		VectorNormalize( m_vBlockingDirection );
 		m_vBlockingDirection = m_vBlockingDirection.Cross( Vector(0, 0, 1) );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool UnitBaseNavigator::IsEntityNavIgnored( UnitBaseMoveCommand &MoveCommand, CBaseEntity *pEnt )
+{
+	for( int i = 0; i < MoveCommand.navignorelist.Count(); i++ )
+	{
+		if( MoveCommand.navignorelist[i] && MoveCommand.navignorelist[i] == pEnt )
+			return true;
+	}
+
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -807,6 +825,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCom
 	}
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: Determine whether the entity can affect our flow our not.
 //-----------------------------------------------------------------------------
@@ -822,6 +841,7 @@ bool UnitBaseNavigator::ShouldConsiderEntity( CBaseEntity *pEnt )
 
 	return true;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Whether we should add density from nav areas

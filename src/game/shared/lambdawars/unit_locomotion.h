@@ -72,6 +72,7 @@ public:
 	Vector outwishvel;
 	float outstepheight;
 	float stopdistance;
+	CUtlVector< EHANDLE > navignorelist;
 
 	// Out list of blockers
 	CUtlVector< UnitBlocker_t > blockers;

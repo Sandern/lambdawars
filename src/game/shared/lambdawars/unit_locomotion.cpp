@@ -485,19 +485,38 @@ void UnitBaseLocomotion::WalkMove( void )
 //-----------------------------------------------------------------------------
 void UnitBaseLocomotion::UpdateBlockerNoMove()
 {
+	int i;
 	float fBloat = 32.0f;
 	CBaseEntity *pList[MAX_FIND_BLOCKERS];
 	Ray_t ray;
 	ray.Init( mv->origin, mv->origin + Vector(0,0,1), m_vecMins - Vector(fBloat, fBloat, 0.0f), m_vecMaxs + Vector(fBloat, fBloat, 0.0f) );
 	int n = UTIL_EntitiesAlongRay( pList, MAX_FIND_BLOCKERS, ray, FL_NPC|FL_OBJECT );
 
-	for( int i = 0; i < n; i++ )
+	for( i = 0; i < n; i++ )
 	{
 		CBaseEntity *pEnt = pList[i];
 		if( !pEnt || pEnt == GetOuter() || !pEnt->IsSolid() )
 			continue;
 
 		AddBlocker( pEnt, pEnt->GetAbsOrigin(), vec3_origin );
+	}
+
+	// Find objects which can be ignored by navigation
+	mv->navignorelist.Purge();
+	trace_t trace;
+	for( i = 0; i < 4; i++ )
+	{
+		TraceUnitBBox( mv->origin, mv->origin+Vector(0,0,1), unitsolidmask, m_pOuter->GetCollisionGroup(), trace );
+		if( !trace.startsolid || !trace.m_pEnt || 
+			(!trace.m_pEnt->AllowNavIgnore() && trace.m_pEnt->GetMoveType() != MOVETYPE_VPHYSICS) )
+			break;
+		mv->navignorelist.AddToTail( trace.m_pEnt );
+		trace.m_pEnt->SetNavIgnore();
+	}
+	// Clear nav ignored entities	
+	for ( i = 0; i < mv->navignorelist.Count(); i++ )
+	{
+		mv->navignorelist[i]->ClearNavIgnore();
 	}
 }
 
@@ -553,7 +572,7 @@ void UnitBaseLocomotion::AirMove( void )
 	// first try just moving to the destination?	
 	//dest = mv->origin + mv->velocity*mv->interval;
 
-	CUtlVector<CBaseEntity *> ignoredEntities;
+	mv->navignorelist.Purge();
 	trace_t trace;
 	for( i = 0; i < 8; i++ )
 	{
@@ -561,7 +580,7 @@ void UnitBaseLocomotion::AirMove( void )
 		if( !trace.startsolid || !trace.m_pEnt || 
 			(!trace.m_pEnt->AllowNavIgnore() && trace.m_pEnt->GetMoveType() != MOVETYPE_VPHYSICS) )
 			break;
-		ignoredEntities.AddToTail( trace.m_pEnt );
+		mv->navignorelist.AddToTail( trace.m_pEnt );
 		trace.m_pEnt->SetNavIgnore();
 		//m_pTraceListData->m_aEntityList.FindAndRemove( trace.m_pEnt );
 		//m_pTraceListData->m_nEntityCount--;	
@@ -577,9 +596,9 @@ void UnitBaseLocomotion::AirMove( void )
 	UnitTryMove(&pm);
 
 	// Clear nav ignored entities	
-	for ( i = 0; i < ignoredEntities.Count(); i++ )
+	for ( i = 0; i < mv->navignorelist.Count(); i++ )
 	{
-		ignoredEntities[i]->ClearNavIgnore();
+		mv->navignorelist[i]->ClearNavIgnore();
 	}
 }
 
@@ -711,7 +730,6 @@ void UnitBaseLocomotion::Move( float interval, UnitBaseMoveCommand &move_command
 //#define UNIT_DEBUGSTEP 
 void UnitBaseLocomotion::GroundMove()
 {
-	CUtlVector<CBaseEntity *> ignoredEntities;
 	trace_t trace;
 	Vector stepEnd;
 	float fIntervalStepSize;
@@ -724,6 +742,7 @@ void UnitBaseLocomotion::GroundMove()
 	// Raise ourself stepsize
 	// Combine with testing the start position.
 	// Set blocker to ignore if allowed.
+	mv->navignorelist.Purge();
 	stepEnd = mv->origin;
 	stepEnd.z = mv->origin.z + fIntervalStepSize;
 	for( i = 0; i < 8; i++ )
@@ -732,7 +751,7 @@ void UnitBaseLocomotion::GroundMove()
 		if( !trace.startsolid || !trace.m_pEnt || 
 			(!trace.m_pEnt->AllowNavIgnore() && trace.m_pEnt->GetMoveType() != MOVETYPE_VPHYSICS) )
 			break;
-		ignoredEntities.AddToTail( trace.m_pEnt );
+		mv->navignorelist.AddToTail( trace.m_pEnt );
 		trace.m_pEnt->SetNavIgnore();
 		//m_pTraceListData->m_aEntityList.FindAndRemove( trace.m_pEnt );
 		//m_pTraceListData->m_nEntityCount--;	
@@ -770,9 +789,9 @@ void UnitBaseLocomotion::GroundMove()
 #endif // !(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )
 
 	// Clear nav ignored entities	
-	for ( i = 0; i < ignoredEntities.Count(); i++ )
+	for ( i = 0; i < mv->navignorelist.Count(); i++ )
 	{
-		ignoredEntities[i]->ClearNavIgnore();
+		mv->navignorelist[i]->ClearNavIgnore();
 	}
 
 #if !defined(CLIENT_DLL) && defined( UNIT_DEBUGSTEP )

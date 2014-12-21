@@ -48,6 +48,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual'
         cls.var('blockers').exclude()
+        cls.var('navignorelist').exclude()
         cls.var('pyblockers').rename('blockers')
        
         cls = mb.class_('UnitBaseLocomotion')

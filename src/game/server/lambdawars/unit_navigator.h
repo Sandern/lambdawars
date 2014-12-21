@@ -383,12 +383,13 @@ public:
 
 	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
 	virtual void		RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
-	virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
+	//virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
 	virtual bool		ShouldConsiderNavMesh( void );
 
 	
 	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
 	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual bool		IsEntityNavIgnored( UnitBaseMoveCommand &MoveCommand, CBaseEntity *pEnt );
 
 	virtual float		ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCommand &MoveCommand );
 	float				GetEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
