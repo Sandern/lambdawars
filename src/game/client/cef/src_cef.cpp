@@ -25,6 +25,11 @@
 #include "srcpy.h"
 #endif // ENABLE_PYTHON
 
+#ifdef WIN32
+#include <windows.h>
+#include <imm.h>
+#endif // WIN32
+
 // CEF
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
@@ -86,6 +91,40 @@ LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 		case WM_DEADCHAR:
 		{
 			CEFSystem().ProcessDeadChar( message, wParam, lParam );
+			break;
+		}
+		case WM_IME_STARTCOMPOSITION:
+		{
+			break;
+		}
+		case WM_IME_ENDCOMPOSITION:
+		{
+			break;
+		}
+		case WM_IME_COMPOSITION:
+		{
+			HIMC hIMC = ImmGetContext( ( HWND )vgui::input()->GetIMEWindow() );
+			if ( hIMC )
+			{
+				wchar_t tempstr[32];
+
+				int len = ImmGetCompositionStringW( hIMC, GCS_RESULTSTR, (LPVOID)tempstr, sizeof( tempstr ) );
+				if( len > 0 )
+				{
+					if ((len % 2) != 0)
+						len++;
+					int numchars = len / sizeof( wchar_t );
+
+					for( int i = 0; i < numchars; ++i )
+					{
+						CEFSystem().ProcessCompositionResult( tempstr[i] );
+					}
+						
+				}
+
+				ImmReleaseContext( ( HWND )vgui::input()->GetIMEWindow(), hIMC );
+			}
+
 			break;
 		}
 		case WM_MOUSEWHEEL:
@@ -417,7 +456,7 @@ SrcCefBrowser *CCefSystem::FindBrowser( CefBrowser *pBrowser )
 //-----------------------------------------------------------------------------
 SrcCefBrowser *CCefSystem::FindBrowserByName( const char *pName )
 {
-	for( int i = 0; i < m_CefBrowsers.Count(); i++ )
+	for( int i = 0; i < m_CefBrowsers.Count(); i++ ) 
 	{
 		if( m_CefBrowsers[i]->IsValid() && V_strcmp( m_CefBrowsers[i]->GetName(), pName ) == 0 )
 			return m_CefBrowsers[i];
@@ -557,6 +596,8 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 	}
 	else
 	{
+		keyevent.type = KEYEVENT_CHAR;
+
 		HKL currentKb = ::GetKeyboardLayout( 0 );
 
 		// Source's input system seems to be doing the same call to ToUnicodeEx, due which 
@@ -577,12 +618,9 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 			Assert( deadCharRet == -1 ); // -1 means dead char
 		}
 
-		keyevent.type = KEYEVENT_CHAR;
-
 		// CEF key event expects the unicode version, but our multi byte application does not
 		// receive the right code from the message loop. This is a problem for languages such as
 		// Cyrillic. Convert the virtual key to the right unicode char.
-
 		UINT scancode = ( lParam >> 16 ) & 0xFF;
 		UINT virtualKey = MapVirtualKeyEx(scancode, MAPVK_VSC_TO_VK, currentKb);
 
@@ -615,6 +653,27 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 							message == WM_SYSKEYUP;
 
 	m_iKeyModifiers = getKeyModifiers( wParam, lParam );
+	keyevent.modifiers = m_iKeyModifiers;
+
+	SendKeyEventToBrowsers( keyevent );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CCefSystem::ProcessCompositionResult( wchar_t result )
+{
+	CefKeyEvent keyevent;
+	keyevent.type = KEYEVENT_CHAR;
+
+	keyevent.character = (wchar_t)result;
+	keyevent.unmodified_character = (wchar_t)result;
+
+	keyevent.windows_key_code = result;
+	//keyevent.native_key_code = lParam;
+	keyevent.is_system_key = false;
+
+	m_iKeyModifiers = getKeyModifiers( result, 0 );
 	keyevent.modifiers = m_iKeyModifiers;
 
 	SendKeyEventToBrowsers( keyevent );

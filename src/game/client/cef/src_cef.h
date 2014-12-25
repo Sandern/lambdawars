@@ -59,6 +59,7 @@ public:
 
 #ifdef WIN32
 	void ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam );
+	void ProcessCompositionResult( wchar_t result );
 	void ProcessDeadChar( UINT message, WPARAM wParam, LPARAM lParam );
 #endif WIN32
 #ifndef PYPP_GENERATION // FIXME: Generation compiler doesn't likes this...
