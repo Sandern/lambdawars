@@ -2146,7 +2146,8 @@ class VPKPathFinder(PathFinder):
 class VPKSourceFileLoader(SourceFileLoader):
     def path_stats(self, path):
         """Return the metadata for the path."""
-        return {'mtime': _filesystem.GetFileTime(path), 'size': _filesystem.Size(path)}
+        filetime = _filesystem.GetFileTime(path)
+        return {'mtime': filetime if filetime != 0 else -1, 'size': _filesystem.Size(path)}
         
     def get_data(self, path):
         """Return the data from path as raw bytes."""
