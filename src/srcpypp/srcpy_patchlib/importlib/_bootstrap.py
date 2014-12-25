@@ -523,7 +523,8 @@ def _verbose_message(message, *args, verbosity=1):
     if sys.flags.verbose >= verbosity:
         if not message.startswith(('#', 'import ')):
             message = '# ' + message
-        print(message.format(*args), file=sys.stderr)
+        #print(message.format(*args), file=sys.stderr)
+        srcbuiltins.PrintWarning('%s\n' % message.format(*args))
 
 
 def _check_name(method):
@@ -2576,16 +2577,15 @@ def _setup(sys_module, _imp_module):
         except ImportError:
             raise ImportError('importlib requires _filesystem')
             
-    # The following code can be used for debugging the frozen importlib module:
-    # A message can be printed using "srcbuiltins.Msg"
-    # print does not work yet, because it's not redirected
-    '''if 'srcbuiltins' in sys.modules:
+    # Use srcbuiltins module for access to print functions. At this point
+    # printing is not redirected yet.
+    if 'srcbuiltins' in sys.modules:
         srcbuiltins = sys.modules['srcbuiltins']
     else:
         try:
             srcbuiltins = _builtin_from_name('srcbuiltins')
         except ImportError:
-            raise ImportError('importlib requires srcbuiltins')'''
+            raise ImportError('importlib requires srcbuiltins')
                 
     setattr(self_module, '_os', os_module)
     setattr(self_module, 'path_sep', path_sep)
