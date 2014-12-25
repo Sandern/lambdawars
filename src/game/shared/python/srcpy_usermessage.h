@@ -15,7 +15,7 @@
 		pywrite() {}
 		pywrite(const pywrite &w) 
 		{
-			memcpy(this, &w, sizeof(pywrite)-sizeof(CUtlVector< struct pywrite >));
+			V_memcpy(this, &w, sizeof(pywrite)-sizeof(CUtlVector< struct pywrite >));
 			writelist = w.writelist;
 		}
 
