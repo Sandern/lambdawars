@@ -57,7 +57,7 @@ public:
 	CBitVec<ABSOLUTE_PLAYER_LIMIT> m_PlayerUpdateBits;
 
 protected:
-	char m_Name[PYNETVAR_MAX_NAME];
+	CUtlString m_Name;
 	bool m_bChangedCallback;
 	bool m_bInitialState;
 
@@ -127,7 +127,7 @@ private:
 // Reset all network variables transmit bits for the specified client (0 based)
 void PyNetworkVarsResetClientTransmitBits( int iClient );
 // Updates network variables for specified client index (0 based)
-void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient );
+void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict );
 
 #else
 	void HookPyNetworkVar();

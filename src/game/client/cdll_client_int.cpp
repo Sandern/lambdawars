@@ -1551,6 +1551,9 @@ void CHLClient::HudUpdate( bool bActive )
 				case k_EMsgClientRequestGameDenied:
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
 					break;
+				case k_EMsgClient_PyEntityUpdate:
+					Msg("Received k_EMsgClient_PyEntityUpdate\n");
+					break;
 				default:
 					Warning("Unknown client message type %d\n", eMsg); 
 					break;

@@ -12,4 +12,7 @@
 #pragma once
 #endif
 
+void WarsNet_StartEntityUpdate( const CSteamID &steamIDRemote, EHANDLE ent );
+void WarsNet_EndEntityUpdate();
+
 #endif // WARS_NETWORK_H

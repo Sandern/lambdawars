@@ -16,6 +16,11 @@
 #include "usermessages.h"
 #endif // CLIENT_DLL
 
+#ifdef HL2WARS_DLL
+//#define USE_WARS_NETWORK
+#include "wars_network.h"
+#endif // HL2WARS_DLL
+
 ConVar g_debug_pynetworkvar("g_debug_pynetworkvar", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 namespace bp = boost::python;
@@ -48,7 +53,7 @@ bool CPythonSendProxyAlliesOnly::ShouldSend( CBaseEntity *pEnt, int iClient )
 CPythonNetworkVarBase::CPythonNetworkVarBase( bp::object ent, const char *name, bool changedcallback, bp::object sendproxy )
 	: m_bChangedCallback(changedcallback), m_bInitialState(true)
 {
-	Q_snprintf(m_Name, PYNETVAR_MAX_NAME, name);
+	m_Name = name;
 	CBaseEntity *pEnt = NULL;
 	m_pPySendProxy = NULL;
 	try 
@@ -175,7 +180,7 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 	} 
 	catch(boost::python::error_already_set &) 
 	{
-		Warning("Failed to parse data for network variable %s:\n", m_Name );
+		Warning("Failed to parse data for network variable %s:\n", m_Name.String() );
 		PyErr_Print();
 		PyErr_Clear();
 		Set( bp::object(0) );
@@ -190,13 +195,13 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 	else
 		UserMessageBegin( filter, "PyNetworkVar");
 	WRITE_EHANDLE(pEnt);
-	WRITE_STRING(m_Name);
+	WRITE_STRING(m_Name.String());
 	PyWriteElement(write);
 	MessageEnd();
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		DevMsg("#%d:%s - %f - PyNetworkVar: %s, Value -> ", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name);
+		DevMsg("#%d:%s - %f - PyNetworkVar: %s, Value -> ", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name.String());
 		PyPrintElement(write);
 	}
 }
@@ -300,7 +305,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	else
 		UserMessageBegin( filter, "PyNetworkArrayFull");
 	WRITE_EHANDLE(pEnt);
-	WRITE_STRING(m_Name);
+	WRITE_STRING(m_Name.String());
 	WRITE_BYTE(length);
 	for( int i = 0; i < writelist.Count(); i++ )
 	{
@@ -310,7 +315,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		DevMsg("#%d:%s - %f - PyNetworkArray: %s\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name);
+		DevMsg("#%d:%s - %f - PyNetworkArray: %s\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name.String());
 		for( int i = 0; i < writelist.Count(); i++ )
 		{
 			DevMsg("\t");
@@ -436,7 +441,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 	filter.AddRecipient( iClient + 1 );
 	UserMessageBegin( filter, m_bChangedCallback ? "PyNetworkDictFullCC" : "PyNetworkDictFull" );
 	WRITE_EHANDLE(pEnt);
-	WRITE_STRING(m_Name);
+	WRITE_STRING(m_Name.String());
 	WRITE_BYTE((int)length);
 	for( int i = 0; i < writelist.Count(); i++ )
 	{
@@ -446,7 +451,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 
 	if( g_debug_pynetworkvar.GetBool() )
 	{
-		DevMsg("#%d:%s - %f - PyNetworkDict: %s (length: %d)\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name, (int)length);
+		DevMsg("#%d:%s - %f - PyNetworkDict: %s (length: %d)\n", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name.String(), (int)length);
 		for( int i = 0; i < writelist.Count(); i++ )
 		{
 			DevMsg("\t");
@@ -480,14 +485,27 @@ void PyNetworkVarsResetClientTransmitBits( int iClient )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
+void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict )
 {
 	if( !pEnt->m_utlPyNetworkVars.Count() )
 		return;
 
+	int iClient = ENTINDEX( pClientEdict ) - 1; // Client index is 0 based
+
 	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get( iClient ) == false )
 		return;
 
+#ifdef USE_WARS_NETWORK
+	WarsNet_StartEntityUpdate( *engine->GetClientSteamID( pClientEdict ), pEnt );
+	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
+	{
+		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
+			continue;
+
+		// TODO
+	}
+	WarsNet_EndEntityUpdate();
+#else
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
 		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
@@ -495,6 +513,7 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 
 		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
 	}
+#endif // USE_WARS_NETWORK
 }
 
 #else 

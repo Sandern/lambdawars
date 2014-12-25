@@ -4298,7 +4298,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	// Python networkvars: mark player as transmit
 	int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
 	m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
-	PyNetworkVarsUpdateClient( this, iClientIdx );
+	PyNetworkVarsUpdateClient( this, pInfo->m_pClientEnt );
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions

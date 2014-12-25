@@ -2679,7 +2679,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				// Python networkvars: mark player as transmit
 				int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
 				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
-				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), iClientIdx );
+				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), pInfo->m_pClientEnt );
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
