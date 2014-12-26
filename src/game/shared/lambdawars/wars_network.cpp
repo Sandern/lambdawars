@@ -225,12 +225,12 @@ static void WarsNet_WriteEntityDataInternal( boost::python::object data )
 	}
 }
 
-void WarsNet_WriteEntityData( const char *name, boost::python::object data )
+void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback )
 {
 	s_wroteData = true;
 
 	// Indicate we are writing a new variable
-	WarsNet_WriteType( WARSNET_ENTVAR );
+	WarsNet_WriteType( changecallback ? WARSNET_ENTVAR_CC : WARSNET_ENTVAR );
 
 	int strLen = V_strlen( name );
 	s_variableMessageData.Put( &strLen, sizeof( strLen ) );

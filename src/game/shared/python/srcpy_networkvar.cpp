@@ -174,7 +174,7 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 	m_PlayerUpdateBits.Clear(iClient);
 
 #ifdef USE_WARS_NETWORK
-	WarsNet_WriteEntityData( m_Name.String(), Get() );
+	WarsNet_WriteEntityData( m_Name.String(), Get(), m_bChangedCallback );
 #else
 	pywrite write;
 	try 
@@ -282,7 +282,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 	m_PlayerUpdateBits.Clear(iClient);
 
 #ifdef USE_WARS_NETWORK
-	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal );
+	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal, m_bChangedCallback );
 #else
 	// Parse list
 	int length = 0;
@@ -404,7 +404,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 
 
 #ifdef USE_WARS_NETWORK
-	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal );
+	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal, m_bChangedCallback );
 #else
 	// Create write list
 	// TODO: Only write changed keys if possible

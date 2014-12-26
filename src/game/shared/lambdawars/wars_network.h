@@ -17,6 +17,7 @@
 enum WarsNetType_e {
 	WARSNET_ERROR = 0,
 	WARSNET_ENTVAR,
+	WARSNET_ENTVAR_CC, // Change callback
 	WARSNET_INT,
 	WARSNET_FLOAT,
 	WARSNET_STRING,
@@ -43,7 +44,7 @@ typedef struct WarsEntityUpdateMessage_t : public WarsMessage_t
 #ifndef CLIENT_DLL
 void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );
 void WarsNet_EndEntityUpdate();
-void WarsNet_WriteEntityData( const char *name, boost::python::object data );
+void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback );
 #else
 void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data );
 #endif // CLIENT_DLL
