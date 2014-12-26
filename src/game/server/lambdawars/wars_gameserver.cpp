@@ -91,7 +91,7 @@ void CWarsGameServer::ProcessMessages()
 				{
 					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
-					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
+					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.TellMaxPut() - sizeof( WarsRequestServerMessage_t ) );
 					pGameData = new KeyValues( "GameData" );
 					if( !pGameData->ReadAsBinary( data ) )
 					{
@@ -142,7 +142,7 @@ void CWarsGameServer::ProcessMessages()
 				{
 					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
-					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.Size() - sizeof( WarsRequestServerMessage_t ) );
+					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.TellMaxPut() - sizeof( WarsRequestServerMessage_t ) );
 					pGameData = new KeyValues( "GameData" );
 					if( !pGameData->ReadAsBinary( data ) )
 					{

@@ -2441,6 +2441,9 @@
     <ClCompile Include="cef\src_cef_local_handler.cpp">
       <Filter>Source Files\cef</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\wars_network_read.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -4944,6 +4947,9 @@
     </ClInclude>
     <ClInclude Include="cef\src_cef_local_handler.h">
       <Filter>Source Files\cef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\lambdawars\wars_network.h">
+      <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

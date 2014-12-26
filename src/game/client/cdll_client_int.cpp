@@ -161,6 +161,7 @@
 #include "editor/editorsystem.h"
 #include "wars/iwars_extension.h"
 #include "wars_matchmaking.h"
+#include "wars_network.h"
 
 #include "../materialsystem/IShaderSystem.h"
 #include "shaderapi/ishaderapi.h"
@@ -1521,7 +1522,6 @@ void CHLClient::HudUpdate( bool bActive )
 		{
 			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
 
-			CUtlBuffer data;
 			boost::python::dict kwargs;
 			boost::python::object signal;
 			uint32 publicIP = 0;
@@ -1532,7 +1532,7 @@ void CHLClient::HudUpdate( bool bActive )
 			{
 				case k_EMsgClientRequestGameAccepted:
 
-					if( messageData->buf.Size() >= sizeof(WarsAcceptGameMessage_t) )
+					if( messageData->buf.TellMaxPut() >= sizeof(WarsAcceptGameMessage_t) )
 					{
 						WarsAcceptGameMessage_t *acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
 
@@ -1552,7 +1552,7 @@ void CHLClient::HudUpdate( bool bActive )
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
 					break;
 				case k_EMsgClient_PyEntityUpdate:
-					Msg("Received k_EMsgClient_PyEntityUpdate\n");
+					WarsNet_ReceiveEntityUpdate( messageData->buf );
 					break;
 				default:
 					Warning("Unknown client message type %d\n", eMsg); 

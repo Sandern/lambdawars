@@ -17,7 +17,7 @@
 #endif // CLIENT_DLL
 
 #ifdef HL2WARS_DLL
-//#define USE_WARS_NETWORK
+#define USE_WARS_NETWORK
 #include "wars_network.h"
 #endif // HL2WARS_DLL
 
@@ -173,6 +173,9 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 
 	m_PlayerUpdateBits.Clear(iClient);
 
+#ifdef USE_WARS_NETWORK
+	WarsNet_WriteEntityData( m_Name.String(), Get() );
+#else
 	pywrite write;
 	try 
 	{
@@ -204,6 +207,7 @@ void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient 
 		DevMsg("#%d:%s - %f - PyNetworkVar: %s, Value -> ", pEnt->entindex(), pEnt->GetClassname(), gpGlobals->curtime, m_Name.String());
 		PyPrintElement(write);
 	}
+#endif // USE_WARS_NETWORK
 }
 
 //---------------------------------------------------------------------------------------
@@ -277,6 +281,9 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 
 	m_PlayerUpdateBits.Clear(iClient);
 
+#ifdef USE_WARS_NETWORK
+	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal );
+#else
 	// Parse list
 	int length = 0;
 	CUtlVector<pywrite> writelist;
@@ -322,6 +329,7 @@ void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClien
 			PyPrintElement(writelist.Element(i));
 		}
 	}
+#endif // USE_WARS_NETWORK
 }
 
 //---------------------------------------------------------------------------------------
@@ -394,6 +402,10 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 
 	m_PlayerUpdateBits.Clear(iClient);
 
+
+#ifdef USE_WARS_NETWORK
+	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal );
+#else
 	// Create write list
 	// TODO: Only write changed keys if possible
 	unsigned long length = 0;
@@ -458,6 +470,7 @@ void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient
 			PyPrintElement(writelist.Element(i));
 		}
 	}
+#endif // USE_WARS_NETWORK
 }
 
 //---------------------------------------------------------------------------------------
@@ -496,12 +509,13 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict )
 		return;
 
 #ifdef USE_WARS_NETWORK
-	WarsNet_StartEntityUpdate( *engine->GetClientSteamID( pClientEdict ), pEnt );
+	WarsNet_StartEntityUpdate( pClientEdict, pEnt );
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
 		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
 			continue;
 
+		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
 		// TODO
 	}
 	WarsNet_EndEntityUpdate();
