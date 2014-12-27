@@ -46,6 +46,8 @@ void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );
 void WarsNet_EndEntityUpdate();
 void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback );
 #else
+void WarsNet_Init();
+void WarsNet_Shutdown();
 void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data );
 #endif // CLIENT_DLL
 

@@ -1320,6 +1320,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
+
+	WarsNet_Init();
 #endif // HL2WARS_DLL
 
 	m_bWasPaused = false;
@@ -1420,6 +1422,8 @@ void CHLClient::Shutdown( void )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
+
+	WarsNet_Shutdown();
 #endif // HL2WARS_DLL
 	
 	DisconnectTier3Libraries( );

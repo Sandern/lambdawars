@@ -16,6 +16,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar wars_net_debug_send( "wars_net_debug_send", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
+
 static void WarsNet_WriteEntityDataInternal( boost::python::object data );
 
 static bool s_EntityUpdateStarted = false;
@@ -64,7 +66,11 @@ void WarsNet_EndEntityUpdate()
 		return;
 	}
 
-	Msg("WarsNet wrote %d bytes\n", s_variableMessageData.TellMaxPut() );
+	if( wars_net_debug_send.GetBool() )
+	{
+		Msg("WarsNet wrote entity update of %d bytes, sending using %s\n", 
+			s_variableMessageData.TellMaxPut(), s_isLoopback ? "loopback" : "Steam P2P Networking" );
+	}
 
 	if( s_isLoopback )
 	{
@@ -228,6 +234,11 @@ static void WarsNet_WriteEntityDataInternal( boost::python::object data )
 void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback )
 {
 	s_wroteData = true;
+
+	if( wars_net_debug_send.GetBool() )
+	{
+		Msg("WarsNet Writing entity variable update for %s\n", name);
+	}
 
 	// Indicate we are writing a new variable
 	WarsNet_WriteType( changecallback ? WARSNET_ENTVAR_CC : WARSNET_ENTVAR );
