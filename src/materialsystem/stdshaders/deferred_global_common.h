@@ -135,9 +135,8 @@
 
 /* Radiosity stuff
  */
-#define DEFCFG_ENABLE_RADIOSITY 1
+#define DEFCFG_ENABLE_RADIOSITY 0
 
-#ifdef DEFCFG_ENABLE_RADIOSITY
 #	define RADIOSITY_SMOOTH_TRANSITION 1
 
 #	define RADIOSITY_BUFFER_SAMPLES_XY 42
@@ -156,7 +155,6 @@
 
 #	define RADIOSITY_UVRATIO_X (RADIOSITY_BUFFER_VIEWPORT_SX/(float)RADIOSITY_BUFFER_RES_X)
 #	define RADIOSITY_UVRATIO_Y (RADIOSITY_BUFFER_VIEWPORT_SY/(float)RADIOSITY_BUFFER_RES_Y)
-#endif
 
 
 /* Amount of RTs (or views for composited cascades) allocated per shadow type

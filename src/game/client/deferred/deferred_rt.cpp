@@ -122,9 +122,11 @@ const ImageFormat fmt_gbuffer0 =
 	const ImageFormat fmt_depth = GetDeferredManager()->GetShadowDepthFormat();
 	const ImageFormat fmt_depthColor = bShadowUseColor ? IMAGE_FORMAT_R32F
 		: g_pMaterialSystemHardwareConfig->GetNullTextureFormat();
+#if DEFCFG_ENABLE_RADIOSITY == 1
 	const ImageFormat fmt_radAlbedo = IMAGE_FORMAT_RGB888;
 	const ImageFormat fmt_radNormal = IMAGE_FORMAT_RGB888;
 	const ImageFormat fmt_radBuffer = IMAGE_FORMAT_RGB888;
+#endif // DEFCFG_ENABLE_RADIOSITY
 
 	if ( fmt_depth == IMAGE_FORMAT_D16_SHADOW )
 		g_flDepthScalar = pow( 2.0, 16 );
@@ -139,9 +141,11 @@ const ImageFormat fmt_gbuffer0 =
 	unsigned int depthFlags =			TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
 	unsigned int shadowColorFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
 	unsigned int projVGUIFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
+#if DEFCFG_ENABLE_RADIOSITY == 1
 	unsigned int radAlbedoNormalFlags =	TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
 	unsigned int radBufferFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET;
 	unsigned int radNormalFlags =		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_RENDERTARGET | TEXTUREFLAGS_POINTSAMPLE;
+#endif // DEFCFG_ENABLE_RADIOSITY
 
 	materials->BeginRenderTargetAllocation();
 
@@ -249,7 +253,7 @@ const ImageFormat fmt_gbuffer0 =
 				MATERIAL_RT_DEPTH_NONE,
 				shadowColorFlags, 0 ) );
 
-#if DEFCFG_ENABLE_RADIOSITY
+#if DEFCFG_ENABLE_RADIOSITY != 0
 			g_tex_ShadowRad_Albedo_Ortho[i].Init( materials->CreateNamedRenderTargetTextureEx2(
 				VarArgs( "%s%02i", DEFRTNAME_SHADOWRAD_ALBEDO_ORTHO, i ),
 				iResolution_x, iResolution_y,

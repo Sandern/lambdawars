@@ -74,14 +74,20 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 	const bool bAlbedo4 = PARM_TEX( info.iAlbedo4 );
 #endif
 
+#if DEFCFG_ENABLE_RADIOSITY == 1
 	const bool bHasSpec1 = ( info.nSpecTexture != -1 && params[ info.nSpecTexture ]->IsDefined() );
 	const bool bHasSpec2 = ( info.nSpecTexture2 != -1 && params[ info.nSpecTexture2 ]->IsDefined() );
 	const bool bHasSpec3 = ( info.nSpecTexture3 != -1 && params[ info.nSpecTexture3 ]->IsDefined() );
 	const bool bHasSpec4 = ( info.nSpecTexture4 != -1 && params[ info.nSpecTexture4 ]->IsDefined() );
+#endif
 
 	const bool bAlphatest = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) && bAlbedo;
-
+	
+#if DEFCFG_ENABLE_RADIOSITY == 1
 	const bool bMultiBlend = PARM_SET( info.iMultiblend ) || bAlbedo3 || bAlbedo4;
+#else
+	const bool bMultiBlend = PARM_SET( info.iMultiblend ) || bAlbedo3;
+#endif
 	const bool bBaseTexture2 = !bMultiBlend && bAlbedo2;
 
 	const bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 );
@@ -111,7 +117,7 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 			iVFmtFlags |= VERTEX_FORMAT_COMPRESSED;
 		}
 
-#ifndef DEFCFG_ENABLE_RADIOSITY
+#if DEFCFG_ENABLE_RADIOSITY == 0
 		if ( bAlphatest )
 #endif
 		{
@@ -167,7 +173,7 @@ void DrawPassShadowPass( const defParms_shadow &info, CBaseVSShader *pShader, IM
 				PARM_VALIDATE( info.iAlphatestRef );
 
 				tmpBuf.SetPixelShaderConstant4( 0, PARM_FLOAT( info.iAlphatestRef ), 0, 0, 0 );
-#ifndef DEFCFG_ENABLE_RADIOSITY
+#if DEFCFG_ENABLE_RADIOSITY == 0
 				tmpBuf.BindTexture( pShader, SHADER_SAMPLER0, info.iAlbedo );
 #endif
 			}
