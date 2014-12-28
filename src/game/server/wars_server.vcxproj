@@ -176,7 +176,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;Recast.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)server.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -267,6 +267,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_matchmaking.cpp" />
     <ClCompile Include="..\shared\python\srcpy_sound.cpp" />
     <ClCompile Include="..\shared\python\srcpy_util.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
     <ClCompile Include="lambdawars\unit_vehiclenavigator.cpp" />
     <ClCompile Include="lambdawars\wars_gameserver.cpp" />
@@ -1048,6 +1049,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_entities.h" />
     <ClInclude Include="..\shared\python\srcpy_class_shared.h" />
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
+    <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="deferred\cdeferred_manager_server.h" />
     <ClInclude Include="deferred\deferred_server_common.h" />
     <ClInclude Include="lambdawars\unit_vehiclenavigator.h" />

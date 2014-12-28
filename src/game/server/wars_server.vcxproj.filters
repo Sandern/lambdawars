@@ -60,6 +60,9 @@
     <Filter Include="Source Files\wars\Editor">
       <UniqueIdentifier>{8d34654b-5ff3-43e3-8fe1-2334213c03c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Recast">
+      <UniqueIdentifier>{df3c06d2-fde5-40b3-9f87-969b7f232920}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="spawn_helper.nut">
@@ -1972,6 +1975,9 @@
     <ClCompile Include="..\shared\lambdawars\wars_network.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_mesh.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3830,6 +3836,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_network.h">
       <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_mesh.h">
+      <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
