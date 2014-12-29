@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Recast">
+      <UniqueIdentifier>{9C3D7917-B600-5F40-A029-B1DDAE39F581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Recast\Include">
+      <UniqueIdentifier>{DD479C0A-E59D-0C4B-AC44-1BAD52852453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Recast\Source">
+      <UniqueIdentifier>{54F3554C-B167-934E-B298-927F9852D22C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Recast\Include\Recast.h">
+      <Filter>Recast\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recast\Include\RecastAlloc.h">
+      <Filter>Recast\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Recast\Include\RecastAssert.h">
+      <Filter>Recast\Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Recast\Source\Recast.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastAlloc.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastArea.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastContour.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastFilter.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastLayers.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastMesh.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastMeshDetail.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastRasterization.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Recast\Source\RecastRegion.cpp">
+      <Filter>Recast\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

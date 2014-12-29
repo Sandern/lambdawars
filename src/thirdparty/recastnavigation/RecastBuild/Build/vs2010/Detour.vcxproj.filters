@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Detour">
+      <UniqueIdentifier>{0465CA50-AAD0-2640-A13B-1F46A8AE6BFB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Detour\Include">
+      <UniqueIdentifier>{3AFEC8E3-CBDF-1B4A-B8DE-5C4E6B74CAF2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Detour\Source">
+      <UniqueIdentifier>{F9506DEE-2534-8944-9A66-CF4A501E182A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Detour\Include\DetourAlloc.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourAssert.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourCommon.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourMath.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourNavMesh.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourNavMeshBuilder.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourNavMeshQuery.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourNode.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Detour\Include\DetourStatus.h">
+      <Filter>Detour\Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Detour\Source\DetourAlloc.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Detour\Source\DetourCommon.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Detour\Source\DetourNavMesh.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Detour\Source\DetourNavMeshBuilder.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Detour\Source\DetourNavMeshQuery.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Detour\Source\DetourNode.cpp">
+      <Filter>Detour\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

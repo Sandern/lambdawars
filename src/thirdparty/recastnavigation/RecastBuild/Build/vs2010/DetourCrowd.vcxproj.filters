@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DetourCrowd">
+      <UniqueIdentifier>{33581F98-F780-6846-9B32-6554E452EC48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DetourCrowd\Include">
+      <UniqueIdentifier>{551C5CE8-D372-1747-9F0D-138AC2B3EB47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DetourCrowd\Source">
+      <UniqueIdentifier>{28392DF1-7144-EF4B-AE4A-57A7D76698C6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourCrowd.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourLocalBoundary.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourObstacleAvoidance.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourPathCorridor.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourPathQueue.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DetourCrowd\Include\DetourProximityGrid.h">
+      <Filter>DetourCrowd\Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourCrowd.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourLocalBoundary.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourObstacleAvoidance.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourPathCorridor.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourPathQueue.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DetourCrowd\Source\DetourProximityGrid.cpp">
+      <Filter>DetourCrowd\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
