@@ -75,16 +75,16 @@ void DebugDrawMesh::begin(duDebugDrawPrimitives prim, float size)
 	switch( prim )
 	{
 		case DU_DRAW_POINTS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_POINTS, 100 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_POINTS, 1000 );
 			break;
 		case DU_DRAW_LINES:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_LINES, 100 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_LINES, 1000 );
 			break;
 		case DU_DRAW_TRIS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_TRIANGLES, 100 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_TRIANGLES, 1000 );
 			break;
 		case DU_DRAW_QUADS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_QUADS, 100 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_QUADS, 1000 );
 			break;
 	};
 }
@@ -92,7 +92,7 @@ void DebugDrawMesh::begin(duDebugDrawPrimitives prim, float size)
 void DebugDrawMesh::vertex(const float* pos, unsigned int color)
 {
 	m_meshBuilder.Color4Packed( color );
-	m_meshBuilder.Position3fv( pos );
+	m_meshBuilder.Position3f( pos[0], pos[2], pos[1] );
 	m_meshBuilder.AdvanceVertex();
 	//glColor4ubv((GLubyte*)&color);
 	//glVertex3fv(pos);
@@ -101,7 +101,7 @@ void DebugDrawMesh::vertex(const float* pos, unsigned int color)
 void DebugDrawMesh::vertex(const float x, const float y, const float z, unsigned int color)
 {
 	m_meshBuilder.Color4Packed( color );
-	m_meshBuilder.Position3f( x, y, z );
+	m_meshBuilder.Position3f( x, z, y );
 	m_meshBuilder.AdvanceVertex();
 	//glColor4ubv((GLubyte*)&color);
 	//glVertex3f(x,y,z);
@@ -111,7 +111,7 @@ void DebugDrawMesh::vertex(const float* pos, unsigned int color, const float* uv
 {
 	m_meshBuilder.Color4Packed( color );
 	m_meshBuilder.TexCoord2fv( 0, uv );
-	m_meshBuilder.Position3fv( pos );
+	m_meshBuilder.Position3f( pos[0], pos[2], pos[1] );
 	m_meshBuilder.AdvanceVertex();
 
 	//glColor4ubv((GLubyte*)&color);
@@ -123,7 +123,7 @@ void DebugDrawMesh::vertex(const float x, const float y, const float z, unsigned
 {
 	m_meshBuilder.Color4Packed( color );
 	m_meshBuilder.TexCoord2f( 0, u, v );
-	m_meshBuilder.Position3f( x, y, z );
+	m_meshBuilder.Position3f( x, z, y );
 	m_meshBuilder.AdvanceVertex();
 
 	//glColor4ubv((GLubyte*)&color);

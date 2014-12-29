@@ -19,7 +19,9 @@ public:
 	CRecastMesh();
 	~CRecastMesh();
 
-	virtual void resetCommonSettings();
+
+	virtual void LoadTestData();
+	virtual void ResetCommonSettings();
 
 	virtual bool Load();
 	virtual bool Reset();

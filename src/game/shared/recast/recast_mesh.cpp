@@ -2,6 +2,8 @@
 //
 // Purpose: 
 //
+// Note: Recasts expects "y" to be up, so y and z must be swapped everywhere. 
+//
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
@@ -64,7 +66,7 @@ CRecastMesh::~CRecastMesh()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRecastMesh::resetCommonSettings()
+void CRecastMesh::ResetCommonSettings()
 {
 	const float scale = 100.0f;
 
@@ -74,21 +76,21 @@ void CRecastMesh::resetCommonSettings()
 	m_agentRadius = 0.6f * scale;
 	m_agentMaxClimb = 0.9f * scale;
 	m_agentMaxSlope = 45.0f;
-	m_regionMinSize = 8 * scale;
-	m_regionMergeSize = 20 * scale;
-	m_edgeMaxLen = 12.0f * scale;
-	m_edgeMaxError = 1.3f * scale;
+	m_regionMinSize = 8;// * scale;
+	m_regionMergeSize = 20;// * scale;
+	m_edgeMaxLen = 120.0f * scale;
+	m_edgeMaxError = 1.3f;// * scale;
 	m_vertsPerPoly = 6.0f;
 	m_detailSampleDist = 6.0f * scale;
-	m_detailSampleMaxError = 1.0f;
+	m_detailSampleMaxError = 1.0f * scale;
 	m_partitionType = SAMPLE_PARTITION_WATERSHED;
 }
 
 static void AddVertex( float* verts, float x, float y, float z )
 {
 	verts[0] = x;
-	verts[1] = y;
-	verts[2] = z;
+	verts[1] = z;
+	verts[2] = y;
 }
 static void AddTriangle( int* tris, int p1, int p2, int p3 )
 {
@@ -97,6 +99,7 @@ static void AddTriangle( int* tris, int p1, int p2, int p3 )
 	tris[2] = p3;
 }
 
+#if 0
 static void calcTriNormal(const float* v0, const float* v1, const float* v2, float* norm)
 {
 	float e0[3], e1[3];
@@ -105,23 +108,61 @@ static void calcTriNormal(const float* v0, const float* v1, const float* v2, flo
 	rcVcross(norm, e0, e1);
 	rcVnormalize(norm);
 }
+#endif // 0
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CRecastMesh::Load()
+static void PrintDebugSpans( const char *pStepName, rcHeightfield& solid )
 {
-	resetCommonSettings();
+	const int w = solid.width;
+	const int h = solid.height;
 
-	BuildContext ctx;
+	int nWalkableAreas = 0;
+	for (int y = 0; y < h; ++y)
+	{
+		for (int x = 0; x < w; ++x)
+		{
+			for (rcSpan* s = solid.spans[x + y*w]; s; s = s->next)
+			{
+				if( s->area == RC_WALKABLE_AREA )
+					nWalkableAreas += 1;
+			}
+		}
+	}
+	Msg( "%s: %d walkable areas\n", pStepName, nWalkableAreas );
+}
 
-	ctx.enableLog( true );
+static void PrintDebugCHF( const char *pStepName, rcCompactHeightfield& chf)
+{
+	const int w = chf.width;
+	const int h = chf.height;
 
-	int m_partitionType = SAMPLE_PARTITION_WATERSHED;
+	int nFoundCells = 0;
+	int nBorderReg = 0;
+	for (int y = 0; y < h; ++y)
+	{
+		for (int x = 0; x < w; ++x)
+		{
+			const rcCompactCell& c = chf.cells[x+y*w];
+			for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; ++i)
+			{
+				//unsigned char res = 0;
+				const rcCompactSpan& c = chf.spans[i];
+				nFoundCells += 1;
 
+				nBorderReg += (chf.spans[i].reg & RC_BORDER_REG) ? 1 : 0;
+			}
+		}
+	}
+	Msg( "%s: %d cells, Border Regs: %d\n", pStepName, nFoundCells, nBorderReg );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Build cube
+//-----------------------------------------------------------------------------
+void CRecastMesh::LoadTestData()
+{
 	// Create a mesh for testing
-	float* verts = new float[8*3];
 	const int nverts = 8;
+	float* verts = new float[nverts*3];
 
 	// Create four points for triangles
 	const float meshHeight = 720.0f;
@@ -135,21 +176,33 @@ bool CRecastMesh::Load()
 	AddVertex( verts + 18, 1024.0f, 1024.0f, meshHeight ); // 6
 	AddVertex( verts + 21, 1024.0f, -1024.0f, meshHeight ); // 7
 
-	int* tris = new int[4*3];
-	const int ntris = 4;
+	const int ntris = 12;
+	int* tris = new int[ntris*3];
 
 	// Create two triangles using above points
 	// Bottom
-	AddTriangle( tris, 0, 2, 1 );
-	AddTriangle( tris + 3, 0, 3, 2 );
+	AddTriangle( tris, 0, 1, 2 );
+	AddTriangle( tris + 3, 0, 2, 3 );
 
 	// Top
-	AddTriangle( tris + 6, 4, 5, 6 );
-	AddTriangle( tris + 9, 4, 6, 7 );
+	AddTriangle( tris + 6, 4, 6, 5 );
+	AddTriangle( tris + 9, 4, 7, 6 );
 
 	// Side 1
-	//AddTriangle( tris + 9, 0, 4, 5 );
-	//AddTriangle( tris + 9, 0, 4, 5 );
+	AddTriangle( tris + 12, 0, 5, 1 );
+	AddTriangle( tris + 15, 0, 4, 5 );
+
+	// Side 2
+	AddTriangle( tris + 18, 1, 5, 2 );
+	AddTriangle( tris + 21, 5, 6, 2 );
+
+	// Side 3
+	AddTriangle( tris + 24, 2, 6, 3 );
+	AddTriangle( tris + 27, 6, 7, 3 );
+
+	// Side 4
+	AddTriangle( tris + 30, 3, 7, 0 );
+	AddTriangle( tris + 33, 7, 4, 0 );
 
 	m_verts = verts;
 	m_nverts = nverts;
@@ -182,6 +235,26 @@ bool CRecastMesh::Load()
 			n[2] *= d;
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMesh::Load()
+{
+	ResetCommonSettings();
+
+	BuildContext ctx;
+
+	ctx.enableLog( true );
+
+	int m_partitionType = SAMPLE_PARTITION_WATERSHED;
+
+	LoadTestData();
+	const int nverts = m_nverts;
+	float* verts = m_verts;
+	const int ntris = m_ntris;
+	int* tris = m_tris;
 
 	//
 	// Step 1. Initialize build config.
@@ -189,20 +262,6 @@ bool CRecastMesh::Load()
 	
 	// Init build configuration from GUI
 	V_memset(&m_cfg, 0, sizeof(m_cfg));
-	/*m_cfg.cs = 25.0f;
-	m_cfg.ch = 25.0f;
-	m_cfg.walkableSlopeAngle = 0.7f; 
-	m_cfg.walkableHeight = (int)ceilf(96.0f / m_cfg.ch);
-	m_cfg.walkableClimb = (int)floorf(512.0f / m_cfg.ch);
-	m_cfg.walkableRadius = (int)ceilf(32.0f / m_cfg.cs);
-	m_cfg.maxEdgeLen = (int)(25.0f / 25.0f);
-	m_cfg.maxSimplificationError = 1.0f;
-	m_cfg.minRegionArea = (int)rcSqr(25.0f*25.0f);		// Note: area = size*size
-	m_cfg.mergeRegionArea = (int)rcSqr(100.0f*100.0f);	// Note: area = size*size
-	m_cfg.maxVertsPerPoly = (int)6;
-	m_cfg.detailSampleDist = 6 < 0.9f ? 0 : 25.0f * 6;
-	m_cfg.detailSampleMaxError = 100 * 1;*/
-
 	m_cfg.cs = m_cellSize;
 	m_cfg.ch = m_cellHeight;
 	m_cfg.walkableSlopeAngle = m_agentMaxSlope;
@@ -220,11 +279,16 @@ bool CRecastMesh::Load()
 	// Set the area where the navigation will be build.
 	// Here the bounds of the input mesh are used, but the
 	// area could be specified by an user defined box, etc.
-	static Vector worldMin( MIN_COORD_FRACTION, MIN_COORD_FRACTION, MIN_COORD_FRACTION );
-	static Vector worldMax( MAX_COORD_FRACTION, MAX_COORD_FRACTION, MAX_COORD_FRACTION );
+	/*static Vector worldMin( MIN_COORD_FLOAT, MIN_COORD_FLOAT, MIN_COORD_FLOAT );
+	static Vector worldMax( MAX_COORD_FLOAT, MAX_COORD_FLOAT, MAX_COORD_FLOAT );
 	rcVcopy(m_cfg.bmin, worldMin.Base());
-	rcVcopy(m_cfg.bmax, worldMax.Base());
+	rcVcopy(m_cfg.bmax, worldMax.Base());*/
+	rcCalcBounds( verts, nverts, m_cfg.bmin, m_cfg.bmax );
 	rcCalcGridSize(m_cfg.bmin, m_cfg.bmax, m_cfg.cs, &m_cfg.width, &m_cfg.height);
+
+	Msg("walkableHeight: %d, walkableClimb: %d, walkableRadius: %d\n", m_cfg.walkableHeight, m_cfg.walkableClimb, m_cfg.walkableRadius);
+	Msg("Grid size: bmin: %f %f %f bmax: %f %f %f, width: %d, height: %d\n", m_cfg.bmin[0], m_cfg.bmin[1], m_cfg.bmin[2],
+		m_cfg.bmax[0], m_cfg.bmax[1], m_cfg.bmax[2], m_cfg.width, m_cfg.height);
 
 	//
 	// Step 2. Rasterize input polygon soup.
@@ -258,8 +322,20 @@ bool CRecastMesh::Load()
 	// the are type for each of the meshes and rasterize them.
 	V_memset(m_triareas, 0, ntris*sizeof(unsigned char));
 	rcMarkWalkableTriangles(&ctx, m_cfg.walkableSlopeAngle, verts, nverts, tris, ntris, m_triareas);
-	rcRasterizeTriangles(&ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb);
 
+	int nWalkableAreas = 0;
+	for( int i = 0; i < ntris; i++ )
+	{
+		Msg("Triangle %d is walkable? %d\n", i, m_triareas[i]);
+		if( m_triareas[i] > 0 )
+			nWalkableAreas += 1;
+	}
+	Msg( "RecastDebug: %d walkable triangles\n", nWalkableAreas );
+
+	rcRasterizeTriangles(&ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb);
+	PrintDebugSpans( "After rcRasterizeTriangles", *m_solid );
+
+#if 0
 	const float walkableThr = cosf(m_cfg.walkableSlopeAngle/180.0f*RC_PI);
 
 	float norm[3];
@@ -275,11 +351,7 @@ bool CRecastMesh::Load()
 		//if (norm[1] > walkableThr)
 		//	areas[i] = RC_WALKABLE_AREA;
 	}
-
-	for( int i = 0; i < ntris; i++ )
-	{
-		Msg("Triangle %d is walkable? %d\n", i, m_triareas[i]);
-	}
+#endif // 0
 
 	if (!m_keepInterResults)
 	{
@@ -295,8 +367,11 @@ bool CRecastMesh::Load()
 	// remove unwanted overhangs caused by the conservative rasterization
 	// as well as filter spans where the character cannot possibly stand.
 	rcFilterLowHangingWalkableObstacles(&ctx, m_cfg.walkableClimb, *m_solid);
+	PrintDebugSpans( "After rcFilterLowHangingWalkableObstacles", *m_solid );
 	rcFilterLedgeSpans(&ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid);
+	PrintDebugSpans( "After rcFilterLedgeSpans", *m_solid );
 	rcFilterWalkableLowHeightSpans(&ctx, m_cfg.walkableHeight, *m_solid);
+	PrintDebugSpans( "After rcFilterWalkableLowHeightSpans", *m_solid );
 
 
 	//
@@ -317,6 +392,8 @@ bool CRecastMesh::Load()
 		ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build compact data");
 		return false;
 	}
+
+	PrintDebugCHF( "After rcBuildCompactHeightfield", *m_chf );
 	
 	if (!m_keepInterResults)
 	{
@@ -330,6 +407,8 @@ bool CRecastMesh::Load()
 		ctx.log(RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return false;
 	}
+
+	PrintDebugCHF( "After rcErodeWalkableArea", *m_chf );
 
 	// (Optional) Mark areas.
 	/*const ConvexVolume* vols = m_geom->getConvexVolumes();
@@ -402,6 +481,8 @@ bool CRecastMesh::Load()
 	//
 	// Step 5. Trace and simplify region contours.
 	//
+
+	PrintDebugCHF( "Before rcBuildContours", *m_chf );
 	
 	// Create contours.
 	m_cset = rcAllocContourSet();
@@ -415,6 +496,8 @@ bool CRecastMesh::Load()
 		Warning("buildNavigation: Could not create contours.\n");
 		return false;
 	}
+
+	Msg("After rcBuildContours: %d contours\n", m_cset->nconts);
 	
 	//
 	// Step 6. Build polygons mesh from contours.
