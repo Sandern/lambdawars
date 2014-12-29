@@ -16,7 +16,9 @@
 #include "materialsystem/imaterialvar.h"
 #include "foundryhelpers_client.h"
 
-
+#ifdef HL2WARS_DLL
+#include "recast/recast_mesh.h"
+#endif // HL2WARS_DLL
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -525,6 +527,13 @@ void CDebugViewRender::Draw3DDebuggingInfo( const CViewSetup &view )
 
 	// Draw anything Foundry wants to.
 	FoundryHelpers_DrawAll();
+
+#ifdef HL2WARS_DLL
+	if( GetRecastNavMesh() )
+	{
+		GetRecastNavMesh()->DebugRender();
+	}
+#endif // HL2WARS_DLL
 
 	// Draw 3d overlays
 	render->Draw3DDebugOverlays();

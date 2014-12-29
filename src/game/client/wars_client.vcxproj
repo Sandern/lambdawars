@@ -185,7 +185,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef.lib;libcef_dll_wrapper.lib;Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef.lib;libcef_dll_wrapper.lib;Imm32.lib;Recast.lib;Detour.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -280,6 +280,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_usermessage.cpp" />
     <ClCompile Include="..\shared\python\srcpy_gamerules.cpp" />
     <ClCompile Include="..\shared\python\srcpy_te.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="cef\src_cef_local_handler.cpp" />
     <ClCompile Include="cef\src_cef_vtf_handler.cpp">
@@ -1245,6 +1246,9 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="recast\recast_debugdraw.cpp" />
+    <ClCompile Include="recast\recast_debugdrawmesh.cpp" />
+    <ClCompile Include="recast\recast_recastdebugdraw.cpp" />
     <ClCompile Include="recvproxy.cpp" />
     <ClCompile Include="rendertexture.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1494,6 +1498,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
+    <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="cef\src_cef_avatar_handler.h" />
     <ClInclude Include="cef\src_cef_local_handler.h" />
     <ClInclude Include="cef\src_cef_vtf_handler.h" />
@@ -1746,6 +1751,9 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\postprocess_shared.h" />
     <ClInclude Include="..\shared\sharedvar.h" />
     <ClInclude Include="python\SurfaceBuffer.h" />
+    <ClInclude Include="recast\recast_debugdraw.h" />
+    <ClInclude Include="recast\recast_debugdrawmesh.h" />
+    <ClInclude Include="recast\recast_recastdebugdraw.h" />
     <ClInclude Include="spatialentitymgr.h" />
     <ClInclude Include="vgui_avatarimage.h" />
     <ClInclude Include="viewdebug.h" />

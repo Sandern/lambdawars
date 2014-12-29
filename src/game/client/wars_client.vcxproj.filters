@@ -103,6 +103,9 @@
     <Filter Include="Source Files\wars\Editor">
       <UniqueIdentifier>{24fee448-422f-4037-a5b5-d5e594a0223b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Recast">
+      <UniqueIdentifier>{f816e912-f7fc-4399-badb-0f59e8cf6460}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vscript_client.nut">
@@ -2443,6 +2446,18 @@
     </ClCompile>
     <ClCompile Include="..\shared\lambdawars\wars_network_read.cpp">
       <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_mesh.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="recast\recast_recastdebugdraw.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="recast\recast_debugdraw.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="recast\recast_debugdrawmesh.cpp">
+      <Filter>Source Files\Recast</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -4950,6 +4965,18 @@
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_network.h">
       <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_mesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="recast\recast_recastdebugdraw.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="recast\recast_debugdraw.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="recast\recast_debugdrawmesh.h">
+      <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

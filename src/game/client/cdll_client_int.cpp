@@ -165,6 +165,8 @@
 
 #include "../materialsystem/IShaderSystem.h"
 #include "shaderapi/ishaderapi.h"
+
+#include "recast/recast_mesh.h"
 #endif // HL2WARS_DLL
 
 #include "nav_mesh.h"
@@ -1322,6 +1324,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	CWarsFlora::InitFloraGrid();
 
 	WarsNet_Init();
+	InitRecastMesh();
 #endif // HL2WARS_DLL
 
 	m_bWasPaused = false;
@@ -1424,6 +1427,7 @@ void CHLClient::Shutdown( void )
 	CWarsFlora::DestroyFloraGrid();
 
 	WarsNet_Shutdown();
+	DestroyRecastMesh();
 #endif // HL2WARS_DLL
 	
 	DisconnectTier3Libraries( );
@@ -2074,6 +2078,8 @@ void CHLClient::LevelInitPostEntity( )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::SpawnMapFlora();
+
+	LoadRecastMesh();
 #endif // HL2WARS_DLL
 }
 
@@ -2188,6 +2194,8 @@ void CHLClient::LevelShutdown( void )
 	TheNavMesh->Reset();
 
 #ifdef HL2WARS_DLL
+	ResetRecastMesh();
+
 	// Should never be paused at this point
 	warsextension->SetPaused( false );
 #endif // HL2WARS_DLL
