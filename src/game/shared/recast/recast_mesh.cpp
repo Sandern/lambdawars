@@ -53,6 +53,11 @@ public:
 //-----------------------------------------------------------------------------
 CRecastMesh::CRecastMesh() : m_keepInterResults(true)
 {
+	m_verts = NULL;
+	m_nverts = 0;
+	m_tris = NULL;
+	m_ntris = 0;
+	m_normals = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -70,8 +75,8 @@ void CRecastMesh::ResetCommonSettings()
 {
 	const float scale = 100.0f;
 
-	m_cellSize = 16.0f; //0.3f * scale;
-	m_cellHeight = 0.2f * scale;
+	m_cellSize = 8.0f; //0.3f * scale;
+	m_cellHeight = 6.0f; //0.2f * scale;
 	m_agentHeight = 0.8f * scale;
 	m_agentRadius = 0.6f * scale;
 	m_agentMaxClimb = 0.9f * scale;
@@ -99,17 +104,6 @@ static void AddTriangle( int* tris, int p1, int p2, int p3 )
 	tris[2] = p3;
 }
 
-#if 0
-static void calcTriNormal(const float* v0, const float* v1, const float* v2, float* norm)
-{
-	float e0[3], e1[3];
-	rcVsub(e0, v1, v0);
-	rcVsub(e1, v2, v0);
-	rcVcross(norm, e0, e1);
-	rcVnormalize(norm);
-}
-#endif // 0
-
 static void PrintDebugSpans( const char *pStepName, rcHeightfield& solid )
 {
 	const int w = solid.width;
@@ -128,31 +122,6 @@ static void PrintDebugSpans( const char *pStepName, rcHeightfield& solid )
 		}
 	}
 	Msg( "%s: %d walkable areas\n", pStepName, nWalkableAreas );
-}
-
-static void PrintDebugCHF( const char *pStepName, rcCompactHeightfield& chf)
-{
-	const int w = chf.width;
-	const int h = chf.height;
-
-	int nFoundCells = 0;
-	int nBorderReg = 0;
-	for (int y = 0; y < h; ++y)
-	{
-		for (int x = 0; x < w; ++x)
-		{
-			const rcCompactCell& c = chf.cells[x+y*w];
-			for (int i = (int)c.index, ni = (int)(c.index+c.count); i < ni; ++i)
-			{
-				//unsigned char res = 0;
-				const rcCompactSpan& c = chf.spans[i];
-				nFoundCells += 1;
-
-				nBorderReg += (chf.spans[i].reg & RC_BORDER_REG) ? 1 : 0;
-			}
-		}
-	}
-	Msg( "%s: %d cells, Border Regs: %d\n", pStepName, nFoundCells, nBorderReg );
 }
 
 //-----------------------------------------------------------------------------
@@ -240,7 +209,7 @@ void CRecastMesh::LoadTestData()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CRecastMesh::Load()
+bool CRecastMesh::Build()
 {
 	ResetCommonSettings();
 
@@ -336,10 +305,10 @@ bool CRecastMesh::Load()
 		if( m_triareas[i] > 0 )
 			nWalkableAreas += 1;
 	}
-	Msg( "RecastDebug: %d walkable triangles\n", nWalkableAreas );
+	//Msg( "RecastDebug: %d walkable triangles\n", nWalkableAreas );
 
 	rcRasterizeTriangles(&ctx, verts, nverts, tris, m_triareas, ntris, *m_solid, m_cfg.walkableClimb);
-	PrintDebugSpans( "After rcRasterizeTriangles", *m_solid );
+	//PrintDebugSpans( "After rcRasterizeTriangles", *m_solid );
 
 #if 0
 	const float walkableThr = cosf(m_cfg.walkableSlopeAngle/180.0f*RC_PI);
@@ -373,11 +342,11 @@ bool CRecastMesh::Load()
 	// remove unwanted overhangs caused by the conservative rasterization
 	// as well as filter spans where the character cannot possibly stand.
 	rcFilterLowHangingWalkableObstacles(&ctx, m_cfg.walkableClimb, *m_solid);
-	PrintDebugSpans( "After rcFilterLowHangingWalkableObstacles", *m_solid );
+	//PrintDebugSpans( "After rcFilterLowHangingWalkableObstacles", *m_solid );
 	rcFilterLedgeSpans(&ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid);
-	PrintDebugSpans( "After rcFilterLedgeSpans", *m_solid );
+	//PrintDebugSpans( "After rcFilterLedgeSpans", *m_solid );
 	rcFilterWalkableLowHeightSpans(&ctx, m_cfg.walkableHeight, *m_solid);
-	PrintDebugSpans( "After rcFilterWalkableLowHeightSpans", *m_solid );
+	//PrintDebugSpans( "After rcFilterWalkableLowHeightSpans", *m_solid );
 
 
 	//
@@ -398,8 +367,6 @@ bool CRecastMesh::Load()
 		ctx.log(RC_LOG_ERROR, "buildNavigation: Could not build compact data");
 		return false;
 	}
-
-	PrintDebugCHF( "After rcBuildCompactHeightfield", *m_chf );
 	
 	if (!m_keepInterResults)
 	{
@@ -413,8 +380,6 @@ bool CRecastMesh::Load()
 		ctx.log(RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return false;
 	}
-
-	PrintDebugCHF( "After rcErodeWalkableArea", *m_chf );
 
 	// (Optional) Mark areas.
 	/*const ConvexVolume* vols = m_geom->getConvexVolumes();
@@ -487,8 +452,6 @@ bool CRecastMesh::Load()
 	//
 	// Step 5. Trace and simplify region contours.
 	//
-
-	PrintDebugCHF( "Before rcBuildContours", *m_chf );
 	
 	// Create contours.
 	m_cset = rcAllocContourSet();
@@ -556,8 +519,36 @@ bool CRecastMesh::Load()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMesh::Load()
+{
+	return Build();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CRecastMesh::Reset()
 {
+	// Clear map geometry data
+	if( m_verts != NULL )
+	{
+		delete m_verts;
+		m_verts = NULL;
+		m_nverts = 0;
+	}
+
+	if( m_tris != NULL )
+	{
+		delete m_tris;
+		m_ntris = 0;
+	}
+
+	if( m_normals != NULL )
+	{
+		delete m_normals;
+		m_normals = NULL;
+	}
+
 	return true;
 }
 

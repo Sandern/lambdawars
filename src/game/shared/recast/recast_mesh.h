@@ -24,6 +24,7 @@ public:
 	virtual bool LoadMapData();
 	virtual void ResetCommonSettings();
 
+	virtual bool Build();
 	virtual bool Load();
 	virtual bool Reset();
 

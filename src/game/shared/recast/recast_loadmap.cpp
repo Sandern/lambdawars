@@ -50,17 +50,11 @@ bool CRecastMesh::LoadMapData()
 	// Load vertices
 	dvertex_t *vertices = (dvertex_t *)((char *)fileBuffer + header->lumps[LUMP_VERTEXES].fileofs);
 	int nvertsLump = (header->lumps[LUMP_VERTEXES].filelen) / sizeof(dvertex_t);
-	//m_nverts = (header->lumps[LUMP_VERTEXES].filelen) / sizeof(dvertex_t);
-	//m_verts = new float[3*m_nverts];
 	for( int i = 0; i < nvertsLump; i++ )
 	{
 		verts.AddToTail( vertices[i].point[0] );
 		verts.AddToTail( vertices[i].point[2] );
 		verts.AddToTail( vertices[i].point[1] );
-		//m_verts[i*3] = vertices[i].point[0];
-		//m_verts[i*3+1] = vertices[i].point[2];
-		//m_verts[i*3+2] = vertices[i].point[1];
-		//Msg("vert %d: %f %f %f\n", i, m_verts[i*3], m_verts[i*3+1], m_verts[i*3+2]);
 	}
 
 	// Load edges and Surfedge array
@@ -76,48 +70,67 @@ bool CRecastMesh::LoadMapData()
 	Msg("nFaces: %d\n", nFaces);
 	for( int i = 0; i < nFaces; i++ )
 	{
-		float x = 0, y = 0, z = 0;
-		for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
+		if ( faces[i].dispinfo == -1 )
 		{
-			float *p1 = verts.Base() + (edges[abs(surfedge[j])].v[0] * 3);
-			float *p2 = verts.Base() + (edges[abs(surfedge[j])].v[1] * 3);
-			x += p1[0];
-			y += p1[1];
-			z += p1[2];
-			x += p2[0];
-			y += p2[1];
-			z += p2[2];
+			// Create vertex at face origin
+			float x = 0, y = 0, z = 0;
+			for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
+			{
+				float *p1 = verts.Base() + (edges[abs(surfedge[j])].v[0] * 3);
+				float *p2 = verts.Base() + (edges[abs(surfedge[j])].v[1] * 3);
+				x += p1[0];
+				y += p1[1];
+				z += p1[2];
+				x += p2[0];
+				y += p2[1];
+				z += p2[2];
+			}
+
+			x /= (float)(faces[i].numedges * 2);
+			y /= (float)(faces[i].numedges * 2);
+			z /= (float)(faces[i].numedges * 2);
+
+			//Msg("Face %d origin: %f %f %f\n", i, x, y, z);
+
+			int connectingVertIdx = verts.Count() / 3;
+			verts.AddToTail( x );
+			verts.AddToTail( y );
+			verts.AddToTail( z );
+
+			//Msg( "\tface: %d, firstedge: %d, numedges: %d\n", i, faces[i].firstedge, faces[i].numedges );
+			// Turn the face into a set of triangles
+			for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
+			{
+				if( surfedge[j] < 0 )
+				{
+					triangles.AddToTail( edges[-surfedge[j]].v[1] );
+					triangles.AddToTail( edges[-surfedge[j]].v[0] );
+				}
+				else
+				{
+					triangles.AddToTail( edges[surfedge[j]].v[0] );
+					triangles.AddToTail( edges[surfedge[j]].v[1] );
+				}
+				triangles.AddToTail( connectingVertIdx );
+			}
 		}
-
-		x /= (float)(faces[i].numedges * 2);
-		y /= (float)(faces[i].numedges * 2);
-		z /= (float)(faces[i].numedges * 2);
-
-		//Msg("Face %d origin: %f %f %f\n", i, x, y, z);
-
-		int connectingVertIdx = verts.Count() / 3;
-		verts.AddToTail( x );
-		verts.AddToTail( y );
-		verts.AddToTail( z );
-
-		//Msg( "\tface: %d, firstedge: %d, numedges: %d\n", i, faces[i].firstedge, faces[i].numedges );
-		for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
+		else
 		{
-			// Create triangle 1
-			if( surfedge[j] < 0 )
-			{
-				triangles.AddToTail( edges[-surfedge[j]].v[1] );
-				triangles.AddToTail( edges[-surfedge[j]].v[0] );
-			}
-			else
-			{
-				triangles.AddToTail( edges[surfedge[j]].v[0] );
-				triangles.AddToTail( edges[surfedge[j]].v[1] );
-			}
-			triangles.AddToTail( connectingVertIdx );
+			// Displacement
 		}
 	}
 
+	// Load displacment verts and triangles
+	ddispinfo_t *dispInfo = (ddispinfo_t *)((char *)fileBuffer + header->lumps[LUMP_DISPINFO].fileofs);
+	int nDispInfo = (header->lumps[LUMP_DISPINFO].filelen) / sizeof(ddispinfo_t);
+	CDispVert *dispVerts = (CDispVert *)((char *)fileBuffer + header->lumps[LUMP_DISP_VERTS].fileofs);
+
+	for( int i = 0; i < nDispInfo; i++ )
+	{
+		int nVerts = NUM_DISP_POWER_VERTS( dispInfo[i].power );
+	}
+	
+	// Copy result
 	m_nverts = verts.Count() / 3;
 	m_verts = new float[verts.Count()];
 	V_memcpy( m_verts, verts.Base(), verts.Count() * sizeof(float) );
