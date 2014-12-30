@@ -21,6 +21,7 @@ public:
 
 
 	virtual void LoadTestData();
+	virtual bool LoadMapData();
 	virtual void ResetCommonSettings();
 
 	virtual bool Load();

@@ -1978,6 +1978,9 @@
     <ClCompile Include="..\shared\recast\recast_mesh.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_loadmap.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3838,6 +3841,9 @@
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_mesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_loadmap.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>

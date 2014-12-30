@@ -10,10 +10,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-DebugDrawMesh::DebugDrawMesh()
+DebugDrawMesh::DebugDrawMesh() : m_bBindTexture(false)
 {
-	m_mat.Init( "deferred/editor_select", TEXTURE_GROUP_OTHER );
-	Assert( m_matSelect.IsValid() );
+	m_mat.Init( "editor/recast_debug", TEXTURE_GROUP_OTHER );
+	Assert( m_mat.IsValid() );
 }
 
 DebugDrawMesh::~DebugDrawMesh()
@@ -28,24 +28,7 @@ void DebugDrawMesh::depthMask(bool state)
 
 void DebugDrawMesh::texture(bool state)
 {
-	CMatRenderContextPtr pRenderContext( materials );
-	if (state)
-	{
-		pRenderContext->Bind( m_mat );
-	}
-	else
-	{
-
-	}
-	/*if (state)
-	{
-		glEnable(GL_TEXTURE_2D);
-		g_tex.bind();
-	}
-	else
-	{
-		glDisable(GL_TEXTURE_2D);
-	}*/
+	m_bBindTexture = state;
 }
 
 void DebugDrawMesh::begin(duDebugDrawPrimitives prim, float size)
@@ -75,16 +58,16 @@ void DebugDrawMesh::begin(duDebugDrawPrimitives prim, float size)
 	switch( prim )
 	{
 		case DU_DRAW_POINTS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_POINTS, 1000 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_POINTS, 32000 );
 			break;
 		case DU_DRAW_LINES:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_LINES, 1000 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_LINES, 32000 );
 			break;
 		case DU_DRAW_TRIS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_TRIANGLES, 1000 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_TRIANGLES, 32000 );
 			break;
 		case DU_DRAW_QUADS:
-			m_meshBuilder.Begin( m_pMesh, MATERIAL_QUADS, 1000 );
+			m_meshBuilder.Begin( m_pMesh, MATERIAL_QUADS, 32000 );
 			break;
 	};
 }

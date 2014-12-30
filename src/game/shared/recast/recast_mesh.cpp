@@ -70,9 +70,9 @@ void CRecastMesh::ResetCommonSettings()
 {
 	const float scale = 100.0f;
 
-	m_cellSize = 32.0f; //0.3f * scale;
+	m_cellSize = 16.0f; //0.3f * scale;
 	m_cellHeight = 0.2f * scale;
-	m_agentHeight = 2.0f * scale;
+	m_agentHeight = 0.8f * scale;
 	m_agentRadius = 0.6f * scale;
 	m_agentMaxClimb = 0.9f * scale;
 	m_agentMaxSlope = 45.0f;
@@ -250,7 +250,13 @@ bool CRecastMesh::Load()
 
 	int m_partitionType = SAMPLE_PARTITION_WATERSHED;
 
-	LoadTestData();
+	//LoadTestData();
+	if( !LoadMapData() )
+	{
+		Warning("CRecastMesh::Load: failed to load map data!\n");
+		return false;
+	}
+
 	const int nverts = m_nverts;
 	float* verts = m_verts;
 	const int ntris = m_ntris;
@@ -326,7 +332,7 @@ bool CRecastMesh::Load()
 	int nWalkableAreas = 0;
 	for( int i = 0; i < ntris; i++ )
 	{
-		Msg("Triangle %d is walkable? %d\n", i, m_triareas[i]);
+		//Msg("Triangle %d is walkable? %d\n", i, m_triareas[i]);
 		if( m_triareas[i] > 0 )
 			nWalkableAreas += 1;
 	}

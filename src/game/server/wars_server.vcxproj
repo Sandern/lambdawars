@@ -267,6 +267,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_matchmaking.cpp" />
     <ClCompile Include="..\shared\python\srcpy_sound.cpp" />
     <ClCompile Include="..\shared\python\srcpy_util.cpp" />
+    <ClCompile Include="..\shared\recast\recast_loadmap.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
     <ClCompile Include="lambdawars\unit_vehiclenavigator.cpp" />
@@ -1049,6 +1050,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_entities.h" />
     <ClInclude Include="..\shared\python\srcpy_class_shared.h" />
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
+    <ClInclude Include="..\shared\recast\recast_loadmap.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="deferred\cdeferred_manager_server.h" />
     <ClInclude Include="deferred\deferred_server_common.h" />

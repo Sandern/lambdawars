@@ -31,6 +31,7 @@ public:
 
 private:
 	CMaterialReference m_mat;
+	bool m_bBindTexture;
 	IMesh *m_pMesh;
 	CMeshBuilder m_meshBuilder;
 };
