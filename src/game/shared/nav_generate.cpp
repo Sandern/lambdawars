@@ -46,7 +46,7 @@ extern ConVar nav_area_max_size;
 ConVar nav_generate_skip_viscomp("nav_generate_skip_viscomp", "1", FCVAR_CHEAT);
 
 #ifdef HL2WARS_DLL
-ConVar nav_npcclip_no_areas("nav_npcclip_no_areas", "1", FCVAR_CHEAT);
+ConVar nav_npcclip_no_areas("nav_npcclip_no_areas", "0", FCVAR_CHEAT);
 #endif // HL2WARS_DLL
 
 // Common bounding box for traces
